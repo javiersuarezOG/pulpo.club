@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-04-29T15:16:43.746867+00:00",
-  "started_at": "2026-04-29T15:13:00.551269+00:00",
-  "duration_seconds": 223.2,
-  "total_listings": 49,
-  "dropped": 49,
+  "last_updated": "2026-04-29T15:31:51.954562+00:00",
+  "started_at": "2026-04-29T15:27:38.403726+00:00",
+  "duration_seconds": 253.55,
+  "total_listings": 62,
+  "dropped": 58,
   "per_source_raw": {
-    "goodlife": 60,
+    "goodlife": 82,
     "oceanside": 38
   },
   "sources": [
