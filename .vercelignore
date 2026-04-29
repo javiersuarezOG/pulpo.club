@@ -1,0 +1,15 @@
+# Python pipeline runs in GitHub Actions only — Vercel runtime is static + Node.
+pulpo/
+automation/
+fixtures/
+samples/
+tests/
+requirements.txt
+*.py
+__pycache__/
+*.pyc
+
+# Local artifacts
+.env
+.env.local
+DEPLOY.md
