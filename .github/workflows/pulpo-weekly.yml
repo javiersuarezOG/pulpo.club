@@ -27,7 +27,7 @@ jobs:
           # Set PULPO_OFFLINE=1 to skip network calls (useful while live selectors
           # are still being calibrated).
           PULPO_OFFLINE: "0"
-          PULPO_LIMIT: "60"
+          PULPO_LIMIT: "150"
           # kazu is a Nuxt SPA whose JSON API host (panel.kazurealestate.com)
           # is not yet on the proxy allowlist; the existing CSS-selector
           # scraper would yield zero records and clutter last_updated.json.
