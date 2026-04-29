@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-04-29T07:40:13.900957+00:00",
-  "started_at": "2026-04-29T07:40:13.900996+00:00",
-  "duration_seconds": "chunked-inline",
-  "total_listings": 15,
-  "dropped": 35,
+  "last_updated": "2026-04-29T15:16:43.746867+00:00",
+  "started_at": "2026-04-29T15:13:00.551269+00:00",
+  "duration_seconds": 223.2,
+  "total_listings": 49,
+  "dropped": 49,
   "per_source_raw": {
-    "goodlife": 30,
-    "oceanside": 20
+    "goodlife": 60,
+    "oceanside": 38
   },
   "sources": [
     "goodlife",
@@ -14,6 +14,5 @@
   ],
   "offline": false,
   "fixture_fallback_active": false,
-  "errors": [],
-  "note": "produced via inline chunked invocation, post oceanside-area-fix"
+  "errors": []
 }
