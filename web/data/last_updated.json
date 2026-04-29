@@ -1,0 +1,19 @@
+{
+  "last_updated": "2026-04-29T07:40:13.900957+00:00",
+  "started_at": "2026-04-29T07:40:13.900996+00:00",
+  "duration_seconds": "chunked-inline",
+  "total_listings": 15,
+  "dropped": 35,
+  "per_source_raw": {
+    "goodlife": 30,
+    "oceanside": 20
+  },
+  "sources": [
+    "goodlife",
+    "oceanside"
+  ],
+  "offline": false,
+  "fixture_fallback_active": false,
+  "errors": [],
+  "note": "produced via inline chunked invocation, post oceanside-area-fix"
+}

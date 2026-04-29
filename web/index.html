@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>pulpo.club — best opportunities</title>
+<link rel="icon" href="../assets/logo_mark_only.svg" type="image/svg+xml" />
+<style>
+:root{
+  --navy:#0F2A3F; --navy-2:#173B57; --navy-3:#1F4E73;
+  --cream:#FFF4E6; --cream-2:#F5E6D3;
+  --coral:#FF6B6B; --coral-2:#FF8B7A;
+  --amber:#F4B860; --muted:#8FA3B5;
+  --green:#8FE0B4;
+  --line:rgba(255,244,230,0.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--navy);color:var(--cream);font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;font-weight:400;line-height:1.5}
+a{color:var(--coral);text-decoration:none}
+a:hover{color:var(--coral-2);text-decoration:underline}
+
+.wrap{max-width:1280px;margin:0 auto;padding:40px 32px 80px}
+
+/* header */
+header{display:flex;align-items:center;gap:20px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+header .mark{flex-shrink:0;width:56px;height:56px}
+header h1{margin:0;font-family:Georgia,serif;font-size:32px;font-weight:500;letter-spacing:-0.5px}
+header h1 .tld{color:var(--coral)}
+header .sub{margin:4px 0 0;font-size:13px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+header .meta{margin-left:auto;text-align:right;font-size:12px;color:var(--muted)}
+header .meta strong{display:block;color:var(--cream);font-weight:500;font-size:14px}
+header .auth{margin-left:24px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+header .auth strong{color:var(--coral);font-weight:500}
+header .auth button{background:none;border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:5px;font-size:11px;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer}
+header .auth button:hover{color:var(--cream);border-color:var(--coral)}
+
+/* hero */
+.hero{margin:0 0 28px;padding:32px 28px;background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:14px;border:1px solid var(--line)}
+.hero h2{margin:0;font-family:Georgia,serif;font-size:26px;font-weight:500;color:var(--cream);line-height:1.3}
+.hero p{margin:10px 0 0;font-size:15px;color:var(--cream-2);max-width:640px;line-height:1.6}
+.hero p .em{color:var(--coral)}
+.hero-row{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hero-stats{display:flex;gap:28px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.hero-stat{display:flex;flex-direction:column;gap:2px}
+.hero-stat .v{font-family:Georgia,serif;font-size:24px;font-weight:500;color:var(--coral)}
+.hero-stat .l{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+
+/* login panel */
+.login-panel{background:var(--navy-2);border:1px solid var(--line);border-radius:12px;padding:24px;margin:0 0 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.login-panel .copy{flex:1 1 280px;min-width:240px}
+.login-panel .copy h3{margin:0 0 6px;font-size:16px;font-weight:500;color:var(--cream)}
+.login-panel .copy p{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+.login-panel form{display:flex;gap:8px;flex-wrap:wrap}
+.login-panel input{background:var(--navy);color:var(--cream);border:1px solid var(--line);border-radius:6px;padding:9px 12px;font-size:14px;font-family:inherit;min-width:140px}
+.login-panel input:focus{outline:none;border-color:var(--coral)}
+.login-panel button{padding:9px 18px;background:var(--coral);color:var(--navy);border:0;border-radius:6px;font-weight:500;font-size:13px;letter-spacing:0.5px;cursor:pointer}
+.login-panel button:hover{background:var(--coral-2)}
+.login-panel .err{font-size:12px;color:var(--coral);min-height:16px;margin-top:6px;flex-basis:100%}
+
+/* mode badge */
+.mode{display:inline-block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.mode-public{background:rgba(143,163,181,0.18);color:var(--muted)}
+.mode-member{background:rgba(143,224,180,0.18);color:var(--green)}
+
+/* filter bar */
+.filters{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;padding:16px;background:var(--navy-2);border-radius:12px}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.filters input[type=text],.filters select{background:var(--navy);color:var(--cream);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:14px;font-family:inherit;min-width:180px}
+.filters input[type=text]:focus,.filters select:focus{outline:none;border-color:var(--coral)}
+.toggles{display:flex;gap:14px;align-items:flex-end;padding-bottom:6px}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--cream);cursor:pointer;user-select:none}
+.toggle input{accent-color:var(--coral);width:16px;height:16px;cursor:pointer}
+.count{margin-left:auto;align-self:flex-end;padding-bottom:6px;font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.count strong{color:var(--coral);font-size:14px;font-weight:500}
+
+/* weights tuner */
+.weights{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px;padding:12px 16px;background:rgba(255,255,255,0.02);border:1px dashed var(--line);border-radius:10px;font-size:12px;color:var(--muted)}
+.weights .w-label{letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.weights .w-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:var(--navy-2);border-radius:6px}
+.weights .w-pill input{width:48px;background:var(--navy);color:var(--cream);border:1px solid var(--line);border-radius:4px;padding:3px 5px;font-size:12px;text-align:right;font-family:inherit}
+.weights button{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:5px;font-size:11px;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer}
+.weights button:hover{color:var(--cream);border-color:var(--coral)}
+
+/* table */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--navy-2)}
+table{width:100%;border-collapse:collapse;min-width:1200px;font-size:14px}
+thead th{text-align:left;padding:14px 12px;font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:0;background:var(--navy-2);z-index:1}
+thead th:hover{color:var(--cream)}
+thead th.sort-asc::after{content:" ↑";color:var(--coral)}
+thead th.sort-desc::after{content:" ↓";color:var(--coral)}
+tbody tr{border-bottom:1px solid var(--line);transition:background 0.1s}
+tbody tr:hover{background:var(--navy-3)}
+tbody td{padding:14px 12px;vertical-align:top}
+.col-rank{width:54px;text-align:center}
+.col-score{width:88px}
+.col-cta{width:100px;text-align:right}
+
+/* rank badge — position 1,2,3 — coral for top 3, fades */
+.rk{display:inline-block;min-width:36px;padding:4px 10px;border-radius:6px;font-family:Georgia,serif;font-weight:500;font-size:18px;text-align:center}
+.rk-1{background:var(--coral);color:var(--navy)}
+.rk-2{background:var(--coral-2);color:var(--navy)}
+.rk-3{background:var(--amber);color:var(--navy)}
+.rk-rest{background:rgba(255,244,230,0.06);color:var(--cream)}
+
+/* composite score column: composite + V/Q/L/U mini-bars */
+.score-cell{display:flex;flex-direction:column;gap:5px;min-width:78px}
+.score-cell .composite{font-family:Georgia,serif;font-size:15px;font-weight:500;color:var(--cream)}
+.score-cell .composite .max{color:var(--muted);font-size:11px;font-family:inherit;font-weight:400}
+.legs{display:flex;gap:3px}
+.leg{flex:1;height:5px;border-radius:2px;background:rgba(255,244,230,0.06);position:relative;overflow:hidden}
+.leg::after{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--coral);width:var(--w,0%)}
+.leg.l-q::after{background:var(--amber)}
+.leg.l-l::after{background:var(--green)}
+.leg.l-u::after{background:var(--coral-2)}
+.leg-labels{display:flex;gap:3px;font-size:9px;letter-spacing:0.6px;color:var(--muted);text-transform:uppercase}
+.leg-labels span{flex:1;text-align:center}
+
+/* title block */
+.title{font-weight:500;color:var(--cream);font-size:15px;line-height:1.3;display:block;margin-bottom:4px}
+.zone-line{font-size:12px;color:var(--muted)}
+.tags{display:inline-flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:10px;letter-spacing:0.8px;text-transform:uppercase;padding:2px 6px;border-radius:4px;font-weight:500}
+.tag-beach{background:rgba(255,107,107,0.18);color:var(--coral)}
+.tag-paved{background:rgba(244,184,96,0.18);color:var(--amber)}
+.tag-repriced{background:rgba(143,224,180,0.18);color:var(--green)}
+.tag-stale{background:rgba(255,255,255,0.06);color:var(--muted)}
+.tag-tier{background:rgba(31,78,115,0.6);color:var(--cream-2)}
+
+/* numeric cells */
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.num-strong{color:var(--cream);font-weight:500}
+.num-muted{color:var(--muted);font-size:12px}
+.num-locked{color:var(--muted);font-style:italic;font-size:13px}
+
+/* broker cell */
+.broker{font-size:13px;line-height:1.4}
+.broker-name{color:var(--cream);font-weight:500;display:block;margin-bottom:2px}
+.broker-line{color:var(--muted);font-size:12px;display:block}
+.broker-line a{color:var(--muted)}
+.broker-line a:hover{color:var(--coral)}
+.broker-locked{font-size:12px;color:var(--muted);font-style:italic}
+.broker-locked::before{content:"🔒 ";font-style:normal}
+
+/* CTA */
+.cta{display:inline-block;padding:8px 14px;background:var(--coral);color:var(--navy);border-radius:6px;font-weight:500;font-size:13px;letter-spacing:0.3px;white-space:nowrap}
+.cta:hover{background:var(--coral-2);text-decoration:none}
+.cta-locked{display:inline-block;padding:8px 14px;background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--line);border-radius:6px;font-weight:500;font-size:13px;cursor:not-allowed}
+
+/* expanded row */
+tr.expanded{background:var(--navy-3)}
+tr.detail-row td{padding:0 12px 16px;background:var(--navy-3);border-bottom:1px solid var(--line)}
+.reasons{font-size:12px;color:var(--muted);line-height:1.7;font-style:italic}
+.reasons strong{color:var(--cream-2);font-weight:500;font-style:normal}
+.reasons .leg-bar{margin:8px 0 4px;display:flex;flex-direction:column;gap:6px;font-style:normal}
+.reasons .leg-bar .row{display:flex;align-items:center;gap:10px;font-size:12px}
+.reasons .leg-bar .row .name{width:80px;color:var(--cream-2);letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.reasons .leg-bar .row .track{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.05);overflow:hidden;position:relative}
+.reasons .leg-bar .row .fill{height:100%;background:var(--coral)}
+.reasons .leg-bar .row .pct{width:36px;text-align:right;color:var(--cream);font-weight:500;font-variant-numeric:tabular-nums}
+
+.empty{padding:60px 20px;text-align:center;color:var(--muted)}
+
+/* footer */
+footer{margin-top:32px;font-size:12px;color:var(--muted);text-align:center;letter-spacing:1px}
+footer .dot{color:var(--coral);margin:0 8px}
+
+@media (max-width:720px){
+  .wrap{padding:24px 16px 60px}
+  header h1{font-size:26px}
+  header .meta{display:none}
+  .hero h2{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <svg class="mark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="200" height="200" rx="40" fill="#173B57"/>
+      <g transform="translate(100,100)">
+        <g fill="none" stroke="#FF6B6B" stroke-width="11" stroke-linecap="round">
+          <path d="M 0 0 Q 22 -10, 48 -36"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(45)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(90)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(135)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(180)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(225)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(270)"/>
+          <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(315)"/>
+        </g>
+        <circle r="12" fill="#FFF4E6"/>
+      </g>
+    </svg>
+    <div>
+      <h1>pulpo<span class="tld">.club</span></h1>
+      <div class="sub">Best raw-land &amp; beach opportunities in El Salvador</div>
+    </div>
+    <div class="meta">
+      <strong id="meta-count">—</strong>
+      <span id="meta-updated">loading…</span>
+      <span id="meta-mode" class="mode mode-public">PUBLIC PREVIEW</span>
+    </div>
+    <div class="auth" id="auth-bar" style="display:none">
+      <span>Signed in as <strong id="auth-user">—</strong></span>
+      <button id="btn-logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h2>The 8 best raw-land deals in El Salvador, every Wednesday.</h2>
+    <p>
+      We score every listing on four axes — <span class="em">value</span> (price vs. comp pool),
+      <span class="em">quality</span> (zone tier + attributes), <span class="em">liquidity</span>
+      (exit-risk proxy), and <span class="em">upside</span> (path-of-progress) — then publish
+      the shortlist. No fluff. No off-market vapor. Just the listings worth a phone call this week.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="v" id="stat-listings">—</span><span class="l">Listings ranked this week</span></div>
+      <div class="hero-stat"><span class="v" id="stat-zones">—</span><span class="l">SV zones covered</span></div>
+      <div class="hero-stat"><span class="v" id="stat-best">—</span><span class="l">Top-rank composite</span></div>
+    </div>
+  </section>
+
+  <section class="login-panel" id="login-panel">
+    <div class="copy">
+      <h3>Members get the full data set</h3>
+      <p>
+        Public preview shows rank, zone, size, score breakdown, and price band. Members see exact
+        prices, broker contacts, and the source listing URL. Email <a href="mailto:hola@pulpo.club">hola@pulpo.club</a>
+        if you'd like an account.
+      </p>
+    </div>
+    <form id="login-form" autocomplete="on">
+      <input type="text" id="li-user" placeholder="Username" autocomplete="username" required />
+      <input type="password" id="li-pass" placeholder="Password" autocomplete="current-password" required />
+      <button type="submit">Sign in</button>
+      <div class="err" id="li-err"></div>
+    </form>
+  </section>
+
+  <div class="filters">
+    <label>
+      Search
+      <input type="text" id="f-search" placeholder="title, location, zone…" />
+    </label>
+    <label>
+      Zone
+      <select id="f-zone"><option value="">All zones</option></select>
+    </label>
+    <label>
+      Source
+      <select id="f-source"><option value="">All brokers</option></select>
+    </label>
+    <div class="toggles">
+      <label class="toggle"><input type="checkbox" id="f-beach"/> Beachfront only</label>
+      <label class="toggle"><input type="checkbox" id="f-repriced"/> Repriced only</label>
+      <label class="toggle"><input type="checkbox" id="f-paved"/> Paved access</label>
+    </div>
+    <div class="count">Showing <strong id="f-count">0</strong> of <span id="f-total">0</span></div>
+  </div>
+
+  <div class="weights">
+    <span class="w-label">Investment thesis weights</span>
+    <span class="w-pill">Value <input type="number" id="w-v" min="0" max="1" step="0.05" value="0.35"></span>
+    <span class="w-pill">Quality <input type="number" id="w-q" min="0" max="1" step="0.05" value="0.25"></span>
+    <span class="w-pill">Liquidity <input type="number" id="w-l" min="0" max="1" step="0.05" value="0.20"></span>
+    <span class="w-pill">Upside <input type="number" id="w-u" min="0" max="1" step="0.05" value="0.20"></span>
+    <button id="btn-reset-weights" type="button">Reset</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th class="col-rank" data-sort="rank" data-default="asc">#</th>
+          <th class="col-score" data-sort="rank_score" data-default="desc">Score</th>
+          <th data-sort="title">Listing</th>
+          <th class="num" data-sort="area_m2" data-default="desc">Size</th>
+          <th class="num" data-sort="price_usd" data-default="asc">Price</th>
+          <th class="num" data-sort="price_per_m2" data-default="asc">$/m²</th>
+          <th data-sort="broker_name">Broker</th>
+          <th class="col-cta"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="empty" class="empty" style="display:none">No listings match these filters.</div>
+  </div>
+
+  <footer>
+    pulpo.club <span class="dot">·</span> 8 finds, every Wednesday <span class="dot">·</span>
+    <span id="foot-time">—</span>
+  </footer>
+
+</div>
+
+<script>
+// --- data sources ---------------------------------------------------------
+// Try the members API first (returns full ranked.json behind cookie auth).
+// On 401 / network error, fall back to the public teaser bundle which has
+// broker contact, exact prices, and source URLs stripped.
+const MEMBERS_API   = "/api/members";
+const PUBLIC_DATA   = "data/ranked-public.json";
+const FALLBACK_FULL = "data/ranked.json";   // used in dev when there's no API server
+const META_URL      = "data/last_updated.json";
+
+// --- formatters -----------------------------------------------------------
+const fmt = {
+  usd:  v => v == null ? "—" : "$" + Math.round(v).toLocaleString("en-US"),
+  num:  v => v == null ? "—" : Math.round(v).toLocaleString("en-US"),
+  ppm:  v => v == null ? "—" : "$" + v.toFixed(2),
+};
+
+function fmtArea(m2){
+  if(m2 == null) return "—";
+  if(m2 >= 50000){
+    const mz = m2 / 6988.96, ac = m2 / 4046.86;
+    return `${mz.toFixed(1)} mz <span class="num-muted">(${ac.toFixed(0)} ac)</span>`;
+  }
+  if(m2 >= 6988){
+    const mz = m2 / 6988.96;
+    return `${mz.toFixed(2)} mz <span class="num-muted">(${Math.round(m2).toLocaleString("en-US")} m²)</span>`;
+  }
+  const v2 = m2 / 0.698896;
+  return `${Math.round(m2).toLocaleString("en-US")} m² <span class="num-muted">(${Math.round(v2).toLocaleString("en-US")} vrs²)</span>`;
+}
+
+function rankClass(r){
+  if(r === 1) return "rk-1";
+  if(r === 2) return "rk-2";
+  if(r === 3) return "rk-3";
+  return "rk-rest";
+}
+
+function uniq(values){
+  return [...new Set(values.filter(Boolean))].sort();
+}
+
+// --- state ----------------------------------------------------------------
+let DATA = [];
+let MODE = "public";   // "public" | "member"
+let WEIGHTS = { v:0.35, q:0.25, l:0.20, u:0.20 };
+let SORT = { key: "rank", dir: "asc" };
+
+// --- client-side re-ranking ----------------------------------------------
+// We re-compute composite scores in the browser so users can tune the
+// weights live (value vs. quality vs. liquidity vs. upside) without a
+// server round-trip. The component scores (value_score, quality_score, …)
+// are computed server-side in pulpo/ranker.py and shipped in the JSON.
+function recomputeRanks(){
+  const s = WEIGHTS.v + WEIGHTS.q + WEIGHTS.l + WEIGHTS.u;
+  const wv = s > 0 ? WEIGHTS.v / s : 0.35;
+  const wq = s > 0 ? WEIGHTS.q / s : 0.25;
+  const wl = s > 0 ? WEIGHTS.l / s : 0.20;
+  const wu = s > 0 ? WEIGHTS.u / s : 0.20;
+  for(const r of DATA){
+    const v = r.value_score ?? 35;
+    const q = r.quality_score ?? 30;
+    const li = r.liquidity_score ?? 35;
+    const up = r.upside_score ?? 50;
+    r.rank_score = Math.round((wv*v + wq*q + wl*li + wu*up) * 100) / 100;
+  }
+  // sort then reassign 1-based rank
+  DATA.sort((a,b)=>(b.rank_score||0)-(a.rank_score||0));
+  DATA.forEach((r,i)=> r.rank = i+1);
+}
+
+// --- filtering + sort -----------------------------------------------------
+function applyFilters(){
+  const search = document.getElementById("f-search").value.toLowerCase().trim();
+  const zone = document.getElementById("f-zone").value;
+  const source = document.getElementById("f-source").value;
+  const beach = document.getElementById("f-beach").checked;
+  const repriced = document.getElementById("f-repriced").checked;
+  const paved = document.getElementById("f-paved").checked;
+
+  let rows = DATA.slice();
+  if(search){
+    rows = rows.filter(r =>
+      (r.title || "").toLowerCase().includes(search) ||
+      (r.location_text || "").toLowerCase().includes(search) ||
+      (r.zone || "").toLowerCase().includes(search) ||
+      (r.municipality || "").toLowerCase().includes(search)
+    );
+  }
+  if(zone)   rows = rows.filter(r => r.zone === zone);
+  if(source) rows = rows.filter(r => (r.source || "") === source);
+  if(beach)  rows = rows.filter(r => r.is_beachfront);
+  if(repriced) rows = rows.filter(r => r.is_repriced);
+  if(paved)  rows = rows.filter(r => r.has_paved_access);
+
+  const k = SORT.key, dir = SORT.dir === "asc" ? 1 : -1;
+  rows.sort((a,b)=>{
+    const va = a[k], vb = b[k];
+    if(va == null && vb == null) return 0;
+    if(va == null) return 1;
+    if(vb == null) return -1;
+    if(typeof va === "number") return (va - vb) * dir;
+    return String(va).localeCompare(String(vb)) * dir;
+  });
+
+  document.getElementById("f-count").textContent = rows.length;
+  document.getElementById("f-total").textContent = DATA.length;
+  document.getElementById("empty").style.display = rows.length ? "none" : "block";
+  render(rows);
+}
+
+// --- rendering ------------------------------------------------------------
+function legBars(r){
+  const v = r.value_score ?? 0, q = r.quality_score ?? 0;
+  const l = r.liquidity_score ?? 0, u = r.upside_score ?? 0;
+  return `
+    <div class="legs">
+      <div class="leg l-v" style="--w:${v}%" title="Value ${v.toFixed(0)}"></div>
+      <div class="leg l-q" style="--w:${q}%" title="Quality ${q.toFixed(0)}"></div>
+      <div class="leg l-l" style="--w:${l}%" title="Liquidity ${l.toFixed(0)}"></div>
+      <div class="leg l-u" style="--w:${u}%" title="Upside ${u.toFixed(0)}"></div>
+    </div>
+    <div class="leg-labels"><span>V</span><span>Q</span><span>L</span><span>U</span></div>
+  `;
+}
+
+function render(rows){
+  const tbody = document.getElementById("rows");
+  tbody.innerHTML = "";
+  rows.forEach((r, i) => {
+    const tr = document.createElement("tr");
+    tr.dataset.idx = i;
+    const tier = r.zone ? zoneTierLabel(r.zone) : null;
+    const tags = [];
+    if(tier)               tags.push(`<span class="tag tag-tier">Tier ${tier}</span>`);
+    if(r.is_beachfront)    tags.push('<span class="tag tag-beach">Beachfront</span>');
+    if(r.has_paved_access) tags.push('<span class="tag tag-paved">Paved</span>');
+    if(r.is_repriced)      tags.push('<span class="tag tag-repriced">Repriced</span>');
+    if(r.days_listed && r.days_listed > 90) tags.push('<span class="tag tag-stale">Stale ' + r.days_listed + 'd</span>');
+
+    // Price column: members see exact, public sees price_band
+    let priceCell, ppmCell, brokerCell, ctaCell;
+    if(MODE === "member"){
+      priceCell  = `<span class="num-strong">${fmt.usd(r.price_usd)}</span>`;
+      ppmCell    = fmt.ppm(r.price_per_m2);
+      brokerCell = `
+        <span class="broker-name">${escapeHtml(r.broker_name || r.source || "—")}</span>
+        ${r.broker_phone ? `<span class="broker-line"><a href="tel:${encodeURIComponent(r.broker_phone)}">${escapeHtml(r.broker_phone)}</a></span>` : ""}
+        ${r.broker_email ? `<span class="broker-line"><a href="mailto:${encodeURIComponent(r.broker_email)}">${escapeHtml(r.broker_email)}</a></span>` : ""}
+      `;
+      ctaCell = r.url
+        ? `<a class="cta" href="${escapeAttr(r.url)}" target="_blank" rel="noopener noreferrer">View →</a>`
+        : `<span class="cta-locked">No URL</span>`;
+    } else {
+      priceCell  = `<span class="num-locked">${escapeHtml(r.price_band || "—")}</span>`;
+      ppmCell    = `<span class="num-locked">—</span>`;
+      brokerCell = `<span class="broker-locked">Members only</span>`;
+      ctaCell    = `<span class="cta-locked">Sign in</span>`;
+    }
+
+    tr.innerHTML = `
+      <td class="col-rank"><span class="rk ${rankClass(r.rank)}">${r.rank ?? "—"}</span></td>
+      <td>
+        <div class="score-cell">
+          <div class="composite">${(r.rank_score ?? 0).toFixed(1)} <span class="max">/100</span></div>
+          ${legBars(r)}
+        </div>
+      </td>
+      <td>
+        <span class="title">${escapeHtml(r.title)}</span>
+        <span class="zone-line">${escapeHtml(r.zone || "—")} · ${escapeHtml(r.municipality || "")} · ${escapeHtml(r.department || "")}</span>
+        <div class="tags">${tags.join("")}</div>
+      </td>
+      <td class="num"><span class="num-strong">${fmtArea(r.area_m2)}</span></td>
+      <td class="num">${priceCell}</td>
+      <td class="num">${ppmCell}</td>
+      <td class="broker">${brokerCell}</td>
+      <td class="col-cta">${ctaCell}</td>
+    `;
+    tr.addEventListener("click", (e) => {
+      if(e.target.closest("a,button,input")) return;
+      toggleDetail(tr, r);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function legRow(name, val, klass){
+  const v = Math.max(0, Math.min(100, val ?? 0));
+  return `
+    <div class="row">
+      <span class="name">${name}</span>
+      <span class="track"><span class="fill ${klass}" style="width:${v}%;background:${legColor(klass)}"></span></span>
+      <span class="pct">${v.toFixed(0)}</span>
+    </div>`;
+}
+function legColor(klass){
+  return ({
+    "l-v":"var(--coral)","l-q":"var(--amber)","l-l":"var(--green)","l-u":"var(--coral-2)"
+  })[klass] || "var(--coral)";
+}
+
+function toggleDetail(tr, r){
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains("detail-row")){
+    next.remove();
+    tr.classList.remove("expanded");
+    return;
+  }
+  tr.classList.add("expanded");
+  const det = document.createElement("tr");
+  det.className = "detail-row";
+  const reasons = (r.rank_reasons || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  det.innerHTML = `
+    <td colspan="2"></td>
+    <td colspan="6">
+      <div class="reasons">
+        <strong>Why it ranked here:</strong>
+        <div class="leg-bar">
+          ${legRow("Value",     r.value_score,     "l-v")}
+          ${legRow("Quality",   r.quality_score,   "l-q")}
+          ${legRow("Liquidity", r.liquidity_score, "l-l")}
+          ${legRow("Upside",    r.upside_score,    "l-u")}
+        </div>
+        <ul style="margin:8px 0 0 18px;padding:0">${reasons}</ul>
+        ${r.description ? `<p style="margin:10px 0 0;color:var(--cream-2);font-style:normal">${escapeHtml(r.description)}</p>` : ""}
+      </div>
+    </td>
+  `;
+  tr.parentNode.insertBefore(det, tr.nextSibling);
+}
+
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+// Mirror of the server-side ZONE_TIER table for the client display tag.
+const ZONE_TIER = {
+  "el-tunco":"A","el-sunzal":"A","el-zonte":"A",
+  "san-diego":"B","la-libertad":"B","puerto-la-libertad":"B",
+  "el-cuco":"B","las-flores":"B","mizata":"B",
+  "punta-mango":"C","el-espino":"C","conchagua":"C","la-union":"C",
+};
+function zoneTierLabel(zone){ return ZONE_TIER[zone] || null; }
+
+// --- wiring ---------------------------------------------------------------
+function wireSorting(){
+  document.querySelectorAll("thead th[data-sort]").forEach(th => {
+    th.addEventListener("click", () => {
+      const k = th.dataset.sort;
+      const def = th.dataset.default || "asc";
+      if(SORT.key === k){
+        SORT.dir = SORT.dir === "asc" ? "desc" : "asc";
+      } else {
+        SORT.key = k;
+        SORT.dir = def;
+      }
+      document.querySelectorAll("thead th").forEach(t => t.classList.remove("sort-asc", "sort-desc"));
+      th.classList.add(SORT.dir === "asc" ? "sort-asc" : "sort-desc");
+      applyFilters();
+    });
+  });
+  const initial = document.querySelector(`thead th[data-sort="${SORT.key}"]`);
+  if(initial) initial.classList.add(SORT.dir === "asc" ? "sort-asc" : "sort-desc");
+}
+
+function wireFilters(){
+  ["f-search","f-zone","f-source","f-beach","f-repriced","f-paved"].forEach(id => {
+    document.getElementById(id).addEventListener("input", applyFilters);
+  });
+}
+
+function wireWeights(){
+  const ids = ["w-v","w-q","w-l","w-u"];
+  ids.forEach(id => {
+    document.getElementById(id).addEventListener("input", () => {
+      WEIGHTS.v = parseFloat(document.getElementById("w-v").value) || 0;
+      WEIGHTS.q = parseFloat(document.getElementById("w-q").value) || 0;
+      WEIGHTS.l = parseFloat(document.getElementById("w-l").value) || 0;
+      WEIGHTS.u = parseFloat(document.getElementById("w-u").value) || 0;
+      recomputeRanks();
+      applyFilters();
+    });
+  });
+  document.getElementById("btn-reset-weights").addEventListener("click", () => {
+    WEIGHTS = { v:0.35, q:0.25, l:0.20, u:0.20 };
+    document.getElementById("w-v").value = "0.35";
+    document.getElementById("w-q").value = "0.25";
+    document.getElementById("w-l").value = "0.20";
+    document.getElementById("w-u").value = "0.20";
+    recomputeRanks();
+    applyFilters();
+  });
+}
+
+function populateSelects(){
+  const zoneSel = document.getElementById("f-zone");
+  zoneSel.innerHTML = '<option value="">All zones</option>';
+  uniq(DATA.map(r => r.zone)).forEach(z => {
+    const o = document.createElement("option"); o.value = z; o.textContent = z; zoneSel.appendChild(o);
+  });
+  const srcSel = document.getElementById("f-source");
+  srcSel.innerHTML = '<option value="">All brokers</option>';
+  // In public mode `source` is stripped; show broker_name placeholder if present.
+  uniq(DATA.map(r => r.source || r.broker_name)).forEach(s => {
+    const o = document.createElement("option"); o.value = s; o.textContent = s; srcSel.appendChild(o);
+  });
+}
+
+function setMode(mode, username){
+  MODE = mode;
+  const badge = document.getElementById("meta-mode");
+  const panel = document.getElementById("login-panel");
+  const authBar = document.getElementById("auth-bar");
+  if(mode === "member"){
+    badge.textContent = "MEMBER ACCESS";
+    badge.className = "mode mode-member";
+    panel.style.display = "none";
+    authBar.style.display = "flex";
+    document.getElementById("auth-user").textContent = username || "you";
+  } else {
+    badge.textContent = "PUBLIC PREVIEW";
+    badge.className = "mode mode-public";
+    panel.style.display = "flex";
+    authBar.style.display = "none";
+  }
+}
+
+async function tryLoadMembers(){
+  try{
+    const res = await fetch(MEMBERS_API, { credentials: "same-origin", cache: "no-store" });
+    if(!res.ok) return null;
+    const json = await res.json();
+    return json;
+  } catch(e){
+    return null;
+  }
+}
+
+async function loadPublic(){
+  const res = await fetch(PUBLIC_DATA, { cache: "no-store" });
+  if(res.ok) return await res.json();
+  // Local-dev fallback: if /api isn't running and ranked-public.json
+  // hasn't been generated, just load the full file. Members layout
+  // gracefully degrades because the field set is a superset.
+  const fb = await fetch(FALLBACK_FULL, { cache: "no-store" });
+  return await fb.json();
+}
+
+async function init(){
+  try{
+    // Try members API first
+    const members = await tryLoadMembers();
+    if(members && Array.isArray(members.listings)){
+      DATA = members.listings;
+      setMode("member", members.user);
+    } else {
+      DATA = await loadPublic();
+      setMode("public");
+    }
+    // Some older fixtures may not carry per-leg scores; backfill defaults
+    // so the client-side re-ranker still works.
+    DATA.forEach(r => {
+      if(r.value_score == null)     r.value_score = 35;
+      if(r.quality_score == null)   r.quality_score = 30;
+      if(r.liquidity_score == null) r.liquidity_score = 35;
+      if(r.upside_score == null)    r.upside_score = 50;
+    });
+    // Ensure rank/composite are set; re-compute uniformly so weights tuner works
+    recomputeRanks();
+
+    // meta
+    const metaRes = await fetch(META_URL, { cache: "no-store" }).catch(() => null);
+    document.getElementById("meta-count").textContent = `${DATA.length} listings`;
+    document.getElementById("stat-listings").textContent = DATA.length;
+    document.getElementById("stat-zones").textContent = uniq(DATA.map(r=>r.zone)).length;
+    document.getElementById("stat-best").textContent = DATA.length ? DATA[0].rank_score.toFixed(1) : "—";
+    if(metaRes && metaRes.ok){
+      try{
+        const meta = await metaRes.json();
+        const d = new Date(meta.last_updated);
+        const stamp = d.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+        document.getElementById("meta-updated").textContent = "Updated " + stamp;
+        document.getElementById("foot-time").textContent = "Last run " + stamp;
+      } catch(e){}
+    }
+
+    populateSelects();
+    wireSorting();
+    wireFilters();
+    wireWeights();
+    applyFilters();
+  } catch(e){
+    document.getElementById("rows").innerHTML =
+      `<tr><td colspan="8" class="empty">Failed to load data. Run <code>python3 automation/run.py</code> first.</td></tr>`;
+    console.error(e);
+  }
+}
+
+// --- auth -----------------------------------------------------------------
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById("li-err");
+  errEl.textContent = "";
+  const username = document.getElementById("li-user").value.trim();
+  const password = document.getElementById("li-pass").value;
+  try{
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username, password }),
+      credentials: "same-origin",
+    });
+    if(res.ok){
+      // Reload to get full data via /api/members
+      window.location.reload();
+      return;
+    }
+    if(res.status === 401){ errEl.textContent = "Invalid username or password."; return; }
+    errEl.textContent = "Sign-in failed (" + res.status + "). Try again or email hola@pulpo.club.";
+  } catch(err){
+    errEl.textContent = "Network error. Are the API routes deployed?";
+  }
+});
+
+document.getElementById("btn-logout").addEventListener("click", async () => {
+  try{
+    await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+  } catch(_) { /* ignore */ }
+  window.location.reload();
+});
+
+init();
+</script>
+</body>
+</html>

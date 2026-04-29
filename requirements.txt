@@ -1,0 +1,6 @@
+# [socks] extra installs socksio — required when the runtime is behind a
+# SOCKS proxy (sandbox + most CI runners). Without it, every live fetch
+# raises ImportError("Using SOCKS proxy, but the 'socksio' package is not
+# installed.") and BaseScraper falls through to fixture mode silently.
+httpx[socks]==0.27.2
+selectolax==0.3.21

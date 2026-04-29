@@ -1,0 +1,117 @@
+"""Canonical Listing schema. Stays in stdlib (dataclasses) for portability."""
+from __future__ import annotations
+from dataclasses import dataclass, field, asdict
+from datetime import datetime
+from typing import Optional
+
+@dataclass
+class Listing:
+    # Identity
+    source: str                       # "goodlife" | "oceanside" | "kazu" | ...
+    source_id: str                    # site-specific ID
+    url: str
+    scraped_at: str                   # ISO8601 UTC
+
+    # Headline
+    title: str
+    description: str = ""
+
+    # Geography
+    country: str = "SV"
+    department: Optional[str] = None  # La Unión, San Miguel, La Libertad, ...
+    municipality: Optional[str] = None
+    zone: Optional[str] = None        # canonical zone slug: "el-cuco", "el-tunco", "el-zonte"
+    location_text: str = ""           # raw human-readable location string
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+
+    # Size — canonical is m²
+    area_m2: Optional[float] = None
+    raw_size_text: str = ""           # original text: "30 manzanas"
+
+    # Price
+    price_usd: Optional[float] = None
+    raw_price_text: str = ""
+    price_per_m2: Optional[float] = None  # derived
+
+    # Property type
+    property_type: str = "land"        # "land" | "lot" | "finca" | "house+lot"
+    is_beachfront: bool = False
+    has_paved_access: bool = False
+    has_water: bool = False
+    has_power: bool = False
+    is_repriced: bool = False          # price has dropped vs. previous scrape
+
+    # Activity
+    days_listed: Optional[int] = None
+    photos_count: int = 0
+
+    # Broker
+    broker_name: Optional[str] = None
+    broker_phone: Optional[str] = None
+    broker_email: Optional[str] = None
+
+    # Ranking output (filled by ranker)
+    rank: Optional[int] = None               # 1-based position rank, 1 = best
+    rank_score: Optional[float] = None       # composite 0..100
+    zone_percentile: Optional[float] = None  # 0..100, lower = cheaper for zone
+    value_score: Optional[float] = None      # 0..100, cheap-for-comp-pool leg
+    quality_score: Optional[float] = None    # 0..100, zone tier + attributes
+    liquidity_score: Optional[float] = None  # 0..100, exit-risk proxy
+    upside_score: Optional[float] = None     # 0..100, path-of-progress
+    rank_reasons: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+    def to_public_dict(self) -> dict:
+        """Public/teaser serialization: strips fields that should sit behind the paywall.
+
+        Public viewers see: rank, zone, size, price band, headline tags, score badge —
+        enough to know there ARE good deals, not enough to act on them without a login.
+        """
+        d = asdict(self)
+        # Strip identifying / direct-contact fields
+        d.pop("source", None)
+        d.pop("source_id", None)
+        d.pop("url", None)
+        d.pop("description", None)
+        d.pop("broker_name", None)
+        d.pop("broker_phone", None)
+        d.pop("broker_email", None)
+        # Coarsen the title so brokers can't be reverse-searched from the headline
+        title = d.get("title") or ""
+        if title:
+            # Keep first ~60 chars; anything past the first phrase tends to leak
+            # broker shop names ("— GoodLife El Salvador") that defeat the gate.
+            d["title"] = title.split(" — ")[0].split(" | ")[0][:60]
+        # Coarsen the price into a band rather than the exact ask
+        price = d.get("price_usd")
+        if isinstance(price, (int, float)):
+            d["price_band"] = _price_band(price)
+        d.pop("price_usd", None)
+        d.pop("raw_price_text", None)
+        d.pop("price_per_m2", None)
+        # Coarsen exact coordinates to ~1km grid (3 decimals)
+        if isinstance(d.get("lat"), (int, float)):
+            d["lat"] = round(d["lat"], 2)
+        if isinstance(d.get("lng"), (int, float)):
+            d["lng"] = round(d["lng"], 2)
+        return d
+
+
+def _price_band(price: float) -> str:
+    """Map an exact USD price to a coarse band for the public teaser."""
+    if price < 100_000:
+        return "<$100k"
+    if price < 250_000:
+        return "$100k–$250k"
+    if price < 500_000:
+        return "$250k–$500k"
+    if price < 1_000_000:
+        return "$500k–$1M"
+    if price < 2_500_000:
+        return "$1M–$2.5M"
+    if price < 5_000_000:
+        return "$2.5M–$5M"
+    return "$5M+"

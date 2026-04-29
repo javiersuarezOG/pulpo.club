@@ -1,0 +1,15 @@
+{
+  "name": "pulpo-club",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Salvadoran beach + raw-land aggregator — Vercel serverless auth + static dashboard.",
+  "scripts": {
+    "add-user": "node automation/add_user.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

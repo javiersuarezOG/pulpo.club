@@ -1,0 +1,41 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "echo 'static deploy — pulpo.club'",
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/", "destination": "/web/index.html" },
+    { "source": "/data/ranked-public.json", "destination": "/web/data/ranked-public.json" },
+    { "source": "/data/last_updated.json", "destination": "/web/data/last_updated.json" }
+  ],
+  "redirects": [
+    { "source": "/web/data/ranked.json", "destination": "/api/members", "statusCode": 307 },
+    { "source": "/data/ranked.json",     "destination": "/api/members", "statusCode": 307 }
+  ],
+  "headers": [
+    {
+      "source": "/web/data/ranked-public.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }
+      ]
+    },
+    {
+      "source": "/web/data/last_updated.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }
+      ]
+    },
+    {
+      "source": "/api/members",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store" }
+      ]
+    },
+    {
+      "source": "/api/login",
+      "headers": [
+        { "key": "Cache-Control", "value": "private, no-store" }
+      ]
+    }
+  ]
+}

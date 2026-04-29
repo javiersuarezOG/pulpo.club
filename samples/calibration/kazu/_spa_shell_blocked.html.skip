@@ -1,0 +1,68 @@
+<!DOCTYPE html><html  lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script type="importmap">{"imports":{"#entry":"/_nuxt/Dz3yJGtM.js"}}</script>
+<title>KAZU</title>
+<link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="preconnect" href="https://accounts.google.com">
+<link rel="preconnect" href="https://panel.devkazurealestate.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://kazuqa.blob.core.windows.net">
+<script type="text/javascript">!function(f,b,e,v,n,t,s) {if(f.fbq)return;n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)}; if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0'; n.queue=[];t=b.createElement(e);t.async=!0; t.src=v;s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s)}(window, document,'script', 'https://connect.facebook.net/en_US/fbevents.js'); fbq('init', '1346059900664013'); fbq('track', 'PageView');</script>
+<link rel="stylesheet" href="/_nuxt/entry._Syxpvou.css" crossorigin>
+<link rel="modulepreload" as="script" crossorigin href="/_nuxt/Dz3yJGtM.js">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBN5WvP4L0A1Q5iNc6Xi0M93SnMExjiGQ&loading=async&libraries=places,drawing" defer></script>
+<script type="module" src="/_nuxt/Dz3yJGtM.js" crossorigin></script>
+<link rel="dns-prefetch" href="https://devkazurealestate.com">
+<link rel="dns-prefetch" href="https://panel.devkazurealestate.com">
+<meta name="description" content="Liderazgo regional en tecnología inmobiliaria, primera plataforma digital integral de Centroamérica que optimiza la compra, venta, alquiler y gestión de propiedades.">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<meta name="msapplication-navbutton-color" content="#ffffff">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' *; img-src 'self' data: *; connect-src 'self' *;">
+<meta property="og:title" content="Kazu Real Estate">
+<meta property="og:description" content="Liderazgo regional en tecnología inmobiliaria, primera plataforma digital integral de Centroamérica que optimiza la compra, venta, alquiler y gestión de propiedades.">
+<meta property="og:image" content="https://kazurealestate.com/favicon.png">
+<meta property="og:url" content="https://kazurealestate.com/">
+<link rel="icon" type="image/png" href="/favicon.png">
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1346059900664013&ev=PageView&noscript=1"/></noscript>
+<script id="unhead:payload" type="application/json">{"title":"KAZU"}</script></head><body><div id="__nuxt"><!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>@lottiefiles/dotlottie-web | basic example</title>
+  </head>
+  <body>
+    <!-- Canvas element where the Lottie animation will be rendered -->
+    <div
+      style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100vh; justify-content: center"
+    >
+      <canvas
+        id="canvas"
+        width="250"
+        height="250"
+        style="width: 250px; height: 250px;"
+      ></canvas>
+    </div>
+    <script type="module">
+      import { DotLottie } from 'https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm';
+
+      new DotLottie({
+        autoplay: true,
+        loop: true,
+        canvas: document.getElementById('canvas'),
+        src: '/kazu.json', // or .json file
+      });
+    </script>
+  </body>
+</html></div><div id="teleports"></div><script>window.__NUXT__={};window.__NUXT__.config={public:{apiBaseUrl:"https://panel.kazurealestate.com/api",envApp:"prd",panelUrl:"https://panel.kazurealestate.com",sanctum:{baseUrl:"https://panel.kazurealestate.com",mode:"cookie",userStateKey:"sanctum.user.identity",redirectIfAuthenticated:false,redirectIfUnauthenticated:false,endpoints:{csrf:"/sanctum/csrf-cookie",login:"/api/auth/login",logout:"/api/auth/logout",user:"/api/profile"},csrf:{cookie:"XSRF-TOKEN",header:"X-XSRF-TOKEN"},client:{retry:false,initialRequest:true},redirect:{keepRequestedRoute:true,onLogin:false,onLogout:"/",onAuthOnly:"/",onGuestOnly:"/"},globalMiddleware:{enabled:false,prepend:false,allow404WithoutAuth:true},logLevel:3,appendPlugin:false},"nuxt-scripts":{version:"",defaultScriptOptions:{trigger:"onNuxtReady"}}},app:{baseURL:"/",buildId:"19a1b08f-c3ac-433d-8c3e-060b2d833f88",buildAssetsDir:"/_nuxt/",cdnURL:""}}</script>
+<script type="application/json" data-nuxt-data="nuxt-app" data-ssr="false" id="__NUXT_DATA__">[{"serverRendered":1},false]</script></body></html>

@@ -1,0 +1,54 @@
+pulpo audit — generated 2026-04-29T07:40:13.929316+00:00
+========================================================================
+
+RUN METADATA
+  last_updated:            2026-04-29T07:40:13.900957+00:00
+  duration_seconds:        chunked-inline
+  offline (intent):        False
+  fixture_fallback_active: False
+  raw per source:          {'goodlife': 30, 'oceanside': 20}
+  dropped:                 35
+  errors:                  []
+
+DEDUP
+  total records:  15
+  unique URLs:    15
+  duplicates:     0
+
+SOLD BLEED-THROUGH
+  records carrying SOLD markers anywhere: 0
+
+SOURCE SPLIT
+  goodlife      10
+  oceanside     5
+
+ZONE BREAKDOWN
+  el-tunco        7
+  el-zonte        3
+  <unknown>       3
+  la-libertad     2
+
+FIELD COVERAGE
+  price_usd:     15/15  (100%)
+  area_m2:       5/15  (33%)
+  price_per_m2:  5/15  (33%)
+  zone:          12/15  (80%)
+
+$/m² DISTRIBUTION
+  count:   5
+  min:     $146.66
+  median:  $167.24
+  mean:    $263.90
+  max:     $596.48
+
+MEDIAN $/m² BY ZONE
+  el-tunco        $  207.98   (n=4)
+  la-libertad     $  160.40   (n=1)
+
+UNKNOWN ZONES (candidates for ZONE_PATTERNS expansion)
+  'House / Land at Ilopango Lake'  loc='Ilopango Lake, San Salvador, El Salvador.'
+  '3 Villas Complex in Costa del Sol, $1,200,000'  loc='Costa del Sol, La Paz, El Salvador'
+  'Vacant lot in Santa Ana, $450,000'  loc='Barrio San Antonio, Santa Ana'
+
+========================================================================
+VERDICT: OK
