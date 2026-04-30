@@ -1,0 +1,8 @@
+# Require javier to review any PR that touches production data or deployment
+* @javiersuarezOG
+
+# Scrapers require javier's review (production pipeline)
+/pulpo/         @javiersuarezOG
+/automation/    @javiersuarezOG
+/api/           @javiersuarezOG
+/vercel.json    @javiersuarezOG
