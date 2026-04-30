@@ -58,16 +58,22 @@ def main() -> int:
         print(f"WARNING: {msg}", file=sys.stderr)
         errors.append(msg)
 
+    source_errors: dict[str, str] = {}   # src -> error message
+
     for src in sources:
         src = src.strip()
         mod = REGISTRY.get(src)
         if not mod:
-            errors.append(f"unknown source: {src}")
+            err = f"unknown source: {src}"
+            errors.append(err)
+            source_errors[src] = err
             continue
         try:
             recs = mod.crawl(limit=limit, offline=offline or None)
         except Exception as e:
-            errors.append(f"{src}: {e!r}")
+            err = repr(e)
+            errors.append(f"{src}: {err}")
+            source_errors[src] = err
             continue
         per_source_count[src] = len(recs)
         for r in recs:
@@ -106,6 +112,21 @@ def main() -> int:
     with (web_data_dir / "ranked-public.json").open("w", encoding="utf-8") as f:
         json.dump([li.to_public_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
 
+    # Derive per-source health status for the dashboard status strip.
+    #   green  — returned > 0 listings, no exception
+    #   yellow — returned > 0 listings but with a caught exception (partial)
+    #   red    — returned 0 listings OR raised an exception
+    source_status: dict[str, str] = {}
+    for src in sources:
+        count = per_source_count.get(src)
+        had_error = src in source_errors
+        if had_error:
+            source_status[src] = "red"
+        elif count is None or count == 0:
+            source_status[src] = "red"
+        else:
+            source_status[src] = "green"
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -115,17 +136,33 @@ def main() -> int:
         "total_listings": len(ranked),
         "dropped": dropped,
         "per_source_raw": per_source_count,
+        "source_status": source_status,
         "sources": sources,
         "offline": offline,
-        # True when the run advertised itself as live but BaseScraper
-        # fell through to fixtures because httpx/selectolax weren't
-        # importable. Distinct from `offline` (the env-var intent) so
-        # monitoring can alert on the gap between intended and actual.
         "fixture_fallback_active": fixture_fallback_active,
         "errors": errors,
     }
     with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
+
+    # Append lightweight summary to run history (keep last 60 runs ≈ 15 months weekly).
+    history_path = web_data_dir / "run_history.json"
+    try:
+        history = json.loads(history_path.read_text()) if history_path.exists() else []
+    except Exception:
+        history = []
+    history.append({
+        "ts": finished.isoformat(),
+        "total": len(ranked),
+        "dropped": dropped,
+        "duration": round((finished - started).total_seconds(), 2),
+        "error_count": len(errors),
+        "per_source_raw": per_source_count,
+        "source_status": source_status,
+    })
+    history = history[-60:]
+    with history_path.open("w", encoding="utf-8") as f:
+        json.dump(history, f)
 
     # Summary line for CI logs
     print(

@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>pulpo.club · Scraper Monitor</title>
+<link rel="icon" href="../assets/logo_mark_only.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09090F; --s1:#111119; --s2:#18182A; --s3:#21213A;
+  --border:rgba(255,255,255,.07); --brd2:rgba(255,255,255,.13);
+  --text:#FFFFFF; --t2:rgba(255,255,255,.70); --t3:rgba(255,255,255,.40); --t4:rgba(255,255,255,.18);
+  --green:#22C55E; --green-bg:rgba(34,197,94,.10); --green-brd:rgba(34,197,94,.20);
+  --amber:#F59E0B; --amber-bg:rgba(245,158,11,.10); --amber-brd:rgba(245,158,11,.20);
+  --red:#EF4444;   --red-bg:rgba(239,68,68,.10);   --red-brd:rgba(239,68,68,.20);
+  --cv:#22D3A5; --grad:linear-gradient(135deg,#22D3A5,#0EA5E9);
+  --mono:'JetBrains Mono',monospace;
+  --r:8px; --r-sm:5px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:var(--cv);text-decoration:none}
+
+/* ── Layout ── */
+.page{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+
+/* ── Topbar ── */
+.topbar{border-bottom:1px solid var(--border);margin-bottom:0}
+.tb{height:52px;display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:9px;flex-shrink:0;text-decoration:none}
+.brand-mark{width:24px;height:24px}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--text)}
+.brand-name .tld{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:var(--s2);border:1px solid var(--brd2);font-size:11px;font-weight:600;color:var(--t2)}
+.tb-sep{width:1px;height:14px;background:var(--brd2);margin:0 4px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--t3)}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+.status-dot.ok{background:var(--green)}
+.status-dot.err{background:var(--red);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.view-site{font-size:12px;color:var(--t3);padding:4px 10px;border:1px solid var(--border);border-radius:var(--r-sm)}
+.view-site:hover{color:var(--t2);border-color:var(--brd2)}
+
+/* ── Page header ── */
+.page-head{padding:32px 0 24px;border-bottom:1px solid var(--border)}
+.page-head h1{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.page-head p{font-size:13px;color:var(--t3)}
+
+/* ── Section ── */
+.section{padding:24px 0;border-bottom:1px solid var(--border)}
+.section:last-child{border-bottom:none}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Run summary cards ── */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.summary-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.sc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:8px}
+.sc-value{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1;color:var(--text)}
+.sc-value.grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sc-value.ok{color:var(--green)}
+.sc-value.warn{color:var(--amber)}
+.sc-value.err{color:var(--red)}
+.sc-sub{font-size:11px;color:var(--t3);margin-top:4px}
+
+/* ── Source grid ── */
+.source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.src-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s}
+.src-card:hover{border-color:var(--brd2)}
+.src-card.green{border-left:3px solid var(--green)}
+.src-card.yellow{border-left:3px solid var(--amber)}
+.src-card.red{border-left:3px solid var(--red)}
+
+.src-head{display:flex;align-items:center;gap:10px}
+.src-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.src-status-dot.green{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.4)}
+.src-status-dot.yellow{background:var(--amber)}
+.src-status-dot.red{background:var(--red)}
+.src-name{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.src-status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.src-status-badge.green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
+.src-status-badge.yellow{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-brd)}
+.src-status-badge.red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-brd)}
+
+.src-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.src-metric{display:flex;flex-direction:column;gap:2px}
+.sm-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--t4)}
+.sm-value{font-size:18px;font-weight:700;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
+.sm-value.dim{color:var(--t3);font-size:16px}
+.sm-sub{font-size:10px;color:var(--t3)}
+
+.src-bar-wrap{display:flex;flex-direction:column;gap:4px}
+.src-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--t3)}
+.src-bar-label span:last-child{font-weight:600;color:var(--t2)}
+.src-bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.src-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.src-bar-fill.green{background:linear-gradient(90deg,var(--green),#16A34A)}
+.src-bar-fill.red{background:rgba(239,68,68,.3)}
+
+.src-url{font-size:11px;color:var(--t3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-url a{color:var(--t3)}
+.src-url a:hover{color:var(--cv)}
+
+/* ── Data quality ── */
+.quality-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.q-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.q-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:10px}
+.q-pct{font-size:24px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1;margin-bottom:6px}
+.q-bar-track{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.q-bar-fill{height:100%;border-radius:2px;background:var(--grad)}
+.q-detail{font-size:11px;color:var(--t3)}
+
+/* ── Zone coverage ── */
+.zone-grid{display:flex;flex-wrap:wrap;gap:8px}
+.zone-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r-sm);background:var(--s1);border:1px solid var(--border)}
+.zp-name{font-size:12px;font-weight:500;color:var(--t2)}
+.zp-count{font-size:14px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.zp-bar{height:3px;border-radius:2px;background:var(--grad);min-width:4px;margin-top:4px}
+.zone-item{display:flex;flex-direction:column;gap:2px}
+
+/* ── Run history sparkline ── */
+.history-wrap{position:relative}
+.history-svg{width:100%;height:80px;display:block}
+.history-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--t4);margin-top:4px;font-family:var(--mono)}
+.history-tooltip{position:absolute;background:var(--s3);border:1px solid var(--brd2);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;white-space:nowrap;z-index:10}
+.ht-date{color:var(--t3);font-size:10px;margin-bottom:4px;font-family:var(--mono)}
+.ht-val{font-weight:700}
+.ht-err{color:var(--red);font-size:11px}
+
+/* ── Source log ── */
+.log-table{width:100%;border-collapse:collapse;font-size:12px}
+.log-table th{padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);border-bottom:1px solid var(--border);font-family:var(--mono)}
+.log-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-family:var(--mono)}
+.log-table tr:last-child td{border-bottom:none}
+.log-table tr:hover td{background:rgba(255,255,255,.02)}
+.lc-src{font-weight:600;color:var(--text);font-family:'Inter',sans-serif}
+.lc-count{color:var(--t2);font-variant-numeric:tabular-nums}
+.lc-pct{color:var(--t2)}
+.lc-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.lc-status.green{background:var(--green-bg);color:var(--green)}
+.lc-status.red{background:var(--red-bg);color:var(--red)}
+.lc-status.yellow{background:var(--amber-bg);color:var(--amber)}
+
+/* ── Empty / loading ── */
+.loading{color:var(--t3);font-size:13px;padding:40px 0;text-align:center}
+
+@media(max-width:640px){
+  .page{padding:0 14px 60px}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .source-grid{grid-template-columns:1fr}
+  .quality-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="200" rx="40" fill="#18182A"/>
+          <g transform="translate(100,100)">
+            <g fill="none" stroke="#22D3A5" stroke-width="12" stroke-linecap="round">
+              <path d="M 0 0 Q 22 -10, 48 -36"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(45)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(90)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(135)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(180)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(225)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(270)"/>
+              <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(315)"/>
+            </g>
+            <circle r="10" fill="#FFFFFF"/>
+          </g>
+        </svg>
+        <span class="brand-name">pulpo<span class="tld">.club</span></span>
+      </a>
+      <div class="tb-sep"></div>
+      <span class="badge">Monitor</span>
+      <div class="tb-right">
+        <span class="status-dot" id="global-dot"></span>
+        <span id="global-status">loading…</span>
+        <a class="view-site" href="/">← Live site</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page head -->
+  <div class="page-head">
+    <h1>Scraper Monitor</h1>
+    <p id="run-stamp">Last run: —</p>
+  </div>
+
+  <!-- Run summary -->
+  <div class="section">
+    <div class="section-title">Run summary</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="sc-label">Ranked listings</div>
+        <div class="sc-value grad" id="s-total">—</div>
+        <div class="sc-sub" id="s-dropped"></div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-label">Sources active</div>
+        <div class="sc-value" id="s-active">—</div>
+        <div class="sc-sub" id="s-of"></div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-label">Run duration</div>
+        <div class="sc-value" id="s-dur">—</div>
+        <div class="sc-sub">seconds</div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-label">Errors</div>
+        <div class="sc-value" id="s-err">—</div>
+        <div class="sc-sub" id="s-err-sub"></div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-label">Scraped (raw)</div>
+        <div class="sc-value" id="s-raw">—</div>
+        <div class="sc-sub" id="s-drop-pct"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Source cards -->
+  <div class="section">
+    <div class="section-title">Connected sources</div>
+    <div class="source-grid" id="source-grid">
+      <div class="loading">Loading source data…</div>
+    </div>
+  </div>
+
+  <!-- Source log table -->
+  <div class="section">
+    <div class="section-title">Source breakdown</div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Status</th>
+          <th>Scraped</th>
+          <th>Ranked</th>
+          <th>Drop rate</th>
+          <th>% of total</th>
+        </tr>
+      </thead>
+      <tbody id="source-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Data quality -->
+  <div class="section">
+    <div class="section-title">Data completeness</div>
+    <div class="quality-grid" id="quality-grid">
+      <div class="loading">Computing…</div>
+    </div>
+  </div>
+
+  <!-- Zone coverage -->
+  <div class="section">
+    <div class="section-title">Zone coverage</div>
+    <div class="zone-grid" id="zone-grid">
+      <div class="loading">Computing…</div>
+    </div>
+  </div>
+
+  <!-- Run history sparkline -->
+  <div class="section">
+    <div class="section-title">Run history <span style="color:var(--t4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(last 30 runs)</span></div>
+    <div class="history-wrap" id="history-wrap">
+      <div class="loading">Loading history…</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="history-tooltip" id="tooltip"></div>
+
+<script>
+const DATA_URL    = "data/ranked.json";
+const META_URL    = "data/last_updated.json";
+const HISTORY_URL = "data/run_history.json";
+
+const SOURCE_META = {
+  goodlife:     { name:"GoodLife El Salvador",       url:"https://goodlifeelsalvador.com" },
+  oceanside:    { name:"Oceanside El Salvador",       url:"https://oceansideelsalvador.com" },
+  kazu:         { name:"Kazu Real Estate",            url:"https://kazurealestate.com" },
+  century21:    { name:"Century 21 El Salvador",      url:"https://www.century21elsalvador.com" },
+  remax:        { name:"RE/MAX El Salvador",          url:"https://www.remax.com.sv" },
+  bienesraices: { name:"Bienes Raíces El Salvador",   url:"https://bienesraicesenelsalvador.com" },
+};
+
+function fmtDur(s){
+  if(s<60) return `${s}s`;
+  return `${Math.floor(s/60)}m ${Math.round(s%60)}s`;
+}
+function fmtDate(iso){
+  return new Date(iso).toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+function pct(n,d){return d>0?Math.round(n/d*100):0}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+async function loadAll(){
+  const [meta, ranked, historyRaw] = await Promise.all([
+    fetch(META_URL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(DATA_URL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(HISTORY_URL,{cache:"no-store"}).then(r=>r.json()).catch(()=>[]),
+  ]);
+
+  renderSummary(meta, ranked);
+  renderSources(meta, ranked);
+  renderQuality(ranked);
+  renderZones(ranked);
+  renderHistory(historyRaw);
+}
+
+function renderSummary(meta, ranked){
+  const total   = meta.total_listings ?? ranked.length;
+  const dropped = meta.dropped ?? 0;
+  const raw     = Object.values(meta.per_source_raw??{}).reduce((a,b)=>a+b,0);
+  const active  = Object.values(meta.source_status??{}).filter(s=>s==="green").length;
+  const total_s = Object.keys(meta.source_status??{}).length;
+  const errors  = (meta.errors??[]).length;
+  const dur     = meta.duration_seconds ?? 0;
+  const dropPct = pct(dropped, raw);
+
+  document.getElementById("s-total").textContent   = total;
+  document.getElementById("s-dropped").textContent = `${dropped} dropped in normalize`;
+  document.getElementById("s-active").textContent  = active;
+  document.getElementById("s-of").textContent      = `of ${total_s} configured`;
+  document.getElementById("s-dur").textContent     = fmtDur(dur);
+  document.getElementById("s-err").textContent     = errors;
+  document.getElementById("s-err-sub").textContent = errors ? "check errors below" : "clean run";
+  document.getElementById("s-err").className       = `sc-value ${errors?"err":"ok"}`;
+  document.getElementById("s-raw").textContent     = raw;
+  document.getElementById("s-drop-pct").textContent= `${dropPct}% drop rate`;
+  document.getElementById("run-stamp").textContent = `Last run: ${fmtDate(meta.last_updated)} · duration ${fmtDur(dur)}`;
+
+  const dot = document.getElementById("global-dot");
+  const statusEl = document.getElementById("global-status");
+  if(errors || active < total_s){
+    dot.className="status-dot err";
+    statusEl.textContent=`${total_s-active} source${total_s-active!==1?"s":""} offline`;
+  } else {
+    dot.className="status-dot ok";
+    statusEl.textContent="All systems nominal";
+  }
+}
+
+function renderSources(meta, ranked){
+  const perSourceRaw    = meta.per_source_raw ?? {};
+  const sourceStatus    = meta.source_status  ?? {};
+  const sources         = meta.sources ?? Object.keys(perSourceRaw);
+  const total           = ranked.length;
+
+  // Count ranked listings per source
+  const rankedBySource = {};
+  for(const r of ranked){
+    const s = r.source || "unknown";
+    rankedBySource[s] = (rankedBySource[s]||0) + 1;
+  }
+
+  const grid  = document.getElementById("source-grid");
+  const tbody = document.getElementById("source-table");
+  grid.innerHTML = "";
+  tbody.innerHTML = "";
+
+  // Add any new sources not in SOURCE_META dynamically
+  const allSources = [...new Set([...sources, ...Object.keys(rankedBySource)])];
+
+  for(const src of allSources){
+    const sm     = SOURCE_META[src] || {name: src, url:""};
+    const status = sourceStatus[src] ?? (rankedBySource[src]>0?"green":"red");
+    const scraped= perSourceRaw[src] ?? 0;
+    const rankd  = rankedBySource[src] ?? 0;
+    const dropR  = scraped > 0 ? pct(scraped-rankd, scraped) : 0;
+    const pctTotal = pct(rankd, total);
+    const barFill = pctTotal;
+
+    // Card
+    const card = document.createElement("div");
+    card.className = `src-card ${status}`;
+    card.innerHTML = `
+      <div class="src-head">
+        <span class="src-status-dot ${status}"></span>
+        <span class="src-name">${esc(sm.name)}</span>
+        <span class="src-status-badge ${status}">${status}</span>
+      </div>
+      <div class="src-metrics">
+        <div class="src-metric">
+          <span class="sm-label">Scraped</span>
+          <span class="sm-value ${scraped===0?"dim":""}">${scraped}</span>
+          <span class="sm-sub">raw fetched</span>
+        </div>
+        <div class="src-metric">
+          <span class="sm-label">Ranked</span>
+          <span class="sm-value ${rankd===0?"dim":""}">${rankd}</span>
+          <span class="sm-sub">${dropR>0?`${dropR}% dropped`:rankd===0?"none passed":"all passed"}</span>
+        </div>
+        <div class="src-metric">
+          <span class="sm-label">% of total</span>
+          <span class="sm-value ${rankd===0?"dim":""}">${pctTotal}%</span>
+          <span class="sm-sub">${rankd} / ${total}</span>
+        </div>
+      </div>
+      <div class="src-bar-wrap">
+        <div class="src-bar-label">
+          <span>Share of ranked listings</span>
+          <span>${pctTotal}%</span>
+        </div>
+        <div class="src-bar-track">
+          <div class="src-bar-fill ${status}" style="width:${barFill}%"></div>
+        </div>
+      </div>
+      ${sm.url?`<div class="src-url"><a href="${sm.url}" target="_blank" rel="noopener">${sm.url.replace('https://','')}</a></div>`:""}
+    `;
+    grid.appendChild(card);
+
+    // Table row
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="lc-src">${esc(sm.name)}</td>
+      <td><span class="lc-status ${status}">● ${status}</span></td>
+      <td class="lc-count">${scraped}</td>
+      <td class="lc-count">${rankd}</td>
+      <td class="lc-pct">${scraped>0?dropR+"%":"—"}</td>
+      <td class="lc-pct">${pctTotal}%</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function renderQuality(ranked){
+  const total = ranked.length;
+  if(!total){ document.getElementById("quality-grid").innerHTML="<div class='loading'>No data</div>"; return; }
+
+  const metrics = [
+    { label:"Has price",         count: ranked.filter(r=>r.price_usd>0).length,      desc:"exact USD price present" },
+    { label:"Has broker phone",  count: ranked.filter(r=>r.broker_phone).length,      desc:"phone number scraped" },
+    { label:"Has broker email",  count: ranked.filter(r=>r.broker_email).length,      desc:"email scraped" },
+    { label:"Has source URL",    count: ranked.filter(r=>r.url).length,               desc:"direct listing link" },
+    { label:"Has description",   count: ranked.filter(r=>r.description).length,       desc:"text description" },
+    { label:"Has area (m²)",     count: ranked.filter(r=>r.area_m2>0).length,         desc:"size in m²" },
+    { label:"Is beachfront",     count: ranked.filter(r=>r.is_beachfront).length,     desc:"beachfront flag set" },
+    { label:"Has paved road",    count: ranked.filter(r=>r.has_paved_access).length,  desc:"paved access flag" },
+  ];
+
+  const grid = document.getElementById("quality-grid");
+  grid.innerHTML = "";
+  for(const m of metrics){
+    const p = pct(m.count, total);
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.innerHTML = `
+      <div class="q-label">${esc(m.label)}</div>
+      <div class="q-pct">${p}%</div>
+      <div class="q-bar-track"><div class="q-bar-fill" style="width:${p}%"></div></div>
+      <div class="q-detail">${m.count} / ${total} · ${esc(m.desc)}</div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function renderZones(ranked){
+  const zoneCounts = {};
+  for(const r of ranked){
+    if(r.zone) zoneCounts[r.zone] = (zoneCounts[r.zone]||0)+1;
+  }
+  const sorted = Object.entries(zoneCounts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] ?? 1;
+  const total = ranked.length;
+
+  const grid = document.getElementById("zone-grid");
+  grid.innerHTML = "";
+  for(const [zone, count] of sorted){
+    const barW = pct(count, max);
+    const p    = pct(count, total);
+    const pill = document.createElement("div");
+    pill.className = "zone-pill";
+    pill.innerHTML = `
+      <div class="zone-item">
+        <div style="display:flex;justify-content:space-between;gap:20px;align-items:baseline">
+          <span class="zp-name">${esc(zone)}</span>
+          <span class="zp-count">${count} <span style="font-size:11px;color:var(--t3);font-weight:400">(${p}%)</span></span>
+        </div>
+        <div class="zp-bar" style="width:${Math.max(barW,8)}%"></div>
+      </div>
+    `;
+    grid.appendChild(pill);
+  }
+  if(!sorted.length) grid.innerHTML = `<div class="loading">No zone data</div>`;
+}
+
+function renderHistory(history){
+  const wrap = document.getElementById("history-wrap");
+  if(!history || history.length < 2){
+    wrap.innerHTML = `<div class="loading">Not enough history yet — runs more on Wednesday</div>`;
+    return;
+  }
+  const recent = history.slice(-30);
+  const values = recent.map(r=>r.total);
+  const maxV   = Math.max(...values, 1);
+  const minV   = Math.min(...values, 0);
+  const w = 1060, h = 80, pad = 8;
+
+  const xStep = (w - pad*2) / (recent.length - 1);
+  const yScale = v => h - pad - ((v - minV) / (maxV - minV || 1)) * (h - pad*2);
+
+  // Build SVG path
+  const pts = recent.map((r,i) => `${pad + i*xStep},${yScale(r.total)}`);
+  const area = `M ${pts[0]} ${pts.slice(1).map(p=>`L ${p}`).join(" ")} L ${pad+(recent.length-1)*xStep},${h} L ${pad},${h} Z`;
+  const line = `M ${pts[0]} ${pts.slice(1).map(p=>`L ${p}`).join(" ")}`;
+
+  // Error dots
+  const errorDots = recent.map((r,i)=>
+    r.error_count > 0
+      ? `<circle cx="${pad+i*xStep}" cy="${yScale(r.total)}" r="4" fill="#EF4444" stroke="var(--bg)" stroke-width="1.5"/>`
+      : ""
+  ).join("");
+
+  const svg = `
+    <svg class="history-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#22D3A5" stop-opacity=".25"/>
+          <stop offset="100%" stop-color="#22D3A5" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${area}" fill="url(#hgrad)"/>
+      <path d="${line}" fill="none" stroke="#22D3A5" stroke-width="2" stroke-linejoin="round"/>
+      ${errorDots}
+      ${recent.map((r,i)=>`<rect x="${pad+i*xStep-6}" y="0" width="12" height="${h}" fill="transparent" data-i="${i}" class="bar-hover"/>`).join("")}
+    </svg>
+    <div class="history-labels">
+      <span>${fmtDate(recent[0].ts)}</span>
+      <span>${fmtDate(recent[recent.length-1].ts)}</span>
+    </div>
+  `;
+  wrap.innerHTML = svg;
+
+  // Tooltip on hover
+  const tooltip = document.getElementById("tooltip");
+  wrap.querySelectorAll(".bar-hover").forEach(el=>{
+    el.addEventListener("mouseenter", e=>{
+      const i = parseInt(el.dataset.i);
+      const r = recent[i];
+      tooltip.innerHTML = `
+        <div class="ht-date">${fmtDate(r.ts)}</div>
+        <div class="ht-val">${r.total} listings ranked</div>
+        <div style="font-size:11px;color:var(--t3)">scraped: ${Object.values(r.per_source_raw??{}).reduce((a,b)=>a+b,0)} · dropped: ${r.dropped??0} · ${fmtDur(r.duration??0)}</div>
+        ${r.error_count?"<div class='ht-err'>"+r.error_count+" error(s)</div>":""}
+      `;
+      const rect = wrap.getBoundingClientRect();
+      const svgEl = wrap.querySelector(".history-svg");
+      const svgRect = svgEl.getBoundingClientRect();
+      const xPos = svgRect.left + (parseInt(el.getAttribute("x"))+6) * (svgRect.width / w) - rect.left;
+      tooltip.style.left = Math.min(xPos, rect.width - 200) + "px";
+      tooltip.style.top  = "-56px";
+      tooltip.style.display = "block";
+    });
+    el.addEventListener("mouseleave", ()=>{ tooltip.style.display="none"; });
+  });
+}
+
+loadAll().catch(e=>{
+  console.error(e);
+  document.body.insertAdjacentHTML("afterbegin",`<div style="padding:20px;color:#EF4444;font-size:13px">Failed to load: ${e.message}</div>`);
+});
+</script>
+</body>
+</html>
