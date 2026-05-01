@@ -142,6 +142,7 @@ class Century21Scraper:
             "source_id": str(rec.get("id") or ""),
             "url": url,
             "title": title.strip(),
+            "price_usd": float(price) if price else None,
             "raw_price_text": f"{price} {rec.get('moneda', 'USD')}" if price else "",
             "raw_size_text": f"{area_m2} m2" if area_m2 else "",
             "location_text": location_text,

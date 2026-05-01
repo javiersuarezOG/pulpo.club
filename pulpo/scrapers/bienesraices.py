@@ -165,6 +165,7 @@ class BienesRaicesScraper:
             "source_id": str(prop.get("cid") or ""),
             "url": url,
             "title": title,
+            "price_usd": float(price) if price else None,
             "raw_price_text": f"{price} USD" if price else "",
             "raw_size_text": raw_size,
             "location_text": location_text,
