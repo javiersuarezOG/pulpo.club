@@ -8,8 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from pulpo.units import (
-    parse_area, parse_price_usd, to_m2,
-    M2_PER_VARA2, M2_PER_MANZANA, M2_PER_ACRE,
+    parse_area, parse_price_usd, M2_PER_VARA2, M2_PER_MANZANA, M2_PER_ACRE,
 )
 
 def approx(a: float, b: float, tol: float = 0.5) -> bool:

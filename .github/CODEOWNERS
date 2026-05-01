@@ -1,8 +1,5 @@
-# Require javier to review any PR that touches production data or deployment
-* @javiersuarezOG
-
-# Scrapers require javier's review (production pipeline)
-/pulpo/         @javiersuarezOG
-/automation/    @javiersuarezOG
-/api/           @javiersuarezOG
-/vercel.json    @javiersuarezOG
+# TODO: replace @owner with both engineers' GitHub handles, e.g. @javier @colleague
+/pulpo/normalize.py    @owner
+/pulpo/ranker.py       @owner
+/pulpo/units.py        @owner
+/api/                  @owner

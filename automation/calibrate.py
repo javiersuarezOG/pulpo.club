@@ -214,8 +214,8 @@ def main(argv=None):
             results.extend(calibrate_dir(source, base))
         if not results:
             print(f"\n{DIM}No calibration samples found yet. To get started:")
-            print(f"  mkdir -p samples/calibration/goodlife")
-            print(f"  # save a detail page to samples/calibration/goodlife/page1.html")
+            print("  mkdir -p samples/calibration/goodlife")
+            print("  # save a detail page to samples/calibration/goodlife/page1.html")
             print(f"  python3 automation/calibrate.py --all{RESET}")
         else:
             avg = sum(r["coverage_pct"] for r in results) / len(results)

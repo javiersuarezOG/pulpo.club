@@ -7,7 +7,7 @@ on:
     branches: ["**"]
 
 jobs:
-  test:
+  ci:
     name: pytest
     runs-on: ubuntu-latest
 
@@ -20,9 +20,14 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
-      - name: Run tests
+      - name: Test
         env:
           PULPO_OFFLINE: "1"
-        run: pytest --cov=pulpo --cov-report=term-missing -q
+        run: pytest -q
+
+      - name: Lint
+        run: ruff check .

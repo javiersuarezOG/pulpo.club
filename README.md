@@ -2,9 +2,16 @@
 
 ![CI](https://github.com/javiersuarezOG/pulpo.club/actions/workflows/ci.yml/badge.svg)
 
-Tests must pass before any PR merges — see CONTRIBUTING.md.
-
 Salvadoran beach + raw-land aggregator. Scrapes boutique-broker sites, normalizes mixed units (vrs² / manzanas / m² / acres), ranks every listing on a four-factor investment score, exposes the shortlist behind a username/password gate, and ships a weekly Wednesday refresh.
+
+## How we ship
+
+- Small PRs (one concern, ideally <300 lines).
+- CI must be green to merge.
+- Files in `CODEOWNERS` need a 1-person review.
+- Everything else: if you've eyeballed it and CI is green, merge it.
+- Use rebase to update branches, never merge commits.
+- When two PRs touch each other: hotfix first, dependency first, smaller first. When in doubt, talk for 60 seconds.
 
 ## Layout
 

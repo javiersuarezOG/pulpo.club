@@ -1,10 +1,10 @@
 """Tests for individual ranker legs in isolation."""
 import pytest
 from pulpo.models import Listing
-import pulpo.ranker_legs.value
-import pulpo.ranker_legs.quality
-import pulpo.ranker_legs.liquidity
-import pulpo.ranker_legs.upside
+import pulpo.ranker_legs.value      # noqa: F401 — triggers RANKER_LEGS registration
+import pulpo.ranker_legs.quality    # noqa: F401
+import pulpo.ranker_legs.liquidity  # noqa: F401
+import pulpo.ranker_legs.upside     # noqa: F401
 from pulpo.agents import RANKER_LEGS
 
 

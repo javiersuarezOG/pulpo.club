@@ -58,8 +58,6 @@ def load_fixtures(source_slug: str, fixture_file: str, limit: int) -> list[dict]
 def make_client() -> "httpx.Client":
     if not HTTPX_OK:
         raise RuntimeError("httpx not installed — cannot make HTTP client")
-    delay = os.environ.get("PULPO_REQUEST_DELAY")
-    # delay is used in walk(), not here; we just build the client
     return httpx.Client(headers=DEFAULT_HEADERS, follow_redirects=True, timeout=20.0)
 
 
