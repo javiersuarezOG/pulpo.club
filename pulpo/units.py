@@ -171,28 +171,64 @@ _PRICE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Per-unit rate markers that follow a price and turn it into $/area, not a total.
+# Example: "$20/v²", "$45 per m2", "$100/sqft", "$15 por vara". Land totals don't
+# have these — if we see one immediately after a $-prefixed number, that match is
+# a unit rate and we should keep scanning for the actual total elsewhere in the
+# text (or give up if the whole string is unit rates).
+_UNIT_RATE_TAIL = re.compile(
+    r"^\s*(?:/|per\b|por\b|x\b)\s*"
+    r"(?:v[²2]?|vrs?[²2]?|varas?|m[²2]?|sq\.?\s*m|sqft|ft[²2]?|"
+    r"yd[²2]?|yards?|acres?|manzanas?|mz|hect[aá]reas?|has?)",
+    re.IGNORECASE,
+)
+
+# Floor below which a parsed total is almost certainly a parser artifact (a unit
+# rate the per-unit detector missed, a stray number elsewhere on the page, etc.).
+# Raw-land totals in SV bottom out around $30k for the smallest interior lots; a
+# $5k floor leaves comfortable headroom while filtering the obvious garbage.
+_PRICE_FLOOR_USD = 5_000.0
+
+def _apply_suffix(base: float, suf: str) -> float:
+    suf = suf.lower()
+    if suf == "k":
+        return base * 1_000
+    if suf == "m":
+        return base * 1_000_000
+    if suf == "mil":
+        # "mil" in Spanish = thousand
+        return base * 1_000
+    if suf in ("millones", "millon", "million"):
+        return base * 1_000_000
+    return base
+
 def parse_price_usd(text: str) -> Optional[float]:
-    """Extract USD price. Handles $1.5M, $250k, $1,250,000, US$ 800,000."""
+    """Extract USD price. Handles $1.5M, $250k, $1,250,000, US$ 800,000.
+
+    Rejects per-unit rates ($X/v², $X per m²) and sub-$5k totals — both are
+    parser artifacts in this product space, not real listing prices.
+    """
     if not text:
         return None
-    m = _PRICE_RE.search(text)
-    if not m:
-        # try plain number with no $ prefix
-        nm = re.search(r"\d{1,3}(?:[,\.\s]\d{3})+(?:[\.,]\d+)?", text)
-        if not nm:
-            return None
+    # Walk every $-prefixed match in document order; skip ones followed by a
+    # per-unit divisor (those are unit rates, not totals). Take the first match
+    # that survives.
+    for m in _PRICE_RE.finditer(text):
+        tail = text[m.end():m.end() + 16]
+        if _UNIT_RATE_TAIL.match(tail):
+            continue
+        base = _to_float(m.group(1))
+        if base is None:
+            continue
+        value = _apply_suffix(base, m.group(2) or "")
+        if value < _PRICE_FLOOR_USD:
+            continue
+        return value
+    # Fallback: no surviving $-prefixed match. Try a bare comma/space-grouped
+    # number (e.g. "1,250,000" with no $). Same floor applies.
+    nm = re.search(r"\d{1,3}(?:[,\.\s]\d{3})+(?:[\.,]\d+)?", text)
+    if nm:
         v = _to_float(nm.group(0))
-        return v
-    base = _to_float(m.group(1))
-    if base is None:
-        return None
-    suf = (m.group(2) or "").lower()
-    if suf in ("k",):
-        base *= 1_000
-    elif suf in ("m", "mil",):
-        # ambiguous: "mil" in spanish = thousand, "m" usually = million
-        # We treat "mil" as thousand and "m" as million.
-        base *= 1_000_000 if suf == "m" else 1_000
-    elif suf in ("millones", "millon", "million"):
-        base *= 1_000_000
-    return base
+        if v is not None and v >= _PRICE_FLOOR_USD:
+            return v
+    return None
