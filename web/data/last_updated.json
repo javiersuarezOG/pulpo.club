@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-01T21:12:44.684598+00:00",
-  "started_at": "2026-05-01T21:12:44.676908+00:00",
+  "last_updated": "2026-05-01T21:22:02.545545+00:00",
+  "started_at": "2026-05-01T21:22:02.537715+00:00",
   "duration_seconds": 0.01,
   "total_listings": 21,
   "dropped": 0,
@@ -50,6 +50,133 @@
       "supplier": null,
       "pulled": 0,
       "max_pages_hit": false
+    }
+  },
+  "field_completeness": {
+    "century21": {
+      "n_listings": 3,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
+        "location_text": 1.0,
+        "lat": 0.0,
+        "lng": 0.0,
+        "is_beachfront": 0.0,
+        "has_paved_access": 0.67,
+        "has_water": 1.0,
+        "has_power": 1.0,
+        "is_repriced": 0.0,
+        "days_listed": 1.0,
+        "photos_count": 1.0,
+        "broker_name": 1.0,
+        "broker_phone": 1.0,
+        "broker_email": 1.0,
+        "title": 1.0,
+        "description": 1.0
+      }
+    },
+    "goodlife": {
+      "n_listings": 5,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
+        "location_text": 1.0,
+        "lat": 0.2,
+        "lng": 0.2,
+        "is_beachfront": 0.6,
+        "has_paved_access": 0.8,
+        "has_water": 0.0,
+        "has_power": 0.0,
+        "is_repriced": 0.0,
+        "days_listed": 1.0,
+        "photos_count": 1.0,
+        "broker_name": 1.0,
+        "broker_phone": 1.0,
+        "broker_email": 1.0,
+        "title": 1.0,
+        "description": 1.0
+      }
+    },
+    "kazu": {
+      "n_listings": 5,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
+        "location_text": 1.0,
+        "lat": 0.0,
+        "lng": 0.0,
+        "is_beachfront": 0.4,
+        "has_paved_access": 0.4,
+        "has_water": 0.0,
+        "has_power": 0.0,
+        "is_repriced": 0.4,
+        "days_listed": 1.0,
+        "photos_count": 1.0,
+        "broker_name": 1.0,
+        "broker_phone": 1.0,
+        "broker_email": 1.0,
+        "title": 1.0,
+        "description": 1.0
+      }
+    },
+    "oceanside": {
+      "n_listings": 5,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
+        "location_text": 1.0,
+        "lat": 0.2,
+        "lng": 0.2,
+        "is_beachfront": 0.4,
+        "has_paved_access": 0.6,
+        "has_water": 0.0,
+        "has_power": 0.0,
+        "is_repriced": 0.2,
+        "days_listed": 1.0,
+        "photos_count": 1.0,
+        "broker_name": 1.0,
+        "broker_phone": 1.0,
+        "broker_email": 1.0,
+        "title": 1.0,
+        "description": 1.0
+      }
+    },
+    "remax": {
+      "n_listings": 3,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
+        "location_text": 1.0,
+        "lat": 0.0,
+        "lng": 0.0,
+        "is_beachfront": 0.33,
+        "has_paved_access": 0.67,
+        "has_water": 0.67,
+        "has_power": 1.0,
+        "is_repriced": 0.0,
+        "days_listed": 1.0,
+        "photos_count": 1.0,
+        "broker_name": 1.0,
+        "broker_phone": 1.0,
+        "broker_email": 1.0,
+        "title": 1.0,
+        "description": 1.0
+      }
     }
   },
   "sources": [

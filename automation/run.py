@@ -24,6 +24,7 @@ import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all source
 from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.normalize import normalize  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
+from automation.field_audit import build_completeness_block  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -118,8 +119,9 @@ def main() -> int:
     #   ranked-public.json — broker/url/exact-price fields stripped, safe to serve statically
     web_data_dir = REPO / "web" / "data"
     web_data_dir.mkdir(parents=True, exist_ok=True)
+    ranked_dicts = [li.to_dict() for li in ranked]
     with (web_data_dir / "ranked.json").open("w", encoding="utf-8") as f:
-        json.dump([li.to_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
+        json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
     with (web_data_dir / "ranked-public.json").open("w", encoding="utf-8") as f:
         json.dump([li.to_public_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
 
@@ -150,6 +152,9 @@ def main() -> int:
         for src in sources
     }
 
+    # Field completeness snapshot — populated % per field per source.
+    field_completeness = build_completeness_block(ranked_dicts)
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -161,6 +166,7 @@ def main() -> int:
         "per_source_raw": per_source_count,
         "source_status": source_status,
         "coverage": coverage,
+        "field_completeness": field_completeness,
         "sources": sources,
         "offline": offline,
         "fixture_fallback_active": fixture_fallback_active,
