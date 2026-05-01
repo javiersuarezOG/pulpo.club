@@ -28,34 +28,40 @@ def _percentile_in(sorted_values: list[float], v: float) -> float:
 
 
 def _build_pools(listings: list["Listing"]):
-    by_zone: dict[str, list[float]] = defaultdict(list)
-    by_macro: dict[str, list[float]] = defaultdict(list)
-    global_pool: list[float] = []
+    # Segment by (property_type, zone) so houses don't pollute the land $/m²
+    # distribution — a 6-bed mansion skews the percentile for raw lots.
+    by_zone: dict[tuple[str, str], list[float]] = defaultdict(list)
+    by_macro: dict[tuple[str, str], list[float]] = defaultdict(list)
+    global_pool: dict[str, list[float]] = defaultdict(list)
     for li in listings:
         if li.price_per_m2 is None:
             continue
-        global_pool.append(li.price_per_m2)
+        pt = li.property_type or "land"
+        global_pool[pt].append(li.price_per_m2)
         if li.zone:
-            by_zone[li.zone].append(li.price_per_m2)
+            by_zone[(pt, li.zone)].append(li.price_per_m2)
             macro = MACRO_ZONE.get(li.zone)
             if macro:
-                by_macro[macro].append(li.price_per_m2)
-    for z in by_zone:
-        by_zone[z].sort()
-    for m in by_macro:
-        by_macro[m].sort()
-    global_pool.sort()
+                by_macro[(pt, macro)].append(li.price_per_m2)
+    for k in by_zone:
+        by_zone[k].sort()
+    for k in by_macro:
+        by_macro[k].sort()
+    for k in global_pool:
+        global_pool[k].sort()
     return by_zone, by_macro, global_pool
 
 
 def _pick_pool(li, by_zone, by_macro, global_pool):
-    if li.zone and len(by_zone.get(li.zone, [])) >= MIN_COMPS:
-        return by_zone[li.zone], li.zone
+    pt = li.property_type or "land"
+    if li.zone and len(by_zone.get((pt, li.zone), [])) >= MIN_COMPS:
+        return by_zone[(pt, li.zone)], f"{li.zone} {pt}"
     macro = MACRO_ZONE.get(li.zone or "")
-    if macro and len(by_macro.get(macro, [])) >= MIN_COMPS:
-        return by_macro[macro], f"{macro} (macro)"
-    if len(global_pool) >= MIN_COMPS:
-        return global_pool, "global"
+    if macro and len(by_macro.get((pt, macro), [])) >= MIN_COMPS:
+        return by_macro[(pt, macro)], f"{macro} {pt} (macro)"
+    gpool = global_pool.get(pt, [])
+    if len(gpool) >= MIN_COMPS:
+        return gpool, f"global {pt}"
     return [], ""
 
 
@@ -63,7 +69,6 @@ class ValueLeg:
     slug = "value"
     weight = 0.35
     env_weight_key = "PULPO_W_VALUE"
-    _pools_cache: dict = {}  # keyed by id(listings_tuple) — rebuilt per rank() call
 
     def score(self, listing: "Listing", comp_pool: list["Listing"]) -> tuple[float, str]:
         # Build pools lazily from comp_pool each call (small N, fast)
