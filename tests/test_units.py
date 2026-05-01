@@ -72,6 +72,29 @@ def main() -> int:
     t("'precio: $3,000,000 firme' -> 3000000",
       approx(parse_price_usd("precio: $3,000,000 firme") or 0, 3000000, 0.5))
 
+    print("\nprice parser — unit-rate rejection")
+    # Unit rates should NOT be returned as totals.
+    t("'$20/v2' alone -> None",
+      parse_price_usd("$20/v2") is None)
+    t("'$45/m²' alone -> None",
+      parse_price_usd("$45/m²") is None)
+    t("'$15 per vara' alone -> None",
+      parse_price_usd("$15 per vara") is None)
+    t("'$100 por m2' alone -> None",
+      parse_price_usd("$100 por m2") is None)
+    # When a unit rate AND a total appear, prefer the total.
+    t("'$20/v² total $250,000' -> 250000",
+      approx(parse_price_usd("$20/v² total $250,000") or 0, 250000, 0.5))
+    t("'8 Acres of Oceanview Land Near KM59, $20/v2' -> None",
+      parse_price_usd("8 Acres of Oceanview Land Near KM59, $20/v2") is None)
+    # Sub-economic totals (parser artifacts) should be rejected.
+    t("'$1.92' -> None (sub-$5k floor)",
+      parse_price_usd("$1.92") is None)
+    t("'$1,200' -> None (sub-$5k floor)",
+      parse_price_usd("$1,200") is None)
+    t("'$5,000' -> 5000 (at floor)",
+      approx(parse_price_usd("$5,000") or 0, 5000, 0.5))
+
     print("\nEl Cuco worked example (from architecture doc)")
     p = parse_area("30 manzanas")
     price = parse_price_usd("US$ 3,000,000")

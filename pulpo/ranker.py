@@ -183,13 +183,22 @@ def _upside_leg(li: Listing) -> tuple[float, str]:
 
 
 def _pick_pool(li, by_zone, by_macro, global_pool):
-    if li.zone and len(by_zone.get(li.zone, [])) >= MIN_COMPS:
-        return by_zone[li.zone], li.zone
+    """Cascade: (type,zone) -> (type,macro) -> (type,global). Houses don't comp
+    against land at any rung; the property-type segmentation is preserved all
+    the way through the fallback chain."""
+    pt = li.property_type or "land"
+    if li.zone:
+        zk = (pt, li.zone)
+        if len(by_zone.get(zk, [])) >= MIN_COMPS:
+            return by_zone[zk], f"{li.zone} {pt}"
     macro = MACRO_ZONE.get(li.zone or "")
-    if macro and len(by_macro.get(macro, [])) >= MIN_COMPS:
-        return by_macro[macro], f"{macro} (macro)"
-    if len(global_pool) >= MIN_COMPS:
-        return global_pool, "global"
+    if macro:
+        mk = (pt, macro)
+        if len(by_macro.get(mk, [])) >= MIN_COMPS:
+            return by_macro[mk], f"{macro} {pt} (macro)"
+    gpool = global_pool.get(pt, [])
+    if len(gpool) >= MIN_COMPS:
+        return gpool, f"global {pt}"
     return [], ""
 
 
@@ -209,20 +218,23 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
     """Compute composite investment score + 1-based rank, sort, return."""
     items = list(listings)
 
-    # Build comp pools for the value leg.
-    by_zone: dict[str, list[float]] = defaultdict(list)
-    by_macro: dict[str, list[float]] = defaultdict(list)
-    global_pool: list[float] = []
+    # Build comp pools for the value leg, segmented by property_type so a
+    # mansion's $/m² doesn't drag the lot distribution (and vice-versa).
+    # Keys are (property_type, zone) / (property_type, macro) / property_type.
+    by_zone: dict[tuple[str, str], list[float]] = defaultdict(list)
+    by_macro: dict[tuple[str, str], list[float]] = defaultdict(list)
+    global_pool: dict[str, list[float]] = defaultdict(list)
     for li in items:
         if li.price_per_m2 is None: continue
-        global_pool.append(li.price_per_m2)
+        pt = li.property_type or "land"
+        global_pool[pt].append(li.price_per_m2)
         if li.zone:
-            by_zone[li.zone].append(li.price_per_m2)
+            by_zone[(pt, li.zone)].append(li.price_per_m2)
             macro = MACRO_ZONE.get(li.zone)
-            if macro: by_macro[macro].append(li.price_per_m2)
-    for z in by_zone: by_zone[z].sort()
-    for m in by_macro: by_macro[m].sort()
-    global_pool.sort()
+            if macro: by_macro[(pt, macro)].append(li.price_per_m2)
+    for k in by_zone: by_zone[k].sort()
+    for k in by_macro: by_macro[k].sort()
+    for k in global_pool: global_pool[k].sort()
 
     wv, wq, wl, wu = _weights()
 

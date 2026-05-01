@@ -72,6 +72,111 @@ def detect_zone(text: str) -> tuple[Optional[str], Optional[str], Optional[str]]
             return (slug, muni, dept)
     return (None, None, None)
 
+# ---- Property-type classification ----
+# The scrapers pull every "real estate" listing — houses, condos, villas,
+# mansions, lots, raw land — and the canonical schema defaults `property_type`
+# to "land". Without this classifier, a 6-bedroom mansion in Surf City sits in
+# the same comp pool as a raw 30-manzana parcel, and the $/m² distribution
+# becomes meaningless. The ranker segments comp pools on `property_type`, so
+# a wrong tag here propagates straight into the value score.
+#
+# We classify primarily on the TITLE because descriptions routinely talk about
+# *future use* — "suitable for boutique hotel", "ideal para construir su casa
+# de playa" — which would false-trigger built-structure keywords on what is
+# actually raw land being marketed for development. Title is the curated, terse
+# claim about what the listing is; description is sales copy about what it
+# could become. We only consult the description when the title is missing or
+# a placeholder like "Contact us" (which the oceanside scraper produces ~26%
+# of the time), and even then we strip future-use phrases first.
+
+# Built-structure keywords: explicit "this is a building" vocabulary. Plurals
+# are required because broker headlines pluralize freely ("Cliffside apartments
+# in El Zonte", "Two Lofts in Tuscania") and missing the trailing `s` silently
+# drops them into the land pool.
+_BUILT_RE = re.compile(
+    r"\b("
+    r"houses?|homes?|villas?|mansions?|cabins?|cottages?|bungalows?|"
+    r"casas?|chalets?|residencias?|"
+    r"apartments?|apartamentos?|condos?|condominiums?|condominios?|"
+    r"lofts?|penthouses?|studios?|"
+    r"hotels?|b&b|"
+    r"\d+[\s-]*bed(?:room)?s?|"
+    r"\d+[\s-]*dormitorios?|"
+    r"\d+[\s-]*hab(?:itaciones)?\b"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Land vocabulary: explicit lot/land/finca words.
+_LAND_RE = re.compile(
+    r"\b("
+    r"lot|lote|lots?|lotes?|lotificaci[oó]n|"
+    r"land|terreno|terrenos|parcela|parcelas|plot|plots|"
+    r"finca|fincas|hacienda|"
+    r"acres?\s+of\s+land|manzanas?|hect[aá]reas?|hect[aá]rea"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Quantity-of-land patterns: "30 manzanas", "8 acres", "1.5 mz", "800 vrs²".
+# When this fires in the title, the listing is land regardless of any incidental
+# built-structure keyword (e.g. "30 manzanas beachfront El Cuco — suitable for
+# boutique hotel" is a 30-manzana parcel, not a hotel).
+_LAND_QTY_RE = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s*"
+    r"(manzanas?|mz|acres?|hect[aá]reas?|hect[aá]rea|has?|"
+    r"vrs?[²2]|varas?[\s-]*[²2]?)\b",
+    re.IGNORECASE,
+)
+
+# Sales-copy phrases describing what the buyer could BUILD on the parcel. We
+# strip these from the description before classifying so "suitable for a
+# boutique hotel" stops triggering the hotel keyword on raw land.
+_FUTURE_USE_RE = re.compile(
+    r"(?:suitable\s+for|ideal\s+for|perfect\s+for|great\s+for|"
+    r"build\s+(?:your|a|an)|could\s+be|might\s+be|develop\s+(?:into|as)|"
+    r"ideal\s+para|perfecto\s+para|construir|"
+    r"vacation\s+home|dream\s+home|family\s+compound|boutique\s+hotel)"
+    r"[^.\n]{0,120}",
+    re.IGNORECASE,
+)
+
+_PLACEHOLDER_TITLES = {"", "contact us", "contact", "(untitled)", "untitled"}
+
+def _classify(text: str) -> Optional[str]:
+    """Return 'house' / 'land' / None for a single piece of text."""
+    if not text:
+        return None
+    # Quantity-of-land takes precedence over built keywords in the same string.
+    if _LAND_QTY_RE.search(text):
+        return "land"
+    if _BUILT_RE.search(text):
+        return "house"
+    if _LAND_RE.search(text):
+        return "land"
+    return None
+
+def detect_property_type(title: str = "", description: str = "", location_text: str = "") -> str:
+    """Classify a listing as `house` (built structure) or `land` (lot/raw).
+
+    Title-first: the title is a terse claim about what the listing IS.
+    Description is consulted only when the title is empty / a placeholder,
+    and future-use sales copy is stripped before classification so phrases
+    like "suitable for boutique hotel" don't false-tag raw land as built.
+    Defaults to `land` when nothing classifies — matches the dataclass
+    default and keeps unclassifiable records in the lot comp pool.
+    """
+    title_norm = (title or "").strip().lower()
+    if title_norm not in _PLACEHOLDER_TITLES:
+        verdict = _classify(title)
+        if verdict:
+            return verdict
+    # Title was empty or a placeholder — fall back to description with
+    # future-use phrases stripped.
+    blob = (description or "") + " " + (location_text or "")
+    blob = _FUTURE_USE_RE.sub(" ", blob)
+    return _classify(blob) or "land"
+
 def normalize(raw: dict, source: str) -> Optional[Listing]:
     """
     Convert a raw scraper dict into a canonical Listing.
@@ -122,6 +227,11 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     location_text = str(raw.get("location_text") or "")
     zone, muni, dept = detect_zone(location_text + " " + title + " " + description)
 
+    # Property-type tagging. Honor any explicit value the scraper supplied;
+    # otherwise classify from the text. Used by the ranker to segment comp
+    # pools so houses don't drag the lot $/m² distribution.
+    property_type = str(raw.get("property_type") or detect_property_type(title, description, location_text))
+
     # Derived $/m²
     price_per_m2 = None
     if area_m2 and price_usd and area_m2 > 0:
@@ -146,7 +256,7 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         price_usd=round(price_usd, 2) if price_usd else None,
         raw_price_text=raw_price_text,
         price_per_m2=price_per_m2,
-        property_type=str(raw.get("property_type") or "land"),
+        property_type=property_type,
         is_beachfront=bool(raw.get("is_beachfront", False)),
         has_paved_access=bool(raw.get("has_paved_access", False)),
         has_water=bool(raw.get("has_water", False)),
