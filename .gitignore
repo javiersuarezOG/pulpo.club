@@ -18,6 +18,9 @@ node_modules/
 # session-tagged URLs, and unredacted broker contact info that we don't
 # want in version control. The selectors live in code; the HTML doesn't.
 samples/calibration/*/*.html
+# Exceptions: calibrated source fixtures used by pytest (public listings, no PII)
+!samples/calibration/goodlife/*.html
+!samples/calibration/oceanside/*.html
 
 # OS junk
 .DS_Store

@@ -1,11 +1,8 @@
-"""Site-specific scrapers. Each module exposes `crawl(limit) -> list[dict]`."""
-from . import goodlife, oceanside, kazu, century21, remax, bienesraices
+"""Site-specific scrapers. Importing this module populates pulpo.agents.SOURCES."""
+# Importing each module triggers its register() call
+from . import goodlife, oceanside, kazu, century21, remax, bienesraices  # noqa: F401
 
-REGISTRY = {
-    "goodlife": goodlife,
-    "oceanside": oceanside,
-    "kazu": kazu,
-    "century21": century21,
-    "remax": remax,
-    "bienesraices": bienesraices,
-}
+from pulpo.agents import SOURCES
+
+# Backward-compat alias — use pulpo.agents.SOURCES going forward
+REGISTRY = SOURCES
