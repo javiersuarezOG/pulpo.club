@@ -131,6 +131,7 @@ def walk_with_meta(
             break
         last_had_partials = True
 
+        new_this_page = False
         for partial in partials:
             if len(out) >= limit:
                 limit_hit = True
@@ -142,6 +143,7 @@ def walk_with_meta(
             if durl in seen_urls:
                 continue
             seen_urls.add(durl)
+            new_this_page = True
 
             try:
                 time.sleep(request_delay)
@@ -159,6 +161,13 @@ def walk_with_meta(
                 out.append(rec)
 
         if limit_hit:
+            break
+
+        # WordPress and similar CMSs wrap around when page N exceeds the last
+        # real page — returning the same listing URLs indefinitely. Detect this
+        # by stopping as soon as a full page yields zero new URLs.
+        if not new_this_page:
+            last_had_partials = False
             break
     else:
         # for loop completed all max_pages without a break

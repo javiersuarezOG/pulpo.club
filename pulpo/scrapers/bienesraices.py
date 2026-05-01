@@ -55,21 +55,16 @@ class BienesRaicesScraper:
         except (ValueError, TypeError):
             self.REQUEST_DELAY = 1.5
 
-    def report_total(self, client) -> Optional[int]:
-        """Count land slug candidates from the AlterEstate sitemap."""
-        try:
-            resp = client.get(
-                SITEMAP_URL,
-                headers={**dict(client.headers), **SITEMAP_HEADERS},
-            )
-            resp.raise_for_status()
-            sitemap = resp.json()
-            return sum(
-                1 for item in sitemap
-                if any(k in item.get("slug", "") for k in LAND_SLUG_KEYWORDS)
-            )
-        except Exception:
-            return None
+    def report_total(self, client) -> None:  # noqa: ARG002
+        """Supplier count not available as a reliable pre-fetch number.
+
+        The AlterEstate sitemap returns 1 143 slugs; our keyword filter gives
+        ~556 candidates, but some have non-land categories and get dropped at
+        the detail-page stage. Reporting 556 as 'supplier' makes coverage look
+        like 84% when the true figure is ~100% (all genuine land listings are
+        pulled). Return None so the audit shows '?' instead of a misleading %.
+        """
+        return None
 
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
