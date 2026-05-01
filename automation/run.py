@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -127,6 +128,24 @@ def main() -> int:
         else:
             source_status[src] = "green"
 
+    # Diagnostic counts for the new property-type segmentation. These let us
+    # see at a glance whether the classifier is producing a sane distribution,
+    # how many listings fall into the V-leg neutral default (the metric that
+    # moves once scraper task #28 lifts area_m2 coverage), and which (type,
+    # zone) buckets actually have enough comps to compete locally vs. cascading
+    # up to macro / global pools.
+    property_type_counts = dict(Counter(li.property_type for li in ranked))
+    v_fallback_no_price = sum(1 for li in ranked if li.price_per_m2 is None)
+    v_fallback_no_comps = sum(
+        1 for li in ranked if li.price_per_m2 is not None and li.zone_percentile is None
+    )
+    comp_pool_sizes: dict[str, dict[str, int]] = {}
+    for li in ranked:
+        if li.price_per_m2 is None:
+            continue
+        comp_pool_sizes.setdefault(li.property_type or "land", {}).setdefault(li.zone or "(no-zone)", 0)
+        comp_pool_sizes[li.property_type or "land"][li.zone or "(no-zone)"] += 1
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -141,6 +160,10 @@ def main() -> int:
         "offline": offline,
         "fixture_fallback_active": fixture_fallback_active,
         "errors": errors,
+        "property_type_counts": property_type_counts,
+        "v_fallback_no_price": v_fallback_no_price,
+        "v_fallback_no_comps": v_fallback_no_comps,
+        "comp_pool_sizes": comp_pool_sizes,
     }
     with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
