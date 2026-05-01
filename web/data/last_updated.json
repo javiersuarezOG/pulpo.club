@@ -1,16 +1,32 @@
 {
-  "last_updated": "2026-04-29T15:31:51.954562+00:00",
-  "started_at": "2026-04-29T15:27:38.403726+00:00",
-  "duration_seconds": 253.55,
-  "total_listings": 62,
-  "dropped": 58,
+  "last_updated": "2026-04-29T19:40:27.141631+00:00",
+  "started_at": "2026-04-29T19:38:38.540938+00:00",
+  "duration_seconds": 108.6,
+  "total_listings": 76,
+  "dropped": 29,
   "per_source_raw": {
-    "goodlife": 82,
-    "oceanside": 38
+    "goodlife": 30,
+    "oceanside": 30,
+    "kazu": 0,
+    "century21": 15,
+    "remax": 0,
+    "bienesraices": 30
+  },
+  "source_status": {
+    "goodlife": "green",
+    "oceanside": "green",
+    "kazu": "red",
+    "century21": "green",
+    "remax": "red",
+    "bienesraices": "green"
   },
   "sources": [
     "goodlife",
-    "oceanside"
+    "oceanside",
+    "kazu",
+    "century21",
+    "remax",
+    "bienesraices"
   ],
   "offline": false,
   "fixture_fallback_active": false,

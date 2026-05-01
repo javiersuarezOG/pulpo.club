@@ -79,6 +79,10 @@ class OceansideScraper(BaseScraper):
             out.append({"url": href, "source_id": sid})
         return out
 
+    # Titles that indicate the scraper hit a generic page element rather than
+    # the actual listing heading — reject these so normalize() drops the record.
+    _BAD_TITLES = {"contact us", "contactanos", "contáctanos", "contact", "inquire"}
+
     def parse_detail_page(self, html: str, partial: dict) -> Optional[dict]:
         if not SELECTOLAX_OK:
             return None
@@ -86,14 +90,20 @@ class OceansideScraper(BaseScraper):
         def text_of(sel: str) -> str:
             n = tree.css_first(sel)
             return n.text(strip=True) if n else ""
+
         title = text_of(self.DETAIL_TITLE_SEL)
-        if not title:
-            return None
+        if not title or title.lower().strip() in self._BAD_TITLES:
+            # Fall back to page <title> tag (usually "Property Name – Oceanside")
+            t_node = tree.css_first("title")
+            if t_node:
+                import re as _re
+                raw = t_node.text(strip=True)
+                # Split on " – ", " — ", " | ", " - " (must have surrounding spaces)
+                title = _re.split(r'\s[–—|]\s|\s-\s', raw)[0].strip()
+            if not title or title.lower().strip() in self._BAD_TITLES:
+                return None
+
         post_content = text_of(self.DETAIL_PRICE_SEL)  # = ".post-content"
-        # raw_size_text is intentionally narrowed to a clean "<n> m²" token
-        # extracted via a year-anchored regex. Passing the whole .post-content
-        # blob would let parse_area latch onto "<year><area>" as a single
-        # ~2-billion-m² number.
         return {
             "title": title,
             "raw_price_text": post_content,

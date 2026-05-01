@@ -45,8 +45,5 @@ module.exports = async (req, res) => {
 
   // Members API is dynamic; we don't want CDN caching the privileged payload.
   res.setHeader("Cache-Control", "private, no-store");
-  return res.status(200).json({
-    user: session.u,
-    listings: data,
-  });
+  return res.status(200).json({ listings: data });
 };

@@ -1,9 +1,5 @@
-// POST /api/login   { username, password }   -> 200 { ok: true } + Set-Cookie
-// GET  /api/login                             -> 405
-//
-// Rate-limit-light: bcrypt itself is the rate limit (cost 10 ≈ 100ms/attempt).
-// If brute-force becomes a real concern, front this with Vercel's edge rate
-// limiter or upstash. Not worth the complexity at <50 users.
+// POST /api/login   { code }   -> 200 { ok: true } + Set-Cookie
+// GET  /api/login              -> 405
 
 const { checkPassword, issueToken, buildCookie } = require("./_auth");
 
@@ -14,26 +10,22 @@ module.exports = async (req, res) => {
   }
 
   let body = req.body;
-  // Vercel auto-parses JSON when content-type is application/json, but the
-  // browser fetch in our dashboard sets it explicitly so this is the common path.
   if (typeof body === "string") {
     try { body = JSON.parse(body); } catch { body = {}; }
   }
   body = body || {};
-  const username = (body.username || "").toString().trim().toLowerCase();
-  const password = (body.password || "").toString();
+  const code = (body.code || "").toString();
 
-  if (!username || !password) {
-    return res.status(400).json({ error: "missing_credentials" });
+  if (!code) {
+    return res.status(400).json({ error: "missing_code" });
   }
 
-  const ok = await checkPassword(username, password);
+  const ok = await checkPassword(code);
   if (!ok) {
-    // Generic message — don't leak which half was wrong.
-    return res.status(401).json({ error: "invalid_credentials" });
+    return res.status(401).json({ error: "invalid_code" });
   }
 
-  const token = issueToken(username);
+  const token = issueToken();
   res.setHeader("Set-Cookie", buildCookie(token));
-  return res.status(200).json({ ok: true, username });
+  return res.status(200).json({ ok: true });
 };
