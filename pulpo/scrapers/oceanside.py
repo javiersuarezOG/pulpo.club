@@ -45,7 +45,7 @@ def _extract_area_text(blob: str) -> str:
 
 BASE_URL = "https://oceansideelsalvador.com/"
 LIST_URL = "https://oceansideelsalvador.com/lands/page/{page}/"
-MAX_PAGES = 6
+MAX_PAGES = 50
 REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 

@@ -31,7 +31,7 @@ if SELECTOLAX_OK:
 
 BASE_URL = "https://kazurealestate.com/"
 LIST_URL = "https://kazurealestate.com/properties/?property_type=land&page={page}"
-MAX_PAGES = 6
+MAX_PAGES = 50
 REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 

@@ -37,7 +37,7 @@ LIST_URL = (
     "https://www.remax.com.sv/listings/buy"
     "?page={page}&type=land&pageSize=24"
 )
-MAX_PAGES = 6
+MAX_PAGES = 50
 REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 
