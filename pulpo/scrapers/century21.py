@@ -17,7 +17,8 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from .base import BaseScraper, HTTPX_OK
+from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents import SOURCES, register
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -58,35 +59,45 @@ def _extract_results(html: str) -> list[dict]:
         return []
 
 
-class Century21Scraper(BaseScraper):
-    SOURCE = "century21"
-    BASE_URL = BASE
-    LIST_URL = RESULTS_URL
+class Century21Scraper:
+    slug = "century21"
     FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 1  # all data is in a single embedded JSON blob
 
-    def crawl(self, limit: int = 30) -> list[dict]:
-        if self.offline:
-            return self._load_fixtures(limit)
-        time.sleep(self.REQUEST_DELAY)
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
+        env_delay = None
         try:
-            resp = self.client.get(RESULTS_URL)
-            resp.raise_for_status()
-        except Exception as e:
-            print(f"[{self.SOURCE}] fetch failed: {e}")
-            return []
+            env_delay = float(__import__("os").environ.get("PULPO_REQUEST_DELAY") or 1.5)
+        except (ValueError, TypeError):
+            env_delay = 1.5
+        self.REQUEST_DELAY = env_delay
 
-        raw_results = _extract_results(resp.text)
-        out = []
-        for rec in raw_results:
-            if rec.get("tipoPropiedad") not in LAND_TYPES:
-                continue
-            mapped = self._map(rec)
-            if mapped:
-                out.append(mapped)
-            if len(out) >= limit:
-                break
-        return out
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, self.FIXTURE_FILE, limit)
+        client = make_client()
+        try:
+            time.sleep(self.REQUEST_DELAY)
+            try:
+                resp = client.get(RESULTS_URL)
+                resp.raise_for_status()
+            except Exception as e:
+                print(f"[{self.slug}] fetch failed: {e}")
+                return []
+
+            raw_results = _extract_results(resp.text)
+            out = []
+            for rec in raw_results:
+                if rec.get("tipoPropiedad") not in LAND_TYPES:
+                    continue
+                mapped = self._map(rec)
+                if mapped:
+                    out.append(mapped)
+                if len(out) >= limit:
+                    break
+            return out
+        finally:
+            client.close()
 
     def _map(self, rec: dict) -> Optional[dict]:
         title = rec.get("encabezado") or ""
@@ -110,7 +121,7 @@ class Century21Scraper(BaseScraper):
         broker_email = rec.get("email") or ""
 
         return {
-            "source": self.SOURCE,
+            "source": self.slug,
             "source_id": str(rec.get("id") or ""),
             "url": url,
             "title": title.strip(),
@@ -130,6 +141,10 @@ class Century21Scraper(BaseScraper):
 
     def parse_detail_page(self, html: str, partial: dict) -> Optional[dict]:
         return None
+
+
+_scraper = Century21Scraper(offline=None)
+register(SOURCES, "century21", _scraper)
 
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:

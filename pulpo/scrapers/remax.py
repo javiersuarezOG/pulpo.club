@@ -22,31 +22,29 @@ cron — see automation/calibrate.py.
 """
 from __future__ import annotations
 from typing import Optional
-from .base import BaseScraper, SELECTOLAX_OK
+
+from pulpo.agents.html_crawler import (
+    SELECTOLAX_OK, is_offline, load_fixtures, make_client, walk as _walk,
+)
+from pulpo.agents import SOURCES, register
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser  # noqa: F401
 
+BASE_URL = "https://www.remax.com.sv/"
+LIST_URL = (
+    "https://www.remax.com.sv/listings/buy"
+    "?page={page}&type=land&pageSize=24"
+)
+MAX_PAGES = 6
+REQUEST_DELAY = 1.5
+FIXTURE_FILE = "sample_listings.json"
 
-class RemaxScraper(BaseScraper):
-    SOURCE = "remax"
-    BASE_URL = "https://www.remax.com.sv/"
-    # RE/MAX's listings index. Filters: type=land (terreno), operation=sale.
-    # Pagination is `?page=N` (LATAM template); confirm during calibration.
-    LIST_URL = (
-        "https://www.remax.com.sv/listings/buy"
-        "?page={page}&type=land&pageSize=24"
-    )
-    FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 6
+
+class RemaxScraper:
+    slug = "remax"
 
     # ---- selectors (PLACEHOLDER — calibrate before live use) ----
-    # RE/MAX Global card markup: each property is a `.card` (or
-    # `.listing-card`) within `.listings-grid`. Detail pages render the
-    # headline price as `.listing-price`, the lot size inside a
-    # `.listing-features` / `.feature-item` block, and the location in
-    # `.listing-address`. These are best-effort defaults from the RE/MAX
-    # LATAM template; adjust per saved page.
     INDEX_CARD_SEL = (
         "article.listing-card, div.listing-card, div.card.listing, "
         "div.property-card"
@@ -61,6 +59,9 @@ class RemaxScraper(BaseScraper):
     DETAIL_LOC_SEL = ".listing-address, .property-address, .address, .location"
     DETAIL_DESC_SEL = ".listing-description, .property-description, .description"
 
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
+
     def parse_index_page(self, html: str) -> list[dict]:
         if not SELECTOLAX_OK:
             return []
@@ -73,8 +74,6 @@ class RemaxScraper(BaseScraper):
             href = link.attributes.get("href")
             if not href:
                 continue
-            # RE/MAX detail URLs look like /listing/<numeric-id>/<slug> or
-            # /listings/<id>; the last non-empty path segment is a stable id.
             sid = href.rstrip("/").rsplit("/", 1)[-1]
             out.append({"url": href, "source_id": sid})
         return out
@@ -92,11 +91,6 @@ class RemaxScraper(BaseScraper):
         if not title:
             return None
 
-        # `.listing-features .feature-item` is a list of <li>-shaped chips
-        # like "Lot Size 5,200 m²", "Bedrooms 0", "Year built —". Joining
-        # the chips into one blob lets parse_area pick the first <num><unit>
-        # pair (lot-size always ranks ahead of bedrooms in RE/MAX's
-        # ordering, so the first regex hit is the right one).
         feature_nodes = tree.css(self.DETAIL_AREA_SEL)
         feature_text = " | ".join(
             n.text(strip=True) for n in feature_nodes if n is not None
@@ -115,6 +109,28 @@ class RemaxScraper(BaseScraper):
             "description": description[:1500],
             "property_type": "land",
         }
+
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        client = make_client()
+        try:
+            return _walk(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+
+_scraper = RemaxScraper()
+register(SOURCES, "remax", _scraper)
 
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:

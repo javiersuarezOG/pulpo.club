@@ -18,7 +18,8 @@ import json
 import sys
 from pathlib import Path
 
-from .scrapers import REGISTRY
+from .agents import SOURCES as REGISTRY
+import pulpo.scrapers  # noqa: F401 — triggers registration of all sources
 from .normalize import normalize
 from .ranker import rank
 from .units import fmt_area

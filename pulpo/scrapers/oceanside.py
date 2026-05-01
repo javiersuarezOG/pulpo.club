@@ -8,7 +8,11 @@ Stack signals: WordPress, RealHomes / Houzez-style theme. Listings under
 from __future__ import annotations
 import re
 from typing import Optional
-from .base import BaseScraper, SELECTOLAX_OK
+
+from pulpo.agents.html_crawler import (
+    SELECTOLAX_OK, is_offline, load_fixtures, make_client, walk as _walk,
+)
+from pulpo.agents import SOURCES, register
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser
@@ -38,30 +42,22 @@ def _extract_area_text(blob: str) -> str:
     m = _AREA_AFTER_YEAR_RE.search(blob) or _AREA_PLAIN_RE.search(blob)
     return f"{m.group(1)} m²" if m else ""
 
-class OceansideScraper(BaseScraper):
-    SOURCE = "oceanside"
-    BASE_URL = "https://oceansideelsalvador.com/"
-    # /lands/ is the server-rendered land archive; /property-category/land-for-sale/
-    # 404s. Pagination is /lands/page/N/.
-    LIST_URL = "https://oceansideelsalvador.com/lands/page/{page}/"
-    FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 6
+BASE_URL = "https://oceansideelsalvador.com/"
+LIST_URL = "https://oceansideelsalvador.com/lands/page/{page}/"
+MAX_PAGES = 6
+REQUEST_DELAY = 1.5
+FIXTURE_FILE = "sample_listings.json"
 
-    # ---- selectors (calibrated 2026-04-28 against /lands/ + /rental-details/) ----
-    # Site runs Avada/Fusion theme. Land listings live under /rental-details/
-    # (a quirk of the Avada CPT mapping, not actual rentals). The detail page
-    # packs all property metadata — price, lot size, location — into a single
-    # .post-content block whose visible text reads e.g.
-    #   "$187,916.80 ... 1,171.53m2 ... La Libertad, El Salvador"
-    # so each field-level selector reuses .post-content and lets the
-    # downstream regex parsers pick the right substring.
+
+class OceansideScraper:
+    slug = "oceanside"
     INDEX_CARD_SEL = "li.fusion-grid-column.post-card, .fusion-post-cards-grid-column"
     INDEX_LINK_SEL = "a.fusion-column-anchor"
     DETAIL_TITLE_SEL = "h1.fusion-title-heading, h1.entry-title, h1"
-    DETAIL_PRICE_SEL = "div.post-content"
-    DETAIL_AREA_SEL = "div.post-content"
-    DETAIL_LOC_SEL = "div.post-content"
-    DETAIL_DESC_SEL = "div.post-content"
+    _BAD_TITLES = {"contact us", "contactanos", "contáctanos", "contact", "inquire"}
+
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
 
     def parse_index_page(self, html: str) -> list[dict]:
         if not SELECTOLAX_OK:
@@ -79,10 +75,6 @@ class OceansideScraper(BaseScraper):
             out.append({"url": href, "source_id": sid})
         return out
 
-    # Titles that indicate the scraper hit a generic page element rather than
-    # the actual listing heading — reject these so normalize() drops the record.
-    _BAD_TITLES = {"contact us", "contactanos", "contáctanos", "contact", "inquire"}
-
     def parse_detail_page(self, html: str, partial: dict) -> Optional[dict]:
         if not SELECTOLAX_OK:
             return None
@@ -90,20 +82,15 @@ class OceansideScraper(BaseScraper):
         def text_of(sel: str) -> str:
             n = tree.css_first(sel)
             return n.text(strip=True) if n else ""
-
         title = text_of(self.DETAIL_TITLE_SEL)
         if not title or title.lower().strip() in self._BAD_TITLES:
-            # Fall back to page <title> tag (usually "Property Name – Oceanside")
             t_node = tree.css_first("title")
             if t_node:
-                import re as _re
                 raw = t_node.text(strip=True)
-                # Split on " – ", " — ", " | ", " - " (must have surrounding spaces)
-                title = _re.split(r'\s[–—|]\s|\s-\s', raw)[0].strip()
+                title = re.split(r'\s[–—|]\s|\s-\s', raw)[0].strip()
             if not title or title.lower().strip() in self._BAD_TITLES:
                 return None
-
-        post_content = text_of(self.DETAIL_PRICE_SEL)  # = ".post-content"
+        post_content = text_of("div.post-content")
         return {
             "title": title,
             "raw_price_text": post_content,
@@ -112,6 +99,29 @@ class OceansideScraper(BaseScraper):
             "description": post_content[:1500],
             "property_type": "land",
         }
+
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        client = make_client()
+        try:
+            return _walk(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+
+_scraper = OceansideScraper()
+register(SOURCES, "oceanside", _scraper)
+
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:
     return OceansideScraper(offline=offline).crawl(limit)

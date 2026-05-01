@@ -19,8 +19,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from pulpo.scrapers import REGISTRY  # noqa: E402
-from pulpo.scrapers.base import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
+from pulpo.agents import SOURCES as REGISTRY  # noqa: E402
+import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all sources
+from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.normalize import normalize  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
