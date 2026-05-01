@@ -60,6 +60,7 @@ def main() -> int:
         errors.append(msg)
 
     source_errors: dict[str, str] = {}   # src -> error message
+    source_meta: dict[str, dict] = {}    # src -> {max_pages_hit, limit_hit}
 
     for src in sources:
         src = src.strip()
@@ -70,7 +71,16 @@ def main() -> int:
             source_errors[src] = err
             continue
         try:
-            recs = mod.crawl(limit=limit, offline=offline or None)
+            if hasattr(mod, "crawl_with_meta"):
+                result = mod.crawl_with_meta(limit=limit, offline=offline or None)
+                recs = result["records"]
+                source_meta[src] = {
+                    "max_pages_hit": result["max_pages_hit"],
+                    "limit_hit": result["limit_hit"],
+                }
+            else:
+                recs = mod.crawl(limit=limit, offline=offline or None)
+                source_meta[src] = {"max_pages_hit": False, "limit_hit": False}
         except Exception as e:
             err = repr(e)
             errors.append(f"{src}: {err}")
@@ -128,6 +138,18 @@ def main() -> int:
         else:
             source_status[src] = "green"
 
+    # Coverage block: pulled counts + pagination flags per source.
+    # supplier is null here (run.py doesn't make extra requests to fetch
+    # advertised totals — use automation/coverage_audit.py for that).
+    coverage = {
+        src: {
+            "supplier": None,
+            "pulled": per_source_count.get(src, 0),
+            "max_pages_hit": source_meta.get(src, {}).get("max_pages_hit", False),
+        }
+        for src in sources
+    }
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -138,6 +160,7 @@ def main() -> int:
         "dropped": dropped,
         "per_source_raw": per_source_count,
         "source_status": source_status,
+        "coverage": coverage,
         "sources": sources,
         "offline": offline,
         "fixture_fallback_active": fixture_fallback_active,

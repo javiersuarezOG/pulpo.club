@@ -55,6 +55,22 @@ class BienesRaicesScraper:
         except (ValueError, TypeError):
             self.REQUEST_DELAY = 1.5
 
+    def report_total(self, client) -> Optional[int]:
+        """Count land slug candidates from the AlterEstate sitemap."""
+        try:
+            resp = client.get(
+                SITEMAP_URL,
+                headers={**dict(client.headers), **SITEMAP_HEADERS},
+            )
+            resp.raise_for_status()
+            sitemap = resp.json()
+            return sum(
+                1 for item in sitemap
+                if any(k in item.get("slug", "") for k in LAND_SLUG_KEYWORDS)
+            )
+        except Exception:
+            return None
+
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
@@ -164,6 +180,13 @@ class BienesRaicesScraper:
             "broker_email": broker_email,
             "scraped_at": datetime.now(timezone.utc).isoformat(),
         }
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002
+    ) -> dict:
+        """Sitemap-based source — max_pages does not apply."""
+        records = self.crawl(limit, offline)
+        return {"records": records, "max_pages_hit": False, "limit_hit": len(records) >= limit}
 
     def parse_index_page(self, html: str) -> list[dict]:
         return []

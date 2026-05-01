@@ -1,24 +1,56 @@
 {
-  "last_updated": "2026-04-29T19:40:27.141631+00:00",
-  "started_at": "2026-04-29T19:38:38.540938+00:00",
-  "duration_seconds": 108.6,
-  "total_listings": 76,
-  "dropped": 29,
+  "last_updated": "2026-05-01T21:12:44.684598+00:00",
+  "started_at": "2026-05-01T21:12:44.676908+00:00",
+  "duration_seconds": 0.01,
+  "total_listings": 21,
+  "dropped": 0,
   "per_source_raw": {
-    "goodlife": 30,
-    "oceanside": 30,
-    "kazu": 0,
-    "century21": 15,
-    "remax": 0,
-    "bienesraices": 30
+    "goodlife": 5,
+    "oceanside": 5,
+    "kazu": 5,
+    "century21": 3,
+    "remax": 3,
+    "bienesraices": 0
   },
   "source_status": {
     "goodlife": "green",
     "oceanside": "green",
-    "kazu": "red",
+    "kazu": "green",
     "century21": "green",
-    "remax": "red",
-    "bienesraices": "green"
+    "remax": "green",
+    "bienesraices": "red"
+  },
+  "coverage": {
+    "goodlife": {
+      "supplier": null,
+      "pulled": 5,
+      "max_pages_hit": false
+    },
+    "oceanside": {
+      "supplier": null,
+      "pulled": 5,
+      "max_pages_hit": false
+    },
+    "kazu": {
+      "supplier": null,
+      "pulled": 5,
+      "max_pages_hit": false
+    },
+    "century21": {
+      "supplier": null,
+      "pulled": 3,
+      "max_pages_hit": false
+    },
+    "remax": {
+      "supplier": null,
+      "pulled": 3,
+      "max_pages_hit": false
+    },
+    "bienesraices": {
+      "supplier": null,
+      "pulled": 0,
+      "max_pages_hit": false
+    }
   },
   "sources": [
     "goodlife",
@@ -28,7 +60,7 @@
     "remax",
     "bienesraices"
   ],
-  "offline": false,
+  "offline": true,
   "fixture_fallback_active": false,
   "errors": []
 }

@@ -72,6 +72,16 @@ class Century21Scraper:
             env_delay = 1.5
         self.REQUEST_DELAY = env_delay
 
+    def report_total(self, client) -> Optional[int]:
+        """Count land-type listings from the embedded OmniMLS JSON."""
+        try:
+            resp = client.get(RESULTS_URL)
+            resp.raise_for_status()
+            raw = _extract_results(resp.text)
+            return sum(1 for r in raw if r.get("tipoPropiedad") in LAND_TYPES)
+        except Exception:
+            return None
+
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, self.FIXTURE_FILE, limit)
@@ -98,6 +108,13 @@ class Century21Scraper:
             return out
         finally:
             client.close()
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002
+    ) -> dict:
+        """Single-fetch source — max_pages does not apply."""
+        records = self.crawl(limit, offline)
+        return {"records": records, "max_pages_hit": False, "limit_hit": len(records) >= limit}
 
     def _map(self, rec: dict) -> Optional[dict]:
         title = rec.get("encabezado") or ""

@@ -11,10 +11,12 @@ against actual HTML by saving one detail page locally and adjusting the
 selectors. The fixture fallback lets the pipeline run without live access.
 """
 from __future__ import annotations
+import re
 from typing import Optional
 
 from pulpo.agents.html_crawler import (
-    SELECTOLAX_OK, is_offline, load_fixtures, make_client, walk as _walk,
+    SELECTOLAX_OK, is_offline, load_fixtures, make_client,
+    walk as _walk, walk_with_meta as _walk_meta,
 )
 from pulpo.agents import SOURCES, register
 
@@ -104,6 +106,24 @@ class GoodLifeScraper:
             "property_type": "land",
         }
 
+    def report_total(self, client) -> Optional[int]:
+        """Fetch the land index and return the advertised listing count, or None."""
+        try:
+            r = client.get("https://goodlifeelsalvador.com/land/")
+            r.raise_for_status()
+        except Exception:
+            return None
+        html = r.text
+        for pattern in [
+            r'Showing\s+(?:all\s+)?(\d+)\s+results?',
+            r'(\d+)\s+(?:listings?|properties|results?)\s+found',
+            r'woocommerce-result-count[^>]*>\s*(?:[^<]*of\s+)?(\d+)',
+        ]:
+            m = re.search(pattern, html, re.IGNORECASE)
+            if m:
+                return int(m.group(1))
+        return None
+
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
@@ -116,6 +136,28 @@ class GoodLifeScraper:
                 parse_index=self.parse_index_page,
                 parse_detail=self.parse_detail_page,
                 max_pages=MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None
+    ) -> dict:
+        """Like crawl() but returns {"records", "max_pages_hit", "limit_hit"}."""
+        if is_offline(offline if offline is not None else self.offline):
+            records = load_fixtures(self.slug, FIXTURE_FILE, limit)
+            return {"records": records, "max_pages_hit": False, "limit_hit": False}
+        client = make_client()
+        try:
+            return _walk_meta(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=max_pages if max_pages is not None else MAX_PAGES,
                 request_delay=REQUEST_DELAY,
                 limit=limit,
             )

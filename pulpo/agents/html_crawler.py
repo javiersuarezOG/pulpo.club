@@ -79,7 +79,32 @@ def walk(
     parse_index(html) -> list[{"url": ..., "source_id": ...}]
     parse_detail(html, partial) -> dict | None
     """
-    # Allow env override of per-request delay (useful in tests / CI)
+    return walk_with_meta(
+        client=client, base_url=base_url, list_url=list_url,
+        parse_index=parse_index, parse_detail=parse_detail,
+        max_pages=max_pages, request_delay=request_delay, limit=limit,
+    )["records"]
+
+
+def walk_with_meta(
+    client: "httpx.Client",
+    base_url: str,
+    list_url: str,
+    parse_index: Callable[[str], list[dict]],
+    parse_detail: Callable[[str, dict], Optional[dict]],
+    max_pages: int = 5,
+    request_delay: float = 1.5,
+    limit: int = 30,
+) -> dict:
+    """
+    Like walk() but returns a coverage-audit dict:
+      {"records": [...], "max_pages_hit": bool, "limit_hit": bool}
+
+    max_pages_hit: True when the loop exhausted max_pages with results still
+      coming in — there are likely more listings we didn't fetch.
+    limit_hit: True when the caller's `limit` cap stopped the crawl before
+      pagination ended naturally.
+    """
     try:
         request_delay = float(os.environ.get("PULPO_REQUEST_DELAY") or request_delay)
     except ValueError:
@@ -87,6 +112,8 @@ def walk(
 
     out: list[dict] = []
     seen_urls: set[str] = set()
+    limit_hit = False
+    last_had_partials = False
 
     for page in range(1, max_pages + 1):
         url = list_url.format(page=page) if "{page}" in list_url else list_url
@@ -100,10 +127,13 @@ def walk(
 
         partials = parse_index(r.text)
         if not partials:
+            last_had_partials = False
             break
+        last_had_partials = True
 
         for partial in partials:
             if len(out) >= limit:
+                limit_hit = True
                 break
             durl = partial.get("url", "")
             if not durl:
@@ -128,7 +158,11 @@ def walk(
                 rec.setdefault("scraped_at", datetime.now(timezone.utc).isoformat())
                 out.append(rec)
 
-        if len(out) >= limit:
+        if limit_hit:
             break
+    else:
+        # for loop completed all max_pages without a break
+        max_pages_hit = last_had_partials
+        return {"records": out, "max_pages_hit": max_pages_hit, "limit_hit": limit_hit}
 
-    return out
+    return {"records": out, "max_pages_hit": False, "limit_hit": limit_hit}

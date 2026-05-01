@@ -21,7 +21,8 @@ from __future__ import annotations
 from typing import Optional
 
 from pulpo.agents.html_crawler import (
-    SELECTOLAX_OK, is_offline, load_fixtures, make_client, walk as _walk,
+    SELECTOLAX_OK, is_offline, load_fixtures, make_client,
+    walk as _walk, walk_with_meta as _walk_meta,
 )
 from pulpo.agents import SOURCES, register
 
@@ -84,6 +85,10 @@ class KazuScraper:
             "property_type": "land",
         }
 
+    def report_total(self, client) -> None:  # noqa: ARG002
+        """API host is on denylist — supplier count unavailable."""
+        return None
+
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
@@ -96,6 +101,27 @@ class KazuScraper:
                 parse_index=self.parse_index_page,
                 parse_detail=self.parse_detail_page,
                 max_pages=MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None
+    ) -> dict:
+        if is_offline(offline if offline is not None else self.offline):
+            records = load_fixtures(self.slug, FIXTURE_FILE, limit)
+            return {"records": records, "max_pages_hit": False, "limit_hit": False}
+        client = make_client()
+        try:
+            return _walk_meta(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=max_pages if max_pages is not None else MAX_PAGES,
                 request_delay=REQUEST_DELAY,
                 limit=limit,
             )

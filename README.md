@@ -173,6 +173,8 @@ Before treating the live numbers as trustworthy, this work is required (tracked 
 
 What we *can* commit to once calibrated: weekly Wednesday refresh, with a fixture-fallback path that keeps the dashboard up even if one source breaks. Phase 2 adds Postgres for diff-based repricing detection (right now `is_repriced` is read from raw, not diffed) and Mapbox geocoding.
 
+Run `python3 automation/coverage_audit.py` to check that every source is pulling at or near 100% of advertised supply.
+
 ## What's not in this repo (intentionally — Phase 2+)
 
 - Postgres + dedup
