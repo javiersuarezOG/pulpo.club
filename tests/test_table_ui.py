@@ -82,14 +82,22 @@ def test_filter_partitions_are_complete(listings):
 def sort_rows(rows, col, direction):
     """Python mirror of JS sortedRows()."""
     reverse = direction == "desc"
+
+    def key_price(r):
+        return r.get("price_usd") or (float("inf") if not reverse else float("-inf"))
+
+    def key_area(r):
+        return r.get("area_m2") or (float("-inf") if not reverse else float("inf"))
+
+    def key_ppm(r):
+        v = r.get("price_per_m2") or 0
+        return v if v > 0 else float("inf")
+
     if col == "price":
-        key = lambda r: r.get("price_usd") or (float("inf") if not reverse else float("-inf"))
-    elif col == "area":
-        key = lambda r: r.get("area_m2") or (float("-inf") if not reverse else float("inf"))
-    else:  # ppm
-        ppm = lambda r: r.get("price_per_m2") or 0
-        key = lambda r: ppm(r) if ppm(r) > 0 else float("inf")
-    return sorted(rows, key=key, reverse=reverse)
+        return sorted(rows, key=key_price, reverse=reverse)
+    if col == "area":
+        return sorted(rows, key=key_area, reverse=reverse)
+    return sorted(rows, key=key_ppm, reverse=reverse)
 
 
 def test_sort_ppm_asc_default(listings):
