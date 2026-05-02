@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-02T19:16:54.218465+00:00",
-  "started_at": "2026-05-02T18:47:09.563563+00:00",
-  "duration_seconds": 1784.65,
-  "total_listings": 812,
+  "last_updated": "2026-05-02T21:36:02.849225+00:00",
+  "started_at": "2026-05-02T21:01:32.642204+00:00",
+  "duration_seconds": 2070.21,
+  "total_listings": 803,
   "dropped": 94,
   "per_source_raw": {
     "goodlife": 80,
     "oceanside": 27,
     "century21": 15,
     "bienesraices": 471,
-    "remax": 313
+    "remax": 304
   },
   "source_status": {
     "goodlife": "green",
@@ -41,7 +41,7 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 313,
+      "pulled": 304,
       "max_pages_hit": false
     }
   },
@@ -51,9 +51,9 @@
       "fields": {
         "price_usd": 0.97,
         "area_m2": 0.98,
-        "zone": 0.5,
-        "municipality": 0.5,
-        "department": 0.5,
+        "zone": 0.96,
+        "municipality": 0.98,
+        "department": 0.99,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -76,9 +76,9 @@
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.27,
-        "municipality": 0.27,
-        "department": 0.27,
+        "zone": 0.93,
+        "municipality": 0.93,
+        "department": 1.0,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -101,9 +101,9 @@
       "fields": {
         "price_usd": 0.9,
         "area_m2": 0.97,
-        "zone": 0.84,
-        "municipality": 0.84,
-        "department": 0.84,
+        "zone": 1.0,
+        "municipality": 1.0,
+        "department": 1.0,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -147,13 +147,13 @@
       }
     },
     "remax": {
-      "n_listings": 308,
+      "n_listings": 299,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.17,
-        "municipality": 0.17,
-        "department": 0.17,
+        "zone": 0.86,
+        "municipality": 0.89,
+        "department": 0.9,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -168,7 +168,7 @@
         "broker_phone": 0.0,
         "broker_email": 0.0,
         "title": 1.0,
-        "description": 0.26
+        "description": 0.27
       }
     }
   },
