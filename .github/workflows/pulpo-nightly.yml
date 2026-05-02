@@ -6,6 +6,12 @@ on:
     - cron: "0 12 * * *"
   workflow_dispatch: {}    # also allow manual runs
 
+# Count floor: workflow fails (and does NOT commit) if fewer than this
+# many listings are produced. Protects against a single broken scraper
+# silently zeroing out the leaderboard. Tune upward as supply grows.
+env:
+  LISTING_COUNT_FLOOR: "50"
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -13,6 +19,13 @@ jobs:
       contents: write     # commit refreshed web/data/ back
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Use PAT so the bot push bypasses the "require PR" check on main.
+          # PULPO_BOT_TOKEN must be a fine-grained PAT with Contents: write
+          # on this repo, stored as a repository secret.
+          # Fall back to the default GITHUB_TOKEN when the PAT isn't set
+          # (preview branches, forks, first-time setup).
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
       - uses: actions/setup-python@v5
         with:
@@ -27,9 +40,26 @@ jobs:
           PULPO_OFFLINE: "0"
           PULPO_LIMIT: "1000"
           # kazu: Nuxt SPA, panel API still denylisted — re-add when rewritten.
-          # remax: domain fix merged; added here.
           PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax"
         run: python automation/run.py
+
+      - name: Count-floor canary
+        run: |
+          python3 - <<'EOF'
+          import json, sys, os
+          floor = int(os.environ.get("LISTING_COUNT_FLOOR", "50"))
+          try:
+              data = json.load(open("web/data/ranked.json"))
+          except Exception as e:
+              print(f"ERROR: could not read ranked.json: {e}", file=sys.stderr)
+              sys.exit(1)
+          n = len(data)
+          if n < floor:
+              print(f"CANARY FAIL: {n} listings is below floor of {floor}. "
+                    "Not committing — stale data kept.", file=sys.stderr)
+              sys.exit(1)
+          print(f"CANARY OK: {n} listings ≥ floor {floor}")
+          EOF
 
       - name: Commit refreshed data
         run: |
@@ -44,9 +74,3 @@ jobs:
             git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
             git push
           fi
-
-      # - name: Deploy to Vercel
-      #   run: vercel --prod --token $VERCEL_TOKEN
-      #
-      # - name: Send newsletter draft to Beehiiv
-      #   run: python automation/build_newsletter.py
