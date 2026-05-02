@@ -13,7 +13,7 @@ import pytest
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from pulpo.normalize import normalize, _resolve_zone  # noqa: E402
+from pulpo.normalize import normalize  # noqa: E402
 
 
 # ── Helpers ───────────────────────────────────────────────────────────
