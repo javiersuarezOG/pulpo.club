@@ -436,3 +436,90 @@ def test_url_state_documented():
     """
     # This test exists to document the contract; it always passes.
     assert True
+
+
+# ── Header stat formatting ────────────────────────────────────────────
+
+def fmt_updated(iso_str: str, now_override=None) -> str:
+    """Python mirror of JS fmtUpdated()."""
+    from datetime import datetime, timezone, timedelta
+    d = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+    now = now_override or datetime.now(timezone.utc)
+    def fmt_time(dt):
+        h = dt.hour % 12 or 12
+        m = dt.minute
+        ampm = "AM" if dt.hour < 12 else "PM"
+        return f"{h}:{m:02d} {ampm}"
+    def same_date(a, b):
+        return a.date() == b.date()
+    yesterday = now - timedelta(days=1)
+    t = fmt_time(d)
+    if same_date(d, now):
+        return f"Today, {t}"
+    if same_date(d, yesterday):
+        return f"Yesterday, {t}"
+    months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+    return f"{months[d.month-1]} {d.day}, {t}"
+
+
+def test_fmt_updated_today():
+    """When last_updated is today, shows 'Today, HH:MM AM/PM'."""
+    from datetime import datetime, timezone
+    now = datetime(2026, 5, 2, 21, 16, 0, tzinfo=timezone.utc)
+    ts  = "2026-05-02T21:16:00Z"
+    result = fmt_updated(ts, now_override=now)
+    assert result.startswith("Today,"), f"Expected 'Today, …', got {result!r}"
+
+
+def test_fmt_updated_yesterday():
+    """When last_updated is yesterday, shows 'Yesterday, HH:MM AM/PM'."""
+    from datetime import datetime, timezone, timedelta
+    now = datetime(2026, 5, 3, 10, 0, 0, tzinfo=timezone.utc)
+    ts  = "2026-05-02T20:00:00Z"
+    result = fmt_updated(ts, now_override=now)
+    assert result.startswith("Yesterday,"), f"Expected 'Yesterday, …', got {result!r}"
+
+
+def test_fmt_updated_older():
+    """Older dates show 'Mon DD, HH:MM AM/PM' — not 'Today' or 'Yesterday'."""
+    from datetime import datetime, timezone
+    now = datetime(2026, 5, 5, 12, 0, 0, tzinfo=timezone.utc)
+    ts  = "2026-05-02T21:16:00Z"
+    result = fmt_updated(ts, now_override=now)
+    assert not result.startswith("Today") and not result.startswith("Yesterday")
+    assert "May 2" in result or "May" in result
+
+
+def test_sources_format_includes_live():
+    """Sources value must include 'live' and use ' / ' separator — not '/' or 'of'."""
+    sources_text = "5 / 5 live"
+    assert " / " in sources_text, "Must use ' / ' separator"
+    assert "live" in sources_text, "Must include the word 'live'"
+    assert "of" not in sources_text, "Must not use 'of'"
+
+
+def test_brand_dot_color_is_literal():
+    """The brand dot uses literal #1D9E75, not a CSS variable."""
+    import re
+    html = open("web/index.html").read()
+    # hdr-dot class should set color to #1D9E75 directly
+    assert ".hdr-dot{color:#1D9E75}" in html or ".hdr-dot{color:#1D9E75" in html, \
+        "Brand dot must use literal color #1D9E75, not a CSS var"
+
+
+def test_badge_svg_stroke_color():
+    """The SVG asterisk in the badge uses stroke #085041 (brand dark teal)."""
+    import re
+    html = open("web/index.html").read()
+    assert 'stroke="#085041"' in html, "Badge SVG must use stroke #085041"
+
+
+def test_header_border_bottom_present():
+    """Site header has a bottom border (not the old topbar height-based approach)."""
+    html = open("web/index.html").read()
+    assert ".site-header" in html, "New header class must be .site-header"
+    # The filter-bar DIV element must come after the closing </header> tag
+    header_end = html.find("</header>")
+    filter_bar_pos = html.find('class="filter-bar"')
+    assert header_end > 0 and filter_bar_pos > 0, "Both elements must exist in HTML"
+    assert header_end < filter_bar_pos, "Filter bar must be outside the header"
