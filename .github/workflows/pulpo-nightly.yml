@@ -147,6 +147,7 @@ jobs:
             echo "committed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
+            git pull --rebase
             git push
             echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
