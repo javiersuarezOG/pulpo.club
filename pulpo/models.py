@@ -20,6 +20,7 @@ class Listing:
     department: Optional[str] = None  # La Unión, San Miguel, La Libertad, ...
     municipality: Optional[str] = None
     zone: Optional[str] = None        # canonical zone slug: "el-cuco", "el-tunco", "el-zonte"
+    zone_confidence: Optional[str] = None  # 'specific'|'municipality'|'department'|'unresolved'
     location_text: str = ""           # raw human-readable location string
     lat: Optional[float] = None
     lng: Optional[float] = None
