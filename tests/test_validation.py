@@ -7,7 +7,6 @@ Each Phase 7 case from the spec is represented here, using real
 production listing data as fixtures where noted.
 """
 from __future__ import annotations
-import json
 import sys
 from pathlib import Path
 
