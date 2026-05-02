@@ -68,6 +68,71 @@ jobs:
           print(f"CANARY OK: {n} listings in [{floor}, {ceiling}]")
           EOF
 
+      - name: Data-quality canaries
+        # TODO(2026-05-09): switch from LOG_ONLY=true to fail once canaries are
+        # tuned against 7 days of real nightly runs.  Until then, violations are
+        # printed but do NOT fail the workflow so we can calibrate thresholds.
+        env:
+          LOG_ONLY: "true"   # flip to "false" after the 7-day soak window
+        run: |
+          python3 - <<'EOF'
+          import json, re, sys, os
+
+          log_only = os.environ.get("LOG_ONLY", "true").lower() == "true"
+          fail     = False
+
+          try:
+              data = json.load(open("web/data/ranked.json"))
+          except Exception as e:
+              print(f"ERROR: could not read ranked.json: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          NON_SV_TITLE_RE = re.compile(
+              r'(?:^(?:\w+\s+){0,4}|,\s*(?:en|in)\s+)'
+              r'(guatemala|honduras|costa.?rica|nicaragua|panam[aá]|m[eé]xico|colombia)\b',
+              re.IGNORECASE,
+          )
+
+          violations = []
+          for r in data:
+              url   = r.get("url") or ""
+              title = r.get("title") or ""
+              price = r.get("price_usd")
+              area  = r.get("area_m2")
+              ppm   = r.get("price_per_m2")
+
+              # Country canary
+              if NON_SV_TITLE_RE.search(title):
+                  violations.append(f"COUNTRY: {title!r} (url={url})")
+
+              # Area canary
+              if area is not None and area > 5_000_000:
+                  violations.append(f"MAX_AREA: area_m2={area} title={title!r}")
+
+              # Price canary
+              if price is not None and price > 50_000_000:
+                  violations.append(f"MAX_PRICE: price_usd={price} title={title!r}")
+
+              # $/m² range canary
+              if ppm is not None and ppm > 0 and (ppm < 1 or ppm > 5_000):
+                  violations.append(f"PPM_RANGE: price_per_m2={ppm} title={title!r}")
+
+          if violations:
+              label = "CANARY LOG" if log_only else "CANARY FAIL"
+              for v in violations:
+                  print(f"{label}: {v}", file=sys.stderr)
+              if not log_only:
+                  fail = True
+
+          if violations:
+              print(f"Data-quality canaries: {len(violations)} violations "
+                    f"({'logged only' if log_only else 'FAILING'})")
+          else:
+              print("Data-quality canaries: all OK")
+
+          sys.exit(1 if fail else 0)
+          EOF
+
       - name: Commit refreshed data
         id: commit
         run: |
@@ -75,7 +140,7 @@ jobs:
           git config user.email "bot@pulpo.club"
           git add web/data/ranked.json web/data/ranked-public.json \
                   web/data/last_updated.json web/data/run_history.json \
-                  web/data/parser_errors.log \
+                  web/data/parser_errors.log web/data/validation_log.jsonl \
                   samples/ranked.csv
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
