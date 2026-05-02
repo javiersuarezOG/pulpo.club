@@ -13,6 +13,11 @@ from typing import Optional
 from .models import Listing
 from .units import parse_area, parse_price_usd
 from .developments import detect_development
+from automation.localities import (
+    parse_location_text as _parse_loc_text,
+    lookup_locality     as _lookup_locality,
+    DEPT_LOOKUP, MUNI_LOOKUP, TOURIST_LOOKUP, _norm,
+)
 
 # ---- Sold-listing detection ----
 # Goodlife (and other SV brokers) leave properties indexed indefinitely with
@@ -292,6 +297,180 @@ _LAND_EXCEPTION_RE = re.compile(
 )
 
 
+# ── Multi-tier zone resolver ──────────────────────────────────────────
+# Returns (zone_slug, municipality, department, confidence).
+# confidence: 'specific' | 'municipality' | 'department' | 'unresolved'
+
+# Context guard for description text — zone must follow a location preposition
+# or appear at the start of a sentence/after a comma.
+_LOC_CTX = r'(?:(?:^|[.\n])\s*|[,;]\s*|\b(?:en|in|at|near|from|around|within|by|destination|located\s+in|ubicad[ao]\s+en|cerca\s+de|junto\s+a|frente\s+a)\s+)'
+
+
+def _search_localities_in_text(text: str, use_context: bool = False) -> Optional[tuple[str, str, str, str]]:
+    """Scan text for known tourist locality or municipality names.
+
+    Returns (slug, municipality, department, confidence) or None.
+    With use_context=True, tourist names must follow a location preposition
+    (prevents comparative-mention false-positives).
+
+    Matching uses accent-stripped normalized text so "AHUACHAPÁN" and
+    "Ahuachapan" both resolve correctly.
+    """
+    if not text:
+        return None
+    # Accent-stripped lowercase for pattern matching against normalized lookup keys
+    tl = _norm(text)
+
+    # Tourist localities (specific)
+    for variant, t in TOURIST_LOOKUP.items():
+        if use_context:
+            pattern = _LOC_CTX + re.escape(variant)
+            if re.search(pattern, tl, re.IGNORECASE | re.MULTILINE):
+                return (t["slug"], t["municipality"], t["department"], "specific")
+        else:
+            if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+                return (t["slug"], t["municipality"], t["department"], "specific")
+
+    # Municipalities — longer names first to avoid partial matches
+    for variant in sorted(MUNI_LOOKUP, key=len, reverse=True):
+        if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+            name, dept = MUNI_LOOKUP[variant]
+            slug = variant.replace(" ", "-")
+            return (slug, name, dept, "municipality")
+
+    # Department only
+    for variant, dept_canon in DEPT_LOOKUP.items():
+        if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+            return (None, None, dept_canon, "department")
+
+    return None
+
+
+def _slug_localities(url: str) -> Optional[tuple[str, str, str, str]]:
+    """Extract location from URL slug (e.g. /terreno-en-tonacatepeque-cm045)."""
+    try:
+        from urllib.parse import urlparse
+        path = urlparse(url).path.lower()
+    except Exception:
+        return None
+    # Strip common non-location words from the slug tokens
+    _STOPWORDS = {"terreno", "finca", "lote", "venta", "en", "de", "la", "el",
+                  "propiedad", "property", "land", "sale", "playa", "beach", "for"}
+    tokens = re.split(r'[-/]', path)
+    for tok in tokens:
+        tok = tok.strip()
+        if len(tok) < 3 or tok in _STOPWORDS:
+            continue
+        result = _lookup_locality(tok)
+        if result:
+            return result
+    return None
+
+
+def _search_tourist_only(text: str) -> Optional[tuple[str, str, str, str]]:
+    """Search for tourist localities ONLY (not municipalities or departments).
+
+    Used on title/location_text where we want specific zones but NOT the
+    municipality/dept fallback (which would prevent the description from
+    providing a more precise zone like El Tunco for a La Libertad listing).
+    """
+    if not text:
+        return None
+    tl = _norm(text)
+    for variant, t in TOURIST_LOOKUP.items():
+        if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+            return (t["slug"], t["municipality"], t["department"], "specific")
+    return None
+
+
+def _search_muni_dept_only(text: str) -> Optional[tuple[str, str, str, str]]:
+    """Search for municipality or department names (NOT tourist zones).
+
+    Used as a fallback AFTER zone-specific search has already failed.
+    """
+    if not text:
+        return None
+    tl = _norm(text)
+    # Municipality — longer names first to avoid partial matches
+    for variant in sorted(MUNI_LOOKUP, key=len, reverse=True):
+        if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+            name, dept = MUNI_LOOKUP[variant]
+            slug = variant.replace(" ", "-")
+            return (slug, name, dept, "municipality")
+    # Department only
+    for variant, dept_canon in DEPT_LOOKUP.items():
+        if re.search(r'\b' + re.escape(variant) + r'\b', tl):
+            return (None, None, dept_canon, "department")
+    return None
+
+
+def _resolve_zone(
+    location_text: str,
+    title: str,
+    description: str,
+    url: str,
+) -> tuple[Optional[str], Optional[str], Optional[str], str]:
+    """Multi-tier zone resolver.
+
+    Specific-zone tiers run first (T1–T5), then municipality/dept fallback
+    (T6–T8). This ensures a "La Libertad" in location_text doesn't shadow
+    "El Tunco" found in the description.
+
+      T1  Structured "Locality, Department, El Salvador" in title
+      T2  Tourist/zone-specific in location_text + title
+      T3  Legacy ZONE_PATTERNS on all text (backward compat for oceanside)
+      T4  Tourist/zone in description WITH context guard
+      T5  URL slug analysis
+      T6  Structured parse of location_text CSV (municipality/dept)
+      T7  Municipality/dept in title
+      T8  Municipality/dept in description (context-guarded)
+
+    Returns (zone_slug, municipality, department, confidence).
+    """
+    # T1 — structured title ("Jiquilisco, Usulután, El Salvador")
+    z, m, d = _detect_zone_structured(title)
+    if z or d:
+        return (z, m, d, "specific" if z else "municipality")
+
+    # T2 — tourist/zone-specific in location_text + title (no description yet)
+    combined = (location_text + " " + title).strip()
+    res = _search_tourist_only(combined)
+    if res:
+        return res
+
+    # T3 — legacy ZONE_PATTERNS on full text including description (backward compat)
+    z, m, d = detect_zone(location_text + " " + title + " " + description)
+    if z:
+        return (z, m, d, "specific")
+
+    # T4 — tourist/zone in description WITH context guard (only if T3 missed)
+    res = _search_localities_in_text(description, use_context=True)
+    if res and res[3] == "specific":
+        return res
+
+    # T5 — URL slug analysis
+    res = _slug_localities(url)
+    if res:
+        return res
+
+    # T6 — parse location_text as structured CSV (municipality/dept fallback)
+    res = _parse_loc_text(location_text)
+    if res:
+        return res
+
+    # T7 — municipality/dept in title
+    res = _search_muni_dept_only(title)
+    if res:
+        return res
+
+    # T8 — municipality/dept in description (context-guarded via existing fn)
+    res = _search_localities_in_text(description, use_context=True)
+    if res:
+        return res
+
+    return (None, None, None, "unresolved")
+
+
 def is_non_land_title(title: str, source: str) -> bool:
     """Return True if the title signals a non-raw-land listing that should be dropped.
 
@@ -357,15 +536,17 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     if area_m2 is None and price_usd is None:
         return None
 
-    # Zone snapping — multi-source:
-    # 1. Structured title: "Locality, Department, El Salvador" — high precision
-    # 2. Substring match on all available text (existing behavior; ordering in
-    #    ZONE_PATTERNS ensures specific zones beat generic department names)
-    # Scraper-supplied zone from raw.get("zone") takes priority at return time.
+    # Zone snapping — multi-tier resolver (highest confidence first).
+    # Each tier short-circuits on a hit.  Scraper-supplied zone (raw["zone"])
+    # takes priority over all tiers at return time.
     location_text = str(raw.get("location_text") or "")
-    zone, muni, dept = _detect_zone_structured(title)
-    if not zone:
-        zone, muni, dept = detect_zone(location_text + " " + title + " " + description)
+
+    zone, muni, dept, zone_confidence = _resolve_zone(
+        location_text=location_text,
+        title=title,
+        description=description,
+        url=url,
+    )
 
     # Property-type tagging. Honor any explicit value the scraper supplied;
     # otherwise classify from the text. Used by the ranker to segment comp
@@ -412,4 +593,5 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         broker_name=raw.get("broker_name"),
         broker_phone=raw.get("broker_phone"),
         broker_email=raw.get("broker_email"),
+        zone_confidence=zone_confidence if not raw.get("zone") else "specific",
     )

@@ -1,0 +1,16 @@
+exclude = [
+    ".claude",
+    ".git",
+    "__pycache__",
+    "node_modules",
+]
+
+[lint]
+# Match CI exactly: ruff defaults (E4xx, E7xx, E9xx, Fxx).
+# E501 (line-length) is intentionally excluded — the data files
+# use wide dict literals that can't be wrapped without losing readability.
+select = ["E4", "E7", "E9", "F"]
+
+[lint.per-file-ignores]
+# Test files import modules for side-effects and fixture visibility.
+"tests/*" = ["F401"]

@@ -224,7 +224,9 @@ def _rule_zero_ppm(li: dict) -> tuple[Disposition, Optional[str]]:
 
 
 def _rule_zone_unresolved(li: dict) -> tuple[Disposition, Optional[str]]:
-    if not li.get("zone"):
+    confidence = li.get("zone_confidence") or "unresolved"
+    # department, municipality, specific → good enough; only true unresolved is flagged
+    if confidence == "unresolved" and not li.get("zone") and not li.get("department"):
         title = (li.get("title") or "")[:80]
         return ("FLAG", f"zone_unresolved: title='{title}'")
     return ("PASS", None)
