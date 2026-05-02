@@ -33,7 +33,7 @@ FIXTURE_FILE = "sample_listings.json"
 class GoodLifeScraper:
     slug = "goodlife"
 
-    # ---- selectors (calibrated 2026-04-28 against /land/ + /property-item/) ----
+    # ---- selectors (calibrated 2026-04-28, icon-box area updated 2026-05-02) ----
     INDEX_CARD_SEL = "div.mkdf-ips-item-content"
     INDEX_LINK_SEL = "a.mkdf-ips-item-link"
     _TOGGLE_PRICE_KEYS = {"asking price", "price", "precio"}
@@ -42,6 +42,10 @@ class GoodLifeScraper:
         "area", "área", "lot size", "land size", "size", "lot area",
         "tamaño", "superficie", "metraje",
     }
+    # Theme changed: area moved from vc_toggle to mkdf icon-box widget.
+    # First mkdf-icon-box-title on the page is always the area value, e.g.
+    # "2,434.61 v2; 1,701.57 m2" or "1014.41 m2" — parse_area handles both.
+    DETAIL_AREA_ICONBOX_SEL = "div.mkdf-icon-box-title"
 
     def __init__(self, offline: bool | None = None):
         # offline stored for backward-compat; crawl() calls is_offline() directly
@@ -92,6 +96,11 @@ class GoodLifeScraper:
 
         raw_price = first(self._TOGGLE_PRICE_KEYS) or title
         raw_size = first(self._TOGGLE_AREA_KEYS)
+        # Fallback: area moved to mkdf icon-box widget ("2,434.61 v2; 1,701.57 m2")
+        if not raw_size:
+            box = tree.css_first(self.DETAIL_AREA_ICONBOX_SEL)
+            if box:
+                raw_size = box.text(strip=True)
         location = first(self._TOGGLE_LOC_KEYS) or title
 
         desc_node = tree.css_first("div.wpb_text_column")
