@@ -79,10 +79,13 @@ jobs:
 
       - name: Deploy to Vercel
         # Only runs when fresh data was actually committed.
-        # Uses vercel pull/build/deploy --prebuilt so the token is never echoed
-        # and the deploy bypasses Vercel Deployment Protection (Blocked status).
-        # vercel.json ignoreCommand skips the GitHub-integration auto-deploy for
-        # pulpo-bot commits, eliminating the Blocked/duplicate deploy pair.
+        # Direct vercel deploy --prod: no local build needed — this is a static
+        # site (buildCommand = "echo ..."). Skipping vercel build avoids the
+        # 'spawn uv ENOENT' error caused by Vercel CLI trying to install Python
+        # deps on the runner. VERCEL_TOKEN env var is read automatically by the
+        # CLI; no --token flag needed (which was rejected for containing hyphens).
+        # vercel.json ignoreCommand stops the GitHub-integration from making a
+        # duplicate Blocked deploy for the same bot commit.
         if: steps.commit.outputs.committed == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -90,6 +93,4 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           npm install -g vercel@latest
-          vercel pull --yes --environment=production
-          vercel build --prod
-          vercel deploy --prebuilt --prod
+          vercel deploy --prod --yes
