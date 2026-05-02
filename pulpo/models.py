@@ -54,6 +54,10 @@ class Listing:
     broker_email: Optional[str] = None
 
     # Ranking output (filled by ranker)
+    # Validation output (filled by validation layer, before ranker)
+    validation_status: Optional[str] = None      # None | "flagged"
+    validation_warnings: list[str] = field(default_factory=list)
+
     rank: Optional[int] = None               # 1-based position rank, 1 = best
     rank_score: Optional[float] = None       # composite 0..100
     zone_percentile: Optional[float] = None  # 0..100, lower = cheaper for zone

@@ -48,28 +48,125 @@ def is_sold(*texts: str) -> bool:
 # specific patterns first. Add zones here as we expand coverage.
 ZONE_PATTERNS: list[tuple[str, str, str, str]] = [
     # (regex, zone_slug, municipality, department)
-    (r"el\s*cuco|playa\s*el\s*cuco",            "el-cuco",        "Chirilagua",     "San Miguel"),
-    (r"playa\s*las?\s*flores|las?\s*flores",    "las-flores",     "Intipucá",       "La Unión"),
-    (r"punta\s*mango",                          "punta-mango",    "Intipucá",       "La Unión"),
-    (r"el\s*espino|playa\s*espino",             "el-espino",      "Jucuarán",       "Usulután"),
-    (r"el\s*tunco",                             "el-tunco",       "Tamanique",      "La Libertad"),
-    (r"el\s*sunzal",                            "el-sunzal",      "Tamanique",      "La Libertad"),
-    (r"el\s*zonte|zonte",                       "el-zonte",       "Chiltiupán",     "La Libertad"),
-    (r"k\s*59|km\s*59|playa\s*san\s*diego",     "san-diego",      "La Libertad",    "La Libertad"),
-    (r"mizata",                                 "mizata",         "Teotepeque",     "La Libertad"),
-    (r"conchagua|playa\s*el\s*tamarindo",       "conchagua",      "Conchagua",      "La Unión"),
-    (r"la\s*libertad\s*puerto",                 "puerto-la-libertad","La Libertad", "La Libertad"),
-    (r"la\s*libertad",                          "la-libertad",    "La Libertad",    "La Libertad"),
-    (r"la\s*uni[oó]n",                          "la-union",       "La Unión",       "La Unión"),
+    # Most-specific patterns first — order matters.
+    (r"el\s*cuco|playa\s*el\s*cuco",            "el-cuco",           "Chirilagua",     "San Miguel"),
+    (r"playa\s*las?\s*flores|las?\s*flores",    "las-flores",        "Intipucá",       "La Unión"),
+    (r"punta\s*mango",                          "punta-mango",       "Intipucá",       "La Unión"),
+    (r"el\s*espino|playa\s*espino",             "el-espino",         "Jucuarán",       "Usulután"),
+    (r"el\s*tunco",                             "el-tunco",          "Tamanique",      "La Libertad"),
+    (r"el\s*sunzal",                            "el-sunzal",         "Tamanique",      "La Libertad"),
+    (r"el\s*zonte|(?<!\w)zonte(?!\w)",          "el-zonte",          "Chiltiupán",     "La Libertad"),
+    (r"k\s*59|km\s*59|playa\s*san\s*diego",     "san-diego",         "La Libertad",    "La Libertad"),
+    (r"mizata",                                 "mizata",            "Teotepeque",     "La Libertad"),
+    (r"conchagua|playa\s*el\s*tamarindo",       "conchagua",         "Conchagua",      "La Unión"),
+    (r"jiquilisco",                             "jiquilisco",        "Jiquilisco",     "Usulután"),
+    (r"la\s*libertad\s*puerto",                 "puerto-la-libertad","La Libertad",    "La Libertad"),
+    (r"la\s*libertad",                          "la-libertad",       "La Libertad",    "La Libertad"),
+    (r"la\s*uni[oó]n",                          "la-union",          "La Unión",       "La Unión"),
 ]
 
+# Known El Salvador departments for structured-title validation
+_SV_DEPARTMENTS = {
+    "ahuachapán", "santa ana", "sonsonate", "chalatenango",
+    "la libertad", "san salvador", "cuscatlán", "la paz", "cabañas",
+    "san vicente", "usulután", "san miguel", "morazán", "la unión",
+}
+_DEPT_CANONICAL = {
+    "ahuachapán": "Ahuachapán", "santa ana": "Santa Ana",
+    "sonsonate": "Sonsonate",   "chalatenango": "Chalatenango",
+    "la libertad": "La Libertad", "san salvador": "San Salvador",
+    "cuscatlán": "Cuscatlán",   "la paz": "La Paz",
+    "cabañas": "Cabañas",       "san vicente": "San Vicente",
+    "usulután": "Usulután",     "san miguel": "San Miguel",
+    "morazán": "Morazán",       "la unión": "La Unión",
+}
+
+# Structured-title pattern: "Locality, Department, El Salvador"
+# Matches after a dash/preamble, not necessarily at string start.
+_STRUCTURED_LOC_RE = re.compile(
+    r'([A-ZÁÉÍÓÚÜÑa-záéíóúüñ][A-ZÁÉÍÓÚÜÑa-záéíóúüñ\s]+?)'
+    r',\s*'
+    r'([A-ZÁÉÍÓÚÜÑa-záéíóúüñ][A-ZÁÉÍÓÚÜÑa-záéíóúüñ\s]+?)'
+    r',\s*El\s+Salvador\b',
+    re.IGNORECASE,
+)
+
+def _detect_zone_structured(title: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """Extract zone from 'Locality, Department, El Salvador' in title.
+
+    Returns (zone_slug, municipality, department) when the department is a
+    valid El Salvador department, else (None, None, None).
+    """
+    m = _STRUCTURED_LOC_RE.search(title)
+    if not m:
+        return (None, None, None)
+    locality   = m.group(1).strip()
+    department = m.group(2).strip()
+    dept_lower = department.lower()
+    if dept_lower not in _SV_DEPARTMENTS:
+        return (None, None, None)
+    dept_canon = _DEPT_CANONICAL[dept_lower]
+    # Try to snap the locality to a known zone slug
+    slug, muni, _ = detect_zone(locality)
+    if slug:
+        return (slug, muni, dept_canon)
+    # No zone match: use locality as slug + department as region
+    slug_gen = re.sub(r'[\s]+', '-', locality.strip().lower())
+    slug_gen = re.sub(r'[^a-záéíóúüñ\-]', '', slug_gen)
+    return (slug_gen or None, locality.strip().title(), dept_canon)
+
+
 def detect_zone(text: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
-    """Return (zone_slug, municipality, department) or (None, None, None)."""
+    """Return (zone_slug, municipality, department) or (None, None, None).
+
+    Performs simple substring matching — reliable for title/location_text.
+    Use _detect_zone_structured() first for titles with structured location info.
+    """
     if not text:
         return (None, None, None)
     t = text.lower()
     for pattern, slug, muni, dept in ZONE_PATTERNS:
         if re.search(pattern, t):
+            return (slug, muni, dept)
+    return (None, None, None)
+
+
+# Context-guarded zone matching for description text.
+# Zone name must appear after "en/in/located/ubicado" or a comma, or at the
+# start of a sentence — prevents "El Zonte" from matching when it appears in
+# a comparative clause like "similar to what you find in El Zonte".
+_ZONE_SLUG_PATTERNS = [
+    (r"el\s*cuco|playa\s*el\s*cuco",          "el-cuco",           "Chirilagua",  "San Miguel"),
+    (r"playa\s*las?\s*flores|las?\s*flores",  "las-flores",        "Intipucá",    "La Unión"),
+    (r"punta\s*mango",                        "punta-mango",       "Intipucá",    "La Unión"),
+    (r"el\s*espino|playa\s*espino",           "el-espino",         "Jucuarán",    "Usulután"),
+    (r"el\s*tunco",                           "el-tunco",          "Tamanique",   "La Libertad"),
+    (r"el\s*sunzal",                          "el-sunzal",         "Tamanique",   "La Libertad"),
+    (r"el\s*zonte|(?<!\w)zonte(?!\w)",        "el-zonte",          "Chiltiupán",  "La Libertad"),
+    (r"k\s*59|km\s*59|playa\s*san\s*diego",  "san-diego",         "La Libertad", "La Libertad"),
+    (r"mizata",                               "mizata",            "Teotepeque",  "La Libertad"),
+    (r"conchagua|playa\s*el\s*tamarindo",     "conchagua",         "Conchagua",   "La Unión"),
+    (r"jiquilisco",                           "jiquilisco",        "Jiquilisco",  "Usulután"),
+    (r"la\s*libertad",                        "la-libertad",       "La Libertad", "La Libertad"),
+    (r"la\s*uni[oó]n",                        "la-union",          "La Unión",    "La Unión"),
+]
+_DESC_ZONE_CONTEXT_RE = re.compile(
+    r'(?:(?:^|[.\n])\s*|[,]\s*|\b(?:en|in|located\s+in|ubicad[ao]\s+en)\s+)',
+    re.IGNORECASE,
+)
+
+def _detect_zone_desc(text: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """Zone extraction from description with context guard.
+
+    Only matches zone names that appear after "en/in/ubicado" or a comma/newline
+    — prevents comparative mentions ("similar to El Zonte") from registering.
+    """
+    if not text:
+        return (None, None, None)
+    # Build a single string to search with context prefix
+    for pattern, slug, muni, dept in _ZONE_SLUG_PATTERNS:
+        combined = rf'(?:(?:^|[.\n])\s*|[,]\s*|\b(?:en|in|located\s+in|ubicad[ao]\s+en)\s+)(?:{pattern})'
+        if re.search(combined, text, re.IGNORECASE | re.MULTILINE):
             return (slug, muni, dept)
     return (None, None, None)
 
@@ -260,9 +357,15 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     if area_m2 is None and price_usd is None:
         return None
 
-    # Zone snapping
+    # Zone snapping — multi-source:
+    # 1. Structured title: "Locality, Department, El Salvador" — high precision
+    # 2. Substring match on all available text (existing behavior; ordering in
+    #    ZONE_PATTERNS ensures specific zones beat generic department names)
+    # Scraper-supplied zone from raw.get("zone") takes priority at return time.
     location_text = str(raw.get("location_text") or "")
-    zone, muni, dept = detect_zone(location_text + " " + title + " " + description)
+    zone, muni, dept = _detect_zone_structured(title)
+    if not zone:
+        zone, muni, dept = detect_zone(location_text + " " + title + " " + description)
 
     # Property-type tagging. Honor any explicit value the scraper supplied;
     # otherwise classify from the text. Used by the ranker to segment comp
