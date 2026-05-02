@@ -19,7 +19,8 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from .base import BaseScraper, HTTPX_OK
+from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents import SOURCES, register
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -41,58 +42,78 @@ _NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL
 )
 
+FIXTURE_FILE = "sample_listings.json"
 
-class BienesRaicesScraper(BaseScraper):
-    SOURCE = "bienesraices"
-    BASE_URL = BASE
-    LIST_URL = SITEMAP_URL
-    FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 1
 
-    def crawl(self, limit: int = 30) -> list[dict]:
-        if self.offline:
-            return self._load_fixtures(limit)
+class BienesRaicesScraper:
+    slug = "bienesraices"
 
-        # Step 1: sitemap
-        time.sleep(self.REQUEST_DELAY)
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
         try:
-            resp = self.client.get(
-                SITEMAP_URL,
-                headers={**self.client.headers, **SITEMAP_HEADERS},
-            )
-            resp.raise_for_status()
-            sitemap = resp.json()
-        except Exception as e:
-            print(f"[{self.SOURCE}] sitemap failed: {e}")
-            return []
+            self.REQUEST_DELAY = float(__import__("os").environ.get("PULPO_REQUEST_DELAY") or 1.5)
+        except (ValueError, TypeError):
+            self.REQUEST_DELAY = 1.5
 
-        # Step 2: filter land candidates by slug keyword
-        candidates = [
-            item for item in sitemap
-            if any(k in item.get("slug", "") for k in LAND_SLUG_KEYWORDS)
-        ]
+    def report_total(self, client) -> None:  # noqa: ARG002
+        """Supplier count not available as a reliable pre-fetch number.
 
-        # Step 3: fetch detail pages
-        out: list[dict] = []
-        for item in candidates:
-            if len(out) >= limit:
-                break
-            slug = item.get("slug", "")
-            if not slug:
-                continue
-            url = f"{BASE}/propiedad/{slug}"
+        The AlterEstate sitemap returns 1 143 slugs; our keyword filter gives
+        ~556 candidates, but some have non-land categories and get dropped at
+        the detail-page stage. Reporting 556 as 'supplier' makes coverage look
+        like 84% when the true figure is ~100% (all genuine land listings are
+        pulled). Return None so the audit shows '?' instead of a misleading %.
+        """
+        return None
+
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+
+        client = make_client()
+        try:
+            # Step 1: sitemap
             time.sleep(self.REQUEST_DELAY)
             try:
-                detail = self.client.get(url)
-                detail.raise_for_status()
+                resp = client.get(
+                    SITEMAP_URL,
+                    headers={**dict(client.headers), **SITEMAP_HEADERS},
+                )
+                resp.raise_for_status()
+                sitemap = resp.json()
             except Exception as e:
-                print(f"[{self.SOURCE}] detail failed {slug}: {e}")
-                continue
-            rec = self._parse(detail.text, url)
-            if rec:
-                out.append(rec)
+                print(f"[{self.slug}] sitemap failed: {e}")
+                return []
 
-        return out
+            # Step 2: filter land candidates by slug keyword
+            candidates = [
+                item for item in sitemap
+                if any(k in item.get("slug", "") for k in LAND_SLUG_KEYWORDS)
+            ]
+
+            # Step 3: fetch detail pages
+            out: list[dict] = []
+            for item in candidates:
+                if len(out) >= limit:
+                    break
+                slug = item.get("slug", "")
+                if not slug:
+                    continue
+                url = f"{BASE}/propiedad/{slug}"
+                time.sleep(self.REQUEST_DELAY)
+                try:
+                    detail = client.get(url)
+                    detail.raise_for_status()
+                except Exception as e:
+                    print(f"[{self.slug}] detail failed {slug}: {e}")
+                    continue
+                rec = self._parse(detail.text, url)
+                if rec:
+                    out.append(rec)
+
+            return out
+        finally:
+            client.close()
 
     def _parse(self, html: str, url: str) -> Optional[dict]:
         m = _NEXT_DATA_RE.search(html)
@@ -140,10 +161,11 @@ class BienesRaicesScraper(BaseScraper):
         raw_size = f"{area_val} {area_unit}" if area_val else ""
 
         return {
-            "source": self.SOURCE,
+            "source": self.slug,
             "source_id": str(prop.get("cid") or ""),
             "url": url,
             "title": title,
+            "price_usd": float(price) if price else None,
             "raw_price_text": f"{price} USD" if price else "",
             "raw_size_text": raw_size,
             "location_text": location_text,
@@ -155,11 +177,22 @@ class BienesRaicesScraper(BaseScraper):
             "scraped_at": datetime.now(timezone.utc).isoformat(),
         }
 
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002
+    ) -> dict:
+        """Sitemap-based source — max_pages does not apply."""
+        records = self.crawl(limit, offline)
+        return {"records": records, "max_pages_hit": False, "limit_hit": len(records) >= limit}
+
     def parse_index_page(self, html: str) -> list[dict]:
         return []
 
     def parse_detail_page(self, html: str, partial: dict) -> Optional[dict]:
         return None
+
+
+_scraper = BienesRaicesScraper(offline=None)
+register(SOURCES, "bienesraices", _scraper)
 
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:

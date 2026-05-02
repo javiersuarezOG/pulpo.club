@@ -1,6 +1,10 @@
 # pulpo.club — Phase 1
 
-Salvadoran beach + raw-land aggregator. Scrapes boutique-broker sites, normalizes mixed units (vrs² / manzanas / m² / acres), ranks every listing on a four-factor investment score, exposes the shortlist behind a username/password gate, and ships a weekly Wednesday refresh.
+![CI](https://github.com/javiersuarezOG/pulpo.club/actions/workflows/ci.yml/badge.svg)
+
+Tests must pass before any PR merges — see CONTRIBUTING.md.
+
+Salvadoran beach + raw-land aggregator. Scrapes boutique-broker sites, normalizes mixed units (vrs² / manzanas / m² / acres), ranks every listing on a four-factor investment score, and ships a nightly refresh.
 
 ## Layout
 
@@ -32,7 +36,7 @@ pulpo-sv/
 ├── samples/ranked.csv              # generated CSV with all rank columns
 ├── tests/test_units.py             # unit-conversion + parser tests
 ├── assets/                         # pinwheel logo (SVG)
-├── .github/workflows/pulpo-weekly.yml
+├── .github/workflows/pulpo-nightly.yml
 ├── vercel.json
 ├── package.json
 └── requirements.txt
@@ -153,7 +157,7 @@ Coordinates are coarsened to ~1 km grid in the teaser.
 2. In Vercel: New Project → import the repo → no build command needed.
 3. Set env vars: `SESSION_SECRET` (32+ chars) and `USERS` (comma-separated bcrypt lines).
 4. Point `pulpo.club` at the Vercel project (Add Domain).
-5. The GitHub Action (`.github/workflows/pulpo-weekly.yml`) runs every Wednesday 06:00 SV, refreshes `web/data/*.json`, commits the changes back, and a redeploy fires automatically.
+5. The GitHub Action (`.github/workflows/pulpo-nightly.yml`) runs every night at 06:00 SV, refreshes `web/data/*.json`, commits the changes back, and a redeploy fires automatically.
 
 ## Scraping reliability — current state (be honest)
 
@@ -168,6 +172,8 @@ Before treating the live numbers as trustworthy, this work is required (tracked 
 5. **Per-source confidence flag** — tag each scraped record `full | partial | fallback` so the dashboard can mark calibration regressions.
 
 What we *can* commit to once calibrated: weekly Wednesday refresh, with a fixture-fallback path that keeps the dashboard up even if one source breaks. Phase 2 adds Postgres for diff-based repricing detection (right now `is_repriced` is read from raw, not diffed) and Mapbox geocoding.
+
+Run `python3 automation/coverage_audit.py` to check that every source is pulling at or near 100% of advertised supply. Run `python3 automation/field_audit.py` to see which fields each source is under-reporting — calibration targets.
 
 ## What's not in this repo (intentionally — Phase 2+)
 

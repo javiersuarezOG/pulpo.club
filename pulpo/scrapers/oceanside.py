@@ -1,117 +1,277 @@
 """
-Oceanside El Salvador scraper.
+Oceanside El Salvador scraper — WP REST API client.
 
-Site: https://oceansideelsalvador.com/
-Stack signals: WordPress, RealHomes / Houzez-style theme. Listings under
-/properties/ or /property-category/land-for-sale/.
+Replaced HTML walking (2026-05-02) with direct WP REST API calls.
+
+Why: The Avada/Fusion theme exposed a public REST API at
+  GET /wp-json/wp/v2/rental-details?per_page=100&property-type=<id>
+returning clean JSON for all land listings in a single call. No more
+Avada selector regressions, no more year+area concatenation hacks,
+no per-listing detail-page fetches.
+
+CPT mapping:
+  - /rental-details  = land lots (Avada quirk: lots use the "rental" CPT)
+  - /home-details    = houses/condos/hotels (excluded here)
+  - property-type taxonomy id=122 slug="lot" = land filter
+
+ACF block is empty on all records — price/area still parsed from
+content.rendered (same blob the HTML scraper used).
+
+class_list carries location-* slugs (e.g. location-la-libertad) which
+complement the regex-based zone detection in normalize.py.
 """
 from __future__ import annotations
+import html as _html
 import re
+import time
+from datetime import datetime, timezone
 from typing import Optional
-from .base import BaseScraper, SELECTOLAX_OK
 
-if SELECTOLAX_OK:
-    from selectolax.parser import HTMLParser
+from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client
+from pulpo.agents import SOURCES, register
 
-# The Avada theme glues "Listed on <date>" to the lot-size m² value with no
-# whitespace once the DOM text is flattened, e.g.:
+API_BASE   = "https://oceansideelsalvador.com/wp-json/wp/v2"
+BASE_URL   = "https://oceansideelsalvador.com/"
+PER_PAGE   = 100
+MAX_PAGES  = 50         # safety cap: 50 × 100 = 5 000 records
+REQUEST_DELAY = 1.5
+FIXTURE_FILE  = "sample_listings.json"
+
+# Land-type slugs we accept from the property-type taxonomy
+_LAND_SLUGS = {
+    "land", "lot", "lots", "lots-and-land",
+    "terrenos", "lotes", "terreno", "lote",
+}
+
+# ── Area regexes (kept from HTML scraper to handle the same content blobs) ──
+# The Avada theme concatenates "Listed on <date>" with the area value:
 #   "Listed on Sep 2, 2025243,080.00m2Lot"
-# A generic <num><unit> extractor would pick "2025243,080.00" as the number
-# (= 2 billion m²). We pluck out just the area portion by anchoring on the
-# four-digit year and the m² suffix, ignoring case and tolerating an optional
-# space between the number and "m2".
+# Anchor on the four-digit year to avoid parsing the year as part of the number.
 _AREA_AFTER_YEAR_RE = re.compile(
     r"20\d{2}\s*(\d[\d,\.]*)\s*m[2²]",
     re.IGNORECASE,
 )
-# Fallback: a clean "<num> m²" mention with proper whitespace. Needed for
-# listings whose body text doesn't follow the "Listed on…" template.
 _AREA_PLAIN_RE = re.compile(
     r"(?<![\d])(\d[\d,]*\.?\d*)\s+m[2²](?![a-zA-Z])",
+    re.IGNORECASE,
 )
+
+_PRICE_RE = re.compile(r"\$\s*([\d,]+(?:\.\d{2})?)")
+_TAG_RE   = re.compile(r"<[^>]+>")
+
+
+def _strip(html_str: str) -> str:
+    """Strip HTML tags and collapse whitespace."""
+    return _html.unescape(re.sub(r"\s+", " ", _TAG_RE.sub(" ", html_str)).strip())
 
 
 def _extract_area_text(blob: str) -> str:
-    """Return a clean '<num> m²' string from the .post-content blob, or ''."""
     if not blob:
         return ""
     m = _AREA_AFTER_YEAR_RE.search(blob) or _AREA_PLAIN_RE.search(blob)
     return f"{m.group(1)} m²" if m else ""
 
-class OceansideScraper(BaseScraper):
-    SOURCE = "oceanside"
-    BASE_URL = "https://oceansideelsalvador.com/"
-    # /lands/ is the server-rendered land archive; /property-category/land-for-sale/
-    # 404s. Pagination is /lands/page/N/.
-    LIST_URL = "https://oceansideelsalvador.com/lands/page/{page}/"
-    FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 6
 
-    # ---- selectors (calibrated 2026-04-28 against /lands/ + /rental-details/) ----
-    # Site runs Avada/Fusion theme. Land listings live under /rental-details/
-    # (a quirk of the Avada CPT mapping, not actual rentals). The detail page
-    # packs all property metadata — price, lot size, location — into a single
-    # .post-content block whose visible text reads e.g.
-    #   "$187,916.80 ... 1,171.53m2 ... La Libertad, El Salvador"
-    # so each field-level selector reuses .post-content and lets the
-    # downstream regex parsers pick the right substring.
-    INDEX_CARD_SEL = "li.fusion-grid-column.post-card, .fusion-post-cards-grid-column"
-    INDEX_LINK_SEL = "a.fusion-column-anchor"
-    DETAIL_TITLE_SEL = "h1.fusion-title-heading, h1.entry-title, h1"
-    DETAIL_PRICE_SEL = "div.post-content"
-    DETAIL_AREA_SEL = "div.post-content"
-    DETAIL_LOC_SEL = "div.post-content"
-    DETAIL_DESC_SEL = "div.post-content"
+def _find_land_term_id(client) -> Optional[int]:
+    """Return the property-type term ID for land/lots, or None.
 
+    Picks the matching term with the highest count so that a narrow
+    niche term (e.g. 'commercial-land', count=1) never shadows the
+    primary land term (e.g. 'lot', count=27).
+    """
+    try:
+        r = client.get(f"{API_BASE}/property-type", params={"per_page": 100})
+        r.raise_for_status()
+        candidates = [
+            t for t in r.json()
+            if t.get("slug", "").lower() in _LAND_SLUGS
+        ]
+        if candidates:
+            best = max(candidates, key=lambda t: t.get("count", 0))
+            return best["id"]
+    except Exception as e:
+        print(f"[oceanside] could not fetch property-type terms: {e}")
+    print("[oceanside] WARNING: no land-type term found; fetching all rental-details")
+    return None
+
+
+def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
+    """Map one WP REST record to the normalized raw-dict shape."""
+    title = _strip(rec["title"]["rendered"])
+    if not title:
+        return None
+
+    # If no term filter was applied server-side, verify in Python
+    if land_term_id is None:
+        pt = rec.get("property-type") or []
+        # Fall back: keep if property-type list is empty or contains any land-ish slug
+        # (we can't look up slugs here without an extra call, so keep all)
+    else:
+        pt = rec.get("property-type") or []
+        if land_term_id not in pt:
+            return None
+
+    content_html = rec["content"]["rendered"]
+    content_text = _strip(content_html)
+
+    raw_price_text = ""
+    pm = _PRICE_RE.search(content_text)
+    if pm:
+        raw_price_text = f"${pm.group(1)}"
+
+    raw_size_text = _extract_area_text(content_text)
+
+    # Location from class_list: "location-la-libertad" → "La Libertad"
+    loc_slugs = [
+        c[len("location-"):].replace("-", " ").title()
+        for c in (rec.get("class_list") or [])
+        if c.startswith("location-") and c != "location-el-salvador"
+    ]
+    location_text = ", ".join(loc_slugs) if loc_slugs else title
+
+    # Days since last modified
+    days_listed: Optional[int] = None
+    modified = rec.get("modified") or ""
+    if modified:
+        try:
+            mod_dt = datetime.fromisoformat(modified.rstrip("Z")).replace(
+                tzinfo=timezone.utc
+            )
+            days_listed = (datetime.now(timezone.utc) - mod_dt).days
+        except Exception:
+            pass
+
+    ct = content_text.lower()
+    is_beachfront   = bool(re.search(r"frente\s+al\s+mar|beachfront|ocean.?front", ct))
+    has_paved_access = bool(re.search(r"pavimentad|paved\s+road|paved\s+access|acceso\s+pavimentado", ct))
+    has_water       = bool(re.search(r"\bagua\b|water\s+access|water\s+available|suministro\s+de\s+agua", ct))
+    has_power       = bool(re.search(r"el[eé]ctric|energ[íi]a|l[íi]neas?\s+el[eé]ctric|power\s+available", ct))
+
+    return {
+        "source_id":       str(rec["id"]),
+        "url":             rec["link"],
+        "scraped_at":      datetime.now(timezone.utc).isoformat(),
+        "title":           title,
+        "description":     content_text[:1500],
+        "raw_price_text":  raw_price_text,
+        "raw_size_text":   raw_size_text,
+        "location_text":   location_text,
+        "property_type":   "land",
+        "photos_count":    1 if rec.get("featured_media") else 0,
+        "days_listed":     days_listed,
+        "is_repriced":     False,
+        "is_beachfront":   is_beachfront,
+        "has_paved_access":has_paved_access,
+        "has_water":       has_water,
+        "has_power":       has_power,
+    }
+
+
+class OceansideScraper:
+    slug = "oceanside"
+
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
+
+    def report_total(self, client) -> Optional[int]:
+        """Return advertised land listing count via X-WP-Total header."""
+        try:
+            time.sleep(REQUEST_DELAY)
+            land_id = _find_land_term_id(client)
+            params = {"per_page": 1}
+            if land_id:
+                params["property-type"] = land_id
+            r = client.get(f"{API_BASE}/rental-details", params=params)
+            r.raise_for_status()
+            return int(r.headers.get("X-WP-Total") or 0) or None
+        except Exception:
+            return None
+
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        client = make_client()
+        try:
+            return self._fetch(client, limit)
+        finally:
+            client.close()
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002
+    ) -> dict:
+        if is_offline(offline if offline is not None else self.offline):
+            records = load_fixtures(self.slug, FIXTURE_FILE, limit)
+            return {"records": records, "max_pages_hit": False, "limit_hit": False}
+        client = make_client()
+        try:
+            return self._fetch_with_meta(client, limit)
+        finally:
+            client.close()
+
+    def _fetch(self, client, limit: int) -> list[dict]:
+        return self._fetch_with_meta(client, limit)["records"]
+
+    def _fetch_with_meta(self, client, limit: int) -> dict:
+        time.sleep(REQUEST_DELAY)
+        land_id = _find_land_term_id(client)
+
+        out: list[dict] = []
+        max_pages_hit = False
+        limit_hit = False
+
+        params: dict = {"per_page": PER_PAGE}
+        if land_id:
+            params["property-type"] = land_id
+
+        for page in range(1, MAX_PAGES + 1):
+            params["page"] = page
+            time.sleep(REQUEST_DELAY)
+            try:
+                r = client.get(f"{API_BASE}/rental-details", params=params)
+                r.raise_for_status()
+            except Exception as e:
+                print(f"[oceanside] API page {page} failed: {e}")
+                break
+
+            recs = r.json()
+            total_pages = int(r.headers.get("X-WP-TotalPages") or 1)
+
+            if not recs:
+                break
+
+            for rec in recs:
+                if len(out) >= limit:
+                    limit_hit = True
+                    break
+                mapped = _map(rec, land_id)
+                if mapped:
+                    out.append(mapped)
+
+            if limit_hit:
+                break
+
+            if page >= total_pages:
+                break
+
+            if page >= MAX_PAGES:
+                max_pages_hit = True
+                break
+
+        return {"records": out, "max_pages_hit": max_pages_hit, "limit_hit": limit_hit}
+
+    # ── Kept for calibration harness compatibility ──────────────────────────
     def parse_index_page(self, html: str) -> list[dict]:
-        if not SELECTOLAX_OK:
-            return []
-        tree = HTMLParser(html)
-        out = []
-        for card in tree.css(self.INDEX_CARD_SEL):
-            link = card.css_first(self.INDEX_LINK_SEL)
-            if not link:
-                continue
-            href = link.attributes.get("href")
-            if not href:
-                continue
-            sid = href.rstrip("/").rsplit("/", 1)[-1]
-            out.append({"url": href, "source_id": sid})
-        return out
-
-    # Titles that indicate the scraper hit a generic page element rather than
-    # the actual listing heading — reject these so normalize() drops the record.
-    _BAD_TITLES = {"contact us", "contactanos", "contáctanos", "contact", "inquire"}
+        """Stub — calibration harness may call this; API client doesn't use it."""
+        return []
 
     def parse_detail_page(self, html: str, partial: dict) -> Optional[dict]:
-        if not SELECTOLAX_OK:
-            return None
-        tree = HTMLParser(html)
-        def text_of(sel: str) -> str:
-            n = tree.css_first(sel)
-            return n.text(strip=True) if n else ""
+        """Stub — calibration harness may call this; API client doesn't use it."""
+        return None
 
-        title = text_of(self.DETAIL_TITLE_SEL)
-        if not title or title.lower().strip() in self._BAD_TITLES:
-            # Fall back to page <title> tag (usually "Property Name – Oceanside")
-            t_node = tree.css_first("title")
-            if t_node:
-                import re as _re
-                raw = t_node.text(strip=True)
-                # Split on " – ", " — ", " | ", " - " (must have surrounding spaces)
-                title = _re.split(r'\s[–—|]\s|\s-\s', raw)[0].strip()
-            if not title or title.lower().strip() in self._BAD_TITLES:
-                return None
 
-        post_content = text_of(self.DETAIL_PRICE_SEL)  # = ".post-content"
-        return {
-            "title": title,
-            "raw_price_text": post_content,
-            "raw_size_text": _extract_area_text(post_content),
-            "location_text": post_content,
-            "description": post_content[:1500],
-            "property_type": "land",
-        }
+_scraper = OceansideScraper()
+register(SOURCES, "oceanside", _scraper)
+
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:
     return OceansideScraper(offline=offline).crawl(limit)

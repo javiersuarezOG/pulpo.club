@@ -19,10 +19,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from pulpo.scrapers import REGISTRY  # noqa: E402
-from pulpo.scrapers.base import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
+from pulpo.agents import SOURCES as REGISTRY  # noqa: E402
+import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all sources
+from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.normalize import normalize  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
+from automation.field_audit import build_completeness_block  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -59,6 +61,7 @@ def main() -> int:
         errors.append(msg)
 
     source_errors: dict[str, str] = {}   # src -> error message
+    source_meta: dict[str, dict] = {}    # src -> {max_pages_hit, limit_hit}
 
     for src in sources:
         src = src.strip()
@@ -69,7 +72,16 @@ def main() -> int:
             source_errors[src] = err
             continue
         try:
-            recs = mod.crawl(limit=limit, offline=offline or None)
+            if hasattr(mod, "crawl_with_meta"):
+                result = mod.crawl_with_meta(limit=limit, offline=offline or None)
+                recs = result["records"]
+                source_meta[src] = {
+                    "max_pages_hit": result["max_pages_hit"],
+                    "limit_hit": result["limit_hit"],
+                }
+            else:
+                recs = mod.crawl(limit=limit, offline=offline or None)
+                source_meta[src] = {"max_pages_hit": False, "limit_hit": False}
         except Exception as e:
             err = repr(e)
             errors.append(f"{src}: {err}")
@@ -107,8 +119,9 @@ def main() -> int:
     #   ranked-public.json — broker/url/exact-price fields stripped, safe to serve statically
     web_data_dir = REPO / "web" / "data"
     web_data_dir.mkdir(parents=True, exist_ok=True)
+    ranked_dicts = [li.to_dict() for li in ranked]
     with (web_data_dir / "ranked.json").open("w", encoding="utf-8") as f:
-        json.dump([li.to_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
+        json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
     with (web_data_dir / "ranked-public.json").open("w", encoding="utf-8") as f:
         json.dump([li.to_public_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
 
@@ -127,6 +140,21 @@ def main() -> int:
         else:
             source_status[src] = "green"
 
+    # Coverage block: pulled counts + pagination flags per source.
+    # supplier is null here (run.py doesn't make extra requests to fetch
+    # advertised totals — use automation/coverage_audit.py for that).
+    coverage = {
+        src: {
+            "supplier": None,
+            "pulled": per_source_count.get(src, 0),
+            "max_pages_hit": source_meta.get(src, {}).get("max_pages_hit", False),
+        }
+        for src in sources
+    }
+
+    # Field completeness snapshot — populated % per field per source.
+    field_completeness = build_completeness_block(ranked_dicts)
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -137,6 +165,8 @@ def main() -> int:
         "dropped": dropped,
         "per_source_raw": per_source_count,
         "source_status": source_status,
+        "coverage": coverage,
+        "field_completeness": field_completeness,
         "sources": sources,
         "offline": offline,
         "fixture_fallback_active": fixture_fallback_active,

@@ -225,3 +225,17 @@ vercel --prod
 # Registrar → DNS → add the A/CNAME records Vercel showed
 # Wait ~15 min, open https://pulpo.club
 ```
+
+## Cron environment variables
+
+When running `automation/run.py` as a weekly cron job (GitHub Actions or
+self-hosted), set the following environment variable so the default `limit=30`
+does not truncate supply on large sources:
+
+```bash
+PULPO_LIMIT=1000
+```
+
+Without this, each source is capped at 30 raw listings per run regardless
+of how many the broker publishes. The coverage audit will report
+`limit_hit=yes` for any source that publishes more than 30 land listings.

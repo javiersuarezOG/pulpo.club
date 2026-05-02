@@ -19,17 +19,25 @@ Implication for this scraper:
 """
 from __future__ import annotations
 from typing import Optional
-from .base import BaseScraper, SELECTOLAX_OK
+
+from pulpo.agents.html_crawler import (
+    SELECTOLAX_OK, is_offline, load_fixtures, make_client,
+    walk as _walk, walk_with_meta as _walk_meta,
+)
+from pulpo.agents import SOURCES, register
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser
 
-class KazuScraper(BaseScraper):
-    SOURCE = "kazu"
-    BASE_URL = "https://kazurealestate.com/"
-    LIST_URL = "https://kazurealestate.com/properties/?property_type=land&page={page}"
-    FIXTURE_FILE = "sample_listings.json"
-    MAX_PAGES = 6
+BASE_URL = "https://kazurealestate.com/"
+LIST_URL = "https://kazurealestate.com/properties/?property_type=land&page={page}"
+MAX_PAGES = 50
+REQUEST_DELAY = 1.5
+FIXTURE_FILE = "sample_listings.json"
+
+
+class KazuScraper:
+    slug = "kazu"
 
     INDEX_CARD_SEL = "div.es-grid-item, article.estatik-property, div.property-card"
     INDEX_LINK_SEL = "a.es-grid-image, h3 a, a.permalink"
@@ -38,6 +46,9 @@ class KazuScraper(BaseScraper):
     DETAIL_AREA_SEL = ".es-property-area, .lot-area, li[data-feature='area']"
     DETAIL_LOC_SEL = ".es-property-address, .property-location"
     DETAIL_DESC_SEL = ".es-property-description, .entry-content"
+
+    def __init__(self, offline: bool | None = None):
+        self.offline = offline
 
     def parse_index_page(self, html: str) -> list[dict]:
         if not SELECTOLAX_OK:
@@ -73,6 +84,54 @@ class KazuScraper(BaseScraper):
             "description": text_of(self.DETAIL_DESC_SEL)[:1500],
             "property_type": "land",
         }
+
+    def report_total(self, client) -> None:  # noqa: ARG002
+        """API host is on denylist — supplier count unavailable."""
+        return None
+
+    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+        if is_offline(offline if offline is not None else self.offline):
+            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        client = make_client()
+        try:
+            return _walk(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+    def crawl_with_meta(
+        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None
+    ) -> dict:
+        if is_offline(offline if offline is not None else self.offline):
+            records = load_fixtures(self.slug, FIXTURE_FILE, limit)
+            return {"records": records, "max_pages_hit": False, "limit_hit": False}
+        client = make_client()
+        try:
+            return _walk_meta(
+                client=client,
+                base_url=BASE_URL,
+                list_url=LIST_URL,
+                parse_index=self.parse_index_page,
+                parse_detail=self.parse_detail_page,
+                max_pages=max_pages if max_pages is not None else MAX_PAGES,
+                request_delay=REQUEST_DELAY,
+                limit=limit,
+            )
+        finally:
+            client.close()
+
+
+_scraper = KazuScraper()
+register(SOURCES, "kazu", _scraper)
+
 
 def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:
     return KazuScraper(offline=offline).crawl(limit)

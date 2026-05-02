@@ -4,9 +4,9 @@
 # Add to crontab with:   crontab -e
 # Then paste:
 #
-#     0 6 * * 3  /path/to/pulpo-sv/automation/cron_local.sh >> /var/log/pulpo.log 2>&1
+#     0 6 * * *  /path/to/pulpo.club/automation/cron_local.sh >> /var/log/pulpo.log 2>&1
 #
-# Wednesday 06:00 SV time. Adjust path. Uses the repo's own venv.
+# Every night at 06:00 SV time (UTC-6). Adjust path. Uses the repo's own venv.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -18,10 +18,10 @@ if [ -d .venv ]; then
   source .venv/bin/activate
 fi
 
-# Use offline=0 once selectors are calibrated against the live sites
 export PULPO_OFFLINE="${PULPO_OFFLINE:-0}"
-export PULPO_LIMIT="${PULPO_LIMIT:-60}"
-export PULPO_SOURCES="${PULPO_SOURCES:-goodlife,oceanside,kazu}"
+export PULPO_LIMIT="${PULPO_LIMIT:-1000}"
+# kazu: API host still denylisted. Re-add when rewritten as a JSON consumer.
+export PULPO_SOURCES="${PULPO_SOURCES:-goodlife,oceanside,century21,bienesraices,remax}"
 
 python3 automation/run.py
 

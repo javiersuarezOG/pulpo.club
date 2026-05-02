@@ -47,3 +47,7 @@ gh pr create --base dev --title "feat: my feature"
 | `api/` | Javier (auth/API) |
 | `automation/` | Either |
 | `web/data/` | Generated — do not edit by hand |
+
+## Adding a new agent
+
+Every new file under `pulpo/scrapers/`, `pulpo/agents/`, `pulpo/enrichers/`, or `pulpo/ranker_legs/` must ship with a matching test file under the corresponding `tests/` subdirectory. CI will fail the PR if the test file is absent. Use the `no-test-required` label only for pure docs or refactor PRs that add no new logic.
