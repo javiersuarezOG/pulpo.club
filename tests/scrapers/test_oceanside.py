@@ -7,7 +7,6 @@ target the API record mapper (_map) rather than the old parse_*_page
 HTML methods, which are retained as stubs for calibration harness
 compatibility.
 """
-import re
 from pulpo.scrapers.oceanside import _map, _extract_area_text, OceansideScraper
 
 # ── Synthetic API record that matches real rental-details shape ──────────────

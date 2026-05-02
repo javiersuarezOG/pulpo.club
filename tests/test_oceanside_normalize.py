@@ -122,7 +122,8 @@ def test_fixture_total_records(raw_records):
 
 def test_stub_filter_count(raw_records):
     """Records that have at least price or area (survive normalize's hard gate)."""
-    import sys; sys.path.insert(0, str(REPO))
+    import sys
+    sys.path.insert(0, str(REPO))
     from pulpo.scrapers.oceanside import _map
 
     LAND_ID = 122

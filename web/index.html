@@ -330,6 +330,7 @@ footer a:hover{color:var(--t2)}
     </label>
     <select class="f-select" id="f-zone"><option value="">All zones</option></select>
     <label class="f-toggle" id="chip-beach"><input type="checkbox" id="f-beach" /> 🏖 Beachfront</label>
+    <label class="f-toggle" id="chip-devs"><input type="checkbox" id="f-hide-devs" /> 🔓 Hide gated</label>
     <div class="ctrl-right">Showing <strong id="f-count">0</strong> of <span id="f-total">0</span></div>
   </div>
 
@@ -601,10 +602,12 @@ function applyFilters(){
   const q=document.getElementById("f-search").value.toLowerCase().trim();
   const zn=document.getElementById("f-zone").value;
   const bf=document.getElementById("f-beach").checked;
+  const hd=document.getElementById("f-hide-devs").checked;
   let rows=DATA.slice();
   if(q) rows=rows.filter(r=>(r.title||"").toLowerCase().includes(q)||(r.location_text||"").toLowerCase().includes(q)||(r.zone||"").toLowerCase().includes(q)||(r.municipality||"").toLowerCase().includes(q));
   if(zn) rows=rows.filter(r=>r.zone===zn);
   if(bf) rows=rows.filter(r=>r.is_beachfront);
+  if(hd) rows=rows.filter(r=>!r.is_in_development);
   const k=SORT.key,d=SORT.dir==="asc"?1:-1;
   rows.sort((a,b)=>{const va=a[k],vb=b[k];if(va==null&&vb==null)return 0;if(va==null)return 1;if(vb==null)return-1;return typeof va==="number"?(va-vb)*d:String(va).localeCompare(String(vb))*d;});
   document.getElementById("f-count").textContent=rows.length;
@@ -635,6 +638,14 @@ function wireFilters(){
   ["f-search","f-zone"].forEach(id=>document.getElementById(id).addEventListener("input",applyFilters));
   const cb=document.getElementById("f-beach"),chip=document.getElementById("chip-beach");
   cb.addEventListener("change",()=>{chip.classList.toggle("on",cb.checked);applyFilters();});
+  const cbDev=document.getElementById("f-hide-devs"),chipDev=document.getElementById("chip-devs");
+  // Restore persisted preference
+  if(localStorage.getItem("pulpo-hide-devs")==="1"){cbDev.checked=true;chipDev.classList.add("on");}
+  cbDev.addEventListener("change",()=>{
+    chipDev.classList.toggle("on",cbDev.checked);
+    localStorage.setItem("pulpo-hide-devs",cbDev.checked?"1":"0");
+    applyFilters();
+  });
 }
 
 // Re-render when crossing the mobile/desktop breakpoint

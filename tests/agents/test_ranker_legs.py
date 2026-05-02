@@ -1,10 +1,6 @@
 """Tests for individual ranker legs in isolation."""
 import pytest
 from pulpo.models import Listing
-import pulpo.ranker_legs.value
-import pulpo.ranker_legs.quality
-import pulpo.ranker_legs.liquidity
-import pulpo.ranker_legs.upside
 from pulpo.agents import RANKER_LEGS
 
 

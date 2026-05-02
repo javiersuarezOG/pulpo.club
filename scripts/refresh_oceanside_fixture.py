@@ -18,8 +18,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from pulpo.scrapers.oceanside import _find_land_term_id, API_BASE
-from pulpo.agents.html_crawler import make_client
+from pulpo.scrapers.oceanside import _find_land_term_id, API_BASE  # noqa: E402
+from pulpo.agents.html_crawler import make_client  # noqa: E402
 
 FIXTURE_PATH = REPO / "tests" / "fixtures" / "oceanside_lots.json"
 

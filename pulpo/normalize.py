@@ -12,6 +12,7 @@ from typing import Optional
 
 from .models import Listing
 from .units import parse_area, parse_price_usd
+from .developments import detect_development
 
 # ---- Sold-listing detection ----
 # Goodlife (and other SV brokers) leave properties indexed indefinitely with
@@ -177,6 +178,38 @@ def detect_property_type(title: str = "", description: str = "", location_text: 
     blob = _FUTURE_USE_RE.sub(" ", blob)
     return _classify(blob) or "land"
 
+# ── Phase 1: property-type title filter ─────────────────────────────────────
+# Applied only to HTML scraper sources that pull mixed inventory.
+# oceanside: already API-filtered to property-type=lot. century21: clean.
+_TITLE_FILTER_SOURCES = {"bienesraices", "remax", "goodlife"}
+
+# Always drop these patterns in the title regardless of other keywords.
+_ALWAYS_DROP_RE = re.compile(
+    r"\b(bedroom|habitaci[oó]n|apartment|apartamento|departamento|depa|condo)\b",
+    re.IGNORECASE,
+)
+# Drop "house" / "casa" UNLESS the title also carries explicit land vocabulary.
+_HOUSE_RE = re.compile(r"\b(house|casa)\b", re.IGNORECASE)
+_LAND_EXCEPTION_RE = re.compile(
+    r"\b(land|terreno|lote|lots?|finca)\b", re.IGNORECASE
+)
+
+
+def is_non_land_title(title: str, source: str) -> bool:
+    """Return True if the title signals a non-raw-land listing that should be dropped.
+
+    Only applied to sources that pull mixed inventory (see _TITLE_FILTER_SOURCES).
+    Keeps 'Land With House' style titles; drops '3-Bedroom House' titles.
+    """
+    if source not in _TITLE_FILTER_SOURCES:
+        return False
+    if _ALWAYS_DROP_RE.search(title):
+        return True
+    if _HOUSE_RE.search(title) and not _LAND_EXCEPTION_RE.search(title):
+        return True
+    return False
+
+
 def normalize(raw: dict, source: str) -> Optional[Listing]:
     """
     Convert a raw scraper dict into a canonical Listing.
@@ -207,6 +240,10 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     if is_sold(title, description, raw_price_text, raw_size_text):
         return None
 
+    # Phase 1: drop non-land listings by title pattern (bienesraices/remax/goodlife only)
+    if is_non_land_title(title, source):
+        return None
+
     # Area: prefer pre-computed, else parse raw_size_text
     area_m2 = raw.get("area_m2")
     if area_m2 is None and raw_size_text:
@@ -231,6 +268,9 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     # otherwise classify from the text. Used by the ranker to segment comp
     # pools so houses don't drag the lot $/m² distribution.
     property_type = str(raw.get("property_type") or detect_property_type(title, description, location_text))
+
+    # Phase 3: development / gated-community tagging
+    is_in_development, development_name = detect_development(title, description)
 
     # Derived $/m²
     price_per_m2 = None
@@ -257,6 +297,8 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         raw_price_text=raw_price_text,
         price_per_m2=price_per_m2,
         property_type=property_type,
+        is_in_development=is_in_development,
+        development_name=development_name,
         is_beachfront=bool(raw.get("is_beachfront", False)),
         has_paved_access=bool(raw.get("has_paved_access", False)),
         has_water=bool(raw.get("has_water", False)),
