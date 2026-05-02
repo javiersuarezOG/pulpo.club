@@ -122,11 +122,25 @@ def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
     raw_size_text = _extract_area_text(content_text)
 
     # Location from class_list: "location-la-libertad" → "La Libertad"
+    #
+    # Phase-3 zone note (2026-05-02): class_list slugs are DEPARTMENT-level
+    # (la-libertad / san-miguel / sonsonate), not zone-level. Migrating to
+    # class_list-primary zone detection would downgrade 24 listings from
+    # specific zones (el-tunco, el-zonte) to the generic 'la-libertad'.
+    # The current flow already correctly uses class_list:
+    #   class_list → loc_slugs → location_text → normalize() → detect_zone()
+    # detect_zone() scans (location_text + title + description) so it resolves
+    # el-tunco / el-zonte from the listing title even when location_text only
+    # says "La Libertad". No migration needed.
     loc_slugs = [
         c[len("location-"):].replace("-", " ").title()
         for c in (rec.get("class_list") or [])
         if c.startswith("location-") and c != "location-el-salvador"
     ]
+    if not loc_slugs:
+        # Defensive: class_list should always have a location-* entry for
+        # rental-details; log and fall back to title.
+        print(f"[oceanside] WARNING: no location-* in class_list for id={rec.get('id')}")
     location_text = ", ".join(loc_slugs) if loc_slugs else title
 
     # Days since last modified
