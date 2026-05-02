@@ -20,11 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Use PAT so the bot push bypasses the "require PR" check on main.
-          # PULPO_BOT_TOKEN must be a fine-grained PAT with Contents: write
-          # on this repo, stored as a repository secret.
-          # Fall back to the default GITHUB_TOKEN when the PAT isn't set
-          # (preview branches, forks, first-time setup).
+          # Use PAT so the bot push can write to main without a PR.
+          # PULPO_BOT_TOKEN: fine-grained PAT, Contents: write on this repo.
+          # Falls back to GITHUB_TOKEN (works since the 0-approval PR rule
+          # was removed from main's branch protection).
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
       - uses: actions/setup-python@v5
@@ -58,7 +57,7 @@ jobs:
               print(f"CANARY FAIL: {n} listings is below floor of {floor}. "
                     "Not committing — stale data kept.", file=sys.stderr)
               sys.exit(1)
-          print(f"CANARY OK: {n} listings ≥ floor {floor}")
+          print(f"CANARY OK: {n} listings >= floor {floor}")
           EOF
 
       - name: Commit refreshed data
@@ -74,3 +73,17 @@ jobs:
             git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      - name: Deploy to Vercel
+        # Explicit CLI deploy so Vercel Deployment Protection doesn't block
+        # the bot-authored commit. VERCEL_TOKEN must be stored as a repo secret
+        # (Vercel dashboard → Account Settings → Tokens → "pulpo-bot-ci").
+        # Skip silently when the secret isn't configured yet.
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install -g vercel
+          vercel --prod --token "$VERCEL_TOKEN" --yes
