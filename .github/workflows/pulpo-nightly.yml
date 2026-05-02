@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: write     # commit refreshed web/data/ back
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           # Use PAT so the bot push can write to main without a PR.
           # PULPO_BOT_TOKEN: fine-grained PAT, Contents: write on this repo.
@@ -29,7 +29,7 @@ jobs:
           # requires a PR on main).
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.12"
           cache: pip
