@@ -385,7 +385,7 @@ const fmtArea = v => v==null ? '—' : Math.round(v).toLocaleString('en-US')+' m
 const fmtDays = d => d==null ? '—' : d===0 ? 'Today' : d===1 ? '1 day ago' : `${d} days ago`;
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])) }
 function zoneLabel(z){ return z ? z.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : 'No zone'; }
-const isNoZone = r => !r.zone;
+const isNoZone = r => r.zone_confidence ? r.zone_confidence === 'unresolved' : (!r.zone && !r.department);
 
 function zonePillHTML(r) {
   if (r.zone) {
