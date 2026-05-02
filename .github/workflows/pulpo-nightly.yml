@@ -6,11 +6,14 @@ on:
     - cron: "0 12 * * *"
   workflow_dispatch: {}    # also allow manual runs
 
-# Count floor: workflow fails (and does NOT commit) if fewer than this
-# many listings are produced. Protects against a single broken scraper
-# silently zeroing out the leaderboard. Tune upward as supply grows.
+# Count canaries — both fail the workflow without committing stale data.
+# FLOOR: raise if clean baseline grows. CEILING: raise if ceiling is hit
+# legitimately (new large source added). The asymmetry catches both supply
+# collapse (broken scraper) and phantom inflation (parser bug, dedup failure).
+# Baseline after Phase 1+2 cleanup: ~740 listings.
 env:
-  LISTING_COUNT_FLOOR: "50"
+  LISTING_COUNT_FLOOR: "600"    # ~80% of 740 — catches scraper collapse
+  LISTING_COUNT_CEILING: "900"  # ~120% of 740 — catches runaway parser bugs
 
 jobs:
   run:
@@ -42,11 +45,12 @@ jobs:
           PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax"
         run: python automation/run.py
 
-      - name: Count-floor canary
+      - name: Count canary (floor + ceiling)
         run: |
           python3 - <<'EOF'
           import json, sys, os
-          floor = int(os.environ.get("LISTING_COUNT_FLOOR", "50"))
+          floor   = int(os.environ.get("LISTING_COUNT_FLOOR",   "600"))
+          ceiling = int(os.environ.get("LISTING_COUNT_CEILING", "900"))
           try:
               data = json.load(open("web/data/ranked.json"))
           except Exception as e:
@@ -54,10 +58,14 @@ jobs:
               sys.exit(1)
           n = len(data)
           if n < floor:
-              print(f"CANARY FAIL: {n} listings is below floor of {floor}. "
+              print(f"CANARY FAIL: {n} listings < floor {floor}. "
                     "Not committing — stale data kept.", file=sys.stderr)
               sys.exit(1)
-          print(f"CANARY OK: {n} listings >= floor {floor}")
+          if n > ceiling:
+              print(f"CANARY FAIL: {n} listings > ceiling {ceiling}. "
+                    "Possible parser inflation — not committing.", file=sys.stderr)
+              sys.exit(1)
+          print(f"CANARY OK: {n} listings in [{floor}, {ceiling}]")
           EOF
 
       - name: Commit refreshed data
@@ -67,6 +75,7 @@ jobs:
           git config user.email "bot@pulpo.club"
           git add web/data/ranked.json web/data/ranked-public.json \
                   web/data/last_updated.json web/data/run_history.json \
+                  web/data/parser_errors.log \
                   samples/ranked.csv
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."

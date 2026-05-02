@@ -37,6 +37,9 @@ class Listing:
     # Property type
     property_type: str = "land"        # "land" | "lot" | "finca" | "house+lot"
     is_beachfront: bool = False
+    # Development / gated-community tagging
+    is_in_development: bool = False    # inside a named development or gated community
+    development_name: Optional[str] = None  # e.g. "Surf City 1", "Atami"
     has_paved_access: bool = False
     has_water: bool = False
     has_power: bool = False
