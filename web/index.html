@@ -62,7 +62,7 @@ button{font-family:inherit;cursor:pointer}
 
 /* ── Table wrapper ────────────────────────────────────────────────── */
 .table-wrap{flex:1;overflow-y:auto;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:680px}
+table{width:100%;border-collapse:collapse;min-width:560px}
 
 thead th{
   position:sticky;top:0;z-index:10;
@@ -80,27 +80,24 @@ thead th .sort-ic{font-size:10px;margin-left:3px;opacity:.35;transition:opacity 
 thead th.sortable:hover .sort-ic{opacity:.6}
 thead th.sorted .sort-ic{opacity:1;color:var(--accent)}
 
-th.col-title{width:36%}
-th.col-zone {width:14%}
-th.col-price{width:13%;text-align:right}
-th.col-area {width:12%;text-align:right}
-th.col-ppm  {width:11%;text-align:right}
-th.col-stars{width:14%}
+th.col-zone {width:22%}
+th.col-price{width:19%;text-align:right}
+th.col-area {width:18%;text-align:right}
+th.col-ppm  {width:17%;text-align:right}
+th.col-stars{width:20%}
+th.col-chev {width:44px;text-align:center;padding:0}
 
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 tbody tr:hover{background:var(--s1)}
 tbody tr.selected{background:var(--accent-bg)}
 tbody td{padding:10px 12px;vertical-align:middle}
 
-.td-title{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0}/* max-width:0 triggers ellipsis in table */
 .td-zone{}
 .td-num{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;color:var(--text)}
 .td-ppm{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--text)}
 .td-stars{white-space:nowrap}
-.zone-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--s2);color:var(--t2);letter-spacing:.2px}
-.zone-pill.tier-A{background:#dcfce7;color:#15803d}
-.zone-pill.tier-B{background:#dbeafe;color:#1d4ed8}
-.zone-pill.tier-C{background:#ede9fe;color:#7c3aed}
+.td-chev{text-align:center;color:var(--t4);font-size:16px;line-height:1;padding:0 8px}
+.zone-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.2px}
 .na{color:var(--t4);font-size:12px}
 
 /* ── Stars ────────────────────────────────────────────────────────── */
@@ -231,8 +228,6 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <option value="area_asc">Sort: Area ↑</option>
         <option value="stars_desc">Sort: Rating ↓ (best first)</option>
         <option value="stars_asc">Sort: Rating ↑</option>
-        <option value="title_asc">Sort: Title A→Z</option>
-        <option value="title_desc">Sort: Title Z→A</option>
         <option value="zone_asc">Sort: Zone A→Z</option>
         <option value="zone_desc">Sort: Zone Z→A</option>
       </select>
@@ -243,9 +238,6 @@ tbody td{padding:10px 12px;vertical-align:middle}
       <table id="listings-table">
         <thead>
           <tr>
-            <th class="col-title sortable" data-col="title" data-def="asc">
-              Title <span class="sort-ic" id="ic-title">↕</span>
-            </th>
             <th class="col-zone sortable" data-col="zone" data-def="asc">
               Zone <span class="sort-ic" id="ic-zone">↕</span>
             </th>
@@ -261,6 +253,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
             <th class="col-stars sortable" data-col="stars" data-def="desc">
               Rating <span class="sort-ic" id="ic-stars">↕</span>
             </th>
+            <th class="col-chev"></th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -311,12 +304,32 @@ const SOURCE_NAMES = {
   remax:        'RE/MAX El Salvador',
 };
 
-const ZONE_TIER = {
-  'el-tunco':'A','el-sunzal':'A','el-zonte':'A',
-  'san-diego':'B','la-libertad':'B','puerto-la-libertad':'B',
-  'el-cuco':'B','las-flores':'B','mizata':'B',
-  'punta-mango':'C','el-espino':'C','conchagua':'C','la-union':'C',
+const ZONE_COLORS = {
+  'el-tunco':           {bg:'#fde8e8',fg:'#c0392b'},
+  'el-zonte':           {bg:'#fce4f5',fg:'#a8118c'},
+  'el-sunzal':          {bg:'#fff3cd',fg:'#856404'},
+  'san-diego':          {bg:'#d6eaff',fg:'#1548a0'},
+  'la-libertad':        {bg:'#d0f4ea',fg:'#0a6847'},
+  'puerto-la-libertad': {bg:'#e6ddff',fg:'#5b21b6'},
+  'el-cuco':            {bg:'#d1f5d3',fg:'#14532d'},
+  'las-flores':         {bg:'#ffe5d9',fg:'#9a3412'},
+  'mizata':             {bg:'#ffd9ec',fg:'#9d174d'},
+  'punta-mango':        {bg:'#ecfccb',fg:'#365314'},
+  'el-espino':          {bg:'#fef9c3',fg:'#713f12'},
+  'conchagua':          {bg:'#fff1e6',fg:'#92400e'},
+  'la-union':           {bg:'#e0f7ff',fg:'#0c4a6e'},
 };
+const ZONE_PALETTE = [
+  {bg:'#f3f4f6',fg:'#374151'},{bg:'#eff6ff',fg:'#1e40af'},
+  {bg:'#f0fdf4',fg:'#166534'},{bg:'#fefce8',fg:'#854d0e'},
+  {bg:'#fff7ed',fg:'#9a3412'},{bg:'#fdf4ff',fg:'#6b21a8'},
+  {bg:'#fff1f2',fg:'#9f1239'},{bg:'#f0fdfa',fg:'#134e4a'},
+];
+function zoneColor(zone) {
+  if (ZONE_COLORS[zone]) return ZONE_COLORS[zone];
+  const h = [...zone].reduce((s,c)=>s+c.charCodeAt(0),0);
+  return ZONE_PALETTE[h % ZONE_PALETTE.length];
+}
 
 /* ── State ──────────────────────────────────────────────────────────── */
 let ALL_DATA   = [];
@@ -354,10 +367,9 @@ function renderStars(score) {
 /* ── Zone pill ──────────────────────────────────────────────────────── */
 function zonePill(zone) {
   if (!zone) return '<span class="na">—</span>';
-  const tier  = ZONE_TIER[zone] || '';
-  const cls   = tier ? `tier-${tier}` : '';
+  const {bg, fg} = zoneColor(zone);
   const label = zone.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  return `<span class="zone-pill ${cls}">${esc(label)}</span>`;
+  return `<span class="zone-pill" style="background:${bg};color:${fg}">${esc(label)}</span>`;
 }
 
 /* ── URL state ──────────────────────────────────────────────────────── */
@@ -365,7 +377,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER   = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   const s  = p.get('sort') || 'ppm_asc';
-  const m  = s.match(/^(title|zone|price|area|ppm|stars)_(asc|desc)$/);
+  const m  = s.match(/^(zone|price|area|ppm|stars)_(asc|desc)$/);
   if (m) { SORT_COL = m[1]; SORT_DIR = m[2]; }
   OPEN_ID  = p.get('listing') || null;
 }
@@ -391,21 +403,22 @@ function filteredRows() {
 
 function sortedRows(rows) {
   const dir = SORT_DIR === 'asc' ? 1 : -1;
+  const nil = SORT_DIR === 'asc' ? Infinity : -Infinity;  // nulls always sink
   return [...rows].sort((a, b) => {
-    let va, vb;
-    if (SORT_COL === 'title') {
-      return (a.title || '').localeCompare(b.title || '', 'es') * dir;
-    }
     if (SORT_COL === 'zone') {
-      return (a.zone || 'zzz').localeCompare(b.zone || 'zzz', 'en') * dir;
+      const az = a.zone, bz = b.zone;
+      if (!az && !bz) return 0;
+      if (!az) return 1;
+      if (!bz) return -1;
+      return az.localeCompare(bz, 'es') * dir;
     }
-    if (SORT_COL === 'price') { va = a.price_usd ?? Infinity; vb = b.price_usd ?? Infinity; }
-    else if (SORT_COL === 'area') { va = a.area_m2 ?? -Infinity; vb = b.area_m2 ?? -Infinity; }
-    else if (SORT_COL === 'stars') {
-      va = a.rank_score ?? -Infinity; vb = b.rank_score ?? -Infinity;
-    } else { /* ppm */
-      va = a.price_per_m2 && a.price_per_m2 > 0 ? a.price_per_m2 : Infinity;
-      vb = b.price_per_m2 && b.price_per_m2 > 0 ? b.price_per_m2 : Infinity;
+    let va, vb;
+    if      (SORT_COL === 'price') { va = a.price_usd  ?? nil; vb = b.price_usd  ?? nil; }
+    else if (SORT_COL === 'area')  { va = a.area_m2    ?? nil; vb = b.area_m2    ?? nil; }
+    else if (SORT_COL === 'stars') { va = a.rank_score ?? nil; vb = b.rank_score ?? nil; }
+    else /* ppm */ {
+      va = (a.price_per_m2 > 0) ? a.price_per_m2 : nil;
+      vb = (b.price_per_m2 > 0) ? b.price_per_m2 : nil;
     }
     return (va - vb) * dir;
   });
@@ -518,12 +531,12 @@ function renderTable(rows) {
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = rows.map(r => `
     <tr data-id="${esc(r.source_id)}" class="${r.source_id === OPEN_ID ? 'selected' : ''}">
-      <td class="td-title">${esc(r.title)}</td>
       <td class="td-zone">${zonePill(r.zone)}</td>
       <td class="td-num">${fmtUSD(r.price_usd)}</td>
       <td class="td-num">${fmtArea(r.area_m2)}</td>
       <td class="td-ppm">${fmtPPM(r.price_per_m2)}</td>
       <td class="td-stars">${renderStars(r.rank_score)}</td>
+      <td class="td-chev">›</td>
     </tr>`).join('');
 
   tbody.querySelectorAll('tr').forEach((tr, i) => {
@@ -615,7 +628,7 @@ function wireMobileSort() {
   const sel = document.getElementById('mobile-sort');
   sel.value = `${SORT_COL}_${SORT_DIR}`;
   sel.addEventListener('change', () => {
-    const m = sel.value.match(/^(title|zone|price|area|ppm|stars)_(asc|desc)$/);
+    const m = sel.value.match(/^(zone|price|area|ppm|stars)_(asc|desc)$/);
     if (m) { SORT_COL = m[1]; SORT_DIR = m[2]; }
     pushURL(true);
     render();
