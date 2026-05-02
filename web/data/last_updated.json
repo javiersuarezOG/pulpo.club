@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-02T14:03:40.119999+00:00",
-  "started_at": "2026-05-02T14:00:16.836688+00:00",
-  "duration_seconds": 203.28,
-  "total_listings": 95,
-  "dropped": 37,
+  "last_updated": "2026-05-02T19:16:54.218465+00:00",
+  "started_at": "2026-05-02T18:47:09.563563+00:00",
+  "duration_seconds": 1784.65,
+  "total_listings": 812,
+  "dropped": 94,
   "per_source_raw": {
-    "goodlife": 30,
+    "goodlife": 80,
     "oceanside": 27,
     "century21": 15,
-    "bienesraices": 30,
-    "remax": 30
+    "bienesraices": 471,
+    "remax": 313
   },
   "source_status": {
     "goodlife": "green",
@@ -21,7 +21,7 @@
   "coverage": {
     "goodlife": {
       "supplier": null,
-      "pulled": 30,
+      "pulled": 80,
       "max_pages_hit": false
     },
     "oceanside": {
@@ -36,24 +36,24 @@
     },
     "bienesraices": {
       "supplier": null,
-      "pulled": 30,
+      "pulled": 471,
       "max_pages_hit": false
     },
     "remax": {
       "supplier": null,
-      "pulled": 30,
+      "pulled": 313,
       "max_pages_hit": false
     }
   },
   "field_completeness": {
     "bienesraices": {
-      "n_listings": 29,
+      "n_listings": 445,
       "fields": {
-        "price_usd": 1.0,
-        "area_m2": 1.0,
-        "zone": 0.45,
-        "municipality": 0.45,
-        "department": 0.45,
+        "price_usd": 0.97,
+        "area_m2": 0.98,
+        "zone": 0.5,
+        "municipality": 0.5,
+        "department": 0.5,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -97,13 +97,13 @@
       }
     },
     "goodlife": {
-      "n_listings": 9,
+      "n_listings": 31,
       "fields": {
-        "price_usd": 1.0,
-        "area_m2": 0.89,
-        "zone": 0.67,
-        "municipality": 0.67,
-        "department": 0.67,
+        "price_usd": 0.9,
+        "area_m2": 0.97,
+        "zone": 0.84,
+        "municipality": 0.84,
+        "department": 0.84,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -147,13 +147,13 @@
       }
     },
     "remax": {
-      "n_listings": 29,
+      "n_listings": 308,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.1,
-        "municipality": 0.1,
-        "department": 0.1,
+        "zone": 0.17,
+        "municipality": 0.17,
+        "department": 0.17,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
@@ -168,7 +168,7 @@
         "broker_phone": 0.0,
         "broker_email": 0.0,
         "title": 1.0,
-        "description": 0.72
+        "description": 0.26
       }
     }
   },
