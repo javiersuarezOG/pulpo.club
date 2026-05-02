@@ -229,6 +229,12 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <option value="price_desc">Sort: Price ↓</option>
         <option value="area_desc">Sort: Area ↓ (largest first)</option>
         <option value="area_asc">Sort: Area ↑</option>
+        <option value="stars_desc">Sort: Rating ↓ (best first)</option>
+        <option value="stars_asc">Sort: Rating ↑</option>
+        <option value="title_asc">Sort: Title A→Z</option>
+        <option value="title_desc">Sort: Title Z→A</option>
+        <option value="zone_asc">Sort: Zone A→Z</option>
+        <option value="zone_desc">Sort: Zone Z→A</option>
       </select>
     </div>
 
@@ -237,8 +243,12 @@ tbody td{padding:10px 12px;vertical-align:middle}
       <table id="listings-table">
         <thead>
           <tr>
-            <th class="col-title">Title</th>
-            <th class="col-zone">Zone</th>
+            <th class="col-title sortable" data-col="title" data-def="asc">
+              Title <span class="sort-ic" id="ic-title">↕</span>
+            </th>
+            <th class="col-zone sortable" data-col="zone" data-def="asc">
+              Zone <span class="sort-ic" id="ic-zone">↕</span>
+            </th>
             <th class="col-price sortable" data-col="price" data-def="asc">
               <div class="th-in" style="justify-content:flex-end">Price <span class="sort-ic" id="ic-price">↕</span></div>
             </th>
@@ -248,7 +258,9 @@ tbody td{padding:10px 12px;vertical-align:middle}
             <th class="col-ppm sortable sorted" data-col="ppm" data-def="asc">
               <div class="th-in" style="justify-content:flex-end">$/m² <span class="sort-ic" id="ic-ppm">↑</span></div>
             </th>
-            <th class="col-stars">Rating</th>
+            <th class="col-stars sortable" data-col="stars" data-def="desc">
+              Rating <span class="sort-ic" id="ic-stars">↕</span>
+            </th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -309,7 +321,7 @@ const ZONE_TIER = {
 /* ── State ──────────────────────────────────────────────────────────── */
 let ALL_DATA   = [];
 let FILTER     = 'all';       // 'all' | 'open' | 'gated'
-let SORT_COL   = 'ppm';       // 'price' | 'area' | 'ppm'
+let SORT_COL   = 'ppm';       // 'title'|'zone'|'price'|'area'|'ppm'|'stars'
 let SORT_DIR   = 'asc';       // 'asc' | 'desc'
 let OPEN_ID    = null;        // source_id of open listing
 
@@ -353,7 +365,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER   = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   const s  = p.get('sort') || 'ppm_asc';
-  const m  = s.match(/^(price|area|ppm)_(asc|desc)$/);
+  const m  = s.match(/^(title|zone|price|area|ppm|stars)_(asc|desc)$/);
   if (m) { SORT_COL = m[1]; SORT_DIR = m[2]; }
   OPEN_ID  = p.get('listing') || null;
 }
@@ -381,9 +393,17 @@ function sortedRows(rows) {
   const dir = SORT_DIR === 'asc' ? 1 : -1;
   return [...rows].sort((a, b) => {
     let va, vb;
+    if (SORT_COL === 'title') {
+      return (a.title || '').localeCompare(b.title || '', 'es') * dir;
+    }
+    if (SORT_COL === 'zone') {
+      return (a.zone || 'zzz').localeCompare(b.zone || 'zzz', 'en') * dir;
+    }
     if (SORT_COL === 'price') { va = a.price_usd ?? Infinity; vb = b.price_usd ?? Infinity; }
     else if (SORT_COL === 'area') { va = a.area_m2 ?? -Infinity; vb = b.area_m2 ?? -Infinity; }
-    else { /* ppm */
+    else if (SORT_COL === 'stars') {
+      va = a.rank_score ?? -Infinity; vb = b.rank_score ?? -Infinity;
+    } else { /* ppm */
       va = a.price_per_m2 && a.price_per_m2 > 0 ? a.price_per_m2 : Infinity;
       vb = b.price_per_m2 && b.price_per_m2 > 0 ? b.price_per_m2 : Infinity;
     }
@@ -595,7 +615,7 @@ function wireMobileSort() {
   const sel = document.getElementById('mobile-sort');
   sel.value = `${SORT_COL}_${SORT_DIR}`;
   sel.addEventListener('change', () => {
-    const m = sel.value.match(/^(price|area|ppm)_(asc|desc)$/);
+    const m = sel.value.match(/^(title|zone|price|area|ppm|stars)_(asc|desc)$/);
     if (m) { SORT_COL = m[1]; SORT_DIR = m[2]; }
     pushURL(true);
     render();
