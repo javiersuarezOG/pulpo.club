@@ -22,8 +22,8 @@ jobs:
         with:
           # Use PAT so the bot push can write to main without a PR.
           # PULPO_BOT_TOKEN: fine-grained PAT, Contents: write on this repo.
-          # Falls back to GITHUB_TOKEN (works since the 0-approval PR rule
-          # was removed from main's branch protection).
+          # Falls back to GITHUB_TOKEN (works since branch protection no longer
+          # requires a PR on main).
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
       - uses: actions/setup-python@v5
@@ -61,6 +61,7 @@ jobs:
           EOF
 
       - name: Commit refreshed data
+        id: commit
         run: |
           git config user.name "pulpo-bot"
           git config user.email "bot@pulpo.club"
@@ -69,21 +70,26 @@ jobs:
                   samples/ranked.csv
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
             git push
+            echo "committed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Deploy to Vercel
-        # Explicit CLI deploy so Vercel Deployment Protection doesn't block
-        # the bot-authored commit. VERCEL_TOKEN must be stored as a repo secret
-        # (Vercel dashboard → Account Settings → Tokens → "pulpo-bot-ci").
-        # Skip silently when the secret isn't configured yet.
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        # Only runs when fresh data was actually committed.
+        # Uses vercel pull/build/deploy --prebuilt so the token is never echoed
+        # and the deploy bypasses Vercel Deployment Protection (Blocked status).
+        # vercel.json ignoreCommand skips the GitHub-integration auto-deploy for
+        # pulpo-bot commits, eliminating the Blocked/duplicate deploy pair.
+        if: steps.commit.outputs.committed == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npm install -g vercel
-          vercel --prod --token "$VERCEL_TOKEN" --yes
+          npm install -g vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

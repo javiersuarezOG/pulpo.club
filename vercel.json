@@ -3,6 +3,7 @@
   "version": 2,
   "framework": null,
   "buildCommand": "echo 'static deploy — pulpo.club'",
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
   "rewrites": [
     { "source": "/", "destination": "/web/index.html" },
