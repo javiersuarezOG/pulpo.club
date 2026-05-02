@@ -1,0 +1,52 @@
+name: pulpo nightly run
+
+# Every night at 12:00 UTC = 06:00 in El Salvador (UTC-6).
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch: {}    # also allow manual runs
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write     # commit refreshed web/data/ back
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          PULPO_OFFLINE: "0"
+          PULPO_LIMIT: "1000"
+          # kazu: Nuxt SPA, panel API still denylisted — re-add when rewritten.
+          # remax: domain fix merged; added here.
+          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax"
+        run: python automation/run.py
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "bot@pulpo.club"
+          git add web/data/ranked.json web/data/ranked-public.json \
+                  web/data/last_updated.json web/data/run_history.json \
+                  samples/ranked.csv
+          if git diff --staged --quiet; then
+            echo "No data changes — skipping commit."
+          else
+            git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      # - name: Deploy to Vercel
+      #   run: vercel --prod --token $VERCEL_TOKEN
+      #
+      # - name: Send newsletter draft to Beehiiv
+      #   run: python automation/build_newsletter.py
