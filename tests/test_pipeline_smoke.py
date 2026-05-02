@@ -3,9 +3,7 @@
 Runs automation/run.py in offline mode and writes output to a temp
 directory so the production web/data/ranked.json is never clobbered.
 """
-import importlib
 import json
-import os
 import sys
 from pathlib import Path
 from unittest import mock
@@ -31,8 +29,6 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
     fake_samples.mkdir()
 
     import automation.run as run_mod  # noqa: E402
-
-    real_repo = run_mod.REPO
 
     with mock.patch.object(run_mod, "REPO", tmp_path):
         # run.py uses REPO / "web" / "data" for output paths

@@ -15,7 +15,6 @@ Data locations:
   detail page → area (li "Lot size:" > span.det), description, confirm title
 """
 from __future__ import annotations
-import json
 import re
 import time
 from datetime import datetime, timezone

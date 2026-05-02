@@ -11,10 +11,10 @@ import pytest
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from pulpo.normalize import is_non_land_title, normalize
-from pulpo.developments import detect_development
-from pulpo.ranker import rank
-from pulpo.models import Listing
+from pulpo.normalize import is_non_land_title, normalize  # noqa: E402
+from pulpo.developments import detect_development  # noqa: E402
+from pulpo.ranker import rank  # noqa: E402
+from pulpo.models import Listing  # noqa: E402
 
 
 # ── Phase 1: property-type title filter ──────────────────────────────────────
