@@ -8,6 +8,7 @@ manual checklist (no JS test runner in this project).
 """
 from __future__ import annotations
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -523,3 +524,156 @@ def test_header_border_bottom_present():
     filter_bar_pos = html.find('class="filter-bar"')
     assert header_end > 0 and filter_bar_pos > 0, "Both elements must exist in HTML"
     assert header_end < filter_bar_pos, "Filter bar must be outside the header"
+
+
+# ── Newest sort + NEW badge (PRD 2 — sort by first_seen_at) ───────────
+# Pure Python mirrors of the JS isNewListing() and the 'newest' branch in
+# sortedRows(). These tests pin the contract so the dashboard can't lose
+# time-based sorting in a future refactor.
+
+NEW_BADGE_DAYS = 14
+NEW_BADGE_SECONDS = NEW_BADGE_DAYS * 24 * 60 * 60
+
+
+def is_new_listing(row: dict, now: datetime | None = None) -> bool:
+    """Python mirror of the JS isNewListing() — true iff first_seen_at is
+    within the last NEW_BADGE_DAYS days. Missing or unparseable timestamps
+    are never new."""
+    if not row or not row.get("first_seen_at"):
+        return False
+    try:
+        ts = datetime.fromisoformat(row["first_seen_at"].replace("Z", "+00:00"))
+    except (ValueError, AttributeError):
+        return False
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    now = now or datetime.now(timezone.utc)
+    return (now - ts).total_seconds() <= NEW_BADGE_SECONDS
+
+
+def sort_by_newest(rows, direction: str):
+    """Python mirror of sortedRows() with SORT_COL='newest'."""
+    reverse = direction == "desc"
+    sentinel_asc = "￿"  # nulls sink to the end on asc
+    sentinel_desc = ""        # nulls sink to the end on desc (smallest string)
+    sentinel = sentinel_asc if direction == "asc" else sentinel_desc
+
+    def key(r):
+        return r.get("first_seen_at") or sentinel
+
+    return sorted(rows, key=key, reverse=reverse)
+
+
+def test_is_new_listing_true_within_14_days():
+    """A first_seen_at one day ago triggers the badge."""
+    one_day_ago = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    assert is_new_listing({"first_seen_at": one_day_ago}) is True
+
+
+def test_is_new_listing_false_at_15_days():
+    """A first_seen_at 15 days ago is past the cutoff."""
+    fifteen_days_ago = (datetime.now(timezone.utc) - timedelta(days=15)).isoformat()
+    assert is_new_listing({"first_seen_at": fifteen_days_ago}) is False
+
+
+def test_is_new_listing_false_at_exactly_14_days_plus_one_second():
+    """The boundary is inclusive: <= 14 days. Tested at 14 days + 1 second."""
+    boundary = (datetime.now(timezone.utc) - timedelta(days=14, seconds=1)).isoformat()
+    assert is_new_listing({"first_seen_at": boundary}) is False
+
+
+def test_is_new_listing_handles_missing_timestamp():
+    """Missing first_seen_at must not error and must not flag the row as new.
+
+    This matters because the live ranked.json carries first_seen_at = null
+    for every listing until the next cron run after the sidecar lands.
+    The badge must never throw, and it must never falsely render on
+    null-timestamp rows.
+    """
+    assert is_new_listing({}) is False
+    assert is_new_listing({"first_seen_at": None}) is False
+
+
+def test_is_new_listing_handles_garbage_timestamp():
+    """Unparseable timestamps must never flag a row as new."""
+    assert is_new_listing({"first_seen_at": "not-an-iso-date"}) is False
+    assert is_new_listing({"first_seen_at": ""}) is False
+
+
+def test_sort_newest_desc_orders_recent_first():
+    """Sorting by newest_desc puts the most recent first_seen_at at the top."""
+    rows = [
+        {"source_id": "old",    "first_seen_at": "2026-01-01T00:00:00+00:00"},
+        {"source_id": "newer",  "first_seen_at": "2026-04-01T00:00:00+00:00"},
+        {"source_id": "newest", "first_seen_at": "2026-05-01T00:00:00+00:00"},
+    ]
+    result = [r["source_id"] for r in sort_by_newest(rows, "desc")]
+    assert result == ["newest", "newer", "old"]
+
+
+def test_sort_newest_pushes_nulls_to_end_on_desc():
+    """Listings with null first_seen_at sink to the bottom on desc — the
+    common case until the cron has populated the sidecar for everyone."""
+    rows = [
+        {"source_id": "with_ts",    "first_seen_at": "2026-05-01T00:00:00+00:00"},
+        {"source_id": "no_ts",      "first_seen_at": None},
+        {"source_id": "older_ts",   "first_seen_at": "2026-01-01T00:00:00+00:00"},
+    ]
+    result = [r["source_id"] for r in sort_by_newest(rows, "desc")]
+    assert result == ["with_ts", "older_ts", "no_ts"]
+
+
+def test_sort_newest_pushes_nulls_to_end_on_asc():
+    """Same nulls-sink behavior in ascending direction."""
+    rows = [
+        {"source_id": "no_ts",      "first_seen_at": None},
+        {"source_id": "older_ts",   "first_seen_at": "2026-01-01T00:00:00+00:00"},
+        {"source_id": "with_ts",    "first_seen_at": "2026-05-01T00:00:00+00:00"},
+    ]
+    result = [r["source_id"] for r in sort_by_newest(rows, "asc")]
+    assert result == ["older_ts", "with_ts", "no_ts"]
+
+
+# ── DOM contract tests (HTML-string assertions) ──────────────────────
+
+
+def test_mobile_sort_dropdown_has_newest_option():
+    """The mobile sort dropdown exposes 'newest_desc' as a selectable option.
+
+    Without this assertion, a refactor that drops the option would silently
+    remove the only mobile-accessible path to the time-based sort.
+    """
+    html = open("web/index.html").read()
+    assert 'value="newest_desc"' in html, "Mobile sort missing the newest_desc option"
+    # Sanity: the option's display label is human-readable.
+    assert "Newest first" in html
+
+
+def test_url_state_regex_includes_newest():
+    """`?sort=newest_desc` URLs must round-trip through readURL/pushURL.
+
+    The regex in readURL() restricts which sort columns are accepted from
+    the URL. Removing 'newest' from the regex would silently break the
+    only desktop path to this sort.
+    """
+    html = open("web/index.html").read()
+    # Look for the readURL regex with the newest token.
+    assert "(zone|price|area|ppm|stars|newest)" in html, (
+        "readURL sort regex no longer accepts 'newest' — desktop URL sort broken"
+    )
+
+
+def test_new_badge_helper_present():
+    """The newBadgeHTML helper and isNewListing function exist in the HTML.
+
+    These are the contract surfaces the badge depends on. If they're
+    renamed or removed, the existing rendering call sites
+    (`${newBadgeHTML(r)}` in renderTable + renderCards) would silently
+    produce 'undefined' strings.
+    """
+    html = open("web/index.html").read()
+    assert "function newBadgeHTML" in html
+    assert "function isNewListing" in html
+    assert "${newBadgeHTML(r)}" in html, (
+        "renderTable/renderCards no longer call newBadgeHTML — badge won't render"
+    )
