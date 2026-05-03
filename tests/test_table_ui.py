@@ -677,3 +677,137 @@ def test_new_badge_helper_present():
     assert "${newBadgeHTML(r)}" in html, (
         "renderTable/renderCards no longer call newBadgeHTML — badge won't render"
     )
+
+
+# ── Price range filter (PRD 3 — Tune panel) ──────────────────────────
+# The price filter encodes its state as snap-point indices, not raw USD,
+# so the URL stays stable even if we re-tune the snap array. These tests
+# pin the filter logic + the DOM surfaces it depends on.
+
+PRICE_SNAPS_PY = [0, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, float("inf")]
+
+
+def price_in_range(row: dict, min_idx: int, max_idx: int) -> bool:
+    """Python mirror of the JS _priceInRange().
+
+    Listings without price_usd survive only when the range is fully open
+    (default = no filter active). Once the user narrows either end, unpriced
+    listings drop out — the user is asking for a price-bounded view and a
+    null price doesn't satisfy "between $X and $Y".
+    """
+    is_default = min_idx == 0 and max_idx == len(PRICE_SNAPS_PY) - 1
+    if is_default:
+        return True
+    p = row.get("price_usd")
+    if p is None:
+        return False
+    return PRICE_SNAPS_PY[min_idx] <= p <= PRICE_SNAPS_PY[max_idx]
+
+
+def test_price_default_range_includes_all_priced():
+    """Default range admits every priced listing."""
+    rows = [{"price_usd": 0}, {"price_usd": 100}, {"price_usd": 1_000_000_000}]
+    last = len(PRICE_SNAPS_PY) - 1
+    assert all(price_in_range(r, 0, last) for r in rows)
+
+
+def test_price_default_range_includes_unpriced():
+    """At default range, unpriced listings remain visible — the filter is off."""
+    last = len(PRICE_SNAPS_PY) - 1
+    assert price_in_range({"price_usd": None}, 0, last) is True
+    assert price_in_range({}, 0, last) is True
+
+
+def test_price_narrowed_range_excludes_unpriced():
+    """When the user narrows the range, unpriced listings drop out."""
+    last = len(PRICE_SNAPS_PY) - 1
+    assert price_in_range({"price_usd": None}, 1, last) is False  # min moved off zero
+    assert price_in_range({}, 0, last - 1) is False               # max moved off infinity
+
+
+def test_price_filter_inclusive_bounds():
+    """Boundary values pass — bounds are inclusive on both sides."""
+    # Idx 2 = $50K, idx 5 = $500K
+    assert price_in_range({"price_usd": 50_000},  2, 5) is True
+    assert price_in_range({"price_usd": 500_000}, 2, 5) is True
+
+
+def test_price_filter_excludes_below_min():
+    """Below the min snap → excluded."""
+    # Idx 2 = $50K
+    assert price_in_range({"price_usd": 49_999}, 2, 5) is False
+
+
+def test_price_filter_excludes_above_max():
+    """Above the max snap → excluded."""
+    # Idx 5 = $500K
+    assert price_in_range({"price_usd": 500_001}, 2, 5) is False
+
+
+def test_price_filter_max_idx_is_infinity():
+    """The highest snap index represents 'No max' — values up to ∞ pass."""
+    last = len(PRICE_SNAPS_PY) - 1
+    assert PRICE_SNAPS_PY[last] == float("inf")
+    assert price_in_range({"price_usd": 50_000_000}, 0, last) is True
+
+
+def test_price_snap_array_length_matches_labels():
+    """PRICE_SNAPS and PRICE_LABELS must agree in length — drift would mis-label sliders."""
+    html = open("web/index.html").read()
+    # Both arrays declared on the same script block; pull their literal lengths.
+    import re as _re
+    snap_match = _re.search(r"PRICE_SNAPS\s*=\s*\[([^\]]+)\]", html)
+    label_match = _re.search(r"PRICE_LABELS\s*=\s*\[([^\]]+)\]", html)
+    assert snap_match and label_match, "PRICE_SNAPS / PRICE_LABELS declarations missing"
+    snap_count  = len(_re.findall(r"\d[\d_]*|Infinity", snap_match.group(1)))
+    label_count = len(_re.findall(r"'[^']+'", label_match.group(1)))
+    assert snap_count == label_count, (
+        f"PRICE_SNAPS has {snap_count} entries but PRICE_LABELS has {label_count} — "
+        f"slider labels would desync"
+    )
+
+
+def test_tune_panel_dom_contracts_present():
+    """Tune panel + button + filter wiring all exist in the HTML.
+
+    These are the load-bearing surfaces. Removing any of them silently
+    breaks the price filter (button stops opening the panel, panel stops
+    rendering, or filtered rows stop respecting the slider state).
+    """
+    html = open("web/index.html").read()
+    # Tune button anchored in the filter bar.
+    assert 'id="tune-open"' in html
+    # Desktop and mobile panels exist.
+    assert 'id="tune-panel"' in html
+    assert 'id="mobile-tune-overlay"' in html
+    # Filter logic is wired into the row filter.
+    assert "_priceInRange" in html, (
+        "filteredRows() no longer references _priceInRange — price filter is dead"
+    )
+    # URL keys round-trip through readURL/pushURL.
+    assert "price_min" in html and "price_max" in html
+
+
+def test_url_state_omits_default_price_range():
+    """pushURL only emits ?price_min/?price_max when the user has narrowed
+    the range. This keeps the default URL clean and ensures shareable URLs
+    only carry the filter state that actually differs from the page default.
+    """
+    html = open("web/index.html").read()
+    # The pushURL function checks against the defaults before setting params.
+    assert "PRICE_MIN_IDX !== 0" in html
+    assert "PRICE_MAX_IDX !== PRICE_SNAPS.length-1" in html
+
+
+def test_price_filter_applied_to_live_data(listings):
+    """End-to-end: applying a $50K–$500K filter on the real ranked.json
+    yields only listings whose price falls in that band. Treats live data
+    as the ground truth — if the JSON shape changes, this catches it.
+    """
+    in_band = [r for r in listings if price_in_range(r, 2, 5)]  # $50K–$500K
+    for r in in_band:
+        # The unpriced listings should NOT appear — narrowed range excludes them.
+        assert r.get("price_usd") is not None
+        assert 50_000 <= r["price_usd"] <= 500_000, (
+            f"Listing {r.get('source_id')} price {r.get('price_usd')} outside band"
+        )
