@@ -217,76 +217,102 @@ def test_value_reason_string_includes_property_type_label():
     )
 
 
-# ── Momentum leg (replaces Upside, repriced-rate-based) ───────────────────
+# ── Momentum leg (listing-velocity via first_seen_at) ─────────────────────
+# Replaces the prior is_repriced-based algorithm: live broker data has 0%
+# REBAJADO/REDUCED markers, so that signal was effectively dead. The new
+# algorithm ranks zones by the mean age of their listings' first_seen_at
+# timestamps — newer-on-average inventory → higher momentum score.
 
-def test_momentum_repriced_rate_orthogonal_to_zone_tier():
-    """The point of Momentum: it ranks zones by price-drop activity, NOT by
-    zone tier. A tier-A zone with low repriced rate must score lower than a
-    tier-C zone with high repriced rate. Without this property, Momentum is
-    just Location with extra steps (the failure mode of the old Upside leg).
+
+def _at(days_ago: float) -> str:
+    """Helper: ISO timestamp for a point N days before now."""
+    from datetime import datetime, timedelta, timezone
+    return (datetime.now(timezone.utc) - timedelta(days=days_ago)).isoformat()
+
+
+def test_momentum_newer_listings_score_higher_than_stale_zone():
+    """A zone whose listings are mostly new arrivals scores higher than a
+    zone whose listings have been sitting in our index. Same property type,
+    same composition — only the first_seen_at distribution differs.
     """
     leg = RANKER_LEGS["momentum"]
-    # Pool: el-tunco (tier-A) with ~0% repriced rate; conchagua (tier-C) with
-    # ~80% repriced rate. Zone has 5+ listings each so neither is sparse.
     pool = []
-    for i in range(8):  # 8 tunco listings, 0 repriced
-        pool.append(_make_listing(source_id=f"tunco-{i}", zone="el-tunco", is_repriced=False))
-    for i in range(5):  # 5 conchagua, 4 repriced
-        pool.append(_make_listing(source_id=f"con-{i}", zone="conchagua",
-                                   is_repriced=(i < 4)))
-    tunco_target = _make_listing(zone="el-tunco", is_repriced=False)
-    con_target   = _make_listing(zone="conchagua", is_repriced=False)
-    s_tunco, _ = leg.score(tunco_target, pool)
-    s_con,   _ = leg.score(con_target, pool)
-    assert s_con > s_tunco, (
-        f"high-repriced-rate zone (conchagua, 80%) must score higher than "
-        f"low-repriced-rate zone (el-tunco, 0%); got conchagua={s_con} vs "
-        f"el-tunco={s_tunco}. If they're equal, the leg is collapsing the "
-        f"signal it was designed to surface."
+    # Zone A: 6 listings, all first seen 0–1 days ago (fresh)
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"fresh-{i}", zone="el-tunco",
+                                   first_seen_at=_at(i * 0.2)))
+    # Zone B: 6 listings, all first seen 30+ days ago (stale)
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"stale-{i}", zone="conchagua",
+                                   first_seen_at=_at(30 + i * 0.2)))
+    fresh_target = _make_listing(zone="el-tunco", first_seen_at=_at(0.5))
+    stale_target = _make_listing(zone="conchagua", first_seen_at=_at(30.5))
+    s_fresh, _ = leg.score(fresh_target, pool)
+    s_stale, _ = leg.score(stale_target, pool)
+    assert s_fresh > s_stale, (
+        f"zone with fresh listings (mean age ~0.5d) should score higher "
+        f"than zone with stale listings (mean age ~30d); got fresh={s_fresh} "
+        f"vs stale={s_stale}"
     )
 
 
 def test_momentum_sparse_zone_neutral():
-    """Zones with <5 listings score the neutral default 50.0. The repriced
-    rate signal is too noisy on small samples to be informative.
-    """
+    """Zones with <5 listings score the neutral default 50.0 — too few
+    listings for the per-zone mean age to be informative."""
     leg = RANKER_LEGS["momentum"]
-    # Only 3 listings in the zone — sparse. Even with 100% repriced rate the
-    # zone gets neutral score because we don't trust the signal.
     pool = [
-        _make_listing(source_id=f"sparse-{i}", zone="el-cuco", is_repriced=True)
+        _make_listing(source_id=f"sparse-{i}", zone="el-cuco", first_seen_at=_at(i))
         for i in range(3)
     ]
-    target = _make_listing(zone="el-cuco", is_repriced=False)
+    target = _make_listing(zone="el-cuco", first_seen_at=_at(1))
     score, reason = leg.score(target, pool)
     assert score == pytest.approx(50.0)
     assert "sparse" in reason
 
 
-def test_momentum_self_repriced_bonus():
-    """A repriced listing gets a small bonus on top of its zone score. Two
-    listings in the same dense zone — one repriced, one not — must differ
-    by at least 5 points (or be capped at 100).
+def test_momentum_insufficient_history_returns_neutral():
+    """When all dense zones have mean ages within MIN_HISTORY_SPAN_DAYS
+    (=1 day) of each other, the sidecar is too young — the leg returns
+    neutral with an explanatory reason instead of producing meaningless
+    rank-noise. This is the gate that auto-opens once the cron has been
+    running for ~3-7 days and zones diverge.
     """
     leg = RANKER_LEGS["momentum"]
-    # Build a dense pool with non-zero repriced rate so the zone is in the
-    # rates dict. Use el-tunco with 6 listings, 2 repriced.
-    pool = [
-        _make_listing(source_id=f"tunco-{i}", zone="el-tunco",
-                      is_repriced=(i < 2))
-        for i in range(6)
-    ]
-    # We also need a second zone with a different rate so the leg has variance.
-    pool += [
-        _make_listing(source_id=f"con-{i}", zone="conchagua",
-                      is_repriced=(i < 3))
-        for i in range(5)
-    ]
-    base     = _make_listing(zone="el-tunco", is_repriced=False)
-    repriced = _make_listing(zone="el-tunco", is_repriced=True)
-    s_base, _     = leg.score(base, pool)
-    s_repriced, _ = leg.score(repriced, pool)
-    assert s_repriced > s_base, (
-        f"self-repriced listing must score above non-repriced peer in same "
-        f"zone; got {s_repriced} vs {s_base}"
+    pool = []
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"a-{i}", zone="el-tunco",
+                                   first_seen_at=_at(0.1 * i)))
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"b-{i}", zone="conchagua",
+                                   first_seen_at=_at(0.1 * i)))
+    target = _make_listing(zone="el-tunco", first_seen_at=_at(0))
+    score, reason = leg.score(target, pool)
+    assert score == pytest.approx(50.0)
+    assert "insufficient history" in reason
+
+
+def test_momentum_orthogonal_to_zone_tier():
+    """The point of Momentum: it ranks zones by inventory dynamics, NOT by
+    zone tier. A tier-C zone with fresh listings must score higher than a
+    tier-A zone with stale listings. Without this, Momentum is just
+    Location with extra steps.
+    """
+    leg = RANKER_LEGS["momentum"]
+    pool = []
+    # Tier-A zone (el-tunco) but stale — listings have been sitting for 30+ days
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"tunco-stale-{i}", zone="el-tunco",
+                                   first_seen_at=_at(30 + i * 0.1)))
+    # Tier-C zone (conchagua) but fresh — listings just arrived
+    for i in range(6):
+        pool.append(_make_listing(source_id=f"con-fresh-{i}", zone="conchagua",
+                                   first_seen_at=_at(i * 0.1)))
+    a_target = _make_listing(zone="el-tunco", first_seen_at=_at(30))
+    c_target = _make_listing(zone="conchagua", first_seen_at=_at(0))
+    s_a, _ = leg.score(a_target, pool)
+    s_c, _ = leg.score(c_target, pool)
+    assert s_c > s_a, (
+        f"fresh tier-C zone must score higher Momentum than stale tier-A "
+        f"zone (Momentum is delta-shaped, independent of tier); got "
+        f"tier-A_stale={s_a} vs tier-C_fresh={s_c}"
     )
