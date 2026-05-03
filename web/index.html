@@ -443,6 +443,11 @@ const isDefaultPriceRange = () =>
 /* ── Helpers ─────────────────────────────────────────── */
 const fmtUSD  = v => v==null ? '—' : '$'+Math.round(v).toLocaleString('en-US');
 const fmtPPM  = v => (v==null||v<=0) ? '—' : '$'+Math.round(v).toLocaleString('en-US');
+// Salvadoran vara² is 0.836m × 0.836m = 0.698896 m². Conversion lives in
+// pulpo/units.py:19 (Python) and is duplicated here for client-side render
+// of the alternate unit. Keep in sync.
+const M2_PER_VARA2 = 0.698896;
+const fmtPPV2 = v => (v==null||v<=0) ? '—' : '$'+Math.round(v*M2_PER_VARA2).toLocaleString('en-US');
 const fmtArea = v => v==null ? '—' : Math.round(v).toLocaleString('en-US')+' m²';
 const fmtDays = d => d==null ? '—' : d===0 ? 'Today' : d===1 ? '1 day ago' : `${d} days ago`;
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])) }
@@ -693,6 +698,7 @@ function panelHTML(r) {
       <div class="panel-meta-item"><span class="panel-meta-label">Price</span><span class="panel-meta-value">${fmtUSD(r.price_usd)}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Area</span><span class="panel-meta-value">${fmtArea(r.area_m2)}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">$/m²</span><span class="panel-meta-value">${fmtPPM(r.price_per_m2)}</span></div>
+      <div class="panel-meta-item"><span class="panel-meta-label">$/vrs²</span><span class="panel-meta-value">${fmtPPV2(r.price_per_m2)}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Listed</span><span class="panel-meta-value">${fmtDays(r.days_listed)}</span></div>
     </div>
     <div class="panel-section-label">Score ${renderStars(r.rank_score)}</div>
