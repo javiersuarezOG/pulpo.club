@@ -160,6 +160,18 @@ class BienesRaicesScraper:
 
         raw_size = f"{area_val} {area_unit}" if area_val else ""
 
+        # Photos — AlterEstate stores images as list of dicts with 'photo' or 'url' key
+        photo_urls: list[str] = []
+        for img in (prop.get("images") or prop.get("photos") or []):
+            if isinstance(img, dict):
+                u = img.get("photo") or img.get("url") or img.get("src") or ""
+            elif isinstance(img, str):
+                u = img
+            else:
+                continue
+            if u.startswith("http"):
+                photo_urls.append(u)
+
         return {
             "source": self.slug,
             "source_id": str(prop.get("cid") or ""),
@@ -171,6 +183,7 @@ class BienesRaicesScraper:
             "location_text": location_text,
             "description": description,
             "property_type": "land",
+            "photo_urls": photo_urls,
             "broker_name": broker_name,
             "broker_phone": broker_phone,
             "broker_email": broker_email,

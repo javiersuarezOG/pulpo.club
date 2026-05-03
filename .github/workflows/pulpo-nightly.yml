@@ -133,6 +133,36 @@ jobs:
           sys.exit(1 if fail else 0)
           EOF
 
+      - name: Photo storage canary (100 MB limit)
+        run: |
+          python3 - <<'EOF'
+          import os, sys, json
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          photos = Path("web/photos")
+          if not photos.exists():
+              print("Photo storage canary: no photos directory yet — OK")
+              sys.exit(0)
+
+          # Sum .jpg sizes, excluding _archive/
+          total = sum(
+              f.stat().st_size for f in photos.rglob("*.jpg")
+              if "_archive" not in f.parts
+          )
+          mb = total / (1024 * 1024)
+
+          # Append to size history log
+          log = Path("web/data/photo_storage_size.jsonl")
+          with log.open("a", encoding="utf-8") as f:
+              f.write(json.dumps({"ts": datetime.now(timezone.utc).isoformat(), "mb": round(mb, 2)}) + "\n")
+
+          print(f"Photo storage: {mb:.1f} MB (limit 100 MB)")
+          if mb > 100:
+              print("CANARY FAIL: photo storage exceeds 100 MB — migrate to external storage", file=sys.stderr)
+              sys.exit(1)
+          EOF
+
       - name: Commit refreshed data
         id: commit
         run: |
@@ -141,6 +171,8 @@ jobs:
           git add web/data/ranked.json web/data/ranked-public.json \
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
+                  web/data/photo_fetch_log.jsonl \
+                  "web/photos/" \
                   samples/ranked.csv
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."

@@ -48,6 +48,8 @@ class Listing:
     # Activity
     days_listed: Optional[int] = None
     photos_count: int = 0
+    photo_urls: list[str] = field(default_factory=list)   # broker-hosted; [0] is hero
+    hero_photo_path: Optional[str] = None                  # local /photos/<source>_<id>.jpg
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker

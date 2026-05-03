@@ -29,6 +29,114 @@ from automation.field_audit import build_completeness_block  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
+import hashlib  # noqa: E402
+import io      # noqa: E402
+import time as _time  # noqa: E402
+
+
+def _download_hero_photos(listings, repo: Path) -> dict:
+    """Download + resize the first photo_url for each listing with photos.
+
+    Saves to web/photos/{source}_{source_id}.jpg (max 600×400, JPEG Q75).
+    Uses a URL-hash sidecar (.hash file) to skip unchanged photos.
+    Logs failures to web/data/photo_fetch_log.jsonl (non-fatal).
+    Returns summary counts.
+    """
+    # Pillow is optional — skip the whole step if not installed
+    try:
+        from PIL import Image  # noqa: F401
+    except ImportError:
+        print("[photos] Pillow not installed — skipping hero download")
+        return {"attempted": 0, "ok": 0, "skipped": 0, "failed": 0, "elapsed_s": 0.0}
+
+    import httpx
+
+    photos_dir = repo / "web" / "photos"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    log_path = repo / "web" / "data" / "photo_fetch_log.jsonl"
+
+    attempted = ok = skipped = failed = 0
+    t0 = _time.monotonic()
+
+    for li in listings:
+        if not li.photo_urls:
+            continue
+        url = li.photo_urls[0]
+        fname = f"{li.source}_{li.source_id}.jpg"
+        fpath = photos_dir / fname
+        hash_path = photos_dir / (fname + ".hash")
+
+        # Skip if URL unchanged
+        url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
+        if fpath.exists() and hash_path.exists():
+            if hash_path.read_text().strip() == url_hash:
+                li.hero_photo_path = f"/photos/{fname}"
+                skipped += 1
+                continue
+
+        attempted += 1
+        try:
+            r = httpx.get(url, timeout=5.0, follow_redirects=True)
+            r.raise_for_status()
+            from PIL import Image
+            img = Image.open(io.BytesIO(r.content))
+            img.thumbnail((600, 400), Image.LANCZOS)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=75, optimize=True)
+            fpath.write_bytes(buf.getvalue())
+            hash_path.write_text(url_hash)
+            li.hero_photo_path = f"/photos/{fname}"
+            ok += 1
+        except Exception as e:
+            failed += 1
+            with log_path.open("a", encoding="utf-8") as lf:
+                lf.write(json.dumps({
+                    "source_id": li.source_id, "source": li.source,
+                    "url": url, "error": str(e),
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                }) + "\n")
+
+    elapsed = _time.monotonic() - t0
+    if elapsed > 300:
+        print(f"[photos] WARNING: download step took {elapsed:.0f}s (>5 min)")
+
+    # Orphan pruning — photos with no matching listing move to _archive/
+    _prune_orphan_photos(photos_dir, {f"{li.source}_{li.source_id}.jpg" for li in listings})
+
+    return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
+            "elapsed_s": elapsed}
+
+
+def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
+    """Move orphaned hero photos to _archive/<date>/, delete those older than 30d."""
+    from datetime import timedelta
+    archive_base = photos_dir / "_archive"
+    today_dir = archive_base / datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    for f in photos_dir.glob("*.jpg"):
+        if f.name not in live_filenames:
+            today_dir.mkdir(parents=True, exist_ok=True)
+            f.rename(today_dir / f.name)
+            # Remove matching .hash sidecar
+            h = photos_dir / (f.name + ".hash")
+            if h.exists():
+                h.unlink()
+
+    # Delete archives older than 30 days
+    if not archive_base.exists():
+        return
+    cutoff = datetime.now(timezone.utc).date() - timedelta(days=30)
+    for d in archive_base.iterdir():
+        if d.is_dir():
+            try:
+                if datetime.strptime(d.name, "%Y-%m-%d").date() < cutoff:
+                    import shutil
+                    shutil.rmtree(d, ignore_errors=True)
+            except ValueError:
+                pass
+
 
 def main() -> int:
     offline = os.environ.get("PULPO_OFFLINE") == "1"
@@ -180,8 +288,16 @@ def main() -> int:
     with listings_history_path.open("w", encoding="utf-8") as f:
         json.dump(first_seen, f, ensure_ascii=False)
 
-    # Rank
-    ranked = rank(listings)
+    # Hero photo download — fetch + resize the first photo URL for each listing.
+    # Skips listings with no photo_urls; skips re-download when URL unchanged.
+    # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.
+    ranked_pre = rank(listings)  # rank before download so we can prioritise by rank
+    photo_results = _download_hero_photos(ranked_pre, REPO)
+    print(f"[photos] attempted={photo_results['attempted']} "
+          f"ok={photo_results['ok']} skipped={photo_results['skipped']} "
+          f"failed={photo_results['failed']} "
+          f"elapsed={photo_results['elapsed_s']:.1f}s")
+    ranked = ranked_pre
 
     # Write CSV
     samples_path = REPO / "samples" / "ranked.csv"

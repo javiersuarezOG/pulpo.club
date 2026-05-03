@@ -106,6 +106,25 @@ class GoodLifeScraper:
         desc_node = tree.css_first("div.wpb_text_column")
         description = desc_node.text(strip=True) if desc_node else ""
 
+        # Photos — try gallery containers first, then Open Graph hero as fallback
+        photo_urls: list[str] = []
+        seen: set[str] = set()
+        for img in tree.css(
+            "div.gallery img, div.wp-block-gallery img, "
+            ".mkdf-lightbox-gallery img, .property-gallery img, "
+            "div[class*='gallery'] img, div[class*='slider'] img"
+        ):
+            u = img.attributes.get("data-src") or img.attributes.get("src") or ""
+            if u.startswith("http") and u not in seen:
+                seen.add(u)
+                photo_urls.append(u)
+        if not photo_urls:
+            og = tree.css_first('meta[property="og:image"]')
+            if og:
+                u = og.attributes.get("content") or ""
+                if u.startswith("http"):
+                    photo_urls.append(u)
+
         return {
             "title": title,
             "raw_price_text": raw_price,
@@ -113,6 +132,7 @@ class GoodLifeScraper:
             "location_text": location,
             "description": description[:1500],
             "property_type": "land",
+            "photo_urls": photo_urls,
         }
 
     def report_total(self, client) -> Optional[int]:
