@@ -15,22 +15,15 @@
 
 ## Merging to main
 
-PRs are **optional**, not required. After pushing the branch you have two paths:
+**PRs are required.** Direct push to `main` is blocked at the GitHub level (rule `GH006: protected branch update failed — Changes must be made through a pull request`).
 
-**Path A — Local merge, no PR (default for low-risk work):**
+After pushing the branch:
 ```bash
-git checkout main && git pull
-git merge <your-branch>
-git push origin main
+gh pr create --base main --head <your-branch> --title "..." --body "..."
 ```
-Use this for tests, docstrings, additive diagnostics, and other zero-risk additive changes. Faster, no GitHub UI roundtrip.
+Vercel will auto-generate a preview URL on the PR. Merge from the GitHub UI (or via `gh pr merge`) once review is satisfied.
 
-**Path B — Open a PR (when external review or preview URL helps):**
-- File-structure refactors, renames, anything that touches files another contributor owns
-- Frontend changes where you want the Vercel preview URL
-- Anything you want a second pair of eyes on before it lands
-
-Open the PR with `gh pr create` after pushing. Vercel will auto-generate a preview URL on PRs.
+If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back the local merge with `git reset --hard origin/main` and open a PR for the branch instead.
 
 ## Testing Before Pushing
 - Frontend changes: run `npx serve .` and open `http://localhost:3000/web/index.html`
