@@ -202,6 +202,16 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .tune-range-fill{position:absolute;height:4px;top:14px;background:var(--accent);border-radius:2px}
 .tune-reset{display:inline-block;font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;padding:0;margin-top:4px;text-decoration:underline}
 .tune-reset:hover{opacity:.7}
+/* Weight sliders — one row per V/L/M dimension. Color stripe on the
+   left of each label mirrors the score-bar fill color so the connection
+   between "this slider" and "this bar in the breakdown" is visual. */
+.weight-help{font-size:11px;color:var(--t3);line-height:1.45;margin-bottom:10px}
+.weight-row{display:grid;grid-template-columns:108px 1fr 36px;align-items:center;gap:10px;padding:6px 0}
+.weight-name{font-size:12px;color:var(--t2);font-weight:500;padding-left:8px}
+.weight-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--s3);border-radius:2px;outline:none;margin:0}
+.weight-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.weight-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.weight-value{font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
 .tune-button{font-size:12px;padding:5px 10px;border:1px solid var(--brd2);border-radius:var(--r-sm);background:var(--bg);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit}
 .tune-button:hover{border-color:var(--accent);color:var(--text)}
 .tune-button.has-filters::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:2px}
@@ -317,6 +327,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
           <option value="deal_desc">Sort: Price vs Comps (cheapest first)</option>
           <option value="location_desc">Sort: Location (best spot first)</option>
           <option value="momentum_desc">Sort: Momentum (most active area first)</option>
+          <option value="composite_desc">Sort: Composite (using your weights)</option>
         </optgroup>
         <option value="newest_desc">Sort: Newest first</option>
         <option value="zone_asc">Sort: Zone A→Z</option>
@@ -503,6 +514,35 @@ let SIZE_MIN_IDX = 0, SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
 const isDefaultSizeRange = () =>
   SIZE_MIN_IDX === 0 && SIZE_MAX_IDX === SIZE_SNAPS.length - 1;
 
+/* ── Tune-panel state: V/L/M weight sliders ────────────── */
+// Defaults match pulpo/ranker.py composite weights (0.40 / 0.35 / 0.25).
+// Slider values are stored as integer percentages 0..100 — re-blended
+// composite per row is `Σ(w_i * leg_i) / Σ(w_i)` so they don't need to
+// sum to 100. Encoded in URL as `?w=40,35,25` to keep shareable URLs
+// stable across rebalance.
+const WEIGHT_DEFAULTS = {value: 40, location: 35, momentum: 25};
+const WEIGHT_KEYS = ['value', 'location', 'momentum'];  // stable order matches URL
+const WEIGHTS = {...WEIGHT_DEFAULTS};
+const isDefaultWeights = () =>
+  WEIGHT_KEYS.every(k => WEIGHTS[k] === WEIGHT_DEFAULTS[k]);
+
+// Re-blend the composite using current slider weights. Falls back to the
+// listing's static rank_score when any leg is missing — same null
+// semantics as the original Python ranker.
+function recomputeComposite(li, w = WEIGHTS) {
+  const fields = {value: li.value_score, location: li.location_score, momentum: li.momentum_score};
+  let weighted = 0, total = 0;
+  for (const k of WEIGHT_KEYS) {
+    const score = fields[k];
+    const wt = w[k];
+    if (score == null || !wt) continue;
+    weighted += wt * score;
+    total += wt;
+  }
+  if (total === 0) return li.rank_score; // all weights at zero → preserve original order
+  return weighted / total;
+}
+
 /* ── Helpers ─────────────────────────────────────────── */
 const fmtUSD  = v => v==null ? '—' : '$'+Math.round(v).toLocaleString('en-US');
 const fmtPPM  = v => (v==null||v<=0) ? '—' : '$'+Math.round(v).toLocaleString('en-US');
@@ -570,7 +610,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   const s = p.get('sort')||'ppm_asc';
-  const m = s.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum)_(asc|desc)$/);
+  const m = s.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum|composite)_(asc|desc)$/);
   if (m) { SORT_COL=m[1]; SORT_DIR=m[2]; }
   const zg=p.get('zone_group'), z=p.get('zone');
   if (zg==='no-zone') ZONE_F={type:'no-zone',value:'no-zone'};
@@ -595,6 +635,19 @@ function readURL() {
     SIZE_MIN_IDX = 0;
     SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
   }
+  // Weight sliders: ?w=V,L,M (integers 0..100). Reject malformed input
+  // by reverting to defaults — silently dropping the URL is friendlier
+  // than rendering a confusing "weights all zero → no sort change" state.
+  const wRaw = p.get('w');
+  if (wRaw) {
+    const parts = wRaw.split(',');
+    if (parts.length === WEIGHT_KEYS.length) {
+      const parsed = parts.map(x => parseInt(x, 10));
+      if (parsed.every(n => Number.isInteger(n) && n >= 0 && n <= 100)) {
+        WEIGHT_KEYS.forEach((k, i) => { WEIGHTS[k] = parsed[i]; });
+      }
+    }
+  }
   OPEN_ID=p.get('listing')||null;
 }
 function pushURL(replace=true) {
@@ -610,6 +663,9 @@ function pushURL(replace=true) {
   if (PRICE_MAX_IDX !== PRICE_SNAPS.length-1) p.set('price_max', String(PRICE_MAX_IDX));
   if (SIZE_MIN_IDX  !== 0)                    p.set('size_min',  String(SIZE_MIN_IDX));
   if (SIZE_MAX_IDX  !== SIZE_SNAPS.length-1)  p.set('size_max',  String(SIZE_MAX_IDX));
+  if (!isDefaultWeights()) {
+    p.set('w', WEIGHT_KEYS.map(k => WEIGHTS[k]).join(','));
+  }
   if (OPEN_ID) p.set('listing',OPEN_ID);
   const qs=p.toString();
   const url=qs?`${location.pathname}?${qs}`:location.pathname;
@@ -678,6 +734,14 @@ function sortedRows(rows) {
     else if (SORT_COL==='deal')     {va=a.value_score    ??nil;vb=b.value_score    ??nil;}
     else if (SORT_COL==='location') {va=a.location_score ??nil;vb=b.location_score ??nil;}
     else if (SORT_COL==='momentum') {va=a.momentum_score ??nil;vb=b.momentum_score ??nil;}
+    else if (SORT_COL==='composite') {
+      // Composite uses live slider weights. Recomputed per-row each
+      // sort because WEIGHTS may have changed between sorts and the
+      // recomputed value is cheap.
+      const av = recomputeComposite(a);
+      const bv = recomputeComposite(b);
+      va = av ?? nil; vb = bv ?? nil;
+    }
     else {va=(a.price_per_m2>0)?a.price_per_m2:nil;vb=(b.price_per_m2>0)?b.price_per_m2:nil;}
     return (va-vb)*dir;
   });
@@ -890,9 +954,36 @@ function _rangeSectionHTML(opts) {
     </div>
   `;
 }
+// One weight slider (label, 0–100 input, current value badge). Reuses the
+// SCORE_DIMENSIONS palette so V/L/M look consistent everywhere they're
+// surfaced. Returns just one row — multiple are stacked by _weightSectionHTML.
+function _weightSliderHTML(slug, label, color) {
+  return `
+    <div class="weight-row">
+      <label class="weight-name" for="weight-${slug}" style="border-left:3px solid ${color}">${esc(label)}</label>
+      <input type="range" id="weight-${slug}" class="weight-slider" min="0" max="100" step="1" value="${WEIGHTS[slug]}" aria-label="${esc(label)} weight">
+      <span class="weight-value" id="weight-${slug}-value">${WEIGHTS[slug]}</span>
+    </div>
+  `;
+}
+// The whole weight-sliders section. Reads SCORE_DIMENSIONS for canonical
+// labels + colors so the names here stay in sync with the score breakdown.
+function _weightSectionHTML() {
+  const rows = SCORE_DIMENSIONS
+    .map(([slug, name, color]) => _weightSliderHTML(slug, name, color))
+    .join('');
+  return `
+    <div class="tune-section">
+      <div class="tune-section-title">Reranking weights</div>
+      <div class="weight-help">Drag any slider to reweight the dimensions and see the table reorder. Defaults match the published model: 40 / 35 / 25.</div>
+      ${rows}
+      ${isDefaultWeights() ? '' : '<button class="tune-reset" id="weights-reset" type="button">Reset weights</button>'}
+    </div>
+  `;
+}
 function _tuneBodyHTML() {
-  // Composed from generic range sections so adding a new filter (e.g. weight
-  // sliders) is a one-line append rather than a rewrite of the panel.
+  // Composed from independent sections so adding a new filter is a one-line
+  // append rather than a rewrite of the panel.
   return _rangeSectionHTML({
     id: 'price', title: 'Price range',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
@@ -903,7 +994,7 @@ function _tuneBodyHTML() {
     snaps: SIZE_SNAPS, labels: SIZE_LABELS,
     minIdx: SIZE_MIN_IDX, maxIdx: SIZE_MAX_IDX,
     isDefault: isDefaultSizeRange(),
-  });
+  }) + _weightSectionHTML();
 }
 function _wireRangeSection(container, opts) {
   const minEl   = container.querySelector(`#${opts.id}-min`);
@@ -939,6 +1030,28 @@ function _wireRangeSection(container, opts) {
     renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
   });
 }
+function _wireWeightSliders(container) {
+  // Wire one slider per dimension. On change: update WEIGHTS, refresh the
+  // numeric badge, push URL, re-render. The composite-sort branch in
+  // sortedRows() picks up the new weights automatically — no special
+  // re-sort path needed unless SORT_COL is currently 'composite'.
+  for (const [slug] of SCORE_DIMENSIONS) {
+    const sliderEl = container.querySelector(`#weight-${slug}`);
+    const valueEl  = container.querySelector(`#weight-${slug}-value`);
+    if (!sliderEl || !valueEl) continue;
+    sliderEl.addEventListener('input', () => {
+      const v = parseInt(sliderEl.value, 10);
+      WEIGHTS[slug] = Number.isInteger(v) ? v : WEIGHT_DEFAULTS[slug];
+      valueEl.textContent = WEIGHTS[slug];
+      pushURL(true); render(); _updateTuneButtonState();
+    });
+  }
+  const reset = container.querySelector('#weights-reset');
+  if (reset) reset.addEventListener('click', () => {
+    Object.assign(WEIGHTS, WEIGHT_DEFAULTS);
+    renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
+  });
+}
 function _wireTuneControls(container) {
   _wireRangeSection(container, {
     id: 'price', snaps: PRICE_SNAPS, labels: PRICE_LABELS,
@@ -950,6 +1063,7 @@ function _wireTuneControls(container) {
     setMin: v => { SIZE_MIN_IDX = v; },
     setMax: v => { SIZE_MAX_IDX = v; },
   });
+  _wireWeightSliders(container);
 }
 function renderTunePanel() {
   const html = _tuneBodyHTML();
@@ -975,7 +1089,8 @@ function closeTunePanel() {
 function _updateTuneButtonState() {
   const btn = document.getElementById('tune-open');
   if (!btn) return;
-  btn.classList.toggle('has-filters', !isDefaultPriceRange() || !isDefaultSizeRange());
+  const active = !isDefaultPriceRange() || !isDefaultSizeRange() || !isDefaultWeights();
+  btn.classList.toggle('has-filters', active);
 }
 
 /* ── Render ──────────────────────────────────────────── */
