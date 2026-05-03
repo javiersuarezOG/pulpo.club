@@ -27,3 +27,6 @@ samples/calibration/*/*.html
 Thumbs.db
 .vercel
 .env*.local
+
+# Claude Code workspace (per-user, agent worktrees, local settings)
+.claude/
