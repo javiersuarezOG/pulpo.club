@@ -1181,7 +1181,13 @@ function wireClose() {
   document.getElementById('table-wrap')?.addEventListener('click',e=>{if(!e.target.closest('tr')&&OPEN_ID)closePanel();});
 }
 function wireTune() {
-  document.getElementById('tune-open').addEventListener('click', openTunePanel);
+  // Toggle: a second click on "Filters" closes the panel rather than re-opening it.
+  document.getElementById('tune-open').addEventListener('click', () => {
+    const panel = document.getElementById('tune-panel');
+    const overlay = document.getElementById('mobile-tune-overlay');
+    const isOpen = panel.classList.contains('open') || overlay.classList.contains('open');
+    if (isOpen) closeTunePanel(); else openTunePanel();
+  });
   document.getElementById('tune-close').addEventListener('click', closeTunePanel);
   document.getElementById('mobile-tune-close').addEventListener('click', closeTunePanel);
   _updateTuneButtonState();
