@@ -57,21 +57,42 @@ def test_location_repriced_bonus():
 
 
 def test_location_airport_distance_bonus():
-    """Per pulpo/airports.py, zones near SAL get +5, far zones get -5.
+    """Per pulpo/airports.py, the leg picks the nearest airport across SAL
+    (operational) and AeP (planned, eastern coast) and applies a bonus.
+
     Comparing two same-tier (C) zones to isolate the airport signal:
-    punta-mango is ~105 km from SAL (0 bonus) and la-union is ~132 km
-    (-5 penalty). The closer zone scores higher.
+    Conchagua sits ~15 km from AeP (+5 "near airport"); El Espino is
+    ~62 km from its nearest airport (0, mid-bracket). Same tier, same
+    base — only the airport bonus differs.
     """
     leg = RANKER_LEGS["location"]
-    far    = leg.score(_make_listing(zone="la-union"), [])      # tier-C, ~132 km, -5
-    nearer = leg.score(_make_listing(zone="punta-mango"), [])   # tier-C, ~105 km,  0
-    assert nearer[0] > far[0], (
-        f"closer zone (punta-mango, 105 km) should score higher than far "
-        f"zone (la-union, 132 km); got {nearer} vs {far}"
+    near_aep = leg.score(_make_listing(zone="conchagua"), [])  # tier-C, AeP 15 km, +5
+    far_aep  = leg.score(_make_listing(zone="el-espino"), [])  # tier-C, AeP 62 km, 0
+    assert near_aep[0] > far_aep[0], (
+        f"zone with closer airport (conchagua, AeP 15 km) should score higher "
+        f"than mid-bracket (el-espino, 62 km); got {near_aep} vs {far_aep}"
     )
-    # Sanity: airport reason string surfaces in both
-    assert "airport" in far[1]
-    assert "airport" in nearer[1]
+    # Sanity: airport reason string surfaces in both, and surfaces the
+    # specific airport code so the user can read which one was picked.
+    assert "airport" in near_aep[1] and "AeP" in near_aep[1]
+    assert "airport" in far_aep[1]
+
+
+def test_location_airport_picks_nearest_across_sal_and_aep():
+    """The eastern coast benefits from AeP even though SAL is far away.
+    Conchagua → SAL is ~130 km (-5 in the old single-airport model);
+    Conchagua → AeP is ~15 km (+5). The leg must pick the minimum.
+    """
+    leg = RANKER_LEGS["location"]
+    s, reason = leg.score(_make_listing(zone="conchagua"), [])
+    # Reason must reference AeP, not SAL — proves min(SAL, AeP) is firing.
+    assert "AeP" in reason, (
+        f"expected AeP in reason for conchagua (closer than SAL); got: {reason}"
+    )
+    # And the bonus must be +5 (near bracket), not -5 (far bracket).
+    assert "+5" in reason, (
+        f"expected +5 near-airport bonus for conchagua via AeP; got: {reason}"
+    )
 
 
 def test_value_cheaper_scores_higher():
