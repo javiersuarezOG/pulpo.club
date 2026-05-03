@@ -307,6 +307,11 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <option value="area_asc">Sort: Area ↑</option>
         <option value="stars_desc">Sort: Rating ↓ (best first)</option>
         <option value="stars_asc">Sort: Rating ↑</option>
+        <optgroup label="By dimension">
+          <option value="deal_desc">Sort: Deal (cheapest vs comps first)</option>
+          <option value="location_desc">Sort: Location (best spot first)</option>
+          <option value="momentum_desc">Sort: Momentum (most active area first)</option>
+        </optgroup>
         <option value="newest_desc">Sort: Newest first</option>
         <option value="zone_asc">Sort: Zone A→Z</option>
         <option value="zone_desc">Sort: Zone Z→A</option>
@@ -549,7 +554,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   const s = p.get('sort')||'ppm_asc';
-  const m = s.match(/^(zone|price|area|ppm|stars|newest)_(asc|desc)$/);
+  const m = s.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum)_(asc|desc)$/);
   if (m) { SORT_COL=m[1]; SORT_DIR=m[2]; }
   const zg=p.get('zone_group'), z=p.get('zone');
   if (zg==='no-zone') ZONE_F={type:'no-zone',value:'no-zone'};
@@ -631,9 +636,12 @@ function sortedRows(rows) {
       return av.localeCompare(bv) * dir;
     }
     let va,vb;
-    if      (SORT_COL==='price') {va=a.price_usd  ??nil;vb=b.price_usd  ??nil;}
-    else if (SORT_COL==='area')  {va=a.area_m2    ??nil;vb=b.area_m2    ??nil;}
-    else if (SORT_COL==='stars') {va=a.rank_score ??nil;vb=b.rank_score ??nil;}
+    if      (SORT_COL==='price')    {va=a.price_usd      ??nil;vb=b.price_usd      ??nil;}
+    else if (SORT_COL==='area')     {va=a.area_m2        ??nil;vb=b.area_m2        ??nil;}
+    else if (SORT_COL==='stars')    {va=a.rank_score     ??nil;vb=b.rank_score     ??nil;}
+    else if (SORT_COL==='deal')     {va=a.value_score    ??nil;vb=b.value_score    ??nil;}
+    else if (SORT_COL==='location') {va=a.location_score ??nil;vb=b.location_score ??nil;}
+    else if (SORT_COL==='momentum') {va=a.momentum_score ??nil;vb=b.momentum_score ??nil;}
     else {va=(a.price_per_m2>0)?a.price_per_m2:nil;vb=(b.price_per_m2>0)?b.price_per_m2:nil;}
     return (va-vb)*dir;
   });
@@ -961,7 +969,10 @@ function wireMobileSort() {
   const sel=document.getElementById('mobile-sort');
   sel.value=`${SORT_COL}_${SORT_DIR}`;
   sel.addEventListener('change',()=>{
-    const m=sel.value.match(/^(zone|price|area|ppm|stars)_(asc|desc)$/);
+    // Keep this regex in sync with readURL()'s match — both must accept the
+    // same set of sort columns or selecting an option silently no-ops while
+    // pushing the URL anyway. Newest was already broken here pre-Phase-7.
+    const m=sel.value.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum)_(asc|desc)$/);
     if(m){SORT_COL=m[1];SORT_DIR=m[2];}
     pushURL(true); render();
   });
