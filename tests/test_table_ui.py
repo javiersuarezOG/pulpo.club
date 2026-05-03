@@ -655,11 +655,21 @@ def test_url_state_regex_includes_newest():
     The regex in readURL() restricts which sort columns are accepted from
     the URL. Removing 'newest' from the regex would silently break the
     only desktop path to this sort.
+
+    Asserts the regex contains all expected tokens — order-and-extension
+    independent so future additions (e.g. deal/location/momentum) don't
+    require updating this test alongside the regex.
     """
+    import re
     html = open("web/index.html").read()
-    # Look for the readURL regex with the newest token.
-    assert "(zone|price|area|ppm|stars|newest)" in html, (
-        "readURL sort regex no longer accepts 'newest' — desktop URL sort broken"
+    # Find the readURL sort regex: look for a `(<tokens>)_(asc|desc)$` pattern
+    # constrained to a |-separated lowercase identifier list.
+    m = re.search(r"\(([a-z|]+)\)_\(asc\|desc\)\$/", html)
+    assert m, "readURL sort regex with the (cols)_(asc|desc) shape not found"
+    tokens = set(m.group(1).split("|"))
+    assert "newest" in tokens, (
+        f"readURL sort regex no longer accepts 'newest' — desktop URL sort "
+        f"broken. Found tokens: {sorted(tokens)}"
     )
 
 
