@@ -125,6 +125,8 @@ def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
                 h.unlink()
 
     # Delete archives older than 30 days
+    if not archive_base.exists():
+        return
     cutoff = datetime.now(timezone.utc).date() - timedelta(days=30)
     for d in archive_base.iterdir():
         if d.is_dir():
