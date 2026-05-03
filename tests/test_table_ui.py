@@ -821,3 +821,128 @@ def test_price_filter_applied_to_live_data(listings):
         assert 50_000 <= r["price_usd"] <= 500_000, (
             f"Listing {r.get('source_id')} price {r.get('price_usd')} outside band"
         )
+
+
+# ── Size range filter (PRD 3 — Tune panel) ───────────────────────────
+# Mirrors the price filter contract. Pinned because size and price are the
+# load-bearing buyer-intent filters; either drifting silently undercuts the
+# whole filter UX. The defaults-pass-everything semantic for unpriced /
+# unsized listings is intentional — the filter is "off" until the user
+# narrows a handle.
+
+SIZE_SNAPS_PY = [0, 100, 500, 1_000, 5_000, 10_000, 50_000, 100_000, 500_000, float("inf")]
+
+
+def size_in_range(row: dict, min_idx: int, max_idx: int) -> bool:
+    """Python mirror of JS _sizeInRange()."""
+    is_default = min_idx == 0 and max_idx == len(SIZE_SNAPS_PY) - 1
+    if is_default:
+        return True
+    a = row.get("area_m2")
+    if a is None:
+        return False
+    return SIZE_SNAPS_PY[min_idx] <= a <= SIZE_SNAPS_PY[max_idx]
+
+
+def test_size_default_range_includes_all_sized():
+    last = len(SIZE_SNAPS_PY) - 1
+    rows = [{"area_m2": 67}, {"area_m2": 1_000}, {"area_m2": 6_800_000}]
+    assert all(size_in_range(r, 0, last) for r in rows)
+
+
+def test_size_default_range_includes_unsized():
+    """At default range, unsized listings remain visible — filter is off."""
+    last = len(SIZE_SNAPS_PY) - 1
+    assert size_in_range({"area_m2": None}, 0, last) is True
+    assert size_in_range({}, 0, last) is True
+
+
+def test_size_narrowed_range_excludes_unsized():
+    """Once narrowed, listings without area_m2 drop out."""
+    last = len(SIZE_SNAPS_PY) - 1
+    assert size_in_range({"area_m2": None}, 1, last) is False
+    assert size_in_range({}, 0, last - 1) is False
+
+
+def test_size_filter_inclusive_bounds():
+    # idx 2 = 500 m², idx 5 = 10K m²
+    assert size_in_range({"area_m2": 500},   2, 5) is True
+    assert size_in_range({"area_m2": 10_000}, 2, 5) is True
+
+
+def test_size_filter_excludes_outside_band():
+    assert size_in_range({"area_m2": 499},     2, 5) is False
+    assert size_in_range({"area_m2": 10_001},  2, 5) is False
+
+
+def test_size_filter_max_idx_is_infinity():
+    last = len(SIZE_SNAPS_PY) - 1
+    assert SIZE_SNAPS_PY[last] == float("inf")
+    assert size_in_range({"area_m2": 6_800_000}, 0, last) is True
+
+
+def test_size_snap_array_length_matches_labels():
+    """SIZE_SNAPS and SIZE_LABELS must agree in length."""
+    html = open("web/index.html").read()
+    import re as _re
+    snap_match  = _re.search(r"SIZE_SNAPS\s*=\s*\[([^\]]+)\]",  html)
+    label_match = _re.search(r"SIZE_LABELS\s*=\s*\[([^\]]+)\]", html)
+    assert snap_match and label_match, "SIZE_SNAPS / SIZE_LABELS declarations missing"
+    snap_count  = len(_re.findall(r"\d[\d_]*|Infinity", snap_match.group(1)))
+    label_count = len(_re.findall(r"'[^']+'", label_match.group(1)))
+    assert snap_count == label_count, (
+        f"SIZE_SNAPS has {snap_count} entries but SIZE_LABELS has {label_count} — "
+        "slider labels would desync"
+    )
+
+
+def test_size_filter_dom_contracts_present():
+    """Size filter is wired into the same Tune panel surfaces as price."""
+    html = open("web/index.html").read()
+    # Filter logic referenced in filteredRows.
+    assert "_sizeInRange" in html, (
+        "filteredRows() no longer references _sizeInRange — size filter is dead"
+    )
+    # URL keys round-trip.
+    assert "size_min" in html and "size_max" in html
+    # Tune button state reflects size filter too.
+    assert "isDefaultSizeRange" in html
+
+
+def test_url_state_omits_default_size_range():
+    """pushURL only emits ?size_min/?size_max when narrowed from defaults."""
+    html = open("web/index.html").read()
+    assert "SIZE_MIN_IDX  !== 0" in html or "SIZE_MIN_IDX !== 0" in html
+    assert "SIZE_MAX_IDX  !== SIZE_SNAPS.length-1" in html or "SIZE_MAX_IDX !== SIZE_SNAPS.length-1" in html
+
+
+def test_size_filter_applied_to_live_data(listings):
+    """End-to-end: applying a 500–10K m² filter on the real ranked.json
+    yields only listings whose area falls in that band.
+    """
+    in_band = [r for r in listings if size_in_range(r, 2, 5)]  # 500 m² – 10K m²
+    for r in in_band:
+        assert r.get("area_m2") is not None
+        assert 500 <= r["area_m2"] <= 10_000, (
+            f"Listing {r.get('source_id')} area {r.get('area_m2')} outside band"
+        )
+
+
+def test_m2_per_vara2_constant_matches_python():
+    """The JS conversion factor must match pulpo/units.py M2_PER_VARA2.
+
+    The dashboard's vara² display (via fmtPPV2 and any size-display dual
+    units) divides m² by this value. Drift between the JS literal and the
+    Python source-of-truth means visible price/area numbers diverge.
+    """
+    html = open("web/index.html").read()
+    assert "M2_PER_VARA2 = 0.698896" in html, (
+        "JS M2_PER_VARA2 literal drifted from pulpo/units.py:19 (= 0.698896)"
+    )
+    # Cross-check against the Python source.
+    units = open("pulpo/units.py").read()
+    import re as _re
+    m = _re.search(r"M2_PER_VARA2\s*=\s*([\d.]+)", units)
+    assert m and m.group(1) == "0.698896", (
+        "pulpo/units.py M2_PER_VARA2 changed; update the JS literal too"
+    )
