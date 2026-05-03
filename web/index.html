@@ -163,6 +163,32 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .score-n{width:24px;text-align:right;font-variant-numeric:tabular-nums;color:var(--t2)}
 .panel-dev-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;background:var(--s2);color:var(--t2);margin-bottom:12px}
 
+/* ── Tune panel (filters/sort) — mirrors .side-panel chrome ────── */
+/* Why a dedicated panel instead of stacking sliders above the table:
+   the filter-bar + zone-bar already use vertical real estate. A third
+   strip with sliders would push the table below the fold. The slide-in
+   panel mirrors the existing listing-detail panel's animation/styling. */
+.tune-panel{width:0;overflow:hidden;border-left:1px solid var(--border);transition:width .2s ease;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg)}
+.tune-panel.open{width:32%;min-width:280px}
+.tune-section{margin-bottom:20px}
+.tune-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px}
+.tune-range-display{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:10px;font-weight:500}
+.tune-range-controls{position:relative;height:32px}
+.tune-range-controls input[type=range]{position:absolute;width:100%;top:0;-webkit-appearance:none;appearance:none;background:none;pointer-events:none;height:32px;margin:0}
+.tune-range-controls input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer;pointer-events:auto;margin-top:0}
+.tune-range-controls input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer;pointer-events:auto}
+.tune-range-track{position:absolute;width:100%;height:4px;top:14px;background:var(--s3);border-radius:2px}
+.tune-range-fill{position:absolute;height:4px;top:14px;background:var(--accent);border-radius:2px}
+.tune-reset{display:inline-block;font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;padding:0;margin-top:4px;text-decoration:underline}
+.tune-reset:hover{opacity:.7}
+.tune-button{font-size:12px;padding:5px 10px;border:1px solid var(--brd2);border-radius:var(--r-sm);background:var(--bg);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit}
+.tune-button:hover{border-color:var(--accent);color:var(--text)}
+.tune-button.has-filters::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:2px}
+.mobile-tune-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+.mobile-tune-overlay.open{display:flex;flex-direction:column}
+.mobile-tune-overlay .panel-header{position:sticky;top:0;background:var(--bg);z-index:5}
+.mobile-tune-overlay .panel-body{flex:1;padding:18px}
+
 /* ── Mobile cards ───────────────────────────────────── */
 .cards-wrap{display:none;flex:1;overflow-y:auto;padding:8px 12px;gap:8px;flex-direction:column}
 .card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color .1s}
@@ -185,6 +211,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   .cards-wrap{display:flex}
   .sort-bar{display:block}
   .side-panel{display:none}
+  .tune-panel{display:none}
   .content{height:auto;overflow:visible}
   .zf-group{grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:2px 8px}
   .zg-label{grid-column:1;grid-row:1}
@@ -248,6 +275,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <button class="seg-btn" data-filter="gated">Gated</button>
       </div>
       <span class="filter-count" id="filter-count"></span>
+      <button class="tune-button" id="tune-open" aria-label="Open price filter">⚙ Tune</button>
     </div>
 
     <!-- Zone filter -->
@@ -315,6 +343,15 @@ tbody td{padding:10px 12px;vertical-align:middle}
     </div>
     <div class="panel-body" id="panel-body"></div>
   </aside>
+
+  <!-- Desktop tune panel (filters + sort) — mutually exclusive with side-panel -->
+  <aside class="tune-panel" id="tune-panel">
+    <div class="panel-header">
+      <span class="panel-title">Tune filters</span>
+      <button class="panel-close" id="tune-close" aria-label="Close panel">×</button>
+    </div>
+    <div class="panel-body" id="tune-body"></div>
+  </aside>
 </div>
 
 <!-- Mobile full-screen overlay -->
@@ -324,6 +361,15 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <button class="panel-close" id="mobile-close" aria-label="Close">×</button>
   </div>
   <div class="panel-body" id="mobile-panel-body"></div>
+</div>
+
+<!-- Mobile full-screen tune overlay -->
+<div class="mobile-tune-overlay" id="mobile-tune-overlay">
+  <div class="panel-header">
+    <span class="panel-title">Tune filters</span>
+    <button class="panel-close" id="mobile-tune-close" aria-label="Close">×</button>
+  </div>
+  <div class="panel-body" id="mobile-tune-body"></div>
 </div>
 
 <script>
@@ -383,6 +429,17 @@ function zoneColor(z) { return ZONE_COLORS[z] || ZONE_PALETTE[_hashZone(z)]; }
 let ALL_DATA = [], FILTER = 'all', ZONE_F = null;
 let SORT_COL = 'ppm', SORT_DIR = 'asc', OPEN_ID = null;
 
+/* ── Tune-panel state: price range ─────────────────────── */
+// Snap points calibrated to the live data distribution: median $250K,
+// 95th percentile $4.1M. Index 0 = no min ($0); last index = no max (Infinity).
+// Indices into PRICE_SNAPS are what's stored in URL state, not raw USD,
+// so the snap labels stay stable even if we re-tune the snap points later.
+const PRICE_SNAPS = [0, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, Infinity];
+const PRICE_LABELS = ['$0', '$25K', '$50K', '$100K', '$250K', '$500K', '$1M', '$2.5M', '$5M', 'No max'];
+let PRICE_MIN_IDX = 0, PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
+const isDefaultPriceRange = () =>
+  PRICE_MIN_IDX === 0 && PRICE_MAX_IDX === PRICE_SNAPS.length - 1;
+
 /* ── Helpers ─────────────────────────────────────────── */
 const fmtUSD  = v => v==null ? '—' : '$'+Math.round(v).toLocaleString('en-US');
 const fmtPPM  = v => (v==null||v<=0) ? '—' : '$'+Math.round(v).toLocaleString('en-US');
@@ -434,6 +491,13 @@ function renderStars(score) {
 }
 
 /* ── URL state ───────────────────────────────────────── */
+function _parseSnapIdx(raw) {
+  // URL carries snap-point indices, not raw USD, so the encoding survives
+  // re-tuning the snap array. Out-of-range / non-numeric → null (use default).
+  const n = parseInt(raw, 10);
+  if (!Number.isInteger(n) || n < 0 || n >= PRICE_SNAPS.length) return null;
+  return n;
+}
 function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
@@ -445,6 +509,16 @@ function readURL() {
   else if (zg&&ZONE_GROUPS[zg]) ZONE_F={type:'group',value:zg};
   else if (z) ZONE_F={type:'zone',value:z};
   else ZONE_F=null;
+  const pmin = _parseSnapIdx(p.get('price_min'));
+  const pmax = _parseSnapIdx(p.get('price_max'));
+  PRICE_MIN_IDX = pmin ?? 0;
+  PRICE_MAX_IDX = pmax ?? PRICE_SNAPS.length - 1;
+  if (PRICE_MIN_IDX > PRICE_MAX_IDX) {
+    // Defensive: malformed URL with min>max collapses to defaults rather
+    // than zero-listings empty state, which would look broken on first load.
+    PRICE_MIN_IDX = 0;
+    PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
+  }
   OPEN_ID=p.get('listing')||null;
 }
 function pushURL(replace=true) {
@@ -456,6 +530,8 @@ function pushURL(replace=true) {
     else if (ZONE_F.type==='group') p.set('zone_group',ZONE_F.value);
     else p.set('zone',ZONE_F.value);
   }
+  if (PRICE_MIN_IDX !== 0)                    p.set('price_min', String(PRICE_MIN_IDX));
+  if (PRICE_MAX_IDX !== PRICE_SNAPS.length-1) p.set('price_max', String(PRICE_MAX_IDX));
   if (OPEN_ID) p.set('listing',OPEN_ID);
   const qs=p.toString();
   const url=qs?`${location.pathname}?${qs}`:location.pathname;
@@ -463,10 +539,22 @@ function pushURL(replace=true) {
 }
 
 /* ── Filter + Sort ───────────────────────────────────── */
+// Predicate: a listing's price falls within the active range. Listings
+// without a price (price_usd === null) are excluded only when the user has
+// narrowed the range from defaults — full-range = "show everything,
+// including unpriced." That way the price filter doesn't silently hide
+// unpriced listings just because the panel was opened.
+function _priceInRange(r) {
+  if (isDefaultPriceRange()) return true;
+  const p = r.price_usd;
+  if (p == null) return false;
+  return p >= PRICE_SNAPS[PRICE_MIN_IDX] && p <= PRICE_SNAPS[PRICE_MAX_IDX];
+}
 function filteredRows() {
   return ALL_DATA.filter(r => {
     if (FILTER==='open'  && r.is_in_development)  return false;
     if (FILTER==='gated' && !r.is_in_development) return false;
+    if (!_priceInRange(r)) return false;
     if (!ZONE_F) return true;
     if (ZONE_F.type==='no-zone') return isNoZone(r);
     if (ZONE_F.type==='zone')    return r.zone===ZONE_F.value;
@@ -612,6 +700,9 @@ function panelHTML(r) {
     ${description}${brokerHTML}${cta}`;
 }
 function openPanel(r) {
+  // Close the tune panel first — they share desktop layout space and only
+  // one slide-in panel can be visible at a time without the table reflowing.
+  closeTunePanel();
   OPEN_ID=r.source_id; pushURL(true);
   const html=panelHTML(r);
   if(window.innerWidth<=640){
@@ -629,6 +720,97 @@ function closePanel() {
   document.getElementById('side-panel').classList.remove('open');
   document.getElementById('mobile-overlay').classList.remove('open');
   document.querySelectorAll('tbody tr,.card').forEach(el=>el.classList.remove('selected'));
+}
+
+/* ── Tune panel (filters/sort) ───────────────────────── */
+// The Tune panel is mutually exclusive with the listing-detail side panel:
+// opening one closes the other so the layout never tries to host both.
+function _tuneBodyHTML() {
+  // The price section. Designed to be extended with future filter sections
+  // (size range, weight sliders) by appending more `<div class="tune-section">`
+  // blocks here — the panel chrome and open/close logic don't care how many.
+  const minLabel = PRICE_LABELS[PRICE_MIN_IDX];
+  const maxLabel = PRICE_LABELS[PRICE_MAX_IDX];
+  const display = `${minLabel} – ${maxLabel}`;
+  const lastIdx = PRICE_SNAPS.length - 1;
+  // Overlay-fill positions (left/right percentages of the track).
+  const fillLeft  = (PRICE_MIN_IDX / lastIdx) * 100;
+  const fillRight = ((lastIdx - PRICE_MAX_IDX) / lastIdx) * 100;
+  return `
+    <div class="tune-section">
+      <div class="tune-section-title">Price range</div>
+      <div class="tune-range-display" id="price-range-display">${display}</div>
+      <div class="tune-range-controls">
+        <div class="tune-range-track"></div>
+        <div class="tune-range-fill" id="price-range-fill" style="left:${fillLeft}%;right:${fillRight}%"></div>
+        <input type="range" id="price-min" min="0" max="${lastIdx}" step="1" value="${PRICE_MIN_IDX}" aria-label="Minimum price">
+        <input type="range" id="price-max" min="0" max="${lastIdx}" step="1" value="${PRICE_MAX_IDX}" aria-label="Maximum price">
+      </div>
+      ${isDefaultPriceRange() ? '' : '<button class="tune-reset" id="price-reset" type="button">Reset price</button>'}
+    </div>
+  `;
+}
+function _wireTuneControls(container) {
+  const minEl = container.querySelector('#price-min');
+  const maxEl = container.querySelector('#price-max');
+  const display = container.querySelector('#price-range-display');
+  const fill = container.querySelector('#price-range-fill');
+  if (!minEl || !maxEl) return;
+  const lastIdx = PRICE_SNAPS.length - 1;
+  function update() {
+    let lo = parseInt(minEl.value, 10);
+    let hi = parseInt(maxEl.value, 10);
+    // Crossover: snap whichever side just moved past the other to the
+    // other slider's position. Tracks which input was the last source of
+    // change via document.activeElement so we know which side to clamp.
+    if (lo > hi) {
+      if (document.activeElement === minEl) hi = lo;
+      else lo = hi;
+      minEl.value = lo; maxEl.value = hi;
+    }
+    PRICE_MIN_IDX = lo; PRICE_MAX_IDX = hi;
+    display.textContent = `${PRICE_LABELS[lo]} – ${PRICE_LABELS[hi]}`;
+    if (fill) {
+      fill.style.left  = `${(lo / lastIdx) * 100}%`;
+      fill.style.right = `${((lastIdx - hi) / lastIdx) * 100}%`;
+    }
+    pushURL(true);
+    render();
+    _updateTuneButtonState();
+  }
+  minEl.addEventListener('input', update);
+  maxEl.addEventListener('input', update);
+  const reset = container.querySelector('#price-reset');
+  if (reset) reset.addEventListener('click', () => {
+    PRICE_MIN_IDX = 0; PRICE_MAX_IDX = lastIdx;
+    renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
+  });
+}
+function renderTunePanel() {
+  const html = _tuneBodyHTML();
+  const desktopBody = document.getElementById('tune-body');
+  const mobileBody  = document.getElementById('mobile-tune-body');
+  if (desktopBody) { desktopBody.innerHTML = html; _wireTuneControls(desktopBody); }
+  if (mobileBody)  { mobileBody.innerHTML = html;  _wireTuneControls(mobileBody); }
+}
+function openTunePanel() {
+  // Close the listing-detail panel first — they share desktop layout space.
+  closePanel();
+  renderTunePanel();
+  if (window.innerWidth <= 640) {
+    document.getElementById('mobile-tune-overlay').classList.add('open');
+  } else {
+    document.getElementById('tune-panel').classList.add('open');
+  }
+}
+function closeTunePanel() {
+  document.getElementById('tune-panel').classList.remove('open');
+  document.getElementById('mobile-tune-overlay').classList.remove('open');
+}
+function _updateTuneButtonState() {
+  const btn = document.getElementById('tune-open');
+  if (!btn) return;
+  btn.classList.toggle('has-filters', !isDefaultPriceRange());
 }
 
 /* ── Render ──────────────────────────────────────────── */
@@ -707,8 +889,14 @@ function wireMobileSort() {
 function wireClose() {
   document.getElementById('panel-close').addEventListener('click',closePanel);
   document.getElementById('mobile-close').addEventListener('click',closePanel);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePanel();closeTunePanel();}});
   document.getElementById('table-wrap')?.addEventListener('click',e=>{if(!e.target.closest('tr')&&OPEN_ID)closePanel();});
+}
+function wireTune() {
+  document.getElementById('tune-open').addEventListener('click', openTunePanel);
+  document.getElementById('tune-close').addEventListener('click', closeTunePanel);
+  document.getElementById('mobile-tune-close').addEventListener('click', closeTunePanel);
+  _updateTuneButtonState();
 }
 let _lastMobile=window.innerWidth<=640;
 window.addEventListener('resize',()=>{const m=window.innerWidth<=640;if(m!==_lastMobile){_lastMobile=m;render();}});
@@ -757,7 +945,7 @@ async function init() {
     return;
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
-  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose();
+  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune();
   render(); loadMeta();
 }
 init();
