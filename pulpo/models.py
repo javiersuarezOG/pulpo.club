@@ -48,6 +48,7 @@ class Listing:
     # Activity
     days_listed: Optional[int] = None
     photos_count: int = 0
+    first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker
     broker_name: Optional[str] = None

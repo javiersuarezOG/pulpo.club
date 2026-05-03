@@ -155,6 +155,31 @@ def main() -> int:
         f.write(f"# parser_errors.log — generated {datetime.now(timezone.utc).isoformat()}\n")
         f.write("# Replaced by validation_log.jsonl. Kept empty for git history continuity.\n")
 
+    # First-seen tracking. Persistent sidecar keyed by "<source>|<source_id>"
+    # so that "Newest first" sort and the NEW badge survive re-scrapes —
+    # `scraped_at` rewrites every run and can't tell a 1-day-old listing
+    # apart from a 6-month-old one we just re-fetched. Idempotent: existing
+    # keys keep their original timestamp; new keys get the current run's
+    # start time. Same pattern as run_history.json below.
+    listings_history_path = web_data_dir / "listings_history.json"
+    try:
+        first_seen = (
+            json.loads(listings_history_path.read_text())
+            if listings_history_path.exists() else {}
+        )
+        if not isinstance(first_seen, dict):
+            first_seen = {}
+    except Exception:
+        first_seen = {}
+    started_iso = started.isoformat()
+    for li in listings:
+        key = f"{li.source}|{li.source_id}"
+        if key not in first_seen:
+            first_seen[key] = started_iso
+        li.first_seen_at = first_seen[key]
+    with listings_history_path.open("w", encoding="utf-8") as f:
+        json.dump(first_seen, f, ensure_ascii=False)
+
     # Rank
     ranked = rank(listings)
 

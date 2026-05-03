@@ -47,6 +47,10 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
     for record in data:
         assert record.get("rank") is not None, f"Missing rank in {record.get('source_id')}"
         assert record.get("rank_score") is not None, f"Missing rank_score in {record.get('source_id')}"
+        assert record.get("first_seen_at") is not None, (
+            f"Missing first_seen_at in {record.get('source_id')} — "
+            "the listings_history.json sidecar should populate this for every listing."
+        )
 
     # Confirm the real production file was NOT touched
     prod_ranked = REPO / "web" / "data" / "ranked.json"
