@@ -171,7 +171,13 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .panel-scores{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
 .score-block{display:flex;flex-direction:column;gap:2px}
 .score-row{display:flex;align-items:center;gap:8px;font-size:12px}
-.score-name{width:80px;color:var(--t2);font-weight:500;cursor:help}
+/* Button-styled label so click semantics (open methodology modal) are
+   accessible and obvious. Reset native button chrome to inherit the
+   surrounding text style. The dotted underline on hover signals interactivity
+   the way the prior cursor:help did, but with an actual click target. */
+.score-name{width:108px;color:var(--t2);font-weight:500;cursor:pointer;background:none;border:none;padding:0;text-align:left;font:inherit;font-weight:500;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:transparent;text-underline-offset:2px;transition:color .12s,text-decoration-color .12s;line-height:inherit}
+.score-name:hover{color:var(--text);text-decoration-color:var(--t3)}
+.score-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 .score-track{flex:1;height:4px;border-radius:2px;background:var(--s3);overflow:hidden}
 .score-fill{height:100%;border-radius:2px}
 .score-n{width:24px;text-align:right;font-variant-numeric:tabular-nums;color:var(--t2)}
@@ -308,7 +314,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <option value="stars_desc">Sort: Rating ↓ (best first)</option>
         <option value="stars_asc">Sort: Rating ↑</option>
         <optgroup label="By dimension">
-          <option value="deal_desc">Sort: Deal (cheapest vs comps first)</option>
+          <option value="deal_desc">Sort: Price vs Comps (cheapest first)</option>
           <option value="location_desc">Sort: Location (best spot first)</option>
           <option value="momentum_desc">Sort: Momentum (most active area first)</option>
         </optgroup>
@@ -375,7 +381,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <p>Whether an area is gaining or losing steam right now. We track how often listings in the area get repriced down — a sign of motivated sellers — and (as we accumulate scraping history) how quickly new inventory appears in each zone. A tier-B area gaining momentum can outscore a tier-A area that's plateaued. Sparse zones with fewer than 5 listings score the neutral default until we have more data.</p>
 
   <h3>The composite</h3>
-  <div class="meth-formula">composite = 0.40 × Deal + 0.35 × Location + 0.25 × Momentum</div>
+  <div class="meth-formula">composite = 0.40 × Price vs Comps + 0.35 × Location + 0.25 × Momentum</div>
   <p>The composite is the single number you see at the top of the listing panel. Each dimension is shown as a bar so you can see how a high or low score was earned, with a one-line explanation under each bar.</p>
 
   <h3>Honest limitations</h3>
@@ -763,31 +769,47 @@ function reasonFor(prefix, reasons) {
   return close > i ? m.slice(i + 1, close).trim() : m.slice(i + 1).trim();
 }
 
+// ── Score breakdown components ─────────────────────────
+// Canonical display labels for the three V/L/M dimensions. Single source of
+// truth — sort dropdown, score breakdown bars, and any future surface that
+// names a leg should reference SCORE_DIMENSIONS so renaming a label is one
+// edit, not a hunt across the file.
+const SCORE_DIMENSIONS = [
+  // [slug,         displayName,           color,      tooltip]
+  ['value',    'Price vs Comps', '#059669', 'How cheap this listing is versus similar lots in the same area'],
+  ['location', 'Location',       '#2563eb', 'Zone tier, beachfront access, infrastructure, and distance to the airport'],
+  ['momentum', 'Momentum',       '#ea580c', 'Whether this area is gaining or losing steam right now'],
+];
+
+// One score bar (label + track + value + per-listing reason). Clicking the
+// label opens the methodology modal — replaces the prior cursor:help that
+// had no actionable click target. The native title attribute is kept as a
+// hover hint while the click is the canonical interaction.
+function scoreBarHTML(opts) {
+  // opts: { name, value, color, tooltip, reason }
+  const reason = opts.reason ? `<div class="score-reason">${esc(opts.reason)}</div>` : '';
+  return `<div class="score-block">
+    <div class="score-row">
+      <button type="button" class="score-name js-open-methodology" title="${esc(opts.tooltip)} — click for details">${esc(opts.name)}</button>
+      <span class="score-track"><span class="score-fill" style="width:${opts.value}%;background:${opts.color}"></span></span>
+      <span class="score-n">${Math.round(opts.value)}</span>
+    </div>
+    ${reason}
+  </div>`;
+}
+
 function panelHTML(r) {
-  // Three legs (Deal / Location / Momentum) with the V/L/M canonical fields
-  // populated by pulpo/ranker.py. The .score-name carries a title= tooltip
-  // (Layer 1 hover); the .score-reason underneath is the per-listing
-  // explanation pulled from rank_reasons.
-  const scoreColor={value:'#059669',location:'#2563eb',momentum:'#ea580c'};
-  const dimensions=[
-    ['Deal','value','How cheap this listing is versus similar lots in the same area',
-      r.value_score,scoreColor.value],
-    ['Location','location','Zone tier, beachfront access, infrastructure, and distance to the airport',
-      r.location_score,scoreColor.location],
-    ['Momentum','momentum','Whether this area is gaining or losing steam right now',
-      r.momentum_score,scoreColor.momentum],
-  ].filter(([,,,val])=>val!=null);
-  const scoreBars=dimensions.map(([name,prefix,tip,val,color])=>{
-    const reason=reasonFor(prefix,r.rank_reasons);
-    return `<div class="score-block">
-      <div class="score-row">
-        <span class="score-name" title="${esc(tip)}">${name}</span>
-        <span class="score-track"><span class="score-fill" style="width:${val}%;background:${color}"></span></span>
-        <span class="score-n">${Math.round(val)}</span>
-      </div>
-      ${reason?`<div class="score-reason">${esc(reason)}</div>`:''}
-    </div>`;
-  }).join('');
+  // Three legs (Price vs Comps / Location / Momentum) with the V/L/M
+  // canonical fields populated by pulpo/ranker.py. Per-listing reason is
+  // pulled from rank_reasons; clicking the label opens the methodology.
+  const scoreField = {value: r.value_score, location: r.location_score, momentum: r.momentum_score};
+  const scoreBars = SCORE_DIMENSIONS
+    .filter(([slug]) => scoreField[slug] != null)
+    .map(([slug, name, color, tooltip]) => scoreBarHTML({
+      name, value: scoreField[slug], color, tooltip,
+      reason: reasonFor(slug, r.rank_reasons),
+    }))
+    .join('');
   const warnings=r.validation_warnings||[];
   const warnHTML=warnings.length
     ? `<span class="warn-icon" title="Validation warnings">⚠<span class="warn-tooltip">${warnings.map(esc).join('<br>')}</span></span>`
@@ -1081,19 +1103,40 @@ async function loadMeta() {
 }
 
 /* ── Methodology modal wiring ────────────────────────── */
+// Imperative open/close so multiple call sites can share the modal without
+// duplicating dialog-vs-fallback logic. Score-name labels in the side panel
+// call openMethodologyModal() too — clicking a "Price vs Comps" / "Location"
+// / "Momentum" name jumps straight here, replacing the prior cursor:help
+// pattern that did nothing actionable on click.
+function openMethodologyModal() {
+  const dlg = document.getElementById('methodology-modal');
+  if (!dlg) return;
+  if (typeof dlg.showModal === 'function') dlg.showModal();
+  else dlg.setAttribute('open', '');  // older-browser fallback
+}
+function closeMethodologyModal() {
+  const dlg = document.getElementById('methodology-modal');
+  if (!dlg) return;
+  if (typeof dlg.close === 'function') dlg.close();
+  else dlg.removeAttribute('open');
+}
 function wireMethodology() {
   const dlg = document.getElementById('methodology-modal');
   const open = document.getElementById('open-methodology');
   const close = document.getElementById('close-methodology');
   if (!dlg || !open || !close) return;
-  open.addEventListener('click', () => {
-    if (typeof dlg.showModal === 'function') dlg.showModal();
-    else dlg.setAttribute('open', ''); // graceful fallback for older browsers
-  });
-  close.addEventListener('click', () => dlg.close());
+  open.addEventListener('click', openMethodologyModal);
+  close.addEventListener('click', closeMethodologyModal);
   // Click on backdrop closes (native dialogs treat backdrop clicks as on the
   // <dialog> element itself; clicks on inner content bubble to the inner box).
-  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('click', e => { if (e.target === dlg) closeMethodologyModal(); });
+  // Delegated click for any score-name button rendered later by panelHTML().
+  // Keeps the handler stable across panel re-renders (which clobber the
+  // score-name nodes each time openPanel() runs).
+  document.body.addEventListener('click', e => {
+    const t = e.target instanceof Element ? e.target.closest('.js-open-methodology') : null;
+    if (t) openMethodologyModal();
+  });
 }
 
 /* ── Init ────────────────────────────────────────────── */
