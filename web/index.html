@@ -289,8 +289,13 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <button class="seg-btn" data-filter="open">Open land</button>
         <button class="seg-btn" data-filter="gated">Gated</button>
       </div>
+      <button class="tune-button" id="tune-open" aria-label="Open filters panel">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 5h14M5.5 10h9M8.5 15h3"/>
+        </svg>
+        Filters
+      </button>
       <span class="filter-count" id="filter-count"></span>
-      <button class="tune-button" id="tune-open" aria-label="Open price filter">⚙ Tune</button>
     </div>
 
     <!-- Zone filter -->
@@ -394,7 +399,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <!-- Desktop tune panel (filters + sort) — mutually exclusive with side-panel -->
   <aside class="tune-panel" id="tune-panel">
     <div class="panel-header">
-      <span class="panel-title">Tune filters</span>
+      <span class="panel-title">Filters</span>
       <button class="panel-close" id="tune-close" aria-label="Close panel">×</button>
     </div>
     <div class="panel-body" id="tune-body"></div>
@@ -413,7 +418,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
 <!-- Mobile full-screen tune overlay -->
 <div class="mobile-tune-overlay" id="mobile-tune-overlay">
   <div class="panel-header">
-    <span class="panel-title">Tune filters</span>
+    <span class="panel-title">Filters</span>
     <button class="panel-close" id="mobile-tune-close" aria-label="Close">×</button>
   </div>
   <div class="panel-body" id="mobile-tune-body"></div>
