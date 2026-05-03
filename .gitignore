@@ -21,6 +21,8 @@ samples/calibration/*/*.html
 # Exceptions: calibrated source fixtures used by pytest (public listings, no PII)
 !samples/calibration/goodlife/*.html
 !samples/calibration/oceanside/*.html
+!samples/calibration/nexo/*.html
+!samples/calibration/realtyelsalvador/*.html
 
 # OS junk
 .DS_Store

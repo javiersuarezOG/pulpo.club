@@ -1,0 +1,28 @@
+[
+  {
+    "source": "nexo",
+    "source_id": "6_42",
+    "url": "https://nexo.com.sv/6/42/Terreno-en-venta-en-la-Hacienda-2800-vrs-Plano",
+    "title": "Terreno en venta en La Hacienda",
+    "raw_price_text": "$105,000.00",
+    "raw_size_text": "2800.00 vrs2",
+    "location_text": "San José Villanueva, La Libertad, El Salvador",
+    "description": "Terreno plano ubicado en La Hacienda, excelente acceso.",
+    "property_type": "land",
+    "photo_urls": ["https://nexo.com.sv/nexocrm/imagenes/fotos_inmuebles/terrenos/fotoGeneral_6_42.jpg"],
+    "scraped_at": "2026-05-03T00:00:00Z"
+  },
+  {
+    "source": "nexo",
+    "source_id": "6_41",
+    "url": "https://nexo.com.sv/6/41/El-Encanto-Terreno-en-venta-plano-1425-vrs",
+    "title": "El Encanto Terreno en venta plano 1425 vrs",
+    "raw_price_text": "$68,500.00",
+    "raw_size_text": "1425.00 vrs2",
+    "location_text": "La Libertad, El Salvador",
+    "description": "Terreno plano en El Encanto.",
+    "property_type": "land",
+    "photo_urls": ["https://nexo.com.sv/nexocrm/imagenes/fotos_inmuebles/terrenos/fotoGeneral_6_41.jpg"],
+    "scraped_at": "2026-05-03T00:00:00Z"
+  }
+]

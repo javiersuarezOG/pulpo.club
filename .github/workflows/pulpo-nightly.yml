@@ -42,7 +42,7 @@ jobs:
           PULPO_OFFLINE: "0"
           PULPO_LIMIT: "1000"
           # kazu: Nuxt SPA, panel API still denylisted — re-add when rewritten.
-          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax"
+          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,realtyelsalvador"
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
