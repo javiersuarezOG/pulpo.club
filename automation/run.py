@@ -233,6 +233,21 @@ def main() -> int:
     # Field completeness snapshot — populated % per field per source.
     field_completeness = build_completeness_block(ranked_dicts)
 
+    # V-leg fallback diagnostic. The Value leg returns a neutral default of
+    # 35 when price_per_m2 is None (no_price) or when the comp pool can't
+    # form (no_comps). With the V-weight at 0.40, every listing on neutral
+    # is contributing the same constant to its composite — a big mass of
+    # listings on neutral means the V leg is mostly noise that week. The
+    # property_type_counts surfaces classifier drift if a future scraper
+    # change starts mass-misclassifying inventory.
+    from collections import Counter as _Counter
+    property_type_counts = dict(_Counter(li.property_type for li in ranked))
+    v_fallback_no_price = sum(1 for li in ranked if li.price_per_m2 is None)
+    v_fallback_no_comps = sum(
+        1 for li in ranked
+        if li.price_per_m2 is not None and li.zone_percentile is None
+    )
+
     # Last-updated metadata
     finished = datetime.now(timezone.utc)
     meta = {
@@ -245,6 +260,9 @@ def main() -> int:
         "source_status": source_status,
         "coverage": coverage,
         "field_completeness": field_completeness,
+        "property_type_counts": property_type_counts,
+        "v_fallback_no_price": v_fallback_no_price,
+        "v_fallback_no_comps": v_fallback_no_comps,
         "sources": sources,
         "offline": offline,
         "fixture_fallback_active": fixture_fallback_active,
