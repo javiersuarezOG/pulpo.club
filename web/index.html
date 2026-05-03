@@ -1210,9 +1210,11 @@ function _wireRangeSection(container, opts) {
 }
 function _wireWeightSliders(container) {
   // Wire one slider per dimension. On change: update WEIGHTS, refresh the
-  // numeric badge, push URL, re-render. The composite-sort branch in
-  // sortedRows() picks up the new weights automatically — no special
-  // re-sort path needed unless SORT_COL is currently 'composite'.
+  // numeric badge, push URL, re-render — and auto-switch the sort to
+  // "composite" if it isn't already, so the user sees their reweighting
+  // take effect immediately. Otherwise the page stays sorted by whatever
+  // it was (e.g. $/m² ascending), and the slider would silently no-op
+  // from the user's POV. This was a real complaint in the wild.
   for (const [slug] of SCORE_DIMENSIONS) {
     const sliderEl = container.querySelector(`#weight-${slug}`);
     const valueEl  = container.querySelector(`#weight-${slug}-value`);
@@ -1221,6 +1223,15 @@ function _wireWeightSliders(container) {
       const v = parseInt(sliderEl.value, 10);
       WEIGHTS[slug] = Number.isInteger(v) ? v : WEIGHT_DEFAULTS[slug];
       valueEl.textContent = WEIGHTS[slug];
+      // Snap the active sort to the live-weight composite so the table
+      // visibly reorders. Reflect the change in the desktop sort-icons
+      // and the mobile dropdown so the UI never lies about what's
+      // actually being sorted.
+      if (SORT_COL !== 'composite') {
+        SORT_COL = 'composite';
+        SORT_DIR = 'desc';
+        updateSortHeaders();
+      }
       pushURL(true); render(); _updateTuneButtonState();
     });
   }
