@@ -946,3 +946,106 @@ def test_m2_per_vara2_constant_matches_python():
     assert m and m.group(1) == "0.698896", (
         "pulpo/units.py M2_PER_VARA2 changed; update the JS literal too"
     )
+
+
+# ── Score breakdown labels: consistency across the interface ──────────
+# The three V/L/M dimensions are surfaced in three places: the side-panel
+# score breakdown bars, the mobile sort dropdown, and the methodology
+# modal's composite formula. Drift between any two of these would
+# confuse users — these tests pin a single set of canonical labels and
+# fail loudly if any surface drifts.
+
+EXPECTED_LABELS = {
+    "value":    "Price vs Comps",
+    "location": "Location",
+    "momentum": "Momentum",
+}
+
+
+def test_score_dimensions_constant_exists():
+    """SCORE_DIMENSIONS is the single source of truth for V/L/M display
+    labels. Removing it forces the breakdown bars back into per-call-site
+    string literals, which is exactly the drift we just stamped out.
+    """
+    html = open("web/index.html").read()
+    assert "const SCORE_DIMENSIONS" in html, (
+        "SCORE_DIMENSIONS dropped — score-bar labels would diverge per surface"
+    )
+
+
+def test_score_dimensions_canonical_labels_present():
+    """All three canonical labels appear in the SCORE_DIMENSIONS array."""
+    import re as _re
+    html = open("web/index.html").read()
+    block = _re.search(r"const SCORE_DIMENSIONS\s*=\s*\[(.+?)\];", html, _re.DOTALL)
+    assert block, "SCORE_DIMENSIONS array not found"
+    body = block.group(1)
+    for slug, label in EXPECTED_LABELS.items():
+        assert f"'{slug}'" in body, f"slug {slug!r} missing from SCORE_DIMENSIONS"
+        assert f"'{label}'" in body, f"label {label!r} missing from SCORE_DIMENSIONS"
+
+
+def test_old_deal_label_removed_from_user_facing_surfaces():
+    """The earlier 'Deal' label should no longer appear in panelHTML's
+    breakdown rows or the methodology composite formula. Sort dropdown
+    `value="deal_desc"` is the URL state key — that stays for stability.
+    """
+    html = open("web/index.html").read()
+    # Score breakdown rows used to literally contain 'Deal' as a label.
+    # The panelHTML now reads from SCORE_DIMENSIONS; a literal 'Deal' in
+    # there would mean a stale per-call-site string snuck back in.
+    panel_block = html.split("function panelHTML")[1].split("function ")[0]
+    assert "'Deal'" not in panel_block, (
+        "panelHTML still hardcodes 'Deal' — should pull from SCORE_DIMENSIONS"
+    )
+    # Methodology formula should reflect the new label.
+    assert "Price vs Comps" in html, "Methodology formula missing 'Price vs Comps'"
+    assert "0.40 × Deal" not in html, "Methodology formula still says 'Deal'"
+
+
+def test_sort_dropdown_uses_consistent_dimension_label():
+    """Sort dropdown shows 'Price vs Comps' to match the score bar / methodology."""
+    html = open("web/index.html").read()
+    assert "Sort: Price vs Comps" in html, (
+        "Sort dropdown no longer says 'Price vs Comps' — drifts from score bar"
+    )
+
+
+def test_score_name_is_a_button():
+    """The .score-name is a <button> so click-to-open-methodology is
+    accessible (keyboard, screen readers) and obvious. The earlier
+    `<span class="score-name" cursor:help>` had no click target despite
+    the help cursor signaling interactivity — exactly the bug we're
+    fixing here.
+    """
+    html = open("web/index.html").read()
+    # The scoreBarHTML componentizer renders a <button>.
+    assert "<button" in html and "class=\"score-name js-open-methodology\"" in html, (
+        ".score-name is no longer a button — click-to-open-methodology won't work"
+    )
+    # Cursor reflects clickability, not the broken cursor:help.
+    assert ".score-name{" in html
+    score_name_css = html.split(".score-name{")[1].split("}")[0]
+    assert "cursor:pointer" in score_name_css, (
+        ".score-name CSS still uses cursor:help despite being clickable"
+    )
+    assert "cursor:help" not in score_name_css, (
+        ".score-name should not use cursor:help — it's an actionable button"
+    )
+
+
+def test_methodology_open_helper_exists_and_is_called():
+    """openMethodologyModal() is the shared open helper. It's called by
+    the footer link, by the new score-name buttons (via delegated click),
+    and could be called by future surfaces (e.g. info icons next to
+    table column headers).
+    """
+    html = open("web/index.html").read()
+    assert "function openMethodologyModal" in html
+    assert "openMethodologyModal()" in html, (
+        "openMethodologyModal defined but never called — modal is unreachable"
+    )
+    # Delegated click handler picks up score-name presses anywhere on body.
+    assert ".js-open-methodology" in html, (
+        "Score-name buttons have no class hook for the delegated click handler"
+    )
