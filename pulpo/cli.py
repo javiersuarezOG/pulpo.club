@@ -128,12 +128,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {jp.relative_to(repo_root)}")
 
     # Print top 5 to stdout
-    print("\nTop 5 (rank | composite | V/Q/L/U | zone | price | $/m² | title):")
+    print("\nTop 5 (rank | composite | V/Q/U | zone | price | $/m² | title):")
     for li in ranked[:5]:
         print(
             f" #{li.rank:<2} {li.rank_score:>5.1f}  "
             f"V{li.value_score:>4.0f} Q{li.quality_score:>4.0f} "
-            f"L{li.liquidity_score:>4.0f} U{li.upside_score:>4.0f}  "
+            f"U{li.upside_score:>4.0f}  "
             f"{li.zone or '?':<13} "
             f"${(li.price_usd or 0):>10,.0f}  "
             f"${li.price_per_m2 or 0:>7.2f}/m²  "

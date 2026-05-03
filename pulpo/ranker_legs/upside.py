@@ -23,7 +23,7 @@ ZONE_UPSIDE = {
 
 class UpsideLeg:
     slug = "upside"
-    weight = 0.20
+    weight = 0.25
     env_weight_key = "PULPO_W_UPSIDE"
 
     def score(self, listing: "Listing", comp_pool: list["Listing"]) -> tuple[float, str]:

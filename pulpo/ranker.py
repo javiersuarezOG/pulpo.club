@@ -1,34 +1,30 @@
 """
 Multi-factor investment ranker for raw beach + recreational land in El Salvador.
 
-Why a multi-factor model?  A pure "cheap-for-zone" scorer (which is what we
-shipped first) tells you which listings are mispriced low against their comp
-pool — but it punishes prime-location plays at fair price and rewards cheap
-parcels in zones nobody is buying. The classic real-estate trap: you get a
-nominal "discount" on something with no liquidity and no exit.
+Why a multi-factor model?  A pure "cheap-for-zone" scorer tells you which
+listings are mispriced low against their comp pool — but it punishes prime-
+location plays at fair price and rewards cheap parcels in zones nobody is
+buying. The classic real-estate trap: you get a nominal "discount" on
+something with no liquidity and no exit.
 
-Institutional underwriting decomposes asset attractiveness into four legs:
+Three legs, each on a 0..100 scale, combined with editor-tunable weights:
 
-    1. VALUE       — entry price vs comparable sales (your ranker bread-and-butter)
-    2. QUALITY     — locational tier + physical attributes (the "A-location premium")
-    3. LIQUIDITY   — exit-risk proxy: how fast does this zone turn over?
-    4. UPSIDE      — path-of-progress: where is capital flowing next?
+    1. VALUE    — entry price vs comparable sales (cheaper-for-pool = higher)
+    2. QUALITY  — zone tier + physical attributes + freshness signals
+    3. UPSIDE   — path-of-progress: where is capital flowing next?
 
-We compute each on a 0..100 scale, then combine with editor-tunable weights:
+    composite = 0.40*value + 0.35*quality + 0.25*upside
 
-    composite = 0.35*value + 0.25*quality + 0.20*liquidity + 0.20*upside
+…then converted to a 1-based position rank (1 = best opportunity).
 
-…and convert the composite to a 1-based position rank (1 = best opportunity).
+A previous LIQUIDITY leg was dropped after a correlation audit on 803 live
+listings showed it was 0.99 correlated with QUALITY (i.e. the same signal in
+two skins). Its DOM penalty + repriced bonus moved into the QUALITY leg's
+score function. Top-10 leaderboard overlap before/after the consolidation
+was 9/10 — the change is empirically free.
 
-This intentionally maps to the way a sophisticated SV beach-land investor
-would actually frame the trade: a single $1.5M Tunco oceanfront at fair price
-can beat five $200k Conchagua interior parcels that LOOK cheap, because the
-Tunco asset has lower liquidity risk + a bigger growth multiple — even if
-the value-leg score is identical or worse. The composite makes that visible
-instead of letting the value leg dominate.
-
-A user who wants the old behavior can re-weight via env vars:
-    PULPO_W_VALUE / PULPO_W_QUALITY / PULPO_W_LIQUIDITY / PULPO_W_UPSIDE
+Re-weight via env vars:
+    PULPO_W_VALUE / PULPO_W_QUALITY / PULPO_W_UPSIDE
 
 (weights renormalize so they don't have to sum to 1.0).
 """
@@ -38,8 +34,7 @@ from typing import Iterable
 from .models import Listing
 import pulpo.ranker_legs.value    # noqa: F401 — triggers registration
 import pulpo.ranker_legs.quality  # noqa: F401
-import pulpo.ranker_legs.liquidity  # noqa: F401
-import pulpo.ranker_legs.upside    # noqa: F401
+import pulpo.ranker_legs.upside   # noqa: F401
 from pulpo.agents import RANKER_LEGS
 
 
@@ -71,23 +66,22 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
             w = weights.get(slug, leg.weight)
             composite += w * s
             reasons.append(reason)
-            # Store component scores on the Listing for UI
+            # Store component scores on the Listing for UI. liquidity_score
+            # remains a None-able field on the dataclass for backward compat
+            # with cached payloads, but we no longer populate it.
             if slug == "value":
                 li.value_score = round(s, 1)
             elif slug == "quality":
                 li.quality_score = round(s, 1)
-            elif slug == "liquidity":
-                li.liquidity_score = round(s, 1)
             elif slug == "upside":
                 li.upside_score = round(s, 1)
 
         composite = round(composite, 2)
         li.rank_score = composite
-        wv = weights.get("value", 0.35)
-        wq = weights.get("quality", 0.25)
-        wl = weights.get("liquidity", 0.20)
-        wu = weights.get("upside", 0.20)
-        reasons.append(f"weights V{wv:.2f} Q{wq:.2f} L{wl:.2f} U{wu:.2f} → {composite:.1f}")
+        wv = weights.get("value", 0.40)
+        wq = weights.get("quality", 0.35)
+        wu = weights.get("upside", 0.25)
+        reasons.append(f"weights V{wv:.2f} Q{wq:.2f} U{wu:.2f} → {composite:.1f}")
         li.rank_reasons = reasons
 
     items.sort(key=lambda x: (x.rank_score or 0), reverse=True)

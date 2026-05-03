@@ -67,7 +67,7 @@ def _pick_pool(li, by_zone, by_macro, global_pool):
 
 class ValueLeg:
     slug = "value"
-    weight = 0.35
+    weight = 0.40
     env_weight_key = "PULPO_W_VALUE"
 
     def score(self, listing: "Listing", comp_pool: list["Listing"]) -> tuple[float, str]:
