@@ -225,6 +225,14 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .weight-help{font-size:11px;color:var(--t3);line-height:1.45;margin-bottom:10px}
 .weight-row{display:grid;grid-template-columns:108px 1fr 36px;align-items:center;gap:10px;padding:6px 0}
 .weight-name{font-size:12px;color:var(--t2);font-weight:500;padding-left:8px}
+/* Per-slider hint — tells the user what moving the slider left/right does
+   for THIS specific dimension. Sits underneath each slider, indented to
+   match the slider track so the eye reads it as belonging to that row. */
+.weight-hint{font-size:10.5px;color:var(--t3);line-height:1.4;margin:2px 0 10px 118px}
+/* Inline section hint — short one-liner under the section title that
+   explains how the controls in this section work. Lives between the
+   section title and the controls themselves. */
+.tune-section-hint{font-size:11px;color:var(--t3);line-height:1.4;margin-top:-4px;margin-bottom:10px}
 .weight-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--s3);border-radius:2px;outline:none;margin:0}
 .weight-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
 .weight-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
@@ -1021,9 +1029,11 @@ function _rangeSectionHTML(opts) {
   const fillLeft  = (opts.minIdx / lastIdx) * 100;
   const fillRight = ((lastIdx - opts.maxIdx) / lastIdx) * 100;
   const titleLow = opts.title.toLowerCase();
+  const hint = opts.hint || '';
   return `
     <div class="tune-section">
       <div class="tune-section-title">${opts.title}</div>
+      ${hint ? `<div class="tune-section-hint">${esc(hint)}</div>` : ''}
       <div class="tune-range-display" id="${opts.id}-range-display">${display}</div>
       <div class="tune-range-controls">
         <div class="tune-range-track"></div>
@@ -1035,16 +1045,26 @@ function _rangeSectionHTML(opts) {
     </div>
   `;
 }
+// Per-slider hints — tell the user what moving each slider left/right does
+// for that specific dimension. Kept short (one line) so they don't dominate
+// the panel; the modal triggered by the "?" button has the full version.
+const WEIGHT_SLIDER_HINTS = {
+  value:    'Right: prioritize listings cheap vs comparable lots · Left: de-emphasize',
+  location: 'Right: prioritize zone quality, beachfront, airport access · Left: ignore location',
+  momentum: 'Right: prioritize areas with active inventory churn · Left: ignore market timing',
+};
 // One weight slider (label, 0–100 input, current value badge). Reuses the
 // SCORE_DIMENSIONS palette so V/L/M look consistent everywhere they're
 // surfaced. Returns just one row — multiple are stacked by _weightSectionHTML.
 function _weightSliderHTML(slug, label, color) {
+  const hint = WEIGHT_SLIDER_HINTS[slug] || '';
   return `
     <div class="weight-row">
       <label class="weight-name" for="weight-${slug}" style="border-left:3px solid ${color}">${esc(label)}</label>
       <input type="range" id="weight-${slug}" class="weight-slider" min="0" max="100" step="1" value="${WEIGHTS[slug]}" aria-label="${esc(label)} weight">
       <span class="weight-value" id="weight-${slug}-value">${WEIGHTS[slug]}</span>
     </div>
+    ${hint ? `<div class="weight-hint">${esc(hint)}</div>` : ''}
   `;
 }
 // The whole weight-sliders section. Reads SCORE_DIMENSIONS for canonical
@@ -1068,6 +1088,7 @@ function _zoneFilterSectionHTML() {
   // buildZoneFilter() now targets every .zone-filter on the page.
   return `<div class="tune-section">
     <div class="tune-section-title">Zone</div>
+    <div class="tune-section-hint">Click a region to filter to all its zones, or a single pill for one zone. Click again to clear.</div>
     <div class="zone-filter"></div>
   </div>`;
 }
@@ -1076,11 +1097,13 @@ function _tuneBodyHTML() {
   // append rather than a rewrite of the panel.
   return _zoneFilterSectionHTML() + _rangeSectionHTML({
     id: 'price', title: 'Price range',
+    hint: 'Drag the LEFT handle to raise the floor (exclude cheaper). Drag the RIGHT to lower the ceiling (exclude more expensive).',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
     minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
     isDefault: isDefaultPriceRange(),
   }) + _rangeSectionHTML({
     id: 'size', title: 'Size range',
+    hint: 'Drag the LEFT handle to exclude smaller plots. Drag the RIGHT to exclude larger ones.',
     snaps: SIZE_SNAPS, labels: SIZE_LABELS,
     minIdx: SIZE_MIN_IDX, maxIdx: SIZE_MAX_IDX,
     isDefault: isDefaultSizeRange(),
