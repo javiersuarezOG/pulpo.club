@@ -1,29 +1,40 @@
 """
-Area Momentum leg — measures whether a zone is heating up, cooling down,
-or holding steady, using delta-shaped signals only.
+Area Momentum leg — measures whether a zone is gaining or losing inventory
+faster than other zones, using the persistent `first_seen_at` sidecar
+populated by automation/run.py.
 
-Replaces the previous Upside leg, which scored an editor-curated zone-upside
-table (correlated 0.66 with the Quality/Location leg, indicating substantial
-shared variance with the static zone-tier signal). This leg constructs
-momentum exclusively from rate-of-change observations so it stays orthogonal
-to Location.
+Why this signal: listing velocity (rate of new inventory per zone) is a
+genuine momentum measurement — zones that are heating up see more new
+listings appear; zones that are cooling see existing inventory persist
+without churn. Unlike level signals (zone tier, search volume), velocity
+is structurally orthogonal to Location: a tier-B zone with rising velocity
+and a tier-A zone with flat velocity tell different stories.
 
-V1 input: per-zone repriced rate. For each zone, compute the fraction of
-listings flagged `is_repriced = True`. Zones above the cross-zone median get
-high momentum scores (lots of motivated sellers, opportunity to negotiate);
-zones below the median score lower (stable market, fewer concessions).
+Implementation: for each zone, compute the mean age (in days) of its
+listings' first_seen_at. Zones with a low mean age — listings are mostly
+new arrivals — score high. Zones with a high mean age — same listings
+have been sitting in our index — score low.
 
-Sparse zones (< MIN_ZONE_LISTINGS listings) score the neutral default 50.0 —
-the rate is too noisy to be informative.
+History-depth guard: when first_seen_at across all dense zones spans less
+than 1 day (i.e. the sidecar is too new), the leg returns the neutral
+default 50.0 with an "insufficient history" reason. This gates the leg
+behind real signal — when nightly cron has run for a week+ and zones have
+differing mean ages, the gate opens automatically and the leg starts
+contributing. No code change needed when the data matures.
 
-Phase 6.5 (~2026-06-01) will add listing-velocity-per-zone as a second input
-once we have 4+ weeks of nightly scrape history. Until then, momentum runs
-on repriced-rate alone.
+Why we replaced the prior `is_repriced` algorithm: the audit on 811 live
+listings showed 0% of broker titles or descriptions contain "REBAJADO",
+"REDUCED", or any equivalent repricing marker. The fixture data that
+informed the prior design was curated and didn't reflect actual SV broker
+conventions. is_repriced as a "Momentum" signal was also a stretch
+semantically — it captures seller distress / capitulation, not actual
+market acceleration. Listing-velocity is closer to the real thing.
 
-Default weight 0.25 (consolidation rebalance from Upside's 0.20).
+Default weight 0.25 (unchanged).
 """
 from __future__ import annotations
 from bisect import bisect_left
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from pulpo.agents import RANKER_LEGS, register
 
@@ -31,40 +42,56 @@ if TYPE_CHECKING:
     from pulpo.models import Listing
 
 
-# Minimum listings per zone before we trust the repriced-rate signal.
-# Below this, the per-zone fraction is too noisy to be meaningful (a single
-# repriced listing in a 2-listing zone reads as "50% repriced" — meaningless).
+# Minimum listings per zone before we trust the velocity signal. Below this,
+# the per-zone mean age is too noisy to be meaningful.
 MIN_ZONE_LISTINGS = 5
+
+# Minimum time-span (in days) across all dense-zone mean ages before the
+# leg actually contributes. Below this, the sidecar is too young to give
+# a meaningful relative ranking — every zone has the same near-zero mean
+# age. Default 1 day; once the cron has run for ~3-7 days and zones diverge
+# in their first_seen_at distributions, this gate opens automatically.
+MIN_HISTORY_SPAN_DAYS = 1.0
 
 NEUTRAL_SCORE = 50.0
 
-# Listing-level bonus when the listing itself has been repriced. A motivated
-# seller deserves an extra nudge regardless of the zone's overall behavior.
-SELF_REPRICED_BONUS = 5
+
+def _parse_iso(s: str | None) -> datetime | None:
+    """Tolerant ISO8601 parser. Returns None on parse failure."""
+    if not s:
+        return None
+    try:
+        # Handle trailing Z (Python's fromisoformat doesn't accept it pre-3.11).
+        return datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except (ValueError, AttributeError):
+        return None
 
 
-def _zone_repriced_rates(comp_pool: list["Listing"]) -> tuple[dict[str, float], list[float]]:
-    """Compute per-zone repriced rate. Returns (rates_by_zone, sorted_rates).
+def _zone_mean_ages_days(comp_pool: list["Listing"], now: datetime | None = None) -> dict[str, float]:
+    """Mean age (in days) of listings' first_seen_at, per zone.
 
-    Only zones with at least MIN_ZONE_LISTINGS listings appear in the result.
-    Sparser zones are excluded because their rate isn't reliable.
+    Only zones with at least MIN_ZONE_LISTINGS appear in the result. Listings
+    without a first_seen_at or with an unparseable timestamp are skipped.
     """
-    counts: dict[str, list[int]] = {}  # zone -> [repriced_count, total_count]
+    if now is None:
+        now = datetime.now(timezone.utc)
+
+    by_zone_ages: dict[str, list[float]] = {}
     for li in comp_pool:
         z = li.zone
         if not z:
             continue
-        if z not in counts:
-            counts[z] = [0, 0]
-        if li.is_repriced:
-            counts[z][0] += 1
-        counts[z][1] += 1
-    rates = {
-        z: r / t
-        for z, (r, t) in counts.items()
-        if t >= MIN_ZONE_LISTINGS
+        ts = _parse_iso(getattr(li, "first_seen_at", None))
+        if ts is None:
+            continue
+        age_days = (now - ts).total_seconds() / 86400.0
+        by_zone_ages.setdefault(z, []).append(age_days)
+
+    return {
+        z: sum(ages) / len(ages)
+        for z, ages in by_zone_ages.items()
+        if len(ages) >= MIN_ZONE_LISTINGS
     }
-    return rates, sorted(rates.values())
 
 
 class MomentumLeg:
@@ -73,36 +100,37 @@ class MomentumLeg:
     env_weight_key = "PULPO_W_MOMENTUM"
 
     def score(self, listing: "Listing", comp_pool: list["Listing"]) -> tuple[float, str]:
-        rates, sorted_rates = _zone_repriced_rates(comp_pool)
+        mean_ages = _zone_mean_ages_days(comp_pool)
         zone = listing.zone
 
-        # No zone, or zone is sparse → neutral. Nothing else to say.
-        if not zone or zone not in rates:
+        # No zone, or zone is sparse → neutral.
+        if not zone or zone not in mean_ages:
             return NEUTRAL_SCORE, f"momentum {NEUTRAL_SCORE:.0f} (sparse zone, no signal)"
 
-        # No variance across all dense zones → everyone neutral. Avoids
-        # a degenerate percentile that would award 0 (or 100) to every
-        # listing when all zones happen to have the same repriced rate.
-        if len(set(sorted_rates)) <= 1:
+        sorted_ages = sorted(mean_ages.values())
+        history_span = sorted_ages[-1] - sorted_ages[0]
+
+        # Sidecar is too new to differentiate zones. When the cron has
+        # accumulated several days of runs and zones diverge in mean age,
+        # this gate opens automatically.
+        if history_span < MIN_HISTORY_SPAN_DAYS:
             return NEUTRAL_SCORE, (
                 f"momentum {NEUTRAL_SCORE:.0f} "
-                f"(no zone variance — all zones at {sorted_rates[0]*100:.0f}% repriced)"
+                f"(insufficient history: {history_span:.1f}d range, "
+                f"need ≥{MIN_HISTORY_SPAN_DAYS:.0f}d)"
             )
 
-        # Percentile rank within the dense-zone repriced-rate distribution.
-        # Higher rate → higher percentile → higher momentum score.
-        rate = rates[zone]
-        pct = bisect_left(sorted_rates, rate) / len(sorted_rates)
-        score = 100.0 * pct
-
-        # Listing-level self-repriced bonus.
-        if listing.is_repriced:
-            score = min(100.0, score + SELF_REPRICED_BONUS)
-            return score, (
-                f"momentum {score:.0f} "
-                f"(zone {rate*100:.0f}% repriced, +{SELF_REPRICED_BONUS} self-repriced)"
-            )
-        return score, f"momentum {score:.0f} (zone {rate*100:.0f}% repriced)"
+        zone_age = mean_ages[zone]
+        # Lower mean age (newer listings) → higher percentile → higher score.
+        # bisect_left gives the count of zones with strictly lower mean age,
+        # i.e. zones that are newer / hotter than this one. Invert via (1-r).
+        rank = bisect_left(sorted_ages, zone_age) / len(sorted_ages)
+        score = 100.0 * (1 - rank)
+        return score, (
+            f"momentum {score:.0f} "
+            f"(zone mean age {zone_age:.1f}d in {sorted_ages[0]:.1f}-"
+            f"{sorted_ages[-1]:.1f}d range)"
+        )
 
 
 register(RANKER_LEGS, "momentum", MomentumLeg())
