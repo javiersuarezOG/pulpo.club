@@ -1,3 +1,26 @@
+"""
+Value leg — "Price vs Comparable Lots" in user-facing terms.
+
+ARCHITECTURE INVARIANT
+======================
+The comp pools below are keyed on `(property_type, zone)` tuples — NOT bare
+zone strings. This is load-bearing. The scrapers pull every real-estate
+listing (houses, condos, mansions, raw land, lots), and `property_type` is
+populated by the title-first classifier in pulpo/normalize.py. Without the
+type segmentation, a 6-bedroom mansion's $/m² lands in the same percentile
+distribution as a vacant lot, dragging the lot's value score artificially
+high and the mansion's artificially low.
+
+If a future refactor "simplifies" by collapsing the keys back to
+`dict[str, list[float]]` keyed only on zone, the leg will silently start
+producing wrong percentiles for both property types. The contract is pinned
+by tests in tests/agents/test_ranker_legs.py:
+- test_value_segments_houses_from_land_in_same_zone
+- test_value_macro_cascade_respects_property_type
+- test_value_reason_string_includes_property_type_label
+
+Touch _build_pools / _pick_pool below only if those tests still pass after.
+"""
 from __future__ import annotations
 from bisect import bisect_left
 from collections import defaultdict
