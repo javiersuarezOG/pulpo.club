@@ -33,7 +33,7 @@ import os
 from typing import Iterable
 from .models import Listing
 import pulpo.ranker_legs.value    # noqa: F401 — triggers registration
-import pulpo.ranker_legs.quality  # noqa: F401
+import pulpo.ranker_legs.location # noqa: F401
 import pulpo.ranker_legs.upside   # noqa: F401
 from pulpo.agents import RANKER_LEGS
 
@@ -68,20 +68,23 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
             reasons.append(reason)
             # Store component scores on the Listing for UI. liquidity_score
             # remains a None-able field on the dataclass for backward compat
-            # with cached payloads, but we no longer populate it.
+            # with cached payloads, but we no longer populate it. quality_score
+            # is similarly aliased — populated alongside location_score for one
+            # cycle so the dashboard doesn't break during the rename.
             if slug == "value":
                 li.value_score = round(s, 1)
-            elif slug == "quality":
-                li.quality_score = round(s, 1)
+            elif slug == "location":
+                li.location_score = round(s, 1)
+                li.quality_score = round(s, 1)  # alias; drop next cycle
             elif slug == "upside":
                 li.upside_score = round(s, 1)
 
         composite = round(composite, 2)
         li.rank_score = composite
         wv = weights.get("value", 0.40)
-        wq = weights.get("quality", 0.35)
+        wl = weights.get("location", 0.35)
         wu = weights.get("upside", 0.25)
-        reasons.append(f"weights V{wv:.2f} Q{wq:.2f} U{wu:.2f} → {composite:.1f}")
+        reasons.append(f"weights V{wv:.2f} L{wl:.2f} U{wu:.2f} → {composite:.1f}")
         li.rank_reasons = reasons
 
     items.sort(key=lambda x: (x.rank_score or 0), reverse=True)

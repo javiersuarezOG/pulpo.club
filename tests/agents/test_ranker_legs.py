@@ -14,45 +14,64 @@ def _make_listing(**kwargs) -> Listing:
 
 
 def test_only_three_legs_registered():
-    """Locks in the V/Q/U consolidation. A regression that re-adds the
-    Liquidity leg (or any other) needs to update this assertion explicitly —
-    silent re-introduction is exactly the kind of drift this is here to catch.
+    """Locks in the V/Location/Upside consolidation. A regression that
+    re-adds Liquidity or restores the old "quality" slug needs to update
+    this assertion explicitly — silent re-introduction is exactly the
+    kind of drift this is here to catch.
     """
-    assert set(RANKER_LEGS.keys()) == {"value", "quality", "upside"}
+    assert set(RANKER_LEGS.keys()) == {"value", "location", "upside"}
 
 
-def test_quality_beachfront_bonus():
-    leg = RANKER_LEGS["quality"]
+def test_location_beachfront_bonus():
+    leg = RANKER_LEGS["location"]
     base = leg.score(_make_listing(is_beachfront=False), [])
     beach = leg.score(_make_listing(is_beachfront=True), [])
     assert beach[0] > base[0]
 
 
-def test_quality_tier_a_beats_tier_c():
-    leg = RANKER_LEGS["quality"]
+def test_location_tier_a_beats_tier_c():
+    leg = RANKER_LEGS["location"]
     tier_a = leg.score(_make_listing(zone="el-tunco"), [])
     tier_c = leg.score(_make_listing(zone="conchagua"), [])
     assert tier_a[0] > tier_c[0]
 
 
-def test_quality_stale_listing_penalized():
+def test_location_stale_listing_penalized():
     """DOM penalty was folded in from the dropped LIQUIDITY leg. A 200-day
     stale listing must score lower than a 5-day fresh one, all else equal.
     """
-    leg = RANKER_LEGS["quality"]
+    leg = RANKER_LEGS["location"]
     fresh = leg.score(_make_listing(days_listed=5), [])
     stale = leg.score(_make_listing(days_listed=200), [])
     assert fresh[0] > stale[0]
 
 
-def test_quality_repriced_bonus():
+def test_location_repriced_bonus():
     """Repriced bonus was folded in from the dropped LIQUIDITY leg. A
     repriced listing must score higher than an otherwise-identical
     unrepriced one (motivated-seller signal)."""
-    leg = RANKER_LEGS["quality"]
+    leg = RANKER_LEGS["location"]
     base = leg.score(_make_listing(is_repriced=False), [])
     repriced = leg.score(_make_listing(is_repriced=True), [])
     assert repriced[0] > base[0]
+
+
+def test_location_airport_distance_bonus():
+    """Per pulpo/airports.py, zones near SAL get +5, far zones get -5.
+    Comparing two same-tier (C) zones to isolate the airport signal:
+    punta-mango is ~105 km from SAL (0 bonus) and la-union is ~132 km
+    (-5 penalty). The closer zone scores higher.
+    """
+    leg = RANKER_LEGS["location"]
+    far    = leg.score(_make_listing(zone="la-union"), [])      # tier-C, ~132 km, -5
+    nearer = leg.score(_make_listing(zone="punta-mango"), [])   # tier-C, ~105 km,  0
+    assert nearer[0] > far[0], (
+        f"closer zone (punta-mango, 105 km) should score higher than far "
+        f"zone (la-union, 132 km); got {nearer} vs {far}"
+    )
+    # Sanity: airport reason string surfaces in both
+    assert "airport" in far[1]
+    assert "airport" in nearer[1]
 
 
 def test_value_cheaper_scores_higher():

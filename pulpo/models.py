@@ -63,8 +63,9 @@ class Listing:
     rank_score: Optional[float] = None       # composite 0..100
     zone_percentile: Optional[float] = None  # 0..100, lower = cheaper for zone
     value_score: Optional[float] = None      # 0..100, cheap-for-comp-pool leg
-    quality_score: Optional[float] = None    # 0..100, zone tier + attributes
-    liquidity_score: Optional[float] = None  # 0..100, exit-risk proxy
+    location_score: Optional[float] = None   # 0..100, zone tier + airport + attributes + freshness
+    quality_score: Optional[float] = None    # alias for location_score; drop next cycle
+    liquidity_score: Optional[float] = None  # legacy: dropped leg, kept None for backward compat
     upside_score: Optional[float] = None     # 0..100, path-of-progress
     rank_reasons: list[str] = field(default_factory=list)
 
