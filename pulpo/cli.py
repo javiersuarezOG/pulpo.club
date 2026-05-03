@@ -27,7 +27,8 @@ from .models import Listing
 
 CSV_FIELDS = [
     "rank", "rank_score",
-    "value_score", "location_score", "quality_score", "liquidity_score", "upside_score",
+    "value_score", "location_score", "momentum_score",
+    "quality_score", "upside_score", "liquidity_score",
     "zone_percentile",
     "source", "source_id", "title",
     "zone", "municipality", "department",
@@ -45,9 +46,10 @@ def _row(li: Listing) -> dict:
         "rank_score": li.rank_score,
         "value_score": li.value_score,
         "location_score": li.location_score,
-        "quality_score": li.quality_score,   # alias; drop next cycle
+        "momentum_score": li.momentum_score,
+        "quality_score": li.quality_score,    # alias for location; drop next cycle
+        "upside_score": li.upside_score,      # alias for momentum; drop next cycle
         "liquidity_score": li.liquidity_score,  # legacy: always None now
-        "upside_score": li.upside_score,
         "zone_percentile": li.zone_percentile,
         "source": li.source,
         "source_id": li.source_id,
@@ -129,12 +131,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {jp.relative_to(repo_root)}")
 
     # Print top 5 to stdout
-    print("\nTop 5 (rank | composite | V/L/U | zone | price | $/m² | title):")
+    print("\nTop 5 (rank | composite | V/L/M | zone | price | $/m² | title):")
     for li in ranked[:5]:
         print(
             f" #{li.rank:<2} {li.rank_score:>5.1f}  "
             f"V{li.value_score:>4.0f} L{li.location_score:>4.0f} "
-            f"U{li.upside_score:>4.0f}  "
+            f"M{li.momentum_score:>4.0f}  "
             f"{li.zone or '?':<13} "
             f"${(li.price_usd or 0):>10,.0f}  "
             f"${li.price_per_m2 or 0:>7.2f}/m²  "
