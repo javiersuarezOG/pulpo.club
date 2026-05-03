@@ -91,6 +91,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .zone-pill.clickable{cursor:pointer}
 .zone-pill.pill-active{outline:2px solid var(--text);outline-offset:1px}
 .zone-pill--nozone{background:#F1EFE8;color:#2C2C2A}
+/* "NEW" badge — listings first seen in the last 14 days. Sits next to the
+   zone pill so it's visible at the same glance as the zone, with the
+   accent color so the eye picks it up immediately. */
+.new-badge{display:inline-flex;align-items:center;margin-left:4px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.5px;background:var(--accent);color:#fff;vertical-align:middle}
 
 /* ── Mobile sort bar ────────────────────────────────── */
 .sort-bar{display:none;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -260,6 +264,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
         <option value="area_asc">Sort: Area ↑</option>
         <option value="stars_desc">Sort: Rating ↓ (best first)</option>
         <option value="stars_asc">Sort: Rating ↑</option>
+        <option value="newest_desc">Sort: Newest first</option>
         <option value="zone_asc">Sort: Zone A→Z</option>
         <option value="zone_desc">Sort: Zone Z→A</option>
       </select>
@@ -401,6 +406,22 @@ function zonePillHTML(r) {
   return `<span class="zone-pill zone-pill--nozone">No zone</span>`;
 }
 
+/* ── "NEW" badge ─────────────────────────────────────── */
+// Rendered next to the zone pill when first_seen_at is within NEW_BADGE_DAYS.
+// Returns '' for older or missing timestamps so the existing pill layout is
+// unchanged on rows that don't qualify.
+const NEW_BADGE_DAYS = 14;
+const NEW_BADGE_MS = NEW_BADGE_DAYS * 24 * 60 * 60 * 1000;
+function isNewListing(r, nowMs = Date.now()) {
+  if (!r || !r.first_seen_at) return false;
+  const t = Date.parse(r.first_seen_at);
+  if (Number.isNaN(t)) return false;
+  return (nowMs - t) <= NEW_BADGE_MS;
+}
+function newBadgeHTML(r) {
+  return isNewListing(r) ? '<span class="new-badge" title="Listed in the last 14 days">NEW</span>' : '';
+}
+
 /* ── Score → Stars ───────────────────────────────────── */
 function scoreToStars(s) {
   if (s==null) return 0;
@@ -417,7 +438,7 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   const s = p.get('sort')||'ppm_asc';
-  const m = s.match(/^(zone|price|area|ppm|stars)_(asc|desc)$/);
+  const m = s.match(/^(zone|price|area|ppm|stars|newest)_(asc|desc)$/);
   if (m) { SORT_COL=m[1]; SORT_DIR=m[2]; }
   const zg=p.get('zone_group'), z=p.get('zone');
   if (zg==='no-zone') ZONE_F={type:'no-zone',value:'no-zone'};
@@ -464,6 +485,15 @@ function sortedRows(rows) {
       const az=a.zone||(a.department?'￾'+a.department:'￿');
       const bz=b.zone||(b.department?'￾'+b.department:'￿');
       return az.localeCompare(bz,'es')*dir;
+    }
+    if (SORT_COL==='newest') {
+      // ISO8601 strings sort lexicographically === chronologically. Nulls sink
+      // regardless of direction — listings without first_seen_at are always
+      // less informative than ones that have it.
+      const sentinel = SORT_DIR==='asc' ? '￿' : '';
+      const av = a.first_seen_at || sentinel;
+      const bv = b.first_seen_at || sentinel;
+      return av.localeCompare(bv) * dir;
     }
     let va,vb;
     if      (SORT_COL==='price') {va=a.price_usd  ??nil;vb=b.price_usd  ??nil;}
@@ -606,7 +636,7 @@ function renderTable(rows) {
   const tbody=document.getElementById('table-body');
   tbody.innerHTML=rows.map(r=>`
     <tr data-id="${esc(r.source_id)}" class="${r.source_id===OPEN_ID?'selected':''}">
-      <td>${zonePillHTML(r)}</td>
+      <td>${zonePillHTML(r)}${newBadgeHTML(r)}</td>
       <td class="td-num">${fmtUSD(r.price_usd)}</td>
       <td class="td-num">${fmtArea(r.area_m2)}</td>
       <td class="td-ppm">${fmtPPM(r.price_per_m2)}</td>
@@ -622,7 +652,7 @@ function renderCards(rows) {
   const wrap=document.getElementById('cards-wrap');
   wrap.innerHTML=rows.map(r=>`
     <div class="card" data-id="${esc(r.source_id)}" style="${r.source_id===OPEN_ID?'border-color:var(--accent);background:var(--accent-bg)':''}">
-      <div class="card-zone-row">${zonePillHTML(r)} ${renderStars(r.rank_score)}</div>
+      <div class="card-zone-row">${zonePillHTML(r)}${newBadgeHTML(r)} ${renderStars(r.rank_score)}</div>
       <div class="card-row2">
         <span>${fmtUSD(r.price_usd)}</span>
         <span>${fmtArea(r.area_m2)}</span>
