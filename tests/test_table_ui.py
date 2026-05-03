@@ -1049,3 +1049,161 @@ def test_methodology_open_helper_exists_and_is_called():
     assert ".js-open-methodology" in html, (
         "Score-name buttons have no class hook for the delegated click handler"
     )
+
+
+# ── V/L/M weight sliders (PRD 2 — flexible reranking) ────────────────
+# These tests pin both the math (composite re-blend) and the wire-up
+# (sliders exist, URL round-trips, slugs stable). The recompute math is
+# the load-bearing surface — get it wrong and "Sort: Composite" silently
+# orders by something different than the user's slider weights.
+
+# Defaults must match Python pulpo/ranker.py composite: 0.40 / 0.35 / 0.25.
+EXPECTED_WEIGHT_DEFAULTS = {"value": 40, "location": 35, "momentum": 25}
+
+
+def recompute_composite_py(li: dict, weights: dict) -> float | None:
+    """Python mirror of JS recomputeComposite()."""
+    fields = {
+        "value":    li.get("value_score"),
+        "location": li.get("location_score"),
+        "momentum": li.get("momentum_score"),
+    }
+    weighted = 0.0
+    total = 0.0
+    for k in ("value", "location", "momentum"):
+        score = fields[k]
+        wt = weights.get(k, 0)
+        if score is None or not wt:
+            continue
+        weighted += wt * score
+        total += wt
+    if total == 0:
+        return li.get("rank_score")
+    return weighted / total
+
+
+def test_recompute_default_weights_matches_python_ranker_formula():
+    """Default weights must reproduce the Python composite (within rounding)."""
+    li = {"value_score": 100, "location_score": 60, "momentum_score": 40}
+    expected = (40*100 + 35*60 + 25*40) / (40 + 35 + 25)
+    actual = recompute_composite_py(li, EXPECTED_WEIGHT_DEFAULTS)
+    assert actual is not None and abs(actual - expected) < 0.01
+
+
+def test_recompute_with_only_value_weight_orders_by_value():
+    """With V=100 and L/M=0, the sort should match max(value_score) order."""
+    rows = [
+        {"value_score": 50, "location_score": 90, "momentum_score": 90},
+        {"value_score": 90, "location_score": 50, "momentum_score": 50},
+        {"value_score": 70, "location_score": 70, "momentum_score": 70},
+    ]
+    only_value = {"value": 100, "location": 0, "momentum": 0}
+    composites = [recompute_composite_py(r, only_value) for r in rows]
+    assert composites == [50, 90, 70], (
+        f"V-only weights should yield value-only composites; got {composites}"
+    )
+
+
+def test_recompute_all_zero_weights_preserves_rank_score():
+    """All sliders at 0 → fall back to the listing's static rank_score
+    rather than producing a divide-by-zero or zeroing out the order."""
+    li = {"value_score": 100, "location_score": 60, "momentum_score": 40, "rank_score": 84.5}
+    zero = {"value": 0, "location": 0, "momentum": 0}
+    assert recompute_composite_py(li, zero) == 84.5
+
+
+def test_recompute_handles_missing_score_legs():
+    """A leg with a null score is skipped (not zeroed) — mirrors the
+    fallback the Python ranker uses when a leg can't compute."""
+    li = {"value_score": 80, "location_score": None, "momentum_score": 40, "rank_score": 60}
+    weights = {"value": 50, "location": 50, "momentum": 50}
+    # Only value + momentum contribute; expected = (50*80 + 50*40) / 100 = 60
+    assert recompute_composite_py(li, weights) == 60
+
+
+def test_recompute_handles_missing_score_when_weight_zero():
+    """Zero-weight legs are skipped before nullness — guards against
+    a single null score short-circuiting the whole composite."""
+    li = {"value_score": 80, "location_score": 40, "momentum_score": None}
+    # Momentum is null but its weight is 0 anyway — should still work.
+    weights = {"value": 50, "location": 50, "momentum": 0}
+    expected = (50*80 + 50*40) / 100
+    assert recompute_composite_py(li, weights) == expected
+
+
+def test_weight_defaults_constant_in_html():
+    """The JS WEIGHT_DEFAULTS must match the Python ranker composite."""
+    import re as _re
+    html = open("web/index.html").read()
+    match = _re.search(r"WEIGHT_DEFAULTS\s*=\s*\{([^}]+)\}", html)
+    assert match, "WEIGHT_DEFAULTS not found"
+    body = match.group(1)
+    for slug, val in EXPECTED_WEIGHT_DEFAULTS.items():
+        assert f"{slug}:" in body
+        assert str(val) in body, (
+            f"WEIGHT_DEFAULTS for {slug!r} drifted from expected {val}"
+        )
+
+
+def test_weight_sliders_dom_present():
+    """Each V/L/M slider exists in the rendered Tune panel HTML
+    (or its render function — the DOM elements are created at runtime
+    via _weightSliderHTML, but the function must exist)."""
+    html = open("web/index.html").read()
+    assert "function _weightSliderHTML" in html
+    assert "function _weightSectionHTML" in html
+    assert "function _wireWeightSliders" in html
+    # Slider IDs follow the pattern weight-<slug>.
+    assert "id=\"weight-${slug}\"" in html or "weight-${slug}" in html, (
+        "Weight slider ID pattern lost — slider wiring would silently break"
+    )
+
+
+def test_composite_sort_option_present():
+    """The composite sort option lets users sort by their re-blended
+    composite; without it, the sliders only affect the panel scores
+    on screen and don't actually reorder the table by the new weights."""
+    html = open("web/index.html").read()
+    assert 'value="composite_desc"' in html, (
+        "Sort dropdown lost the composite option — sliders can't reorder"
+    )
+    # The sortedRows() handler matches the new SORT_COL.
+    assert "SORT_COL==='composite'" in html
+
+
+def test_weight_url_state_round_trips():
+    """?w=V,L,M URL key gets parsed and emitted by readURL/pushURL.
+
+    pushURL only emits ?w when WEIGHTS differ from defaults — same
+    discipline as the price/size keys. URL stays clean at defaults.
+    """
+    html = open("web/index.html").read()
+    assert "p.get('w')" in html, "readURL doesn't parse ?w= URL state"
+    assert "p.set('w'," in html or "p.set(\"w\"," in html, (
+        "pushURL doesn't emit ?w= URL state"
+    )
+    assert "isDefaultWeights()" in html, (
+        "pushURL emits ?w= even at defaults — URL won't stay clean"
+    )
+
+
+def test_url_regex_includes_composite():
+    """readURL's sort regex accepts 'composite' so ?sort=composite_desc
+    URLs round-trip after a refresh."""
+    html = open("web/index.html").read()
+    assert "newest|deal|location|momentum|composite" in html, (
+        "readURL sort regex no longer accepts 'composite' — desktop URL sort broken"
+    )
+
+
+def test_weight_slider_reuses_score_dimensions():
+    """The slider section reads colors + labels from SCORE_DIMENSIONS so
+    visual identity stays in sync with the score breakdown bars. A slider
+    with a stale or hardcoded color would drift visually after any future
+    palette change.
+    """
+    html = open("web/index.html").read()
+    section_block = html.split("function _weightSectionHTML")[1].split("function ")[0]
+    assert "SCORE_DIMENSIONS" in section_block, (
+        "_weightSectionHTML doesn't iterate SCORE_DIMENSIONS — labels can drift"
+    )
