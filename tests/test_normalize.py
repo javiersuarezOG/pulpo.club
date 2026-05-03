@@ -241,3 +241,88 @@ def test_department_confidence_not_flagged_by_validation():
     assert not zone_reasons, (
         f"Department-level listing was flagged for zone_unresolved: {zone_reasons}"
     )
+
+
+# ── Property-type classifier (detect_property_type) ────────────────────
+# These pin the contract of the title-first classifier used to segment the
+# value-leg comp pool. The classifier is keyword-based; a future tweak to
+# _BUILT_RE / _LAND_RE / _LAND_QTY_RE / _FUTURE_USE_RE could silently
+# regress real cases that ship in PR #2's commit messages. The cases below
+# are taken from live data the classifier needed to handle correctly.
+
+from pulpo.normalize import detect_property_type  # noqa: E402
+
+
+def test_classifier_title_land_qty_beats_description_built_keywords():
+    """Title says '30 manzanas', description says 'suitable for boutique
+    hotel'. The land-quantity in the title must win — the description is
+    talking about what the buyer could BUILD, not what's there."""
+    pt = detect_property_type(
+        title="30 manzanas beachfront El Cuco — paved access",
+        description="Suitable for boutique hotel, residential subdivision, or family compound.",
+    )
+    assert pt == "land", "land-quantity in title must beat future-use description text"
+
+
+def test_classifier_title_land_qty_in_acres_or_vrs():
+    """The _LAND_QTY_RE pattern covers acres, vrs², and manzanas alike."""
+    assert detect_property_type(title="8 Acres of Oceanview Land Near KM59") == "land"
+    assert detect_property_type(title="Lote 800 vrs² frente al mar") == "land"
+    assert detect_property_type(title="2.5 manzanas en El Cuco") == "land"
+
+
+def test_classifier_handles_plurals():
+    """Cliffside apartments / Two Lofts / 3-Bedroom Houses all read as built.
+    Plural handling regression — a missing trailing s in the regex would
+    silently drop these into the land pool."""
+    assert detect_property_type(title="Cliffside apartments in El Zonte") == "house"
+    assert detect_property_type(title="Two Lofts in Tuscania") == "house"
+    assert detect_property_type(title="3-Bedroom Houses in Surf City") == "house"
+
+
+def test_classifier_explicit_built_keywords_in_title():
+    assert detect_property_type(title="3-Bedroom Beach House at Xanadu") == "house"
+    assert detect_property_type(title="Beautiful Oceanview Condominium at Zonset") == "house"
+    assert detect_property_type(title="Two-story Loft in Tuscania") == "house"
+
+
+def test_classifier_explicit_land_keywords_in_title():
+    assert detect_property_type(title="Lots Available at Las Luces Community") == "land"
+    assert detect_property_type(title="Vacant Land in Apaneca") == "land"
+    assert detect_property_type(title="Parcela en El Cuco") == "land"
+
+
+def test_classifier_placeholder_title_falls_through_to_description():
+    """When the scraper produces a placeholder title like 'Contact us'
+    (oceanside scraper pattern), the classifier must fall through to the
+    description rather than defaulting blindly."""
+    # House signal in description survives placeholder title
+    assert detect_property_type(
+        title="Contact us",
+        description="Casa de 3 dormitorios con piscina y vista al mar.",
+    ) == "house"
+    # Land signal in description survives placeholder title
+    assert detect_property_type(
+        title="Contact us",
+        description="Beautiful 12 manzanas of beachfront with mango trees.",
+    ) == "land"
+
+
+def test_classifier_future_use_phrases_stripped_from_description_fallback():
+    """When falling through to description for placeholder titles, phrases
+    like 'suitable for vacation home' must be stripped before classification.
+    Otherwise raw land marketed for development would false-tag as built."""
+    pt = detect_property_type(
+        title="Contact us",
+        description="Premium beachfront parcel. Suitable for vacation home or small B&B.",
+    )
+    # 'parcel' is a land keyword; future-use is stripped → land
+    assert pt == "land"
+
+
+def test_classifier_default_when_nothing_matches():
+    """Empty / unclassifiable input defaults to 'land' — matches the
+    Listing dataclass default and keeps unclassified records in the lot
+    comp pool rather than leaking them into houses."""
+    assert detect_property_type(title="", description="", location_text="") == "land"
+    assert detect_property_type(title="Investment Opportunity") == "land"
