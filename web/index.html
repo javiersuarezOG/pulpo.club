@@ -76,7 +76,18 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .filter-count strong{color:var(--t2)}
 
 /* ── Zone filter block ──────────────────────────────── */
-.zone-filter{flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg);padding:4px 0}
+.zone-filter{flex-shrink:0;background:var(--bg);padding:0}
+/* Inside the Filters panel — narrower container; rearrange the
+   3-column grid (label / pills / count) into a 2-row layout where the
+   label and count sit on top and the pills wrap underneath. The
+   standalone full-width row outside the panel keeps the original
+   3-column grid because it has the horizontal room for it. */
+.tune-section .zone-filter{padding:0;border:0;background:none}
+.tune-section .zf-group{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:4px 8px;padding:8px 0;border-top:1px solid var(--s2)}
+.tune-section .zf-group:first-of-type{border-top:0;padding-top:0}
+.tune-section .zf-group .zg-label{grid-row:1;grid-column:1;padding:0}
+.tune-section .zf-group .zg-count{grid-row:1;grid-column:2;padding:0}
+.tune-section .zf-group .zg-pills{grid-row:2;grid-column:1 / -1;padding:0;margin:0;flex-wrap:wrap}
 .zf-group{display:grid;grid-template-columns:120px 1fr 54px;align-items:start;padding:3px 20px;gap:6px;transition:background .1s}
 .zf-group:hover{background:var(--s1)}
 .zf-group.active{background:var(--s2)}
@@ -155,6 +166,12 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .panel-title{font-size:13px;font-weight:600;color:var(--t2)}
 .panel-close{font-size:18px;color:var(--t3);padding:2px 6px;border-radius:4px;line-height:1}
 .panel-close:hover{background:var(--s2);color:var(--text)}
+/* Question-mark button on the Filters panel header — opens a help modal that
+   explains each control point-by-point. Sits to the LEFT of the close button.
+   panel-header is justify-content:space-between, so we wrap close + help in
+   a flex group via auto margin on the help button. */
+.panel-help-btn{font-size:12px;font-weight:600;color:var(--t3);padding:0;border-radius:50%;line-height:1;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--brd2);margin-left:auto;margin-right:8px;font-family:inherit;background:none;cursor:pointer;transition:all .12s}
+.panel-help-btn:hover{border-color:var(--accent);color:var(--accent)}
 .panel-body{flex:1;overflow-y:auto;padding:18px}
 .panel-full-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
 .warn-icon{flex-shrink:0;color:var(--warn);font-size:14px;position:relative;cursor:help;margin-top:2px}
@@ -314,8 +331,10 @@ tbody td{padding:10px 12px;vertical-align:middle}
       <span class="filter-count" id="filter-count"></span>
     </div>
 
-    <!-- Zone filter -->
-    <div class="zone-filter" id="zone-filter"></div>
+    <!-- Zone filter relocated into the Filters panel (see _tuneBodyHTML).
+         The buildZoneFilter() function still targets #zone-filter — that
+         element now lives inside the panel body and is re-rendered when
+         the panel opens. -->
 
     <!-- Mobile sort bar -->
     <div class="sort-bar">
@@ -417,6 +436,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <aside class="tune-panel" id="tune-panel">
     <div class="panel-header">
       <span class="panel-title">Filters</span>
+      <button class="panel-help-btn" id="filters-help-desktop" aria-label="What does each filter do?">?</button>
       <button class="panel-close" id="tune-close" aria-label="Close panel">×</button>
     </div>
     <div class="panel-body" id="tune-body"></div>
@@ -432,14 +452,64 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <div class="panel-body" id="mobile-panel-body"></div>
 </div>
 
+<!-- Help button on the mobile tune overlay header gets injected when the
+     overlay is rendered. We use the same id pattern (filters-help-mobile)
+     so the wiring code can attach a handler to either or both. -->
+
 <!-- Mobile full-screen tune overlay -->
 <div class="mobile-tune-overlay" id="mobile-tune-overlay">
   <div class="panel-header">
     <span class="panel-title">Filters</span>
+    <button class="panel-help-btn" id="filters-help-mobile" aria-label="What does each filter do?">?</button>
     <button class="panel-close" id="mobile-tune-close" aria-label="Close">×</button>
   </div>
   <div class="panel-body" id="mobile-tune-body"></div>
 </div>
+
+<!-- Filters help modal — point-by-point explanation of every control in the
+     Filters panel. Triggered by the "?" buttons on either the desktop panel
+     header or the mobile overlay header. Uses native <dialog> for backdrop
+     + ESC-to-close, same pattern as the methodology modal. -->
+<dialog class="methodology" id="filters-help-modal" aria-labelledby="filters-help-title">
+  <button class="meth-close" id="filters-help-close" type="button" aria-label="Close">×</button>
+  <h2 id="filters-help-title">How the Filters work</h2>
+  <p class="meth-tagline">Every control in the Filters panel narrows or re-ranks the listings you see. This explains what each one does, in order.</p>
+
+  <h3>Zone</h3>
+  <p>Pick a region or a specific zone to limit the listings to that geography.</p>
+  <ul>
+    <li>Click a region name (Surf City Core, Eastern Pacific, Gulf-Fonseca, Inland) to filter to every zone in that region.</li>
+    <li>Click an individual zone pill to filter to just that one zone.</li>
+    <li>Click "No zone" to see only listings where we couldn't determine the location.</li>
+    <li>Click the same selection again to clear it.</li>
+  </ul>
+
+  <h3>Price range</h3>
+  <p>Two handles set the minimum and maximum price the listings can have.</p>
+  <ul>
+    <li>Drag the LEFT handle to the right → exclude cheaper listings (raise the floor).</li>
+    <li>Drag the RIGHT handle to the left → exclude more expensive listings (lower the ceiling).</li>
+    <li>Listings without a parsed price are excluded once you narrow the range from the default.</li>
+    <li>"Reset" returns to the full default range.</li>
+  </ul>
+
+  <h3>Size range</h3>
+  <p>Same mechanic as price, but for plot size in square meters (m²). Useful when you want only small lots (vacation home) or only large parcels (development / subdivision).</p>
+  <ul>
+    <li>Drag the LEFT handle to the right → exclude smaller plots.</li>
+    <li>Drag the RIGHT handle to the left → exclude larger plots.</li>
+    <li>Listings without a parsed size are excluded once you narrow the range.</li>
+  </ul>
+
+  <h3>Weight sliders — Price vs Comps / Location / Momentum</h3>
+  <p>These don't filter listings; they re-rank them. Each slider controls how much that dimension counts toward the <strong>Composite</strong> score. Defaults: 40 / 35 / 25. Sort by "Composite (using your weights)" in the dropdown to see your custom ranking — otherwise listings sort by whatever else you've selected.</p>
+  <ul>
+    <li><strong>Price vs Comps</strong> — slide RIGHT to prioritize listings that are cheap relative to similar nearby lots. Slide LEFT to deprioritize the comparison-to-comps signal.</li>
+    <li><strong>Location</strong> — slide RIGHT to prioritize zone quality, beachfront, accessibility (airport distance, paved access). Slide LEFT to ignore where the listing is.</li>
+    <li><strong>Momentum</strong> — slide RIGHT to prioritize areas with active market dynamics (repricing, new inventory). Slide LEFT to ignore market timing.</li>
+    <li>"Reset" restores the defaults.</li>
+  </ul>
+</dialog>
 
 <script>
 'use strict';
@@ -774,7 +844,11 @@ function buildZoneFilter(data) {
     const gk=ZONE_TO_GROUP[z];
     if(gk) groupCounts[gk]=(groupCounts[gk]||0)+1;
   }
-  const wrap=document.getElementById('zone-filter');
+  // .zone-filter exists once per panel body (desktop + mobile both render
+  // the section); update them all so toggling the panel between viewports
+  // doesn't show stale chip state.
+  const wraps=document.querySelectorAll('.zone-filter');
+  if (!wraps.length) return;
   let html='';
   for (const gk of ZONE_GROUP_ORDER) {
     const g=ZONE_GROUPS[gk], cnt=groupCounts[gk]||0;
@@ -799,14 +873,16 @@ function buildZoneFilter(data) {
     <div class="zg-pills"><span class="zone-pill zone-pill--nozone clickable${nzRing}" data-zone="__no-zone__">No zone</span></div>
     <span class="zg-count">${noZoneCount.toLocaleString('en-US')}</span>
   </div>`;
-  wrap.innerHTML=html;
-  wrap.querySelectorAll('.zg-label').forEach(el=>el.addEventListener('click',()=>toggleGroupFilter(el.dataset.group)));
-  wrap.querySelectorAll('.zone-pill.clickable').forEach(el=>el.addEventListener('click',e=>{
-    e.stopPropagation();
-    const z=el.dataset.zone;
-    if(z==='__no-zone__') toggleGroupFilter('no-zone');
-    else toggleZoneFilter(z);
-  }));
+  for (const wrap of wraps) {
+    wrap.innerHTML=html;
+    wrap.querySelectorAll('.zg-label').forEach(el=>el.addEventListener('click',()=>toggleGroupFilter(el.dataset.group)));
+    wrap.querySelectorAll('.zone-pill.clickable').forEach(el=>el.addEventListener('click',e=>{
+      e.stopPropagation();
+      const z=el.dataset.zone;
+      if(z==='__no-zone__') toggleGroupFilter('no-zone');
+      else toggleZoneFilter(z);
+    }));
+  }
 }
 function toggleGroupFilter(gk) {
   ZONE_F=(gk==='no-zone')
@@ -986,10 +1062,19 @@ function _weightSectionHTML() {
     </div>
   `;
 }
+function _zoneFilterSectionHTML() {
+  // Containers for buildZoneFilter() to populate. The desktop and mobile
+  // bodies both render this section, so we can't rely on a single id —
+  // buildZoneFilter() now targets every .zone-filter on the page.
+  return `<div class="tune-section">
+    <div class="tune-section-title">Zone</div>
+    <div class="zone-filter"></div>
+  </div>`;
+}
 function _tuneBodyHTML() {
   // Composed from independent sections so adding a new filter is a one-line
   // append rather than a rewrite of the panel.
-  return _rangeSectionHTML({
+  return _zoneFilterSectionHTML() + _rangeSectionHTML({
     id: 'price', title: 'Price range',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
     minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
@@ -1076,6 +1161,12 @@ function renderTunePanel() {
   const mobileBody  = document.getElementById('mobile-tune-body');
   if (desktopBody) { desktopBody.innerHTML = html; _wireTuneControls(desktopBody); }
   if (mobileBody)  { mobileBody.innerHTML = html;  _wireTuneControls(mobileBody); }
+  // The zone-filter section in the panel is empty until buildZoneFilter()
+  // populates it. ALL_DATA is the in-memory dataset; mirrors the call from
+  // render() which keeps the chips in sync with the active dataset.
+  if (typeof ALL_DATA !== 'undefined' && Array.isArray(ALL_DATA)) {
+    buildZoneFilter(ALL_DATA);
+  }
 }
 function openTunePanel() {
   // Close the listing-detail panel first — they share desktop layout space.
@@ -1265,6 +1356,26 @@ function wireMethodology() {
   });
 }
 
+/* ── Filters help modal wiring ───────────────────────── */
+// "?" buttons in the desktop and mobile Filters panel headers open a modal
+// that explains each control point-by-point. Same <dialog> pattern as the
+// methodology modal — backdrop + ESC close for free.
+function wireFiltersHelp() {
+  const dlg = document.getElementById('filters-help-modal');
+  const close = document.getElementById('filters-help-close');
+  if (!dlg || !close) return;
+  const open = () => {
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.setAttribute('open', '');
+  };
+  ['filters-help-desktop', 'filters-help-mobile'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', open);
+  });
+  close.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+}
+
 /* ── Init ────────────────────────────────────────────── */
 async function init() {
   readURL();
@@ -1276,7 +1387,7 @@ async function init() {
     return;
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
-  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology();
+  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
   render(); loadMeta();
 }
 init();
