@@ -133,7 +133,20 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .stars-val{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
 
 /* ── Footer ─────────────────────────────────────────── */
-.table-footer{padding:8px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--t3);flex-shrink:0;background:var(--s1);display:flex;align-items:center;justify-content:space-between}
+.table-footer{padding:8px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--t3);flex-shrink:0;background:var(--s1);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.footer-link{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.footer-link:hover{color:var(--accent);text-decoration-style:solid}
+
+/* ── Methodology modal ──────────────────────────────── */
+.methodology[open]{display:block;border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;max-width:560px;width:calc(100% - 32px);max-height:80vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.methodology::backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(2px)}
+.methodology h2{font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.methodology h3{font-size:13px;font-weight:600;margin-top:18px;margin-bottom:6px;color:var(--text)}
+.methodology p{font-size:13px;line-height:1.55;color:var(--t2);margin-bottom:8px}
+.methodology .meth-tagline{font-size:13px;color:var(--t3);margin-bottom:16px}
+.methodology .meth-close{position:absolute;top:14px;right:16px;font-size:20px;line-height:1;color:var(--t3);background:none;border:none;cursor:pointer;padding:4px 8px}
+.methodology .meth-close:hover{color:var(--text)}
+.methodology .meth-formula{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;font-family:'SF Mono',Menlo,Consolas,monospace;color:var(--t2);margin:8px 0}
 
 /* ── Side panel ─────────────────────────────────────── */
 .side-panel{width:0;overflow:hidden;border-left:1px solid var(--border);transition:width .2s ease;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg)}
@@ -155,12 +168,14 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .panel-cta{display:block;padding:10px 18px;background:var(--accent);color:#fff;border-radius:var(--r-sm);font-size:13px;font-weight:600;text-align:center;text-decoration:none;margin-top:auto}
 .panel-cta:hover{opacity:.9}
 .panel-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px}
-.panel-scores{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.panel-scores{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.score-block{display:flex;flex-direction:column;gap:2px}
 .score-row{display:flex;align-items:center;gap:8px;font-size:12px}
-.score-name{width:64px;color:var(--t2);font-weight:500}
+.score-name{width:80px;color:var(--t2);font-weight:500;cursor:help}
 .score-track{flex:1;height:4px;border-radius:2px;background:var(--s3);overflow:hidden}
 .score-fill{height:100%;border-radius:2px}
 .score-n{width:24px;text-align:right;font-variant-numeric:tabular-nums;color:var(--t2)}
+.score-reason{font-size:10.5px;color:var(--t3);margin-left:88px;line-height:1.35}
 .panel-dev-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;background:var(--s2);color:var(--t2);margin-bottom:12px}
 
 /* ── Tune panel (filters/sort) — mirrors .side-panel chrome ────── */
@@ -331,9 +346,36 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <!-- Footer -->
     <div class="table-footer">
       <span id="footer-count"></span>
+      <button class="footer-link" id="open-methodology" type="button">How we rank</button>
       <span id="footer-updated" style="font-size:11px;color:var(--t4)"></span>
     </div>
   </div>
+
+<!-- Methodology modal — Layer 4 of the per-listing explanation surface.
+     Opened from the footer "How we rank" link. Walks through the three
+     dimensions, the composite formula, and the data sources.
+     Uses native <dialog> + showModal() for backdrop + ESC-to-close. -->
+<dialog class="methodology" id="methodology-modal" aria-labelledby="meth-title">
+  <button class="meth-close" id="close-methodology" type="button" aria-label="Close">×</button>
+  <h2 id="meth-title">How we rank</h2>
+  <p class="meth-tagline">Every listing gets a 0–100 composite score from three plain-English dimensions. Higher is a better-looking opportunity for an investor. The score is meant as a starting point — not a substitute for talking to a broker and walking the lot.</p>
+
+  <h3>Price vs Comparable Lots</h3>
+  <p>How cheap this listing is per square meter compared to similar lots in the same area — same zone first, then the wider region if there aren't enough nearby comparisons. Houses are compared against houses and raw land against raw land, so a 6-bedroom mansion doesn't make a vacant lot look expensive. A score of 100 means it's the cheapest comparable; 0 means it's the most expensive.</p>
+
+  <h3>Location &amp; Accessibility</h3>
+  <p>How well-positioned the spot is. We score the area on zone tier — Tier A is established beach corridors with deep buyer demand, B is proven secondary, C is frontier — and add points for beachfront, paved access, water and power on the lot, and proximity to El Salvador's international airport. A higher score means a more developed, more accessible spot.</p>
+
+  <h3>Area Momentum</h3>
+  <p>Whether an area is gaining or losing steam right now. We track how often listings in the area get repriced down — a sign of motivated sellers — and (as we accumulate scraping history) how quickly new inventory appears in each zone. A tier-B area gaining momentum can outscore a tier-A area that's plateaued. Sparse zones with fewer than 5 listings score the neutral default until we have more data.</p>
+
+  <h3>The composite</h3>
+  <div class="meth-formula">composite = 0.40 × Deal + 0.35 × Location + 0.25 × Momentum</div>
+  <p>The composite is the single number you see at the top of the listing panel. Each dimension is shown as a bar so you can see how a high or low score was earned, with a one-line explanation under each bar.</p>
+
+  <h3>Honest limitations</h3>
+  <p>Coverage of physical-attribute flags (water, power, paved access) is still building — bonuses fire only when set, and many listings don't yet carry them. The Momentum signal is single-input today (repriced-rate); listing-velocity will be added once we have 4+ weeks of nightly scrape history. The methodology is intentionally simple: three dimensions an investor can defend out loud, not a black-box opinion.</p>
+</dialog>
 
   <!-- Desktop side panel -->
   <aside class="side-panel" id="side-panel">
@@ -669,13 +711,45 @@ function toggleZoneFilter(z) {
 }
 
 /* ── Side panel ──────────────────────────────────────── */
+// reasonFor extracts the per-leg explanation from rank_reasons. Each leg's
+// score() returns a string like "value 100 ($35.77/m² = 0th pct of el-zonte
+// land, 3 comps)"; we strip the leading "<name> <num>" and the parens to
+// surface the substantive part as the bar's caption.
+function reasonFor(prefix, reasons) {
+  if (!Array.isArray(reasons)) return '';
+  const m = reasons.find(r => typeof r === 'string' && r.startsWith(prefix + ' '));
+  if (!m) return '';
+  const i = m.indexOf('(');
+  if (i < 0) return '';
+  const close = m.lastIndexOf(')');
+  return close > i ? m.slice(i + 1, close).trim() : m.slice(i + 1).trim();
+}
+
 function panelHTML(r) {
-  const scoreColor={value:'#059669',quality:'#2563eb',liquidity:'#7c3aed',upside:'#ea580c'};
-  const scores=[['Value',r.value_score,scoreColor.value],['Quality',r.quality_score,scoreColor.quality],
-    ['Liquidity',r.liquidity_score,scoreColor.liquidity],['Upside',r.upside_score,scoreColor.upside]]
-    .filter(([,v])=>v!=null);
-  const scoreBars=scores.map(([name,val,color])=>
-    `<div class="score-row"><span class="score-name">${name}</span><span class="score-track"><span class="score-fill" style="width:${val}%;background:${color}"></span></span><span class="score-n">${Math.round(val)}</span></div>`).join('');
+  // Three legs (Deal / Location / Momentum) with the V/L/M canonical fields
+  // populated by pulpo/ranker.py. The .score-name carries a title= tooltip
+  // (Layer 1 hover); the .score-reason underneath is the per-listing
+  // explanation pulled from rank_reasons.
+  const scoreColor={value:'#059669',location:'#2563eb',momentum:'#ea580c'};
+  const dimensions=[
+    ['Deal','value','How cheap this listing is versus similar lots in the same area',
+      r.value_score,scoreColor.value],
+    ['Location','location','Zone tier, beachfront access, infrastructure, and distance to the airport',
+      r.location_score,scoreColor.location],
+    ['Momentum','momentum','Whether this area is gaining or losing steam right now',
+      r.momentum_score,scoreColor.momentum],
+  ].filter(([,,,val])=>val!=null);
+  const scoreBars=dimensions.map(([name,prefix,tip,val,color])=>{
+    const reason=reasonFor(prefix,r.rank_reasons);
+    return `<div class="score-block">
+      <div class="score-row">
+        <span class="score-name" title="${esc(tip)}">${name}</span>
+        <span class="score-track"><span class="score-fill" style="width:${val}%;background:${color}"></span></span>
+        <span class="score-n">${Math.round(val)}</span>
+      </div>
+      ${reason?`<div class="score-reason">${esc(reason)}</div>`:''}
+    </div>`;
+  }).join('');
   const warnings=r.validation_warnings||[];
   const warnHTML=warnings.length
     ? `<span class="warn-icon" title="Validation warnings">⚠<span class="warn-tooltip">${warnings.map(esc).join('<br>')}</span></span>`
@@ -940,6 +1014,22 @@ async function loadMeta() {
   } catch {}
 }
 
+/* ── Methodology modal wiring ────────────────────────── */
+function wireMethodology() {
+  const dlg = document.getElementById('methodology-modal');
+  const open = document.getElementById('open-methodology');
+  const close = document.getElementById('close-methodology');
+  if (!dlg || !open || !close) return;
+  open.addEventListener('click', () => {
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.setAttribute('open', ''); // graceful fallback for older browsers
+  });
+  close.addEventListener('click', () => dlg.close());
+  // Click on backdrop closes (native dialogs treat backdrop clicks as on the
+  // <dialog> element itself; clicks on inner content bubble to the inner box).
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+}
+
 /* ── Init ────────────────────────────────────────────── */
 async function init() {
   readURL();
@@ -951,7 +1041,7 @@ async function init() {
     return;
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
-  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune();
+  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology();
   render(); loadMeta();
 }
 init();
