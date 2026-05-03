@@ -136,6 +136,16 @@ class Century21Scraper:
         broker_phone = rec.get("whatsapp") or rec.get("telefono") or ""
         broker_email = rec.get("email") or ""
 
+        # Photos — OmniMLS typically stores them under 'fotos' (list of URL strings)
+        photo_urls: list[str] = []
+        for item in (rec.get("fotos") or rec.get("photos") or rec.get("imagenes") or []):
+            if isinstance(item, str) and item.startswith("http"):
+                photo_urls.append(item)
+            elif isinstance(item, dict):
+                u = item.get("url") or item.get("src") or ""
+                if u.startswith("http"):
+                    photo_urls.append(u)
+
         return {
             "source": self.slug,
             "source_id": str(rec.get("id") or ""),
@@ -147,6 +157,7 @@ class Century21Scraper:
             "location_text": location_text,
             "description": "",
             "property_type": "land",
+            "photo_urls": photo_urls,
             "broker_name": broker_name.strip(),
             "broker_phone": broker_phone.strip(),
             "broker_email": broker_email.strip(),

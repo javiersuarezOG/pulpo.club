@@ -95,6 +95,41 @@ def _find_land_term_id(client) -> Optional[int]:
     return None
 
 
+def _extract_photo_urls(rec: dict) -> list[str]:
+    """Extract photo URLs from a WP REST record.
+
+    Prefer the _embed response (featured media); fall back to the ACF gallery
+    field if present. Returns a list with the hero URL first (may be empty).
+    """
+    urls: list[str] = []
+    # Embedded featured media (requires _embed=wp:featuredmedia on the request)
+    embedded = rec.get("_embedded") or {}
+    fm_list  = embedded.get("wp:featuredmedia") or []
+    if fm_list and isinstance(fm_list, list) and fm_list[0]:
+        fm = fm_list[0]
+        # Prefer 'full' size; fall back through sizes, then source_url
+        sizes = (fm.get("media_details") or {}).get("sizes") or {}
+        hero = (
+            (sizes.get("full") or sizes.get("large") or sizes.get("medium") or {}).get("source_url")
+            or fm.get("source_url")
+        )
+        if hero and hero.startswith("http"):
+            urls.append(hero)
+    # ACF gallery array (present on some listings)
+    acf = rec.get("acf") or {}
+    gallery = acf.get("gallery") or acf.get("photos") or []
+    for item in gallery:
+        if isinstance(item, dict):
+            u = item.get("url") or item.get("source_url") or ""
+        elif isinstance(item, str):
+            u = item
+        else:
+            continue
+        if u.startswith("http") and u not in urls:
+            urls.append(u)
+    return urls
+
+
 def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
     """Map one WP REST record to the normalized raw-dict shape."""
     title = _strip(rec["title"]["rendered"])
@@ -171,6 +206,7 @@ def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
         "raw_size_text":   raw_size_text,
         "location_text":   location_text,
         "property_type":   "land",
+        "photo_urls":      _extract_photo_urls(rec),
         "photos_count":    1 if rec.get("featured_media") else 0,
         "days_listed":     days_listed,
         "is_repriced":     False,
@@ -233,7 +269,7 @@ class OceansideScraper:
         max_pages_hit = False
         limit_hit = False
 
-        params: dict = {"per_page": PER_PAGE}
+        params: dict = {"per_page": PER_PAGE, "_embed": "wp:featuredmedia"}
         if land_id:
             params["property-type"] = land_id
 

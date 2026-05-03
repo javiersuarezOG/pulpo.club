@@ -6,3 +6,4 @@ httpx[socks]==0.27.2
 selectolax==0.3.21
 pytest>=8.0
 pytest-cov>=5.0
+Pillow>=10.0

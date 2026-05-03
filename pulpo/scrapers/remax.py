@@ -153,6 +153,25 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
     desc_el = tree.css_first("section p")
     description = desc_el.text(strip=True)[:1500] if desc_el else ""
 
+    # Photos — RE/MAX typically uses an image gallery with data-src lazy loading
+    photo_urls: list[str] = []
+    seen: set[str] = set()
+    for img in tree.css(
+        ".property-gallery img, .gallery img, .slider img, "
+        "div[class*='gallery'] img, div[class*='photo'] img, "
+        ".re-detail-gallery img"
+    ):
+        u = img.attributes.get("data-src") or img.attributes.get("src") or ""
+        if u.startswith("http") and u not in seen:
+            seen.add(u)
+            photo_urls.append(u)
+    if not photo_urls:
+        og = tree.css_first('meta[property="og:image"]')
+        if og:
+            u = og.attributes.get("content") or ""
+            if u.startswith("http"):
+                photo_urls.append(u)
+
     if not title:
         return None
 
@@ -168,6 +187,7 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         "location_text": title,   # title always contains location (zone / city)
         "description": description,
         "property_type": "land",
+        "photo_urls": photo_urls,
     }
 
 
