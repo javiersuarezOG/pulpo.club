@@ -10,21 +10,27 @@ something with no liquidity and no exit.
 Three legs, each on a 0..100 scale, combined with editor-tunable weights:
 
     1. VALUE    — entry price vs comparable sales (cheaper-for-pool = higher)
-    2. QUALITY  — zone tier + physical attributes + freshness signals
-    3. UPSIDE   — path-of-progress: where is capital flowing next?
+    2. LOCATION — zone tier + airport accessibility + amenities + freshness
+    3. MOMENTUM — repriced-rate-per-zone, a delta signal that captures
+                  whether an area is heating up or cooling down
 
-    composite = 0.40*value + 0.35*quality + 0.25*upside
+    composite = 0.40*value + 0.35*location + 0.25*momentum
 
 …then converted to a 1-based position rank (1 = best opportunity).
 
-A previous LIQUIDITY leg was dropped after a correlation audit on 803 live
-listings showed it was 0.99 correlated with QUALITY (i.e. the same signal in
-two skins). Its DOM penalty + repriced bonus moved into the QUALITY leg's
-score function. Top-10 leaderboard overlap before/after the consolidation
-was 9/10 — the change is empirically free.
+User-facing labels for the three dimensions:
+    Price vs Comparable Lots / Location & Accessibility / Area Momentum
+
+Two legs were retired in the consolidation after a correlation audit on 803
+live listings:
+- LIQUIDITY (Q-L corr 0.99 — same signal in two skins). DOM penalty +
+  repriced bonus moved into LOCATION.
+- UPSIDE-as-zone-table (Q-U corr 0.66 — heavily zone-tier-derived). The
+  algorithm replaced with a delta-shaped repriced-rate signal so MOMENTUM
+  stays orthogonal to LOCATION.
 
 Re-weight via env vars:
-    PULPO_W_VALUE / PULPO_W_QUALITY / PULPO_W_UPSIDE
+    PULPO_W_VALUE / PULPO_W_LOCATION / PULPO_W_MOMENTUM
 
 (weights renormalize so they don't have to sum to 1.0).
 """
@@ -32,9 +38,9 @@ from __future__ import annotations
 import os
 from typing import Iterable
 from .models import Listing
-import pulpo.ranker_legs.value    # noqa: F401 — triggers registration
-import pulpo.ranker_legs.location # noqa: F401
-import pulpo.ranker_legs.upside   # noqa: F401
+import pulpo.ranker_legs.value     # noqa: F401 — triggers registration
+import pulpo.ranker_legs.location  # noqa: F401
+import pulpo.ranker_legs.momentum  # noqa: F401
 from pulpo.agents import RANKER_LEGS
 
 
@@ -66,25 +72,25 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
             w = weights.get(slug, leg.weight)
             composite += w * s
             reasons.append(reason)
-            # Store component scores on the Listing for UI. liquidity_score
-            # remains a None-able field on the dataclass for backward compat
-            # with cached payloads, but we no longer populate it. quality_score
-            # is similarly aliased — populated alongside location_score for one
-            # cycle so the dashboard doesn't break during the rename.
+            # Store component scores on the Listing for UI. quality_score and
+            # upside_score are populated as aliases for one deployment cycle
+            # so the dashboard doesn't break during the rename. liquidity_score
+            # stays None-able (legacy field, dropped leg).
             if slug == "value":
                 li.value_score = round(s, 1)
             elif slug == "location":
                 li.location_score = round(s, 1)
-                li.quality_score = round(s, 1)  # alias; drop next cycle
-            elif slug == "upside":
-                li.upside_score = round(s, 1)
+                li.quality_score = round(s, 1)   # alias; drop next cycle
+            elif slug == "momentum":
+                li.momentum_score = round(s, 1)
+                li.upside_score = round(s, 1)    # alias; drop next cycle
 
         composite = round(composite, 2)
         li.rank_score = composite
         wv = weights.get("value", 0.40)
         wl = weights.get("location", 0.35)
-        wu = weights.get("upside", 0.25)
-        reasons.append(f"weights V{wv:.2f} L{wl:.2f} U{wu:.2f} → {composite:.1f}")
+        wm = weights.get("momentum", 0.25)
+        reasons.append(f"weights V{wv:.2f} L{wl:.2f} M{wm:.2f} → {composite:.1f}")
         li.rank_reasons = reasons
 
     items.sort(key=lambda x: (x.rank_score or 0), reverse=True)
