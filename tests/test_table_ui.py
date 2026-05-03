@@ -643,10 +643,19 @@ def test_mobile_sort_dropdown_has_newest_option():
     Without this assertion, a refactor that drops the option would silently
     remove the only mobile-accessible path to the time-based sort.
     """
+    import re
     html = open("web/index.html").read()
     assert 'value="newest_desc"' in html, "Mobile sort missing the newest_desc option"
-    # Sanity: the option's display label is human-readable.
-    assert "Newest first" in html
+    # Sanity: the option's display label mentions "newest" in some form
+    # (case-insensitive). Pinned this way so future copy edits don't break
+    # the test for trivial reasons.
+    label_match = re.search(
+        r'value="newest_desc"[^>]*>([^<]+)</option>', html, re.I,
+    )
+    assert label_match, "newest_desc option has no human label"
+    assert "newest" in label_match.group(1).lower(), (
+        f"newest_desc option label should reference 'newest'; got {label_match.group(1)!r}"
+    )
 
 
 def test_url_state_regex_includes_newest():
@@ -1004,10 +1013,21 @@ def test_old_deal_label_removed_from_user_facing_surfaces():
 
 
 def test_sort_dropdown_uses_consistent_dimension_label():
-    """Sort dropdown shows 'Price vs Comps' to match the score bar / methodology."""
+    """Sort dropdown's deal_desc option labels itself with 'Price vs Comps'
+    to match the score bar / methodology / SCORE_DIMENSIONS centralized
+    label.
+
+    Asserts on the option's text content rather than a fixed prefix string
+    so copy edits to the surrounding "Sort: ..." vs "Sort by ..." pattern
+    don't break this test for the wrong reason.
+    """
+    import re
     html = open("web/index.html").read()
-    assert "Sort: Price vs Comps" in html, (
-        "Sort dropdown no longer says 'Price vs Comps' — drifts from score bar"
+    m = re.search(r'value="deal_desc"[^>]*>([^<]+)</option>', html, re.I)
+    assert m, "Sort dropdown is missing the deal_desc option"
+    assert "Price vs Comps" in m.group(1), (
+        f"deal_desc option no longer says 'Price vs Comps' — drifts from "
+        f"score bar. Found: {m.group(1)!r}"
     )
 
 

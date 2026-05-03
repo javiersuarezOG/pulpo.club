@@ -170,8 +170,31 @@ tbody td{padding:10px 12px;vertical-align:middle}
    explains each control point-by-point. Sits to the LEFT of the close button.
    panel-header is justify-content:space-between, so we wrap close + help in
    a flex group via auto margin on the help button. */
-.panel-help-btn{font-size:12px;font-weight:600;color:var(--t3);padding:0;border-radius:50%;line-height:1;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--brd2);margin-left:auto;margin-right:8px;font-family:inherit;background:none;cursor:pointer;transition:all .12s}
+.panel-help-btn{font-size:12px;font-weight:600;color:var(--t3);padding:0;border-radius:50%;line-height:1;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--brd2);margin-right:8px;font-family:inherit;background:none;cursor:pointer;transition:all .12s}
 .panel-help-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* "Clear all" link in the Filters panel header — hidden when no filter is
+   active. Sits LEFT of the help button. Text-link style (low visual weight
+   for a destructive-but-recoverable action) so it doesn't dominate the
+   panel chrome. */
+.panel-reset-all{font-size:12px;color:var(--t3);padding:2px 8px;margin-left:auto;margin-right:8px;font-family:inherit;background:none;border:none;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;transition:color .12s}
+.panel-reset-all:hover{color:var(--accent)}
+/* When .panel-reset-all is hidden via [hidden], the help-btn needs to
+   reclaim the auto-margin so it floats right. Same selector trick. */
+.panel-reset-all[hidden] + .panel-help-btn{margin-left:auto}
+/* Filter-count badge appended to the Filters button text — replaces the
+   solid green dot when active filters > 0. Easier to scan ("Filters · 2")
+   than a binary indicator. */
+.tune-button .filter-count-badge{font-weight:700;color:var(--accent);margin-left:2px}
+.tune-button.has-filters::after{display:none}  /* badge replaces the dot */
+/* Visual divider between filter sections (narrowing) and the weight
+   sliders (reranking). Communicates that everything below behaves
+   differently from everything above. */
+/* Visual divider between filtering controls (above) and ranking sliders
+   (below). The label "Adjust the ranking" sits in the divider's gap so
+   the eye reads it as a section break, not another filter title. */
+.tune-section-divider{margin:24px 0 8px;border-top:1px solid var(--border);position:relative}
+.tune-section-divider::before{content:"Adjust the ranking";position:absolute;top:-7px;left:0;background:var(--bg);padding-right:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3)}
+.tune-divider-hint{font-size:11px;color:var(--t3);line-height:1.4;margin:0 0 14px}
 .panel-body{flex:1;overflow-y:auto;padding:18px}
 .panel-full-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
 .warn-icon{flex-shrink:0;color:var(--warn);font-size:14px;position:relative;cursor:help;margin-top:2px}
@@ -347,23 +370,23 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <!-- Mobile sort bar -->
     <div class="sort-bar">
       <select class="sort-select" id="mobile-sort">
-        <option value="ppm_asc">Sort: $/m² ↑ (best value first)</option>
-        <option value="ppm_desc">Sort: $/m² ↓</option>
-        <option value="price_asc">Sort: Price ↑</option>
-        <option value="price_desc">Sort: Price ↓</option>
-        <option value="area_desc">Sort: Area ↓ (largest first)</option>
-        <option value="area_asc">Sort: Area ↑</option>
-        <option value="stars_desc">Sort: Rating ↓ (best first)</option>
-        <option value="stars_asc">Sort: Rating ↑</option>
+        <option value="ppm_asc">Sort by $/m²: cheapest first</option>
+        <option value="ppm_desc">Sort by $/m²: most expensive first</option>
+        <option value="price_asc">Sort by price: lowest first</option>
+        <option value="price_desc">Sort by price: highest first</option>
+        <option value="area_desc">Sort by size: largest first</option>
+        <option value="area_asc">Sort by size: smallest first</option>
+        <option value="stars_desc">Sort by score: highest first</option>
+        <option value="stars_asc">Sort by score: lowest first</option>
         <optgroup label="By dimension">
-          <option value="deal_desc">Sort: Price vs Comps (cheapest first)</option>
-          <option value="location_desc">Sort: Location (best spot first)</option>
-          <option value="momentum_desc">Sort: Momentum (most active area first)</option>
-          <option value="composite_desc">Sort: Composite (using your weights)</option>
+          <option value="deal_desc">Sort by Price vs Comps: cheapest first</option>
+          <option value="location_desc">Sort by Location: best spot first</option>
+          <option value="momentum_desc">Sort by Momentum: most active first</option>
+          <option value="composite_desc">Sort by your custom weights</option>
         </optgroup>
-        <option value="newest_desc">Sort: Newest first</option>
-        <option value="zone_asc">Sort: Zone A→Z</option>
-        <option value="zone_desc">Sort: Zone Z→A</option>
+        <option value="newest_desc">Sort by recency: newest first</option>
+        <option value="zone_asc">Sort by zone: A → Z</option>
+        <option value="zone_desc">Sort by zone: Z → A</option>
       </select>
     </div>
 
@@ -385,7 +408,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
               <div style="display:flex;justify-content:flex-end;gap:3px">$/m² <span class="sort-ic" id="ic-ppm">↑</span></div>
             </th>
             <th class="col-stars sortable" data-col="stars" data-def="desc">
-              Rating <span class="sort-ic" id="ic-stars">↕</span>
+              Score <span class="sort-ic" id="ic-stars">↕</span>
             </th>
             <th class="col-chev"></th>
           </tr>
@@ -444,6 +467,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <aside class="tune-panel" id="tune-panel">
     <div class="panel-header">
       <span class="panel-title">Filters</span>
+      <button class="panel-reset-all" id="filters-reset-all-desktop" type="button" hidden>Clear all</button>
       <button class="panel-help-btn" id="filters-help-desktop" aria-label="What does each filter do?">?</button>
       <button class="panel-close" id="tune-close" aria-label="Close panel">×</button>
     </div>
@@ -468,6 +492,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
 <div class="mobile-tune-overlay" id="mobile-tune-overlay">
   <div class="panel-header">
     <span class="panel-title">Filters</span>
+    <button class="panel-reset-all" id="filters-reset-all-mobile" type="button" hidden>Clear all</button>
     <button class="panel-help-btn" id="filters-help-mobile" aria-label="What does each filter do?">?</button>
     <button class="panel-close" id="mobile-tune-close" aria-label="Close">×</button>
   </div>
@@ -480,51 +505,23 @@ tbody td{padding:10px 12px;vertical-align:middle}
      + ESC-to-close, same pattern as the methodology modal. -->
 <dialog class="methodology" id="filters-help-modal" aria-labelledby="filters-help-title">
   <button class="meth-close" id="filters-help-close" type="button" aria-label="Close">×</button>
-  <h2 id="filters-help-title">How the Filters work</h2>
-  <p class="meth-tagline">Every control in the Filters panel narrows or re-ranks the listings you see. This explains what each one does, in order.</p>
+  <h2 id="filters-help-title">What each control does</h2>
+  <p class="meth-tagline">Filters narrow what's shown. The bottom three sliders change the order, not the set.</p>
 
   <h3>Zone</h3>
-  <p>Pick a region or a specific zone to limit the listings to that geography.</p>
-  <ul>
-    <li>Click a region name (Surf City Core, Eastern Pacific, Gulf-Fonseca, Inland) to filter to every zone in that region.</li>
-    <li>Click an individual zone pill to filter to just that one zone.</li>
-    <li>Click "No zone" to see only listings where we couldn't determine the location.</li>
-    <li>Click the same selection again to clear it.</li>
-  </ul>
+  <p>Filter to a region (a group of zones) or to a single zone. "No zone" surfaces listings whose location couldn't be parsed.</p>
 
-  <h3>Price range</h3>
-  <p>Two handles set the minimum and maximum price the listings can have.</p>
-  <ul>
-    <li>Drag the LEFT handle to the right → exclude cheaper listings (raise the floor).</li>
-    <li>Drag the RIGHT handle to the left → exclude more expensive listings (lower the ceiling).</li>
-    <li>Listings without a parsed price are excluded once you narrow the range from the default.</li>
-    <li>"Reset" returns to the full default range.</li>
-  </ul>
+  <h3>Price (USD)</h3>
+  <p>Hide listings outside the price range. Listings without a parsed price drop once the range is narrowed from the default.</p>
 
-  <h3>Size range</h3>
-  <p>Same mechanic as price, but for plot size in square meters (m²). Useful when you want only small lots (vacation home) or only large parcels (development / subdivision).</p>
-  <ul>
-    <li>Drag the LEFT handle to the right → exclude smaller plots.</li>
-    <li>Drag the RIGHT handle to the left → exclude larger plots.</li>
-    <li>Listings without a parsed size are excluded once you narrow the range.</li>
-  </ul>
+  <h3>Size (m²)</h3>
+  <p>Hide listings outside the size range. Sizes are square meters; <code>1 vrs² ≈ 0.7 m²</code>.</p>
 
-  <h3>Minimum score</h3>
-  <p>A single-handle slider that sets a quality floor. Listings with a composite score below the threshold are hidden. At 0 (default), all listings pass. Crank it up to surface only the strongest opportunities — useful for the curation use case ("only show me listings worth a phone call").</p>
-  <ul>
-    <li>0 = no filter, show every listing.</li>
-    <li>Higher values progressively hide weaker listings.</li>
-    <li>The composite score is the same number that drives the Rating column's stars.</li>
-  </ul>
+  <h3>Score floor</h3>
+  <p>Hide listings below this score. The score is the same number shown in the table's Score column.</p>
 
-  <h3>Weight sliders — Price vs Comps / Location / Momentum</h3>
-  <p>These don't filter listings; they re-rank them. Each slider controls how much that dimension counts toward the <strong>Composite</strong> score. Defaults: 40 / 35 / 25. Sort by "Composite (using your weights)" in the dropdown to see your custom ranking — otherwise listings sort by whatever else you've selected.</p>
-  <ul>
-    <li><strong>Price vs Comps</strong> — slide RIGHT to prioritize listings that are cheap relative to similar nearby lots. Slide LEFT to deprioritize the comparison-to-comps signal.</li>
-    <li><strong>Location</strong> — slide RIGHT to prioritize zone quality, beachfront, accessibility (airport distance, paved access). Slide LEFT to ignore where the listing is.</li>
-    <li><strong>Momentum</strong> — slide RIGHT to prioritize areas with active market dynamics (repricing, new inventory). Slide LEFT to ignore market timing.</li>
-    <li>"Reset" restores the defaults.</li>
-  </ul>
+  <h3>Adjust the ranking — Price vs Comps · Location · Momentum</h3>
+  <p>Three sliders that rebalance the score. Each controls how much its dimension counts; defaults are 40 / 35 / 25 and re-derive on reset. Move a slider right to make that dimension matter more, left to matter less. Pick "Sort by your custom weights" in the sort dropdown to see your re-ranked list — other sort options ignore the weights.</p>
 </dialog>
 
 <script>
@@ -1082,13 +1079,14 @@ function _rangeSectionHTML(opts) {
     </div>
   `;
 }
-// Per-slider hints — tell the user what moving each slider left/right does
-// for that specific dimension. Kept short (one line) so they don't dominate
-// the panel; the modal triggered by the "?" button has the full version.
+// Per-slider hints — one line each, consistent verb pattern: "Right: X
+// matters more · Left: less". The dimension labels in SCORE_DIMENSIONS
+// already tell users what each one is; the hint just tells them which
+// direction means "matters more."
 const WEIGHT_SLIDER_HINTS = {
-  value:    'Right: prioritize listings cheap vs comparable lots · Left: de-emphasize',
-  location: 'Right: prioritize zone quality, beachfront, airport access · Left: ignore location',
-  momentum: 'Right: prioritize areas with active inventory churn · Left: ignore market timing',
+  value:    'Right: cheap-vs-comparable matters more · Left: less',
+  location: 'Right: location matters more · Left: less',
+  momentum: 'Right: market activity matters more · Left: less',
 };
 // One weight slider (label, 0–100 input, current value badge). Reuses the
 // SCORE_DIMENSIONS palette so V/L/M look consistent everywhere they're
@@ -1106,14 +1104,15 @@ function _weightSliderHTML(slug, label, color) {
 }
 // The whole weight-sliders section. Reads SCORE_DIMENSIONS for canonical
 // labels + colors so the names here stay in sync with the score breakdown.
+// Section title is provided by the .tune-section-divider rendered just
+// above this in _tuneBodyHTML — that's also the visual break between
+// filters (which narrow) and weights (which reorder).
 function _weightSectionHTML() {
   const rows = SCORE_DIMENSIONS
     .map(([slug, name, color]) => _weightSliderHTML(slug, name, color))
     .join('');
   return `
     <div class="tune-section">
-      <div class="tune-section-title">Reranking weights</div>
-      <div class="weight-help">Drag any slider to reweight the dimensions and see the table reorder. Defaults match the published model: 40 / 35 / 25.</div>
       ${rows}
       ${isDefaultWeights() ? '' : '<button class="tune-reset" id="weights-reset" type="button">Reset weights</button>'}
     </div>
@@ -1123,9 +1122,10 @@ function _zoneFilterSectionHTML() {
   // Containers for buildZoneFilter() to populate. The desktop and mobile
   // bodies both render this section, so we can't rely on a single id —
   // buildZoneFilter() now targets every .zone-filter on the page.
+  // No hint here — the chip block is self-explanatory and a hint would
+  // just take up vertical space.
   return `<div class="tune-section">
     <div class="tune-section-title">Zone</div>
-    <div class="tune-section-hint">Click a region to filter to all its zones, or a single pill for one zone. Click again to clear.</div>
     <div class="zone-filter"></div>
   </div>`;
 }
@@ -1135,38 +1135,44 @@ function _minScoreSectionHTML() {
   // ("only show me listings strong enough to be worth a phone call").
   const isDefault = isDefaultMinScore();
   const display = MIN_SCORE === 0 ? 'Show all' : `≥ ${MIN_SCORE}`;
-  const hint = 'Drag right to require a higher score. At 0 (default), all listings pass — at 80 only the top-scoring ones do.';
   return `
     <div class="tune-section">
-      <div class="tune-section-title">Minimum score</div>
-      <div class="tune-section-hint">${esc(hint)}</div>
+      <div class="tune-section-title">Score floor</div>
+      <div class="tune-section-hint">Hide listings below this score.</div>
       <div class="tune-range-display" id="min-score-display">${display}</div>
       <div class="tune-range-controls min-score-controls">
         <div class="tune-range-track"></div>
         <div class="tune-range-fill" id="min-score-fill" style="left:0;right:${100 - MIN_SCORE}%"></div>
-        <input type="range" id="min-score-slider" min="0" max="100" step="1" value="${MIN_SCORE}" aria-label="Minimum composite score">
+        <input type="range" id="min-score-slider" min="0" max="100" step="1" value="${MIN_SCORE}" aria-label="Minimum score">
       </div>
-      ${isDefault ? '' : `<button class="tune-reset" id="min-score-reset" type="button">Reset minimum score</button>`}
+      ${isDefault ? '' : `<button class="tune-reset" id="min-score-reset" type="button">Reset score floor</button>`}
     </div>
   `;
+}
+function _rerankingDividerHTML() {
+  // Visual + verbal break between filters (which narrow what's shown) and
+  // the weight sliders (which change the order). Section title comes from
+  // the ::before pseudo-element on .tune-section-divider so the heading
+  // floats inline with the rule.
+  return `<div class="tune-section-divider"></div>
+    <div class="tune-divider-hint">These sliders change the order, not what's shown.</div>`;
 }
 function _tuneBodyHTML() {
   // Composed from independent sections so adding a new filter is a one-line
   // append rather than a rewrite of the panel. Section order matches
   // mental model: where → how-much → how-big → how-good → reranking.
   return _zoneFilterSectionHTML() + _rangeSectionHTML({
-    id: 'price', title: 'Price range (USD)',
-    hint: 'Drag the LEFT handle to raise the floor (exclude cheaper listings). Drag the RIGHT to lower the ceiling (exclude more expensive ones).',
+    id: 'price', title: 'Price (USD)',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
     minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
     isDefault: isDefaultPriceRange(),
   }) + _rangeSectionHTML({
-    id: 'size', title: 'Size range (m²)',
-    hint: 'Drag the LEFT handle to exclude smaller plots. Drag the RIGHT to exclude larger ones. m² = square meters.',
+    id: 'size', title: 'Size (m²)',
+    hint: 'Sizes shown in square meters (m²).',
     snaps: SIZE_SNAPS, labels: SIZE_LABELS,
     minIdx: SIZE_MIN_IDX, maxIdx: SIZE_MAX_IDX,
     isDefault: isDefaultSizeRange(),
-  }) + _minScoreSectionHTML() + _weightSectionHTML();
+  }) + _minScoreSectionHTML() + _rerankingDividerHTML() + _weightSectionHTML();
 }
 function _wireRangeSection(container, opts) {
   const minEl   = container.querySelector(`#${opts.id}-min`);
@@ -1284,11 +1290,52 @@ function closeTunePanel() {
   document.getElementById('tune-panel').classList.remove('open');
   document.getElementById('mobile-tune-overlay').classList.remove('open');
 }
+function _activeFilterCount() {
+  // Counts non-default sections in the panel. Zone / Price / Size / Min
+  // score / Weights — each section that's been touched contributes 1.
+  // Grouped this way (rather than per-handle) so the badge reads as
+  // "how many things did I change," not as a slider count.
+  let n = 0;
+  if (ZONE_F) n++;
+  if (!isDefaultPriceRange()) n++;
+  if (!isDefaultSizeRange()) n++;
+  if (!isDefaultMinScore()) n++;
+  if (!isDefaultWeights()) n++;
+  return n;
+}
 function _updateTuneButtonState() {
   const btn = document.getElementById('tune-open');
   if (!btn) return;
-  const active = !isDefaultPriceRange() || !isDefaultSizeRange() || !isDefaultMinScore() || !isDefaultWeights();
-  btn.classList.toggle('has-filters', active);
+  const count = _activeFilterCount();
+  btn.classList.toggle('has-filters', count > 0);
+  // Replace the prior dot-only indicator with a badge showing the count.
+  // The button text is rebuilt rather than hunted-and-replaced because
+  // the funnel SVG is also in there.
+  let badge = btn.querySelector('.filter-count-badge');
+  if (count > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'filter-count-badge';
+      btn.appendChild(badge);
+    }
+    badge.textContent = `· ${count}`;
+  } else if (badge) {
+    badge.remove();
+  }
+  // Toggle the "Clear all" link in the panel header — same active state.
+  ['filters-reset-all-desktop', 'filters-reset-all-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.toggleAttribute('hidden', count === 0);
+  });
+}
+function _resetAllFilters() {
+  // Snap every panel-controlled state back to defaults.
+  ZONE_F = null;
+  PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
+  SIZE_MIN_IDX  = 0; SIZE_MAX_IDX  = SIZE_SNAPS.length - 1;
+  MIN_SCORE = 0;
+  Object.assign(WEIGHTS, WEIGHT_DEFAULTS);
+  renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
 }
 
 /* ── Render ──────────────────────────────────────────── */
@@ -1383,6 +1430,12 @@ function wireTune() {
   });
   document.getElementById('tune-close').addEventListener('click', closeTunePanel);
   document.getElementById('mobile-tune-close').addEventListener('click', closeTunePanel);
+  // "Clear all" link — visible only when at least one filter is non-default.
+  // Snaps every panel-controlled state back to defaults in one shot.
+  ['filters-reset-all-desktop', 'filters-reset-all-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', _resetAllFilters);
+  });
   _updateTuneButtonState();
 }
 let _lastMobile=window.innerWidth<=640;
