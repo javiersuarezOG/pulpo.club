@@ -509,6 +509,14 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <li>Listings without a parsed size are excluded once you narrow the range.</li>
   </ul>
 
+  <h3>Minimum score</h3>
+  <p>A single-handle slider that sets a quality floor. Listings with a composite score below the threshold are hidden. At 0 (default), all listings pass. Crank it up to surface only the strongest opportunities — useful for the curation use case ("only show me listings worth a phone call").</p>
+  <ul>
+    <li>0 = no filter, show every listing.</li>
+    <li>Higher values progressively hide weaker listings.</li>
+    <li>The composite score is the same number that drives the Rating column's stars.</li>
+  </ul>
+
   <h3>Weight sliders — Price vs Comps / Location / Momentum</h3>
   <p>These don't filter listings; they re-rank them. Each slider controls how much that dimension counts toward the <strong>Composite</strong> score. Defaults: 40 / 35 / 25. Sort by "Composite (using your weights)" in the dropdown to see your custom ranking — otherwise listings sort by whatever else you've selected.</p>
   <ul>
@@ -596,6 +604,16 @@ const SIZE_LABELS = ['No min', '100 m²', '500 m²', '1K m²', '5K m²', '10K m�
 let SIZE_MIN_IDX = 0, SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
 const isDefaultSizeRange = () =>
   SIZE_MIN_IDX === 0 && SIZE_MAX_IDX === SIZE_SNAPS.length - 1;
+
+/* ── Minimum-score filter ──────────────────────────────
+   Single-handle slider [0..100]: only show listings with rank_score ≥ MIN_SCORE.
+   Default 0 = pass-through (no filter). The user can crank this up to see
+   only the top N% of listings — useful for the curation use case ("only show
+   me listings strong enough to be worth a phone call").
+   URL key: ?min_score=NN. Default omitted from URL to keep shareable URLs
+   clean. */
+let MIN_SCORE = 0;
+const isDefaultMinScore = () => MIN_SCORE === 0;
 
 /* ── Tune-panel state: V/L/M weight sliders ────────────── */
 // Defaults match pulpo/ranker.py composite weights (0.40 / 0.35 / 0.25).
@@ -718,6 +736,15 @@ function readURL() {
     SIZE_MIN_IDX = 0;
     SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
   }
+  // Min-score filter: ?min_score=NN (integer 0..100). Anything malformed
+  // or out-of-range silently drops to the default 0 (pass-through).
+  const msRaw = p.get('min_score');
+  if (msRaw) {
+    const ms = parseInt(msRaw, 10);
+    MIN_SCORE = (Number.isInteger(ms) && ms >= 0 && ms <= 100) ? ms : 0;
+  } else {
+    MIN_SCORE = 0;
+  }
   // Weight sliders: ?w=V,L,M (integers 0..100). Reject malformed input
   // by reverting to defaults — silently dropping the URL is friendlier
   // than rendering a confusing "weights all zero → no sort change" state.
@@ -746,6 +773,7 @@ function pushURL(replace=true) {
   if (PRICE_MAX_IDX !== PRICE_SNAPS.length-1) p.set('price_max', String(PRICE_MAX_IDX));
   if (SIZE_MIN_IDX  !== 0)                    p.set('size_min',  String(SIZE_MIN_IDX));
   if (SIZE_MAX_IDX  !== SIZE_SNAPS.length-1)  p.set('size_max',  String(SIZE_MAX_IDX));
+  if (!isDefaultMinScore())                   p.set('min_score', String(MIN_SCORE));
   if (!isDefaultWeights()) {
     p.set('w', WEIGHT_KEYS.map(k => WEIGHTS[k]).join(','));
   }
@@ -776,12 +804,21 @@ function _sizeInRange(r) {
   if (a == null) return false;
   return a >= SIZE_SNAPS[SIZE_MIN_IDX] && a <= SIZE_SNAPS[SIZE_MAX_IDX];
 }
+function _scoreAtLeastMin(r) {
+  // Minimum-score filter — pass-through when MIN_SCORE === 0. Listings
+  // without rank_score (None / null) drop only when the user has set a
+  // non-default threshold, matching the "default-passes-everything"
+  // pattern of _priceInRange / _sizeInRange.
+  if (isDefaultMinScore()) return true;
+  return (r.rank_score ?? -Infinity) >= MIN_SCORE;
+}
 function filteredRows() {
   return ALL_DATA.filter(r => {
     if (FILTER==='open'  && r.is_in_development)  return false;
     if (FILTER==='gated' && !r.is_in_development) return false;
     if (!_priceInRange(r)) return false;
     if (!_sizeInRange(r))  return false;
+    if (!_scoreAtLeastMin(r)) return false;
     if (!ZONE_F) return true;
     if (ZONE_F.type==='no-zone') return isNoZone(r);
     if (ZONE_F.type==='zone')    return r.zone===ZONE_F.value;
@@ -1092,22 +1129,44 @@ function _zoneFilterSectionHTML() {
     <div class="zone-filter"></div>
   </div>`;
 }
+function _minScoreSectionHTML() {
+  // Single-handle slider [0..100]. At 0 it's a no-op; cranking it up
+  // hides anything below the threshold. Useful for the curation use case
+  // ("only show me listings strong enough to be worth a phone call").
+  const isDefault = isDefaultMinScore();
+  const display = MIN_SCORE === 0 ? 'Show all' : `≥ ${MIN_SCORE}`;
+  const hint = 'Drag right to require a higher score. At 0 (default), all listings pass — at 80 only the top-scoring ones do.';
+  return `
+    <div class="tune-section">
+      <div class="tune-section-title">Minimum score</div>
+      <div class="tune-section-hint">${esc(hint)}</div>
+      <div class="tune-range-display" id="min-score-display">${display}</div>
+      <div class="tune-range-controls min-score-controls">
+        <div class="tune-range-track"></div>
+        <div class="tune-range-fill" id="min-score-fill" style="left:0;right:${100 - MIN_SCORE}%"></div>
+        <input type="range" id="min-score-slider" min="0" max="100" step="1" value="${MIN_SCORE}" aria-label="Minimum composite score">
+      </div>
+      ${isDefault ? '' : `<button class="tune-reset" id="min-score-reset" type="button">Reset minimum score</button>`}
+    </div>
+  `;
+}
 function _tuneBodyHTML() {
   // Composed from independent sections so adding a new filter is a one-line
-  // append rather than a rewrite of the panel.
+  // append rather than a rewrite of the panel. Section order matches
+  // mental model: where → how-much → how-big → how-good → reranking.
   return _zoneFilterSectionHTML() + _rangeSectionHTML({
-    id: 'price', title: 'Price range',
-    hint: 'Drag the LEFT handle to raise the floor (exclude cheaper). Drag the RIGHT to lower the ceiling (exclude more expensive).',
+    id: 'price', title: 'Price range (USD)',
+    hint: 'Drag the LEFT handle to raise the floor (exclude cheaper listings). Drag the RIGHT to lower the ceiling (exclude more expensive ones).',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
     minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
     isDefault: isDefaultPriceRange(),
   }) + _rangeSectionHTML({
-    id: 'size', title: 'Size range',
-    hint: 'Drag the LEFT handle to exclude smaller plots. Drag the RIGHT to exclude larger ones.',
+    id: 'size', title: 'Size range (m²)',
+    hint: 'Drag the LEFT handle to exclude smaller plots. Drag the RIGHT to exclude larger ones. m² = square meters.',
     snaps: SIZE_SNAPS, labels: SIZE_LABELS,
     minIdx: SIZE_MIN_IDX, maxIdx: SIZE_MAX_IDX,
     isDefault: isDefaultSizeRange(),
-  }) + _weightSectionHTML();
+  }) + _minScoreSectionHTML() + _weightSectionHTML();
 }
 function _wireRangeSection(container, opts) {
   const minEl   = container.querySelector(`#${opts.id}-min`);
@@ -1165,6 +1224,25 @@ function _wireWeightSliders(container) {
     renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
   });
 }
+function _wireMinScore(container) {
+  const sl = container.querySelector('#min-score-slider');
+  const display = container.querySelector('#min-score-display');
+  const fill = container.querySelector('#min-score-fill');
+  if (!sl) return;
+  const update = () => {
+    const v = parseInt(sl.value, 10);
+    MIN_SCORE = Number.isInteger(v) ? v : 0;
+    if (display) display.textContent = MIN_SCORE === 0 ? 'Show all' : `≥ ${MIN_SCORE}`;
+    if (fill) fill.style.right = `${100 - MIN_SCORE}%`;
+    pushURL(true); render(); _updateTuneButtonState();
+  };
+  sl.addEventListener('input', update);
+  const reset = container.querySelector('#min-score-reset');
+  if (reset) reset.addEventListener('click', () => {
+    MIN_SCORE = 0;
+    renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
+  });
+}
 function _wireTuneControls(container) {
   _wireRangeSection(container, {
     id: 'price', snaps: PRICE_SNAPS, labels: PRICE_LABELS,
@@ -1176,6 +1254,7 @@ function _wireTuneControls(container) {
     setMin: v => { SIZE_MIN_IDX = v; },
     setMax: v => { SIZE_MAX_IDX = v; },
   });
+  _wireMinScore(container);
   _wireWeightSliders(container);
 }
 function renderTunePanel() {
@@ -1208,7 +1287,7 @@ function closeTunePanel() {
 function _updateTuneButtonState() {
   const btn = document.getElementById('tune-open');
   if (!btn) return;
-  const active = !isDefaultPriceRange() || !isDefaultSizeRange() || !isDefaultWeights();
+  const active = !isDefaultPriceRange() || !isDefaultSizeRange() || !isDefaultMinScore() || !isDefaultWeights();
   btn.classList.toggle('has-filters', active);
 }
 
