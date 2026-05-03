@@ -487,6 +487,16 @@ let PRICE_MIN_IDX = 0, PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
 const isDefaultPriceRange = () =>
   PRICE_MIN_IDX === 0 && PRICE_MAX_IDX === PRICE_SNAPS.length - 1;
 
+/* ── Tune-panel state: size range ──────────────────────── */
+// Log-spaced snap points calibrated to live data (live spread is ~67 m² →
+// 6.8M m², median 2,516 m², 95th %ile 482K m²). Index 0 = no min;
+// last index = no max (Infinity). Same URL-as-index encoding as price.
+const SIZE_SNAPS  = [0, 100, 500, 1_000, 5_000, 10_000, 50_000, 100_000, 500_000, Infinity];
+const SIZE_LABELS = ['No min', '100 m²', '500 m²', '1K m²', '5K m²', '10K m²', '50K m²', '100K m²', '500K m²', 'No max'];
+let SIZE_MIN_IDX = 0, SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
+const isDefaultSizeRange = () =>
+  SIZE_MIN_IDX === 0 && SIZE_MAX_IDX === SIZE_SNAPS.length - 1;
+
 /* ── Helpers ─────────────────────────────────────────── */
 const fmtUSD  = v => v==null ? '—' : '$'+Math.round(v).toLocaleString('en-US');
 const fmtPPM  = v => (v==null||v<=0) ? '—' : '$'+Math.round(v).toLocaleString('en-US');
@@ -543,11 +553,11 @@ function renderStars(score) {
 }
 
 /* ── URL state ───────────────────────────────────────── */
-function _parseSnapIdx(raw) {
-  // URL carries snap-point indices, not raw USD, so the encoding survives
+function _parseSnapIdx(raw, snaps) {
+  // URL carries snap-point indices, not raw USD/m², so the encoding survives
   // re-tuning the snap array. Out-of-range / non-numeric → null (use default).
   const n = parseInt(raw, 10);
-  if (!Number.isInteger(n) || n < 0 || n >= PRICE_SNAPS.length) return null;
+  if (!Number.isInteger(n) || n < 0 || n >= snaps.length) return null;
   return n;
 }
 function readURL() {
@@ -561,8 +571,8 @@ function readURL() {
   else if (zg&&ZONE_GROUPS[zg]) ZONE_F={type:'group',value:zg};
   else if (z) ZONE_F={type:'zone',value:z};
   else ZONE_F=null;
-  const pmin = _parseSnapIdx(p.get('price_min'));
-  const pmax = _parseSnapIdx(p.get('price_max'));
+  const pmin = _parseSnapIdx(p.get('price_min'), PRICE_SNAPS);
+  const pmax = _parseSnapIdx(p.get('price_max'), PRICE_SNAPS);
   PRICE_MIN_IDX = pmin ?? 0;
   PRICE_MAX_IDX = pmax ?? PRICE_SNAPS.length - 1;
   if (PRICE_MIN_IDX > PRICE_MAX_IDX) {
@@ -570,6 +580,14 @@ function readURL() {
     // than zero-listings empty state, which would look broken on first load.
     PRICE_MIN_IDX = 0;
     PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
+  }
+  const smin = _parseSnapIdx(p.get('size_min'), SIZE_SNAPS);
+  const smax = _parseSnapIdx(p.get('size_max'), SIZE_SNAPS);
+  SIZE_MIN_IDX = smin ?? 0;
+  SIZE_MAX_IDX = smax ?? SIZE_SNAPS.length - 1;
+  if (SIZE_MIN_IDX > SIZE_MAX_IDX) {
+    SIZE_MIN_IDX = 0;
+    SIZE_MAX_IDX = SIZE_SNAPS.length - 1;
   }
   OPEN_ID=p.get('listing')||null;
 }
@@ -584,6 +602,8 @@ function pushURL(replace=true) {
   }
   if (PRICE_MIN_IDX !== 0)                    p.set('price_min', String(PRICE_MIN_IDX));
   if (PRICE_MAX_IDX !== PRICE_SNAPS.length-1) p.set('price_max', String(PRICE_MAX_IDX));
+  if (SIZE_MIN_IDX  !== 0)                    p.set('size_min',  String(SIZE_MIN_IDX));
+  if (SIZE_MAX_IDX  !== SIZE_SNAPS.length-1)  p.set('size_max',  String(SIZE_MAX_IDX));
   if (OPEN_ID) p.set('listing',OPEN_ID);
   const qs=p.toString();
   const url=qs?`${location.pathname}?${qs}`:location.pathname;
@@ -602,11 +622,21 @@ function _priceInRange(r) {
   if (p == null) return false;
   return p >= PRICE_SNAPS[PRICE_MIN_IDX] && p <= PRICE_SNAPS[PRICE_MAX_IDX];
 }
+function _sizeInRange(r) {
+  // Same defaults-pass-everything semantics as _priceInRange. When the
+  // user narrows either handle, listings without area_m2 drop out — a
+  // null area can't satisfy "between X and Y m²".
+  if (isDefaultSizeRange()) return true;
+  const a = r.area_m2;
+  if (a == null) return false;
+  return a >= SIZE_SNAPS[SIZE_MIN_IDX] && a <= SIZE_SNAPS[SIZE_MAX_IDX];
+}
 function filteredRows() {
   return ALL_DATA.filter(r => {
     if (FILTER==='open'  && r.is_in_development)  return false;
     if (FILTER==='gated' && !r.is_in_development) return false;
     if (!_priceInRange(r)) return false;
+    if (!_sizeInRange(r))  return false;
     if (!ZONE_F) return true;
     if (ZONE_F.type==='no-zone') return isNoZone(r);
     if (ZONE_F.type==='zone')    return r.zone===ZONE_F.value;
@@ -813,65 +843,90 @@ function closePanel() {
 /* ── Tune panel (filters/sort) ───────────────────────── */
 // The Tune panel is mutually exclusive with the listing-detail side panel:
 // opening one closes the other so the layout never tries to host both.
-function _tuneBodyHTML() {
-  // The price section. Designed to be extended with future filter sections
-  // (size range, weight sliders) by appending more `<div class="tune-section">`
-  // blocks here — the panel chrome and open/close logic don't care how many.
-  const minLabel = PRICE_LABELS[PRICE_MIN_IDX];
-  const maxLabel = PRICE_LABELS[PRICE_MAX_IDX];
-  const display = `${minLabel} – ${maxLabel}`;
-  const lastIdx = PRICE_SNAPS.length - 1;
+function _rangeSectionHTML(opts) {
+  // Generic range-slider section. Used for both Price and Size — anything
+  // with snap-point indices and a paired (min, max) shape can plug in.
+  const minLabel = opts.labels[opts.minIdx];
+  const maxLabel = opts.labels[opts.maxIdx];
+  const display  = `${minLabel} – ${maxLabel}`;
+  const lastIdx  = opts.snaps.length - 1;
   // Overlay-fill positions (left/right percentages of the track).
-  const fillLeft  = (PRICE_MIN_IDX / lastIdx) * 100;
-  const fillRight = ((lastIdx - PRICE_MAX_IDX) / lastIdx) * 100;
+  const fillLeft  = (opts.minIdx / lastIdx) * 100;
+  const fillRight = ((lastIdx - opts.maxIdx) / lastIdx) * 100;
+  const titleLow = opts.title.toLowerCase();
   return `
     <div class="tune-section">
-      <div class="tune-section-title">Price range</div>
-      <div class="tune-range-display" id="price-range-display">${display}</div>
+      <div class="tune-section-title">${opts.title}</div>
+      <div class="tune-range-display" id="${opts.id}-range-display">${display}</div>
       <div class="tune-range-controls">
         <div class="tune-range-track"></div>
-        <div class="tune-range-fill" id="price-range-fill" style="left:${fillLeft}%;right:${fillRight}%"></div>
-        <input type="range" id="price-min" min="0" max="${lastIdx}" step="1" value="${PRICE_MIN_IDX}" aria-label="Minimum price">
-        <input type="range" id="price-max" min="0" max="${lastIdx}" step="1" value="${PRICE_MAX_IDX}" aria-label="Maximum price">
+        <div class="tune-range-fill" id="${opts.id}-range-fill" style="left:${fillLeft}%;right:${fillRight}%"></div>
+        <input type="range" id="${opts.id}-min" min="0" max="${lastIdx}" step="1" value="${opts.minIdx}" aria-label="Minimum ${titleLow}">
+        <input type="range" id="${opts.id}-max" min="0" max="${lastIdx}" step="1" value="${opts.maxIdx}" aria-label="Maximum ${titleLow}">
       </div>
-      ${isDefaultPriceRange() ? '' : '<button class="tune-reset" id="price-reset" type="button">Reset price</button>'}
+      ${opts.isDefault ? '' : `<button class="tune-reset" id="${opts.id}-reset" type="button">Reset ${titleLow}</button>`}
     </div>
   `;
 }
-function _wireTuneControls(container) {
-  const minEl = container.querySelector('#price-min');
-  const maxEl = container.querySelector('#price-max');
-  const display = container.querySelector('#price-range-display');
-  const fill = container.querySelector('#price-range-fill');
+function _tuneBodyHTML() {
+  // Composed from generic range sections so adding a new filter (e.g. weight
+  // sliders) is a one-line append rather than a rewrite of the panel.
+  return _rangeSectionHTML({
+    id: 'price', title: 'Price range',
+    snaps: PRICE_SNAPS, labels: PRICE_LABELS,
+    minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
+    isDefault: isDefaultPriceRange(),
+  }) + _rangeSectionHTML({
+    id: 'size', title: 'Size range',
+    snaps: SIZE_SNAPS, labels: SIZE_LABELS,
+    minIdx: SIZE_MIN_IDX, maxIdx: SIZE_MAX_IDX,
+    isDefault: isDefaultSizeRange(),
+  });
+}
+function _wireRangeSection(container, opts) {
+  const minEl   = container.querySelector(`#${opts.id}-min`);
+  const maxEl   = container.querySelector(`#${opts.id}-max`);
+  const display = container.querySelector(`#${opts.id}-range-display`);
+  const fill    = container.querySelector(`#${opts.id}-range-fill`);
   if (!minEl || !maxEl) return;
-  const lastIdx = PRICE_SNAPS.length - 1;
+  const lastIdx = opts.snaps.length - 1;
   function update() {
     let lo = parseInt(minEl.value, 10);
     let hi = parseInt(maxEl.value, 10);
-    // Crossover: snap whichever side just moved past the other to the
-    // other slider's position. Tracks which input was the last source of
-    // change via document.activeElement so we know which side to clamp.
+    // Crossover: whichever side the user is dragging pulls the other
+    // along instead of locking up. Uses document.activeElement to detect
+    // direction; falls back to clamping high to low.
     if (lo > hi) {
       if (document.activeElement === minEl) hi = lo;
       else lo = hi;
       minEl.value = lo; maxEl.value = hi;
     }
-    PRICE_MIN_IDX = lo; PRICE_MAX_IDX = hi;
-    display.textContent = `${PRICE_LABELS[lo]} – ${PRICE_LABELS[hi]}`;
+    opts.setMin(lo); opts.setMax(hi);
+    display.textContent = `${opts.labels[lo]} – ${opts.labels[hi]}`;
     if (fill) {
       fill.style.left  = `${(lo / lastIdx) * 100}%`;
       fill.style.right = `${((lastIdx - hi) / lastIdx) * 100}%`;
     }
-    pushURL(true);
-    render();
-    _updateTuneButtonState();
+    pushURL(true); render(); _updateTuneButtonState();
   }
   minEl.addEventListener('input', update);
   maxEl.addEventListener('input', update);
-  const reset = container.querySelector('#price-reset');
+  const reset = container.querySelector(`#${opts.id}-reset`);
   if (reset) reset.addEventListener('click', () => {
-    PRICE_MIN_IDX = 0; PRICE_MAX_IDX = lastIdx;
+    opts.setMin(0); opts.setMax(lastIdx);
     renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
+  });
+}
+function _wireTuneControls(container) {
+  _wireRangeSection(container, {
+    id: 'price', snaps: PRICE_SNAPS, labels: PRICE_LABELS,
+    setMin: v => { PRICE_MIN_IDX = v; },
+    setMax: v => { PRICE_MAX_IDX = v; },
+  });
+  _wireRangeSection(container, {
+    id: 'size', snaps: SIZE_SNAPS, labels: SIZE_LABELS,
+    setMin: v => { SIZE_MIN_IDX = v; },
+    setMax: v => { SIZE_MAX_IDX = v; },
   });
 }
 function renderTunePanel() {
@@ -898,7 +953,7 @@ function closeTunePanel() {
 function _updateTuneButtonState() {
   const btn = document.getElementById('tune-open');
   if (!btn) return;
-  btn.classList.toggle('has-filters', !isDefaultPriceRange());
+  btn.classList.toggle('has-filters', !isDefaultPriceRange() || !isDefaultSizeRange());
 }
 
 /* ── Render ──────────────────────────────────────────── */
