@@ -1,0 +1,102 @@
+name: pulpo watchdog
+
+# Runs 2 hours after the nightly (0 12 * * * UTC) so the pipeline has time
+# to finish. Opens a GitHub Issue on failure; comments on an existing open
+# issue if one was already created today (suppresses duplicates).
+#
+# To silence temporarily: rename this file or set WATCHDOG_SKIP=1 as a
+# repository variable. To trigger manually: gh workflow run pulpo-watchdog.yml
+# To skip the public-deploy check (e.g. during DNS migration):
+#   gh workflow run pulpo-watchdog.yml -f skip_deploy=true
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 14:00 UTC = 08:00 El Salvador
+  workflow_dispatch:
+    inputs:
+      skip_deploy:
+        description: "Skip the public-deploy reachability check (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  watchdog:
+    name: Watchdog checks
+    runs-on: ubuntu-latest
+    # Read repo contents + write issues
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-python@v5.6.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run watchdog checks
+        id: watchdog
+        env:
+          SKIP_DEPLOY: ${{ github.event.inputs.skip_deploy || 'false' }}
+        run: |
+          set +e
+          ARGS=""
+          if [ "$SKIP_DEPLOY" = "true" ]; then
+            ARGS="--skip-deploy"
+          fi
+          python3 automation/watchdog.py $ARGS | tee /tmp/watchdog_output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          # Capture output for issue body
+          {
+            echo "body<<WATCHDOG_EOF"
+            cat /tmp/watchdog_output.txt
+            echo "WATCHDOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+          exit $EXIT_CODE
+
+      - name: Create or update GitHub Issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          TITLE="[watchdog] Pipeline check failed $TODAY"
+          LABEL="watchdog"
+
+          # Create the label if it doesn't exist
+          gh label create "$LABEL" --color "e4e669" --description "Automated pipeline watchdog alert" 2>/dev/null || true
+
+          # Check for an existing open issue with the same title today
+          EXISTING=$(gh issue list \
+            --label "$LABEL" \
+            --state open \
+            --json number,title \
+            --jq ".[] | select(.title == \"$TITLE\") | .number" \
+            | head -1)
+
+          BODY="## Watchdog failure — $TODAY
+
+          \`\`\`
+          ${{ steps.watchdog.outputs.body }}
+          \`\`\`
+
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          **To silence temporarily:** rename \`.github/workflows/pulpo-watchdog.yml\` via PR or set \`WATCHDOG_SKIP=1\` as a repo variable.
+          **To re-run manually:** \`gh workflow run pulpo-watchdog.yml\`"
+
+          if [ -n "$EXISTING" ]; then
+            echo "Commenting on existing issue #$EXISTING"
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            echo "Opening new issue"
+            gh issue create \
+              --title "$TITLE" \
+              --label "$LABEL" \
+              --body "$BODY"
+          fi
