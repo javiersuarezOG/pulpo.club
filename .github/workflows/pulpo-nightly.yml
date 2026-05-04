@@ -43,6 +43,10 @@ jobs:
           PULPO_LIMIT: "1000"
           # kazu: Nuxt SPA, panel API still denylisted — re-add when rewritten.
           PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,realtyelsalvador"
+          # PRD §FR-6 AI enrichment. When this secret is unset, the
+          # ai_enrichment step logs and skips — full pipeline still runs.
+          # Provision via: gh secret set OPENAI_API_KEY (org or repo level).
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
@@ -181,6 +185,7 @@ jobs:
           git add web/data/prd_feasibility.md 2>/dev/null || true
           git add web/data/source_health_history.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
+          git add web/data/ai_enrichment_cache.json 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
