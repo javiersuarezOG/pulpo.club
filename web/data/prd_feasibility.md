@@ -1,6 +1,6 @@
 # PRD WS2 — Feasibility Probe
 
-_Generated: 2026-05-04T15:57:51.297753+00:00_  
+_Generated: 2026-05-04T16:07:52.349114+00:00_  
 _Catalog size: **811 listings**_  
 _UI filter gate: ≥ 15% population (per PRD §OQ-1)_
 

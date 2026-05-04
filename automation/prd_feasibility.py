@@ -198,11 +198,16 @@ def description_quality(data: list[dict], n: int) -> dict:
     for li in data:
         d = (li.get("description") or "").strip()
         n_chars = len(d)
-        if n_chars == 0:    buckets["empty"] += 1
-        elif n_chars < 50:  buckets["<50 chars"] += 1
-        elif n_chars < 200: buckets["50-200"] += 1
-        elif n_chars < 500: buckets["200-500"] += 1
-        else:               buckets[">=500"] += 1
+        if n_chars == 0:
+            buckets["empty"] += 1
+        elif n_chars < 50:
+            buckets["<50 chars"] += 1
+        elif n_chars < 200:
+            buckets["50-200"] += 1
+        elif n_chars < 500:
+            buckets["200-500"] += 1
+        else:
+            buckets[">=500"] += 1
 
     by_source: dict[str, list[int]] = {}
     for li in data:
