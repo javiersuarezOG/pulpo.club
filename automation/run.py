@@ -413,21 +413,28 @@ def main() -> int:
           f"repriced_this_run={repriced_count}")
 
     # PRD §FR-6 — AI enrichment (title_canonical, short_description_canonical,
-    # reasons_to_buy). Idempotent via description_md5 cache. Skips entirely
-    # when OPENAI_API_KEY is missing or the openai package isn't installed —
-    # listings just keep AI fields as None and downstream code handles that.
+    # reasons_to_buy). Idempotent via description_md5 cache. When the API
+    # is unavailable (missing key, missing package, quota exhausted, auth
+    # error), falls back to deterministic templates for title + USPs;
+    # short_description_canonical stays None until AI is back.
     ai_metrics = _ai_enrich(listings)
+    fb_count = ai_metrics.get("fallback_applied", 0)
     if ai_metrics.get("skipped_no_api_key"):
-        print("[ai_enrich] OPENAI_API_KEY missing — skipping enrichment")
+        print(f"[ai_enrich] OPENAI_API_KEY missing — fallback templates only "
+              f"(applied to {fb_count} listings)")
     elif ai_metrics.get("skipped_no_package"):
-        print("[ai_enrich] openai package not installed — skipping enrichment")
+        print(f"[ai_enrich] openai package not installed — fallback templates only "
+              f"(applied to {fb_count} listings)")
     else:
+        ge = ai_metrics.get("global_error_seen")
+        ge_note = f" GLOBAL_ERROR={ge}" if ge else ""
         print(f"[ai_enrich] cache_hits={ai_metrics['cache_hits']} "
               f"cache_misses={ai_metrics['cache_misses']} "
               f"api_ok={ai_metrics['api_calls_succeeded']} "
               f"api_fail={ai_metrics['api_calls_failed']} "
+              f"fallback={fb_count} "
               f"cost=${ai_metrics['total_cost_usd']:.4f} "
-              f"quality={ai_metrics['content_quality']}")
+              f"quality={ai_metrics['content_quality']}{ge_note}")
 
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.

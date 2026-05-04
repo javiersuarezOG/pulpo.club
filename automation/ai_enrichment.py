@@ -155,38 +155,85 @@ def _to_dict(li: Any) -> dict:
     return {k: getattr(li, k, None) for k in dir(li) if not k.startswith("_")}
 
 
+# Errors that mean "every subsequent call will fail the same way" — stop
+# the run rather than logging 800 identical errors. Detected by class name
+# OR HTTP status code in the error message.
+_GLOBAL_ERROR_SUBSTRINGS = (
+    "AuthenticationError",
+    "PermissionDeniedError",
+    "InvalidAPIKeyError",
+    " 401 ",
+    " 402 ",
+    "insufficient_quota",
+    "billing_hard_limit_reached",
+    "rate_limit_exceeded",
+)
+
+
+def _is_global_error(exc: BaseException) -> bool:
+    """True if the error is a permanent/quota/auth issue — short-circuit."""
+    blob = f"{type(exc).__name__} {exc!r}"
+    return any(s in blob for s in _GLOBAL_ERROR_SUBSTRINGS)
+
+
 def enrich_listings(listings: list[Any],
                     cache_path: Path = CACHE_FILE,
                     model: str = DEFAULT_MODEL,
-                    max_listings: int | None = None) -> dict:
+                    max_listings: int | None = None,
+                    apply_fallback: bool = True) -> dict:
     """Enrich a list of Listing objects (or dicts). Returns metrics dict.
 
-    Skips entirely if OPENAI_API_KEY is missing or `openai` package is not
-    installed. Caches by `source|source_id` → md5(description_raw); only
-    re-enriches when the md5 changes.
+    Path matrix:
+      OPENAI_API_KEY missing     → fallback only (no API)
+      openai package missing     → fallback only
+      Auth/quota error mid-run   → short-circuit, fallback for remaining
+      Per-listing transient err  → fallback for that listing, continue
+      Cache hit                  → use cached AI output
+      Cache miss + API ok        → live AI call
+
+    The fallback module ships title_canonical and reasons_to_buy from
+    deterministic templates (PRD §8.1 + §8.3 are fully spec'd rule sets).
+    short_description_canonical needs natural-language flow and stays
+    None when AI is unavailable.
+
+    Set apply_fallback=False to opt out (e.g. tests that want to verify
+    pure-AI behavior).
     """
-    metrics = {
+    metrics: dict[str, Any] = {
         "skipped_no_api_key":  False,
         "skipped_no_package":  False,
+        "global_error_seen":   None,
         "cache_hits":          0,
         "cache_misses":        0,
         "api_calls_succeeded": 0,
         "api_calls_failed":    0,
+        "fallback_applied":    0,
         "total_cost_usd":      0.0,
         "content_quality":     {"high": 0, "medium": 0, "low": 0},
     }
 
+    # Lazy-import the fallback so this module stays importable even if
+    # something goes wrong in fallback land (very unlikely — pure stdlib).
+    _fb_apply = None
+    if apply_fallback:
+        try:
+            from automation.ai_enrichment_fallback import apply_fallbacks as _fb_apply  # type: ignore
+        except Exception as e:
+            print(f"[ai_enrich] fallback module import failed: {e!r}")
+
+    api_path_alive = True
+
     if not os.environ.get("OPENAI_API_KEY"):
         metrics["skipped_no_api_key"] = True
-        return metrics
+        api_path_alive = False
+    else:
+        try:
+            from openai import OpenAI  # type: ignore
+        except ImportError:
+            metrics["skipped_no_package"] = True
+            api_path_alive = False
 
-    try:
-        from openai import OpenAI  # type: ignore
-    except ImportError:
-        metrics["skipped_no_package"] = True
-        return metrics
-
-    client = OpenAI()
+    client = OpenAI() if api_path_alive else None   # type: ignore[name-defined]
     cache  = _load_cache(cache_path)
 
     n_processed = 0
@@ -197,11 +244,12 @@ def enrich_listings(listings: list[Any],
         key = f"{_g(li, 'source')}|{_g(li, 'source_id')}"
         current_md5 = _description_md5(li)
         cached = cache.get(key)
+        entry: dict[str, Any] | None = None
 
         if cached and cached.get("description_md5") == current_md5:
             metrics["cache_hits"] += 1
             entry = cached
-        else:
+        elif api_path_alive and client is not None:
             metrics["cache_misses"] += 1
             try:
                 entry = _enrich_one(li, client, model)
@@ -211,14 +259,31 @@ def enrich_listings(listings: list[Any],
             except Exception as e:
                 metrics["api_calls_failed"] += 1
                 print(f"[ai_enrich] {key}: {e!r}")
-                continue
+                if _is_global_error(e):
+                    # Auth / quota / billing — every subsequent call would
+                    # fail the same way. Switch off the API path; remaining
+                    # listings get fallback templates only.
+                    metrics["global_error_seen"] = type(e).__name__
+                    api_path_alive = False
+                    print(f"[ai_enrich] global error detected — disabling "
+                          f"API path for remaining {len(listings) - n_processed} listings")
+                entry = None
 
-        # Apply enriched fields onto the listing
-        _set(li, "title_canonical",              entry.get("title_canonical"))
-        _set(li, "short_description_canonical",  entry.get("short_description_canonical"))
-        _set(li, "reasons_to_buy",               entry.get("reasons_to_buy") or [])
-        cq = entry.get("content_quality") or "low"
-        metrics["content_quality"][cq] = metrics["content_quality"].get(cq, 0) + 1
+        # Apply AI fields if available
+        if entry:
+            _set(li, "title_canonical",              entry.get("title_canonical"))
+            _set(li, "short_description_canonical",  entry.get("short_description_canonical"))
+            _set(li, "reasons_to_buy",               entry.get("reasons_to_buy") or [])
+            cq = entry.get("content_quality") or "low"
+            metrics["content_quality"][cq] = metrics["content_quality"].get(cq, 0) + 1
+
+        # Fallback: fills title_canonical + reasons_to_buy from PRD-spec
+        # templates whenever they're not already set (no overwrite if AI
+        # succeeded). short_description_canonical stays None — needs AI.
+        if _fb_apply is not None:
+            written = _fb_apply(li)
+            if written:
+                metrics["fallback_applied"] += 1
 
     metrics["total_cost_usd"] = round(metrics["total_cost_usd"], 6)
     _save_cache(cache_path, cache)
