@@ -163,8 +163,10 @@ jobs:
               sys.exit(1)
           EOF
 
-      - name: Commit refreshed data
+      - name: Commit refreshed data via PR
         id: commit
+        env:
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
         run: |
           git config user.name "pulpo-bot"
           git config user.email "bot@pulpo.club"
@@ -179,12 +181,20 @@ jobs:
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
             echo "committed=false" >> "$GITHUB_OUTPUT"
-          else
-            git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
-            git pull --rebase
-            git push
-            echo "committed=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          # main is PR-protected — push to a dated branch and auto-merge a PR.
+          BRANCH="chore/nightly-data-$(date -u +%Y-%m-%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore(data): nightly run $(date -u +%Y-%m-%d)" \
+            --body "Automated nightly data refresh. No code changes."
+          # Try auto-merge; fall back to admin merge for protected branches
+          gh pr merge "$BRANCH" --squash --delete-branch --admin || \
+            gh pr merge "$BRANCH" --squash --delete-branch --auto
+          echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel
         # Only runs when fresh data was actually committed.
