@@ -26,6 +26,7 @@ from pulpo.normalize import normalize  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
 from automation.validation import validate  # noqa: E402
 from automation.field_audit import build_completeness_block  # noqa: E402
+from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -405,6 +406,19 @@ def main() -> int:
     history = history[-60:]
     with history_path.open("w", encoding="utf-8") as f:
         json.dump(history, f)
+
+    # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}
+    # so weekly drift in field populations is visible without a manual re-run.
+    # Non-blocking: any failure is logged and the nightly run still succeeds.
+    try:
+        run_feasibility_probe(
+            input_path = web_data_dir / "ranked.json",
+            out_md     = web_data_dir / "prd_feasibility.md",
+            out_json   = web_data_dir / "prd_feasibility.json",
+        )
+        print("[run] prd_feasibility probe ok")
+    except Exception as _e:
+        print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
 
     # Summary line for CI logs
     print(
