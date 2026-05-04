@@ -8,11 +8,17 @@
     "sea view",
     "vistas al oc[eé]ano",
     "vista al oc[eé]ano",
-    "view of the ocean"
+    "view of the ocean",
+    "vista al pac[ií]fico",
+    "frente al pac[ií]fico",
+    "vistas panor[aá]micas al mar",
+    "vista panor[aá]mica al mar",
+    "vistas? al mar",
+    "panoramic ocean"
   ],
   "negative": [
     "sin vista al mar",
     "no ocean view"
   ],
-  "_comment": "PRD §FR-2.5. Geometric upgrade in Phase 2 once lat/lng land."
+  "_comment": "PRD §FR-2.5 + SV-specific (Pacífico is the local ocean). Geometric upgrade in Phase 2 once lat/lng land."
 }

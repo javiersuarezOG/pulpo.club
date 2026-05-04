@@ -7,7 +7,11 @@
     "\\bflat\\b",
     "lote plano",
     "topograf[ií]a plana",
-    "\\bnivel\\b"
+    "\\bnivel\\b",
+    "\\bnivelado\\b",
+    "superficie plana",
+    "totalmente plano",
+    "completamente plano"
   ],
   "negative": [
     "no es plano",
@@ -16,7 +20,10 @@
     "irregular",
     "con pendiente",
     "pendiente pronunciada",
-    "topograf[ií]a irregular"
+    "topograf[ií]a irregular",
+    "ligeramente inclinado",
+    "lote a desnivel",
+    "con desnivel"
   ],
-  "_comment": "PRD §FR-2.4 boolean_with_negation: match positives but suppress when negation appears within 3-word window."
+  "_comment": "PRD §FR-2.4 boolean_with_negation: match positives but suppress when negation appears within 3-word window. Negatives extended to catch SV-specific 'a desnivel' / 'desnivelado' phrasing that's commonly used to describe sloped terrain."
 }

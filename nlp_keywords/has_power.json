@@ -14,7 +14,15 @@
     "con luz",
     "servicio el[eé]ctrico",
     "tiene electricidad",
-    "con electricidad"
+    "con electricidad",
+    "\\bdelsur\\b",
+    "\\bcaess\\b",
+    "transformador",
+    "poste de luz",
+    "red el[eé]ctrica",
+    "medidor el[eé]ctrico",
+    "\\b110v\\b",
+    "\\b220v\\b"
   ],
   "negative": [
     "sin luz",
@@ -23,5 +31,5 @@
     "no power",
     "no electricity"
   ],
-  "_comment": "PRD §FR-2.5 starting dictionary."
+  "_comment": "PRD §FR-2.5 + SV electricity providers (DELSUR, CAESS) and physical infrastructure markers (poste de luz, transformador, medidor)."
 }

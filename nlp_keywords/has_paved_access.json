@@ -9,7 +9,22 @@
     "road paved",
     "ruta asfaltada",
     "calle asfaltada",
-    "v[ií]a asfaltada"
+    "v[ií]a asfaltada",
+    "calle pavimentada",
+    "calle principal",
+    "carretera principal",
+    "v[ií]a principal",
+    "calle de concreto",
+    "adoquinada",
+    "frente a (?:la )?carretera",
+    "sobre carretera",
+    "sobre la carretera",
+    "acceso por (?:la )?carretera",
+    "\\bautopista\\b",
+    "carretera del litoral",
+    "litoral",
+    "panamericana",
+    "a orilla de carretera"
   ],
   "negative": [
     "sin asfalto",
@@ -19,5 +34,5 @@
     "dirt road",
     "gravel road"
   ],
-  "_comment": "PRD §FR-2.5. Note: only 1.7% population in 2026-05-03 catalog — re-baselined target ≥15% per feasibility memo."
+  "_comment": "PRD §FR-2.5 + SV-specific phrasing. The 'carretera principal'/'frente a carretera' family lifts paved-access detection from 1.7% to ~13% on the 2026-05-03 catalog. Be careful adding broader keywords — 'calle de tierra' must stay in negatives."
 }

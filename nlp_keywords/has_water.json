@@ -12,7 +12,14 @@
     "water supply",
     "tiene agua",
     "con agua",
-    "servicio de agua"
+    "servicio de agua",
+    "\\bcisterna\\b",
+    "tanque de agua",
+    "\\baljibe\\b",
+    "agua de pozo",
+    "servicio hidr[aá]ulico",
+    "\\bnacimientos?\\b",
+    "\\bpila\\b"
   ],
   "negative": [
     "sin agua",
@@ -20,5 +27,5 @@
     "no tiene agua",
     "no water"
   ],
-  "_comment": "PRD §FR-2.5 starting dictionary + extensions. Edit positives to lift recall, edit negatives to suppress false positives. Re-run python3 -m pulpo.nlp_extractor --check after editing to see population delta."
+  "_comment": "PRD §FR-2.5 + SV-specific extensions (cisterna/aljibe/pila are common storage; nacimiento = natural spring). Edit positives to lift recall, edit negatives to suppress false positives. Re-run python3 -m pulpo.nlp_extractor --check after editing to see population delta."
 }
