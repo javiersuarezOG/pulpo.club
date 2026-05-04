@@ -177,6 +177,8 @@ jobs:
           # Optional files — only add if they exist
           git add web/data/photo_fetch_log.jsonl 2>/dev/null || true
           git add web/data/photo_storage_size.jsonl 2>/dev/null || true
+          git add web/data/prd_feasibility.json 2>/dev/null || true
+          git add web/data/prd_feasibility.md 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."

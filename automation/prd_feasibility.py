@@ -324,26 +324,19 @@ def render_md(r: dict) -> str:
     return "\n".join(out)
 
 
-def main() -> int:
-    p = argparse.ArgumentParser(description="PRD WS2 field-feasibility probe")
-    p.add_argument("--input", type=Path,
-                   default=REPO / "web" / "data" / "ranked.json",
-                   help="ranked.json to probe (default: web/data/ranked.json)")
-    p.add_argument("--out-md", type=Path,
-                   default=REPO / "web" / "data" / "prd_feasibility.md")
-    p.add_argument("--out-json", type=Path,
-                   default=REPO / "web" / "data" / "prd_feasibility.json")
-    args = p.parse_args()
+def run_probe(input_path: Path, out_md: Path, out_json: Path) -> dict:
+    """Run the probe and write outputs. Returns the in-memory report.
 
-    if not args.input.exists():
-        print(f"ERROR: {args.input} not found — run automation/run.py first",
-              file=sys.stderr)
-        return 1
-    data = json.loads(args.input.read_text(encoding="utf-8"))
+    Raises FileNotFoundError if the input is missing or empty. Importable
+    by automation/run.py so the nightly pipeline can refresh feasibility
+    numbers without shelling out to a subprocess.
+    """
+    if not input_path.exists():
+        raise FileNotFoundError(f"{input_path} not found")
+    data = json.loads(input_path.read_text(encoding="utf-8"))
     n = len(data)
     if n == 0:
-        print("ERROR: ranked.json is empty", file=sys.stderr)
-        return 1
+        raise ValueError(f"{input_path} is empty")
 
     report = {
         "generated_at":        datetime.now(timezone.utc).isoformat(),
@@ -355,15 +348,33 @@ def main() -> int:
         "us01_cohort":         us01_cohort(data, n),
     }
 
-    args.out_json.parent.mkdir(parents=True, exist_ok=True)
-    args.out_json.write_text(json.dumps(report, indent=2, ensure_ascii=False))
-    args.out_md.write_text(render_md(report), encoding="utf-8")
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(report, indent=2, ensure_ascii=False))
+    out_md.write_text(render_md(report), encoding="utf-8")
+    return report
 
-    # Console summary line so CI / dashboards can grep
+
+def main() -> int:
+    p = argparse.ArgumentParser(description="PRD WS2 field-feasibility probe")
+    p.add_argument("--input", type=Path,
+                   default=REPO / "web" / "data" / "ranked.json",
+                   help="ranked.json to probe (default: web/data/ranked.json)")
+    p.add_argument("--out-md", type=Path,
+                   default=REPO / "web" / "data" / "prd_feasibility.md")
+    p.add_argument("--out-json", type=Path,
+                   default=REPO / "web" / "data" / "prd_feasibility.json")
+    args = p.parse_args()
+
+    try:
+        report = run_probe(args.input, args.out_md, args.out_json)
+    except (FileNotFoundError, ValueError) as e:
+        print(f"ERROR: {e} — run automation/run.py first", file=sys.stderr)
+        return 1
+
     nlp_green = sum(1 for r in report["nlp"] if r["verdict"] == "GREEN")
     nlp_amber = sum(1 for r in report["nlp"] if r["verdict"] == "AMBER")
     nlp_red   = sum(1 for r in report["nlp"] if r["verdict"] == "RED")
-    print(f"[prd_feasibility] catalog={n} "
+    print(f"[prd_feasibility] catalog={report['total_listings']} "
           f"nlp_fields green={nlp_green} amber={nlp_amber} red={nlp_red}  "
           f"us01_strict={report['us01_cohort']['all_three_signals']['pct']}% "
           f"us01_relaxed={report['us01_cohort']['any_one_signal']['pct']}%")
