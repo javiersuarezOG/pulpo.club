@@ -171,9 +171,11 @@ jobs:
           git add web/data/ranked.json web/data/ranked-public.json \
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
-                  web/data/photo_fetch_log.jsonl \
-                  "web/photos/" \
                   samples/ranked.csv
+          # Optional files — only add if they exist
+          git add web/data/photo_fetch_log.jsonl 2>/dev/null || true
+          git add web/data/photo_storage_size.jsonl 2>/dev/null || true
+          git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
             echo "committed=false" >> "$GITHUB_OUTPUT"
