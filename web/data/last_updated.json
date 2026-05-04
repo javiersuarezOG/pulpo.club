@@ -1,22 +1,26 @@
 {
-  "last_updated": "2026-05-03T15:29:46.688148+00:00",
-  "started_at": "2026-05-03T15:00:20.042865+00:00",
-  "duration_seconds": 1766.65,
-  "total_listings": 811,
+  "last_updated": "2026-05-04T14:41:04.262654+00:00",
+  "started_at": "2026-05-04T14:02:28.616374+00:00",
+  "duration_seconds": 2315.65,
+  "total_listings": 821,
   "dropped": 94,
   "per_source_raw": {
     "goodlife": 80,
     "oceanside": 27,
     "century21": 15,
     "bienesraices": 471,
-    "remax": 312
+    "remax": 313,
+    "nexo": 9,
+    "realtyelsalvador": 0
   },
   "source_status": {
     "goodlife": "green",
     "oceanside": "green",
     "century21": "green",
     "bienesraices": "green",
-    "remax": "green"
+    "remax": "green",
+    "nexo": "green",
+    "realtyelsalvador": "red"
   },
   "coverage": {
     "goodlife": {
@@ -41,7 +45,17 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 312,
+      "pulled": 313,
+      "max_pages_hit": false
+    },
+    "nexo": {
+      "supplier": null,
+      "pulled": 9,
+      "max_pages_hit": false
+    },
+    "realtyelsalvador": {
+      "supplier": null,
+      "pulled": 0,
       "max_pages_hit": false
     }
   },
@@ -121,6 +135,31 @@
         "description": 1.0
       }
     },
+    "nexo": {
+      "n_listings": 9,
+      "fields": {
+        "price_usd": 1.0,
+        "area_m2": 1.0,
+        "zone": 0.44,
+        "municipality": 0.44,
+        "department": 0.78,
+        "location_text": 1.0,
+        "lat": 0.0,
+        "lng": 0.0,
+        "is_beachfront": 0.0,
+        "has_paved_access": 0.0,
+        "has_water": 0.0,
+        "has_power": 0.0,
+        "is_repriced": 0.0,
+        "days_listed": 0.0,
+        "photos_count": 1.0,
+        "broker_name": 0.0,
+        "broker_phone": 0.0,
+        "broker_email": 0.0,
+        "title": 1.0,
+        "description": 1.0
+      }
+    },
     "oceanside": {
       "n_listings": 13,
       "fields": {
@@ -147,7 +186,7 @@
       }
     },
     "remax": {
-      "n_listings": 307,
+      "n_listings": 308,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -173,7 +212,7 @@
     }
   },
   "property_type_counts": {
-    "land": 811
+    "land": 821
   },
   "v_fallback_no_price": 31,
   "v_fallback_no_comps": 0,
@@ -182,7 +221,9 @@
     "oceanside",
     "century21",
     "bienesraices",
-    "remax"
+    "remax",
+    "nexo",
+    "realtyelsalvador"
   ],
   "offline": false,
   "fixture_fallback_active": false,
