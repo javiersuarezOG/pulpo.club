@@ -35,6 +35,30 @@ import io      # noqa: E402
 import time as _time  # noqa: E402
 
 
+def _classify_error(exc: BaseException) -> str:
+    """Map a scraper exception to a short, alert-friendly category.
+
+    Used by source health telemetry so the watchdog can say "remax has had
+    4 ParseError(NoListings) in 6 runs" rather than "remax errored."
+    Categories are deliberately coarse — refine over time as alert rules
+    mature.
+    """
+    name = type(exc).__name__
+    msg  = (str(exc) or "").lower()
+    # httpx, requests, urllib3 timeouts — all use these substrings
+    if "timeout" in name.lower() or "timeout" in msg:
+        return "NetworkTimeout"
+    if "connect" in name.lower() or "connection" in msg or "dns" in msg:
+        return "NetworkError"
+    if "httpstatus" in name.lower() or "http" in name.lower():
+        return "HTTPError"
+    if name in ("JSONDecodeError",) or "json" in msg:
+        return "JSONDecodeError"
+    if name in ("KeyError", "IndexError", "AttributeError", "ValueError"):
+        return "ParseError"
+    return "Unknown"
+
+
 def _download_hero_photos(listings, repo: Path) -> dict:
     """Download + resize the first photo_url for each listing with photos.
 
@@ -170,8 +194,10 @@ def main() -> int:
         print(f"WARNING: {msg}", file=sys.stderr)
         errors.append(msg)
 
-    source_errors: dict[str, str] = {}   # src -> error message
-    source_meta: dict[str, dict] = {}    # src -> {max_pages_hit, limit_hit}
+    source_errors: dict[str, str] = {}     # src -> error message
+    source_meta: dict[str, dict] = {}      # src -> {max_pages_hit, limit_hit}
+    source_durations: dict[str, float] = {}  # src -> seconds in mod.crawl
+    source_error_class: dict[str, str] = {}  # src -> short error category
 
     for src in sources:
         src = src.strip()
@@ -180,7 +206,9 @@ def main() -> int:
             err = f"unknown source: {src}"
             errors.append(err)
             source_errors[src] = err
+            source_error_class[src] = "UnknownSource"
             continue
+        crawl_started = _time.monotonic()
         try:
             if hasattr(mod, "crawl_with_meta"):
                 result = mod.crawl_with_meta(limit=limit, offline=offline or None)
@@ -196,11 +224,45 @@ def main() -> int:
             err = repr(e)
             errors.append(f"{src}: {err}")
             source_errors[src] = err
+            source_error_class[src] = _classify_error(e)
+            source_durations[src] = round(_time.monotonic() - crawl_started, 2)
             continue
+        source_durations[src] = round(_time.monotonic() - crawl_started, 2)
         per_source_count[src] = len(recs)
         for r in recs:
             r.setdefault("source", src)
             raw.append(r)
+
+    # ── Per-source health telemetry ──────────────────────────────────
+    # Append one row per source per run to web/data/source_health_history.jsonl
+    # so we can detect "scraper X went silent for 3 days" without staring at
+    # the dashboard. Same idea as run_history.json but per-source granular,
+    # and with error classification for the watchdog to alert on.
+    health_path = REPO / "web" / "data" / "source_health_history.jsonl"
+    health_path.parent.mkdir(parents=True, exist_ok=True)
+    health_ts = started.isoformat()
+    with health_path.open("a", encoding="utf-8") as _hf:
+        for src in sources:
+            src = src.strip()
+            count = per_source_count.get(src, 0)
+            had_error = src in source_errors
+            if had_error:
+                status = "red"
+            elif count == 0:
+                status = "red"
+            else:
+                status = "green"
+            _hf.write(json.dumps({
+                "ts":          health_ts,
+                "source":      src,
+                "status":      status,
+                "count":       count,
+                "duration_s":  source_durations.get(src, 0.0),
+                "error_class": source_error_class.get(src),
+                "error_msg":   (source_errors.get(src) or "")[:300],
+                "max_pages_hit": source_meta.get(src, {}).get("max_pages_hit", False),
+                "limit_hit":     source_meta.get(src, {}).get("limit_hit", False),
+            }, ensure_ascii=False) + "\n")
 
     # Normalize
     listings = []

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulpo.club/schemas/listing.v1.json",
+  "title": "Pulpo Listing Schema v1",
+  "version": "1.0.0",
+  "description": "Canonical post-normalize listing record. Every scraper, after normalize(), MUST produce records that validate against this schema. PRD §FR-1 reference. Required fields are the minimal identity set; everything else is nullable per PRD §FR-1.3 (Core fields that cannot be extracted must be written as null, not omitted).",
+
+  "type": "object",
+  "additionalProperties": true,
+
+  "required": ["source", "source_id", "url", "title", "country", "scraped_at"],
+
+  "$comment": "Field groups follow PRD §6 — A=Identity/Location, B=Physical, C=Price/Market, D=Accessibility, E=Environmental, F=Zoning, G=Media, H=DerivedSignals. Existing-pipeline fields use legacy names (source, broker_*, zone) — Phase 1 schema rename pass will alias these to PRD spec names.",
+
+  "properties": {
+
+    "source":            {"type": "string", "minLength": 1, "$comment": "PRD §6.A source_platform. Snake_case, matches scraper module name."},
+    "source_id":         {"type": "string", "minLength": 1},
+    "source_type":       {"type": ["string", "null"], "enum": ["on_market", "off_market", null], "$comment": "PRD §6.A. Set by scraper config, not inferred."},
+    "url":               {"type": "string", "format": "uri", "$comment": "PRD §6.A original_url"},
+    "scraped_at":        {"type": "string", "format": "date-time"},
+
+    "title":             {"type": "string", "$comment": "PRD §6.A title_raw"},
+    "title_canonical":   {"type": ["string", "null"], "maxLength": 80, "$comment": "PRD §6.A — AI-generated, ships Phase 1"},
+    "description":       {"type": "string", "$comment": "PRD §6.A description_raw"},
+    "short_description_canonical": {"type": ["string", "null"]},
+    "reasons_to_buy":    {"type": ["array", "null"], "items": {"type": "string"}, "minItems": 0, "maxItems": 3},
+
+    "country":           {"type": "string", "minLength": 2},
+    "department":        {"type": ["string", "null"], "$comment": "PRD §6.A province_state"},
+    "municipality":      {"type": ["string", "null"], "$comment": "PRD §6.A city"},
+    "zone":              {"type": ["string", "null"], "$comment": "PRD §6.A zone_name"},
+    "zone_confidence":   {"type": ["string", "null"], "enum": ["specific", "municipality", "department", "unresolved", null]},
+    "location_text":     {"type": ["string"], "$comment": "PRD §6.A address_raw"},
+    "lat":               {"type": ["number", "null"], "minimum": -90, "maximum": 90},
+    "lng":               {"type": ["number", "null"], "minimum": -180, "maximum": 180},
+
+    "area_m2":           {"type": ["number", "null"], "minimum": 0, "$comment": "Existing platform field per PRD §6 note"},
+    "raw_size_text":     {"type": ["string", "null"]},
+    "price_usd":         {"type": ["number", "null"], "minimum": 0, "$comment": "Existing platform field"},
+    "raw_price_text":    {"type": ["string", "null"]},
+    "price_per_m2":      {"type": ["number", "null"], "minimum": 0, "$comment": "Existing platform field"},
+
+    "property_type":     {"type": "string", "enum": ["land", "lot", "finca", "house+lot", "residential", "agricultural", "commercial", "recreational", "mixed", "raw"], "$comment": "PRD §6.B land_type"},
+    "is_beachfront":     {"type": "boolean"},
+    "is_in_development": {"type": "boolean"},
+    "development_name":  {"type": ["string", "null"]},
+    "has_paved_access":  {"type": "boolean", "$comment": "PRD §6.D road_access_type=paved (boolean form)"},
+    "has_water":         {"type": "boolean"},
+    "has_power":         {"type": "boolean"},
+    "is_repriced":       {"type": "boolean", "$comment": "PRD §6.C — calculated via FR-3 price history, ships Phase 1"},
+    "is_sold":           {"type": "boolean", "default": false},
+    "date_sold":         {"type": ["string", "null"], "format": "date-time"},
+
+    "days_listed":       {"type": ["integer", "null"], "minimum": 0, "$comment": "PRD §6.C. Phase 1: derived from first_seen_at, will be 100% populated"},
+    "first_seen_at":     {"type": ["string", "null"], "format": "date-time"},
+
+    "photos_count":      {"type": "integer", "minimum": 0},
+    "photo_urls":        {"type": "array", "items": {"type": "string", "format": "uri"}},
+    "hero_photo_path":   {"type": ["string", "null"]},
+
+    "broker_name":       {"type": ["string", "null"], "$comment": "PRD §6.A agent_name"},
+    "broker_phone":      {"type": ["string", "null"], "$comment": "PRD §6.A agent_phone — encrypt at rest per PRD §10"},
+    "broker_email":      {"type": ["string", "null"], "$comment": "PRD §6.A agent_email — encrypt at rest"},
+
+    "validation_status": {"type": ["string", "null"], "enum": ["flagged", null]},
+    "validation_warnings": {"type": "array", "items": {"type": "string"}},
+
+    "rank":              {"type": ["integer", "null"], "minimum": 1},
+    "rank_score":        {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "zone_percentile":   {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "value_score":       {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "location_score":    {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "momentum_score":    {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "quality_score":     {"type": ["number", "null"]},
+    "upside_score":      {"type": ["number", "null"]},
+    "liquidity_score":   {"type": ["number", "null"]},
+    "rank_reasons":      {"type": "array", "items": {"type": "string"}},
+
+    "data_quality_score":{"type": ["number", "null"], "minimum": 0, "maximum": 1, "$comment": "PRD §FR-7.4. Phase 1."},
+    "investment_signal": {"type": ["string", "null"], "enum": ["deal", "hot", "stale", "new", null], "$comment": "PRD §6.H. Phase 3."},
+    "readiness_score":   {"type": ["integer", "null"], "minimum": 0, "maximum": 3, "$comment": "PRD §6.H. Phase 1."},
+    "source_label":      {"type": "array", "items": {"type": "string", "enum": ["Beachfront", "Off-Market", "Price Drop", "New", "Build-Ready", "Hot"]}, "$comment": "PRD §6.H. Phase 1."}
+  }
+}
