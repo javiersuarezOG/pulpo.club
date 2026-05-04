@@ -1,0 +1,18 @@
+{
+  "field": "has_water_body",
+  "type": "boolean",
+  "positive": [
+    "\\br[ií]o\\b",
+    "quebrada",
+    "\\bcreek\\b",
+    "riachuelo",
+    "\\blaguna\\b",
+    "\\blago\\b",
+    "arroyo",
+    "\\briver\\b",
+    "\\bstream\\b",
+    "manantial"
+  ],
+  "negative": [],
+  "_comment": "PRD §FR-2.5."
+}

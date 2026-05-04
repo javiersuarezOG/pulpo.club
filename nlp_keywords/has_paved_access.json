@@ -1,0 +1,23 @@
+{
+  "field": "has_paved_access",
+  "type": "boolean",
+  "positive": [
+    "acceso asfaltado",
+    "asfalto",
+    "\\bpaved\\b",
+    "carretera pavimentada",
+    "road paved",
+    "ruta asfaltada",
+    "calle asfaltada",
+    "v[ií]a asfaltada"
+  ],
+  "negative": [
+    "sin asfalto",
+    "no pavimentado",
+    "calle de tierra",
+    "camino de tierra",
+    "dirt road",
+    "gravel road"
+  ],
+  "_comment": "PRD §FR-2.5. Note: only 1.7% population in 2026-05-03 catalog — re-baselined target ≥15% per feasibility memo."
+}

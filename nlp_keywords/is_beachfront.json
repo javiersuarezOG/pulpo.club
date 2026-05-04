@@ -1,0 +1,18 @@
+{
+  "field": "is_beachfront",
+  "type": "boolean",
+  "positive": [
+    "frente al mar",
+    "frente a la playa",
+    "beachfront",
+    "ocean front",
+    "primera l[ií]nea de playa",
+    "directly on the beach",
+    "directamente en la playa"
+  ],
+  "negative": [
+    "cerca del mar",
+    "near the beach"
+  ],
+  "_comment": "PRD §FR-2.5. The model already has is_beachfront as a bool; NLP populates it where scrapers don't. Phase 2 geocoding upgrades to geometric distance-to-coast (PRD §FR-5.6)."
+}

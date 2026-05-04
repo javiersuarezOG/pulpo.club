@@ -1,0 +1,24 @@
+{
+  "field": "has_water",
+  "type": "boolean",
+  "positive": [
+    "\\bagua\\b",
+    "\\bpozo\\b",
+    "\\bwell\\b",
+    "\\basada\\b",
+    "\\baya\\b",
+    "agua potable",
+    "water hookup",
+    "water supply",
+    "tiene agua",
+    "con agua",
+    "servicio de agua"
+  ],
+  "negative": [
+    "sin agua",
+    "no agua",
+    "no tiene agua",
+    "no water"
+  ],
+  "_comment": "PRD §FR-2.5 starting dictionary + extensions. Edit positives to lift recall, edit negatives to suppress false positives. Re-run python3 -m pulpo.nlp_extractor --check after editing to see population delta."
+}

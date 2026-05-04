@@ -1,0 +1,22 @@
+{
+  "field": "is_flat",
+  "type": "boolean_with_negation",
+  "positive": [
+    "\\bplano\\b",
+    "terreno plano",
+    "\\bflat\\b",
+    "lote plano",
+    "topograf[ií]a plana",
+    "\\bnivel\\b"
+  ],
+  "negative": [
+    "no es plano",
+    "no plano",
+    "no flat",
+    "irregular",
+    "con pendiente",
+    "pendiente pronunciada",
+    "topograf[ií]a irregular"
+  ],
+  "_comment": "PRD §FR-2.4 boolean_with_negation: match positives but suppress when negation appears within 3-word window."
+}
