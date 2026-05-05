@@ -19,7 +19,7 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 
 if HTTPX_OK:
@@ -50,10 +50,8 @@ class BienesRaicesScraper:
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline
-        try:
-            self.REQUEST_DELAY = float(__import__("os").environ.get("PULPO_REQUEST_DELAY") or 1.5)
-        except (ValueError, TypeError):
-            self.REQUEST_DELAY = 1.5
+        # PULPO_REQUEST_DELAY env var honoured by DEFAULT_REQUEST_DELAY (html_crawler).
+        self.REQUEST_DELAY = DEFAULT_REQUEST_DELAY
 
     def report_total(self, client) -> None:  # noqa: ARG002
         """Supplier count not available as a reliable pre-fetch number.
@@ -75,10 +73,7 @@ class BienesRaicesScraper:
             # Step 1: sitemap
             time.sleep(self.REQUEST_DELAY)
             try:
-                resp = client.get(
-                    SITEMAP_URL,
-                    headers={**dict(client.headers), **SITEMAP_HEADERS},
-                )
+                resp = with_retries(lambda: client.get(SITEMAP_URL, headers={**dict(client.headers), **SITEMAP_HEADERS}))
                 resp.raise_for_status()
                 sitemap = resp.json()
             except Exception as e:
@@ -102,7 +97,7 @@ class BienesRaicesScraper:
                 url = f"{BASE}/propiedad/{slug}"
                 time.sleep(self.REQUEST_DELAY)
                 try:
-                    detail = client.get(url)
+                    detail = with_retries(lambda: client.get(url))
                     detail.raise_for_status()
                 except Exception as e:
                     print(f"[{self.slug}] detail failed {slug}: {e}")
