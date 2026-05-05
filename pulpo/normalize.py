@@ -612,6 +612,15 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         raw_price_text=raw_price_text,
         price_per_m2=price_per_m2,
         property_type=property_type,
+        # Type-specific fields — only populated for house/condo. Scrapers
+        # that don't yet ingest these types silently pass `None` through.
+        bedrooms=raw.get("bedrooms"),
+        bathrooms=raw.get("bathrooms"),
+        built_area_m2=raw.get("built_area_m2"),
+        year_built=raw.get("year_built"),
+        parking_spaces=raw.get("parking_spaces"),
+        floor=raw.get("floor"),
+        hoa_fee_usd_monthly=raw.get("hoa_fee_usd_monthly"),
         is_in_development=is_in_development,
         development_name=development_name,
         # Boolean attributes — scraper-supplied values win. When scraper didn't
