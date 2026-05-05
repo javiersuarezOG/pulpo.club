@@ -6,6 +6,13 @@ on:
     - cron: "0 12 * * *"
   workflow_dispatch: {}    # also allow manual runs
 
+# Single-flight: a manual trigger or a backed-up cron must not race a
+# still-running nightly — both would try to PR-merge dated data branches and
+# the second commit would lose. cancel-in-progress kills the older run.
+concurrency:
+  group: pulpo-nightly
+  cancel-in-progress: true
+
 # Count canaries — both fail the workflow without committing stale data.
 # FLOOR: raise if clean baseline grows. CEILING: raise if ceiling is hit
 # legitimately (new large source added). The asymmetry catches both supply
@@ -18,6 +25,10 @@ env:
 jobs:
   run:
     runs-on: ubuntu-latest
+    # Hard ceiling. A healthy run finishes in ~30 min; past 60 min something
+    # is hung (typically photo download or detail-page fetch). Better to fail
+    # the job and have watchdog page than burn Actions minutes silently.
+    timeout-minutes: 60
     permissions:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)

@@ -85,9 +85,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     log_path = repo / "web" / "data" / "photo_fetch_log.jsonl"
 
     attempted = ok = skipped = failed = 0
+    budget_s = float(os.environ.get("PULPO_PHOTO_BUDGET_S", "600"))
     t0 = _time.monotonic()
+    budget_hit = False
 
     for li in listings:
+        if _time.monotonic() - t0 > budget_s:
+            budget_hit = True
+            break
         if not li.photo_urls:
             continue
         url = li.photo_urls[0]
@@ -128,14 +133,17 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 }) + "\n")
 
     elapsed = _time.monotonic() - t0
-    if elapsed > 300:
+    if budget_hit:
+        print(f"[photos] WARNING: budget {budget_s:.0f}s exceeded — "
+              f"stopped at {ok}/{attempted} downloads ({skipped} skipped, {failed} failed)")
+    elif elapsed > 300:
         print(f"[photos] WARNING: download step took {elapsed:.0f}s (>5 min)")
 
     # Orphan pruning — photos with no matching listing move to _archive/
     _prune_orphan_photos(photos_dir, {f"{li.source}_{li.source_id}.jpg" for li in listings})
 
     return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
-            "elapsed_s": elapsed}
+            "elapsed_s": elapsed, "budget_hit": budget_hit}
 
 
 def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
