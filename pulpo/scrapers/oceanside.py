@@ -27,14 +27,14 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client
+from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client, with_retries
+from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 
 API_BASE   = "https://oceansideelsalvador.com/wp-json/wp/v2"
 BASE_URL   = "https://oceansideelsalvador.com/"
 PER_PAGE   = 100
 MAX_PAGES  = 50         # safety cap: 50 × 100 = 5 000 records
-REQUEST_DELAY = 1.5
 FIXTURE_FILE  = "sample_listings.json"
 
 # Land-type slugs we accept from the property-type taxonomy
@@ -231,7 +231,7 @@ class OceansideScraper:
             params = {"per_page": 1}
             if land_id:
                 params["property-type"] = land_id
-            r = client.get(f"{API_BASE}/rental-details", params=params)
+            r = with_retries(lambda: client.get(f"{API_BASE}/rental-details", params=params))
             r.raise_for_status()
             return int(r.headers.get("X-WP-Total") or 0) or None
         except Exception:
@@ -277,7 +277,7 @@ class OceansideScraper:
             params["page"] = page
             time.sleep(REQUEST_DELAY)
             try:
-                r = client.get(f"{API_BASE}/rental-details", params=params)
+                r = with_retries(lambda: client.get(f"{API_BASE}/rental-details", params=params))
                 r.raise_for_status()
             except Exception as e:
                 print(f"[oceanside] API page {page} failed: {e}")

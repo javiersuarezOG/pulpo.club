@@ -17,6 +17,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import (
     SELECTOLAX_OK, is_offline, load_fixtures, make_client,
     walk as _walk, walk_with_meta as _walk_meta,
+    DEFAULT_REQUEST_DELAY as REQUEST_DELAY,
 )
 from pulpo.agents import SOURCES, register
 
@@ -26,7 +27,6 @@ if SELECTOLAX_OK:
 BASE_URL = "https://goodlifeelsalvador.com/"
 LIST_URL = "https://goodlifeelsalvador.com/land/?page={page}"
 MAX_PAGES = 50
-REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 
 

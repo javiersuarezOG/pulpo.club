@@ -20,7 +20,8 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from pulpo.agents.html_crawler import SELECTOLAX_OK, HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents.html_crawler import SELECTOLAX_OK, HTTPX_OK, is_offline, load_fixtures, make_client, with_retries
+from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 
 if SELECTOLAX_OK:
@@ -29,7 +30,6 @@ if SELECTOLAX_OK:
 BASE = "https://nexo.com.sv"
 LIST_URL = BASE + "/terrenos-en-venta-el-salvador/{page}"
 MAX_PAGES = 20
-REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 
 
@@ -171,7 +171,7 @@ class NexoScraper:
             for page in range(1, MAX_PAGES + 1):
                 time.sleep(REQUEST_DELAY)
                 try:
-                    resp = client.get(LIST_URL.format(page=page))
+                    resp = with_retries(lambda: client.get(LIST_URL.format(page=page)))
                     resp.raise_for_status()
                     # Site uses ISO-8859-1 — encode response bytes explicitly
                     html = resp.content.decode("iso-8859-1", errors="replace")
@@ -194,7 +194,7 @@ class NexoScraper:
                     # Fetch detail page
                     time.sleep(REQUEST_DELAY)
                     try:
-                        dr = client.get(stub["url"])
+                        dr = with_retries(lambda: client.get(stub["url"]))
                         dr.raise_for_status()
                         detail_html = dr.content.decode("iso-8859-1", errors="replace")
                         rec = _parse_detail_page(detail_html, stub)
