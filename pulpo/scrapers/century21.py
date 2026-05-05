@@ -18,7 +18,7 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 
 if HTTPX_OK:
@@ -95,17 +95,13 @@ class Century21Scraper:
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline
-        env_delay = None
-        try:
-            env_delay = float(__import__("os").environ.get("PULPO_REQUEST_DELAY") or 1.5)
-        except (ValueError, TypeError):
-            env_delay = 1.5
-        self.REQUEST_DELAY = env_delay
+        # PULPO_REQUEST_DELAY env var honoured by DEFAULT_REQUEST_DELAY (html_crawler).
+        self.REQUEST_DELAY = DEFAULT_REQUEST_DELAY
 
     def report_total(self, client) -> Optional[int]:
         """Count land-type listings from the embedded OmniMLS JSON."""
         try:
-            resp = client.get(RESULTS_URL)
+            resp = with_retries(lambda: client.get(RESULTS_URL))
             resp.raise_for_status()
             raw = _extract_results(resp.text)
             return sum(1 for r in raw if r.get("tipoPropiedad") in LAND_TYPES)
@@ -119,7 +115,7 @@ class Century21Scraper:
         try:
             time.sleep(self.REQUEST_DELAY)
             try:
-                resp = client.get(RESULTS_URL)
+                resp = with_retries(lambda: client.get(RESULTS_URL))
                 resp.raise_for_status()
             except Exception as e:
                 print(f"[{self.slug}] fetch failed: {e}")
@@ -143,7 +139,7 @@ class Century21Scraper:
                 if mapped.get("url"):
                     try:
                         time.sleep(self.REQUEST_DELAY)
-                        dresp = client.get(mapped["url"])
+                        dresp = with_retries(lambda: client.get(mapped["url"]))
                         if dresp.status_code == 200:
                             mapped["description"] = _extract_description(dresp.text)
                         else:
