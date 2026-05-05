@@ -15,6 +15,21 @@ import pytest
 
 REPO = Path(__file__).resolve().parent.parent
 
+def _frontend_text() -> str:
+    """Concatenate index.html + assets/index.css + assets/index.js for grep-style assertions.
+
+    The frontend was split into separate files in chore/split-frontend so the
+    HTML stays under 14 KB. Tests that grep for inline CSS or JS now grep
+    against the concatenated text instead of just the HTML.
+    """
+    parts = [(REPO / "web/index.html").read_text()]
+    for asset in ("index.css", "index.js"):
+        p = REPO / "web/assets" / asset
+        if p.exists():
+            parts.append(p.read_text())
+    return "\n".join(parts)
+
+
 
 # ── Score-to-stars ────────────────────────────────────────────────────
 
@@ -502,7 +517,7 @@ def test_sources_format_includes_live():
 def test_brand_dot_color_is_literal():
     """The brand dot uses literal #1D9E75, not a CSS variable."""
     import re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # hdr-dot class should set color to #1D9E75 directly
     assert ".hdr-dot{color:#1D9E75}" in html or ".hdr-dot{color:#1D9E75" in html, \
         "Brand dot must use literal color #1D9E75, not a CSS var"
@@ -511,13 +526,13 @@ def test_brand_dot_color_is_literal():
 def test_badge_svg_stroke_color():
     """The SVG asterisk in the badge uses stroke #085041 (brand dark teal)."""
     import re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert 'stroke="#085041"' in html, "Badge SVG must use stroke #085041"
 
 
 def test_header_border_bottom_present():
     """Site header has a bottom border (not the old topbar height-based approach)."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert ".site-header" in html, "New header class must be .site-header"
     # The filter-bar DIV element must come after the closing </header> tag
     header_end = html.find("</header>")
@@ -644,7 +659,7 @@ def test_mobile_sort_dropdown_has_newest_option():
     remove the only mobile-accessible path to the time-based sort.
     """
     import re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert 'value="newest_desc"' in html, "Mobile sort missing the newest_desc option"
     # Sanity: the option's display label mentions "newest" in some form
     # (case-insensitive). Pinned this way so future copy edits don't break
@@ -670,7 +685,7 @@ def test_url_state_regex_includes_newest():
     require updating this test alongside the regex.
     """
     import re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # Find the readURL sort regex: look for a `(<tokens>)_(asc|desc)$` pattern
     # constrained to a |-separated lowercase identifier list.
     m = re.search(r"\(([a-z|]+)\)_\(asc\|desc\)\$/", html)
@@ -690,7 +705,7 @@ def test_new_badge_helper_present():
     (`${newBadgeHTML(r)}` in renderTable + renderCards) would silently
     produce 'undefined' strings.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "function newBadgeHTML" in html
     assert "function isNewListing" in html
     assert "${newBadgeHTML(r)}" in html, (
@@ -772,7 +787,7 @@ def test_price_filter_max_idx_is_infinity():
 
 def test_price_snap_array_length_matches_labels():
     """PRICE_SNAPS and PRICE_LABELS must agree in length — drift would mis-label sliders."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # Both arrays declared on the same script block; pull their literal lengths.
     import re as _re
     snap_match = _re.search(r"PRICE_SNAPS\s*=\s*\[([^\]]+)\]", html)
@@ -793,7 +808,7 @@ def test_tune_panel_dom_contracts_present():
     breaks the price filter (button stops opening the panel, panel stops
     rendering, or filtered rows stop respecting the slider state).
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # Tune button anchored in the filter bar.
     assert 'id="tune-open"' in html
     # Desktop and mobile panels exist.
@@ -812,7 +827,7 @@ def test_url_state_omits_default_price_range():
     the range. This keeps the default URL clean and ensures shareable URLs
     only carry the filter state that actually differs from the page default.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # The pushURL function checks against the defaults before setting params.
     assert "PRICE_MIN_IDX !== 0" in html
     assert "PRICE_MAX_IDX !== PRICE_SNAPS.length-1" in html
@@ -892,7 +907,7 @@ def test_size_filter_max_idx_is_infinity():
 
 def test_size_snap_array_length_matches_labels():
     """SIZE_SNAPS and SIZE_LABELS must agree in length."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     import re as _re
     snap_match  = _re.search(r"SIZE_SNAPS\s*=\s*\[([^\]]+)\]",  html)
     label_match = _re.search(r"SIZE_LABELS\s*=\s*\[([^\]]+)\]", html)
@@ -907,7 +922,7 @@ def test_size_snap_array_length_matches_labels():
 
 def test_size_filter_dom_contracts_present():
     """Size filter is wired into the same Tune panel surfaces as price."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # Filter logic referenced in filteredRows.
     assert "_sizeInRange" in html, (
         "filteredRows() no longer references _sizeInRange — size filter is dead"
@@ -920,7 +935,7 @@ def test_size_filter_dom_contracts_present():
 
 def test_url_state_omits_default_size_range():
     """pushURL only emits ?size_min/?size_max when narrowed from defaults."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "SIZE_MIN_IDX  !== 0" in html or "SIZE_MIN_IDX !== 0" in html
     assert "SIZE_MAX_IDX  !== SIZE_SNAPS.length-1" in html or "SIZE_MAX_IDX !== SIZE_SNAPS.length-1" in html
 
@@ -944,7 +959,7 @@ def test_m2_per_vara2_constant_matches_python():
     units) divides m² by this value. Drift between the JS literal and the
     Python source-of-truth means visible price/area numbers diverge.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "M2_PER_VARA2 = 0.698896" in html, (
         "JS M2_PER_VARA2 literal drifted from pulpo/units.py:19 (= 0.698896)"
     )
@@ -976,7 +991,7 @@ def test_score_dimensions_constant_exists():
     labels. Removing it forces the breakdown bars back into per-call-site
     string literals, which is exactly the drift we just stamped out.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "const SCORE_DIMENSIONS" in html, (
         "SCORE_DIMENSIONS dropped — score-bar labels would diverge per surface"
     )
@@ -985,7 +1000,7 @@ def test_score_dimensions_constant_exists():
 def test_score_dimensions_canonical_labels_present():
     """All three canonical labels appear in the SCORE_DIMENSIONS array."""
     import re as _re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     block = _re.search(r"const SCORE_DIMENSIONS\s*=\s*\[(.+?)\];", html, _re.DOTALL)
     assert block, "SCORE_DIMENSIONS array not found"
     body = block.group(1)
@@ -999,7 +1014,7 @@ def test_old_deal_label_removed_from_user_facing_surfaces():
     breakdown rows or the methodology composite formula. Sort dropdown
     `value="deal_desc"` is the URL state key — that stays for stability.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # Score breakdown rows used to literally contain 'Deal' as a label.
     # The panelHTML now reads from SCORE_DIMENSIONS; a literal 'Deal' in
     # there would mean a stale per-call-site string snuck back in.
@@ -1022,7 +1037,7 @@ def test_sort_dropdown_uses_consistent_dimension_label():
     don't break this test for the wrong reason.
     """
     import re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     m = re.search(r'value="deal_desc"[^>]*>([^<]+)</option>', html, re.I)
     assert m, "Sort dropdown is missing the deal_desc option"
     assert "Price vs Comps" in m.group(1), (
@@ -1038,7 +1053,7 @@ def test_score_name_is_a_button():
     the help cursor signaling interactivity — exactly the bug we're
     fixing here.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     # The scoreBarHTML componentizer renders a <button>.
     assert "<button" in html and "class=\"score-name js-open-methodology\"" in html, (
         ".score-name is no longer a button — click-to-open-methodology won't work"
@@ -1060,7 +1075,7 @@ def test_methodology_open_helper_exists_and_is_called():
     and could be called by future surfaces (e.g. info icons next to
     table column headers).
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "function openMethodologyModal" in html
     assert "openMethodologyModal()" in html, (
         "openMethodologyModal defined but never called — modal is unreachable"
@@ -1154,7 +1169,7 @@ def test_recompute_handles_missing_score_when_weight_zero():
 def test_weight_defaults_constant_in_html():
     """The JS WEIGHT_DEFAULTS must match the Python ranker composite."""
     import re as _re
-    html = open("web/index.html").read()
+    html = _frontend_text()
     match = _re.search(r"WEIGHT_DEFAULTS\s*=\s*\{([^}]+)\}", html)
     assert match, "WEIGHT_DEFAULTS not found"
     body = match.group(1)
@@ -1169,7 +1184,7 @@ def test_weight_sliders_dom_present():
     """Each V/L/M slider exists in the rendered Tune panel HTML
     (or its render function — the DOM elements are created at runtime
     via _weightSliderHTML, but the function must exist)."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "function _weightSliderHTML" in html
     assert "function _weightSectionHTML" in html
     assert "function _wireWeightSliders" in html
@@ -1183,7 +1198,7 @@ def test_composite_sort_option_present():
     """The composite sort option lets users sort by their re-blended
     composite; without it, the sliders only affect the panel scores
     on screen and don't actually reorder the table by the new weights."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert 'value="composite_desc"' in html, (
         "Sort dropdown lost the composite option — sliders can't reorder"
     )
@@ -1197,7 +1212,7 @@ def test_weight_url_state_round_trips():
     pushURL only emits ?w when WEIGHTS differ from defaults — same
     discipline as the price/size keys. URL stays clean at defaults.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "p.get('w')" in html, "readURL doesn't parse ?w= URL state"
     assert "p.set('w'," in html or "p.set(\"w\"," in html, (
         "pushURL doesn't emit ?w= URL state"
@@ -1210,7 +1225,7 @@ def test_weight_url_state_round_trips():
 def test_url_regex_includes_composite():
     """readURL's sort regex accepts 'composite' so ?sort=composite_desc
     URLs round-trip after a refresh."""
-    html = open("web/index.html").read()
+    html = _frontend_text()
     assert "newest|deal|location|momentum|composite" in html, (
         "readURL sort regex no longer accepts 'composite' — desktop URL sort broken"
     )
@@ -1222,7 +1237,7 @@ def test_weight_slider_reuses_score_dimensions():
     with a stale or hardcoded color would drift visually after any future
     palette change.
     """
-    html = open("web/index.html").read()
+    html = _frontend_text()
     section_block = html.split("function _weightSectionHTML")[1].split("function ")[0]
     assert "SCORE_DIMENSIONS" in section_block, (
         "_weightSectionHTML doesn't iterate SCORE_DIMENSIONS — labels can drift"
