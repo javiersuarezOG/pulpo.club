@@ -132,15 +132,117 @@ def check_public_deploy(url: str = "https://pulpo.club/data/ranked.json") -> tup
         return False, f"FAIL deploy: {url} unreachable — {e}"
 
 
+# ── v2 checks: source-level health from source_health_history.jsonl ─────
+
+# How many consecutive red runs trigger a per-source alert.
+SOURCE_CONSECUTIVE_RED_THRESHOLD = 2
+
+# Latency regression ratio: today's duration_s vs 7-day median.
+# 3.0 = "today's run took 3× longer than the recent median" — almost always
+# a DOM change, anti-bot kicking in, or proxy slowness. Anything below 2× is
+# noise; we don't want to alert on every blip.
+LATENCY_REGRESSION_RATIO = 3.0
+LATENCY_MIN_SAMPLES      = 3      # need at least 3 historical samples to compare
+LATENCY_MIN_DURATION_S   = 5.0    # don't alert on <5s baselines (too jittery)
+
+
+def _read_source_history(data_dir: Path) -> list[dict]:
+    """Read all rows from source_health_history.jsonl. Empty list if missing."""
+    path = data_dir / "source_health_history.jsonl"
+    if not path.exists():
+        return []
+    rows: list[dict] = []
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return rows
+
+
+def check_source_consecutive_red(data_dir: Path) -> tuple[bool, str]:
+    """Alert if any source has been red for SOURCE_CONSECUTIVE_RED_THRESHOLD+ runs.
+
+    'Red' is the status string the run.py telemetry writes — set when a
+    source either errored or returned zero listings. A single red run is
+    noise; two in a row is a signal worth chasing.
+    """
+    rows = _read_source_history(data_dir)
+    if not rows:
+        return True, "OK   source_health: no history yet (skipping consecutive-red check)"
+
+    # Group rows by source, sorted by ts descending.
+    by_source: dict[str, list[dict]] = {}
+    for r in rows:
+        by_source.setdefault(r.get("source", "?"), []).append(r)
+    for src in by_source:
+        by_source[src].sort(key=lambda r: r.get("ts") or "", reverse=True)
+
+    streaks: list[str] = []
+    for src, entries in sorted(by_source.items()):
+        recent = entries[:SOURCE_CONSECUTIVE_RED_THRESHOLD]
+        if len(recent) < SOURCE_CONSECUTIVE_RED_THRESHOLD:
+            continue
+        if all(r.get("status") == "red" for r in recent):
+            err_classes = sorted({(r.get("error_class") or "ZeroRecords") for r in recent})
+            streaks.append(f"{src} ({SOURCE_CONSECUTIVE_RED_THRESHOLD}× red, "
+                           f"errors={','.join(err_classes)})")
+
+    if streaks:
+        return False, ("FAIL source_health: consecutive-red streaks detected — "
+                       + "; ".join(streaks))
+    return True, f"OK   source_health: no source red ≥{SOURCE_CONSECUTIVE_RED_THRESHOLD}× in a row"
+
+
+def check_source_latency_regression(data_dir: Path) -> tuple[bool, str]:
+    """Alert if any source's latest duration_s is >LATENCY_REGRESSION_RATIO×
+    its rolling median. Catches DOM changes / anti-bot before they go red."""
+    rows = _read_source_history(data_dir)
+    if not rows:
+        return True, "OK   latency: no history yet (skipping regression check)"
+
+    by_source: dict[str, list[dict]] = {}
+    for r in rows:
+        by_source.setdefault(r.get("source", "?"), []).append(r)
+
+    regressions: list[str] = []
+    for src, entries in sorted(by_source.items()):
+        entries.sort(key=lambda r: r.get("ts") or "")
+        if len(entries) < LATENCY_MIN_SAMPLES + 1:
+            continue
+        latest = entries[-1]
+        history = entries[-(LATENCY_MIN_SAMPLES * 5):-1]  # last ~15 entries excl. today
+        durations = [float(r.get("duration_s") or 0) for r in history if r.get("duration_s")]
+        if len(durations) < LATENCY_MIN_SAMPLES:
+            continue
+        median = statistics.median(durations)
+        latest_d = float(latest.get("duration_s") or 0)
+        if median < LATENCY_MIN_DURATION_S:
+            continue   # baseline too small — ratios are noisy
+        if latest_d / median > LATENCY_REGRESSION_RATIO:
+            regressions.append(f"{src}: {latest_d:.1f}s vs median {median:.1f}s "
+                               f"({latest_d/median:.1f}×)")
+
+    if regressions:
+        return False, "FAIL latency: regressions detected — " + "; ".join(regressions)
+    return True, "OK   latency: no source >3× rolling median"
+
+
 def run(data_dir: Path | None = None, skip_deploy: bool = False) -> list[str]:
     """Run all checks. Returns list of result strings; any starting with 'FAIL' is a failure."""
     if data_dir is None:
         data_dir = REPO / "web" / "data"
 
     results = []
-    results.append(check_freshness(data_dir)[1])       # message only
+    results.append(check_freshness(data_dir)[1])
     results.append(check_volume(data_dir)[1])
     results.append(check_parser_errors(data_dir)[1])
+    results.append(check_source_consecutive_red(data_dir)[1])
+    results.append(check_source_latency_regression(data_dir)[1])
     if not skip_deploy:
         results.append(check_public_deploy()[1])
     return results
