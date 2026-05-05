@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-05-05T13:46:51.400059+00:00",
-  "started_at": "2026-05-05T13:11:09.383892+00:00",
-  "duration_seconds": 2142.02,
-  "total_listings": 817,
+  "last_updated": "2026-05-05T21:18:42.320915+00:00",
+  "started_at": "2026-05-05T20:43:18.336070+00:00",
+  "duration_seconds": 2123.98,
+  "total_listings": 819,
   "dropped": 95,
   "per_source_raw": {
     "goodlife": 80,
-    "oceanside": 25,
+    "oceanside": 27,
     "century21": 15,
     "bienesraices": 471,
     "remax": 312,
@@ -30,7 +30,7 @@
     },
     "oceanside": {
       "supplier": null,
-      "pulled": 25,
+      "pulled": 27,
       "max_pages_hit": false
     },
     "century21": {
@@ -161,20 +161,20 @@
       }
     },
     "oceanside": {
-      "n_listings": 11,
+      "n_listings": 13,
       "fields": {
-        "price_usd": 0.73,
-        "area_m2": 0.91,
+        "price_usd": 0.69,
+        "area_m2": 0.92,
         "zone": 1.0,
         "municipality": 1.0,
         "department": 1.0,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
-        "is_beachfront": 0.36,
+        "is_beachfront": 0.31,
         "has_paved_access": 0.0,
-        "has_water": 0.27,
-        "has_power": 0.36,
+        "has_water": 0.23,
+        "has_power": 0.31,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -212,9 +212,11 @@
     }
   },
   "property_type_counts": {
-    "land": 817
+    "condo": 3,
+    "land": 815,
+    "house": 1
   },
-  "v_fallback_no_price": 30,
+  "v_fallback_no_price": 31,
   "v_fallback_no_comps": 0,
   "sources": [
     "goodlife",
