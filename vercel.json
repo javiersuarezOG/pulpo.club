@@ -12,6 +12,7 @@
     { "source": "/data/last_updated.json",  "destination": "/web/data/last_updated.json" },
     { "source": "/data/run_history.json",   "destination": "/web/data/run_history.json" },
     { "source": "/photos/:file",            "destination": "/web/photos/:file" },
+    { "source": "/assets/:file",            "destination": "/web/assets/:file" },
     { "source": "/legal",                   "destination": "/web/legal.html" }
   ],
   "headers": [

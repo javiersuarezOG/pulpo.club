@@ -1,0 +1,313 @@
+/* ── Tokens ─────────────────────────────────────────── */
+:root{
+  --bg:#fff;--s1:#f8fafc;--s2:#f1f5f9;--s3:#e2e8f0;
+  --border:#e2e8f0;--brd2:#cbd5e1;
+  --text:#0f172a;--t2:#475569;--t3:#94a3b8;--t4:#cbd5e1;
+  --accent:#059669;--accent-bg:rgba(5,150,105,.08);
+  --amber:#f59e0b;--warn:#d97706;
+  --r:8px;--r-sm:5px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;height:100%;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Site header ─────────────────────────────────────
+   Brand colors used as literals here (not CSS vars) so they remain stable
+   across theme changes. #1D9E75 = brand teal, #E1F5EE = badge bg, #085041 = icon.
+   ─────────────────────────────────────────────────── */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  padding:1.25rem 20px;gap:16px;
+}
+/* Brand block (left) */
+.hdr-brand{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.hdr-badge{
+  width:36px;height:36px;border-radius:8px;
+  background:#E1F5EE;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.hdr-brand-text{display:flex;flex-direction:column;gap:2px}
+.hdr-name{font-size:19px;font-weight:500;letter-spacing:-0.01em;color:var(--text);text-decoration:none}
+.hdr-dot{color:#1D9E75}
+.hdr-tagline{font-size:12px;color:var(--t2);line-height:1.4}
+/* Stats row (right) */
+.hdr-stats{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.hdr-stat{display:flex;flex-direction:column;gap:3px}
+.hdr-stat-label{font-size:11px;color:var(--t3);letter-spacing:0.02em}
+.hdr-stat-value{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums}
+.hdr-divider{width:1px;height:28px;background:var(--border);flex-shrink:0}
+/* Live pulse dot (static — no animation for v1) */
+.pulse-dot{position:relative;flex-shrink:0;width:7px;height:7px;border-radius:50%;background:#1D9E75}
+.pulse-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid #1D9E75;opacity:.35}
+@media(max-width:640px){
+  .site-header{padding:1rem 16px}
+  .hdr-badge{width:32px;height:32px}
+  .hdr-stats{gap:16px}
+  .hdr-divider{height:20px}
+}
+
+/* ── Main layout ────────────────────────────────────── */
+/* body is already height:100%; site-header is sticky, .layout fills the rest */
+.layout{display:flex;flex:1;min-height:0;overflow:hidden}
+.content{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Open/Gated filter bar ──────────────────────────── */
+.filter-bar{display:flex;align-items:center;gap:10px;padding:10px 20px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.seg{display:flex;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px;gap:2px}
+.seg-btn{background:transparent;padding:5px 14px;border-radius:4px;font-size:13px;font-weight:500;color:var(--t2);transition:all .12s}
+.seg-btn.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.filter-count{font-size:12px;color:var(--t3);margin-left:auto;white-space:nowrap}
+.filter-count strong{color:var(--t2)}
+
+/* ── Zone filter block ──────────────────────────────── */
+.zone-filter{flex-shrink:0;background:var(--bg);padding:0}
+/* Inside the Filters panel — narrower container; rearrange the
+   3-column grid (label / pills / count) into a 2-row layout where the
+   label and count sit on top and the pills wrap underneath. The
+   standalone full-width row outside the panel keeps the original
+   3-column grid because it has the horizontal room for it. */
+.tune-section .zone-filter{padding:0;border:0;background:none}
+.tune-section .zf-group{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:4px 8px;padding:8px 0;border-top:1px solid var(--s2)}
+.tune-section .zf-group:first-of-type{border-top:0;padding-top:0}
+.tune-section .zf-group .zg-label{grid-row:1;grid-column:1;padding:0}
+.tune-section .zf-group .zg-count{grid-row:1;grid-column:2;padding:0}
+.tune-section .zf-group .zg-pills{grid-row:2;grid-column:1 / -1;padding:0;margin:0;flex-wrap:wrap}
+.zf-group{display:grid;grid-template-columns:120px 1fr 54px;align-items:start;padding:3px 20px;gap:6px;transition:background .1s}
+.zf-group:hover{background:var(--s1)}
+.zf-group.active{background:var(--s2)}
+.zg-label{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.2px;padding-top:5px;text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none}
+.zf-group.active .zg-label{color:var(--text)}
+.zg-pills{display:flex;flex-wrap:wrap;gap:4px;padding:2px 0}
+.zg-count{font-size:11px;color:var(--t3);text-align:right;padding-top:5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.zf-group.active .zg-count{color:var(--text);font-weight:600}
+
+/* ── Zone pills ─────────────────────────────────────── */
+.zone-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.2px;white-space:nowrap;transition:outline .1s}
+.zone-pill.clickable{cursor:pointer}
+.zone-pill.pill-active{outline:2px solid var(--text);outline-offset:1px}
+.zone-pill--nozone{background:#F1EFE8;color:#2C2C2A}
+/* "NEW" badge — listings first seen in the last 14 days. Sits next to the
+   zone pill so it's visible at the same glance as the zone, with the
+   accent color so the eye picks it up immediately. */
+.new-badge{display:inline-flex;align-items:center;margin-left:4px;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.5px;background:var(--accent);color:#fff;vertical-align:middle}
+
+/* ── Mobile sort bar ────────────────────────────────── */
+.sort-bar{display:none;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sort-select{width:100%;padding:7px 10px;border:1px solid var(--brd2);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--bg);color:var(--text)}
+
+/* ── Table ──────────────────────────────────────────── */
+.table-wrap{flex:1;overflow-y:auto;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+thead th{position:sticky;top:0;z-index:10;background:var(--s1);padding:9px 12px;font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--t3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;user-select:none}
+thead th.sortable{cursor:pointer}
+thead th.sortable:hover{color:var(--t2)}
+thead th.sorted{color:var(--text)}
+thead th .sort-ic{font-size:10px;margin-left:3px;opacity:.35;transition:opacity .1s}
+thead th.sortable:hover .sort-ic{opacity:.6}
+thead th.sorted .sort-ic{opacity:1;color:var(--accent)}
+th.col-zone {width:22%}
+th.col-price{width:19%;text-align:right}
+th.col-area {width:18%;text-align:right}
+th.col-ppm  {width:12%;text-align:right}
+th.col-stars{width:24%}
+th.col-chev {width:44px;text-align:center;padding:0}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
+tbody tr:hover{background:var(--s1)}
+tbody tr.selected{background:var(--accent-bg)}
+tbody td{padding:10px 12px;vertical-align:middle}
+.td-num{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;color:var(--text)}
+.td-ppm{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--text)}
+.td-stars{white-space:nowrap}
+.td-chev{text-align:center;color:var(--t4);font-size:16px;line-height:1;padding:0 8px}
+
+/* ── Stars ──────────────────────────────────────────── */
+.stars-wrap{display:inline-flex;align-items:center;gap:5px}
+.stars{position:relative;display:inline-block;line-height:1}
+.stars-bg{color:var(--t4);font-size:13px;letter-spacing:1px}
+.stars-fg{position:absolute;left:0;top:0;color:var(--amber);font-size:13px;letter-spacing:1px;overflow:hidden;white-space:nowrap}
+.stars-val{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+
+/* ── Footer ─────────────────────────────────────────── */
+.table-footer{padding:8px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--t3);flex-shrink:0;background:var(--s1);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.footer-link{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.footer-link:hover{color:var(--accent);text-decoration-style:solid}
+
+/* ── Methodology modal ──────────────────────────────── */
+.methodology[open]{display:block;border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;max-width:560px;width:calc(100% - 32px);max-height:80vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.methodology::backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(2px)}
+.methodology h2{font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.methodology h3{font-size:13px;font-weight:600;margin-top:18px;margin-bottom:6px;color:var(--text)}
+.methodology p{font-size:13px;line-height:1.55;color:var(--t2);margin-bottom:8px}
+.methodology .meth-tagline{font-size:13px;color:var(--t3);margin-bottom:16px}
+.methodology .meth-close{position:absolute;top:14px;right:16px;font-size:20px;line-height:1;color:var(--t3);background:none;border:none;cursor:pointer;padding:4px 8px}
+.methodology .meth-close:hover{color:var(--text)}
+.methodology .meth-formula{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;font-family:'SF Mono',Menlo,Consolas,monospace;color:var(--t2);margin:8px 0}
+
+/* ── Side panel ─────────────────────────────────────── */
+.side-panel{width:0;overflow:hidden;border-left:1px solid var(--border);transition:width .2s ease;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg)}
+.side-panel.open{width:42%;min-width:300px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.panel-title{font-size:13px;font-weight:600;color:var(--t2)}
+.panel-close{font-size:18px;color:var(--t3);padding:2px 6px;border-radius:4px;line-height:1}
+.panel-close:hover{background:var(--s2);color:var(--text)}
+/* Question-mark button on the Filters panel header — opens a help modal that
+   explains each control point-by-point. Sits to the LEFT of the close button.
+   panel-header is justify-content:space-between, so we wrap close + help in
+   a flex group via auto margin on the help button. */
+.panel-help-btn{font-size:12px;font-weight:600;color:var(--t3);padding:0;border-radius:50%;line-height:1;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--brd2);margin-right:8px;font-family:inherit;background:none;cursor:pointer;transition:all .12s}
+.panel-help-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* "Clear all" link in the Filters panel header — hidden when no filter is
+   active. Sits LEFT of the help button. Text-link style (low visual weight
+   for a destructive-but-recoverable action) so it doesn't dominate the
+   panel chrome. */
+.panel-reset-all{font-size:12px;color:var(--t3);padding:2px 8px;margin-left:auto;margin-right:8px;font-family:inherit;background:none;border:none;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;transition:color .12s}
+.panel-reset-all:hover{color:var(--accent)}
+/* When .panel-reset-all is hidden via [hidden], the help-btn needs to
+   reclaim the auto-margin so it floats right. Same selector trick. */
+.panel-reset-all[hidden] + .panel-help-btn{margin-left:auto}
+/* Filter-count badge appended to the Filters button text — replaces the
+   solid green dot when active filters > 0. Easier to scan ("Filters · 2")
+   than a binary indicator. */
+.tune-button .filter-count-badge{font-weight:700;color:var(--accent);margin-left:2px}
+.tune-button.has-filters::after{display:none}  /* badge replaces the dot */
+/* Visual divider between filter sections (narrowing) and the weight
+   sliders (reranking). Communicates that everything below behaves
+   differently from everything above. */
+/* Visual divider between filtering controls (above) and ranking sliders
+   (below). The label "Adjust the ranking" sits in the divider's gap so
+   the eye reads it as a section break, not another filter title. */
+.tune-section-divider{margin:24px 0 8px;border-top:1px solid var(--border);position:relative}
+.tune-section-divider::before{content:"Adjust the ranking";position:absolute;top:-7px;left:0;background:var(--bg);padding-right:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3)}
+.tune-divider-hint{font-size:11px;color:var(--t3);line-height:1.4;margin:0 0 14px}
+.panel-body{flex:1;overflow-y:auto;padding:18px}
+.panel-full-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
+.warn-icon{flex-shrink:0;color:var(--warn);font-size:14px;position:relative;cursor:help;margin-top:2px}
+.warn-tooltip{display:none;position:absolute;top:22px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:11px;padding:6px 10px;border-radius:6px;z-index:100;max-width:260px;white-space:normal;text-align:left;line-height:1.4;width:max-content}
+.warn-icon:hover .warn-tooltip{display:block}
+.panel-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.panel-meta-item{display:flex;flex-direction:column;gap:2px}
+.panel-meta-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--t3)}
+.panel-meta-value{font-size:14px;font-weight:500;color:var(--text)}
+.panel-desc{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:16px}
+.panel-cta{display:block;padding:10px 18px;background:var(--accent);color:#fff;border-radius:var(--r-sm);font-size:13px;font-weight:600;text-align:center;text-decoration:none;margin-top:auto}
+.panel-cta:hover{opacity:.9}
+/* ── Panel hero photo ───────────────────────────────── */
+.panel-hero{position:relative;width:100%;aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;margin-bottom:14px;background:var(--s2);cursor:zoom-in;flex-shrink:0}
+.panel-hero img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+@media(hover:hover){.panel-hero:hover img{transform:scale(1.03)}}
+.panel-hero-zoom{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);border-radius:var(--r-xs);padding:4px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.panel-hero-counter{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;border-radius:var(--r-xs);padding:2px 7px;pointer-events:none}
+.panel-no-photo{width:100%;aspect-ratio:16/10;border-radius:var(--r);overflow:hidden;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:var(--t3);text-align:center;padding:16px}
+/* Gallery strip */
+.panel-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+@media(max-width:640px){.panel-gallery{grid-template-columns:repeat(3,1fr)}}
+.gallery-thumb{aspect-ratio:4/3;border-radius:var(--r-xs);overflow:hidden;cursor:pointer;background:var(--s2)}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s}
+.gallery-thumb img[data-loading]{opacity:0}
+/* Lightbox — position:absolute inside body (no position:fixed per spec) */
+body{position:relative}
+.lightbox-wrap{position:absolute;inset:0;z-index:900;display:none;align-items:center;justify-content:center}
+.lightbox-wrap.open{display:flex}
+.lightbox-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.92)}
+.lightbox-content{position:relative;z-index:1;max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center}
+.lightbox-img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:var(--r-xs)}
+.lightbox-counter{position:absolute;top:-28px;right:0;color:rgba(255,255,255,.7);font-size:12px}
+.lightbox-close{position:absolute;top:-36px;right:-8px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 10px;line-height:1}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);border:none;color:#fff;font-size:28px;cursor:pointer;padding:6px 14px;border-radius:var(--r-xs);line-height:1;user-select:none}
+.lightbox-prev{left:-56px}.lightbox-next{right:-56px}
+@media(max-width:640px){.lightbox-prev{left:-44px}.lightbox-next{right:-44px}}
+.panel-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px}
+.panel-scores{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.score-block{display:flex;flex-direction:column;gap:2px}
+.score-row{display:flex;align-items:center;gap:8px;font-size:12px}
+/* Button-styled label so click semantics (open methodology modal) are
+   accessible and obvious. Reset native button chrome to inherit the
+   surrounding text style. The dotted underline on hover signals interactivity
+   the way the prior cursor:help did, but with an actual click target. */
+.score-name{width:108px;color:var(--t2);font-weight:500;cursor:pointer;background:none;border:none;padding:0;text-align:left;font:inherit;font-weight:500;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:transparent;text-underline-offset:2px;transition:color .12s,text-decoration-color .12s;line-height:inherit}
+.score-name:hover{color:var(--text);text-decoration-color:var(--t3)}
+.score-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.score-track{flex:1;height:4px;border-radius:2px;background:var(--s3);overflow:hidden}
+.score-fill{height:100%;border-radius:2px}
+.score-n{width:24px;text-align:right;font-variant-numeric:tabular-nums;color:var(--t2)}
+.score-reason{font-size:10.5px;color:var(--t3);margin-left:88px;line-height:1.35}
+.panel-dev-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;background:var(--s2);color:var(--t2);margin-bottom:12px}
+
+/* ── Tune panel (filters/sort) — mirrors .side-panel chrome ────── */
+/* Why a dedicated panel instead of stacking sliders above the table:
+   the filter-bar + zone-bar already use vertical real estate. A third
+   strip with sliders would push the table below the fold. The slide-in
+   panel mirrors the existing listing-detail panel's animation/styling. */
+.tune-panel{width:0;overflow:hidden;border-left:1px solid var(--border);transition:width .2s ease;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg)}
+.tune-panel.open{width:32%;min-width:280px}
+.tune-section{margin-bottom:20px}
+.tune-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px}
+.tune-range-display{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums;margin-bottom:10px;font-weight:500}
+.tune-range-controls{position:relative;height:32px}
+.tune-range-controls input[type=range]{position:absolute;width:100%;top:0;-webkit-appearance:none;appearance:none;background:none;pointer-events:none;height:32px;margin:0}
+.tune-range-controls input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer;pointer-events:auto;margin-top:0}
+.tune-range-controls input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer;pointer-events:auto}
+.tune-range-track{position:absolute;width:100%;height:4px;top:14px;background:var(--s3);border-radius:2px}
+.tune-range-fill{position:absolute;height:4px;top:14px;background:var(--accent);border-radius:2px}
+.tune-reset{display:inline-block;font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;padding:0;margin-top:4px;text-decoration:underline}
+.tune-reset:hover{opacity:.7}
+/* Weight sliders — one row per V/L/M dimension. Color stripe on the
+   left of each label mirrors the score-bar fill color so the connection
+   between "this slider" and "this bar in the breakdown" is visual. */
+.weight-help{font-size:11px;color:var(--t3);line-height:1.45;margin-bottom:10px}
+.weight-row{display:grid;grid-template-columns:108px 1fr 36px;align-items:center;gap:10px;padding:6px 0}
+.weight-name{font-size:12px;color:var(--t2);font-weight:500;padding-left:8px}
+/* Per-slider hint — tells the user what moving the slider left/right does
+   for THIS specific dimension. Sits underneath each slider, indented to
+   match the slider track so the eye reads it as belonging to that row. */
+.weight-hint{font-size:10.5px;color:var(--t3);line-height:1.4;margin:2px 0 10px 118px}
+/* Inline section hint — short one-liner under the section title that
+   explains how the controls in this section work. Lives between the
+   section title and the controls themselves. */
+.tune-section-hint{font-size:11px;color:var(--t3);line-height:1.4;margin-top:-4px;margin-bottom:10px}
+.weight-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--s3);border-radius:2px;outline:none;margin:0}
+.weight-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.weight-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.weight-value{font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.tune-button{font-size:12px;padding:5px 10px;border:1px solid var(--brd2);border-radius:var(--r-sm);background:var(--bg);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit}
+.tune-button:hover{border-color:var(--accent);color:var(--text)}
+.tune-button.has-filters::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:2px}
+.mobile-tune-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+.mobile-tune-overlay.open{display:flex;flex-direction:column}
+.mobile-tune-overlay .panel-header{position:sticky;top:0;background:var(--bg);z-index:5}
+.mobile-tune-overlay .panel-body{flex:1;padding:18px}
+
+/* ── Mobile cards ───────────────────────────────────── */
+.cards-wrap{display:none;flex:1;overflow-y:auto;padding:8px 12px;gap:8px;flex-direction:column}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color .1s}
+.card:hover{border-color:var(--brd2)}
+.card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.card-zone-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.card-row2{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--t2);font-variant-numeric:tabular-nums}
+.card-ppm{font-weight:600;color:var(--text)}
+
+/* ── Mobile overlay panel ───────────────────────────── */
+.mobile-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+.mobile-overlay.open{display:flex;flex-direction:column}
+.mobile-overlay .panel-header{position:sticky;top:0;background:var(--bg);z-index:5}
+.mobile-overlay .panel-body{flex:1}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media(max-width:640px){
+  .layout{height:auto;flex-direction:column;overflow:visible}
+  .table-wrap{display:none}
+  .cards-wrap{display:flex}
+  .sort-bar{display:block}
+  .side-panel{display:none}
+  .tune-panel{display:none}
+  .content{height:auto;overflow:visible}
+  .zf-group{grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:2px 8px}
+  .zg-label{grid-column:1;grid-row:1}
+  .zg-count{grid-column:2;grid-row:1}
+  .zg-pills{grid-column:1/-1;grid-row:2;padding-bottom:4px}
+}
