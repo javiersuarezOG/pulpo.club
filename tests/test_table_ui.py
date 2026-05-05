@@ -1242,3 +1242,160 @@ def test_weight_slider_reuses_score_dimensions():
     assert "SCORE_DIMENSIONS" in section_block, (
         "_weightSectionHTML doesn't iterate SCORE_DIMENSIONS — labels can drift"
     )
+
+
+# ── Photos column ─────────────────────────────────────────────────────
+# Mirrors the JS photosCellHTML(), photo sort, and photos filter so the
+# column's behaviour is verifiable without a browser.
+
+def photos_cell_html(photos_count) -> str:
+    """Python mirror of JS photosCellHTML()."""
+    c = photos_count or 0
+    if c <= 0:
+        return '<span class="photo-empty">—</span>'
+    plural = "" if c == 1 else "s"
+    return (f'<span class="photo-tag" aria-label="{c} photo{plural}">'
+            f'<svg aria-hidden="true"><use href="#pp-camera"/></svg>{c}</span>')
+
+
+def sort_rows_photos(rows, direction):
+    """Python mirror of the photos branch in JS sortedRows().
+    Treats null and 0 identically — both sink to the end regardless of dir."""
+    reverse = direction == "desc"
+    nil = float("-inf") if reverse else float("inf")
+    def key(r):
+        c = r.get("photos_count")
+        return c if (c and c > 0) else nil
+    return sorted(rows, key=key, reverse=reverse)
+
+
+def filter_photos(rows, mode):
+    """Python mirror of the PHOTOS_F branch in JS filteredRows()."""
+    if mode == "with":
+        return [r for r in rows if (r.get("photos_count") or 0) > 0]
+    if mode == "none":
+        return [r for r in rows if (r.get("photos_count") or 0) == 0]
+    return list(rows)
+
+
+def test_photos_cell_renders_camera_tag_for_positive_count():
+    html = photos_cell_html(6)
+    assert "photo-tag" in html
+    assert "#pp-camera" in html, "camera SVG sprite reference missing"
+    assert ">6</span>" in html, "count is not rendered inside the pill"
+
+
+def test_photos_cell_renders_dash_for_zero_and_null():
+    """photos_count == 0 and photos_count is None are treated identically —
+    both render the muted dash, never the pill."""
+    for c in (0, None):
+        html = photos_cell_html(c)
+        assert "photo-empty" in html
+        assert "—" in html
+        assert "photo-tag" not in html, (
+            f"empty count {c!r} should not render the pill"
+        )
+
+
+def test_photos_sort_desc_puts_highest_first_nulls_last():
+    rows = [
+        {"id": "a", "photos_count": 0},
+        {"id": "b", "photos_count": 5},
+        {"id": "c", "photos_count": None},
+        {"id": "d", "photos_count": 12},
+        {"id": "e", "photos_count": 1},
+    ]
+    out = sort_rows_photos(rows, "desc")
+    assert [r["id"] for r in out[:3]] == ["d", "b", "e"], (
+        "desc should put 12, 5, 1 first"
+    )
+    # The two null/zero rows go to the end (order between them is not part
+    # of the contract; just assert both are at the tail).
+    tail_ids = {r["id"] for r in out[3:]}
+    assert tail_ids == {"a", "c"}, "null/zero rows must sink to the end"
+
+
+def test_photos_sort_asc_puts_lowest_nonzero_first_nulls_still_last():
+    rows = [
+        {"id": "a", "photos_count": 0},
+        {"id": "b", "photos_count": 5},
+        {"id": "c", "photos_count": None},
+        {"id": "d", "photos_count": 12},
+        {"id": "e", "photos_count": 1},
+    ]
+    out = sort_rows_photos(rows, "asc")
+    assert [r["id"] for r in out[:3]] == ["e", "b", "d"], (
+        "asc should put 1, 5, 12 first — null/zero must NOT interleave"
+    )
+    tail_ids = {r["id"] for r in out[3:]}
+    assert tail_ids == {"a", "c"}, "null/zero rows must remain at the end on asc"
+
+
+def test_photos_filter_with_excludes_zero_and_null():
+    rows = [
+        {"id": "a", "photos_count": 0},
+        {"id": "b", "photos_count": 3},
+        {"id": "c", "photos_count": None},
+        {"id": "d", "photos_count": 1},
+    ]
+    out = filter_photos(rows, "with")
+    assert [r["id"] for r in out] == ["b", "d"]
+
+
+def test_photos_filter_none_includes_zero_and_null():
+    rows = [
+        {"id": "a", "photos_count": 0},
+        {"id": "b", "photos_count": 3},
+        {"id": "c", "photos_count": None},
+        {"id": "d", "photos_count": 1},
+    ]
+    out = filter_photos(rows, "none")
+    assert sorted(r["id"] for r in out) == ["a", "c"]
+
+
+def test_photos_filter_combinable_with_open_gated():
+    """?filter=open&photos=with applies BOTH — only open-land listings with photos."""
+    rows = [
+        {"id": "a", "is_in_development": False, "photos_count": 5},   # open + photos ✓
+        {"id": "b", "is_in_development": False, "photos_count": 0},   # open, no photos
+        {"id": "c", "is_in_development": True,  "photos_count": 5},   # gated, has photos
+        {"id": "d", "is_in_development": True,  "photos_count": 0},   # gated, no photos
+        {"id": "e", "is_in_development": False, "photos_count": None},# open, null photos
+    ]
+    open_land = [r for r in rows if not r.get("is_in_development")]
+    out = filter_photos(open_land, "with")
+    assert [r["id"] for r in out] == ["a"], (
+        "intersection of FILTER=open and PHOTOS_F=with should yield only 'a'"
+    )
+
+
+def test_photos_url_state_round_trips():
+    """readURL must accept ?photos=with|none and ?sort=photos_(asc|desc).
+    pushURL must emit ?photos= only when non-default."""
+    html = _frontend_text()
+    # readURL parses ?photos=
+    assert "['all','with','none'].includes(p.get('photos'))" in html, (
+        "readURL doesn't accept ?photos= URL state"
+    )
+    # readURL sort regex includes 'photos'
+    assert "stars|photos|newest" in html, (
+        "readURL sort regex doesn't include 'photos' — ?sort=photos_desc breaks on reload"
+    )
+    # pushURL emits ?photos= only for non-default
+    assert "PHOTOS_F!=='all'" in html, (
+        "pushURL emits ?photos= even at default — URL won't stay clean"
+    )
+    # mobile-sort regex must also include 'photos' (kept in sync per existing comment)
+    mobile_block = html.split("function wireMobileSort")[1].split("function ")[0]
+    assert "stars|photos|newest" in mobile_block, (
+        "mobile-sort regex doesn't accept 'photos_*' values — selecting the option no-ops"
+    )
+
+
+def test_photos_header_default_first_click_is_descending():
+    """Per spec: first click on the Photos header sorts descending (most useful
+    default for visual browsers). Verified via the data-def attribute on the th."""
+    html = _frontend_text()
+    assert 'data-col="photos" data-def="desc"' in html, (
+        "Photos column header missing data-def=\"desc\" — first click would be ascending"
+    )

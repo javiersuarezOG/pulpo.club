@@ -55,6 +55,9 @@ function zoneColor_bg(z) { return zoneColor(z).bg; }
 /* ── State ───────────────────────────────────────────── */
 let ALL_DATA = [], FILTER = 'all', ZONE_F = null;
 let SORT_COL = 'ppm', SORT_DIR = 'asc', OPEN_ID = null;
+// Photos filter: 'all' | 'with' | 'none'. 'none' includes both 0 and null
+// counts (both mean "no photos"); 'with' requires photos_count > 0.
+let PHOTOS_F = 'all';
 
 /* ── Tune-panel state: price range ─────────────────────── */
 // Snap points calibrated to the live data distribution: median $250K,
@@ -182,8 +185,9 @@ function _parseSnapIdx(raw, snaps) {
 function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
+  PHOTOS_F = ['all','with','none'].includes(p.get('photos')) ? p.get('photos') : 'all';
   const s = p.get('sort')||'ppm_asc';
-  const m = s.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum|composite)_(asc|desc)$/);
+  const m = s.match(/^(zone|price|area|ppm|stars|photos|newest|deal|location|momentum|composite)_(asc|desc)$/);
   if (m) { SORT_COL=m[1]; SORT_DIR=m[2]; }
   const zg=p.get('zone_group'), z=p.get('zone');
   if (zg==='no-zone') ZONE_F={type:'no-zone',value:'no-zone'};
@@ -235,6 +239,7 @@ function readURL() {
 function pushURL(replace=true) {
   const p=new URLSearchParams();
   if (FILTER!=='all') p.set('filter',FILTER);
+  if (PHOTOS_F!=='all') p.set('photos',PHOTOS_F);
   if (SORT_COL!=='ppm'||SORT_DIR!=='asc') p.set('sort',`${SORT_COL}_${SORT_DIR}`);
   if (ZONE_F) {
     if (ZONE_F.type==='no-zone') p.set('zone_group','no-zone');
@@ -284,10 +289,13 @@ function _scoreAtLeastMin(r) {
   if (isDefaultMinScore()) return true;
   return (r.rank_score ?? -Infinity) >= MIN_SCORE;
 }
+function _hasPhotos(r) { return (r.photos_count || 0) > 0; }
 function filteredRows() {
   return ALL_DATA.filter(r => {
     if (FILTER==='open'  && r.is_in_development)  return false;
     if (FILTER==='gated' && !r.is_in_development) return false;
+    if (PHOTOS_F==='with' && !_hasPhotos(r)) return false;
+    if (PHOTOS_F==='none' &&  _hasPhotos(r)) return false;
     if (!_priceInRange(r)) return false;
     if (!_sizeInRange(r))  return false;
     if (!_scoreAtLeastMin(r)) return false;
@@ -323,6 +331,13 @@ function sortedRows(rows) {
     if      (SORT_COL==='price')    {va=a.price_usd      ??nil;vb=b.price_usd      ??nil;}
     else if (SORT_COL==='area')     {va=a.area_m2        ??nil;vb=b.area_m2        ??nil;}
     else if (SORT_COL==='stars')    {va=recomputeComposite(a) ?? nil; vb=recomputeComposite(b) ?? nil;}
+    else if (SORT_COL==='photos')   {
+      // Treat null and 0 identically — both mean "no photos" — and sink them
+      // to the end regardless of direction (asc or desc), matching the
+      // null-tolerant pattern used by price/area.
+      const ac=a.photos_count, bc=b.photos_count;
+      va=(ac && ac>0)?ac:nil; vb=(bc && bc>0)?bc:nil;
+    }
     else if (SORT_COL==='deal')     {va=a.value_score    ??nil;vb=b.value_score    ??nil;}
     else if (SORT_COL==='location') {va=a.location_score ??nil;vb=b.location_score ??nil;}
     else if (SORT_COL==='momentum') {va=a.momentum_score ??nil;vb=b.momentum_score ??nil;}
@@ -870,6 +885,12 @@ function _resetAllFilters() {
 }
 
 /* ── Render ──────────────────────────────────────────── */
+function photosCellHTML(r) {
+  const c = r.photos_count || 0;
+  if (c <= 0) return '<span class="photo-empty">—</span>';
+  return `<span class="photo-tag" aria-label="${c} photo${c===1?'':'s'}">`
+    + `<svg aria-hidden="true"><use href="#pp-camera"/></svg>${c}</span>`;
+}
 function renderTable(rows) {
   const tbody=document.getElementById('table-body');
   tbody.innerHTML=rows.map(r=>`
@@ -879,6 +900,7 @@ function renderTable(rows) {
       <td class="td-num">${fmtArea(r.area_m2)}</td>
       <td class="td-ppm">${fmtPPM(r.price_per_m2)}</td>
       <td class="td-stars">${renderStars(recomputeComposite(r))}</td>
+      <td class="td-photos">${photosCellHTML(r)}</td>
       <td class="td-chev">›</td>
     </tr>`).join('');
   tbody.querySelectorAll('tr').forEach((tr,i)=>tr.addEventListener('click',()=>{
@@ -890,7 +912,7 @@ function renderCards(rows) {
   const wrap=document.getElementById('cards-wrap');
   wrap.innerHTML=rows.map(r=>`
     <div class="card" data-id="${esc(r.source_id)}" style="${r.source_id===OPEN_ID?'border-color:var(--accent);background:var(--accent-bg)':''}">
-      <div class="card-zone-row">${zonePillHTML(r)}${newBadgeHTML(r)} ${renderStars(recomputeComposite(r))}</div>
+      <div class="card-zone-row">${zonePillHTML(r)}${newBadgeHTML(r)} ${renderStars(recomputeComposite(r))} ${photosCellHTML(r)}</div>
       <div class="card-row2">
         <span>${fmtUSD(r.price_usd)}</span>
         <span>${fmtArea(r.area_m2)}</span>
@@ -902,7 +924,8 @@ function renderCards(rows) {
 function updateCounts(filtered, total) {
   const label=FILTER==='all'?'All listings':FILTER==='open'?'Open land':'Gated / developments';
   const zLabel=!ZONE_F?'':ZONE_F.type==='no-zone'?' · No zone':ZONE_F.type==='group'?` · ${ZONE_GROUPS[ZONE_F.value]?.label||''}`:(` · ${zoneLabel(ZONE_F.value)}`);
-  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${label}${zLabel}`;
+  const pLabel=PHOTOS_F==='with'?' · With photos':PHOTOS_F==='none'?' · No photos':'';
+  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${label}${zLabel}${pLabel}`;
   document.getElementById('footer-count').textContent=`${filtered.toLocaleString()} listing${filtered!==1?'s':''}`;
 }
 function render() {
@@ -914,12 +937,25 @@ function render() {
 }
 
 /* ── Wire events ─────────────────────────────────────── */
+// Two segmented controls share the .seg-btn class — each button carries either
+// data-filter (Open/Gated) or data-photos (Photos), never both. Activate state
+// is scoped to the button's parent .seg so the two controls stay independent.
+function _activateInGroup(btn) {
+  const group = btn.closest('.seg');
+  if (!group) return;
+  group.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active', b===btn));
+}
 function wireSegment() {
   document.querySelectorAll('.seg-btn').forEach(btn=>{
-    btn.classList.toggle('active',btn.dataset.filter===FILTER);
+    if (btn.dataset.filter) {
+      btn.classList.toggle('active', btn.dataset.filter===FILTER);
+    } else if (btn.dataset.photos) {
+      btn.classList.toggle('active', btn.dataset.photos===PHOTOS_F);
+    }
     btn.addEventListener('click',()=>{
-      FILTER=btn.dataset.filter;
-      document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b===btn));
+      if (btn.dataset.filter) FILTER = btn.dataset.filter;
+      else if (btn.dataset.photos) PHOTOS_F = btn.dataset.photos;
+      _activateInGroup(btn);
       OPEN_ID=null; document.getElementById('side-panel').classList.remove('open');
       pushURL(true); render();
     });
@@ -940,7 +976,7 @@ function wireMobileSort() {
     // Keep this regex in sync with readURL()'s match — both must accept the
     // same set of sort columns or selecting an option silently no-ops while
     // pushing the URL anyway. Newest was already broken here pre-Phase-7.
-    const m=sel.value.match(/^(zone|price|area|ppm|stars|newest|deal|location|momentum)_(asc|desc)$/);
+    const m=sel.value.match(/^(zone|price|area|ppm|stars|photos|newest|deal|location|momentum)_(asc|desc)$/);
     if(m){SORT_COL=m[1];SORT_DIR=m[2];}
     pushURL(true); render();
   });
@@ -1069,7 +1105,7 @@ async function init() {
     ALL_DATA=await fetch(DATA_URL,{cache:'no-store'}).then(r=>r.json());
   } catch {
     document.getElementById('table-body').innerHTML=
-      '<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--t3)">Failed to load data.</td></tr>';
+      '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--t3)">Failed to load data.</td></tr>';
     return;
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));

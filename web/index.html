@@ -12,6 +12,18 @@
 </head>
 <body>
 
+<!-- SVG sprite — symbols referenced via <use href="#id"/>. Hidden via inline
+     style so it doesn't affect layout. Add new symbols here, not inline. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="pp-camera" viewBox="0 0 14 14">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1.5" y="3.5" width="11" height="8" rx="1.5"/>
+      <circle cx="7" cy="7.5" r="2"/>
+      <line x1="9.5" y1="3.5" x2="10.5" y2="3.5"/>
+    </g>
+  </symbol>
+</svg>
+
 <!-- Site header -->
 <header class="site-header">
   <!-- Brand block (left) -->
@@ -57,12 +69,18 @@
 <div class="layout">
   <div class="content">
 
-    <!-- Open/Gated filter -->
+    <!-- Open/Gated + Photos filters -->
     <div class="filter-bar">
       <div class="seg" role="group" aria-label="Land type filter">
         <button class="seg-btn active" data-filter="all">All</button>
         <button class="seg-btn" data-filter="open">Open land</button>
         <button class="seg-btn" data-filter="gated">Gated</button>
+      </div>
+      <span class="seg-divider" aria-hidden="true"></span>
+      <div class="seg" role="group" aria-label="Photos filter">
+        <button class="seg-btn active" data-photos="all">All photos</button>
+        <button class="seg-btn" data-photos="with">With photos</button>
+        <button class="seg-btn" data-photos="none">No photos</button>
       </div>
       <button class="tune-button" id="tune-open" aria-label="Open filters panel">
         <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -89,6 +107,8 @@
         <option value="area_asc">Sort by size: smallest first</option>
         <option value="stars_desc">Sort by score: highest first</option>
         <option value="stars_asc">Sort by score: lowest first</option>
+        <option value="photos_desc">Sort by photos: most first</option>
+        <option value="photos_asc">Sort by photos: fewest first</option>
         <optgroup label="By dimension">
           <option value="deal_desc">Sort by Price vs Comps: cheapest first</option>
           <option value="location_desc">Sort by Location: best spot first</option>
@@ -120,6 +140,9 @@
             </th>
             <th class="col-stars sortable" data-col="stars" data-def="desc">
               Score <span class="sort-ic" id="ic-stars">↕</span>
+            </th>
+            <th class="col-photos sortable" data-col="photos" data-def="desc">
+              Photos <span class="sort-ic" id="ic-photos">↕</span>
             </th>
             <th class="col-chev"></th>
           </tr>
