@@ -438,5 +438,24 @@
     "is_repriced": false,
     "price_usd": 18500.0,
     "scraped_at": "2026-05-03T00:00:00Z"
+  },
+  {
+    "source": "bienesraices",
+    "source_id": "br-test-001",
+    "url": "https://bienesraicesenelsalvador.com/propiedad/test-terreno",
+    "title": "Terreno El Tunco 1500 m²",
+    "price_usd": 150000.0,
+    "raw_price_text": "150000 USD",
+    "raw_size_text": "1500 m2",
+    "location_text": "Tamanique, La Libertad, El Salvador",
+    "description": "Terreno plano con acceso pavimentado.",
+    "property_type": "land",
+    "photo_urls": [
+      "https://cdn.bienesraices.com/photos/test1.jpg"
+    ],
+    "broker_name": "Carlos Test",
+    "broker_phone": "+50312345678",
+    "broker_email": "test@test.com",
+    "scraped_at": "2026-05-04T00:00:00Z"
   }
 ]

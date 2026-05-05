@@ -486,6 +486,37 @@ def is_non_land_title(title: str, source: str) -> bool:
     return False
 
 
+# ── Shared boolean-attribute extraction ───────────────────────────────
+# Originally inline in oceanside.py. Promoted here so every scraper benefits
+# without each one having to duplicate the regex set. Scraper-supplied truthy
+# values always win — these only fire when the raw dict didn't set them.
+_RX_BEACHFRONT = re.compile(
+    r"\b(?:frente\s+al\s+mar|beachfront|ocean[\s-]?front|playa\s+propia)\b",
+    re.IGNORECASE,
+)
+_RX_PAVED = re.compile(
+    r"\b(?:pavimentad[oa]?|paved\s+(?:road|access)|acceso\s+pavimentado|carretera\s+asfaltad[oa])\b",
+    re.IGNORECASE,
+)
+_RX_WATER = re.compile(
+    r"\b(?:agua\s+(?:potable|disponible)?|water\s+(?:access|available)|suministro\s+de\s+agua|"
+    r"acceso\s+a\s+agua|conexi[oó]n\s+de\s+agua)\b",
+    re.IGNORECASE,
+)
+_RX_POWER = re.compile(
+    r"\b(?:el[eé]ctric|energ[íi]a|l[íi]neas?\s+el[eé]ctric|power\s+(?:available|access)|"
+    r"luz\s+el[eé]ctrica|servicio\s+el[eé]ctrico)\b",
+    re.IGNORECASE,
+)
+
+def _attr(raw: dict, key: str, pattern: re.Pattern, *texts: str) -> bool:
+    """Return the scraper-supplied bool if truthy, else regex-derive from texts."""
+    if raw.get(key):
+        return True
+    blob = " ".join(t for t in texts if t)
+    return bool(pattern.search(blob)) if blob else False
+
+
 def normalize(raw: dict, source: str) -> Optional[Listing]:
     """
     Convert a raw scraper dict into a canonical Listing.
@@ -583,10 +614,13 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         property_type=property_type,
         is_in_development=is_in_development,
         development_name=development_name,
-        is_beachfront=bool(raw.get("is_beachfront", False)),
-        has_paved_access=bool(raw.get("has_paved_access", False)),
-        has_water=bool(raw.get("has_water", False)),
-        has_power=bool(raw.get("has_power", False)),
+        # Boolean attributes — scraper-supplied values win. When scraper didn't
+        # set them, derive from text via shared regex so all sources benefit
+        # equally instead of only oceanside (where it was originally inline).
+        is_beachfront=_attr(raw, "is_beachfront", _RX_BEACHFRONT, title, description, location_text),
+        has_paved_access=_attr(raw, "has_paved_access", _RX_PAVED, title, description, location_text),
+        has_water=_attr(raw, "has_water", _RX_WATER, title, description, location_text),
+        has_power=_attr(raw, "has_power", _RX_POWER, title, description, location_text),
         is_repriced=bool(raw.get("is_repriced", False)),
         days_listed=raw.get("days_listed"),
         photos_count=int(raw.get("photos_count") or len(raw.get("photo_urls") or [])),

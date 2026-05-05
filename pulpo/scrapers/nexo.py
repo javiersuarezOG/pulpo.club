@@ -145,6 +145,20 @@ class NexoScraper:
     def __init__(self, offline: bool | None = None):
         self.offline = offline
 
+    def report_total(self, client) -> Optional[int]:
+        """Count of land listings advertised by nexo (single page at scale).
+
+        Pagination on this site is shallow — usually one page total. Returns
+        the count of div.dresultado cards on page 1, or None on fetch error.
+        """
+        try:
+            resp = client.get(LIST_URL.format(page=1))
+            resp.raise_for_status()
+            html = resp.content.decode("iso-8859-1", errors="replace")
+            return len(_parse_listing_page(html)) or None
+        except Exception:
+            return None
+
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
