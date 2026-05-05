@@ -118,3 +118,54 @@ def test_parse_photo_urls_empty_list_when_no_images():
     result = s._parse(html, "https://example.com")
     assert result is not None
     assert result["photo_urls"] == []
+
+
+def test_parse_extracts_photos_from_real_alterestate_shape():
+    """The live AlterEstate __NEXT_DATA__ uses featured_image (string) + gallery_image
+    (list of dicts with `image` key). The earlier extractor looked for the field
+    name 'images' which never appears, so 100% of bienesraices listings shipped
+    with photos_count=0. Lock the real shape in."""
+    import json
+    s = BienesRaicesScraper()
+    payload = {"props": {"pageProps": {"property": {
+        "name": "Terreno",
+        "category": {"name": "Terreno"},
+        "cid": "1",
+        "agents": [],
+        "description": "",
+        "featured_image": "https://cdn.example.com/hero.jpg",
+        "gallery_image": [
+            {"image": "https://cdn.example.com/g1.jpg", "image_wm": None},
+            {"image": "https://cdn.example.com/g2.jpg", "image_wm": None},
+        ],
+    }}}}
+    html = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+    result = s._parse(html, "https://example.com")
+    assert result is not None
+    assert result["photo_urls"] == [
+        "https://cdn.example.com/hero.jpg",
+        "https://cdn.example.com/g1.jpg",
+        "https://cdn.example.com/g2.jpg",
+    ], "featured_image must come first, gallery_image follows in order"
+
+
+def test_parse_dedupes_when_featured_appears_in_gallery():
+    """If featured_image URL also appears in gallery_image, it should not
+    appear twice — dedup by exact URL."""
+    import json
+    s = BienesRaicesScraper()
+    payload = {"props": {"pageProps": {"property": {
+        "name": "Terreno", "category": {"name": "Terreno"}, "cid": "1",
+        "agents": [], "description": "",
+        "featured_image": "https://cdn.example.com/hero.jpg",
+        "gallery_image": [
+            {"image": "https://cdn.example.com/hero.jpg"},  # dup of featured
+            {"image": "https://cdn.example.com/g2.jpg"},
+        ],
+    }}}}
+    html = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+    result = s._parse(html, "https://example.com")
+    assert result["photo_urls"] == [
+        "https://cdn.example.com/hero.jpg",
+        "https://cdn.example.com/g2.jpg",
+    ]
