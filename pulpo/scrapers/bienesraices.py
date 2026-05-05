@@ -21,6 +21,8 @@ from typing import Optional
 
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._type_classifier import classify_property_type
+from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -29,14 +31,40 @@ BASE = "https://bienesraicesenelsalvador.com"
 SITEMAP_URL = "https://secure.alterestate.com/api/v1/properties/sitemap/"
 SITEMAP_HEADERS = {"domain": "bienesraicesenelsalvador.com"}
 
+# Slug keywords used to filter the AlterEstate sitemap (per-listing detail
+# fetches are expensive — narrow upfront). Broadened beyond land in the
+# Phase A houses+condos PR; the type-specific category check at parse-time
+# is what actually decides whether the listing flows through.
 LAND_SLUG_KEYWORDS = {
     "terreno", "lote", "finca", "parcela",
     "hacienda", "rancho", "manzana", "hectarea", "tierra", "campo",
 }
-LAND_CATEGORY_KEYWORDS = {
-    "terreno", "lote", "finca", "parcela",
-    "hacienda", "rancho", "tierra", "campo",
+HOUSE_SLUG_KEYWORDS = {
+    "casa", "villa", "residencia", "chalet", "house",
 }
+CONDO_SLUG_KEYWORDS = {
+    "apartamento", "condominio", "departamento", "depa", "loft", "apto",
+}
+ALL_SLUG_KEYWORDS = LAND_SLUG_KEYWORDS | HOUSE_SLUG_KEYWORDS | CONDO_SLUG_KEYWORDS
+
+# Category-name → property_type. AlterEstate's `category.name` is the
+# strongest possible broker_field signal; we map it explicitly. Unknown
+# categories fall through to the multi-signal classifier in `_parse`.
+_CATEGORY_TO_TYPE = {
+    # Land
+    "terreno": "land", "terrenos": "land", "lote": "land", "lotes": "land",
+    "finca": "land", "fincas": "land", "parcela": "land", "parcelas": "land",
+    # House
+    "casa": "house", "casas": "house", "villa": "house", "villas": "house",
+    "residencia": "house", "house": "house",
+    # Condo
+    "apartamento": "condo", "apartamentos": "condo",
+    "condominio": "condo", "condominios": "condo", "condo": "condo",
+    "departamento": "condo", "departamentos": "condo",
+}
+
+# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
+_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
 
 _NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL
@@ -80,10 +108,13 @@ class BienesRaicesScraper:
                 print(f"[{self.slug}] sitemap failed: {e}")
                 return []
 
-            # Step 2: filter land candidates by slug keyword
+            # Step 2: filter relevant candidates by slug keyword (land, house,
+            # or condo). Per-listing category check + classifier decides the
+            # actual type at parse time — slugs are just a coarse pre-filter
+            # to avoid fetching ~370 unkeyworded entries.
             candidates = [
                 item for item in sitemap
-                if any(k in item.get("slug", "") for k in LAND_SLUG_KEYWORDS)
+                if any(k in item.get("slug", "") for k in ALL_SLUG_KEYWORDS)
             ]
 
             # Step 3: fetch detail pages
@@ -123,9 +154,18 @@ class BienesRaicesScraper:
         if not prop:
             return None
 
-        # Verify land category
-        cat = (prop.get("category") or {}).get("name", "").lower()
-        if not any(k in cat for k in LAND_CATEGORY_KEYWORDS):
+        # Resolve type from the broker's `category.name`. Unknown categories
+        # are dropped here — they're typically commercial / industrial /
+        # rentals we don't surface today.
+        cat = (prop.get("category") or {}).get("name", "").strip().lower()
+        broker_type = _CATEGORY_TO_TYPE.get(cat)
+        if broker_type is None:
+            return None
+
+        # House/condo: only sales, not rentals. Land is sale-only by nature
+        # so we don't apply the same gate (and many lots have no sale_price
+        # but are still for sale).
+        if broker_type in ("house", "condo") and not prop.get("forSale", True):
             return None
 
         title = prop.get("name", "").strip()
@@ -133,8 +173,6 @@ class BienesRaicesScraper:
             return None
 
         price = prop.get("sale_price") or prop.get("us_saleprice")
-        area_val = prop.get("terrain_area")
-        area_unit = (prop.get("terrain_area_measurer") or "v2").strip()
 
         province = prop.get("province") or ""
         city = prop.get("city") or ""
@@ -153,13 +191,9 @@ class BienesRaicesScraper:
         desc_html = prop.get("description") or ""
         description = re.sub(r"<[^>]+>", " ", desc_html).strip()[:1500]
 
-        raw_size = f"{area_val} {area_unit}" if area_val else ""
-
         # Photos — AlterEstate's __NEXT_DATA__ exposes:
         #   featured_image: single string URL (the hero, used as photos[0])
         #   gallery_image:  list of {image, image_wm, external_url, ...} dicts
-        # Older 'images' / 'photos' field names were never present on this site;
-        # they're kept as fallbacks only for defensiveness.
         photo_urls: list[str] = []
         seen: set[str] = set()
         def _add(u: str) -> None:
@@ -175,7 +209,16 @@ class BienesRaicesScraper:
             elif isinstance(img, str):
                 _add(img)
 
-        return {
+        # Build the base record. The lot-area field (`terrain_area`) is the
+        # `area_m2` for ALL types: for land it's THE area; for houses it's
+        # the lot the house sits on; condos rarely have it. The BUILT area
+        # lives in `built_area_m2` (from `property_area`) and is only used
+        # for house/condo.
+        terrain_val = prop.get("terrain_area")
+        terrain_unit = (prop.get("terrain_area_measurer") or "v2").strip()
+        raw_size = f"{terrain_val} {terrain_unit}" if terrain_val else ""
+
+        rec: dict = {
             "source": self.slug,
             "source_id": str(prop.get("cid") or ""),
             "url": url,
@@ -185,13 +228,79 @@ class BienesRaicesScraper:
             "raw_size_text": raw_size,
             "location_text": location_text,
             "description": description,
-            "property_type": "land",
+            "property_type": broker_type,
             "photo_urls": photo_urls,
             "broker_name": broker_name,
             "broker_phone": broker_phone,
             "broker_email": broker_email,
             "scraped_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        # Type-specific fields for house / condo. AlterEstate field shapes
+        # confirmed against live samples (Casas → cid 2346, Apartamentos →
+        # cid 2350) during the Phase A diagnosis.
+        if broker_type in ("house", "condo"):
+            built_val = prop.get("property_area")
+            if built_val and (prop.get("property_area_measurer") or "").lower() in ("mt2", "m2", ""):
+                rec["built_area_m2"] = float(built_val)
+            if prop.get("room") is not None:
+                rec["bedrooms"] = int(prop["room"])
+            full_baths = prop.get("bathroom") or 0
+            half_baths = prop.get("half_bathrooms") or 0
+            if full_baths or half_baths:
+                rec["bathrooms"] = float(full_baths) + 0.5 * float(half_baths)
+            if prop.get("parkinglot") is not None:
+                rec["parking_spaces"] = int(prop["parkinglot"])
+            if prop.get("year_construction"):
+                try:
+                    rec["year_built"] = int(prop["year_construction"])
+                except (TypeError, ValueError):
+                    pass
+            if broker_type == "condo":
+                if prop.get("floor_level") is not None:
+                    rec["floor"] = int(prop["floor_level"])
+                if prop.get("maintenance_fee"):
+                    try:
+                        rec["hoa_fee_usd_monthly"] = float(prop["maintenance_fee"])
+                    except (TypeError, ValueError):
+                        pass
+
+        # Coastal filter (house/condo only). Per spec: drop a built listing
+        # unless its zone is coastal OR title/description has a beachfront
+        # keyword. Land is unaffected — inland lots are still ingested.
+        # Zone resolution happens later in normalize.py; here we use a quick
+        # sector/city/province lower-bag check against COASTAL_ZONES.
+        if broker_type in ("house", "condo"):
+            location_blob = " ".join(p.lower().replace(" ", "-")
+                                     for p in (sector, city, province))
+            zone_is_coastal = any(z in location_blob for z in COASTAL_ZONES)
+            text_blob = f"{title}\n{description}"
+            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
+            if not zone_is_coastal and not has_beachfront_kw:
+                return None
+
+        # Multi-signal classifier confirmation. The broker_field signal
+        # above already produced our type; running the classifier here
+        # produces signals + confidence so the shadow log captures them
+        # and any future tightening can compare broker_type vs predicted.
+        ptype, signals, confidence, total = classify_property_type({
+            "broker_type_field": cat,
+            "url":               url,
+            "photo_urls":        photo_urls,
+            "title":             title,
+            "description":       description,
+        }, fallback_type=broker_type)
+        rec["_type_signals"]    = [s.to_dict() for s in signals]
+        rec["_type_confidence"] = confidence
+        rec["_type_total"]      = total
+        # Flag (don't drop) on classifier disagreement — the broker label is
+        # authoritative for shipping but the disagreement is worth a human
+        # eye. Existing validation_warnings list pattern preserved.
+        if ptype != broker_type:
+            rec["validation_status"] = "flagged"
+            rec.setdefault("validation_warnings", []).append("type_classifier_disagree")
+
+        return rec
 
     def crawl_with_meta(
         self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002

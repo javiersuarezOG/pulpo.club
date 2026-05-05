@@ -35,7 +35,19 @@ class Listing:
     price_per_m2: Optional[float] = None  # derived
 
     # Property type
-    property_type: str = "land"        # "land" | "lot" | "finca" | "house+lot"
+    property_type: str = "land"        # "land" | "house" | "condo"
+    # Type-specific fields. All Optional — populated only for house/condo
+    # listings. Default None for land so existing land code paths and
+    # validation are unaffected. Built area is distinct from `area_m2`
+    # (which is the LOT area for land, also-the-lot for house).
+    bedrooms: Optional[int] = None
+    bathrooms: Optional[float] = None  # half-baths land as 0.5 increments
+    built_area_m2: Optional[float] = None
+    year_built: Optional[int] = None
+    parking_spaces: Optional[int] = None
+    floor: Optional[int] = None                  # condo only
+    hoa_fee_usd_monthly: Optional[float] = None  # condo only
+
     is_beachfront: bool = False
     # Development / gated-community tagging
     is_in_development: bool = False    # inside a named development or gated community
