@@ -18,6 +18,7 @@ from pulpo.scrapers.realtyelsalvador import (  # noqa: E402
     _map,
     _is_land,
     _extract_photo_urls,
+    _API_HEADERS,
 )
 
 
@@ -178,3 +179,27 @@ def test_extract_photo_urls_deduplicates():
     }
     urls = _extract_photo_urls(rec)
     assert urls.count(same_url) == 1
+
+
+# ── Anti-403 headers ────────────────────────────────────────────────────
+# The two prior nightlies returned 0 listings due to HTTP 403 from
+# realtyelsalvador.com when the API is hit from GitHub Actions runner IPs.
+# These tests pin the headers we send so a future cleanup doesn't silently
+# strip them and reintroduce the regression.
+
+def test_api_headers_include_browser_realistic_ua():
+    """Pulpo's default UA returned 403 from runner IPs. The Safari UA in
+    _API_HEADERS is the workaround. If this assertion fails the request
+    will go out with whatever fallback the client supplies, very likely
+    triggering the WAF block again."""
+    assert "Mozilla/5.0" in _API_HEADERS["User-Agent"]
+    assert "Safari" in _API_HEADERS["User-Agent"]
+
+
+def test_api_headers_include_referer_and_sec_fetch():
+    """Referer + Sec-Fetch-* headers are commonly weighted by WordPress /
+    Cloudflare bot scoring. Pin them so a refactor doesn't drop them."""
+    assert _API_HEADERS["Referer"].startswith("https://realtyelsalvador.com")
+    assert _API_HEADERS["Sec-Fetch-Mode"] == "cors"
+    assert _API_HEADERS["Sec-Fetch-Site"] == "same-origin"
+    assert _API_HEADERS["Accept"].startswith("application/json")

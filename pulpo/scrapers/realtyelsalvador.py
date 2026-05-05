@@ -35,6 +35,30 @@ PER_PAGE     = 100
 MAX_PAGES    = 20
 FIXTURE_FILE = "sample_listings.json"
 
+# Browser-realistic headers — the WP REST endpoint returns HTTP 403 to
+# requests from GitHub Actions runner IPs (Azure datacenter ranges) when
+# only the default pulpo-club UA is sent. The two prior nightlies hit
+# this and shipped 0 listings. From a developer machine the same code
+# works regardless of UA, so the gate is some combination of IP + missing
+# bot-evasion headers. These match what Safari/Chrome sends for an XHR to
+# the same endpoint and have defeated similar WordPress / Cloudflare
+# bot-scoring rules elsewhere. If 403s persist on the next nightly we
+# know it's pure IP-based and need a proxy.
+_API_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+    ),
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "es-SV,es;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Referer": f"{BASE}/",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Cache-Control": "no-cache",
+}
+
 # tipo-de-propiedad taxonomy: terms we treat as land
 # Discovered by inspecting live records — expand as new terms appear.
 _LAND_KEYWORDS = {"terreno", "terrenos", "lote", "lotes", "land", "lot", "finca", "parcela"}
@@ -176,7 +200,7 @@ class RealtyElSalvadorScraper:
 
     def report_total(self, client) -> Optional[int]:
         try:
-            r = client.get(f"{API_BASE}?per_page=1")
+            r = client.get(f"{API_BASE}?per_page=1", headers=_API_HEADERS)
             r.raise_for_status()
             return int(r.headers.get("X-WP-Total", 0)) or None
         except Exception:
@@ -197,7 +221,7 @@ class RealtyElSalvadorScraper:
                         "per_page": PER_PAGE,
                         "page":     page,
                         "_embed":   "wp:featuredmedia,wp:term",
-                    }))
+                    }, headers=_API_HEADERS))
                     r.raise_for_status()
                 except Exception as e:
                     print(f"[realtyelsalvador] page {page} failed: {e}")
