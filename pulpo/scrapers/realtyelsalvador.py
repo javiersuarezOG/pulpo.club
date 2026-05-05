@@ -25,14 +25,14 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client
+from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries
+from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 
 BASE         = "https://realtyelsalvador.com"
 API_BASE     = f"{BASE}/wp-json/wp/v2/propiedades"
 PER_PAGE     = 100
 MAX_PAGES    = 20
-REQUEST_DELAY = 1.5
 FIXTURE_FILE = "sample_listings.json"
 
 # tipo-de-propiedad taxonomy: terms we treat as land
@@ -193,11 +193,11 @@ class RealtyElSalvadorScraper:
             for page in range(1, MAX_PAGES + 1):
                 time.sleep(REQUEST_DELAY)
                 try:
-                    r = client.get(API_BASE, params={
+                    r = with_retries(lambda: client.get(API_BASE, params={
                         "per_page": PER_PAGE,
                         "page":     page,
                         "_embed":   "wp:featuredmedia,wp:term",
-                    })
+                    }))
                     r.raise_for_status()
                 except Exception as e:
                     print(f"[realtyelsalvador] page {page} failed: {e}")
