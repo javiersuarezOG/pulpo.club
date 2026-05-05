@@ -27,6 +27,10 @@ from pulpo.ranker import rank  # noqa: E402
 from automation.validation import validate  # noqa: E402
 from automation.field_audit import build_completeness_block  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
+from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
+    load_dictionaries as _load_nlp_dicts,
+    extract as _nlp_extract,
+)
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -274,6 +278,24 @@ def main() -> int:
         else:
             dropped += 1
 
+    # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
+    # at startup, runs all dictionaries against title+description+location_text
+    # for each listing, and fills False→True on the boolean fields. Existing
+    # per-scraper True values are preserved.
+    nlp_dicts = _load_nlp_dicts()
+    nlp_changes_per_field: dict[str, int] = {}
+    for li in listings:
+        changes = _nlp_extract(li, nlp_dicts)
+        for f in changes:
+            nlp_changes_per_field[f] = nlp_changes_per_field.get(f, 0) + 1
+    if nlp_dicts:
+        summary = " ".join(
+            f"{f}={c}"
+            for f, c in sorted(nlp_changes_per_field.items(), key=lambda x: -x[1])
+        ) or "no_changes"
+        print(f"[nlp] dicts={len(nlp_dicts)} listings={len(listings)} "
+              f"flips_false_to_true: {summary}")
+
     # Validation layer — runs before the ranker.
     # DROP'd listings are excluded entirely. FLAG'd listings pass to the ranker
     # but get validation_status/validation_warnings fields set.
@@ -350,6 +372,58 @@ def main() -> int:
         li.first_seen_at = first_seen[key]
     with listings_history_path.open("w", encoding="utf-8") as f:
         json.dump(first_seen, f, ensure_ascii=False)
+
+    # Price history (PRD §FR-3). Append-only sidecar keyed by source|source_id
+    # so we can compute is_repriced from real cross-run price comparison —
+    # not from per-scraper "old_price" flags that disappear when the broker
+    # removes the strikethrough.
+    #
+    # Storage shape: {listing_id: [{"ts": iso, "price_usd": float}, ...]}.
+    # We only append when price differs from the most recent recorded value,
+    # so listings whose price never moves contribute one row total. Each
+    # listing's history is capped at PRICE_HISTORY_MAX_ENTRIES.
+    PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies, more than enough
+    prices_history_path = web_data_dir / "prices_history.json"
+    try:
+        prices_history: dict = (
+            json.loads(prices_history_path.read_text())
+            if prices_history_path.exists() else {}
+        )
+        if not isinstance(prices_history, dict):
+            prices_history = {}
+    except Exception:
+        prices_history = {}
+
+    repriced_count = 0
+    for li in listings:
+        if li.price_usd is None:
+            continue
+        key = f"{li.source}|{li.source_id}"
+        history = prices_history.get(key) or []
+
+        # Append only when price moved (or it's the first record).
+        last_price = history[-1].get("price_usd") if history else None
+        if last_price is None or float(last_price) != float(li.price_usd):
+            history.append({"ts": started_iso, "price_usd": float(li.price_usd)})
+            history = history[-PRICE_HISTORY_MAX_ENTRIES:]
+            prices_history[key] = history
+
+        # is_repriced = current price strictly lower than any earlier recorded
+        # price (excluding today's just-appended entry to avoid self-reference).
+        # First-ever scrape (no prior entries) leaves the field at its
+        # per-scraper default rather than overriding to False.
+        prior_prices = [h["price_usd"] for h in history[:-1]] if history else []
+        if prior_prices:
+            if float(li.price_usd) < min(prior_prices):
+                li.is_repriced = True
+                repriced_count += 1
+            else:
+                li.is_repriced = False
+
+    with prices_history_path.open("w", encoding="utf-8") as f:
+        json.dump(prices_history, f, ensure_ascii=False)
+    print(f"[price_history] tracked={len(prices_history)} listings  "
+          f"repriced_this_run={repriced_count}")
 
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.

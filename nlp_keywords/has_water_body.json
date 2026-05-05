@@ -1,0 +1,22 @@
+{
+  "field": "has_water_body",
+  "type": "boolean",
+  "positive": [
+    "\\br[ií]o\\b",
+    "quebrada",
+    "\\bcreek\\b",
+    "riachuelo",
+    "\\blaguna\\b",
+    "\\blago\\b",
+    "arroyo",
+    "\\briver\\b",
+    "\\bstream\\b",
+    "manantial",
+    "\\bestero\\b",
+    "fuente de agua",
+    "\\bcatarata\\b",
+    "cascada"
+  ],
+  "negative": [],
+  "_comment": "PRD §FR-2.5 + SV-specific extensions (estero = mangrove inlet, cascada/catarata = waterfall, fuente de agua = water source on-property)."
+}

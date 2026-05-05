@@ -3,15 +3,17 @@ Century 21 El Salvador scraper.
 
 Site: https://www.century21elsalvador.com/
 Stack: WordPress + OmniMLS widget (mx.omnimls.com). The results page
-embeds all listing data as JSON in window.REP_LOG_APP_PROPS.data.results,
-so no per-listing detail requests are needed — all fields (price, area,
-location, broker contact, URL) are present in a single fetch.
+embeds most listing data as JSON in window.REP_LOG_APP_PROPS.data.results,
+covering price, area, location, broker contact, URL — but NOT description.
+Per-listing detail page fetches are required to populate `description`,
+which downstream NLP and AI rely on (Phase 0 fix per PRD WS2 feasibility).
 
 Land-type filter keeps: lote_residencial, finca, propiedad_de_desarrollo,
 terreno, lote, tierra, rancho, hacienda, lote_comercial.
 """
 from __future__ import annotations
 import json
+import re
 import time
 from datetime import datetime, timezone
 from typing import Optional
@@ -21,6 +23,35 @@ from pulpo.agents import SOURCES, register
 
 if HTTPX_OK:
     import httpx  # noqa: F401
+
+
+# Description extractors — tried in order, first hit wins.
+# 1. og:description meta tag (HTML-decoded, present on every property page)
+# 2. "descripcion": "..." JSON property in the embedded REP_LOG_APP_PROPS blob
+_RX_OG_DESC      = re.compile(
+    r'<meta\s+[^>]*property=["\']og:description["\'][^>]*content=["\']([^"\']{20,2000})["\']',
+    re.IGNORECASE,
+)
+_RX_JSON_DESC    = re.compile(r'"descripcion"\s*:\s*"((?:[^"\\]|\\.){20,4000})"')
+
+
+def _extract_description(html: str) -> str:
+    """Pull a description out of a c21 detail page. Empty string if neither path hits."""
+    m = _RX_OG_DESC.search(html)
+    if m:
+        # Decode common HTML entities that ride in og: meta tags
+        text = (m.group(1)
+                .replace("&quot;", '"').replace("&#039;", "'")
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">"))
+        return text.strip()[:2000]
+    m = _RX_JSON_DESC.search(html)
+    if m:
+        # Decode JSON escapes (\\u00f3 → ó, \\r → space, \\n → space)
+        try:
+            return json.loads(f'"{m.group(1)}"').replace("\r", " ").replace("\n", " ").strip()[:2000]
+        except json.JSONDecodeError:
+            return m.group(1).strip()[:2000]
+    return ""
 
 BASE = "https://www.century21elsalvador.com"
 RESULTS_URL = f"{BASE}/v/resultados/oficina_4942-century-21-el-salvador_local"
@@ -100,8 +131,31 @@ class Century21Scraper:
                 if rec.get("tipoPropiedad") not in LAND_TYPES:
                     continue
                 mapped = self._map(rec)
-                if mapped:
-                    out.append(mapped)
+                if not mapped:
+                    continue
+
+                # Phase 0: fetch detail page to populate description.
+                # The OmniMLS results blob has 91 fields but no description —
+                # description lives on the property detail page only.
+                # Cost: ~1 HTTP request per listing × ~15 listings × 1.5s = ~22s
+                # overhead per nightly run. Worth it: c21 today ships 100% empty
+                # descriptions which kills downstream NLP + AI quality.
+                if mapped.get("url"):
+                    try:
+                        time.sleep(self.REQUEST_DELAY)
+                        dresp = client.get(mapped["url"])
+                        if dresp.status_code == 200:
+                            mapped["description"] = _extract_description(dresp.text)
+                        else:
+                            print(f"[{self.slug}] detail {mapped['source_id']} "
+                                  f"returned HTTP {dresp.status_code}")
+                    except Exception as e:
+                        # Non-fatal: keep the listing with empty description rather
+                        # than dropping it entirely.
+                        print(f"[{self.slug}] detail fetch failed "
+                              f"{mapped['source_id']}: {e}")
+
+                out.append(mapped)
                 if len(out) >= limit:
                     break
             return out

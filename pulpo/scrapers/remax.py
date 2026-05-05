@@ -149,9 +149,36 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
                     raw_size = f"{m.group(1).replace(',', '')} {unit}"
             break
 
-    # Description: first <p> in main section
-    desc_el = tree.css_first("section p")
-    description = desc_el.text(strip=True)[:1500] if desc_el else ""
+    # Description — multi-tier extraction. The original `section p` selector
+    # works on a minority of pages (~26% in 2026-05-03 prod); the remaining
+    # listings hide the description elsewhere. Tier order is:
+    #   1. embedded `"description":"..."` JSON property (~74% of pages)
+    #   2. og:description meta tag (cleaned of HTML entities)
+    #   3. `section p` legacy selector (kept for backward compat)
+    description = ""
+    json_desc_match = re.search(
+        r'"description"\s*:\s*"((?:[^"\\]|\\.){40,4000})"', html
+    )
+    if json_desc_match:
+        import json as _json
+        try:
+            description = _json.loads(f'"{json_desc_match.group(1)}"')
+            description = description.replace("\r", " ").replace("\n", " ").strip()[:1500]
+        except _json.JSONDecodeError:
+            description = json_desc_match.group(1).strip()[:1500]
+    if not description:
+        og_match = re.search(
+            r'<meta\s+[^>]*property=["\']og:description["\'][^>]*content=["\']([^"\']{40,2000})["\']',
+            html, re.IGNORECASE,
+        )
+        if og_match:
+            description = (og_match.group(1)
+                           .replace("&quot;", '"').replace("&#039;", "'")
+                           .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+                           .strip()[:1500])
+    if not description:
+        desc_el = tree.css_first("section p")
+        description = desc_el.text(strip=True)[:1500] if desc_el else ""
 
     # Photos — RE/MAX typically uses an image gallery with data-src lazy loading
     photo_urls: list[str] = []

@@ -1,0 +1,35 @@
+{
+  "field": "has_power",
+  "type": "boolean",
+  "positive": [
+    "\\bluz\\b",
+    "electricidad",
+    "\\bice\\b",
+    "\\bcnfl\\b",
+    "corriente",
+    "\\belectric\\b",
+    "\\bpower\\b",
+    "energ[ií]a el[eé]ctrica",
+    "tiene luz",
+    "con luz",
+    "servicio el[eé]ctrico",
+    "tiene electricidad",
+    "con electricidad",
+    "\\bdelsur\\b",
+    "\\bcaess\\b",
+    "transformador",
+    "poste de luz",
+    "red el[eé]ctrica",
+    "medidor el[eé]ctrico",
+    "\\b110v\\b",
+    "\\b220v\\b"
+  ],
+  "negative": [
+    "sin luz",
+    "sin electricidad",
+    "no tiene luz",
+    "no power",
+    "no electricity"
+  ],
+  "_comment": "PRD §FR-2.5 + SV electricity providers (DELSUR, CAESS) and physical infrastructure markers (poste de luz, transformador, medidor)."
+}

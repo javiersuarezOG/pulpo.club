@@ -43,6 +43,11 @@ class Listing:
     has_paved_access: bool = False
     has_water: bool = False
     has_power: bool = False
+    # PRD §FR-2 NLP-extracted booleans (Phase 1)
+    has_ocean_view: bool = False
+    has_mountain_view: bool = False
+    has_water_body: bool = False
+    is_flat: bool = False
     is_repriced: bool = False          # price has dropped vs. previous scrape
 
     # Activity
