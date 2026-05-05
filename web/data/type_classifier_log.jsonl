@@ -1,0 +1,3 @@
+# type_classifier_log.jsonl — one row per listing per nightly run
+# Schema: {ts, source, source_id, scraper_type, predicted, confidence, total_weight, mode, signals}
+# mode = "applied" (classifier's verdict overrode scraper) | "shadow" (logged but not applied)
