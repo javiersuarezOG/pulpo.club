@@ -23,6 +23,8 @@ samples/calibration/*/*.html
 !samples/calibration/oceanside/*.html
 !samples/calibration/nexo/*.html
 !samples/calibration/realtyelsalvador/*.html
+!samples/calibration/bienesraices/*.html
+!samples/calibration/century21/*.html
 
 # OS junk
 .DS_Store
