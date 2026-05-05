@@ -1,8 +1,15 @@
-# Require javier to review any PR that touches production data or deployment
-* @javiersuarezOG
+# CODEOWNERS — surgical review gating for high-blast-radius files.
+#
+# Files matched here require @javiersuarezOG approval before merge.
+# Branch protection enforces this via require_code_owner_reviews=true.
+# All other files self-merge after CI green per CLAUDE.md rule 1.
 
-# Scrapers require javier's review (production pipeline)
-/pulpo/         @javiersuarezOG
-/automation/    @javiersuarezOG
-/api/           @javiersuarezOG
-/vercel.json    @javiersuarezOG
+# Validation rules and bounds: changes here can silently corrupt the dataset.
+automation/validation.py        @javiersuarezOG
+automation/validation_bounds.py @javiersuarezOG
+
+# CI workflows: changes here can disable canaries, leak secrets, or break deploys.
+.github/workflows/              @javiersuarezOG
+
+# Branch protection / CODEOWNERS itself: meta-changes need review.
+.github/CODEOWNERS              @javiersuarezOG
