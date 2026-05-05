@@ -196,6 +196,7 @@ jobs:
           git add web/data/prd_feasibility.json 2>/dev/null || true
           git add web/data/prd_feasibility.md 2>/dev/null || true
           git add web/data/source_health_history.jsonl 2>/dev/null || true
+          git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true

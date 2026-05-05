@@ -245,6 +245,52 @@ def main() -> int:
             r.setdefault("source", src)
             raw.append(r)
 
+    # ── Per-listing type-classifier shadow log ───────────────────────
+    # Goodlife already runs the multi-signal classifier inline and writes
+    # `_type_signals`, `_type_confidence`, `_type_total` onto its records.
+    # Other sources still hardcode their type — for those we run the
+    # classifier here in SHADOW mode (no behaviour change; we only log
+    # whether the prediction agrees with the scraper's hardcode). This is
+    # observability without risk: drives the next phase's decision on
+    # which scrapers to broaden.
+    type_log_path = REPO / "web" / "data" / "type_classifier_log.jsonl"
+    type_log_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        from pulpo.scrapers._type_classifier import classify_property_type as _classify_t
+        with type_log_path.open("a", encoding="utf-8") as _tf:
+            for r in raw:
+                if "_type_signals" in r:
+                    pred_type, signals_payload = r["property_type"], r["_type_signals"]
+                    confidence, total = r["_type_confidence"], r["_type_total"]
+                    mode = "applied"
+                else:
+                    p, sigs, confidence, total = _classify_t({
+                        "url":         r.get("url") or "",
+                        "photo_urls":  r.get("photo_urls") or [],
+                        "title":       r.get("title") or "",
+                        "description": r.get("description") or "",
+                    }, fallback_type=r.get("property_type") or "land")
+                    pred_type = p
+                    signals_payload = [s.to_dict() for s in sigs]
+                    mode = "shadow"
+                _tf.write(json.dumps({
+                    "ts":           started.isoformat(),
+                    "source":       r.get("source"),
+                    "source_id":    r.get("source_id"),
+                    "scraper_type": r.get("property_type"),
+                    "predicted":    pred_type,
+                    "confidence":   confidence,
+                    "total_weight": round(total, 2),
+                    "mode":         mode,
+                    "signals":      signals_payload,
+                }, ensure_ascii=False) + "\n")
+                # Strip the piggyback fields before normalize sees the record.
+                for k in ("_type_signals", "_type_confidence", "_type_total"):
+                    r.pop(k, None)
+    except Exception as e:
+        # Telemetry must never block a run.
+        print(f"[type_classifier] shadow log skipped: {e}")
+
     # ── Per-source health telemetry ──────────────────────────────────
     # Append one row per source per run to web/data/source_health_history.jsonl
     # so we can detect "scraper X went silent for 3 days" without staring at

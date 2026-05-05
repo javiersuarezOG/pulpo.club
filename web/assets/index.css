@@ -122,6 +122,21 @@ th.col-ppm   {width:10%;text-align:right}
 th.col-stars {width:20%}
 th.col-photos{width:13%;text-align:left}
 th.col-chev  {width:44px;text-align:center;padding:0}
+/* Type column — only injected when ranked.json contains >1 distinct
+   property_type. When present, other columns yield ~10% to fit it; when
+   absent, layout is identical to today. */
+th.col-type  {width:10%;text-align:left}
+.td-type{white-space:nowrap}
+body.has-type-col th.col-zone {width:18%}
+body.has-type-col th.col-price{width:14%}
+body.has-type-col th.col-stars{width:18%}
+body.has-type-col th.col-photos{width:11%}
+
+/* Property-type pill — small chip on the row + side panel. Visual family
+   matches .zone-pill but with per-type colours from PROPERTY_TYPES. */
+.type-pill{display:inline-block;padding:2px 8px;border-radius:var(--r-sm);
+  font-size:11px;font-weight:600;line-height:1.5;letter-spacing:.1px;
+  white-space:nowrap}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 tbody tr:hover{background:var(--s1)}
 tbody tr.selected{background:var(--accent-bg)}

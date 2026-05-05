@@ -155,17 +155,25 @@ class BienesRaicesScraper:
 
         raw_size = f"{area_val} {area_unit}" if area_val else ""
 
-        # Photos — AlterEstate stores images as list of dicts with 'photo' or 'url' key
+        # Photos — AlterEstate's __NEXT_DATA__ exposes:
+        #   featured_image: single string URL (the hero, used as photos[0])
+        #   gallery_image:  list of {image, image_wm, external_url, ...} dicts
+        # Older 'images' / 'photos' field names were never present on this site;
+        # they're kept as fallbacks only for defensiveness.
         photo_urls: list[str] = []
-        for img in (prop.get("images") or prop.get("photos") or []):
-            if isinstance(img, dict):
-                u = img.get("photo") or img.get("url") or img.get("src") or ""
-            elif isinstance(img, str):
-                u = img
-            else:
-                continue
-            if u.startswith("http"):
+        seen: set[str] = set()
+        def _add(u: str) -> None:
+            u = (u or "").strip()
+            if u.startswith("http") and u not in seen:
+                seen.add(u)
                 photo_urls.append(u)
+
+        _add(prop.get("featured_image") or "")
+        for img in prop.get("gallery_image") or prop.get("images") or prop.get("photos") or []:
+            if isinstance(img, dict):
+                _add(img.get("image") or img.get("photo") or img.get("url") or img.get("src") or "")
+            elif isinstance(img, str):
+                _add(img)
 
         return {
             "source": self.slug,

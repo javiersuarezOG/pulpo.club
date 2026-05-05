@@ -186,15 +186,24 @@ class Century21Scraper:
         broker_phone = rec.get("whatsapp") or rec.get("telefono") or ""
         broker_email = rec.get("email") or ""
 
-        # Photos — OmniMLS typically stores them under 'fotos' (list of URL strings)
+        # Photos — OmniMLS exposes them under fotos: a DICT (not a list) with
+        # the schema: {totalFotos: int, propiedadThumbnail: [url, url, ...]}.
+        # The list-of-strings shape was an early misread; iterating the dict
+        # yielded its keys and silently produced zero photos.
         photo_urls: list[str] = []
-        for item in (rec.get("fotos") or rec.get("photos") or rec.get("imagenes") or []):
-            if isinstance(item, str) and item.startswith("http"):
-                photo_urls.append(item)
-            elif isinstance(item, dict):
-                u = item.get("url") or item.get("src") or ""
-                if u.startswith("http"):
+        fotos = rec.get("fotos")
+        if isinstance(fotos, dict):
+            for u in fotos.get("propiedadThumbnail") or []:
+                if isinstance(u, str) and u.startswith("http"):
                     photo_urls.append(u)
+        elif isinstance(fotos, list):  # defensive: future schema change
+            for item in fotos:
+                if isinstance(item, str) and item.startswith("http"):
+                    photo_urls.append(item)
+                elif isinstance(item, dict):
+                    u = item.get("url") or item.get("src") or ""
+                    if u.startswith("http"):
+                        photo_urls.append(u)
 
         return {
             "source": self.slug,

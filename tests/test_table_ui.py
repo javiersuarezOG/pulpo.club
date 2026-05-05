@@ -1399,3 +1399,62 @@ def test_photos_header_default_first_click_is_descending():
     assert 'data-col="photos" data-def="desc"' in html, (
         "Photos column header missing data-def=\"desc\" — first click would be ascending"
     )
+
+
+# ── Property-type column / pill ─────────────────────────────────────────
+# This PR adds a read-only Type column + side-panel pill that only appear
+# when ranked.json contains >1 distinct property_type. Single-type land-only
+# datasets stay visually identical to today.
+
+def test_type_column_only_appears_when_multiple_types_in_data():
+    html = _frontend_text()
+    # Init computes a Set of property_type values and toggles SHOW_TYPE_COL
+    assert "new Set(ALL_DATA.map(r => r.property_type)" in html, (
+        "init() should derive the type set from ranked.json"
+    )
+    assert "SHOW_TYPE_COL = types.size > 1" in html, (
+        "SHOW_TYPE_COL must be true only when >1 distinct property_type exists"
+    )
+
+
+def test_type_header_injected_only_when_types_diverge():
+    """The Type <th> is injected programmatically — never present in the
+    base HTML. This keeps the land-only view identical to today."""
+    html_only = (REPO / "web/index.html").read_text()
+    assert "col-type" not in html_only, (
+        "Type header must be injected by JS, not present in base HTML"
+    )
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "th.className = 'col-type'" in js, (
+        "init() must inject the Type <th> when SHOW_TYPE_COL is true"
+    )
+
+
+def test_type_pill_helper_exists_and_returns_empty_for_unknown_type():
+    """The typePillHTML helper must gracefully render '' for unknown types
+    so the cell collapses to an empty TD rather than rendering 'undefined'."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function typePillHTML")[1].split("function ")[0]
+    assert "if (!cfg) return ''" in block, (
+        "typePillHTML must return '' when PROPERTY_TYPES has no entry for the type"
+    )
+    assert "type-pill" in block, "missing CSS class"
+
+
+def test_side_panel_renders_type_meta_item():
+    """Type appears as a panel meta item alongside Zone / Source / Price."""
+    js = (REPO / "web/assets/index.js").read_text()
+    assert ">Type<" in js, "side panel missing Type meta-item label"
+    assert "typePillHTML(r)" in js, (
+        "side panel must use typePillHTML so the chip uses per-type colours"
+    )
+
+
+def test_table_render_threads_type_col_state():
+    """renderTable must short-circuit the type cell when SHOW_TYPE_COL is false
+    so single-type datasets emit the historical 7-column row shape unchanged."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function renderTable")[1].split("function ")[0]
+    assert "SHOW_TYPE_COL ?" in block, (
+        "renderTable must gate the type cell on SHOW_TYPE_COL"
+    )

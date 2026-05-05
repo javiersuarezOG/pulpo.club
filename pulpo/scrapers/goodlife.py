@@ -20,6 +20,7 @@ from pulpo.agents.html_crawler import (
     DEFAULT_REQUEST_DELAY as REQUEST_DELAY,
 )
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._type_classifier import classify_property_type
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser  # noqa: F401
@@ -125,15 +126,38 @@ class GoodLifeScraper:
                 if u.startswith("http"):
                     photo_urls.append(u)
 
-        return {
+        # Multi-signal classifier — supersedes the previous hardcode of
+        # "land". The hardcode misclassified built listings (real example:
+        # "3 Villas Complex in Costa del Sol" with 27 villa-* photo files
+        # was typed as land). The classifier reads URL slug, photo file
+        # names, title, and description with weighted signals; uncertain
+        # listings fall back to "land" (goodlife's dominant type) and are
+        # flagged so a human can review.
+        url = partial.get("url") or ""
+        ptype, signals, confidence, total = classify_property_type({
+            "url":         url,
+            "photo_urls":  photo_urls,
+            "title":       title,
+            "description": description,
+        }, fallback_type="land")
+        rec = {
             "title": title,
             "raw_price_text": raw_price,
             "raw_size_text": raw_size,
             "location_text": location,
             "description": description[:1500],
-            "property_type": "land",
+            "property_type": ptype,
             "photo_urls": photo_urls,
+            # Classifier signals piggyback on the record so automation/run.py
+            # can write a per-listing log without re-running classification.
+            "_type_signals":    [s.to_dict() for s in signals],
+            "_type_confidence": confidence,
+            "_type_total":      total,
         }
+        if confidence == "uncertain":
+            rec["validation_status"] = "flagged"
+            rec["validation_warnings"] = ["type_uncertain"]
+        return rec
 
     def report_total(self, client) -> Optional[int]:
         """Fetch the land index and return the advertised listing count, or None."""
