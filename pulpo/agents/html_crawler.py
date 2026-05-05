@@ -61,6 +61,50 @@ def make_client() -> "httpx.Client":
     return httpx.Client(headers=DEFAULT_HEADERS, follow_redirects=True, timeout=20.0)
 
 
+# ── Shared retry helper ────────────────────────────────────────────────
+# Hand-rolled (no new dep) — exponential backoff, retries only on transient
+# failures (5xx, 429, network/timeout). 4xx other than 429 fails fast since
+# those won't change on retry. Use as: result = with_retries(lambda: client.get(url))
+def with_retries(fn, *, attempts: int = 3, base_delay_s: float = 1.5):
+    """Call fn() up to `attempts` times with exponential backoff on transient errors.
+
+    Retries on:
+      - httpx network / timeout exceptions
+      - HTTP 429 (rate-limit)
+      - HTTP 5xx (server errors)
+    Raises immediately on:
+      - 4xx other than 429
+      - non-network exceptions
+    """
+    if not HTTPX_OK:
+        return fn()  # cannot retry without httpx — caller will fall back
+    last_exc: Optional[BaseException] = None
+    for i in range(attempts):
+        try:
+            result = fn()
+            # If it's a Response object, decide based on status code
+            if hasattr(result, "status_code"):
+                code = result.status_code
+                if code == 429 or 500 <= code < 600:
+                    last_exc = RuntimeError(f"HTTP {code}")
+                    if i < attempts - 1:
+                        time.sleep(base_delay_s * (2 ** i))
+                        continue
+            return result
+        except (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError) as e:
+            last_exc = e
+            if i < attempts - 1:
+                time.sleep(base_delay_s * (2 ** i))
+                continue
+            raise
+        except Exception:
+            # Non-transient — fail fast
+            raise
+    if last_exc is not None:
+        raise last_exc
+    return None  # unreachable
+
+
 def walk(
     client: "httpx.Client",
     base_url: str,
