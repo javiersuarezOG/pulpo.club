@@ -19,7 +19,8 @@ jobs:
   run:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # commit refreshed web/data/ back
+      contents: write       # commit refreshed web/data/ back
+      pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
     steps:
       - uses: actions/checkout@v4.2.2
         with:
