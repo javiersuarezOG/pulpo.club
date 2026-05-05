@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-05-05T21:18:42.320915+00:00",
-  "started_at": "2026-05-05T20:43:18.336070+00:00",
-  "duration_seconds": 2123.98,
-  "total_listings": 819,
-  "dropped": 95,
+  "last_updated": "2026-05-05T22:16:08.763257+00:00",
+  "started_at": "2026-05-05T21:33:29.804944+00:00",
+  "duration_seconds": 2558.96,
+  "total_listings": 865,
+  "dropped": 138,
   "per_source_raw": {
     "goodlife": 80,
     "oceanside": 27,
     "century21": 15,
-    "bienesraices": 471,
+    "bienesraices": 560,
     "remax": 312,
     "nexo": 9,
     "realtyelsalvador": 0
@@ -40,7 +40,7 @@
     },
     "bienesraices": {
       "supplier": null,
-      "pulled": 471,
+      "pulled": 560,
       "max_pages_hit": false
     },
     "remax": {
@@ -61,20 +61,20 @@
   },
   "field_completeness": {
     "bienesraices": {
-      "n_listings": 445,
+      "n_listings": 491,
       "fields": {
         "price_usd": 0.97,
-        "area_m2": 0.98,
+        "area_m2": 0.97,
         "zone": 0.96,
         "municipality": 0.98,
         "department": 0.99,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
-        "is_beachfront": 0.11,
-        "has_paved_access": 0.35,
+        "is_beachfront": 0.14,
+        "has_paved_access": 0.32,
         "has_water": 0.36,
-        "has_power": 0.32,
+        "has_power": 0.31,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -212,11 +212,11 @@
     }
   },
   "property_type_counts": {
-    "condo": 3,
+    "condo": 7,
     "land": 815,
-    "house": 1
+    "house": 43
   },
-  "v_fallback_no_price": 31,
+  "v_fallback_no_price": 37,
   "v_fallback_no_comps": 0,
   "sources": [
     "goodlife",
