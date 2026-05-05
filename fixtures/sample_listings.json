@@ -38,23 +38,6 @@
     "broker_email": "info@oceansideelsalvador.com"
   },
   {
-    "source": "kazu",
-    "source_id": "KZ-CUCO-003",
-    "url": "https://kazurealestate.com/property/cuco-1mz-beach/",
-    "title": "1 manzana frente al mar El Cuco",
-    "description": "Premium beachfront parcel, walking distance to El Cuco town. Suitable for vacation home or small B&B.",
-    "raw_size_text": "1 manzana",
-    "raw_price_text": "$250,000",
-    "location_text": "Playa El Cuco frente al mar",
-    "is_beachfront": true,
-    "has_paved_access": true,
-    "photos_count": 6,
-    "days_listed": 110,
-    "broker_name": "Kazu Real Estate",
-    "broker_phone": "+503 7321-3030",
-    "broker_email": "ventas@kazurealestate.com"
-  },
-  {
     "source": "goodlife",
     "source_id": "GL-TUNCO-010",
     "url": "https://goodlifeelsalvador.com/property/tunco-1.5mz-hilltop/",
@@ -87,24 +70,6 @@
     "broker_name": "Oceanside El Salvador",
     "broker_phone": "+503 7654-2020",
     "broker_email": "info@oceansideelsalvador.com"
-  },
-  {
-    "source": "kazu",
-    "source_id": "KZ-TUNCO-012",
-    "url": "https://kazurealestate.com/property/tunco-2mz-back/",
-    "title": "2 manzanas El Tunco 200m off beach — REBAJADO",
-    "description": "Recientemente rebajado de $400k a $300k. Lote a 200m de la playa, calle pavimentada. Bordeado por nuevo desarrollo residencial.",
-    "raw_size_text": "2 manzanas",
-    "raw_price_text": "$300,000",
-    "location_text": "El Tunco zona alta, Tamanique",
-    "is_beachfront": false,
-    "has_paved_access": true,
-    "is_repriced": true,
-    "photos_count": 9,
-    "days_listed": 22,
-    "broker_name": "Kazu Real Estate",
-    "broker_phone": "+503 7321-3030",
-    "broker_email": "ventas@kazurealestate.com"
   },
   {
     "source": "goodlife",
@@ -159,23 +124,6 @@
     "broker_email": "land@goodlifeelsalvador.com"
   },
   {
-    "source": "kazu",
-    "source_id": "KZ-MANGO-031",
-    "url": "https://kazurealestate.com/property/punta-mango-1mz/",
-    "title": "1 manzana Punta Mango interior",
-    "description": "Lote agrícola en zona Punta Mango, a 800m del punto de surf.",
-    "raw_size_text": "1 manzana",
-    "raw_price_text": "$80,000",
-    "location_text": "Punta Mango interior, Intipucá",
-    "is_beachfront": false,
-    "has_paved_access": false,
-    "photos_count": 4,
-    "days_listed": 12,
-    "broker_name": "Kazu Real Estate",
-    "broker_phone": "+503 7321-3030",
-    "broker_email": "ventas@kazurealestate.com"
-  },
-  {
     "source": "oceanside",
     "source_id": "OC-CONCHAGUA-040",
     "url": "https://oceansideelsalvador.com/property/conchagua-50mz/",
@@ -191,23 +139,6 @@
     "broker_name": "Oceanside El Salvador",
     "broker_phone": "+503 7654-2020",
     "broker_email": "info@oceansideelsalvador.com"
-  },
-  {
-    "source": "kazu",
-    "source_id": "KZ-CONCHAGUA-041",
-    "url": "https://kazurealestate.com/property/conchagua-10mz/",
-    "title": "10 manzanas vista al océano Conchagua",
-    "description": "Mid-elevation parcel with ocean view. Suitable for eco-resort or reforestation project.",
-    "raw_size_text": "10 manzanas",
-    "raw_price_text": "$180,000",
-    "location_text": "Conchagua, La Unión",
-    "is_beachfront": false,
-    "has_paved_access": false,
-    "photos_count": 6,
-    "days_listed": 140,
-    "broker_name": "Kazu Real Estate",
-    "broker_phone": "+503 7321-3030",
-    "broker_email": "ventas@kazurealestate.com"
   },
   {
     "source": "goodlife",
@@ -242,24 +173,6 @@
     "broker_name": "Oceanside El Salvador",
     "broker_phone": "+503 7654-2020",
     "broker_email": "info@oceansideelsalvador.com"
-  },
-  {
-    "source": "kazu",
-    "source_id": "KZ-MIZATA-060",
-    "url": "https://kazurealestate.com/property/mizata-2mz/",
-    "title": "2 manzanas Playa Mizata frente al mar — REBAJADO",
-    "description": "Beachfront parcel at Mizata, formerly listed at $310,000 now $250,000. 100m of sand frontage. Off-grid electric, well water.",
-    "raw_size_text": "2 mz",
-    "raw_price_text": "$250,000",
-    "location_text": "Playa Mizata, Teotepeque, La Libertad",
-    "is_beachfront": true,
-    "has_paved_access": false,
-    "is_repriced": true,
-    "photos_count": 9,
-    "days_listed": 19,
-    "broker_name": "Kazu Real Estate",
-    "broker_phone": "+503 7321-3030",
-    "broker_email": "ventas@kazurealestate.com"
   },
   {
     "source": "century21",
