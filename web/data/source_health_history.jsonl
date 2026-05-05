@@ -1,3 +1,10 @@
 # source_health_history.jsonl — one row per source per nightly run
 # Schema: {ts, source, status, count, duration_s, error_class, error_msg, max_pages_hit, limit_hit}
 # Bootstrapped empty so consumers can rely on the file existing.
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "goodlife", "status": "green", "count": 80, "duration_s": 128.58, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "oceanside", "status": "green", "count": 25, "duration_s": 4.73, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "century21", "status": "green", "count": 15, "duration_s": 49.08, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "bienesraices", "status": "green", "count": 471, "duration_s": 1088.43, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "remax", "status": "green", "count": 312, "duration_s": 635.34, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "nexo", "status": "green", "count": 9, "duration_s": 19.54, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T13:11:09.383892+00:00", "source": "realtyelsalvador", "status": "red", "count": 0, "duration_s": 1.64, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
