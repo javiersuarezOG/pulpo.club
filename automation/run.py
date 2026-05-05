@@ -22,10 +22,7 @@ sys.path.insert(0, str(REPO))
 from pulpo.agents import SOURCES as REGISTRY  # noqa: E402
 import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all sources
 from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
-from pulpo.normalize import normalize  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
-from automation.validation import validate  # noqa: E402
-from automation.field_audit import build_completeness_block  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
 from automation.ai_enrichment import enrich_listings as _ai_enrich  # type: ignore  # noqa: E402
 from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
@@ -33,9 +30,10 @@ from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     extract as _nlp_extract,
 )
 from pulpo.derived_rules import apply_all as _apply_derived_rules  # type: ignore  # noqa: E402
-from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
+from automation.pipeline_steps import (  # noqa: E402
+    phase_normalize, phase_validate, phase_write_outputs, phase_print_summary,
+)
 
-import csv  # noqa: E402
 import hashlib  # noqa: E402
 import io      # noqa: E402
 import time as _time  # noqa: E402
@@ -271,14 +269,7 @@ def main() -> int:
             }, ensure_ascii=False) + "\n")
 
     # Normalize
-    listings = []
-    dropped = 0
-    for r in raw:
-        li = normalize(r, source=r.get("source") or "unknown")
-        if li:
-            listings.append(li)
-        else:
-            dropped += 1
+    listings, dropped = phase_normalize(raw)
 
     # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
     # at startup, runs all dictionaries against title+description+location_text
@@ -298,57 +289,14 @@ def main() -> int:
         print(f"[nlp] dicts={len(nlp_dicts)} listings={len(listings)} "
               f"flips_false_to_true: {summary}")
 
-    # Validation layer — runs before the ranker.
-    # DROP'd listings are excluded entirely. FLAG'd listings pass to the ranker
-    # but get validation_status/validation_warnings fields set.
-    # Writes web/data/validation_log.jsonl for auditing.
-    val_pass = val_flag = val_drop = 0
-    val_log_entries: list[dict] = []
-    validated_listings: list = []
-    for li in listings:
-        li_dict = li.to_dict()
-        result  = validate(li_dict)
-        entry   = {
-            "source_id":   li.source_id,
-            "source":      li.source,
-            "url":         li.url,
-            "title":       li.title,
-            "disposition": result.disposition,
-            "reasons":     result.reasons,
-        }
-        val_log_entries.append(entry)
-        if result.disposition == "DROP":
-            val_drop += 1
-            dropped  += 1
-        elif result.disposition == "FLAG":
-            val_flag += 1
-            li.validation_status   = "flagged"
-            li.validation_warnings = result.reasons
-            validated_listings.append(li)
-        else:
-            val_pass += 1
-            validated_listings.append(li)
-    listings = validated_listings
-
-    print(
-        f"[validation] PASS={val_pass} FLAG={val_flag} DROP={val_drop} "
-        f"(total in={val_pass+val_flag+val_drop})"
-    )
-
-    # Write validation log for auditability
+    # Validation layer — drop bad listings, flag suspicious ones, write logs.
     web_data_dir = REPO / "web" / "data"
-    web_data_dir.mkdir(parents=True, exist_ok=True)
-    val_log_path = web_data_dir / "validation_log.jsonl"
-    with val_log_path.open("w", encoding="utf-8") as f:
-        for entry in val_log_entries:
-            import json as _json
-            f.write(_json.dumps(entry, ensure_ascii=False) + "\n")
-
-    # Legacy price-outlier log (kept for backward compat with the commit step)
-    log_path = web_data_dir / "parser_errors.log"
-    with log_path.open("w", encoding="utf-8") as f:
-        f.write(f"# parser_errors.log — generated {datetime.now(timezone.utc).isoformat()}\n")
-        f.write("# Replaced by validation_log.jsonl. Kept empty for git history continuity.\n")
+    listings, val_counts, val_dropped = phase_validate(listings, web_data_dir)
+    dropped += val_dropped
+    print(
+        f"[validation] PASS={val_counts['pass']} FLAG={val_counts['flag']} "
+        f"DROP={val_counts['drop']} (total in={sum(val_counts.values())})"
+    )
 
     # First-seen tracking. Persistent sidecar keyed by "<source>|<source_id>"
     # so that "Newest first" sort and the NEW badge survive re-scrapes —
@@ -476,112 +424,24 @@ def main() -> int:
           f"elapsed={photo_results['elapsed_s']:.1f}s")
     ranked = ranked_pre
 
-    # Write CSV
-    samples_path = REPO / "samples" / "ranked.csv"
-    samples_path.parent.mkdir(parents=True, exist_ok=True)
-    with samples_path.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
-        w.writeheader()
-        for li in ranked:
-            w.writerow(_row(li))
-
-    # Write web JSON. Two files:
-    #   ranked.json        — full records, served only by /api/members behind auth
-    #   ranked-public.json — broker/url/exact-price fields stripped, safe to serve statically
-    web_data_dir = REPO / "web" / "data"
-    web_data_dir.mkdir(parents=True, exist_ok=True)
-    ranked_dicts = [li.to_dict() for li in ranked]
-    with (web_data_dir / "ranked.json").open("w", encoding="utf-8") as f:
-        json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
-    with (web_data_dir / "ranked-public.json").open("w", encoding="utf-8") as f:
-        json.dump([li.to_public_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
-
-    # Derive per-source health status for the dashboard status strip.
-    #   green  — returned > 0 listings, no exception
-    #   yellow — returned > 0 listings but with a caught exception (partial)
-    #   red    — returned 0 listings OR raised an exception
-    source_status: dict[str, str] = {}
-    for src in sources:
-        count = per_source_count.get(src)
-        had_error = src in source_errors
-        if had_error:
-            source_status[src] = "red"
-        elif count is None or count == 0:
-            source_status[src] = "red"
-        else:
-            source_status[src] = "green"
-
-    # Coverage block: pulled counts + pagination flags per source.
-    # supplier is null here (run.py doesn't make extra requests to fetch
-    # advertised totals — use automation/coverage_audit.py for that).
-    coverage = {
-        src: {
-            "supplier": None,
-            "pulled": per_source_count.get(src, 0),
-            "max_pages_hit": source_meta.get(src, {}).get("max_pages_hit", False),
-        }
-        for src in sources
-    }
-
-    # Field completeness snapshot — populated % per field per source.
-    field_completeness = build_completeness_block(ranked_dicts)
-
-    # V-leg fallback diagnostic. The Value leg returns a neutral default of
-    # 35 when price_per_m2 is None (no_price) or when the comp pool can't
-    # form (no_comps). With the V-weight at 0.40, every listing on neutral
-    # is contributing the same constant to its composite — a big mass of
-    # listings on neutral means the V leg is mostly noise that week. The
-    # property_type_counts surfaces classifier drift if a future scraper
-    # change starts mass-misclassifying inventory.
-    from collections import Counter as _Counter
-    property_type_counts = dict(_Counter(li.property_type for li in ranked))
-    v_fallback_no_price = sum(1 for li in ranked if li.price_per_m2 is None)
-    v_fallback_no_comps = sum(
-        1 for li in ranked
-        if li.price_per_m2 is not None and li.zone_percentile is None
-    )
-
-    # Last-updated metadata
+    # Write all outputs: CSV, ranked.json, ranked-public.json, last_updated.json,
+    # run_history.json. Returns the meta dict for downstream use.
     finished = datetime.now(timezone.utc)
-    meta = {
-        "last_updated": finished.isoformat(),
-        "started_at": started.isoformat(),
-        "duration_seconds": round((finished - started).total_seconds(), 2),
-        "total_listings": len(ranked),
-        "dropped": dropped,
-        "per_source_raw": per_source_count,
-        "source_status": source_status,
-        "coverage": coverage,
-        "field_completeness": field_completeness,
-        "property_type_counts": property_type_counts,
-        "v_fallback_no_price": v_fallback_no_price,
-        "v_fallback_no_comps": v_fallback_no_comps,
-        "sources": sources,
-        "offline": offline,
-        "fixture_fallback_active": fixture_fallback_active,
-        "errors": errors,
-    }
-    with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
-        json.dump(meta, f, indent=2)
-
-    # Append lightweight summary to run history (keep last 60 runs ≈ 15 months weekly).
-    history_path = web_data_dir / "run_history.json"
-    try:
-        history = json.loads(history_path.read_text()) if history_path.exists() else []
-    except Exception:
-        history = []
-    history.append({
-        "ts": finished.isoformat(),
-        "total": len(ranked),
-        "dropped": dropped,
-        "duration": round((finished - started).total_seconds(), 2),
-        "error_count": len(errors),
-        "per_source_raw": per_source_count,
-        "source_status": source_status,
-    })
-    history = history[-60:]
-    with history_path.open("w", encoding="utf-8") as f:
-        json.dump(history, f)
+    phase_write_outputs(
+        ranked=ranked,
+        web_data_dir=web_data_dir,
+        samples_path=REPO / "samples" / "ranked.csv",
+        sources=sources,
+        per_source_count=per_source_count,
+        source_errors=source_errors,
+        source_meta=source_meta,
+        errors=errors,
+        started=started,
+        finished=finished,
+        offline=offline,
+        fixture_fallback_active=fixture_fallback_active,
+        dropped=dropped,
+    )
 
     # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}
     # so weekly drift in field populations is visible without a manual re-run.
@@ -596,17 +456,10 @@ def main() -> int:
     except Exception as _e:
         print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
 
-    # Summary line for CI logs
-    print(
-        f"pulpo run | {finished.isoformat()} | "
-        f"{len(ranked)} listings | sources={','.join(sources)} | "
-        f"errors={len(errors)} | offline={offline}"
+    phase_print_summary(
+        finished=finished, ranked_count=len(ranked),
+        sources=sources, errors=errors, offline=offline,
     )
-    if errors:
-        print("ERRORS:")
-        for e in errors:
-            print(f"  - {e}")
-        # Don't fail the run on partial failures — partial data is better than no data
     return 0
 
 if __name__ == "__main__":
