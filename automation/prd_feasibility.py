@@ -28,29 +28,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+# Allow `python3 automation/prd_feasibility.py` to find `pulpo.nlp_extractor`
+sys.path.insert(0, str(REPO))
 
 
-# ── PRD §FR-2.5 starting-point keyword dictionaries ───────────────────────
-# These mirror the PRD verbatim. Extending these lifts hit-rates; the YAML
-# migration noted in the PRD is deferred to Phase 1 of execution.
+# ── Keyword sources ─────────────────────────────────────────────────────
+# Production NLP runs from `nlp_keywords/{field}.json` files (loaded by
+# pulpo.nlp_extractor). The probe MUST use the same source of truth so
+# this report's numbers match what actually populates ranked.json. Without
+# this, tuning a JSON keyword file lifts production but leaves the report
+# stuck on the original Day-1 starter dictionaries (the bug fixed by #47's
+# follow-up: feasibility report said has_paved_access=3.7% while live
+# pipeline showed 24.0%).
+#
+# Inline KEYWORDS below covers only fields the probe surveys but production
+# does NOT have a JSON dictionary for yet — zoning_residential, land_type
+# heuristics, has_sewage, is_repriced text-only signal. These are
+# experimental / report-only signals that don't yet drive a Listing field.
 KEYWORDS: dict[str, list[str]] = {
-    "has_water":          [r"\bagua\b", r"\bpozo\b", r"\bwell\b", r"\basada\b",
-                           r"\baya\b", r"agua potable", r"water hookup", r"water supply"],
-    "has_power":          [r"\bluz\b", r"electricidad", r"\bice\b", r"\bcnfl\b",
-                           r"corriente", r"electric", r"\bpower\b", r"energ[ií]a el[eé]ctrica"],
-    "has_paved_access":   [r"acceso asfaltado", r"asfalto", r"\bpaved\b",
-                           r"carretera pavimentada", r"road paved", r"ruta asfaltada"],
-    "has_ocean_view":     [r"vista al mar", r"vista oce[aá]nica", r"ocean view",
-                           r"sea view", r"vistas al oc[eé]ano"],
-    "has_mountain_view":  [r"vista monta[nñ]a", r"mountain view", r"vista cordillera",
-                           r"vista a los cerros"],
-    "has_water_body":     [r"\br[ií]o\b", r"quebrada", r"\bcreek\b", r"riachuelo",
-                           r"\blaguna\b", r"\blago\b", r"arroyo", r"\briver\b",
-                           r"\bstream\b"],
-    "is_flat":            [r"\bplano\b", r"terreno plano", r"\bflat\b",
-                           r"lote plano", r"topograf[ií]a plana", r"\bnivel\b"],
-    "is_beachfront_text": [r"frente al mar", r"frente a la playa", r"beachfront",
-                           r"ocean front", r"primera l[ií]nea de playa"],
     "has_sewage":          [r"alcantarillado", r"tanque s[eé]ptico", r"septic tank",
                             r"aguas negras", r"\bsewage\b"],
     "is_repriced_text":   [r"precio reducido", r"rebajado", r"price reduced",
@@ -67,10 +62,10 @@ KEYWORDS: dict[str, list[str]] = {
 
 # PRD §4 — 3-month-post-ship targets
 TARGETS: dict[str, int] = {
-    "has_water":          40,
-    "has_power":          40,
-    "has_paved_access":   40,
-    "is_beachfront_text": 15,
+    "has_water":        40,
+    "has_power":        40,
+    "has_paved_access": 40,
+    "is_beachfront":    15,   # was is_beachfront_text — renamed to match nlp_keywords/is_beachfront.json
 }
 
 # PRD §FR-2.6 / §OQ-1 — minimum population for a field to surface as a UI filter
@@ -171,12 +166,66 @@ def existing_inventory(data: list[dict], n: int) -> list[dict]:
     return sorted(rows, key=lambda r: -r["hits"])
 
 
-def nlp_feasibility(data: list[dict], n: int) -> list[dict]:
-    """For each PRD field, does the §FR-2.5 keyword dictionary find anything?"""
-    rows = []
+# Lazy-loaded so test isolation works (tests load_dictionaries from fixtures)
+_NLP_FIELD_EVALUATORS: list | None = None
+
+
+def _field_evaluators() -> list:
+    """Return [(field_name, eval_fn(blob)->bool), ...].
+
+    Production NLP source-of-truth comes from `nlp_keywords/{field}.json` via
+    pulpo.nlp_extractor.load_dictionaries. The probe shares those CompiledDicts
+    so this report's hits exactly match the production extractor's flips —
+    including its negation-window suppression (e.g. "no es plano").
+
+    Inline KEYWORDS in this module covers the report-only signals that don't
+    have JSON files (zoning_residential, land_*, has_sewage, is_repriced_text).
+    """
+    global _NLP_FIELD_EVALUATORS
+    if _NLP_FIELD_EVALUATORS is not None:
+        return _NLP_FIELD_EVALUATORS
+
+    out: list[tuple] = []
+    seen: set[str] = set()
+
+    # Try to import production extractor's dictionaries.
+    try:
+        from pulpo.nlp_extractor import (   # type: ignore
+            load_dictionaries,
+            _evaluate_field,
+        )
+        for cd in load_dictionaries():
+            seen.add(cd.field)
+            out.append((cd.field, lambda blob, _cd=cd: _evaluate_field(blob, _cd)))
+    except Exception as e:
+        # If the extractor module fails to import (test isolation, broken
+        # checkout), fall through to inline KEYWORDS only — the probe still
+        # produces a useful (if narrower) report.
+        print(f"[prd_feasibility] WARN: nlp_extractor unavailable, "
+              f"using inline patterns only: {e!r}")
+
+    # Inline-only fields (report-extras that have no JSON file)
     for field, patterns in KEYWORDS.items():
+        if field in seen:
+            continue
         rx = re.compile("|".join(patterns), re.IGNORECASE)
-        hits = sum(1 for li in data if rx.search(_text_blob(li)))
+        out.append((field, lambda blob, _rx=rx: bool(_rx.search(blob))))
+
+    _NLP_FIELD_EVALUATORS = out
+    return out
+
+
+def nlp_feasibility(data: list[dict], n: int) -> list[dict]:
+    """For each PRD field, does the keyword extractor find anything?
+
+    Uses the SAME compiled dictionaries as the production NLP extractor —
+    so hits in this report match the actual ranked.json populations.
+    Earlier versions had inline KEYWORDS that diverged from
+    nlp_keywords/*.json after tuning, undercounting reality.
+    """
+    rows = []
+    for field, eval_fn in _field_evaluators():
+        hits = sum(1 for li in data if eval_fn(_text_blob(li)))
         pct = round(100 * hits / n, 1) if n else 0
         target = TARGETS.get(field, 0)
         v = _verdict(pct, target)
@@ -236,11 +285,23 @@ def description_quality(data: list[dict], n: int) -> dict:
 
 
 def us01_cohort(data: list[dict], n: int) -> dict:
-    """US-01 'water + power + paved road' build-ready filter sizing."""
-    rxs = [re.compile("|".join(KEYWORDS[k]), re.IGNORECASE)
-           for k in ("has_water", "has_power", "has_paved_access")]
-    any3 = sum(1 for li in data if any(rx.search(_text_blob(li)) for rx in rxs))
-    all3 = sum(1 for li in data if all(rx.search(_text_blob(li)) for rx in rxs))
+    """US-01 'water + power + paved road' build-ready filter sizing.
+
+    Uses the same evaluators as nlp_feasibility() — including production's
+    negation-window suppression — so cohort sizes here match what the
+    actual `readiness_score` field in ranked.json reports.
+    """
+    by_field = {field: fn for field, fn in _field_evaluators()}
+    needed = ("has_water", "has_power", "has_paved_access")
+    fns = [by_field[k] for k in needed if k in by_field]
+    if len(fns) < 3:
+        # JSON files missing for one of the three — return zeros rather than KeyError
+        return {
+            "any_one_signal":    {"hits": 0, "pct": 0.0},
+            "all_three_signals": {"hits": 0, "pct": 0.0},
+        }
+    any3 = sum(1 for li in data if any(fn(_text_blob(li)) for fn in fns))
+    all3 = sum(1 for li in data if all(fn(_text_blob(li)) for fn in fns))
     return {
         "any_one_signal":   {"hits": any3, "pct": round(100 * any3 / n, 1) if n else 0},
         "all_three_signals":{"hits": all3, "pct": round(100 * all3 / n, 1) if n else 0},
