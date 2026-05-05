@@ -22,6 +22,7 @@ from typing import Optional
 
 from pulpo.agents.html_crawler import (
     HTTPX_OK, SELECTOLAX_OK, is_offline, load_fixtures, make_client,
+    DEFAULT_REQUEST_DELAY as REQUEST_DELAY,
 )
 from pulpo.agents import SOURCES, register
 
@@ -34,7 +35,6 @@ BASE_URL   = "https://www.remax-elsalvador.com"
 LIST_PATH  = "/showing-properties-in/el-salvador/for-sale/newest-listings"
 PROP_TYPE  = "3"   # Lot/Land
 CONTRACT   = "1"   # For sale
-REQUEST_DELAY = 1.5
 MAX_PAGES  = 50
 FIXTURE_FILE = "sample_listings.json"
 
