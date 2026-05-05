@@ -116,10 +116,40 @@ def phase_write_outputs(
     fixture_fallback_active: bool,
     dropped: int,
 ) -> dict:
-    """Write all output files: ranked.json, ranked-public.json, samples/ranked.csv,
-    last_updated.json, run_history.json. Returns the meta dict for further use.
+    """Write all output files. Returns the meta dict for further use.
+
+    Composed from the smaller helpers below, each of which writes one file
+    or computes one block. Keep this function thin; add new outputs as new
+    helpers, not as more inline statements.
     """
-    # CSV
+    web_data_dir.mkdir(parents=True, exist_ok=True)
+    ranked_dicts = [li.to_dict() for li in ranked]
+
+    _write_csv(ranked, samples_path)
+    _write_ranked_json(ranked_dicts, web_data_dir / "ranked.json")
+
+    source_status = _compute_source_status(sources, per_source_count, source_errors)
+    meta = _build_meta(
+        ranked=ranked, ranked_dicts=ranked_dicts,
+        sources=sources, per_source_count=per_source_count,
+        source_meta=source_meta, source_status=source_status,
+        errors=errors, started=started, finished=finished,
+        offline=offline, fixture_fallback_active=fixture_fallback_active,
+        dropped=dropped,
+    )
+    with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+
+    _append_run_history(
+        web_data_dir / "run_history.json",
+        finished=finished, ranked_count=len(ranked), dropped=dropped,
+        started=started, errors=errors, per_source_count=per_source_count,
+        source_status=source_status,
+    )
+    return meta
+
+
+def _write_csv(ranked: list, samples_path: Path) -> None:
     samples_path.parent.mkdir(parents=True, exist_ok=True)
     with samples_path.open("w", newline="", encoding="utf-8") as f:
         w = _csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
@@ -127,23 +157,34 @@ def phase_write_outputs(
         for li in ranked:
             w.writerow(_row(li))
 
-    # JSON output. ranked-public.json was historically generated for an
-    # auth-gated split that was never built; the frontend reads ranked.json
-    # directly. Dropped to save ~1.1 MB per nightly commit.
-    web_data_dir.mkdir(parents=True, exist_ok=True)
-    ranked_dicts = [li.to_dict() for li in ranked]
-    with (web_data_dir / "ranked.json").open("w", encoding="utf-8") as f:
+
+def _write_ranked_json(ranked_dicts: list, path: Path) -> None:
+    """Write ranked.json. ranked-public.json was historically generated for
+    an auth-gated split that was never built; frontend reads ranked.json
+    directly so the public version was dropped (saved ~1.1 MB per commit).
+    """
+    with path.open("w", encoding="utf-8") as f:
         json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
 
-    # Per-source health status — green if pulled > 0 and no error, else red.
-    source_status: dict[str, str] = {}
+
+def _compute_source_status(sources: list[str], per_source_count: dict[str, int], source_errors: dict[str, str]) -> dict[str, str]:
+    """green = pulled > 0 and no error; red otherwise."""
+    out: dict[str, str] = {}
     for src in sources:
         count = per_source_count.get(src)
         if src in source_errors or count is None or count == 0:
-            source_status[src] = "red"
+            out[src] = "red"
         else:
-            source_status[src] = "green"
+            out[src] = "green"
+    return out
 
+
+def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
+                source_status, errors, started, finished, offline,
+                fixture_fallback_active, dropped) -> dict:
+    """Assemble the last_updated.json meta dict (single source of truth for the
+    dashboard header + watchdog)."""
+    from collections import Counter as _Counter
     coverage = {
         src: {
             "supplier": None,
@@ -152,59 +193,51 @@ def phase_write_outputs(
         }
         for src in sources
     }
-
-    field_completeness = build_completeness_block(ranked_dicts)
-
-    # V-leg fallback diagnostics
-    from collections import Counter as _Counter
-    property_type_counts = dict(_Counter(li.property_type for li in ranked))
-    v_fallback_no_price = sum(1 for li in ranked if li.price_per_m2 is None)
-    v_fallback_no_comps = sum(
-        1 for li in ranked
-        if li.price_per_m2 is not None and li.zone_percentile is None
-    )
-
-    meta = {
-        "last_updated": finished.isoformat(),
-        "started_at": started.isoformat(),
-        "duration_seconds": round((finished - started).total_seconds(), 2),
-        "total_listings": len(ranked),
-        "dropped": dropped,
-        "per_source_raw": per_source_count,
-        "source_status": source_status,
-        "coverage": coverage,
-        "field_completeness": field_completeness,
-        "property_type_counts": property_type_counts,
-        "v_fallback_no_price": v_fallback_no_price,
-        "v_fallback_no_comps": v_fallback_no_comps,
-        "sources": sources,
-        "offline": offline,
+    return {
+        "last_updated":       finished.isoformat(),
+        "started_at":         started.isoformat(),
+        "duration_seconds":   round((finished - started).total_seconds(), 2),
+        "total_listings":     len(ranked),
+        "dropped":            dropped,
+        "per_source_raw":     per_source_count,
+        "source_status":      source_status,
+        "coverage":           coverage,
+        "field_completeness": build_completeness_block(ranked_dicts),
+        "property_type_counts": dict(_Counter(li.property_type for li in ranked)),
+        # V-leg fallback diagnostics — listings with no price (neutral 35
+        # default) or no comp pool (zone_percentile=None). High counts mean
+        # the V leg is mostly noise that week.
+        "v_fallback_no_price": sum(1 for li in ranked if li.price_per_m2 is None),
+        "v_fallback_no_comps": sum(
+            1 for li in ranked
+            if li.price_per_m2 is not None and li.zone_percentile is None
+        ),
+        "sources":                sources,
+        "offline":                offline,
         "fixture_fallback_active": fixture_fallback_active,
-        "errors": errors,
+        "errors":                  errors,
     }
-    with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
-        json.dump(meta, f, indent=2)
 
-    # Run history (last 60 entries)
-    history_path = web_data_dir / "run_history.json"
+
+def _append_run_history(path: Path, *, finished, ranked_count, dropped,
+                        started, errors, per_source_count, source_status) -> None:
+    """Append one entry to run_history.json, capped at last 60 runs."""
     try:
-        history = json.loads(history_path.read_text()) if history_path.exists() else []
+        history = json.loads(path.read_text()) if path.exists() else []
     except Exception:
         history = []
     history.append({
-        "ts":              finished.isoformat(),
-        "total":           len(ranked),
-        "dropped":         dropped,
-        "duration":        round((finished - started).total_seconds(), 2),
-        "error_count":     len(errors),
-        "per_source_raw":  per_source_count,
-        "source_status":   source_status,
+        "ts":             finished.isoformat(),
+        "total":          ranked_count,
+        "dropped":        dropped,
+        "duration":       round((finished - started).total_seconds(), 2),
+        "error_count":    len(errors),
+        "per_source_raw": per_source_count,
+        "source_status":  source_status,
     })
     history = history[-60:]
-    with history_path.open("w", encoding="utf-8") as f:
+    with path.open("w", encoding="utf-8") as f:
         json.dump(history, f)
-
-    return meta
 
 
 # ── Phase: print summary (stdout for CI logs) ─────────────────────────
