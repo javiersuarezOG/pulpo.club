@@ -72,18 +72,13 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
             w = weights.get(slug, leg.weight)
             composite += w * s
             reasons.append(reason)
-            # Store component scores on the Listing for UI. quality_score and
-            # upside_score are populated as aliases for one deployment cycle
-            # so the dashboard doesn't break during the rename. liquidity_score
-            # stays None-able (legacy field, dropped leg).
+            # Store component scores on the Listing for UI.
             if slug == "value":
                 li.value_score = round(s, 1)
             elif slug == "location":
                 li.location_score = round(s, 1)
-                li.quality_score = round(s, 1)   # alias; drop next cycle
             elif slug == "momentum":
                 li.momentum_score = round(s, 1)
-                li.upside_score = round(s, 1)    # alias; drop next cycle
 
         composite = round(composite, 2)
         li.rank_score = composite

@@ -28,7 +28,6 @@ from .models import Listing
 CSV_FIELDS = [
     "rank", "rank_score",
     "value_score", "location_score", "momentum_score",
-    "quality_score", "upside_score", "liquidity_score",
     "zone_percentile",
     "source", "source_id", "title",
     "zone", "municipality", "department",
@@ -47,9 +46,6 @@ def _row(li: Listing) -> dict:
         "value_score": li.value_score,
         "location_score": li.location_score,
         "momentum_score": li.momentum_score,
-        "quality_score": li.quality_score,    # alias for location; drop next cycle
-        "upside_score": li.upside_score,      # alias for momentum; drop next cycle
-        "liquidity_score": li.liquidity_score,  # legacy: always None now
         "zone_percentile": li.zone_percentile,
         "source": li.source,
         "source_id": li.source_id,

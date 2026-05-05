@@ -78,9 +78,6 @@ class Listing:
     value_score: Optional[float] = None      # 0..100, cheap-for-comp-pool leg
     location_score: Optional[float] = None   # 0..100, zone tier + airport + attributes + freshness
     momentum_score: Optional[float] = None   # 0..100, repriced-rate-per-zone (delta signal)
-    quality_score: Optional[float] = None    # alias for location_score; drop next cycle
-    upside_score: Optional[float] = None     # alias for momentum_score; drop next cycle
-    liquidity_score: Optional[float] = None  # legacy: dropped leg, kept None for backward compat
     rank_reasons: list[str] = field(default_factory=list)
 
     # PRD §FR-7 derived signals (Phase 1)

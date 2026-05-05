@@ -28,6 +28,19 @@ except ImportError:
 
 FIXTURES_DIR = Path(__file__).resolve().parents[2] / "fixtures"
 
+
+# Default request delay between HTTP fetches across all scrapers. Override with
+# PULPO_REQUEST_DELAY=<seconds>. Centralised so each scraper doesn't redefine
+# the same constant (and so a future runtime tweak only needs one change).
+def get_request_delay() -> float:
+    """Return the default per-request delay seconds. Reads PULPO_REQUEST_DELAY."""
+    try:
+        return float(os.environ.get("PULPO_REQUEST_DELAY") or 1.5)
+    except (ValueError, TypeError):
+        return 1.5
+
+DEFAULT_REQUEST_DELAY = get_request_delay()
+
 DEFAULT_HEADERS = {
     "User-Agent": (
         "pulpo-club/0.1 (+https://pulpo.club; aggregator) "
