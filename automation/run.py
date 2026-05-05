@@ -27,6 +27,7 @@ from pulpo.ranker import rank  # noqa: E402
 from automation.validation import validate  # noqa: E402
 from automation.field_audit import build_completeness_block  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
+from automation.ai_enrichment import enrich_listings as _ai_enrich  # type: ignore  # noqa: E402
 from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
     extract as _nlp_extract,
@@ -373,16 +374,9 @@ def main() -> int:
     with listings_history_path.open("w", encoding="utf-8") as f:
         json.dump(first_seen, f, ensure_ascii=False)
 
-    # Price history (PRD §FR-3). Append-only sidecar keyed by source|source_id
-    # so we can compute is_repriced from real cross-run price comparison —
-    # not from per-scraper "old_price" flags that disappear when the broker
-    # removes the strikethrough.
-    #
-    # Storage shape: {listing_id: [{"ts": iso, "price_usd": float}, ...]}.
-    # We only append when price differs from the most recent recorded value,
-    # so listings whose price never moves contribute one row total. Each
-    # listing's history is capped at PRICE_HISTORY_MAX_ENTRIES.
-    PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies, more than enough
+    # Price history (PRD §FR-3). Sets is_repriced before AI runs so the
+    # AI's content_quality can reflect repriced state.
+    PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
     prices_history_path = web_data_dir / "prices_history.json"
     try:
         prices_history: dict = (
@@ -400,18 +394,11 @@ def main() -> int:
             continue
         key = f"{li.source}|{li.source_id}"
         history = prices_history.get(key) or []
-
-        # Append only when price moved (or it's the first record).
         last_price = history[-1].get("price_usd") if history else None
         if last_price is None or float(last_price) != float(li.price_usd):
             history.append({"ts": started_iso, "price_usd": float(li.price_usd)})
             history = history[-PRICE_HISTORY_MAX_ENTRIES:]
             prices_history[key] = history
-
-        # is_repriced = current price strictly lower than any earlier recorded
-        # price (excluding today's just-appended entry to avoid self-reference).
-        # First-ever scrape (no prior entries) leaves the field at its
-        # per-scraper default rather than overriding to False.
         prior_prices = [h["price_usd"] for h in history[:-1]] if history else []
         if prior_prices:
             if float(li.price_usd) < min(prior_prices):
@@ -424,6 +411,30 @@ def main() -> int:
         json.dump(prices_history, f, ensure_ascii=False)
     print(f"[price_history] tracked={len(prices_history)} listings  "
           f"repriced_this_run={repriced_count}")
+
+    # PRD §FR-6 — AI enrichment (title_canonical, short_description_canonical,
+    # reasons_to_buy). Idempotent via description_md5 cache. When the API
+    # is unavailable (missing key, missing package, quota exhausted, auth
+    # error), falls back to deterministic templates for title + USPs;
+    # short_description_canonical stays None until AI is back.
+    ai_metrics = _ai_enrich(listings)
+    fb_count = ai_metrics.get("fallback_applied", 0)
+    if ai_metrics.get("skipped_no_api_key"):
+        print(f"[ai_enrich] OPENAI_API_KEY missing — fallback templates only "
+              f"(applied to {fb_count} listings)")
+    elif ai_metrics.get("skipped_no_package"):
+        print(f"[ai_enrich] openai package not installed — fallback templates only "
+              f"(applied to {fb_count} listings)")
+    else:
+        ge = ai_metrics.get("global_error_seen")
+        ge_note = f" GLOBAL_ERROR={ge}" if ge else ""
+        print(f"[ai_enrich] cache_hits={ai_metrics['cache_hits']} "
+              f"cache_misses={ai_metrics['cache_misses']} "
+              f"api_ok={ai_metrics['api_calls_succeeded']} "
+              f"api_fail={ai_metrics['api_calls_failed']} "
+              f"fallback={fb_count} "
+              f"cost=${ai_metrics['total_cost_usd']:.4f} "
+              f"quality={ai_metrics['content_quality']}{ge_note}")
 
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.

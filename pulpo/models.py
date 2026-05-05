@@ -67,6 +67,11 @@ class Listing:
     validation_status: Optional[str] = None      # None | "flagged"
     validation_warnings: list[str] = field(default_factory=list)
 
+    # PRD §FR-6 AI-enriched fields (Phase 1)
+    title_canonical: Optional[str] = None
+    short_description_canonical: Optional[str] = None
+    reasons_to_buy: list[str] = field(default_factory=list)
+
     rank: Optional[int] = None               # 1-based position rank, 1 = best
     rank_score: Optional[float] = None       # composite 0..100
     zone_percentile: Optional[float] = None  # 0..100, lower = cheaper for zone

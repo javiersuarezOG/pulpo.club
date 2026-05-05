@@ -7,3 +7,8 @@ selectolax==0.3.21
 pytest>=8.0
 pytest-cov>=5.0
 Pillow>=10.0
+# OpenAI client for PRD §FR-6 AI enrichment.
+# Optional at runtime: when OPENAI_API_KEY is unset OR the package fails
+# to import, automation/ai_enrichment.py logs and skips. Listed here so
+# CI installs it and the import path is exercised in tests.
+openai>=1.0,<2.0
