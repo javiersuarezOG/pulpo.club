@@ -127,13 +127,13 @@ def phase_write_outputs(
         for li in ranked:
             w.writerow(_row(li))
 
-    # JSON outputs
+    # JSON output. ranked-public.json was historically generated for an
+    # auth-gated split that was never built; the frontend reads ranked.json
+    # directly. Dropped to save ~1.1 MB per nightly commit.
     web_data_dir.mkdir(parents=True, exist_ok=True)
     ranked_dicts = [li.to_dict() for li in ranked]
     with (web_data_dir / "ranked.json").open("w", encoding="utf-8") as f:
         json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
-    with (web_data_dir / "ranked-public.json").open("w", encoding="utf-8") as f:
-        json.dump([li.to_public_dict() for li in ranked], f, indent=2, ensure_ascii=False, default=str)
 
     # Per-source health status — green if pulled > 0 and no error, else red.
     source_status: dict[str, str] = {}
