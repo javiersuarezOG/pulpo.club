@@ -32,6 +32,7 @@ from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
     extract as _nlp_extract,
 )
+from pulpo.derived_rules import apply_all as _apply_derived_rules  # type: ignore  # noqa: E402
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -374,8 +375,8 @@ def main() -> int:
     with listings_history_path.open("w", encoding="utf-8") as f:
         json.dump(first_seen, f, ensure_ascii=False)
 
-    # Price history (PRD §FR-3). Sets is_repriced before AI runs so the
-    # AI's content_quality can reflect repriced state.
+    # Price history (PRD §FR-3). Sets is_repriced before derived rules and
+    # AI run, so downstream fields reflect cross-run price comparison.
     PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
     prices_history_path = web_data_dir / "prices_history.json"
     try:
@@ -411,6 +412,34 @@ def main() -> int:
         json.dump(prices_history, f, ensure_ascii=False)
     print(f"[price_history] tracked={len(prices_history)} listings  "
           f"repriced_this_run={repriced_count}")
+
+    # PRD §FR-3.7 — days_listed = CURRENT_DATE - first_seen_date, populated
+    # here so the derived-rules engine has it as input.
+    now_utc = datetime.now(timezone.utc)
+    for li in listings:
+        if li.days_listed is None and li.first_seen_at:
+            try:
+                fs = datetime.fromisoformat(li.first_seen_at.replace("Z", "+00:00"))
+                li.days_listed = max(0, (now_utc - fs).days)
+            except (ValueError, AttributeError):
+                pass
+
+    # PRD §FR-7 — derived field rule engine. Pure functions over upstream
+    # fields (NLP-extracted booleans + is_repriced + days_listed). Sets
+    # readiness_score / investment_signal / source_label / data_quality_score.
+    # MUST run before AI enrichment so the AI fallback module sees the
+    # derived signals (Build-Ready, Hot, etc.) when filling source_label.
+    deriv_signal_counts: dict[str, int] = {}
+    deriv_label_counts:  dict[str, int] = {}
+    for li in listings:
+        result = _apply_derived_rules(li)
+        sig = result.get("investment_signal")
+        if sig:
+            deriv_signal_counts[sig] = deriv_signal_counts.get(sig, 0) + 1
+        for lbl in (result.get("source_label") or []):
+            deriv_label_counts[lbl] = deriv_label_counts.get(lbl, 0) + 1
+    print(f"[derived] signals={dict(deriv_signal_counts)} "
+          f"labels={dict(deriv_label_counts)}")
 
     # PRD §FR-6 — AI enrichment (title_canonical, short_description_canonical,
     # reasons_to_buy). Idempotent via description_md5 cache. When the API
