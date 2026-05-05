@@ -83,6 +83,12 @@ class Listing:
     liquidity_score: Optional[float] = None  # legacy: dropped leg, kept None for backward compat
     rank_reasons: list[str] = field(default_factory=list)
 
+    # PRD §FR-7 derived signals (Phase 1)
+    data_quality_score: Optional[float] = None  # 0..1, populated_fields / scoreable_total
+    investment_signal: Optional[str] = None     # 'deal'|'hot'|'stale'|'new'|None
+    readiness_score: Optional[int] = None       # 0..3, has_water + has_power + has_paved_access
+    source_label: list[str] = field(default_factory=list)  # display chips: Beachfront/Price Drop/etc.
+
     def to_dict(self) -> dict:
         return asdict(self)
 
