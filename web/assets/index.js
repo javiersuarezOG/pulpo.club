@@ -9,6 +9,16 @@ const SOURCE_NAMES = {
   kazu:'Kazu Real Estate', remax:'RE/MAX El Salvador',
 };
 
+// Property-type display config — mirrors automation/property_types.py.
+// Kept in sync via tests/test_table_ui.py::test_property_types_mirror_python.
+// The Type column / pill only renders when ranked.json contains >1 distinct
+// property_type — single-type datasets stay visually identical to today.
+const PROPERTY_TYPES = {
+  land:  {label:'Land',        pill_bg:'#E1F5EE', pill_text:'#085041'},
+  house: {label:'Beach house', pill_bg:'#FAECE7', pill_text:'#712B13'},
+  condo: {label:'Beach condo', pill_bg:'#FAEEDA', pill_text:'#633806'},
+};
+
 /* ── Zone groups (mirrors automation/zones.py) ───────── */
 const ZONE_GROUPS = {
   'surf-city-1':  {label:'Surf City 1',    zones:['el-tunco','el-sunzal','el-zonte','san-diego','mizata']},
@@ -549,6 +559,7 @@ function panelHTML(r) {
   return `${photoBlock}<div class="panel-full-title">${esc(r.title)}${warnHTML}</div>
     ${devTag}
     <div class="panel-meta">
+      <div class="panel-meta-item"><span class="panel-meta-label">Type</span><span class="panel-meta-value">${typePillHTML(r) || esc(r.property_type || '—')}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Zone</span><span class="panel-meta-value">${esc(zoneDisplay)}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Source</span><span class="panel-meta-value">${esc(SOURCE_NAMES[r.source]||r.source||'—')}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Price</span><span class="panel-meta-value">${fmtUSD(r.price_usd)}</span></div>
@@ -891,10 +902,23 @@ function photosCellHTML(r) {
   return `<span class="photo-tag" aria-label="${c} photo${c===1?'':'s'}">`
     + `<svg aria-hidden="true"><use href="#pp-camera"/></svg>${c}</span>`;
 }
+
+// Type pill — small coloured chip with the type label. Returns empty string
+// when property_type is missing or unknown, so the cell collapses cleanly.
+function typePillHTML(r) {
+  const cfg = PROPERTY_TYPES[r.property_type];
+  if (!cfg) return '';
+  return `<span class="type-pill" style="background:${cfg.pill_bg};color:${cfg.pill_text}">${esc(cfg.label)}</span>`;
+}
 function renderTable(rows) {
   const tbody=document.getElementById('table-body');
+  // Type column appears only when the dataset has >1 distinct property_type.
+  // The matching <th> is rendered once at init via ensureTypeHeader().
+  const typeCell = SHOW_TYPE_COL ? '<td class="td-type">' : '';
+  const typeCellEnd = SHOW_TYPE_COL ? '</td>' : '';
   tbody.innerHTML=rows.map(r=>`
     <tr data-id="${esc(r.source_id)}" class="${r.source_id===OPEN_ID?'selected':''}">
+      ${SHOW_TYPE_COL ? `${typeCell}${typePillHTML(r)}${typeCellEnd}` : ''}
       <td>${zonePillHTML(r)}${newBadgeHTML(r)}</td>
       <td class="td-num">${fmtUSD(r.price_usd)}</td>
       <td class="td-num">${fmtArea(r.area_m2)}</td>
@@ -1099,6 +1123,12 @@ function wireFiltersHelp() {
 }
 
 /* ── Init ────────────────────────────────────────────── */
+// Set true once the loaded ranked.json contains >1 distinct property_type.
+// Drives whether the Type column + Type pill on the side panel render.
+// Single-type datasets (the historical land-only state) keep the original
+// table shape — no visual change until houses/condos actually appear.
+let SHOW_TYPE_COL = false;
+
 async function init() {
   readURL();
   try {
@@ -1107,6 +1137,21 @@ async function init() {
     document.getElementById('table-body').innerHTML=
       '<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--t3)">Failed to load data.</td></tr>';
     return;
+  }
+  const types = new Set(ALL_DATA.map(r => r.property_type).filter(Boolean));
+  SHOW_TYPE_COL = types.size > 1;
+  if (SHOW_TYPE_COL) {
+    document.body.classList.add('has-type-col');
+    // Inject a non-sortable Type header as the first <th>. Skipping
+    // sortability keeps the per-type ranking discussion (Phase 3 of the
+    // larger spec) out of scope for this PR.
+    const headerRow = document.querySelector('#listings-table thead tr');
+    if (headerRow && !headerRow.querySelector('.col-type')) {
+      const th = document.createElement('th');
+      th.className = 'col-type';
+      th.textContent = 'Type';
+      headerRow.insertBefore(th, headerRow.firstElementChild);
+    }
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
   wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
