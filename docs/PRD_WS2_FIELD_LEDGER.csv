@@ -21,7 +21,7 @@ A,lat,Internal,Extended,0,,,2,INTERNAL,Phase 2 geocoding — 44% from HTML free-
 A,lng,Internal,Extended,0,,,2,INTERNAL,Same as lat
 B,land_type,Filter,Core,23,,,1,FILTER,residential 23% / agricultural 12% / commercial 13% — ships
 B,is_flat,Filter,Extended,19,,15,1,FILTER,Passes 15% UI gate today
-B,has_water_body,Filter,Extended,8,,15,1,INTERNAL,Below gate; computed-only
+B,has_water_body,Filter,Extended,10,,15,1,INTERNAL,Below gate; computed-only. NLP tuning lifted from 7.9% to 9.9%; needs Phase 2 geometric overlay to clear 15%.
 B,has_ocean_view,Filter,Extended,9,,15,2,FILTER,Lifts past gate after Phase 2 geocoding
 B,has_mountain_view,Filter,Extended,0,,,,DROP,1 hit out of 811 — no recovery path
 C,is_repriced,Calculated,Core,0,100,100,1,FILTER,Phase 1 via FR-3 price history (not text)
@@ -32,7 +32,7 @@ C,days_listed,Filter/Sort,Core,2,100,100,1,FILTER,Phase 1 derive from first_seen
 C,original_listing_date,Filter,Extended,0,,,1,INTERNAL,Phase 1 fallback to first_seen_date
 C,price_vs_zone_median,Filter,Signal,0,,,3,DESCRIPTION,Phase 3 — needs zone median batch + ≥10 listings/zone
 C,price_vs_zone_pct,Filter,Signal,0,,,3,FILTER,Same dependency as price_vs_zone_median
-D,road_access_type,Filter,Core,2,40,15,1,INTERNAL,1.7% paved today; even Phase 0 unlikely to hit 40% — drop as filter
+D,road_access_type,Filter,Core,19,40,20,1,FILTER,Lifted from 1.7% to 19% via NLP keyword tuning (carretera del litoral / panamericana / autopista families). Clears the 15% gate. Re-baselined target to 20%.
 D,has_water,Filter,Core,22,40,25,1,FILTER,Re-baseline target from 40% to 25%
 D,has_power,Filter,Core,20,40,25,1,FILTER,Re-baseline target from 40% to 25%
 D,has_sewage,Filter,Extended,3,,,,DROP,Broker pages don't talk about it

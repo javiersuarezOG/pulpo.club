@@ -1,0 +1,13 @@
+{
+  "field": "has_mountain_view",
+  "type": "boolean",
+  "positive": [
+    "vista monta[nñ]a",
+    "mountain view",
+    "vista cordillera",
+    "vista a los cerros",
+    "vista a la monta[nñ]a"
+  ],
+  "negative": [],
+  "_comment": "PRD §FR-2.5. WARNING: 0.1% population in 2026-05-03 catalog — flagged for DROP in feasibility memo. Kept here for completeness; surface only when population clears 5%."
+}

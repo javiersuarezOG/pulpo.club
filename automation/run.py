@@ -27,6 +27,10 @@ from pulpo.ranker import rank  # noqa: E402
 from automation.validation import validate  # noqa: E402
 from automation.field_audit import build_completeness_block  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
+from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
+    load_dictionaries as _load_nlp_dicts,
+    extract as _nlp_extract,
+)
 from pulpo.cli import _row, CSV_FIELDS  # noqa: E402
 
 import csv  # noqa: E402
@@ -273,6 +277,24 @@ def main() -> int:
             listings.append(li)
         else:
             dropped += 1
+
+    # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
+    # at startup, runs all dictionaries against title+description+location_text
+    # for each listing, and fills False→True on the boolean fields. Existing
+    # per-scraper True values are preserved.
+    nlp_dicts = _load_nlp_dicts()
+    nlp_changes_per_field: dict[str, int] = {}
+    for li in listings:
+        changes = _nlp_extract(li, nlp_dicts)
+        for f in changes:
+            nlp_changes_per_field[f] = nlp_changes_per_field.get(f, 0) + 1
+    if nlp_dicts:
+        summary = " ".join(
+            f"{f}={c}"
+            for f, c in sorted(nlp_changes_per_field.items(), key=lambda x: -x[1])
+        ) or "no_changes"
+        print(f"[nlp] dicts={len(nlp_dicts)} listings={len(listings)} "
+              f"flips_false_to_true: {summary}")
 
     # Validation layer — runs before the ranker.
     # DROP'd listings are excluded entirely. FLAG'd listings pass to the ranker
