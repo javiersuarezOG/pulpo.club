@@ -29,6 +29,7 @@ from automation.validation_bounds import (
     PPM_CONSISTENCY_TOLERANCE, MANZANA_M2,
     COASTAL_ZONES, COASTAL_LARGE_AREA_M2,
     STALE_PHOTOLESS_DAYS,
+    BOUNDS_BY_TYPE,
 )
 
 Disposition = Literal["PASS", "FLAG", "DROP"]
@@ -232,6 +233,59 @@ def _rule_zone_unresolved(li: dict) -> tuple[Disposition, Optional[str]]:
     return ("PASS", None)
 
 
+def _rule_type_bounds(li: dict) -> tuple[Disposition, Optional[str]]:
+    """Per-type field bounds — reads BOUNDS_BY_TYPE[property_type].
+
+    Land bounds are duplicated here from the flat constants (so the
+    legacy _rule_price_bounds / _rule_area_bounds / _rule_ppm_bounds
+    rules stay the source of truth for land — they fire first and produce
+    identical output for the 815 land listings on production today). For
+    house + condo this rule is the sole bounds gate.
+
+    Each field that the listing carries gets checked against
+    (drop_min, drop_max, flag_min, flag_max). Missing fields are
+    silently skipped — 80% of houses lack built_area_m2; faulting on
+    that would drop the entire built ingestion path.
+    """
+    pt = li.get("property_type") or "land"
+    bounds = BOUNDS_BY_TYPE.get(pt)
+    if not bounds:
+        return ("PASS", None)
+
+    # For 'land' the legacy rules already fire on price/area/ppm, so we
+    # skip those fields here to avoid duplicate log entries. For house
+    # and condo, this rule is THE bounds check.
+    skip_fields = {"price_usd", "area_m2", "price_per_m2"} if pt == "land" else set()
+
+    # Track the first FLAG seen — keep scanning afterwards because a
+    # later field may DROP, which outranks. Returning the first FLAG
+    # would lose the DROP signal.
+    flag_reason: Optional[str] = None
+    for fname, (drop_min, drop_max, flag_min, flag_max) in bounds.items():
+        if fname in skip_fields:
+            continue
+        v = li.get(fname)
+        if v is None:
+            continue
+        try:
+            v = float(v)
+        except (TypeError, ValueError):
+            continue
+        if v < drop_min or v > drop_max:
+            return ("DROP", (
+                f"type_bound_violation[{pt}]: {fname}={v} outside drop range "
+                f"[{drop_min}, {drop_max}]"
+            ))
+        if (v < flag_min or v > flag_max) and flag_reason is None:
+            flag_reason = (
+                f"type_bound_violation[{pt}]: {fname}={v} outside flag range "
+                f"[{flag_min}, {flag_max}]"
+            )
+    if flag_reason:
+        return ("FLAG", flag_reason)
+    return ("PASS", None)
+
+
 # ── Registry ───────────────────────────────────────────────────────────
 _RULES: list[RuleFn] = [
     _rule_country_url,
@@ -248,6 +302,7 @@ _RULES: list[RuleFn] = [
     _rule_stale_no_photos,
     _rule_zero_ppm,
     _rule_zone_unresolved,
+    _rule_type_bounds,
 ]
 
 _DISPOSITION_ORDER = {"DROP": 2, "FLAG": 1, "PASS": 0}
