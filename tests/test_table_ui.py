@@ -1458,3 +1458,109 @@ def test_table_render_threads_type_col_state():
     assert "SHOW_TYPE_COL ?" in block, (
         "renderTable must gate the type cell on SHOW_TYPE_COL"
     )
+
+
+# ── D1: Multi-select type pills ─────────────────────────────────────────
+# Top-toolbar pills replace the read-only Type column as the primary
+# user-control for filtering by property_type. Each pill is independently
+# toggleable; at least one must always be selected (last-pill snap-back).
+
+def test_type_pills_present_in_html_for_all_three_types():
+    html = (REPO / "web/index.html").read_text()
+    for pt in ("land", "house", "condo"):
+        assert f'data-type-pill="{pt}"' in html, f"Type pill missing for {pt}"
+
+
+def test_type_pills_default_all_active():
+    """Default state: all 3 types active so the dataset isn't filtered
+    out before the user does anything. Pre-PR-D1 there was no type
+    filter — the read-only Type column showed everything."""
+    html = (REPO / "web/index.html").read_text()
+    # Each pill renders with class 'active' baseline
+    for pt in ("land", "house", "condo"):
+        # Match the button regardless of attribute order
+        snippet = f'data-type-pill="{pt}"'
+        idx = html.find(snippet)
+        # Look back at the opening <button to find its class
+        opener = html.rfind("<button", 0, idx)
+        button_tag = html[opener:idx + 50]
+        assert "active" in button_tag, (
+            f"Default-all-selected violated: pill {pt!r} not active in initial HTML"
+        )
+
+
+def test_types_f_state_initialized_as_set_of_three():
+    js = (REPO / "web/assets/index.js").read_text()
+    # The default literal in the state declaration
+    assert "TYPES_F = new Set(['land', 'house', 'condo'])" in js, (
+        "TYPES_F default not initialised to all 3 types"
+    )
+
+
+def test_filtered_rows_excludes_listings_outside_types_f():
+    """JS filter logic mirror — TYPES_F.has(pt) gate must come before
+    other filters so it short-circuits the rest."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function filteredRows")[1].split("function ")[0]
+    assert "TYPES_F.has(pt)" in block, (
+        "filteredRows must filter by TYPES_F membership"
+    )
+
+
+def test_type_pill_last_pill_snap_back_logic_present():
+    """Must NEVER let the user de-toggle the last selected pill —
+    otherwise the dataset becomes empty and the table goes blank."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function wireTypePills")[1].split("function ")[0]
+    assert "TYPES_F.size === 1" in block, (
+        "Snap-back guard missing — clicking an already-active pill when only one is "
+        "active would leave 0 types selected and produce an empty table"
+    )
+
+
+def test_type_pill_url_state_round_trips():
+    """readURL must accept ?types=land,house — comma-separated. pushURL
+    must emit ?types= only when narrowing (URL stays clean by default)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    # readURL parses it
+    assert "p.get('types')" in js, "readURL doesn't accept ?types= URL state"
+    # Validation: only known type names accepted
+    assert "['land','house','condo'].includes(s)" in js, (
+        "readURL doesn't validate the type names from ?types= — junk values would tip TYPES_F.size"
+    )
+    # pushURL emits only when not all 3 (default)
+    assert "TYPES_F.size < 3" in js, (
+        "pushURL emits ?types= even at default — URL won't stay clean"
+    )
+
+
+def test_type_pill_count_label_includes_active_types_when_narrowed():
+    """Smart count narrative includes type info when narrowed (e.g.
+    '... · Beach houses + Beach condos'). Empty when all 3 active."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function updateCounts")[1].split("function ")[0]
+    assert "TYPES_F.size < 3" in block, (
+        "updateCounts doesn't gate the type label on TYPES_F.size — "
+        "the full label would always render and the count narrative gets noisy"
+    )
+
+
+def test_type_pill_active_color_uses_property_types_config():
+    """Active pills get their colour from PROPERTY_TYPES (the single
+    source of truth shared with row pills + side panel). Hardcoded
+    colours would drift."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderTypePill")[1].split("function ")[0]
+    assert "PROPERTY_TYPES[pt]" in block, (
+        "_renderTypePill not reading from PROPERTY_TYPES — pills can drift "
+        "out of sync with row pill colours"
+    )
+    assert "cfg.pill_bg" in block and "cfg.pill_text" in block, (
+        "_renderTypePill not setting both bg + text from the config"
+    )
+
+
+def test_type_pill_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    assert ".type-pill-btn" in css, "Type pill CSS class missing"
+    assert ".type-pills" in css, "Type pills container CSS class missing"
