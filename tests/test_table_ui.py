@@ -2129,3 +2129,104 @@ def test_beds_baths_css_present():
     css = (REPO / "web/assets/index.css").read_text()
     for sel in ('.col-beds', '.col-baths', '.td-beds', '.td-baths', '.cell-empty'):
         assert sel in css, f"4f CSS selector {sel} missing"
+
+
+# ── 4g: side panel type-aware fields ───────────────────────────────────
+# When a house or condo is selected, the side panel renders its
+# type-specific structured fields (bedrooms, bathrooms, built area,
+# parking, year built, floor (condo), HOA (condo)) as a dedicated
+# section below the universal meta block.
+
+def test_type_specific_panel_helper_returns_empty_for_land():
+    """Land has no type-specific fields — universal Area / $/m² / $/vrs²
+    in the existing meta block already cover it. Helper must return ''
+    so the panel doesn't render an empty 'Land details' section."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    assert "if (pt !== 'house' && pt !== 'condo') return ''" in block, (
+        "_typeSpecificPanelHTML doesn't short-circuit for land — would "
+        "render an empty section header for 815 land listings"
+    )
+
+
+def test_type_specific_panel_renders_house_fields():
+    """House section renders bedrooms, bathrooms, built area, parking,
+    year built. Each field rendered ONLY when populated (sparse data
+    collapses cleanly — no forest of dashes)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    for field in ('bedrooms', 'bathrooms', 'built_area_m2', 'parking_spaces', 'year_built'):
+        assert f"r.{field}" in block, (
+            f"_typeSpecificPanelHTML doesn't read r.{field} — "
+            f"house listings won't show this field even when populated"
+        )
+
+
+def test_type_specific_panel_renders_condo_only_fields():
+    """Condo gets two extra rows: Floor + HOA. House does not — gating on
+    pt === 'condo'."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    assert "pt === 'condo'" in block, (
+        "_typeSpecificPanelHTML missing condo-only gate for floor + HOA"
+    )
+    assert "r.floor" in block
+    assert "r.hoa_fee_usd_monthly" in block
+
+
+def test_type_specific_panel_skips_fields_when_unset():
+    """Each field check uses != null so 0 (legitimate, e.g. 0 parking
+    spaces) renders but missing/null fields don't. Avoids the forest-of-
+    dashes problem when data coverage is partial (80% of bienesraices
+    houses have no built_area_m2)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    for nullcheck in ("r.bedrooms != null", "r.bathrooms != null",
+                       "r.parking_spaces != null"):
+        assert nullcheck in block, (
+            f"_typeSpecificPanelHTML missing != null guard for {nullcheck} — "
+            f"would render a dash for sparse fields, cluttering the panel"
+        )
+
+
+def test_type_specific_panel_section_label_uses_property_types_config():
+    """Section header reads PROPERTY_TYPES[pt].label so it stays in
+    lockstep with the row pill + side-panel pill. Hardcoded labels
+    would drift after a future label change."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    assert "PROPERTY_TYPES[pt]" in block, (
+        "_typeSpecificPanelHTML hardcodes the section label — would drift "
+        "from the row pill if PROPERTY_TYPES.house.label is renamed"
+    )
+
+
+def test_type_specific_panel_called_from_side_panel_render():
+    """The render call must wire the helper into the panel HTML between
+    the universal meta block and the score block. Otherwise the section
+    silently never renders."""
+    js = (REPO / "web/assets/index.js").read_text()
+    # Find the openPanel-style render call
+    assert "_typeSpecificPanelHTML(r)" in js, (
+        "Side panel render doesn't call _typeSpecificPanelHTML — section "
+        "would never appear regardless of helper correctness"
+    )
+
+
+def test_type_specific_panel_built_pair_renders_together():
+    """When built_area_m2 is populated, also render $/built-m² (the
+    metric the per-type ranker scored on, PR #72). Both numbers
+    together preserve the user's mental model."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _typeSpecificPanelHTML")[1].split("function ")[0]
+    # The if-block for built_area renders $/built-m² inside the same branch
+    built_branch_start = block.find("r.built_area_m2")
+    assert built_branch_start > 0
+    built_branch_end = block.find("if (r.parking_spaces", built_branch_start)
+    if built_branch_end < 0:
+        built_branch_end = built_branch_start + 600
+    branch = block[built_branch_start:built_branch_end]
+    assert "price_per_built_m2" in branch, (
+        "_typeSpecificPanelHTML doesn't pair $/built-m² with built area — "
+        "user sees built area but loses the per-type ranker's actual metric"
+    )
