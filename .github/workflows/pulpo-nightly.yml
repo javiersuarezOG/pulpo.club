@@ -59,6 +59,10 @@ jobs:
           # ai_enrichment step logs and skips — full pipeline still runs.
           # Provision via: gh secret set OPENAI_API_KEY (org or repo level).
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # PRD §FR-5 geocoding. Same graceful-skip pattern: unset → no
+          # Mapbox calls. Free tier covers 100k req/mo (≥4× our budget).
+          # Provision via: gh secret set MAPBOX_TOKEN.
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
@@ -199,6 +203,7 @@ jobs:
           git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
+          git add web/data/geocoding_cache.json 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."

@@ -505,6 +505,24 @@ def main() -> int:
               f"cost=${ai_metrics['total_cost_usd']:.4f} "
               f"quality={ai_metrics['content_quality']}{ge_note}")
 
+    # PRD §FR-5 — geocoding (Phase 2). Skips entirely without MAPBOX_TOKEN.
+    # When token is set, populates lat/lng/geocoding_confidence on listings
+    # via Mapbox; cached by source|source_id + address_md5 so re-geocoding
+    # only happens when address text changes.
+    from automation.geocoding import geocode_listings as _geocode  # type: ignore
+    geo_metrics = _geocode(listings, web_data_dir / "geocoding_cache.json")
+    if geo_metrics.get("skipped_no_token"):
+        print("[geocoding] MAPBOX_TOKEN missing — skipping geocoding")
+    elif geo_metrics.get("skipped_no_httpx"):
+        print("[geocoding] httpx not installed — skipping geocoding")
+    else:
+        print(f"[geocoding] populated_total={geo_metrics['populated_total']} "
+              f"already={geo_metrics['already_has_coords']} "
+              f"cache_hits={geo_metrics['cache_hits']} "
+              f"mapbox_ok={geo_metrics['mapbox_succeeded']} "
+              f"mapbox_fail={geo_metrics['mapbox_failed']} "
+              f"no_addr={geo_metrics['no_address']}")
+
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
     # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.

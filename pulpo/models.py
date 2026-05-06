@@ -24,6 +24,7 @@ class Listing:
     location_text: str = ""           # raw human-readable location string
     lat: Optional[float] = None
     lng: Optional[float] = None
+    geocoding_confidence: Optional[str] = None  # 'high'|'low' (Mapbox) or 'medium' (HTML-extracted) per FR-5.4
 
     # Size — canonical is m²
     area_m2: Optional[float] = None
