@@ -7,12 +7,14 @@ endpoint returns JSON {"ModelString": "<html>…</html>"} with 52 listing
 cards per page. Pagination requires a session CSRF token obtained from the
 index page GET, so we open one session per crawl.
 
-Filter: propertyTypeID=3 (Lot/Land), ContractTypeID=1 (For sale).
-313 land listings total as of 2026-05-02.
+Filters: propertyTypeID maps to property type, ContractTypeID=1 (For sale).
+PROP_TYPE_IDS_TO_FETCH covers land, houses, and condos.
 
 Data locations:
   index card  → title, price_usd, detail URL
-  detail page → area (li "Lot size:" > span.det), description, confirm title
+  detail page → area (li "Tamaño de lote:" > span.det), description, type
+                fields (bedrooms, bathrooms, built area, parking) for
+                house/condo via labelled <li> entries.
 """
 from __future__ import annotations
 import re
@@ -25,6 +27,8 @@ from pulpo.agents.html_crawler import (
     DEFAULT_REQUEST_DELAY as REQUEST_DELAY,
 )
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._type_classifier import classify_property_type
+from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -33,10 +37,29 @@ if SELECTOLAX_OK:
 
 BASE_URL   = "https://www.remax-elsalvador.com"
 LIST_PATH  = "/showing-properties-in/el-salvador/for-sale/newest-listings"
-PROP_TYPE  = "3"   # Lot/Land
 CONTRACT   = "1"   # For sale
 MAX_PAGES  = 50
 FIXTURE_FILE = "sample_listings.json"
+
+# RE/MAX propertyTypeID → canonical property_type. Audited live 2026-05-06:
+#   1 = Casa/Villa     (~150-300 listings, mostly inland; coastal filter
+#                       drops most)
+#   2 = Apto/Condominio(~18 listings, almost all in San Salvador / Santa
+#                       Tecla towers; very few coastal)
+#   3 = Lote/Terreno   (~313 listings, current scraper, unchanged)
+#   4 = Mixed (Rancho/Quinta/Casa/Bodega) — heterogeneous, SKIPPED for now
+#   5 = empty
+PROP_TYPE_IDS_TO_FETCH: list[tuple[str, str]] = [
+    ("3", "land"),
+    ("1", "house"),
+    ("2", "condo"),
+]
+# Backwards-compat alias — the existing offline tests + calibration scripts
+# still import PROP_TYPE expecting the land ID.
+PROP_TYPE = "3"
+
+# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
+_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
 
 _TOKEN_FIELDS = ("__RequestVerificationToken", "ax", "bx", "cx", "dx")
 
@@ -58,8 +81,12 @@ def _get_tokens(client) -> dict:
     return tokens
 
 
-def _post_page(client, tokens: dict, page: int) -> str:
-    """Return ModelString HTML for one page of land listings."""
+def _post_page(client, tokens: dict, page: int, property_type_id: str = PROP_TYPE) -> str:
+    """Return ModelString HTML for one page of listings of the given type.
+
+    property_type_id defaults to PROP_TYPE (land) for backwards compat with
+    callers that don't pass it explicitly.
+    """
     r = client.post(
         BASE_URL + LIST_PATH,
         headers={
@@ -69,7 +96,7 @@ def _post_page(client, tokens: dict, page: int) -> str:
         data={
             **tokens,
             "page": str(page),
-            "propertyTypeID": PROP_TYPE,
+            "propertyTypeID": property_type_id,
             "ContractTypeID": CONTRACT,
             "sortType": "1",
             "keyword": "",
@@ -119,8 +146,51 @@ def _parse_cards(html: str) -> list[dict]:
     return out
 
 
+def _li_dets(tree) -> dict:
+    """Map labelled <li> entries to their <span class="det"> values.
+
+    The detail page exposes structured fields as <li>{Label}: <span
+    class="det">{Value}</span></li>. Returns {label: value} dict with
+    labels normalised (no trailing colon, stripped). Used by
+    _parse_detail to look up bedrooms / bathrooms / built area / etc.
+    in one pass.
+    """
+    out: dict[str, str] = {}
+    for li in tree.css("li"):
+        det = li.css_first("span.det")
+        if det:
+            value = det.text(strip=True)
+            # Strip the value substring + colon to recover the label
+            label = li.text(strip=True).replace(value, "").strip(" :")
+            if label:
+                out[label] = value
+    return out
+
+
+def _parse_area_value_unit(s: str) -> tuple[Optional[float], str]:
+    """Parse '290.50 Sq. Mt.' or '66.96 Sq. Vr.' → (value, 'm2'|'v2').
+
+    Returns (None, '') if no parseable number, OR if the value parses to 0.
+    Many remax listings have placeholder '0.00 Sq. Vr.' which is the broker's
+    way of saying 'unknown' — treat as missing rather than 'zero size'.
+    """
+    if not s:
+        return (None, "")
+    m = _AREA_RE.search(s)
+    if not m:
+        return (None, "")
+    try:
+        v = float(m.group(1).replace(",", ""))
+    except ValueError:
+        return (None, "")
+    if v == 0:
+        return (None, "")
+    unit = "v2" if m.group(2).lower().startswith("vr") else "m2"
+    return (v, unit)
+
+
 def _parse_detail(html: str, partial: dict) -> Optional[dict]:
-    """Extract area and description from a detail page."""
+    """Extract area, description, and type-specific fields from a detail page."""
     if not SELECTOLAX_OK:
         return None
     tree = HTMLParser(html)
@@ -136,18 +206,17 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         if raw:
             title = raw
 
-    # Area: li with "Lot size:" (EN) or "Tamaño de lote:" (ES) → span.det
+    # One pass over <li><span class="det"></span></li> for all structured fields
+    dets = _li_dets(tree)
+
+    # Lot area (the area_m2 field for land + house). Prefer the structured
+    # value over the legacy `for li in tree.css("li")` walk — same data
+    # source, terser code path.
     raw_size = ""
-    for li in tree.css("li"):
-        li_text = li.text(strip=True)
-        if "Lot size:" in li_text or "Tamaño de lote:" in li_text:
-            det = li.css_first("span.det")
-            if det:
-                m = _AREA_RE.search(det.text(strip=True))
-                if m:
-                    unit = "v2" if m.group(2).lower().startswith("vr") else "m2"
-                    raw_size = f"{m.group(1).replace(',', '')} {unit}"
-            break
+    lot_str = dets.get("Tamaño de lote") or dets.get("Lot size") or ""
+    lot_val, lot_unit = _parse_area_value_unit(lot_str)
+    if lot_val:
+        raw_size = f"{lot_val} {lot_unit}"
 
     # Description — multi-tier extraction. The original `section p` selector
     # works on a minority of pages (~26% in 2026-05-03 prod); the remaining
@@ -202,7 +271,22 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
     if not title:
         return None
 
-    return {
+    # Property type — preferred source is the explicit list-page POST tag
+    # (partial['_source_property_type']). If absent (e.g. calibration call)
+    # fall back to inferring from the "Tipo de Propiedad" detail field.
+    explicit_type = partial.get("_source_property_type")
+    if explicit_type in ("land", "house", "condo"):
+        broker_type = explicit_type
+    else:
+        tipo = (dets.get("Tipo de Propiedad") or "").strip().lower()
+        if tipo.startswith(("casa", "villa", "house")):
+            broker_type = "house"
+        elif tipo.startswith(("apto", "apartamento", "condominio", "condo")):
+            broker_type = "condo"
+        else:
+            broker_type = "land"  # default for terreno/lote
+
+    rec: dict = {
         "source": "remax",
         "source_id": partial["source_id"],
         "url": partial["url"],
@@ -213,9 +297,78 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         "raw_size_text": raw_size,
         "location_text": title,   # title always contains location (zone / city)
         "description": description,
-        "property_type": "land",
+        "property_type": broker_type,
         "photo_urls": photo_urls,
     }
+
+    # Type-specific fields — house + condo only. Same Optional treatment
+    # as bienesraices: missing fields silently absent rather than 0/None
+    # values that would falsely tip validation. The "0.00 Sq. Vr." placeholder
+    # is filtered to None by _parse_area_value_unit.
+    if broker_type in ("house", "condo"):
+        # Bedrooms / bathrooms / parking
+        try:
+            beds = dets.get("Habitaciones") or dets.get("Bedrooms") or ""
+            if beds.strip():
+                rec["bedrooms"] = int(re.sub(r"\D", "", beds) or 0) or None
+                if rec["bedrooms"] is None:
+                    rec.pop("bedrooms", None)
+        except (ValueError, TypeError):
+            pass
+        try:
+            baths = dets.get("Baños") or dets.get("Bathrooms") or ""
+            if baths.strip():
+                # Some listings show "2.5" — preserve halves
+                rec["bathrooms"] = float(re.search(r"[\d.]+", baths).group(0))
+        except (AttributeError, ValueError, TypeError):
+            pass
+        try:
+            park = dets.get("Espacios para vehículo") or dets.get("Parking") or ""
+            if park.strip():
+                rec["parking_spaces"] = int(re.sub(r"\D", "", park) or 0) or None
+                if rec["parking_spaces"] is None:
+                    rec.pop("parking_spaces", None)
+        except (ValueError, TypeError):
+            pass
+        # Built area — use whichever unit parses out. Conversion to m² happens
+        # downstream in normalize.py (parses raw_size_text via the units module).
+        # We carry the m² value directly when it's m²; v² values get converted
+        # here so built_area_m2 is always m² as the field name promises.
+        built_str = dets.get("Tamaño de Construcción") or dets.get("Building size") or ""
+        bv, bu = _parse_area_value_unit(built_str)
+        if bv:
+            # 1 v² = 0.6987 m² (standard El Salvador conversion).
+            rec["built_area_m2"] = round(bv * 0.6987, 2) if bu == "v2" else bv
+
+    # Coastal filter — house/condo dropped unless its location string matches
+    # COASTAL_ZONES OR title/description carries a beachfront keyword. Land
+    # is exempt (inland lots stay).
+    if broker_type in ("house", "condo"):
+        loc_blob = (rec.get("location_text") or "").lower().replace(" ", "-")
+        zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+        text_blob = f"{title}\n{description}"
+        has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
+        if not zone_is_coastal and not has_beachfront_kw:
+            return None
+
+    # Multi-signal classifier — confirms broker_type, surfaces signals for
+    # the shadow log, FLAGS the listing if classifier disagrees with the
+    # broker's structured type field.
+    ptype, signals, confidence, total = classify_property_type({
+        "broker_type_field": dets.get("Tipo de Propiedad", ""),
+        "url":               partial["url"],
+        "photo_urls":        photo_urls,
+        "title":             title,
+        "description":       description,
+    }, fallback_type=broker_type)
+    rec["_type_signals"]    = [s.to_dict() for s in signals]
+    rec["_type_confidence"] = confidence
+    rec["_type_total"]      = total
+    if ptype != broker_type:
+        rec["validation_status"] = "flagged"
+        rec.setdefault("validation_warnings", []).append("type_classifier_disagree")
+
+    return rec
 
 
 class RemaxScraper:
@@ -247,42 +400,56 @@ class RemaxScraper:
             out: list[dict] = []
             seen: set[str] = set()
 
-            for page in range(1, MAX_PAGES + 1):
-                time.sleep(REQUEST_DELAY)
-                try:
-                    html = _post_page(client, tokens, page)
-                except Exception as e:
-                    print(f"[remax] page {page} fetch failed: {e}")
+            # Iterate the property-type IDs in priority order. Land first
+            # (largest pool, biggest single-source contributor); houses +
+            # condos appended after. The seen set is shared across types
+            # so an ID that appears in multiple categories (rare) doesn't
+            # get duplicated.
+            for type_id, ptype_label in PROP_TYPE_IDS_TO_FETCH:
+                if len(out) >= limit:
                     break
-
-                partials = _parse_cards(html)
-                if not partials:
-                    break
-
-                new_this_page = False
-                for p in partials:
+                for page in range(1, MAX_PAGES + 1):
                     if len(out) >= limit:
                         break
-                    sid = p["source_id"]
-                    if sid in seen:
-                        continue
-                    seen.add(sid)
-                    new_this_page = True
-
                     time.sleep(REQUEST_DELAY)
                     try:
-                        dr = client.get(p["url"])
-                        dr.raise_for_status()
+                        html = _post_page(client, tokens, page, type_id)
                     except Exception as e:
-                        print(f"[remax] detail failed {sid}: {e}")
-                        continue
+                        print(f"[remax] type={ptype_label} page {page} fetch failed: {e}")
+                        break
 
-                    rec = _parse_detail(dr.text, p)
-                    if rec:
-                        out.append(rec)
+                    partials = _parse_cards(html)
+                    if not partials:
+                        break
 
-                if not new_this_page or len(out) >= limit:
-                    break
+                    new_this_page = False
+                    for p in partials:
+                        if len(out) >= limit:
+                            break
+                        sid = p["source_id"]
+                        if sid in seen:
+                            continue
+                        seen.add(sid)
+                        new_this_page = True
+                        # Tag the partial with the type the list-page POST
+                        # was filtered by. _parse_detail prefers this over
+                        # inferring from the detail page (more reliable).
+                        p["_source_property_type"] = ptype_label
+
+                        time.sleep(REQUEST_DELAY)
+                        try:
+                            dr = client.get(p["url"])
+                            dr.raise_for_status()
+                        except Exception as e:
+                            print(f"[remax] detail failed {sid}: {e}")
+                            continue
+
+                        rec = _parse_detail(dr.text, p)
+                        if rec:
+                            out.append(rec)
+
+                    if not new_this_page:
+                        break
 
             return out
         finally:
