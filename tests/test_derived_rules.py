@@ -100,11 +100,51 @@ def test_readiness_none_when_all_inputs_absent():
     assert compute_readiness_score(li) is None
 
 
-# ── compute_investment_signal (PRD §FR-7.2 — Phase 1 reduced rules) ───
+# ── compute_investment_signal (PRD §FR-7.2 — full rule) ───────────────
 
-def test_signal_deal_when_repriced():
-    """Phase 1 degraded 'deal' fires on is_repriced alone (full rule needs Phase 3)."""
-    assert compute_investment_signal(_li(is_repriced=True)) == "deal"
+def test_signal_deal_when_repriced_and_below_median():
+    """Strict PRD path: is_repriced AND price_vs_zone_pct ≤ -10."""
+    li = _li(is_repriced=True, price_vs_zone_pct=-15.0)
+    assert compute_investment_signal(li) == "deal"
+
+
+def test_signal_deal_at_threshold():
+    """Boundary: pct = -10 exactly counts as 'deal' (≤, not <)."""
+    li = _li(is_repriced=True, price_vs_zone_pct=-10.0)
+    assert compute_investment_signal(li) == "deal"
+
+
+def test_signal_deal_fallback_when_pct_unknown():
+    """~32% of catalog is in low-volume buckets where price_vs_zone_pct is
+    None. Without a fallback, those listings would lose 'deal' even when
+    heavily repriced. Keep the conservative fallback."""
+    li = _li(is_repriced=True, price_vs_zone_pct=None)
+    assert compute_investment_signal(li) == "deal"
+
+
+def test_signal_not_deal_when_repriced_but_above_threshold():
+    """Repriced but only -5% off median — full rule says NOT a deal.
+    Falls through to days_listed-based rules (or None)."""
+    li = _li(is_repriced=True, price_vs_zone_pct=-5.0, days_listed=30)
+    assert compute_investment_signal(li) is None
+
+
+def test_signal_repriced_above_threshold_falls_through_to_stale():
+    """Repriced + shallow discount + old = stale (not deal)."""
+    li = _li(is_repriced=True, price_vs_zone_pct=-5.0, days_listed=120)
+    assert compute_investment_signal(li) == "stale"
+
+
+def test_signal_repriced_above_threshold_falls_through_to_new():
+    """Repriced + shallow discount + recent = new (not deal)."""
+    li = _li(is_repriced=True, price_vs_zone_pct=-5.0, days_listed=3)
+    assert compute_investment_signal(li) == "new"
+
+
+def test_signal_repriced_above_median_does_not_fire_deal():
+    """Repriced but +20% above median — definitely not a deal."""
+    li = _li(is_repriced=True, price_vs_zone_pct=20.0, days_listed=30)
+    assert compute_investment_signal(li) is None
 
 
 def test_signal_stale_when_old():
@@ -120,7 +160,8 @@ def test_signal_none_when_no_rules_apply():
 
 
 def test_signal_priority_deal_over_stale():
-    """deal beats stale even when both technically apply."""
+    """deal beats stale even when both technically apply (low-volume
+    fallback path: pct=None, repriced=True, days_listed=120 → still deal)."""
     li = _li(is_repriced=True, days_listed=120)
     assert compute_investment_signal(li) == "deal"
 
