@@ -65,10 +65,12 @@ jobs:
           # The scraper code, registration, and tests are kept in place — only
           # the env list excludes it, so reverting is a one-line change.
           PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo"
-          # PRD §FR-6 AI enrichment. When this secret is unset, the
-          # ai_enrichment step logs and skips — full pipeline still runs.
-          # Provision via: gh secret set OPENAI_API_KEY (org or repo level).
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # PRD §FR-6 AI enrichment. The single-call DeepSeek flow (PRs
+          # #79-81) reads DEEPSEEK_API_TOKEN. When unset, llm_enrichment
+          # graceful-skips and listings get fallback templates only —
+          # full pipeline still runs.
+          # Provision via: gh secret set DEEPSEEK_API_TOKEN
+          DEEPSEEK_API_TOKEN: ${{ secrets.DEEPSEEK_API_TOKEN }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
