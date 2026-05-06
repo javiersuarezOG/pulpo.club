@@ -347,10 +347,20 @@ def main() -> int:
     web_data_dir = REPO / "web" / "data"
     listings, val_counts, val_dropped = phase_validate(listings, web_data_dir)
     dropped += val_dropped
+    val_total = val_counts['pass'] + val_counts['flag'] + val_counts['drop']
     print(
         f"[validation] PASS={val_counts['pass']} FLAG={val_counts['flag']} "
-        f"DROP={val_counts['drop']} (total in={sum(val_counts.values())})"
+        f"DROP={val_counts['drop']} (total in={val_total})"
     )
+    # Per-type breakdown — empty for land-only datasets, useful as soon
+    # as houses/condos appear so red flags surface per type instead of
+    # being averaged with land's much larger denominator.
+    if len(val_counts.get('by_type', {})) > 1:
+        print("[validation] by_type:")
+        for pt in sorted(val_counts['by_type']):
+            b = val_counts['by_type'][pt]
+            tot = b['pass'] + b['flag'] + b['drop']
+            print(f"  {pt:6s} pass={b['pass']:>4} flag={b['flag']:>3} drop={b['drop']:>3} (total={tot})")
 
     # First-seen tracking. Persistent sidecar keyed by "<source>|<source_id>"
     # so that "Newest first" sort and the NEW badge survive re-scrapes —
@@ -495,6 +505,7 @@ def main() -> int:
         offline=offline,
         fixture_fallback_active=fixture_fallback_active,
         dropped=dropped,
+        validation_by_type=val_counts.get('by_type'),
     )
 
     # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}

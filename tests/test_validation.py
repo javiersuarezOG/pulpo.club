@@ -293,3 +293,150 @@ def test_various_country_urls_dropped(country_url, slug):
     li = _listing(url=country_url, zone=None)
     result = validate(li)
     assert result.disposition == "DROP", f"Expected DROP for {slug}, got {result.disposition}"
+
+
+# ── Per-type bounds (PRD: BOUNDS_BY_TYPE) ──────────────────────────────
+# House and condo bounds; land bounds also live in BOUNDS_BY_TYPE but are
+# pre-empted by the legacy _rule_price_bounds / _rule_area_bounds rules
+# (the new _rule_type_bounds skips price/area/ppm for land to avoid
+# duplicate log entries — verified by test_land_unchanged_under_type_rule).
+
+def _house(**kwargs) -> dict:
+    """Minimal valid house listing for type-bounds tests."""
+    base = _listing(
+        property_type="house",
+        zone="el-tunco",
+        price_usd=425_000.0,
+        bedrooms=3,
+        bathrooms=2.5,
+        built_area_m2=180.0,
+        area_m2=300.0,
+    )
+    base.update(kwargs)
+    return base
+
+
+def _condo(**kwargs) -> dict:
+    base = _listing(
+        property_type="condo",
+        zone="costa-del-sol",
+        price_usd=180_000.0,
+        bedrooms=2,
+        bathrooms=2.0,
+        built_area_m2=85.0,
+        area_m2=None,
+    )
+    base.update(kwargs)
+    return base
+
+
+# House bounds — bedrooms
+
+def test_house_bedrooms_at_flag_boundary_passes():
+    """The 10-bedroom house we have on production is at the boundary —
+    flag_max=10. Must NOT fire (rule is `> flag_max`, not `>=`)."""
+    result = validate(_house(bedrooms=10))
+    assert "type_bound_violation" not in " ".join(result.reasons)
+
+
+def test_house_bedrooms_above_flag_fires():
+    result = validate(_house(bedrooms=11))
+    flagged = [r for r in result.reasons if "type_bound_violation" in r]
+    assert flagged, "11 bedrooms must produce a type_bound_violation"
+    assert "bedrooms=11" in flagged[0]
+    assert result.disposition == "FLAG"
+
+
+def test_house_bedrooms_at_drop_max_drops():
+    result = validate(_house(bedrooms=50))
+    assert result.disposition == "DROP"
+    assert any("bedrooms=50" in r for r in result.reasons)
+
+
+def test_house_bedrooms_zero_drops():
+    """A house with 0 bedrooms is a parser error (drop_min=1)."""
+    result = validate(_house(bedrooms=0))
+    assert result.disposition == "DROP"
+
+
+# House bounds — price
+
+def test_house_price_below_drop_min_drops():
+    result = validate(_house(price_usd=20_000))
+    assert result.disposition == "DROP"
+
+
+def test_house_price_in_flag_band_flags():
+    result = validate(_house(price_usd=8_000_000))
+    assert result.disposition == "FLAG"
+    assert any("price_usd=8000000" in r for r in result.reasons)
+
+
+# Missing field handling
+
+def test_house_missing_built_area_silently_skipped():
+    """80% of bienesraices houses lack built_area_m2. The rule must NOT
+    flag for missing data — only for present-but-out-of-range data."""
+    li = _house(built_area_m2=None)
+    result = validate(li)
+    bound_reasons = [r for r in result.reasons if "built_area_m2" in r]
+    assert not bound_reasons, "missing built_area_m2 must be silently skipped"
+
+
+def test_house_missing_bedrooms_silently_skipped():
+    li = _house(bedrooms=None)
+    result = validate(li)
+    bound_reasons = [r for r in result.reasons if "bedrooms" in r]
+    assert not bound_reasons
+
+
+# Condo bounds
+
+def test_condo_tiny_built_area_drops():
+    """30 m² is the drop_min — under 30 isn't a livable unit."""
+    result = validate(_condo(built_area_m2=10))
+    assert result.disposition == "DROP"
+    assert any("built_area_m2=10" in r for r in result.reasons)
+
+
+def test_condo_zero_bedrooms_passes():
+    """Studio condos exist (drop_min=0 for condo, unlike house)."""
+    result = validate(_condo(bedrooms=0))
+    bound_reasons = [r for r in result.reasons if "type_bound_violation[condo]: bedrooms" in r]
+    assert not bound_reasons, "0 bedrooms is valid for a condo (studio)"
+
+
+def test_condo_hoa_above_drop_drops():
+    result = validate(_condo(hoa_fee_usd_monthly=10_000))
+    assert result.disposition == "DROP"
+
+
+# Land regression — type-bounds rule must produce no land-specific findings
+
+def test_land_unchanged_under_type_rule():
+    """The legacy _rule_price_bounds / _rule_area_bounds / _rule_ppm_bounds
+    are the source of truth for land. The new _rule_type_bounds skips
+    those fields for land to avoid duplicate log entries. Verify no
+    land listing produces a `type_bound_violation[land]` reason."""
+    result = validate(_listing(property_type="land", price_usd=80_000, area_m2=400, price_per_m2=200))
+    type_reasons = [r for r in result.reasons if "type_bound_violation[land]" in r]
+    assert not type_reasons
+
+
+# Unknown type — no-op (PASS)
+
+def test_unknown_property_type_passes_type_rule():
+    """A future property_type without an entry in BOUNDS_BY_TYPE shouldn't
+    crash or fire spurious flags — the rule no-ops."""
+    result = validate(_listing(property_type="warehouse"))
+    type_reasons = [r for r in result.reasons if "type_bound_violation" in r]
+    assert not type_reasons
+
+
+# Drop outranks Flag when both fire on different fields
+
+def test_drop_outranks_flag_in_same_listing():
+    """House with 11 bedrooms (FLAG) and price $20k (DROP) → DROP wins."""
+    li = _house(bedrooms=11, price_usd=20_000)
+    result = validate(li)
+    assert result.disposition == "DROP"

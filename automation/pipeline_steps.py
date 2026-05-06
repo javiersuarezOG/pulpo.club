@@ -15,6 +15,7 @@ import csv as _csv
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from pulpo.normalize import normalize as _normalize
 from pulpo.cli import _row, CSV_FIELDS
@@ -53,31 +54,41 @@ def phase_validate(
     validation_status / validation_warnings populated. Writes
     web/data/validation_log.jsonl with one entry per listing.
 
-    counts dict: {"pass": N, "flag": N, "drop": N}
+    counts dict: {"pass": N, "flag": N, "drop": N,
+                  "by_type": {pt: {"pass": N, "flag": N, "drop": N}, ...}}
     drop_count: number dropped (to add to running total in main)
     """
     val_pass = val_flag = val_drop = 0
+    # Per-type breakdown for last_updated.json — surfaces "houses passed
+    # 47/50, condos 7/7" at a glance instead of one flat aggregate.
+    by_type: dict[str, dict[str, int]] = {}
     val_log_entries: list[dict] = []
     kept: list = []
     for li in listings:
         result = _validate(li.to_dict())
+        pt = li.property_type or "land"
+        bucket = by_type.setdefault(pt, {"pass": 0, "flag": 0, "drop": 0})
         val_log_entries.append({
-            "source_id":   li.source_id,
-            "source":      li.source,
-            "url":         li.url,
-            "title":       li.title,
-            "disposition": result.disposition,
-            "reasons":     result.reasons,
+            "source_id":     li.source_id,
+            "source":        li.source,
+            "url":           li.url,
+            "title":         li.title,
+            "property_type": pt,
+            "disposition":   result.disposition,
+            "reasons":       result.reasons,
         })
         if result.disposition == "DROP":
             val_drop += 1
+            bucket["drop"] += 1
         elif result.disposition == "FLAG":
             val_flag += 1
+            bucket["flag"] += 1
             li.validation_status = "flagged"
             li.validation_warnings = result.reasons
             kept.append(li)
         else:
             val_pass += 1
+            bucket["pass"] += 1
             kept.append(li)
 
     # Write validation log
@@ -94,7 +105,7 @@ def phase_validate(
         f.write(f"# parser_errors.log — generated {datetime.now(timezone.utc).isoformat()}\n")
         f.write("# Replaced by validation_log.jsonl. Kept empty for git history continuity.\n")
 
-    counts = {"pass": val_pass, "flag": val_flag, "drop": val_drop}
+    counts = {"pass": val_pass, "flag": val_flag, "drop": val_drop, "by_type": by_type}
     return kept, counts, val_drop
 
 
@@ -115,6 +126,7 @@ def phase_write_outputs(
     offline: bool,
     fixture_fallback_active: bool,
     dropped: int,
+    validation_by_type: Optional[dict] = None,
 ) -> dict:
     """Write all output files. Returns the meta dict for further use.
 
@@ -135,7 +147,7 @@ def phase_write_outputs(
         source_meta=source_meta, source_status=source_status,
         errors=errors, started=started, finished=finished,
         offline=offline, fixture_fallback_active=fixture_fallback_active,
-        dropped=dropped,
+        dropped=dropped, validation_by_type=validation_by_type,
     )
     with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
@@ -181,7 +193,8 @@ def _compute_source_status(sources: list[str], per_source_count: dict[str, int],
 
 def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
                 source_status, errors, started, finished, offline,
-                fixture_fallback_active, dropped) -> dict:
+                fixture_fallback_active, dropped,
+                validation_by_type: Optional[dict] = None) -> dict:
     """Assemble the last_updated.json meta dict (single source of truth for the
     dashboard header + watchdog)."""
     from collections import Counter as _Counter
@@ -204,6 +217,11 @@ def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
         "coverage":           coverage,
         "field_completeness": build_completeness_block(ranked_dicts),
         "property_type_counts": dict(_Counter(li.property_type for li in ranked)),
+        # Per-type pass/flag/drop breakdown — empty {} when only land
+        # exists (the historical state); populated as soon as houses or
+        # condos appear in ingestion. Surfaces type-specific quality
+        # issues that the flat aggregate would hide.
+        "validation_by_type": validation_by_type or {},
         # V-leg fallback diagnostics — listings with no price (neutral 35
         # default) or no comp pool (zone_percentile=None). High counts mean
         # the V leg is mostly noise that week.
