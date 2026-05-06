@@ -32,6 +32,12 @@ jobs:
     permissions:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
+      # The fallback `gh workflow run ci.yml --ref BRANCH` step (added in
+      # PR #69 to unblock the recurring 'pytest Expected' lockout) needs
+      # this. Without it the dispatch returns HTTP 403 'Resource not
+      # accessible by integration' and the data PR sits forever waiting
+      # on required checks that never report.
+      actions: write
     steps:
       - uses: actions/checkout@v6.0.2
         with:
