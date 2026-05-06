@@ -81,6 +81,20 @@ jobs:
           # full pipeline still runs.
           # Provision via: gh secret set DEEPSEEK_API_TOKEN
           DEEPSEEK_API_TOKEN: ${{ secrets.DEEPSEEK_API_TOKEN }}
+          # Bounded concurrency for the LLM enrichment fan-out. 8 in-flight
+          # DeepSeek calls keeps us comfortably under their published rate
+          # limit while collapsing what was a ~50-min serial loop into ~5-7
+          # min. Run 25456987618 (2026-05-06) hit the 60-min wall mid-loop
+          # because of the previous serial fan-out.
+          PULPO_LLM_CONCURRENCY: "8"
+          # Soft-fail deadline for enrichment (seconds from start of the
+          # enrichment leg). Leaves ~30 min of budget for everything that
+          # comes after enrichment (fallback templates, photo download,
+          # write JSON, commit + PR). Past the deadline, no NEW DeepSeek
+          # calls go out — in-flight ones complete; deferred listings get
+          # picked up next nightly via the sidecar cache. The pipeline
+          # ALWAYS ships rather than dying inside the LLM loop.
+          PULPO_LLM_DEADLINE_SECONDS: "5400"   # 90 min
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
