@@ -122,6 +122,16 @@ class Listing:
     price_vs_zone_median: Optional[float] = None  # USD/m² median of bucket peers
     price_vs_zone_pct: Optional[float] = None     # signed % vs. bucket median (negative=cheaper)
 
+    # PRD §FR-5.5 distance fields (Phase 3) — populated either via haversine
+    # from lat/lng (preferred) or via the per-zone airport distance table
+    # in pulpo/airports.py (fallback for listings without coords). The
+    # other three are stubbed and populate via haversine + SV reference
+    # geometry in a follow-up PR.
+    dist_airport_km: Optional[float] = None
+    dist_beach_km: Optional[float] = None       # ships when SV coastline polylines land
+    dist_highway_km: Optional[float] = None     # ships when SV highway shapefiles land
+    dist_nearest_town_km: Optional[float] = None  # ships when populated-place table lands
+
     def to_dict(self) -> dict:
         return asdict(self)
 
