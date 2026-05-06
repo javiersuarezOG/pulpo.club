@@ -3,6 +3,9 @@ name: Tests Required
 on:
   pull_request:
     branches: ["**"]
+  # Same fallback rationale as ci.yml — pulpo-nightly.yml force-triggers
+  # this workflow on dated data PRs to cover the GITHUB_TOKEN suppression.
+  workflow_dispatch: {}
 
 jobs:
   check-tests:

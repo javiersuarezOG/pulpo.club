@@ -213,6 +213,13 @@ jobs:
           gh pr create --base main --head "$BRANCH" \
             --title "chore(data): nightly run $(date -u +%Y-%m-%d)" \
             --body "Automated nightly data refresh. No code changes."
+          # GitHub suppresses Actions triggered by a GITHUB_TOKEN-authored
+          # push (anti-recursion). When PULPO_BOT_TOKEN is unset/expired
+          # the data-only PR sits forever waiting on the required `pytest`
+          # check that never fires (observed on PR #68). Force the dispatch
+          # so the required check has a status to report against.
+          gh workflow run ci.yml --ref "$BRANCH" || true
+          gh workflow run tests-required.yml --ref "$BRANCH" || true
           # Try auto-merge; fall back to admin merge for protected branches
           gh pr merge "$BRANCH" --squash --delete-branch --admin || \
             gh pr merge "$BRANCH" --squash --delete-branch --auto
