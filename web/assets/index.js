@@ -655,6 +655,7 @@ function panelHTML(r) {
       <div class="panel-meta-item"><span class="panel-meta-label">$/vrs²</span><span class="panel-meta-value">${fmtPPV2(r.price_per_m2)}</span></div>
       <div class="panel-meta-item"><span class="panel-meta-label">Listed</span><span class="panel-meta-value">${fmtDays(r.days_listed)}</span></div>
     </div>
+    ${_typeSpecificPanelHTML(r)}
     <div class="panel-section-label">Score ${renderStars(recomputeComposite(r))}</div>
     <div class="panel-scores" style="margin-top:8px">${scoreBars}</div>
     ${description}${brokerHTML}${cta}`;
@@ -1157,6 +1158,59 @@ function typePillHTML(r) {
   const cfg = PROPERTY_TYPES[r.property_type];
   if (!cfg) return '';
   return `<span class="type-pill" style="background:${cfg.pill_bg};color:${cfg.pill_text}">${esc(cfg.label)}</span>`;
+}
+
+// Phase 4g — type-specific side-panel section. For house/condo, render
+// the structured fields the per-type pipeline captures (bedrooms,
+// bathrooms, built area, parking, year built, floor, HOA). Each row
+// only renders when its source field is populated — sparse data
+// (e.g. condos with no HOA, houses with no built_area) collapses
+// cleanly rather than showing a forest of dashes.
+//
+// Returns '' for land listings — they have no type-specific fields,
+// the existing Area / $/m² / $/vrs² meta items already cover them.
+function _typeSpecificPanelHTML(r) {
+  const pt = r.property_type;
+  if (pt !== 'house' && pt !== 'condo') return '';
+  const items = [];
+  if (r.bedrooms != null) {
+    items.push(['Bedrooms', `${r.bedrooms} BR`]);
+  }
+  if (r.bathrooms != null) {
+    // Render half-baths cleanly: 2.5 stays "2.5", whole numbers drop the .0
+    const baths = r.bathrooms % 1 === 0 ? r.bathrooms.toFixed(0) : r.bathrooms.toFixed(1);
+    items.push(['Bathrooms', `${baths} BA`]);
+  }
+  if (r.built_area_m2) {
+    items.push(['Built area', fmtArea(r.built_area_m2)]);
+    if (r.price_per_built_m2) {
+      items.push(['$/built-m²', fmtPPM(r.price_per_built_m2)]);
+    }
+  }
+  if (r.parking_spaces != null) {
+    items.push(['Parking', `${r.parking_spaces} space${r.parking_spaces===1?'':'s'}`]);
+  }
+  if (r.year_built) {
+    items.push(['Year built', String(r.year_built)]);
+  }
+  // Condo-only fields
+  if (pt === 'condo') {
+    if (r.floor != null) {
+      items.push(['Floor', String(r.floor)]);
+    }
+    if (r.hoa_fee_usd_monthly != null) {
+      items.push(['HOA', `$${Math.round(r.hoa_fee_usd_monthly).toLocaleString('en-US')}/mo`]);
+    }
+  }
+  if (items.length === 0) return '';
+  const rows = items.map(([k, v]) =>
+    `<div class="panel-meta-item"><span class="panel-meta-label">${esc(k)}</span><span class="panel-meta-value">${v}</span></div>`
+  ).join('');
+  // Section header matches the existing PROPERTY_TYPES.label so the
+  // panel + row pill stay in lockstep visually.
+  const sectionLabel = (PROPERTY_TYPES[pt] && PROPERTY_TYPES[pt].label) || pt;
+  return `<div class="panel-section-label" style="margin-top:14px">${esc(sectionLabel)} details</div>`
+    + `<div class="panel-meta panel-meta-type-specific">${rows}</div>`;
 }
 
 // D2 — contextual area + $/m² rendering per listing.
