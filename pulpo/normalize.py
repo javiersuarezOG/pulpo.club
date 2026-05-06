@@ -281,9 +281,20 @@ def detect_property_type(title: str = "", description: str = "", location_text: 
     return _classify(blob) or "land"
 
 # ── Phase 1: property-type title filter ─────────────────────────────────────
-# Applied only to HTML scraper sources that pull mixed inventory.
-# oceanside: already API-filtered to property-type=lot. century21: clean.
-_TITLE_FILTER_SOURCES = {"bienesraices", "remax", "goodlife"}
+# Applied only to HTML scraper sources that pull mixed inventory and lack a
+# Phase C coastal filter at parse time.
+#
+# goodlife was REMOVED from this list (PR #111) after the 2026-05-06 audit
+# showed the title filter was dropping 13 beachfront house/condo listings —
+# exactly the listings PR #108's Phase C broadening was meant to capture.
+# goodlife now relies on the in-scraper coastal filter + multi-signal
+# classifier to decide what survives, same pattern as oceanside / century21.
+#
+# bienesraices + remax still rely on the title filter as a backstop. Each
+# needs its own pre-removal audit (memory: project_title_filter_audit.md)
+# before being pulled out — both are >300-listing sources, so the blast
+# radius is wider than goodlife's.
+_TITLE_FILTER_SOURCES = {"bienesraices", "remax"}
 
 # Always drop these patterns in the title regardless of other keywords.
 _ALWAYS_DROP_RE = re.compile(

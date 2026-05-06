@@ -20,10 +20,10 @@ from pulpo.models import Listing  # noqa: E402
 # ── Phase 1: property-type title filter ──────────────────────────────────────
 
 @pytest.mark.parametrize("title,source,expect_drop", [
-    # Always-drop patterns
-    ("3-Bedroom House in El Zonte, $850,000",        "goodlife",      True),
-    ("Newly Built Condo with Partial Ocean view",     "goodlife",      True),
+    # Always-drop patterns — bienesraices + remax only (goodlife removed
+    # in PR #111 after Phase C; classifier + coastal filter handle it).
     ("Apartment en El Zonte, $300k",                 "bienesraices",  True),
+    ("3-Bedroom House",                              "remax",         True),
     # House/casa WITH land keyword — must NOT drop
     ("Land With House Near the Beach",               "remax",         False),
     ("Terreno con casa en La Libertad",              "bienesraices",  False),
@@ -32,9 +32,17 @@ from pulpo.models import Listing  # noqa: E402
     ("Lot in El Zonte, $350,000",                    "goodlife",      False),
     ("TERRENO 40mz PLAYA EL TUNCO",                  "bienesraices",  False),
     ("Farm for sale – Guayaltepe, Ahuachapán",       "remax",         False),
-    # Filter not applied to oceanside / century21
+    # Filter not applied to oceanside / century21 / goodlife — those
+    # sources rely on classifier + parse-time coastal filter instead.
     ("3-Bedroom House in Surf City",                 "oceanside",     False),
     ("Casa con piscina $1M",                         "century21",     False),
+    # PR #111: goodlife house/condo titles pass through normalize so
+    # Phase C's per-type extraction can populate bedrooms/bathrooms/
+    # built_area_m2. The in-scraper coastal filter (PR #108) drops
+    # inland house/condo at parse time, so by the time normalize runs
+    # only coastal house/condo are left.
+    ("3-Bedroom House in El Zonte, $850,000",        "goodlife",      False),
+    ("Newly Built Condo with Partial Ocean view",    "goodlife",      False),
 ])
 def test_property_type_filter(title, source, expect_drop):
     assert is_non_land_title(title, source) == expect_drop, (
