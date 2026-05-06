@@ -482,6 +482,33 @@ def main() -> int:
     print(f"[derived] signals={dict(deriv_signal_counts)} "
           f"labels={dict(deriv_label_counts)}")
 
+    # PRD §FR-7.5 — zone median price batch. Computes median price_per_m2
+    # per (zone, property_type) bucket from current listings, then sets
+    # price_vs_zone_median + price_vs_zone_pct on each scored listing.
+    # Pure function of the in-memory catalog — no sidecar; recomputed
+    # every run. Listings in buckets below MIN_LISTINGS_PER_ZONE leave
+    # both fields as None.
+    from automation.zone_medians import compute_and_apply as _zone_medians  # type: ignore
+    zm_metrics = _zone_medians(listings)
+    print(f"[zone_medians] buckets={zm_metrics['buckets_computed']} "
+          f"scored={zm_metrics['listings_scored']} "
+          f"skipped_no_zone={zm_metrics['listings_skipped_no_zone']} "
+          f"skipped_inactive={zm_metrics['listings_skipped_inactive']} "
+          f"skipped_no_bucket_median={zm_metrics['listings_skipped_no_bucket_median']}")
+
+    # PRD §FR-5.5 — distance fields. dist_airport_km always populates from
+    # the per-zone airport table when the zone is known; haversine from
+    # lat/lng (when LLM has populated it) takes priority. The other three
+    # distance fields stay None until SV reference geometry lands in a
+    # follow-up PR.
+    from automation.distance_fields import apply_distances as _apply_distances  # type: ignore
+    df_metrics = _apply_distances(listings)
+    print(f"[distance_fields] dist_airport_km: "
+          f"scored={df_metrics['scored_total']} "
+          f"(latlng={df_metrics['scored_from_latlng']}, "
+          f"zone_table={df_metrics['scored_from_zone']}) "
+          f"unscored={df_metrics['unscored']}")
+
     # PRD WS2 — single-call DeepSeek enrichment. ONE LLM call per eligible
     # listing returns title + description + usps + latlong together (replacing
     # the previous 3-call OpenAI flow + Mapbox geocoding pass). Idempotent
