@@ -415,43 +415,15 @@ def main() -> int:
     with listings_history_path.open("w", encoding="utf-8") as f:
         json.dump(first_seen, f, ensure_ascii=False)
 
-    # Price history (PRD §FR-3). Sets is_repriced before derived rules and
-    # AI run, so downstream fields reflect cross-run price comparison.
-    PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
-    prices_history_path = web_data_dir / "prices_history.json"
-    try:
-        prices_history: dict = (
-            json.loads(prices_history_path.read_text())
-            if prices_history_path.exists() else {}
-        )
-        if not isinstance(prices_history, dict):
-            prices_history = {}
-    except Exception:
-        prices_history = {}
-
-    repriced_count = 0
-    for li in listings:
-        if li.price_usd is None:
-            continue
-        key = f"{li.source}|{li.source_id}"
-        history = prices_history.get(key) or []
-        last_price = history[-1].get("price_usd") if history else None
-        if last_price is None or float(last_price) != float(li.price_usd):
-            history.append({"ts": started_iso, "price_usd": float(li.price_usd)})
-            history = history[-PRICE_HISTORY_MAX_ENTRIES:]
-            prices_history[key] = history
-        prior_prices = [h["price_usd"] for h in history[:-1]] if history else []
-        if prior_prices:
-            if float(li.price_usd) < min(prior_prices):
-                li.is_repriced = True
-                repriced_count += 1
-            else:
-                li.is_repriced = False
-
-    with prices_history_path.open("w", encoding="utf-8") as f:
-        json.dump(prices_history, f, ensure_ascii=False)
-    print(f"[price_history] tracked={len(prices_history)} listings  "
-          f"repriced_this_run={repriced_count}")
+    # Price history (PRD §FR-3) — extracted to automation.price_history.
+    # Sets is_repriced before derived rules and AI run, so downstream
+    # fields reflect cross-run price comparison.
+    from automation.price_history import track_prices as _track_prices  # type: ignore
+    ph_metrics = _track_prices(
+        listings, web_data_dir / "prices_history.json", started_iso
+    )
+    print(f"[price_history] tracked={ph_metrics['tracked']} listings  "
+          f"repriced_this_run={ph_metrics['repriced_this_run']}")
 
     # PRD §FR-3.7 — days_listed = CURRENT_DATE - first_seen_date, populated
     # here so the derived-rules engine has it as input.
