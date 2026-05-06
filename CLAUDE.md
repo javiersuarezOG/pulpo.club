@@ -21,7 +21,15 @@ After pushing the branch:
 ```bash
 gh pr create --base main --head <your-branch> --title "..." --body "..."
 ```
-Vercel will auto-generate a preview URL on the PR. Merge from the GitHub UI (or via `gh pr merge`) once review is satisfied.
+Vercel will auto-generate a preview URL on the PR.
+
+**Default merge command:**
+```bash
+gh pr merge <NUM> --auto --squash --delete-branch
+```
+The `--auto` flag queues the merge to fire as soon as required checks pass. Auto-merge is enabled at the repo level. Required checks (`pytest`, `Vercel`) typically complete in ~50 seconds — `--auto` eliminates the "pytest: Expected — Waiting" race that happens if you try to merge immediately after `gh pr create`.
+
+**Do NOT use `--admin` to bypass branch protection** unless a check is genuinely stuck or broken. The recurring "Expected, waiting" state is almost always transient (CI hasn't started yet); `--auto` handles it cleanly. Reserve `--admin` for the data-PR fallback path documented in `pulpo-nightly.yml` (where `GITHUB_TOKEN`-authored pushes don't trigger downstream workflows).
 
 If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back the local merge with `git reset --hard origin/main` and open a PR for the branch instead.
 
