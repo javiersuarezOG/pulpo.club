@@ -169,6 +169,21 @@ tbody td{padding:10px 12px;vertical-align:middle}
 /* D2 — tiny "built" suffix on built-area cells to disambiguate from lot
    area in mixed views. Lighter colour so the eye reads the number first. */
 .cell-suffix{font-size:10px;color:var(--t3);font-weight:400;margin-left:2px}
+
+/* ── D4: active filter chips strip ─────────────────────────────────────
+   Sits between the filter-bar and the table when any panel-controlled
+   filter is active. Each chip shows a label + × close. Hidden when no
+   filters active so the table breathes. Type pills get their own
+   always-visible UI in the toolbar so they're NOT chipped here. */
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
+.filter-chips[hidden]{display:none}
+.filter-chips-prefix{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-right:2px}
+.filter-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--brd2);padding:3px 4px 3px 10px;border-radius:999px;font-size:12px;color:var(--text)}
+.filter-chip-x{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:999px;color:var(--t3);font-size:14px;line-height:1;background:transparent;border:0;cursor:pointer;padding:0}
+.filter-chip-x:hover{background:var(--s2);color:var(--text)}
+.filter-chips-clear{margin-left:auto;font-size:12px;color:var(--accent);background:none;border:0;cursor:pointer;padding:2px 4px;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.filter-chips-clear:hover{text-decoration-style:solid}
+
 .td-ppm{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--text)}
 .td-stars{white-space:nowrap}
 .td-chev{text-align:center;color:var(--t4);font-size:16px;line-height:1;padding:0 8px}

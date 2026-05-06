@@ -1046,8 +1046,90 @@ function render() {
   const filtered=filteredRows(), sorted=sortedRows(filtered);
   updateSortHeaders(); updateCounts(filtered.length,ALL_DATA.length);
   buildZoneFilter(ALL_DATA);
+  _renderFilterChips();
   if(window.innerWidth>640) renderTable(sorted); else renderCards(sorted);
   if(OPEN_ID){const r=ALL_DATA.find(r=>r.source_id===OPEN_ID);if(r)openPanel(r);}
+}
+
+// D4 — active filter chips strip. One chip per non-default filter
+// (Open/Gated, Photos, Zone, Price range, Size range, Min score).
+// Type pills are intentionally NOT chipped — they have their own
+// always-visible toolbar UI; chipping them would be redundant.
+//
+// Each chip carries data-chip-key so the click handler knows which
+// filter to clear. The strip is hidden when zero filters are active.
+function _activeChips() {
+  const chips = [];
+  if (FILTER === 'open')  chips.push({key: 'filter', label: 'Open land'});
+  if (FILTER === 'gated') chips.push({key: 'filter', label: 'Gated'});
+  if (PHOTOS_F === 'with') chips.push({key: 'photos', label: 'With photos'});
+  if (PHOTOS_F === 'none') chips.push({key: 'photos', label: 'No photos'});
+  if (ZONE_F) {
+    let label;
+    if (ZONE_F.type === 'no-zone') label = 'No zone';
+    else if (ZONE_F.type === 'group') label = ZONE_GROUPS[ZONE_F.value]?.label || ZONE_F.value;
+    else label = (typeof zoneLabel === 'function') ? zoneLabel(ZONE_F.value) : ZONE_F.value;
+    chips.push({key: 'zone', label});
+  }
+  if (!isDefaultPriceRange()) {
+    chips.push({
+      key: 'price',
+      label: `${PRICE_LABELS[PRICE_MIN_IDX]}–${PRICE_LABELS[PRICE_MAX_IDX]}`,
+    });
+  }
+  if (!isDefaultSizeRange()) {
+    chips.push({
+      key: 'size',
+      label: `${SIZE_LABELS[SIZE_MIN_IDX]}–${SIZE_LABELS[SIZE_MAX_IDX]}`,
+    });
+  }
+  if (!isDefaultMinScore()) {
+    chips.push({key: 'score', label: `Score ≥ ${MIN_SCORE}`});
+  }
+  return chips;
+}
+
+function _renderFilterChips() {
+  const wrap = document.getElementById('filter-chips');
+  if (!wrap) return;
+  const chips = _activeChips();
+  if (chips.length === 0) {
+    wrap.hidden = true;
+    wrap.innerHTML = '';
+    return;
+  }
+  wrap.hidden = false;
+  const chipsHTML = chips.map(c =>
+    `<span class="filter-chip" data-chip-key="${esc(c.key)}">`
+    + `${esc(c.label)}`
+    + `<button class="filter-chip-x" data-chip-x="${esc(c.key)}" aria-label="Remove ${esc(c.label)}">×</button>`
+    + `</span>`
+  ).join('');
+  wrap.innerHTML =
+    `<span class="filter-chips-prefix">Filtered:</span>${chipsHTML}`
+    + `<button class="filter-chips-clear" id="filter-chips-clear" type="button">Clear all</button>`;
+  // Wire each × button to clear its specific filter
+  wrap.querySelectorAll('.filter-chip-x').forEach(btn => {
+    btn.addEventListener('click', () => _removeFilter(btn.dataset.chipX));
+  });
+  document.getElementById('filter-chips-clear').addEventListener('click', _resetAllFilters);
+}
+
+function _removeFilter(key) {
+  switch (key) {
+    case 'filter': FILTER = 'all'; break;
+    case 'photos': PHOTOS_F = 'all'; break;
+    case 'zone':   ZONE_F = null; break;
+    case 'price':  PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1; break;
+    case 'size':   SIZE_MIN_IDX = 0;  SIZE_MAX_IDX  = SIZE_SNAPS.length - 1;  break;
+    case 'score':  MIN_SCORE = 0; break;
+  }
+  // Re-render the panel so its segmented controls / sliders reflect the
+  // cleared state. _updateTuneButtonState refreshes the count badge.
+  if (typeof renderTunePanel === 'function') renderTunePanel();
+  pushURL(true);
+  render();
+  if (typeof _updateTuneButtonState === 'function') _updateTuneButtonState();
 }
 
 /* ── Wire events ─────────────────────────────────────── */
