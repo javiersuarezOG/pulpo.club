@@ -126,6 +126,11 @@
       </select>
     </div>
 
+    <!-- Phase 4e: empty-state strip with structured suggestions. Hidden
+         while results exist; renders inside the layout (not over the
+         table) so it doesn't overlap the chip strip / filter bar. -->
+    <div class="empty-state" id="empty-state" hidden></div>
+
     <!-- Desktop table -->
     <div class="table-wrap" id="table-wrap">
       <table id="listings-table">

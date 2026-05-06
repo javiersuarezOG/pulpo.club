@@ -1295,8 +1295,98 @@ function render() {
   updateSortHeaders(); updateCounts(filtered.length,ALL_DATA.length);
   buildZoneFilter(ALL_DATA);
   _renderFilterChips();
+  _renderEmptyState(filtered.length);
   if(window.innerWidth>640) renderTable(sorted); else renderCards(sorted);
   if(OPEN_ID){const r=ALL_DATA.find(r=>r.source_id===OPEN_ID);if(r)openPanel(r);}
+}
+
+// Phase 4e — structured empty-state suggestions. When the active filter
+// combination yields 0 results, render a strip explaining the situation
+// and listing 2-3 specific filters the user can drop to recover the most
+// listings. Computed by snapshotting state, temporarily clearing each
+// active filter one at a time, recounting, and ranking by delta.
+//
+// Type pills (TYPES_F) are intentionally NOT included — they're always
+// visible above; the user can already see + fix them. Suggestions
+// focus on panel-controlled filters whose UI is hidden.
+function _emptyStateSuggestions() {
+  const snapshot = {
+    FILTER, PHOTOS_F, ZONE_F,
+    PRICE_MIN_IDX, PRICE_MAX_IDX,
+    SIZE_MIN_IDX, SIZE_MAX_IDX,
+    MIN_SCORE, BEDROOMS_MIN,
+  };
+  const candidates = [];
+  function _try(label, mutator) {
+    mutator();
+    const n = filteredRows().length;
+    if (n > 0) candidates.push({label, count: n});
+    FILTER        = snapshot.FILTER;
+    PHOTOS_F      = snapshot.PHOTOS_F;
+    ZONE_F        = snapshot.ZONE_F;
+    PRICE_MIN_IDX = snapshot.PRICE_MIN_IDX;
+    PRICE_MAX_IDX = snapshot.PRICE_MAX_IDX;
+    SIZE_MIN_IDX  = snapshot.SIZE_MIN_IDX;
+    SIZE_MAX_IDX  = snapshot.SIZE_MAX_IDX;
+    MIN_SCORE     = snapshot.MIN_SCORE;
+    BEDROOMS_MIN  = snapshot.BEDROOMS_MIN;
+  }
+  if (FILTER !== 'all') {
+    _try(FILTER === 'open' ? "'Open land'" : "'Gated'", () => { FILTER = 'all'; });
+  }
+  if (PHOTOS_F !== 'all') {
+    _try(PHOTOS_F === 'with' ? "'With photos'" : "'No photos'",
+         () => { PHOTOS_F = 'all'; });
+  }
+  if (ZONE_F) {
+    let label;
+    if (ZONE_F.type === 'no-zone') label = "'No zone'";
+    else if (ZONE_F.type === 'group') label = `'${ZONE_GROUPS[ZONE_F.value]?.label || ZONE_F.value}'`;
+    else label = `'${(typeof zoneLabel === 'function') ? zoneLabel(ZONE_F.value) : ZONE_F.value}'`;
+    _try(`zone ${label}`, () => { ZONE_F = null; });
+  }
+  if (!isDefaultPriceRange()) {
+    _try(`price ${PRICE_LABELS[PRICE_MIN_IDX]}–${PRICE_LABELS[PRICE_MAX_IDX]}`,
+         () => { PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1; });
+  }
+  if (!isDefaultSizeRange()) {
+    _try(`size ${SIZE_LABELS[SIZE_MIN_IDX]}–${SIZE_LABELS[SIZE_MAX_IDX]}`,
+         () => { SIZE_MIN_IDX = 0; SIZE_MAX_IDX = SIZE_SNAPS.length - 1; });
+  }
+  if (!isDefaultMinScore()) {
+    _try(`'Score ≥ ${MIN_SCORE}'`, () => { MIN_SCORE = 0; });
+  }
+  if (!isDefaultBedroomsMin()) {
+    _try(`'${BEDROOMS_MIN}+ bedrooms'`, () => { BEDROOMS_MIN = 0; });
+  }
+  // Top 3 by delta count, descending — small filter that recovers many
+  // listings beats a large one that recovers few.
+  candidates.sort((a, b) => b.count - a.count);
+  return candidates.slice(0, 3);
+}
+
+function _renderEmptyState(filteredCount) {
+  const wrap = document.getElementById('empty-state');
+  if (!wrap) return;
+  if (filteredCount > 0) {
+    wrap.hidden = true;
+    wrap.innerHTML = '';
+    return;
+  }
+  const suggestions = _emptyStateSuggestions();
+  const suggestionsHTML = suggestions.length === 0
+    ? `<p class="empty-state-help">Try removing a type pill above, or click \"Clear all\" to reset.</p>`
+    : `<p class="empty-state-help">Try removing:</p>`
+      + `<ul class="empty-state-list">`
+      + suggestions.map(s =>
+          `<li><strong>${esc(s.label)}</strong> to see ${s.count.toLocaleString('en-US')} more listing${s.count === 1 ? '' : 's'}</li>`
+        ).join('')
+      + `</ul>`
+      + `<p class="empty-state-clear-all"><button class="empty-state-clear-btn" id="empty-state-clear-all" type="button">Or clear all filters</button></p>`;
+  wrap.innerHTML = `<div class="empty-state-headline">No listings match your filters.</div>${suggestionsHTML}`;
+  wrap.hidden = false;
+  const clearBtn = document.getElementById('empty-state-clear-all');
+  if (clearBtn) clearBtn.addEventListener('click', _resetAllFilters);
 }
 
 // D4 — active filter chips strip. One chip per non-default filter

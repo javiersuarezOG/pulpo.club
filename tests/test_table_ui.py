@@ -2115,3 +2115,132 @@ def test_type_specific_panel_built_pair_renders_together():
         "_typeSpecificPanelHTML doesn't pair $/built-m² with built area — "
         "user sees built area but loses the per-type ranker's actual metric"
     )
+
+
+# ── 4e: empty-state structured suggestions ─────────────────────────────
+# When filteredRows() returns 0, render a helpful explanation + 2-3
+# specific filters the user can drop to recover the most listings.
+# Computed by snapshot/clear-one/recount/restore per active filter.
+
+def test_empty_state_container_present_in_html():
+    html = (REPO / "web/index.html").read_text()
+    assert 'id="empty-state"' in html, (
+        "Empty-state container missing from HTML — empty-state UX inert"
+    )
+    assert 'class="empty-state"' in html
+    # Hidden by default — only shown when 0 results
+    assert "empty-state" in html and "hidden" in html.split('id="empty-state"')[1].split('>')[0]
+
+
+def test_empty_state_render_called_from_main_render():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function render(")[1].split("function ")[0]
+    assert "_renderEmptyState(filtered.length)" in block, (
+        "render() doesn't call _renderEmptyState — empty-state UX never appears"
+    )
+
+
+def test_empty_state_hides_when_filtered_count_positive():
+    """Strip stays invisible while results exist — no nag for healthy state."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderEmptyState")[1].split("function ")[0]
+    assert "filteredCount > 0" in block
+    assert "wrap.hidden = true" in block, (
+        "_renderEmptyState doesn't hide the strip when results exist"
+    )
+
+
+def test_empty_state_suggestions_helper_excludes_type_pills():
+    """TYPES_F is intentionally NOT in the snapshot — type pills are
+    always-visible above; user can already see + fix them. Suggestions
+    focus on panel-controlled filters whose UI is hidden."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _emptyStateSuggestions")[1].split("function _renderEmptyState")[0]
+    # Comment can mention TYPES_F; check actual snapshot/restore code
+    code_only = "\n".join(
+        line for line in block.split("\n") if not line.strip().startswith("//")
+    )
+    for pat in ("TYPES_F = ", "TYPES_F.add(", "TYPES_F.delete(", "snapshot.TYPES_F"):
+        assert pat not in code_only, (
+            f"_emptyStateSuggestions mutates/snapshots TYPES_F via {pat!r} — "
+            f"type pills should not be empty-state suggestions"
+        )
+
+
+def test_empty_state_suggestions_helper_handles_each_panel_filter():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _emptyStateSuggestions")[1].split("function _renderEmptyState")[0]
+    for needle in (
+        "FILTER !== 'all'",
+        "PHOTOS_F !== 'all'",
+        "ZONE_F",
+        "isDefaultPriceRange",
+        "isDefaultSizeRange",
+        "isDefaultMinScore",
+        "isDefaultBedroomsMin",
+    ):
+        assert needle in block, (
+            f"_emptyStateSuggestions missing branch for {needle!r}"
+        )
+
+
+def test_empty_state_suggestions_restore_state_after_each_try():
+    """The snapshot/restore pattern must restore EVERY field after each
+    try — otherwise the second + third tries see a corrupted base state
+    and produce wrong delta counts."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _emptyStateSuggestions")[1].split("function _renderEmptyState")[0]
+    for pat in (
+        "FILTER        = snapshot.FILTER",
+        "PHOTOS_F      = snapshot.PHOTOS_F",
+        "ZONE_F        = snapshot.ZONE_F",
+        "PRICE_MIN_IDX = snapshot.PRICE_MIN_IDX",
+        "MIN_SCORE     = snapshot.MIN_SCORE",
+        "BEDROOMS_MIN  = snapshot.BEDROOMS_MIN",
+    ):
+        assert pat in block, (
+            f"_try restore missing {pat!r} — corrupted state across tries"
+        )
+
+
+def test_empty_state_suggestions_returns_top_3_by_delta():
+    """A small filter that recovers many listings should rank above a
+    large one that recovers few. Sort: count desc, top 3."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _emptyStateSuggestions")[1].split("function _renderEmptyState")[0]
+    assert "candidates.sort((a, b) => b.count - a.count)" in block, (
+        "Suggestions not sorted by count desc — top suggestions could be tiny gains"
+    )
+    assert "candidates.slice(0, 3)" in block, (
+        "Suggestions not capped at 3 — empty-state strip could grow tall"
+    )
+
+
+def test_empty_state_clear_all_button_resets_all():
+    """The 'Or clear all filters' button at the bottom of the empty-state
+    strip must call _resetAllFilters — same handler as the chip strip's
+    Clear-all link. One behaviour, multiple entry points."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderEmptyState")[1].split("function ")[0]
+    assert "_resetAllFilters" in block, (
+        "Empty-state's 'Clear all' button doesn't wire to _resetAllFilters"
+    )
+
+
+def test_empty_state_falls_back_when_no_panel_filters_active():
+    """0 results AND no panel filters active = the 0-result state was
+    caused by type pills alone (which the user can see). Suggestion list
+    is empty; render an alternative help message instead."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderEmptyState")[1].split("function ")[0]
+    assert "suggestions.length === 0" in block, (
+        "_renderEmptyState doesn't handle the no-suggestions case — "
+        "would render an empty <ul> if user has only type-pill narrowing"
+    )
+
+
+def test_empty_state_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    for sel in ('.empty-state', '.empty-state-headline', '.empty-state-list',
+                '.empty-state-clear-btn'):
+        assert sel in css, f"4e CSS selector {sel} missing"
