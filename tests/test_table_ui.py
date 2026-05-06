@@ -1564,3 +1564,82 @@ def test_type_pill_css_present():
     css = (REPO / "web/assets/index.css").read_text()
     assert ".type-pill-btn" in css, "Type pill CSS class missing"
     assert ".type-pills" in css, "Type pills container CSS class missing"
+
+
+# ── D2: contextual area + $/m² rendering ───────────────────────────────
+# Per-row contextual rendering — house/condo cells show built_area_m2
+# and price_per_built_m2 when populated, else fall back to lot metric.
+# Header text shifts when TYPES_F is built-only (no land selected).
+
+def test_area_cell_helper_uses_built_for_house():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _areaCellHTML")[1].split("function ")[0]
+    assert "r.built_area_m2" in block, (
+        "_areaCellHTML doesn't read built_area_m2 — house/condo cells will "
+        "show lot area instead of built area"
+    )
+    assert "fmtArea(r.area_m2)" in block, (
+        "_areaCellHTML missing the lot-area fallback for built listings without "
+        "built_area_m2 (80% of bienesraices houses lack it)"
+    )
+
+
+def test_ppm_cell_helper_uses_price_per_built_m2_for_house():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _ppmCellHTML")[1].split("function ")[0]
+    assert "r.price_per_built_m2" in block, (
+        "_ppmCellHTML doesn't read price_per_built_m2 — the metric the "
+        "per-type ranker scored houses on (PR #72)"
+    )
+
+
+def test_render_table_uses_contextual_helpers():
+    """renderTable + renderCards must call the helpers, not fmtArea/fmtPPM
+    directly — otherwise built listings would always show lot metric and
+    the per-type ranker numbers would be invisible to the user."""
+    js = (REPO / "web/assets/index.js").read_text()
+    rt_block = js.split("function renderTable")[1].split("function ")[0]
+    assert "_areaCellHTML(r)" in rt_block, (
+        "renderTable not using _areaCellHTML — table won't show built area"
+    )
+    assert "_ppmCellHTML(r)" in rt_block, (
+        "renderTable not using _ppmCellHTML — table won't show $/built-m²"
+    )
+    rc_block = js.split("function renderCards")[1].split("function ")[0]
+    assert "_areaCellHTML(r)" in rc_block, (
+        "renderCards (mobile) not using _areaCellHTML — mobile won't show built area"
+    )
+
+
+def test_contextual_header_swaps_when_built_only_selected():
+    """When TYPES_F excludes land entirely, headers shift from 'Area'/'$/m²'
+    to 'Built m²'/'$/built-m²'. With land selected, headers stay at 'Area'/'$/m²'
+    (consistent with mixed-view dominant metric)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _updateContextualHeaders")[1].split("function ")[0]
+    assert "TYPES_F.has('land')" in block, (
+        "_updateContextualHeaders doesn't gate on land membership in TYPES_F"
+    )
+    assert "Built m²" in block, "Built m² header label not present"
+    assert "$/built-m²" in block, "$/built-m² header label not present"
+
+
+def test_contextual_helpers_emit_built_suffix_only_for_house_with_built_area():
+    """The tiny ' built' suffix disambiguates built area from lot area in
+    mixed views. Must NOT appear on land rows or on house rows that fell
+    back to lot metric (no built_area_m2)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _areaCellHTML")[1].split("function ")[0]
+    # The suffix is only emitted inside the built-area branch
+    assert 'cell-suffix' in block, "built-area suffix span missing"
+    # Suffix must be in the if-built branch, not the fallback
+    if_branch_end = block.find("return fmtArea(r.area_m2)")
+    suffix_idx = block.find('cell-suffix')
+    assert suffix_idx < if_branch_end, (
+        "'built' suffix renders even on lot-fallback rows — visual lies"
+    )
+
+
+def test_cell_suffix_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    assert ".cell-suffix" in css, "Cell-suffix style missing"
