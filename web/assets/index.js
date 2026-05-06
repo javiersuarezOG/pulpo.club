@@ -400,6 +400,36 @@ function updateSortHeaders() {
   });
   const sel=document.getElementById('mobile-sort');
   if (sel) sel.value=`${SORT_COL}_${SORT_DIR}`;
+  _updateContextualHeaders();
+}
+
+// D2 — when TYPES_F excludes land entirely, headers shift from "Area"/"$/m²"
+// to "Built m²"/"$/built-m²" to match the per-row contextual rendering.
+// When land is selected (alone or with built types), headers stay at "Area"
+// and "$/m²" — consistent with the dominant metric for mixed views.
+// Tooltip on the contextual headers explains the per-row semantics.
+function _updateContextualHeaders() {
+  const builtOnly = TYPES_F.size > 0 && !TYPES_F.has('land');
+  const areaTh = document.querySelector('th.col-area');
+  const ppmTh  = document.querySelector('th.col-ppm');
+  if (areaTh) {
+    const ic = document.getElementById('ic-area');
+    const arrow = ic ? ic.outerHTML : '';
+    const label = builtOnly ? 'Built m²' : 'Area';
+    areaTh.querySelector('div').innerHTML = `${label} ${arrow}`;
+    areaTh.title = builtOnly
+      ? 'Built area — interior floor space (m²)'
+      : 'Area — lot area for land + house, built area for condo without lot';
+  }
+  if (ppmTh) {
+    const ic = document.getElementById('ic-ppm');
+    const arrow = ic ? ic.outerHTML : '';
+    const label = builtOnly ? '$/built-m²' : '$/m²';
+    ppmTh.querySelector('div').innerHTML = `${label} ${arrow}`;
+    ppmTh.title = builtOnly
+      ? 'Price per built m² — the metric the per-type ranker scores houses on'
+      : '$/m² — lot $/m² for land, $/built-m² for house/condo with built area';
+  }
 }
 
 /* ── Zone filter render ──────────────────────────────── */
@@ -937,6 +967,34 @@ function typePillHTML(r) {
   if (!cfg) return '';
   return `<span class="type-pill" style="background:${cfg.pill_bg};color:${cfg.pill_text}">${esc(cfg.label)}</span>`;
 }
+
+// D2 — contextual area + $/m² rendering per listing.
+//
+// For LAND: area_m2 (lot) + price_per_m2 ($/lot-m²) — the historical metric.
+// For HOUSE/CONDO: built_area_m2 + price_per_built_m2 when populated; falls
+// back to lot metric (area_m2/price_per_m2) so houses without built area
+// still display a number rather than a dash.
+//
+// The metric rendered ALWAYS matches what the per-type ranker (PR #72)
+// scored that listing on, so user mental model stays coherent: the
+// number you see is the number that ranked the row.
+function _areaCellHTML(r) {
+  const pt = r.property_type || 'land';
+  if (pt === 'house' || pt === 'condo') {
+    if (r.built_area_m2) {
+      // Tiny suffix so the user knows this isn't the lot
+      return `${fmtArea(r.built_area_m2)}<span class="cell-suffix"> built</span>`;
+    }
+  }
+  return fmtArea(r.area_m2);
+}
+function _ppmCellHTML(r) {
+  const pt = r.property_type || 'land';
+  if (pt === 'house' || pt === 'condo') {
+    if (r.price_per_built_m2) return fmtPPM(r.price_per_built_m2);
+  }
+  return fmtPPM(r.price_per_m2);
+}
 function renderTable(rows) {
   const tbody=document.getElementById('table-body');
   // Type column appears only when the dataset has >1 distinct property_type.
@@ -948,8 +1006,8 @@ function renderTable(rows) {
       ${SHOW_TYPE_COL ? `${typeCell}${typePillHTML(r)}${typeCellEnd}` : ''}
       <td>${zonePillHTML(r)}${newBadgeHTML(r)}</td>
       <td class="td-num">${fmtUSD(r.price_usd)}</td>
-      <td class="td-num">${fmtArea(r.area_m2)}</td>
-      <td class="td-ppm">${fmtPPM(r.price_per_m2)}</td>
+      <td class="td-num">${_areaCellHTML(r)}</td>
+      <td class="td-ppm">${_ppmCellHTML(r)}</td>
       <td class="td-stars">${renderStars(recomputeComposite(r))}</td>
       <td class="td-photos">${photosCellHTML(r)}</td>
       <td class="td-chev">›</td>
@@ -966,8 +1024,8 @@ function renderCards(rows) {
       <div class="card-zone-row">${zonePillHTML(r)}${newBadgeHTML(r)} ${renderStars(recomputeComposite(r))} ${photosCellHTML(r)}</div>
       <div class="card-row2">
         <span>${fmtUSD(r.price_usd)}</span>
-        <span>${fmtArea(r.area_m2)}</span>
-        <span class="card-ppm">${fmtPPM(r.price_per_m2)}/m²</span>
+        <span>${_areaCellHTML(r)}</span>
+        <span class="card-ppm">${_ppmCellHTML(r)}/m²</span>
       </div>
     </div>`).join('');
   wrap.querySelectorAll('.card').forEach((card,i)=>card.addEventListener('click',()=>openPanel(rows[i])));

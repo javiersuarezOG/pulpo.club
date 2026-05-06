@@ -166,6 +166,9 @@ tbody tr:hover{background:var(--s1)}
 tbody tr.selected{background:var(--accent-bg)}
 tbody td{padding:10px 12px;vertical-align:middle}
 .td-num{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;color:var(--text)}
+/* D2 — tiny "built" suffix on built-area cells to disambiguate from lot
+   area in mixed views. Lighter colour so the eye reads the number first. */
+.cell-suffix{font-size:10px;color:var(--t3);font-weight:400;margin-left:2px}
 .td-ppm{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--text)}
 .td-stars{white-space:nowrap}
 .td-chev{text-align:center;color:var(--t4);font-size:16px;line-height:1;padding:0 8px}
