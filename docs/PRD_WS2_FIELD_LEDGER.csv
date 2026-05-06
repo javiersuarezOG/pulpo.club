@@ -5,46 +5,47 @@ A,source_type,Description,Core,0,,,1,FILTER,On_market vs off_market — set per 
 A,original_url,Description,Core,100,,,1,IDENTITY,Rename of existing `url` field
 A,pulpo_url,Description,Core,0,,,1,IDENTITY,Derive from source|source_id
 A,title_raw,Internal,Core,100,,,1,INTERNAL,Already populated as `title`
-A,title_canonical,Description,Core,0,100,100,1,DESCRIPTION,AI-generated; ships ~100% in Phase 1
-A,description_raw,Internal,Core,70,100,90,0,INTERNAL,29.8% empty today (c21 100%, remax 74% short); Phase 0 fix is load-bearing
-A,short_description_canonical,Description,Core,0,100,100,1,DESCRIPTION,AI-generated; quality flag `low` for 31% until Phase 0
-A,reasons_to_buy,Description,Core,0,100,100,1,DESCRIPTION,AI-generated 3-bullet USPs
-A,agent_name,Description,Extended,57,,,1,DESCRIPTION,Already as `broker_name`
-A,agent_phone,Description,Extended,57,,,1,DESCRIPTION,Already as `broker_phone`; encrypt at rest per PRD §10
-A,agent_email,Description,Extended,57,,,1,DESCRIPTION,Already as `broker_email`; encrypt at rest
-A,address_raw,Internal,Core,partial,,,1,INTERNAL,Already in `location_text`
-A,city,Description,Core,96,,,1,DESCRIPTION,Derive from existing `department`/`zone`
-A,province_state,Description,Core,96,,,1,DESCRIPTION,Already as `department`
-A,country,Description,Core,100,,,1,DESCRIPTION,Already 100%
-A,zone_name,Filter,Core,92,,,1,FILTER,60% specific confidence; ships now
-A,lat,Internal,Extended,0,,,2,INTERNAL,Phase 2 geocoding — 44% from HTML free-tier
-A,lng,Internal,Extended,0,,,2,INTERNAL,Same as lat
-B,land_type,Filter,Core,23,,,1,FILTER,residential 23% / agricultural 12% / commercial 13% — ships
-B,is_flat,Filter,Extended,19,,15,1,FILTER,Passes 15% UI gate today
-B,has_water_body,Filter,Extended,10,,15,1,INTERNAL,Below gate; computed-only. NLP tuning lifted from 7.9% to 9.9%; needs Phase 2 geometric overlay to clear 15%.
-B,has_ocean_view,Filter,Extended,9,,15,2,FILTER,Lifts past gate after Phase 2 geocoding
-B,has_mountain_view,Filter,Extended,0,,,,DROP,1 hit out of 811 — no recovery path
-C,is_repriced,Calculated,Core,0,100,100,1,FILTER,Phase 1 via FR-3 price history (not text)
-C,is_sold,Tracking,Core,0,100,100,1,INTERNAL,Phase 1 via URL/page check; flag don't drop
-C,date_sold,Tracking,Core,0,100,100,1,INTERNAL,Paired with is_sold
-C,first_seen_date,Calculated,Core,100,100,100,1,INTERNAL,Already as `first_seen_at` sidecar
-C,days_listed,Filter/Sort,Core,2,100,100,1,FILTER,Phase 1 derive from first_seen_date — 100% after derive
-C,original_listing_date,Filter,Extended,0,,,1,INTERNAL,Phase 1 fallback to first_seen_date
-C,price_vs_zone_median,Filter,Signal,0,,,3,DESCRIPTION,Phase 3 — needs zone median batch + ≥10 listings/zone
-C,price_vs_zone_pct,Filter,Signal,0,,,3,FILTER,Same dependency as price_vs_zone_median
-D,road_access_type,Filter,Core,19,40,20,1,FILTER,Lifted from 1.7% to 19% via NLP keyword tuning (carretera del litoral / panamericana / autopista families). Clears the 15% gate. Re-baselined target to 20%.
-D,has_water,Filter,Core,22,40,25,1,FILTER,Re-baseline target from 40% to 25%
-D,has_power,Filter,Core,20,40,25,1,FILTER,Re-baseline target from 40% to 25%
-D,has_sewage,Filter,Extended,3,,,,DROP,Broker pages don't talk about it
-D,dist_nearest_town_km,Filter/Sort,Signal,0,,,2,FILTER,Phase 2 geocoding
-D,dist_airport_km,Filter/Sort,Signal,0,,,2,FILTER,Phase 2 geocoding
-D,dist_highway_km,Filter/Sort,Signal,0,,,2,FILTER,Phase 2 geocoding
-D,dist_beach_km,Filter/Sort,Signal,0,,,2,FILTER,Phase 2 geocoding
-E,beachfront_tier,Filter,Extended,1,15,12,2,FILTER,0.5% existing flag + 7.3% NLP combined → ~12% after geocoding
-F,zoning_code,Filter,Extended,0,,,,DROP,Broker pages don't expose it
-F,zoning_use,Filter,Extended,23,,15,1,FILTER,residential 23% (ships); tourist 4% / others <5% (bucket as `other`)
-G,photos_count,Filter,Core,2,70,70,2,FILTER,Phase 2 Playwright unlocks JS-lazy galleries
-H,investment_signal,Filter,Extended,0,,,3,FILTER,Rule engine over upstream fields; ships Phase 3
-H,readiness_score,Filter/Sort,Extended,0,,,1,FILTER,has_water + has_power + (road_access_type=paved); 0-2 mostly
-H,data_quality_score,Internal,Core,0,,,1,INTERNAL,Pure derivation; surfaced only on PRD §FR-9 admin dashboard
-H,source_label,Filter,Core,0,,,1,FILTER,Derived chip array (Beachfront / Off-Market / Price Drop / etc.)
+A,title_canonical,Description,Core,100,100,100,1,DESCRIPTION,Populated 100% via deterministic fallback templates (PRD §8.1). LLM (DeepSeek single-call PR #79-81) overrides with richer text once DEEPSEEK_API_TOKEN is provisioned (PR #82).
+A,description_raw,Internal,Core,100,100,90,0,INTERNAL,Was 70% before Phase 0 (c21 100% empty / remax 74% short). Phase 0 fix in #41+#42 lifted to ~100% on 2026-05-06 nightly.
+A,short_description_canonical,Description,Core,0,100,100,1,DESCRIPTION,Needs LLM (PRD §8.2 PQAB structure). Will populate once DEEPSEEK_API_TOKEN is provisioned (PR #82). Fallback module deliberately leaves this None — natural-language flow needs AI.
+A,reasons_to_buy,Description,Core,99,100,100,1,DESCRIPTION,Populated 99% via deterministic §8.3 trigger-table templates. LLM overrides when token is set.
+A,agent_name,Description,Extended,59,,,1,DESCRIPTION,Already as `broker_name`. Steady at ~59%.
+A,agent_phone,Description,Extended,59,,,1,DESCRIPTION,Already as `broker_phone`; encrypt at rest per PRD §10.
+A,agent_email,Description,Extended,59,,,1,DESCRIPTION,Already as `broker_email`; encrypt at rest.
+A,address_raw,Internal,Core,partial,,,1,INTERNAL,Already in `location_text`.
+A,city,Description,Core,96,,,1,DESCRIPTION,Derive from existing `department`/`zone`.
+A,province_state,Description,Core,96,,,1,DESCRIPTION,Already as `department`.
+A,country,Description,Core,100,,,1,DESCRIPTION,Already 100%.
+A,zone_name,Filter,Core,92,,,1,FILTER,60% specific confidence; ships now.
+A,lat,Internal,Extended,0,,,1,INTERNAL,Pivoted to Phase 1 — LLM single-call (PR #80/#81) returns lat/lng inline with title+description. Previous separate Mapbox pass deleted in #83. Fires once DEEPSEEK_API_TOKEN is set (PR #82).
+A,lng,Internal,Extended,0,,,1,INTERNAL,Same as lat — Phase 1 via LLM single-call.
+A,geocoding_confidence,Internal,Extended,0,,,1,INTERNAL,Phase 1 via LLM. Bucketed as high/medium/low based on the model's self-reported confidence.
+B,land_type,Filter,Core,23,,,1,FILTER,residential 23% / agricultural 12% / commercial 13% — ships.
+B,is_flat,Filter,Extended,27,,15,1,FILTER,2026-05-06 nightly: 27.1% (was 19.4% pre-tuning). Above 15% UI gate.
+B,has_water_body,Filter,Extended,13,,15,1,INTERNAL,2026-05-06 nightly: 12.7% (was 7.9%). Just below the gate; needs Phase 2 geometric overlay to clear it.
+B,has_ocean_view,Filter,Extended,11,,15,2,FILTER,2026-05-06 nightly: 10.6%. Lifts past gate after Phase 2 geometric coastline-distance overlay.
+B,has_mountain_view,Filter,Extended,1,,,,DROP,2026-05-06 nightly: 0.9% (8 hits in 865). Confirmed drop — no recovery path.
+C,is_repriced,Calculated,Core,0,100,100,1,FILTER,Phase 1 via FR-3 price history (PR #37). 0% on 2026-05-06 — first nightly with the sidecar. Real signal lights up from run #2 onward.
+C,is_sold,Tracking,Core,0,100,100,1,INTERNAL,Currently DROPPED at normalize() (sold listings filtered out). Phase 1 should keep + flag instead.
+C,date_sold,Tracking,Core,0,100,100,1,INTERNAL,Paired with is_sold.
+C,first_seen_date,Calculated,Core,100,100,100,1,INTERNAL,Already as `first_seen_at` sidecar — 100% on 2026-05-06.
+C,days_listed,Filter/Sort,Core,100,100,100,1,FILTER,Lifted from 2% to 100% via Phase 1 derive-from-first_seen_date (PR #39).
+C,original_listing_date,Filter,Extended,0,,,1,INTERNAL,Phase 1 fallback to first_seen_date.
+C,price_vs_zone_median,Filter,Signal,0,,,3,DESCRIPTION,Phase 3 — needs zone median batch + ≥10 listings/zone.
+C,price_vs_zone_pct,Filter,Signal,0,,,3,FILTER,Same dependency as price_vs_zone_median.
+D,road_access_type,Filter,Core,23,40,20,1,FILTER,Lifted from 1.7% via NLP keyword tuning (carretera del litoral / panamericana / autopista families). 2026-05-06: 23.2% — clears the gate.
+D,has_water,Filter,Core,30,40,25,1,FILTER,2026-05-06 nightly: 30.4%. Above re-baselined 25% target.
+D,has_power,Filter,Core,23,40,25,1,FILTER,2026-05-06 nightly: 23.0%. Just below re-baselined 25% target; close.
+D,has_sewage,Filter,Extended,3,,,,DROP,Broker pages don't talk about it.
+D,dist_nearest_town_km,Filter/Sort,Signal,0,,,3,FILTER,Phase 3 — derive from lat/lng via SV reference data once LLM populates coords.
+D,dist_airport_km,Filter/Sort,Signal,0,,,3,FILTER,Phase 3 — same dependency on lat/lng.
+D,dist_highway_km,Filter/Sort,Signal,0,,,3,FILTER,Phase 3 — same dependency on lat/lng.
+D,dist_beach_km,Filter/Sort,Signal,0,,,3,FILTER,Phase 3 — same dependency on lat/lng.
+E,beachfront_tier,Filter,Extended,11,15,12,3,FILTER,2026-05-06 nightly: is_beachfront=11.2%. Phase 3 — geometric overlay (distance to coastline) once lat/lng populates.
+F,zoning_code,Filter,Extended,0,,,,DROP,Broker pages don't expose it.
+F,zoning_use,Filter,Extended,23,,15,1,FILTER,residential 23% (ships); tourist 4% / others <5% (bucket as `other`).
+G,photos_count,Filter,Core,91,70,70,2,FILTER,2026-05-06 nightly: 91.0% photo_urls populated (was 1.6% pre-Phase-2). PRs #58+#59 photo recovery + per-source detail-page extraction blew past the 70% target.
+H,investment_signal,Filter,Extended,99,,,1,FILTER,2026-05-06 nightly: 99.4% populated via degraded "deal-on-is_repriced" rule. Full PRD §FR-7.2 rule needs price_vs_zone_pct (Phase 3).
+H,readiness_score,Filter/Sort,Extended,100,,,1,FILTER,has_water + has_power + has_paved_access; 100% populated on 2026-05-06.
+H,data_quality_score,Internal,Core,100,,,1,INTERNAL,Pure derivation; 100% on 2026-05-06.
+H,source_label,Filter,Core,99,,,1,FILTER,Derived chip array (Beachfront / Off-Market / Price Drop / etc.); 99.3% populated 2026-05-06.
