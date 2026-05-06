@@ -40,3 +40,6 @@
 {"ts": "2026-05-06T12:21:48.330310+00:00", "zone": "santa-tecla", "property_type": "house", "n_listings": 13, "median_ppm_usd": 604.06}
 {"ts": "2026-05-06T12:21:48.330310+00:00", "zone": "el-espino", "property_type": "land", "n_listings": 10, "median_ppm_usd": 48.49}
 {"ts": "2026-05-06T12:21:48.330310+00:00", "zone": "nueva-concepcion", "property_type": "land", "n_listings": 25, "median_ppm_usd": 100.16}
+{"ts": "2026-05-06T19:06:17.126079+00:00", "zone": "el-tunco", "property_type": "land", "n_listings": 12, "median_ppm_usd": 155.0}
+{"ts": "2026-05-06T19:06:17.126797+00:00", "zone": "el-tunco", "property_type": "land", "n_listings": 10, "median_ppm_usd": 145.0}
+{"ts": "2026-05-06T19:06:17.127001+00:00", "zone": "el-tunco", "property_type": "land", "n_listings": 10, "median_ppm_usd": 145.0}

@@ -30,6 +30,8 @@ from typing import Optional
 from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client, with_retries
 from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._type_classifier import classify_property_type
+from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
 
 API_BASE   = "https://oceansideelsalvador.com/wp-json/wp/v2"
 BASE_URL   = "https://oceansideelsalvador.com/"
@@ -37,11 +39,35 @@ PER_PAGE   = 100
 MAX_PAGES  = 50         # safety cap: 50 × 100 = 5 000 records
 FIXTURE_FILE  = "sample_listings.json"
 
-# Land-type slugs we accept from the property-type taxonomy
+# Land-type slugs we accept from the property-type taxonomy.
+# /rental-details CPT — handled by the existing flow.
 _LAND_SLUGS = {
     "land", "lot", "lots", "lots-and-land",
     "terrenos", "lotes", "terreno", "lote",
 }
+
+# Built-type slugs from the same property-type taxonomy.
+# /home-details CPT — Phase C broadening adds these.
+# Audited live 2026-05-06: id=21 houses (33), id=8 apartments (7), id=114
+# condo (3), id=116 beach-villa (5). Hotels (81), restaurant (117),
+# commercial-land (123) intentionally skipped.
+_HOUSE_SLUGS = {"houses", "house", "beach-villa", "casa", "casas", "villa", "villas"}
+_CONDO_SLUGS = {"condo", "condos", "apartments", "apartment", "apartamento", "apartamentos"}
+
+# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
+_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+
+# ── Built-type field regexes (oceanside content_text is unstructured prose) ──
+# Bedrooms: "3 bedroom", "3 beds", "tres habitaciones", "3-bed", "3BR".
+_BEDROOMS_RE = re.compile(
+    r"\b(\d+)\s*(?:bed(?:room)?s?|hab(?:itaci(?:ó|o)n(?:es)?)?|rec[áa]maras?|br|-bed)\b",
+    re.IGNORECASE,
+)
+# Bathrooms: "2 bathroom", "2.5 baths", "2 baños", "2 ba".
+_BATHROOMS_RE = re.compile(
+    r"\b([\d.]+)\s*(?:bath(?:room)?s?|baños?|ba\b)",
+    re.IGNORECASE,
+)
 
 # ── Area regexes (kept from HTML scraper to handle the same content blobs) ──
 # The Avada theme concatenates "Listed on <date>" with the area value:
@@ -95,6 +121,30 @@ def _find_land_term_id(client) -> Optional[int]:
     return None
 
 
+def _find_built_term_ids(client) -> dict[int, str]:
+    """Return {term_id: 'house'|'condo'} for the built-type taxonomy terms.
+
+    Used by the /home-details branch (Phase C) to filter for built listings
+    we want and tag each record with its broker_type. Multi-term records
+    (e.g. [8, 21] = Apartments + Houses) get the FIRST hit in the priority
+    order: condo → house. Classifier downstream confirms.
+    """
+    try:
+        r = client.get(f"{API_BASE}/property-type", params={"per_page": 100})
+        r.raise_for_status()
+        out: dict[int, str] = {}
+        for t in r.json():
+            slug = (t.get("slug") or "").lower()
+            if slug in _CONDO_SLUGS:
+                out[t["id"]] = "condo"
+            elif slug in _HOUSE_SLUGS:
+                out[t["id"]] = "house"
+        return out
+    except Exception as e:
+        print(f"[oceanside] could not fetch built-type terms: {e}")
+        return {}
+
+
 def _extract_photo_urls(rec: dict) -> list[str]:
     """Extract photo URLs from a WP REST record.
 
@@ -130,21 +180,31 @@ def _extract_photo_urls(rec: dict) -> list[str]:
     return urls
 
 
-def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
-    """Map one WP REST record to the normalized raw-dict shape."""
+def _map(rec: dict, land_term_id: Optional[int], broker_type: str = "land") -> Optional[dict]:
+    """Map one WP REST record to the normalized raw-dict shape.
+
+    broker_type controls type-specific extraction + coastal filter:
+      - 'land'  → existing flow, no built-area / bedroom extraction
+      - 'house' → regex-extract bedrooms + bathrooms from content_text;
+                  apply coastal filter (drop unless coastal zone or
+                  beachfront keyword in title/description)
+      - 'condo' → same as house
+    """
     title = _strip(rec["title"]["rendered"])
     if not title:
         return None
 
-    # If no term filter was applied server-side, verify in Python
-    if land_term_id is None:
-        pt = rec.get("property-type") or []
-        # Fall back: keep if property-type list is empty or contains any land-ish slug
-        # (we can't look up slugs here without an extra call, so keep all)
-    else:
-        pt = rec.get("property-type") or []
-        if land_term_id not in pt:
-            return None
+    # Land path: gate on the land term ID. Built path: caller already
+    # filtered to known built-type term IDs, so no further check.
+    if broker_type == "land":
+        if land_term_id is None:
+            pt = rec.get("property-type") or []
+            # Fall back: keep if property-type list is empty or contains any land-ish slug
+            # (we can't look up slugs here without an extra call, so keep all)
+        else:
+            pt = rec.get("property-type") or []
+            if land_term_id not in pt:
+                return None
 
     content_html = rec["content"]["rendered"]
     content_text = _strip(content_html)
@@ -196,17 +256,20 @@ def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
     has_water       = bool(re.search(r"\bagua\b|water\s+access|water\s+available|suministro\s+de\s+agua", ct))
     has_power       = bool(re.search(r"el[eé]ctric|energ[íi]a|l[íi]neas?\s+el[eé]ctric|power\s+available", ct))
 
-    return {
+    photo_urls = _extract_photo_urls(rec)
+    description = content_text[:1500]
+
+    rec_out: dict = {
         "source_id":       str(rec["id"]),
         "url":             rec["link"],
         "scraped_at":      datetime.now(timezone.utc).isoformat(),
         "title":           title,
-        "description":     content_text[:1500],
+        "description":     description,
         "raw_price_text":  raw_price_text,
         "raw_size_text":   raw_size_text,
         "location_text":   location_text,
-        "property_type":   "land",
-        "photo_urls":      _extract_photo_urls(rec),
+        "property_type":   broker_type,
+        "photo_urls":      photo_urls,
         "photos_count":    1 if rec.get("featured_media") else 0,
         "days_listed":     days_listed,
         "is_repriced":     False,
@@ -215,6 +278,55 @@ def _map(rec: dict, land_term_id: Optional[int]) -> Optional[dict]:
         "has_water":       has_water,
         "has_power":       has_power,
     }
+
+    # Type-specific fields for house/condo. Oceanside content_text is
+    # unstructured prose (no ACF blob) so we regex out bedrooms +
+    # bathrooms only — built area is too easy to confuse with lot area
+    # in this format ("3 bedroom house on 1500 m² lot"). The per-type
+    # ranker falls back to lot area when built_area_m2 is None.
+    if broker_type in ("house", "condo"):
+        bm = _BEDROOMS_RE.search(content_text)
+        if bm:
+            try:
+                rec_out["bedrooms"] = int(bm.group(1))
+            except ValueError:
+                pass
+        bath = _BATHROOMS_RE.search(content_text)
+        if bath:
+            try:
+                rec_out["bathrooms"] = float(bath.group(1))
+            except ValueError:
+                pass
+
+        # Coastal filter — drop unless location matches COASTAL_ZONES OR
+        # title/description carries a beachfront keyword. Most oceanside
+        # listings ARE coastal (the brand is "Oceanside"), so this filter
+        # should be lenient in practice — but documenting the gate keeps
+        # parity with bienesraices/remax/c21.
+        loc_blob = location_text.lower().replace(" ", "-")
+        zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+        text_blob = f"{title}\n{description}"
+        has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
+        if not zone_is_coastal and not has_beachfront_kw:
+            return None
+
+    # Multi-signal classifier — confirms broker_type, surfaces signals
+    # for the shadow log, FLAGS the listing if classifier disagrees.
+    ptype, signals, confidence, total = classify_property_type({
+        "broker_type_field": broker_type,
+        "url":               rec_out["url"],
+        "photo_urls":        photo_urls,
+        "title":             title,
+        "description":       description,
+    }, fallback_type=broker_type)
+    rec_out["_type_signals"]    = [s.to_dict() for s in signals]
+    rec_out["_type_confidence"] = confidence
+    rec_out["_type_total"]      = total
+    if ptype != broker_type:
+        rec_out["validation_status"] = "flagged"
+        rec_out.setdefault("validation_warnings", []).append("type_classifier_disagree")
+
+    return rec_out
 
 
 class OceansideScraper:
@@ -264,11 +376,15 @@ class OceansideScraper:
     def _fetch_with_meta(self, client, limit: int) -> dict:
         time.sleep(REQUEST_DELAY)
         land_id = _find_land_term_id(client)
+        # Phase C — also resolve the built-type term IDs for the
+        # /home-details branch.
+        built_id_to_type = _find_built_term_ids(client)
 
         out: list[dict] = []
         max_pages_hit = False
         limit_hit = False
 
+        # ── Pass 1: land via /rental-details (existing flow) ──────────
         params: dict = {"per_page": PER_PAGE, "_embed": "wp:featuredmedia"}
         if land_id:
             params["property-type"] = land_id
@@ -293,7 +409,7 @@ class OceansideScraper:
                 if len(out) >= limit:
                     limit_hit = True
                     break
-                mapped = _map(rec, land_id)
+                mapped = _map(rec, land_id, broker_type="land")
                 if mapped:
                     out.append(mapped)
 
@@ -306,6 +422,57 @@ class OceansideScraper:
             if page >= MAX_PAGES:
                 max_pages_hit = True
                 break
+
+        # ── Pass 2: house/condo via /home-details (Phase C) ───────────
+        # Crawl all home-details, classify each via the term IDs we
+        # resolved above. Multi-term records (e.g. [8, 21]) prefer
+        # condo over house in the priority order.
+        if not limit_hit and built_id_to_type:
+            for page in range(1, MAX_PAGES + 1):
+                if len(out) >= limit:
+                    limit_hit = True
+                    break
+                time.sleep(REQUEST_DELAY)
+                try:
+                    home_r = with_retries(lambda: client.get(
+                        f"{API_BASE}/home-details",
+                        params={"per_page": PER_PAGE, "page": page,
+                                "_embed": "wp:featuredmedia"}))
+                    home_r.raise_for_status()
+                except Exception as e:
+                    print(f"[oceanside] /home-details page {page} failed: {e}")
+                    break
+
+                home_recs = home_r.json()
+                home_total_pages = int(home_r.headers.get("X-WP-TotalPages") or 1)
+                if not home_recs:
+                    break
+
+                for rec in home_recs:
+                    if len(out) >= limit:
+                        limit_hit = True
+                        break
+                    rec_term_ids = rec.get("property-type") or []
+                    # Priority: condo > house. Pick the first matching type.
+                    matched_type: Optional[str] = None
+                    for tid in rec_term_ids:
+                        t = built_id_to_type.get(tid)
+                        if t == "condo":
+                            matched_type = "condo"
+                            break
+                        if t == "house" and matched_type is None:
+                            matched_type = "house"
+                    if not matched_type:
+                        continue  # not a house or condo we want
+                    mapped = _map(rec, land_id, broker_type=matched_type)
+                    if mapped:
+                        out.append(mapped)
+
+                if page >= home_total_pages:
+                    break
+                if page >= MAX_PAGES:
+                    max_pages_hit = True
+                    break
 
         return {"records": out, "max_pages_hit": max_pages_hit, "limit_hit": limit_hit}
 
