@@ -15,3 +15,10 @@
 {"ts": "2026-05-05T20:43:18.336070+00:00", "source": "remax", "status": "green", "count": 312, "duration_s": 700.18, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
 {"ts": "2026-05-05T20:43:18.336070+00:00", "source": "nexo", "status": "green", "count": 9, "duration_s": 21.26, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
 {"ts": "2026-05-05T20:43:18.336070+00:00", "source": "realtyelsalvador", "status": "red", "count": 0, "duration_s": 1.58, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "goodlife", "status": "green", "count": 80, "duration_s": 126.45, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "oceanside", "status": "green", "count": 27, "duration_s": 3.16, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "century21", "status": "green", "count": 15, "duration_s": 109.42, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "bienesraices", "status": "green", "count": 560, "duration_s": 1659.45, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "remax", "status": "green", "count": 312, "duration_s": 622.65, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "nexo", "status": "green", "count": 9, "duration_s": 20.84, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-05T21:33:29.804944+00:00", "source": "realtyelsalvador", "status": "red", "count": 0, "duration_s": 1.59, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
