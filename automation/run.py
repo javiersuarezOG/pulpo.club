@@ -24,7 +24,8 @@ import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all source
 from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
-from automation.ai_enrichment import enrich_listings as _ai_enrich  # type: ignore  # noqa: E402
+from automation.llm_enrichment import enrich_listings as _llm_enrich  # type: ignore  # noqa: E402
+from automation.ai_enrichment_fallback import apply_fallbacks as _ai_fallback  # type: ignore  # noqa: E402
 from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
     extract as _nlp_extract,
@@ -481,47 +482,51 @@ def main() -> int:
     print(f"[derived] signals={dict(deriv_signal_counts)} "
           f"labels={dict(deriv_label_counts)}")
 
-    # PRD §FR-6 — AI enrichment (title_canonical, short_description_canonical,
-    # reasons_to_buy). Idempotent via description_md5 cache. When the API
-    # is unavailable (missing key, missing package, quota exhausted, auth
-    # error), falls back to deterministic templates for title + USPs;
-    # short_description_canonical stays None until AI is back.
-    ai_metrics = _ai_enrich(listings)
-    fb_count = ai_metrics.get("fallback_applied", 0)
-    if ai_metrics.get("skipped_no_api_key"):
-        print(f"[ai_enrich] OPENAI_API_KEY missing — fallback templates only "
-              f"(applied to {fb_count} listings)")
-    elif ai_metrics.get("skipped_no_package"):
-        print(f"[ai_enrich] openai package not installed — fallback templates only "
-              f"(applied to {fb_count} listings)")
+    # PRD WS2 — single-call DeepSeek enrichment. ONE LLM call per eligible
+    # listing returns title + description + usps + latlong together (replacing
+    # the previous 3-call OpenAI flow + Mapbox geocoding pass). Idempotent
+    # via the per-listing sidecar at web/data/llm_enrichment.json: a listing
+    # already in the sidecar is rehydrated without an API call. The
+    # eligibility rule — skip if any of {title_canonical,
+    # short_description_canonical, reasons_to_buy, lat-or-lng} is set —
+    # means listings already enriched by prior runs (or grandfathered with
+    # Mapbox lat/lng from the legacy geocoding pass) are not re-processed.
+    llm_metrics = _llm_enrich(
+        listings,
+        sidecar_path = web_data_dir / "llm_enrichment.json",
+        log_path     = web_data_dir / "llm_enrichment_log.jsonl",
+    )
+    if llm_metrics.get("skipped_no_token"):
+        print("[llm_enrich] DEEPSEEK_API_TOKEN missing — fallback templates only")
+    elif llm_metrics.get("skipped_no_package"):
+        print("[llm_enrich] openai package not installed — fallback templates only")
     else:
-        ge = ai_metrics.get("global_error_seen")
+        ge = llm_metrics.get("global_error_seen")
         ge_note = f" GLOBAL_ERROR={ge}" if ge else ""
-        print(f"[ai_enrich] cache_hits={ai_metrics['cache_hits']} "
-              f"cache_misses={ai_metrics['cache_misses']} "
-              f"api_ok={ai_metrics['api_calls_succeeded']} "
-              f"api_fail={ai_metrics['api_calls_failed']} "
-              f"fallback={fb_count} "
-              f"cost=${ai_metrics['total_cost_usd']:.4f} "
-              f"quality={ai_metrics['content_quality']}{ge_note}")
+        lat = llm_metrics.get("latency_ms") or []
+        lat_note = ""
+        if lat:
+            srt = sorted(lat)
+            p50 = srt[len(srt) // 2]
+            p95 = srt[max(0, int(len(srt) * 0.95) - 1)]
+            lat_note = f" latency_p50={p50}ms latency_p95={p95}ms"
+        print(f"[llm_enrich] eligible={llm_metrics['eligible']} "
+              f"cache_hits={llm_metrics['cache_hits']} "
+              f"enriched={llm_metrics['enriched']} "
+              f"skipped={llm_metrics['skipped']} "
+              f"failed={llm_metrics['failed']} "
+              f"cost=${llm_metrics['cost_usd']:.4f}{lat_note}{ge_note}")
+        if llm_metrics.get("skip_reasons"):
+            print(f"[llm_enrich] skip_reasons={llm_metrics['skip_reasons']}")
+        if llm_metrics.get("failure_reasons"):
+            print(f"[llm_enrich] failure_reasons={llm_metrics['failure_reasons']}")
 
-    # PRD §FR-5 — geocoding (Phase 2). Skips entirely without MAPBOX_TOKEN.
-    # When token is set, populates lat/lng/geocoding_confidence on listings
-    # via Mapbox; cached by source|source_id + address_md5 so re-geocoding
-    # only happens when address text changes.
-    from automation.geocoding import geocode_listings as _geocode  # type: ignore
-    geo_metrics = _geocode(listings, web_data_dir / "geocoding_cache.json")
-    if geo_metrics.get("skipped_no_token"):
-        print("[geocoding] MAPBOX_TOKEN missing — skipping geocoding")
-    elif geo_metrics.get("skipped_no_httpx"):
-        print("[geocoding] httpx not installed — skipping geocoding")
-    else:
-        print(f"[geocoding] populated_total={geo_metrics['populated_total']} "
-              f"already={geo_metrics['already_has_coords']} "
-              f"cache_hits={geo_metrics['cache_hits']} "
-              f"mapbox_ok={geo_metrics['mapbox_succeeded']} "
-              f"mapbox_fail={geo_metrics['mapbox_failed']} "
-              f"no_addr={geo_metrics['no_address']}")
+    # Deterministic fallback templates (PRD §8.1 + §8.3) for listings the
+    # LLM skipped or couldn't enrich. Fills title_canonical and
+    # reasons_to_buy from the rule tables; short_description_canonical
+    # stays None — that one genuinely needs natural-language generation.
+    fb_count = sum(1 for li in listings if _ai_fallback(li))
+    print(f"[llm_enrich] fallback_templates_applied={fb_count}")
 
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
