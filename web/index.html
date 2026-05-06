@@ -69,8 +69,19 @@
 <div class="layout">
   <div class="content">
 
-    <!-- Open/Gated + Photos filters -->
+    <!-- Property type pills (multi-select) + Open/Gated + Photos filters -->
     <div class="filter-bar">
+      <!-- Type pills: each is independently toggleable. Default all selected.
+           Cannot de-toggle the last selected pill (snaps back).
+           Visible always; pre-PR-D1 the table already showed a Type column
+           when ranked.json had >1 distinct type — these pills are how the
+           user filters that. -->
+      <div class="type-pills" role="group" aria-label="Property type">
+        <button class="type-pill-btn active" data-type-pill="land"  aria-pressed="true">Land</button>
+        <button class="type-pill-btn active" data-type-pill="house" aria-pressed="true">Beach houses</button>
+        <button class="type-pill-btn active" data-type-pill="condo" aria-pressed="true">Beach condos</button>
+      </div>
+      <span class="seg-divider" aria-hidden="true"></span>
       <div class="seg" role="group" aria-label="Land type filter">
         <button class="seg-btn active" data-filter="all">All</button>
         <button class="seg-btn" data-filter="open">Open land</button>

@@ -69,6 +69,12 @@ let SORT_COL = 'ppm', SORT_DIR = 'asc', OPEN_ID = null;
 // counts (both mean "no photos"); 'with' requires photos_count > 0.
 let PHOTOS_F = 'all';
 
+// Property-type pills (D1). Set of canonical types currently selected.
+// Defaults to all 3; cannot be empty (de-toggling the last selected pill
+// snaps it back). Filter logic includes a listing iff its property_type
+// is in TYPES_F.
+let TYPES_F = new Set(['land', 'house', 'condo']);
+
 /* ── Tune-panel state: price range ─────────────────────── */
 // Snap points calibrated to the live data distribution: median $250K,
 // 95th percentile $4.1M. Index 0 = no min ($0); last index = no max (Infinity).
@@ -196,6 +202,18 @@ function readURL() {
   const p = new URLSearchParams(location.search);
   FILTER = ['all','open','gated'].includes(p.get('filter')) ? p.get('filter') : 'all';
   PHOTOS_F = ['all','with','none'].includes(p.get('photos')) ? p.get('photos') : 'all';
+  // Type pills: ?types=land,house — comma-separated. Unknown values silently
+  // dropped; if the URL param ends up empty, fall back to default-all so the
+  // page never lands in a "no results possible" state.
+  const typesRaw = p.get('types');
+  if (typesRaw) {
+    const parsed = new Set(
+      typesRaw.split(',').map(s => s.trim()).filter(s => ['land','house','condo'].includes(s))
+    );
+    TYPES_F = parsed.size > 0 ? parsed : new Set(['land','house','condo']);
+  } else {
+    TYPES_F = new Set(['land','house','condo']);
+  }
   const s = p.get('sort')||'ppm_asc';
   const m = s.match(/^(zone|price|area|ppm|stars|photos|newest|deal|location|momentum|composite)_(asc|desc)$/);
   if (m) { SORT_COL=m[1]; SORT_DIR=m[2]; }
@@ -250,6 +268,10 @@ function pushURL(replace=true) {
   const p=new URLSearchParams();
   if (FILTER!=='all') p.set('filter',FILTER);
   if (PHOTOS_F!=='all') p.set('photos',PHOTOS_F);
+  // Type pills: emit ?types= only when not all 3 selected (URL stays clean).
+  if (TYPES_F.size < 3) {
+    p.set('types', ['land','house','condo'].filter(t => TYPES_F.has(t)).join(','));
+  }
   if (SORT_COL!=='ppm'||SORT_DIR!=='asc') p.set('sort',`${SORT_COL}_${SORT_DIR}`);
   if (ZONE_F) {
     if (ZONE_F.type==='no-zone') p.set('zone_group','no-zone');
@@ -302,6 +324,11 @@ function _scoreAtLeastMin(r) {
 function _hasPhotos(r) { return (r.photos_count || 0) > 0; }
 function filteredRows() {
   return ALL_DATA.filter(r => {
+    // Type-pill filter. TYPES_F is never empty (last-pill snap-back enforced
+    // in wireTypePills) so an unknown property_type would just be excluded
+    // here — that's fine, nothing in production has an unknown type.
+    const pt = r.property_type || 'land';
+    if (!TYPES_F.has(pt)) return false;
     if (FILTER==='open'  && r.is_in_development)  return false;
     if (FILTER==='gated' && !r.is_in_development) return false;
     if (PHOTOS_F==='with' && !_hasPhotos(r)) return false;
@@ -949,7 +976,12 @@ function updateCounts(filtered, total) {
   const label=FILTER==='all'?'All listings':FILTER==='open'?'Open land':'Gated / developments';
   const zLabel=!ZONE_F?'':ZONE_F.type==='no-zone'?' · No zone':ZONE_F.type==='group'?` · ${ZONE_GROUPS[ZONE_F.value]?.label||''}`:(` · ${zoneLabel(ZONE_F.value)}`);
   const pLabel=PHOTOS_F==='with'?' · With photos':PHOTOS_F==='none'?' · No photos':'';
-  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${label}${zLabel}${pLabel}`;
+  // Type pill suffix — only show when narrowing (not all 3 active). Joins
+  // active types' labels: "Land", "Land + Beach houses", "Beach condos", etc.
+  const tLabel = TYPES_F.size < 3
+    ? ' · ' + ['land','house','condo'].filter(t=>TYPES_F.has(t)).map(t=>PROPERTY_TYPES[t]?.label||t).join(' + ')
+    : '';
+  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${label}${tLabel}${zLabel}${pLabel}`;
   document.getElementById('footer-count').textContent=`${filtered.toLocaleString()} listing${filtered!==1?'s':''}`;
 }
 function render() {
@@ -969,6 +1001,50 @@ function _activateInGroup(btn) {
   if (!group) return;
   group.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active', b===btn));
 }
+// ── Property-type pills (D1) ──────────────────────────────────────────
+// Multi-select toggle group. Each pill clicks toggle its type in TYPES_F.
+// At least one pill must always be selected — clicking the last active
+// pill snaps it back on. Active pills get their type's PROPERTY_TYPES
+// background colour (single source of truth) so the visual stays in
+// lockstep with the row pills + side panel.
+function wireTypePills() {
+  document.querySelectorAll('.type-pill-btn').forEach(btn => {
+    const pt = btn.dataset.typePill;
+    // Initial visual state from TYPES_F (set by readURL or default-all)
+    _renderTypePill(btn, pt);
+    btn.addEventListener('click', () => {
+      if (TYPES_F.has(pt)) {
+        // Snap-back: never let the user de-toggle the last selected pill.
+        if (TYPES_F.size === 1) return;
+        TYPES_F.delete(pt);
+      } else {
+        TYPES_F.add(pt);
+      }
+      document.querySelectorAll('.type-pill-btn').forEach(b => {
+        _renderTypePill(b, b.dataset.typePill);
+      });
+      OPEN_ID = null;
+      document.getElementById('side-panel').classList.remove('open');
+      pushURL(true);
+      render();
+    });
+  });
+}
+
+function _renderTypePill(btn, pt) {
+  const cfg = PROPERTY_TYPES[pt];
+  const active = TYPES_F.has(pt);
+  btn.classList.toggle('active', active);
+  btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  if (cfg && active) {
+    btn.style.background = cfg.pill_bg;
+    btn.style.color      = cfg.pill_text;
+  } else {
+    btn.style.background = '';
+    btn.style.color      = '';
+  }
+}
+
 function wireSegment() {
   document.querySelectorAll('.seg-btn').forEach(btn=>{
     if (btn.dataset.filter) {
@@ -1154,7 +1230,7 @@ async function init() {
     }
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
-  wireSegment(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
+  wireSegment(); wireTypePills(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
   render(); loadMeta();
 }
 init();

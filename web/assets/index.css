@@ -66,6 +66,30 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 /* Vertical separator between the two segmented controls. Hidden when the
    filter-bar wraps onto two rows — the line of sight is already broken. */
 .seg-divider{width:1px;height:28px;background:var(--brd2);flex-shrink:0}
+
+/* ── Property type pills (D1) ───────────────────────────────────────
+   Multi-select toggle group. Each pill carries its type's PROPERTY_TYPES
+   colour from index.js; active = filled with type colour, inactive =
+   greyed out. Visually different from .seg-btn (a single-select group)
+   to signal "you can pick any combination". */
+.type-pills{display:inline-flex;gap:6px;flex-wrap:wrap}
+.type-pill-btn{
+  background:var(--s2);
+  color:var(--t3);
+  border:1px solid var(--brd2);
+  padding:5px 12px;
+  border-radius:999px;
+  font-size:13px;font-weight:500;
+  cursor:pointer;
+  transition:background .12s, color .12s, border-color .12s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.type-pill-btn:hover{border-color:var(--t3);color:var(--t2)}
+/* Active state colours are set inline by JS from PROPERTY_TYPES so they
+   stay in sync with the same source of truth as the row pills + side
+   panel. Inactive pills stay neutral. */
+.type-pill-btn.active{font-weight:600;border-color:transparent}
+.type-pill-btn.active::before{content:"✓ "}
 .filter-count{font-size:12px;color:var(--t3);margin-left:auto;white-space:nowrap}
 .filter-count strong{color:var(--t2)}
 
