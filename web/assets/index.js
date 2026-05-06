@@ -1240,12 +1240,64 @@ function _ppmCellHTML(r) {
   }
   return fmtPPM(r.price_per_m2);
 }
+// Phase 4f — sync the dynamic <th> elements (Type column from PR #64,
+// Beds + Baths columns from this PR) with current state. Called from
+// render() so changes to TYPES_F flow through immediately. Idempotent:
+// safe to call multiple times.
+function _syncDynamicHeaders() {
+  const headerRow = document.querySelector('#listings-table thead tr');
+  if (!headerRow) return;
+
+  // Type column: insert as the FIRST <th> when SHOW_TYPE_COL true; remove otherwise.
+  const existingType = headerRow.querySelector('.col-type');
+  if (SHOW_TYPE_COL && !existingType) {
+    const th = document.createElement('th');
+    th.className = 'col-type';
+    th.textContent = 'Type';
+    headerRow.insertBefore(th, headerRow.firstElementChild);
+  } else if (!SHOW_TYPE_COL && existingType) {
+    existingType.remove();
+  }
+
+  // Beds + Baths columns: insert RIGHT AFTER the $/m² <th> (col-ppm)
+  // when built-only; remove otherwise. Order matches the per-row cell
+  // rendering below.
+  const ppmTh = headerRow.querySelector('.col-ppm');
+  const existingBeds  = headerRow.querySelector('.col-beds');
+  const existingBaths = headerRow.querySelector('.col-baths');
+  if (SHOW_BUILT_COLS && ppmTh && !existingBeds) {
+    const bedsTh = document.createElement('th');
+    bedsTh.className = 'col-beds';
+    bedsTh.textContent = 'Beds';
+    ppmTh.insertAdjacentElement('afterend', bedsTh);
+    const bathsTh = document.createElement('th');
+    bathsTh.className = 'col-baths';
+    bathsTh.textContent = 'Baths';
+    bedsTh.insertAdjacentElement('afterend', bathsTh);
+  } else if (!SHOW_BUILT_COLS) {
+    if (existingBeds) existingBeds.remove();
+    if (existingBaths) existingBaths.remove();
+  }
+}
+
 function renderTable(rows) {
   const tbody=document.getElementById('table-body');
+  _syncDynamicHeaders();
   // Type column appears only when the dataset has >1 distinct property_type.
-  // The matching <th> is rendered once at init via ensureTypeHeader().
   const typeCell = SHOW_TYPE_COL ? '<td class="td-type">' : '';
   const typeCellEnd = SHOW_TYPE_COL ? '</td>' : '';
+  // Phase 4f — Beds + Baths cells appear when TYPES_F is built-only.
+  // null/undefined render as a muted dash (consistent with photo-empty).
+  const bedsCell = SHOW_BUILT_COLS
+    ? (r) => `<td class="td-beds td-num">${r.bedrooms != null ? r.bedrooms : '<span class="cell-empty">—</span>'}</td>`
+    : () => '';
+  const bathsCell = SHOW_BUILT_COLS
+    ? (r) => {
+        if (r.bathrooms == null) return `<td class="td-baths td-num"><span class="cell-empty">—</span></td>`;
+        const baths = r.bathrooms % 1 === 0 ? r.bathrooms.toFixed(0) : r.bathrooms.toFixed(1);
+        return `<td class="td-baths td-num">${baths}</td>`;
+      }
+    : () => '';
   tbody.innerHTML=rows.map(r=>`
     <tr data-id="${esc(r.source_id)}" class="${r.source_id===OPEN_ID?'selected':''}">
       ${SHOW_TYPE_COL ? `${typeCell}${typePillHTML(r)}${typeCellEnd}` : ''}
@@ -1253,6 +1305,8 @@ function renderTable(rows) {
       <td class="td-num">${fmtUSD(r.price_usd)}</td>
       <td class="td-num">${_areaCellHTML(r)}</td>
       <td class="td-ppm">${_ppmCellHTML(r)}</td>
+      ${bedsCell(r)}
+      ${bathsCell(r)}
       <td class="td-stars">${renderStars(recomputeComposite(r))}</td>
       <td class="td-photos">${photosCellHTML(r)}</td>
       <td class="td-chev">›</td>
@@ -1292,6 +1346,10 @@ function updateCounts(filtered, total) {
 }
 function render() {
   const filtered=filteredRows(), sorted=sortedRows(filtered);
+  // Phase 4f — recompute SHOW_BUILT_COLS each render so toggling type
+  // pills flows through immediately. True only when TYPES_F is built-only
+  // (no land selected) so mixed views keep the universal column shape.
+  SHOW_BUILT_COLS = TYPES_F.size > 0 && !TYPES_F.has('land');
   updateSortHeaders(); updateCounts(filtered.length,ALL_DATA.length);
   buildZoneFilter(ALL_DATA);
   _renderFilterChips();
@@ -1669,6 +1727,12 @@ function wireFiltersHelp() {
 // Single-type datasets (the historical land-only state) keep the original
 // table shape — no visual change until houses/condos actually appear.
 let SHOW_TYPE_COL = false;
+
+// Phase 4f — true when TYPES_F is built-only (house/condo, no land).
+// Dedicated Beds + Baths columns appear; Area / $/m² stay (they swap to
+// Built m² / $/built-m² via the contextual rendering from D2). Recomputed
+// per render() because TYPES_F is user-mutable.
+let SHOW_BUILT_COLS = false;
 
 async function init() {
   readURL();
