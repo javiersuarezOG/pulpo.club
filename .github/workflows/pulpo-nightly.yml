@@ -33,7 +33,7 @@ jobs:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v6.0.2
         with:
           # Use PAT so the bot push can write to main without a PR.
           # PULPO_BOT_TOKEN: fine-grained PAT, Contents: write on this repo.
@@ -41,7 +41,7 @@ jobs:
           # requires a PR on main).
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
-      - uses: actions/setup-python@v5.6.0
+      - uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
           cache: pip

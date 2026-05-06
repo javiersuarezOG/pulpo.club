@@ -14,7 +14,7 @@ jobs:
     if: "!contains(github.event.pull_request.labels.*.name, 'no-test-required')"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -24,7 +24,7 @@ jobs:
           echo "Added files:"
           cat /tmp/added_files.txt
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.10"
 
