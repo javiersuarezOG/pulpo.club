@@ -217,3 +217,91 @@ def test_apply_fallbacks_does_not_set_short_description():
     apply_fallbacks(li)
     assert "short_description_canonical" not in li or \
            li.get("short_description_canonical") is None
+
+
+# ── Type-aware title prefix ─────────────────────────────────────────────
+# Pre-PR fix every listing got "Raw Land · …" because LAND_TYPE_LABELS
+# had no entry for built types and fell through to the default. The
+# goodlife villa shipped as "Raw Land · Costa Del Sol" until this fix.
+# These tests pin the correct behaviour for all three canonical types.
+
+from automation.ai_enrichment_fallback import _type_label  # noqa: E402
+
+
+def test_type_label_house_reads_from_property_types_config():
+    """Reading from PROPERTY_TYPES (single source of truth) means a future
+    rename of the title prefix happens in one place."""
+    assert _type_label("house") == "Beach House"
+
+
+def test_type_label_condo_reads_from_property_types_config():
+    assert _type_label("condo") == "Beach Condo"
+
+
+def test_type_label_land_unchanged():
+    """Land prefix must remain 'Raw Land' — used by 815/865 production listings."""
+    assert _type_label("land") == "Raw Land"
+
+
+def test_type_label_legacy_finca_still_resolves():
+    """Pre-PR-#64 normalize.detect_property_type emitted strings like
+    'finca', 'lot', 'agricultural'. Old fixtures + already-shipped data
+    may still carry these. Backwards compat must hold."""
+    assert _type_label("finca") == "Farm / Agricultural Land"
+    assert _type_label("lot") == "Residential Lot"
+    assert _type_label("agricultural") == "Farm / Agricultural Land"
+
+
+def test_type_label_unknown_falls_back_to_raw_land():
+    assert _type_label("warehouse") == "Raw Land"
+    assert _type_label("") == "Raw Land"
+
+
+def test_fallback_title_house_no_longer_says_raw_land():
+    """The motivating real case: goodlife villa with no lot area, on the
+    Costa del Sol (a coastal zone), beachfront. Pre-fix it shipped as
+    'Raw Land · Costa Del Sol'. Post-fix it MUST start with 'Beach House'."""
+    li = _li(
+        property_type="house",
+        area_m2=None,
+        zone="costa-del-sol",
+        municipality="San Luis Talpa",
+        department="La Paz",
+        is_beachfront=True,
+    )
+    title = fallback_title(li)
+    assert title is not None
+    assert title.startswith("Beach House"), (
+        f"House listing must not be titled as Raw Land: got {title!r}"
+    )
+
+
+def test_fallback_title_condo_uses_beach_condo_prefix():
+    li = _li(property_type="condo", area_m2=None, zone="el-tunco")
+    title = fallback_title(li)
+    assert title is not None
+    assert title.startswith("Beach Condo"), title
+
+
+def test_fallback_title_land_format_unchanged():
+    """Regression guard for the 815 land listings on production today.
+    Format and content for land must be byte-identical to pre-fix output."""
+    li = _li(area_m2=1500, zone="el-tunco", is_beachfront=True)
+    assert fallback_title(li) == "Raw Land · 1,500 m² · El Tunco · Beachfront"
+
+
+def test_fallback_title_house_omits_size_when_no_area():
+    """Houses without lot area still produce a clean title (size segment
+    is just omitted, not rendered as a stray separator)."""
+    title = fallback_title(_li(property_type="house", area_m2=None, zone="el-zonte"))
+    assert title is not None
+    assert " ·  · " not in title, "double-separator from missing size"
+    assert title.startswith("Beach House · El Zonte"), title
+
+
+def test_legacy_alias_still_importable():
+    """LAND_TYPE_LABELS is the historical name; downstream code may import
+    it. Keep the alias pointing at the legacy dict for backwards compat."""
+    from automation.ai_enrichment_fallback import LAND_TYPE_LABELS, _LEGACY_TYPE_LABELS
+    assert LAND_TYPE_LABELS is _LEGACY_TYPE_LABELS
+    assert LAND_TYPE_LABELS["lot"] == "Residential Lot"

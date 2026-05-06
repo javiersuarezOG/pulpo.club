@@ -24,19 +24,52 @@ they're equally usable in production (run.py) and in tests.
 from __future__ import annotations
 from typing import Any
 
+from automation.property_types import PROPERTY_TYPES
+
 
 # PRD §8.1 — Land-type labels for the title.
-LAND_TYPE_LABELS = {
+# Legacy strings only — pre-PR-#64 normalize.detect_property_type emitted
+# these as `property_type` values. Kept for backwards compat with old
+# fixtures + already-shipped data. Canonical types (land/house/condo)
+# read from PROPERTY_TYPES via _type_label() instead so the label stays
+# in sync with property_types.py's title_canonical_template.
+_LEGACY_TYPE_LABELS = {
     "residential":  "Residential Lot",
     "agricultural": "Farm / Agricultural Land",
     "commercial":   "Commercial Land",
     "recreational": "Recreational Land",
     "mixed":        "Mixed-Use Land",
     "raw":          "Raw Land",
-    "land":         "Raw Land",
     "lot":          "Residential Lot",
     "finca":        "Farm / Agricultural Land",
 }
+
+# Backwards-compat alias for any external test/import that still uses the
+# old name. New code should call _type_label() instead.
+LAND_TYPE_LABELS = _LEGACY_TYPE_LABELS
+
+
+def _type_label(pt: str) -> str:
+    """Return the title-prefix label for a property_type.
+
+    Resolution order:
+      1. PROPERTY_TYPES[pt]: derive from title_canonical_template's
+         leading segment ("Beach House · {zone}" → "Beach House"). This
+         keeps the label in lockstep with property_types.py — change one,
+         change both. Covers land/house/condo (the canonical 3 types).
+      2. _LEGACY_TYPE_LABELS: pre-PR-#64 strings that historical data
+         may carry (lot/finca/residential/etc.).
+      3. "Raw Land" default.
+    """
+    cfg = PROPERTY_TYPES.get(pt)
+    if cfg:
+        template = cfg.get("title_canonical_template", "")
+        # Templates are "{prefix} · {placeholder}" — split on the first
+        # " · {" so the prefix survives even if the template gains more
+        # placeholders later.
+        prefix = template.split(" · {", 1)[0]
+        return prefix or "Raw Land"
+    return _LEGACY_TYPE_LABELS.get(pt) or "Raw Land"
 
 
 def _g(li: Any, name: str) -> Any:
@@ -91,10 +124,17 @@ def _zone_name(li: Any) -> str | None:
 
 
 def fallback_title(li: Any) -> str | None:
-    """Build [Land Type] · [Size] · [Zone] · [Top Feature]. Omit empty parts."""
+    """Build [Type Label] · [Size] · [Zone] · [Top Feature]. Omit empty parts.
+
+    Type label is now type-aware — houses produce "Beach House · …",
+    condos produce "Beach Condo · …". Pre-PR-#64 every listing got
+    "Raw Land · …" because LAND_TYPE_LABELS had no entry for built
+    types and fell through to the default; the goodlife villa shipped
+    as "Raw Land · Costa Del Sol" until this fix.
+    """
     parts: list[str] = []
     pt = (_g(li, "property_type") or "land")
-    parts.append(LAND_TYPE_LABELS.get(pt) or "Raw Land")
+    parts.append(_type_label(pt))
 
     size = _format_size(_g(li, "area_m2"))
     if size:
