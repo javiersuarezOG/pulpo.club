@@ -21,9 +21,30 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser  # noqa: F401
+
+# Coastal filter for house/condo. Land is exempt — inland lots stay
+# (parity with bienesraices PR #65 / remax PR #90 / c21 PR #91).
+_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+
+# Bed/bath summary lives in the third mkdf icon-box title, e.g.
+# "1 Bed, 1 Bath" / "3 Bed, 3 Bath". Captures the leading integers
+# only; "1.5 Bath" hasn't been observed but we keep bathrooms as float
+# in case it appears.
+_BED_BATH_RE = re.compile(
+    r"(\d+)\s*Bed[s]?\s*,\s*([\d.]+)\s*Bath", re.IGNORECASE
+)
+
+# Area icon-box. Two observed shapes:
+#   "840 m2; Construction 190 m2"      → house with split lot/built
+#   "105.39 m2 / 1,134 sqft"           → condo with single (interior) area
+# For house we take the first m2 number as lot, second as built; for
+# condo we treat the first m2 number as built (no lot for a unit).
+_AREA_M2_RE  = re.compile(r"([\d,]+\.?\d*)\s*m2", re.IGNORECASE)
+_BUILT_M2_RE = re.compile(r"construction[^0-9]+([\d,]+\.?\d*)\s*m2", re.IGNORECASE)
 
 BASE_URL = "https://goodlifeelsalvador.com/"
 LIST_URL = "https://goodlifeelsalvador.com/land/?page={page}"
@@ -157,6 +178,64 @@ class GoodLifeScraper:
         if confidence == "uncertain":
             rec["validation_status"] = "flagged"
             rec["validation_warnings"] = ["type_uncertain"]
+
+        # Phase C — type-specific fields for house/condo. Land path is
+        # untouched (parity with bienesraices PR #65 / remax PR #90 /
+        # c21 PR #91). The icon-box layout is the same on both house and
+        # condo detail pages; what differs is which numbers populate.
+        if ptype in ("house", "condo"):
+            iconbox_titles = [
+                box.text(strip=True)
+                for box in tree.css(self.DETAIL_AREA_ICONBOX_SEL)
+            ]
+            area_box = iconbox_titles[0] if iconbox_titles else ""
+            bed_bath_box = (
+                iconbox_titles[2]
+                if len(iconbox_titles) >= 3
+                else (iconbox_titles[-1] if iconbox_titles else "")
+            )
+
+            # Built area: explicit "Construction X m2" wins; otherwise for
+            # condos the leading m2 is the unit interior; for houses with
+            # only one m2 number (no construction split) we leave built
+            # absent rather than guess.
+            m_built = _BUILT_M2_RE.search(area_box)
+            if m_built:
+                try:
+                    rec["built_area_m2"] = float(m_built.group(1).replace(",", ""))
+                except ValueError:
+                    pass
+            elif ptype == "condo":
+                m_area = _AREA_M2_RE.search(area_box)
+                if m_area:
+                    try:
+                        rec["built_area_m2"] = float(m_area.group(1).replace(",", ""))
+                    except ValueError:
+                        pass
+                # A condo unit has no lot; clear raw_size_text so normalize
+                # doesn't attribute the unit's interior area to area_m2.
+                rec["raw_size_text"] = ""
+
+            m_bb = _BED_BATH_RE.search(bed_bath_box)
+            if m_bb:
+                try:
+                    rec["bedrooms"] = int(m_bb.group(1))
+                except ValueError:
+                    pass
+                try:
+                    rec["bathrooms"] = float(m_bb.group(2))
+                except ValueError:
+                    pass
+
+            # Coastal filter — drop inland house/condo. Same logic as
+            # remax/c21: zone match OR beachfront keyword in text wins.
+            loc_blob = location.lower().replace(" ", "-")
+            zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+            text_blob = f"{title}\n{description}"
+            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
+            if not zone_is_coastal and not has_beachfront_kw:
+                return None
+
         return rec
 
     def report_total(self, client) -> Optional[int]:
