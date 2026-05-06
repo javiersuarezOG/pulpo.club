@@ -20,6 +20,8 @@ from typing import Optional
 
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._type_classifier import classify_property_type
+from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -62,6 +64,29 @@ LAND_TYPES = {
     "finca", "rancho", "hacienda",
     "propiedad_de_desarrollo",
 }
+HOUSE_TYPES = {"casa", "villa", "residencia", "chalet"}
+CONDO_TYPES = {"apartamento", "departamento", "condominio", "loft"}
+
+# tipoPropiedad → canonical property_type. Audited live 2026-05-06: results
+# spread on the office's listing endpoint includes 8× casa, 8× lote_residencial,
+# 5× finca, 3× local (skip), 2× propiedad_de_desarrollo, 1× restaurante_bar (skip).
+# No apartamento on the current page but condo branch is wired for when one
+# appears.
+def _broker_type_for(tipo: str) -> Optional[str]:
+    if not tipo:
+        return None
+    t = tipo.lower()
+    if t in LAND_TYPES:
+        return "land"
+    if t in HOUSE_TYPES:
+        return "house"
+    if t in CONDO_TYPES:
+        return "condo"
+    return None
+
+
+# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
+_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
 
 
 def _extract_results(html: str) -> list[dict]:
@@ -99,12 +124,12 @@ class Century21Scraper:
         self.REQUEST_DELAY = DEFAULT_REQUEST_DELAY
 
     def report_total(self, client) -> Optional[int]:
-        """Count land-type listings from the embedded OmniMLS JSON."""
+        """Count relevant listings (land + house + condo) from the embedded OmniMLS JSON."""
         try:
             resp = with_retries(lambda: client.get(RESULTS_URL))
             resp.raise_for_status()
             raw = _extract_results(resp.text)
-            return sum(1 for r in raw if r.get("tipoPropiedad") in LAND_TYPES)
+            return sum(1 for r in raw if _broker_type_for(r.get("tipoPropiedad")) is not None)
         except Exception:
             return None
 
@@ -124,9 +149,10 @@ class Century21Scraper:
             raw_results = _extract_results(resp.text)
             out = []
             for rec in raw_results:
-                if rec.get("tipoPropiedad") not in LAND_TYPES:
+                broker_type = _broker_type_for(rec.get("tipoPropiedad"))
+                if broker_type is None:
                     continue
-                mapped = self._map(rec)
+                mapped = self._map(rec, broker_type=broker_type)
                 if not mapped:
                     continue
 
@@ -165,7 +191,7 @@ class Century21Scraper:
         records = self.crawl(limit, offline)
         return {"records": records, "max_pages_hit": False, "limit_hit": len(records) >= limit}
 
-    def _map(self, rec: dict) -> Optional[dict]:
+    def _map(self, rec: dict, broker_type: str = "land") -> Optional[dict]:
         title = rec.get("encabezado") or ""
         if not title:
             return None
@@ -205,7 +231,7 @@ class Century21Scraper:
                     if u.startswith("http"):
                         photo_urls.append(u)
 
-        return {
+        rec_out: dict = {
             "source": self.slug,
             "source_id": str(rec.get("id") or ""),
             "url": url,
@@ -215,13 +241,85 @@ class Century21Scraper:
             "raw_size_text": f"{area_m2} m2" if area_m2 else "",
             "location_text": location_text,
             "description": "",
-            "property_type": "land",
+            "property_type": broker_type,
             "photo_urls": photo_urls,
             "broker_name": broker_name.strip(),
             "broker_phone": broker_phone.strip(),
             "broker_email": broker_email.strip(),
             "scraped_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        # Type-specific fields — house/condo only. OmniMLS exposes these
+        # consistently when present, in m² (the field comments confirm
+        # m2T = total/lot, m2C = construction/built — both in metres²).
+        if broker_type in ("house", "condo"):
+            built = rec.get("m2C")
+            if built and float(built) > 0:
+                rec_out["built_area_m2"] = float(built)
+            if rec.get("recamaras"):
+                try:
+                    rec_out["bedrooms"] = int(rec["recamaras"])
+                except (TypeError, ValueError):
+                    pass
+            full_baths = rec.get("banos") or 0
+            half_baths = rec.get("medioBanos") or 0
+            if full_baths or half_baths:
+                try:
+                    rec_out["bathrooms"] = float(full_baths) + 0.5 * float(half_baths)
+                except (TypeError, ValueError):
+                    pass
+            if rec.get("estacionamientos"):
+                try:
+                    rec_out["parking_spaces"] = int(rec["estacionamientos"])
+                except (TypeError, ValueError):
+                    pass
+            if rec.get("antiguedad"):
+                # antiguedad is years-old, not year-built. Skip — we'd need
+                # current_year - antiguedad which can drift. Lock when the
+                # field has a clearer semantic.
+                pass
+            # Mantenimiento string format observed: " + 210 mantenimiento".
+            # Pull the first integer out.
+            mant = rec.get("mantenimiento") or ""
+            if isinstance(mant, str) and mant.strip():
+                m = re.search(r"\d[\d,]*\.?\d*", mant)
+                if m:
+                    try:
+                        rec_out["hoa_fee_usd_monthly"] = float(m.group(0).replace(",", ""))
+                    except ValueError:
+                        pass
+            if broker_type == "condo" and rec.get("niveles"):
+                try:
+                    rec_out["floor"] = int(rec["niveles"])
+                except (TypeError, ValueError):
+                    pass
+
+        # Coastal filter for house/condo (land is exempt — inland lots stay).
+        if broker_type in ("house", "condo"):
+            loc_blob = location_text.lower().replace(" ", "-")
+            zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+            text_blob = f"{title}\n{rec_out.get('description','')}"
+            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
+            if not zone_is_coastal and not has_beachfront_kw:
+                return None
+
+        # Multi-signal classifier — confirms broker_type, surfaces signals
+        # for the shadow log, FLAGS the listing if classifier disagrees.
+        ptype, signals, confidence, total = classify_property_type({
+            "broker_type_field": rec.get("tipoPropiedad", ""),
+            "url":               url,
+            "photo_urls":        photo_urls,
+            "title":             title,
+            "description":       rec_out.get("description", ""),
+        }, fallback_type=broker_type)
+        rec_out["_type_signals"]    = [s.to_dict() for s in signals]
+        rec_out["_type_confidence"] = confidence
+        rec_out["_type_total"]      = total
+        if ptype != broker_type:
+            rec_out["validation_status"] = "flagged"
+            rec_out.setdefault("validation_warnings", []).append("type_classifier_disagree")
+
+        return rec_out
 
     def parse_index_page(self, html: str) -> list[dict]:
         return []
