@@ -216,9 +216,75 @@ def test_idempotent_repeat_application():
     assert snapshot == again
 
 
-def test_metrics_shape():
-    metrics = compute_and_apply([])
+def test_metrics_shape(tmp_path):
+    metrics = compute_and_apply([], history_path=tmp_path / "h.jsonl")
     for k in ("buckets_computed", "buckets_below_min", "listings_scored",
               "listings_skipped_no_zone", "listings_skipped_inactive",
               "listings_skipped_no_bucket_median"):
         assert k in metrics
+
+
+# ── telemetry sidecar ──────────────────────────────────────────────────
+
+def test_telemetry_writes_one_row_per_eligible_bucket(tmp_path):
+    """Each bucket above MIN_LISTINGS_PER_ZONE gets one row per run."""
+    import json
+    history = tmp_path / "zone_medians_history.jsonl"
+    listings = []
+    for i in range(MIN_LISTINGS_PER_ZONE):
+        listings.append(_li(zone="el-tunco", price_per_m2=100 + i * 10))
+    for i in range(MIN_LISTINGS_PER_ZONE):
+        listings.append(_li(zone="el-cuco", price_per_m2=200 + i * 5))
+    compute_and_apply(listings, history_path=history)
+    rows = [json.loads(line) for line in history.read_text().splitlines() if line.strip()]
+    assert len(rows) == 2
+    zones = {r["zone"] for r in rows}
+    assert zones == {"el-tunco", "el-cuco"}
+
+
+def test_telemetry_includes_n_listings_and_median(tmp_path):
+    import json
+    history = tmp_path / "h.jsonl"
+    listings = [_li(zone="el-tunco", price_per_m2=p)
+                for p in range(100, 100 + MIN_LISTINGS_PER_ZONE * 10, 10)]
+    compute_and_apply(listings, history_path=history)
+    row = json.loads(history.read_text().strip())
+    assert row["zone"] == "el-tunco"
+    assert row["property_type"] == "land"
+    assert row["n_listings"] == MIN_LISTINGS_PER_ZONE
+    assert row["median_ppm_usd"] is not None
+    assert "ts" in row
+
+
+def test_telemetry_skips_below_threshold_buckets(tmp_path):
+    """Buckets below MIN_LISTINGS_PER_ZONE shouldn't appear in history."""
+    import json
+    history = tmp_path / "h.jsonl"
+    listings = [_li(zone="rare-zone", price_per_m2=100) for _ in range(3)]
+    compute_and_apply(listings, history_path=history)
+    if history.exists():
+        rows = [json.loads(line) for line in history.read_text().splitlines() if line.strip()]
+        assert len(rows) == 0   # no eligible bucket = no telemetry rows
+
+
+def test_telemetry_appends_across_runs(tmp_path):
+    """History is append-only across nightly runs."""
+    import json
+    history = tmp_path / "h.jsonl"
+    listings = [_li(zone="el-tunco", price_per_m2=p)
+                for p in range(100, 100 + MIN_LISTINGS_PER_ZONE * 10, 10)]
+    compute_and_apply(listings, history_path=history)
+    compute_and_apply(listings, history_path=history)
+    rows = [json.loads(line) for line in history.read_text().splitlines() if line.strip()]
+    assert len(rows) == 2   # one row per run × 2 runs
+
+
+def test_telemetry_write_failure_is_non_fatal(tmp_path):
+    """Pipeline continues if history can't be written."""
+    bad_path = tmp_path / "is_a_file"
+    bad_path.write_text("blocking")
+    history = bad_path / "h.jsonl"
+    listings = [_li(zone="el-tunco", price_per_m2=p)
+                for p in range(100, 100 + MIN_LISTINGS_PER_ZONE * 10, 10)]
+    metrics = compute_and_apply(listings, history_path=history)
+    assert metrics["listings_scored"] == MIN_LISTINGS_PER_ZONE
