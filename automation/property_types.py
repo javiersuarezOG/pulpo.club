@@ -41,7 +41,7 @@ PROPERTY_TYPES: dict[str, dict] = {
 COASTAL_ZONES: frozenset[str] = frozenset({
     "el-tunco", "el-sunzal", "el-zonte", "san-diego", "mizata",
     "el-cuco", "las-flores", "punta-mango", "el-espino", "conchagua",
-    "jiquilisco", "tamanique", "costa-del-sol",
+    "jiquilisco", "tamanique", "costa-del-sol", "atami",
 })
 
 # Type keyword regex map — used by the multi-signal classifier.
@@ -55,7 +55,7 @@ TYPE_KEYWORDS: dict[str, list[str]] = {
               r"\bresidenc[ai]s?\b", r"\bchalets?\b",
               r"\bbeach[- ]?house\b"],
     "condo": [r"\bapartamentos?\b", r"\bapartments?\b",
-              r"\bcondominios?\b", r"\bcondos?\b",
+              r"\bcondominios?\b", r"\bcondominiums?\b", r"\bcondos?\b",
               r"\bdepartamentos?\b", r"\bdepas?\b", r"\blofts?\b"],
 }
 
