@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-06T11:27:03.594153+00:00",
-  "started_at": "2026-05-06T10:46:13.941498+00:00",
-  "duration_seconds": 2449.65,
-  "total_listings": 865,
-  "dropped": 138,
+  "last_updated": "2026-05-06T12:21:55.320527+00:00",
+  "started_at": "2026-05-06T11:32:47.137757+00:00",
+  "duration_seconds": 2948.18,
+  "total_listings": 873,
+  "dropped": 150,
   "per_source_raw": {
     "goodlife": 80,
     "oceanside": 25,
     "century21": 15,
     "bienesraices": 560,
-    "remax": 314,
+    "remax": 334,
     "nexo": 9
   },
   "source_status": {
@@ -43,7 +43,7 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 314,
+      "pulled": 334,
       "max_pages_hit": false
     },
     "nexo": {
@@ -179,18 +179,18 @@
       }
     },
     "remax": {
-      "n_listings": 308,
+      "n_listings": 316,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.94,
+        "zone": 0.93,
         "municipality": 0.95,
         "department": 0.96,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
         "is_beachfront": 0.08,
-        "has_paved_access": 0.12,
+        "has_paved_access": 0.11,
         "has_water": 0.21,
         "has_power": 0.11,
         "is_repriced": 0.0,
@@ -205,15 +205,15 @@
     }
   },
   "property_type_counts": {
-    "condo": 7,
+    "condo": 8,
     "land": 815,
-    "house": 43
+    "house": 50
   },
   "validation_by_type": {
     "condo": {
-      "pass": 6,
+      "pass": 7,
       "flag": 1,
-      "drop": 1
+      "drop": 2
     },
     "land": {
       "pass": 762,
@@ -221,9 +221,9 @@
       "drop": 25
     },
     "house": {
-      "pass": 43,
-      "flag": 0,
-      "drop": 6
+      "pass": 46,
+      "flag": 4,
+      "drop": 9
     }
   },
   "v_fallback_no_price": 36,
