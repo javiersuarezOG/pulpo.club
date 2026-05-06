@@ -489,7 +489,14 @@ def main() -> int:
     # every run. Listings in buckets below MIN_LISTINGS_PER_ZONE leave
     # both fields as None.
     from automation.zone_medians import compute_and_apply as _zone_medians  # type: ignore
-    zm_metrics = _zone_medians(listings)
+    # Pass history_path explicitly so the helper writes via REPO (which
+    # tests mock to tmp_path) rather than its own `__file__`-derived
+    # default (which always resolves to the real repo and pollutes
+    # web/data/zone_medians_history.jsonl on every local pytest run).
+    zm_metrics = _zone_medians(
+        listings,
+        history_path=REPO / "web" / "data" / "zone_medians_history.jsonl",
+    )
     print(f"[zone_medians] buckets={zm_metrics['buckets_computed']} "
           f"scored={zm_metrics['listings_scored']} "
           f"skipped_no_zone={zm_metrics['listings_skipped_no_zone']} "
@@ -502,7 +509,11 @@ def main() -> int:
     # distance fields stay None until SV reference geometry lands in a
     # follow-up PR.
     from automation.distance_fields import apply_distances as _apply_distances  # type: ignore
-    df_metrics = _apply_distances(listings)
+    # Same REPO-explicit path treatment as zone_medians above.
+    df_metrics = _apply_distances(
+        listings,
+        history_path=REPO / "web" / "data" / "distance_fields_history.jsonl",
+    )
     print(f"[distance_fields] dist_airport_km: "
           f"scored={df_metrics['scored_total']} "
           f"(latlng={df_metrics['scored_from_latlng']}, "

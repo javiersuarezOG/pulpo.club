@@ -141,27 +141,29 @@ def test_unknown_zone_no_latlng_returns_none():
 
 # ── apply_distances — bulk path ───────────────────────────────────────
 
-def test_apply_sets_dist_airport_km():
+def test_apply_sets_dist_airport_km(tmp_path):
     listings = [_li(zone="el-tunco")]
-    apply_distances(listings)
+    # history_path → tmp_path so the test never appends to the real
+    # production sidecar at web/data/distance_fields_history.jsonl.
+    apply_distances(listings, history_path=tmp_path / "h.jsonl")
     assert listings[0]["dist_airport_km"] is not None
     assert 30 <= listings[0]["dist_airport_km"] <= 50
 
 
-def test_apply_does_not_overwrite_when_unscoreable():
+def test_apply_does_not_overwrite_when_unscoreable(tmp_path):
     """Listings with no zone + no latlng leave existing dist_airport_km alone."""
     li = {"zone": None, "lat": None, "lng": None, "dist_airport_km": 99.0}
-    apply_distances([li])
+    apply_distances([li], history_path=tmp_path / "h.jsonl")
     assert li["dist_airport_km"] == 99.0   # unchanged
 
 
-def test_apply_metrics_shape():
+def test_apply_metrics_shape(tmp_path):
     listings = [
         _li(zone="el-tunco"),                              # zone_table
         _li(zone=None, lat=13.5, lng=-89.0),               # haversine
         _li(zone=None, lat=None, lng=None),                # unscoreable
     ]
-    metrics = apply_distances(listings)
+    metrics = apply_distances(listings, history_path=tmp_path / "h.jsonl")
     assert metrics["scored_from_latlng"] == 1
     assert metrics["scored_from_zone"] == 1
     assert metrics["unscored"] == 1
