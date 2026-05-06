@@ -175,6 +175,34 @@ def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
                 pass
 
 
+def _print_per_type_score_distribution(ranked: list) -> None:
+    """Stdout breakdown of rank_score quartiles per property_type.
+
+    Empty {} for land-only datasets — kept silent so the existing log
+    layout is unchanged for the historical state. As soon as a second
+    type appears (houses/condos), surface their distribution alongside
+    land's so a per-type regression is visible without parsing JSON.
+    """
+    from collections import defaultdict
+    by_type: dict[str, list[float]] = defaultdict(list)
+    for li in ranked:
+        s = getattr(li, "rank_score", None)
+        if s is not None:
+            by_type[li.property_type or "land"].append(s)
+    if len(by_type) <= 1:
+        return
+    print("[ranker] score distribution by_type:")
+    for pt in sorted(by_type):
+        scores = sorted(by_type[pt])
+        n = len(scores)
+        if n == 0:
+            continue
+        p10 = scores[max(0, n // 10)]
+        p50 = scores[n // 2]
+        p90 = scores[min(n - 1, (9 * n) // 10)]
+        print(f"  {pt:6s} n={n:>4}  p10={p10:>5.1f}  median={p50:>5.1f}  p90={p90:>5.1f}  top={scores[-1]:>5.1f}")
+
+
 def main() -> int:
     offline = os.environ.get("PULPO_OFFLINE") == "1"
     limit = int(os.environ.get("PULPO_LIMIT", "30"))
@@ -481,6 +509,11 @@ def main() -> int:
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
     # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.
     ranked_pre = rank(listings)  # rank before download so we can prioritise by rank
+    # Per-type score distribution — surfaces "houses scoring 50.4 median,
+    # land scoring 67.2 median" so a regression in either type's metric
+    # is visible without staring at ranked.json. Empty for land-only
+    # datasets; populated as soon as houses/condos are present.
+    _print_per_type_score_distribution(ranked_pre)
     photo_results = _download_hero_photos(ranked_pre, REPO)
     print(f"[photos] attempted={photo_results['attempted']} "
           f"ok={photo_results['ok']} skipped={photo_results['skipped']} "

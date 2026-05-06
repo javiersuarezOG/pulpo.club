@@ -1,6 +1,12 @@
 """Tests for individual ranker legs in isolation."""
 import pytest
 from pulpo.models import Listing
+# Import the leg modules so each registers itself in RANKER_LEGS. Without
+# this, RANKER_LEGS is empty when the file is run in isolation (the full
+# suite previously masked this — some earlier test file pre-imported them).
+import pulpo.ranker_legs.value     # noqa: F401
+import pulpo.ranker_legs.location  # noqa: F401
+import pulpo.ranker_legs.momentum  # noqa: F401
 from pulpo.agents import RANKER_LEGS
 
 
@@ -316,3 +322,137 @@ def test_momentum_orthogonal_to_zone_tier():
         f"zone (Momentum is delta-shaped, independent of tier); got "
         f"tier-A_stale={s_a} vs tier-C_fresh={s_c}"
     )
+
+
+# ── Per-type ranker — built metric ─────────────────────────────────────
+# Phase B: house/condo with built_area_m2 ranks against $/built-m² pool of
+# similar built listings. House/condo without built_area_m2 falls through
+# to the existing $/lot-m² metric. Land never uses the built pool.
+
+def _h(source_id: str, **kw) -> Listing:
+    """A built listing — defaults wired so price_per_built_m2 derives via
+    normalize-style construction. Tests pass it pre-computed for clarity."""
+    defaults = dict(
+        source="bienesraices", url=f"http://x.com/{source_id}",
+        scraped_at="2026-01-01T00:00:00Z",
+        title="Casa", property_type="house", zone="el-tunco",
+        area_m2=300.0, price_usd=400_000.0, price_per_m2=None,
+        built_area_m2=200.0, price_per_built_m2=2_000.0, bedrooms=3,
+    )
+    defaults.update(kw)
+    return Listing(source_id=source_id, **defaults)
+
+
+def test_value_built_metric_used_for_house_with_built_area():
+    """House with built_area_m2 should be scored against the built pool,
+    not the lot pool. The reason string must reflect $/built-m²."""
+    leg = RANKER_LEGS["value"]
+    pool = [_h(f"H{i}", price_per_built_m2=2000.0 + 100 * i) for i in range(5)]
+    cheap = pool[0]   # $2000/built-m² (cheapest)
+    score, reason = leg.score(cheap, pool)
+    assert "$/built-m²" not in reason or "built-m²" in reason  # label lands
+    assert "built-m² = 0th pct" in reason or "built" in reason
+    assert score > 80
+
+
+def test_value_lot_metric_for_land_unchanged():
+    """Land must NOT use the built pool — pure regression guard for the
+    815 land listings on production today."""
+    leg = RANKER_LEGS["value"]
+    pool = [_make_listing(source_id=f"L{i}", price_per_m2=100.0 + 10 * i)
+            for i in range(5)]
+    target = pool[0]
+    score, reason = leg.score(target, pool)
+    assert "/built-m²" not in reason, "land must use lot metric"
+    assert "/m² = " in reason
+
+
+def test_value_house_without_built_area_falls_back_to_lot_pool():
+    """80% of bienesraices houses have no built_area_m2. They must still
+    get a score (against the lot pool) instead of the no-comp default."""
+    leg = RANKER_LEGS["value"]
+    # Pool of houses where most have built area (built pool exists)
+    pool = [_h(f"H{i}", price_per_built_m2=2000.0) for i in range(5)]
+    # Target house with NO built area but lot data present
+    no_built = _h("HX", built_area_m2=None, price_per_built_m2=None,
+                  area_m2=300.0, price_per_m2=1333.0)
+    # Add lot comps so the lot pool has signal
+    pool += [_h(f"HL{i}", built_area_m2=None, price_per_built_m2=None,
+                area_m2=300.0, price_per_m2=1000.0 + 100 * i) for i in range(5)]
+    score, reason = leg.score(no_built, pool)
+    # Built pool empty for HX → fall through to lot metric
+    assert "(no" not in reason, f"expected scored result, got: {reason}"
+
+
+def test_value_villa_with_no_area_returns_default():
+    """Goodlife villa case — no built_area_m2, no area_m2, no price_per_m2.
+    Honest default 35.0 — no metric to score against."""
+    leg = RANKER_LEGS["value"]
+    pool = [_h(f"H{i}", price_per_built_m2=2000.0) for i in range(5)]
+    villa = _h("Villa", area_m2=None, price_per_m2=None,
+               built_area_m2=None, price_per_built_m2=None)
+    score, reason = leg.score(villa, pool)
+    assert score == 35.0
+    assert "no $/m²" in reason
+
+
+def test_built_pool_excludes_land():
+    """Land listings must NOT enter the built pool — even if a malformed
+    record has property_type='land' AND price_per_built_m2 set somehow,
+    pool builder shouldn't accept it. Documented invariant: built pool
+    is house+condo only."""
+    from pulpo.ranker_legs.value import _build_pools
+    pool = [
+        _make_listing(source_id="L1", property_type="land", price_per_m2=100),
+        _h("H1", price_per_built_m2=2000),
+        _h("H2", price_per_built_m2=2200),
+    ]
+    pools = _build_pools(pool)
+    # Land never enters built pool
+    assert pools["built"]["global"].get("land", []) == []
+    # Land always in lot pool
+    assert 100 in pools["lot"]["global"]["land"]
+    # Houses go to both their built pool and (since price_per_m2=None) NOT lot pool
+    assert sorted(pools["built"]["global"]["house"]) == [2000, 2200]
+
+
+def test_value_legacy_pick_pool_shim_still_works():
+    """Pre-Phase-B helper signature kept as a shim — anything importing
+    _pick_pool with 3 positional args (by_zone, by_macro, global_pool)
+    should still resolve a pool for land. Backwards compat lock."""
+    from pulpo.ranker_legs.value import _build_pools_legacy_lot_only, _pick_pool
+    pool = [_make_listing(source_id=f"L{i}", price_per_m2=100.0 + 10 * i)
+            for i in range(5)]
+    by_zone, by_macro, global_pool = _build_pools_legacy_lot_only(pool)
+    target = pool[0]
+    out, label = _pick_pool(target, by_zone, by_macro, global_pool)
+    assert len(out) == 5
+    assert "land" in label
+
+
+def test_per_type_score_distribution_helper():
+    """Stdout helper must remain silent for land-only datasets (the
+    historical state) and emit when a second type appears."""
+    from io import StringIO
+    from contextlib import redirect_stdout
+    from automation.run import _print_per_type_score_distribution
+
+    land_only = [_make_listing(source_id=f"L{i}") for i in range(3)]
+    for li in land_only:
+        li.rank_score = 50.0
+    buf = StringIO()
+    with redirect_stdout(buf):
+        _print_per_type_score_distribution(land_only)
+    assert "by_type" not in buf.getvalue(), "land-only dataset must stay silent"
+
+    # Add one house — now it must emit
+    h = _h("H1")
+    h.rank_score = 75.0
+    for li in land_only:
+        li.rank_score = 50.0
+    buf = StringIO()
+    with redirect_stdout(buf):
+        _print_per_type_score_distribution(land_only + [h])
+    out = buf.getvalue()
+    assert "by_type" in out
+    assert "house" in out and "land" in out
