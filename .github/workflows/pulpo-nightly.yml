@@ -211,6 +211,8 @@ jobs:
           git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
+          git add web/data/zone_medians_history.jsonl 2>/dev/null || true
+          git add web/data/distance_fields_history.jsonl 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
