@@ -116,6 +116,12 @@ class Listing:
     readiness_score: Optional[int] = None       # 0..3, has_water + has_power + has_paved_access
     source_label: list[str] = field(default_factory=list)  # display chips: Beachfront/Price Drop/etc.
 
+    # PRD §FR-7.5 zone medians (Phase 3) — computed each run from the full
+    # catalog. None when the (zone, property_type) bucket has fewer than
+    # 10 active comparable peers.
+    price_vs_zone_median: Optional[float] = None  # USD/m² median of bucket peers
+    price_vs_zone_pct: Optional[float] = None     # signed % vs. bucket median (negative=cheaper)
+
     def to_dict(self) -> dict:
         return asdict(self)
 
