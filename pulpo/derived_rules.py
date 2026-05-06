@@ -106,21 +106,46 @@ def compute_readiness_score(li: Any) -> Optional[int]:
 def compute_investment_signal(li: Any) -> Optional[str]:
     """Priority-ordered: deal > hot > stale > new > None.
 
-    PRD §FR-7.2 has full rule:
-      deal: is_repriced AND price_vs_zone_pct ≤ -10
-      hot:  days_listed ≤ 7 AND saves/views in top 20%
+    PRD §FR-7.2 full rule (active after #86 zone medians shipped):
+      deal:  is_repriced AND price_vs_zone_pct ≤ -10
+      hot:   days_listed ≤ 7 AND saves/views in top 20%   (skipped — no signal)
       stale: days_listed ≥ 90
-      new:  days_listed ≤ 7 (fallback)
+      new:   days_listed ≤ 7 (fallback)
 
-    Phase 1 minimum we can compute today (no price_vs_zone_pct, no
-    saves/views): just stale/new from days_listed, plus a degraded-deal
-    that fires on is_repriced alone.
+    Behavior change from the previously-degraded rule:
+
+      | is_repriced | pct ≤ -10 | pct is None | OLD result | NEW result   |
+      |-------------|-----------|-------------|------------|--------------|
+      | True        | True      | False       | deal       | deal         |
+      | True        | False     | False       | deal ⚠     | stale/new/None |
+      | True        | n/a       | True        | deal       | deal (fallback) |
+      | False       | n/a       | n/a         | per below  | per below     |
+
+    Why the None fallback: ~32% of catalog sits in zone buckets below
+    the MIN_LISTINGS_PER_ZONE (10) threshold so price_vs_zone_pct is
+    None. Without the fallback, a heavily-repriced listing in a
+    low-volume zone loses its "deal" tag despite an obvious motivated-
+    seller signal. Strict path stays primary for well-bucketed listings.
+
+    Note: `Price Drop` source_label chip (PRD §FR-7.3) fires
+    independently on is_repriced=True, so the "is_repriced but
+    price_vs_zone_pct above -10" state still surfaces visually via that
+    chip — investment_signal just becomes more conservative about
+    what it labels a "deal."
     """
     is_repriced = _g(li, "is_repriced")
     days_listed = _g(li, "days_listed")
+    price_vs_zone_pct = _g(li, "price_vs_zone_pct")
 
     if is_repriced is True:
-        return "deal"   # degraded — full rule needs price_vs_zone_pct (Phase 3)
+        if price_vs_zone_pct is None:
+            return "deal"   # fallback for low-volume zones
+        if isinstance(price_vs_zone_pct, (int, float)) and price_vs_zone_pct <= -10:
+            return "deal"
+        # else fall through — repriced but not deeply enough below median.
+
+    # hot: skipped — no saves/views signal yet.
+
     if isinstance(days_listed, int):
         if days_listed >= 90:
             return "stale"
