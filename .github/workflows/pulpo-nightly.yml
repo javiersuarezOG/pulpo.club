@@ -25,10 +25,14 @@ env:
 jobs:
   run:
     runs-on: ubuntu-latest
-    # Hard ceiling. A healthy run finishes in ~30 min; past 60 min something
-    # is hung (typically photo download or detail-page fetch). Better to fail
-    # the job and have watchdog page than burn Actions minutes silently.
-    timeout-minutes: 60
+    # Hard ceiling. A healthy run finishes in ~30 min; the LLM enrichment
+    # leg can stretch to ~50 min on cold-cache nightlies (~900 listings ×
+    # ~3.5s/call serial DeepSeek). Bumped to 120 to survive cold-cache
+    # nightlies until enrichment is parallelised. Past 120 min something
+    # is genuinely hung (typically photo download or detail-page fetch);
+    # better to fail the job and have watchdog page than burn Actions
+    # minutes silently.
+    timeout-minutes: 120
     permissions:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
