@@ -5,6 +5,11 @@ on:
     branches: ["**"]
   pull_request:
     branches: ["**"]
+  # Manual dispatch — used by pulpo-nightly.yml to force-trigger CI on
+  # data-only nightly PRs whose pushes were authored by GITHUB_TOKEN
+  # (Actions doesn't trigger downstream workflows from such pushes,
+  # leaving the required `pytest` check stuck on "Expected — Waiting").
+  workflow_dispatch: {}
 
 jobs:
   ci:
