@@ -1,10 +1,16 @@
 """
-PRD §FR-7.5 — zone median price batch.
+PRD §FR-7.5 — zone median price batch + per-run telemetry.
 
 Computes the median price_per_m2 per (zone_name, property_type) bucket
 across all active listings, then writes price_vs_zone_median and
 price_vs_zone_pct on every listing whose bucket has ≥ MIN_LISTINGS_PER_ZONE
 comparable peers.
+
+Telemetry: appends one row per (zone, property_type, ts) to
+web/data/zone_medians_history.jsonl per nightly. Lets us spot
+week-over-week shifts in zone medians (zone heating up, supply collapse,
+etc.) without parsing ranked.json. Same append-only pattern as
+source_health_history.jsonl.
 
 This is the dependency that unlocks:
   - PRD §FR-7.2 investment_signal=deal     (is_repriced AND price_vs_zone_pct ≤ -10)
@@ -33,7 +39,10 @@ Idempotent: pure function of (current listings) → fields. No sidecar.
 The medians are recomputed every run from the current catalog state.
 """
 from __future__ import annotations
+import json
 import statistics
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 # PRD §FR-7.5 — at least 10 active listings per zone to compute a median.
@@ -144,12 +153,53 @@ def apply_zone_metrics(listings: list[Any],
     return metrics
 
 
-def compute_and_apply(listings: list[Any]) -> dict:
+def _write_history(medians: dict[tuple[str, str], float],
+                   bucket_sizes: dict[tuple[str, str], int],
+                   history_path: Path) -> None:
+    """Append one row per eligible (zone, type) bucket to the history JSONL."""
+    ts = datetime.now(timezone.utc).isoformat()
+    try:
+        history_path.parent.mkdir(parents=True, exist_ok=True)
+        with history_path.open("a", encoding="utf-8") as f:
+            for (zone, ptype), median in medians.items():
+                f.write(json.dumps({
+                    "ts":              ts,
+                    "zone":            zone,
+                    "property_type":   ptype,
+                    "n_listings":      bucket_sizes.get((zone, ptype), 0),
+                    "median_ppm_usd":  median,
+                }, ensure_ascii=False) + "\n")
+    except OSError:
+        # Telemetry write failure should not break the pipeline.
+        pass
+
+
+def compute_and_apply(listings: list[Any], history_path: Path | None = None) -> dict:
     """Top-level entry point — compute medians from `listings` and apply
     them in-place. Returns metrics dict.
 
     Common case: called once per nightly run after enrichment / derived
     rules / etc. — listings is the validated set, not raw scraper output.
+
+    Side effect: appends one row per eligible bucket to history_path
+    (default web/data/zone_medians_history.jsonl) for trend tracking.
     """
     medians = compute_zone_medians(listings)
-    return apply_zone_metrics(listings, medians)
+    metrics = apply_zone_metrics(listings, medians)
+
+    # Compute per-bucket sizes for telemetry (separately from medians,
+    # which already filtered to only eligible buckets).
+    bucket_sizes: dict[tuple[str, str], int] = {}
+    for li in listings:
+        if not _is_active(li):
+            continue
+        key = _bucket_key(li)
+        if key is None:
+            continue
+        bucket_sizes[key] = bucket_sizes.get(key, 0) + 1
+
+    if history_path is None:
+        history_path = (Path(__file__).resolve().parents[1]
+                        / "web" / "data" / "zone_medians_history.jsonl")
+    _write_history(medians, bucket_sizes, history_path)
+    return metrics
