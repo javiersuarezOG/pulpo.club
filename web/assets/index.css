@@ -161,6 +161,13 @@ body.has-type-col th.col-photos{width:11%}
 .type-pill{display:inline-block;padding:2px 8px;border-radius:var(--r-sm);
   font-size:11px;font-weight:600;line-height:1.5;letter-spacing:.1px;
   white-space:nowrap}
+
+/* Phase 4f — Beds/Baths columns appear when TYPES_F is built-only.
+   Same right-aligned tabular-nums treatment as Price/Area cells.
+   Width tight (8% each) so the existing columns don't compress much. */
+th.col-beds, th.col-baths{width:8%;text-align:right}
+.td-beds, .td-baths{font-variant-numeric:tabular-nums;font-size:13px;color:var(--text)}
+.cell-empty{color:var(--t4);opacity:.5}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s}
 tbody tr:hover{background:var(--s1)}
 tbody tr.selected{background:var(--accent-bg)}

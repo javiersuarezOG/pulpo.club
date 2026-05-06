@@ -2014,3 +2014,118 @@ def test_narrowing_toast_css_present():
     assert "position:absolute" in block.replace(" ", ""), (
         "Toast uses position:absolute (house style — no position:fixed)"
     )
+
+
+# ── 4f: dedicated Beds + Baths columns when built-only selected ────────
+# When TYPES_F excludes land entirely, two new columns (Beds, Baths)
+# appear in the table, dynamically injected. When land is in the
+# selection, table keeps its current 7-column shape (or 8 if Type col).
+# Built m² + HOA columns intentionally NOT added — sparse data
+# (built_area_m2 22% for houses, HOA 0% for condos) would show mostly
+# dashes. Side panel covers them via Phase 4g (PR #103).
+
+def test_show_built_cols_state_recomputed_each_render():
+    js = (REPO / "web/assets/index.js").read_text()
+    # State variable declared
+    assert "let SHOW_BUILT_COLS = false" in js, (
+        "SHOW_BUILT_COLS state variable missing"
+    )
+    # render() recomputes it each call
+    block = js.split("function render(")[1].split("function ")[0]
+    assert "SHOW_BUILT_COLS = TYPES_F.size > 0 && !TYPES_F.has('land')" in block, (
+        "render() doesn't recompute SHOW_BUILT_COLS — toggling pills won't "
+        "flow through to column visibility"
+    )
+
+
+def test_dynamic_headers_synced_per_render():
+    """The Beds/Baths headers are injected/removed based on SHOW_BUILT_COLS.
+    A static <th> in HTML would persist through state changes. Helper
+    must run per-render to keep headers in sync with state."""
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "function _syncDynamicHeaders" in js, (
+        "_syncDynamicHeaders helper missing"
+    )
+    rt_block = js.split("function renderTable")[1].split("function ")[0]
+    assert "_syncDynamicHeaders()" in rt_block, (
+        "renderTable doesn't call _syncDynamicHeaders — headers won't "
+        "appear/disappear when SHOW_BUILT_COLS toggles"
+    )
+
+
+def test_beds_baths_headers_inserted_after_ppm():
+    """Beds + Baths columns sit RIGHT AFTER $/m² so the visual flow is
+    Price → Area → $/m² → Beds → Baths → Score → Photos. Inserting
+    elsewhere (e.g. before Score) would break the per-row mental model."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _syncDynamicHeaders")[1].split("function ")[0]
+    assert "headerRow.querySelector('.col-ppm')" in block, (
+        "_syncDynamicHeaders doesn't anchor on .col-ppm — insertion order "
+        "would drift if column structure changes"
+    )
+    assert "ppmTh.insertAdjacentElement('afterend', bedsTh)" in block, (
+        "Beds <th> not inserted directly after the $/m² header"
+    )
+
+
+def test_beds_baths_headers_removed_when_built_cols_off():
+    """Toggling Land back on must REMOVE the dynamic headers. Otherwise
+    columns persist as ghost headers with no matching <td> cells."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _syncDynamicHeaders")[1].split("function ")[0]
+    assert "if (existingBeds) existingBeds.remove()" in block, (
+        "_syncDynamicHeaders doesn't remove Beds header when SHOW_BUILT_COLS=false"
+    )
+    assert "if (existingBaths) existingBaths.remove()" in block, (
+        "_syncDynamicHeaders doesn't remove Baths header when SHOW_BUILT_COLS=false"
+    )
+
+
+def test_render_table_threads_beds_baths_cells():
+    """Per-row cells must match the dynamic headers — when SHOW_BUILT_COLS
+    is false, NO td-beds/td-baths cells should render (would create
+    column-misalignment)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function renderTable")[1].split("function ")[0]
+    assert "SHOW_BUILT_COLS" in block
+    assert "bedsCell" in block and "bathsCell" in block
+    assert "td-beds" in block and "td-baths" in block
+
+
+def test_beds_baths_cell_renders_dash_for_null():
+    """Sparse data (e.g. bedrooms=null on bienesraices houses) renders
+    a muted dash, not 'undefined' or 'null'."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function renderTable")[1].split("function ")[0]
+    assert "cell-empty" in block, (
+        "Cell-empty class not used for null beds/baths — would render 'undefined'"
+    )
+
+
+def test_bathrooms_renders_half_baths_cleanly():
+    """2.5 stays '2.5'; whole numbers drop the .0 (2.0 → '2'). Otherwise
+    every house with no half-bath shows '2.0' which looks wrong."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function renderTable")[1].split("function ")[0]
+    assert "% 1 === 0" in block, (
+        "Bathrooms cell doesn't strip .0 from whole numbers — "
+        "houses without half-baths show '2.0' instead of '2'"
+    )
+
+
+def test_beds_baths_columns_built_only_not_mixed():
+    """Spec — these columns appear only when TYPES_F is BUILT-ONLY (no
+    land). Mixed views (land + house) keep the universal column shape
+    so Land rows don't render meaningless dashes."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function render(")[1].split("function ")[0]
+    assert "!TYPES_F.has('land')" in block, (
+        "SHOW_BUILT_COLS doesn't gate on Land absence — mixed views "
+        "would show beds/baths columns full of dashes for land rows"
+    )
+
+
+def test_beds_baths_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    for sel in ('.col-beds', '.col-baths', '.td-beds', '.td-baths', '.cell-empty'):
+        assert sel in css, f"4f CSS selector {sel} missing"
