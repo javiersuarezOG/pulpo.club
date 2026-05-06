@@ -24,6 +24,7 @@ class Listing:
     location_text: str = ""           # raw human-readable location string
     lat: Optional[float] = None
     lng: Optional[float] = None
+    geocoding_confidence: Optional[str] = None  # 'high'|'low' (Mapbox) or 'medium' (HTML-extracted) per FR-5.4
 
     # Size — canonical is m²
     area_m2: Optional[float] = None
@@ -88,6 +89,18 @@ class Listing:
     title_canonical: Optional[str] = None
     short_description_canonical: Optional[str] = None
     reasons_to_buy: list[str] = field(default_factory=list)
+
+    # PRD WS2 — single-call DeepSeek enrichment metadata (latlong block).
+    # `lat`/`lng`/`geocoding_confidence` above are reused; these two carry
+    # the LLM-only fields from the latlong response: 'extracted'|'estimated'
+    # and the free-text geographic reference the model anchored on.
+    geocoding_source: Optional[str] = None
+    geocoding_reference: Optional[str] = None
+
+    # Bookkeeping written by the enrichment pass on success — used to gate
+    # re-runs on model change and to telemeter coverage over time.
+    enriched_at: Optional[str] = None      # ISO8601 UTC, set when enrichment succeeds
+    enrichment_model: Optional[str] = None # e.g. "deepseek-chat"
 
     rank: Optional[int] = None               # 1-based position rank, 1 = best
     rank_score: Optional[float] = None       # composite 0..100
