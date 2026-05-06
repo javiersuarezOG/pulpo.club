@@ -37,6 +37,7 @@ Public API:
     # rehydrated from the sidecar.
 """
 from __future__ import annotations
+import concurrent.futures
 import json
 import os
 import sys
@@ -44,6 +45,12 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# Bounded-concurrency default for the LLM enrichment fan-out. DeepSeek's
+# documented chat-completions rate is comfortable above 8 concurrent
+# in-flight requests; staying conservative leaves headroom for retries
+# and keeps logs ordered enough to debug. Override via PULPO_LLM_CONCURRENCY.
+DEFAULT_LLM_CONCURRENCY = 8
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
@@ -320,7 +327,9 @@ def enrich_listings(listings: list[Any],
                     *,
                     schema: EnrichmentSchema = DEFAULT_SCHEMA,
                     max_listings: int | None = None,
-                    client: Any | None = None) -> dict:
+                    client: Any | None = None,
+                    max_workers: int | None = None,
+                    deadline: float | None = None) -> dict:
     """Run single-call DeepSeek enrichment over a list of listings.
 
     Args:
@@ -337,6 +346,19 @@ def enrich_listings(listings: list[Any],
         max_listings: Cap total API calls (cost control, dry runs).
         client:       Optional pre-built client (test injection). When
                       None, builds one from the schema's env var.
+        max_workers:  Bounded concurrency for the API fan-out. None →
+                      reads PULPO_LLM_CONCURRENCY env var (default
+                      DEFAULT_LLM_CONCURRENCY=8). Pass 1 to force the
+                      sequential code path (handy for tests asserting
+                      ordering or for debugging a single-threaded run).
+        deadline:     Optional `time.monotonic()` deadline. Once it's
+                      reached, no NEW API calls start; in-flight ones
+                      are awaited to completion. Listings not yet
+                      submitted are simply not enriched this run and
+                      will be picked up next nightly. The point is
+                      that the pipeline always SHIPS — better to commit
+                      partially-enriched data than to time out the
+                      whole nightly job and lose all of today's scrape.
 
     Returns:
       Metrics dict with these keys:
@@ -345,6 +367,7 @@ def enrich_listings(listings: list[Any],
         enriched:           int   # NEW enrichments via API call
         skipped:            int   # ineligible (one of 4 fields already set)
         failed:             int   # API/parse/schema failure
+        deadline_skipped:   int   # eligible but deadline cut us off
         skipped_no_token:   bool  # DEEPSEEK_API_TOKEN missing
         skipped_no_package: bool  # openai package not installed
         global_error_seen:  str|None
@@ -353,12 +376,19 @@ def enrich_listings(listings: list[Any],
         failure_reasons:    dict[str, int]    # counter per failure reason
         latency_ms:         list[int]         # per-call latencies (for p50/p95)
     """
+    if max_workers is None:
+        max_workers = max(
+            1, int(os.environ.get("PULPO_LLM_CONCURRENCY",
+                                  str(DEFAULT_LLM_CONCURRENCY)))
+        )
+
     metrics: dict[str, Any] = {
         "eligible":           0,
         "cache_hits":         0,
         "enriched":           0,
         "skipped":            0,
         "failed":             0,
+        "deadline_skipped":   0,
         "skipped_no_token":   False,
         "skipped_no_package": False,
         "global_error_seen":  None,
@@ -385,12 +415,13 @@ def enrich_listings(listings: list[Any],
             metrics[f"skipped_{err}"] = True   # skipped_no_token | skipped_no_package
             api_path_alive = False
 
-    n_api_calls = 0
-
+    # ── Phase 1 (sequential): classify each listing into one of
+    # {cache_hit, ineligible, api_unavailable, max_reached, to_enrich}.
+    # Apply non-API decisions immediately. Build a work list for Phase 2.
+    work: list[tuple[Any, str]] = []   # (listing, key) for API calls
     for li in listings:
         key = _key(li)
 
-        # ── 1. Sidecar hit → idempotent rehydration, no API call ──
         if key in sidecar:
             metrics["cache_hits"] += 1
             _hydrate_from_sidecar(li, sidecar[key], schema)
@@ -403,7 +434,6 @@ def enrich_listings(listings: list[Any],
                 })
             continue
 
-        # ── 2. Eligibility check (the hard rule) ──
         eligible, skip_reason = is_eligible(li, schema)
         if not eligible:
             metrics["skipped"] += 1
@@ -421,12 +451,7 @@ def enrich_listings(listings: list[Any],
 
         metrics["eligible"] += 1
 
-        # ── 3. API path closed (no token / no package / global error) ──
         if not api_path_alive:
-            # We don't count this as "failed" — it's the API path being
-            # unavailable, which is reported via skipped_no_* flags
-            # and the run-level summary. Listing keeps no enrichment;
-            # the fallback templates module can fill some fields later.
             if log_path is not None:
                 _append_log(log_path, {
                     "ts":       _now_iso(),
@@ -436,8 +461,7 @@ def enrich_listings(listings: list[Any],
                 })
             continue
 
-        # ── 4. API call cap (cost control) ──
-        if max_listings is not None and n_api_calls >= max_listings:
+        if max_listings is not None and len(work) >= max_listings:
             if log_path is not None:
                 _append_log(log_path, {
                     "ts":       _now_iso(),
@@ -447,30 +471,18 @@ def enrich_listings(listings: list[Any],
                 })
             continue
 
-        # ── 5. Make the call ──
-        n_api_calls += 1
-        try:
-            decision, entry, event = _enrich_one(api_client, li, schema)
-        except Exception as e:
-            decision = "failed"
-            entry    = None
-            event    = {
-                "ts":       _now_iso(),
-                "key":      key,
-                "decision": "failed",
-                "reason":   f"http_error:{type(e).__name__}",
-                "model":    schema.model,
-            }
-            if _is_global_error(e):
-                metrics["global_error_seen"] = type(e).__name__
-                api_path_alive = False
-                print(f"[llm_enrich] global error detected ({type(e).__name__}) "
-                      f"— disabling API path for remaining listings")
+        work.append((li, key))
 
-        # ── 6. Record outcome ──
+    # ── Phase 2 (parallel or sequential): fire the API calls.
+    # Sequential when max_workers <= 1 (preserves the legacy code path
+    # for tests asserting strict call ordering); parallel otherwise.
+
+    def _record(li: Any, key: str, decision: str,
+                entry: dict | None, event: dict) -> None:
+        """Apply outcome to metrics + sidecar + log. Single-threaded
+        callsite — runs from the main loop only."""
         if log_path is not None:
             _append_log(log_path, event)
-
         if decision == "enriched" and entry is not None:
             metrics["enriched"] += 1
             metrics["cost_usd"] += float(event.get("cost_usd") or 0.0)
@@ -489,6 +501,99 @@ def enrich_listings(listings: list[Any],
             metrics["failure_reasons"][reason] = (
                 metrics["failure_reasons"].get(reason, 0) + 1)
             print(f"[llm_enrich] key={key} decision=failed reason={reason}")
+
+    def _safe_call(li: Any, key: str) -> tuple[str, dict | None, dict]:
+        """_enrich_one wrapped in the same try/except the legacy loop
+        used so HTTP / network errors become a structured 'failed' event
+        rather than a crashing exception."""
+        try:
+            return _enrich_one(api_client, li, schema)
+        except Exception as e:
+            event = {
+                "ts":       _now_iso(),
+                "key":      key,
+                "decision": "failed",
+                "reason":   f"http_error:{type(e).__name__}",
+                "model":    schema.model,
+            }
+            if _is_global_error(e):
+                event["_global_error"] = type(e).__name__
+            return ("failed", None, event)
+
+    if max_workers <= 1:
+        # ── Sequential path: identical ordering to the legacy loop.
+        for li, key in work:
+            if not api_path_alive:
+                break
+            if deadline is not None and time.monotonic() >= deadline:
+                metrics["deadline_skipped"] += 1
+                continue
+            decision, entry, event = _safe_call(li, key)
+            global_err = event.pop("_global_error", None)
+            if global_err:
+                metrics["global_error_seen"] = global_err
+                api_path_alive = False
+                print(f"[llm_enrich] global error detected ({global_err}) "
+                      f"— disabling API path for remaining listings")
+            _record(li, key, decision, entry, event)
+    else:
+        # ── Parallel path: bounded ThreadPool fan-out, deadline-aware.
+        # We submit lazily so the deadline cuts in BEFORE the next batch
+        # of work is dispatched, not just before result collection. That
+        # lets the pipeline ship with a fraction enriched rather than
+        # paying for hundreds of in-flight calls we'll never use.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+            inflight: dict = {}
+            iterator = iter(work)
+            stopped = False
+
+            def _submit_next() -> bool:
+                """Pull one work item and submit it. Return False if
+                the iterator's exhausted, the deadline's been hit, or
+                the API path's gone dead."""
+                nonlocal stopped
+                if stopped or not api_path_alive:
+                    return False
+                if deadline is not None and time.monotonic() >= deadline:
+                    stopped = True
+                    return False
+                try:
+                    li, key = next(iterator)
+                except StopIteration:
+                    return False
+                fut = ex.submit(_safe_call, li, key)
+                inflight[fut] = (li, key)
+                return True
+
+            # Prime the pool
+            for _ in range(max_workers):
+                if not _submit_next():
+                    break
+
+            while inflight:
+                done, _ = concurrent.futures.wait(
+                    inflight.keys(),
+                    return_when=concurrent.futures.FIRST_COMPLETED,
+                )
+                for fut in done:
+                    li, key = inflight.pop(fut)
+                    decision, entry, event = fut.result()
+                    global_err = event.pop("_global_error", None)
+                    if global_err:
+                        metrics["global_error_seen"] = global_err
+                        api_path_alive = False
+                        stopped = True
+                        print(f"[llm_enrich] global error detected ({global_err}) "
+                              f"— disabling API path for remaining listings")
+                    _record(li, key, decision, entry, event)
+                    # Top up the pool
+                    _submit_next()
+
+            # Anything left in the iterator after we stopped early is
+            # counted as deadline-skipped so the metric reflects how
+            # many listings we deferred to the next nightly.
+            for _ in iterator:
+                metrics["deadline_skipped"] += 1
 
     metrics["cost_usd"] = round(metrics["cost_usd"], 6)
     _save_sidecar(sidecar_path, sidecar)

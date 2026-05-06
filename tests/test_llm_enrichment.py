@@ -402,7 +402,14 @@ def test_skipped_no_token_when_DEEPSEEK_API_TOKEN_unset(tmp_path):
 
 
 def test_global_error_short_circuits_remaining_calls(tmp_path):
-    """Auth failure on first call → remaining listings get skipped, not retried."""
+    """Auth failure on first call → remaining listings get skipped, not retried.
+
+    Tested with `max_workers=1` because the strict 'no further calls' guarantee
+    only holds for the sequential code path. The parallel path makes the
+    weaker (still useful) guarantee that no NEW submissions happen after the
+    global error is detected, but in-flight ones from the priming batch
+    complete — see `test_global_error_in_parallel_stops_new_submissions`.
+    """
     listings = [_li(source_id=f"GL-{i}") for i in range(3)]
 
     class AuthenticationError(Exception):
@@ -415,7 +422,7 @@ def test_global_error_short_circuits_remaining_calls(tmp_path):
     ])
     metrics = enrich_listings(listings, tmp_path / "side.json",
                               tmp_path / "log.jsonl",
-                              client=client)
+                              client=client, max_workers=1)
     # Only the first listing actually called the API
     assert len(client.chat.completions.calls) == 1
     assert metrics["failed"] == 1
@@ -433,6 +440,118 @@ def test_max_listings_caps_api_calls(tmp_path):
                               client=client, max_listings=2)
     assert len(client.chat.completions.calls) == 2
     assert metrics["enriched"] == 2
+
+
+# ── parallelisation + deadline soft-fail (PRD WS2 nightly stability) ──
+
+
+def test_max_workers_one_preserves_sequential_path(tmp_path):
+    """max_workers=1 → strictly sequential; same call ordering as the legacy
+    pre-parallel implementation."""
+    listings = [_li(source_id=f"GL-{i}") for i in range(4)]
+    client = _StubClient(responses=[_OK_JSON] * 4)
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=1)
+    assert metrics["enriched"] == 4
+    # Sequential ordering: call 0 carries GL-0's prompt, call 3 carries GL-3's
+    bodies = [c["messages"][1]["content"] for c in client.chat.completions.calls]
+    assert all("Lote de 5,000 m²" in b for b in bodies)
+
+
+def test_parallel_pool_processes_all_eligible_listings(tmp_path):
+    """max_workers=4 → all 8 listings still get enriched, sidecar grows by 8."""
+    listings = [_li(source_id=f"GL-{i}") for i in range(8)]
+    client = _StubClient(responses=[_OK_JSON] * 8)
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=4)
+    assert metrics["enriched"] == 8
+    assert len(client.chat.completions.calls) == 8
+    sidecar = json.loads((tmp_path / "side.json").read_text())
+    assert len(sidecar) == 8
+    assert all(li.get("title_canonical") for li in listings)
+
+
+def test_global_error_in_parallel_stops_new_submissions(tmp_path):
+    """Parallel-path semantics: in-flight calls from the priming batch may
+    complete after the global error is detected, but NO new ones get
+    submitted. With 8 listings and pool=2, exactly 2 land in-flight; the
+    remaining 6 are deferred. Counts the legacy strict-ordering test
+    (max_workers=1) as the sequential complement."""
+    listings = [_li(source_id=f"GL-{i}") for i in range(8)]
+
+    class AuthenticationError(Exception):
+        pass
+
+    # First two responses: one auth error, one success. Anything beyond
+    # that is the test bug — no further calls should ever happen.
+    client = _StubClient(responses=[
+        AuthenticationError,
+        _OK_JSON,
+        # Padding to detect over-submission. If the test ever triggers
+        # any of these, the global short-circuit broke.
+    ] + [_OK_JSON] * 20)
+
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=2)
+    # Pool primed with 2 calls → both land. After the auth-error result
+    # is processed, no new submissions go out.
+    assert len(client.chat.completions.calls) == 2
+    assert metrics["global_error_seen"] == "AuthenticationError"
+
+
+def test_deadline_passed_in_advance_skips_all_eligible(tmp_path):
+    """deadline already in the past → the parallel loop submits nothing,
+    every eligible listing is counted as deadline_skipped."""
+    import time
+    listings = [_li(source_id=f"GL-{i}") for i in range(5)]
+    client = _StubClient(responses=[_OK_JSON] * 5)
+    past = time.monotonic() - 1.0   # already expired
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=4, deadline=past)
+    assert len(client.chat.completions.calls) == 0
+    assert metrics["enriched"] == 0
+    assert metrics["deadline_skipped"] == 5
+    assert metrics["eligible"] == 5   # they passed eligibility, just got cut off
+
+
+def test_deadline_in_sequential_path_skips_remaining(tmp_path):
+    """Same deadline contract on the max_workers=1 path."""
+    import time
+    listings = [_li(source_id=f"GL-{i}") for i in range(3)]
+    client = _StubClient(responses=[_OK_JSON] * 3)
+    past = time.monotonic() - 1.0
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=1, deadline=past)
+    assert len(client.chat.completions.calls) == 0
+    assert metrics["deadline_skipped"] == 3
+
+
+def test_concurrency_default_from_env_var(tmp_path, monkeypatch):
+    """When max_workers is None (caller didn't specify), the env var
+    PULPO_LLM_CONCURRENCY drives the default."""
+    monkeypatch.setenv("PULPO_LLM_CONCURRENCY", "1")
+    listings = [_li(source_id=f"GL-{i}") for i in range(3)]
+    client = _StubClient(responses=[_OK_JSON] * 3)
+    enrich_listings(listings, tmp_path / "side.json",
+                    tmp_path / "log.jsonl", client=client)
+    assert len(client.chat.completions.calls) == 3
+
+
+def test_concurrency_default_when_env_unset(tmp_path, monkeypatch):
+    """No env var, no explicit max_workers → default kicks in (8). With
+    only 3 listings this still works fine; we just assert it doesn't
+    crash and the work completes."""
+    monkeypatch.delenv("PULPO_LLM_CONCURRENCY", raising=False)
+    listings = [_li(source_id=f"GL-{i}") for i in range(3)]
+    client = _StubClient(responses=[_OK_JSON] * 3)
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl", client=client)
+    assert metrics["enriched"] == 3
 
 
 # ── _is_global_error classifier ────────────────────────────────────────

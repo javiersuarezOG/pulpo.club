@@ -529,10 +529,26 @@ def main() -> int:
     # short_description_canonical, reasons_to_buy, lat-or-lng} is set —
     # means listings already enriched by prior runs (or grandfathered with
     # Mapbox lat/lng from the legacy geocoding pass) are not re-processed.
+    #
+    # Concurrency + soft-fail deadline:
+    # - PULPO_LLM_CONCURRENCY=N caps the in-flight API call fan-out.
+    # - PULPO_LLM_DEADLINE_SECONDS=N (optional) sets a wall-clock budget
+    #   from now: once it elapses no NEW calls go out. In-flight calls
+    #   complete; remaining listings are deferred to the next nightly
+    #   (the sidecar persists progress, so cache_hits cover them).
+    #   The point is that the pipeline always SHIPS — better to commit
+    #   partially-enriched data than time out the whole nightly job.
+    _llm_deadline_s = os.environ.get("PULPO_LLM_DEADLINE_SECONDS")
+    _llm_deadline = (
+        _time.monotonic() + float(_llm_deadline_s)
+        if _llm_deadline_s and _llm_deadline_s.strip()
+        else None
+    )
     llm_metrics = _llm_enrich(
         listings,
         sidecar_path = web_data_dir / "llm_enrichment.json",
         log_path     = web_data_dir / "llm_enrichment_log.jsonl",
+        deadline     = _llm_deadline,
     )
     if llm_metrics.get("skipped_no_token"):
         print("[llm_enrich] DEEPSEEK_API_TOKEN missing — fallback templates only")
