@@ -43,6 +43,11 @@ class Listing:
     bedrooms: Optional[int] = None
     bathrooms: Optional[float] = None  # half-baths land as 0.5 increments
     built_area_m2: Optional[float] = None
+    # The ranking metric for built listings. price / built_area_m2 — derived
+    # in normalize.py when both inputs are present. Optional because 80% of
+    # bienesraices houses lack built_area_m2; those listings fall through to
+    # the lot-based price_per_m2 metric in the value leg.
+    price_per_built_m2: Optional[float] = None
     year_built: Optional[int] = None
     parking_spaces: Optional[int] = None
     floor: Optional[int] = None                  # condo only

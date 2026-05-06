@@ -617,6 +617,16 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         bedrooms=raw.get("bedrooms"),
         bathrooms=raw.get("bathrooms"),
         built_area_m2=raw.get("built_area_m2"),
+        # price_per_built_m2 — derived for built listings with both inputs.
+        # The value leg prefers this over price_per_m2 (the lot metric)
+        # for house/condo. Land + house-without-built-area fall back to
+        # the lot metric.
+        price_per_built_m2=(
+            round(price_usd / float(raw.get("built_area_m2")), 2)
+            if (price_usd and raw.get("built_area_m2")
+                and float(raw.get("built_area_m2")) > 0)
+            else None
+        ),
         year_built=raw.get("year_built"),
         parking_spaces=raw.get("parking_spaces"),
         floor=raw.get("floor"),

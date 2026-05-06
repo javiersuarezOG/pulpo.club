@@ -51,32 +51,56 @@ def _percentile_in(sorted_values: list[float], v: float) -> float:
 
 
 def _build_pools(listings: list["Listing"]):
-    # Segment by (property_type, zone) so houses don't pollute the land $/m²
-    # distribution — a 6-bed mansion skews the percentile for raw lots.
-    by_zone: dict[tuple[str, str], list[float]] = defaultdict(list)
-    by_macro: dict[tuple[str, str], list[float]] = defaultdict(list)
-    global_pool: dict[str, list[float]] = defaultdict(list)
+    """Build per-(metric, type, zone) comp pools.
+
+    Two metrics, kept separate (mixing them would compare e.g. $80/lot-m²
+    of land against $1500/built-m² of a house — same number-line, different
+    semantics):
+      - lot:   price_per_m2   (the lot $/m². Used by land. Fallback for
+               house/condo when built_area_m2 is missing — about 80% of
+               bienesraices houses today.)
+      - built: price_per_built_m2 (the built $/m². Preferred metric for
+               house/condo. Computed in normalize.py when both inputs
+               exist.)
+    """
+    pools: dict = {
+        "lot":   {"by_zone": defaultdict(list), "by_macro": defaultdict(list),
+                  "global":  defaultdict(list)},
+        "built": {"by_zone": defaultdict(list), "by_macro": defaultdict(list),
+                  "global":  defaultdict(list)},
+    }
     for li in listings:
-        if li.price_per_m2 is None:
-            continue
         pt = li.property_type or "land"
-        global_pool[pt].append(li.price_per_m2)
-        if li.zone:
-            by_zone[(pt, li.zone)].append(li.price_per_m2)
-            macro = MACRO_ZONE.get(li.zone)
-            if macro:
-                by_macro[(pt, macro)].append(li.price_per_m2)
-    for k in by_zone:
-        by_zone[k].sort()
-    for k in by_macro:
-        by_macro[k].sort()
-    for k in global_pool:
-        global_pool[k].sort()
-    return by_zone, by_macro, global_pool
+        macro = MACRO_ZONE.get(li.zone or "") if li.zone else None
+        if li.price_per_m2 is not None:
+            p = pools["lot"]
+            p["global"][pt].append(li.price_per_m2)
+            if li.zone:
+                p["by_zone"][(pt, li.zone)].append(li.price_per_m2)
+                if macro:
+                    p["by_macro"][(pt, macro)].append(li.price_per_m2)
+        ppbm = getattr(li, "price_per_built_m2", None)
+        if ppbm is not None:
+            p = pools["built"]
+            p["global"][pt].append(ppbm)
+            if li.zone:
+                p["by_zone"][(pt, li.zone)].append(ppbm)
+                if macro:
+                    p["by_macro"][(pt, macro)].append(ppbm)
+    # Sort every pool list once
+    for metric_pools in pools.values():
+        for tier in metric_pools.values():
+            for k in tier:
+                tier[k].sort()
+    return pools
 
 
-def _pick_pool(li, by_zone, by_macro, global_pool):
+def _pick_pool_for_metric(li, metric_pools):
+    """Cascade: zone → macro → global, all keyed on (property_type, …)."""
     pt = li.property_type or "land"
+    by_zone, by_macro, global_pool = (
+        metric_pools["by_zone"], metric_pools["by_macro"], metric_pools["global"]
+    )
     if li.zone and len(by_zone.get((pt, li.zone), [])) >= MIN_COMPS:
         return by_zone[(pt, li.zone)], f"{li.zone} {pt}"
     macro = MACRO_ZONE.get(li.zone or "")
@@ -88,24 +112,67 @@ def _pick_pool(li, by_zone, by_macro, global_pool):
     return [], ""
 
 
+# ── Backwards-compat shims ──────────────────────────────────────────────
+# Older tests/external callers used the (by_zone, by_macro, global_pool)
+# triple keyed on lot $/m². Keep the shape so existing tests don't break.
+
+def _build_pools_legacy_lot_only(listings: list["Listing"]):
+    pools = _build_pools(listings)
+    p = pools["lot"]
+    return p["by_zone"], p["by_macro"], p["global"]
+
+
+def _pick_pool(li, by_zone, by_macro, global_pool):
+    return _pick_pool_for_metric(li, {
+        "by_zone": by_zone, "by_macro": by_macro, "global": global_pool
+    })
+
+
 class ValueLeg:
     slug = "value"
     weight = 0.40
     env_weight_key = "PULPO_W_VALUE"
 
     def score(self, listing: "Listing", comp_pool: list["Listing"]) -> tuple[float, str]:
-        # Build pools lazily from comp_pool each call (small N, fast)
-        by_zone, by_macro, global_pool = _build_pools(comp_pool)
-        if listing.price_per_m2 is None:
+        # Build pools lazily from comp_pool each call (small N, fast).
+        # The full pool shape lives in `pools["lot"]` and `pools["built"]`.
+        pools = _build_pools(comp_pool)
+        pt = listing.property_type or "land"
+
+        # Pick the metric. House/condo with a built-area metric → use the
+        # built pool (the right comp set: a 200 m² built house at $400k is
+        # $2,000/built-m², comparable to other built houses in the zone).
+        # Land or house-without-built-area → fall through to the lot pool.
+        metric_value: float | None = None
+        metric_label = "$/m²"
+        metric_pools = pools["lot"]
+        if pt in ("house", "condo") and listing.price_per_built_m2 is not None:
+            metric_value = listing.price_per_built_m2
+            metric_label = "$/built-m²"
+            metric_pools = pools["built"]
+        elif listing.price_per_m2 is not None:
+            metric_value = listing.price_per_m2
+
+        if metric_value is None:
             return NO_PRICE_VALUE_DEFAULT, f"value {NO_PRICE_VALUE_DEFAULT:.0f} (no $/m²)"
-        pool, label = _pick_pool(listing, by_zone, by_macro, global_pool)
+
+        pool, label = _pick_pool_for_metric(listing, metric_pools)
+        # Fallback chain — built house with no built-comp pool falls back
+        # to the lot pool so a house with built area in a sparse zone
+        # still gets some signal. Keeps the scoreless fraction tiny.
+        if not pool and metric_pools is pools["built"] and listing.price_per_m2 is not None:
+            metric_value = listing.price_per_m2
+            metric_label = "$/m² (built fallback)"
+            pool, label = _pick_pool_for_metric(listing, pools["lot"])
+
         if not pool:
             return NO_PRICE_VALUE_DEFAULT, f"value {NO_PRICE_VALUE_DEFAULT:.0f} (no comps)"
-        pct = _percentile_in(pool, listing.price_per_m2)
+
+        pct = _percentile_in(pool, metric_value)
         listing.zone_percentile = round(pct, 1)
         s = max(0.0, min(100.0, 100.0 - pct))
         return s, (
-            f"value {s:.0f} (${listing.price_per_m2:,.2f}/m² = "
+            f"value {s:.0f} (${metric_value:,.2f}/{metric_label.split('/')[1]} = "
             f"{int(pct)}th pct of {label}, {len(pool)} comps)"
         )
 
