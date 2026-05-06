@@ -191,6 +191,20 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .filter-chips-clear{margin-left:auto;font-size:12px;color:var(--accent);background:none;border:0;cursor:pointer;padding:2px 4px;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
 .filter-chips-clear:hover{text-decoration-style:solid}
 
+/* ── Phase 4e: empty-state strip with structured suggestions ───────────
+   Hidden until filteredRows() returns 0. Sits between the filter-bar/
+   chips strip and the (now-empty) table-wrap. Suggestions list filters
+   the user can drop, ranked by recovered-listing count desc. */
+.empty-state{padding:24px 20px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0}
+.empty-state[hidden]{display:none}
+.empty-state-headline{font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px}
+.empty-state-help{font-size:13px;color:var(--t2);margin:8px 0 4px}
+.empty-state-list{margin:6px 0 8px;padding-left:20px;font-size:13px;color:var(--t2);line-height:1.7}
+.empty-state-list strong{color:var(--text);font-weight:600}
+.empty-state-clear-all{margin-top:10px}
+.empty-state-clear-btn{font-size:13px;color:var(--accent);background:none;border:0;cursor:pointer;padding:0;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.empty-state-clear-btn:hover{text-decoration-style:solid}
+
 /* ── D5: implicit-narrowing toast ──────────────────────────────────────
    Transient banner shown when an action narrowed the dataset in a
    non-obvious way — e.g. picking a Bedrooms threshold auto-removed
