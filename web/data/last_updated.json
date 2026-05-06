@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-05T22:16:08.763257+00:00",
-  "started_at": "2026-05-05T21:33:29.804944+00:00",
-  "duration_seconds": 2558.96,
+  "last_updated": "2026-05-06T07:38:49.712940+00:00",
+  "started_at": "2026-05-06T06:59:19.029183+00:00",
+  "duration_seconds": 2370.68,
   "total_listings": 865,
   "dropped": 138,
   "per_source_raw": {
     "goodlife": 80,
-    "oceanside": 27,
+    "oceanside": 25,
     "century21": 15,
     "bienesraices": 560,
-    "remax": 312,
+    "remax": 314,
     "nexo": 9,
     "realtyelsalvador": 0
   },
@@ -30,7 +30,7 @@
     },
     "oceanside": {
       "supplier": null,
-      "pulled": 27,
+      "pulled": 25,
       "max_pages_hit": false
     },
     "century21": {
@@ -45,7 +45,7 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 312,
+      "pulled": 314,
       "max_pages_hit": false
     },
     "nexo": {
@@ -161,20 +161,20 @@
       }
     },
     "oceanside": {
-      "n_listings": 13,
+      "n_listings": 11,
       "fields": {
-        "price_usd": 0.69,
-        "area_m2": 0.92,
+        "price_usd": 0.73,
+        "area_m2": 0.91,
         "zone": 1.0,
         "municipality": 1.0,
         "department": 1.0,
         "location_text": 1.0,
         "lat": 0.0,
         "lng": 0.0,
-        "is_beachfront": 0.31,
+        "is_beachfront": 0.36,
         "has_paved_access": 0.0,
-        "has_water": 0.23,
-        "has_power": 0.31,
+        "has_water": 0.27,
+        "has_power": 0.36,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -186,11 +186,11 @@
       }
     },
     "remax": {
-      "n_listings": 306,
+      "n_listings": 308,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.93,
+        "zone": 0.94,
         "municipality": 0.95,
         "department": 0.96,
         "location_text": 1.0,
@@ -216,7 +216,24 @@
     "land": 815,
     "house": 43
   },
-  "v_fallback_no_price": 37,
+  "validation_by_type": {
+    "condo": {
+      "pass": 6,
+      "flag": 1,
+      "drop": 1
+    },
+    "land": {
+      "pass": 762,
+      "flag": 53,
+      "drop": 25
+    },
+    "house": {
+      "pass": 43,
+      "flag": 0,
+      "drop": 6
+    }
+  },
+  "v_fallback_no_price": 36,
   "v_fallback_no_comps": 0,
   "sources": [
     "goodlife",

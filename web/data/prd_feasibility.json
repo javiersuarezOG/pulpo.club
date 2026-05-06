@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T22:16:08.911892+00:00",
+  "generated_at": "2026-05-06T07:38:49.859472+00:00",
   "total_listings": 865,
   "ui_gate_pct": 15,
   "existing": [
@@ -45,13 +45,13 @@
     },
     {
       "field": "price_usd",
-      "hits": 845,
-      "pct": 97.7
+      "hits": 846,
+      "pct": 97.8
     },
     {
       "field": "price_per_m2",
-      "hits": 828,
-      "pct": 95.7
+      "hits": 829,
+      "pct": 95.8
     },
     {
       "field": "zone",
@@ -70,8 +70,8 @@
     },
     {
       "field": "zone_specific",
-      "hits": 541,
-      "pct": 62.5
+      "hits": 540,
+      "pct": 62.4
     },
     {
       "field": "broker_name",
@@ -90,18 +90,23 @@
     },
     {
       "field": "is_in_development",
-      "hits": 348,
-      "pct": 40.2
+      "hits": 347,
+      "pct": 40.1
     },
     {
       "field": "is_beachfront",
-      "hits": 97,
-      "pct": 11.2
+      "hits": 98,
+      "pct": 11.3
     },
     {
       "field": "property_type!=land",
       "hits": 50,
       "pct": 5.8
+    },
+    {
+      "field": "is_repriced",
+      "hits": 1,
+      "pct": 0.1
     },
     {
       "field": "lat",
@@ -110,11 +115,6 @@
     },
     {
       "field": "lng",
-      "hits": 0,
-      "pct": 0.0
-    },
-    {
-      "field": "is_repriced",
       "hits": 0,
       "pct": 0.0
     }
@@ -130,8 +130,8 @@
     },
     {
       "field": "has_ocean_view",
-      "hits": 92,
-      "pct": 10.6,
+      "hits": 91,
+      "pct": 10.5,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -170,8 +170,8 @@
     },
     {
       "field": "is_beachfront",
-      "hits": 92,
-      "pct": 10.6,
+      "hits": 93,
+      "pct": 10.8,
       "prd_target": 15,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -202,8 +202,8 @@
     },
     {
       "field": "zoning_residential",
-      "hits": 317,
-      "pct": 36.6,
+      "hits": 319,
+      "pct": 36.9,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -226,16 +226,16 @@
     },
     {
       "field": "land_commercial",
-      "hits": 131,
-      "pct": 15.1,
+      "hits": 132,
+      "pct": 15.3,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "land_recreational",
-      "hits": 59,
-      "pct": 6.8,
+      "hits": 58,
+      "pct": 6.7,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -296,14 +296,14 @@
       },
       {
         "source": "oceanside",
-        "n": 13,
-        "avg_chars": 1422,
+        "n": 11,
+        "avg_chars": 1423,
         "pct_short_lt50": 0.0
       },
       {
         "source": "remax",
-        "n": 306,
-        "avg_chars": 951,
+        "n": 308,
+        "avg_chars": 950,
         "pct_short_lt50": 0.0
       }
     ]
