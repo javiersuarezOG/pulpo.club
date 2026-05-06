@@ -182,7 +182,7 @@ def test_apply_skips_inactive_listings():
 
 # ── compute_and_apply (end-to-end) ─────────────────────────────────────
 
-def test_compute_and_apply_full_path():
+def test_compute_and_apply_full_path(tmp_path):
     """End-to-end on a realistic mini-catalog."""
     # 12 land listings in el-tunco — eligible for median
     listings = [_li(price_per_m2=p) for p in [100, 110, 120, 130, 140, 150,
@@ -192,7 +192,9 @@ def test_compute_and_apply_full_path():
     # Plus a sold listing that should be excluded
     listings.append(_li(price_per_m2=9999, is_sold=True))
 
-    metrics = compute_and_apply(listings)
+    # history_path → tmp_path so the test never appends to the real
+    # production sidecar at web/data/zone_medians_history.jsonl.
+    metrics = compute_and_apply(listings, history_path=tmp_path / "h.jsonl")
     assert metrics["buckets_computed"] == 1   # only el-tunco land qualifies
     assert metrics["listings_scored"] == 12   # all 12 active el-tunco land
 
@@ -206,12 +208,13 @@ def test_compute_and_apply_full_path():
     assert all(li["price_vs_zone_pct"] is None for li in el_cuco)
 
 
-def test_idempotent_repeat_application():
+def test_idempotent_repeat_application(tmp_path):
     """Running twice with the same inputs produces identical outputs."""
+    history = tmp_path / "h.jsonl"
     listings = [_li(price_per_m2=100 + i * 10) for i in range(MIN_LISTINGS_PER_ZONE)]
-    compute_and_apply(listings)
+    compute_and_apply(listings, history_path=history)
     snapshot = [(li["price_vs_zone_median"], li["price_vs_zone_pct"]) for li in listings]
-    compute_and_apply(listings)
+    compute_and_apply(listings, history_path=history)
     again = [(li["price_vs_zone_median"], li["price_vs_zone_pct"]) for li in listings]
     assert snapshot == again
 
