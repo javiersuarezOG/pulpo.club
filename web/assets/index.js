@@ -106,6 +106,16 @@ const isDefaultSizeRange = () =>
 let MIN_SCORE = 0;
 const isDefaultMinScore = () => MIN_SCORE === 0;
 
+/* ── D5: bedrooms threshold ───────────────────────────────
+   Single-threshold pill group: 0 = no filter, 1+/2+/3+/4+/5+ = require
+   listing.bedrooms >= N. House + condo only — land never has bedrooms.
+   Picking a value while Land is in TYPES_F triggers implicit narrowing
+   (auto-removes land + shows a toast) so the user doesn't see an empty
+   table from the type/filter mismatch.
+   URL key: ?bedrooms=NN. Default omitted to keep URLs clean. */
+let BEDROOMS_MIN = 0;
+const isDefaultBedroomsMin = () => BEDROOMS_MIN === 0;
+
 /* ── Tune-panel state: V/L/M weight sliders ────────────── */
 // Defaults match pulpo/ranker.py composite weights (0.40 / 0.35 / 0.25).
 // Slider values are stored as integer percentages 0..100 — re-blended
@@ -249,6 +259,16 @@ function readURL() {
   } else {
     MIN_SCORE = 0;
   }
+  // Bedrooms threshold (D5): ?bedrooms=N (integer 0..6). Out-of-range
+  // values silently drop to 0 (pass-through) so URL junk doesn't yield
+  // an empty table.
+  const brRaw = p.get('bedrooms');
+  if (brRaw) {
+    const br = parseInt(brRaw, 10);
+    BEDROOMS_MIN = (Number.isInteger(br) && br >= 0 && br <= 6) ? br : 0;
+  } else {
+    BEDROOMS_MIN = 0;
+  }
   // Weight sliders: ?w=V,L,M (integers 0..100). Reject malformed input
   // by reverting to defaults — silently dropping the URL is friendlier
   // than rendering a confusing "weights all zero → no sort change" state.
@@ -283,6 +303,7 @@ function pushURL(replace=true) {
   if (SIZE_MIN_IDX  !== 0)                    p.set('size_min',  String(SIZE_MIN_IDX));
   if (SIZE_MAX_IDX  !== SIZE_SNAPS.length-1)  p.set('size_max',  String(SIZE_MAX_IDX));
   if (!isDefaultMinScore())                   p.set('min_score', String(MIN_SCORE));
+  if (!isDefaultBedroomsMin())                p.set('bedrooms',  String(BEDROOMS_MIN));
   if (!isDefaultWeights()) {
     p.set('w', WEIGHT_KEYS.map(k => WEIGHTS[k]).join(','));
   }
@@ -322,6 +343,14 @@ function _scoreAtLeastMin(r) {
   return (r.rank_score ?? -Infinity) >= MIN_SCORE;
 }
 function _hasPhotos(r) { return (r.photos_count || 0) > 0; }
+
+// D5 — bedrooms threshold gate. Listings with bedrooms unset (land, or
+// house/condo with missing data) drop when the threshold is non-default.
+// Same default-passes-everything pattern as _priceInRange / _scoreAtLeastMin.
+function _bedroomsAtLeastMin(r) {
+  if (isDefaultBedroomsMin()) return true;
+  return (r.bedrooms ?? -Infinity) >= BEDROOMS_MIN;
+}
 function filteredRows() {
   return ALL_DATA.filter(r => {
     // Type-pill filter. TYPES_F is never empty (last-pill snap-back enforced
@@ -336,6 +365,7 @@ function filteredRows() {
     if (!_priceInRange(r)) return false;
     if (!_sizeInRange(r))  return false;
     if (!_scoreAtLeastMin(r)) return false;
+    if (!_bedroomsAtLeastMin(r)) return false;
     if (!ZONE_F) return true;
     if (ZONE_F.type==='no-zone') return isNoZone(r);
     if (ZONE_F.type==='zone')    return r.zone===ZONE_F.value;
@@ -723,10 +753,7 @@ function _weightSectionHTML() {
 }
 // D3 — Open/Gated section moved from the top toolbar into the Filters
 // panel. Same segmented control as before, just rendered inside the
-// panel. Wired in renderTunePanel via the .seg-btn[data-filter] selector
-// the existing wireSegment() already handles — when this PR removes the
-// duplicate top-toolbar control, the panel becomes the sole place this
-// filter lives.
+// panel. Wired in renderTunePanel via the .seg-btn[data-filter] selector.
 function _openGatedSectionHTML() {
   return `<div class="tune-section">
     <div class="tune-section-title">Land type</div>
@@ -741,7 +768,7 @@ function _openGatedSectionHTML() {
 
 // D3 — Photos filter moved from the top toolbar into the Filters panel.
 // Same shape as Open/Gated above; data-photos buttons wired by the same
-// wireSegment() handler.
+// _wireSegInPanel() handler.
 function _photosFilterSectionHTML() {
   return `<div class="tune-section">
     <div class="tune-section-title">Photos</div>
@@ -751,6 +778,35 @@ function _photosFilterSectionHTML() {
       <button class="seg-btn ${PHOTOS_F==='with'?'active':''}" data-photos="with">With photos</button>
       <button class="seg-btn ${PHOTOS_F==='none'?'active':''}" data-photos="none">No photos</button>
     </div>
+  </div>`;
+}
+
+// D5 — bedrooms threshold section. Single-select pill group: 0 (Any),
+// 1+/2+/3+/4+/5+. Renders only when at least one built type is in TYPES_F
+// (house or condo) — there's no point showing "1+ bedrooms" when only
+// land is selected since land never has bedrooms.
+//
+// When the user picks a non-zero threshold while Land is in TYPES_F,
+// the click handler triggers implicit narrowing (auto-removes land)
+// + shows a transient toast explaining why.
+function _bedroomsSectionHTML() {
+  const builtSelected = TYPES_F.has('house') || TYPES_F.has('condo');
+  if (!builtSelected) return '';
+  const opts = [
+    {n: 0, label: 'Any'},
+    {n: 1, label: '1+'},
+    {n: 2, label: '2+'},
+    {n: 3, label: '3+'},
+    {n: 4, label: '4+'},
+    {n: 5, label: '5+'},
+  ];
+  const buttons = opts.map(o =>
+    `<button class="seg-btn ${BEDROOMS_MIN===o.n?'active':''}" data-bedrooms="${o.n}">${o.label}</button>`
+  ).join('');
+  return `<div class="tune-section">
+    <div class="tune-section-title">Bedrooms</div>
+    <div class="tune-section-hint">Houses + condos only — land has no bedrooms field.</div>
+    <div class="seg" role="group" aria-label="Bedrooms threshold">${buttons}</div>
   </div>`;
 }
 
@@ -802,6 +858,7 @@ function _tuneBodyHTML() {
   // the primary type-pill selector.
   return _openGatedSectionHTML()
     + _photosFilterSectionHTML()
+    + _bedroomsSectionHTML()  // D5 — visible only when house/condo in TYPES_F
     + _zoneFilterSectionHTML() + _rangeSectionHTML({
     id: 'price', title: 'Price (USD)',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
@@ -933,6 +990,22 @@ function _wireSegInPanel(container) {
         FILTER = btn.dataset.filter;
       } else if (btn.dataset.photos) {
         PHOTOS_F = btn.dataset.photos;
+      } else if (btn.dataset.bedrooms !== undefined) {
+        // D5 — bedrooms threshold pill. Picking a non-zero value while Land
+        // is in TYPES_F triggers implicit narrowing: auto-remove land + show
+        // a transient toast explaining why. Without this, the user would set
+        // "3+ BR" and see all land disappear silently with no explanation.
+        const newMin = parseInt(btn.dataset.bedrooms, 10) || 0;
+        const willNarrow = newMin > 0 && TYPES_F.has('land') && TYPES_F.size > 1;
+        BEDROOMS_MIN = newMin;
+        if (willNarrow) {
+          TYPES_F.delete('land');
+          _showNarrowingToast('Land removed from results — Bedrooms filter only applies to houses + condos.');
+          // Re-render the type pills so the de-toggled Land pill goes inactive.
+          document.querySelectorAll('.type-pill-btn').forEach(b => {
+            if (typeof _renderTypePill === 'function') _renderTypePill(b, b.dataset.typePill);
+          });
+        }
       } else {
         return;
       }
@@ -948,6 +1021,8 @@ function _wireSegInPanel(container) {
           b.classList.toggle('active', b.dataset.filter === FILTER);
         if (btn.dataset.photos && b.dataset.photos)
           b.classList.toggle('active', b.dataset.photos === PHOTOS_F);
+        if (btn.dataset.bedrooms !== undefined && b.dataset.bedrooms !== undefined)
+          b.classList.toggle('active', parseInt(b.dataset.bedrooms, 10) === BEDROOMS_MIN);
       });
       OPEN_ID = null;
       document.getElementById('side-panel').classList.remove('open');
@@ -956,6 +1031,31 @@ function _wireSegInPanel(container) {
       _updateTuneButtonState();
     });
   });
+}
+
+// D5 — implicit-narrowing toast. Transient banner that appears at the top
+// of the layout when an action narrowed the dataset in a non-obvious way
+// (e.g. picking a bedrooms threshold auto-removed Land from TYPES_F).
+// Auto-dismisses after 4s; user can close earlier with the × button.
+// position:absolute, not :fixed (per house style — no fixed positioning).
+function _showNarrowingToast(message) {
+  let el = document.getElementById('narrowing-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'narrowing-toast';
+    el.className = 'narrowing-toast';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<span>${esc(message)}</span>`
+    + `<button class="narrowing-toast-x" aria-label="Dismiss">×</button>`;
+  el.classList.add('shown');
+  el.querySelector('.narrowing-toast-x').addEventListener('click', () => {
+    el.classList.remove('shown');
+  });
+  // Auto-dismiss after 4s; clear any prior timeout so rapid triggers don't
+  // stack and cancel each other unexpectedly.
+  if (el._timeoutId) clearTimeout(el._timeoutId);
+  el._timeoutId = setTimeout(() => el.classList.remove('shown'), 4000);
 }
 function renderTunePanel() {
   const html = _tuneBodyHTML();
@@ -997,6 +1097,7 @@ function _activeFilterCount() {
   if (!isDefaultPriceRange()) n++;
   if (!isDefaultSizeRange()) n++;
   if (!isDefaultMinScore()) n++;
+  if (!isDefaultBedroomsMin()) n++;  // D5
   if (!isDefaultWeights()) n++;
   return n;
 }
@@ -1037,6 +1138,7 @@ function _resetAllFilters() {
   PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
   SIZE_MIN_IDX  = 0; SIZE_MAX_IDX  = SIZE_SNAPS.length - 1;
   MIN_SCORE = 0;
+  BEDROOMS_MIN = 0;  // D5
   Object.assign(WEIGHTS, WEIGHT_DEFAULTS);
   renderTunePanel(); pushURL(true); render(); _updateTuneButtonState();
 }
@@ -1178,6 +1280,10 @@ function _activeChips() {
   if (!isDefaultMinScore()) {
     chips.push({key: 'score', label: `Score ≥ ${MIN_SCORE}`});
   }
+  // D5 — bedrooms threshold chip
+  if (!isDefaultBedroomsMin()) {
+    chips.push({key: 'bedrooms', label: `${BEDROOMS_MIN}+ BR`});
+  }
   return chips;
 }
 
@@ -1215,6 +1321,7 @@ function _removeFilter(key) {
     case 'price':  PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1; break;
     case 'size':   SIZE_MIN_IDX = 0;  SIZE_MAX_IDX  = SIZE_SNAPS.length - 1;  break;
     case 'score':  MIN_SCORE = 0; break;
+    case 'bedrooms': BEDROOMS_MIN = 0; break;  // D5
   }
   // Re-render the panel so its segmented controls / sliders reflect the
   // cleared state. _updateTuneButtonState refreshes the count badge.

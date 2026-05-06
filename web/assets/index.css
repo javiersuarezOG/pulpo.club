@@ -184,6 +184,30 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .filter-chips-clear{margin-left:auto;font-size:12px;color:var(--accent);background:none;border:0;cursor:pointer;padding:2px 4px;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
 .filter-chips-clear:hover{text-decoration-style:solid}
 
+/* ── D5: implicit-narrowing toast ──────────────────────────────────────
+   Transient banner shown when an action narrowed the dataset in a
+   non-obvious way — e.g. picking a Bedrooms threshold auto-removed
+   Land from TYPES_F. Auto-dismisses after 4s; user can close earlier.
+   position:absolute (not :fixed) per house style. Sits at the top
+   centre of the viewport. */
+.narrowing-toast{
+  position:absolute;top:80px;left:50%;transform:translateX(-50%) translateY(-12px);
+  background:var(--text);color:#fff;
+  padding:10px 14px;border-radius:var(--r);
+  display:none;align-items:center;gap:10px;
+  font-size:13px;line-height:1.4;max-width:90vw;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);
+  z-index:100;opacity:0;
+  transition:opacity .18s ease, transform .18s ease;
+  pointer-events:none;
+}
+.narrowing-toast.shown{display:flex;opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.narrowing-toast-x{
+  background:transparent;border:0;color:#fff;font-size:16px;line-height:1;
+  cursor:pointer;padding:0 2px;opacity:.7;
+}
+.narrowing-toast-x:hover{opacity:1}
+
 .td-ppm{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--text)}
 .td-stars{white-space:nowrap}
 .td-chev{text-align:center;color:var(--t4);font-size:16px;line-height:1;padding:0 8px}

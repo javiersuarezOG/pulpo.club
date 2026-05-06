@@ -1881,3 +1881,136 @@ def test_filter_chips_css_present():
     css = (REPO / "web/assets/index.css").read_text()
     for sel in ('.filter-chips', '.filter-chip', '.filter-chip-x', '.filter-chips-clear'):
         assert sel in css, f"D4 CSS selector {sel} missing"
+
+
+# ── D5: bedrooms threshold + implicit-narrowing toast ─────────────────
+# First cross-type-only filter — bedrooms applies to house + condo only.
+# Land never has bedrooms, so picking a non-zero threshold while Land is
+# in TYPES_F triggers implicit narrowing: auto-remove land + toast.
+
+def test_bedrooms_state_initialized_to_zero():
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "let BEDROOMS_MIN = 0" in js, "BEDROOMS_MIN default not 0"
+    assert "isDefaultBedroomsMin = () => BEDROOMS_MIN === 0" in js, (
+        "isDefaultBedroomsMin helper missing"
+    )
+
+
+def test_bedrooms_section_renders_only_when_built_type_selected():
+    """The section is conditional — no point showing 1+/2+/3+ when only
+    land is selected (land never has bedrooms)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _bedroomsSectionHTML")[1].split("function ")[0]
+    assert "TYPES_F.has('house') || TYPES_F.has('condo')" in block, (
+        "_bedroomsSectionHTML doesn't gate on built types in TYPES_F — "
+        "section would show even when only land is selected"
+    )
+    assert "if (!builtSelected) return ''" in block
+
+
+def test_bedrooms_section_in_tune_body():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _tuneBodyHTML")[1].split("function ")[0]
+    assert "_bedroomsSectionHTML()" in block, (
+        "_bedroomsSectionHTML not composed into _tuneBodyHTML"
+    )
+
+
+def test_bedrooms_filter_logic_present():
+    """filteredRows must call _bedroomsAtLeastMin so the threshold actually
+    narrows the data. Without this the pill would just toggle visually."""
+    js = (REPO / "web/assets/index.js").read_text()
+    fr_block = js.split("function filteredRows")[1].split("function ")[0]
+    assert "_bedroomsAtLeastMin(r)" in fr_block, (
+        "filteredRows doesn't apply _bedroomsAtLeastMin gate"
+    )
+    helper = js.split("function _bedroomsAtLeastMin")[1].split("function ")[0]
+    assert "isDefaultBedroomsMin()" in helper, (
+        "_bedroomsAtLeastMin doesn't short-circuit on default"
+    )
+    assert "BEDROOMS_MIN" in helper
+
+
+def test_bedrooms_url_state_round_trips():
+    """readURL accepts ?bedrooms=N (0..6); pushURL emits only when
+    non-default."""
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "p.get('bedrooms')" in js, "readURL missing ?bedrooms="
+    assert "br >= 0 && br <= 6" in js, (
+        "readURL doesn't validate ?bedrooms= range — junk would reach state"
+    )
+    assert "isDefaultBedroomsMin()" in js
+    # pushURL emits only when non-default (URL stays clean by default)
+    block = js.split("function pushURL")[1].split("function ")[0]
+    assert "p.set('bedrooms'" in block, "pushURL missing ?bedrooms= emit"
+
+
+def test_bedrooms_narrowing_toast_fires_when_land_selected():
+    """Picking a non-zero bedrooms while Land is in TYPES_F must:
+       1. remove land from TYPES_F
+       2. show the implicit-narrowing toast
+    Without the toast the user sees Land disappear silently."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _wireSegInPanel")[1].split("function ")[0]
+    assert "TYPES_F.has('land')" in block, (
+        "_wireSegInPanel bedrooms branch doesn't check for Land in TYPES_F"
+    )
+    assert "TYPES_F.delete('land')" in block, (
+        "_wireSegInPanel bedrooms branch doesn't remove Land — narrowing "
+        "would not fire and the user would see an empty table"
+    )
+    assert "_showNarrowingToast" in block, (
+        "_wireSegInPanel doesn't call the toast — silent narrowing is the bug"
+    )
+
+
+def test_narrowing_toast_helper_exists_and_auto_dismisses():
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "function _showNarrowingToast" in js, "Toast helper missing"
+    block = js.split("function _showNarrowingToast")[1].split("function ")[0]
+    assert "setTimeout" in block, "Toast doesn't auto-dismiss"
+    assert "narrowing-toast-x" in block, "Toast missing × close button"
+
+
+def test_bedrooms_in_active_filter_count():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _activeFilterCount")[1].split("function ")[0]
+    assert "isDefaultBedroomsMin()" in block, (
+        "_activeFilterCount doesn't include bedrooms — badge under-reports"
+    )
+
+
+def test_bedrooms_in_reset_all_filters():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _resetAllFilters")[1].split("function ")[0]
+    assert "BEDROOMS_MIN = 0" in block, (
+        "_resetAllFilters doesn't reset bedrooms — Clear-all leaves it stuck"
+    )
+
+
+def test_bedrooms_chip_in_active_chips():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _activeChips")[1].split("function ")[0]
+    assert "isDefaultBedroomsMin()" in block, (
+        "_activeChips doesn't add a chip for bedrooms — user can't see/remove it"
+    )
+    assert "bedrooms" in block.lower()
+
+
+def test_bedrooms_in_remove_filter():
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _removeFilter")[1].split("function ")[0]
+    assert "case 'bedrooms'" in block, (
+        "_removeFilter has no bedrooms case — × on the chip would no-op"
+    )
+
+
+def test_narrowing_toast_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    assert ".narrowing-toast" in css, "Toast container CSS missing"
+    assert ".narrowing-toast.shown" in css, "Toast shown-state CSS missing"
+    # House style: no position:fixed
+    block = css.split(".narrowing-toast")[1].split("}")[0]
+    assert "position:absolute" in block.replace(" ", ""), (
+        "Toast uses position:absolute (house style — no position:fixed)"
+    )
