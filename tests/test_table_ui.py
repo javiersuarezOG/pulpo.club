@@ -1643,3 +1643,141 @@ def test_contextual_helpers_emit_built_suffix_only_for_house_with_built_area():
 def test_cell_suffix_css_present():
     css = (REPO / "web/assets/index.css").read_text()
     assert ".cell-suffix" in css, "Cell-suffix style missing"
+
+
+# ── D3: Open/Gated + Photos consolidated into Filters panel ────────────
+# Pre-D3 these were 2 segmented controls in the top toolbar; D3 moves
+# them into the existing Filters panel so the toolbar stays focused on
+# the type pills + filters button. Each filter's logic is unchanged —
+# only its rendering location and wiring move.
+
+def test_open_gated_section_in_panel_only():
+    """The data-filter buttons must NOT appear in the static HTML toolbar
+    anymore — only inside the panel-builder JS. Otherwise the user would
+    see duplicate controls."""
+    html_only = (REPO / "web/index.html").read_text()
+    assert 'data-filter="open"' not in html_only, (
+        "Open/Gated still in top-toolbar HTML — D3 should have moved it to the panel"
+    )
+    js = (REPO / "web/assets/index.js").read_text()
+    assert 'data-filter="open"' in js, (
+        "Open/Gated buttons not present in JS panel-builder — moved without replacement"
+    )
+
+
+def test_photos_filter_section_in_panel_only():
+    html_only = (REPO / "web/index.html").read_text()
+    assert 'data-photos="with"' not in html_only, (
+        "Photos filter still in top-toolbar HTML — D3 should have moved it"
+    )
+    js = (REPO / "web/assets/index.js").read_text()
+    assert 'data-photos="with"' in js
+
+
+def test_open_gated_section_helper_present():
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "function _openGatedSectionHTML" in js, (
+        "Section builder for Open/Gated panel section missing"
+    )
+
+
+def test_photos_filter_section_helper_present():
+    js = (REPO / "web/assets/index.js").read_text()
+    assert "function _photosFilterSectionHTML" in js
+
+
+def test_tune_body_includes_new_sections_at_top():
+    """The new sections render BEFORE the existing zone/price/size sections.
+    Spec: 'most-used filters first' — Open/Gated + Photos are quick toggles."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _tuneBodyHTML")[1].split("function ")[0]
+    open_gated_idx = block.find("_openGatedSectionHTML()")
+    photos_idx     = block.find("_photosFilterSectionHTML()")
+    zone_idx       = block.find("_zoneFilterSectionHTML()")
+    assert open_gated_idx > 0, "Open/Gated not composed into _tuneBodyHTML"
+    assert photos_idx > 0, "Photos filter not composed into _tuneBodyHTML"
+    assert zone_idx > 0, "Zone filter section disappeared"
+    assert open_gated_idx < zone_idx, (
+        "Open/Gated should render before Zone filter (spec: most-used first)"
+    )
+    assert photos_idx < zone_idx
+
+
+def test_active_filter_count_now_includes_open_gated_and_photos():
+    """The Filters button badge must now count Open/Gated + Photos when
+    they're not at default. Pre-D3 they lived outside the panel and weren't
+    counted; without this update the badge under-reports active filters."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _activeFilterCount")[1].split("function ")[0]
+    assert "FILTER !== 'all'" in block, (
+        "_activeFilterCount doesn't count FILTER (Open/Gated)"
+    )
+    assert "PHOTOS_F !== 'all'" in block, (
+        "_activeFilterCount doesn't count PHOTOS_F"
+    )
+
+
+def test_reset_all_filters_now_includes_open_gated_and_photos():
+    """Clear-all must reset FILTER + PHOTOS_F too (they live in the panel
+    now). Pre-D3 they weren't reset because they weren't 'panel-controlled'."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _resetAllFilters")[1].split("function ")[0]
+    assert "FILTER = 'all'" in block, (
+        "_resetAllFilters doesn't reset Open/Gated"
+    )
+    assert "PHOTOS_F = 'all'" in block, (
+        "_resetAllFilters doesn't reset Photos filter"
+    )
+
+
+def test_reset_all_filters_does_not_reset_type_pills():
+    """TYPES_F is controlled by the always-visible top toolbar, not the
+    Filters panel. Clear-all should leave it alone — only secondary
+    filters get cleared. (Comment mentioning TYPES_F is fine; what's
+    forbidden is an actual assignment / mutation.)"""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _resetAllFilters")[1].split("function ")[0]
+    # Strip comment lines so we don't trip on the explanatory comment.
+    code_only = "\n".join(
+        line for line in block.split("\n")
+        if not line.strip().startswith("//")
+    )
+    for pat in ("TYPES_F = ", "TYPES_F.clear()", "TYPES_F.add(", "TYPES_F.delete("):
+        assert pat not in code_only, (
+            f"_resetAllFilters mutates TYPES_F via {pat!r} — top-toolbar "
+            f"pill state should not be cleared by 'Clear all' in the panel"
+        )
+
+
+def test_old_wire_segment_no_longer_called_from_init():
+    """wireSegment was the pre-D3 top-toolbar wirer. After D3 the panel
+    re-binds via _wireSegInPanel() per render. init() should no longer
+    call the old wireSegment (and the function itself should be gone)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    init_block = js.split("async function init")[1].split("init();")[0]
+    assert "wireSegment()" not in init_block, (
+        "init() still calls the old wireSegment — should be removed"
+    )
+
+
+def test_panel_seg_buttons_wired_per_render():
+    """_wireSegInPanel runs from _wireTuneControls so every panel render
+    rebinds click handlers (the buttons are recreated each render)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _wireTuneControls")[1].split("function ")[0]
+    assert "_wireSegInPanel(container)" in block, (
+        "_wireTuneControls doesn't call _wireSegInPanel — panel seg-btns won't fire on re-render"
+    )
+
+
+def test_count_label_uses_types_first_and_filter_as_suffix():
+    """With FILTER moving into the panel, the count label hierarchy
+    flips: types (the now-primary surface) lead, FILTER becomes a suffix."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function updateCounts")[1].split("function ")[0]
+    # The leading label is the types label
+    assert "TYPES_F.size < 3" in block
+    assert "All listings" in block
+    # FILTER renders as a ' · ...' suffix, not the primary label
+    assert "fLabel" in block
+    assert "' · Open land'" in block or "\\' · Open land\\'" in block
