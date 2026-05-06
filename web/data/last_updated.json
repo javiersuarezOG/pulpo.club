@@ -1,7 +1,7 @@
 {
-  "last_updated": "2026-05-06T07:38:49.712940+00:00",
-  "started_at": "2026-05-06T06:59:19.029183+00:00",
-  "duration_seconds": 2370.68,
+  "last_updated": "2026-05-06T11:27:03.594153+00:00",
+  "started_at": "2026-05-06T10:46:13.941498+00:00",
+  "duration_seconds": 2449.65,
   "total_listings": 865,
   "dropped": 138,
   "per_source_raw": {
@@ -10,8 +10,7 @@
     "century21": 15,
     "bienesraices": 560,
     "remax": 314,
-    "nexo": 9,
-    "realtyelsalvador": 0
+    "nexo": 9
   },
   "source_status": {
     "goodlife": "green",
@@ -19,8 +18,7 @@
     "century21": "green",
     "bienesraices": "green",
     "remax": "green",
-    "nexo": "green",
-    "realtyelsalvador": "red"
+    "nexo": "green"
   },
   "coverage": {
     "goodlife": {
@@ -51,11 +49,6 @@
     "nexo": {
       "supplier": null,
       "pulled": 9,
-      "max_pages_hit": false
-    },
-    "realtyelsalvador": {
-      "supplier": null,
-      "pulled": 0,
       "max_pages_hit": false
     }
   },
@@ -241,8 +234,7 @@
     "century21",
     "bienesraices",
     "remax",
-    "nexo",
-    "realtyelsalvador"
+    "nexo"
   ],
   "offline": false,
   "fixture_fallback_active": false,
