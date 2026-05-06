@@ -721,6 +721,39 @@ function _weightSectionHTML() {
     </div>
   `;
 }
+// D3 — Open/Gated section moved from the top toolbar into the Filters
+// panel. Same segmented control as before, just rendered inside the
+// panel. Wired in renderTunePanel via the .seg-btn[data-filter] selector
+// the existing wireSegment() already handles — when this PR removes the
+// duplicate top-toolbar control, the panel becomes the sole place this
+// filter lives.
+function _openGatedSectionHTML() {
+  return `<div class="tune-section">
+    <div class="tune-section-title">Land type</div>
+    <div class="tune-section-hint">Open lots vs. listings inside named developments / gated communities.</div>
+    <div class="seg" role="group" aria-label="Land type filter">
+      <button class="seg-btn ${FILTER==='all'?'active':''}"   data-filter="all">All</button>
+      <button class="seg-btn ${FILTER==='open'?'active':''}"  data-filter="open">Open land</button>
+      <button class="seg-btn ${FILTER==='gated'?'active':''}" data-filter="gated">Gated</button>
+    </div>
+  </div>`;
+}
+
+// D3 — Photos filter moved from the top toolbar into the Filters panel.
+// Same shape as Open/Gated above; data-photos buttons wired by the same
+// wireSegment() handler.
+function _photosFilterSectionHTML() {
+  return `<div class="tune-section">
+    <div class="tune-section-title">Photos</div>
+    <div class="tune-section-hint">Narrow to listings with broker-supplied photos, or those without.</div>
+    <div class="seg" role="group" aria-label="Photos filter">
+      <button class="seg-btn ${PHOTOS_F==='all'?'active':''}"  data-photos="all">All photos</button>
+      <button class="seg-btn ${PHOTOS_F==='with'?'active':''}" data-photos="with">With photos</button>
+      <button class="seg-btn ${PHOTOS_F==='none'?'active':''}" data-photos="none">No photos</button>
+    </div>
+  </div>`;
+}
+
 function _zoneFilterSectionHTML() {
   // Containers for buildZoneFilter() to populate. The desktop and mobile
   // bodies both render this section, so we can't rely on a single id —
@@ -763,8 +796,13 @@ function _rerankingDividerHTML() {
 function _tuneBodyHTML() {
   // Composed from independent sections so adding a new filter is a one-line
   // append rather than a rewrite of the panel. Section order matches
-  // mental model: where → how-much → how-big → how-good → reranking.
-  return _zoneFilterSectionHTML() + _rangeSectionHTML({
+  // mental model: type → location → price → size → score → reranking.
+  // Pre-D3 Open/Gated + Photos lived in the top toolbar; D3 consolidates
+  // all secondary filters into the panel so the toolbar stays focused on
+  // the primary type-pill selector.
+  return _openGatedSectionHTML()
+    + _photosFilterSectionHTML()
+    + _zoneFilterSectionHTML() + _rangeSectionHTML({
     id: 'price', title: 'Price (USD)',
     snaps: PRICE_SNAPS, labels: PRICE_LABELS,
     minIdx: PRICE_MIN_IDX, maxIdx: PRICE_MAX_IDX,
@@ -876,6 +914,48 @@ function _wireTuneControls(container) {
   });
   _wireMinScore(container);
   _wireWeightSliders(container);
+  // D3 — Open/Gated + Photos seg-btns rebuilt with each panel render;
+  // wire their click handlers per-container so the panel-scoped buttons
+  // work correctly on both desktop tune-body and mobile tune-body.
+  _wireSegInPanel(container);
+}
+
+// D3 — wire the panel's segmented controls. Each click updates the
+// scalar state, restyles the local button group, refreshes the badge,
+// and re-renders the table. Distinct from the original wireSegment()
+// (which targeted top-toolbar buttons that no longer exist after D3)
+// so the panel can be re-rendered without re-binding global handlers.
+function _wireSegInPanel(container) {
+  container.querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const group = btn.closest('.seg');
+      if (btn.dataset.filter) {
+        FILTER = btn.dataset.filter;
+      } else if (btn.dataset.photos) {
+        PHOTOS_F = btn.dataset.photos;
+      } else {
+        return;
+      }
+      if (group) {
+        group.querySelectorAll('.seg-btn').forEach(b =>
+          b.classList.toggle('active', b === btn));
+      }
+      // Mirror the active state on the OTHER body (desktop ↔ mobile)
+      // so the visual stays in sync if both are open simultaneously
+      // (rare but possible during a viewport resize).
+      document.querySelectorAll('.seg-btn').forEach(b => {
+        if (btn.dataset.filter && b.dataset.filter)
+          b.classList.toggle('active', b.dataset.filter === FILTER);
+        if (btn.dataset.photos && b.dataset.photos)
+          b.classList.toggle('active', b.dataset.photos === PHOTOS_F);
+      });
+      OPEN_ID = null;
+      document.getElementById('side-panel').classList.remove('open');
+      pushURL(true);
+      render();
+      _updateTuneButtonState();
+    });
+  });
 }
 function renderTunePanel() {
   const html = _tuneBodyHTML();
@@ -905,11 +985,14 @@ function closeTunePanel() {
   document.getElementById('mobile-tune-overlay').classList.remove('open');
 }
 function _activeFilterCount() {
-  // Counts non-default sections in the panel. Zone / Price / Size / Min
-  // score / Weights — each section that's been touched contributes 1.
-  // Grouped this way (rather than per-handle) so the badge reads as
-  // "how many things did I change," not as a slider count.
+  // Counts non-default sections in the panel. Each section the user has
+  // touched contributes 1. Grouped per-section (not per-handle) so the
+  // badge reads as "how many things did I change," not as a slider count.
+  // Pre-D3 Open/Gated + Photos lived in the top toolbar and weren't
+  // counted here; D3 moved them in so they now contribute too.
   let n = 0;
+  if (FILTER !== 'all') n++;
+  if (PHOTOS_F !== 'all') n++;
   if (ZONE_F) n++;
   if (!isDefaultPriceRange()) n++;
   if (!isDefaultSizeRange()) n++;
@@ -943,7 +1026,13 @@ function _updateTuneButtonState() {
   });
 }
 function _resetAllFilters() {
-  // Snap every panel-controlled state back to defaults.
+  // Snap every panel-controlled state back to defaults. D3 added FILTER
+  // (Open/Gated) and PHOTOS_F to the panel so they reset alongside the
+  // others. Type-pill state (TYPES_F) is intentionally NOT reset — it's
+  // controlled by the always-visible top toolbar and "Clear all" should
+  // only clear the secondary filters, not the user's type selection.
+  FILTER = 'all';
+  PHOTOS_F = 'all';
   ZONE_F = null;
   PRICE_MIN_IDX = 0; PRICE_MAX_IDX = PRICE_SNAPS.length - 1;
   SIZE_MIN_IDX  = 0; SIZE_MAX_IDX  = SIZE_SNAPS.length - 1;
@@ -1031,15 +1120,18 @@ function renderCards(rows) {
   wrap.querySelectorAll('.card').forEach((card,i)=>card.addEventListener('click',()=>openPanel(rows[i])));
 }
 function updateCounts(filtered, total) {
-  const label=FILTER==='all'?'All listings':FILTER==='open'?'Open land':'Gated / developments';
-  const zLabel=!ZONE_F?'':ZONE_F.type==='no-zone'?' · No zone':ZONE_F.type==='group'?` · ${ZONE_GROUPS[ZONE_F.value]?.label||''}`:(` · ${zoneLabel(ZONE_F.value)}`);
-  const pLabel=PHOTOS_F==='with'?' · With photos':PHOTOS_F==='none'?' · No photos':'';
-  // Type pill suffix — only show when narrowing (not all 3 active). Joins
-  // active types' labels: "Land", "Land + Beach houses", "Beach condos", etc.
+  // Pre-D3 the leading label was driven by FILTER (Open/Gated). With FILTER
+  // now living inside the panel and the type pills being the primary user
+  // surface, the leading label is just "All listings" (or the active types'
+  // labels when narrowed). Open/Gated + Photos become suffix tags like the
+  // other panel filters — coherent with the new toolbar hierarchy.
   const tLabel = TYPES_F.size < 3
-    ? ' · ' + ['land','house','condo'].filter(t=>TYPES_F.has(t)).map(t=>PROPERTY_TYPES[t]?.label||t).join(' + ')
-    : '';
-  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${label}${tLabel}${zLabel}${pLabel}`;
+    ? ['land','house','condo'].filter(t=>TYPES_F.has(t)).map(t=>PROPERTY_TYPES[t]?.label||t).join(' + ')
+    : 'All listings';
+  const zLabel=!ZONE_F?'':ZONE_F.type==='no-zone'?' · No zone':ZONE_F.type==='group'?` · ${ZONE_GROUPS[ZONE_F.value]?.label||''}`:(` · ${zoneLabel(ZONE_F.value)}`);
+  const fLabel = FILTER==='open'?' · Open land':FILTER==='gated'?' · Gated':'';
+  const pLabel=PHOTOS_F==='with'?' · With photos':PHOTOS_F==='none'?' · No photos':'';
+  document.getElementById('filter-count').innerHTML=`<strong>${filtered.toLocaleString()}</strong> of ${total.toLocaleString()} — ${tLabel}${fLabel}${zLabel}${pLabel}`;
   document.getElementById('footer-count').textContent=`${filtered.toLocaleString()} listing${filtered!==1?'s':''}`;
 }
 function render() {
@@ -1133,14 +1225,9 @@ function _removeFilter(key) {
 }
 
 /* ── Wire events ─────────────────────────────────────── */
-// Two segmented controls share the .seg-btn class — each button carries either
-// data-filter (Open/Gated) or data-photos (Photos), never both. Activate state
-// is scoped to the button's parent .seg so the two controls stay independent.
-function _activateInGroup(btn) {
-  const group = btn.closest('.seg');
-  if (!group) return;
-  group.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active', b===btn));
-}
+// Pre-D3 _activateInGroup helper removed alongside wireSegment(). The
+// panel's seg-btn buttons now live inside the filters panel and are
+// wired per-render by _wireSegInPanel() (in the panel section above).
 // ── Property-type pills (D1) ──────────────────────────────────────────
 // Multi-select toggle group. Each pill clicks toggle its type in TYPES_F.
 // At least one pill must always be selected — clicking the last active
@@ -1185,22 +1272,9 @@ function _renderTypePill(btn, pt) {
   }
 }
 
-function wireSegment() {
-  document.querySelectorAll('.seg-btn').forEach(btn=>{
-    if (btn.dataset.filter) {
-      btn.classList.toggle('active', btn.dataset.filter===FILTER);
-    } else if (btn.dataset.photos) {
-      btn.classList.toggle('active', btn.dataset.photos===PHOTOS_F);
-    }
-    btn.addEventListener('click',()=>{
-      if (btn.dataset.filter) FILTER = btn.dataset.filter;
-      else if (btn.dataset.photos) PHOTOS_F = btn.dataset.photos;
-      _activateInGroup(btn);
-      OPEN_ID=null; document.getElementById('side-panel').classList.remove('open');
-      pushURL(true); render();
-    });
-  });
-}
+// D3 — wireSegment() removed. Pre-D3 it bound the top-toolbar Open/Gated
+// + Photos buttons; D3 moved those into the Filters panel where each
+// render call re-binds via _wireSegInPanel(). Init no longer calls this.
 function wireSortHeaders() {
   document.querySelectorAll('thead th.sortable').forEach(th=>th.addEventListener('click',()=>{
     const col=th.dataset.col;
@@ -1370,7 +1444,7 @@ async function init() {
     }
   }
   document.querySelectorAll('.seg-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===FILTER));
-  wireSegment(); wireTypePills(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
+  wireTypePills(); wireSortHeaders(); wireMobileSort(); wireClose(); wireTune(); wireMethodology(); wireFiltersHelp();
   render(); loadMeta();
 }
 init();
