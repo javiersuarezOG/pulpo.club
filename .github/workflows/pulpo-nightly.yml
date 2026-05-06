@@ -102,6 +102,92 @@ jobs:
           print(f"CANARY OK: {n} listings in [{floor}, {ceiling}]")
           EOF
 
+      - name: Per-type canaries (floor + classification confidence)
+        # Per-type ingestion floors + classifier-confidence guard. Catches:
+        #   - house/condo coverage collapsing below acceptable minimum
+        #     (e.g. a scraper broadening regression silently drops built listings)
+        #   - classifier going haywire and tagging the majority of listings
+        #     "uncertain" (signal that broker fields or text patterns shifted)
+        #
+        # LOG_ONLY=true for the first 7 days so we calibrate thresholds against
+        # real nightly variance before enforcing. Floors set at ~80% of current
+        # production data (house=50, condo=8); ceiling on uncertain rate at 15%
+        # per the original PRD spec.
+        # TODO(2026-05-13): flip LOG_ONLY to false after 7-day soak window.
+        env:
+          LOG_ONLY:        "true"
+          HOUSE_FLOOR:     "40"   # ~80% of 50 — catches broadening collapse
+          CONDO_FLOOR:     "5"    # ~60% of 8 (small N — looser tolerance)
+          UNCERTAIN_PCT_CEILING: "15"
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys
+          from collections import Counter
+
+          log_only = os.environ.get("LOG_ONLY", "true").lower() == "true"
+          floors = {
+              "house": int(os.environ.get("HOUSE_FLOOR",  "40")),
+              "condo": int(os.environ.get("CONDO_FLOOR",  "5")),
+          }
+          uncertain_ceiling = float(os.environ.get("UNCERTAIN_PCT_CEILING", "15"))
+          violations: list[str] = []
+
+          # ── Per-type floor canary ──────────────────────────────────────
+          try:
+              data = json.load(open("web/data/ranked.json"))
+          except Exception as e:
+              print(f"ERROR: could not read ranked.json: {e}", file=sys.stderr)
+              sys.exit(1)
+          counts = Counter(li.get("property_type") for li in data)
+          for pt, floor in floors.items():
+              n = counts.get(pt, 0)
+              if n < floor:
+                  violations.append(
+                      f"PER_TYPE_FLOOR: {pt}={n} < floor {floor} "
+                      f"(scraper broadening may have regressed)"
+                  )
+              else:
+                  print(f"  {pt:6s} {n:>4} ≥ floor {floor}")
+
+          # ── Classifier confidence canary ───────────────────────────────
+          # Reads type_classifier_log.jsonl, looks at the LAST run's rows
+          # (highest ts), counts uncertain%. >ceiling means the classifier
+          # is no longer confident — could be broker-side field changes,
+          # weak text signals on a newly-broadened scraper, etc.
+          try:
+              rows = []
+              with open("web/data/type_classifier_log.jsonl") as f:
+                  for ln in f:
+                      ln = ln.strip()
+                      if ln and not ln.startswith("#"):
+                          rows.append(json.loads(ln))
+              if rows:
+                  latest_ts = max(r["ts"] for r in rows)
+                  latest = [r for r in rows if r["ts"] == latest_ts]
+                  unc = sum(1 for r in latest if r.get("confidence") == "uncertain")
+                  pct = (100.0 * unc) / len(latest) if latest else 0.0
+                  if pct > uncertain_ceiling:
+                      violations.append(
+                          f"CLASSIFIER_UNCERTAIN: {pct:.1f}% > ceiling {uncertain_ceiling}% "
+                          f"({unc}/{len(latest)} listings — text signals weakened?)"
+                      )
+                  else:
+                      print(f"  classifier_uncertain {pct:.1f}% ≤ ceiling {uncertain_ceiling}%")
+          except FileNotFoundError:
+              print("  classifier log not found — skipping confidence canary")
+          except Exception as e:
+              print(f"  classifier log read error: {e}")
+
+          if violations:
+              label = "CANARY LOG" if log_only else "CANARY FAIL"
+              for v in violations:
+                  print(f"{label}: {v}", file=sys.stderr)
+              if not log_only:
+                  sys.exit(1)
+          else:
+              print("Per-type canaries: all OK")
+          EOF
+
       - name: Data-quality canaries
         # TODO(2026-05-09): switch from LOG_ONLY=true to fail once canaries are
         # tuned against 7 days of real nightly runs.  Until then, violations are
