@@ -89,6 +89,13 @@
       <span class="filter-count" id="filter-count"></span>
     </div>
 
+    <!-- D4: active filter chips strip. Hidden until any panel-controlled
+         filter is active. Each chip is one-click removable. Type pills
+         get their own always-visible UI in the toolbar above, so they're
+         intentionally NOT chipped here — removing them via × would be
+         redundant + confusing (two ways to do the same thing). -->
+    <div class="filter-chips" id="filter-chips" hidden></div>
+
     <!-- Zone filter relocated into the Filters panel (see _tuneBodyHTML).
          The buildZoneFilter() function still targets #zone-filter — that
          element now lives inside the panel body and is re-rendered when

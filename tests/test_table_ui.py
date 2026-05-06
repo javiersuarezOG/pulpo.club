@@ -1781,3 +1781,103 @@ def test_count_label_uses_types_first_and_filter_as_suffix():
     # FILTER renders as a ' · ...' suffix, not the primary label
     assert "fLabel" in block
     assert "' · Open land'" in block or "\\' · Open land\\'" in block
+
+
+# ── D4: active filter chips strip ──────────────────────────────────────
+# Chips appear above the table when any panel-controlled filter is
+# active. Each chip has a × close button that clears just that filter.
+# Type pills are NOT chipped — they have their own always-visible
+# toolbar UI; chipping them would be redundant + confusing.
+
+def test_filter_chips_container_present_in_html():
+    html = (REPO / "web/index.html").read_text()
+    assert 'id="filter-chips"' in html, "Filter chips container missing from HTML"
+    assert 'class="filter-chips"' in html
+    # Hidden by default — no filters active on first load
+    assert "filter-chips" in html and "hidden" in html.split('id="filter-chips"')[1].split('>')[0]
+
+
+def test_active_chips_helper_excludes_type_pills():
+    """_activeChips MUST NOT add chips for TYPES_F — type pills have
+    their own always-visible UI in the toolbar. Adding chips would mean
+    two ways to do the same thing (pill toggle vs chip ×)."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _activeChips")[1].split("function ")[0]
+    assert "TYPES_F" not in block, (
+        "_activeChips references TYPES_F — type pills should not appear "
+        "as filter chips (they have their own toolbar UI)"
+    )
+
+
+def test_active_chips_helper_handles_each_panel_filter():
+    """Each panel-controlled filter must produce a chip when non-default."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _activeChips")[1].split("function ")[0]
+    for needle in (
+        "FILTER === 'open'",       # Open
+        "FILTER === 'gated'",      # Gated
+        "PHOTOS_F === 'with'",     # Photos with
+        "PHOTOS_F === 'none'",     # Photos none
+        "ZONE_F",                  # Zone
+        "isDefaultPriceRange",     # Price range
+        "isDefaultSizeRange",      # Size range
+        "isDefaultMinScore",       # Min score
+    ):
+        assert needle in block, (
+            f"_activeChips missing branch for {needle!r}"
+        )
+
+
+def test_render_filter_chips_hides_when_no_active_filters():
+    """The strip is invisible (display:none via [hidden]) when zero
+    filters active — table breathes when the user hasn't engaged."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderFilterChips")[1].split("function ")[0]
+    assert "wrap.hidden = true" in block, (
+        "_renderFilterChips doesn't hide the strip when 0 chips — table "
+        "loses padding for an empty container"
+    )
+
+
+def test_remove_filter_clears_only_target():
+    """Each × click clears just one filter. Verified via the switch
+    block — each case must clear ONLY the keyed dimension."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _removeFilter")[1].split("function ")[0]
+    # Each case clears the right state
+    assert "FILTER = 'all'" in block, "filter case doesn't clear FILTER"
+    assert "PHOTOS_F = 'all'" in block, "photos case doesn't clear PHOTOS_F"
+    assert "ZONE_F = null" in block, "zone case doesn't clear ZONE_F"
+    assert "PRICE_MIN_IDX = 0" in block, "price case doesn't clear price range"
+    assert "MIN_SCORE = 0" in block, "score case doesn't clear MIN_SCORE"
+    # Must trigger pushURL + render to make the change visible
+    assert "pushURL(true)" in block
+    assert "render()" in block
+
+
+def test_render_calls_filter_chips_renderer():
+    """Each render() must call _renderFilterChips so chips stay in sync
+    with state. Otherwise applying a filter wouldn't show its chip until
+    the panel re-rendered for some other reason."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function render(")[1].split("function ")[0]
+    assert "_renderFilterChips()" in block, (
+        "render() doesn't call _renderFilterChips — chips would lag state"
+    )
+
+
+def test_filter_chip_clear_all_button_resets_all():
+    """The 'Clear all' link inside the chip strip must call _resetAllFilters
+    — same handler as the panel's Clear-all link. Two entry points, one
+    behaviour."""
+    js = (REPO / "web/assets/index.js").read_text()
+    block = js.split("function _renderFilterChips")[1].split("function ")[0]
+    assert "_resetAllFilters" in block, (
+        "Chip strip's 'Clear all' button doesn't wire to _resetAllFilters"
+    )
+
+
+def test_filter_chips_css_present():
+    css = (REPO / "web/assets/index.css").read_text()
+    for sel in ('.filter-chips', '.filter-chip', '.filter-chip-x', '.filter-chips-clear'):
+        assert sel in css, f"D4 CSS selector {sel} missing"
