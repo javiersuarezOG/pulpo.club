@@ -32,7 +32,9 @@ function LiveStats({ locale }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/data/last_updated.json", { headers: { Accept: "application/json" } })
+    import("../telemetry/perf").then(({ timedFetch }) =>
+      timedFetch("last_updated.json", "/data/last_updated.json", { headers: { Accept: "application/json" } })
+    )
       .then(r => (r.ok ? r.json() : null))
       .then(j => { if (!cancelled) setData(j); })
       .catch(() => { /* swallow — see header comment */ });

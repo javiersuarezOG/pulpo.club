@@ -126,15 +126,34 @@ function App() {
 
   const showToast = useCallback((message) => setToast({ id: Date.now(), message }), []);
 
+  // PR-photo-nav-perf — instrument route transitions + detail open
+  // for compelling perf telemetry. Uses requestAnimationFrame so the
+  // measurement spans through React's commit phase (the actual user-
+  // visible "next page" / "panel rendered" moment).
+  const _measure = useCallback((eventName, payload) => {
+    const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const t1 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+      track(eventName, { ...payload, ms: Math.round(t1 - t0) });
+    }));
+  }, []);
+
   const go = useCallback((r, params = {}) => {
+    const from = route;
     setRoute(r); setRouteParams(params); setOpenListingId(null);
     window.scrollTo(0, 0);
-  }, []);
+    if (from !== r) _measure("perf.route_transition", { from, to: r });
+  }, [route, _measure]);
   const goBrowse = useCallback((params = {}) => {
+    const from = route;
     setRoute("browse"); setRouteParams(params); setOpenListingId(null);
     window.scrollTo(0, 0);
-  }, []);
-  const openListing = useCallback((id) => setOpenListingId(id), []);
+    if (from !== "browse") _measure("perf.route_transition", { from, to: "browse" });
+  }, [route, _measure]);
+  const openListing = useCallback((id) => {
+    setOpenListingId(id);
+    _measure("perf.detail_open", { listing_id: id });
+  }, [_measure]);
   const closeListing = useCallback(() => setOpenListingId(null), []);
 
   const toggleSave = useCallback((id) => {
