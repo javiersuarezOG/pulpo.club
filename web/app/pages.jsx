@@ -47,7 +47,7 @@ function TopNav({ app }) {
   return (
     <header className="topnav">
       <div className="topnav-inner">
-        <button className="logo-btn" onClick={() => app.go("home")} aria-label="Home">
+        <button className="logo-btn" onClick={() => app.go("home")} aria-label={t("nav.tab.home", lc)}>
           <PulpoLogo />
         </button>
         <nav className="topnav-links">
@@ -86,12 +86,18 @@ function TopNav({ app }) {
 // language names and flag-free regional labels (CR, MX, etc.) plus URL routing.
 function LocaleToggle({ app }) {
   return (
-    <div className="locale-toggle" role="group" aria-label="Language">
+    <div className="locale-toggle" role="group" aria-label={t("locale.toggle_aria", app.locale)}>
       {LOCALES.map(lc => (
         <button
           key={lc}
           className={app.locale === lc ? "active" : ""}
-          onClick={() => app.setLocale(lc)}
+          onClick={() => {
+            const prev = app.locale;
+            if (prev !== lc) {
+              track("locale.changed", { from: prev, to: lc });
+            }
+            app.setLocale(lc);
+          }}
         >
           {lc.toUpperCase()}
         </button>
@@ -139,7 +145,7 @@ function PillRail({ app, active }) {
           className={`pill-chip ${!active ? "is-active" : ""}`}
           onClick={() => app.goBrowse({ category: null })}
         >
-          <span className="pill-icon" aria-hidden="true"><Icon name="cat_all" size={15} strokeWidth={1.6}/></span> All
+          <span className="pill-icon" aria-hidden="true"><Icon name="cat_all" size={15} strokeWidth={1.6}/></span> {t("pill.all", app.locale)}
         </button>
         {PILLS.map(p => (
           <button
@@ -246,13 +252,13 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
             }}
           >
             {expanded
-              ? (app.locale === "es" ? "Mostrar menos" : "Show less")
+              ? t("shelf.show_less", app.locale)
               : <>{t("card.see_all", app.locale)} <Icon name="arrow_right" size={14} strokeWidth={2}/></>}
           </button>
           {!expanded && (
             <div className="shelf-scroll-btns">
-              <button onClick={() => scrollBy(-1)} aria-label="Scroll left"><Icon name="chevron_left" size={18}/></button>
-              <button onClick={() => scrollBy(1)} aria-label="Scroll right"><Icon name="chevron_right" size={18}/></button>
+              <button onClick={() => scrollBy(-1)} aria-label={t("common.scroll_left", app.locale)}><Icon name="chevron_left" size={18}/></button>
+              <button onClick={() => scrollBy(1)} aria-label={t("common.scroll_right", app.locale)}><Icon name="chevron_right" size={18}/></button>
             </div>
           )}
         </div>
@@ -480,14 +486,14 @@ function HomePage({ app }) {
       )}
 
       <div className="discover-controls">
-        <div className="layout-toggle" role="tablist" aria-label="Discover layout">
+        <div className="layout-toggle" role="tablist" aria-label={t("layout.aria", app.locale)}>
           <button
             role="tab"
             aria-selected={layout === "magazine"}
             className={layout === "magazine" ? "is-active" : ""}
             onClick={() => setLayoutPersist("magazine")}
           >
-            <Icon name="grid" size={14}/> {app.locale === "es" ? "Revista" : "Magazine"}
+            <Icon name="grid" size={14}/> {t("layout.magazine", app.locale)}
           </button>
           <button
             role="tab"
@@ -495,7 +501,7 @@ function HomePage({ app }) {
             className={layout === "standard" ? "is-active" : ""}
             onClick={() => setLayoutPersist("standard")}
           >
-            <Icon name="list" size={14}/> {app.locale === "es" ? "Estándar" : "Standard"}
+            <Icon name="list" size={14}/> {t("layout.standard", app.locale)}
           </button>
         </div>
       </div>
@@ -523,24 +529,25 @@ function HomePage({ app }) {
 // ====== Newsletter sticky CTA (compact inline version) ======
 function NewsletterCTA({ app }) {
   const [submitted, setSubmitted] = pUseState(false);
+  const lc = app.locale;
   return (
     <section className="newsletter-cta">
       <div className="nl-inner">
         <div className="nl-text">
           <Icon name="bell" size={18} />
           <div>
-            <div className="nl-title">Get the top 10 land deals every week</div>
-            <div className="nl-sub">Beachfront, build-ready and off-market — straight to your inbox. Unsubscribe anytime.</div>
+            <div className="nl-title">{t("newsletter.title", lc)}</div>
+            <div className="nl-sub">{t("newsletter.sub", lc)}</div>
           </div>
         </div>
         {submitted ? (
           <div className="nl-success">
-            <Icon name="check" size={16} strokeWidth={2.4} /> You're in. First digest Monday.
+            <Icon name="check" size={16} strokeWidth={2.4} /> {t("newsletter.success", lc)}
           </div>
         ) : (
           <form className="nl-form" onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
-            <input type="email" placeholder="your@email.com" required />
-            <button type="submit" className="btn-primary">Subscribe</button>
+            <input type="email" placeholder={t("newsletter.placeholder", lc)} required aria-label={t("newsletter.placeholder", lc)}/>
+            <button type="submit" className="btn-primary">{t("newsletter.subscribe", lc)}</button>
           </form>
         )}
       </div>
@@ -566,9 +573,9 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
   return (
     <aside className="filter-panel">
       <div className="filter-head">
-        <h3>Filters</h3>
-        {activeCount > 0 && <button className="link-btn" onClick={() => setFilters(makeDefaultFilters())}>Clear all</button>}
-        {onClose && <button className="icon-btn" onClick={onClose}><Icon name="close" size={18}/></button>}
+        <h3>{t("filter.title", lc)}</h3>
+        {activeCount > 0 && <button className="link-btn" onClick={() => setFilters(makeDefaultFilters())}>{t("filter.clear", lc)}</button>}
+        {onClose && <button className="icon-btn" onClick={onClose} aria-label={t("common.close", lc)}><Icon name="close" size={18}/></button>}
       </div>
 
       {/* PR-4c — area-unit preference. Persists in localStorage via useUnits()
@@ -593,7 +600,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       )}
 
-      <FilterGroup title="Zone">
+      <FilterGroup title={t("filter.zone", lc)}>
         <div className="chip-grid">
           {zoneList.map(z => (
             <button key={z}
@@ -603,93 +610,73 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Price">
+      <FilterGroup title={t("filter.price", lc)}>
         <PriceHistogram filters={filters} setFilters={update} />
       </FilterGroup>
 
-      <FilterGroup title="Land type">
+      <FilterGroup title={t("filter.land_type", lc)}>
         <div className="chip-grid">
-          {["residential","agricultural","commercial","tourist","mixed","raw"].map(t => (
-            <button key={t}
-              className={`chip ${filters.land_types.has(t) ? "is-active" : ""}`}
-              onClick={() => toggleSet("land_types", t)}>{landTypeLabel(t)}</button>
+          {["residential","agricultural","commercial","tourist","mixed","raw"].map(typeKey => (
+            <button key={typeKey}
+              className={`chip ${filters.land_types.has(typeKey) ? "is-active" : ""}`}
+              onClick={() => toggleSet("land_types", typeKey)}>{landTypeLabel(typeKey)}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Size">
+      <FilterGroup title={t("filter.size", lc)}>
         <div className="range-row">
-          <label>Min: {(filters.size_min/10000).toFixed(1)} ha</label>
+          <label>{t("filter.size_min", lc, { n: (filters.size_min/10000).toFixed(1) })}</label>
           <input type="range" min="0" max="200000" step="500"
             value={filters.size_min} onChange={(e) => update({ size_min: +e.target.value })}/>
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Key features">
+      <FilterGroup title={t("filter.features", lc)}>
         <div className="chip-grid">
-          {[
-            ["beachfront","Beachfront"],
-            ["ocean_view","Ocean View"],
-            ["mountain_view","Mountain View"],
-            ["flat","Flat Land"],
-            ["water_body","Water Feature"],
-          ].map(([k,l]) => (
+          {["beachfront","ocean_view","mountain_view","flat","water_body"].map(k => (
             <button key={k}
               className={`chip ${filters.features.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("features", k)}>{l}</button>
+              onClick={() => toggleSet("features", k)}>{t(`filter.feature.${k}`, lc)}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Infrastructure">
+      <FilterGroup title={t("filter.infrastructure", lc)}>
         <div className="chip-grid">
-          {[
-            ["water","Water"],
-            ["power","Electricity"],
-            ["paved","Paved Road"],
-            ["sewage","Sewage"],
-          ].map(([k,l]) => (
+          {["water","power","paved","sewage"].map(k => (
             <button key={k}
               className={`chip ${filters.infra.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("infra", k)}>{l}</button>
+              onClick={() => toggleSet("infra", k)}>{t(`filter.infra.${k}`, lc)}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Listing status">
+      <FilterGroup title={t("filter.status", lc)}>
         <div className="chip-grid">
-          {[
-            ["new","New"],
-            ["price_drop","Price drop"],
-            ["off_market","Off-market"],
-            ["motivated","Motivated seller"],
-          ].map(([k,l]) => (
+          {["new","price_drop","off_market","motivated"].map(k => (
             <button key={k}
               className={`chip ${filters.status.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("status", k)}>{l}</button>
+              onClick={() => toggleSet("status", k)}>{t(`filter.status.${k}`, lc)}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Build readiness">
+      <FilterGroup title={t("filter.readiness", lc)}>
         <div className="range-row">
-          <label>{["Any","Basic","Some","Most","Fully ready"][filters.readiness] || "Any"}</label>
+          <label>{t(`filter.readiness.${filters.readiness ?? 0}`, lc)}</label>
           <input type="range" min="0" max="4" step="1"
             value={filters.readiness} onChange={(e) => update({ readiness: +e.target.value })}/>
         </div>
       </FilterGroup>
 
       {/* PR-4b — photos chip (legacy parity). */}
-      <FilterGroup title="Photos">
+      <FilterGroup title={t("filter.photos", lc)}>
         <div className="chip-grid">
-          {[
-            ["all","All listings"],
-            ["with","With photos"],
-            ["none","No photos"],
-          ].map(([k,l]) => (
+          {["all","with","none"].map(k => (
             <button key={k}
               className={`chip ${filters.photos === k ? "is-active" : ""}`}
-              onClick={() => update({ photos: k })}>{l}</button>
+              onClick={() => update({ photos: k })}>{t(`filter.photos_${k}`, lc)}</button>
           ))}
         </div>
       </FilterGroup>
@@ -700,7 +687,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
 
       {onClose && (
         <div className="filter-apply">
-          <button className="btn-primary block" onClick={onClose}>Show {count} listings</button>
+          <button className="btn-primary block" onClick={onClose}>{t("filter.show_count", lc, { n: count })}</button>
         </div>
       )}
     </aside>
@@ -808,7 +795,7 @@ function MethodologyModal({ open, onClose }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal modal-methodology" onClick={(e) => e.stopPropagation()} role="dialog" aria-labelledby="meth-title">
-        <button className="modal-close" onClick={onClose} aria-label="Close">
+        <button className="modal-close" onClick={onClose} aria-label={t("common.close", lc)}>
           <Icon name="close" size={18} />
         </button>
         <h2 id="meth-title">{lc === "es" ? "Cómo clasificamos" : "How we rank"}</h2>
@@ -1126,30 +1113,30 @@ function BrowsePage({ app }) {
                 );
               })() : (
                 <>
-                  <span className="num">{results.length}</span> listings
+                  <span className="num">{results.length}</span> {t("card.listings_count", app.locale)}
                 </>
               )}
             </div>
             <div className="results-controls">
               <button className="filter-mobile-btn" onClick={() => setFilterDrawerOpen(true)}>
-                <Icon name="sliders" size={16} /> Filters {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
+                <Icon name="sliders" size={16} /> {t("view.filters", app.locale)} {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
               </button>
               <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
-                <option value="recent">Most recent</option>
-                <option value="price_asc">Price: low to high</option>
-                <option value="price_desc">Price: high to low</option>
-                <option value="size_desc">Size: largest first</option>
-                <option value="ppm_asc">{`$${ppmSuffix()}: lowest first`}</option>
-                <option value="days_asc">Days listed: fewest first</option>
-                <option value="ready_desc">Most build-ready</option>
-                <option value="stars_desc">Investment score: highest</option>
-                <option value="composite_desc">Best match (your weights)</option>
+                <option value="recent">{t("sort.recent", app.locale)}</option>
+                <option value="price_asc">{t("sort.price_asc", app.locale)}</option>
+                <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
+                <option value="size_desc">{t("sort.size_desc", app.locale)}</option>
+                <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
+                <option value="days_asc">{t("sort.days_asc", app.locale)}</option>
+                <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
+                <option value="stars_desc">{t("sort.stars_desc", app.locale)}</option>
+                <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
               </select>
               <div className="view-toggle">
-                <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label="Table view">
+                <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label={t("view.table", app.locale)}>
                   <Icon name="list" size={16}/>
                 </button>
-                <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label="Card view">
+                <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label={t("view.cards", app.locale)}>
                   <Icon name="grid" size={16}/>
                 </button>
               </div>
@@ -1337,15 +1324,16 @@ function ListingDetail({ listing, app, asPanel = true }) {
     track("detail.photo_lightbox_opened", { listing_id: listing.id });
   };
 
+  const lc = app.locale;
   const facts = [
-    { icon: "road", label: "Road access", value: listing.road_access_type ? capitalize(listing.road_access_type) : "—" },
-    { icon: "droplet", label: "Water supply", value: listing.has_water ? "On site" : "—" },
-    { icon: "bolt", label: "Electricity", value: listing.has_power ? "At boundary" : "—" },
-    { icon: "leaf", label: "Topography", value: listing.is_flat ? "Mostly flat" : "Sloped" },
-    { icon: "wave", label: "Beachfront tier", value: listing.beachfront_tier ? capitalize(listing.beachfront_tier.replace("_"," ")) : "—" },
-    { icon: "sun", label: "Ocean view", value: listing.has_ocean_view ? "Yes" : "—" },
-    { icon: "zone", label: "Zoning", value: capitalize(listing.zoning_use) },
-    { icon: "camera", label: "Photos", value: `${listing.photos_count}` },
+    { icon: "road", label: t("detail.fact.road", lc), value: listing.road_access_type ? capitalize(listing.road_access_type) : "—" },
+    { icon: "droplet", label: t("detail.fact.water", lc), value: listing.has_water ? t("detail.fact.water_on", lc) : "—" },
+    { icon: "bolt", label: t("detail.fact.electricity", lc), value: listing.has_power ? t("detail.fact.power_at", lc) : "—" },
+    { icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) },
+    { icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: listing.beachfront_tier ? capitalize(listing.beachfront_tier.replace("_"," ")) : "—" },
+    { icon: "sun", label: t("detail.fact.ocean_view", lc), value: listing.has_ocean_view ? t("detail.fact.yes", lc) : "—" },
+    { icon: "zone", label: t("detail.fact.zoning", lc), value: capitalize(listing.zoning_use) },
+    { icon: "camera", label: t("detail.fact.photos", lc), value: `${listing.photos_count}` },
   ];
 
   return (
@@ -1361,9 +1349,9 @@ function ListingDetail({ listing, app, asPanel = true }) {
 
       {isSold && (
         <div className="sold-banner">
-          <strong>This listing has been sold or removed.</strong>
-          <span>It was on the market for {listing.days_listed} days.</span>
-          <button className="link-btn" onClick={() => app.goBrowse({ category: null, zones: [listing.zone_name] })}>Browse similar listings in {listing.zone_name} →</button>
+          <strong>{t("detail.sold_banner.title", lc)}</strong>
+          <span>{t("detail.sold_banner.days", lc, { n: listing.days_listed })}</span>
+          <button className="link-btn" onClick={() => app.goBrowse({ category: null, zones: [listing.zone_name] })}>{t("detail.sold_banner.cta", lc, { zone: listing.zone_name })}</button>
         </div>
       )}
 
@@ -1372,7 +1360,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           <button
             className="gallery-main"
             onClick={() => listing.photos.length && !needsSignup && openLightbox(0)}
-            aria-label={listing.photos.length ? "Open photo gallery" : undefined}
+            aria-label={listing.photos.length ? t("detail.gallery.open", lc) : undefined}
           >
             {listing.photos[0] ? (
               <img src={listing.photos[0]} alt={tr(listing.title, app.locale)}/>
@@ -1388,7 +1376,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <button
                 key={i}
                 className={`gallery-thumb ${needsSignup && i >= 2 ? "locked" : ""}`}
-                aria-label={needsSignup && i >= 2 ? "Sign up to unlock more photos" : `Open photo ${i + 1}`}
+                aria-label={needsSignup && i >= 2 ? t("detail.gallery.locked_aria", lc) : t("detail.gallery.open_n", lc, { n: i + 1 })}
                 onClick={() => {
                   if (needsSignup && i >= 2) {
                     app.openSignup({ mode: "signup", pendingListing: listing.id });
@@ -1402,10 +1390,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   <div className="thumb-lock"><Icon name="lock" size={16}/></div>
                 )}
                 {!needsSignup && i === 4 && listing.photos.length > 5 && (
-                  <div className="more-photos">+{listing.photos.length - 5} photos</div>
+                  <div className="more-photos">{t("detail.more_photos", lc, { n: listing.photos.length - 5 })}</div>
                 )}
                 {needsSignup && i === 4 && (
-                  <div className="more-photos">Sign up for {listing.photos.length - 2}+ photos</div>
+                  <div className="more-photos">{t("detail.signup_more_photos", lc, { n: listing.photos.length - 2 })}</div>
                 )}
               </button>
             ))}
@@ -1423,20 +1411,20 @@ function ListingDetail({ listing, app, asPanel = true }) {
           <h1 className="detail-title">{tr(listing.title, app.locale)}</h1>
           <div className="detail-badges">
             <Badge listing={listing}/>
-            {listing.readiness_score >= 3 && !listing.is_repriced && <span className="pulpo-badge soft">Build-ready</span>}
-            {listing.has_ocean_view && <span className="pulpo-badge soft">Ocean view</span>}
-            {listing.is_flat && <span className="pulpo-badge soft">Flat</span>}
+            {listing.readiness_score >= 3 && !listing.is_repriced && <span className="pulpo-badge soft">{t("badge.build_ready", lc)}</span>}
+            {listing.has_ocean_view && <span className="pulpo-badge soft">{t("badge.ocean_view", lc)}</span>}
+            {listing.is_flat && <span className="pulpo-badge soft">{t("badge.flat", lc)}</span>}
           </div>
         </div>
 
         <div className="detail-keystats">
           <div className="kstat">
-            <div className="kstat-label">Price</div>
+            <div className="kstat-label">{t("detail.price", lc)}</div>
             <div className="kstat-value">{formatPrice(listing.price)}</div>
             {listing.previous_price && <div className="kstat-sub strike">{formatPrice(listing.previous_price)}</div>}
           </div>
           <div className="kstat">
-            <div className="kstat-label">Size</div>
+            <div className="kstat-label">{t("detail.size", lc)}</div>
             <div className="kstat-value">{formatSize(listing.size_m2)}</div>
           </div>
           <div className="kstat">
@@ -1444,7 +1432,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
             <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
           </div>
           <div className="kstat">
-            <div className="kstat-label">Days listed</div>
+            <div className="kstat-label">{t("detail.days_listed", lc)}</div>
             <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{listing.days_listed}</div>
           </div>
         </div>
@@ -1463,7 +1451,9 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
                 <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                  Sign up to see {listing.usps.length - 1} more reason{listing.usps.length - 1 === 1 ? "" : "s"} we picked this listing
+                  {listing.usps.length - 1 === 1
+                    ? t("detail.signup_more_reasons_one", lc)
+                    : t("detail.signup_more_reasons_other", lc, { n: listing.usps.length - 1 })}
                 </button>
               </li>
             )}
@@ -1471,7 +1461,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
         </div>
 
         <div className="detail-section">
-          <h3 className="section-title">Key facts</h3>
+          <h3 className="section-title">{t("detail.key_facts", lc)}</h3>
           <div className="facts-grid">
             {facts.map(f => (
               <div className="fact-tile" key={f.label}>
@@ -1486,23 +1476,23 @@ function ListingDetail({ listing, app, asPanel = true }) {
         </div>
 
         <div className="detail-section">
-          <h3 className="section-title">Location</h3>
+          <h3 className="section-title">{t("detail.location", lc)}</h3>
           <div className="location-block">
             <div className="map-chip">
               <Icon name="map_pin" size={16}/>
               <span><strong>{listing.zone_name}</strong>, {listing.province_state}</span>
             </div>
             <div className="distance-pills">
-              {listing.dist_beach_km != null && <span className="dpill"><Icon name="cat_beachfront" size={13} strokeWidth={1.6}/> {listing.dist_beach_km < 1 ? "On beach" : `${listing.dist_beach_km}km to beach`}</span>}
-              <span className="dpill"><Icon name="plane" size={13} strokeWidth={1.6}/> {listing.dist_airport_km}km to airport</span>
-              <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {listing.dist_nearest_town_km}km to town</span>
+              {listing.dist_beach_km != null && <span className="dpill"><Icon name="cat_beachfront" size={13} strokeWidth={1.6}/> {listing.dist_beach_km < 1 ? t("detail.on_beach", lc) : t("detail.km_to_beach", lc, { n: listing.dist_beach_km })}</span>}
+              <span className="dpill"><Icon name="plane" size={13} strokeWidth={1.6}/> {t("detail.km_to_airport", lc, { n: listing.dist_airport_km })}</span>
+              <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t("detail.km_to_town", lc, { n: listing.dist_nearest_town_km })}</span>
             </div>
             <div className={`static-map ${needsSignup ? "zone-only" : ""}`}>
               <div className="static-map-grid"/>
               {needsSignup ? (
                 <div className="static-map-zone-blob">
                   <Icon name="map_pin" size={20} strokeWidth={1.4}/>
-                  <span>{listing.zone_name} area</span>
+                  <span>{t("detail.zone_area", lc, { zone: listing.zone_name })}</span>
                 </div>
               ) : (
                 <div className="static-map-pin"><Icon name="map_pin" size={28} strokeWidth={1.4}/></div>
@@ -1510,7 +1500,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <div className="static-map-zone">{listing.zone_name}</div>
               {needsSignup && (
                 <button className="map-unlock-chip" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                  <Icon name="lock" size={12}/> Sign up for precise pin
+                  <Icon name="lock" size={12}/> {t("detail.signup_for_pin", lc)}
                 </button>
               )}
             </div>
@@ -1521,11 +1511,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
           <div className="paywall-overlay hard">
             <div className="pw-card">
               <Icon name="cat_off_market" size={28}/>
-              <h3>Off-market deal</h3>
-              <p>This listing isn’t public anywhere else. Pulpo Pro members get direct access plus broker intros.</p>
-              <button className="btn-primary lg" onClick={() => app.go("plans")}>See plans</button>
+              <h3>{t("detail.paywall.title", lc)}</h3>
+              <p>{t("detail.paywall.body", lc)}</p>
+              <button className="btn-primary lg" onClick={() => app.go("plans")}>{t("detail.paywall.see_plans", lc)}</button>
               {!app.user && (
-                <button className="btn-ghost" onClick={() => app.openSignup({ mode: "login" })}>I have an account</button>
+                <button className="btn-ghost" onClick={() => app.openSignup({ mode: "login" })}>{t("detail.paywall.have_account", lc)}</button>
               )}
             </div>
           </div>
@@ -1540,7 +1530,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
               className="btn-primary lg block"
               onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}
             >
-              <Icon name="lock" size={16}/> Sign up free to view source listing
+              <Icon name="lock" size={16}/> {t("detail.signup_to_view_source", lc)}
             </button>
           ) : listing.original_url ? (
             <a
@@ -1553,15 +1543,15 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 source_label: listing.source_label,
               })}
             >
-              View on {listing.source_label} <Icon name="arrow_up_right" size={16} strokeWidth={2}/>
+              {t("detail.view_on", lc, { source: listing.source_label })} <Icon name="arrow_up_right" size={16} strokeWidth={2}/>
             </a>
           ) : (
             <button className="btn-primary lg block" disabled>
-              Off-market — see Plans to inquire
+              {t("detail.off_market_inquire", lc)}
             </button>
           )}
           <button className="btn-ghost lg" onClick={(e) => { e.stopPropagation(); app.toggleSave(listing.id); }}>
-            <Icon name="heart" size={16}/> {app.savedIds.has(listing.id) ? "Saved" : "Save"}
+            <Icon name="heart" size={16}/> {app.savedIds.has(listing.id) ? t("detail.saved", lc) : t("detail.save", lc)}
           </button>
         </div>
       )}
@@ -1573,28 +1563,28 @@ function ListingDetail({ listing, app, asPanel = true }) {
           ref={lightboxRef}
           role="dialog"
           aria-modal="true"
-          aria-label={`Photo ${galleryIdx + 1} of ${listing.photos.length}`}
+          aria-label={t("lightbox.aria_label", lc, { n: galleryIdx + 1, total: listing.photos.length })}
         >
           <button
             className="lightbox-close"
             ref={lightboxCloseRef}
             onClick={(e) => { e.stopPropagation(); setLightbox(false); }}
-            aria-label="Close photo gallery (Escape)"
+            aria-label={t("lightbox.close", lc)}
           >
             <Icon name="close" size={22}/>
           </button>
-          <img src={listing.photos[galleryIdx]} alt={`${tr(listing.title, app.locale)} — photo ${galleryIdx + 1}`}/>
+          <img src={listing.photos[galleryIdx]} alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}/>
           <div className="lightbox-controls" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setGalleryIdx((galleryIdx - 1 + listing.photos.length) % listing.photos.length)}
-              aria-label="Previous photo (Left arrow)"
+              aria-label={t("lightbox.prev", lc)}
             >
               <Icon name="chevron_left" size={24}/>
             </button>
             <span aria-live="polite">{galleryIdx + 1} / {listing.photos.length}</span>
             <button
               onClick={() => setGalleryIdx((galleryIdx + 1) % listing.photos.length)}
-              aria-label="Next photo (Right arrow)"
+              aria-label={t("lightbox.next", lc)}
             >
               <Icon name="chevron_right" size={24}/>
             </button>
@@ -1639,7 +1629,7 @@ function SavedPage({ app }) {
           </div>
           <h2>{t("saved.empty.title", app.locale)}</h2>
           <p>{t("saved.empty.body", app.locale)}</p>
-          <button className="btn-primary" onClick={() => app.go("browse")}>Browse listings →</button>
+          <button className="btn-primary" onClick={() => app.go("browse")}>{t("saved.browse_cta", app.locale)}</button>
         </div>
       </div>
     );
@@ -1653,18 +1643,18 @@ function SavedPage({ app }) {
         </div>
         <div className="results-controls">
           <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
-            <option value="recent">Recently saved</option>
-            <option value="price_asc">Price: low to high</option>
-            <option value="price_desc">Price: high to low</option>
-            <option value="size_desc">Size: largest first</option>
-            <option value="ppm_asc">{`$${ppmSuffix()}: lowest first`}</option>
-            <option value="days_asc">Days listed: fewest first</option>
+            <option value="recent">{t("sort.recently_saved", app.locale)}</option>
+            <option value="price_asc">{t("sort.price_asc", app.locale)}</option>
+            <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
+            <option value="size_desc">{t("sort.size_desc", app.locale)}</option>
+            <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
+            <option value="days_asc">{t("sort.days_asc", app.locale)}</option>
           </select>
           <div className="view-toggle">
-            <button className={view === "table" ? "active" : ""} onClick={() => setView("table")} aria-label="Table view">
+            <button className={view === "table" ? "active" : ""} onClick={() => setView("table")} aria-label={t("view.table", app.locale)}>
               <Icon name="list" size={16}/>
             </button>
-            <button className={view === "cards" ? "active" : ""} onClick={() => setView("cards")} aria-label="Card view">
+            <button className={view === "cards" ? "active" : ""} onClick={() => setView("cards")} aria-label={t("view.cards", app.locale)}>
               <Icon name="grid" size={16}/>
             </button>
           </div>
@@ -1782,7 +1772,7 @@ function SignupModal({ app }) {
   return (
     <div className="modal-backdrop" onClick={() => app.closeSignup()}>
       <div className="modal modal-signup" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={() => app.closeSignup()} aria-label="Close">
+        <button className="modal-close" onClick={() => app.closeSignup()} aria-label={t("common.close", app.locale)}>
           <Icon name="close" size={18}/>
         </button>
         <div className="modal-head">
@@ -2020,7 +2010,7 @@ function detectEuRegion() {
     return /^Europe\//.test(tz);
   } catch { return false; }
 }
-function ConsentBanner() {
+function ConsentBanner({ locale = "en" }) {
   const [decided, setDecided] = pUseState(() => {
     try { return localStorage.getItem("pulpo-consent") || ""; }
     catch { return ""; }
@@ -2039,13 +2029,13 @@ function ConsentBanner() {
     setDecided(decision);
   };
   return (
-    <div className="consent-banner" role="dialog" aria-label="Cookie consent">
+    <div className="consent-banner" role="dialog" aria-label={t("consent.aria", locale)}>
       <div className="consent-text">
-        Pulpo uses analytics cookies to improve the site. No third-party ads.
+        {t("consent.body", locale)}
       </div>
       <div className="consent-actions">
-        <button className="btn-ghost" onClick={() => set("declined")}>Decline</button>
-        <button className="btn-primary" onClick={() => set("granted")}>Accept</button>
+        <button className="btn-ghost" onClick={() => set("declined")}>{t("consent.decline", locale)}</button>
+        <button className="btn-primary" onClick={() => set("granted")}>{t("consent.accept", locale)}</button>
       </div>
     </div>
   );
