@@ -203,3 +203,72 @@ def apply_all(li: Any) -> dict[str, Any]:
         "source_label":      _g(li, "source_label"),
         "data_quality_score":_g(li, "data_quality_score"),
     }
+
+
+# ─────────────────────────────────────────────────────────────────────
+# PR-7 — UX-facing derives (source_type + previous_price).
+# These are wired into automation/run.py *before* apply_all() so that
+# downstream label/signal logic can read them once they're meaningful.
+# ─────────────────────────────────────────────────────────────────────
+
+# Sources that scrape from social/private channels rather than indexed
+# real-estate sites. Listings from these surface as "off_market" — the
+# UI gates direct contact behind the Pro paywall.
+OFF_MARKET_SOURCES: frozenset[str] = frozenset({
+    "whatsapp", "facebook", "private", "instagram",
+})
+
+
+def derive_source_type(li: Any) -> str:
+    """Map listing.source slug to 'off_market' or 'on_market'.
+
+    Off-market is the smaller, paywalled shelf. The list is whitelist-style
+    (additive): unrecognized sources default to 'on_market' so a new
+    indexed scraper doesn't accidentally land on the paywall side.
+    """
+    src = _g(li, "source")
+    if isinstance(src, str) and src.lower() in OFF_MARKET_SOURCES:
+        return "off_market"
+    return "on_market"
+
+
+def derive_previous_price(li: Any, prices_history: Optional[dict] = None) -> Optional[float]:
+    """Most-recent prior price for a repriced listing.
+
+    Reads from `prices_history.json`'s `{source}|{source_id}` key, which
+    automation/run.py populates as a chronological list of `{ts, price_usd}`
+    snapshots. We surface the LAST entry whose price differs from the
+    current price — that's the price the buyer "saw" before today's drop.
+
+    Returns None when:
+      - is_repriced is not True (saves the lookup; nothing to display)
+      - history is missing for this listing key (some scrapers reslug
+        source_id over time and detach the history)
+      - the only prior entry equals the current price (not actually a drop)
+
+    Plan note: a regex fallback for "rebajado de $X a $Y" / "reduced from
+    $X to $Y" in description was scoped but not implemented here — the
+    history-based path covers all listings whose source_id is stable, which
+    is every current scraper. Add the regex when we see a reslug.
+    """
+    if _g(li, "is_repriced") is not True:
+        return None
+    if not prices_history:
+        return None
+    src = _g(li, "source")
+    sid = _g(li, "source_id")
+    if not (isinstance(src, str) and isinstance(sid, str)):
+        return None
+    history = prices_history.get(f"{src}|{sid}")
+    if not isinstance(history, list) or len(history) < 2:
+        return None
+    cur = _g(li, "price_usd")
+    if not isinstance(cur, (int, float)):
+        return None
+    # Walk backwards; first entry whose price differs from current is the
+    # "previous" price. Skip same-price echoes (redundant snapshots).
+    for entry in reversed(history[:-1]):
+        prev = entry.get("price_usd") if isinstance(entry, dict) else None
+        if isinstance(prev, (int, float)) and float(prev) != float(cur):
+            return float(prev)
+    return None

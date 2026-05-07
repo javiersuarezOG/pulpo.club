@@ -123,7 +123,14 @@ export function adaptListing(raw: any): Listing {
   const sourceKey = String(raw.source ?? "unknown");
   const sourceId = String(raw.source_id ?? "");
   const id = `${sourceKey}-${sourceId}` || `pulpo-${Math.random().toString(36).slice(2)}`;
-  const sourceType = deriveSourceType(sourceKey);
+  // PR-7 — prefer the backend-derived source_type when present (the
+  // pipeline now sets it via pulpo/derived_rules.derive_source_type).
+  // Fallback to the FE-side derivation keeps things rendering during
+  // the deploy window before the new ranked.json lands.
+  const sourceType: "on_market" | "off_market" =
+    raw.source_type === "off_market" || raw.source_type === "on_market"
+      ? raw.source_type
+      : deriveSourceType(sourceKey);
 
   // Off-market listings hide the source name entirely (the user's rule
   // — never reveal that a listing came from WhatsApp/Facebook/private).

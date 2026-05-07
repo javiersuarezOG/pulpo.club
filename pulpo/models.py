@@ -116,6 +116,16 @@ class Listing:
     readiness_score: Optional[int] = None       # 0..3, has_water + has_power + has_paved_access
     source_label: list[str] = field(default_factory=list)  # display chips: Beachfront/Price Drop/etc.
 
+    # PR-7 — UX-facing derived fields.
+    # `source_type`: "off_market" if scraped from social/private channels
+    # (whatsapp, facebook, private, instagram), else "on_market". Drives
+    # the off-market shelf, the "View on source" link gating, and the
+    # paywall on the detail panel.
+    # `previous_price`: most-recent prior price from prices_history.json
+    # when is_repriced=True. Surfaced on cards/detail as the strikethrough.
+    source_type: Optional[str] = None           # 'off_market'|'on_market'
+    previous_price: Optional[float] = None      # USD; only set when is_repriced
+
     # PRD §FR-7.5 zone medians (Phase 3) — computed each run from the full
     # catalog. None when the (zone, property_type) bucket has fewer than
     # 10 active comparable peers.

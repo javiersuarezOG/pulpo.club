@@ -151,6 +151,10 @@ export interface Listing {
     readiness_score: number | null;     // 0..3
     source_label: string[];
 
+    // ── PR-7 — UX-facing derives ────────────────────────────────────
+    source_type: "off_market" | "on_market" | null;  // gates paywall + "View on source"
+    previous_price: number | null;                   // strikethrough on cards/detail when is_repriced
+
     // ── Zone medians (PRD §FR-7.5) ──────────────────────────────────
     price_vs_zone_median: number | null;  // USD/m² median of bucket peers
     price_vs_zone_pct: number | null;     // signed % vs bucket median
