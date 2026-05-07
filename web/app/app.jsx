@@ -246,7 +246,7 @@ function App() {
 
       <SignupModal app={app} />
       <ToastHost app={app} />
-      <ConsentBanner />
+      <ConsentBanner locale={locale} />
 
       {__PULPO_DEV_PANEL__ && showDevPanel && (
       <TweaksPanel>
