@@ -224,7 +224,12 @@ export async function loadListings(): Promise<Listing[]> {
   // within a session.
   if (cache && Date.now() - cache.ts < 60_000) return cache.listings;
 
-  const res = await fetch("/data/ranked.json", { headers: { Accept: "application/json" } });
+  // PR-photo-nav-perf — instrumented fetch surfaces the data-load
+  // latency + cache-hit-rate in PostHog.
+  const { timedFetch } = await import("../telemetry/perf");
+  const res = await timedFetch("ranked.json", "/data/ranked.json", {
+    headers: { Accept: "application/json" },
+  });
   if (!res.ok) {
     throw new Error(`ranked.json HTTP ${res.status}`);
   }

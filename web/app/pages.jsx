@@ -179,7 +179,9 @@ function Hero({ app }) {
   const [featuredId, setFeaturedId] = pUseState(null);
   pUseEffect(() => {
     let cancelled = false;
-    fetch("/data/featured.json", { headers: { Accept: "application/json" } })
+    import("./telemetry/perf").then(({ timedFetch }) =>
+      timedFetch("featured.json", "/data/featured.json", { headers: { Accept: "application/json" } })
+    )
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (!cancelled && j && typeof j.listing_id === "string") {
@@ -1345,6 +1347,10 @@ function BrowsePage({ app }) {
   const debouncedFilters = useDebouncedValue(filters, 300);
 
   const results = pUseMemo(() => {
+    // PR-photo-nav-perf — filter+sort cost is the most expensive
+    // recurring computation on Browse (873 listings × 15 predicates).
+    // Telemetry surfaces P95 in PostHog so a regression is visible.
+    const _perf_t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
     const r = applyFilters(LISTINGS, debouncedFilters);
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
@@ -1360,7 +1366,23 @@ function BrowsePage({ app }) {
         recomputeComposite(b, debouncedFilters.weights) -
         recomputeComposite(a, debouncedFilters.weights),
     };
-    return [...r].sort(sorters[sort] || sorters.recent);
+    const sorted = [...r].sort(sorters[sort] || sorters.recent);
+    // Emit perf telemetry for the full filter+sort cycle.
+    if (_perf_t0 > 0 && typeof performance !== "undefined" && performance.now) {
+      const ms = Math.round(performance.now() - _perf_t0);
+      const _activeFilterCount =
+        debouncedFilters.zones.size + debouncedFilters.land_types.size +
+        debouncedFilters.features.size + debouncedFilters.infra.size +
+        debouncedFilters.status.size +
+        (debouncedFilters.price_max != null || debouncedFilters.price_min > 0 ? 1 : 0) +
+        (debouncedFilters.readiness > 0 ? 1 : 0);
+      track("perf.filter_recompute", {
+        ms,
+        result_count: sorted.length,
+        active_filters: _activeFilterCount,
+      });
+    }
+    return sorted;
   }, [debouncedFilters, sort, LISTINGS]);
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
@@ -1640,9 +1662,17 @@ function ListingDetail({ listing, app, asPanel = true }) {
   }, [lightbox, listing.photos.length]);
 
   const openLightbox = (idx) => {
+    const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
     setGalleryIdx(idx);
     setLightbox(true);
     track("detail.photo_lightbox_opened", { listing_id: listing.id });
+    // PR-photo-nav-perf — lightbox open latency = state-set → next paint.
+    if (t0 > 0) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const ms = Math.round(performance.now() - t0);
+        track("perf.lightbox_open", { listing_id: listing.id, ms });
+      }));
+    }
   };
 
   const lc = app.locale;
