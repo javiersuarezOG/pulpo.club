@@ -7,7 +7,7 @@
 // QA helpers exposed via ?debug=1 URL flag (no UI in production).
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import ReactDOM from "react-dom/client";
-import { t, useLocale } from "./i18n.jsx";
+import { t, useLocale, useUnits } from "./i18n.jsx";
 import { ListingsProvider, useListings, useListingsState } from "./data/use-listings.tsx";
 import { PulpoLogo } from "./components.jsx";
 import {
@@ -50,6 +50,7 @@ function App() {
   const [route, setRoute] = useState("home");
   const [routeParams, setRouteParams] = useState({});
   const [locale, setLocale] = useLocale();
+  const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
   });
@@ -178,6 +179,7 @@ function App() {
     detailViewCount, recordDetailView,
     showToast, toast,
     locale, setLocale,
+    units, setUnits,
     showShelfBlur: true,
     tweaks,
     listings,

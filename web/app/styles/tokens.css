@@ -98,9 +98,13 @@
   --section-pad: 24px;
   --card-cols: 3;
 
-  /* Card widths (StyleCarousel vs. ListingCard differ — see PR-4 plan) */
+  /* Card widths (StyleCarousel vs. ListingCard differ — see PR-4 plan).
+     Magazine variant rides on the standard carousel rail (PR-4c) but uses
+     a wider card so the editorial visual language reads distinct from
+     the denser standard rail. */
   --card-w-style: 280px;
   --card-w-listing: 340px;
+  --card-w-magazine: 480px;
 
   /* ============== RADII ============== */
   --radius-sm: 6px;
