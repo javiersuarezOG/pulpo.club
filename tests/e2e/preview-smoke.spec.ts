@@ -162,4 +162,43 @@ test.describe("New app boots cleanly on key routes", () => {
 
     expect(errors, "console errors during histogram interaction").toEqual([]);
   });
+
+  // Auth-state QA hack — until PR-9 ships real Clerk auth, the only
+  // way to test logged-in/logged-out flows on the production /preview
+  // alias is to set `pulpo-user` in localStorage manually. The dev
+  // panel's authState useEffect MUST NOT clobber this on initial
+  // mount. We hit a regression once where it did (the panel's default
+  // "signed_out" value overwrote the localStorage-saved user on every
+  // page load — flash of logged-in, then back to logged-out). This
+  // test pins the fix.
+  test("localStorage pulpo-user persists across reload", async ({ page, context }) => {
+    await context.addInitScript(() => {
+      localStorage.setItem(
+        "pulpo-user",
+        JSON.stringify({
+          email: "you@pulpo.club",
+          name: "Demo User",
+          plan: "pro",
+          joined: Date.now(),
+        }),
+      );
+    });
+
+    await page.goto("/", { waitUntil: "networkidle" });
+
+    // After mount: localStorage should still have the user.
+    const persisted = await page.evaluate(() => localStorage.getItem("pulpo-user"));
+    expect(persisted, "pulpo-user clobbered on mount").toBeTruthy();
+
+    const parsed = JSON.parse(persisted!);
+    expect(parsed.plan).toBe("pro");
+
+    // And the TopNav should reflect a signed-in state — the avatar
+    // button (initial of email) renders only when `app.user` is set.
+    // If the override fired, .avatar wouldn't appear.
+    await page.locator(".avatar, .profile-chip").first().waitFor({
+      state: "visible",
+      timeout: 5_000,
+    });
+  });
 });

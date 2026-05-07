@@ -55,10 +55,17 @@ function App() {
     try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
   });
 
-  // Auth-state tweak — overrides persisted user when set to a non-default value.
-  // Lets the user preview the full app from any auth perspective without
-  // having to manually log in/out.
+  // Auth-state tweak — overrides persisted user when the dev panel
+  // explicitly toggles. Skipped on initial mount so the panel's
+  // default "signed_out" doesn't clobber a localStorage-saved user
+  // (or one set manually via DevTools for QA — the workaround until
+  // PR-9 ships real Clerk auth).
+  const initialAuthRef = useRef(tweaks.authState);
   useEffect(() => {
+    // First render: keep whatever localStorage gave us. Only fire
+    // when the user actually toggles the dev-panel radio.
+    if (tweaks.authState === initialAuthRef.current) return;
+    initialAuthRef.current = tweaks.authState;
     if (tweaks.authState === "signed_out") {
       setUser(null);
     } else if (tweaks.authState === "signed_in_free") {
