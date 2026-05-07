@@ -73,9 +73,24 @@ function App() {
     return +localStorage.getItem("pulpo-detail-views") || 0;
   });
 
-  // Debug flag — opt-in via ?debug=1 so QA can simulate funnel states
-  // without exposing controls to real users.
+  // Dev panel gate: visible only when (a) the build is non-production AND
+  // (b) the URL carries ?dev=1 or ?debug=1, OR we're in `vite dev`. In
+  // production builds `__PULPO_DEV_PANEL__` is the literal `false`, so
+  // both panels (TweaksPanel and DebugPanel) get dead-code-eliminated by
+  // tree-shaking. See vite.config.js.
+  const showDevPanel = useMemo(() => {
+    if (!__PULPO_DEV_PANEL__) return false;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return import.meta.env.DEV || params.has("dev") || params.has("debug");
+    } catch {
+      return import.meta.env.DEV;
+    }
+  }, []);
+  // Legacy ?debug=1 flag — still wires the lower-right DebugPanel
+  // specifically (separate from the full TweaksPanel above).
   const debug = useMemo(() => {
+    if (!__PULPO_DEV_PANEL__) return false;
     try { return new URLSearchParams(window.location.search).has("debug"); }
     catch { return false; }
   }, []);
@@ -213,6 +228,7 @@ function App() {
       <SignupModal app={app} />
       <ToastHost app={app} />
 
+      {__PULPO_DEV_PANEL__ && showDevPanel && (
       <TweaksPanel>
         <TweakSection label="Auth state" />
         <TweakRadio
@@ -267,8 +283,9 @@ function App() {
           <TweakButton onClick={() => go("account", { section: "security" })}>· Security</TweakButton>
         </div>
       </TweaksPanel>
+      )}
 
-      {debug && <DebugPanel app={app} />}
+      {__PULPO_DEV_PANEL__ && debug && <DebugPanel app={app} />}
     </div>
   );
 }
