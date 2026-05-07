@@ -86,9 +86,17 @@ class Listing:
     validation_warnings: list[str] = field(default_factory=list)
 
     # PRD §FR-6 AI-enriched fields (Phase 1)
-    title_canonical: Optional[str] = None
-    short_description_canonical: Optional[str] = None
-    reasons_to_buy: list[str] = field(default_factory=list)
+    # PR-7.5 — bilingual shape: {"en": "...", "es": "..."} (was Optional[str]).
+    # FE's tr() helper handles both shapes; pre-PR-7.5 sidecar entries are
+    # invalidated by the schema_version bump and re-enriched into the new
+    # shape on next run.
+    title_canonical: Optional[dict] = None
+    short_description_canonical: Optional[dict] = None
+    reasons_to_buy: list = field(default_factory=list)  # list[dict[str,str]]
+    # PR-7.5 — language of the source listing's URL ("en", "es", "mixed").
+    # FE uses it to gate the "View on source" CTA on the detail panel:
+    # only shows when url_language == user_locale OR == "mixed".
+    url_language: Optional[str] = None
 
     # PRD WS2 — single-call DeepSeek enrichment metadata (latlong block).
     # `lat`/`lng`/`geocoding_confidence` above are reused; these two carry

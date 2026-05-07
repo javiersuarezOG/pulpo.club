@@ -43,6 +43,11 @@ export type Listing = {
   has_lat_lng: boolean;
   is_sold: boolean;
   original_url: string | null;
+  // PR-7.5 — language of the source listing's URL. FE uses this to
+  // decide whether to show the "View on source" CTA on the detail
+  // panel: only renders when url_language matches user_locale OR is
+  // "mixed". Legacy listings (pre-bilingual-enrichment) carry null.
+  url_language: "en" | "es" | "mixed" | null;
   // Carried for the legacy Browse "Advanced ranking" group + sort:
   rank_score: number | null;
   value_score: number | null;

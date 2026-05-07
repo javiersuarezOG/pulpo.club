@@ -128,9 +128,13 @@ export interface Listing {
     // ── Validation + AI enrichment ────────────────────────────────
     validation_status: ValidationStatus;
     validation_warnings: string[];
-    title_canonical: string | null;
-    short_description_canonical: string | null;
-    reasons_to_buy: string[];
+    /** PR-7.5 bilingual shape: {en, es}. Legacy entries (pre-PR-7.5) carry null. */
+    title_canonical: { en: string; es: string } | null;
+    short_description_canonical: { en: string; es: string } | null;
+    /** PR-7.5: each USP carries both languages. */
+    reasons_to_buy: { en: string; es: string }[];
+    /** PR-7.5: language of the source listing's URL — gates the "View on source" CTA. */
+    url_language: "en" | "es" | "mixed" | null;
     geocoding_source: GeocodingSource | null;
     geocoding_reference: string | null;
     enriched_at: string | null;

@@ -44,6 +44,7 @@ def _li(**overrides) -> dict:
         "title_canonical":             None,
         "short_description_canonical": None,
         "reasons_to_buy":              [],
+        "url_language":                None,
         "lat":                         None,
         "lng":                         None,
         "geocoding_confidence":        None,
@@ -54,12 +55,27 @@ def _li(**overrides) -> dict:
     return base
 
 
+def _bilingual(en: str, es: str) -> dict:
+    return {"en": en, "es": es}
+
+
 def _ok_response() -> dict:
-    """A response that passes every validator in DEFAULT_SCHEMA."""
+    """A response that passes every validator in DEFAULT_SCHEMA (PR-7.5)."""
     return {
-        "title":       "Beachfront 5,000 m² lot in El Tunco",
-        "description": "A flat, well-positioned parcel " * 5,
-        "usps":        ["Direct beach access", "Flat terrain", "Paved road"],
+        "title":       _bilingual(
+            "Beachfront 5,000 m² lot in El Tunco",
+            "Terreno frente al mar de 5,000 m² en El Tunco",
+        ),
+        "description": _bilingual(
+            "A flat, well-positioned parcel " * 5,
+            "Un terreno plano y bien posicionado " * 5,
+        ),
+        "usps": [
+            _bilingual("Direct beach access", "Acceso directo a la playa"),
+            _bilingual("Flat terrain", "Terreno plano"),
+            _bilingual("Paved road", "Camino pavimentado"),
+        ],
+        "url_language": "en",
         "latlong": {
             "lat":        13.4912,
             "lng":        -89.3818,
@@ -179,7 +195,7 @@ def test_validate_rejects_usps_as_string():
 
 def test_validate_rejects_usps_too_few():
     r = _ok_response()
-    r["usps"] = ["only", "two"]
+    r["usps"] = [_bilingual("only", "solo"), _bilingual("two", "dos")]
     ok, reason = validate_response(r)
     assert ok is False
     assert reason == "invalid:usps"
@@ -187,10 +203,68 @@ def test_validate_rejects_usps_too_few():
 
 def test_validate_rejects_usps_too_many():
     r = _ok_response()
-    r["usps"] = ["a", "b", "c", "d", "e", "f"]
+    r["usps"] = [_bilingual(c, c) for c in "abcdef"]
     ok, reason = validate_response(r)
     assert ok is False
     assert reason == "invalid:usps"
+
+
+# PR-7.5 — bilingual shape validation
+def test_validate_rejects_legacy_string_title():
+    """Pre-PR-7.5 strings must NOT validate against the new dict schema."""
+    r = _ok_response()
+    r["title"] = "Just a string"
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_title_missing_es():
+    r = _ok_response()
+    r["title"] = {"en": "EN only"}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_title_with_empty_es():
+    r = _ok_response()
+    r["title"] = {"en": "EN", "es": "  "}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_usps_with_legacy_strings():
+    """USPs must be bilingual dicts; raw strings get rejected."""
+    r = _ok_response()
+    r["usps"] = ["Direct beach access", "Flat terrain", "Paved road"]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:usps"
+
+
+def test_validate_rejects_unknown_url_language():
+    r = _ok_response()
+    r["url_language"] = "fr"
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:url_language"
+
+
+def test_validate_rejects_missing_url_language():
+    r = _ok_response()
+    del r["url_language"]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "missing:url_language"
+
+
+def test_validate_accepts_url_language_mixed():
+    r = _ok_response()
+    r["url_language"] = "mixed"
+    ok, _ = validate_response(r)
+    assert ok is True
 
 
 def test_validate_rejects_lat_outside_sv_bbox():
@@ -247,9 +321,18 @@ def test_validate_rejects_bool_as_lat():
 def test_apply_writes_all_target_attrs():
     li = _li()
     apply_response(li, _ok_response())
-    assert li["title_canonical"] == "Beachfront 5,000 m² lot in El Tunco"
-    assert "well-positioned" in li["short_description_canonical"]
-    assert li["reasons_to_buy"] == ["Direct beach access", "Flat terrain", "Paved road"]
+    assert li["title_canonical"] == {
+        "en": "Beachfront 5,000 m² lot in El Tunco",
+        "es": "Terreno frente al mar de 5,000 m² en El Tunco",
+    }
+    assert "well-positioned" in li["short_description_canonical"]["en"]
+    assert "bien posicionado" in li["short_description_canonical"]["es"]
+    assert li["reasons_to_buy"] == [
+        {"en": "Direct beach access", "es": "Acceso directo a la playa"},
+        {"en": "Flat terrain", "es": "Terreno plano"},
+        {"en": "Paved road", "es": "Camino pavimentado"},
+    ]
+    assert li["url_language"] == "en"
     assert li["lat"] == 13.4912
     assert li["lng"] == -89.3818
     assert li["geocoding_confidence"] == "medium"
@@ -260,9 +343,9 @@ def test_apply_writes_all_target_attrs():
 def test_apply_strips_whitespace_on_strings():
     li = _li()
     r = _ok_response()
-    r["title"] = "  Padded title  "
+    r["title"] = {"en": "  Padded title  ", "es": "  Título con espacios  "}
     apply_response(li, r)
-    assert li["title_canonical"] == "Padded title"
+    assert li["title_canonical"] == {"en": "Padded title", "es": "Título con espacios"}
 
 
 def test_apply_rounds_coords_to_six_decimals():
@@ -331,9 +414,17 @@ def test_custom_schema_extends_eligibility_with_new_field():
 
 
 def test_default_schema_has_expected_fields_in_order():
-    """Lock the field order — telemetry skip_reason depends on it."""
+    """Lock the field order — telemetry skip_reason depends on it.
+    PR-7.5 added url_language at the end so existing skip-reason
+    counters don't shift."""
     keys = [f.json_key for f in DEFAULT_SCHEMA.fields]
-    assert keys == ["title", "description", "usps", "latlong"]
+    assert keys == ["title", "description", "usps", "latlong", "url_language"]
+
+
+def test_default_schema_version_is_two():
+    """PR-7.5 bumped schema_version 1 → 2 to invalidate pre-bilingual
+    sidecars on the next pipeline run."""
+    assert DEFAULT_SCHEMA.schema_version == 2
 
 
 def test_default_schema_uses_deepseek_model_and_env():

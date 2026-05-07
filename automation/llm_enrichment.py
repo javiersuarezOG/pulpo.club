@@ -207,6 +207,9 @@ def _build_sidecar_entry(li: Any, schema: EnrichmentSchema,
         "title_canonical":             _g(li, "title_canonical"),
         "short_description_canonical": _g(li, "short_description_canonical"),
         "reasons_to_buy":              list(_g(li, "reasons_to_buy") or []),
+        # PR-7.5 — url_language is one of the schema fields; sidecar
+        # carries it so hydration on subsequent runs validates.
+        "url_language":                _g(li, "url_language"),
         "lat":                         _g(li, "lat"),
         "lng":                         _g(li, "lng"),
         "geocoding_confidence":        _g(li, "geocoding_confidence"),

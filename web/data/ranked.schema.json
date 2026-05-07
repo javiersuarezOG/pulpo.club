@@ -61,6 +61,7 @@
       "title_canonical",
       "short_description_canonical",
       "reasons_to_buy",
+      "url_language",
       "geocoding_source",
       "geocoding_reference",
       "enriched_at",
@@ -361,23 +362,20 @@
           "type": "string"
         }
       },
-      "title_canonical": {
+      "title_canonical": {},
+      "short_description_canonical": {},
+      "reasons_to_buy": {},
+      "url_language": {
         "type": [
           "string",
           "null"
+        ],
+        "enum": [
+          "en",
+          "es",
+          "mixed",
+          null
         ]
-      },
-      "short_description_canonical": {
-        "type": [
-          "string",
-          "null"
-        ]
-      },
-      "reasons_to_buy": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
       },
       "geocoding_source": {
         "type": [

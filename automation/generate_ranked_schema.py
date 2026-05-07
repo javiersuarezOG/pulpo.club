@@ -84,6 +84,26 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
     "dist_nearest_town_km": {"minimum": 0},
     "lat":                  {"minimum": -90,  "maximum": 90},
     "lng":                  {"minimum": -180, "maximum": 180},
+    # PR-7.5 — bilingual shape for AI-enriched canonical fields.
+    "title_canonical": {
+        "type": ["object", "null"],
+        "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+        "required": ["en", "es"],
+    },
+    "short_description_canonical": {
+        "type": ["object", "null"],
+        "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+        "required": ["en", "es"],
+    },
+    "reasons_to_buy": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+            "required": ["en", "es"],
+        },
+    },
+    "url_language": {"enum": ["en", "es", "mixed", None]},
 }
 
 
