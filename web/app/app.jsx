@@ -32,6 +32,7 @@ import {
   TweakButton,
 } from "./tweaks-panel.jsx";
 import { ErrorBoundary } from "./error-boundary.jsx";
+import { ClerkShell } from "./auth/clerk-shell.jsx";
 import { track } from "./telemetry/hook";
 import { bootWebVitals } from "./telemetry/web-vitals";
 import "./styles/index.css";
@@ -372,8 +373,10 @@ function DebugPanel({ app }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>
-    <ListingsProvider>
-      <App />
-    </ListingsProvider>
+    <ClerkShell>
+      <ListingsProvider>
+        <App />
+      </ListingsProvider>
+    </ClerkShell>
   </ErrorBoundary>
 );
