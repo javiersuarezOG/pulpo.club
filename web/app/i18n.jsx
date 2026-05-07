@@ -35,6 +35,29 @@ function useLocale() {
   return [locale, setLocale];
 }
 
+// PR-4c — area-unit preference. Vrs² is the Salvadoran traditional unit
+// (1 vr² ≈ 0.698896 m²). Stored alongside locale so it persists across
+// sessions; mirrored to <html data-units> so format helpers can read it
+// without prop-threading (same trick we use for locale).
+const UNITS = ["m2", "vrs2"];
+const DEFAULT_UNITS = "m2";
+const M2_PER_VARA2 = 0.698896;
+function getStoredUnits() {
+  try { return localStorage.getItem("pulpo-units") || DEFAULT_UNITS; }
+  catch { return DEFAULT_UNITS; }
+}
+function useUnits() {
+  const [units, setUnitsState] = React.useState(getStoredUnits);
+  const setUnits = React.useCallback((next) => {
+    if (!UNITS.includes(next)) return;
+    try { localStorage.setItem("pulpo-units", next); } catch {}
+    setUnitsState(next);
+    document.documentElement.dataset.units = next;
+  }, []);
+  React.useEffect(() => { document.documentElement.dataset.units = units; }, [units]);
+  return [units, setUnits];
+}
+
 // Translate a localized field. Accepts:
 //   - string                                   → returned as-is (legacy / non-translatable)
 //   - { en: "...", es: "..." }                 → picks current locale, falls back to EN
@@ -148,6 +171,18 @@ const UI_STRINGS = {
   "style.sub":               { en: "Every property in Pulpo has a mood. Pick yours.",
                                es: "Cada propiedad en Pulpo tiene una vibra. Elige la tuya." },
 
+  // Live header stats (PR-4c)
+  "stats.sources":           { en: "sources",  es: "fuentes" },
+  "stats.listings":          { en: "listings", es: "terrenos" },
+  "stats.updated":           { en: "updated",  es: "actualizado" },
+  "stats.info_label":        { en: "Pulpo data freshness", es: "Frescura de los datos de Pulpo" },
+
+  // Units toggle (PR-4c) — vrs² is the Salvadoran traditional area unit.
+  "units.label":             { en: "Show areas in", es: "Mostrar áreas en" },
+  "units.m2":                { en: "m²",       es: "m²" },
+  "units.vrs2":              { en: "vrs²",     es: "vrs²" },
+  "units.aria":              { en: "Choose area unit", es: "Elegir unidad de área" },
+
   // Account area (A.3)
   "nav.account":             { en: "Account",                       es: "Cuenta" },
   "account.back":            { en: "← Back to Discover",            es: "← Volver a Descubrir" },
@@ -191,8 +226,18 @@ function formatPriceI18n(n, locale) {
     style: "currency", currency: "USD", maximumFractionDigits: 0,
   }).format(n);
 }
-function formatSizeI18n(m2, locale) {
+function formatSizeI18n(m2, locale, units) {
   const lc = localeMap[locale] || "en-US";
+  const u = units === "vrs2" ? "vrs2" : "m2";
+  if (u === "vrs2") {
+    // Convert m² → vrs². Show in manzanas (1 mz = 10000 vrs²) at large
+    // magnitudes for parity with how Salvadoran agents quote land.
+    const vrs2 = m2 / M2_PER_VARA2;
+    if (vrs2 >= 10000) {
+      return `${new Intl.NumberFormat(lc, { maximumFractionDigits: 2 }).format(vrs2 / 10000)} mz`;
+    }
+    return `${new Intl.NumberFormat(lc, { maximumFractionDigits: 0 }).format(vrs2)} vrs²`;
+  }
   if (m2 >= 10000) return `${new Intl.NumberFormat(lc, { maximumFractionDigits: 1 }).format(m2/10000)} ha`;
   return `${new Intl.NumberFormat(lc).format(m2)} m²`;
 }
@@ -205,5 +250,6 @@ function formatDaysListedI18n(d, locale) {
 
 export {
   LOCALES, DEFAULT_LOCALE, useLocale, tr, t,
+  UNITS, DEFAULT_UNITS, M2_PER_VARA2, useUnits,
   formatPriceI18n, formatSizeI18n, formatDaysListedI18n,
 };

@@ -1,11 +1,17 @@
 // Shared atoms + listing components for Pulpo
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n } from "./i18n.jsx";
+import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VARA2 } from "./i18n.jsx";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
 function currentLocale() {
   return document.documentElement.lang || "en";
+}
+// PR-4c — units preference (m² vs. Salvadoran vrs²). Mirrors the locale
+// pattern: stored on <html data-units>, read here so format helpers
+// don't need prop-threading.
+function currentUnits() {
+  return document.documentElement.dataset.units === "vrs2" ? "vrs2" : "m2";
 }
 function formatPrice(n) {
   if (n == null) return "—";
@@ -13,7 +19,7 @@ function formatPrice(n) {
 }
 function formatSize(m2) {
   if (m2 == null) return "—";
-  return formatSizeI18n(m2, currentLocale());
+  return formatSizeI18n(m2, currentLocale(), currentUnits());
 }
 function formatDaysListed(d) {
   if (d == null) return null;
@@ -23,9 +29,21 @@ function formatDaysListed(d) {
 // price_per_m2 (price missing from scrape, area_m2 missing). The
 // legacy index.js fmtPPM handled this — restored here as a guardrail
 // against the kind of crash we hit on /preview twice.
+//
+// PR-4c — when the user picks vrs² in the FilterPanel, swap the
+// denominator to vara² (1 vr² ≈ 0.698896 m²), so price_per_vara² =
+// price_per_m² × 0.698896. Suffix swaps to /vr².
 function formatPpm(n) {
   if (n == null || !Number.isFinite(n) || n <= 0) return "—";
-  return `$${Math.round(n).toLocaleString(currentLocale() === "es" ? "es-CR" : "en-US")}`;
+  const lc = currentLocale();
+  const isVrs = currentUnits() === "vrs2";
+  const value = isVrs ? n * M2_PER_VARA2 : n;
+  return `$${Math.round(value).toLocaleString(lc === "es" ? "es-CR" : "en-US")}`;
+}
+// Suffix to append after a formatPpm() string. Lets call sites stay
+// declarative ("$X/m²" vs "$X/vr²") without each one re-checking units.
+function ppmSuffix() {
+  return currentUnits() === "vrs2" ? "/vr²" : "/m²";
 }
 function daysListedTone(d) {
   if (d == null) return "muted";
@@ -74,6 +92,7 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     eye: <><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></>,
     bookmark: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>,
     star: <polygon points="12 2 15 8.5 22 9.3 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.3 9 8.5"/>,
+    info: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="12" y1="7.5" x2="12" y2="7.51"/></>,
 
     /* ===== Category icons (monochrome, line) ===== */
     /* Used by PillRail. Hairline (1.6) line, geometric, no fills. */
@@ -264,7 +283,7 @@ function ListingCard({ listing, app, compact = false, onOpen, variant = "default
             <span className="price-was">{formatPrice(listing.previous_price)}</span>
           )}
           {!isMag && (
-            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}/m²</span>
+            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}{ppmSuffix()}</span>
           )}
         </div>
         {!compact && !isMag && listing.usps[0] && (
@@ -316,5 +335,6 @@ function Toast({ toast }) {
 
 export {
   Icon, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
-  formatPrice, formatSize, formatDaysListed, formatPpm, daysListedTone, landTypeLabel, currentLocale,
+  formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
+  daysListedTone, landTypeLabel, currentLocale, currentUnits,
 };

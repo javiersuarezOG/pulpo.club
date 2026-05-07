@@ -392,6 +392,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
   /* Keep snap mandatory on mobile — momentum scroll + snap feels right */
 }
 
+/* PR-4c — magazine variant of the carousel rail.
+   Wider cards + tighter peek so the editorial card variant
+   (transparent bg, no source pill, taller 4/3 photo) reads as
+   distinct from the dense standard rail. Desktop shows ~2.4 cards,
+   tablet ~1.7, mobile keeps the same single-card behavior. */
+.shelf-rail-magazine .shelf-item {
+  width: var(--card-w-magazine);
+}
+@media (max-width: 1279px) {
+  .shelf-rail-magazine .shelf-item { width: 420px; }
+}
+@media (max-width: 767px) {
+  .shelf-rail-magazine .shelf-item { width: 78%; min-width: 260px; }
+}
+
 .shelf.is-blurred .shelf-rail { filter: blur(7px); pointer-events: none; user-select: none; }
 .shelf-blur-gate {
   position: absolute; inset: 0;
@@ -2343,4 +2358,144 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--ink);
+}
+
+/* ============== PR-4c — Units toggle (m² / vrs²) ============== */
+/* Lives at the top of FilterPanel, right under the filter-head row.
+   Mirrors the locale-toggle visual language (pill segmented control)
+   so the two preferences read as siblings. */
+.units-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.units-toggle-label {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+.units-toggle {
+  display: inline-flex;
+  gap: 0;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px;
+  font-family: var(--font-mono);
+}
+.units-toggle button {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: all 160ms;
+}
+.units-toggle button:hover { color: var(--ink); }
+.units-toggle button.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ============== PR-4c — Live header stats ============== */
+/* Three-metric compact chip in TopNav: sources online, listings,
+   updated. Inline on desktop; collapses behind an info-toggle popover
+   on mobile to keep the header height stable. */
+.live-stats {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+}
+.live-stats-inline {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ls-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+.ls-num {
+  color: var(--ink-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.ls-label {
+  text-transform: lowercase;
+}
+.ls-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  margin-right: 2px;
+  align-self: center;
+}
+.ls-dot[data-state="ok"]   { background: var(--badge-new); }
+.ls-dot[data-state="warn"] { background: var(--tone-amber); }
+
+/* Mobile-only info toggle. Hidden on desktop; replaces inline rail on mobile. */
+.live-stats-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color 160ms, border-color 160ms;
+}
+.live-stats-toggle:hover { color: var(--ink); border-color: var(--line-2); }
+
+.live-stats-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  min-width: 200px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.live-stats-popover .ls-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+@media (max-width: 1023px) {
+  /* On tablet/mobile, collapse to the icon. */
+  .live-stats-inline { display: none; }
+  .live-stats-toggle { display: inline-flex; }
+}
+@media (max-width: 480px) {
+  /* Free up topnav-right gap on tiny screens. */
+  .live-stats { margin-right: -4px; }
 }

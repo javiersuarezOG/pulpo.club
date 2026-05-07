@@ -32,10 +32,14 @@ import {
   formatSize,
   formatDaysListed,
   formatPpm,
+  ppmSuffix,
   daysListedTone,
   landTypeLabel,
   currentLocale,
+  currentUnits,
 } from "./components.jsx";
+import { LiveStats } from "./components/LiveStats.jsx";
+import { useUnits } from "./i18n.jsx";
 
 // ====== TopNav ======
 function TopNav({ app }) {
@@ -54,6 +58,7 @@ function TopNav({ app }) {
           </button>
         </nav>
         <div className="topnav-right">
+          <LiveStats locale={lc} />
           <LocaleToggle app={app} />
           {app.user ? (
             <div className="profile-chip">
@@ -244,7 +249,7 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
               ? (app.locale === "es" ? "Mostrar menos" : "Show less")
               : <>{t("card.see_all", app.locale)} <Icon name="arrow_right" size={14} strokeWidth={2}/></>}
           </button>
-          {!expanded && !isMagazine && (
+          {!expanded && (
             <div className="shelf-scroll-btns">
               <button onClick={() => scrollBy(-1)} aria-label="Scroll left"><Icon name="chevron_left" size={18}/></button>
               <button onClick={() => scrollBy(1)} aria-label="Scroll right"><Icon name="chevron_right" size={18}/></button>
@@ -265,21 +270,11 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
             />
           ))}
         </div>
-      ) : isMagazine ? (
-        <div className="shelf-magazine-grid">
-          {items.slice(0, 6).map(l => (
-            <ListingCard
-              key={l.id} listing={l} app={app}
-              onOpen={() => {
-                track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
-                app.openListing(l.id);
-              }}
-              variant="magazine"
-            />
-          ))}
-        </div>
       ) : (
-        <div className="shelf-rail" ref={scrollRef}>
+        // PR-4c: magazine + standard now share the carousel rail. The rail
+        // gets a `shelf-rail-magazine` modifier class that swaps card width
+        // to --card-w-magazine so the editorial language stays distinct.
+        <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
           {items.map(l => (
             <div className="shelf-item" key={l.id}>
               <ListingCard
@@ -289,6 +284,7 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
                   track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
                   app.openListing(l.id);
                 }}
+                variant={isMagazine ? "magazine" : "default"}
               />
             </div>
           ))}
@@ -519,7 +515,7 @@ function NewsletterCTA({ app }) {
 }
 
 // ====== Browse — filter sidebar ======
-function FilterPanel({ filters, setFilters, count, onClose }) {
+function FilterPanel({ filters, setFilters, count, onClose, app }) {
   const update = (patch) => setFilters({ ...filters, ...patch });
   const toggleSet = (key, val) => {
     const s = new Set(filters[key]);
@@ -531,6 +527,7 @@ function FilterPanel({ filters, setFilters, count, onClose }) {
     + filters.land_types.size + filters.features.size
     + filters.infra.size + filters.status.size
     + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0);
+  const lc = app?.locale || currentLocale();
 
   return (
     <aside className="filter-panel">
@@ -539,6 +536,28 @@ function FilterPanel({ filters, setFilters, count, onClose }) {
         {activeCount > 0 && <button className="link-btn" onClick={() => setFilters(makeDefaultFilters())}>Clear all</button>}
         {onClose && <button className="icon-btn" onClick={onClose}><Icon name="close" size={18}/></button>}
       </div>
+
+      {/* PR-4c — area-unit preference. Persists in localStorage via useUnits()
+          in app.jsx; flips formatSize / formatPpm everywhere. */}
+      {app?.setUnits && (
+        <div className="units-toggle-row">
+          <span className="units-toggle-label">{t("units.label", lc)}</span>
+          <div className="units-toggle" role="group" aria-label={t("units.aria", lc)}>
+            <button
+              type="button"
+              className={app.units !== "vrs2" ? "is-active" : ""}
+              onClick={() => app.setUnits("m2")}
+              aria-pressed={app.units !== "vrs2"}
+            >{t("units.m2", lc)}</button>
+            <button
+              type="button"
+              className={app.units === "vrs2" ? "is-active" : ""}
+              onClick={() => app.setUnits("vrs2")}
+              aria-pressed={app.units === "vrs2"}
+            >{t("units.vrs2", lc)}</button>
+          </div>
+        </div>
+      )}
 
       <FilterGroup title="Zone">
         <div className="chip-grid">
@@ -1046,7 +1065,7 @@ function BrowsePage({ app }) {
       <PillRail app={app} active={app.routeParams.category} />
       <div className="browse-layout">
         <div className="filter-desktop">
-          <FilterPanel filters={filters} setFilters={setFilters} count={results.length} />
+          <FilterPanel filters={filters} setFilters={setFilters} count={results.length} app={app} />
         </div>
         <div className="results-col">
           <div className="results-header">
@@ -1086,7 +1105,7 @@ function BrowsePage({ app }) {
                 <option value="price_asc">Price: low to high</option>
                 <option value="price_desc">Price: high to low</option>
                 <option value="size_desc">Size: largest first</option>
-                <option value="ppm_asc">$/m²: lowest first</option>
+                <option value="ppm_asc">{`$${ppmSuffix()}: lowest first`}</option>
                 <option value="days_asc">Days listed: fewest first</option>
                 <option value="ready_desc">Most build-ready</option>
                 <option value="stars_desc">Investment score: highest</option>
@@ -1146,7 +1165,7 @@ function BrowsePage({ app }) {
         <div className="filter-drawer-backdrop" onClick={() => setFilterDrawerOpen(false)}>
           <div className="filter-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-handle" />
-            <FilterPanel filters={filters} setFilters={setFilters} count={results.length} onClose={() => setFilterDrawerOpen(false)} />
+            <FilterPanel filters={filters} setFilters={setFilters} count={results.length} onClose={() => setFilterDrawerOpen(false)} app={app} />
           </div>
         </div>
       )}
@@ -1176,7 +1195,7 @@ function ResultsTable({ results, app, sort, setSort }) {
             <th>Type</th>
             {headerSortable("size", "Size")}
             {headerSortable("price", "Price")}
-            {headerSortable("ppm", "$/m²")}
+            {headerSortable("ppm", `$${ppmSuffix()}`)}
             {headerSortable("days", "Days")}
             <th>Signal</th>
             <th></th>
@@ -1319,7 +1338,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
             <div className="kstat-value">{formatSize(listing.size_m2)}</div>
           </div>
           <div className="kstat">
-            <div className="kstat-label">$/m²</div>
+            <div className="kstat-label">{`$${ppmSuffix()}`}</div>
             <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
           </div>
           <div className="kstat">
@@ -1507,7 +1526,7 @@ function SavedPage({ app }) {
             <option value="price_asc">Price: low to high</option>
             <option value="price_desc">Price: high to low</option>
             <option value="size_desc">Size: largest first</option>
-            <option value="ppm_asc">$/m²: lowest first</option>
+            <option value="ppm_asc">{`$${ppmSuffix()}: lowest first`}</option>
             <option value="days_asc">Days listed: fewest first</option>
           </select>
           <div className="view-toggle">
