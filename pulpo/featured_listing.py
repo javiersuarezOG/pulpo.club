@@ -1,38 +1,64 @@
 """
-PR-7.6 — daily-cron-stable featured-listing pick for the Discover hero.
+Cron-stable featured-listing selection for the Discover hero.
 
-Replaces the prototype's client-side hero pick (which sorted by
-`photos_count desc, first_seen_at asc` per pageview) with a single,
-deterministic pick written to disk so an Instagram ad clicked at
-9:00:00 hits the same listing as one clicked at 9:00:01.
+Two-stage design:
 
-Eligibility (a featured listing satisfies ALL):
-  - hero_photo_quality_score ≥ 80      (PR-7.6 — Phase 1 quality gate)
-  - photos_count ≥ 3                    (avoid one-photo skeleton listings)
-  - is_sold == false
-  - days_listed ≤ 30                    (recent — keeps the hero fresh)
-  - rank_score ≥ 70                      (defensible to surface investors)
+1. **Backend (this module)** picks a *pool* of up to N elite listings
+   per UTC day and writes them to `web/data/featured.json`. Selection
+   is deterministic — same listings → same pool order across runs, so
+   debugging "why was this listing in the hero?" has a single answer.
 
-Tie-break: highest rank_score wins. Same score → first by source/source_id
-to keep the result deterministic across runs.
+2. **Frontend** rotates within that pool: per-session sticky random
+   start + slow auto-crossfade. So a visitor sees one listing per
+   session (no jarring mid-session swaps), but different visitors —
+   and the same visitor across sessions — see different premium
+   properties.
+
+Three tiers, layered. The first tier that yields >=1 listing wins.
+
+| Tier      | not sold | photos >= | rank >= | days <= | photo quality >= |
+|-----------|----------|-----------|---------|---------|-------------------|
+| elite     | yes      |    8      |   75    |   30    |   80 (or null)    |
+| soft      | yes      |    5      |   65    |   30    |    -              |
+| fallback  | yes      |    1      |    -    |    -    |    -              |
+
+The elite tier accepts `hero_photo_quality_score == None` provided
+rank >= 75 and photos >= 8 - those are strong proxies for a curated
+listing while the photo-scoring backfill catches up on the catalog.
+Once scoring is populated, null scores become rare and the literal
+">=80" bar takes over.
+
+Pool size is capped at MAX_POOL so we don't ship 50 hero candidates
+to the FE; 12 is enough rotation that a returning visitor sees
+variety, small enough that every listing in the pool is genuinely
+top-shelf.
 
 Output: web/data/featured.json carrying:
 
     {
-        "listing_id":  "goodlife|GL-CUCO-001",
-        "picked_at":   "2026-05-07T12:00:00+00:00",
-        "expires_at":  "2026-05-08T00:00:00+00:00",
-        "rank_score":  78.4,
-        "hero_photo_quality_score": 90,
-        "fallback":    false   // true when no eligible listing exists
-                                // and we relax the gates
+        "tier":         "elite",
+        "criteria":     { "elite": {...}, "soft": {...} },
+        "picked_at":    "2026-05-07T12:00:00+00:00",
+        "expires_at":   "2026-05-08T00:00:00+00:00",
+        "listing_id":   "goodlife|GL-001",
+        "rank_score":   87.5,
+        "hero_photo_quality_score": null,
+        "fallback":     false,
+        "pool": [
+            { "listing_id": "goodlife|GL-001",
+              "rank_score": 87.5,
+              "hero_photo_quality_score": null,
+              "photos_count": 28 },
+            ...
+        ]
     }
 
-Frontend reads this once on app boot and renders the Hero. Vercel CDN
-serves the file edge-cached for 24h aligned to UTC midnight.
+Frontend reads this once on app boot and renders the Hero with a
+random pool entry per session. Vercel CDN serves edge-cached for 24h
+aligned to UTC midnight.
 
 Pure: no I/O outside the single write. Listings are passed in;
-pick_featured() returns the chosen Listing or None. write_featured_json()
+pick_featured_pool() returns the chosen pool. write_featured_json()
 serialises and writes.
 """
 from __future__ import annotations
@@ -43,28 +69,45 @@ from pathlib import Path
 from typing import Any, Optional
 
 
-# Eligibility thresholds — kept here as constants so the cron-stable
-# "why was THIS listing picked" question has a single clear answer.
-MIN_PHOTO_QUALITY    = 80
-MIN_PHOTOS_COUNT     = 3
-MAX_DAYS_LISTED      = 30
-MIN_RANK_SCORE       = 70.0
+# Elite tier - the visible, exclusive bar.
+MIN_PHOTOS_COUNT     = 8        # rich gallery; signals seller invested
+MIN_RANK_SCORE       = 75.0     # roughly top ~5% of catalog
+MIN_PHOTO_QUALITY    = 80       # excellent band per automation/photo_quality.py
+MAX_DAYS_LISTED      = 30       # fresh
+
+# Soft tier - invoked when elite pool is empty (early-catalog states,
+# post-tightening). Still selective, just less stringent.
+SOFT_MIN_PHOTOS      = 5
+SOFT_MIN_RANK        = 65.0
+
+# Maximum pool size shipped to the FE. Capped so the JSON stays tiny
+# and the rotation is meaningful (every entry is genuinely elite).
+MAX_POOL             = 12
 
 
 @dataclass(frozen=True)
-class FeaturedPick:
-    """Result of pick_featured(). Carries the chosen listing's
-    identifiers + the score components that made it eligible. Used by
-    the JSON writer + by tests."""
+class FeaturedEntry:
+    """One listing in the featured pool."""
     listing_id:                 str
     rank_score:                 float
     hero_photo_quality_score:   Optional[int]
-    fallback:                   bool      # True when gates were relaxed
+    photos_count:               int
+
+
+@dataclass(frozen=True)
+class FeaturedPool:
+    """Result of pick_featured_pool().
+
+    `tier` answers "why was this pool chosen": "elite" (strict gates
+    passed), "soft" (relaxed gates), "fallback" (last-resort single pick).
+    """
+    tier:        str        # "elite" | "soft" | "fallback"
+    entries:     tuple      # tuple[FeaturedEntry, ...] - ordered, top first
 
 
 def _key(li: Any) -> str:
-    """Identifier shared with sidecars and price_history. Format:
-    `{source}|{source_id}` — matches the FE adapter's `id` shape via
+    """Identifier shared with sidecars and price_history. Format
+    `{source}|{source_id}` - matches the FE adapter's `id` shape via
     a hyphen-replacement on the FE side."""
     src = getattr(li, "source", None) or (li.get("source") if isinstance(li, dict) else None)
     sid = getattr(li, "source_id", None) or (li.get("source_id") if isinstance(li, dict) else None)
@@ -75,44 +118,77 @@ def _g(li: Any, name: str) -> Any:
     return li.get(name) if isinstance(li, dict) else getattr(li, name, None)
 
 
-def _eligible(li: Any) -> bool:
-    """Strict eligibility — used in the primary pass."""
+def _is_elite(li: Any) -> bool:
+    """Strict eligibility for the elite pool - every gate must hold.
+
+    The photo-quality gate is permissive on null: the rank+photos
+    proxies stand in until the scoring backfill catches up.
+    """
     if _g(li, "is_sold") is True:
         return False
-    score = _g(li, "hero_photo_quality_score")
-    if not isinstance(score, int) or score < MIN_PHOTO_QUALITY:
+    if (_g(li, "photos_count") or 0) < MIN_PHOTOS_COUNT:
         return False
-    photos_count = _g(li, "photos_count") or 0
-    if photos_count < MIN_PHOTOS_COUNT:
-        return False
-    days_listed = _g(li, "days_listed")
-    if days_listed is None or days_listed > MAX_DAYS_LISTED:
+    days = _g(li, "days_listed")
+    if days is None or days > MAX_DAYS_LISTED:
         return False
     rank = _g(li, "rank_score")
     if not isinstance(rank, (int, float)) or rank < MIN_RANK_SCORE:
         return False
-    return True
+    score = _g(li, "hero_photo_quality_score")
+    if score is None:
+        # Unscored - accept on rank+photos proxies (already gated above).
+        return True
+    return score >= MIN_PHOTO_QUALITY
 
 
-def _eligible_relaxed(li: Any) -> bool:
-    """Fallback when the strict pass returns nothing.
-
-    Drops the rank_score gate (some early-catalog states have <10
-    listings above 70) and the photo_quality gate (zero listings have
-    quality scores in offline / no-OpenCV runs). Keeps the hard
-    is_sold filter and a softened photos_count ≥ 1.
-    """
+def _is_soft(li: Any) -> bool:
+    """Softer gates - still selective. Used only if elite pool is empty."""
     if _g(li, "is_sold") is True:
         return False
-    photos_count = _g(li, "photos_count") or 0
-    if photos_count < 1:
+    if (_g(li, "photos_count") or 0) < SOFT_MIN_PHOTOS:
+        return False
+    days = _g(li, "days_listed")
+    if days is None or days > MAX_DAYS_LISTED:
+        return False
+    rank = _g(li, "rank_score")
+    if not isinstance(rank, (int, float)) or rank < SOFT_MIN_RANK:
         return False
     return True
+
+
+def _is_minimum(li: Any) -> bool:
+    """Last-resort relaxed pass - only sold + has-a-photo gates."""
+    if _g(li, "is_sold") is True:
+        return False
+    return (_g(li, "photos_count") or 0) >= 1
+
+
+def _to_entry(li: Any) -> FeaturedEntry:
+    return FeaturedEntry(
+        listing_id               = _key(li),
+        rank_score               = float(_g(li, "rank_score") or 0),
+        hero_photo_quality_score = _g(li, "hero_photo_quality_score"),
+        photos_count             = int(_g(li, "photos_count") or 0),
+    )
+
+
+def _ranked_pool(listings: list, predicate) -> list:
+    """Filter + sort: rank_score desc, then deterministic source/source_id
+    for stable tie-break."""
+    eligible = [li for li in listings if predicate(li)]
+    eligible.sort(
+        key=lambda li: (
+            -float(_g(li, "rank_score") or 0),
+            _g(li, "source") or "",
+            _g(li, "source_id") or "",
+        )
+    )
+    return eligible
 
 
 def _utc_midnight_after(now: datetime) -> datetime:
     """Next UTC-midnight after `now`. The cache TTL is aligned to
-    midnight so the hero changes at most once per UTC day, regardless
+    midnight so the pool changes at most once per UTC day, regardless
     of when the nightly cron actually runs."""
     next_day = (now + timedelta(days=1)).date()
     return datetime(
@@ -121,73 +197,93 @@ def _utc_midnight_after(now: datetime) -> datetime:
     )
 
 
-def pick_featured(listings: list, now: Optional[datetime] = None) -> Optional[FeaturedPick]:
-    """Pick the highest-ranking eligible listing.
+def pick_featured_pool(listings: list,
+                       now: Optional[datetime] = None) -> Optional[FeaturedPool]:
+    """Return the highest-tier non-empty pool, or None when nothing
+    qualifies (e.g. an empty listings list, or every listing is sold
+    with zero photos).
 
-    Returns None when neither the strict nor relaxed pass yields a
-    candidate (e.g. an empty listings list). The caller decides what
-    to do with None — typically: don't write featured.json, let the FE
-    fall back to client-side hero pick (legacy behavior).
-
-    `now` is injectable for tests.
+    `now` is reserved for future "freshness windows" but currently unused.
     """
-    del now  # unused in pick logic; reserved for future "freshness" gates
+    del now
 
-    # Stable tie-break: source/source_id, then strict ordering by score.
-    pool = sorted(
-        listings,
-        key=lambda li: (_g(li, "source") or "", _g(li, "source_id") or ""),
-    )
-
-    strict = [li for li in pool if _eligible(li)]
-    if strict:
-        winner = max(strict, key=lambda li: _g(li, "rank_score") or 0)
-        return FeaturedPick(
-            listing_id               = _key(winner),
-            rank_score               = float(_g(winner, "rank_score") or 0),
-            hero_photo_quality_score = _g(winner, "hero_photo_quality_score"),
-            fallback                 = False,
+    elite = _ranked_pool(listings, _is_elite)
+    if elite:
+        return FeaturedPool(
+            tier    = "elite",
+            entries = tuple(_to_entry(li) for li in elite[:MAX_POOL]),
         )
 
-    relaxed = [li for li in pool if _eligible_relaxed(li)]
-    if relaxed:
-        winner = max(relaxed, key=lambda li: _g(li, "rank_score") or 0)
-        return FeaturedPick(
-            listing_id               = _key(winner),
-            rank_score               = float(_g(winner, "rank_score") or 0),
-            hero_photo_quality_score = _g(winner, "hero_photo_quality_score"),
-            fallback                 = True,
+    soft = _ranked_pool(listings, _is_soft)
+    if soft:
+        return FeaturedPool(
+            tier    = "soft",
+            entries = tuple(_to_entry(li) for li in soft[:MAX_POOL]),
+        )
+
+    minimal = _ranked_pool(listings, _is_minimum)
+    if minimal:
+        # Last-resort: single listing, just so the hero renders.
+        return FeaturedPool(
+            tier    = "fallback",
+            entries = (_to_entry(minimal[0]),),
         )
 
     return None
 
 
 def write_featured_json(out_path: Path, listings: list,
-                        now: Optional[datetime] = None) -> Optional[FeaturedPick]:
-    """Pick + serialize. Idempotent — safe to call from a cron and
+                        now: Optional[datetime] = None) -> Optional[FeaturedPool]:
+    """Pick + serialize. Idempotent - safe to call from a cron and
     locally without side effects beyond the single file write.
 
-    Returns the chosen FeaturedPick or None when no listing was eligible.
+    Returns the chosen FeaturedPool or None when no listing was eligible.
     """
     if now is None:
         now = datetime.now(timezone.utc)
 
-    pick = pick_featured(listings, now=now)
-    if pick is None:
-        # Nothing eligible — refuse to write the file rather than
-        # writing a sentinel that the FE then has to interpret. Callers
-        # check the existence of featured.json to decide whether to use
-        # the cron-stable pick or fall back to client-side selection.
+    pool = pick_featured_pool(listings, now=now)
+    if pool is None:
+        # Nothing eligible - refuse to write the file rather than
+        # writing a sentinel. Callers check the existence of
+        # featured.json to decide whether to use the cron-stable pick
+        # or fall back to client-side selection.
         return None
 
+    top = pool.entries[0]
     payload = {
-        "listing_id":               pick.listing_id,
-        "picked_at":                now.isoformat(),
-        "expires_at":               _utc_midnight_after(now).isoformat(),
-        "rank_score":               round(pick.rank_score, 2),
-        "hero_photo_quality_score": pick.hero_photo_quality_score,
-        "fallback":                 pick.fallback,
+        "tier":       pool.tier,
+        "criteria": {
+            "elite": {
+                "min_rank":      MIN_RANK_SCORE,
+                "min_photos":    MIN_PHOTOS_COUNT,
+                "min_quality":   MIN_PHOTO_QUALITY,
+                "max_days":      MAX_DAYS_LISTED,
+            },
+            "soft": {
+                "min_rank":      SOFT_MIN_RANK,
+                "min_photos":    SOFT_MIN_PHOTOS,
+                "max_days":      MAX_DAYS_LISTED,
+            },
+        },
+        "picked_at":               now.isoformat(),
+        "expires_at":              _utc_midnight_after(now).isoformat(),
+        # Legacy single-pick fields - older readers and the schema keep
+        # working. The FE prefers `pool`.
+        "listing_id":              top.listing_id,
+        "rank_score":              round(top.rank_score, 2),
+        "hero_photo_quality_score": top.hero_photo_quality_score,
+        "fallback":                pool.tier != "elite",
+        "pool": [
+            {
+                "listing_id":               e.listing_id,
+                "rank_score":               round(e.rank_score, 2),
+                "hero_photo_quality_score": e.hero_photo_quality_score,
+                "photos_count":             e.photos_count,
+            }
+            for e in pool.entries
+        ],
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
-    return pick
+    return pool
