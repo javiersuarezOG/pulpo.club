@@ -93,6 +93,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -209,6 +210,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -299,6 +301,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -387,6 +390,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -475,6 +479,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -565,6 +570,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -651,6 +657,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -747,6 +754,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -837,6 +845,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -930,6 +939,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1041,6 +1051,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1137,6 +1148,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1225,6 +1237,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1315,6 +1328,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1404,6 +1418,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1515,6 +1530,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1631,6 +1647,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1721,6 +1738,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1816,6 +1834,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -1933,6 +1952,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2019,6 +2039,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2109,6 +2130,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2197,6 +2219,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2285,6 +2308,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2373,6 +2397,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2467,6 +2492,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2558,6 +2584,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2648,6 +2675,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2737,6 +2765,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2825,6 +2854,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -2921,6 +2951,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3010,6 +3041,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3117,6 +3149,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3211,6 +3244,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3303,6 +3337,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3425,6 +3460,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3511,6 +3547,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3602,6 +3639,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3707,6 +3745,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3801,6 +3840,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3895,6 +3935,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -3986,6 +4027,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4075,6 +4117,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4166,6 +4209,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4261,6 +4305,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4349,6 +4394,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4452,6 +4498,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4558,6 +4605,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4657,6 +4705,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4752,6 +4801,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4843,6 +4893,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -4955,6 +5006,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5045,6 +5097,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5149,6 +5202,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5237,6 +5291,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5323,6 +5378,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5411,6 +5467,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5507,6 +5564,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5607,6 +5665,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5713,6 +5772,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5801,6 +5861,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5910,6 +5971,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -5998,6 +6060,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6097,6 +6160,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6185,6 +6249,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6277,6 +6342,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6366,6 +6432,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6455,6 +6522,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6551,6 +6619,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6640,6 +6709,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6733,6 +6803,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6829,6 +6900,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -6918,6 +6990,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7006,6 +7079,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7093,6 +7167,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7188,6 +7263,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7286,6 +7362,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7374,6 +7451,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7476,6 +7554,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7562,6 +7641,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7650,6 +7730,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7738,6 +7819,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7827,6 +7909,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -7918,6 +8001,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8007,6 +8091,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8113,6 +8198,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8251,6 +8337,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8337,6 +8424,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8423,6 +8511,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8511,6 +8600,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8602,6 +8692,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8693,6 +8784,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8780,6 +8872,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8870,6 +8963,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -8969,6 +9063,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9061,6 +9156,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9150,6 +9246,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9236,6 +9333,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9324,6 +9422,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9414,6 +9513,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9516,6 +9616,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9608,6 +9709,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9697,6 +9799,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9793,6 +9896,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9886,6 +9990,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -9975,6 +10080,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10063,6 +10169,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10151,6 +10258,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10239,6 +10347,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10335,6 +10444,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10421,6 +10531,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10512,6 +10623,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10599,6 +10711,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10687,6 +10800,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10775,6 +10889,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10863,6 +10978,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -10951,6 +11067,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11039,6 +11156,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11127,6 +11245,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11215,6 +11334,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11303,6 +11423,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11391,6 +11512,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11479,6 +11601,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11567,6 +11690,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11655,6 +11779,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11743,6 +11868,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11831,6 +11957,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -11919,6 +12046,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12007,6 +12135,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12112,6 +12241,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12208,6 +12338,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12296,6 +12427,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12384,6 +12516,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12503,6 +12636,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12603,6 +12737,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12699,6 +12834,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12789,6 +12925,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -12917,6 +13054,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13014,6 +13152,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13110,6 +13249,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13214,6 +13354,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13307,6 +13448,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13393,6 +13535,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13485,6 +13628,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13574,6 +13718,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13663,6 +13808,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13751,6 +13897,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13840,6 +13987,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -13928,6 +14076,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14016,6 +14165,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14104,6 +14254,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14192,6 +14343,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14280,6 +14432,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14368,6 +14521,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14458,6 +14612,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14547,6 +14702,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14635,6 +14791,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14723,6 +14880,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14813,6 +14971,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -14914,6 +15073,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15003,6 +15163,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15095,6 +15256,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15186,6 +15348,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15275,6 +15438,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15369,6 +15533,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15460,6 +15625,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15557,6 +15723,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15652,6 +15819,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15743,6 +15911,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15833,6 +16002,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -15926,6 +16096,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16036,6 +16207,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16130,6 +16302,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16219,6 +16392,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16307,6 +16481,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16430,6 +16605,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16516,6 +16692,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16615,6 +16792,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16707,6 +16885,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16809,6 +16988,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16899,6 +17079,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -16989,6 +17170,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17077,6 +17259,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17163,6 +17346,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17251,6 +17435,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17364,6 +17549,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17453,6 +17639,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17541,6 +17728,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17629,6 +17817,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17715,6 +17904,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17803,6 +17993,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17891,6 +18082,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -17977,6 +18169,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18065,6 +18258,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18153,6 +18347,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18239,6 +18434,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18330,6 +18526,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18418,6 +18615,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18512,6 +18710,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18625,6 +18824,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18713,6 +18913,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18802,6 +19003,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18892,6 +19094,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -18981,6 +19184,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19067,6 +19271,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19158,6 +19363,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19246,6 +19452,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19334,6 +19541,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19422,6 +19630,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19512,6 +19721,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19600,6 +19810,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19693,6 +19904,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19781,6 +19993,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19874,6 +20087,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -19962,6 +20176,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20074,6 +20289,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20167,6 +20383,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20269,6 +20486,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20360,6 +20578,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20455,6 +20674,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20548,6 +20768,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20634,6 +20855,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20722,6 +20944,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20818,6 +21041,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20904,6 +21128,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -20992,6 +21217,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21080,6 +21306,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21201,6 +21428,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21308,6 +21536,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21396,6 +21625,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21485,6 +21715,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21574,6 +21805,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21668,6 +21900,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21754,6 +21987,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21842,6 +22076,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -21930,6 +22165,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22018,6 +22254,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22106,6 +22343,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22195,6 +22433,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22285,6 +22524,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22403,6 +22643,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22496,6 +22737,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22584,6 +22826,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22672,6 +22915,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22760,6 +23004,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22856,6 +23101,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -22948,6 +23194,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23044,6 +23291,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23157,6 +23405,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23251,6 +23500,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23344,6 +23594,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23430,6 +23681,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23517,6 +23769,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23603,6 +23856,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23697,6 +23951,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23786,6 +24041,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23874,6 +24130,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -23970,6 +24227,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24063,6 +24321,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24153,6 +24412,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24241,6 +24501,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24329,6 +24590,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24419,6 +24681,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24554,6 +24817,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24643,6 +24907,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24732,6 +24997,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24822,6 +25088,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24908,6 +25175,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -24996,6 +25264,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25085,6 +25354,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25174,6 +25444,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25311,6 +25582,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25402,6 +25674,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25490,6 +25763,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25578,6 +25852,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25666,6 +25941,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25754,6 +26030,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25842,6 +26119,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -25930,6 +26208,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26018,6 +26297,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26111,6 +26391,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26224,6 +26505,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26312,6 +26594,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26400,6 +26683,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26490,6 +26774,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26586,6 +26871,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26673,6 +26959,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26763,6 +27050,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26853,6 +27141,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -26941,6 +27230,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27063,6 +27353,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27151,6 +27442,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27241,6 +27533,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27340,6 +27633,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27434,6 +27728,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27520,6 +27815,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27608,6 +27904,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27739,6 +28036,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27827,6 +28125,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -27915,6 +28214,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28001,6 +28301,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28089,6 +28390,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28185,6 +28487,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28276,6 +28579,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28364,6 +28668,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28459,6 +28764,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28548,6 +28854,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28637,6 +28944,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28725,6 +29033,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28821,6 +29130,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28909,6 +29219,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -28995,6 +29306,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29084,6 +29396,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29211,6 +29524,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29298,6 +29612,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29389,6 +29704,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29477,6 +29793,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29570,6 +29887,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29658,6 +29976,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29746,6 +30065,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29834,6 +30154,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -29922,6 +30243,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30010,6 +30332,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30098,6 +30421,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30186,6 +30510,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30274,6 +30599,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30365,6 +30691,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30455,6 +30782,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30557,6 +30885,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30645,6 +30974,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30733,6 +31063,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30824,6 +31155,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -30910,6 +31242,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31005,6 +31338,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31093,6 +31427,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31179,6 +31514,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31267,6 +31603,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31353,6 +31690,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31441,6 +31779,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31542,6 +31881,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31630,6 +31970,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31718,6 +32059,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31806,6 +32148,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31899,6 +32242,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -31991,6 +32335,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32083,6 +32428,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32177,6 +32523,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32265,6 +32612,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32353,6 +32701,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32443,6 +32792,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32529,6 +32879,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32619,6 +32970,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32725,6 +33077,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32822,6 +33175,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -32914,6 +33268,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33005,6 +33360,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33093,6 +33449,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33193,6 +33550,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33281,6 +33639,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33372,6 +33731,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33460,6 +33820,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33548,6 +33909,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33636,6 +33998,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33724,6 +34087,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33812,6 +34176,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -33912,6 +34277,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34011,6 +34377,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34123,6 +34490,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34211,6 +34579,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34301,6 +34670,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34389,6 +34759,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34478,6 +34849,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34576,6 +34948,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34689,6 +35062,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34778,6 +35152,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34866,6 +35241,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -34952,6 +35328,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35044,6 +35421,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35136,6 +35514,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35222,6 +35601,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35310,6 +35690,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35398,6 +35779,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35486,6 +35868,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35577,6 +35960,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35663,6 +36047,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35751,6 +36136,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35839,6 +36225,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -35928,6 +36315,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36019,6 +36407,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36118,6 +36507,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36250,6 +36640,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36338,6 +36729,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36426,6 +36818,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36521,6 +36914,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36611,6 +37005,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36700,6 +37095,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36788,6 +37184,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36884,6 +37281,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -36972,6 +37370,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37098,6 +37497,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37215,6 +37615,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37314,6 +37715,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37402,6 +37804,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37491,6 +37894,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37579,6 +37983,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37668,6 +38073,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37754,6 +38160,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37856,6 +38263,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -37947,6 +38355,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38035,6 +38444,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38179,6 +38589,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38274,6 +38685,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38360,6 +38772,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38459,6 +38872,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38547,6 +38961,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38637,6 +39052,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38730,6 +39146,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38820,6 +39237,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -38908,6 +39326,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39003,6 +39422,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39096,6 +39516,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39184,6 +39605,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39273,6 +39695,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39359,6 +39782,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39447,6 +39871,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39533,6 +39958,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39624,6 +40050,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39717,6 +40144,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39822,6 +40250,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39910,6 +40339,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -39998,6 +40428,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40095,6 +40526,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40183,6 +40615,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40274,6 +40707,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40373,6 +40807,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40463,6 +40898,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40554,6 +40990,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40649,6 +41086,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40735,6 +41173,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40823,6 +41262,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40911,6 +41351,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -40999,6 +41440,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41092,6 +41534,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41180,6 +41623,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41268,6 +41712,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41357,6 +41802,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41454,6 +41900,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41544,6 +41991,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41636,6 +42084,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41724,6 +42173,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41812,6 +42262,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -41915,6 +42366,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42010,6 +42462,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42109,6 +42562,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42197,6 +42651,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42309,6 +42764,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42420,6 +42876,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42512,6 +42969,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42600,6 +43058,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42688,6 +43147,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42776,6 +43236,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42866,6 +43327,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -42954,6 +43416,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43061,6 +43524,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43149,6 +43613,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43247,6 +43712,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43336,6 +43802,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43433,6 +43900,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43520,6 +43988,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43612,6 +44081,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43702,6 +44172,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43790,6 +44261,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43879,6 +44351,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -43967,6 +44440,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44055,6 +44529,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44142,6 +44617,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44230,6 +44706,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44318,6 +44795,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44406,6 +44884,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44494,6 +44973,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44589,6 +45069,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44707,6 +45188,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44795,6 +45277,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44891,6 +45374,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -44999,6 +45483,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45090,6 +45575,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45176,6 +45662,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45272,6 +45759,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45362,6 +45850,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45452,6 +45941,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45555,6 +46045,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45641,6 +46132,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45729,6 +46221,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45823,6 +46316,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -45933,6 +46427,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46026,6 +46521,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46114,6 +46610,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46202,6 +46699,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46295,6 +46793,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46391,6 +46890,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46480,6 +46980,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46578,6 +47079,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46666,6 +47168,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46759,6 +47262,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46847,6 +47351,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -46948,6 +47453,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47036,6 +47542,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47155,6 +47662,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47243,6 +47751,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47331,6 +47840,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47419,6 +47929,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47529,6 +48040,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47639,6 +48151,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47733,6 +48246,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47834,6 +48348,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -47927,6 +48442,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48023,6 +48539,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48110,6 +48627,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48198,6 +48716,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48288,6 +48807,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48377,6 +48897,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48465,6 +48986,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48566,6 +49088,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48657,6 +49180,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48743,6 +49267,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48834,6 +49359,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -48922,6 +49448,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49010,6 +49537,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49098,6 +49626,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49186,6 +49715,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49272,6 +49802,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49360,6 +49891,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49448,6 +49980,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49542,6 +50075,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49649,6 +50183,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49736,6 +50271,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49822,6 +50358,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49911,6 +50448,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -49998,6 +50536,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50094,6 +50633,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50186,6 +50726,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50274,6 +50815,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50362,6 +50904,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50450,6 +50993,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50558,6 +51102,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50646,6 +51191,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50732,6 +51278,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50820,6 +51367,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50908,6 +51456,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -50996,6 +51545,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51135,6 +51685,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51223,6 +51774,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51314,6 +51866,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51402,6 +51955,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51490,6 +52044,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51583,6 +52138,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51719,6 +52275,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51818,6 +52375,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51908,6 +52466,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -51996,6 +52555,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52084,6 +52644,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52172,6 +52733,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52262,6 +52824,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52351,6 +52914,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52458,6 +53022,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52551,6 +53116,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52641,6 +53207,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52730,6 +53297,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52818,6 +53386,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -52943,6 +53512,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53031,6 +53601,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53139,6 +53710,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53227,6 +53799,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53315,6 +53888,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53406,6 +53980,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53499,6 +54074,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53587,6 +54163,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53675,6 +54252,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53763,6 +54341,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53851,6 +54430,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -53939,6 +54519,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54027,6 +54608,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54115,6 +54697,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54208,6 +54791,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54295,6 +54879,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54381,6 +54966,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54469,6 +55055,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54564,6 +55151,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54653,6 +55241,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54741,6 +55330,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54833,6 +55423,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -54919,6 +55510,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55011,6 +55603,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55099,6 +55692,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55187,6 +55781,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55275,6 +55870,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55363,6 +55959,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55451,6 +56048,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55539,6 +56137,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55631,6 +56230,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55720,6 +56320,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55809,6 +56410,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55897,6 +56499,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -55991,6 +56594,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56090,6 +56694,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56178,6 +56783,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56268,6 +56874,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56356,6 +56963,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56444,6 +57052,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56532,6 +57141,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56620,6 +57230,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56716,6 +57327,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56811,6 +57423,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56899,6 +57512,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -56987,6 +57601,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57075,6 +57690,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57163,6 +57779,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57251,6 +57868,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57339,6 +57957,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57427,6 +58046,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57542,6 +58162,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57630,6 +58251,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57732,6 +58354,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57820,6 +58443,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -57913,6 +58537,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58005,6 +58630,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58096,6 +58722,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58185,6 +58812,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58275,6 +58903,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58372,6 +59001,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58469,6 +59099,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58556,6 +59187,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58683,6 +59315,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58785,6 +59418,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58874,6 +59508,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -58960,6 +59595,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59051,6 +59687,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59145,6 +59782,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59236,6 +59874,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59328,6 +59967,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59442,6 +60082,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59543,6 +60184,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59631,6 +60273,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59719,6 +60362,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59807,6 +60451,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59898,6 +60543,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -59988,6 +60634,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60092,6 +60739,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60181,6 +60829,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60272,6 +60921,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60392,6 +61042,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60488,6 +61139,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60585,6 +61237,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60676,6 +61329,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60768,6 +61422,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60858,6 +61513,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -60953,6 +61609,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61042,6 +61699,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61135,6 +61793,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61226,6 +61885,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61323,6 +61983,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61411,6 +62072,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61501,6 +62163,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61593,6 +62256,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61690,6 +62354,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61778,6 +62443,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61866,6 +62532,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -61954,6 +62621,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62042,6 +62710,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62136,6 +62805,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62224,6 +62894,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62316,6 +62987,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62406,6 +63078,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62498,6 +63171,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62591,6 +63265,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62680,6 +63355,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62769,6 +63445,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62857,6 +63534,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -62945,6 +63623,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63043,6 +63722,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63132,6 +63812,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63237,6 +63918,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63329,6 +64011,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63419,6 +64102,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63507,6 +64191,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63595,6 +64280,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63683,6 +64369,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63794,6 +64481,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63880,6 +64568,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -63968,6 +64657,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64064,6 +64754,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64176,6 +64867,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64267,6 +64959,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64356,6 +65049,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64454,6 +65148,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64542,6 +65237,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64629,6 +65325,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64741,6 +65438,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64855,6 +65553,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -64948,6 +65647,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65039,6 +65739,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65133,6 +65834,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65223,6 +65925,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65325,6 +66028,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65411,6 +66115,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65503,6 +66208,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65589,6 +66295,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65679,6 +66386,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65768,6 +66476,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65856,6 +66565,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -65944,6 +66654,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66049,6 +66760,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66163,6 +66875,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66255,6 +66968,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66341,6 +67055,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66429,6 +67144,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66517,6 +67233,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66605,6 +67322,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66693,6 +67411,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66781,6 +67500,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66870,6 +67590,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -66964,6 +67685,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67057,6 +67779,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67148,6 +67871,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67236,6 +67960,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67339,6 +68064,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67427,6 +68153,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67517,6 +68244,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67612,6 +68340,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67700,6 +68429,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67788,6 +68518,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67876,6 +68607,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -67965,6 +68697,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68056,6 +68789,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68149,6 +68883,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68240,6 +68975,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68328,6 +69064,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68418,6 +69155,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68506,6 +69244,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68594,6 +69333,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68682,6 +69422,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68770,6 +69511,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68858,6 +69600,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -68946,6 +69689,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69034,6 +69778,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69122,6 +69867,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69210,6 +69956,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69300,6 +70047,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69390,6 +70138,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69478,6 +70227,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69568,6 +70318,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69665,6 +70416,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69753,6 +70505,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69841,6 +70594,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -69929,6 +70683,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70022,6 +70777,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70110,6 +70866,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70204,6 +70961,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70293,6 +71051,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70381,6 +71140,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70469,6 +71229,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70558,6 +71319,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70649,6 +71411,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70739,6 +71502,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70847,6 +71611,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -70943,6 +71708,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71034,6 +71800,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71121,6 +71888,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71209,6 +71977,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71304,6 +72073,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71395,6 +72165,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71499,6 +72270,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71587,6 +72359,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71675,6 +72448,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71763,6 +72537,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71851,6 +72626,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -71939,6 +72715,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72027,6 +72804,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72115,6 +72893,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72204,6 +72983,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72298,6 +73078,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72388,6 +73169,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72520,6 +73302,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72632,6 +73415,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72724,6 +73508,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72826,6 +73611,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -72914,6 +73700,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73008,6 +73795,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73104,6 +73892,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73205,6 +73994,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73298,6 +74088,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73387,6 +74178,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73487,6 +74279,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73575,6 +74368,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73663,6 +74457,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73753,6 +74548,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73843,6 +74639,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -73929,6 +74726,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74021,6 +74819,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74144,6 +74943,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74233,6 +75033,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74330,6 +75131,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74420,6 +75222,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74512,6 +75315,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74598,6 +75402,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74686,6 +75491,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74774,6 +75580,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74862,6 +75669,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -74951,6 +75759,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75039,6 +75848,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75127,6 +75937,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75215,6 +76026,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75303,6 +76115,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75391,6 +76204,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75479,6 +76293,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75567,6 +76382,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75655,6 +76471,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75743,6 +76560,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75831,6 +76649,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -75921,6 +76740,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76009,6 +76829,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76098,6 +76919,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76186,6 +77008,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76303,6 +77126,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76393,6 +77217,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76479,6 +77304,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76570,6 +77396,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76660,6 +77487,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76746,6 +77574,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76834,6 +77663,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -76923,6 +77753,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77011,6 +77842,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77097,6 +77929,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77190,6 +78023,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77278,6 +78112,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77372,6 +78207,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77460,6 +78296,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77549,6 +78386,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77638,6 +78476,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77734,6 +78573,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77829,6 +78669,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -77917,6 +78758,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78014,6 +78856,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78100,6 +78943,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78191,6 +79035,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78277,6 +79122,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78365,6 +79211,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78451,6 +79298,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78541,6 +79389,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78629,6 +79478,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78719,6 +79569,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78810,6 +79661,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78896,6 +79748,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -78984,6 +79837,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79072,6 +79926,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79160,6 +80015,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79259,6 +80115,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79347,6 +80204,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79433,6 +80291,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79521,6 +80380,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79609,6 +80469,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79699,6 +80560,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79787,6 +80649,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79873,6 +80736,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -79967,6 +80831,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80055,6 +80920,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80143,6 +81009,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80232,6 +81099,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80320,6 +81188,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80406,6 +81275,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80494,6 +81364,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80595,6 +81466,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   },
   {
@@ -80686,6 +81558,7 @@
     "dist_nearest_town_km": null,
     "source_type": "on_market",
     "previous_price": null,
+    "hero_photo_quality_score": null,
     "url_language": null
   }
 ]
