@@ -13,6 +13,13 @@ import { t, tr, LOCALES } from "./i18n.jsx";
 import { SHELVES, PILLS, ZONES } from "./data.jsx";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
+  readFilterFromURL,
+  readSortFromURL,
+  writeFilterToURL,
+} from "./data/filter-url.ts";
+import { track } from "./telemetry/hook";
+import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import {
   Icon,
   PulpoLogo,
   Badge,
@@ -126,7 +133,7 @@ function PillRail({ app, active }) {
           className={`pill-chip ${!active ? "is-active" : ""}`}
           onClick={() => app.goBrowse({ category: null })}
         >
-          <span className="pill-icon"><Icon name="cat_all" size={15} strokeWidth={1.6}/></span> All
+          <span className="pill-icon" aria-hidden="true"><Icon name="cat_all" size={15} strokeWidth={1.6}/></span> All
         </button>
         {PILLS.map(p => (
           <button
@@ -134,7 +141,7 @@ function PillRail({ app, active }) {
             className={`pill-chip ${active === p.key ? "is-active" : ""}`}
             onClick={() => app.goBrowse({ category: p.key })}
           >
-            <span className="pill-icon"><Icon name={p.icon} size={15} strokeWidth={1.6}/></span>{tr(p.label, app.locale)}
+            <span className="pill-icon" aria-hidden="true"><Icon name={p.icon} size={15} strokeWidth={1.6}/></span>{tr(p.label, app.locale)}
           </button>
         ))}
       </div>
@@ -166,10 +173,22 @@ function Hero({ app }) {
         <h1 className="hero-title">{tr(featured.title, app.locale)}</h1>
         <p className="hero-sub">{t("hero.sub", app.locale)}</p>
         <div className="hero-ctas">
-          <button className="btn-primary lg" onClick={() => app.go("browse")}>
+          <button
+            className="btn-primary lg"
+            onClick={() => {
+              track("hero.cta_clicked", { destination: "browse" });
+              app.go("browse");
+            }}
+          >
             {t("hero.cta.browse", app.locale)} <Icon name="arrow_right" size={16} strokeWidth={2}/>
           </button>
-          <button className="btn-ghost lg" onClick={() => app.openListing(featured.id)}>{t("hero.cta.see_listing", app.locale)}</button>
+          <button
+            className="btn-ghost lg"
+            onClick={() => {
+              track("hero.cta_clicked", { destination: "see_listing" });
+              app.openListing(featured.id);
+            }}
+          >{t("hero.cta.see_listing", app.locale)}</button>
         </div>
       </div>
       <div className="hero-attrib">{t("hero.featured_today", app.locale)} · {formatPrice(featured.price)} · {formatSize(featured.size_m2)}</div>
@@ -206,14 +225,20 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
       <div className="shelf-head">
         <div className="shelf-head-text">
           <h2 className="shelf-title">
-            <span className="shelf-icon"><Icon name={shelf.icon} size={20} strokeWidth={1.6}/></span>{tr(shelf.label, app.locale)}
+            <span className="shelf-icon" aria-hidden="true"><Icon name={shelf.icon} size={20} strokeWidth={1.6}/></span>{tr(shelf.label, app.locale)}
           </h2>
           {shelf.subline && (
             <p className="shelf-subline">{tr(shelf.subline, app.locale)}</p>
           )}
         </div>
         <div className="shelf-actions">
-          <button className="link-btn" onClick={() => onToggleExpand && onToggleExpand(shelf.key)}>
+          <button
+            className="link-btn"
+            onClick={() => {
+              if (!expanded) track("shelf.see_all_clicked", { shelf_key: shelf.key });
+              if (onToggleExpand) onToggleExpand(shelf.key);
+            }}
+          >
             {expanded
               ? (app.locale === "es" ? "Mostrar menos" : "Show less")
               : <>{t("card.see_all", app.locale)} <Icon name="arrow_right" size={14} strokeWidth={2}/></>}
@@ -231,7 +256,10 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
           {items.map(l => (
             <ListingCard
               key={l.id} listing={l} app={app}
-              onOpen={() => app.openListing(l.id)}
+              onOpen={() => {
+                track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
+                app.openListing(l.id);
+              }}
               variant={isMagazine ? "magazine" : "default"}
             />
           ))}
@@ -241,7 +269,10 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
           {items.slice(0, 6).map(l => (
             <ListingCard
               key={l.id} listing={l} app={app}
-              onOpen={() => app.openListing(l.id)}
+              onOpen={() => {
+                track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
+                app.openListing(l.id);
+              }}
               variant="magazine"
             />
           ))}
@@ -250,7 +281,14 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
         <div className="shelf-rail" ref={scrollRef}>
           {items.map(l => (
             <div className="shelf-item" key={l.id}>
-              <ListingCard listing={l} app={app} onOpen={() => app.openListing(l.id)} />
+              <ListingCard
+                listing={l}
+                app={app}
+                onOpen={() => {
+                  track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
+                  app.openListing(l.id);
+                }}
+              />
             </div>
           ))}
         </div>
@@ -335,7 +373,11 @@ function StyleCarousel({ app, onPickStyle }) {
           <button
             key={s.key}
             className={`style-tile ${s.photo ? "" : "no-photo"}`}
-            onClick={() => onPickStyle ? onPickStyle(s.key) : app.goBrowse({ category: s.key })}
+            onClick={() => {
+              track("style_carousel.tile_clicked", { style_key: s.key });
+              if (onPickStyle) onPickStyle(s.key);
+              else app.goBrowse({ category: s.key });
+            }}
             aria-label={tr(s.label, app.locale)}
           >
             {s.photo && <img src={s.photo} alt="" loading="lazy" />}
@@ -710,9 +752,21 @@ function buildFiltersForCategory(category) {
 function BrowsePage({ app }) {
   const LISTINGS = useListings();
   const listingsState = useListingsState();
-  const [filters, setFilters] = pUseState(() => buildFiltersForCategory(app.routeParams.category));
+  // Initial filter state — seed from URL on first render so a refresh
+  // of /browse?features=beachfront&pmax=100000 reproduces the view.
+  const [filters, setFilters] = pUseState(() => {
+    const seeded = buildFiltersForCategory(app.routeParams.category);
+    if (typeof window !== "undefined") {
+      return readFilterFromURL(window.location.search, seeded);
+    }
+    return seeded;
+  });
   const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
-  const [sort, setSort] = pUseState("recent");
+  const [sort, setSort] = pUseState(() =>
+    typeof window !== "undefined"
+      ? readSortFromURL(window.location.search, "recent")
+      : "recent"
+  );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
 
   // When the category in the URL changes (incl. "All" which is null), resync
@@ -729,10 +783,21 @@ function BrowsePage({ app }) {
     setFilters(f);
   }, [app.routeParams.category, app.routeParams.zones]);
 
+  // Persist filter + sort + category to URLSearchParams (replaceState
+  // — no new history entries on every chip toggle).
+  pUseEffect(() => {
+    writeFilterToURL(filters, app.routeParams.category ?? null, sort);
+  }, [filters, sort, app.routeParams.category]);
+
   pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
 
+  // Debounce the slider-driven filter values 300ms so a single drag
+  // doesn't fire dozens of applyFilters() passes. Chip toggles still
+  // feel instant — the debounced snapshot tracks the live value.
+  const debouncedFilters = useDebouncedValue(filters, 300);
+
   const results = pUseMemo(() => {
-    const r = applyFilters(LISTINGS, filters);
+    const r = applyFilters(LISTINGS, debouncedFilters);
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
       price_asc: (a, b) => a.price - b.price,
@@ -743,7 +808,7 @@ function BrowsePage({ app }) {
       ready_desc: (a, b) => b.readiness_score - a.readiness_score,
     };
     return [...r].sort(sorters[sort]);
-  }, [filters, sort, LISTINGS]);
+  }, [debouncedFilters, sort, LISTINGS]);
 
   if (listingsState.state.status === "loading") return <BrowseSkeleton />;
   if (listingsState.state.status === "error") {
@@ -751,6 +816,43 @@ function BrowsePage({ app }) {
   }
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+
+  // Telemetry: report empty-result state once per filter change so the
+  // funnel can flag filter combinations that nuke the results.
+  pUseEffect(() => {
+    if (results.length === 0 && activeFilterCount > 0) {
+      track("browse.empty_results", {
+        filters: {
+          zones: [...filters.zones].length,
+          land_types: [...filters.land_types].length,
+          features: [...filters.features].length,
+          infra: [...filters.infra].length,
+          status: [...filters.status].length,
+          price_min: filters.price_min,
+          price_max: filters.price_max,
+          readiness: filters.readiness,
+        },
+      });
+    }
+  }, [results.length, activeFilterCount]);
+
+  // Wrap setFilters / setSort / setView to fire telemetry on user-driven
+  // changes (filter resync from category-change is filtered out by the
+  // initial-render check).
+  const setFiltersTelemeter = pUseCallback((next, key, value) => {
+    setFilters(next);
+    if (key) {
+      track("browse.filter_changed", { filter_key: key, value, active_count: activeFilterCount });
+    }
+  }, [activeFilterCount]);
+  const setSortTelemeter = pUseCallback((next) => {
+    setSort(next);
+    track("browse.sort_changed", { sort: next });
+  }, []);
+  const setViewTelemeter = pUseCallback((next) => {
+    setView(next);
+    track("browse.view_toggled", { view: next });
+  }, []);
 
   return (
     <div className="page page-browse">
@@ -792,7 +894,7 @@ function BrowsePage({ app }) {
               <button className="filter-mobile-btn" onClick={() => setFilterDrawerOpen(true)}>
                 <Icon name="sliders" size={16} /> Filters {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
               </button>
-              <select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+              <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
                 <option value="recent">Most recent</option>
                 <option value="price_asc">Price: low to high</option>
                 <option value="price_desc">Price: high to low</option>
@@ -802,10 +904,10 @@ function BrowsePage({ app }) {
                 <option value="ready_desc">Most build-ready</option>
               </select>
               <div className="view-toggle">
-                <button className={view === "table" ? "active" : ""} onClick={() => setView("table")} aria-label="Table view">
+                <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label="Table view">
                   <Icon name="list" size={16}/>
                 </button>
-                <button className={view === "cards" ? "active" : ""} onClick={() => setView("cards")} aria-label="Card view">
+                <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label="Card view">
                   <Icon name="grid" size={16}/>
                 </button>
               </div>
@@ -825,15 +927,28 @@ function BrowsePage({ app }) {
           )}
 
           {results.length === 0 ? (
-            <EmptyResults onClear={() => setFilters(makeDefaultFilters())} />
+            <EmptyResults
+              onClear={() => setFilters(makeDefaultFilters())}
+              filters={filters}
+              listings={LISTINGS}
+              setFilters={setFilters}
+            />
           ) : view === "cards" ? (
             <div className="card-grid">
               {results.map(l => (
-                <ListingCard key={l.id} listing={l} app={app} onOpen={() => app.openListing(l.id)} />
+                <ListingCard
+                  key={l.id}
+                  listing={l}
+                  app={app}
+                  onOpen={() => {
+                    track("card.clicked", { listing_id: l.id, source_view: "browse" });
+                    app.openListing(l.id);
+                  }}
+                />
               ))}
             </div>
           ) : (
-            <ResultsTable results={results} app={app} sort={sort} setSort={setSort} />
+            <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} />
           )}
         </div>
       </div>
@@ -1218,7 +1333,17 @@ function SavedPage({ app }) {
       </div>
       {view === "cards" ? (
         <div className="card-grid">
-          {sorted.map(l => <ListingCard key={l.id} listing={l} app={app} onOpen={() => app.openListing(l.id)} />)}
+          {sorted.map(l => (
+            <ListingCard
+              key={l.id}
+              listing={l}
+              app={app}
+              onOpen={() => {
+                track("card.clicked", { listing_id: l.id, source_view: "saved" });
+                app.openListing(l.id);
+              }}
+            />
+          ))}
         </div>
       ) : (
         <ResultsTable results={sorted} app={app} sort={sort} setSort={setSort} />
@@ -1384,18 +1509,104 @@ function ToastHost({ app }) {
 }
 
 // ====== Empty results ======
-function EmptyResults({ onClear }) {
+// PR-4 — empty-state cross-suggest. Walks through active filters and
+// proposes dropping the single most-restrictive one (the one whose
+// removal would unlock the most results). Per the plan: "No
+// beachfront listings under $50K. Try **Ocean View** under $50K?".
+function EmptyResults({ onClear, filters, listings, setFilters }) {
+  const lc = currentLocale();
+  // Try removing each filter group one at a time; pick the one that
+  // unlocks the most listings.
+  const suggestion = pUseMemo(() => {
+    if (!Array.isArray(listings) || !filters) return null;
+    const candidates = [];
+    const tryWithout = (label_en, label_es, mutator) => {
+      const next = {
+        zones: new Set(filters.zones),
+        land_types: new Set(filters.land_types),
+        features: new Set(filters.features),
+        infra: new Set(filters.infra),
+        status: new Set(filters.status),
+        price_min: filters.price_min,
+        price_max: filters.price_max,
+        size_min: filters.size_min,
+        readiness: filters.readiness,
+      };
+      mutator(next);
+      const count = applyFilters(listings, next).length;
+      if (count > 0) candidates.push({ count, next, label_en, label_es });
+    };
+    if (filters.features.has("beachfront")) {
+      tryWithout("ocean view", "vista al mar", (n) => {
+        n.features.delete("beachfront");
+        n.features.add("ocean_view");
+      });
+    }
+    if (filters.zones.size > 0) {
+      tryWithout("any zone", "cualquier zona", (n) => n.zones = new Set());
+    }
+    if (filters.price_max < 1_000_000) {
+      tryWithout("any budget", "cualquier presupuesto", (n) => {
+        n.price_min = 0;
+        n.price_max = 1_000_000;
+      });
+    }
+    if (filters.features.size > 0) {
+      tryWithout("any features", "cualquier característica", (n) => n.features = new Set());
+    }
+    if (filters.readiness > 0) {
+      tryWithout("any readiness", "cualquier nivel de preparación", (n) => (n.readiness = 0));
+    }
+    candidates.sort((a, b) => b.count - a.count);
+    return candidates[0] || null;
+  }, [filters, listings]);
+
   return (
     <div className="empty-state">
-      <div className="empty-illus">
+      <div className="empty-illus" aria-hidden="true">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
           <circle cx="35" cy="35" r="20" stroke="var(--ink-3)" strokeWidth="2"/>
           <line x1="50" y1="50" x2="65" y2="65" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round"/>
         </svg>
       </div>
-      <h3>No listings match your filters.</h3>
-      <p>Try removing a filter, or explore a different zone.</p>
-      <button className="btn-primary" onClick={onClear}>Clear filters</button>
+      <h3>
+        {lc === "es"
+          ? "Ningún terreno coincide con tus filtros."
+          : "No listings match your filters."}
+      </h3>
+      {suggestion ? (
+        <>
+          <p>
+            {lc === "es"
+              ? `¿Quieres ver con `
+              : `Want to try with `}
+            <strong>{lc === "es" ? suggestion.label_es : suggestion.label_en}</strong>?{" "}
+            {lc === "es" ? `Tendrías ${suggestion.count} resultados.` : `${suggestion.count} listings would match.`}
+          </p>
+          <div className="empty-actions">
+            <button
+              className="btn-primary"
+              onClick={() => setFilters && setFilters(suggestion.next)}
+            >
+              {lc === "es" ? `Ver ${suggestion.count} ahora` : `See ${suggestion.count} now`}
+            </button>
+            <button className="btn-ghost" onClick={onClear}>
+              {lc === "es" ? "Limpiar filtros" : "Clear filters"}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p>
+            {lc === "es"
+              ? "Quita algún filtro o explora otra zona."
+              : "Try removing a filter, or explore a different zone."}
+          </p>
+          <button className="btn-primary" onClick={onClear}>
+            {lc === "es" ? "Limpiar filtros" : "Clear filters"}
+          </button>
+        </>
+      )}
     </div>
   );
 }

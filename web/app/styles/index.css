@@ -260,6 +260,13 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--paper);
   position: sticky; top: 65px; z-index: 20;
 }
+/* PR-4 — sticky-stack audit: on mobile, topnav (65px) + pill rail
+   (56px) + filter button + bottom nav consume too much screen.
+   Drop pill rail stickiness below 768px per Recommendations
+   §"Mobile & performance". */
+@media (max-width: 767px) {
+  .pill-rail-wrap { position: static; top: auto; }
+}
 .pill-rail {
   max-width: 1400px; margin: 0 auto;
   display: flex; gap: 8px;
@@ -345,30 +352,44 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .shelf-scroll-btns { display: none; }
   .shelf-title { font-size: 22px; }
 }
+/* PR-4 — 1-row carousel with intentional scroll affordance.
+   The recipe (per the plan): fade + peek + snap + chevron buttons.
+   Cards never wrap to a second row; the last card visibly fades into
+   a gradient mask, ~12% of card N+1 always sits past the right edge,
+   and snap-scroll lands flicks on a card. No horizontal scrollbar
+   (gradient fade is the only affordance — see Recommendations). */
 .shelf-rail {
-  display: flex; gap: var(--shelf-rail-gap);
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--shelf-rail-gap);
   overflow-x: auto;
   scrollbar-width: none;
   scroll-behavior: smooth;
   padding-bottom: 6px;
-  margin: 0 -24px; padding-left: 24px; padding-right: 24px;
-  scroll-snap-type: x proximity;
+  margin: 0 -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  scroll-snap-type: x mandatory;
+  /* Edge-fade mask — the last card visibly trails off so the user
+     understands there's more to the right without needing chevrons. */
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
+          mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
 }
 .shelf-rail::-webkit-scrollbar { display: none; }
+/* Card width math is calibrated so card N+1 always peeks ~12% past the
+   right edge — desktop shows ~3.4 cards, tablet ~2.4, mobile ~1.2. */
 .shelf-item {
   flex-shrink: 0;
-  width: calc((100% - var(--shelf-rail-gap) * 3) / 4);
-  min-width: 280px;
+  width: var(--card-w-listing);
   scroll-snap-align: start;
 }
-
-@media (max-width: 1023px) {
-  .shelf-item { width: calc((100% - var(--shelf-rail-gap) * 2) / 3); }
+@media (max-width: 1279px) {
+  .shelf-item { width: 320px; }
 }
-
 @media (max-width: 767px) {
   .shelf-item { width: 78%; min-width: 260px; }
   .shelf-rail { gap: 12px; }
+  /* Keep snap mandatory on mobile — momentum scroll + snap feels right */
 }
 
 .shelf.is-blurred .shelf-rail { filter: blur(7px); pointer-events: none; user-select: none; }
@@ -510,6 +531,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .heart-btn.heart-inline:hover { background: var(--paper-2); }
 .heart-btn.is-saved { color: var(--accent-2); }
 
+/* PR-4 — 44×44 touch targets. Visual 30px circle stays for design
+   harmony, but a transparent ::before extends the hit-box on mobile so
+   thumbs land reliably. Desktop hover-reveal preserved. */
 .photo-nav {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 30px; height: 30px;
@@ -519,6 +543,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
   z-index: 2;
   opacity: 0; transition: opacity 200ms;
   color: var(--ink);
+}
+.photo-nav::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  /* expands hit-box to 44px on mobile without shifting the visual size */
+}
+@media (max-width: 767px) {
+  .photo-nav { opacity: 0.85; }
 }
 .listing-card:hover .photo-nav { opacity: 1; }
 .photo-nav.prev { left: 10px; }
@@ -1936,25 +1969,33 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 @media (max-width: 767px) { .style-carousel { padding: 0 16px; margin-bottom: 32px; } }
 
-.style-carousel-head {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+/* StyleCarousel header inherits .shelf-head rhythm — overrides handled
+   in the consolidated rule above. This block keeps layout-specific
+   bits only (the head's flex container behaviour). */
+.style-carousel .style-carousel-head {
+  align-items: flex-end;
 }
 
+/* Categories carousel — shares the fade+peek+snap+chevron recipe with
+   .shelf-rail but uses a smaller --card-w-style so the visual language
+   reads as "browse by mood" (lighter, photo-backdrop) vs "individual
+   property" (denser ListingCard) on the shelves below. */
 .style-rail {
   display: flex;
+  flex-wrap: nowrap;
   gap: 14px;
   overflow-x: auto;
-  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
   padding-bottom: 4px;
-  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
+          mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
 }
-.style-rail::-webkit-scrollbar { height: 6px; }
-.style-rail::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; }
+.style-rail::-webkit-scrollbar { display: none; }
 
 .style-tile {
-  flex: 0 0 280px;
+  flex: 0 0 var(--card-w-style);
   aspect-ratio: 4 / 3;
   position: relative;
   border-radius: var(--radius-lg, 14px);
@@ -1966,6 +2007,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   transition: transform 200ms var(--ease-spring, cubic-bezier(.34,1.56,.64,1));
   border: 1px solid var(--line);
   padding: 0;
+  /* Touch target ≥ 44×44 — already satisfied by --card-w-style 280px */
 }
 
 @media (max-width: 600px) { .style-tile { flex-basis: 220px; } }
@@ -2017,39 +2059,63 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 767px) { .style-carousel { margin-top: 36px; } }
 
 /* Shelf head — title + subline tight, "See all" right-anchored to title baseline. */
-.shelf-head {
+/* PR-4 — section-head rhythm. The designer flagged that
+   "Find Your Style" / subline had too much air, while
+   "Just Got More Affordable" / subline looked broken.
+   Single source of truth: tokens.css `--space-title-to-subline`
+   and `--space-section-head-to-content`. Apply uniformly. */
+.shelf-head,
+.style-carousel-head {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
   column-gap: 24px;
-  margin-bottom: 14px;
+  margin-bottom: var(--space-section-head-to-content);
 }
-.shelf-head .shelf-head-text {
-  display: flex; flex-direction: column; gap: 2px;
+.shelf-head .shelf-head-text,
+.style-carousel-head .shelf-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-title-to-subline);
 }
-.shelf-head .shelf-title {
+.shelf-head .shelf-title,
+.style-carousel-head .shelf-title {
   margin: 0;
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--type-section-title-size);
+  line-height: calc(var(--type-section-title-line) / var(--type-section-title-size));
+  letter-spacing: -0.01em;
 }
-.shelf-head .shelf-subline {
+.shelf-head .shelf-subline,
+.style-carousel-head .shelf-subline {
   margin: 0;
-  font-size: 13px; color: var(--ink-3);
-  line-height: 1.4;
+  color: var(--ink-3);
+  font-size: var(--type-section-subline-size);
+  line-height: calc(var(--type-section-subline-line) / var(--type-section-subline-size));
 }
-.shelf-head .shelf-actions {
+.shelf-head .shelf-actions,
+.style-carousel-head .shelf-actions,
+.style-carousel-head .shelf-scroll-btns {
   align-self: end;
-  display: flex; align-items: center; gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   white-space: nowrap;
 }
-.style-carousel .style-carousel-head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  column-gap: 24px;
-  margin-bottom: 14px;
-}
-
 @media (max-width: 600px) {
+  .shelf-head,
+  .style-carousel-head { margin-bottom: 16px; }
+  .shelf-head .shelf-title,
+  .style-carousel-head .shelf-title {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .shelf-head .shelf-subline,
+  .style-carousel-head .shelf-subline {
+    font-size: 14px;
+    line-height: 1.4;
+  }
   .shelf-head .shelf-actions .link-btn { display: none; }
 }
 
@@ -2200,4 +2266,13 @@ h1,h2,h3,h4,h5 { margin: 0; }
     gap: 10px;
   }
   .consent-actions { justify-content: flex-end; }
+}
+
+/* PR-4 — empty-state cross-suggest action row */
+.empty-state .empty-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
 }
