@@ -191,6 +191,72 @@ def _compute_source_status(sources: list[str], per_source_count: dict[str, int],
     return out
 
 
+def check_population_regression(
+    prev_meta: Optional[dict],
+    new_rates: dict[str, float],
+    threshold: float = 0.20,
+) -> list[str]:
+    """PR-7 — population-rate regression guard.
+
+    Compare the just-computed `derived_field_population` rates against the
+    previous run's `last_updated.json`. Returns a list of human-readable
+    regression messages; an empty list means the run is clean. Caller
+    decides whether to fail the pipeline or just warn.
+
+    Logic:
+      - First run after this lands → `prev_meta` lacks `derived_field_population`;
+        skip the check (no baseline). Return [].
+      - For each field present in BOTH the previous and the new rates,
+        flag a regression if (prev - new) / max(prev, 0.001) > threshold.
+        Use prev as the denominator so a 20% relative drop is the threshold
+        regardless of absolute level.
+      - Fields newly added in the current run (not in prev) are skipped —
+        no baseline to compare against. They become baseline for the next
+        run.
+
+    Threshold defaults to 20% per plan. Can be tightened later via env override
+    in the caller.
+    """
+    if not isinstance(prev_meta, dict):
+        return []
+    prev_rates = prev_meta.get("derived_field_population")
+    if not isinstance(prev_rates, dict) or not prev_rates:
+        return []
+    regressions: list[str] = []
+    for field, prev in prev_rates.items():
+        if not isinstance(prev, (int, float)) or prev <= 0:
+            continue
+        new = new_rates.get(field)
+        if not isinstance(new, (int, float)):
+            continue
+        relative_drop = (prev - new) / max(prev, 0.001)
+        if relative_drop > threshold:
+            regressions.append(
+                f"{field}: {prev:.1%} → {new:.1%} "
+                f"(relative drop {relative_drop:.1%} > threshold {threshold:.0%})"
+            )
+    return regressions
+
+
+def compute_derived_population(ranked) -> dict[str, float]:
+    """PR-7 — population rates for derived fields, used by the regression
+    guard and surfaced in last_updated.json.
+
+    Returns a flat dict of `field_or_label: rate_in_[0,1]`. Adding a new
+    derive in PR-8/9? Add its rate here. Keys map 1:1 to the regression
+    threshold check.
+    """
+    n = max(len(ranked), 1)
+    off_market = sum(1 for li in ranked if getattr(li, "source_type", None) == "off_market")
+    on_market  = sum(1 for li in ranked if getattr(li, "source_type", None) == "on_market")
+    prev_price = sum(1 for li in ranked if getattr(li, "previous_price", None) is not None)
+    return {
+        "source_type_off_market": round(off_market / n, 4),
+        "source_type_on_market":  round(on_market / n, 4),
+        "previous_price":         round(prev_price / n, 4),
+    }
+
+
 def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
                 source_status, errors, started, finished, offline,
                 fixture_fallback_active, dropped,
@@ -215,6 +281,7 @@ def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
         "per_source_raw":     per_source_count,
         "source_status":      source_status,
         "coverage":           coverage,
+        "derived_field_population": compute_derived_population(ranked),
         "field_completeness": build_completeness_block(ranked_dicts),
         "property_type_counts": dict(_Counter(li.property_type for li in ranked)),
         # Per-type pass/flag/drop breakdown — empty {} when only land

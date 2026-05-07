@@ -30,9 +30,14 @@ from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
     extract as _nlp_extract,
 )
-from pulpo.derived_rules import apply_all as _apply_derived_rules  # type: ignore  # noqa: E402
+from pulpo.derived_rules import (   # type: ignore  # noqa: E402
+    apply_all as _apply_derived_rules,
+    derive_source_type as _derive_source_type,
+    derive_previous_price as _derive_previous_price,
+)
 from automation.pipeline_steps import (  # noqa: E402
     phase_normalize, phase_validate, phase_write_outputs, phase_print_summary,
+    compute_derived_population, check_population_regression,
 )
 
 import hashlib  # noqa: E402
@@ -465,6 +470,23 @@ def main() -> int:
             except (ValueError, AttributeError):
                 pass
 
+    # PR-7 — UX-facing derives that need to land BEFORE apply_all() so the
+    # source_label rule (which reads source_type == 'off_market') sees them.
+    # source_type: based on the listing.source slug (whitelist).
+    # previous_price: read from prices_history when is_repriced=True.
+    pr7_source_type_counts: dict[str, int] = {}
+    pr7_previous_price_populated = 0
+    for li in listings:
+        st = _derive_source_type(li)
+        li.source_type = st
+        pr7_source_type_counts[st] = pr7_source_type_counts.get(st, 0) + 1
+        prev = _derive_previous_price(li, prices_history)
+        if prev is not None:
+            li.previous_price = prev
+            pr7_previous_price_populated += 1
+    print(f"[pr-7] source_type={dict(pr7_source_type_counts)} "
+          f"previous_price_populated={pr7_previous_price_populated}")
+
     # PRD §FR-7 — derived field rule engine. Pure functions over upstream
     # fields (NLP-extracted booleans + is_repriced + days_listed). Sets
     # readiness_score / investment_signal / source_label / data_quality_score.
@@ -597,6 +619,39 @@ def main() -> int:
           f"failed={photo_results['failed']} "
           f"elapsed={photo_results['elapsed_s']:.1f}s")
     ranked = ranked_pre
+
+    # PR-7 — population-rate regression guard. Read the previous run's
+    # last_updated.json BEFORE we overwrite it, compare derived-field
+    # population rates against the new ones, and fail the run if any
+    # field's rate dropped > 20% (relative). Catches NLP-keyword
+    # regressions / scraper-config mistakes before they hit production.
+    #
+    # Override: set PULPO_ALLOW_POPULATION_REGRESSION=1 to downgrade
+    # to a warning. Useful when intentionally tightening a rule that
+    # makes a field stricter (and the temporary drop is expected).
+    new_rates = compute_derived_population(ranked)
+    prev_meta_path = web_data_dir / "last_updated.json"
+    prev_meta = None
+    if prev_meta_path.exists():
+        try:
+            prev_meta = json.loads(prev_meta_path.read_text())
+        except Exception as _e:
+            print(f"[regression-guard] could not parse previous last_updated.json: {_e!r}")
+    regressions = check_population_regression(prev_meta, new_rates, threshold=0.20)
+    if regressions:
+        msg = "[regression-guard] population-rate drops exceeded 20% threshold:\n  " + "\n  ".join(regressions)
+        if os.getenv("PULPO_ALLOW_POPULATION_REGRESSION") == "1":
+            print(f"{msg}\n[regression-guard] override active — continuing.")
+        else:
+            print(msg, file=sys.stderr)
+            print(
+                "[regression-guard] failing run. Set PULPO_ALLOW_POPULATION_REGRESSION=1 "
+                "to override (use sparingly — this guard exists to catch silent NLP/keyword regressions).",
+                file=sys.stderr,
+            )
+            raise SystemExit(2)
+    else:
+        print(f"[regression-guard] population rates OK (new={new_rates})")
 
     # Write all outputs: CSV, ranked.json, ranked-public.json, last_updated.json,
     # run_history.json. Returns the meta dict for downstream use.

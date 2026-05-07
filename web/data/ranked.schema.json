@@ -76,6 +76,8 @@
       "investment_signal",
       "readiness_score",
       "source_label",
+      "source_type",
+      "previous_price",
       "price_vs_zone_median",
       "price_vs_zone_pct",
       "dist_airport_km",
@@ -493,6 +495,18 @@
         "items": {
           "type": "string"
         }
+      },
+      "source_type": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "previous_price": {
+        "type": [
+          "number",
+          "null"
+        ]
       },
       "price_vs_zone_median": {
         "type": [

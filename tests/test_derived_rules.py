@@ -15,6 +15,9 @@ from pulpo.derived_rules import (   # noqa: E402
     compute_source_label,
     compute_data_quality_score,
     apply_all,
+    derive_source_type,
+    derive_previous_price,
+    OFF_MARKET_SOURCES,
     SCOREABLE_FIELDS,
     SCOREABLE_TOTAL,
     _is_populated,
@@ -286,3 +289,144 @@ def test_apply_all_handles_dict_and_dataclass_like():
     apply_all(fake)
     assert getattr(fake, "investment_signal") == "deal"
     assert isinstance(getattr(fake, "source_label"), list)
+
+
+# ── PR-7: derive_source_type ───────────────────────────────────────────
+
+def test_source_type_off_market_for_whatsapp():
+    assert derive_source_type(_li(source="whatsapp")) == "off_market"
+
+
+def test_source_type_off_market_for_facebook():
+    assert derive_source_type(_li(source="facebook")) == "off_market"
+
+
+def test_source_type_off_market_for_private():
+    assert derive_source_type(_li(source="private")) == "off_market"
+
+
+def test_source_type_off_market_case_insensitive():
+    """Defensive — scraper configs sometimes capitalize."""
+    assert derive_source_type(_li(source="WhatsApp")) == "off_market"
+
+
+def test_source_type_on_market_for_indexed_scraper():
+    """Default + whitelist semantics: anything not in OFF_MARKET_SOURCES is on_market."""
+    assert derive_source_type(_li(source="goodlife")) == "on_market"
+    assert derive_source_type(_li(source="remax")) == "on_market"
+
+
+def test_source_type_on_market_for_unknown_source():
+    """A new scraper that hasn't been added to OFF_MARKET_SOURCES yet
+    must NOT accidentally land on the paywall side."""
+    assert derive_source_type(_li(source="brand-new-scraper")) == "on_market"
+
+
+def test_source_type_off_market_set_is_frozen():
+    """Caller can't mutate the constant by accident."""
+    import pytest
+    with pytest.raises(AttributeError):
+        OFF_MARKET_SOURCES.add("zillow")  # type: ignore[attr-defined]
+
+
+# ── PR-7: derive_previous_price ────────────────────────────────────────
+
+def test_previous_price_none_when_not_repriced():
+    """No need to spelunk history if the listing isn't flagged as repriced."""
+    li = _li(is_repriced=False, price_usd=100_000)
+    history = {"goodlife|GL-001": [
+        {"ts": "2026-04-01", "price_usd": 120_000.0},
+        {"ts": "2026-05-01", "price_usd": 100_000.0},
+    ]}
+    assert derive_previous_price(li, history) is None
+
+
+def test_previous_price_returns_last_different_entry():
+    """Walks backwards from the snapshot before current; returns the
+    first one with a different price."""
+    li = _li(is_repriced=True, price_usd=100_000)
+    history = {"goodlife|GL-001": [
+        {"ts": "2026-04-01", "price_usd": 130_000.0},
+        {"ts": "2026-04-15", "price_usd": 120_000.0},
+        {"ts": "2026-05-01", "price_usd": 100_000.0},
+    ]}
+    assert derive_previous_price(li, history) == 120_000.0
+
+
+def test_previous_price_skips_same_price_echoes():
+    """Some snapshots write redundant equal-price rows. Walk past them
+    until we find a real prior price."""
+    li = _li(is_repriced=True, price_usd=100_000)
+    history = {"goodlife|GL-001": [
+        {"ts": "2026-03-01", "price_usd": 130_000.0},
+        {"ts": "2026-04-01", "price_usd": 100_000.0},
+        {"ts": "2026-05-01", "price_usd": 100_000.0},
+    ]}
+    assert derive_previous_price(li, history) == 130_000.0
+
+
+def test_previous_price_none_when_history_missing():
+    """Some scrapers reslug source_id over time; the history key
+    detaches and we can't look up. Return None — the FE shows no
+    strikethrough rather than crashing."""
+    li = _li(is_repriced=True, price_usd=100_000)
+    assert derive_previous_price(li, {}) is None
+    assert derive_previous_price(li, None) is None
+
+
+def test_previous_price_none_when_only_one_entry():
+    """First-time scrape: history has just the current price. Nothing
+    prior to compare against."""
+    li = _li(is_repriced=True, price_usd=100_000)
+    history = {"goodlife|GL-001": [
+        {"ts": "2026-05-01", "price_usd": 100_000.0},
+    ]}
+    assert derive_previous_price(li, history) is None
+
+
+def test_previous_price_none_when_current_price_missing():
+    """Bad upstream data — without a current price, "previous" is meaningless."""
+    li = _li(is_repriced=True, price_usd=None)
+    history = {"goodlife|GL-001": [
+        {"ts": "2026-04-01", "price_usd": 100_000.0},
+        {"ts": "2026-05-01", "price_usd": 90_000.0},
+    ]}
+    assert derive_previous_price(li, history) is None
+
+
+# ── PR-7: regression guard ─────────────────────────────────────────────
+
+def test_regression_guard_skips_when_no_baseline():
+    """First run after this guard lands — prev_meta has no
+    derived_field_population block. Skip cleanly."""
+    from automation.pipeline_steps import check_population_regression
+    new = {"source_type_off_market": 0.05, "previous_price": 0.02}
+    assert check_population_regression(None, new) == []
+    assert check_population_regression({}, new) == []
+    assert check_population_regression({"derived_field_population": {}}, new) == []
+
+
+def test_regression_guard_clean_when_within_threshold():
+    from automation.pipeline_steps import check_population_regression
+    prev = {"derived_field_population": {"is_beachfront": 0.30}}
+    new = {"is_beachfront": 0.27}    # 10% relative drop, under threshold
+    assert check_population_regression(prev, new) == []
+
+
+def test_regression_guard_flags_drops_above_threshold():
+    """A field falling from 30% → 5% is the canonical NLP regression."""
+    from automation.pipeline_steps import check_population_regression
+    prev = {"derived_field_population": {"is_beachfront": 0.30}}
+    new = {"is_beachfront": 0.05}    # 83% relative drop
+    msgs = check_population_regression(prev, new, threshold=0.20)
+    assert len(msgs) == 1
+    assert "is_beachfront" in msgs[0]
+
+
+def test_regression_guard_skips_new_fields():
+    """A field added in the current run has no baseline — don't flag.
+    It becomes baseline for next run."""
+    from automation.pipeline_steps import check_population_regression
+    prev = {"derived_field_population": {"is_beachfront": 0.30}}
+    new = {"is_beachfront": 0.30, "land_type_agricultural": 0.0}  # newly added, 0%
+    assert check_population_regression(prev, new) == []
