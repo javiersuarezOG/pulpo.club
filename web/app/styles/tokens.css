@@ -1,0 +1,137 @@
+/* ============================================================
+   Pulpo — Design tokens
+   ============================================================
+   The single source of truth for color, type, spacing, radius,
+   shadow, motion, breakpoints. Imported once at the top of
+   index.css; every other rule references these vars.
+
+   Hard rules (enforced by stylelint, see .stylelintrc.json):
+   - No hex literals in component CSS.
+   - No rgb/rgba literals.
+   - No default font stacks (Arial, Times New Roman, system-ui)
+     as inline fallbacks — declared once here, referenced everywhere.
+   - Spacing values come from the scale below; new sizes get a
+     token, not a one-off pixel value.
+
+   Override: /* token-exception: <reason> */ /* on a violating
+   rule, justify in the PR description. Reviewers approve the
+   exception or ask for a token addition.
+   ============================================================ */
+
+:root {
+  /* ============== TYPE ============== */
+  /* Display: Instrument Serif (editorial, magazine-cover voice) */
+  /* Sans:    Inter (neo-grotesque, body + UI) */
+  /* Mono:    JetBrains Mono (eyebrows, source pills, folios) */
+  --font-display: "Instrument Serif", "Times New Roman", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* Editorial type scale — used by hero, shelf heads, section heads.
+     Section-title↔subline rhythm fixes the inconsistency the designer flagged. */
+  --type-section-title-size: 28px;
+  --type-section-title-line: 36px;
+  --type-section-subline-size: 15px;
+  --type-section-subline-line: 22px;
+  --type-card-title-size: 17px;
+  --type-card-title-line: 22px;
+  --type-card-meta-size: 13px;
+  --type-card-meta-line: 18px;
+  --type-card-price-size: 18px;
+  --type-card-price-line: 22px;
+  --type-eyebrow-size: 12px;
+  --type-eyebrow-line: 16px;
+  --type-body-size: 15px;
+  --type-body-line: 24px;
+
+  /* ============== COLOR (oklch) ============== */
+  /* Paper/ink ramp — Pulpo (white + deep green) */
+  --paper: oklch(1 0 0);
+  --paper-2: oklch(0.97 0.012 160);
+  --paper-3: oklch(0.94 0.018 160);
+  --ink: oklch(0.22 0.04 165);          /* primary text — ≥14:1 on paper */
+  --ink-2: oklch(0.38 0.035 165);       /* secondary text — ≥7:1 */
+  --ink-3: oklch(0.50 0.025 165);       /* tertiary — ≥4.5:1 (AA body) */
+  --ink-4: oklch(0.68 0.018 160);       /* placeholder/disabled — large text only */
+  --line: oklch(0.90 0.015 160);
+  --line-2: oklch(0.84 0.018 160);
+
+  /* Brand accents */
+  --accent: oklch(0.40 0.09 165);       /* deep green */
+  --accent-soft: oklch(0.93 0.035 160);
+  --accent-strong: oklch(0.28 0.08 165);
+  --accent-2: oklch(0.62 0.20 25);      /* heart red */
+  --moss: oklch(0.55 0.08 145);
+  --gold: oklch(0.72 0.13 80);
+
+  /* Semantic badges (one color per state) */
+  --badge-drop: oklch(0.58 0.18 25);
+  --badge-off: oklch(0.46 0.10 290);
+  --badge-new: oklch(0.55 0.12 145);
+  --badge-ready: oklch(0.55 0.12 240);
+  --badge-motivated: oklch(0.65 0.15 60);
+
+  /* Status tones (days-listed, danger, success) */
+  --tone-amber: oklch(0.65 0.13 70);
+  --tone-urgent: oklch(0.55 0.18 25);
+
+  /* ============== SPACING ============== */
+  /* Use the scale; don't introduce one-off values. */
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-9: 64px;
+  --space-title-to-subline: 8px;        /* equalises shelf-head rhythm */
+  --space-section-head-to-content: 24px;
+
+  /* Layout-wide */
+  --gap-page: 24px;
+  --card-gap: 24px;
+  --shelf-gap: 56px;
+  --shelf-rail-gap: 18px;
+  --card-pad-y: 14px;
+  --shelf-mb: 18px;
+  --section-pad: 24px;
+  --card-cols: 3;
+
+  /* Card widths (StyleCarousel vs. ListingCard differ — see PR-4 plan) */
+  --card-w-style: 280px;
+  --card-w-listing: 340px;
+
+  /* ============== RADII ============== */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* ============== TYPE BASE ============== */
+  --base-size: 15px;
+
+  /* ============== MOTION ============== */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
+
+  /* ============== SHADOWS ============== */
+  /* RGBA exceptions: shadows specify alpha — the only allowed rgba use
+     in the codebase. Component CSS must reference these tokens, not
+     declare new shadows. */
+  --shadow-1: 0 1px 2px rgba(40, 28, 18, 0.04), 0 4px 12px rgba(40, 28, 18, 0.04);
+  --shadow-2: 0 2px 6px rgba(40, 28, 18, 0.06), 0 12px 28px rgba(40, 28, 18, 0.08);
+  --shadow-modal: 0 30px 60px rgba(20, 12, 5, 0.25);
+
+  /* ============== BREAKPOINTS ============== */
+  /* CSS variables can't drive @media queries directly, so these are
+     for documentation + use in JS (Playwright/PostHog segmentation).
+     In CSS, write the value: @media (min-width: 768px). */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+}
