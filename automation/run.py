@@ -118,6 +118,17 @@ def _download_hero_photos(listings, repo: Path) -> dict:
         try:
             r = httpx.get(url, timeout=5.0, follow_redirects=True)
             r.raise_for_status()
+            # PR-7.6 — score the *original* bytes BEFORE we down-resample
+            # to 600×400. Resolution + sharpness need full-res input;
+            # post-thumbnail bytes are already lossy.
+            try:
+                from automation.photo_quality import compute_score as _compute_photo_score
+                li.hero_photo_quality_score = _compute_photo_score(r.content)
+            except Exception as score_err:
+                # Photo scoring is non-fatal — never kill the download
+                # because of an OpenCV/PIL edge case.
+                print(f"[photos] score failed for {li.source}|{li.source_id}: {score_err!r}")
+                li.hero_photo_quality_score = None
             from PIL import Image
             img = Image.open(io.BytesIO(r.content))
             img.thumbnail((600, 400), Image.LANCZOS)
@@ -685,6 +696,23 @@ def main() -> int:
         print("[run] prd_feasibility probe ok")
     except Exception as _e:
         print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
+
+    # PR-7.6 — pick the cron-stable Discover hero. Writes
+    # web/data/featured.json with { listing_id, picked_at, expires_at,
+    # ... }. Non-fatal: a missing file just lets the FE fall back to
+    # the legacy client-side hero pick.
+    try:
+        from pulpo.featured_listing import write_featured_json
+        pick = write_featured_json(web_data_dir / "featured.json", ranked)
+        if pick is not None:
+            print(f"[featured] pick={pick.listing_id} "
+                  f"rank={pick.rank_score:.1f} "
+                  f"photo_quality={pick.hero_photo_quality_score} "
+                  f"fallback={pick.fallback}")
+        else:
+            print("[featured] no eligible listing — featured.json not written")
+    except Exception as _e:
+        print(f"[featured] failed (non-fatal): {_e!r}")
 
     phase_print_summary(
         finished=finished, ranked_count=len(ranked),

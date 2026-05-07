@@ -52,6 +52,7 @@
       "photos_count",
       "photo_urls",
       "hero_photo_path",
+      "hero_photo_quality_score",
       "first_seen_at",
       "broker_name",
       "broker_phone",
@@ -318,6 +319,12 @@
       "hero_photo_path": {
         "type": [
           "string",
+          "null"
+        ]
+      },
+      "hero_photo_quality_score": {
+        "type": [
+          "integer",
           "null"
         ]
       },

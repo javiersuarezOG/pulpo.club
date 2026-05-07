@@ -20,6 +20,9 @@ export type Listing = {
   price_per_m2: number | null;
   photos: string[];
   photos_count: number;
+  // PR-7.6 — heuristic quality score (0..100) for the hero photo.
+  // null = pipeline didn't score this run (offline / no OpenCV).
+  hero_photo_quality_score: number | null;
   first_seen_date: number;     // days ago (computed at adapter time)
   days_listed: number;
   is_repriced: boolean;

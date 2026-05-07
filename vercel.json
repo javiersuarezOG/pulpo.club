@@ -14,6 +14,7 @@
     { "source": "/data/ranked.json",        "destination": "/web/data/ranked.json" },
     { "source": "/data/last_updated.json",  "destination": "/web/data/last_updated.json" },
     { "source": "/data/run_history.json",   "destination": "/web/data/run_history.json" },
+    { "source": "/data/featured.json",      "destination": "/web/data/featured.json" },
     { "source": "/photos/:file",            "destination": "/web/photos/:file" },
     { "source": "/assets/:file",            "destination": "/web/assets/:file" },
     { "source": "/legal",                   "destination": "/web/legal.html" }
@@ -30,6 +31,10 @@
     {
       "source": "/web/data/run_history.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }]
+    },
+    {
+      "source": "/web/data/featured.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=86400" }]
     }
   ]
 }
