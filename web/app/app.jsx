@@ -33,6 +33,7 @@ import {
 } from "./tweaks-panel.jsx";
 import { ErrorBoundary } from "./error-boundary.jsx";
 import { ClerkShell, clerkEnabled } from "./auth/clerk-shell.jsx";
+import { fetchSaves, postSaveAction } from "./auth/saves-client.js";
 import { track } from "./telemetry/hook";
 import { bootWebVitals } from "./telemetry/web-vitals";
 import "./styles/index.css";
@@ -134,6 +135,47 @@ function App() {
 
   const showToast = useCallback((message) => setToast({ id: Date.now(), message }), []);
 
+  // Auto-close the SignupModal on user transition to signed-in.
+  // Covers both the legacy signin() callback (which already clears
+  // it inline) and Clerk's hosted modal flow where ClerkUserSync
+  // sets user asynchronously after the modal closes itself.
+  useEffect(() => {
+    if (user && signupModal) setSignupModal(null);
+  }, [user, signupModal]);
+
+  // PR-9c — Clerk-on path takes the saves list from the server.
+  // Hydrates on user transition; clears on sign-out so we don't
+  // display the previous user's set briefly. Also reconciles any
+  // anonymous Heart click captured in pulpo-pending-save before
+  // sign-in (the flow: anon clicks Heart → save intent stashed →
+  // SignupModal → Clerk sign-in completes → ClerkUserSync sets
+  // user → this effect fires the pending POST + hydrates).
+  const clerkUserId = user && user.clerkId;
+  useEffect(() => {
+    if (!clerkEnabled()) return;
+    if (!clerkUserId) {
+      setSavedIds(new Set());
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      let pending = null;
+      try { pending = localStorage.getItem("pulpo-pending-save"); } catch {}
+      if (pending) {
+        const r = await postSaveAction(pending, "add");
+        try { localStorage.removeItem("pulpo-pending-save"); } catch {}
+        if (!cancelled && r.ok) {
+          setSavedIds(new Set(r.saves));
+          showToast(t("toast.saved", locale));
+          return;
+        }
+      }
+      const r = await fetchSaves();
+      if (!cancelled && r.ok) setSavedIds(new Set(r.saves));
+    })();
+    return () => { cancelled = true; };
+  }, [clerkUserId, locale, showToast]);
+
   // PR-photo-nav-perf — instrument route transitions + detail open
   // for compelling perf telemetry. Uses requestAnimationFrame so the
   // measurement spans through React's commit phase (the actual user-
@@ -165,13 +207,53 @@ function App() {
   const closeListing = useCallback(() => setOpenListingId(null), []);
 
   const toggleSave = useCallback((id) => {
+    // Anon click while flag-on → stash intent, open SignupModal. The
+    // hydration effect picks up `pulpo-pending-save` after Clerk
+    // sign-in completes and posts it server-side.
+    if (clerkEnabled() && !clerkUserId) {
+      try { localStorage.setItem("pulpo-pending-save", id); } catch {}
+      setSignupModal({ mode: "signup", pendingSave: id });
+      return;
+    }
+
+    // Optimistic local toggle. `wasSaved` is set inside the updater
+    // so we know which way to roll back if the server call fails.
+    let wasSaved = false;
     setSavedIds(prev => {
+      wasSaved = prev.has(id);
       const next = new Set(prev);
-      if (next.has(id)) { next.delete(id); showToast(t("toast.removed", locale)); }
-      else { next.add(id); showToast(t("toast.saved", locale)); }
+      if (wasSaved) next.delete(id);
+      else next.add(id);
       return next;
     });
-  }, [showToast]);
+    showToast(t(wasSaved ? "toast.removed" : "toast.saved", locale));
+
+    // Flag-off keeps localStorage-only behaviour (legacy). Flag-on
+    // syncs to /api/saves and rolls back the optimistic update on
+    // any non-2xx (cap-reached, network, 500).
+    if (!clerkEnabled() || !clerkUserId) return;
+    const action = wasSaved ? "remove" : "add";
+    postSaveAction(id, action).then((r) => {
+      if (r.ok) {
+        // Server-authoritative state — handles dupes, partial fails.
+        setSavedIds(new Set(r.saves));
+        return;
+      }
+      setSavedIds(prev => {
+        const next = new Set(prev);
+        if (wasSaved) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+      if (r.error === "save_cap_reached") {
+        showToast("Free plan caps at 10 saves — upgrade to keep adding.");
+      } else if (r.status === 401) {
+        showToast("Sign in to save listings.");
+      } else {
+        showToast("Couldn't save — try again.");
+      }
+    });
+  }, [clerkUserId, showToast, locale]);
 
   const openSignup = useCallback((cfg = {}) => setSignupModal(cfg), []);
   const closeSignup = useCallback(() => setSignupModal(null), []);

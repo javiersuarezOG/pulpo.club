@@ -12,7 +12,7 @@
 //   CLERK_SECRET_KEY       — sk_test_… or sk_live_… from Clerk dashboard
 
 const Stripe = require("stripe");
-const { createClerkClient } = require("@clerk/backend");
+const { clerkClient } = require("../_clerk");
 
 // Header version for Managed Payments calls. Per the blueprint,
 // Checkout Sessions with managed_payments=true require this.
@@ -25,15 +25,6 @@ function stripeClient() {
   if (!key) throw new Error("STRIPE_SECRET_KEY not set");
   _stripe = new Stripe(key);
   return _stripe;
-}
-
-let _clerk = null;
-function clerkClient() {
-  if (_clerk) return _clerk;
-  const key = process.env.CLERK_SECRET_KEY;
-  if (!key) throw new Error("CLERK_SECRET_KEY not set");
-  _clerk = createClerkClient({ secretKey: key });
-  return _clerk;
 }
 
 // Vercel parses JSON bodies automatically, but Stripe's signature

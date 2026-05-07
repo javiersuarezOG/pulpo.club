@@ -5,8 +5,16 @@ import React, {
   useRef as pUseRef,
   useMemo as pUseMemo,
   useCallback as pUseCallback,
+  Suspense as pSuspense,
+  lazy as pLazy,
 } from "react";
 import { t, tr, LOCALES } from "./i18n.jsx";
+import { clerkEnabled } from "./auth/clerk-shell.jsx";
+
+// Lazy-loaded bridge to Clerk's hosted sign-in modal. Static-imports
+// @clerk/react, so this lives in the lazy chunk that flag-off builds
+// never fetch.
+const ClerkSignInLazy = pLazy(() => import("./auth/clerk-signin-panel.jsx"));
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
@@ -2177,6 +2185,20 @@ function PlansPage({ app }) {
 function SignupModal({ app }) {
   const m = app.signupModal;
   if (!m) return null;
+
+  // Flag on → hand off to Clerk's hosted modal. The lazy bridge opens
+  // it imperatively and dismisses our shell modal so the two don't
+  // stack. ClerkUserSync (PR-9b) flips app.user once the user
+  // completes; the existing useEffect in App auto-closes the modal on
+  // user transition.
+  if (clerkEnabled()) {
+    return (
+      <pSuspense fallback={null}>
+        <ClerkSignInLazy mode={m.mode || "signup"} onClose={app.closeSignup} />
+      </pSuspense>
+    );
+  }
+
   const [mode, setMode] = pUseState(m.mode || "signup");
   const [email, setEmail] = pUseState(m.email || "");
   const [password, setPassword] = pUseState("");
