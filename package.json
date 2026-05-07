@@ -13,7 +13,8 @@
     "test": "vitest run --passWithNoTests",
     "lint:css": "stylelint 'web/app/**/*.css'",
     "check:contrast": "node web/app/styles/check-contrast.mjs",
-    "check:size": "node web/app/styles/check-bundle-size.mjs"
+    "check:size": "node web/app/styles/check-bundle-size.mjs",
+    "e2e:smoke": "playwright test"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,7 @@
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",

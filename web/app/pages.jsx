@@ -31,6 +31,7 @@ import {
   formatPrice,
   formatSize,
   formatDaysListed,
+  formatPpm,
   daysListedTone,
   landTypeLabel,
   currentLocale,
@@ -1192,7 +1193,7 @@ function ResultsTable({ results, app, sort, setSort }) {
               <td><span className={`type-pill type-${l.land_type}`}>{landTypeLabel(l.land_type)}</span></td>
               <td className="num">{formatSize(l.size_m2)}</td>
               <td className="num bold">{formatPrice(l.price)}</td>
-              <td className="num muted">${l.price_per_m2.toFixed(0)}</td>
+              <td className="num muted">{formatPpm(l.price_per_m2)}</td>
               <td className={`num tone-${daysListedTone(l.days_listed)}`}>{l.days_listed}d</td>
               <td><Badge listing={l}/></td>
               <td onClick={(e) => e.stopPropagation()}><HeartButton listingId={l.id} app={app} variant="inline" size={16}/></td>
@@ -1319,7 +1320,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
           <div className="kstat">
             <div className="kstat-label">$/m²</div>
-            <div className="kstat-value">${listing.price_per_m2.toFixed(0)}</div>
+            <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
           </div>
           <div className="kstat">
             <div className="kstat-label">Days listed</div>

@@ -46,6 +46,23 @@ If a local-merge attempt to `main` fails with `protected branch hook declined`, 
 - **Tests**: `PULPO_OFFLINE=1 pytest -q` — full suite must pass (or fail only in known-broken areas not touched by your change)
 - **Lint**: `ruff check .`
 
+## NEVER ship a /preview crash again — null-safety + smoke test (post-2026-05-07)
+
+**Two crashes shipped in two PRs.** That's twice too many. The pattern was the same both times: a real listing's field was null where the prototype's mock was always populated. Components called `.toFixed()` / `.length` directly without a null guard, ErrorBoundary fired, page blanked.
+
+**Mandatory rules:**
+
+1. **Every Listing field that's `| null` in `web/app/data/types.ts` must be guarded in every component.** Never `listing.price_per_m2.toFixed(0)`. Always `formatPpm(listing.price_per_m2)` or equivalent. New format helpers go in `web/app/components.jsx` next to `formatPrice` / `formatSize`. The pattern: `if (n == null) return "—"; return …`.
+
+2. **Before merging any PR that touches `web/app/data/*` OR a render path that reads Listing fields:**
+   - Run `npm run e2e:smoke` (Playwright) locally. The smoke test boots the dev server, opens `/` and `/?dev=1`, asserts no console errors, fails on the `"Something went wrong."` ErrorBoundary fallback. ~30s.
+   - Or click through the dev server manually: `npm run dev`, open all four routes (Discover, Browse, Saved, Plans), check the dev console for red.
+   - Vercel preview is the last line of defence, not the first.
+
+3. **Adding a new field to `web/app/data/types.ts`?** Search-replace the field name across `web/app/`. Every read site needs to consider the null case.
+
+4. **Skipping these guardrails is worse than missing the deadline.** The user sees crashes, not commits.
+
 ## Frontend conventions (post-PR-1.5)
 
 The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.

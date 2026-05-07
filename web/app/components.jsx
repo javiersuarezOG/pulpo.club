@@ -12,17 +12,29 @@ function formatPrice(n) {
   return formatPriceI18n(n, currentLocale());
 }
 function formatSize(m2) {
+  if (m2 == null) return "—";
   return formatSizeI18n(m2, currentLocale());
 }
 function formatDaysListed(d) {
+  if (d == null) return null;
   return formatDaysListedI18n(d, currentLocale());
 }
+// Null-safe price-per-square-meter. Real listings can have null
+// price_per_m2 (price missing from scrape, area_m2 missing). The
+// legacy index.js fmtPPM handled this — restored here as a guardrail
+// against the kind of crash we hit on /preview twice.
+function formatPpm(n) {
+  if (n == null || !Number.isFinite(n) || n <= 0) return "—";
+  return `$${Math.round(n).toLocaleString(currentLocale() === "es" ? "es-CR" : "en-US")}`;
+}
 function daysListedTone(d) {
+  if (d == null) return "muted";
   if (d < 30) return "muted";
   if (d < 90) return "amber";
   return "urgent";
 }
 function landTypeLabel(typeKey) {
+  if (!typeKey) return "—";
   return t(`type.${typeKey}`, currentLocale());
 }
 
@@ -252,7 +264,7 @@ function ListingCard({ listing, app, compact = false, onOpen, variant = "default
             <span className="price-was">{formatPrice(listing.previous_price)}</span>
           )}
           {!isMag && (
-            <span className="price-sub">· {formatSize(listing.size_m2)} · ${listing.price_per_m2.toFixed(0)}/m²</span>
+            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}/m²</span>
           )}
         </div>
         {!compact && !isMag && listing.usps[0] && (
@@ -304,5 +316,5 @@ function Toast({ toast }) {
 
 export {
   Icon, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
-  formatPrice, formatSize, formatDaysListed, daysListedTone, landTypeLabel, currentLocale,
+  formatPrice, formatSize, formatDaysListed, formatPpm, daysListedTone, landTypeLabel, currentLocale,
 };
