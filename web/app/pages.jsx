@@ -392,9 +392,17 @@ function StyleCarousel({ app, onPickStyle }) {
 
 // ====== Home page ======
 function HomePage({ app }) {
+  // === ALL HOOKS UP TOP — Rules of Hooks. Don't insert early returns
+  // between any of these or React errors out (#310). ===
   const LISTINGS = useListings();
   const listingsState = useListingsState();
-  // Order shelves: pinned first, then by listing count desc, hide < 6
+  const [expandedKey, setExpandedKey] = pUseState(null);
+  const shelfRefs = pUseRef({});
+  const [layout, setLayout] = pUseState(() => {
+    try { return localStorage.getItem("pulpo-discover-layout") || "magazine"; }
+    catch { return "magazine"; }
+  });
+
   const orderedShelves = pUseMemo(() => {
     const pinned = ["new_this_week", "price_drops", "off_market"];
     const counts = SHELVES.map(s => ({ s, n: LISTINGS.filter(l => !l.is_sold).filter(s.filter).length }));
@@ -404,25 +412,10 @@ function HomePage({ app }) {
     return [...pinnedOrdered, ...rest].map(x => x.s);
   }, [LISTINGS]);
 
-  // Surface load state — Discover renders a skeleton while listings
-  // stream in, and a hard error UI on permanent fetch failure.
-  if (listingsState.state.status === "loading") {
-    return <DiscoverSkeleton />;
-  }
-  if (listingsState.state.status === "error") {
-    return <DataFetchFailed onRetry={listingsState.reload} />;
-  }
-
-  // Expand a single shelf inline (See all → Show less). Clicking a style tile
-  // also opens its corresponding shelf in expanded mode and scrolls to it.
-  const [expandedKey, setExpandedKey] = pUseState(null);
-  const shelfRefs = pUseRef({});
   const registerRef = pUseCallback((key, el) => { if (el) shelfRefs.current[key] = el; }, []);
-
   const toggleExpand = pUseCallback((key) => {
     setExpandedKey(prev => prev === key ? null : key);
   }, []);
-
   const pickStyle = pUseCallback((key) => {
     setExpandedKey(key);
     setTimeout(() => {
@@ -433,16 +426,16 @@ function HomePage({ app }) {
       }
     }, 80);
   }, []);
-
-  // Layout toggle — magazine (default) ↔ standard rails
-  const [layout, setLayout] = pUseState(() => {
-    try { return localStorage.getItem("pulpo-discover-layout") || "magazine"; }
-    catch { return "magazine"; }
-  });
   const setLayoutPersist = (v) => {
     setLayout(v);
     try { localStorage.setItem("pulpo-discover-layout", v); } catch {}
   };
+
+  // === Hooks done — branch on load state. ===
+  if (listingsState.state.status === "loading") return <DiscoverSkeleton />;
+  if (listingsState.state.status === "error") {
+    return <DataFetchFailed onRetry={listingsState.reload} />;
+  }
 
   return (
     <div className={`page page-home discover-${layout}`}>
@@ -810,11 +803,6 @@ function BrowsePage({ app }) {
     return [...r].sort(sorters[sort]);
   }, [debouncedFilters, sort, LISTINGS]);
 
-  if (listingsState.state.status === "loading") return <BrowseSkeleton />;
-  if (listingsState.state.status === "error") {
-    return <DataFetchFailed onRetry={listingsState.reload} />;
-  }
-
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
 
   // Telemetry: report empty-result state once per filter change so the
@@ -836,15 +824,7 @@ function BrowsePage({ app }) {
     }
   }, [results.length, activeFilterCount]);
 
-  // Wrap setFilters / setSort / setView to fire telemetry on user-driven
-  // changes (filter resync from category-change is filtered out by the
-  // initial-render check).
-  const setFiltersTelemeter = pUseCallback((next, key, value) => {
-    setFilters(next);
-    if (key) {
-      track("browse.filter_changed", { filter_key: key, value, active_count: activeFilterCount });
-    }
-  }, [activeFilterCount]);
+  // Wrap setSort / setView to fire telemetry on user-driven changes.
   const setSortTelemeter = pUseCallback((next) => {
     setSort(next);
     track("browse.sort_changed", { sort: next });
@@ -853,6 +833,12 @@ function BrowsePage({ app }) {
     setView(next);
     track("browse.view_toggled", { view: next });
   }, []);
+
+  // === Hooks done — branch on load state. ===
+  if (listingsState.state.status === "loading") return <BrowseSkeleton />;
+  if (listingsState.state.status === "error") {
+    return <DataFetchFailed onRetry={listingsState.reload} />;
+  }
 
   return (
     <div className="page page-browse">
