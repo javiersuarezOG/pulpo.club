@@ -326,10 +326,18 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 /* ============== Shelves ============== */
 .shelves {
-  max-width: 1400px;
+  max-width: var(--max-discover-width);
   margin: 0 auto;
   padding: 32px var(--section-pad) 80px;
   display: flex; flex-direction: column; gap: var(--shelf-gap);
+}
+/* PR-4d — token-pinned vertical rhythm. Drop --shelf-gap one step on
+   each breakpoint via the same token; no off-scale values introduced. */
+@media (max-width: 1023px) {
+  :root { --shelf-gap: 32px; }
+}
+@media (max-width: 767px) {
+  :root { --shelf-gap: 24px; }
 }
 .shelf { position: relative; }
 .shelf-head {
@@ -390,6 +398,62 @@ h1,h2,h3,h4,h5 { margin: 0; }
           mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
 }
 .shelf-rail::-webkit-scrollbar { display: none; }
+
+/* PR-4d — in-rail nav controls.
+   The wrapper is positioned so .rail-nav buttons can sit OUTSIDE the
+   .shelf-rail's mask-image (the right-edge fade would otherwise eat the
+   right button). Wrapper extends `margin: 0 -24px` ⟶ `padding: 0 24px`
+   to bleed flush with the listing-card gutter without resetting the
+   rail's existing edge-padding. Buttons are mouse-redundancy only —
+   tabIndex=-1 in JSX keeps the keyboard cycle on the section-head arrows
+   (which remain visible). */
+.shelf-rail-wrap,
+.style-rail-wrap {
+  position: relative;
+}
+.rail-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-2);
+  box-shadow: var(--shadow-1);
+  display: grid;
+  place-items: center;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out), background 160ms, color 160ms;
+  cursor: pointer;
+}
+.rail-nav:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+/* Inset 8px from the wrapper edge so the button sits over the
+   first/last card's photo without obscuring its center. */
+.rail-nav-prev { left: 8px; }
+.rail-nav-next { right: 8px; }
+/* Touch users get the swipe affordance — buttons would intercept
+   the gesture. Hover-capable pointers (desktop, USB mouse) get the
+   in-rail nav as a redundant click target. */
+@media (hover: hover) {
+  .shelf-rail-wrap:hover .rail-nav,
+  .style-rail-wrap:hover .rail-nav {
+    opacity: 1;
+  }
+  /* Keyboard discoverability — show on focus-within even if cursor
+     hasn't entered the wrapper. Section-head buttons remain primary. */
+  .shelf-rail-wrap:focus-within .rail-nav,
+  .style-rail-wrap:focus-within .rail-nav {
+    opacity: 1;
+  }
+}
+@media (hover: none) {
+  .rail-nav { display: none; }
+}
 /* Card width math is calibrated so card N+1 always peeks ~12% past the
    right edge — desktop shows ~3.4 cards, tablet ~2.4, mobile ~1.2. */
 .shelf-item {
@@ -2011,13 +2075,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 
 /* ============== Find Your Style carousel (A.2) ============== */
+/* PR-4d — width parity with .shelves. Same max-width + section-pad
+   so the two rails share the exact same gutter at every breakpoint
+   (was 1280px / 24px, narrower than shelves at 1400px / --section-pad). */
 .style-carousel {
-  max-width: var(--max-page, 1280px);
-  margin: 0 auto 48px;
-  padding: 0 24px;
+  max-width: var(--max-discover-width);
+  margin: 0 auto;
+  padding: 0 var(--section-pad);
+  margin-bottom: var(--shelf-gap);
 }
-
-@media (max-width: 767px) { .style-carousel { padding: 0 16px; margin-bottom: 32px; } }
 
 /* StyleCarousel header inherits .shelf-head rhythm — overrides handled
    in the consolidated rule above. This block keeps layout-specific
