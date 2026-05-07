@@ -31,6 +31,8 @@ import {
   TweakButton,
 } from "./tweaks-panel.jsx";
 import { ErrorBoundary } from "./error-boundary.jsx";
+import { track } from "./telemetry/hook";
+import { bootWebVitals } from "./telemetry/web-vitals";
 import "./styles/index.css";
 
 function App() {
@@ -93,6 +95,14 @@ function App() {
     if (!__PULPO_DEV_PANEL__) return false;
     try { return new URLSearchParams(window.location.search).has("debug"); }
     catch { return false; }
+  }, []);
+
+  // Telemetry boot — fires `landing.viewed` once per app mount and
+  // wires Web Vitals (LCP/INP/CLS/TTFB) → PostHog. PostHog itself is
+  // lazy-loaded inside requestIdleCallback, so this runs cheaply.
+  useEffect(() => {
+    track("landing.viewed", { route: window.location.pathname || "/" });
+    bootWebVitals();
   }, []);
 
   useEffect(() => {
