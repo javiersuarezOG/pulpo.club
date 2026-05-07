@@ -22,7 +22,7 @@ def _frontend_text() -> str:
     HTML stays under 14 KB. Tests that grep for inline CSS or JS now grep
     against the concatenated text instead of just the HTML.
     """
-    parts = [(REPO / "web/index.html").read_text()]
+    parts = [(REPO / "web/legacy.html").read_text()]
     for asset in ("index.css", "index.js"):
         p = REPO / "web/assets" / asset
         if p.exists():
@@ -1420,7 +1420,7 @@ def test_type_column_only_appears_when_multiple_types_in_data():
 def test_type_header_injected_only_when_types_diverge():
     """The Type <th> is injected programmatically — never present in the
     base HTML. This keeps the land-only view identical to today."""
-    html_only = (REPO / "web/index.html").read_text()
+    html_only = (REPO / "web/legacy.html").read_text()
     assert "col-type" not in html_only, (
         "Type header must be injected by JS, not present in base HTML"
     )
@@ -1466,7 +1466,7 @@ def test_table_render_threads_type_col_state():
 # toggleable; at least one must always be selected (last-pill snap-back).
 
 def test_type_pills_present_in_html_for_all_three_types():
-    html = (REPO / "web/index.html").read_text()
+    html = (REPO / "web/legacy.html").read_text()
     for pt in ("land", "house", "condo"):
         assert f'data-type-pill="{pt}"' in html, f"Type pill missing for {pt}"
 
@@ -1475,7 +1475,7 @@ def test_type_pills_default_all_active():
     """Default state: all 3 types active so the dataset isn't filtered
     out before the user does anything. Pre-PR-D1 there was no type
     filter — the read-only Type column showed everything."""
-    html = (REPO / "web/index.html").read_text()
+    html = (REPO / "web/legacy.html").read_text()
     # Each pill renders with class 'active' baseline
     for pt in ("land", "house", "condo"):
         # Match the button regardless of attribute order
@@ -1655,7 +1655,7 @@ def test_open_gated_section_in_panel_only():
     """The data-filter buttons must NOT appear in the static HTML toolbar
     anymore — only inside the panel-builder JS. Otherwise the user would
     see duplicate controls."""
-    html_only = (REPO / "web/index.html").read_text()
+    html_only = (REPO / "web/legacy.html").read_text()
     assert 'data-filter="open"' not in html_only, (
         "Open/Gated still in top-toolbar HTML — D3 should have moved it to the panel"
     )
@@ -1666,7 +1666,7 @@ def test_open_gated_section_in_panel_only():
 
 
 def test_photos_filter_section_in_panel_only():
-    html_only = (REPO / "web/index.html").read_text()
+    html_only = (REPO / "web/legacy.html").read_text()
     assert 'data-photos="with"' not in html_only, (
         "Photos filter still in top-toolbar HTML — D3 should have moved it"
     )
@@ -1790,7 +1790,7 @@ def test_count_label_uses_types_first_and_filter_as_suffix():
 # toolbar UI; chipping them would be redundant + confusing.
 
 def test_filter_chips_container_present_in_html():
-    html = (REPO / "web/index.html").read_text()
+    html = (REPO / "web/legacy.html").read_text()
     assert 'id="filter-chips"' in html, "Filter chips container missing from HTML"
     assert 'class="filter-chips"' in html
     # Hidden by default — no filters active on first load
@@ -2238,7 +2238,7 @@ def test_type_specific_panel_built_pair_renders_together():
 # Computed by snapshot/clear-one/recount/restore per active filter.
 
 def test_empty_state_container_present_in_html():
-    html = (REPO / "web/index.html").read_text()
+    html = (REPO / "web/legacy.html").read_text()
     assert 'id="empty-state"' in html, (
         "Empty-state container missing from HTML — empty-state UX inert"
     )

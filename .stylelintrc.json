@@ -1,0 +1,76 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "color-no-hex": [true, {
+      "message": "Use an oklch token from web/app/styles/tokens.css. Override with /* token-exception: <reason> */ if intentional."
+    }],
+    "color-named": ["never", {
+      "message": "Use an oklch token from web/app/styles/tokens.css.",
+      "ignore": ["inside-function"]
+    }],
+    "function-disallowed-list": [
+      ["rgb", "rgba", "hsl", "hsla"],
+      {
+        "message": "Use oklch tokens. rgba is allowed only inside tokens.css for shadow alpha."
+      }
+    ],
+    "declaration-property-value-disallowed-list": {
+      "/^font-family/": [
+        "/Arial/i",
+        "/Times New Roman/i",
+        "/^system-ui$/",
+        "/^sans-serif$/",
+        "/^serif$/",
+        "/^monospace$/"
+      ]
+    },
+    "no-empty-source": null,
+    "selector-class-pattern": null,
+    "custom-property-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "hue-degree-notation": null,
+    "media-feature-range-notation": null,
+    "value-keyword-case": null,
+    "selector-not-notation": null,
+    "no-descending-specificity": null,
+    "import-notation": null,
+    "shorthand-property-no-redundant-values": null
+  },
+  "ignoreFiles": [
+    "web/app/styles/tokens.css",
+    "web/dist/**",
+    "node_modules/**",
+    "web/legacy.html",
+    "web/assets/**",
+    "new_ux/**"
+  ],
+  "overrides": [
+    {
+      "//": "Legacy index.css inherited from the prototype — cleaned up incrementally as components migrate to web/app/styles/components/. New CSS must lint clean from day one.",
+      "files": ["web/app/styles/index.css"],
+      "rules": {
+        "color-no-hex": null,
+        "color-named": null,
+        "function-disallowed-list": null,
+        "declaration-property-value-disallowed-list": null,
+        "declaration-block-single-line-max-declarations": null,
+        "no-duplicate-selectors": null,
+        "at-rule-empty-line-before": null,
+        "selector-pseudo-element-colon-notation": null,
+        "media-feature-name-no-vendor-prefix": null,
+        "shorthand-property-no-redundant-values": null,
+        "color-hex-length": null,
+        "length-zero-no-unit": null,
+        "no-invalid-double-slash-comments": null,
+        "block-no-empty": null,
+        "keyframes-name-pattern": null,
+        "declaration-block-no-duplicate-properties": null,
+        "no-duplicate-at-import-rules": null
+      }
+    }
+  ]
+}

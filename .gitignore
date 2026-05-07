@@ -11,6 +11,9 @@ venv/
 # Node
 node_modules/
 
+# Vite build output — Vercel rebuilds on deploy; locals don't track it
+web/dist/
+
 # Vercel build cache
 .vercel/
 
