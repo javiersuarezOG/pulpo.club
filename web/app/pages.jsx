@@ -163,52 +163,120 @@ function PillRail({ app, active }) {
 }
 
 // ====== Home — Hero ======
+//
+// Hero rotation contract (see pulpo/featured_listing.py for the picker):
+//
+//   1. Backend writes /data/featured.json once per UTC day with a *pool*
+//      of up to 12 elite listings (rank>=75 + photos>=8 + days<=30 +
+//      not sold; quality>=80 once scoring catches up). Three tiers —
+//      elite / soft / fallback — answer "why this pool".
+//   2. On mount, FE fetches the pool and resolves listing_ids to live
+//      Listings (a few may have churned since the daily run).
+//   3. Per-session sticky pick: the starting index is randomized once
+//      and cached in sessionStorage, so refreshing or navigating within
+//      the session doesn't jarringly swap the hero.
+//   4. Auto-rotation: every HERO_ROTATE_MS the index advances with a
+//      crossfade. Paused when the tab is hidden.
+//
+// Legacy fallback (client-side highest-photo-count, freshest first)
+// fires when featured.json 404s or no pool ID resolves.
+const HERO_ROTATE_MS    = 12_000;
+const HERO_SESSION_KEY  = "pulpo.hero.startIdx.v1";
+
 function Hero({ app }) {
   const LISTINGS = useListings();
 
-  // PR-7.6 — cron-stable featured pick. Backend writes
-  // /data/featured.json once per nightly run; we read it on mount and
-  // use that listing as the hero. This means an Instagram ad clicked at
-  // 9:00:00 hits the same listing as one clicked at 9:00:01.
-  //
-  // Falls back to the legacy client-side pick when:
-  //   - featured.json is 404 (first-deploy / pipeline never wrote)
-  //   - the listing_id can't be resolved to a current listing
-  //     (catalog mid-rotation)
-  //   - fetch errors out
-  const [featuredId, setFeaturedId] = pUseState(null);
+  const [featuredJson, setFeaturedJson] = pUseState(null);
   pUseEffect(() => {
     let cancelled = false;
     import("./telemetry/perf").then(({ timedFetch }) =>
       timedFetch("featured.json", "/data/featured.json", { headers: { Accept: "application/json" } })
     )
       .then(r => (r.ok ? r.json() : null))
-      .then(j => {
-        if (!cancelled && j && typeof j.listing_id === "string") {
-          // Backend uses `source|source_id`; FE adapter joins with `-`.
-          setFeaturedId(j.listing_id.replace("|", "-"));
-        }
-      })
+      .then(j => { if (!cancelled && j) setFeaturedJson(j); })
       .catch(() => { /* swallow — fall back to client-side */ });
     return () => { cancelled = true; };
   }, []);
 
-  const featured = pUseMemo(() => {
-    if (featuredId) {
-      const match = LISTINGS.find(l => l.id === featuredId);
-      if (match) return match;
+  // Resolve the pool to live Listings. Backend ID format is
+  // `source|source_id`; FE adapter uses `source-source_id`.
+  const pool = pUseMemo(() => {
+    if (!featuredJson) return [];
+    const ids = Array.isArray(featuredJson.pool) && featuredJson.pool.length
+      ? featuredJson.pool.map(p => p && p.listing_id)
+      : (featuredJson.listing_id ? [featuredJson.listing_id] : []);
+    const resolved = [];
+    for (const raw of ids) {
+      if (typeof raw !== "string") continue;
+      const id = raw.replace("|", "-");
+      const match = LISTINGS.find(l => l.id === id);
+      if (match) resolved.push(match);
     }
-    // Legacy fallback: highest-photo-count, freshest listing.
-    return [...LISTINGS]
+    return resolved;
+  }, [LISTINGS, featuredJson]);
+
+  // Legacy client-side fallback when the pool is empty (404, all stale).
+  const fallbackListing = pUseMemo(() => (
+    [...LISTINGS]
       .filter(l => l.photos_count > 0 && !l.is_sold)
-      .sort((a, b) => (b.photos_count - a.photos_count) || (a.first_seen_date - b.first_seen_date))[0];
-  }, [LISTINGS, featuredId]);
-  if (!featured) return null;
+      .sort((a, b) => (b.photos_count - a.photos_count) || (a.first_seen_date - b.first_seen_date))[0]
+  ), [LISTINGS]);
+
+  const heroPool = pool.length > 0 ? pool : (fallbackListing ? [fallbackListing] : []);
+
+  // Sticky-per-session starting index. Random on first visit so two
+  // visitors typically land on different elites; same-session refreshes
+  // are stable.
+  const [idx, setIdx] = pUseState(() => {
+    if (typeof window === "undefined") return 0;
+    try {
+      const cached = window.sessionStorage.getItem(HERO_SESSION_KEY);
+      if (cached !== null) {
+        const n = Number(cached);
+        if (Number.isFinite(n) && n >= 0) return n;
+      }
+    } catch {}
+    return Math.floor(Math.random() * 1024);
+  });
+
+  // Persist the current cursor so a refresh in the same session lands
+  // on the same listing.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || heroPool.length === 0) return;
+    try {
+      window.sessionStorage.setItem(HERO_SESSION_KEY, String(idx % heroPool.length));
+    } catch {}
+  }, [idx, heroPool.length]);
+
+  // Auto-rotate. Pause while the tab is hidden so an idle background
+  // tab isn't churning fades.
+  pUseEffect(() => {
+    if (heroPool.length < 2) return;
+    const tick = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      setIdx(i => i + 1);
+    };
+    const timer = setInterval(tick, HERO_ROTATE_MS);
+    return () => clearInterval(timer);
+  }, [heroPool.length]);
+
+  if (heroPool.length === 0) return null;
+  const cursor = idx % heroPool.length;
+  const featured = heroPool[cursor];
+  const tier = featuredJson && typeof featuredJson.tier === "string" ? featuredJson.tier : null;
+
   return (
     <section className="hero">
-      <img className="hero-bg" src={featured.photos[0]} alt="" />
+      {/* `key` per pool entry forces a remount so the heroIn keyframe
+          re-runs as a fade-in on each rotation. */}
+      <img
+        key={`bg-${featured.id}`}
+        className="hero-bg"
+        src={featured.photos[0]}
+        alt=""
+      />
       <div className="hero-overlay" />
-      <div className="hero-content">
+      <div className="hero-content" key={`content-${featured.id}`}>
         <div className="hero-eyebrow">
           <span>{featured.zone_name}, {featured.province_state}</span>
           <span className="dot">·</span>
@@ -235,7 +303,12 @@ function Hero({ app }) {
           >{t("hero.cta.see_listing", app.locale)}</button>
         </div>
       </div>
-      <div className="hero-attrib">{t("hero.featured_today", app.locale)} · {formatPrice(featured.price)} · {formatSize(featured.size_m2)}</div>
+      <div className="hero-attrib">
+        {t("hero.featured_today", app.locale)}
+        {heroPool.length > 1 ? ` · ${cursor + 1}/${heroPool.length}` : ""}
+        {tier === "elite" ? " · elite" : ""}
+        {" · "}{formatPrice(featured.price)} · {formatSize(featured.size_m2)}
+      </div>
     </section>
   );
 }

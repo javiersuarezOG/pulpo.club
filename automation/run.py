@@ -740,18 +740,17 @@ def main() -> int:
     except Exception as _e:
         print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
 
-    # PR-7.6 — pick the cron-stable Discover hero. Writes
-    # web/data/featured.json with { listing_id, picked_at, expires_at,
-    # ... }. Non-fatal: a missing file just lets the FE fall back to
-    # the legacy client-side hero pick.
+    # Cron-stable Discover hero pool. Writes web/data/featured.json
+    # with { tier, pool: [...], ... }. Non-fatal: a missing file just
+    # lets the FE fall back to a client-side pick.
     try:
         from pulpo.featured_listing import write_featured_json
-        pick = write_featured_json(web_data_dir / "featured.json", ranked)
-        if pick is not None:
-            print(f"[featured] pick={pick.listing_id} "
-                  f"rank={pick.rank_score:.1f} "
-                  f"photo_quality={pick.hero_photo_quality_score} "
-                  f"fallback={pick.fallback}")
+        pool = write_featured_json(web_data_dir / "featured.json", ranked)
+        if pool is not None:
+            top = pool.entries[0]
+            print(f"[featured] tier={pool.tier} pool_size={len(pool.entries)} "
+                  f"top={top.listing_id} rank={top.rank_score:.1f} "
+                  f"photo_quality={top.hero_photo_quality_score}")
         else:
             print("[featured] no eligible listing — featured.json not written")
     except Exception as _e:

@@ -1,8 +1,96 @@
 {
-  "listing_id": "bienesraices|1399",
-  "picked_at": "2026-05-07T13:27:31.368973+00:00",
+  "tier": "elite",
+  "criteria": {
+    "elite": {
+      "min_rank": 75.0,
+      "min_photos": 8,
+      "min_quality": 80,
+      "max_days": 30
+    },
+    "soft": {
+      "min_rank": 65.0,
+      "min_photos": 5,
+      "max_days": 30
+    }
+  },
+  "picked_at": "2026-05-07T14:56:29.233690+00:00",
   "expires_at": "2026-05-08T00:00:00+00:00",
+  "listing_id": "bienesraices|1399",
   "rank_score": 87.5,
   "hero_photo_quality_score": null,
-  "fallback": true
+  "fallback": false,
+  "pool": [
+    {
+      "listing_id": "bienesraices|1399",
+      "rank_score": 87.5,
+      "hero_photo_quality_score": null,
+      "photos_count": 28
+    },
+    {
+      "listing_id": "goodlife|apartments-in-el-zonte",
+      "rank_score": 87.5,
+      "hero_photo_quality_score": null,
+      "photos_count": 8
+    },
+    {
+      "listing_id": "goodlife|oceanview-land-near-el-tunco-3-63-acres-980000",
+      "rank_score": 82.89,
+      "hero_photo_quality_score": null,
+      "photos_count": 9
+    },
+    {
+      "listing_id": "bienesraices|2059",
+      "rank_score": 82.71,
+      "hero_photo_quality_score": null,
+      "photos_count": 24
+    },
+    {
+      "listing_id": "bienesraices|1349",
+      "rank_score": 82.41,
+      "hero_photo_quality_score": null,
+      "photos_count": 9
+    },
+    {
+      "listing_id": "bienesraices|1529",
+      "rank_score": 80.04,
+      "hero_photo_quality_score": null,
+      "photos_count": 24
+    },
+    {
+      "listing_id": "bienesraices|1875",
+      "rank_score": 79.74,
+      "hero_photo_quality_score": null,
+      "photos_count": 29
+    },
+    {
+      "listing_id": "bienesraices|1424",
+      "rank_score": 79.45,
+      "hero_photo_quality_score": null,
+      "photos_count": 8
+    },
+    {
+      "listing_id": "bienesraices|1559",
+      "rank_score": 79.39,
+      "hero_photo_quality_score": null,
+      "photos_count": 29
+    },
+    {
+      "listing_id": "goodlife|2201-97m2-lot-with-panoramic-view-in-chiltiupan-195000",
+      "rank_score": 76.86,
+      "hero_photo_quality_score": null,
+      "photos_count": 9
+    },
+    {
+      "listing_id": "bienesraices|1783",
+      "rank_score": 75.72,
+      "hero_photo_quality_score": null,
+      "photos_count": 20
+    },
+    {
+      "listing_id": "bienesraices|1158",
+      "rank_score": 75.36,
+      "hero_photo_quality_score": null,
+      "photos_count": 35
+    }
+  ]
 }
