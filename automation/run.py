@@ -20,7 +20,11 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from pulpo.agents import SOURCES as REGISTRY  # noqa: E402
-import pulpo.scrapers  # noqa: F401,E402 — triggers registration of all sources
+# Importing pulpo.scrapers triggers registration of all sources via
+# module-level decorators. The trailing `assert` pins the reference so
+# Pyright doesn't flag the import as unused.
+import pulpo.scrapers  # noqa: F401,E402
+assert pulpo.scrapers is not None
 from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
@@ -436,8 +440,12 @@ def main() -> int:
     # AI run, so downstream fields reflect cross-run price comparison.
     PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
     prices_history_path = web_data_dir / "prices_history.json"
+    # json.loads returns Any — guard against a hand-edited file that
+    # contains a list / scalar instead of an object. Don't annotate the
+    # initial assignment as `: dict`, or Pyright assumes the guard is
+    # tautological and reports the body as unreachable.
     try:
-        prices_history: dict = (
+        prices_history = (
             json.loads(prices_history_path.read_text())
             if prices_history_path.exists() else {}
         )
