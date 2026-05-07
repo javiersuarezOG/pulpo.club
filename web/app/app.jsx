@@ -32,7 +32,7 @@ import {
   TweakButton,
 } from "./tweaks-panel.jsx";
 import { ErrorBoundary } from "./error-boundary.jsx";
-import { ClerkShell } from "./auth/clerk-shell.jsx";
+import { ClerkShell, clerkEnabled } from "./auth/clerk-shell.jsx";
 import { track } from "./telemetry/hook";
 import { bootWebVitals } from "./telemetry/web-vitals";
 import "./styles/index.css";
@@ -59,7 +59,14 @@ function App() {
   // Auth-state tweak — overrides persisted user when set to a non-default value.
   // Lets the user preview the full app from any auth perspective without
   // having to manually log in/out.
+  //
+  // PR-9b: when Clerk is the source of truth (flag on), this toggle is
+  // a no-op — Clerk's <ClerkUserSync> would immediately overwrite any
+  // setUser we did here, so they'd fight each frame. Use Clerk test
+  // users (free + pro) from the dashboard instead. PR-9d removes the
+  // toggle entirely.
   useEffect(() => {
+    if (clerkEnabled()) return;
     if (tweaks.authState === "signed_out") {
       setUser(null);
     } else if (tweaks.authState === "signed_in_free") {
@@ -209,6 +216,12 @@ function App() {
   const openListingObj = openListingId ? listings.find(l => l.id === openListingId) : null;
 
   return (
+    // <ClerkShell> mounts <ClerkProvider> only when VITE_USE_CLERK=1.
+    // Flag off → returns children unchanged. Flag on → also mounts a
+    // ClerkUserSync inside the provider that maps Clerk's user to
+    // App's `setUser` so every downstream `app.user` reader works
+    // unchanged. Lives inside App so `setUser` is in scope.
+    <ClerkShell setUser={setUser}>
     <div className={`app density-${tweaks.density}`}>
       <TopNav app={app} />
       <main className="main">
@@ -327,6 +340,7 @@ function App() {
 
       {__PULPO_DEV_PANEL__ && debug && <DebugPanel app={app} />}
     </div>
+    </ClerkShell>
   );
 }
 
@@ -373,10 +387,8 @@ function DebugPanel({ app }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>
-    <ClerkShell>
-      <ListingsProvider>
-        <App />
-      </ListingsProvider>
-    </ClerkShell>
+    <ListingsProvider>
+      <App />
+    </ListingsProvider>
   </ErrorBoundary>
 );
