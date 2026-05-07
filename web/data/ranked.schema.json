@@ -1,0 +1,539 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pulpo.club/schemas/ranked.schema.json",
+  "title": "Pulpo ranked.json (array of Listings)",
+  "description": "Auto-generated from pulpo.models.Listing. Do not edit by hand — run `python -m automation.generate_ranked_schema` after changing the dataclass. Mirror any field changes in web/assets/types.d.ts.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "source",
+      "source_id",
+      "url",
+      "scraped_at",
+      "title",
+      "description",
+      "country",
+      "department",
+      "municipality",
+      "zone",
+      "zone_confidence",
+      "location_text",
+      "lat",
+      "lng",
+      "geocoding_confidence",
+      "area_m2",
+      "raw_size_text",
+      "price_usd",
+      "raw_price_text",
+      "price_per_m2",
+      "property_type",
+      "bedrooms",
+      "bathrooms",
+      "built_area_m2",
+      "price_per_built_m2",
+      "year_built",
+      "parking_spaces",
+      "floor",
+      "hoa_fee_usd_monthly",
+      "is_beachfront",
+      "is_in_development",
+      "development_name",
+      "has_paved_access",
+      "has_water",
+      "has_power",
+      "has_ocean_view",
+      "has_mountain_view",
+      "has_water_body",
+      "is_flat",
+      "is_repriced",
+      "days_listed",
+      "photos_count",
+      "photo_urls",
+      "hero_photo_path",
+      "first_seen_at",
+      "broker_name",
+      "broker_phone",
+      "broker_email",
+      "validation_status",
+      "validation_warnings",
+      "title_canonical",
+      "short_description_canonical",
+      "reasons_to_buy",
+      "geocoding_source",
+      "geocoding_reference",
+      "enriched_at",
+      "enrichment_model",
+      "rank",
+      "rank_score",
+      "zone_percentile",
+      "value_score",
+      "location_score",
+      "momentum_score",
+      "rank_reasons",
+      "data_quality_score",
+      "investment_signal",
+      "readiness_score",
+      "source_label",
+      "price_vs_zone_median",
+      "price_vs_zone_pct",
+      "dist_airport_km",
+      "dist_beach_km",
+      "dist_highway_km",
+      "dist_nearest_town_km"
+    ],
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "source_id": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "scraped_at": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "country": {
+        "type": "string",
+        "const": "SV"
+      },
+      "department": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "municipality": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "zone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "zone_confidence": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "specific",
+          "municipality",
+          "department",
+          "unresolved",
+          null
+        ]
+      },
+      "location_text": {
+        "type": "string"
+      },
+      "lat": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -90,
+        "maximum": 90
+      },
+      "lng": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -180,
+        "maximum": 180
+      },
+      "geocoding_confidence": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "high",
+          "medium",
+          "low",
+          null
+        ]
+      },
+      "area_m2": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "raw_size_text": {
+        "type": "string"
+      },
+      "price_usd": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "raw_price_text": {
+        "type": "string"
+      },
+      "price_per_m2": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "property_type": {
+        "type": "string",
+        "enum": [
+          "land",
+          "house",
+          "condo"
+        ]
+      },
+      "bedrooms": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "bathrooms": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "built_area_m2": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "price_per_built_m2": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "year_built": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1800,
+        "maximum": 2100
+      },
+      "parking_spaces": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "floor": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "hoa_fee_usd_monthly": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "is_beachfront": {
+        "type": "boolean"
+      },
+      "is_in_development": {
+        "type": "boolean"
+      },
+      "development_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "has_paved_access": {
+        "type": "boolean"
+      },
+      "has_water": {
+        "type": "boolean"
+      },
+      "has_power": {
+        "type": "boolean"
+      },
+      "has_ocean_view": {
+        "type": "boolean"
+      },
+      "has_mountain_view": {
+        "type": "boolean"
+      },
+      "has_water_body": {
+        "type": "boolean"
+      },
+      "is_flat": {
+        "type": "boolean"
+      },
+      "is_repriced": {
+        "type": "boolean"
+      },
+      "days_listed": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "photos_count": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "photo_urls": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "hero_photo_path": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "first_seen_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "broker_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "broker_phone": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "broker_email": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "validation_status": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "flagged",
+          null
+        ]
+      },
+      "validation_warnings": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "title_canonical": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "short_description_canonical": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "reasons_to_buy": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "geocoding_source": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "extracted",
+          "estimated",
+          null
+        ]
+      },
+      "geocoding_reference": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "enriched_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "enrichment_model": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "rank": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1
+      },
+      "rank_score": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      },
+      "zone_percentile": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      },
+      "value_score": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      },
+      "location_score": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      },
+      "momentum_score": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      },
+      "rank_reasons": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "data_quality_score": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 1
+      },
+      "investment_signal": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "deal",
+          "hot",
+          "stale",
+          "new",
+          null
+        ]
+      },
+      "readiness_score": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3
+      },
+      "source_label": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "price_vs_zone_median": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "price_vs_zone_pct": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "dist_airport_km": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "dist_beach_km": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "dist_highway_km": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      },
+      "dist_nearest_town_km": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0
+      }
+    }
+  }
+}
