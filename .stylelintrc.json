@@ -69,7 +69,9 @@
         "block-no-empty": null,
         "keyframes-name-pattern": null,
         "declaration-block-no-duplicate-properties": null,
-        "no-duplicate-at-import-rules": null
+        "no-duplicate-at-import-rules": null,
+        "property-no-vendor-prefix": null,
+        "value-no-vendor-prefix": null
       }
     }
   ]
