@@ -80,6 +80,11 @@ function App() {
     try { return new Set(JSON.parse(localStorage.getItem("pulpo-saved")) || []); } catch { return new Set(); }
   });
   const [signupModal, setSignupModal] = useState(null);
+  // Hot-line for triggering Clerk's hosted sign-in / sign-up modal
+  // imperatively, without a click-time Suspense boundary that would
+  // throw React #426. <ClerkActionsBinder> inside ClerkShell wires
+  // this up once the SDK loads (flag-on only); SignupModal calls it.
+  const [clerkActions, setClerkActions] = useState(null);
   const [toast, setToast] = useState(null);
   const [openListingId, setOpenListingId] = useState(null);
   const [detailViewCount, setDetailViewCount] = useState(() => {
@@ -142,6 +147,26 @@ function App() {
   useEffect(() => {
     if (user && signupModal) setSignupModal(null);
   }, [user, signupModal]);
+
+  // Auth telemetry. Fires once per transition for both Clerk-on
+  // (ClerkUserSync drives setUser) and legacy (signin/signout
+  // callbacks). Identity-keyed on user.email so tab visibility
+  // re-renders don't double-fire.
+  const prevAuthEmailRef = useRef(user ? user.email : null);
+  useEffect(() => {
+    const prev = prevAuthEmailRef.current;
+    const next = user ? user.email : null;
+    if (prev === next) return;
+    prevAuthEmailRef.current = next;
+    if (next && !prev) {
+      track("signin.completed", {
+        provider: (user && user.provider) || "legacy",
+        plan:     (user && user.plan)     || "free",
+      });
+    } else if (!next && prev) {
+      track("signout.completed", {});
+    }
+  }, [user]);
 
   // PR-9c — Clerk-on path takes the saves list from the server.
   // Hydrates on user transition; clears on sign-out so we don't
@@ -207,12 +232,15 @@ function App() {
   const closeListing = useCallback(() => setOpenListingId(null), []);
 
   const toggleSave = useCallback((id) => {
+    const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
+
     // Anon click while flag-on → stash intent, open SignupModal. The
     // hydration effect picks up `pulpo-pending-save` after Clerk
     // sign-in completes and posts it server-side.
     if (clerkEnabled() && !clerkUserId) {
       try { localStorage.setItem("pulpo-pending-save", id); } catch {}
       setSignupModal({ mode: "signup", pendingSave: id });
+      track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
       return;
     }
 
@@ -227,6 +255,11 @@ function App() {
       return next;
     });
     showToast(t(wasSaved ? "toast.removed" : "toast.saved", locale));
+    track("save.toggled", {
+      listing_id: id,
+      action:     wasSaved ? "remove" : "add",
+      auth_state: authState,
+    });
 
     // Flag-off keeps localStorage-only behaviour (legacy). Flag-on
     // syncs to /api/saves and rolls back the optimistic update on
@@ -293,6 +326,7 @@ function App() {
     tweaks,
     listings,
     listingsState,
+    clerkActions,
   };
 
   const openListingObj = openListingId ? listings.find(l => l.id === openListingId) : null;
@@ -303,7 +337,7 @@ function App() {
     // ClerkUserSync inside the provider that maps Clerk's user to
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
-    <ClerkShell setUser={setUser}>
+    <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
     <div className={`app density-${tweaks.density}`}>
       <TopNav app={app} />
       <main className="main">
