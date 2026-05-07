@@ -165,12 +165,42 @@ function PillRail({ app, active }) {
 // ====== Home — Hero ======
 function Hero({ app }) {
   const LISTINGS = useListings();
-  // Pick highest-photo-count, freshest listing
+
+  // PR-7.6 — cron-stable featured pick. Backend writes
+  // /data/featured.json once per nightly run; we read it on mount and
+  // use that listing as the hero. This means an Instagram ad clicked at
+  // 9:00:00 hits the same listing as one clicked at 9:00:01.
+  //
+  // Falls back to the legacy client-side pick when:
+  //   - featured.json is 404 (first-deploy / pipeline never wrote)
+  //   - the listing_id can't be resolved to a current listing
+  //     (catalog mid-rotation)
+  //   - fetch errors out
+  const [featuredId, setFeaturedId] = pUseState(null);
+  pUseEffect(() => {
+    let cancelled = false;
+    fetch("/data/featured.json", { headers: { Accept: "application/json" } })
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (!cancelled && j && typeof j.listing_id === "string") {
+          // Backend uses `source|source_id`; FE adapter joins with `-`.
+          setFeaturedId(j.listing_id.replace("|", "-"));
+        }
+      })
+      .catch(() => { /* swallow — fall back to client-side */ });
+    return () => { cancelled = true; };
+  }, []);
+
   const featured = pUseMemo(() => {
+    if (featuredId) {
+      const match = LISTINGS.find(l => l.id === featuredId);
+      if (match) return match;
+    }
+    // Legacy fallback: highest-photo-count, freshest listing.
     return [...LISTINGS]
       .filter(l => l.photos_count > 0 && !l.is_sold)
       .sort((a, b) => (b.photos_count - a.photos_count) || (a.first_seen_date - b.first_seen_date))[0];
-  }, [LISTINGS]);
+  }, [LISTINGS, featuredId]);
   if (!featured) return null;
   return (
     <section className="hero">

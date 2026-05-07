@@ -182,6 +182,8 @@ export function adaptListing(raw: any): Listing {
     price_per_m2: typeof raw.price_per_m2 === "number" ? raw.price_per_m2 : null,
     photos,
     photos_count: typeof raw.photos_count === "number" ? raw.photos_count : photos.length,
+    hero_photo_quality_score:
+      typeof raw.hero_photo_quality_score === "number" ? raw.hero_photo_quality_score : null,
     first_seen_date: daysSince(raw.first_seen_at),
     days_listed: typeof raw.days_listed === "number" ? raw.days_listed : 0,
     is_repriced: Boolean(raw.is_repriced),
