@@ -5,16 +5,9 @@ import React, {
   useRef as pUseRef,
   useMemo as pUseMemo,
   useCallback as pUseCallback,
-  Suspense as pSuspense,
-  lazy as pLazy,
 } from "react";
 import { t, tr, LOCALES } from "./i18n.jsx";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
-
-// Lazy-loaded bridge to Clerk's hosted sign-in modal. Static-imports
-// @clerk/react, so this lives in the lazy chunk that flag-off builds
-// never fetch.
-const ClerkSignInLazy = pLazy(() => import("./auth/clerk-signin-panel.jsx"));
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
@@ -2184,21 +2177,33 @@ function PlansPage({ app }) {
 // ====== Sign-up modal ======
 function SignupModal({ app }) {
   const m = app.signupModal;
+
+  // Flag-on hand-off to Clerk. Trigger the hosted modal imperatively
+  // via app.clerkActions (wired by ClerkActionsBinder once the SDK
+  // chunk has loaded) — no click-time Suspense, so React #426 doesn't
+  // fire. If clerkActions isn't ready yet (cold first paint), we wait;
+  // the effect re-runs when it lands.
+  //
+  // Hook is at the top so order is stable across renders, regardless
+  // of whether `m` or `clerkEnabled()` flip the early returns below.
+  pUseEffect(() => {
+    if (!m) return;
+    if (!clerkEnabled()) return;
+    if (!app.clerkActions) return;
+    const target = m.mode === "login" ? "openSignIn" : "openSignUp";
+    app.clerkActions[target]();
+    app.closeSignup();
+  }, [m, app.clerkActions]);
+
   if (!m) return null;
+  if (clerkEnabled()) return null;   // Clerk's hosted modal takes over.
+  return <LegacySignupModal app={app} m={m} />;
+}
 
-  // Flag on → hand off to Clerk's hosted modal. The lazy bridge opens
-  // it imperatively and dismisses our shell modal so the two don't
-  // stack. ClerkUserSync (PR-9b) flips app.user once the user
-  // completes; the existing useEffect in App auto-closes the modal on
-  // user transition.
-  if (clerkEnabled()) {
-    return (
-      <pSuspense fallback={null}>
-        <ClerkSignInLazy mode={m.mode || "signup"} onClose={app.closeSignup} />
-      </pSuspense>
-    );
-  }
-
+// Legacy email/password sign-in form. Only renders when VITE_USE_CLERK
+// is off — extracted so its useState hooks don't clash with the parent
+// component's lone useEffect on flag-on renders.
+function LegacySignupModal({ app, m }) {
   const [mode, setMode] = pUseState(m.mode || "signup");
   const [email, setEmail] = pUseState(m.email || "");
   const [password, setPassword] = pUseState("");

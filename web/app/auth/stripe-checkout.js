@@ -8,7 +8,10 @@
 // The signed-in Clerk session cookie is sent automatically because the
 // fetch is same-origin.
 
+import { track } from "../telemetry/hook";
+
 export async function startStripeCheckout({ onError } = {}) {
+  track("upgrade.checkout_started", {});
   let res;
   try {
     res = await fetch("/api/stripe/create-checkout-session", {

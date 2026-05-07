@@ -29,14 +29,18 @@ export function clerkEnabled() {
   );
 }
 
-export function ClerkShell({ setUser, children }) {
+export function ClerkShell({ setUser, onClerkActions, children }) {
   if (!clerkEnabled()) return children;
   // Suspense fallback renders the children directly while Clerk loads,
   // so the app is interactive immediately — Clerk just hydrates auth
-  // state on top once its chunk arrives.
+  // state on top once its chunk arrives. This Suspense fires once on
+  // boot, *not* in response to user input — that's the one #426 trap
+  // we have to avoid (see SignupModal in pages.jsx).
   return (
     <Suspense fallback={children}>
-      <ClerkProviderLazy setUser={setUser}>{children}</ClerkProviderLazy>
+      <ClerkProviderLazy setUser={setUser} onClerkActions={onClerkActions}>
+        {children}
+      </ClerkProviderLazy>
     </Suspense>
   );
 }

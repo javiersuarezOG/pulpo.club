@@ -6,14 +6,21 @@
 //
 // Don't import from here directly elsewhere — go through ClerkShell.
 //
-// PR-9b — when a `setUser` prop is passed, also mounts <ClerkUserSync>
-// inside the provider. That bridge converts Clerk's user object to the
-// app's legacy `{ email, name, plan, joined }` shape and pushes it
-// into App's existing state, so every downstream `app.user` reader is
-// unchanged. Without `setUser` (flag off) ClerkShell never renders
-// this file at all.
+// Two bridges live inside <ClerkProvider>:
+//
+//   ClerkUserSync — maps Clerk's user to App's `setUser` so every
+//                   `app.user` reader keeps working unchanged. (PR-9b)
+//
+//   ClerkActionsBinder — gathers openSignIn / openSignUp / signOut from
+//                        useClerk() and hands them up to App via
+//                        `onClerkActions`. App can then trigger Clerk's
+//                        hosted modal imperatively, *without* needing a
+//                        click-time Suspense boundary in SignupModal.
+//                        Fixes React error #426 ("suspended in response
+//                        to synchronous input"). (PR-9c hotfix)
+
 import { useEffect } from "react";
-import { ClerkProvider, useUser } from "@clerk/react";
+import { ClerkProvider, useUser, useClerk } from "@clerk/react";
 
 function planFromMetadata(metadata) {
   // Clerk Dashboard test users carry plan in publicMetadata.plan.
@@ -44,11 +51,26 @@ function ClerkUserSync({ setUser }) {
   return null;
 }
 
-export default function ClerkProviderWrapper({ setUser, children }) {
+function ClerkActionsBinder({ onActions }) {
+  const clerk = useClerk();
+  useEffect(() => {
+    if (typeof onActions !== "function") return;
+    onActions({
+      openSignIn: (opts) => clerk.openSignIn(opts || {}),
+      openSignUp: (opts) => clerk.openSignUp(opts || {}),
+      signOut:    (opts) => clerk.signOut(opts || {}),
+    });
+    return () => onActions(null);
+  }, [clerk, onActions]);
+  return null;
+}
+
+export default function ClerkProviderWrapper({ setUser, onClerkActions, children }) {
   // <ClerkProvider> reads VITE_CLERK_PUBLISHABLE_KEY from import.meta.env.
   return (
     <ClerkProvider afterSignOutUrl="/">
       {typeof setUser === "function" ? <ClerkUserSync setUser={setUser} /> : null}
+      {typeof onClerkActions === "function" ? <ClerkActionsBinder onActions={onClerkActions} /> : null}
       {children}
     </ClerkProvider>
   );
