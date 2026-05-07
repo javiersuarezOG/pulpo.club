@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"sidecar: {sidecar.relative_to(REPO)} — not present (already clean)")
 
     if not ranked.exists():
-        print(f"ranked.json: not present — skipping field clear")
+        print("ranked.json: not present — skipping field clear")
         return 0
 
     data = json.loads(ranked.read_text())
