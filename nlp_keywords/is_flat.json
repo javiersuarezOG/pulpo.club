@@ -1,29 +1,65 @@
 {
   "field": "is_flat",
   "type": "boolean_with_negation",
-  "positive": [
+  "positive_en": [
+    "\\bflat\\b",
+    "flat lot",
+    "flat terrain",
+    "flat parcel",
+    "level lot",
+    "level terrain",
+    "level surface",
+    "completely flat",
+    "fully flat",
+    "perfectly flat",
+    "no slope",
+    "buildable flat",
+    "ready-to-build flat"
+  ],
+  "positive_es": [
     "\\bplano\\b",
     "terreno plano",
-    "\\bflat\\b",
     "lote plano",
     "topograf[ií]a plana",
     "\\bnivel\\b",
     "\\bnivelado\\b",
     "superficie plana",
     "totalmente plano",
-    "completamente plano"
+    "completamente plano",
+    "perfectamente plano",
+    "sin pendiente",
+    "sin desnivel",
+    "topograf[ií]a regular",
+    "lote a nivel",
+    "terreno regular y plano",
+    "100% plano",
+    "100 por ciento plano",
+    "todo plano"
   ],
-  "negative": [
+  "negative_en": [
+    "not flat",
+    "no flat",
+    "irregular",
+    "sloped",
+    "steep slope",
+    "with slope",
+    "uneven",
+    "hilly"
+  ],
+  "negative_es": [
     "no es plano",
     "no plano",
-    "no flat",
     "irregular",
     "con pendiente",
     "pendiente pronunciada",
     "topograf[ií]a irregular",
     "ligeramente inclinado",
     "lote a desnivel",
-    "con desnivel"
+    "con desnivel",
+    "desnivelado",
+    "inclinado",
+    "lomas",
+    "con lomeras"
   ],
-  "_comment": "PRD §FR-2.4 boolean_with_negation: match positives but suppress when negation appears within 3-word window. Negatives extended to catch SV-specific 'a desnivel' / 'desnivelado' phrasing that's commonly used to describe sloped terrain."
+  "_comment": "PRD §FR-2.4 boolean_with_negation. SV-specific 'a desnivel' / 'desnivelado' / 'lomas' commonly describe sloped terrain — keep in negatives."
 }

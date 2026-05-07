@@ -54,8 +54,35 @@ class CompiledDict:
     negative: re.Pattern | None
 
 
+def _collect_patterns(spec: dict, kind: str) -> list[str]:
+    """PR-8 — bilingual schema. Pulls patterns from both the legacy
+    `{kind}` key and the new `{kind}_en` / `{kind}_es` keys, deduped.
+
+    The extractor matches across the merged blob (cross-language) since
+    Salvadoran listings frequently mix EN headers with ES bodies. The
+    per-language split exists so contributors can edit each language
+    independently and so reviewers can spot-check coverage by locale.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for key in (kind, f"{kind}_en", f"{kind}_es"):
+        for pat in spec.get(key) or []:
+            if pat not in seen:
+                seen.add(pat)
+                out.append(pat)
+    return out
+
+
 def load_dictionaries(base: Path = KEYWORDS_DIR) -> list[CompiledDict]:
-    """Read all *.json files in nlp_keywords/, compile their regexes."""
+    """Read all *.json files in nlp_keywords/, compile their regexes.
+
+    Each file may declare patterns in either:
+      - the legacy single-list form: `{"positive": [...], "negative": [...]}`
+      - the bilingual form (PR-8):
+        `{"positive_en": [...], "positive_es": [...],
+          "negative_en": [...], "negative_es": [...]}`
+      - or a mix of both (legacy keys merged with the bilingual ones).
+    """
     if not base.exists():
         return []
     out: list[CompiledDict] = []
@@ -67,8 +94,8 @@ def load_dictionaries(base: Path = KEYWORDS_DIR) -> list[CompiledDict]:
             continue
         field    = spec.get("field") or path.stem
         type_    = spec.get("type") or "boolean"
-        pos      = spec.get("positive") or []
-        neg      = spec.get("negative") or []
+        pos      = _collect_patterns(spec, "positive")
+        neg      = _collect_patterns(spec, "negative")
         if not pos:
             continue
         pos_rx   = re.compile("|".join(pos), re.IGNORECASE)

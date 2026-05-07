@@ -1,0 +1,42 @@
+{
+  "field": "is_walk_to_beach",
+  "type": "boolean",
+  "positive_en": [
+    "walk to (?:the )?beach",
+    "walking to (?:the )?beach",
+    "[0-9]+ ?minutes? walking to (?:the )?beach",
+    "[0-9]+ ?minutes? walk to (?:the )?beach",
+    "short walk to (?:the )?beach",
+    "few minutes? to (?:the )?beach",
+    "a few steps from (?:the )?beach",
+    "[1-5] minute walk",
+    "[0-9]+m to (?:the )?beach",
+    "[0-9]+ ?meters? to (?:the )?beach",
+    "[0-9]+ ?metres? to (?:the )?beach"
+  ],
+  "positive_es": [
+    "minutos caminando a (?:la )?playa",
+    "a [1-9] minutos caminando",
+    "[1-5] minutos? a pie",
+    "a [0-9]+ minutos? de (?:la )?playa",
+    "a pocos pasos de (?:la )?playa",
+    "a pasos de la playa",
+    "caminando a la playa",
+    "muy cerca de la playa",
+    "a [0-9]+ ?m de (?:la )?playa",
+    "a [0-9]+ ?metros de (?:la )?playa",
+    "[0-9]+ ?metros? a la playa",
+    "a 2 cuadras de la playa",
+    "a 3 cuadras de la playa",
+    "a una cuadra de la playa"
+  ],
+  "negative_en": [
+    "directly on the beach",
+    "right on the beach"
+  ],
+  "negative_es": [
+    "directamente en la playa",
+    "frente al mar"
+  ],
+  "_comment": "PR-8 — middle tier. Composes into beachfront_tier='walk_to_beach' when is_on_beach is False. Negatives suppress overlap with the strongest tier."
+}

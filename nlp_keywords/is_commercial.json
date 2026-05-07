@@ -1,0 +1,60 @@
+{
+  "field": "is_commercial",
+  "type": "boolean_with_negation",
+  "positive_en": [
+    "commercial zoning",
+    "commercial use",
+    "commercial property",
+    "commercial lot",
+    "zoned commercial",
+    "commercial development",
+    "ideal for retail",
+    "retail use",
+    "retail space",
+    "store front",
+    "ideal for office",
+    "office building",
+    "warehouse",
+    "shopping center",
+    "strip mall",
+    "business location",
+    "commercial corridor"
+  ],
+  "positive_es": [
+    "uso comercial",
+    "zona comercial",
+    "zonificaci[oó]n comercial",
+    "para uso comercial",
+    "ideal comercio",
+    "ideal para comercio",
+    "ideal para negocio",
+    "ideal para oficinas",
+    "para oficinas",
+    "para bodega",
+    "para bodegas",
+    "bodega industrial",
+    "centro comercial",
+    "plaza comercial",
+    "local comercial",
+    "comercio establecido",
+    "alto flujo vehicular",
+    "alto tr[aá]fico",
+    "fachada comercial",
+    "esquina comercial"
+  ],
+  "negative_en": [
+    "negotiable price",
+    "any reasonable offer",
+    "open to offers"
+  ],
+  "negative_es": [
+    "precio negociable",
+    "negociable",
+    "cualquier oferta",
+    "se reciben ofertas",
+    "se recibe oferta",
+    "abierto a oferta",
+    "abierto a ofertas"
+  ],
+  "_comment": "PR-8 — composes into land_type='commercial'. CRITICAL DISAMBIGUATION: Salvadoran brokers use 'comercial' to mean *negotiable* in price contexts. Negative patterns suppress 'precio comercial', 'oferta comercial' that aren't zoning signals. Ship with confidence threshold ≥0.85 in derive_land_type()."
+}

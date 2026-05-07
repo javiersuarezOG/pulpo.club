@@ -1,13 +1,36 @@
 {
   "field": "has_mountain_view",
   "type": "boolean",
-  "positive": [
-    "vista monta[nñ]a",
+  "positive_en": [
     "mountain view",
-    "vista cordillera",
-    "vista a los cerros",
-    "vista a la monta[nñ]a"
+    "mountain views",
+    "view of the mountains",
+    "panoramic mountain view",
+    "valley view",
+    "view of the valley",
+    "highland view",
+    "volcano view",
+    "with views of the mountains",
+    "overlooking the mountains",
+    "view of the volcano"
   ],
-  "negative": [],
-  "_comment": "PRD §FR-2.5. WARNING: 0.1% population in 2026-05-03 catalog — flagged for DROP in feasibility memo. Kept here for completeness; surface only when population clears 5%."
+  "positive_es": [
+    "vista monta[nñ]a",
+    "vista a la monta[nñ]a",
+    "vistas a la monta[nñ]a",
+    "vista cordillera",
+    "vista a (?:la )?cordillera",
+    "vista a los cerros",
+    "vista al cerro",
+    "vista al volc[aá]n",
+    "vista a los volcanes",
+    "vista al valle",
+    "panor[aá]mica de (?:la )?monta[nñ]a",
+    "panor[aá]mica monta[nñ]as?",
+    "vistas panor[aá]micas a la monta[nñ]a",
+    "vista a (?:los )?valles?"
+  ],
+  "negative_en": [],
+  "negative_es": [],
+  "_comment": "PRD §FR-2.5 + PR-8. SV-specific: vista al volcán (Santa Ana, San Vicente, San Miguel volcanoes). Watch population — historically <1% in flat coastal listings."
 }

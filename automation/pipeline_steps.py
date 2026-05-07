@@ -250,10 +250,27 @@ def compute_derived_population(ranked) -> dict[str, float]:
     off_market = sum(1 for li in ranked if getattr(li, "source_type", None) == "off_market")
     on_market  = sum(1 for li in ranked if getattr(li, "source_type", None) == "on_market")
     prev_price = sum(1 for li in ranked if getattr(li, "previous_price", None) is not None)
+    # PR-8 — NLP-derived fields.
+    bt_on    = sum(1 for li in ranked if getattr(li, "beachfront_tier", None) == "on_beach")
+    bt_walk  = sum(1 for li in ranked if getattr(li, "beachfront_tier", None) == "walk_to_beach")
+    bt_near  = sum(1 for li in ranked if getattr(li, "beachfront_tier", None) == "near_beach")
+    lt_agri  = sum(1 for li in ranked if getattr(li, "land_type", None) == "agricultural")
+    lt_comm  = sum(1 for li in ranked if getattr(li, "land_type", None) == "commercial")
+    lt_tour  = sum(1 for li in ranked if getattr(li, "land_type", None) == "tourist")
+    lt_resi  = sum(1 for li in ranked if getattr(li, "land_type", None) == "residential")
+    motiv    = sum(1 for li in ranked if getattr(li, "is_motivated", False) is True)
     return {
-        "source_type_off_market": round(off_market / n, 4),
-        "source_type_on_market":  round(on_market / n, 4),
-        "previous_price":         round(prev_price / n, 4),
+        "source_type_off_market":    round(off_market / n, 4),
+        "source_type_on_market":     round(on_market / n, 4),
+        "previous_price":            round(prev_price / n, 4),
+        "beachfront_tier_on_beach":      round(bt_on   / n, 4),
+        "beachfront_tier_walk_to_beach": round(bt_walk / n, 4),
+        "beachfront_tier_near_beach":    round(bt_near / n, 4),
+        "land_type_agricultural":        round(lt_agri / n, 4),
+        "land_type_commercial":          round(lt_comm / n, 4),
+        "land_type_tourist":             round(lt_tour / n, 4),
+        "land_type_residential":         round(lt_resi / n, 4),
+        "is_motivated":                  round(motiv   / n, 4),
     }
 
 

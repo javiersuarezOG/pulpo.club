@@ -16,7 +16,15 @@ export type Listing = {
   region: string | null;
   country: string;
   province_state: string;
-  land_type: "residential" | "agricultural" | "commercial" | "tourist" | "mixed" | "raw";
+  // PR-8 — backend-derived enum (pulpo/derived_rules.derive_land_type).
+  // null when no signal (rare — backend defaults to "residential" for
+  // any land/house/condo property_type).
+  land_type:
+    | "residential"
+    | "agricultural"
+    | "commercial"
+    | "tourist"
+    | null;
   size_m2: number | null;
   price: number | null;
   previous_price: number | null;
@@ -32,7 +40,9 @@ export type Listing = {
   source_type: "on_market" | "off_market";
   source_label: string;
   source_id: string;
-  beachfront_tier: "oceanfront" | "walk_to_beach" | "near_beach" | null;
+  // PR-8 — backend-derived (pulpo/derived_rules.derive_beachfront_tier).
+  // "on_beach" replaces the prototype's "oceanfront" placeholder.
+  beachfront_tier: "on_beach" | "walk_to_beach" | "near_beach" | null;
   has_ocean_view: boolean;
   has_mountain_view: boolean;
   has_water_body: boolean;

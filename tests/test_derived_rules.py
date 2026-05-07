@@ -17,6 +17,8 @@ from pulpo.derived_rules import (   # noqa: E402
     apply_all,
     derive_source_type,
     derive_previous_price,
+    derive_beachfront_tier,
+    derive_land_type,
     OFF_MARKET_SOURCES,
     SCOREABLE_FIELDS,
     SCOREABLE_TOTAL,
@@ -430,3 +432,69 @@ def test_regression_guard_skips_new_fields():
     prev = {"derived_field_population": {"is_beachfront": 0.30}}
     new = {"is_beachfront": 0.30, "land_type_agricultural": 0.0}  # newly added, 0%
     assert check_population_regression(prev, new) == []
+
+
+# ── PR-8: derive_beachfront_tier ──────────────────────────────────────
+
+def test_beachfront_tier_on_beach_wins():
+    """on_beach beats every other beach signal."""
+    li = _li(is_on_beach=True, is_walk_to_beach=True, is_beachfront=True)
+    assert derive_beachfront_tier(li) == "on_beach"
+
+
+def test_beachfront_tier_walk_when_not_on_beach():
+    li = _li(is_on_beach=False, is_walk_to_beach=True, is_beachfront=True)
+    assert derive_beachfront_tier(li) == "walk_to_beach"
+
+
+def test_beachfront_tier_near_beach_fallback_from_legacy_bool():
+    """is_beachfront alone (no specific tier) → near_beach."""
+    li = _li(is_on_beach=False, is_walk_to_beach=False, is_beachfront=True)
+    assert derive_beachfront_tier(li) == "near_beach"
+
+
+def test_beachfront_tier_none_when_no_signal():
+    li = _li(is_on_beach=False, is_walk_to_beach=False, is_beachfront=False)
+    assert derive_beachfront_tier(li) is None
+
+
+# ── PR-8: derive_land_type ────────────────────────────────────────────
+
+def test_land_type_agricultural_when_flag_set():
+    li = _li(is_agricultural=True)
+    assert derive_land_type(li) == "agricultural"
+
+
+def test_land_type_agricultural_priority_over_other_uses():
+    """Salvadoran 'finca' descriptions sometimes also mention 'ideal
+    para hotel'. Current use (agricultural) wins."""
+    li = _li(is_agricultural=True, is_tourist=True, is_commercial=True)
+    assert derive_land_type(li) == "agricultural"
+
+
+def test_land_type_commercial_when_flag_set():
+    li = _li(is_commercial=True)
+    assert derive_land_type(li) == "commercial"
+
+
+def test_land_type_tourist_when_flag_set():
+    li = _li(is_tourist=True)
+    assert derive_land_type(li) == "tourist"
+
+
+def test_land_type_residential_default_for_land():
+    """No NLP signal + property_type=land → residential (the default)."""
+    li = _li(property_type="land")
+    assert derive_land_type(li) == "residential"
+
+
+def test_land_type_residential_for_house_and_condo():
+    assert derive_land_type(_li(property_type="house")) == "residential"
+    assert derive_land_type(_li(property_type="condo")) == "residential"
+
+
+def test_land_type_none_for_unknown_property_type():
+    li = _li(property_type="unknown")
+    # Override so dict-shape doesn't carry the default 'land'.
+    li["property_type"] = "unknown"
+    assert derive_land_type(li) is None

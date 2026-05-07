@@ -74,24 +74,36 @@ function daysSince(iso: string | null | undefined): number {
   return Math.max(0, Math.floor(ms / 86_400_000));
 }
 
-function deriveLandType(propertyType: string | null): Listing["land_type"] {
-  // Placeholder — PR-8 ships the real text classifier.
-  if (propertyType === "land") return "raw";
-  if (propertyType === "condo" || propertyType === "house" || propertyType === "apartment") {
+// PR-8 — backend now derives land_type (pulpo/derived_rules.derive_land_type)
+// from NLP-extracted booleans + property_type. Pass through when present;
+// fall back to "residential" for any property_type ∈ {land,house,condo,apartment}
+// and null otherwise.
+function deriveLandType(
+  raw: any,
+  propertyType: string | null,
+): Listing["land_type"] {
+  const v = raw?.land_type;
+  if (v === "agricultural" || v === "commercial" || v === "tourist" || v === "residential") {
+    return v;
+  }
+  if (propertyType === "land" || propertyType === "house" ||
+      propertyType === "condo" || propertyType === "apartment") {
     return "residential";
   }
-  return "residential";
+  return null;
 }
 
 function deriveBeachfrontTier(
   isBeachfront: boolean,
-  tier: string | null | undefined
+  tier: string | null | undefined,
 ): Listing["beachfront_tier"] {
-  // Backend may already emit a tier (post-PR-8). Until then, fall back
-  // to the boolean.
-  if (tier === "oceanfront" || tier === "walk_to_beach" || tier === "near_beach") {
+  // PR-8 — backend now emits one of "on_beach" | "walk_to_beach" |
+  // "near_beach". Map the prototype's "oceanfront" string defensively
+  // so legacy snapshots still render.
+  if (tier === "on_beach" || tier === "walk_to_beach" || tier === "near_beach") {
     return tier;
   }
+  if (tier === "oceanfront") return "on_beach";   // legacy alias
   return isBeachfront ? "near_beach" : null;
 }
 
@@ -202,7 +214,7 @@ export function adaptListing(raw: any): Listing {
     region: department,
     country: typeof raw.country === "string" ? raw.country : "SV",
     province_state: department ? `${department}, El Salvador` : "El Salvador",
-    land_type: deriveLandType(typeof raw.property_type === "string" ? raw.property_type : null),
+    land_type: deriveLandType(raw, typeof raw.property_type === "string" ? raw.property_type : null),
     size_m2: typeof raw.area_m2 === "number" ? raw.area_m2 : null,
     price: typeof raw.price_usd === "number" ? raw.price_usd : null,
     previous_price: typeof raw.previous_price === "number" ? raw.previous_price : null,

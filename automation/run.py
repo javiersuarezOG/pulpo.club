@@ -38,6 +38,8 @@ from pulpo.derived_rules import (   # type: ignore  # noqa: E402
     apply_all as _apply_derived_rules,
     derive_source_type as _derive_source_type,
     derive_previous_price as _derive_previous_price,
+    derive_beachfront_tier as _derive_beachfront_tier,
+    derive_land_type as _derive_land_type,
 )
 from automation.pipeline_steps import (  # noqa: E402
     phase_normalize, phase_validate, phase_write_outputs, phase_print_summary,
@@ -522,6 +524,23 @@ def main() -> int:
             deriv_label_counts[lbl] = deriv_label_counts.get(lbl, 0) + 1
     print(f"[derived] signals={dict(deriv_signal_counts)} "
           f"labels={dict(deriv_label_counts)}")
+
+    # PR-8 — NLP enum derives (beachfront_tier, land_type). Run AFTER
+    # apply_all so source_label is already populated; these enums are
+    # composed from NLP booleans and don't feed back into source_label.
+    pr8_beach_tier_counts: dict[str, int] = {}
+    pr8_land_type_counts:  dict[str, int] = {}
+    for li in listings:
+        bt = _derive_beachfront_tier(li)
+        if bt is not None:
+            li.beachfront_tier = bt
+            pr8_beach_tier_counts[bt] = pr8_beach_tier_counts.get(bt, 0) + 1
+        lt = _derive_land_type(li)
+        if lt is not None:
+            li.land_type = lt
+            pr8_land_type_counts[lt] = pr8_land_type_counts.get(lt, 0) + 1
+    print(f"[pr-8] beachfront_tier={dict(pr8_beach_tier_counts)} "
+          f"land_type={dict(pr8_land_type_counts)}")
 
     # PRD §FR-7.5 — zone median price batch. Computes median price_per_m2
     # per (zone, property_type) bucket from current listings, then sets
