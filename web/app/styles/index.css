@@ -2149,3 +2149,55 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 980px) { .shelf-expanded-grid { grid-template-columns: repeat(2, 1fr); } }
 
 @media (max-width: 600px) { .shelf-expanded-grid { grid-template-columns: 1fr; } }
+
+/* ============== CONSENT BANNER (PR-3) ============== */
+.consent-banner {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 720px;
+  width: calc(100% - 32px);
+  padding: 14px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.consent-text { flex: 1 1 auto; }
+.consent-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.consent-banner .btn-ghost,
+.consent-banner .btn-primary {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+}
+.consent-banner .btn-ghost {
+  color: var(--paper);
+  background: transparent;
+  border: 1px solid var(--ink-3);
+}
+.consent-banner .btn-primary {
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--paper);
+}
+@media (max-width: 600px) {
+  .consent-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .consent-actions { justify-content: flex-end; }
+}
