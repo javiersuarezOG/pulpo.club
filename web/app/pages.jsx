@@ -621,12 +621,175 @@ function FilterPanel({ filters, setFilters, count, onClose }) {
         </div>
       </FilterGroup>
 
+      {/* PR-4b — photos chip (legacy parity). */}
+      <FilterGroup title="Photos">
+        <div className="chip-grid">
+          {[
+            ["all","All listings"],
+            ["with","With photos"],
+            ["none","No photos"],
+          ].map(([k,l]) => (
+            <button key={k}
+              className={`chip ${filters.photos === k ? "is-active" : ""}`}
+              onClick={() => update({ photos: k })}>{l}</button>
+          ))}
+        </div>
+      </FilterGroup>
+
+      {/* PR-4b — advanced ranking (legacy parity). Collapsed by default;
+          power-user surface for the score-floor + V/L/M weight tuning. */}
+      <AdvancedRanking filters={filters} update={update} />
+
       {onClose && (
         <div className="filter-apply">
           <button className="btn-primary block" onClick={onClose}>Show {count} listings</button>
         </div>
       )}
     </aside>
+  );
+}
+
+// ====== Advanced ranking — score floor + V/L/M weight sliders ======
+// Mirrors the legacy "Adjust the ranking" panel. Weights auto-rebalance:
+// when one slider moves, the other two scale to keep the sum at 100.
+// Methodology link opens the "How we rank" modal.
+function AdvancedRanking({ filters, update }) {
+  const [open, setOpen] = pUseState(false);
+  const [methOpen, setMethOpen] = pUseState(false);
+  const lc = currentLocale();
+
+  const setWeight = (key, value) => {
+    const w = filters.weights || { ...WEIGHT_DEFAULTS };
+    const next = { ...w, [key]: value };
+    // Rebalance the other two so the sum stays at 100. Mirrors legacy
+    // _wireWeightSliders.
+    const others = ["value", "location", "momentum"].filter(k => k !== key);
+    const remainder = 100 - value;
+    const sumOthers = w[others[0]] + w[others[1]];
+    if (sumOthers > 0) {
+      next[others[0]] = Math.max(0, Math.round((w[others[0]] / sumOthers) * remainder));
+      next[others[1]] = Math.max(0, 100 - value - next[others[0]]);
+    } else {
+      next[others[0]] = Math.round(remainder / 2);
+      next[others[1]] = remainder - next[others[0]];
+    }
+    update({ weights: next });
+  };
+
+  const reset = () => update({ score_min: 0, weights: { ...WEIGHT_DEFAULTS } });
+  const w = filters.weights || WEIGHT_DEFAULTS;
+
+  return (
+    <div className="filter-group filter-group-advanced">
+      <button
+        className="filter-group-title filter-group-toggle"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+      >
+        <span>{lc === "es" ? "Ajusta el ranking" : "Tune the ranking"}</span>
+        <Icon name={open ? "chevron_up" : "chevron_down"} size={14} />
+      </button>
+      {open && (
+        <div className="advanced-ranking">
+          <div className="advanced-ranking-help">
+            <button className="link-btn" onClick={() => setMethOpen(true)}>
+              {lc === "es" ? "¿Cómo calculamos esto?" : "How we rank"}
+            </button>
+          </div>
+          <div className="range-row">
+            <label>
+              {lc === "es" ? "Puntaje mínimo" : "Investment score"}: <strong>{filters.score_min ?? 0}</strong>
+            </label>
+            <input type="range" min="0" max="100" step="5"
+              value={filters.score_min ?? 0}
+              onChange={(e) => update({ score_min: +e.target.value })}/>
+          </div>
+          <div className="range-row">
+            <label>{lc === "es" ? "Precio vs. comparables" : "Price vs. comps"}: <strong>{w.value}%</strong></label>
+            <input type="range" min="0" max="100" step="5"
+              value={w.value}
+              onChange={(e) => setWeight("value", +e.target.value)}/>
+          </div>
+          <div className="range-row">
+            <label>{lc === "es" ? "Ubicación" : "Location"}: <strong>{w.location}%</strong></label>
+            <input type="range" min="0" max="100" step="5"
+              value={w.location}
+              onChange={(e) => setWeight("location", +e.target.value)}/>
+          </div>
+          <div className="range-row">
+            <label>{lc === "es" ? "Momentum del área" : "Area momentum"}: <strong>{w.momentum}%</strong></label>
+            <input type="range" min="0" max="100" step="5"
+              value={w.momentum}
+              onChange={(e) => setWeight("momentum", +e.target.value)}/>
+          </div>
+          <button className="link-btn" onClick={reset}>
+            {lc === "es" ? "Restablecer" : "Reset to defaults"}
+          </button>
+          <p className="advanced-ranking-hint">
+            {lc === "es"
+              ? `Elige "Mejor coincidencia (tus pesos)" en el orden para usar tus pesos.`
+              : `Pick "Best match (your weights)" in the sort dropdown to use your weights.`}
+          </p>
+        </div>
+      )}
+      <MethodologyModal open={methOpen} onClose={() => setMethOpen(false)} />
+    </div>
+  );
+}
+
+// ====== "How we rank" methodology modal (legacy parity, restyled) ======
+function MethodologyModal({ open, onClose }) {
+  const lc = currentLocale();
+  pUseEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+  if (!open) return null;
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal modal-methodology" onClick={(e) => e.stopPropagation()} role="dialog" aria-labelledby="meth-title">
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          <Icon name="close" size={18} />
+        </button>
+        <h2 id="meth-title">{lc === "es" ? "Cómo clasificamos" : "How we rank"}</h2>
+        <p className="meth-tagline">
+          {lc === "es"
+            ? "Cada terreno recibe un puntaje compuesto de 0–100 basado en tres dimensiones simples."
+            : "Every listing gets a 0–100 composite score from three plain-English dimensions."}
+        </p>
+        <h3>{lc === "es" ? "Precio vs. comparables" : "Price vs. comparable lots"}</h3>
+        <p>
+          {lc === "es"
+            ? "Qué tan barato es por m² comparado con lotes similares en la misma zona. 100 = el más barato; 0 = el más caro."
+            : "How cheap this listing is per square meter compared to similar lots in the same area. 100 = cheapest comparable; 0 = most expensive."}
+        </p>
+        <h3>{lc === "es" ? "Ubicación y accesibilidad" : "Location & accessibility"}</h3>
+        <p>
+          {lc === "es"
+            ? "Posición y acceso del lote — beneficio de zona, frente al mar, acceso pavimentado, agua y luz, cercanía al aeropuerto."
+            : "Zone tier, beachfront, paved access, water/power on the lot, and proximity to the nearest international airport."}
+        </p>
+        <h3>{lc === "es" ? "Momentum del área" : "Area momentum"}</h3>
+        <p>
+          {lc === "es"
+            ? "Qué tan caliente está la zona — re-precios indican vendedores motivados; nuevo inventario indica demanda creciente."
+            : "How often listings get repriced down (motivated sellers) and how quickly new inventory appears in each zone."}
+        </p>
+        <h3>{lc === "es" ? "El compuesto" : "The composite"}</h3>
+        <div className="meth-formula">
+          {lc === "es"
+            ? "compuesto = 0.40 × Precio + 0.35 × Ubicación + 0.25 × Momentum"
+            : "composite = 0.40 × Price vs Comps + 0.35 × Location + 0.25 × Momentum"}
+        </div>
+        <p>
+          {lc === "es"
+            ? "Mueve los pesos en \"Ajusta el ranking\" para ver tu propio compuesto."
+            : `Move the weights under "Tune the ranking" to see your own composite.`}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -676,6 +839,9 @@ function PriceHistogram({ filters, setFilters }) {
   );
 }
 
+// Default ranking weights — match legacy index.js (PR-4b restore).
+const WEIGHT_DEFAULTS = { value: 40, location: 35, momentum: 25 };
+
 function makeDefaultFilters() {
   return {
     zones: new Set(),
@@ -687,7 +853,27 @@ function makeDefaultFilters() {
     price_max: 1000000,
     size_min: 0,
     readiness: 0,
+    // PR-4b — feature parity with legacy:
+    score_min: 0,                             // 0–100 score floor
+    weights: { ...WEIGHT_DEFAULTS },          // V/L/M weights, sum = 100
+    photos: "all",                            // "all" | "with" | "none"
   };
+}
+
+// Recompute composite score from V/L/M components and user-overridden
+// weights. Mirrors legacy index.js:recomputeComposite. Returns the
+// listing's static rank_score when weights match defaults.
+function recomputeComposite(l, w) {
+  if (!w) return l.rank_score ?? 0;
+  if (w.value === WEIGHT_DEFAULTS.value && w.location === WEIGHT_DEFAULTS.location && w.momentum === WEIGHT_DEFAULTS.momentum) {
+    return l.rank_score ?? 0;
+  }
+  const v = l.value_score ?? 0;
+  const ll = l.location_score ?? 0;
+  const m = l.momentum_score ?? 0;
+  const total = w.value + w.location + w.momentum;
+  if (total <= 0) return 0;
+  return (v * w.value + ll * w.location + m * w.momentum) / total;
 }
 
 function applyFilters(listings, f) {
@@ -711,6 +897,9 @@ function applyFilters(listings, f) {
     if (f.status.has("off_market") && l.source_type !== "off_market") return false;
     if (f.status.has("motivated") && l.days_listed < 90) return false;
     if (l.readiness_score < f.readiness) return false;
+    if ((f.score_min ?? 0) > 0 && (l.rank_score ?? 0) < f.score_min) return false;
+    if (f.photos === "with" && (l.photos_count ?? 0) === 0) return false;
+    if (f.photos === "none" && (l.photos_count ?? 0) > 0) return false;
     return true;
   });
 }
@@ -793,14 +982,19 @@ function BrowsePage({ app }) {
     const r = applyFilters(LISTINGS, debouncedFilters);
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
-      price_asc: (a, b) => a.price - b.price,
-      price_desc: (a, b) => b.price - a.price,
-      size_desc: (a, b) => b.size_m2 - a.size_m2,
-      ppm_asc: (a, b) => a.price_per_m2 - b.price_per_m2,
+      price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
+      price_desc: (a, b) => (b.price ?? -1) - (a.price ?? -1),
+      size_desc: (a, b) => (b.size_m2 ?? 0) - (a.size_m2 ?? 0),
+      ppm_asc: (a, b) => (a.price_per_m2 ?? Infinity) - (b.price_per_m2 ?? Infinity),
       days_asc: (a, b) => a.days_listed - b.days_listed,
       ready_desc: (a, b) => b.readiness_score - a.readiness_score,
+      stars_desc: (a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0),
+      // Composite using user-overridden weights (PR-4b — feature parity).
+      composite_desc: (a, b) =>
+        recomputeComposite(b, debouncedFilters.weights) -
+        recomputeComposite(a, debouncedFilters.weights),
     };
-    return [...r].sort(sorters[sort]);
+    return [...r].sort(sorters[sort] || sorters.recent);
   }, [debouncedFilters, sort, LISTINGS]);
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
@@ -825,6 +1019,8 @@ function BrowsePage({ app }) {
   }, [results.length, activeFilterCount]);
 
   // Wrap setSort / setView to fire telemetry on user-driven changes.
+  // setFilters intentionally untracked — chip handlers wrap it themselves
+  // when needed.
   const setSortTelemeter = pUseCallback((next) => {
     setSort(next);
     track("browse.sort_changed", { sort: next });
@@ -888,6 +1084,8 @@ function BrowsePage({ app }) {
                 <option value="ppm_asc">$/m²: lowest first</option>
                 <option value="days_asc">Days listed: fewest first</option>
                 <option value="ready_desc">Most build-ready</option>
+                <option value="stars_desc">Investment score: highest</option>
+                <option value="composite_desc">Best match (your weights)</option>
               </select>
               <div className="view-toggle">
                 <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label="Table view">

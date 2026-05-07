@@ -2276,3 +2276,71 @@ h1,h2,h3,h4,h5 { margin: 0; }
   justify-content: center;
   margin-top: 12px;
 }
+
+/* PR-4b — Advanced ranking group (collapsed by default) + methodology modal */
+.filter-group-advanced .filter-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.advanced-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.advanced-ranking-help {
+  margin-bottom: 4px;
+}
+.advanced-ranking-hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.modal-methodology {
+  max-width: 640px;
+  padding: 28px 32px;
+}
+.modal-methodology h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+.modal-methodology .meth-tagline {
+  margin: 0 0 18px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.modal-methodology h3 {
+  margin: 18px 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.modal-methodology p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.modal-methodology .meth-formula {
+  margin: 8px 0 14px;
+  padding: 10px 12px;
+  background: var(--paper-2);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+}
