@@ -32,6 +32,15 @@ export type EventMap = {
   "browse.sort_changed": { sort: string };
   "browse.view_toggled": { view: "cards" | "table" };
   "browse.empty_results": { filters: Record<string, unknown> };
+  // PR-4f — interactive PriceHistogram instrumentation
+  "browse.price_histogram.dragged": {
+    from_min: number;
+    from_max: number | null;
+    to_min: number;
+    to_max: number | null;
+  };
+  "browse.price_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
+  "browse.price_histogram.reset": Record<string, never>;
 
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
