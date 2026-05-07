@@ -1,5 +1,11 @@
 # Pulpo Club — Claude Code Guidelines
 
+## Collaboration style (Sebastian)
+- Run with it. Don't ping for questions you can answer better than him with the context you have.
+- Make the call, document it, keep moving. He'd rather correct course than be the bottleneck.
+- Per-PR merge gate is for *during* the new-UX rollout. After PR-10 the gates remain as standing CI; the manual-check ritual disappears.
+- Plan source of truth: `~/.claude/plans/use-the-ux-fluffy-cocke.md`.
+
 ## Branch Rules (NEVER skip this)
 - NEVER commit or push directly to `main`
 - Always work on a feature branch: `feat/description` or `fix/description`
@@ -10,8 +16,8 @@
 1. `git pull origin main` — get Javi's latest
 2. `git checkout -b feat/your-task-name` — create your branch
 3. Make changes, test locally
-4. `git add . && git commit -m "feat: describe what changed"`
-5. `git push origin feat/your-task-name`
+4. `git add <files>` (explicit — never `git add .` for sensitive trees) `&& git commit`
+5. `git push -u origin feat/your-task-name`
 
 ## Merging to main
 
@@ -27,17 +33,34 @@ Vercel will auto-generate a preview URL on the PR.
 ```bash
 gh pr merge <NUM> --auto --squash --delete-branch
 ```
-The `--auto` flag queues the merge to fire as soon as required checks pass. Auto-merge is enabled at the repo level. Required checks (`pytest`, `Vercel`) typically complete in ~50 seconds — `--auto` eliminates the "pytest: Expected — Waiting" race that happens if you try to merge immediately after `gh pr create`.
+The `--auto` flag queues the merge to fire as soon as required checks pass. Auto-merge is enabled at the repo level. Required checks (`pytest`, `frontend (typecheck + build)`, `Vercel`) typically complete in ~1 minute — `--auto` eliminates the "Expected — Waiting" race that happens if you try to merge immediately after `gh pr create`.
 
-**Do NOT use `--admin` to bypass branch protection** unless a check is genuinely stuck or broken. The recurring "Expected, waiting" state is almost always transient (CI hasn't started yet); `--auto` handles it cleanly. Reserve `--admin` for the data-PR fallback path documented in `pulpo-nightly.yml` (where `GITHUB_TOKEN`-authored pushes don't trigger downstream workflows).
+**Do NOT use `--admin` to bypass branch protection** unless a check is genuinely stuck or broken. The recurring "Expected, waiting" state is almost always transient (CI hasn't started yet); `--auto` handles it cleanly. Reserve `--admin` for the data-PR fallback path documented in `pulpo-nightly.yml`.
 
-If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back the local merge with `git reset --hard origin/main` and open a PR for the branch instead.
+If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back with `git reset --hard origin/main` and open a PR.
 
 ## Testing Before Pushing
-- Frontend changes: run `npx serve .` and open `http://localhost:3000/web/index.html`
-- Pipeline changes: run `python3 -m pulpo.cli --offline` to verify no errors
-- Tests: `PULPO_OFFLINE=1 pytest -q` — full suite must pass (or fail only in known-broken areas not touched by your change)
-- Lint: `ruff check .`
+- **Frontend (Vite app)**: `npm run dev` opens http://localhost:5173. Build check: `npm run build`. Typecheck: `npm run typecheck`.
+- **Frontend (legacy)**: serves at `/legacy.html` until the PR-10 cutover. Tested via `npx serve .` if needed.
+- **Pipeline changes**: run `python3 -m pulpo.cli --offline` to verify no errors
+- **Tests**: `PULPO_OFFLINE=1 pytest -q` — full suite must pass (or fail only in known-broken areas not touched by your change)
+- **Lint**: `ruff check .`
+
+## Frontend conventions (post-PR-1.5)
+
+The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.
+
+- **Design tokens** live at `web/app/styles/tokens.css` (lands in PR-1.5). Every color, font, spacing, radius, shadow, and motion easing comes from there.
+- **Banned in any `.css`/`.tsx`/`.jsx` file under `web/app/`:**
+  - Hex color literals (`#fff`, `#1a1a1a`)
+  - `rgb(...)` / `rgba(...)` literals (use the oklch tokens)
+  - `font-family: Arial`, `Times New Roman`, `system-ui` as inline fallbacks (the tokens cover the fallback chain)
+  - Off-token spacing (`margin: 13px`, `padding: 9px`) — pick a token or add one to `tokens.css`
+- **stylelint** enforces the above (PR-1.5 onward). CI fails on violation. Override only with `/* token-exception: <reason> */` and justify in the PR.
+- **New filter / shelf / badge:** add an entry to `web/app/config/registry.ts` and an i18n key. **Don't** hard-code in a component.
+- **Visual fidelity:** Discover/Browse/Detail are diffed against `docs/design-references/` in every PR that touches them. Visual deviation needs a one-line justification.
+- **Responsive:** every PR touching a visual surface attaches one mobile (375px) + one desktop (1280px) screenshot. Playwright smoke includes `page.setViewportSize({ width: 320, height: 568 })` and asserts no horizontal overflow on `/` and `/browse`.
+- **No backwards-compat shims** in the new app — the legacy is the legacy, the new is the new. Don't re-export old utilities to "ease migration."
 
 ## Commit Message Format
 - `feat:` new feature
@@ -46,8 +69,11 @@ If a local-merge attempt to `main` fails with `protected branch hook declined`, 
 - `refactor:` restructuring without behaviour change
 - `test:` test-only change
 
+Prefix with the PR number where it fits the new-UX rollout: `feat(pr-3): ...`.
+
 ## What Sebastian Works On
 - `pulpo/ranker.py` and `pulpo/ranker_legs/*.py` — ranking model and weights
 - `pulpo/normalize.py` — normalization, classification, zone detection
-- `web/index.html` / `web/dashboard.html` — frontend tweaks
-- `web/data/` — never edit these manually, they're generated by the pipeline
+- `web/legacy.html` — current production frontend, frozen until PR-10 cutover
+- `web/app/**` — new React app (this is the active surface; lands in PR-0 onward)
+- `web/data/` — never edit manually, generated by the pipeline

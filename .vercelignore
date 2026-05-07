@@ -13,3 +13,12 @@ __pycache__/
 .env
 .env.local
 DEPLOY.md
+
+# Vite source (JSX) — built bundle ships from web/dist/, source isn't needed at runtime
+new_ux/
+docs/
+nlp_keywords/
+prompts/
+
+# Node toolchain — Vercel installs from package.json itself
+node_modules/

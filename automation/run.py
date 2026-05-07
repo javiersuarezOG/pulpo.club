@@ -3,7 +3,7 @@ Single-command pipeline runner for automation (cron, GitHub Actions, etc.).
 
 Runs all configured scrapers, normalizes, ranks, and writes:
     samples/ranked.csv         (committed for human review)
-    web/data/ranked.json       (consumed by web/index.html dashboard)
+    web/data/ranked.json       (consumed by web/legacy.html + the new Vite app)
     web/data/last_updated.json (timestamp + counts for the dashboard header)
 
 Exit code 0 on success, 1 on failure.

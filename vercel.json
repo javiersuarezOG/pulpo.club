@@ -2,11 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "framework": null,
-  "buildCommand": "echo 'static deploy — pulpo.club'",
+  "buildCommand": "npm install --no-audit --no-fund && npm run build",
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/", "destination": "/web/index.html" },
+    { "source": "/", "destination": "/web/legacy.html" },
     { "source": "/dashboard", "destination": "/web/dashboard.html" },
     { "source": "/data/ranked.json",        "destination": "/web/data/ranked.json" },
     { "source": "/data/last_updated.json",  "destination": "/web/data/last_updated.json" },
