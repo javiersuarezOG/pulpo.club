@@ -5,6 +5,7 @@
 import React, { useState as aUseState, useEffect as aUseEffect, useMemo as aUseMemo } from "react";
 import { t, tr } from "./i18n.jsx";
 import { Icon, PulpoLogo, formatPrice, currentLocale } from "./components.jsx";
+import { startStripeCheckout } from "./auth/stripe-checkout.js";
 
 function AccountPage({ app }) {
   const [section, setSection] = aUseState(() => app.routeParams.section || "profile");
@@ -332,7 +333,25 @@ function SubscriptionSection({ app }) {
           {isPaid ? (
             <a className="link-btn">Manage plan →</a>
           ) : (
-            <button className="btn-primary" onClick={() => app.go("plans")}>See plans</button>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                // Stripe Managed Payments redirect. Server creates a
+                // Checkout Session for the signed-in Clerk user and
+                // returns the hosted URL. On error we fall back to the
+                // legacy "see plans" route so the button always does
+                // *something* meaningful.
+                startStripeCheckout({
+                  onError: (code) => {
+                    if (code === "sign_in_required") {
+                      app.openSignup({ mode: "signup" });
+                    } else {
+                      app.go("plans");
+                    }
+                  },
+                });
+              }}
+            >Upgrade to Pro</button>
           )}
         </div>
       </div>
