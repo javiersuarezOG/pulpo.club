@@ -399,8 +399,12 @@ function HomePage({ app }) {
   const [expandedKey, setExpandedKey] = pUseState(null);
   const shelfRefs = pUseRef({});
   const [layout, setLayout] = pUseState(() => {
-    try { return localStorage.getItem("pulpo-discover-layout") || "magazine"; }
-    catch { return "magazine"; }
+    // Default to "standard" so the 1-row carousel scroll affordance from
+    // PR-4 is visible immediately. Magazine layout is opt-in via the
+    // toggle (renders a static 6-card grid, no scroll). PR-4c will
+    // refactor magazine to also carousel.
+    try { return localStorage.getItem("pulpo-discover-layout") || "standard"; }
+    catch { return "standard"; }
   });
 
   const orderedShelves = pUseMemo(() => {
