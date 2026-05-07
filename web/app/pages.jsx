@@ -7,7 +7,11 @@ import React, {
   useCallback as pUseCallback,
 } from "react";
 import { t, tr, LOCALES } from "./i18n.jsx";
-import { LISTINGS, SHELVES, PILLS, ZONES } from "./data.jsx";
+// Static-only imports from the prototype data file (shelves, pills, zones).
+// The LISTINGS array is now live data, accessed per-component via
+// useListings() / useListingsState().
+import { SHELVES, PILLS, ZONES } from "./data.jsx";
+import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
   Icon,
   PulpoLogo,
@@ -141,12 +145,13 @@ function PillRail({ app, active }) {
 
 // ====== Home — Hero ======
 function Hero({ app }) {
+  const LISTINGS = useListings();
   // Pick highest-photo-count, freshest listing
   const featured = pUseMemo(() => {
     return [...LISTINGS]
       .filter(l => l.photos_count > 0 && !l.is_sold)
       .sort((a, b) => (b.photos_count - a.photos_count) || (a.first_seen_date - b.first_seen_date))[0];
-  }, []);
+  }, [LISTINGS]);
   if (!featured) return null;
   return (
     <section className="hero">
@@ -174,6 +179,7 @@ function Hero({ app }) {
 
 // ====== Horizontal shelf ======
 function Shelf({ shelf, app, locked = false, layout = "standard", expanded = false, onToggleExpand, registerRef }) {
+  const LISTINGS = useListings();
   const scrollRef = pUseRef(null);
   const sectionRef = pUseRef(null);
 
@@ -184,7 +190,7 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
 
   const allItems = pUseMemo(() =>
     LISTINGS.filter(l => !l.is_sold).filter(shelf.filter),
-    [shelf]
+    [shelf, LISTINGS]
   );
   const items = expanded ? allItems : allItems.slice(0, 12);
   if (allItems.length < 6 && !locked) return null;
@@ -265,6 +271,7 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
 //   - Photo fallback: render style name on offset surface (no broken image).
 //   - Order: most-populated styles first.
 function StyleCarousel({ app, onPickStyle }) {
+  const LISTINGS = useListings();
   const scrollRef = pUseRef(null);
 
   // Map a PILL key → a representative listing photo. We don't carry photos
@@ -301,7 +308,7 @@ function StyleCarousel({ app, onPickStyle }) {
       })
       .filter(s => s && s.count >= 3)        // min inventory threshold
       .sort((a, b) => b.count - a.count);    // most-populated first
-  }, []);
+  }, [LISTINGS]);
 
   // Min 3 tiles to show the carousel at all.
   if (styles.length < 3) return null;
@@ -343,6 +350,8 @@ function StyleCarousel({ app, onPickStyle }) {
 
 // ====== Home page ======
 function HomePage({ app }) {
+  const LISTINGS = useListings();
+  const listingsState = useListingsState();
   // Order shelves: pinned first, then by listing count desc, hide < 6
   const orderedShelves = pUseMemo(() => {
     const pinned = ["new_this_week", "price_drops", "off_market"];
@@ -351,7 +360,16 @@ function HomePage({ app }) {
     const pinnedOrdered = pinned.map(k => filtered.find(x => x.s.key === k)).filter(Boolean);
     const rest = filtered.filter(x => !pinned.includes(x.s.key)).sort((a, b) => b.n - a.n);
     return [...pinnedOrdered, ...rest].map(x => x.s);
-  }, []);
+  }, [LISTINGS]);
+
+  // Surface load state — Discover renders a skeleton while listings
+  // stream in, and a hard error UI on permanent fetch failure.
+  if (listingsState.state.status === "loading") {
+    return <DiscoverSkeleton />;
+  }
+  if (listingsState.state.status === "error") {
+    return <DataFetchFailed onRetry={listingsState.reload} />;
+  }
 
   // Expand a single shelf inline (See all → Show less). Clicking a style tile
   // also opens its corresponding shelf in expanded mode and scrolls to it.
@@ -587,18 +605,20 @@ function FilterGroup({ title, children }) {
 }
 
 function PriceHistogram({ filters, setFilters }) {
+  const LISTINGS = useListings();
   // Compute histogram from full listings
   const max = 1000000;
   const buckets = 24;
   const counts = pUseMemo(() => {
     const arr = new Array(buckets).fill(0);
     LISTINGS.forEach(l => {
+      if (typeof l.price !== "number" || l.price <= 0) return;
       const b = Math.min(buckets - 1, Math.floor(l.price / max * buckets));
       arr[b] += 1;
     });
     return arr;
-  }, []);
-  const peak = Math.max(...counts);
+  }, [LISTINGS]);
+  const peak = Math.max(...counts, 1);
   return (
     <div className="histo">
       <div className="histo-bars">
@@ -688,6 +708,8 @@ function buildFiltersForCategory(category) {
 }
 
 function BrowsePage({ app }) {
+  const LISTINGS = useListings();
+  const listingsState = useListingsState();
   const [filters, setFilters] = pUseState(() => buildFiltersForCategory(app.routeParams.category));
   const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
   const [sort, setSort] = pUseState("recent");
@@ -721,7 +743,12 @@ function BrowsePage({ app }) {
       ready_desc: (a, b) => b.readiness_score - a.readiness_score,
     };
     return [...r].sort(sorters[sort]);
-  }, [filters, sort]);
+  }, [filters, sort, LISTINGS]);
+
+  if (listingsState.state.status === "loading") return <BrowseSkeleton />;
+  if (listingsState.state.status === "error") {
+    return <DataFetchFailed onRetry={listingsState.reload} />;
+  }
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
 
@@ -1127,6 +1154,7 @@ function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 
 // ====== Saved page ======
 function SavedPage({ app }) {
+  const LISTINGS = useListings();
   const items = LISTINGS.filter(l => app.savedIds.has(l.id));
   const [view, setView] = pUseState(() => localStorage.getItem("pulpo-saved-view") || "cards");
   const [sort, setSort] = pUseState("recent");
@@ -1372,7 +1400,109 @@ function EmptyResults({ onClear }) {
   );
 }
 
+// ====== Loading skeletons ======
+function DiscoverSkeleton() {
+  return (
+    <div className="page page-home discover-magazine">
+      <section className="hero" aria-busy="true">
+        <div className="hero-bg" style={{ background: "var(--paper-3)" }} />
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <div className="skel-line w-50" style={{ height: 14, marginBottom: 12 }} />
+          <div className="skel-line w-80" style={{ height: 36, marginBottom: 14 }} />
+          <div className="skel-line w-60" style={{ height: 16 }} />
+        </div>
+      </section>
+      <div className="shelves" aria-busy="true">
+        {[0, 1, 2].map((i) => (
+          <section className="shelf" key={i}>
+            <div className="shelf-head">
+              <div className="shelf-head-text">
+                <div className="skel-line w-50" style={{ height: 24, marginBottom: 8 }} />
+                <div className="skel-line w-80" style={{ height: 14 }} />
+              </div>
+            </div>
+            <div className="shelf-rail">
+              {[0, 1, 2, 3].map((j) => (
+                <div className="shelf-item" key={j}>
+                  <SkeletonCard />
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BrowseSkeleton() {
+  return (
+    <div className="page page-browse" aria-busy="true">
+      <div className="card-grid">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ====== Hard-error UI for permanent fetch failure (production) ======
+function DataFetchFailed({ onRetry }) {
+  return (
+    <div className="empty-state lg" role="alert">
+      <h2>We couldn't load the listings.</h2>
+      <p>This is on us. The data feed didn't respond — try again in a moment.</p>
+      <button className="btn-primary" onClick={onRetry}>Retry</button>
+    </div>
+  );
+}
+
+// ====== Cookie-consent banner shim ======
+// Defaults to opt-in outside the EU. EU detection is best-effort via
+// timezone — accurate enough for a non-binding consent prompt; the real
+// determination of GDPR applicability lives server-side once the
+// auth+legal stack lands.
+function detectEuRegion() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    return /^Europe\//.test(tz);
+  } catch { return false; }
+}
+function ConsentBanner() {
+  const [decided, setDecided] = pUseState(() => {
+    try { return localStorage.getItem("pulpo-consent") || ""; }
+    catch { return ""; }
+  });
+  if (decided === "granted" || decided === "declined") return null;
+  const region = detectEuRegion() ? "eu" : "non-eu";
+  // Outside the EU, default to silent opt-in (don't show the banner).
+  if (region === "non-eu") {
+    if (!decided) {
+      try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
+    }
+    return null;
+  }
+  const set = (decision) => {
+    try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }
+    setDecided(decision);
+  };
+  return (
+    <div className="consent-banner" role="dialog" aria-label="Cookie consent">
+      <div className="consent-text">
+        Pulpo uses analytics cookies to improve the site. No third-party ads.
+      </div>
+      <div className="consent-actions">
+        <button className="btn-ghost" onClick={() => set("declined")}>Decline</button>
+        <button className="btn-primary" onClick={() => set("granted")}>Accept</button>
+      </div>
+    </div>
+  );
+}
+
 export {
   TopNav, BottomNav, PillRail, HomePage, BrowsePage, ListingDetail,
   SavedPage, PlansPage, SignupModal, ToastHost, makeDefaultFilters, applyFilters,
+  ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
 };

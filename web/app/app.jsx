@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 import { t, useLocale } from "./i18n.jsx";
-import { LISTINGS } from "./data.jsx";
+import { ListingsProvider, useListings, useListingsState } from "./data/use-listings.tsx";
 import { PulpoLogo } from "./components.jsx";
 import {
   TopNav,
@@ -20,6 +20,7 @@ import {
   ListingDetail,
   SignupModal,
   ToastHost,
+  ConsentBanner,
 } from "./pages.jsx";
 import { AccountPage } from "./account.jsx";
 import {
@@ -164,6 +165,10 @@ function App() {
 
   const recordDetailView = useCallback(() => setDetailViewCount(c => c + 1), []);
 
+  // Live listings — fetched once on mount, drives every page below.
+  const listings = useListings();
+  const listingsState = useListingsState();
+
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout,
@@ -175,9 +180,11 @@ function App() {
     locale, setLocale,
     showShelfBlur: true,
     tweaks,
+    listings,
+    listingsState,
   };
 
-  const openListingObj = openListingId ? LISTINGS.find(l => l.id === openListingId) : null;
+  const openListingObj = openListingId ? listings.find(l => l.id === openListingId) : null;
 
   return (
     <div className={`app density-${tweaks.density}`}>
@@ -237,6 +244,7 @@ function App() {
 
       <SignupModal app={app} />
       <ToastHost app={app} />
+      <ConsentBanner />
 
       {__PULPO_DEV_PANEL__ && showDevPanel && (
       <TweaksPanel>
@@ -343,6 +351,8 @@ function DebugPanel({ app }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>
-    <App />
+    <ListingsProvider>
+      <App />
+    </ListingsProvider>
   </ErrorBoundary>
 );
