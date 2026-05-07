@@ -615,6 +615,49 @@ def main() -> int:
     fb_count = sum(1 for li in listings if _ai_fallback(li))
     print(f"[llm_enrich] fallback_templates_applied={fb_count}")
 
+    # PR-8.5 — OSM Nominatim geocoding fallback for listings still
+    # missing lat/lng after the LLM enrichment pass. Free, rate-limited
+    # to 1 req/sec, results cached in web/data/geocoding_nominatim.json
+    # so subsequent runs are zero-API-call for previously-geocoded
+    # zones. Non-fatal: any HTTP error is logged + the listing's
+    # lat/lng stay None.
+    try:
+        from automation.geocoding_nominatim import geocode_listings as _nominatim_geocode
+        nominatim_metrics = _nominatim_geocode(
+            listings,
+            cache_path = web_data_dir / "geocoding_nominatim.json",
+        )
+        print(f"[nominatim] scanned={nominatim_metrics['scanned']} "
+              f"already_geocoded={nominatim_metrics['skipped_already_geocoded']} "
+              f"no_query={nominatim_metrics['skipped_no_query']} "
+              f"cache_hits={nominatim_metrics['cache_hits']} "
+              f"api_calls={nominatim_metrics['api_calls']} "
+              f"api_hits={nominatim_metrics['api_hits']} "
+              f"api_misses={nominatim_metrics['api_misses']}")
+    except Exception as _e:
+        print(f"[nominatim] failed (non-fatal): {_e!r}")
+
+    # PR-8.5 — re-run distance fields AFTER LLM + Nominatim so
+    # haversine fires on the freshly-geocoded listings. The first
+    # apply_distances pass earlier in the pipeline used zone-table
+    # fallback for listings without lat/lng; this second pass upgrades
+    # them to haversine and ALSO populates dist_beach_km (PR-8.5
+    # addition; needs lat/lng — no zone fallback for the beach).
+    try:
+        from automation.distance_fields import apply_distances as _redo_distances
+        df2 = _redo_distances(
+            listings,
+            history_path=REPO / "web" / "data" / "distance_fields_history.jsonl",
+        )
+        print(f"[distance_fields:final] dist_airport_km scored={df2['scored_total']} "
+              f"(latlng={df2['scored_from_latlng']}, "
+              f"zone_table={df2['scored_from_zone']}) "
+              f"unscored={df2['unscored']} | "
+              f"dist_beach_km scored={df2['scored_beach']} "
+              f"median={df2['median_dist_beach_km']}")
+    except Exception as _e:
+        print(f"[distance_fields:final] failed (non-fatal): {_e!r}")
+
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
     # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.

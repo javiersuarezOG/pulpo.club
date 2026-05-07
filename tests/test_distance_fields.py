@@ -243,3 +243,55 @@ def test_telemetry_write_failure_is_non_fatal(tmp_path):
     metrics = apply_distances(listings, history_path=history)
     assert metrics["scored_total"] == 1
     assert listings[0]["dist_airport_km"] is not None
+
+
+# ── PR-8.5: dist_beach_km ─────────────────────────────────────────────
+
+def test_dist_beach_km_close_to_zero_for_coastal_listing(tmp_path):
+    """A listing at El Tunco (a curated coastline point) should be < 1km
+    from the nearest reference point."""
+    from automation.distance_fields import compute_dist_beach_km
+    li = _li(zone="el-tunco", lat=13.487, lng=-89.6133)
+    km = compute_dist_beach_km(li)
+    assert km is not None
+    assert km < 1.0
+
+
+def test_dist_beach_km_large_for_inland_listing(tmp_path):
+    """San Salvador metro (~13.7, -89.2) is ~30km north of the coast."""
+    from automation.distance_fields import compute_dist_beach_km
+    li = _li(zone="san-salvador", lat=13.7, lng=-89.2)
+    km = compute_dist_beach_km(li)
+    assert km is not None
+    assert 20.0 <= km <= 50.0
+
+
+def test_dist_beach_km_none_when_no_latlng(tmp_path):
+    from automation.distance_fields import compute_dist_beach_km
+    li = _li(zone="el-tunco", lat=None, lng=None)
+    assert compute_dist_beach_km(li) is None
+
+
+def test_apply_distances_sets_dist_beach_km_alongside_airport(tmp_path):
+    """A coastal listing with lat/lng gets BOTH dist_airport_km and
+    dist_beach_km on the same pass."""
+    history = tmp_path / "h.jsonl"
+    li = _li(zone="el-tunco", lat=13.487, lng=-89.6133)
+    metrics = apply_distances([li], history_path=history)
+    assert li["dist_airport_km"] is not None
+    assert li["dist_beach_km"] is not None
+    assert metrics["scored_beach"] == 1
+
+
+def test_apply_distances_skips_dist_beach_km_when_no_latlng(tmp_path):
+    """The zone-table fallback covers airport but NOT beach (no zone
+    table for coastline yet). Listing with zone but no lat/lng gets
+    airport km but not beach."""
+    history = tmp_path / "h.jsonl"
+    li = _li(zone="el-tunco")  # no lat/lng
+    metrics = apply_distances([li], history_path=history)
+    assert li["dist_airport_km"] is not None    # zone-table hit
+    # dist_beach_km stays at the dataclass default (None) — apply_distances
+    # only writes when there's a number to write.
+    assert li.get("dist_beach_km") is None
+    assert metrics["scored_beach"] == 0
