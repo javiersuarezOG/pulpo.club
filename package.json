@@ -10,17 +10,24 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "lint:css": "stylelint 'web/app/**/*.css'",
+    "check:contrast": "node web/app/styles/check-contrast.mjs",
+    "check:size": "node web/app/styles/check-bundle-size.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "posthog-js": "^1.372.9",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "web-vitals": "^5.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "stylelint": "^17.11.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"

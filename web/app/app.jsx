@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 import { t, useLocale } from "./i18n.jsx";
-import { LISTINGS } from "./data.jsx";
+import { ListingsProvider, useListings, useListingsState } from "./data/use-listings.tsx";
 import { PulpoLogo } from "./components.jsx";
 import {
   TopNav,
@@ -20,6 +20,7 @@ import {
   ListingDetail,
   SignupModal,
   ToastHost,
+  ConsentBanner,
 } from "./pages.jsx";
 import { AccountPage } from "./account.jsx";
 import {
@@ -31,6 +32,8 @@ import {
   TweakButton,
 } from "./tweaks-panel.jsx";
 import { ErrorBoundary } from "./error-boundary.jsx";
+import { track } from "./telemetry/hook";
+import { bootWebVitals } from "./telemetry/web-vitals";
 import "./styles/index.css";
 
 function App() {
@@ -73,11 +76,34 @@ function App() {
     return +localStorage.getItem("pulpo-detail-views") || 0;
   });
 
-  // Debug flag — opt-in via ?debug=1 so QA can simulate funnel states
-  // without exposing controls to real users.
+  // Dev panel gate: visible only when (a) the build is non-production AND
+  // (b) the URL carries ?dev=1 or ?debug=1, OR we're in `vite dev`. In
+  // production builds `__PULPO_DEV_PANEL__` is the literal `false`, so
+  // both panels (TweaksPanel and DebugPanel) get dead-code-eliminated by
+  // tree-shaking. See vite.config.js.
+  const showDevPanel = useMemo(() => {
+    if (!__PULPO_DEV_PANEL__) return false;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return import.meta.env.DEV || params.has("dev") || params.has("debug");
+    } catch {
+      return import.meta.env.DEV;
+    }
+  }, []);
+  // Legacy ?debug=1 flag — still wires the lower-right DebugPanel
+  // specifically (separate from the full TweaksPanel above).
   const debug = useMemo(() => {
+    if (!__PULPO_DEV_PANEL__) return false;
     try { return new URLSearchParams(window.location.search).has("debug"); }
     catch { return false; }
+  }, []);
+
+  // Telemetry boot — fires `landing.viewed` once per app mount and
+  // wires Web Vitals (LCP/INP/CLS/TTFB) → PostHog. PostHog itself is
+  // lazy-loaded inside requestIdleCallback, so this runs cheaply.
+  useEffect(() => {
+    track("landing.viewed", { route: window.location.pathname || "/" });
+    bootWebVitals();
   }, []);
 
   useEffect(() => {
@@ -139,6 +165,10 @@ function App() {
 
   const recordDetailView = useCallback(() => setDetailViewCount(c => c + 1), []);
 
+  // Live listings — fetched once on mount, drives every page below.
+  const listings = useListings();
+  const listingsState = useListingsState();
+
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout,
@@ -150,9 +180,11 @@ function App() {
     locale, setLocale,
     showShelfBlur: true,
     tweaks,
+    listings,
+    listingsState,
   };
 
-  const openListingObj = openListingId ? LISTINGS.find(l => l.id === openListingId) : null;
+  const openListingObj = openListingId ? listings.find(l => l.id === openListingId) : null;
 
   return (
     <div className={`app density-${tweaks.density}`}>
@@ -212,7 +244,9 @@ function App() {
 
       <SignupModal app={app} />
       <ToastHost app={app} />
+      <ConsentBanner />
 
+      {__PULPO_DEV_PANEL__ && showDevPanel && (
       <TweaksPanel>
         <TweakSection label="Auth state" />
         <TweakRadio
@@ -267,8 +301,9 @@ function App() {
           <TweakButton onClick={() => go("account", { section: "security" })}>· Security</TweakButton>
         </div>
       </TweaksPanel>
+      )}
 
-      {debug && <DebugPanel app={app} />}
+      {__PULPO_DEV_PANEL__ && debug && <DebugPanel app={app} />}
     </div>
   );
 }
@@ -316,6 +351,8 @@ function DebugPanel({ app }) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>
-    <App />
+    <ListingsProvider>
+      <App />
+    </ListingsProvider>
   </ErrorBoundary>
 );
