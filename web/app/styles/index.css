@@ -953,18 +953,157 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .histo {
   display: flex; flex-direction: column; gap: 12px;
 }
-.histo-bars {
-  display: flex; gap: 2px; align-items: flex-end;
+
+/* PR-4f — interactive range-slider-over-histogram.
+   The .histo-track is the positioning context for the bars, the
+   range overlay, and the two thumbs. Bars sit at the bottom; the
+   thumbs sit on top with `position: absolute` and a transform
+   to center on their `left` percentage. The track has extra
+   bottom-padding so the thumb hit-rect (44×44 per WCAG 2.5.5)
+   doesn't get clipped. */
+.histo-track {
+  position: relative;
   height: 50px;
+  /* Inset so the thumbs (16px wide) don't overflow when at 0% / 100%. */
+  margin: 0 8px;
+  /* Touch users get larger thumb hit-targets via a transparent inset
+     padding around the visible thumb (see .histo-thumb below). */
+  touch-action: none;          /* let us own the pointer gestures */
+  cursor: pointer;
+}
+.histo-bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 100%;
+  position: relative;
+  z-index: 1;
 }
 .histo-bar {
   flex: 1;
   min-height: 2px;
   background: var(--paper-3);
   border-radius: 2px;
-  transition: background 160ms;
+  transition: background var(--dur-fast) var(--ease-out);
+  pointer-events: none;        /* track owns the pointer gestures */
 }
 .histo-bar.active { background: var(--accent); }
+.histo-bar.is-brushed { background: var(--accent-strong); }
+
+@media (hover: hover) {
+  .histo-track:not(.is-dragging):hover .histo-bar { opacity: 0.92; }
+}
+
+/* The shaded range overlay between thumbs — sits behind the thumbs,
+   above the bars. Subtle so the bars stay readable. */
+.histo-range-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--accent-soft);
+  opacity: 0.55;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2;
+  transition: left var(--dur-fast) var(--ease-out), width var(--dur-fast) var(--ease-out);
+}
+.histo-track.is-dragging .histo-range-overlay { transition: none; }
+
+/* The brush overlay only appears during a brush gesture — slightly
+   stronger fill than the resting range, so the live selection
+   reads as "in progress." */
+.histo-brush-overlay {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  background: var(--accent);
+  opacity: 0.18;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Thumbs — round, paper bg, accent border. WCAG 2.5.5 touch target via
+   the transparent ::before that extends the hit-rect to 44×44 even
+   though the visible mark is only 16×16. */
+.histo-thumb {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-1);
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  cursor: grab;
+  padding: 0;
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+}
+.histo-thumb::before {
+  /* 44×44 hit-rect for touch — invisible padding outside the visible mark. */
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 44px; height: 44px;
+  transform: translate(-50%, -50%);
+}
+.histo-thumb:hover {
+  box-shadow: var(--shadow-2);
+}
+.histo-thumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.histo-thumb.is-dragging,
+.histo-thumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: var(--shadow-2);
+}
+
+/* Floating numeric label that appears above the dragged thumb. */
+.histo-thumb-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  box-shadow: var(--shadow-1);
+}
+
+/* The "current range" + reset link row, only shown when a range is set. */
+.histo-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.histo-current-range {
+  color: var(--ink-2);
+}
+.histo-reset {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+/* prefers-reduced-motion handled by the global rule at the top of this
+   file (clamps all transitions to ~0ms). The thumb scale-on-drag still
+   visually changes — instantaneous instead of animated. */
 .price-inputs { display: flex; gap: 8px; }
 .price-input { flex: 1; }
 .price-input label {

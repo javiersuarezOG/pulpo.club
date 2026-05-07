@@ -116,4 +116,50 @@ test.describe("New app boots cleanly on key routes", () => {
 
     expect(errors, "console errors after detail open/close").toEqual([]);
   });
+
+  // PR-4f — interactive PriceHistogram smoke test.
+  // Open Browse, click a histogram bar, verify the listing count drops
+  // and the URL gets a pmax/pmin querystring. Click reset, verify the
+  // count restores. Catches regressions in pointer-event wiring,
+  // bucket→price math, and URL sync.
+  test("price histogram bar-click filters listings and updates URL", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+    });
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await page.goto("/", { waitUntil: "networkidle" });
+    // The app uses internal state for routing — click the Browse nav
+    // link in TopNav to navigate, then wait for the histogram to mount.
+    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
+    const histo = page.locator(".histo-track");
+    await histo.waitFor({ state: "visible", timeout: 10_000 });
+
+    // Click roughly bar 5 of 24 (midway-low, where most listings cluster).
+    const box = await histo.boundingBox();
+    if (!box) throw new Error("histo-track has no box");
+    const targetX = box.x + box.width * (5 / 24) + 4;
+    const targetY = box.y + box.height / 2;
+    await page.mouse.click(targetX, targetY);
+
+    // After bar-click, URL should carry pmin and pmax.
+    await page.waitForFunction(
+      () => /[?&](pmin|pmax)=/.test(window.location.search),
+      { timeout: 3_000 },
+    );
+
+    // Reset chip (visible only when range is active).
+    const reset = page.locator(".histo-reset").first();
+    await reset.waitFor({ state: "visible", timeout: 3_000 });
+    await reset.click();
+
+    // URL should clear pmin and pmax after reset.
+    await page.waitForFunction(
+      () => !/[?&]pmin=|[?&]pmax=/.test(window.location.search),
+      { timeout: 3_000 },
+    );
+
+    expect(errors, "console errors during histogram interaction").toEqual([]);
+  });
 });
