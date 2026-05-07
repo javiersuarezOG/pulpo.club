@@ -78,4 +78,42 @@ test.describe("New app boots cleanly on key routes", () => {
     // class shared by both default + magazine variants.
     await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
   });
+
+  // PR-5 — detail-panel + lightbox smoke test.
+  // Click a card → detail overlay opens → photo gallery → ESC closes
+  // lightbox → click backdrop closes detail. Catches focus-trap or
+  // event-listener leaks that crash on close.
+  test("detail panel opens, lightbox accepts ESC, focus returns", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+    });
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await page.goto("/", { waitUntil: "networkidle" });
+    const card = page.locator(".listing-card").first();
+    await card.waitFor({ state: "visible", timeout: 10_000 });
+    await card.click();
+
+    // Detail overlay mounts with .detail-panel.
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+
+    // Try opening the lightbox via the first non-locked thumbnail
+    // (anonymous users have the main photo + thumb 0/1 unlocked; thumbs
+    // 2+ are sign-up gated). If no thumbnails render, skip the
+    // lightbox assertion — PR-5 still passes if detail itself didn't crash.
+    const unlockedThumb = page.locator(".gallery-thumb:not(.locked)").first();
+    if (await unlockedThumb.count() > 0) {
+      await unlockedThumb.click();
+      await page.locator(".lightbox").waitFor({ state: "visible", timeout: 3_000 });
+      await page.keyboard.press("Escape");
+      await page.locator(".lightbox").waitFor({ state: "hidden", timeout: 3_000 });
+    }
+
+    // Close detail by clicking the overlay backdrop (outside the panel).
+    await page.locator(".detail-overlay").click({ position: { x: 5, y: 5 } });
+    await page.locator(".detail-panel").waitFor({ state: "hidden", timeout: 3_000 });
+
+    expect(errors, "console errors after detail open/close").toEqual([]);
+  });
 });

@@ -1365,7 +1365,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
   padding: 40px;
 }
 .lightbox img { max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-.lightbox-close { position: absolute; top: 24px; right: 24px; color: white; }
+/* PR-5 — touch targets ≥ 44px + visible focus ring (a11y). */
+.lightbox-close {
+  position: absolute; top: 24px; right: 24px; color: white;
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: rgb(255,255,255,0.08);
+  transition: background 160ms;
+}
+.lightbox-close:hover { background: rgb(255,255,255,0.16); }
+.lightbox-close:focus-visible,
+.lightbox-controls button:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
 .lightbox-controls {
   position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 16px; align-items: center;
@@ -1373,7 +1387,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: rgb(255,255,255,0.1); padding: 8px 16px;
   border-radius: 999px; backdrop-filter: blur(10px);
 }
-.lightbox-controls button { color: white; }
+.lightbox-controls button {
+  color: white;
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  transition: background 160ms;
+}
+.lightbox-controls button:hover { background: rgb(255,255,255,0.12); }
 
 /* ============== Saved page ============== */
 .page-saved { max-width: 1400px; margin: 0 auto; padding: 32px var(--section-pad) 80px; }
