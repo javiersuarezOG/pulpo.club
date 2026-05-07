@@ -271,23 +271,41 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
           ))}
         </div>
       ) : (
-        // PR-4c: magazine + standard now share the carousel rail. The rail
-        // gets a `shelf-rail-magazine` modifier class that swaps card width
-        // to --card-w-magazine so the editorial language stays distinct.
-        <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
-          {items.map(l => (
-            <div className="shelf-item" key={l.id}>
-              <ListingCard
-                listing={l}
-                app={app}
-                onOpen={() => {
-                  track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
-                  app.openListing(l.id);
-                }}
-                variant={isMagazine ? "magazine" : "default"}
-              />
-            </div>
-          ))}
+        // PR-4c: magazine + standard share the carousel rail.
+        // PR-4d: rail wrapped in .shelf-rail-wrap so the in-rail nav buttons
+        // can sit OUTSIDE the rail's mask-image (the gradient at the right
+        // edge would otherwise eat the right button) and remain fixed while
+        // the rail scrolls. Buttons are tab-after-cards by DOM order.
+        <div className="shelf-rail-wrap">
+          <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
+            {items.map(l => (
+              <div className="shelf-item" key={l.id}>
+                <ListingCard
+                  listing={l}
+                  app={app}
+                  onOpen={() => {
+                    track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
+                    app.openListing(l.id);
+                  }}
+                  variant={isMagazine ? "magazine" : "default"}
+                />
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="rail-nav rail-nav-prev"
+            onClick={() => scrollBy(-1)}
+            aria-label={t("common.scroll_left", app.locale)}
+            tabIndex={-1}
+          ><Icon name="chevron_left" size={18} strokeWidth={2}/></button>
+          <button
+            type="button"
+            className="rail-nav rail-nav-next"
+            onClick={() => scrollBy(1)}
+            aria-label={t("common.scroll_right", app.locale)}
+            tabIndex={-1}
+          ><Icon name="chevron_right" size={18} strokeWidth={2}/></button>
         </div>
       )}
     </section>
@@ -361,27 +379,43 @@ function StyleCarousel({ app, onPickStyle }) {
           <p className="shelf-subline">{t("style.sub", app.locale)}</p>
         </div>
         <div className="shelf-scroll-btns">
-          <button onClick={() => scrollBy(-1)} aria-label="Scroll left"><Icon name="chevron_left" size={18}/></button>
-          <button onClick={() => scrollBy(1)} aria-label="Scroll right"><Icon name="chevron_right" size={18}/></button>
+          <button onClick={() => scrollBy(-1)} aria-label={t("common.scroll_left", app.locale)}><Icon name="chevron_left" size={18}/></button>
+          <button onClick={() => scrollBy(1)} aria-label={t("common.scroll_right", app.locale)}><Icon name="chevron_right" size={18}/></button>
         </div>
       </div>
-      <div className="style-rail" ref={scrollRef}>
-        {styles.map(s => (
-          <button
-            key={s.key}
-            className={`style-tile ${s.photo ? "" : "no-photo"}`}
-            onClick={() => {
-              track("style_carousel.tile_clicked", { style_key: s.key });
-              if (onPickStyle) onPickStyle(s.key);
-              else app.goBrowse({ category: s.key });
-            }}
-            aria-label={tr(s.label, app.locale)}
-          >
-            {s.photo && <img src={s.photo} alt="" loading="lazy" />}
-            <div className="style-tile-overlay" />
-            <span className="style-tile-label">{tr(s.label, app.locale)}</span>
-          </button>
-        ))}
+      <div className="style-rail-wrap">
+        <div className="style-rail" ref={scrollRef}>
+          {styles.map(s => (
+            <button
+              key={s.key}
+              className={`style-tile ${s.photo ? "" : "no-photo"}`}
+              onClick={() => {
+                track("style_carousel.tile_clicked", { style_key: s.key });
+                if (onPickStyle) onPickStyle(s.key);
+                else app.goBrowse({ category: s.key });
+              }}
+              aria-label={tr(s.label, app.locale)}
+            >
+              {s.photo && <img src={s.photo} alt="" loading="lazy" />}
+              <div className="style-tile-overlay" />
+              <span className="style-tile-label">{tr(s.label, app.locale)}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="rail-nav rail-nav-prev"
+          onClick={() => scrollBy(-1)}
+          aria-label={t("common.scroll_left", app.locale)}
+          tabIndex={-1}
+        ><Icon name="chevron_left" size={18} strokeWidth={2}/></button>
+        <button
+          type="button"
+          className="rail-nav rail-nav-next"
+          onClick={() => scrollBy(1)}
+          aria-label={t("common.scroll_right", app.locale)}
+          tabIndex={-1}
+        ><Icon name="chevron_right" size={18} strokeWidth={2}/></button>
       </div>
     </section>
   );
