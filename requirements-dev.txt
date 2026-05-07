@@ -1,1 +1,4 @@
 ruff>=0.4
+# Schema validation for the ranked.json data contract (tests/test_ranked_schema.py).
+# Test-only — production code never imports it.
+jsonschema>=4.0
