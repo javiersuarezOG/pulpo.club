@@ -567,7 +567,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
   const activeCount = (filters.zones?.size || 0)
     + filters.land_types.size + filters.features.size
     + filters.infra.size + filters.status.size
-    + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0);
+    + (filters.price_max != null || filters.price_min > 0 ? 1 : 0);
   const lc = app?.locale || currentLocale();
 
   return (
@@ -849,8 +849,11 @@ function FilterGroup({ title, children }) {
 
 function PriceHistogram({ filters, setFilters }) {
   const LISTINGS = useListings();
-  // Compute histogram from full listings
-  const max = 1000000;
+  // Visual scale of the bars (token from filter-url.ts kept here for
+  // the histogram math). Listings priced above this still pass the
+  // filter when filters.price_max is null; they cluster in the
+  // rightmost bucket so the user can see they exist.
+  const max = 1_000_000;
   const buckets = 24;
   const counts = pUseMemo(() => {
     const arr = new Array(buckets).fill(0);
@@ -862,11 +865,14 @@ function PriceHistogram({ filters, setFilters }) {
     return arr;
   }, [LISTINGS]);
   const peak = Math.max(...counts, 1);
+  // Effective upper bound for the "in range" highlight: when no cap
+  // is set, every bucket up to and including the rightmost is active.
+  const effectiveMax = filters.price_max != null ? filters.price_max : Infinity;
   return (
     <div className="histo">
       <div className="histo-bars">
         {counts.map((c, i) => {
-          const inRange = (i / buckets * max) >= filters.price_min && (i / buckets * max) <= filters.price_max;
+          const inRange = (i / buckets * max) >= filters.price_min && (i / buckets * max) <= effectiveMax;
           return <div key={i} className={`histo-bar ${inRange ? "active" : ""}`} style={{ height: `${(c/peak)*100}%` }} />;
         })}
       </div>
@@ -877,7 +883,15 @@ function PriceHistogram({ filters, setFilters }) {
         </div>
         <div className="price-input">
           <label>Max</label>
-          <input type="number" value={filters.price_max} onChange={(e) => setFilters({ price_max: +e.target.value })} />
+          <input
+            type="number"
+            value={filters.price_max ?? ""}
+            placeholder={filters.price_max == null ? "any" : ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              setFilters({ price_max: v === "" ? null : +v });
+            }}
+          />
         </div>
       </div>
     </div>
@@ -895,7 +909,10 @@ function makeDefaultFilters() {
     infra: new Set(),
     status: new Set(),
     price_min: 0,
-    price_max: 1000000,
+    // null = no upper cap. The previous default of 1,000,000 silently
+    // hid every listing above $1M (~20% of the catalog) — Browse
+    // counted ~700 while LiveStats correctly reported 873. Bug fix.
+    price_max: null,
     size_min: 0,
     readiness: 0,
     // PR-4b — feature parity with legacy:
@@ -926,7 +943,8 @@ function applyFilters(listings, f) {
     if (l.is_sold) return false;
     if (f.zones.size && !f.zones.has(l.zone_name)) return false;
     if (f.land_types.size && !f.land_types.has(l.land_type)) return false;
-    if (l.price < f.price_min || l.price > f.price_max) return false;
+    if (l.price < f.price_min) return false;
+    if (f.price_max != null && l.price > f.price_max) return false;
     if (l.size_m2 < f.size_min) return false;
     if (f.features.has("beachfront") && !l.beachfront_tier) return false;
     if (f.features.has("ocean_view") && !l.has_ocean_view) return false;
@@ -1042,7 +1060,7 @@ function BrowsePage({ app }) {
     return [...r].sort(sorters[sort] || sorters.recent);
   }, [debouncedFilters, sort, LISTINGS]);
 
-  const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max < 1000000 || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+  const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1151,7 +1169,7 @@ function BrowsePage({ app }) {
               {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFilters({...filters, features: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
               {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFilters({...filters, infra: s});}}>{f} <Icon name="close" size={12}/></span>)}
               {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFilters({...filters, status: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
-              {(filters.price_min > 0 || filters.price_max < 1000000) && <span className="active-chip" onClick={() => setFilters({...filters, price_min: 0, price_max: 1000000})}>{formatPrice(filters.price_min)}–{formatPrice(filters.price_max)} <Icon name="close" size={12}/></span>}
+              {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFilters({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
             </div>
           )}
 
@@ -1874,10 +1892,10 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
     if (filters.zones.size > 0) {
       tryWithout("any zone", "cualquier zona", (n) => n.zones = new Set());
     }
-    if (filters.price_max < 1_000_000) {
+    if (filters.price_max != null) {
       tryWithout("any budget", "cualquier presupuesto", (n) => {
         n.price_min = 0;
-        n.price_max = 1_000_000;
+        n.price_max = null;
       });
     }
     if (filters.features.size > 0) {

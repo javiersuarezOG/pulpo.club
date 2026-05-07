@@ -23,14 +23,17 @@ export type FilterShape = {
   infra: Set<string>;
   status: Set<string>;
   price_min: number;
-  price_max: number;
+  price_max: number | null;   // null = no upper cap (default; was 1,000,000 — hid ~20% of catalog)
   size_min: number;
   readiness: number;
   score_min?: number;
   weights?: { value: number; location: number; momentum: number };
 };
 
-const PRICE_MAX_DEFAULT = 1_000_000;
+// Visual scale for the price histogram. Listings above this still pass
+// the filter (when price_max is null) — they just cluster in the
+// rightmost bucket of the bar chart.
+export const PRICE_HISTO_MAX = 1_000_000;
 
 function parseSet(value: string | null): Set<string> {
   if (!value) return new Set();
@@ -53,7 +56,7 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     infra: parseSet(p.get("infra")),
     status: parseSet(p.get("status")),
     price_min: parseInt0(p.get("pmin"), 0),
-    price_max: parseInt0(p.get("pmax"), PRICE_MAX_DEFAULT),
+    price_max: p.get("pmax") != null ? parseInt0(p.get("pmax"), 0) : null,
     size_min: parseInt0(p.get("smin"), 0),
     readiness: parseInt0(p.get("ready"), 0),
   };
@@ -96,7 +99,7 @@ export function writeFilterToURL(
   setOrRemove("infra", [...filters.infra].join(","));
   setOrRemove("status", [...filters.status].join(","));
   setOrRemove("pmin", filters.price_min > 0 ? String(filters.price_min) : "");
-  setOrRemove("pmax", filters.price_max < PRICE_MAX_DEFAULT ? String(filters.price_max) : "");
+  setOrRemove("pmax", filters.price_max != null ? String(filters.price_max) : "");
   setOrRemove("smin", filters.size_min > 0 ? String(filters.size_min) : "");
   setOrRemove("ready", filters.readiness > 0 ? String(filters.readiness) : "");
   setOrRemove(

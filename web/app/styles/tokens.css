@@ -95,14 +95,16 @@
      Both .shelves and .style-carousel consume this so they share the
      exact same gutter at every breakpoint. */
   --max-discover-width: 1400px;
-  /* PR-4d — token-pinned shelf rhythm (was 56px off-scale).
-     Defaults to --space-8 (48px); index.css drops to --space-7 (32px)
-     under 1024px and --space-6 (24px) under 768px via media queries
-     on this same token. Banned: half-step pollution (no 40px/--space-7-5). */
-  --shelf-gap: 48px;
-  --shelf-rail-gap: 18px;
+  /* PR-4d → 4e — token-pinned shelf rhythm. Tightened on the second pass
+     after Sebastian's feedback that 48px still read "blog" not "Netflix":
+     now defaults to --space-7 (32px); index.css drops to --space-6 (24px)
+     under 1024px and --space-5 (16px) under 768px. All values stay on the
+     existing scale (4-8-12-16-24-32-48-64) — no half-step pollution. */
+  --shelf-gap: 32px;
+  /* PR-4e — within-rail card spacing token-aligned (was 18px off-scale). */
+  --shelf-rail-gap: 12px;
   --card-pad-y: 14px;
-  --shelf-mb: 12px;
+  --shelf-mb: 8px;
   --section-pad: 24px;
   --card-cols: 3;
 

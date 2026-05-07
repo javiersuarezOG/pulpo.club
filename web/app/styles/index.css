@@ -328,16 +328,23 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .shelves {
   max-width: var(--max-discover-width);
   margin: 0 auto;
-  padding: 32px var(--section-pad) 80px;
+  /* PR-4e — drop the 32px padding-top: it was stacking on top of
+     .style-carousel's bottom margin to produce an 80px gap between the
+     StyleCarousel and the first shelf, while between-shelf gaps were
+     only 48px. The seam now matches --shelf-gap rhythm. Mobile/tablet
+     keep the full bottom padding to avoid the last shelf hugging the
+     footer. */
+  padding: 0 var(--section-pad) 80px;
   display: flex; flex-direction: column; gap: var(--shelf-gap);
 }
-/* PR-4d — token-pinned vertical rhythm. Drop --shelf-gap one step on
-   each breakpoint via the same token; no off-scale values introduced. */
+/* PR-4d → 4e — token-pinned vertical rhythm, tightened. One step
+   smaller than PR-4d on each breakpoint after the "still feels like a
+   blog" feedback. Token scale stays clean. */
 @media (max-width: 1023px) {
-  :root { --shelf-gap: 32px; }
+  :root { --shelf-gap: 24px; }
 }
 @media (max-width: 767px) {
-  :root { --shelf-gap: 24px; }
+  :root { --shelf-gap: 16px; }
 }
 .shelf { position: relative; }
 .shelf-head {
@@ -415,42 +422,41 @@ h1,h2,h3,h4,h5 { margin: 0; }
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   background: var(--paper);
-  color: var(--ink-2);
-  box-shadow: var(--shadow-1);
+  color: var(--ink);
+  box-shadow: var(--shadow-2);
   display: grid;
   place-items: center;
   z-index: 4;
-  opacity: 0;
-  transition: opacity var(--dur-base) var(--ease-out), background 160ms, color 160ms;
   cursor: pointer;
+  border: 1px solid var(--line);
+  /* PR-4e — always visible on desktop after Sebastian's PR-4d
+     feedback that hover-only made the new affordance invisible.
+     Touch still hides via @media (hover: none) — swipe is the
+     gesture there. */
+  opacity: 1;
+  transition: background 160ms, color 160ms, transform 160ms var(--ease-out), opacity 160ms;
 }
 .rail-nav:hover {
   background: var(--ink);
   color: var(--paper);
+  border-color: var(--ink);
+  transform: translateY(-50%) scale(1.04);
+}
+.rail-nav:active {
+  transform: translateY(-50%) scale(0.96);
 }
 /* Inset 8px from the wrapper edge so the button sits over the
    first/last card's photo without obscuring its center. */
 .rail-nav-prev { left: 8px; }
 .rail-nav-next { right: 8px; }
+
 /* Touch users get the swipe affordance — buttons would intercept
    the gesture. Hover-capable pointers (desktop, USB mouse) get the
-   in-rail nav as a redundant click target. */
-@media (hover: hover) {
-  .shelf-rail-wrap:hover .rail-nav,
-  .style-rail-wrap:hover .rail-nav {
-    opacity: 1;
-  }
-  /* Keyboard discoverability — show on focus-within even if cursor
-     hasn't entered the wrapper. Section-head buttons remain primary. */
-  .shelf-rail-wrap:focus-within .rail-nav,
-  .style-rail-wrap:focus-within .rail-nav {
-    opacity: 1;
-  }
-}
+   in-rail nav as the primary click target. */
 @media (hover: none) {
   .rail-nav { display: none; }
 }
@@ -2095,16 +2101,26 @@ h1,h2,h3,h4,h5 { margin: 0; }
 /* Categories carousel — shares the fade+peek+snap+chevron recipe with
    .shelf-rail but uses a smaller --card-w-style so the visual language
    reads as "browse by mood" (lighter, photo-backdrop) vs "individual
-   property" (denser ListingCard) on the shelves below. */
+   property" (denser ListingCard) on the shelves below.
+
+   PR-4e — added the `margin: 0 -section-pad; padding: 0 section-pad`
+   bleed pattern that .shelf-rail uses, so the StyleCarousel rail truly
+   aligns edge-to-edge with the listing-shelf rails. Without this, the
+   visible scrolling rail of StyleCarousel was 48px narrower than the
+   listing rails (24px inset on each side) — the parent container width
+   was right but the rail content was wrong. */
 .style-rail {
   display: flex;
   flex-wrap: nowrap;
-  gap: 14px;
+  gap: var(--shelf-rail-gap);
   overflow-x: auto;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   padding-bottom: 4px;
+  margin: 0 calc(-1 * var(--section-pad));
+  padding-left: var(--section-pad);
+  padding-right: var(--section-pad);
   -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
           mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
 }
@@ -2169,10 +2185,11 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 
 /* ============== A.2 + shelf header polish ============== */
-/* Breathing room between hero and Find Your Style. */
-.style-carousel { margin-top: 56px; }
-
-@media (max-width: 767px) { .style-carousel { margin-top: 36px; } }
+/* PR-4e — collapse the Hero→StyleCarousel and StyleCarousel→Shelves
+   gaps to the unified --shelf-gap rhythm. Was margin-top: 56px (off-
+   scale) + a lot of padding stacking; now everything follows the
+   token-aligned vertical rhythm. */
+.style-carousel { margin-top: var(--shelf-gap); }
 
 /* Shelf head — title + subline tight, "See all" right-anchored to title baseline. */
 /* PR-4 — section-head rhythm. The designer flagged that
