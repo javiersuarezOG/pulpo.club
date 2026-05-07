@@ -1236,9 +1236,72 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // Free signup unlocks: source URL, full gallery, all USPs, precise location.
   const needsSignup = !app.user;
 
+  // PR-5 — detail telemetry. Fire `detail.opened` once per listing
+  // (re-fires when user navigates to a different listing). Auth state
+  // is anonymous in this PR; PR-9 wires the real free/pro distinction.
   pUseEffect(() => {
+    const authState = !app.user ? "anonymous" : (isPaid ? "pro" : "free");
+    track("detail.opened", {
+      listing_id: listing.id,
+      auth_state: authState,
+      ...(app.user ? { plan: isPaid ? "pro" : "free" } : {}),
+    });
     if (app.user && !isSold) app.recordDetailView();
   }, [listing.id]);
+
+  // PR-5 — lightbox a11y. ESC closes, ←/→ navigate, Tab is trapped
+  // inside the lightbox. Focus moves to the close button on open and
+  // returns to the trigger on close.
+  const lightboxRef = pUseRef(null);
+  const lightboxCloseRef = pUseRef(null);
+  const lastFocusRef = pUseRef(null);
+  pUseEffect(() => {
+    if (!lightbox) return;
+    lastFocusRef.current = document.activeElement;
+    setTimeout(() => lightboxCloseRef.current?.focus(), 0);
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); setLightbox(false); }
+      else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setGalleryIdx(i => (i - 1 + listing.photos.length) % listing.photos.length);
+      }
+      else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setGalleryIdx(i => (i + 1) % listing.photos.length);
+      }
+      else if (e.key === "Tab") {
+        const root = lightboxRef.current;
+        if (!root) return;
+        const focusable = root.querySelectorAll(
+          'button, [href], [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      if (lastFocusRef.current && typeof lastFocusRef.current.focus === "function") {
+        lastFocusRef.current.focus();
+      }
+    };
+  }, [lightbox, listing.photos.length]);
+
+  const openLightbox = (idx) => {
+    setGalleryIdx(idx);
+    setLightbox(true);
+    track("detail.photo_lightbox_opened", { listing_id: listing.id });
+  };
 
   const facts = [
     { icon: "road", label: "Road access", value: listing.road_access_type ? capitalize(listing.road_access_type) : "—" },
@@ -1272,9 +1335,13 @@ function ListingDetail({ listing, app, asPanel = true }) {
 
       <div className="detail-gallery">
         <div className="gallery-mosaic">
-          <button className="gallery-main" onClick={() => listing.photos.length && !needsSignup && setLightbox(true)}>
+          <button
+            className="gallery-main"
+            onClick={() => listing.photos.length && !needsSignup && openLightbox(0)}
+            aria-label={listing.photos.length ? "Open photo gallery" : undefined}
+          >
             {listing.photos[0] ? (
-              <img src={listing.photos[0]} alt={listing.title}/>
+              <img src={listing.photos[0]} alt={tr(listing.title, app.locale)}/>
             ) : (
               <div className="gallery-placeholder">
                 <Icon name="mountain" size={48} />
@@ -1287,11 +1354,12 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <button
                 key={i}
                 className={`gallery-thumb ${needsSignup && i >= 2 ? "locked" : ""}`}
+                aria-label={needsSignup && i >= 2 ? "Sign up to unlock more photos" : `Open photo ${i + 1}`}
                 onClick={() => {
                   if (needsSignup && i >= 2) {
                     app.openSignup({ mode: "signup", pendingListing: listing.id });
                   } else {
-                    setGalleryIdx(i); setLightbox(true);
+                    openLightbox(i);
                   }
                 }}
               >
@@ -1441,7 +1509,16 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <Icon name="lock" size={16}/> Sign up free to view source listing
             </button>
           ) : listing.original_url ? (
-            <a className="btn-primary lg block" href={listing.original_url} target="_blank" rel="noopener noreferrer">
+            <a
+              className="btn-primary lg block"
+              href={listing.original_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("view_original.clicked", {
+                listing_id: listing.id,
+                source_label: listing.source_label,
+              })}
+            >
               View on {listing.source_label} <Icon name="arrow_up_right" size={16} strokeWidth={2}/>
             </a>
           ) : (
@@ -1456,15 +1533,35 @@ function ListingDetail({ listing, app, asPanel = true }) {
       )}
 
       {lightbox && (
-        <div className="lightbox" onClick={() => setLightbox(false)}>
-          <button className="lightbox-close"><Icon name="close" size={22}/></button>
-          <img src={listing.photos[galleryIdx]} alt=""/>
-          <div className="lightbox-controls">
-            <button onClick={(e) => { e.stopPropagation(); setGalleryIdx((galleryIdx - 1 + listing.photos.length) % listing.photos.length); }}>
+        <div
+          className="lightbox"
+          onClick={() => setLightbox(false)}
+          ref={lightboxRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photo ${galleryIdx + 1} of ${listing.photos.length}`}
+        >
+          <button
+            className="lightbox-close"
+            ref={lightboxCloseRef}
+            onClick={(e) => { e.stopPropagation(); setLightbox(false); }}
+            aria-label="Close photo gallery (Escape)"
+          >
+            <Icon name="close" size={22}/>
+          </button>
+          <img src={listing.photos[galleryIdx]} alt={`${tr(listing.title, app.locale)} — photo ${galleryIdx + 1}`}/>
+          <div className="lightbox-controls" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setGalleryIdx((galleryIdx - 1 + listing.photos.length) % listing.photos.length)}
+              aria-label="Previous photo (Left arrow)"
+            >
               <Icon name="chevron_left" size={24}/>
             </button>
-            <span>{galleryIdx + 1} / {listing.photos.length}</span>
-            <button onClick={(e) => { e.stopPropagation(); setGalleryIdx((galleryIdx + 1) % listing.photos.length); }}>
+            <span aria-live="polite">{galleryIdx + 1} / {listing.photos.length}</span>
+            <button
+              onClick={() => setGalleryIdx((galleryIdx + 1) % listing.photos.length)}
+              aria-label="Next photo (Right arrow)"
+            >
               <Icon name="chevron_right" size={24}/>
             </button>
           </div>
