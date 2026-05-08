@@ -310,3 +310,47 @@ def test_crawl_with_meta_returns_expected_shape():
     meta = sc.crawl_with_meta(limit=5, offline=True)
     assert set(meta.keys()) == {"records", "max_pages_hit", "limit_hit"}
     assert isinstance(meta["records"], list)
+
+
+# ── PULPO_E24_LIMIT — encuentra24-specific cap ────────────────────────
+
+
+def test_resolve_limit_caps_when_env_var_lower(monkeypatch):
+    """PULPO_E24_LIMIT=50 with caller-supplied limit=200 → cap to 50.
+    Pattern for the cautious first nightly: set the env var without
+    touching PULPO_LIMIT (which controls the global pipeline cap)."""
+    monkeypatch.setenv("PULPO_E24_LIMIT", "50")
+    sc = Encuentra24Scraper(offline=False)
+    assert sc._resolve_limit(200, offline=False) == 50
+
+
+def test_resolve_limit_passes_through_when_env_var_higher(monkeypatch):
+    """The env var can ONLY tighten — if it's HIGHER than the caller's
+    limit, the caller wins. Stops a misconfigured env var from
+    accidentally letting encuentra24 spend a 1500-listing budget."""
+    monkeypatch.setenv("PULPO_E24_LIMIT", "5000")
+    sc = Encuentra24Scraper(offline=False)
+    assert sc._resolve_limit(30, offline=False) == 30
+
+
+def test_resolve_limit_unset_env_passes_through(monkeypatch):
+    """No env var → caller's limit is the cap."""
+    monkeypatch.delenv("PULPO_E24_LIMIT", raising=False)
+    sc = Encuentra24Scraper(offline=False)
+    assert sc._resolve_limit(30, offline=False) == 30
+
+
+def test_resolve_limit_garbage_env_fails_open(monkeypatch):
+    """A non-integer env var falls back to caller's limit — failing
+    closed (cap=0) would silently empty the source."""
+    monkeypatch.setenv("PULPO_E24_LIMIT", "not-a-number")
+    sc = Encuentra24Scraper(offline=False)
+    assert sc._resolve_limit(30, offline=False) == 30
+
+
+def test_resolve_limit_offline_ignores_env_var(monkeypatch):
+    """Tests run with offline=True; the env var would surprise them.
+    Offline path skips the cap so test-supplied `limit` is honoured."""
+    monkeypatch.setenv("PULPO_E24_LIMIT", "1")
+    sc = Encuentra24Scraper(offline=True)
+    assert sc._resolve_limit(50, offline=True) == 50
