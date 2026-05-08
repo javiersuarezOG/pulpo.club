@@ -305,3 +305,27 @@ def test_legacy_alias_still_importable():
     from automation.ai_enrichment_fallback import LAND_TYPE_LABELS, _LEGACY_TYPE_LABELS
     assert LAND_TYPE_LABELS is _LEGACY_TYPE_LABELS
     assert LAND_TYPE_LABELS["lot"] == "Residential Lot"
+
+
+# ── Zone-unresolved listings skip {zone}-templated USPs ───────────────
+# Regression guard for the 2026-05-07 nightly's two bienesraices
+# fallback-only listings, which produced "🆕 Just listed — one of 's
+# newest additions" and "on the  coast" when zone/municipality/department
+# were all None.
+
+def test_fallback_skips_zone_templates_when_zone_unresolved():
+    li = _li(zone=None, municipality=None, department=None,
+             is_beachfront=True, days_listed=3)
+    bullets = fallback_reasons_to_buy(li)
+    # Both triggers above use {zone}; should NOT appear with empty zone.
+    rendered = " | ".join(bullets)
+    assert "'s newest additions" not in rendered
+    assert "on the  coast" not in rendered  # double-space gives it away
+    # The off-market / repriced / utilities rules don't reference {zone}
+    # — they should still apply if their predicates fire.
+
+def test_fallback_uses_zone_templates_when_zone_resolved():
+    li = _li(zone="el-tunco", is_beachfront=True, days_listed=3)
+    bullets = fallback_reasons_to_buy(li)
+    rendered = " | ".join(bullets)
+    assert "El Tunco coast" in rendered or "El Tunco's newest" in rendered

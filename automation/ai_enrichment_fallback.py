@@ -193,13 +193,22 @@ def _trigger_rules() -> list:
 
 
 def _fill_template(template: str, li: Any) -> str | None:
-    """Substitute {zone} / {photos_count} / {development_name} from listing."""
-    z = _zone_name(li) or ""
+    """Substitute {zone} / {photos_count} / {development_name} from listing.
+
+    When a template references {zone} but the listing has no resolvable
+    zone/municipality/department, return None to skip the rule. Rendering
+    with an empty zone produced broken bullets like "one of 's newest
+    additions" or "on the  coast" — observed in the 2026-05-07 nightly's
+    fallback path for two zone-unresolved bienesraices listings.
+    """
+    z = _zone_name(li)
+    if "{zone}" in template and not z:
+        return None
     pc = _g(li, "photos_count") or 0
     dn = _g(li, "development_name") or "this development"
     try:
         return template.format(
-            zone           = z,
+            zone           = z or "",
             photos_count   = pc,
             development_name = dn,
         )
