@@ -287,12 +287,56 @@ const UI_STRINGS = {
   "newsletter.success":      { en: "You're in. First digest Monday.",
                                es: "Listo. Primer resumen el lunes." },
 
-  // Plans page — Stripe-wired Pro CTA. PRO_PRICE_USD_PER_MONTH lives in
+  // Plans page — full string set. PRO_PRICE_USD_PER_MONTH lives in
   // pages.jsx and mirrors automation/stripe_setup.mjs.
+  "plans.head.title":        { en: "Pick a plan that fits how you invest.",
+                               es: "Elige un plan que se ajuste a cómo inviertes." },
+  "plans.head.subtitle":     { en: "Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.",
+                               es: "Pulpo es gratis para explorar. Mejora tu plan para detalles ilimitados, acceso off-market y alertas semanales." },
+  // Free tier
+  "plans.free.name":         { en: "Free",                    es: "Gratis" },
+  "plans.free.tag":          { en: "Browse the catalogue",    es: "Explora el catálogo" },
+  "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Exploración ilimitada de tarjetas" },
+  "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 vistas de detalle al mes" },
+  "plans.free.feat.saves_cap":        { en: "Save up to 10 listings",       es: "Guarda hasta 10 propiedades" },
+  "plans.free.feat.off_market_excluded": { en: "Off-market deals",          es: "Ofertas off-market" },
+  "plans.free.feat.newsletter_excluded": { en: "Weekly newsletter",         es: "Boletín semanal" },
+  "plans.free.cta_current":  { en: "Your plan",                es: "Tu plan" },
+  "plans.free.cta_signup":   { en: "Sign up free",             es: "Crear cuenta gratis" },
+  // Pro tier
+  "plans.pro.ribbon":        { en: "Most popular",             es: "Más popular" },
+  "plans.pro.name":          { en: "Pulpo Pro",                es: "Pulpo Pro" },
+  "plans.pro.per_month":     { en: "/month",                   es: "/mes" },
+  "plans.pro.tag":           { en: "Billed monthly",           es: "Facturación mensual" },
+  "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo del plan Gratis" },
+  "plans.pro.feat.unlimited_details":  { en: "Unlimited listing details", es: "Detalles de propiedades ilimitados" },
+  "plans.pro.feat.off_market":         { en: "Off-market deal access",    es: "Acceso a ofertas off-market" },
+  "plans.pro.feat.newsletter":         { en: "Weekly curated newsletter", es: "Boletín semanal curado" },
+  "plans.pro.feat.unlimited_saves":    { en: "Save unlimited listings",   es: "Guarda propiedades ilimitadas" },
+  "plans.pro.feat.price_alerts":       { en: "Price-drop alerts on saved",
+                                         es: "Alertas de bajada de precio en guardados" },
+  // Agency tier (hidden by default — see SHOW_AGENCY_PLAN in pages.jsx).
+  "plans.agency.name":       { en: "Agency",                   es: "Agencia" },
+  "plans.agency.tag":        { en: "For investor groups & brokers",
+                               es: "Para grupos de inversión y corredores" },
+  "plans.agency.feat.everything_in_pro": { en: "Everything in Pro",       es: "Todo lo del plan Pro" },
+  "plans.agency.feat.team_seats":        { en: "5 team seats",            es: "5 asientos de equipo" },
+  "plans.agency.feat.shared_lists":      { en: "Shared saved lists",      es: "Listas guardadas compartidas" },
+  "plans.agency.feat.csv_export":        { en: "CSV export",              es: "Exportación a CSV" },
+  "plans.agency.feat.priority_off_market": { en: "Priority off-market intros",
+                                             es: "Acceso prioritario a off-market" },
+  "plans.agency.cta_contact": { en: "Contact sales",           es: "Contactar ventas" },
+  // Stripe-wired Pro CTA + error toast.
   "plans.upgrade_pro_cta":   { en: "Upgrade — ${price}/month",
                                es: "Mejorar — ${price}/mes" },
   "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
                                   es: "No pudimos iniciar el pago — inténtalo de nuevo." },
+  "upgrade.success_toast":   { en: "You're now on Pulpo Pro. Enjoy!",
+                               es: "¡Listo! Ahora tienes Pulpo Pro." },
+  "upgrade.cancelled_toast": { en: "Checkout cancelled — no changes to your plan.",
+                               es: "Pago cancelado — tu plan no cambió." },
+  "plans.social_proof":      { en: "{n} investors are using Pulpo this month",
+                               es: "{n} inversionistas están usando Pulpo este mes" },
 
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },

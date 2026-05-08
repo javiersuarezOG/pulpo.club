@@ -2196,47 +2196,59 @@ function PlansPage({ app }) {
     startStripeCheckout({
       onError: (code) => {
         if (code === "sign_in_required") {
-          app.openSignup({ mode: "signup" });
+          // Carry pendingAction so app.jsx's post-signin effect chains
+          // the Stripe redirect automatically once auth completes —
+          // no second click required.
+          app.openSignup({ mode: "signup", pendingAction: "checkout" });
         } else {
           app.showToast(t("plans.checkout_error_toast", lc));
         }
       },
     });
   };
+  // Feature line helper — keeps the JSX readable when every line is t()'d.
+  const feat = (key) => (
+    <li><Icon name="check" size={14} strokeWidth={2.4}/> {t(key, lc)}</li>
+  );
+  const featMuted = (key) => (
+    <li className="muted">— {t(key, lc)}</li>
+  );
   return (
     <div className="page page-plans">
       <div className="plans-head">
-        <h1>Pick a plan that fits how you invest.</h1>
-        <p>Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.</p>
+        <h1>{t("plans.head.title", lc)}</h1>
+        <p>{t("plans.head.subtitle", lc)}</p>
       </div>
       <div className="plans-grid">
         <div className="plan-card">
-          <div className="plan-name">Free</div>
+          <div className="plan-name">{t("plans.free.name", lc)}</div>
           <div className="plan-price"><span>$0</span></div>
-          <div className="plan-tag">Browse the catalogue</div>
+          <div className="plan-tag">{t("plans.free.tag", lc)}</div>
           <ul className="plan-features">
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Unlimited card browsing</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> 8 detail views per month</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Save up to 10 listings</li>
-            <li className="muted">— Off-market deals</li>
-            <li className="muted">— Weekly newsletter</li>
+            {feat("plans.free.feat.browsing")}
+            {feat("plans.free.feat.detail_views")}
+            {feat("plans.free.feat.saves_cap")}
+            {featMuted("plans.free.feat.off_market_excluded")}
+            {featMuted("plans.free.feat.newsletter_excluded")}
           </ul>
-          <button className="btn-ghost block" disabled={!app.user}>{app.user ? "Your plan" : "Sign up free"}</button>
+          <button className="btn-ghost block" disabled={!app.user}>
+            {app.user ? t("plans.free.cta_current", lc) : t("plans.free.cta_signup", lc)}
+          </button>
         </div>
         <div className="plan-card featured">
-          <div className="plan-ribbon">Most popular</div>
-          <div className="plan-name">Pulpo Pro</div>
+          <div className="plan-ribbon">{t("plans.pro.ribbon", lc)}</div>
+          <div className="plan-name">{t("plans.pro.name", lc)}</div>
           <div className="plan-price">
-            <span>${PRO_PRICE_USD_PER_MONTH}</span><span className="per">/month</span>
+            <span>${PRO_PRICE_USD_PER_MONTH}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
           </div>
-          <div className="plan-tag">Billed monthly</div>
+          <div className="plan-tag">{t("plans.pro.tag", lc)}</div>
           <ul className="plan-features">
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Everything in Free</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Unlimited listing details</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Off-market deal access</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Weekly curated newsletter</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Save unlimited listings</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Price-drop alerts on saved</li>
+            {feat("plans.pro.feat.everything_in_free")}
+            {feat("plans.pro.feat.unlimited_details")}
+            {feat("plans.pro.feat.off_market")}
+            {feat("plans.pro.feat.newsletter")}
+            {feat("plans.pro.feat.unlimited_saves")}
+            {feat("plans.pro.feat.price_alerts")}
           </ul>
           <button className="btn-primary block lg" onClick={onUpgrade}>
             {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_USD_PER_MONTH })}
@@ -2244,25 +2256,25 @@ function PlansPage({ app }) {
         </div>
         {SHOW_AGENCY_PLAN && (
           <div className="plan-card">
-            <div className="plan-name">Agency</div>
+            <div className="plan-name">{t("plans.agency.name", lc)}</div>
             <div className="plan-price">
-              <span>$79</span><span className="per">/month</span>
+              <span>$79</span><span className="per">{t("plans.pro.per_month", lc)}</span>
             </div>
-            <div className="plan-tag">For investor groups & brokers</div>
+            <div className="plan-tag">{t("plans.agency.tag", lc)}</div>
             <ul className="plan-features">
-              <li><Icon name="check" size={14} strokeWidth={2.4}/> Everything in Pro</li>
-              <li><Icon name="check" size={14} strokeWidth={2.4}/> 5 team seats</li>
-              <li><Icon name="check" size={14} strokeWidth={2.4}/> Shared saved lists</li>
-              <li><Icon name="check" size={14} strokeWidth={2.4}/> CSV export</li>
-              <li><Icon name="check" size={14} strokeWidth={2.4}/> Priority off-market intros</li>
+              {feat("plans.agency.feat.everything_in_pro")}
+              {feat("plans.agency.feat.team_seats")}
+              {feat("plans.agency.feat.shared_lists")}
+              {feat("plans.agency.feat.csv_export")}
+              {feat("plans.agency.feat.priority_off_market")}
             </ul>
-            <button className="btn-ghost block">Contact sales</button>
+            <button className="btn-ghost block">{t("plans.agency.cta_contact", lc)}</button>
           </div>
         )}
       </div>
       <div className="social-proof">
         <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/>
-        <span>247 investors are using Pulpo this month</span>
+        <span>{t("plans.social_proof", lc, { n: 247 })}</span>
       </div>
     </div>
   );

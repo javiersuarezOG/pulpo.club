@@ -162,4 +162,45 @@ test.describe("New app boots cleanly on key routes", () => {
 
     expect(errors, "console errors during histogram interaction").toEqual([]);
   });
+
+  // PR upgrade-flow-polish — verifies the Pro CTA on /plans actually
+  // POSTs to /api/stripe/create-checkout-session. We mock the endpoint
+  // (no real Stripe roundtrip in CI) and assert the click triggers a
+  // request. The full e2e — real Stripe redirect, success URL handling,
+  // webhook-driven plan flip — has to be tested by a human with a Stripe
+  // test card; documented in BACKLOG.md.
+  test("plans page Pro CTA fires create-checkout-session POST", async ({ page }) => {
+    let postSeen = false;
+    let postBody: string | null = null;
+    await page.route("**/api/stripe/create-checkout-session", async (route) => {
+      postSeen = true;
+      postBody = route.request().postData();
+      // Mock: server says "you need to sign in" — exercises the path
+      // that opens the SignupModal with pendingAction:"checkout".
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "sign_in_required" }),
+      });
+    });
+
+    await page.goto("/", { waitUntil: "networkidle" });
+    // Open Plans via the footer link (the topnav doesn't expose it).
+    await page.locator(".site-footer button").getByText(/^Plans$/).first().click();
+    await page.locator(".plan-card.featured").waitFor({ state: "visible", timeout: 5_000 });
+    // Click the Pro CTA — its label uses the new t("plans.upgrade_pro_cta") key.
+    await page.locator(".plan-card.featured .btn-primary").click();
+
+    // The POST should have happened.
+    await expect.poll(() => postSeen, { timeout: 3_000 }).toBe(true);
+    expect(postBody).toBeDefined();
+
+    // Anonymous → 401 → SignupModal opens. With Clerk off in the dev
+    // env this surfaces as the legacy modal with the headline.
+    // (When Clerk is on, the hosted modal opens instead — both cases
+    // land at "the user is being prompted to sign in", which is the
+    // contract that matters.)
+    const modalOpen = await page.locator(".modal-signup, [data-clerk-component]").count();
+    expect(modalOpen, "signup modal didn't open after sign_in_required").toBeGreaterThan(0);
+  });
 });
