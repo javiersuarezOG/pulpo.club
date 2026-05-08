@@ -215,10 +215,13 @@ const UI_STRINGS = {
 
   // Detail-panel section labels (additions to existing detail.* keys)
   "detail.zone_area":        { en: "{zone} area",                   es: "Zona de {zone}" },
-  "detail.km_to_beach":      { en: "{n}km to beach",                es: "{n}km a la playa" },
+  "detail.km_to_beach":      { en: "{n}km to nearest beach",        es: "{n}km a la playa más cercana" },
+  "detail.km_to_beach_approx": { en: "ca. {n}km to nearest beach",  es: "aprox. {n}km a la playa más cercana" },
   "detail.on_beach":         { en: "On beach",                      es: "En la playa" },
-  "detail.km_to_airport":    { en: "{n}km to airport",              es: "{n}km al aeropuerto" },
-  "detail.km_to_town":       { en: "{n}km to town",                 es: "{n}km al pueblo" },
+  "detail.km_to_airport":    { en: "{n}km to nearest airport",      es: "{n}km al aeropuerto más cercano" },
+  "detail.km_to_airport_approx": { en: "ca. {n}km to nearest airport", es: "aprox. {n}km al aeropuerto más cercano" },
+  "detail.km_to_town":       { en: "{n}km to nearest town",         es: "{n}km al pueblo más cercano" },
+  "detail.km_to_town_approx": { en: "ca. {n}km to nearest town",    es: "aprox. {n}km al pueblo más cercano" },
   "detail.fact.road":        { en: "Road access",                   es: "Acceso vial" },
   "detail.fact.water":       { en: "Water supply",                  es: "Suministro de agua" },
   "detail.fact.water_on":    { en: "On site",                       es: "En sitio" },
@@ -337,9 +340,6 @@ const UI_STRINGS = {
                                es: "¡Listo! Ahora tienes Pulpo Pro." },
   "upgrade.cancelled_toast": { en: "Checkout cancelled — no changes to your plan.",
                                es: "Pago cancelado — tu plan no cambió." },
-  "plans.social_proof":      { en: "{n} investors are using Pulpo this month",
-                               es: "{n} inversionistas están usando Pulpo este mes" },
-
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 

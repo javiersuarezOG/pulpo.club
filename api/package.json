@@ -1,0 +1,4 @@
+{
+  "type": "commonjs",
+  "_comment": "Repo-root package.json declares 'type: module', which makes Vercel's Node runtime evaluate every .js file under /var/task as ESM. The api/* serverless functions are written in CommonJS (require / module.exports), so under that interpretation they crash with 'require is not defined in ES module scope'. Node resolves module type via the nearest enclosing package.json — this file scopes the override to api/ only. The frontend (web/) keeps inheriting the root's ESM type. Don't add 'name' or 'version' fields — Vercel's bundler can mistake the directory for a separate package."
+}

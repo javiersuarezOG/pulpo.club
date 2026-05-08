@@ -60,6 +60,15 @@ function ClerkActionsBinder({ onActions }) {
       openSignIn: (opts) => clerk.openSignIn(opts || {}),
       openSignUp: (opts) => clerk.openSignUp(opts || {}),
       signOut:    (opts) => clerk.signOut(opts || {}),
+      // Synchronous "does Clerk think a user is signed in right now?"
+      // SignupModal uses this to short-circuit the open call during the
+      // boot race where Clerk's session is hydrated from cookies *before*
+      // ClerkUserSync pushes setUser into App. Without this, we'd try
+      // to open the hosted SignIn modal — Clerk knows you're signed in,
+      // throws `cannot_render_single_session_enabled`, ErrorBoundary
+      // catches it. `clerk.session` populates as soon as Clerk hydrates,
+      // earlier than the reactive `useUser()` propagation.
+      isSignedIn: () => !!clerk.session || !!clerk.user,
     });
     return () => onActions(null);
   }, [clerk, onActions]);

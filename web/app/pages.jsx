@@ -37,6 +37,7 @@ import {
   ppmSuffix,
   daysListedTone,
   landTypeLabel,
+  formatDistanceKm,
   currentLocale,
   currentUnits,
 } from "./components.jsx";
@@ -2083,9 +2084,35 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <span><strong>{listing.zone_name}</strong>, {listing.province_state}</span>
             </div>
             <div className="distance-pills">
-              {listing.dist_beach_km != null && <span className="dpill"><Icon name="cat_beachfront" size={13} strokeWidth={1.6}/> {listing.dist_beach_km < 1 ? t("detail.on_beach", lc) : t("detail.km_to_beach", lc, { n: listing.dist_beach_km })}</span>}
-              <span className="dpill"><Icon name="plane" size={13} strokeWidth={1.6}/> {t("detail.km_to_airport", lc, { n: listing.dist_airport_km })}</span>
-              <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t("detail.km_to_town", lc, { n: listing.dist_nearest_town_km })}</span>
+              {/* Each pill renders only when its value is non-null. The
+                  formatDistanceKm helper rounds to 5/10km steps and flags
+                  the result as approximate when the listing's lat/lng is
+                  fuzzy (medium/low DeepSeek confidence) or when the
+                  distance came from the zone-table fallback (no lat/lng
+                  at all, e.g. dist_airport_km derived from the per-zone
+                  airports table). The "_approx" i18n keys prefix "ca."
+                  so users see the precision difference. */}
+              {(() => {
+                const beach = formatDistanceKm(listing.dist_beach_km, listing);
+                if (!beach) return null;
+                if (listing.dist_beach_km < 1) {
+                  return <span className="dpill"><Icon name="cat_beachfront" size={13} strokeWidth={1.6}/> {t("detail.on_beach", lc)}</span>;
+                }
+                const key = beach.approx ? "detail.km_to_beach_approx" : "detail.km_to_beach";
+                return <span className="dpill"><Icon name="cat_beachfront" size={13} strokeWidth={1.6}/> {t(key, lc, { n: beach.n })}</span>;
+              })()}
+              {(() => {
+                const airport = formatDistanceKm(listing.dist_airport_km, listing);
+                if (!airport) return null;
+                const key = airport.approx ? "detail.km_to_airport_approx" : "detail.km_to_airport";
+                return <span className="dpill"><Icon name="plane" size={13} strokeWidth={1.6}/> {t(key, lc, { n: airport.n })}</span>;
+              })()}
+              {(() => {
+                const town = formatDistanceKm(listing.dist_nearest_town_km, listing);
+                if (!town) return null;
+                const key = town.approx ? "detail.km_to_town_approx" : "detail.km_to_town";
+                return <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t(key, lc, { n: town.n })}</span>;
+              })()}
             </div>
             {/* Real interactive map deferred — see plan followup. We
                 used to render a CSS .static-map illustration here, but
@@ -2381,10 +2408,6 @@ function PlansPage({ app }) {
           </div>
         )}
       </div>
-      <div className="social-proof">
-        <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/>
-        <span>{t("plans.social_proof", lc, { n: 247 })}</span>
-      </div>
     </div>
   );
 }
@@ -2407,17 +2430,33 @@ function SignupModal({ app }) {
     if (!app.clerkActions) return;
     // Defensive: Clerk's hosted SignIn/SignUp throws
     // `cannot_render_single_session_enabled` when the user is already
-    // signed in — and we have a race where consumers (e.g. AccountPage
-    // mid-Clerk-boot) can call openSignup before ClerkUserSync has
-    // committed user state. If the user IS already signed in by the
-    // time this effect fires, just close the modal and let app.jsx's
-    // post-signin effect process any pendingAction.
-    if (app.user) {
+    // signed in — and we have a race where consumers (e.g. the topnav
+    // sign-in icon mid-Clerk-boot, or AccountPage redirects) can call
+    // openSignup before ClerkUserSync has committed user state. Both
+    // checks below are needed: `app.user` covers the legacy auth path
+    // and the post-sync window; `clerkActions.isSignedIn()` covers the
+    // boot-race window where Clerk's session is hydrated from cookies
+    // but app.user hasn't synced yet. In either case, close the modal
+    // silently and let app.jsx's post-signin effect process any
+    // pendingAction once ClerkUserSync catches up.
+    const clerkSays = typeof app.clerkActions.isSignedIn === "function"
+      && app.clerkActions.isSignedIn();
+    if (app.user || clerkSays) {
       app.closeSignup();
       return;
     }
     const target = m.mode === "login" ? "openSignIn" : "openSignUp";
-    app.clerkActions[target]();
+    try {
+      app.clerkActions[target]();
+    } catch (err) {
+      // Belt-and-braces: if Clerk still throws (e.g. its error code
+      // changes between versions), don't blank the page via the
+      // ErrorBoundary — silently close the modal. The user can retry
+      // on the next render once state catches up.
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[pulpo] clerk." + target + " failed:", err);
+      }
+    }
     app.closeSignup();
   }, [m, app.clerkActions, app.user]);
 
