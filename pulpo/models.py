@@ -68,6 +68,22 @@ class Listing:
     is_flat: bool = False
     is_repriced: bool = False          # price has dropped vs. previous scrape
 
+    # PR-8 — NLP enum-composing booleans. Each populates from a per-field
+    # keyword dictionary in nlp_keywords/. Composed into the enum-typed
+    # `beachfront_tier` and `land_type` fields by derived_rules.py.
+    is_on_beach: bool = False
+    is_walk_to_beach: bool = False
+    is_agricultural: bool = False
+    is_commercial: bool = False
+    is_tourist: bool = False
+    is_motivated: bool = False         # used by the "Motivated sellers" shelf rule
+
+    # PR-8 — derived enum fields. Populated by derive_beachfront_tier()
+    # and derive_land_type() in pulpo/derived_rules.py after the NLP
+    # extractor runs. None = no signal yet.
+    beachfront_tier: Optional[str] = None  # 'on_beach'|'walk_to_beach'|'near_beach'|None
+    land_type: Optional[str] = None         # 'agricultural'|'commercial'|'tourist'|'residential'|None
+
     # Activity
     days_listed: Optional[int] = None
     photos_count: int = 0

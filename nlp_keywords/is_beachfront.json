@@ -1,18 +1,65 @@
 {
   "field": "is_beachfront",
-  "type": "boolean",
-  "positive": [
+  "type": "boolean_with_negation",
+  "positive_en": [
+    "beachfront",
+    "beach front",
+    "ocean front",
+    "oceanfront",
+    "directly on the beach",
+    "right on the beach",
+    "first row",
+    "first line beach",
+    "front row beach",
+    "private beach",
+    "private beach access",
+    "feet from the sand",
+    "steps from the sand",
+    "on the sand",
+    "beach access from the property"
+  ],
+  "positive_es": [
     "frente al mar",
     "frente a la playa",
-    "beachfront",
-    "ocean front",
     "primera l[ií]nea de playa",
-    "directly on the beach",
-    "directamente en la playa"
+    "primera l[ií]nea al mar",
+    "primera fila",
+    "directamente en la playa",
+    "directo a la playa",
+    "playa privada",
+    "acceso privado a la playa",
+    "salida directa a la playa",
+    "pies en la arena",
+    "pasos de la arena",
+    "sobre la arena",
+    "playa propia",
+    "con frente de playa"
   ],
-  "negative": [
+  "negative_en": [
+    "near the beach",
+    "close to beach",
+    "close to the beach",
+    "5 minutes from beach",
+    "5 minutos? from the beach",
+    "10 minutes? from the beach",
+    "minutes? walk to the beach",
+    "minutes? walking to the beach",
+    "short walk to the beach",
+    "ocean view",
+    "view of the ocean",
+    "from the beach"
+  ],
+  "negative_es": [
     "cerca del mar",
-    "near the beach"
+    "cerca de la playa",
+    "a [0-9]+ minutos? de la playa",
+    "a [0-9]+ km de la playa",
+    "a [0-9]+ metros de la playa",
+    "vista al mar",
+    "con vista al mar",
+    "a pasos de la playa",
+    "a pocos minutos de la playa",
+    "minutos caminando a la playa"
   ],
-  "_comment": "PRD §FR-2.5. The model already has is_beachfront as a bool; NLP populates it where scrapers don't. Phase 2 geocoding upgrades to geometric distance-to-coast (PRD §FR-5.6)."
+  "_comment": "PRD §FR-2.5 + PR-8. Negative patterns suppress 'near' phrasing that the simple regex would otherwise flag. PR-8 splits on language and adds ~15 patterns per language."
 }

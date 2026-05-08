@@ -1,24 +1,50 @@
 {
   "field": "has_ocean_view",
   "type": "boolean",
-  "positive": [
-    "vista al mar",
-    "vista oce[aá]nica",
+  "positive_en": [
     "ocean view",
+    "ocean views",
     "sea view",
+    "sea views",
+    "view of the ocean",
+    "view of the sea",
+    "panoramic ocean",
+    "panoramic ocean view",
+    "panoramic sea view",
+    "pacific view",
+    "pacific ocean view",
+    "with ocean views",
+    "overlooking the ocean",
+    "overlooking the sea",
+    "unobstructed ocean view",
+    "stunning ocean view"
+  ],
+  "positive_es": [
+    "vista al mar",
+    "vistas al mar",
+    "vista oce[aá]nica",
+    "vistas oce[aá]nicas",
     "vistas al oc[eé]ano",
     "vista al oc[eé]ano",
-    "view of the ocean",
     "vista al pac[ií]fico",
     "frente al pac[ií]fico",
     "vistas panor[aá]micas al mar",
     "vista panor[aá]mica al mar",
-    "vistas? al mar",
-    "panoramic ocean"
+    "panor[aá]mica del mar",
+    "panor[aá]mica al mar",
+    "con vista al mar",
+    "ofrece vista al mar",
+    "vista del mar",
+    "vista despejada al mar"
   ],
-  "negative": [
+  "negative_en": [
+    "no ocean view",
+    "without ocean view",
+    "blocked ocean view"
+  ],
+  "negative_es": [
     "sin vista al mar",
-    "no ocean view"
+    "no tiene vista al mar"
   ],
-  "_comment": "PRD §FR-2.5 + SV-specific (Pacífico is the local ocean). Geometric upgrade in Phase 2 once lat/lng land."
+  "_comment": "PRD §FR-2.5 + PR-8 bilingual split. Pacífico is the local ocean. Geometric upgrade in Phase 2 once lat/lng land."
 }

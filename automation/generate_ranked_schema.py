@@ -107,6 +107,9 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
         },
     },
     "url_language": {"enum": ["en", "es", "mixed", None]},
+    # PR-8 — NLP enum derives.
+    "beachfront_tier":      {"enum": ["on_beach", "walk_to_beach", "near_beach", None]},
+    "land_type":            {"enum": ["agricultural", "commercial", "tourist", "residential", None]},
 }
 
 

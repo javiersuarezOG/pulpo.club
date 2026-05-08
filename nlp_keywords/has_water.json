@@ -1,15 +1,27 @@
 {
   "field": "has_water",
   "type": "boolean",
-  "positive": [
+  "positive_en": [
+    "\\bwell\\b",
+    "water hookup",
+    "water supply",
+    "running water",
+    "city water",
+    "potable water",
+    "water access",
+    "water on site",
+    "has water",
+    "with water",
+    "deep well",
+    "water tank",
+    "water connection"
+  ],
+  "positive_es": [
     "\\bagua\\b",
     "\\bpozo\\b",
-    "\\bwell\\b",
     "\\basada\\b",
     "\\baya\\b",
     "agua potable",
-    "water hookup",
-    "water supply",
     "tiene agua",
     "con agua",
     "servicio de agua",
@@ -19,13 +31,24 @@
     "agua de pozo",
     "servicio hidr[aá]ulico",
     "\\bnacimientos?\\b",
-    "\\bpila\\b"
+    "\\bpila\\b",
+    "ojo de agua",
+    "manantial",
+    "conexi[oó]n de agua",
+    "acometida de agua",
+    "agua corriente"
   ],
-  "negative": [
+  "negative_en": [
+    "no water",
+    "without water",
+    "no water access"
+  ],
+  "negative_es": [
     "sin agua",
     "no agua",
     "no tiene agua",
-    "no water"
+    "no cuenta con agua",
+    "carece de agua"
   ],
-  "_comment": "PRD §FR-2.5 + SV-specific extensions (cisterna/aljibe/pila are common storage; nacimiento = natural spring). Edit positives to lift recall, edit negatives to suppress false positives. Re-run python3 -m pulpo.nlp_extractor --check after editing to see population delta."
+  "_comment": "PRD §FR-2.5 + PR-8 bilingual split. SV-specific: cisterna/aljibe/pila are storage; nacimiento/manantial/ojo de agua = natural spring."
 }

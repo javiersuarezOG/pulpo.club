@@ -48,6 +48,14 @@
       "has_water_body",
       "is_flat",
       "is_repriced",
+      "is_on_beach",
+      "is_walk_to_beach",
+      "is_agricultural",
+      "is_commercial",
+      "is_tourist",
+      "is_motivated",
+      "beachfront_tier",
+      "land_type",
       "days_listed",
       "photos_count",
       "photo_urls",
@@ -299,6 +307,49 @@
       },
       "is_repriced": {
         "type": "boolean"
+      },
+      "is_on_beach": {
+        "type": "boolean"
+      },
+      "is_walk_to_beach": {
+        "type": "boolean"
+      },
+      "is_agricultural": {
+        "type": "boolean"
+      },
+      "is_commercial": {
+        "type": "boolean"
+      },
+      "is_tourist": {
+        "type": "boolean"
+      },
+      "is_motivated": {
+        "type": "boolean"
+      },
+      "beachfront_tier": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "on_beach",
+          "walk_to_beach",
+          "near_beach",
+          null
+        ]
+      },
+      "land_type": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "agricultural",
+          "commercial",
+          "tourist",
+          "residential",
+          null
+        ]
       },
       "days_listed": {
         "type": [

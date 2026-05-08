@@ -1,12 +1,26 @@
 {
   "field": "has_paved_access",
   "type": "boolean",
-  "positive": [
+  "positive_en": [
+    "\\bpaved\\b",
+    "paved road",
+    "paved access",
+    "paved street",
+    "paved road access",
+    "asphalt road",
+    "asphalt access",
+    "concrete road",
+    "highway access",
+    "road frontage",
+    "on the highway",
+    "on (?:the )?main road",
+    "main road frontage",
+    "off (?:the )?main road"
+  ],
+  "positive_es": [
     "acceso asfaltado",
     "asfalto",
-    "\\bpaved\\b",
     "carretera pavimentada",
-    "road paved",
     "ruta asfaltada",
     "calle asfaltada",
     "v[ií]a asfaltada",
@@ -24,15 +38,25 @@
     "carretera del litoral",
     "litoral",
     "panamericana",
-    "a orilla de carretera"
+    "a orilla de carretera",
+    "carretera asfaltada",
+    "calle de cemento"
   ],
-  "negative": [
+  "negative_en": [
+    "dirt road",
+    "gravel road",
+    "unpaved",
+    "rough road",
+    "dirt access"
+  ],
+  "negative_es": [
     "sin asfalto",
     "no pavimentado",
+    "no pavimentada",
     "calle de tierra",
     "camino de tierra",
-    "dirt road",
-    "gravel road"
+    "calle de balastre",
+    "calle de barro"
   ],
-  "_comment": "PRD §FR-2.5 + SV-specific phrasing. The 'carretera principal'/'frente a carretera' family lifts paved-access detection from 1.7% to ~13% on the 2026-05-03 catalog. Be careful adding broader keywords — 'calle de tierra' must stay in negatives."
+  "_comment": "PRD §FR-2.5 + PR-8 bilingual split. SV-specific 'carretera principal'/'frente a carretera' family lifts recall significantly. 'litoral' = SV's coastal highway."
 }

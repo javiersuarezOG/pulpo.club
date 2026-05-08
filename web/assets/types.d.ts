@@ -112,6 +112,18 @@ export interface Listing {
     has_water_body: boolean;
     is_flat: boolean;
     is_repriced: boolean;
+    /** PR-8 — NLP-extracted booleans, composed into beachfront_tier / land_type. */
+    is_on_beach: boolean;
+    is_walk_to_beach: boolean;
+    is_agricultural: boolean;
+    is_commercial: boolean;
+    is_tourist: boolean;
+    /** PR-8 — drives the "Motivated sellers" shelf rule. */
+    is_motivated: boolean;
+    /** PR-8 — derived enum: backend's collapsed beach-proximity tier. */
+    beachfront_tier: "on_beach" | "walk_to_beach" | "near_beach" | null;
+    /** PR-8 — derived enum: backend's land_type classification. */
+    land_type: "agricultural" | "commercial" | "tourist" | "residential" | null;
 
     // ── Activity ──────────────────────────────────────────────────────
     days_listed: number | null;

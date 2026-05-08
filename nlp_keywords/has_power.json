@@ -1,14 +1,29 @@
 {
   "field": "has_power",
   "type": "boolean",
-  "positive": [
+  "positive_en": [
+    "\\belectric\\b",
+    "electricity",
+    "\\bpower\\b",
+    "power line",
+    "power supply",
+    "electrical service",
+    "electric meter",
+    "electrical hookup",
+    "has electricity",
+    "with power",
+    "grid connection",
+    "on grid",
+    "\\b110v\\b",
+    "\\b220v\\b",
+    "transformer"
+  ],
+  "positive_es": [
     "\\bluz\\b",
     "electricidad",
     "\\bice\\b",
     "\\bcnfl\\b",
     "corriente",
-    "\\belectric\\b",
-    "\\bpower\\b",
     "energ[ií]a el[eé]ctrica",
     "tiene luz",
     "con luz",
@@ -21,15 +36,22 @@
     "poste de luz",
     "red el[eé]ctrica",
     "medidor el[eé]ctrico",
-    "\\b110v\\b",
-    "\\b220v\\b"
+    "acometida el[eé]ctrica",
+    "instalaci[oó]n el[eé]ctrica",
+    "tendido el[eé]ctrico"
   ],
-  "negative": [
+  "negative_en": [
+    "no electricity",
+    "no power",
+    "without electricity",
+    "off grid"
+  ],
+  "negative_es": [
     "sin luz",
     "sin electricidad",
     "no tiene luz",
-    "no power",
-    "no electricity"
+    "no cuenta con electricidad",
+    "carece de electricidad"
   ],
-  "_comment": "PRD §FR-2.5 + SV electricity providers (DELSUR, CAESS) and physical infrastructure markers (poste de luz, transformador, medidor)."
+  "_comment": "PRD §FR-2.5 + PR-8 bilingual split. SV electricity providers: DELSUR, CAESS. ICE/CNFL kept (some SV listings reference Costa Rica)."
 }

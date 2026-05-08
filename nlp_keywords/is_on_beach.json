@@ -1,0 +1,55 @@
+{
+  "field": "is_on_beach",
+  "type": "boolean_with_negation",
+  "positive_en": [
+    "directly on the beach",
+    "right on the beach",
+    "first row beach",
+    "first line beach",
+    "on the sand",
+    "feet (?:in|on) the sand",
+    "private beach",
+    "private beach access",
+    "beachfront property",
+    "ocean front",
+    "oceanfront",
+    "front row beach",
+    "private beachfront"
+  ],
+  "positive_es": [
+    "directamente en la playa",
+    "directo a la playa",
+    "primera l[ií]nea de playa",
+    "primera l[ií]nea al mar",
+    "primera fila",
+    "playa privada",
+    "acceso privado a la playa",
+    "salida directa a la playa",
+    "pies en la arena",
+    "pasos de la arena",
+    "sobre la arena",
+    "playa propia",
+    "frente al mar",
+    "frente a la playa"
+  ],
+  "negative_en": [
+    "near the beach",
+    "close to beach",
+    "minutes? from the beach",
+    "minutes? walk to the beach",
+    "short walk to the beach",
+    "from the beach",
+    "ocean view"
+  ],
+  "negative_es": [
+    "cerca del mar",
+    "cerca de la playa",
+    "a [0-9]+ minutos? de la playa",
+    "a [0-9]+ km de la playa",
+    "a [0-9]+ metros de la playa",
+    "vista al mar",
+    "minutos caminando a la playa",
+    "a pasos de la playa"
+  ],
+  "_comment": "PR-8 — strongest tier of beach proximity. Composes into beachfront_tier='on_beach' via derive_beachfront_tier() in derived_rules.py. Distinct from is_walk_to_beach (a few minutes away) and is_beachfront (existing, broader)."
+}

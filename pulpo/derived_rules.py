@@ -272,3 +272,66 @@ def derive_previous_price(li: Any, prices_history: Optional[dict] = None) -> Opt
         if isinstance(prev, (int, float)) and float(prev) != float(cur):
             return float(prev)
     return None
+
+
+# ─────────────────────────────────────────────────────────────────────
+# PR-8 — NLP enum derives (beachfront_tier, land_type).
+# Composed from per-field booleans populated by pulpo/nlp_extractor.py.
+# Run AFTER the extractor in the pipeline (automation/run.py).
+# ─────────────────────────────────────────────────────────────────────
+
+
+def derive_beachfront_tier(li: Any) -> Optional[str]:
+    """Collapse beach-proximity booleans into a 3-tier enum.
+
+    Priority (most specific wins):
+        is_on_beach=True       → "on_beach"
+        is_walk_to_beach=True  → "walk_to_beach"
+        is_beachfront=True     → "near_beach"   (existing broader signal)
+        else                   → None
+
+    The FE adapter falls back to `near_beach` when only `is_beachfront`
+    is True and no specific tier is set, matching this same logic
+    client-side. Backend-driven values take precedence on the FE.
+    """
+    if _g(li, "is_on_beach") is True:
+        return "on_beach"
+    if _g(li, "is_walk_to_beach") is True:
+        return "walk_to_beach"
+    if _g(li, "is_beachfront") is True:
+        return "near_beach"
+    return None
+
+
+def derive_land_type(li: Any) -> Optional[str]:
+    """Collapse land-use booleans into a 4-tier enum.
+
+    Priority (each NLP signal is well-disambiguated, so the order is
+    informational rather than exclusive):
+        is_agricultural=True   → "agricultural"
+        is_commercial=True     → "commercial"
+        is_tourist=True        → "tourist"
+        property_type='land'   → "residential"   (default for land)
+        property_type='house'  → "residential"
+        property_type='condo'  → "residential"
+        else                   → None
+
+    `is_agricultural` runs first because Salvadoran "finca cafetalera"
+    descriptions sometimes also mention "ideal para hotel" (tourist
+    secondary use); the agricultural classification is the *current*
+    use, which is what the buyer is paying for.
+
+    Risk note (per plan): is_commercial in Salvadoran broker copy
+    overlaps with "precio comercial" (negotiable) — the keyword
+    dictionary's negative patterns suppress the most common confusions.
+    """
+    if _g(li, "is_agricultural") is True:
+        return "agricultural"
+    if _g(li, "is_commercial") is True:
+        return "commercial"
+    if _g(li, "is_tourist") is True:
+        return "tourist"
+    pt = _g(li, "property_type")
+    if pt in ("land", "house", "condo"):
+        return "residential"
+    return None

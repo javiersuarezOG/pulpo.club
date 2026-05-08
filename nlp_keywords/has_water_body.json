@@ -1,22 +1,43 @@
 {
   "field": "has_water_body",
   "type": "boolean",
-  "positive": [
+  "positive_en": [
+    "\\bcreek\\b",
+    "\\briver\\b",
+    "\\bstream\\b",
+    "lake",
+    "lagoon",
+    "pond",
+    "spring",
+    "natural spring",
+    "waterfall",
+    "estuary",
+    "wetland",
+    "river frontage",
+    "creek frontage",
+    "lake frontage"
+  ],
+  "positive_es": [
     "\\br[ií]o\\b",
     "quebrada",
-    "\\bcreek\\b",
     "riachuelo",
     "\\blaguna\\b",
     "\\blago\\b",
     "arroyo",
-    "\\briver\\b",
-    "\\bstream\\b",
     "manantial",
     "\\bestero\\b",
     "fuente de agua",
     "\\bcatarata\\b",
-    "cascada"
+    "cascada",
+    "ojo de agua",
+    "afluente",
+    "frente de r[ií]o",
+    "colinda con r[ií]o",
+    "humedal",
+    "vertiente",
+    "paso de agua"
   ],
-  "negative": [],
-  "_comment": "PRD §FR-2.5 + SV-specific extensions (estero = mangrove inlet, cascada/catarata = waterfall, fuente de agua = water source on-property)."
+  "negative_en": [],
+  "negative_es": [],
+  "_comment": "PRD §FR-2.5 + PR-8 bilingual split. SV-specific: estero (mangrove inlet), cascada/catarata (waterfall), ojo de agua (natural spring), vertiente (water-source slope)."
 }
