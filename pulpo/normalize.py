@@ -65,6 +65,14 @@ ZONE_PATTERNS: list[tuple[str, str, str, str]] = [
     (r"mizata",                                 "mizata",            "Teotepeque",     "La Libertad"),
     (r"conchagua|playa\s*el\s*tamarindo",       "conchagua",         "Conchagua",      "La Unión"),
     (r"jiquilisco",                             "jiquilisco",        "Jiquilisco",     "Usulután"),
+    # Lakes — require "lago" in the text to match. "coatepeque" alone is
+    # tolerated (the town is small + the lake is its main draw), but
+    # "ilopango" alone is risky (the airport district is a separate,
+    # high-volume real-estate zone) — strict "lago" prefix only.
+    (r"lago\s*(?:de\s*)?coatepeque|playa\s*coatepeque",
+                                                "lago-coatepeque",   "El Congo",       "Santa Ana"),
+    (r"lago\s*(?:de\s*)?ilopango|lago\s*el\s*ilopango",
+                                                "lago-ilopango",     "Ilopango",       "San Salvador"),
     (r"la\s*libertad\s*puerto",                 "puerto-la-libertad","La Libertad",    "La Libertad"),
     (r"la\s*libertad",                          "la-libertad",       "La Libertad",    "La Libertad"),
     (r"la\s*uni[oó]n",                          "la-union",          "La Unión",       "La Unión"),
@@ -152,6 +160,12 @@ _ZONE_SLUG_PATTERNS = [
     (r"mizata",                               "mizata",            "Teotepeque",  "La Libertad"),
     (r"conchagua|playa\s*el\s*tamarindo",     "conchagua",         "Conchagua",   "La Unión"),
     (r"jiquilisco",                           "jiquilisco",        "Jiquilisco",  "Usulután"),
+    # Lakes — same rationale as ZONE_PATTERNS above (strict "lago" prefix
+    # for ilopango to avoid false-positives from the airport district).
+    (r"lago\s*(?:de\s*)?coatepeque|playa\s*coatepeque",
+                                              "lago-coatepeque",   "El Congo",    "Santa Ana"),
+    (r"lago\s*(?:de\s*)?ilopango|lago\s*el\s*ilopango",
+                                              "lago-ilopango",     "Ilopango",    "San Salvador"),
     (r"la\s*libertad",                        "la-libertad",       "La Libertad", "La Libertad"),
     (r"la\s*uni[oó]n",                        "la-union",          "La Unión",    "La Unión"),
 ]
@@ -332,8 +346,14 @@ def _search_localities_in_text(text: str, use_context: bool = False) -> Optional
     # Accent-stripped lowercase for pattern matching against normalized lookup keys
     tl = _norm(text)
 
-    # Tourist localities (specific)
-    for variant, t in TOURIST_LOOKUP.items():
+    # Tourist localities (specific). Iterate by descending key length so
+    # the most specific name wins over a partial match — e.g. a listing
+    # carrying both "Lago de Coatepeque" (18 chars) and "Santa Ana" (9
+    # chars) must resolve to the lake, not the department-named tourist
+    # entry. Mirrors the same `sorted(... key=len, reverse=True)` pattern
+    # used for MUNI_LOOKUP below.
+    for variant in sorted(TOURIST_LOOKUP, key=len, reverse=True):
+        t = TOURIST_LOOKUP[variant]
         if use_context:
             pattern = _LOC_CTX + re.escape(variant)
             if re.search(pattern, tl, re.IGNORECASE | re.MULTILINE):
@@ -384,11 +404,19 @@ def _search_tourist_only(text: str) -> Optional[tuple[str, str, str, str]]:
     Used on title/location_text where we want specific zones but NOT the
     municipality/dept fallback (which would prevent the description from
     providing a more precise zone like El Tunco for a La Libertad listing).
+
+    Iterates by descending key length so the longest specific name wins
+    over a partial match — mirrors the same pattern used in
+    `_search_localities_in_text` and `_search_muni_dept_only`. Without
+    this, a listing carrying both "Lago de Coatepeque" (18 chars) and
+    "Santa Ana" (9) resolves to the department-named tourist entry
+    instead of the lake.
     """
     if not text:
         return None
     tl = _norm(text)
-    for variant, t in TOURIST_LOOKUP.items():
+    for variant in sorted(TOURIST_LOOKUP, key=len, reverse=True):
+        t = TOURIST_LOOKUP[variant]
         if re.search(r'\b' + re.escape(variant) + r'\b', tl):
             return (t["slug"], t["municipality"], t["department"], "specific")
     return None

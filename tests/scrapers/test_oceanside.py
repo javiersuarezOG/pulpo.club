@@ -222,9 +222,9 @@ def test_map_coastal_condo_populates_type_specific_fields():
 
 
 def test_map_drops_inland_house_with_no_beachfront_keyword():
-    """Per spec: house/condo not in COASTAL_ZONES AND no beachfront keyword
-    must be DROPPED. Synthetic inland house in San Salvador, generic
-    description with no beach reference → skip."""
+    """Per spec: house/condo not in VACATION_ZONES AND no waterfront
+    keyword must be DROPPED. Synthetic inland house in San Salvador,
+    generic description with no beach/lake reference → skip."""
     rec = _coastal_house_record(
         title={"rendered": "Modern house in San Salvador"},
         content={"rendered": "<p>Spacious 3 bedroom home in colonia residencial.</p>"},
@@ -235,12 +235,12 @@ def test_map_drops_inland_house_with_no_beachfront_keyword():
 
 
 def test_map_keeps_house_with_beachfront_keyword_outside_coastal_zones():
-    """Beachfront-keyword fallback: an inland-zoned house mentioning
-    'frente al mar' in description still passes the coastal filter."""
+    """Waterfront-keyword fallback: an inland-zoned house mentioning
+    'frente al mar' in description still passes the vacation-zone filter."""
     rec = _coastal_house_record(
         title={"rendered": "Casa Acajutla"},
         content={"rendered": "<p>3 bedroom house frente al mar.</p>"},
-        class_list=["location-sonsonate"],  # not in COASTAL_ZONES
+        class_list=["location-sonsonate"],  # not in VACATION_ZONES
     )
     out = _map(rec, land_term_id=122, broker_type="house")
     assert out is not None

@@ -21,7 +21,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
-from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
+from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -85,8 +85,9 @@ def _broker_type_for(tipo: str) -> Optional[str]:
     return None
 
 
-# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
-_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+# Compiled waterfront-keyword fallback for the vacation-zone filter on
+# house/condo. "Waterfront" covers ocean coast + lake (PR #161, 2026-05-08).
+_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 
 def _extract_results(html: str) -> list[dict]:
@@ -294,13 +295,16 @@ class Century21Scraper:
                 except (TypeError, ValueError):
                     pass
 
-        # Coastal filter for house/condo (land is exempt — inland lots stay).
+        # Vacation-zone filter for house/condo (land is exempt — inland
+        # lots stay). Drops the listing unless its location matches a
+        # known vacation zone (ocean coast or lake) or the title/desc
+        # carries a waterfront keyword.
         if broker_type in ("house", "condo"):
             loc_blob = location_text.lower().replace(" ", "-")
-            zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+            zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
             text_blob = f"{title}\n{rec_out.get('description','')}"
-            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
-            if not zone_is_coastal and not has_beachfront_kw:
+            has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
+            if not zone_is_vacation and not has_waterfront_kw:
                 return None
 
         # Multi-signal classifier — confirms broker_type, surfaces signals

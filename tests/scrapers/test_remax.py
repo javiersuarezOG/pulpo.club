@@ -263,8 +263,9 @@ def test_parse_detail_built_area_zero_treated_as_missing():
 
 
 def test_parse_detail_drops_inland_house_with_no_beachfront_keyword():
-    """Per spec: house/condo not in COASTAL_ZONES AND no beachfront keyword
-    must be DROPPED. Inland house in Soyapango, no beach reference → skip."""
+    """Per spec: house/condo not in VACATION_ZONES AND no waterfront
+    keyword must be DROPPED. Inland house in Soyapango, no beach/lake
+    reference → skip."""
     dets = _coastal_house_dets(**{"Tipo de Propiedad": "Casa/Villa"})
     html = _detail_html(
         h3_title="Casa moderna en Soyapango. En Venta",  # inland city

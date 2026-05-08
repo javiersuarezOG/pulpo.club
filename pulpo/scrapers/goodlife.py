@@ -21,14 +21,16 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
-from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
+from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser  # noqa: F401
 
-# Coastal filter for house/condo. Land is exempt — inland lots stay
+# Vacation-zone filter for house/condo. Land is exempt — inland lots stay
 # (parity with bienesraices PR #65 / remax PR #90 / c21 PR #91).
-_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+# Renamed from coastal/beachfront to vacation/waterfront when lake zones
+# (Coatepeque + Ilopango) joined the eligible set (PR #161, 2026-05-08).
+_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 # Bed/bath summary lives in the third mkdf icon-box title, e.g.
 # "1 Bed, 1 Bath" / "3 Bed, 3 Bath". Captures the leading integers
@@ -227,13 +229,14 @@ class GoodLifeScraper:
                 except ValueError:
                     pass
 
-            # Coastal filter — drop inland house/condo. Same logic as
-            # remax/c21: zone match OR beachfront keyword in text wins.
+            # Vacation-zone filter — drop inland house/condo. Same
+            # logic as remax/c21: zone match (ocean coast OR lake) OR
+            # waterfront keyword in text wins.
             loc_blob = location.lower().replace(" ", "-")
-            zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+            zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
             text_blob = f"{title}\n{description}"
-            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
-            if not zone_is_coastal and not has_beachfront_kw:
+            has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
+            if not zone_is_vacation and not has_waterfront_kw:
                 return None
 
         return rec

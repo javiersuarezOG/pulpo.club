@@ -15,15 +15,22 @@ PROPERTY_TYPES: dict[str, dict] = {
     "land": {
         "label":     "Land",
         "label_es":  "Terreno",
-        "coastal_only": False,
+        "vacation_only": False,
         "pill_bg":   "#E1F5EE",
         "pill_text": "#085041",
         "title_canonical_template": "Raw Land · {zone}",
     },
     "house": {
+        # Labels stay "Beach house"/"Casa de playa" today — Coatepeque +
+        # Ilopango lake inventory is small (~4 unique listings as of
+        # 2026-05-08 recon) and the marketing surface is still beach-
+        # focused. Revisit when lake inventory crosses ~20 listings; the
+        # right answer at that point is probably zone-conditional labels
+        # ("Lake House · Coatepeque" vs "Beach House · El Tunco") rather
+        # than a generic "Vacation House" downgrade. Tracked in CLAUDE.md.
         "label":     "Beach house",
         "label_es":  "Casa de playa",
-        "coastal_only": True,
+        "vacation_only": True,
         "pill_bg":   "#FAECE7",
         "pill_text": "#712B13",
         "title_canonical_template": "Beach House · {zone}",
@@ -31,17 +38,37 @@ PROPERTY_TYPES: dict[str, dict] = {
     "condo": {
         "label":     "Beach condo",
         "label_es":  "Apartamento de playa",
-        "coastal_only": True,
+        "vacation_only": True,
         "pill_bg":   "#FAEEDA",
         "pill_text": "#633806",
         "title_canonical_template": "Beach Condo · {zone}",
     },
 }
 
-COASTAL_ZONES: frozenset[str] = frozenset({
+# Geographic gate for `vacation_only` property types (house + condo).
+# House/condo listings outside these zones — without a waterfront keyword
+# in title/description — are dropped at parse time as "inland built".
+# Land has no such filter (inland lots are valid inventory).
+#
+# Renamed from COASTAL_ZONES (2026-05-08) to broaden semantics from "ocean
+# coast" to "vacation/waterfront destinations". Two lake additions
+# (`lago-coatepeque`, `lago-ilopango`) join the original 14 ocean-coast
+# zones. Lakes match the same buyer profile (vacation/second-home) and
+# field shape (bedrooms, bathrooms, built area), so the existing per-type
+# ranker + zone-median pipelines fold them in without further changes.
+#
+# Note: `automation/validation_bounds.py` keeps a separate (and
+# narrower) COASTAL_ZONES set — that one drives a coastal-specific
+# fraud-detection rule (very-large-parcel suspicion in supply-limited
+# beach zones). Lake parcels can legitimately be large, so that set
+# stays strictly ocean-coast.
+VACATION_ZONES: frozenset[str] = frozenset({
+    # Ocean coast
     "el-tunco", "el-sunzal", "el-zonte", "san-diego", "mizata",
     "el-cuco", "las-flores", "punta-mango", "el-espino", "conchagua",
     "jiquilisco", "tamanique", "costa-del-sol", "atami",
+    # Lake (added 2026-05-08; see live recon in commit message)
+    "lago-coatepeque", "lago-ilopango",
 })
 
 # Type keyword regex map — used by the multi-signal classifier.
@@ -72,17 +99,27 @@ PLACE_NAME_EXCLUSIONS: list[str] = [
     r"\bbah[ií]a\s+villas?\b",
 ]
 
-# Beachfront-keyword fallback: a house/condo with no resolved coastal zone
-# but title/description containing one of these terms passes the coastal
-# filter. Kept conservative on purpose — false positives here let inland
-# built listings through.
-BEACHFRONT_KEYWORDS: list[str] = [
+# Waterfront-keyword fallback: a house/condo with no resolved vacation
+# zone but title/description containing one of these terms passes the
+# geographic filter. Kept conservative on purpose — false positives
+# here let inland built listings through.
+#
+# Renamed from BEACHFRONT_KEYWORDS (2026-05-08) — added 4 lake terms
+# alongside the original 6 beach terms. The semantic is "this listing
+# is on the water (ocean or lake)"; specific waterbody is incidental.
+WATERFRONT_KEYWORDS: list[str] = [
+    # Ocean / beach
     r"\bfrente\s+al\s+mar\b",
     r"\bbeach[- ]?front\b",
     r"\bocean[- ]?front\b",
     r"\bvista\s+al\s+mar\b",
     r"\boceanfront\b",
     r"\bplaya\b",
+    # Lake (Coatepeque, Ilopango — added 2026-05-08)
+    r"\bfrente\s+al\s+lago\b",
+    r"\bvista\s+al\s+lago\b",
+    r"\borillas?\s+del\s+lago\b",
+    r"\blakefront\b",
 ]
 
 

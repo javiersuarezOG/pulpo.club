@@ -22,7 +22,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
-from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
+from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -63,8 +63,9 @@ _CATEGORY_TO_TYPE = {
     "departamento": "condo", "departamentos": "condo",
 }
 
-# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
-_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+# Compiled waterfront-keyword fallback for the vacation-zone filter on
+# house/condo. "Waterfront" covers ocean coast + lake (PR #161, 2026-05-08).
+_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 _NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.DOTALL
@@ -265,18 +266,19 @@ class BienesRaicesScraper:
                     except (TypeError, ValueError):
                         pass
 
-        # Coastal filter (house/condo only). Per spec: drop a built listing
-        # unless its zone is coastal OR title/description has a beachfront
-        # keyword. Land is unaffected — inland lots are still ingested.
-        # Zone resolution happens later in normalize.py; here we use a quick
-        # sector/city/province lower-bag check against COASTAL_ZONES.
+        # Vacation-zone filter (house/condo only). Per spec: drop a built
+        # listing unless its zone is a known vacation zone (ocean coast or
+        # lake) OR title/description has a waterfront keyword. Land is
+        # unaffected — inland lots are still ingested. Zone resolution
+        # happens later in normalize.py; here we use a quick sector/city/
+        # province lower-bag check against VACATION_ZONES.
         if broker_type in ("house", "condo"):
             location_blob = " ".join(p.lower().replace(" ", "-")
                                      for p in (sector, city, province))
-            zone_is_coastal = any(z in location_blob for z in COASTAL_ZONES)
+            zone_is_vacation = any(z in location_blob for z in VACATION_ZONES)
             text_blob = f"{title}\n{description}"
-            has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
-            if not zone_is_coastal and not has_beachfront_kw:
+            has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
+            if not zone_is_vacation and not has_waterfront_kw:
                 return None
 
         # Multi-signal classifier confirmation. The broker_field signal

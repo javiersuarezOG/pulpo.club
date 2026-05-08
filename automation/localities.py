@@ -376,6 +376,17 @@ _TOURIST_RAW: list[dict] = [
      "extra_variants": []},
     {"name": "Tacuba",              "slug": "tacuba",             "municipality": "Tacuba",           "department": "Ahuachapán",
      "extra_variants": []},
+    # Lake destinations (added 2026-05-08). Coatepeque + Ilopango are
+    # vacation-property zones distinct from their namesake municipalities
+    # (especially Ilopango, where the airport district is a separate
+    # real-estate market). Variants list "lago" prefixes so a listing
+    # text like "frente al lago de coatepeque" snaps cleanly.
+    {"name": "Lago de Coatepeque",  "slug": "lago-coatepeque",    "municipality": "El Congo",         "department": "Santa Ana",
+     "extra_variants": ["lago coatepeque", "lago de coatepeque", "playa coatepeque",
+                        "lake coatepeque", "lake of coatepeque"]},
+    {"name": "Lago de Ilopango",    "slug": "lago-ilopango",      "municipality": "Ilopango",         "department": "San Salvador",
+     "extra_variants": ["lago ilopango", "lago de ilopango", "lago el ilopango",
+                        "lake ilopango", "lake of ilopango"]},
 ]
 
 # ── Pre-compiled lookup tables ─────────────────────────────────────────
