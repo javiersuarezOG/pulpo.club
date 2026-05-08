@@ -1,7 +1,7 @@
 """Site-specific scrapers. Importing this module populates pulpo.agents.SOURCES."""
 # Importing each module triggers its register() call
 from . import goodlife, oceanside, century21, remax, bienesraices  # noqa: F401
-from . import nexo, realtyelsalvador  # noqa: F401
+from . import nexo, realtyelsalvador, encuentra24  # noqa: F401
 
 from pulpo.agents import SOURCES
 

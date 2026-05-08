@@ -28,6 +28,7 @@ samples/calibration/*/*.html
 !samples/calibration/realtyelsalvador/*.html
 !samples/calibration/bienesraices/*.html
 !samples/calibration/century21/*.html
+!samples/calibration/encuentra24/*.html
 
 # OS junk
 .DS_Store
