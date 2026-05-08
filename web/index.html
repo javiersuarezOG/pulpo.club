@@ -9,7 +9,12 @@
     <meta property="og:description" content="Property deals in El Salvador. Titled and off-market listings — land, beachfront homes, and more." />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="es_SV" />
-    <link rel="icon" href="/assets/logo_mark_only.svg" type="image/svg+xml" />
+    <!-- ?v= cache-buster: browsers special-case favicons and hold the
+         previous one for days/weeks regardless of Cache-Control. Bump
+         this query each time logo_mark_only.svg changes shape/colour
+         (PR-186 recoloured to deep green but users still saw the old
+         icon for this reason). -->
+    <link rel="icon" href="/assets/logo_mark_only.svg?v=2" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
