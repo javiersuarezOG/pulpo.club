@@ -25,8 +25,10 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from automation.duplicate_detection import (   # noqa: E402
+    CENTROID_MIN_LISTINGS,
     COORD_RADIUS_M,
     PRICE_TOLERANCE_PCT,
+    _compute_centroids,
     detect_duplicates,
     haversine_m,
     normalize_phone,
@@ -329,3 +331,147 @@ def test_coverage_metrics_match_input():
     assert metrics["total_listings"] == 3
     assert metrics["listings_with_phone"] == 2
     assert metrics["listings_with_coords"] == 2
+
+
+# ── centroid suppression (Phase 1.1) ─────────────────────────────────
+
+
+def test_centroid_threshold_constant_documented():
+    """If you change CENTROID_MIN_LISTINGS, this test fails — same
+    rationale as PRICE_TOLERANCE_PCT and COORD_RADIUS_M. The choice
+    directly moves the headline number; tweak deliberately."""
+    assert CENTROID_MIN_LISTINGS == 5
+
+
+def test_compute_centroids_returns_coords_at_or_above_threshold():
+    """A coord shared by exactly CENTROID_MIN_LISTINGS listings counts
+    as a centroid; below threshold doesn't."""
+    # 5 listings at one coord → centroid
+    centroid_coord_listings = [
+        _li(source=f"s{i}", source_id=f"id{i}", lat=13.4833, lng=-89.3167)
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    # 4 listings at another coord → NOT a centroid
+    non_centroid_listings = [
+        _li(source=f"s{i}", source_id=f"id{i}", lat=14.0, lng=-89.0)
+        for i in range(CENTROID_MIN_LISTINGS - 1)
+    ]
+    centroids = _compute_centroids(centroid_coord_listings + non_centroid_listings)
+    assert (13.4833, -89.3167) in centroids
+    assert (14.0, -89.0) not in centroids
+
+
+def test_compute_centroids_ignores_listings_without_coords():
+    """Listings with lat=None or lng=None can't contribute to a
+    fallback-centroid count — they have no coord to share."""
+    listings = [
+        _li(source="s", source_id=f"id{i}", lat=None, lng=None)
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    centroids = _compute_centroids(listings)
+    assert centroids == set()
+
+
+def test_compute_centroids_uses_5_decimal_precision():
+    """Centroid bucketing rounds to 5 decimals (~1m). Two coords that
+    round to the same bucket should be treated as the same coord."""
+    listings = [
+        _li(source=f"s{i}", source_id=f"id{i}",
+            lat=13.483300001 + i * 1e-7,   # all round to 13.48330
+            lng=-89.316700001 + i * 1e-7)  # all round to -89.31670
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    centroids = _compute_centroids(listings)
+    assert (13.48330, -89.31670) in centroids
+
+
+def test_coord_pair_at_centroid_is_suppressed():
+    """The whole point of Phase 1.1: cross-source listings at a fallback
+    centroid coord must NOT flag as duplicates."""
+    # Build a centroid: CENTROID_MIN_LISTINGS listings sharing (13.4833, -89.3167)
+    centroid_listings = [
+        _li(source="bienesraices", source_id=f"BR-{i}",
+            lat=13.4833, lng=-89.3167, price_usd=100_000 + i * 10_000)
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    # Add a remax listing at the same centroid coord — would have
+    # paired with all the bienesraices listings under the old rule.
+    centroid_listings.append(
+        _li(source="remax", source_id="RX-X",
+            lat=13.4833, lng=-89.3167, price_usd=110_000)
+    )
+    metrics = detect_duplicates(centroid_listings)
+    assert metrics["coord_pairs"] == 0
+    assert metrics["coord_pairs_suppressed_centroid"] >= 1
+    assert (13.4833, -89.3167) in _compute_centroids(centroid_listings)
+
+
+def test_coord_pair_at_non_centroid_still_counts():
+    """Two cross-source listings at a UNIQUE coord (no other listings
+    sharing it) match cleanly — Phase 1.1 only suppresses centroids,
+    not all coord matches."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.4912, lng=-89.3818, price_usd=100_000)
+    b = _li(source="remax", source_id="B",
+            lat=13.4912, lng=-89.3818, price_usd=100_000)
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 1
+    assert metrics["coord_pairs_suppressed_centroid"] == 0
+
+
+def test_coord_pair_with_one_endpoint_at_centroid_is_suppressed():
+    """Aggressive rule per the design: if EITHER endpoint sits at a
+    centroid, suppress. Listing A might be at a real coord that
+    happens to coincide with a centroid bucket; listing B's "centroid"
+    coord isn't a real geocode at all. Pair them and we're trusting
+    a fallback to confirm a duplicate — not safe."""
+    # Build a centroid at (13.4833, -89.3167)
+    centroid_population = [
+        _li(source="bienesraices", source_id=f"BR-{i}",
+            lat=13.4833, lng=-89.3167, price_usd=100_000 + i * 1_000)
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    # A: at the centroid coord
+    a = _li(source="goodlife", source_id="A",
+            lat=13.4833, lng=-89.3167, price_usd=100_000)
+    # B: at a slightly different coord (within 100m of the centroid).
+    # Without Phase 1.1, A↔B would match by coord. Phase 1.1
+    # suppresses because A is at a centroid coord.
+    b = _li(source="remax", source_id="B",
+            lat=13.4838, lng=-89.3167, price_usd=100_000)   # ~55m away
+    metrics = detect_duplicates(centroid_population + [a, b])
+    # The A↔B match should be suppressed.
+    assert metrics["coord_pairs_suppressed_centroid"] >= 1
+
+
+def test_centroid_metrics_appear_in_summary():
+    """centroid_count + listings_at_centroids show up in the metrics
+    dict so nightly logs and the sidecar can track the suppression."""
+    listings = [
+        _li(source=f"s{i}", source_id=f"id{i}", lat=13.4833, lng=-89.3167)
+        for i in range(CENTROID_MIN_LISTINGS)
+    ]
+    metrics = detect_duplicates(listings)
+    assert metrics["centroid_count"] == 1
+    assert metrics["listings_at_centroids"] == CENTROID_MIN_LISTINGS
+
+
+def test_phone_match_still_fires_at_centroid_coord():
+    """Phone matching is independent of coord matching — a cross-source
+    phone match at a centroid coord still fires (the phone is the
+    high-precision signal; coord centroids only suppress the
+    coord-based pass)."""
+    # Build a centroid population that includes A and B.
+    centroid_filler = [
+        _li(source=f"s{i}", source_id=f"id{i}", lat=13.4833, lng=-89.3167)
+        for i in range(CENTROID_MIN_LISTINGS - 1)
+    ]
+    a = _li(source="bienesraices", source_id="A", broker_phone="78513928",
+            lat=13.4833, lng=-89.3167, price_usd=100_000)
+    b = _li(source="century21", source_id="B", broker_phone="78513928",
+            lat=13.4833, lng=-89.3167, price_usd=100_000)
+    metrics = detect_duplicates(centroid_filler + [a, b])
+    assert metrics["phone_pairs"] == 1   # phone match still fires
+    # Coord match for A↔B is suppressed by centroid rule, but phone
+    # match catches them anyway → still flagged in the headline.
+    assert "bienesraices+century21" in metrics["by_source_pair"]

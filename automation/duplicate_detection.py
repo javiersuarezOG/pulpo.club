@@ -131,6 +131,28 @@ PRICE_TOLERANCE_PCT = 0.25   # ±25% — generous enough for currency drift,
                              # broker price-ladder differences, partial
                              # listing updates
 
+# Coords shared by ≥ this many listings are treated as fallback "centroids"
+# (a municipal/zone default the source falls back to when precise lat/lng
+# isn't available) and are excluded from coord-pair matching. Pinned by a
+# constant test so any change forces a deliberate decision.
+#
+# Threshold rationale (2026-05-08 audit):
+#   The Phase 0 audit found 19/20 cross-source pairs were FPs from listings
+#   sitting at shared default coords (top centroid: 49 listings on
+#   (13.4833, -89.3167), the Santa Tecla default). 5+ listings exactly
+#   colocated at 5-decimal precision is essentially never a real cluster
+#   of distinct properties — it's a fallback. Threshold of 5 catches the
+#   top-10 production centroids cleanly and accepts that we'll miss
+#   genuine condo-tower duplicates (rare today; addressed by photo-URL
+#   matching in Phase 1.2).
+CENTROID_MIN_LISTINGS = 5
+
+# Lat/lng rounding precision for centroid bucketing. 5 decimals ≈ 1 metre,
+# so two listings at "the same coord" really do share an exact geocode
+# rather than being two distinct points 50m apart that happened to round
+# into the same bucket.
+_CENTROID_ROUND_DECIMALS = 5
+
 
 def _phone_pairs(listings: list[Any]) -> list[tuple[str, str, str]]:
     """Pairs of distinct-source listings sharing a normalised phone.
@@ -156,29 +178,79 @@ def _phone_pairs(listings: list[Any]) -> list[tuple[str, str, str]]:
     return out
 
 
-def _coord_pairs(listings: list[Any]) -> list[tuple[str, str, str]]:
-    """Pairs of distinct-source listings within COORD_RADIUS_M and
-    inside PRICE_TOLERANCE_PCT.
+def _compute_centroids(listings: list[Any]) -> set[tuple[float, float]]:
+    """Identify coords shared by ≥ CENTROID_MIN_LISTINGS listings.
 
-    Naive O(n²) cross-source pair scan. n ≈ 900 today → ~400k pairs,
-    haversine ~10 FLOPs each → low milliseconds. We can move to a
-    spatial index if the catalog crosses ~10k listings.
+    These are scrapers' fallback geocodes (a municipal/zone centroid
+    used when precise lat/lng isn't available), not genuine clusters
+    of distinct properties. Returns the set of (rounded_lat, rounded_lng)
+    tuples to exclude from coord matching.
     """
-    geo: list[tuple[Any, float, float, float | None]] = []
+    counts: dict[tuple[float, float], int] = defaultdict(int)
     for li in listings:
         lat, lng = _g(li, "lat"), _g(li, "lng")
         if lat is None or lng is None:
             continue
-        geo.append((li, float(lat), float(lng), _g(li, "price_usd")))
+        key = (
+            round(float(lat), _CENTROID_ROUND_DECIMALS),
+            round(float(lng), _CENTROID_ROUND_DECIMALS),
+        )
+        counts[key] += 1
+    return {coord for coord, n in counts.items() if n >= CENTROID_MIN_LISTINGS}
+
+
+def _coord_pairs(
+    listings: list[Any],
+    centroids: set[tuple[float, float]] | None = None,
+) -> tuple[list[tuple[str, str, str]], int]:
+    """Pairs of distinct-source listings within COORD_RADIUS_M and
+    inside PRICE_TOLERANCE_PCT, with centroid coords excluded.
+
+    Naive O(n²) cross-source pair scan. n ≈ 900 today → ~400k pairs,
+    haversine ~10 FLOPs each → low milliseconds. We can move to a
+    spatial index if the catalog crosses ~10k listings.
+
+    Returns:
+      (pairs, suppressed_by_centroid):
+        pairs:                  list of (key1, key2, source_pair)
+        suppressed_by_centroid: count of pairs that would have been
+                                flagged but were excluded because at
+                                least one endpoint sits at a centroid
+                                coord (telemetry — proves Phase 1.1 is
+                                actually doing something each nightly).
+    """
+    centroids = centroids or set()
+
+    geo: list[tuple[Any, float, float, float | None,
+                     tuple[float, float]]] = []
+    for li in listings:
+        lat, lng = _g(li, "lat"), _g(li, "lng")
+        if lat is None or lng is None:
+            continue
+        latf, lngf = float(lat), float(lng)
+        rounded = (
+            round(latf, _CENTROID_ROUND_DECIMALS),
+            round(lngf, _CENTROID_ROUND_DECIMALS),
+        )
+        geo.append((li, latf, lngf, _g(li, "price_usd"), rounded))
 
     out: list[tuple[str, str, str]] = []
+    suppressed = 0
     for a, b in combinations(geo, 2):
-        la, lat_a, lng_a, p_a = a
-        lb, lat_b, lng_b, p_b = b
+        la, lat_a, lng_a, p_a, ra = a
+        lb, lat_b, lng_b, p_b, rb = b
         sa, sb = _g(la, "source"), _g(lb, "source")
         if sa == sb:
             continue
         if haversine_m(lat_a, lng_a, lat_b, lng_b) > COORD_RADIUS_M:
+            continue
+        # Centroid suppression. If EITHER endpoint sits at a fallback
+        # centroid coord, drop the pair. Aggressive on purpose — Phase 0
+        # audit showed 95% of would-have-been-flags were FPs from this
+        # pattern. We accept losing genuine condo-tower duplicates here
+        # (rare; addressed by photo-URL matching in Phase 1.2).
+        if ra in centroids or rb in centroids:
+            suppressed += 1
             continue
         # Price band check — same coords with wildly different prices
         # is more likely a multi-unit building (single condo tower
@@ -189,7 +261,7 @@ def _coord_pairs(listings: list[Any]) -> list[tuple[str, str, str]]:
             if ratio > PRICE_TOLERANCE_PCT:
                 continue
         out.append((_key(la), _key(lb), _pair_key(sa, sb)))
-    return out
+    return out, suppressed
 
 
 # ── Public API ────────────────────────────────────────────────────────
@@ -214,8 +286,12 @@ def detect_duplicates(
         total_listings:               int
         listings_with_phone:          int
         listings_with_coords:         int
+        centroid_count:               int   # distinct fallback-coord buckets
+        listings_at_centroids:        int   # listings whose coord is a centroid
         phone_pairs:                  int   # cross-source phone matches
-        coord_pairs:                  int   # cross-source coord matches
+        coord_pairs:                  int   # cross-source coord matches (post-suppression)
+        coord_pairs_suppressed_centroid:
+                                      int   # would-have-been-flags excluded by Phase 1.1
         union_pairs:                  int   # phone OR coord
         duplicate_listings_either:    int   # listings flagged in any pair
         unique_listings_estimate:     int   # total - duplicate_listings_either
@@ -231,8 +307,22 @@ def detect_duplicates(
         if _g(li, "lat") is not None and _g(li, "lng") is not None
     )
 
+    # Phase 1.1 — identify fallback centroid coords up front so coord
+    # matching can suppress them. Same-pass count for telemetry.
+    centroids = _compute_centroids(listings)
+    listings_at_centroids = sum(
+        1 for li in listings
+        if _g(li, "lat") is not None and _g(li, "lng") is not None
+        and (
+            round(float(_g(li, "lat")), _CENTROID_ROUND_DECIMALS),
+            round(float(_g(li, "lng")), _CENTROID_ROUND_DECIMALS),
+        ) in centroids
+    )
+
     phone_pairs = _phone_pairs(listings)
-    coord_pairs = _coord_pairs(listings)
+    coord_pairs, coord_pairs_suppressed_centroid = _coord_pairs(
+        listings, centroids=centroids,
+    )
 
     # Union for the "duplicate_listings_either" headline metric. Counts
     # a listing once even if it appears in multiple pairs.
@@ -246,20 +336,23 @@ def detect_duplicates(
         by_source_pair[pair] += 1
 
     metrics = {
-        "total_listings":            n,
-        "listings_with_phone":       listings_with_phone,
-        "listings_with_coords":      listings_with_coords,
-        "phone_pairs":               len(phone_pairs),
-        "coord_pairs":               len(coord_pairs),
-        "union_pairs":               len(set(
+        "total_listings":               n,
+        "listings_with_phone":          listings_with_phone,
+        "listings_with_coords":         listings_with_coords,
+        "centroid_count":               len(centroids),
+        "listings_at_centroids":        listings_at_centroids,
+        "phone_pairs":                  len(phone_pairs),
+        "coord_pairs":                  len(coord_pairs),
+        "coord_pairs_suppressed_centroid": coord_pairs_suppressed_centroid,
+        "union_pairs":                  len(set(
             (k1, k2) for k1, k2, _ in phone_pairs + coord_pairs
         )),
-        "duplicate_listings_either": len(flagged_keys),
-        "unique_listings_estimate":  n - len(flagged_keys),
-        "duplicate_pct":             round(
+        "duplicate_listings_either":    len(flagged_keys),
+        "unique_listings_estimate":     n - len(flagged_keys),
+        "duplicate_pct":                round(
             len(flagged_keys) / n * 100, 2
         ) if n else 0.0,
-        "by_source_pair":            dict(by_source_pair),
+        "by_source_pair":               dict(by_source_pair),
     }
 
     # Sidecar telemetry — append-only JSONL.
