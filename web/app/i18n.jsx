@@ -325,6 +325,11 @@ const UI_STRINGS = {
   "plans.pro.name":          { en: "Pulpo Pro",                es: "Pulpo Pro" },
   "plans.pro.per_month":     { en: "/month",                   es: "/mes" },
   "plans.pro.tag":           { en: "Billed monthly",           es: "Facturación mensual" },
+  // Listings remain in USD (El Salvador's currency); the Pro
+  // subscription is billed in EUR via the European Stripe entity.
+  // This footnote prevents "why is my plan in euros?" confusion.
+  "plans.pro.currency_note": { en: "Listings are priced in USD; Pulpo Pro is billed in EUR.",
+                               es: "Las propiedades aparecen en USD; Pulpo Pro se cobra en EUR." },
   "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo del plan Gratis" },
   "plans.pro.feat.unlimited_details":  { en: "Unlimited listing details", es: "Detalles de propiedades ilimitados" },
   "plans.pro.feat.off_market":         { en: "Off-market deal access",    es: "Acceso a ofertas off-market" },
@@ -404,6 +409,7 @@ const UI_STRINGS = {
   "account.profile.email":   { en: "Email address",                 es: "Correo electrónico" },
   "account.profile.photo":   { en: "Profile photo",                 es: "Foto de perfil" },
   "account.profile.country": { en: "Country / region",              es: "País / región" },
+  "account.profile.country_placeholder": { en: "Type to search…",   es: "Escribe para buscar…" },
   "account.profile.lang":    { en: "Preferred language",            es: "Idioma preferido" },
   "account.profile.save":    { en: "Save changes",                  es: "Guardar cambios" },
   "account.profile.saved":   { en: "Changes saved.",                es: "Cambios guardados." },
@@ -498,6 +504,14 @@ const UI_STRINGS = {
                                es: "No pudimos abrir el portal de facturación. Inténtalo de nuevo." },
   "account.sub.portal_no_customer": { en: "We couldn't find your billing details. Please contact support.",
                                es: "No encontramos tus datos de facturación. Contacta soporte." },
+  "account.sub.invoices_heading": { en: "Invoices",
+                               es: "Facturas" },
+  "account.sub.invoices_intro":   { en: "Stripe keeps your full billing history.",
+                               es: "Stripe guarda tu historial de pagos completo." },
+  "account.sub.invoices_cta":     { en: "View invoices in the Stripe portal →",
+                               es: "Ver facturas en el portal de Stripe →" },
+  "account.sub.invoices_empty":   { en: "No invoices yet — your billing history will appear in the Stripe portal once your first payment is processed.",
+                               es: "Aún no hay facturas — tu historial aparecerá en el portal de Stripe tras tu primer pago." },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

@@ -2454,6 +2454,7 @@ function PlansPage({ app }) {
           <button className="btn-primary block lg" onClick={onUpgrade}>
             {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
           </button>
+          <p className="plan-currency-note">{t("plans.pro.currency_note", lc)}</p>
         </div>
         {SHOW_AGENCY_PLAN && (
           <div className="plan-card">
