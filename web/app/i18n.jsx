@@ -331,6 +331,8 @@ const UI_STRINGS = {
                                es: "Mejorar — ${price}/mes" },
   "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
                                   es: "No pudimos iniciar el pago — inténtalo de nuevo." },
+  "plans.checkout_auth_mismatch": { en: "Couldn't verify your session. Please log out and back in, then try again.",
+                                    es: "No pudimos verificar tu sesión. Cierra sesión y vuelve a entrar." },
   "upgrade.success_toast":   { en: "You're now on Pulpo Pro. Enjoy!",
                                es: "¡Listo! Ahora tienes Pulpo Pro." },
   "upgrade.cancelled_toast": { en: "Checkout cancelled — no changes to your plan.",

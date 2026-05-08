@@ -68,6 +68,7 @@ To ship: add a server endpoint that calls `stripe.billingPortal.sessions.create(
 - [ ] **Free-plan upgrade strips** — sticky banner ("Pulpo Free: 3 of 8 detail views this month") on Discover/Browse/Saved for logged-in-free users. Plan §985.
 - [ ] **Save-cap inline card at save 10** — currently a toast; plan called for an inline upgrade card in the Saved page when the cap hits.
 - [ ] **Redacted `/api/listings/:id`** — confirm the endpoint actually omits broker fields for unauth requests (the CSS blur is visual only per plan §506; the truth is server-side).
+- [ ] **`/api/saves` returns 500 in dev despite a valid Clerk session.** Reproduces on the desktop preview when navigating to /account. The 500 path in [`api/saves.js:57`](api/saves.js) fires when `authenticateClerkRequest` throws. Same shape probably underlies `/api/stripe/create-checkout-session` returning `sign_in_required` for genuinely-signed-in users. Most likely root cause: `@clerk/backend` `authenticateRequest({ request: req })` doesn't read cookies cleanly from a Vercel Node `IncomingMessage` (it expects a Web Fetch `Request`). Fix path: wrap the request in `new Request(req.url, { headers: new Headers(req.headers) })` before passing to Clerk, OR upgrade `@clerk/backend` to a version that accepts Node requests directly. Once this lands, the FE `plans.checkout_auth_mismatch` toast (added in PR-156-area) becomes a no-op fallback rather than the path users actually hit.
 
 ## Map (deferred from PR-150)
 

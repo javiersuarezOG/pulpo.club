@@ -2271,10 +2271,19 @@ function PlansPage({ app }) {
     startStripeCheckout({
       onError: (code) => {
         if (code === "sign_in_required") {
-          // Carry pendingAction so app.jsx's post-signin effect chains
-          // the Stripe redirect automatically once auth completes —
-          // no second click required.
-          app.openSignup({ mode: "signup", pendingAction: "checkout" });
+          if (app.user) {
+            // Server says we're not authenticated but the client has a
+            // user — Clerk cookie / session mismatch (dev keys, dev-vs-
+            // prod cookie domain, etc). Don't reopen the modal — that
+            // would loop indefinitely AND, with Clerk enabled, throw
+            // cannot_render_single_session_enabled. Surface a real
+            // toast and let the user retry.
+            app.showToast(t("plans.checkout_auth_mismatch", lc));
+          } else {
+            // Genuinely anonymous — open the signup modal and chain
+            // the Stripe redirect after auth via pendingAction.
+            app.openSignup({ mode: "signup", pendingAction: "checkout" });
+          }
         } else {
           app.showToast(t("plans.checkout_error_toast", lc));
         }
@@ -2371,10 +2380,21 @@ function SignupModal({ app }) {
     if (!m) return;
     if (!clerkEnabled()) return;
     if (!app.clerkActions) return;
+    // Defensive: Clerk's hosted SignIn/SignUp throws
+    // `cannot_render_single_session_enabled` when the user is already
+    // signed in — and we have a race where consumers (e.g. AccountPage
+    // mid-Clerk-boot) can call openSignup before ClerkUserSync has
+    // committed user state. If the user IS already signed in by the
+    // time this effect fires, just close the modal and let app.jsx's
+    // post-signin effect process any pendingAction.
+    if (app.user) {
+      app.closeSignup();
+      return;
+    }
     const target = m.mode === "login" ? "openSignIn" : "openSignUp";
     app.clerkActions[target]();
     app.closeSignup();
-  }, [m, app.clerkActions]);
+  }, [m, app.clerkActions, app.user]);
 
   if (!m) return null;
   if (clerkEnabled()) return null;   // Clerk's hosted modal takes over.
