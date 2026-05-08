@@ -76,23 +76,49 @@ _VALID_CONFIDENCES = {"high", "medium", "low"}
 _VALID_LATLONG_SOURCES = {"extracted", "estimated"}
 
 
+def _valid_localized(v: Any, max_chars: int) -> bool:
+    """Bilingual {en, es} dict shape.
+
+    Both keys present, both non-empty strings, each ≤ max_chars. Any
+    other shape (str, list, missing keys) fails. The prompt asks the
+    LLM for both translations; partial translations get rejected so we
+    never end up with EN-only or ES-only fields in production.
+    """
+    if not isinstance(v, dict):
+        return False
+    en = v.get("en")
+    es = v.get("es")
+    if not (isinstance(en, str) and 1 <= len(en.strip()) <= max_chars):
+        return False
+    if not (isinstance(es, str) and 1 <= len(es.strip()) <= max_chars):
+        return False
+    return True
+
+
 def _valid_title(v: Any) -> bool:
-    """Non-empty string, capped at 200 chars (the prompt asks for ≤10 words)."""
-    return isinstance(v, str) and 1 <= len(v.strip()) <= 200
+    """Bilingual title — each language ≤ 200 chars (prompt asks for ≤10 words)."""
+    return _valid_localized(v, 200)
 
 
 def _valid_description(v: Any) -> bool:
-    """Non-empty string, capped at 2000 chars (the prompt asks for ≤150 words)."""
-    return isinstance(v, str) and 1 <= len(v.strip()) <= 2000
+    """Bilingual description — each language ≤ 2000 chars (prompt asks for ≤150 words)."""
+    return _valid_localized(v, 2000)
 
 
 def _valid_usps(v: Any) -> bool:
-    """List of 3–5 non-empty strings."""
+    """List of 3–5 bilingual {en, es} dicts."""
     if not isinstance(v, list):
         return False
     if not (3 <= len(v) <= 5):
         return False
-    return all(isinstance(x, str) and bool(x.strip()) for x in v)
+    return all(_valid_localized(x, 200) for x in v)
+
+
+_VALID_URL_LANGUAGES = {"en", "es", "mixed"}
+
+
+def _valid_url_language(v: Any) -> bool:
+    return v in _VALID_URL_LANGUAGES
 
 
 def _valid_latlong(v: Any) -> bool:
@@ -123,16 +149,33 @@ def _valid_latlong(v: Any) -> bool:
 # ── applicators (mutate listing on validated response) ─────────────────
 # Run AFTER all validators pass — partial application is impossible.
 
+def _normalize_localized(v: dict) -> dict:
+    """Strip whitespace from both languages and return a fresh dict.
+
+    Defensive: validators already ensured the shape; we just normalize
+    so applied data is consistent regardless of LLM response noise.
+    """
+    return {"en": v["en"].strip(), "es": v["es"].strip()}
+
+
 def _apply_title(li: Any, v: Any) -> None:
-    _set(li, "title_canonical", str(v).strip())
+    _set(li, "title_canonical", _normalize_localized(v))
 
 
 def _apply_description(li: Any, v: Any) -> None:
-    _set(li, "short_description_canonical", str(v).strip())
+    _set(li, "short_description_canonical", _normalize_localized(v))
 
 
 def _apply_usps(li: Any, v: Any) -> None:
-    _set(li, "reasons_to_buy", [str(x).strip() for x in v])
+    _set(li, "reasons_to_buy", [_normalize_localized(x) for x in v])
+
+
+def _apply_url_language(li: Any, v: Any) -> None:
+    _set(li, "url_language", v)
+
+
+def _present_url_language(li: Any) -> bool:
+    return _g(li, "url_language") in _VALID_URL_LANGUAGES
 
 
 def _apply_latlong(li: Any, v: Any) -> None:
@@ -174,11 +217,21 @@ class EnrichmentSchema:
     enrich_listings(...) to extend the field set or swap models."""
     fields:      tuple[EnrichmentField, ...]
     model:       str = "deepseek-chat"
-    max_tokens:  int = 1024
+    # Bilingual {en, es} output approximately doubles text volume on title/
+    # description/usps. 1024 was tight enough that long descriptions could
+    # truncate latlong (which sits at the bottom of the JSON template),
+    # surfacing as `schema_invalid:invalid:latlong` in telemetry. 1600
+    # gives ~60% headroom for Spanish-side density without a per-call cost
+    # bump (DeepSeek charges by tokens used, not max_tokens budget).
+    max_tokens:  int = 1600
     temperature: float = 0.3
     base_url:    str = "https://api.deepseek.com"
     api_key_env: str = "DEEPSEEK_API_TOKEN"
-    schema_version: int = 1
+    # Schema version 3: bilingual {en, es} dicts on title/description/usps
+    # + url_language. Bumped from 1 (post-#149 monolingual revert) so any
+    # on-disk sidecar entries written under v1 fail re-validation in
+    # _hydrate_from_sidecar and trigger a fresh DeepSeek call.
+    schema_version: int = 3
 
 
 DEFAULT_SCHEMA = EnrichmentSchema(
@@ -215,6 +268,19 @@ DEFAULT_SCHEMA = EnrichmentSchema(
             validate     = _valid_latlong,
             apply        = _apply_latlong,
             skip_reason  = "already_has_latlong",
+        ),
+        # url_language: detected dominant language of the source listing.
+        # Persisted alongside the bilingual canonical fields so the FE can
+        # gate the "View on source" link (only show when url_language
+        # matches the user's locale OR is "mixed"). Frontend wiring is a
+        # follow-up — backend produces the field today.
+        EnrichmentField(
+            json_key     = "url_language",
+            target_attrs = ("url_language",),
+            is_present   = _present_url_language,
+            validate     = _valid_url_language,
+            apply        = _apply_url_language,
+            skip_reason  = "already_has_url_language",
         ),
     ),
 )

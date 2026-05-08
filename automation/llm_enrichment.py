@@ -212,6 +212,10 @@ def _build_sidecar_entry(li: Any, schema: EnrichmentSchema,
         "geocoding_confidence":        _g(li, "geocoding_confidence"),
         "geocoding_source":            _g(li, "geocoding_source"),
         "geocoding_reference":         _g(li, "geocoding_reference"),
+        # Schema v3 — url_language must be persisted so rehydration can
+        # re-validate it under the current schema (sidecar re-validation
+        # in _hydrate_from_sidecar would silently skip the apply otherwise).
+        "url_language":                _g(li, "url_language"),
         "tokens_in":                   tokens_in,
         "tokens_out":                  tokens_out,
         "cost_usd":                    _cost_usd(tokens_in, tokens_out),

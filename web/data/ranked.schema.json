@@ -66,6 +66,7 @@
       "geocoding_reference",
       "enriched_at",
       "enrichment_model",
+      "url_language",
       "rank",
       "rank_score",
       "zone_percentile",
@@ -370,20 +371,52 @@
       },
       "title_canonical": {
         "type": [
+          "object",
           "string",
           "null"
-        ]
+        ],
+        "properties": {
+          "en": {
+            "type": "string"
+          },
+          "es": {
+            "type": "string"
+          }
+        }
       },
       "short_description_canonical": {
         "type": [
-          "string",
+          "object",
           "null"
+        ],
+        "properties": {
+          "en": {
+            "type": "string"
+          },
+          "es": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "en",
+          "es"
         ]
       },
       "reasons_to_buy": {
         "type": "array",
         "items": {
-          "type": "string"
+          "type": [
+            "object",
+            "string"
+          ],
+          "properties": {
+            "en": {
+              "type": "string"
+            },
+            "es": {
+              "type": "string"
+            }
+          }
         }
       },
       "geocoding_source": {
@@ -413,6 +446,18 @@
         "type": [
           "string",
           "null"
+        ]
+      },
+      "url_language": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "en",
+          "es",
+          "mixed",
+          null
         ]
       },
       "rank": {

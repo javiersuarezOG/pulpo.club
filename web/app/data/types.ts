@@ -9,6 +9,9 @@ export type Listing = {
   title: Localized;
   description: Localized;
   usps: Localized[];
+  /** Schema v3 — detected dominant language of the listing's source URL.
+   *  Used to gate the "View on source" link. null when DeepSeek didn't run. */
+  url_language: "en" | "es" | "mixed" | null;
   zone_name: string;
   region: string | null;
   country: string;

@@ -130,13 +130,17 @@ export interface Listing {
     // ── Validation + AI enrichment ────────────────────────────────
     validation_status: ValidationStatus;
     validation_warnings: string[];
-    title_canonical: string | null;
-    short_description_canonical: string | null;
-    reasons_to_buy: string[];
+    /** Schema v3 — DeepSeek emits {en, es} dicts; the fallback template
+     *  path writes a plain string. The FE adapter handles both shapes. */
+    title_canonical: { en: string; es: string } | string | null;
+    short_description_canonical: { en: string; es: string } | null;
+    reasons_to_buy: ({ en: string; es: string } | string)[];
     geocoding_source: GeocodingSource | null;
     geocoding_reference: string | null;
     enriched_at: string | null;
     enrichment_model: string | null;
+    /** Schema v3 — detected dominant language of the source listing. */
+    url_language: "en" | "es" | "mixed" | null;
 
     // ── Ranking output ───────────────────────────────────────────────
     rank: number | null;                // 1-based position rank
