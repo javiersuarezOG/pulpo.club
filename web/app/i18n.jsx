@@ -340,9 +340,6 @@ const UI_STRINGS = {
                                es: "¡Listo! Ahora tienes Pulpo Pro." },
   "upgrade.cancelled_toast": { en: "Checkout cancelled — no changes to your plan.",
                                es: "Pago cancelado — tu plan no cambió." },
-  "plans.social_proof":      { en: "{n} investors are using Pulpo this month",
-                               es: "{n} inversionistas están usando Pulpo este mes" },
-
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 

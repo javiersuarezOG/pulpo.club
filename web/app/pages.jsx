@@ -2408,10 +2408,6 @@ function PlansPage({ app }) {
           </div>
         )}
       </div>
-      <div className="social-proof">
-        <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/>
-        <span>{t("plans.social_proof", lc, { n: 247 })}</span>
-      </div>
     </div>
   );
 }
