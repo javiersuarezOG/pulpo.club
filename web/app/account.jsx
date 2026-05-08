@@ -552,8 +552,92 @@ function SubscriptionSection({ app }) {
   );
 }
 
-// ============== A.3.4 — Security (stub) ==============
+// ============== A.3.4 — Security ==============
 function SecuritySection({ app }) {
+  // When Clerk is the auth source of truth, password / sessions /
+  // connected accounts / 2FA / account-deletion are all managed
+  // server-side by Clerk. Mounting our own password form would be
+  // dead UI: it would call setTimeout and a fake "Password updated."
+  // toast without ever touching the auth provider. Hand off to
+  // Clerk's hosted UserProfile modal — it covers every action a
+  // user could want here, in one consistent UI.
+  //
+  // Fall back to the legacy stub form only when Clerk isn't
+  // configured (CI, fresh clones, e2e dev server without a Clerk
+  // publishable key). The legacy form also doesn't actually change
+  // a password — it never did — but it gives shape to the section
+  // for the non-Clerk dev path.
+  const clerkOn = clerkEnabled();
+  const clerkReady = clerkOn && app.clerkActions;
+
+  if (clerkOn) {
+    return <ClerkSecuritySection app={app} clerkReady={clerkReady} />;
+  }
+  return <LegacySecuritySection app={app} />;
+}
+
+// Clerk-on path: a single CTA opens the hosted UserProfile modal.
+// Sign-out stays as a top-level button for parity with the legacy
+// path (Clerk's UserProfile has its own sign-out, but a one-click
+// shortcut here is friendlier).
+function ClerkSecuritySection({ app, clerkReady }) {
+  const openProfile = () => {
+    if (!clerkReady) return;
+    try {
+      app.clerkActions.openUserProfile();
+    } catch (err) {
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[pulpo] clerk.openUserProfile failed:", err);
+      }
+      app.showToast(t("account.security.clerk.error", app.locale));
+    }
+  };
+
+  const onSignout = () => {
+    app.signout();
+    app.go("home");
+  };
+
+  return (
+    <div className="account-section">
+      <h3 className="account-subhead">{t("account.security.clerk.heading", app.locale)}</h3>
+      <p className="section-intro">{t("account.security.clerk.intro", app.locale)}</p>
+      <ul className="security-clerk-list">
+        <li>{t("account.security.clerk.feat.password", app.locale)}</li>
+        <li>{t("account.security.clerk.feat.sessions", app.locale)}</li>
+        <li>{t("account.security.clerk.feat.mfa", app.locale)}</li>
+        <li>{t("account.security.clerk.feat.connected", app.locale)}</li>
+        <li>{t("account.security.clerk.feat.delete", app.locale)}</li>
+      </ul>
+      <div className="account-save-row">
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={openProfile}
+          disabled={!clerkReady}
+          aria-busy={!clerkReady}
+        >
+          {clerkReady
+            ? t("account.security.clerk.cta", app.locale)
+            : t("account.security.clerk.loading", app.locale)}
+        </button>
+      </div>
+
+      <div className="sub-divider"/>
+      <h3 className="account-subhead">{t("account.security.signout.heading", app.locale)}</h3>
+      <p className="section-intro">{t("account.security.signout.intro", app.locale)}</p>
+      <button className="btn-ghost" onClick={onSignout}>
+        {t("account.security.signout.cta", app.locale)}
+      </button>
+    </div>
+  );
+}
+
+// Legacy path — only mounts when Clerk isn't configured (no
+// publishable key). Doesn't touch a real auth provider; preserved
+// so the Account page still renders something in dev/CI without
+// Clerk credentials.
+function LegacySecuritySection({ app }) {
   const [pwd, setPwd] = aUseState({ current: "", next: "", confirm: "" });
   const [pwdMsg, setPwdMsg] = aUseState("");
   const [showSignoutModal, setShowSignoutModal] = aUseState(false);

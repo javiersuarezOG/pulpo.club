@@ -452,6 +452,30 @@ const UI_STRINGS = {
                                   es: "Las alertas por email de anuncios guardados, los nuevos en tus zonas y el boletín semanal son parte de Pulpo Pro." },
   "account.notif.upsell.cta":   { en: "Upgrade to Pro",
                                   es: "Mejorar a Pro" },
+
+  // Account → Security (Clerk-managed). Single CTA opens Clerk's
+  // hosted UserProfile modal — that one modal covers everything we
+  // used to fake locally (password, sessions, MFA, OAuth, deletion).
+  "account.security.clerk.heading": { en: "Account & security",
+                                       es: "Cuenta y seguridad" },
+  "account.security.clerk.intro":   { en: "Manage your account through Clerk — change your password, control active sessions, set up two-factor auth, and link or unlink Google. To delete your account, use the same panel.",
+                                       es: "Administra tu cuenta a través de Clerk — cambia tu contraseña, gestiona sesiones activas, activa la verificación en dos pasos y conecta o desconecta Google. Para eliminar tu cuenta, usa el mismo panel." },
+  "account.security.clerk.feat.password":  { en: "Change password",                       es: "Cambiar contraseña" },
+  "account.security.clerk.feat.sessions":  { en: "View and revoke active sessions",       es: "Ver y revocar sesiones activas" },
+  "account.security.clerk.feat.mfa":       { en: "Enable two-factor authentication",      es: "Activar autenticación en dos pasos" },
+  "account.security.clerk.feat.connected": { en: "Connect or disconnect Google / Apple",  es: "Conectar o desconectar Google / Apple" },
+  "account.security.clerk.feat.delete":    { en: "Delete your account",                   es: "Eliminar tu cuenta" },
+  "account.security.clerk.cta":     { en: "Open account & security",
+                                       es: "Abrir cuenta y seguridad" },
+  "account.security.clerk.loading": { en: "Loading…",
+                                       es: "Cargando…" },
+  "account.security.clerk.error":   { en: "Couldn't open account settings. Please try again.",
+                                       es: "No pudimos abrir la configuración de cuenta. Inténtalo de nuevo." },
+  "account.security.signout.heading": { en: "Sign out",   es: "Cerrar sesión" },
+  "account.security.signout.intro":   { en: "Sign out of this browser. To sign out of every device, use the sessions panel above.",
+                                         es: "Cierra sesión en este navegador. Para cerrar sesión en todos los dispositivos, usa el panel de sesiones de arriba." },
+  "account.security.signout.cta":     { en: "Sign out",   es: "Cerrar sesión" },
+
   "account.sub.intro":       { en: "Your plan, billing history, and payment details — all in one place.",
                                es: "Tu plan, historial de pagos y detalles — todo en un solo lugar." },
   "account.sub.discover_nudge": { en: "Ready to keep exploring? Head back to Discover →",
