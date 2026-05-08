@@ -18,6 +18,7 @@ sys.path.insert(0, str(REPO))
 from automation.photo_quality import (   # noqa: E402
     compute_score,
     score_band,
+    detect_text_overlay,
 )
 
 
@@ -141,3 +142,92 @@ def test_score_clamped_to_zero_to_hundred():
     raw = _make_image(1920, 1080)
     score = compute_score(raw, byte_size=1)   # force size penalty
     assert 0 <= score <= 100
+
+
+# ── detect_text_overlay ───────────────────────────────────────────────
+#
+# Tesseract is system-binary-dependent. The graceful-degradation tests
+# run unconditionally and pin the contract that the pipeline never
+# crashes when the binary is absent. Tesseract-dependent tests skip
+# cleanly via @pytest.mark.skipif when the binary isn't installed —
+# they document the *behavior* without forcing a binary install on
+# every contributor's machine. CI installs tesseract-ocr so the
+# positive-case tests run on every PR.
+
+def _tesseract_available() -> bool:
+    try:
+        import pytesseract  # type: ignore
+    except ImportError:
+        return False
+    try:
+        from PIL import Image
+        pytesseract.image_to_string(Image.new("RGB", (32, 32), "white"))
+        return True
+    except Exception:
+        return False
+
+
+def _make_text_overlay_image(text: str = "FOR SALE\n$250,000\nCONTACT NOW", size=(900, 700)) -> bytes:
+    """Synthesize a brochure-style image: dark background + large text.
+    Used by the text-detection tests when Tesseract is available."""
+    from PIL import Image, ImageDraw, ImageFont
+    img = Image.new("RGB", size, color=(40, 60, 90))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
+    for i, line in enumerate(text.split("\n")):
+        for repeat_x in range(3):
+            for repeat_y in range(3):
+                draw.text(
+                    (40 + repeat_x * 280, 40 + i * 120 + repeat_y * 40),
+                    line,
+                    fill=(255, 255, 255),
+                    font=font,
+                )
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+# Graceful-degradation contract — runs everywhere.
+
+def test_detect_text_overlay_empty_bytes_returns_none():
+    """Empty input → no signal. None means 'do not exclude' downstream."""
+    assert detect_text_overlay(b"") is None
+
+
+def test_detect_text_overlay_garbage_bytes_returns_none():
+    """Bytes that don't decode as an image → no signal."""
+    assert detect_text_overlay(b"\x00\x01 not an image \xff\xff") is None
+
+
+def test_detect_text_overlay_no_pytesseract_returns_none(monkeypatch):
+    """When pytesseract isn't importable, detector returns None instead
+    of crashing — pipeline must still run on a leaner image."""
+    import sys
+    monkeypatch.setitem(sys.modules, "pytesseract", None)
+    raw = _make_image(900, 700)
+    assert detect_text_overlay(raw) is None
+
+
+# Tesseract-dependent tests — skip when the binary isn't available.
+
+import pytest  # noqa: E402
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_clean_image_returns_false():
+    """Random-pixel image (no readable text) → not flagged."""
+    raw = _make_image(900, 700)
+    assert detect_text_overlay(raw) is False
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_text_heavy_image_returns_true():
+    """Image with prominent multi-line text → flagged. The fixture
+    synthesises a dark backdrop with large white text repeated many
+    times; this should comfortably exceed both the word-count and
+    text-area thresholds. If Tesseract calibration drifts, lower
+    min_word_count / min_area_pct via the kwargs to keep the test
+    behavior-pinned rather than threshold-fragile."""
+    raw = _make_text_overlay_image()
+    assert detect_text_overlay(raw) is True

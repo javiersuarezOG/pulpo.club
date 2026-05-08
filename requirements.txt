@@ -12,3 +12,10 @@ Pillow>=10.0
 # to import, automation/ai_enrichment.py logs and skips. Listed here so
 # CI installs it and the import path is exercised in tests.
 openai>=1.0,<2.0
+# pytesseract — OCR wrapper used by automation/photo_quality.py to detect
+# brochure-style text overlays on hero photos. Requires the `tesseract`
+# system binary on PATH (apt: tesseract-ocr; brew: tesseract). When the
+# binary is missing, detect_text_overlay() returns None and the elite
+# featured-listing filter falls back to "not flagged" — pipeline still
+# runs, just without text-overlay exclusion.
+pytesseract>=0.3.10

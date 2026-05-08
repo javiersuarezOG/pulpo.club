@@ -24,6 +24,13 @@ jobs:
           python-version: "3.10"
           cache: pip
 
+      # System binary for pytesseract (text-overlay detector tests in
+      # tests/test_photo_quality.py). Without it, the positive-case
+      # tests skip cleanly via @pytest.mark.skipif — kept here so the
+      # behavior tests run on every PR rather than only on the nightly.
+      - name: Install Tesseract OCR
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
