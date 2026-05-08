@@ -28,6 +28,14 @@ export async function startStripeCheckout({ onError } = {}) {
   if (!res.ok) {
     let detail = null;
     try { detail = await res.json(); } catch {}
+    try {
+      track("api.error", {
+        endpoint: "/api/stripe/create-checkout-session",
+        status: res.status,
+        reason: detail && detail.error,
+        detail: detail && detail.detail,
+      });
+    } catch {}
     if (onError) onError(detail && detail.error ? detail.error : `http_${res.status}`, detail);
     return false;
   }

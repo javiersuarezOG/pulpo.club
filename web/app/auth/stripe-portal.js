@@ -32,6 +32,14 @@ export async function openStripePortal({ onError } = {}) {
     try { detail = await res.json(); } catch {}
     const reason = detail && detail.error ? detail.error : `http_${res.status}`;
     track("portal.error", { reason });
+    try {
+      track("api.error", {
+        endpoint: "/api/stripe/billing-portal",
+        status: res.status,
+        reason,
+        detail: detail && detail.detail,
+      });
+    } catch {}
     if (onError) onError(reason, detail);
     return false;
   }

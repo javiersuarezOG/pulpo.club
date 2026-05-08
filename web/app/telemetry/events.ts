@@ -64,6 +64,24 @@ export type EventMap = {
     plan: "free" | "pro";
   };
   "signout.completed": Record<string, never>;
+  // Fires the moment the user clicks logout — before we touch local
+  // state or call clerkActions.signOut. Pairs with signout.completed
+  // (which fires when the user transition lands) so a missing
+  // signout.completed after signout.started tells you the Clerk
+  // signOut call hung or the user re-hydrated from a stale cookie.
+  "auth.signout_started": { had_clerk_actions: boolean };
+
+  // Generic API-error telemetry. Wired by the client-side fetch
+  // helpers so non-2xx responses show up in PostHog with enough
+  // detail to triage from the dashboard. `reason` mirrors the
+  // server's response.error code; `detail` carries err.message
+  // when the server included it.
+  "api.error": {
+    endpoint: string;
+    status: number;
+    reason?: string;
+    detail?: string;
+  };
   "paywall.shown": { kind: "detail_view" | "off_market" | "save_cap"; listing_id?: string };
   "paywall.bypassed": { kind: "detail_view" | "off_market" | "save_cap"; action: "upgrade" | "dismiss" | "have_account"; listing_id?: string };
   "plans.viewed": { source: "topnav" | "footer" | "paywall" | "manual" };

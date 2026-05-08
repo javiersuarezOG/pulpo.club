@@ -62,9 +62,15 @@ module.exports = async (req, res) => {
       : null;
   } catch (err) {
     logApi("stripe.create_checkout_session", {
-      status: 500, ms: Date.now() - t0, reason: "auth_failed", error: err.message,
+      status: 500, ms: Date.now() - t0, reason: "auth_failed",
+      error_class: err && err.constructor ? err.constructor.name : "Error",
+      error: err && err.message,
     });
-    return res.status(500).json({ error: "auth_failed" });
+    return res.status(500).json({
+      error: "auth_failed",
+      detail: err && err.message,
+      class: err && err.constructor ? err.constructor.name : undefined,
+    });
   }
 
   const proto = (req.headers["x-forwarded-proto"] || "https").split(",")[0].trim();
