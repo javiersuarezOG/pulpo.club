@@ -89,7 +89,12 @@ function TopNav({ app }) {
                 title={t("nav.account", lc)}
                 aria-label={t("nav.account", lc)}
               >{app.user.email[0].toUpperCase()}</button>
-              <button className="link-btn" onClick={() => app.signout()}>{t("nav.logout", lc)}</button>
+              <button
+                className="link-btn"
+                onClick={() => app.signout()}
+                disabled={app.isSigningOut}
+                aria-busy={app.isSigningOut || undefined}
+              >{t("nav.logout", lc)}</button>
             </div>
           ) : (
             <button
@@ -2531,10 +2536,23 @@ function LegacySignupModal({ app, m }) {
         <div className="divider"><span>or</span></div>
         <form onSubmit={submit} className="modal-form">
           <label>Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoFocus/>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
+              autoComplete="username"
+              autoFocus
+            />
           </label>
           <label>Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters"/>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            />
           </label>
           {error && <div className="form-error">{error}</div>}
           <button type="submit" className="btn-primary block lg">
