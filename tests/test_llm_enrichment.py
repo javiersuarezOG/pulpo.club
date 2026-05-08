@@ -97,12 +97,18 @@ class _StubClient:
 
 
 _OK_JSON = {
-    "title":       "Beachfront 5,000 m² lot in El Tunco",
-    "description": "A flat, well-positioned parcel near the surf break, "
-                   "with paved access and ocean views — well-suited for "
-                   "a small boutique build or buy-and-hold.",
-    "usps":        ["🏖 Beachfront access", "📐 Flat terrain",
-                    "🛣 Paved road"],
+    "title":       {"en": "Beachfront 5,000 m² lot in El Tunco",
+                    "es": "Lote frente al mar de 5,000 m² en El Tunco"},
+    "description": {"en": "A flat, well-positioned parcel near the surf break, "
+                          "with paved access and ocean views — well-suited for "
+                          "a small boutique build or buy-and-hold.",
+                    "es": "Una parcela plana y bien ubicada cerca del rompiente, "
+                          "con acceso pavimentado y vistas al mar — ideal para "
+                          "una construcción boutique o inversión a largo plazo."},
+    "usps":        [{"en": "🏖 Beachfront access",   "es": "🏖 Acceso a la playa"},
+                    {"en": "📐 Flat terrain",        "es": "📐 Terreno plano"},
+                    {"en": "🛣 Paved road",          "es": "🛣 Camino pavimentado"}],
+    "url_language": "en",
     "latlong":     {"lat": 13.4912, "lng": -89.3818,
                     "source": "estimated",
                     "reference": "near El Tunco, La Libertad",
@@ -282,8 +288,10 @@ def test_successful_enrichment_writes_all_fields_atomically(tmp_path):
                               client=client)
     assert metrics["enriched"] == 1
     assert li["title_canonical"] == _OK_JSON["title"]
-    assert li["short_description_canonical"].startswith("A flat, well-positioned")
+    assert li["short_description_canonical"]["en"].startswith("A flat, well-positioned")
+    assert li["short_description_canonical"]["es"].startswith("Una parcela plana")
     assert li["reasons_to_buy"] == _OK_JSON["usps"]
+    assert li["url_language"] == "en"
     assert li["lat"] == 13.4912
     assert li["lng"] == -89.3818
     assert li["geocoding_confidence"] == "medium"

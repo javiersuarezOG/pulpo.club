@@ -84,6 +84,29 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
     "dist_nearest_town_km": {"minimum": 0},
     "lat":                  {"minimum": -90,  "maximum": 90},
     "lng":                  {"minimum": -180, "maximum": 180},
+    # Schema v3 — bilingual canonical fields. Type is permissive:
+    # `object` is the DeepSeek-enriched shape ({en, es} dict), `string` is
+    # the fallback-template shape (single-language). The FE adapter
+    # (`localizedFromAny` in web/app/data/listings.ts) handles both.
+    "title_canonical": {
+        "type": ["object", "string", "null"],
+        "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+    },
+    "short_description_canonical": {
+        # No fallback writes this — only DeepSeek does — so it's strictly
+        # dict-or-null. (The fallback template explicitly skips this field.)
+        "type": ["object", "null"],
+        "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+        "required": ["en", "es"],
+    },
+    "reasons_to_buy": {
+        "type": "array",
+        "items": {
+            "type": ["object", "string"],
+            "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
+        },
+    },
+    "url_language": {"enum": ["en", "es", "mixed", None]},
 }
 
 
@@ -125,6 +148,11 @@ def _field_to_schema(name: str, annotation: Any) -> dict:
 
     # list[X]
     if origin is list:
+        # If an override is registered for this field, prefer it whole — the
+        # override knows the item shape (e.g. {en, es} dicts for
+        # reasons_to_buy) better than the generic primitive mapper.
+        if name in _OVERRIDES:
+            return dict(_OVERRIDES[name])
         item_t = typing.get_args(inner)[0]
         item_json_t = _python_type_to_json_type(item_t)
         if item_json_t is None:
@@ -136,8 +164,12 @@ def _field_to_schema(name: str, annotation: Any) -> dict:
 
     primitive = _python_type_to_json_type(inner)
     if primitive is None:
-        # Fall back to `any` — covers cases the generator doesn't model
-        return {}
+        # Fall back to `any` for fields the generator can't model from the
+        # annotation alone (e.g., Optional[Any] for the bilingual canonical
+        # fields whose JSON shape lives in _OVERRIDES). The override below
+        # supplies the real schema; only fall through to `{}` (any) when
+        # no override is present.
+        return dict(_OVERRIDES[name]) if name in _OVERRIDES else {}
 
     schema: dict = {"type": [primitive, "null"] if is_opt else primitive}
 

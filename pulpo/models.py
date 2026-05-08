@@ -1,7 +1,7 @@
 """Canonical Listing schema. Stays in stdlib (dataclasses) for portability."""
 from __future__ import annotations
 from dataclasses import dataclass, field, asdict
-from typing import Optional
+from typing import Any, Optional
 
 @dataclass
 class Listing:
@@ -89,10 +89,17 @@ class Listing:
     validation_status: Optional[str] = None      # None | "flagged"
     validation_warnings: list[str] = field(default_factory=list)
 
-    # PRD §FR-6 AI-enriched fields (Phase 1)
-    title_canonical: Optional[str] = None
-    short_description_canonical: Optional[str] = None
-    reasons_to_buy: list[str] = field(default_factory=list)
+    # PRD §FR-6 AI-enriched fields (Phase 1).
+    # Schema v3 (bilingual + LOCATION HINTS): DeepSeek emits {en, es} dicts
+    # for these. The fallback path in automation/ai_enrichment_fallback.py
+    # still produces single-language strings for title_canonical and
+    # reasons_to_buy when DeepSeek is skipped/fails — adapter on the FE
+    # (`localizedFromAny` in web/app/data/listings.ts) handles both shapes.
+    # short_description_canonical has no fallback; stays None when the LLM
+    # didn't run.
+    title_canonical: Optional[Any] = None              # {en, es} dict OR str (fallback)
+    short_description_canonical: Optional[Any] = None  # {en, es} dict
+    reasons_to_buy: list[Any] = field(default_factory=list)  # list of {en, es} OR list[str] (fallback)
 
     # PRD WS2 — single-call DeepSeek enrichment metadata (latlong block).
     # `lat`/`lng`/`geocoding_confidence` above are reused; these two carry
@@ -105,6 +112,11 @@ class Listing:
     # re-runs on model change and to telemeter coverage over time.
     enriched_at: Optional[str] = None      # ISO8601 UTC, set when enrichment succeeds
     enrichment_model: Optional[str] = None # e.g. "deepseek-chat"
+    # Schema v3 — detected dominant language of the source listing. FE uses
+    # this to gate the "View on source" link (only show when the source URL
+    # language matches the user's locale or is "mixed"). Stays None when
+    # DeepSeek is skipped/fails — no fallback producer for this field.
+    url_language: Optional[str] = None     # 'en' | 'es' | 'mixed' | None
 
     rank: Optional[int] = None               # 1-based position rank, 1 = best
     rank_score: Optional[float] = None       # composite 0..100

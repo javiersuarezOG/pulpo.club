@@ -55,11 +55,16 @@ def _li(**overrides) -> dict:
 
 
 def _ok_response() -> dict:
-    """A response that passes every validator in DEFAULT_SCHEMA."""
+    """A response that passes every validator in DEFAULT_SCHEMA (schema v3)."""
     return {
-        "title":       "Beachfront 5,000 m² lot in El Tunco",
-        "description": "A flat, well-positioned parcel " * 5,
-        "usps":        ["Direct beach access", "Flat terrain", "Paved road"],
+        "title":       {"en": "Beachfront 5,000 m² lot in El Tunco",
+                        "es": "Lote frente al mar de 5,000 m² en El Tunco"},
+        "description": {"en": "A flat, well-positioned parcel " * 5,
+                        "es": "Una parcela plana y bien ubicada " * 5},
+        "usps":        [{"en": "Direct beach access", "es": "Acceso directo a la playa"},
+                        {"en": "Flat terrain",        "es": "Terreno plano"},
+                        {"en": "Paved road",          "es": "Camino pavimentado"}],
+        "url_language": "en",
         "latlong": {
             "lat":        13.4912,
             "lng":        -89.3818,
@@ -247,9 +252,18 @@ def test_validate_rejects_bool_as_lat():
 def test_apply_writes_all_target_attrs():
     li = _li()
     apply_response(li, _ok_response())
-    assert li["title_canonical"] == "Beachfront 5,000 m² lot in El Tunco"
-    assert "well-positioned" in li["short_description_canonical"]
-    assert li["reasons_to_buy"] == ["Direct beach access", "Flat terrain", "Paved road"]
+    assert li["title_canonical"] == {
+        "en": "Beachfront 5,000 m² lot in El Tunco",
+        "es": "Lote frente al mar de 5,000 m² en El Tunco",
+    }
+    assert "well-positioned" in li["short_description_canonical"]["en"]
+    assert "bien ubicada" in li["short_description_canonical"]["es"]
+    assert li["reasons_to_buy"] == [
+        {"en": "Direct beach access", "es": "Acceso directo a la playa"},
+        {"en": "Flat terrain",        "es": "Terreno plano"},
+        {"en": "Paved road",          "es": "Camino pavimentado"},
+    ]
+    assert li["url_language"] == "en"
     assert li["lat"] == 13.4912
     assert li["lng"] == -89.3818
     assert li["geocoding_confidence"] == "medium"
@@ -257,12 +271,13 @@ def test_apply_writes_all_target_attrs():
     assert li["geocoding_reference"] == "near El Tunco, La Libertad"
 
 
-def test_apply_strips_whitespace_on_strings():
+def test_apply_strips_whitespace_on_localized_dicts():
+    """Schema v3 — apply normalizes whitespace per language inside the dict."""
     li = _li()
     r = _ok_response()
-    r["title"] = "  Padded title  "
+    r["title"] = {"en": "  Padded title  ", "es": "  Título acolchado  "}
     apply_response(li, r)
-    assert li["title_canonical"] == "Padded title"
+    assert li["title_canonical"] == {"en": "Padded title", "es": "Título acolchado"}
 
 
 def test_apply_rounds_coords_to_six_decimals():
@@ -333,12 +348,100 @@ def test_custom_schema_extends_eligibility_with_new_field():
 def test_default_schema_has_expected_fields_in_order():
     """Lock the field order — telemetry skip_reason depends on it."""
     keys = [f.json_key for f in DEFAULT_SCHEMA.fields]
-    assert keys == ["title", "description", "usps", "latlong"]
+    assert keys == ["title", "description", "usps", "latlong", "url_language"]
 
 
 def test_default_schema_uses_deepseek_model_and_env():
     assert DEFAULT_SCHEMA.model == "deepseek-chat"
     assert DEFAULT_SCHEMA.api_key_env == "DEEPSEEK_API_TOKEN"
     assert DEFAULT_SCHEMA.base_url == "https://api.deepseek.com"
-    # Generous max_tokens so the JSON doesn't get truncated
-    assert DEFAULT_SCHEMA.max_tokens >= 1024
+    # Bilingual output ~doubles text volume; bumped from 1024 in v3 so
+    # latlong (at the bottom of the JSON template) doesn't truncate.
+    assert DEFAULT_SCHEMA.max_tokens >= 1500
+
+
+def test_default_schema_version_is_v3():
+    """Schema v3 = bilingual + url_language. Bumping invalidates older sidecars."""
+    assert DEFAULT_SCHEMA.schema_version == 3
+
+
+# ── schema v3: bilingual {en, es} validators ──────────────────────────
+
+def test_validate_rejects_legacy_string_title():
+    """v1 monolingual title (plain string) must fail under v3."""
+    r = _ok_response()
+    r["title"] = "monolingual title"
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_title_missing_es_key():
+    r = _ok_response()
+    r["title"] = {"en": "English only"}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_title_missing_en_key():
+    r = _ok_response()
+    r["title"] = {"es": "Solo español"}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_title_with_empty_es():
+    r = _ok_response()
+    r["title"] = {"en": "Has English", "es": "   "}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:title"
+
+
+def test_validate_rejects_usps_with_string_items():
+    """Each USP must be a {en, es} dict — bare strings rejected."""
+    r = _ok_response()
+    r["usps"] = ["Beachfront", "Flat", "Paved"]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:usps"
+
+
+def test_validate_rejects_usps_with_partial_translation():
+    r = _ok_response()
+    r["usps"] = [
+        {"en": "Beachfront", "es": "Frente al mar"},
+        {"en": "Flat"},  # missing es
+        {"en": "Paved", "es": "Pavimentado"},
+    ]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:usps"
+
+
+# ── schema v3: url_language ───────────────────────────────────────────
+
+def test_validate_rejects_missing_url_language():
+    r = _ok_response()
+    del r["url_language"]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "missing:url_language"
+
+
+def test_validate_rejects_unknown_url_language():
+    r = _ok_response()
+    r["url_language"] = "fr"
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:url_language"
+
+
+def test_validate_accepts_url_language_mixed():
+    r = _ok_response()
+    r["url_language"] = "mixed"
+    ok, reason = validate_response(r)
+    assert ok is True
+    assert reason is None

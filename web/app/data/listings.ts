@@ -142,25 +142,51 @@ export function adaptListing(raw: any): Listing {
       : SOURCE_LABELS[sourceKey] ??
         sourceKey.replace(/^\w/, (c) => c.toUpperCase());
 
-  const titleStr =
-    typeof raw.title_canonical === "string" && raw.title_canonical.length > 0
-      ? raw.title_canonical
-      : typeof raw.title === "string"
-      ? raw.title
-      : "Untitled";
+  // Schema v3 emits {en, es} dicts for title_canonical /
+  // short_description_canonical / reasons_to_buy when DeepSeek runs.
+  // The fallback template path still writes single-language strings.
+  // localizedFromAny accepts either shape and yields a Localized; missing
+  // .es is allowed and tr() falls back to .en at render time.
+  const localizedFromAny = (
+    canonical: any,
+    legacy: string | undefined,
+  ): { en: string; es?: string } => {
+    if (canonical && typeof canonical === "object" && typeof canonical.en === "string") {
+      const out: { en: string; es?: string } = { en: canonical.en };
+      if (typeof canonical.es === "string" && canonical.es.length > 0) out.es = canonical.es;
+      return out;
+    }
+    if (typeof canonical === "string" && canonical.length > 0) return { en: canonical };
+    if (typeof legacy === "string" && legacy.length > 0) return { en: legacy };
+    return { en: "" };
+  };
 
-  const descStr =
-    typeof raw.short_description_canonical === "string" && raw.short_description_canonical.length > 0
-      ? raw.short_description_canonical
-      : typeof raw.description === "string"
-      ? decodeHtmlEntities(raw.description).replace(/\s+/g, " ").trim()
-      : "";
+  const titleLocalized = localizedFromAny(raw.title_canonical, raw.title);
+  if (!titleLocalized.en) titleLocalized.en = "Untitled";
+
+  const descLegacy = typeof raw.description === "string"
+    ? decodeHtmlEntities(raw.description).replace(/\s+/g, " ").trim()
+    : undefined;
+  const descLocalized = localizedFromAny(raw.short_description_canonical, descLegacy);
 
   const usps: Listing["usps"] = Array.isArray(raw.reasons_to_buy)
-    ? raw.reasons_to_buy
-        .filter((s: any) => typeof s === "string" && s.length > 0)
-        .map((s: string) => ({ en: s }))
+    ? (raw.reasons_to_buy
+        .map((s: any): { en: string; es?: string } | null => {
+          if (s && typeof s === "object" && typeof s.en === "string") {
+            const out: { en: string; es?: string } = { en: s.en };
+            if (typeof s.es === "string" && s.es.length > 0) out.es = s.es;
+            return out;
+          }
+          if (typeof s === "string" && s.length > 0) return { en: s };
+          return null;
+        })
+        .filter((u: { en: string; es?: string } | null): u is { en: string; es?: string } => u !== null))
     : [];
+
+  const urlLanguage: "en" | "es" | "mixed" | null =
+    raw.url_language === "en" || raw.url_language === "es" || raw.url_language === "mixed"
+      ? raw.url_language
+      : null;
 
   const isBeachfront = Boolean(raw.is_beachfront);
   const photos = buildPhotos(raw);
@@ -168,9 +194,10 @@ export function adaptListing(raw: any): Listing {
 
   return {
     id,
-    title: { en: titleStr },
-    description: { en: descStr },
+    title: titleLocalized,
+    description: descLocalized,
     usps,
+    url_language: urlLanguage,
     zone_name: pretty(raw.zone, ZONE_NAMES),
     region: department,
     country: typeof raw.country === "string" ? raw.country : "SV",
