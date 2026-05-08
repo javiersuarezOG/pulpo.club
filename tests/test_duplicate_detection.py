@@ -27,6 +27,7 @@ sys.path.insert(0, str(REPO))
 from automation.duplicate_detection import (   # noqa: E402
     CENTROID_MIN_LISTINGS,
     COORD_RADIUS_M,
+    MAX_AREA_RATIO,
     PRICE_TOLERANCE_PCT,
     _compute_centroids,
     detect_duplicates,
@@ -475,3 +476,123 @@ def test_phone_match_still_fires_at_centroid_coord():
     # Coord match for A↔B is suppressed by centroid rule, but phone
     # match catches them anyway → still flagged in the headline.
     assert "bienesraices+century21" in metrics["by_source_pair"]
+
+
+# ── area-band gate (Phase 1.2) ────────────────────────────────────────
+
+
+def test_max_area_ratio_constant_documented():
+    """If you change MAX_AREA_RATIO, this test fails — same rationale as
+    the price-band, coord-radius, and centroid-threshold pinning. The
+    1.5× threshold was calibrated against the Phase 1.1.5 audit
+    (samples/dedup_audit_2026-05-08_v2.md): caught 20 of 20 FPs while
+    preserving the only UNCLEAR pair (1.07× ratio)."""
+    assert MAX_AREA_RATIO == 1.5
+
+
+def test_coord_pair_with_huge_area_mismatch_is_suppressed():
+    """The headline Phase 1.2 case: same coord, areas 22× apart
+    ('11 manzanas Santa Ana commercial 76,880 m²' vs 'Residencial Sinai
+    lot 431 m²') must NOT flag as a duplicate. They are obviously
+    distinct parcels at the same fallback geocode."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.99, lng=-89.55, price_usd=308_000, area_m2=76_880)
+    b = _li(source="remax", source_id="B",
+            lat=13.99, lng=-89.55, price_usd=260_000, area_m2=3_500)
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 0
+    assert metrics["coord_pairs_suppressed_area"] == 1
+
+
+def test_coord_pair_with_close_area_match_keeps():
+    """Areas inside MAX_AREA_RATIO must NOT be suppressed — those are
+    the candidates we actually want. The Phase 1.1.5 audit's only
+    UNCLEAR pair (Tenerife vs El Encanto, ratio 1.07×) is exactly
+    this case."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.674, lng=-89.279, price_usd=334_520, area_m2=875)
+    b = _li(source="remax", source_id="B",
+            lat=13.674, lng=-89.279, price_usd=365_000, area_m2=934)
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 1
+    assert metrics["coord_pairs_suppressed_area"] == 0
+
+
+def test_area_band_just_below_threshold_keeps():
+    """Area ratio = MAX_AREA_RATIO - epsilon → keep. Pinning the
+    boundary so a future tweak surfaces in the diff."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=1_000)
+    b = _li(source="remax", source_id="B",
+            lat=13.5, lng=-89.0, price_usd=100_000,
+            area_m2=1_490)   # ratio 1.49×, just below 1.5
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 1
+
+
+def test_area_band_just_above_threshold_drops():
+    """Area ratio just over MAX_AREA_RATIO → drop. Other side of the
+    same boundary."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=1_000)
+    b = _li(source="remax", source_id="B",
+            lat=13.5, lng=-89.0, price_usd=100_000,
+            area_m2=1_510)   # ratio 1.51×, just over 1.5
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 0
+    assert metrics["coord_pairs_suppressed_area"] == 1
+
+
+def test_area_band_both_areas_missing_keeps_pair():
+    """When EITHER area is missing, the gate doesn't fire — liberal
+    default mirroring the price-band's "missing-price-keeps-pair"
+    behaviour. Documents the choice; tighten later if FP analysis
+    shows it's wrong."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=None)
+    b = _li(source="remax", source_id="B",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=1_000)
+    metrics = detect_duplicates([a, b])
+    assert metrics["coord_pairs"] == 1
+    assert metrics["coord_pairs_suppressed_area"] == 0
+
+
+def test_area_band_zero_area_is_treated_as_missing():
+    """area_m2 == 0 is invalid (no real lot has zero area) — mirror
+    the price-band's `>0` precondition and treat zero as missing."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=0)
+    b = _li(source="remax", source_id="B",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=10_000)
+    metrics = detect_duplicates([a, b])
+    # Pair survives because zero is treated as missing (gate doesn't fire)
+    assert metrics["coord_pairs"] == 1
+
+
+def test_area_band_does_not_affect_phone_match():
+    """Phone matching is independent of coord matching, including the
+    area-band. Two listings with very different areas but a shared
+    phone still flag as duplicates via the phone pass."""
+    a = _li(source="bienesraices", source_id="A",
+            broker_phone="78513928",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=1_000)
+    b = _li(source="century21", source_id="B",
+            broker_phone="78513928",
+            lat=14.0, lng=-89.5,   # different coord — no coord match anyway
+            price_usd=100_000, area_m2=20_000)
+    metrics = detect_duplicates([a, b])
+    assert metrics["phone_pairs"] == 1
+    assert metrics["coord_pairs_suppressed_area"] == 0   # gate didn't run
+
+
+def test_area_band_metric_appears_in_summary():
+    """coord_pairs_suppressed_area surfaces in the metrics dict so
+    nightly logs and the sidecar can prove the gate is doing useful
+    work each run."""
+    a = _li(source="bienesraices", source_id="A",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=10_000)
+    b = _li(source="remax", source_id="B",
+            lat=13.5, lng=-89.0, price_usd=100_000, area_m2=1_000)
+    metrics = detect_duplicates([a, b])
+    assert "coord_pairs_suppressed_area" in metrics
+    assert metrics["coord_pairs_suppressed_area"] == 1

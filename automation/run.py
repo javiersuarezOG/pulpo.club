@@ -602,7 +602,8 @@ def main() -> int:
           f"(suppressing pairs from {dup_metrics['listings_at_centroids']} listings) "
           f"phone_pairs={dup_metrics['phone_pairs']} "
           f"coord_pairs={dup_metrics['coord_pairs']} "
-          f"(centroid-suppressed={dup_metrics['coord_pairs_suppressed_centroid']}) "
+          f"(suppressed centroid={dup_metrics['coord_pairs_suppressed_centroid']} "
+          f"area={dup_metrics['coord_pairs_suppressed_area']}) "
           f"flagged={dup_metrics['duplicate_listings_either']} "
           f"({dup_metrics['duplicate_pct']}%) "
           f"unique_estimate={dup_metrics['unique_listings_estimate']}")
