@@ -212,19 +212,46 @@ function NotificationsSection({ app }) {
   };
   const setKey = (k, v) => { setPrefs(p => ({ ...p, [k]: v })); flash(); };
 
-  const cats = [
-    { key: "newsletter",       title: "Weekly newsletter",        desc: "The main Pulpo digest — new listings, price drops, curated picks." },
-    { key: "price_drops",      title: "Price drop alerts",        desc: "Email when a saved listing drops in price." },
-    { key: "new_in_zones",     title: "New listings in saved zones", desc: "Get early notice when something new appears in areas you've explored." },
-    { key: "platform_updates", title: "Platform updates",         desc: "Occasional product news and feature announcements." },
+  // Pro-only deal alerts. Free users see an upgrade prompt instead
+  // of these toggles; we keep `platform_updates` accessible to
+  // everyone because it's product news, not premium content.
+  const isPaid = !!(app.user && app.user.plan && app.user.plan !== "free");
+
+  const proCats = [
+    { key: "newsletter",   title: t("account.notif.newsletter.title",   app.locale), desc: t("account.notif.newsletter.desc",   app.locale) },
+    { key: "price_drops",  title: t("account.notif.price_drops.title",  app.locale), desc: t("account.notif.price_drops.desc",  app.locale) },
+    { key: "new_in_zones", title: t("account.notif.new_in_zones.title", app.locale), desc: t("account.notif.new_in_zones.desc", app.locale) },
+  ];
+  const freeCats = [
+    { key: "platform_updates", title: t("account.notif.platform_updates.title", app.locale), desc: t("account.notif.platform_updates.desc", app.locale) },
   ];
 
   return (
     <div className="account-section">
       <p className="section-intro">{t("account.notif.intro", app.locale)}</p>
 
+      {!isPaid && <NotifProUpsell app={app} />}
+
+      {isPaid && (
+        <div className="pref-list">
+          {proCats.map(c => (
+            <div className="pref-row" key={c.key}>
+              <div className="pref-text">
+                <div className="pref-title">{c.title}</div>
+                <div className="pref-desc">{c.desc}</div>
+              </div>
+              <Toggle
+                checked={prefs[c.key]}
+                onChange={v => setKey(c.key, v)}
+                ariaLabel={c.title}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="pref-list">
-        {cats.map(c => (
+        {freeCats.map(c => (
           <div className="pref-row" key={c.key}>
             <div className="pref-text">
               <div className="pref-title">{c.title}</div>
@@ -239,45 +266,47 @@ function NotificationsSection({ app }) {
         ))}
       </div>
 
-      <h3 className="account-subhead">Channels</h3>
+      <h3 className="account-subhead">{t("account.notif.channels", app.locale)}</h3>
       <div className="pref-list">
         <div className="pref-row">
           <div className="pref-text">
-            <div className="pref-title">Email</div>
-            <div className="pref-desc">Always on — primary product delivery channel.</div>
+            <div className="pref-title">{t("account.notif.email", app.locale)}</div>
+            <div className="pref-desc">{t("account.notif.email_desc", app.locale)}</div>
           </div>
-          <span className="pref-locked">Required</span>
+          <span className="pref-locked">{t("account.notif.required", app.locale)}</span>
         </div>
-        <div className="pref-row">
-          <div className="pref-text">
-            <div className="pref-title">WhatsApp</div>
-            <div className="pref-desc">Optional opt-in. Stores your number for future deal alerts.</div>
-            {prefs.whatsapp && (
-              <input
-                type="tel"
-                className="pref-inline-input"
-                placeholder="+503 7000 0000"
-                value={prefs.whatsapp_number}
-                onChange={(e) => setPrefs(p => ({ ...p, whatsapp_number: e.target.value }))}
-              />
-            )}
-            {prefs.whatsapp && prefs.whatsapp_number && (
-              <div className="pref-confirm">
-                We'll send deal alerts to {prefs.whatsapp_number}. You can opt out anytime.
-              </div>
-            )}
+        {isPaid && (
+          <div className="pref-row">
+            <div className="pref-text">
+              <div className="pref-title">{t("account.notif.whatsapp", app.locale)}</div>
+              <div className="pref-desc">{t("account.notif.whatsapp_desc", app.locale)}</div>
+              {prefs.whatsapp && (
+                <input
+                  type="tel"
+                  className="pref-inline-input"
+                  placeholder="+503 7000 0000"
+                  value={prefs.whatsapp_number}
+                  onChange={(e) => setPrefs(p => ({ ...p, whatsapp_number: e.target.value }))}
+                />
+              )}
+              {prefs.whatsapp && prefs.whatsapp_number && (
+                <div className="pref-confirm">
+                  {t("account.notif.whatsapp_confirm", app.locale, { number: prefs.whatsapp_number })}
+                </div>
+              )}
+            </div>
+            <Toggle
+              checked={prefs.whatsapp}
+              onChange={v => setKey("whatsapp", v)}
+              ariaLabel={t("account.notif.whatsapp", app.locale)}
+            />
           </div>
-          <Toggle
-            checked={prefs.whatsapp}
-            onChange={v => setKey("whatsapp", v)}
-            ariaLabel="WhatsApp"
-          />
-        </div>
+        )}
       </div>
 
-      {prefs.newsletter && (
+      {isPaid && prefs.newsletter && (
         <>
-          <h3 className="account-subhead">Newsletter frequency</h3>
+          <h3 className="account-subhead">{t("account.notif.frequency", app.locale)}</h3>
           <div className="freq-toggle">
             {["weekly","biweekly"].map(f => (
               <button
@@ -286,7 +315,7 @@ function NotificationsSection({ app }) {
                 className={prefs.frequency === f ? "active" : ""}
                 onClick={() => setKey("frequency", f)}
               >
-                {f === "weekly" ? "Weekly" : "Bi-weekly"}
+                {t(f === "weekly" ? "account.notif.freq_weekly" : "account.notif.freq_biweekly", app.locale)}
               </button>
             ))}
           </div>
@@ -295,9 +324,52 @@ function NotificationsSection({ app }) {
 
       {confirm && <div className="account-inline-confirm">{t("account.notif.saved", app.locale)}</div>}
 
-      <p className="unsub-note">
-        You can also unsubscribe from any email using the link at the bottom of each message.
-      </p>
+      {isPaid && (
+        <p className="unsub-note">
+          {t("account.notif.unsub_note", app.locale)}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Upgrade CTA shown to free / anonymous users in the Notifications
+// subsection in place of the Pro-gated toggles. Click → standard Stripe
+// checkout flow (or signup → checkout for anonymous users via the
+// existing pendingAction chain).
+function NotifProUpsell({ app }) {
+  const onUpgrade = () => {
+    startStripeCheckout({
+      onError: (code) => {
+        if (code === "sign_in_required") {
+          if (app.user) {
+            app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+          } else {
+            app.openSignup({ mode: "signup", pendingAction: "checkout" });
+          }
+        } else {
+          app.go("plans");
+        }
+      },
+    });
+  };
+  return (
+    <div className="notif-upsell">
+      <div className="notif-upsell-icon">
+        <Icon name="sparkle" size={20} strokeWidth={1.8}/>
+      </div>
+      <div className="notif-upsell-body">
+        <h3>{t("account.notif.upsell.title", app.locale)}</h3>
+        <p>{t("account.notif.upsell.body", app.locale)}</p>
+        <ul className="notif-upsell-list">
+          <li>{t("account.notif.newsletter.title", app.locale)}</li>
+          <li>{t("account.notif.price_drops.title", app.locale)}</li>
+          <li>{t("account.notif.new_in_zones.title", app.locale)}</li>
+        </ul>
+        <button className="btn-primary" onClick={onUpgrade}>
+          {t("account.notif.upsell.cta", app.locale)}
+        </button>
+      </div>
     </div>
   );
 }
