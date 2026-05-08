@@ -145,6 +145,19 @@ export type EventMap = {
     to_idx: number;
     ms: number;
   };
+  /** Card image load duration: from React render → onLoad fired.
+   *  Only emitted for `eager` images (the above-the-fold cards on
+   *  Browse/Discover/Saved). Lazy images defer their fetch until
+   *  intersection so a "duration" wouldn't be meaningful — they get
+   *  measured separately if we ever wire an IntersectionObserver
+   *  start-stamp. `idx` is the photo carousel index, `source` is the
+   *  surface so PostHog can compare browse vs discover vs saved. */
+  "perf.card_image_load": {
+    listing_id: string;
+    idx: number;
+    ms: number;
+    source: "browse" | "discover" | "saved";
+  };
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */
   "perf.data_fetch": {

@@ -137,6 +137,7 @@ Source of truth: [`web/app/telemetry/events.ts`](../web/app/telemetry/events.ts)
 | Event | Payload | Fires from |
 |---|---|---|
 | `card.photo_nav_latency` | `{ listing_id, from_idx, to_idx, ms }` | Card photo arrow click |
+| `perf.card_image_load` | `{ listing_id, idx, ms, source }` | Eager card image (above-the-fold on Browse / Discover / Saved). Fires on `<img onLoad>` for cards rendered with `priority`. Lazy cards do not emit — their fetch is intersection-deferred and would mostly measure idle scroll time. |
 | `perf.data_fetch` | `{ file, ms, bytes, cache }` | `useListings` data fetch |
 | `perf.filter_recompute` | `{ ms, result_count, active_filters }` | Browse filter pipeline |
 | `perf.detail_open` | `{ listing_id, ms }` | Card click → detail render |
