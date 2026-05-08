@@ -98,6 +98,55 @@ def test_t3_legacy_zone_el_tunco_in_description():
     assert li.zone_confidence == "specific"
 
 
+# ── Lake zones (PR #161 — Coatepeque + Ilopango) ──────────────────────
+
+
+def test_lago_coatepeque_in_title():
+    """Title 'Terreno con vista al Lago de Coatepeque' → lago-coatepeque
+    zone. Tests the new ZONE_PATTERNS entry; uses a land-style title
+    so the bienesraices title-filter doesn't intercept."""
+    li = _normalize(
+        title="Terreno con vista al Lago de Coatepeque, $200,000",
+        location_text="El Congo, Santa Ana",
+    )
+    assert li is not None
+    assert li.zone == "lago-coatepeque"
+    assert li.department == "Santa Ana"
+
+
+def test_lago_ilopango_in_title():
+    """'Lago de Ilopango' resolves to lago-ilopango. Strict 'lago'
+    prefix means the airport district can't false-match."""
+    li = _normalize(
+        title="Terreno frente al Lago de Ilopango, 2576vr2",
+        location_text="San Salvador",
+    )
+    assert li is not None
+    assert li.zone == "lago-ilopango"
+    assert li.department == "San Salvador"
+
+
+def test_ilopango_alone_does_not_match_lake_zone():
+    """A listing in 'Ilopango' (airport district / municipality) without
+    'lago' prefix must NOT resolve to lago-ilopango — that would conflate
+    the airport-area real-estate market with the lake-front one."""
+    li = _normalize(
+        title="Terreno comercial en Ilopango Bulevar del Ejército",
+        location_text="Ilopango, San Salvador",
+    )
+    assert li is not None
+    assert li.zone != "lago-ilopango"
+
+
+def test_lago_coatepeque_via_playa_alias():
+    """'Playa Coatepeque' (the local term for the lake shore) also
+    resolves to the lake zone."""
+    li = _normalize(title="Lote Playa Coatepeque, $300,000",
+                    location_text="El Congo, Santa Ana")
+    assert li is not None
+    assert li.zone == "lago-coatepeque"
+
+
 # ── T6: Structured location_text CSV parsing ──────────────────────────
 
 def test_t6_location_text_municipality_dept():

@@ -28,7 +28,7 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
-from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
+from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -58,8 +58,9 @@ PROP_TYPE_IDS_TO_FETCH: list[tuple[str, str]] = [
 # still import PROP_TYPE expecting the land ID.
 PROP_TYPE = "3"
 
-# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
-_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+# Compiled waterfront-keyword fallback for the vacation-zone filter on
+# house/condo. "Waterfront" covers ocean coast + lake (PR #161, 2026-05-08).
+_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 _TOKEN_FIELDS = ("__RequestVerificationToken", "ax", "bx", "cx", "dx")
 
@@ -340,15 +341,15 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
             # 1 v² = 0.6987 m² (standard El Salvador conversion).
             rec["built_area_m2"] = round(bv * 0.6987, 2) if bu == "v2" else bv
 
-    # Coastal filter — house/condo dropped unless its location string matches
-    # COASTAL_ZONES OR title/description carries a beachfront keyword. Land
-    # is exempt (inland lots stay).
+    # Vacation-zone filter — house/condo dropped unless its location string
+    # matches VACATION_ZONES (ocean coast OR lake) OR title/description
+    # carries a waterfront keyword. Land is exempt (inland lots stay).
     if broker_type in ("house", "condo"):
         loc_blob = (rec.get("location_text") or "").lower().replace(" ", "-")
-        zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+        zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
         text_blob = f"{title}\n{description}"
-        has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
-        if not zone_is_coastal and not has_beachfront_kw:
+        has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
+        if not zone_is_vacation and not has_waterfront_kw:
             return None
 
     # Multi-signal classifier — confirms broker_type, surfaces signals for

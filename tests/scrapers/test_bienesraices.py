@@ -257,9 +257,10 @@ def test_parse_condo_populates_floor_and_hoa():
 
 
 def test_parse_drops_inland_house_with_no_beachfront_keyword():
-    """Per spec: house/condo not in COASTAL_ZONES AND no beachfront keyword
-    must be DROPPED at scrape time. Inland house in San Salvador, generic
-    description with no playa / frente al mar — must be skipped."""
+    """Per spec: house/condo not in VACATION_ZONES AND no waterfront
+    keyword must be DROPPED at scrape time. Inland house in San
+    Salvador, generic description with no playa / frente al mar /
+    frente al lago — must be skipped."""
     s = BienesRaicesScraper()
     out = s._parse(_wrap(_coastal_house_payload(
         province="San Salvador", city="San Salvador Centro",
