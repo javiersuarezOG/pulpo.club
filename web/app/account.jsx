@@ -298,11 +298,11 @@ function SubscriptionSection({ app }) {
   const status = "active"; // 'active' | 'paused' | 'payment_issue'
 
   const orders = [
-    { date: "5 May 2026",   desc: "Pulpo Monthly — May 2026",   status: "paid",    amount: "$9.95" },
-    { date: "5 Apr 2026",   desc: "Pulpo Monthly — Apr 2026",   status: "paid",    amount: "$9.95" },
-    { date: "5 Mar 2026",   desc: "Pulpo Monthly — Mar 2026",   status: "paid",    amount: "$9.95" },
-    { date: "5 Feb 2026",   desc: "Pulpo Monthly — Feb 2026",   status: "paid",    amount: "$9.95" },
-    { date: "5 Jan 2026",   desc: "Pulpo Monthly — Jan 2026",   status: "paid",    amount: "$9.95" },
+    { date: "5 May 2026",   desc: "Pulpo Monthly — May 2026",   status: "paid",    amount: "$10.00" },
+    { date: "5 Apr 2026",   desc: "Pulpo Monthly — Apr 2026",   status: "paid",    amount: "$10.00" },
+    { date: "5 Mar 2026",   desc: "Pulpo Monthly — Mar 2026",   status: "paid",    amount: "$10.00" },
+    { date: "5 Feb 2026",   desc: "Pulpo Monthly — Feb 2026",   status: "paid",    amount: "$10.00" },
+    { date: "5 Jan 2026",   desc: "Pulpo Monthly — Jan 2026",   status: "paid",    amount: "$10.00" },
   ];
 
   const isPaid = plan !== "free";

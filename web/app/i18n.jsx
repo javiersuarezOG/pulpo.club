@@ -82,6 +82,7 @@ const UI_STRINGS = {
   "nav.login":               { en: "Log in",              es: "Iniciar sesión" },
   "nav.signup_free":         { en: "Sign up — free",      es: "Crear cuenta — gratis" },
   "nav.logout":              { en: "Log out",             es: "Cerrar sesión" },
+  "nav.account_or_sign_in":  { en: "Sign in or create an account", es: "Inicia sesión o crea una cuenta" },
   "nav.tab.home":            { en: "Home",                es: "Inicio" },
   "nav.tab.browse":          { en: "Browse",              es: "Explorar" },
   "nav.tab.saved":           { en: "Saved",               es: "Guardados" },
@@ -89,10 +90,10 @@ const UI_STRINGS = {
   "nav.tab.signin":          { en: "Sign in",             es: "Entrar" },
 
   // Hero
-  "hero.sub":                { en: "Find land worth wanting in El Salvador. Pulpo brings together titled and off-market land deals in one place.",
-                               es: "Encuentra tierra que vale la pena en El Salvador. Pulpo reúne terrenos titulados y off-market en un solo lugar." },
-  "hero.cta.browse":         { en: "Browse all listings", es: "Ver todos los terrenos" },
-  "hero.cta.see_listing":    { en: "See this listing",    es: "Ver este terreno" },
+  "hero.sub":                { en: "Find properties worth wanting in El Salvador. Pulpo brings together titled and off-market listings — land, beachfront homes, and more — in one place.",
+                               es: "Encuentra propiedades que valen la pena en El Salvador. Pulpo reúne anuncios titulados y off-market — terrenos, casas frente al mar y más — en un solo lugar." },
+  "hero.cta.browse":         { en: "Browse all listings", es: "Ver todas las propiedades" },
+  "hero.cta.see_listing":    { en: "See this listing",    es: "Ver este anuncio" },
   "hero.featured_today":     { en: "Featured today",      es: "Destacado hoy" },
 
   // Pill rail
@@ -161,8 +162,8 @@ const UI_STRINGS = {
   "toast.logged_out":        { en: "Logged out",           es: "Sesión cerrada" },
 
   // Footer
-  "footer.tagline":          { en: "Land worth wanting in El Salvador.",
-                               es: "Tierra que vale la pena en El Salvador." },
+  "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
+                               es: "Propiedades que valen la pena en El Salvador." },
   "footer.country_badge":    { en: "Listings in El Salvador",
                                es: "Terrenos en El Salvador" },
 
@@ -275,14 +276,26 @@ const UI_STRINGS = {
   "locale.toggle_aria":      { en: "Language",                      es: "Idioma" },
 
   // Newsletter CTA (Discover footer + dedicated form)
-  "newsletter.title":        { en: "Get the top 10 land deals every week",
-                               es: "Recibe los 10 mejores terrenos cada semana" },
+  "newsletter.title":        { en: "Get the top 10 property deals every week",
+                               es: "Recibe las 10 mejores propiedades cada semana" },
   "newsletter.sub":          { en: "Beachfront, build-ready and off-market — straight to your inbox. Unsubscribe anytime.",
-                               es: "Frente a la playa, listos para construir y off-market — directo a tu correo. Cancela cuando quieras." },
+                               es: "Frente a la playa, listas para construir y off-market — directo a tu correo. Cancela cuando quieras." },
   "newsletter.placeholder":  { en: "your@email.com",                es: "tu@correo.com" },
   "newsletter.subscribe":    { en: "Subscribe",                     es: "Suscribirme" },
+  "newsletter.signup_cta":   { en: "Sign up to unlock the weekly digest",
+                               es: "Crea cuenta para recibir el resumen semanal" },
   "newsletter.success":      { en: "You're in. First digest Monday.",
                                es: "Listo. Primer resumen el lunes." },
+
+  // Plans page — Stripe-wired Pro CTA. PRO_PRICE_USD_PER_MONTH lives in
+  // pages.jsx and mirrors automation/stripe_setup.mjs.
+  "plans.upgrade_pro_cta":   { en: "Upgrade — ${price}/month",
+                               es: "Mejorar — ${price}/mes" },
+  "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
+                                  es: "No pudimos iniciar el pago — inténtalo de nuevo." },
+
+  // Browse — Load more pagination
+  "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 
   // Consent banner (GDPR)
   "consent.aria":            { en: "Cookie consent",                es: "Consentimiento de cookies" },

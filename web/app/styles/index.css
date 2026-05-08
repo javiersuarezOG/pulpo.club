@@ -132,6 +132,28 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 600; font-size: 13px;
 }
 
+/* Single auth icon — replaces the dual "Log in" + "Sign up — free" pair.
+   Both flows live behind the modal's mode-switch links. 44×44 hit area on
+   mobile per the touch-target target. */
+.topnav-auth-icon {
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color 160ms, border-color 160ms, background 160ms;
+}
+.topnav-auth-icon:hover {
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+@media (max-width: 600px) {
+  .topnav-auth-icon { width: 44px; height: 44px; }
+}
+
 /* ============== Buttons ============== */
 .btn-primary {
   background: var(--ink); color: var(--paper);
@@ -403,6 +425,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
   padding-left: 24px;
   padding-right: 24px;
   scroll-snap-type: x mandatory;
+  /* Without scroll-padding-left, snap-mandatory aligns the first card's
+     edge with the rail's edge — past our padding — so the first card
+     renders flush to the screen on first paint. */
+  scroll-padding-left: 24px;
   /* Edge-fade mask — the last card visibly trails off so the user
      understands there's more to the right without needing chevrons. */
   -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
@@ -478,6 +504,24 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .shelf-item { width: 78%; min-width: 260px; }
   .shelf-rail { gap: 12px; }
   /* Keep snap mandatory on mobile — momentum scroll + snap feels right */
+
+  /* Mobile gutter: tighten from 24px → 16px so the first card's left
+     edge has breathing room. --section-pad is desktop-tuned; on a 375px
+     viewport the rail used to read flush to the screen edge. Placed
+     after the base .shelf-rail rule above so it wins on source order. */
+  .shelves { padding-left: 16px; padding-right: 16px; }
+  .shelf-rail,
+  .style-rail {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    /* scroll-padding-left matches padding-left so the scroll-snap
+       alignment respects the gutter — without this, snap-mandatory
+       scrolls past the padding and the first card hugs the edge. */
+    scroll-padding-left: 16px;
+  }
+  .style-carousel { padding-left: 16px; padding-right: 16px; }
 }
 
 /* PR-4c — magazine variant of the carousel rail.
@@ -767,16 +811,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .nl-text > svg { color: var(--accent); margin-top: 4px; flex-shrink: 0; }
 .nl-title { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; }
 .nl-sub { color: var(--ink-3); font-size: 13px; margin-top: 4px; }
-.nl-form { display: flex; gap: 8px; }
-.nl-form input {
-  padding: 12px 16px; border: 1px solid var(--line);
-  border-radius: 999px; min-width: 240px;
-  background: var(--paper);
-}
-.nl-form input:focus { outline: 2px solid var(--accent); }
-.nl-success {
-  display: flex; align-items: center; gap: 8px;
-  color: var(--moss); font-weight: 500;
+.nl-cta { white-space: nowrap; }
+
+/* Mobile: tighten the green box and let the CTA span full width so the
+   button doesn't fall outside the card on narrow viewports. */
+@media (max-width: 600px) {
+  .newsletter-cta { padding: 20px 16px; margin-top: 16px; }
+  .nl-inner { gap: 14px; align-items: stretch; }
+  .nl-cta { width: 100%; justify-content: center; }
+  .nl-title { font-size: 19px; }
 }
 
 /* ============== Browse page ============== */
@@ -908,6 +951,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 1023px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
 
 @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+/* "Load more" pagination CTA — sits below the card grid. Avoids
+   dumping ~870 listings into the DOM at once. */
+.browse-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
 
 /* ============== Filter panel ============== */
 .filter-panel {
@@ -1663,9 +1714,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--moss); color: white;
   padding: 2px 6px; border-radius: 4px;
 }
+/* With the Agency tier hidden the grid is two cards. Centered + capped at
+   360px each so they don't stretch across the full plans-page max-width.
+   Mobile stays single-column. */
 .plans-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  justify-content: center;
+  gap: 24px;
   margin-bottom: 32px;
 }
 
@@ -1864,8 +1920,8 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .site-footer {
   border-top: 1px solid var(--line);
   background: var(--paper-2);
-  padding: 60px 24px 40px;
-  margin-top: 64px;
+  padding: 40px 24px 24px;
+  margin-top: 32px;
 }
 .footer-inner {
   max-width: 1400px; margin: 0 auto;
@@ -2264,6 +2320,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   margin: 0 calc(-1 * var(--section-pad));
   padding-left: var(--section-pad);
   padding-right: var(--section-pad);
+  scroll-padding-left: var(--section-pad);
   -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
           mask-image: linear-gradient(to right, black 0, black calc(100% - 36px), transparent 100%);
 }
@@ -2755,6 +2812,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
   /* On tablet/mobile, collapse to the icon. */
   .live-stats-inline { display: none; }
   .live-stats-toggle { display: inline-flex; }
+}
+@media (max-width: 600px) {
+  /* The toggle sits in the middle of .topnav-right, so anchoring the
+     popover with `right: 0` ran it off-screen left at 375px. Pin to the
+     viewport edge with a small inset and cap the width so it always
+     fits — independent of where the toggle button lives in the header. */
+  .live-stats-popover {
+    position: fixed;
+    top: 64px;
+    right: 12px;
+    left: auto;
+    max-width: calc(100vw - 24px);
+    min-width: 200px;
+  }
 }
 @media (max-width: 480px) {
   /* Free up topnav-right gap on tiny screens. */
