@@ -111,8 +111,8 @@ def test_inland_house_without_beachfront_keyword_is_dropped():
 
 
 def test_house_with_beachfront_keyword_in_text_is_kept():
-    """Coastal filter — beachfront keyword in title/description rescues
-    a listing whose declared zone isn't on COASTAL_ZONES list."""
+    """Vacation-zone filter — waterfront keyword in title/description
+    rescues a listing whose declared zone isn't on VACATION_ZONES."""
     html = """<html><body>
         <h1 class="entry-title">Beachfront Villa near El Tunco</h1>
         <div class="vc_toggle">

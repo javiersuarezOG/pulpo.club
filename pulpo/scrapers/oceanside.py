@@ -31,7 +31,7 @@ from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client, wi
 from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
-from automation.property_types import COASTAL_ZONES, BEACHFRONT_KEYWORDS
+from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 API_BASE   = "https://oceansideelsalvador.com/wp-json/wp/v2"
 BASE_URL   = "https://oceansideelsalvador.com/"
@@ -54,8 +54,9 @@ _LAND_SLUGS = {
 _HOUSE_SLUGS = {"houses", "house", "beach-villa", "casa", "casas", "villa", "villas"}
 _CONDO_SLUGS = {"condo", "condos", "apartments", "apartment", "apartamento", "apartamentos"}
 
-# Compiled beachfront-keyword fallback for the coastal filter on house/condo.
-_BEACHFRONT_RE = re.compile("|".join(BEACHFRONT_KEYWORDS), re.IGNORECASE)
+# Compiled waterfront-keyword fallback for the vacation-zone filter on
+# house/condo. "Waterfront" covers ocean coast + lake (PR #161, 2026-05-08).
+_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 # ── Built-type field regexes (oceanside content_text is unstructured prose) ──
 # Bedrooms: "3 bedroom", "3 beds", "tres habitaciones", "3-bed", "3BR".
@@ -298,16 +299,17 @@ def _map(rec: dict, land_term_id: Optional[int], broker_type: str = "land") -> O
             except ValueError:
                 pass
 
-        # Coastal filter — drop unless location matches COASTAL_ZONES OR
-        # title/description carries a beachfront keyword. Most oceanside
-        # listings ARE coastal (the brand is "Oceanside"), so this filter
-        # should be lenient in practice — but documenting the gate keeps
-        # parity with bienesraices/remax/c21.
+        # Vacation-zone filter — drop unless location matches a known
+        # vacation zone (ocean coast or lake) OR title/description carries
+        # a waterfront keyword. Most oceanside listings ARE coastal (the
+        # brand is "Oceanside"), so this filter should be lenient in
+        # practice — but documenting the gate keeps parity with the
+        # other Phase-C scrapers (bienesraices/remax/c21/goodlife).
         loc_blob = location_text.lower().replace(" ", "-")
-        zone_is_coastal = any(z in loc_blob for z in COASTAL_ZONES)
+        zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
         text_blob = f"{title}\n{description}"
-        has_beachfront_kw = bool(_BEACHFRONT_RE.search(text_blob))
-        if not zone_is_coastal and not has_beachfront_kw:
+        has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
+        if not zone_is_vacation and not has_waterfront_kw:
             return None
 
     # Multi-signal classifier — confirms broker_type, surfaces signals

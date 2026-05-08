@@ -17,8 +17,8 @@ from pathlib import Path
 import pytest
 
 from automation.property_types import (
-    PROPERTY_TYPES, COASTAL_ZONES, TYPE_KEYWORDS, PLACE_NAME_EXCLUSIONS,
-    BEACHFRONT_KEYWORDS, label_for, is_known_type,
+    PROPERTY_TYPES, VACATION_ZONES, TYPE_KEYWORDS, PLACE_NAME_EXCLUSIONS,
+    WATERFRONT_KEYWORDS, label_for, is_known_type,
 )
 from pulpo.scrapers._type_classifier import (
     classify_property_type, _detect_type_in_text, _strip_exclusions,
@@ -37,7 +37,7 @@ def test_property_types_has_all_three_canonical_types():
 @pytest.mark.parametrize("ptype", ["land", "house", "condo"])
 def test_property_type_config_has_required_fields(ptype):
     cfg = PROPERTY_TYPES[ptype]
-    for field in ("label", "label_es", "coastal_only", "pill_bg",
+    for field in ("label", "label_es", "vacation_only", "pill_bg",
                   "pill_text", "title_canonical_template"):
         assert field in cfg, f"{ptype} missing {field}"
 
@@ -60,18 +60,28 @@ def test_is_known_type():
     assert not is_known_type("villa")  # not a canonical type, even if a keyword
 
 
-def test_coastal_zones_only_land_is_non_coastal():
-    """house and condo are coastal_only; land is not. The flag drives the
-    scraper-side coastal filter; if it ever flips for land we lose all
-    inland lots, so this test makes the regression loud."""
-    assert PROPERTY_TYPES["land"]["coastal_only"] is False
-    assert PROPERTY_TYPES["house"]["coastal_only"] is True
-    assert PROPERTY_TYPES["condo"]["coastal_only"] is True
+def test_vacation_only_flag_only_land_is_non_vacation():
+    """house and condo are vacation_only; land is not. The flag is the
+    documented contract that drives the scraper-side vacation-zone
+    filter — if it ever flips for land we lose all inland lots, so this
+    test makes the regression loud."""
+    assert PROPERTY_TYPES["land"]["vacation_only"] is False
+    assert PROPERTY_TYPES["house"]["vacation_only"] is True
+    assert PROPERTY_TYPES["condo"]["vacation_only"] is True
 
 
-def test_coastal_zones_includes_known_surf_corridor():
+def test_vacation_zones_includes_known_surf_corridor():
     for z in ("el-tunco", "el-sunzal", "el-zonte", "costa-del-sol"):
-        assert z in COASTAL_ZONES
+        assert z in VACATION_ZONES
+
+
+def test_vacation_zones_includes_lake_zones():
+    """Coatepeque + Ilopango lakes joined the vacation set in PR #161
+    (2026-05-08). Recon found ~4 unique house/condo + ~14 land lake-area
+    listings across bienesraices/remax/c21 — this test pins the
+    inclusion so a future cleanup doesn't accidentally drop them."""
+    assert "lago-coatepeque" in VACATION_ZONES
+    assert "lago-ilopango" in VACATION_ZONES
 
 
 # ── Place-name exclusion ────────────────────────────────────────────────
@@ -303,11 +313,25 @@ def test_type_keywords_have_no_substring_traps():
             assert "\\b" in p, f"{ptype} keyword {p!r} missing word boundary"
 
 
-def test_beachfront_keywords_compile():
+def test_waterfront_keywords_compile():
     """Cheap smoke test — every entry must be a valid regex; otherwise the
-    coastal fallback breaks at scrape time."""
-    for p in BEACHFRONT_KEYWORDS:
+    vacation-zone fallback breaks at scrape time."""
+    for p in WATERFRONT_KEYWORDS:
         re.compile(p)
+
+
+def test_waterfront_keywords_match_lake_phrases():
+    """Lake terms ('frente al lago', 'vista al lago', etc.) must produce
+    matches — pins the fix for the geographic gate that previously only
+    accepted ocean-coast text."""
+    rx = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
+    for phrase in (
+        "casa con frente al lago",
+        "vista al lago de coatepeque",
+        "orillas del lago",
+        "lakefront cabin",
+    ):
+        assert rx.search(phrase), f"WATERFRONT_KEYWORDS missed {phrase!r}"
 
 
 def test_place_name_exclusions_compile():
