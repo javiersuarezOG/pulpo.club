@@ -415,7 +415,7 @@ function Hero({ app }) {
 }
 
 // ====== Horizontal shelf ======
-function Shelf({ shelf, app, locked = false, layout = "standard", expanded = false, onToggleExpand, registerRef }) {
+function Shelf({ shelf, app, locked = false, layout = "standard", expanded = false, onToggleExpand, registerRef, shelfIndex = 0 }) {
   const LISTINGS = useListings();
   const scrollRef = pUseRef(null);
   const sectionRef = pUseRef(null);
@@ -471,10 +471,15 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
       </div>
       {expanded ? (
         <div className={isMagazine ? "shelf-magazine-grid" : "shelf-expanded-grid"}>
+          {/* Only the FIRST shelf on Discover is above the fold. With
+              15 shelves on the page, marking 4 cards/shelf eager meant
+              60 high-priority fetches on landing — the same priority-
+              lane storm we fixed on Browse. Restrict to shelf 0; the
+              rest fall through to native lazy. */}
           {items.map((l, i) => (
             <ListingCard
               key={l.id} listing={l} app={app}
-              priority={i < 6}
+              priority={shelfIndex === 0 && i < 3}
               source="discover"
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
@@ -492,14 +497,15 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
         // the rail scrolls. Buttons are tab-after-cards by DOM order.
         <div className="shelf-rail-wrap">
           <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
-            {/* Carousel rail: only the first ~4 cards are visible
-                without horizontal scroll, so eager-load just those. */}
+            {/* Same priority-lane budget as the expanded grid above —
+                only the first shelf's first ~3 cards are above the
+                fold; everything else lazy-loads on scroll. */}
             {items.map((l, i) => (
               <div className="shelf-item" key={l.id}>
                 <ListingCard
                   listing={l}
                   app={app}
-                  priority={i < 4}
+                  priority={shelfIndex === 0 && i < 3}
                   source="discover"
                   onOpen={() => {
                     track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
@@ -722,7 +728,7 @@ function HomePage({ app }) {
       </div>
 
       <div className="shelves">
-        {orderedShelves.map((shelf) => (
+        {orderedShelves.map((shelf, i) => (
           <Shelf
             key={shelf.key}
             shelf={shelf}
@@ -731,6 +737,7 @@ function HomePage({ app }) {
             expanded={expandedKey === shelf.key}
             onToggleExpand={toggleExpand}
             registerRef={registerRef}
+            shelfIndex={i}
           />
         ))}
         {!app.user && (
