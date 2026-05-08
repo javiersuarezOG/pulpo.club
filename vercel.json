@@ -23,23 +23,23 @@
   ],
   "headers": [
     {
-      "source": "/web/data/ranked.json",
+      "source": "/data/ranked.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }]
     },
     {
-      "source": "/web/data/last_updated.json",
+      "source": "/data/last_updated.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }]
     },
     {
-      "source": "/web/data/run_history.json",
+      "source": "/data/run_history.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }]
     },
     {
-      "source": "/web/data/featured.json",
+      "source": "/data/featured.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=86400" }]
     },
     {
-      "source": "/web/photos/:file",
+      "source": "/photos/:file",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800" }]
     }
   ]
