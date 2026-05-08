@@ -61,6 +61,12 @@ export type Listing = {
   dist_airport_km: number | null;
   dist_nearest_town_km: number | null;
   has_lat_lng: boolean;
+  /** DeepSeek's self-reported confidence on the lat/lng. 'high' = within
+   *  ~2km, 'medium' = within municipality, 'low' = department-level guess.
+   *  null when DeepSeek didn't run OR the listing has no lat/lng (in which
+   *  case any populated dist_*_km comes from a zone-table fallback and is
+   *  itself approximate). The FE uses this to soften distance displays. */
+  geocoding_confidence: "high" | "medium" | "low" | null;
   is_sold: boolean;
   original_url: string | null;
   // Carried for the legacy Browse "Advanced ranking" group + sort:

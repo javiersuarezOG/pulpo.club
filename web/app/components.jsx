@@ -57,6 +57,33 @@ function landTypeLabel(typeKey) {
   if (!typeKey) return "—";
   return t(`type.${typeKey}`, currentLocale());
 }
+// Format a distance pill (airport/beach/town) with precision tied to
+// the listing's geocoding confidence. Returns { n, approx } where
+// approx=true when the underlying lat/lng is fuzzy or absent (in which
+// case the distance came from a zone-table fallback). The caller picks
+// the right i18n key — the "_approx" variants prefix "ca." so users see
+// the precision difference. Returns null when km is null — callers
+// must skip the pill entirely.
+//
+// Rounding tiers:
+//   high confidence (within ~2km):       no rounding, show the integer km
+//   medium confidence (within municipality): round to nearest 5km, "ca."
+//   low confidence / no lat/lng (zone-table fallback):
+//                                        round to nearest 10km, "ca."
+function formatDistanceKm(km, listing) {
+  if (km == null || !Number.isFinite(km)) return null;
+  const conf = listing && listing.geocoding_confidence;
+  const hasLatLng = !!(listing && listing.has_lat_lng);
+  if (hasLatLng && conf === "high") {
+    return { n: Math.round(km), approx: false };
+  }
+  // Zone-table fallback (no lat/lng) is roughly the zone-centroid distance
+  // — the listing could be a few km off in any direction. Treat as widest
+  // rounding so users don't read precision into a centroid-derived number.
+  const step = (!hasLatLng || conf === "low") ? 10 : 5;
+  const rounded = Math.max(step, Math.round(km / step) * step);
+  return { n: rounded, approx: true };
+}
 
 // ===== Icons (inline SVG, Lucide-style) =====
 const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
@@ -423,5 +450,5 @@ function Toast({ toast }) {
 export {
   Icon, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
-  daysListedTone, landTypeLabel, currentLocale, currentUnits,
+  daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
 };
