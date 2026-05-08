@@ -42,6 +42,11 @@ import {
 import { LiveStats } from "./components/LiveStats.jsx";
 import { useUnits } from "./i18n.jsx";
 import { startStripeCheckout } from "./auth/stripe-checkout.js";
+import {
+  uspsVisibleFor,
+  galleryThumbsUnlockedFor,
+  isPaid as gateIsPaid,
+} from "./lib/gating.ts";
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1716,11 +1721,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
   const [lightbox, setLightbox] = pUseState(false);
   const isSold = listing.is_sold;
   const isOffMarket = listing.source_type === "off_market";
-  const isPaid = app.user && app.user.plan && app.user.plan !== "free";
-  // Off-market = paid-only. Anonymous and free users hit a paywall.
+  // Single source of truth for paywall rules — see web/app/lib/gating.ts.
+  // Off-market is paid-only; anonymous + free hit the soft paywall.
+  const isPaid = gateIsPaid(app.user);
   const offMarketLocked = isOffMarket && !isPaid;
   // Free signup unlocks: source URL, full gallery, all USPs, precise location.
   const needsSignup = !app.user;
+  const uspCap = uspsVisibleFor(app.user);
+  const thumbCap = galleryThumbsUnlockedFor(app.user);
 
   // PR-5 — detail telemetry. Fire `detail.opened` once per listing
   // (re-fires when user navigates to a different listing). Auth state
@@ -1799,11 +1807,16 @@ function ListingDetail({ listing, app, asPanel = true }) {
 
   const lc = app.locale;
   // Only push facts that have real data — skipping the "—" placeholders
-  // we used to render. Facts with null/false/missing values disappear,
-  // and the parent section is hidden entirely when fewer than 2 remain
-  // (rendering one orphan fact reads as a render-time bug, not a feature).
+  // we used to render. Facts with null / false / "unknown" values
+  // disappear, and the parent section is hidden when fewer than 2
+  // remain (rendering one orphan fact reads as a render-time bug, not
+  // a feature). `road_access_type` ships "unknown" as a literal
+  // enum value rather than null when the source data didn't disclose
+  // it, so we filter that out explicitly alongside null/falsy checks.
+  const isKnown = (v) =>
+    v != null && v !== "" && v !== "unknown" && v !== "Unknown";
   const facts = [];
-  if (listing.road_access_type) {
+  if (isKnown(listing.road_access_type)) {
     facts.push({ icon: "road", label: t("detail.fact.road", lc), value: capitalize(listing.road_access_type) });
   }
   if (listing.has_water) {
@@ -1814,13 +1827,13 @@ function ListingDetail({ listing, app, asPanel = true }) {
   }
   // Topography is always known (boolean), so it always shows.
   facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
-  if (listing.beachfront_tier) {
+  if (isKnown(listing.beachfront_tier)) {
     facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: capitalize(listing.beachfront_tier.replace("_", " ")) });
   }
   if (listing.has_ocean_view) {
     facts.push({ icon: "sun", label: t("detail.fact.ocean_view", lc), value: t("detail.fact.yes", lc) });
   }
-  if (listing.zoning_use) {
+  if (isKnown(listing.zoning_use)) {
     facts.push({ icon: "zone", label: t("detail.fact.zoning", lc), value: capitalize(listing.zoning_use) });
   }
   if (listing.photos_count > 0) {
@@ -1864,13 +1877,17 @@ function ListingDetail({ listing, app, asPanel = true }) {
             )}
           </button>
           <div className="gallery-side">
-            {[1,2,3,4].map(i => listing.photos[i] && (
+            {[1,2,3,4].map(i => listing.photos[i] && (() => {
+              // Index `i` is locked when it sits at or past the user's
+              // tier-specific unlock cap (see lib/gating.ts).
+              const locked = i >= thumbCap;
+              return (
               <button
                 key={i}
-                className={`gallery-thumb ${needsSignup && i >= 2 ? "locked" : ""}`}
-                aria-label={needsSignup && i >= 2 ? t("detail.gallery.locked_aria", lc) : t("detail.gallery.open_n", lc, { n: i + 1 })}
+                className={`gallery-thumb ${locked ? "locked" : ""}`}
+                aria-label={locked ? t("detail.gallery.locked_aria", lc) : t("detail.gallery.open_n", lc, { n: i + 1 })}
                 onClick={() => {
-                  if (needsSignup && i >= 2) {
+                  if (locked) {
                     app.openSignup({ mode: "signup", pendingListing: listing.id });
                   } else {
                     openLightbox(i);
@@ -1878,17 +1895,18 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 }}
               >
                 <img src={listing.photos[i]} alt=""/>
-                {needsSignup && i >= 2 && (
+                {locked && (
                   <div className="thumb-lock"><Icon name="lock" size={16}/></div>
                 )}
-                {!needsSignup && i === 4 && listing.photos.length > 5 && (
+                {!locked && i === 4 && listing.photos.length > 5 && (
                   <div className="more-photos">{t("detail.more_photos", lc, { n: listing.photos.length - 5 })}</div>
                 )}
-                {needsSignup && i === 4 && (
+                {locked && i === 4 && (
                   <div className="more-photos">{t("detail.signup_more_photos", lc, { n: listing.photos.length - 2 })}</div>
                 )}
               </button>
-            ))}
+              );
+            })())}
           </div>
         </div>
       </div>
@@ -1936,10 +1954,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
         <div className="detail-section">
           <h3 className="section-title">{t("detail.reasons", app.locale)}</h3>
           <ul className="usp-list">
-            {(needsSignup ? listing.usps.slice(0, 1) : listing.usps).map((u, i) => (
+            {listing.usps.slice(0, uspCap).map((u, i) => (
               <li key={i}><Icon name="check" size={16} strokeWidth={2.4}/> {tr(u, app.locale)}</li>
             ))}
-            {needsSignup && listing.usps.length > 1 && (
+            {/* "Unlock N more" CTA only for anonymous users — free users
+                are already signed in, so the prompt would be confusing.
+                Upgrading free → pro gets handled by the existing
+                Plans/Account flows, not from this list. */}
+            {needsSignup && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
                 <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>

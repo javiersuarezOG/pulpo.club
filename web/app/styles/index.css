@@ -74,7 +74,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .topnav-links button:hover { background: var(--paper-2); color: var(--ink); }
 .topnav-links button.active { color: var(--ink); background: var(--paper-2); }
-.topnav-right { display: flex; align-items: center; gap: 12px; }
+/* margin-left: auto keeps the topnav-right block (LiveStats + locale +
+   auth icon) pinned to the corner regardless of viewport. On desktop
+   the .topnav-links spacer (flex: 1) does this; on mobile that spacer
+   is display:none, so without margin-auto the auth icon ended up
+   wedged next to the logo on the left. */
+.topnav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 
 @media (max-width: 767px) {
   .topnav-links { display: none; }
@@ -757,7 +762,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .listing-card-usps li svg {
   flex-shrink: 0; margin-top: 4px;
-  color: var(--moss);
+  /* Match .usp-list — neutral ink-2 instead of brand-moss so the card
+     reads as informational rather than promotional. */
+  color: var(--ink-2);
 }
 .listing-card-usps li {
   display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
@@ -1501,7 +1508,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--ink-2);
 }
 .usp-list li svg {
-  color: var(--moss); flex-shrink: 0; margin-top: 4px;
+  /* Neutral single-color icon (was --moss). The brand-green check read
+     as "ad copy" rather than property detail; ink-2 sits closer to a
+     bullet point — same role, less voice. */
+  color: var(--ink-2); flex-shrink: 0; margin-top: 4px;
 }
 
 .facts-grid {
@@ -1520,7 +1530,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border-radius: 10px;
   background: var(--paper);
   display: grid; place-items: center;
-  color: var(--accent);
+  /* Neutral single-color tile icon (was --accent green). Pairs with
+     .usp-list above for a consistent "calm informational" voice. */
+  color: var(--ink-2);
   flex-shrink: 0;
 }
 .fact-label { font-size: 12px; color: var(--ink-3); }
