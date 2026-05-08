@@ -93,11 +93,14 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
         "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
     },
     "short_description_canonical": {
-        # No fallback writes this — only DeepSeek does — so it's strictly
-        # dict-or-null. (The fallback template explicitly skips this field.)
-        "type": ["object", "null"],
+        # Tolerant of both shapes: bilingual {en, es} dict (DeepSeek under
+        # v3) or single-language str (DeepSeek under v1 — i.e. data already
+        # produced by the 2026-05-07 nightly sitting in the unmerged data
+        # PR #141). The FE adapter (`localizedFromAny`) handles both. Going
+        # forward all writers emit dict, but the schema must not reject the
+        # legacy str shape for in-flight migrations.
+        "type": ["object", "string", "null"],
         "properties": {"en": {"type": "string"}, "es": {"type": "string"}},
-        "required": ["en", "es"],
     },
     "reasons_to_buy": {
         "type": "array",

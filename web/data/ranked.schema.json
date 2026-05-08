@@ -387,6 +387,7 @@
       "short_description_canonical": {
         "type": [
           "object",
+          "string",
           "null"
         ],
         "properties": {
@@ -396,11 +397,7 @@
           "es": {
             "type": "string"
           }
-        },
-        "required": [
-          "en",
-          "es"
-        ]
+        }
       },
       "reasons_to_buy": {
         "type": "array",
