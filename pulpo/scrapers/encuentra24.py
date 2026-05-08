@@ -42,6 +42,7 @@ nightly's exposure (PR-E2 will wire that env var into the workflow).
 """
 from __future__ import annotations
 import json
+import os
 import re
 import time
 from datetime import datetime, timezone
@@ -394,9 +395,34 @@ class Encuentra24Scraper:
         self.offline = offline
 
     def crawl(self, limit: int = 30, offline: Optional[bool] = None) -> list[dict]:
+        # Honor PULPO_E24_LIMIT for capped first-runs without changing
+        # the global PULPO_LIMIT. Caller-supplied `limit` is the upper
+        # bound; the env var can ONLY tighten, never loosen, so a
+        # forgotten env var doesn't accidentally let encuentra24 spend
+        # a 1500-listing nightly budget. Ignored when offline.
+        limit = self._resolve_limit(limit, offline)
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
         return self._crawl_live(limit)
+
+    def _resolve_limit(self, limit: int, offline: Optional[bool]) -> int:
+        """Apply PULPO_E24_LIMIT (encuentra24-specific cap) on top of
+        the caller's `limit`. Takes the MIN — never raises the cap.
+        Skipped when offline so unit tests don't have to scrub the
+        env var to get predictable counts."""
+        effective_offline = offline if offline is not None else self.offline
+        if is_offline(effective_offline):
+            return limit
+        env = os.environ.get("PULPO_E24_LIMIT")
+        if env and env.strip():
+            try:
+                env_limit = int(env)
+                return min(limit, env_limit)
+            except ValueError:
+                # Garbage in the env var — fail open to caller's limit;
+                # better to over-fetch than to silently cap to 0.
+                pass
+        return limit
 
     def crawl_with_meta(
         self,
