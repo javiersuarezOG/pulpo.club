@@ -95,8 +95,11 @@ module.exports = async (req, res) => {
       // Stripe create one based on the email we collected from Clerk.
       customer:       existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : (userEmail || undefined),
-      success_url: `${origin}/preview/?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${origin}/preview/?upgrade=cancelled`,
+      // PR-10 cutover: returns to `/` (the new app at the canonical
+      // root). The /preview/ rewrite is kept as a one-week fallback,
+      // so existing in-flight checkout sessions still resolve.
+      success_url: `${origin}/?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${origin}/?upgrade=cancelled`,
     }, {
       apiVersion: MANAGED_PAYMENTS_VERSION,
     });

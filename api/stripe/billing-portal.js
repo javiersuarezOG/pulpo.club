@@ -79,7 +79,9 @@ module.exports = async (req, res) => {
   try {
     session = await stripeClient().billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${origin}/preview/?account=subscription`,
+      // PR-10 cutover: returns to `/` (the new app at the canonical
+      // root). The /preview/ rewrite is kept as a one-week fallback.
+      return_url: `${origin}/?account=subscription`,
     });
   } catch (err) {
     logApi("stripe.billing_portal", {
