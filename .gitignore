@@ -37,3 +37,14 @@ Thumbs.db
 
 # Claude Code workspace (per-user, agent worktrees, local settings)
 .claude/
+
+# Category-image masters — heavy PNG sources kept locally for re-export only.
+# The optimized WebPs live in web/app/assets/categories/ and are committed.
+category_imgs/
+
+# Playwright trace artefacts + scratch screenshots dropped at repo root by
+# ad-hoc tool runs.
+.playwright-mcp/
+test-results/
+desktop-discover.png
+mobile-discover.png
