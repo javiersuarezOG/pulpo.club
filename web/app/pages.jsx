@@ -2043,18 +2043,43 @@ function ListingDetail({ listing, app, asPanel = true }) {
             {listing.usps.slice(0, uspCap).map((u, i) => (
               <li key={i}><Icon name="check" size={16} strokeWidth={2.4}/> {tr(u, app.locale)}</li>
             ))}
-            {/* "Unlock N more" CTA only for anonymous users — free users
-                are already signed in, so the prompt would be confusing.
-                Upgrading free → pro gets handled by the existing
-                Plans/Account flows, not from this list. */}
-            {needsSignup && listing.usps.length > uspCap && (
+            {/* Anonymous → "Sign up free to see N more" (chains to
+                signup modal, then the detail page re-renders with
+                free-tier USPs unlocked). Free → "Upgrade to Pro to
+                see N more" (chains to Stripe checkout). Paid users
+                hide both — they see every USP. */}
+            {!isPaid && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
-                <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                  {listing.usps.length - 1 === 1
-                    ? t("detail.signup_more_reasons_one", lc)
-                    : t("detail.signup_more_reasons_other", lc, { n: listing.usps.length - 1 })}
-                </button>
+                {needsSignup ? (
+                  <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
+                    {listing.usps.length - uspCap === 1
+                      ? t("detail.signup_more_reasons_one", lc)
+                      : t("detail.signup_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
+                  </button>
+                ) : (
+                  <button
+                    className="link-btn"
+                    onClick={() => {
+                      track("paywall.bypassed", {
+                        kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                      });
+                      startStripeCheckout({
+                        onError: (code) => {
+                          if (code === "sign_in_required") {
+                            app.showToast(t("plans.checkout_auth_mismatch", lc));
+                          } else {
+                            app.go("plans");
+                          }
+                        },
+                      });
+                    }}
+                  >
+                    {listing.usps.length - uspCap === 1
+                      ? t("detail.upgrade_more_reasons_one", lc)
+                      : t("detail.upgrade_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
+                  </button>
+                )}
               </li>
             )}
           </ul>

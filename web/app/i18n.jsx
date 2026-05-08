@@ -246,6 +246,13 @@ const UI_STRINGS = {
                                es: "Crea cuenta para ver 1 razón más por la que elegimos este terreno" },
   "detail.signup_more_reasons_other": { en: "Sign up to see {n} more reasons we picked this listing",
                                es: "Crea cuenta para ver {n} razones más por las que elegimos este terreno" },
+  // Free signed-in users: same gated row, but the CTA goes to
+  // Stripe checkout instead of the signup modal. Pro users hide
+  // the row entirely.
+  "detail.upgrade_more_reasons_one":   { en: "Upgrade to Pro to see 1 more reason we picked this listing",
+                                          es: "Mejora a Pro para ver 1 razón más por la que elegimos este terreno" },
+  "detail.upgrade_more_reasons_other": { en: "Upgrade to Pro to see {n} more reasons we picked this listing",
+                                          es: "Mejora a Pro para ver {n} razones más por las que elegimos este terreno" },
   "detail.signup_more_photos": { en: "Sign up for {n}+ photos",
                                es: "Crea cuenta para ver {n}+ fotos" },
   "detail.more_photos":      { en: "+{n} photos",                   es: "+{n} fotos" },
