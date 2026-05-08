@@ -598,8 +598,11 @@ def main() -> int:
         history_path=REPO / "web" / "data" / "duplicate_detection_history.jsonl",
     )
     print(f"[duplicate_detection] total={dup_metrics['total_listings']} "
+          f"centroids={dup_metrics['centroid_count']} "
+          f"(suppressing pairs from {dup_metrics['listings_at_centroids']} listings) "
           f"phone_pairs={dup_metrics['phone_pairs']} "
           f"coord_pairs={dup_metrics['coord_pairs']} "
+          f"(centroid-suppressed={dup_metrics['coord_pairs_suppressed_centroid']}) "
           f"flagged={dup_metrics['duplicate_listings_either']} "
           f"({dup_metrics['duplicate_pct']}%) "
           f"unique_estimate={dup_metrics['unique_listings_estimate']}")
