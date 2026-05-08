@@ -5,8 +5,20 @@
 // first use, so an endpoint that never touches Clerk doesn't pay the
 // init cost.
 //
-// Required env var: CLERK_SECRET_KEY (sk_test_… / sk_live_…), Backend
-// API key from https://dashboard.clerk.com/~/api-keys.
+// Required env vars (both — Clerk Backend v3 needs the publishable key
+// for cookie-suffix derivation inside authenticateRequest):
+//   CLERK_SECRET_KEY        sk_test_… / sk_live_…
+//   CLERK_PUBLISHABLE_KEY   pk_test_… / pk_live_…  (or fall back to
+//                           VITE_CLERK_PUBLISHABLE_KEY, which Vercel
+//                           also exposes to serverless functions —
+//                           lets us reuse the frontend env var so
+//                           Sebastian doesn't have to mirror it).
+//
+// Without the publishable key, every authenticateRequest() call
+// throws "Publishable key is missing" deep inside Clerk's
+// assertValidPublishableKey, which our endpoints catch as
+// `auth_failed` 500. That was the prod regression on /api/saves
+// and /api/stripe/* after Clerk-on default-flipped (PR-9d).
 //
 // `@clerk/backend` v3 expects a Web Fetch `Request` as the argument to
 // `authenticateRequest`. Vercel hands the handler a Node
@@ -19,9 +31,20 @@ const { createClerkClient } = require("@clerk/backend");
 let _clerk = null;
 function clerkClient() {
   if (_clerk) return _clerk;
-  const key = process.env.CLERK_SECRET_KEY;
-  if (!key) throw new Error("CLERK_SECRET_KEY not set");
-  _clerk = createClerkClient({ secretKey: key });
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) throw new Error("CLERK_SECRET_KEY not set");
+  // Prefer the explicit server-only var; fall back to the Vite-prefixed
+  // one that the frontend reads — Vercel exposes every env var to
+  // serverless functions regardless of prefix, so this lets Stripe
+  // ship today without needing a second env-var write in the dashboard.
+  const publishableKey =
+    process.env.CLERK_PUBLISHABLE_KEY || process.env.VITE_CLERK_PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    throw new Error(
+      "CLERK_PUBLISHABLE_KEY (or VITE_CLERK_PUBLISHABLE_KEY) not set",
+    );
+  }
+  _clerk = createClerkClient({ secretKey, publishableKey });
   return _clerk;
 }
 
