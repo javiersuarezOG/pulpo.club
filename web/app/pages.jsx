@@ -19,7 +19,7 @@ import {
   readSortFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
-import { track } from "./telemetry/hook";
+import { track, optIn, optOut } from "./telemetry/hook";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import {
   Icon,
@@ -89,7 +89,12 @@ function TopNav({ app }) {
                 title={t("nav.account", lc)}
                 aria-label={t("nav.account", lc)}
               >{app.user.email[0].toUpperCase()}</button>
-              <button className="link-btn" onClick={() => app.signout()}>{t("nav.logout", lc)}</button>
+              <button
+                className="link-btn"
+                onClick={() => app.signout()}
+                disabled={app.isSigningOut}
+                aria-busy={app.isSigningOut || undefined}
+              >{t("nav.logout", lc)}</button>
             </div>
           ) : (
             <button
@@ -2565,10 +2570,23 @@ function LegacySignupModal({ app, m }) {
         <div className="divider"><span>or</span></div>
         <form onSubmit={submit} className="modal-form">
           <label>Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoFocus/>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
+              autoComplete="username"
+              autoFocus
+            />
           </label>
           <label>Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters"/>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            />
           </label>
           {error && <div className="form-error">{error}</div>}
           <button type="submit" className="btn-primary block lg">
@@ -2791,18 +2809,34 @@ function ConsentBanner({ locale = "en" }) {
     try { return localStorage.getItem("pulpo-consent") || ""; }
     catch { return ""; }
   });
-  if (decided === "granted" || decided === "declined") return null;
   const region = detectEuRegion() ? "eu" : "non-eu";
-  // Outside the EU, default to silent opt-in (don't show the banner).
-  if (region === "non-eu") {
-    if (!decided) {
-      try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
-    }
-    return null;
-  }
+  // First-paint side-effect for non-EU: silently auto-grant if no
+  // decision is on file. Wrapped in useEffect so the localStorage
+  // write + telemetry emit happen exactly once and outside render.
+  // The event lets us tell auto-grants apart from explicit clicks
+  // when triaging consent funnels.
+  pUseEffect(() => {
+    if (decided) return;
+    if (region !== "non-eu") return;
+    try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
+    setDecided("granted");
+    track("consent.granted", { region });
+    optIn();
+  }, [decided, region]);
+
+  if (decided === "granted" || decided === "declined") return null;
+  if (region !== "eu") return null;
+
   const set = (decision) => {
     try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }
     setDecided(decision);
+    if (decision === "granted") {
+      track("consent.granted", { region });
+      optIn();
+    } else {
+      track("consent.declined", { region });
+      optOut();
+    }
   };
   return (
     <div className="consent-banner" role="dialog" aria-label={t("consent.aria", locale)}>

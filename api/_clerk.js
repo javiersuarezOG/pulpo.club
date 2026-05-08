@@ -99,20 +99,23 @@ function toWebRequest(req) {
 // fails — caller is responsible for the catch-block.
 async function authenticateClerkRequest(req) {
   const webRequest = toWebRequest(req);
-  // Diagnostic — without this, a 500 from Clerk's auth path looks
-  // identical whether the cookie was missing, the header was
-  // mangled, or Clerk rejected the JWT. The single line below
-  // separates "we never received a session cookie" from "Clerk said
-  // no" in Vercel runtime logs.
-  if (typeof console !== "undefined" && console.log) {
+  // Diagnostic — separates "we never received a session cookie" from
+  // "Clerk said no" in Vercel runtime logs. Off by default so prod logs
+  // don't grow unbounded; flip PULPO_DEBUG_AUTH=1 in Vercel env when
+  // triaging an auth regression. Logs cookie *names* and a boolean
+  // (never values), and the request path (never the full URL — query
+  // strings can carry PII).
+  if (process.env.PULPO_DEBUG_AUTH === "1" && typeof console !== "undefined" && console.log) {
     const cookies = req.headers && req.headers.cookie;
     const cookieNames = typeof cookies === "string"
       ? cookies.split(";").map((c) => c.split("=")[0].trim()).filter(Boolean)
       : [];
     const hasSessionCookie = cookieNames.some((n) =>
       n === "__session" || n === "__client" || n.startsWith("__client_") || n.startsWith("__session_"));
+    let path = "?";
+    try { path = new URL(webRequest.url).pathname; } catch { /* keep "?" */ }
     console.log(
-      `[api] clerk.authReq cookies=${cookieNames.length} session_cookie=${hasSessionCookie ? "1" : "0"} url=${webRequest.url}`,
+      `[api] clerk.authReq cookies=${cookieNames.length} session_cookie=${hasSessionCookie ? "1" : "0"} path=${path}`,
     );
   }
   const requestState = await clerkClient().authenticateRequest(webRequest);
