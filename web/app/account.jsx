@@ -6,6 +6,7 @@ import React, { useState as aUseState, useEffect as aUseEffect, useMemo as aUseM
 import { t, tr } from "./i18n.jsx";
 import { Icon, PulpoLogo, formatPrice, currentLocale } from "./components.jsx";
 import { startStripeCheckout } from "./auth/stripe-checkout.js";
+import { clerkEnabled } from "./auth/clerk-shell.jsx";
 
 function AccountPage({ app }) {
   const [section, setSection] = aUseState(() => app.routeParams.section || "profile");
@@ -17,21 +18,45 @@ function AccountPage({ app }) {
     }
   }, [app.routeParams.section]);
 
+  // Auth gate. The Account area is auth-only — anonymous users get
+  // redirected to /home with the Sign-in modal teed up. There's a race
+  // we have to respect when Clerk is enabled: on first paint
+  // ClerkUserSync hasn't yet committed `setUser`, so `app.user` is
+  // briefly null even for genuinely-signed-in users. If we redirect
+  // during that window:
+  //   1. SignupModal opens with mode="login"
+  //   2. Its Clerk effect calls `clerk.openSignIn()`
+  //   3. Clerk knows the user IS signed in already → throws
+  //      `cannot_render_single_session_enabled`
+  //   4. ErrorBoundary catches → "Something went wrong"
+  //
+  // `app.clerkActions` becoming truthy is a reliable lower bound on
+  // Clerk having loaded. Stay on the page (loading shell) until the
+  // SDK has hydrated; then check user state.
+  //
+  // Hooks run unconditionally (Rules of Hooks) — schedule the redirect
+  // inside the effect rather than wrapping the hook in `if (!app.user)`.
+  // The previous shape violated the rule and was firing the redirect
+  // during the Clerk-boot window.
+  const clerkBooting = clerkEnabled() && !app.clerkActions;
+  aUseEffect(() => {
+    if (clerkBooting) return;
+    if (app.user) return;
+    app.openSignup({ mode: "login" });
+    app.go("home");
+  }, [clerkBooting, app.user]);
+
+  if (clerkBooting) {
+    return <div className="page page-account account-loading" aria-busy="true" />;
+  }
+  if (!app.user) return null;
+
   const subs = [
     { key: "profile",       label: t("account.profile", app.locale),       icon: "user" },
     { key: "notifications", label: t("account.notifications", app.locale), icon: "bell" },
     { key: "subscription",  label: t("account.subscription", app.locale),  icon: "sparkle" },
     { key: "security",      label: t("account.security", app.locale),      icon: "lock" },
   ];
-
-  // If user isn't signed in, send them to sign-up. The Account area is auth-only.
-  if (!app.user) {
-    aUseEffect(() => {
-      app.openSignup({ mode: "login" });
-      app.go("home");
-    }, []);
-    return null;
-  }
 
   return (
     <div className="page page-account">
@@ -344,10 +369,18 @@ function SubscriptionSection({ app }) {
                 startStripeCheckout({
                   onError: (code) => {
                     if (code === "sign_in_required") {
-                      // Carry pendingAction so app.jsx's post-signin
-                      // effect chains the Stripe redirect after auth
-                      // completes — no second click required.
-                      app.openSignup({ mode: "signup", pendingAction: "checkout" });
+                      if (app.user) {
+                        // Server says no auth but the client has a
+                        // user — Clerk cookie / session mismatch.
+                        // Don't loop the modal; surface a real toast
+                        // and let the user retry.
+                        app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+                      } else {
+                        // Genuinely anonymous (rare on Account, but
+                        // possible if the session expired). Open the
+                        // signup modal and chain via pendingAction.
+                        app.openSignup({ mode: "signup", pendingAction: "checkout" });
+                      }
                     } else {
                       app.go("plans");
                     }
