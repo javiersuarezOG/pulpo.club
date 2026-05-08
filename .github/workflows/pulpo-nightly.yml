@@ -323,6 +323,13 @@ jobs:
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
           git add web/data/zone_medians_history.jsonl 2>/dev/null || true
           git add web/data/distance_fields_history.jsonl 2>/dev/null || true
+          # DeepSeek single-call enrichment sidecar + per-event log.
+          # Sidecar enables incremental enrichment across nights
+          # (cache_hits=0 is currently costing ~$12/mo). Log captures
+          # the actual response payload on schema_invalid failures so
+          # they can be debugged without re-running the pipeline.
+          git add web/data/llm_enrichment.json 2>/dev/null || true
+          git add web/data/llm_enrichment_log.jsonl 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
