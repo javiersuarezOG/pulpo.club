@@ -49,10 +49,39 @@ const SHOULD_TELEMETER = (() => {
   return !import.meta.env.DEV;
 })();
 
+// Read the consent decision recorded by ConsentBanner (pages.jsx). Three
+// states: "granted" (full telemetry), "declined" (opt-out before init),
+// or "" / unknown (boot-without-decision). Outside the EU the banner
+// auto-grants on first paint, so "" only happens for a tiny first-paint
+// window before that side-effect lands. We treat "" as granted-pending
+// so EU users get queued events flushed once they accept; declined users
+// have init replaced with a no-op that wires the opt-out.
+function readConsent(): "granted" | "declined" | "" {
+  try {
+    const v = localStorage.getItem("pulpo-consent") || "";
+    if (v === "granted" || v === "declined") return v;
+    return "";
+  } catch { return ""; }
+}
+
 function scheduleInit() {
   if (initStarted) return;
   initStarted = true;
   if (typeof window === "undefined") return;
+
+  // Hard opt-out: if the user explicitly declined we never load the
+  // PostHog SDK at all — no init, no session recording, no network
+  // request to eu.i.posthog.com. The queue from earlier track() calls
+  // is dropped on the floor by every later track() short-circuiting on
+  // `posthog == null && !initStarted` (initStarted is true now).
+  const consent = readConsent();
+  if (consent === "declined") return;
+
+  // Session recording is the heaviest privacy surface — only run it
+  // when consent is explicitly granted. EU users with no decision yet
+  // ("") still init PostHog so we can capture page-view-class events,
+  // but recording stays off until they hit "Accept".
+  const recordingEnabled = consent === "granted";
 
   const start = async () => {
     try {
@@ -63,7 +92,7 @@ function scheduleInit() {
         autocapture: false,             // explicit catalog only
         capture_pageview: false,        // we fire landing.viewed ourselves
         capture_pageleave: false,
-        disable_session_recording: false,
+        disable_session_recording: !recordingEnabled,
         session_recording: { maskAllInputs: true, sampleRate: 0.1 },
         persistence: "localStorage+cookie",
         loaded: () => drainQueue(),
