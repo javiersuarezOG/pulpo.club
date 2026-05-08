@@ -19,6 +19,7 @@ const {
   clerkClient,
   logApi,
 } = require("./_stripe");
+const { toWebRequest } = require("../_clerk");
 
 module.exports = async (req, res) => {
   const t0 = Date.now();
@@ -43,7 +44,7 @@ module.exports = async (req, res) => {
   let existingCustomerId = null;
   try {
     const clerk = clerkClient();
-    const requestState = await clerk.authenticateRequest({ request: req });
+    const requestState = await clerk.authenticateRequest(toWebRequest(req));
     if (!requestState.isSignedIn) {
       logApi("stripe.create_checkout_session", {
         status: 401, ms: Date.now() - t0, reason: "unauthenticated",

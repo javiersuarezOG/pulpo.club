@@ -70,6 +70,13 @@ export type EventMap = {
   // user-experience-only.
   "upgrade.checkout_returned": { result: "success" | "cancelled" };
 
+  // ───── Manage subscription (Stripe Customer Portal) ─────
+  // Fires when the Pro user clicks "Manage plan" on the Account page,
+  // before we POST /api/stripe/billing-portal. Pairs with `portal.error`
+  // to surface auth / config bugs that block the portal redirect.
+  "portal.opened": Record<string, never>;
+  "portal.error": { reason: string };
+
   // ───── Locale ─────
   "locale.changed": { from: string; to: string };
 

@@ -4,7 +4,7 @@ Living list of follow-ups, untested caveats, and pre-existing tech debt. Work
 items here are explicitly *not yet scheduled* — when you pick one up, move it
 into the regular PR/issue flow. Sebastian is the owner unless noted otherwise.
 
-Last updated: 2026-05-08.
+Last updated: 2026-05-08 (post-PR-9.5 ship).
 
 ---
 
@@ -21,9 +21,9 @@ Last updated: 2026-05-08.
 
 ## UX / FE polish
 
-- [ ] **PlansPage hard-coded English.** Only the new `plans.upgrade_pro_cta` and `plans.checkout_error_toast` keys go through `t()`. "Free", "Pulpo Pro", "Most popular", every feature line — all literal English in [pages.jsx:2110-2179](web/app/pages.jsx). ES users see English here. Wrap each string in `t()` and add EN/ES pairs in [i18n.jsx](web/app/i18n.jsx).
-- [ ] **Account.jsx mock orders are hardcoded dates** ("5 May 2026" through "5 Jan 2026" in [account.jsx:301-305](web/app/account.jsx)). Will read as stale once today moves past them. Replace with a `n_months_ago(today, n)` helper or pull live data from Stripe.
-- [ ] **Stripe checkout friction for anonymous users.** Anonymous → "Upgrade $10/month" → `sign_in_required` → SignupModal opens → user signs up → modal closes → user has to click "Upgrade" *again*. Same pattern on Account page. Fix: add a `pendingAction: "checkout"` field to `SignupModal` so the flow chains automatically after auth completes. See [account.jsx:336-355](web/app/account.jsx) and [pages.jsx:2125-2175](web/app/pages.jsx).
+- [x] ~~**PlansPage hard-coded English.**~~ Shipped in PR-153 — every user-facing string flipped to `t()` calls with full EN/ES coverage; verified visually at 375×812 (ES) and 1280×800 (EN).
+- [ ] **Account.jsx mock orders are hardcoded dates** ("5 May 2026" through "5 Jan 2026" in [account.jsx:325-331](web/app/account.jsx)). Will read as stale once today moves past them. Now lower priority since PR-9.5 ships the Stripe Customer Portal — the portal already shows the user their full invoice history, so the in-app table is now a "preview" of recent orders. Replace with a `n_months_ago(today, n)` helper or pull live data from Stripe.
+- [x] ~~**Stripe checkout friction for anonymous users.**~~ Shipped in PR-153 — `pendingAction: "checkout"` field on `SignupModal` chains the flow automatically after auth completes (Clerk + legacy paths).
 - [ ] **`ranked.json` is ~4 MB on every cold load.** Even with the 60-card pagination from PR-150 the JSON is fully parsed in memory. Worth splitting into pages server-side once the catalog grows past ~1500 listings.
 
 ## Telemetry
@@ -38,29 +38,28 @@ Last updated: 2026-05-08.
 
 These shipped in [PR-150](https://github.com/javiersuarezOG/pulpo.club/pull/150) but were verified only in Chromium / dev. Worth a real-device spot check before relying on them:
 
-- [ ] **Real Stripe checkout end-to-end** with a Stripe test card (4242 4242 4242 4242, any future date, any CVC). Steps:
-  1. Sign in as a Free user.
-  2. Click "Upgrade — $10/month" on the Plans page.
-  3. Verify redirect to `https://checkout.stripe.com/...` lands.
-  4. Pay with the test card.
-  5. Verify return to `/preview/?upgrade=success` and the success toast fires.
-  6. Watch the Clerk Dashboard for `publicMetadata.plan = "pro"` (webhook should set it).
-  7. Reload the app — UI should reflect Pro tier (no upgrade prompts, full gallery, off-market unlocked).
-  8. Hit the cancel-flow too: click Upgrade again on a fresh test user, hit "back" / cancel during Checkout, verify the cancel toast.
-  Wiring already verified by [`tests/e2e/preview-smoke.spec.ts`](tests/e2e/preview-smoke.spec.ts) (mocked endpoint + return-URL handling); the end-to-end roundtrip is the part that needs a Stripe test key + a human.
+- [ ] **Real Stripe end-to-end (Checkout + Customer Portal)** with a Stripe test card (4242 4242 4242 4242, any future date, any CVC). Steps:
+  1. Sign in as a Free user on a Vercel preview with `STRIPE_SECRET_KEY` + Clerk wired.
+  2. Click "Upgrade — $10/month" on the Plans page → redirect to `https://checkout.stripe.com/...` lands.
+  3. Pay with the test card → return to `/preview/?upgrade=success` and the success toast fires.
+  4. Watch the Clerk Dashboard: `publicMetadata.plan = "pro"` set by webhook; `privateMetadata.stripeCustomerId` set.
+  5. Reload the app — UI reflects Pro tier (no upgrade prompts, full gallery, off-market unlocked).
+  6. **PR-9.5:** navigate to `/account?section=subscription`. The "Manage plan →" button is live → click → redirected to `https://billing.stripe.com/p/session/...`.
+  7. Update card / change plan / cancel in the portal → "Return to Pulpo" → land on `/preview/?account=subscription`. UI consistent.
+  8. Cancel flow: click Upgrade again on a fresh test user, hit "back" / cancel during Checkout, verify the cancel toast.
+  Wiring verified by [`tests/e2e/preview-smoke.spec.ts`](tests/e2e/preview-smoke.spec.ts) (mocked endpoints — both Checkout and Portal); the full roundtrip is the part that needs a Stripe test key + a human.
 - [x] ~~ES locale visual~~ — verified in PR-153 via Playwright on the Plans page; remaining surfaces (Account, SignupModal, BottomNav) still untested visually.
 - [ ] Real iPhone Safari + Android Chrome — only Chromium emulated viewports were tested.
 - [ ] Tablet (768–1023px) — only mobile and desktop endpoints tested.
 
 ## PR-9.5 — Pro account-management UI (Stripe Customer Portal)
 
-The original plan ([`~/.claude/plans/use-the-ux-fluffy-cocke.md`](~/.claude/plans/use-the-ux-fluffy-cocke.md), line 995) calls for a **PR-9.5** that embeds the Stripe Customer Portal so paid users can update payment method / change plan / cancel without leaving the app. **Not shipped.**
+✅ **Shipped.** [`api/stripe/billing-portal.js`](api/stripe/billing-portal.js) + [`web/app/auth/stripe-portal.js`](web/app/auth/stripe-portal.js) wire the "Manage plan →" button to a Stripe Customer Portal session. Customer ID comes from `privateMetadata.stripeCustomerId` stamped by the existing webhook on `checkout.session.completed`. Return URL lands on `/preview/?account=subscription`.
 
-- The "Manage plan" link in [`web/app/account.jsx:333`](web/app/account.jsx) is a dead static `<a>` with no href.
-- No `/api/stripe/billing-portal` endpoint exists yet.
-- The mock orders in `account.jsx:301-305` are still hardcoded — billing history doesn't pull from Stripe.
+**Stripe Dashboard prereq:** enable Customer Portal at Settings → Billing → Customer portal. The default config works; pick what users can do (update card / change plan / cancel) per product policy. The API call is config-agnostic.
 
-To ship: add a server endpoint that calls `stripe.billingPortal.sessions.create({ customer: ..., return_url: ... })` and returns the URL; wire the "Manage plan" button to fetch it and `window.location.assign(url)`. ~30 lines per plan.
+**Pro account-management UI follow-ups:**
+- [ ] **Replace mock order history** in [`account.jsx:325-331`](web/app/account.jsx) with live Stripe data. Lower priority now that the portal already shows the user their full invoice history.
 
 ## Other PR-9 gaps surfaced during the upgrade-flow audit
 
@@ -68,7 +67,7 @@ To ship: add a server endpoint that calls `stripe.billingPortal.sessions.create(
 - [ ] **Free-plan upgrade strips** — sticky banner ("Pulpo Free: 3 of 8 detail views this month") on Discover/Browse/Saved for logged-in-free users. Plan §985.
 - [ ] **Save-cap inline card at save 10** — currently a toast; plan called for an inline upgrade card in the Saved page when the cap hits.
 - [ ] **Redacted `/api/listings/:id`** — confirm the endpoint actually omits broker fields for unauth requests (the CSS blur is visual only per plan §506; the truth is server-side).
-- [ ] **`/api/saves` returns 500 in dev despite a valid Clerk session.** Reproduces on the desktop preview when navigating to /account. The 500 path in [`api/saves.js:57`](api/saves.js) fires when `authenticateClerkRequest` throws. Same shape probably underlies `/api/stripe/create-checkout-session` returning `sign_in_required` for genuinely-signed-in users. Most likely root cause: `@clerk/backend` `authenticateRequest({ request: req })` doesn't read cookies cleanly from a Vercel Node `IncomingMessage` (it expects a Web Fetch `Request`). Fix path: wrap the request in `new Request(req.url, { headers: new Headers(req.headers) })` before passing to Clerk, OR upgrade `@clerk/backend` to a version that accepts Node requests directly. Once this lands, the FE `plans.checkout_auth_mismatch` toast (added in PR-156-area) becomes a no-op fallback rather than the path users actually hit.
+- [x] ~~**`/api/saves` returns 500 in dev despite a valid Clerk session.**~~ Fixed in PR-9.5 ([`api/_clerk.js`](api/_clerk.js)) — `@clerk/backend` v3 expects a Web Fetch `Request`, not a Vercel Node `IncomingMessage`. Added a `toWebRequest(req)` helper that translates and is now the single auth path used by `/api/saves`, `/api/stripe/create-checkout-session`, and `/api/stripe/billing-portal`.
 
 ## Map (deferred from PR-150)
 

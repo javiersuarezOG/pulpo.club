@@ -6,6 +6,7 @@ import React, { useState as aUseState, useEffect as aUseEffect, useMemo as aUseM
 import { t, tr } from "./i18n.jsx";
 import { Icon, PulpoLogo, formatPrice, currentLocale } from "./components.jsx";
 import { startStripeCheckout } from "./auth/stripe-checkout.js";
+import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 
 function AccountPage({ app }) {
@@ -356,7 +357,27 @@ function SubscriptionSection({ app }) {
         </div>
         <div className="sub-plan-actions">
           {isPaid ? (
-            <a className="link-btn">Manage plan →</a>
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => {
+                openStripePortal({
+                  onError: (code) => {
+                    if (code === "sign_in_required") {
+                      // Cookie / session mismatch — show the same auth-
+                      // mismatch toast we use for the upgrade flow.
+                      app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+                    } else if (code === "no_customer") {
+                      // Pro user without a stripeCustomerId on file —
+                      // metadata out of sync, point them at support.
+                      app.showToast(t("account.sub.portal_no_customer", app.locale));
+                    } else {
+                      app.showToast(t("account.sub.portal_error", app.locale));
+                    }
+                  },
+                });
+              }}
+            >{t("account.sub.manage_plan", app.locale)}</button>
           ) : (
             <button
               className="btn-primary"
