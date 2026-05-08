@@ -70,6 +70,7 @@ function App() {
   // throw React #426. <ClerkActionsBinder> inside ClerkShell wires
   // this up once the SDK loads (flag-on only); SignupModal calls it.
   const [clerkActions, setClerkActions] = useState(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [toast, setToast] = useState(null);
   const [openListingId, setOpenListingId] = useState(null);
   const [detailViewCount, setDetailViewCount] = useState(() => {
@@ -104,6 +105,36 @@ function App() {
   useEffect(() => {
     track("landing.viewed", { route: window.location.pathname || "/" });
     bootWebVitals();
+  }, []);
+
+  // Marquee the document.title so the tab text scrolls like a
+  // marquesina. Pure-cosmetic — pauses entirely when the user has
+  // `prefers-reduced-motion: reduce` set (accessibility — animated
+  // tab titles can be disorienting). Resets to the original on
+  // unmount so the tab doesn't keep a stale rotated state.
+  useEffect(() => {
+    if (typeof window === "undefined" || !document) return;
+    const reduce = typeof window.matchMedia === "function"
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const original = document.title;
+    // The separator gives the eye a clear loop point + makes a one-
+    // word title readable as it scrolls back around. Three spaces
+    // either side of the bullet keep the words from running into
+    // each other on browsers that condense whitespace in the tab.
+    const text = original + "   •   ";
+    let offset = 0;
+    const tick = () => {
+      offset = (offset + 1) % text.length;
+      document.title = text.slice(offset) + text.slice(0, offset);
+    };
+    // 320ms per char ≈ Pulpo (5 letters + space) every ~2s. Faster
+    // becomes flicker on macOS Safari; slower reads as broken.
+    const id = setInterval(tick, 320);
+    return () => {
+      clearInterval(id);
+      document.title = original;
+    };
   }, []);
 
   // Handle the Stripe Checkout return URL. The server's create-checkout-
@@ -376,7 +407,10 @@ function App() {
   }, [showToast, locale]);
 
   const signout = useCallback(() => {
+    if (isSigningOut) return; // re-entry guard for double-clicks
+    setIsSigningOut(true);
     track("auth.signout_started", { had_clerk_actions: !!clerkActions });
+
     // Clerk path: clear the Clerk session FIRST. Without this,
     // ClerkUserSync would re-hydrate the user from Clerk's persisted
     // cookie on the next render — local setUser(null) gets undone
@@ -384,18 +418,32 @@ function App() {
     // becomes truthy when ClerkActionsBinder has wired up; if it
     // isn't yet (very early click) we fall through and at least clear
     // local state.
+    const finish = () => {
+      setUser(null);
+      setDetailViewCount(0);
+      showToast(t("toast.logged_out", locale));
+      setIsSigningOut(false);
+    };
+
     if (clerkActions && typeof clerkActions.signOut === "function") {
-      try {
-        clerkActions.signOut();
-      } catch (err) {
-        if (typeof console !== "undefined" && console.warn) {
-          console.warn("[pulpo] clerk.signOut failed:", err);
-        }
-      }
+      // Hard ceiling: 3s. If Clerk's signOut hangs (network blip,
+      // SDK error code we didn't catch) we still clear local state so
+      // the user isn't stuck staring at a disabled button.
+      let done = false;
+      const safeFinish = () => { if (!done) { done = true; finish(); } };
+      const timeout = setTimeout(safeFinish, 3000);
+      Promise.resolve()
+        .then(() => clerkActions.signOut())
+        .catch((err) => {
+          if (typeof console !== "undefined" && console.warn) {
+            console.warn("[pulpo] clerk.signOut failed:", err);
+          }
+        })
+        .finally(() => { clearTimeout(timeout); safeFinish(); });
+      return;
     }
-    setUser(null); setDetailViewCount(0);
-    showToast(t("toast.logged_out", locale));
-  }, [clerkActions, showToast, locale]);
+    finish();
+  }, [clerkActions, isSigningOut, showToast, locale]);
 
   const recordDetailView = useCallback(() => setDetailViewCount(c => c + 1), []);
 
@@ -405,7 +453,7 @@ function App() {
 
   const app = {
     route, routeParams, go, goBrowse,
-    user, signin, signout,
+    user, signin, signout, isSigningOut,
     savedIds, toggleSave,
     signupModal, openSignup, closeSignup,
     openListing, closeListing, openListingId,

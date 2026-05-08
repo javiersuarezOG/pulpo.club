@@ -19,7 +19,7 @@ import {
   readSortFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
-import { track } from "./telemetry/hook";
+import { track, optIn, optOut } from "./telemetry/hook";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import {
   Icon,
@@ -89,7 +89,12 @@ function TopNav({ app }) {
                 title={t("nav.account", lc)}
                 aria-label={t("nav.account", lc)}
               >{app.user.email[0].toUpperCase()}</button>
-              <button className="link-btn" onClick={() => app.signout()}>{t("nav.logout", lc)}</button>
+              <button
+                className="link-btn"
+                onClick={() => app.signout()}
+                disabled={app.isSigningOut}
+                aria-busy={app.isSigningOut || undefined}
+              >{t("nav.logout", lc)}</button>
             </div>
           ) : (
             <button
@@ -410,7 +415,7 @@ function Hero({ app }) {
 }
 
 // ====== Horizontal shelf ======
-function Shelf({ shelf, app, locked = false, layout = "standard", expanded = false, onToggleExpand, registerRef }) {
+function Shelf({ shelf, app, locked = false, layout = "standard", expanded = false, onToggleExpand, registerRef, shelfIndex = 0 }) {
   const LISTINGS = useListings();
   const scrollRef = pUseRef(null);
   const sectionRef = pUseRef(null);
@@ -466,9 +471,16 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
       </div>
       {expanded ? (
         <div className={isMagazine ? "shelf-magazine-grid" : "shelf-expanded-grid"}>
-          {items.map(l => (
+          {/* Only the FIRST shelf on Discover is above the fold. With
+              15 shelves on the page, marking 4 cards/shelf eager meant
+              60 high-priority fetches on landing — the same priority-
+              lane storm we fixed on Browse. Restrict to shelf 0; the
+              rest fall through to native lazy. */}
+          {items.map((l, i) => (
             <ListingCard
               key={l.id} listing={l} app={app}
+              priority={shelfIndex === 0 && i < 3}
+              source="discover"
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
                 app.openListing(l.id);
@@ -485,11 +497,16 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
         // the rail scrolls. Buttons are tab-after-cards by DOM order.
         <div className="shelf-rail-wrap">
           <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
-            {items.map(l => (
+            {/* Same priority-lane budget as the expanded grid above —
+                only the first shelf's first ~3 cards are above the
+                fold; everything else lazy-loads on scroll. */}
+            {items.map((l, i) => (
               <div className="shelf-item" key={l.id}>
                 <ListingCard
                   listing={l}
                   app={app}
+                  priority={shelfIndex === 0 && i < 3}
+                  source="discover"
                   onOpen={() => {
                     track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
                     app.openListing(l.id);
@@ -711,7 +728,7 @@ function HomePage({ app }) {
       </div>
 
       <div className="shelves">
-        {orderedShelves.map((shelf) => (
+        {orderedShelves.map((shelf, i) => (
           <Shelf
             key={shelf.key}
             shelf={shelf}
@@ -720,6 +737,7 @@ function HomePage({ app }) {
             expanded={expandedKey === shelf.key}
             onToggleExpand={toggleExpand}
             registerRef={registerRef}
+            shelfIndex={i}
           />
         ))}
         {!app.user && (
@@ -1436,7 +1454,7 @@ function applyFilters(listings, f) {
     if (f.status.has("new") && l.first_seen_date > 7) return false;
     if (f.status.has("price_drop") && !l.is_repriced) return false;
     if (f.status.has("off_market") && l.source_type !== "off_market") return false;
-    if (f.status.has("motivated") && l.days_listed < 90) return false;
+    if (f.status.has("motivated") && (typeof l.days_listed !== "number" || l.days_listed < 90)) return false;
     if (l.readiness_score < f.readiness) return false;
     if ((f.score_min ?? 0) > 0 && (l.rank_score ?? 0) < f.score_min) return false;
     if (f.photos === "with" && (l.photos_count ?? 0) === 0) return false;
@@ -1494,6 +1512,11 @@ function BrowsePage({ app }) {
   // Pagination — render in 60-card pages. Filters/sort/category changes
   // reset back to one page. Avoids dumping ~870 cards into the DOM at once.
   const PAGE_SIZE = 60;
+  // Cards above this index get loading="eager" + fetchpriority="high".
+  // The rest fall back to native loading="lazy" and only fetch when
+  // they near the viewport, so a 60-card filter result doesn't slam
+  // the priority lane.
+  const ABOVE_FOLD_COUNT = 6;
   const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
@@ -1542,7 +1565,13 @@ function BrowsePage({ app }) {
       price_desc: (a, b) => (b.price ?? -1) - (a.price ?? -1),
       size_desc: (a, b) => (b.size_m2 ?? 0) - (a.size_m2 ?? 0),
       ppm_asc: (a, b) => (a.price_per_m2 ?? Infinity) - (b.price_per_m2 ?? Infinity),
-      days_asc: (a, b) => a.days_listed - b.days_listed,
+      // Push null days_listed to the end of asc order (unknown age
+       // shouldn't masquerade as freshest).
+      days_asc: (a, b) => {
+        const av = typeof a.days_listed === "number" ? a.days_listed : Number.POSITIVE_INFINITY;
+        const bv = typeof b.days_listed === "number" ? b.days_listed : Number.POSITIVE_INFINITY;
+        return av - bv;
+      },
       ready_desc: (a, b) => b.readiness_score - a.readiness_score,
       stars_desc: (a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0),
       // Composite using user-overridden weights (PR-4b — feature parity).
@@ -1692,11 +1721,20 @@ function BrowsePage({ app }) {
           ) : view === "cards" ? (
             <>
               <div className="card-grid">
-                {results.slice(0, visibleCount).map(l => (
+                {/* `priority={i < ABOVE_FOLD_COUNT}` is the actual fix for
+                    Browse-after-filter slowness. Marking every card eager
+                    storms the high-priority lane the moment 60 cards
+                    mount, and above-fold cards stall behind off-screen
+                    fetches. 6 covers ~2 rows on a desktop auto-fill grid
+                    and ~3 rows on a typical mobile portrait — anything
+                    below that falls through to native loading="lazy". */}
+                {results.slice(0, visibleCount).map((l, i) => (
                   <ListingCard
                     key={l.id}
                     listing={l}
                     app={app}
+                    priority={i < ABOVE_FOLD_COUNT}
+                    source="browse"
                     onOpen={() => {
                       track("card.clicked", { listing_id: l.id, source_view: "browse" });
                       app.openListing(l.id);
@@ -1781,7 +1819,7 @@ function ResultsTable({ results, app, sort, setSort }) {
               <td className="num">{formatSize(l.size_m2)}</td>
               <td className="num bold">{formatPrice(l.price)}</td>
               <td className="num muted">{formatPpm(l.price_per_m2)}</td>
-              <td className={`num tone-${daysListedTone(l.days_listed)}`}>{l.days_listed}d</td>
+              <td className={`num tone-${daysListedTone(l.days_listed)}`}>{typeof l.days_listed === "number" ? `${l.days_listed}d` : "—"}</td>
               <td><Badge listing={l}/></td>
               <td onClick={(e) => e.stopPropagation()}><HeartButton listingId={l.id} app={app} variant="inline" size={16}/></td>
             </tr>
@@ -1941,7 +1979,9 @@ function ListingDetail({ listing, app, asPanel = true }) {
       {isSold && (
         <div className="sold-banner">
           <strong>{t("detail.sold_banner.title", lc)}</strong>
-          <span>{t("detail.sold_banner.days", lc, { n: listing.days_listed })}</span>
+          {typeof listing.days_listed === "number" && (
+            <span>{t("detail.sold_banner.days", lc, { n: listing.days_listed })}</span>
+          )}
           <button className="link-btn" onClick={() => app.goBrowse({ category: null, zones: [listing.zone_name] })}>{t("detail.sold_banner.cta", lc, { zone: listing.zone_name })}</button>
         </div>
       )}
@@ -2029,7 +2069,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
           <div className="kstat">
             <div className="kstat-label">{t("detail.days_listed", lc)}</div>
-            <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{listing.days_listed}</div>
+            <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{typeof listing.days_listed === "number" ? listing.days_listed : "—"}</div>
           </div>
         </div>
 
@@ -2179,15 +2219,49 @@ function ListingDetail({ listing, app, asPanel = true }) {
         )}
       </div>
 
-      {/* Sticky bottom CTA */}
+      {/* Sticky bottom CTA. Source-listing link is Pro-only — the
+          vendor-URL outbound is a paid feature. Anonymous and free
+          users see Pro-upgrade prompts that chain to Stripe checkout
+          (anonymous chains via SignupModal pendingAction:checkout;
+          free goes direct). Off-market listings + sold listings
+          still use the legacy fallback above. */}
       {!isSold && !offMarketLocked && (
         <div className="detail-cta-bar">
-          {needsSignup ? (
+          {!isPaid ? (
             <button
               className="btn-primary lg block"
-              onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}
+              onClick={() => {
+                track("paywall.bypassed", {
+                  kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                });
+                if (needsSignup) {
+                  // Anonymous: signup then chained checkout. The
+                  // post-signin effect in app.jsx fires
+                  // startStripeCheckout when pendingAction is set,
+                  // so a single click covers the whole funnel.
+                  app.openSignup({
+                    mode: "signup",
+                    pendingListing: listing.id,
+                    pendingAction: "checkout",
+                  });
+                } else {
+                  // Free signed-in: straight to Stripe checkout.
+                  startStripeCheckout({
+                    onError: (code) => {
+                      if (code === "sign_in_required") {
+                        app.showToast(t("plans.checkout_auth_mismatch", lc));
+                      } else {
+                        app.go("plans");
+                      }
+                    },
+                  });
+                }
+              }}
             >
-              <Icon name="lock" size={16}/> {t("detail.signup_to_view_source", lc)}
+              <Icon name="lock" size={16}/> {t(
+                needsSignup ? "detail.signup_upgrade_to_view_source" : "detail.upgrade_to_view_source",
+                lc,
+              )}
             </button>
           ) : listing.original_url ? (
             <a
@@ -2268,7 +2342,11 @@ function SavedPage({ app }) {
       case "price_desc": arr.sort((a,b) => b.price - a.price); break;
       case "size_desc": arr.sort((a,b) => b.size_m2 - a.size_m2); break;
       case "ppm_asc": arr.sort((a,b) => a.price_per_m2 - b.price_per_m2); break;
-      case "days_asc": arr.sort((a,b) => a.days_listed - b.days_listed); break;
+      case "days_asc": arr.sort((a,b) => {
+        const av = typeof a.days_listed === "number" ? a.days_listed : Number.POSITIVE_INFINITY;
+        const bv = typeof b.days_listed === "number" ? b.days_listed : Number.POSITIVE_INFINITY;
+        return av - bv;
+      }); break;
       default: arr.sort((a,b) => b.first_seen_date - a.first_seen_date);
     }
     return arr;
@@ -2319,11 +2397,13 @@ function SavedPage({ app }) {
       </div>
       {view === "cards" ? (
         <div className="card-grid">
-          {sorted.map(l => (
+          {sorted.map((l, i) => (
             <ListingCard
               key={l.id}
               listing={l}
               app={app}
+              priority={i < 6}
+              source="saved"
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "saved" });
                 app.openListing(l.id);
@@ -2415,6 +2495,7 @@ function PlansPage({ app }) {
           <button className="btn-primary block lg" onClick={onUpgrade}>
             {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
           </button>
+          <p className="plan-currency-note">{t("plans.pro.currency_note", lc)}</p>
         </div>
         {SHOW_AGENCY_PLAN && (
           <div className="plan-card">
@@ -2531,10 +2612,23 @@ function LegacySignupModal({ app, m }) {
         <div className="divider"><span>or</span></div>
         <form onSubmit={submit} className="modal-form">
           <label>Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoFocus/>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
+              autoComplete="username"
+              autoFocus
+            />
           </label>
           <label>Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters"/>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            />
           </label>
           {error && <div className="form-error">{error}</div>}
           <button type="submit" className="btn-primary block lg">
@@ -2757,18 +2851,34 @@ function ConsentBanner({ locale = "en" }) {
     try { return localStorage.getItem("pulpo-consent") || ""; }
     catch { return ""; }
   });
-  if (decided === "granted" || decided === "declined") return null;
   const region = detectEuRegion() ? "eu" : "non-eu";
-  // Outside the EU, default to silent opt-in (don't show the banner).
-  if (region === "non-eu") {
-    if (!decided) {
-      try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
-    }
-    return null;
-  }
+  // First-paint side-effect for non-EU: silently auto-grant if no
+  // decision is on file. Wrapped in useEffect so the localStorage
+  // write + telemetry emit happen exactly once and outside render.
+  // The event lets us tell auto-grants apart from explicit clicks
+  // when triaging consent funnels.
+  pUseEffect(() => {
+    if (decided) return;
+    if (region !== "non-eu") return;
+    try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
+    setDecided("granted");
+    track("consent.granted", { region });
+    optIn();
+  }, [decided, region]);
+
+  if (decided === "granted" || decided === "declined") return null;
+  if (region !== "eu") return null;
+
   const set = (decision) => {
     try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }
     setDecided(decision);
+    if (decision === "granted") {
+      track("consent.granted", { region });
+      optIn();
+    } else {
+      track("consent.declined", { region });
+      optOut();
+    }
   };
   return (
     <div className="consent-banner" role="dialog" aria-label={t("consent.aria", locale)}>

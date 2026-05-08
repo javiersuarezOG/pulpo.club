@@ -41,6 +41,17 @@ export type EventMap = {
   };
   "browse.price_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
   "browse.price_histogram.reset": Record<string, never>;
+  // Pagination control on Browse — fires when the user clicks
+  // "Load N more". `from`/`to` are the visibleCount before/after the
+  // click; `total` is the total filtered result count so we can tell
+  // a page-2 load apart from page-N.
+  "browse.load_more_clicked": { from: number; to: number; total: number };
+
+  // ───── Discover / Newsletter ─────
+  // Anonymous-only sticky CTA on Discover. Opens the SignupModal in
+  // signup mode; we use this event to compute newsletter-CTA → signup
+  // conversion separately from hero/heart triggers.
+  "newsletter.cta_clicked": { source: "discover" };
 
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
@@ -49,6 +60,11 @@ export type EventMap = {
     listing_id: string;
     auth_state: AuthState;
     action: "add" | "remove";
+    // Set true when the click was intercepted by the anonymous-user
+    // gate (SignupModal opens, intent stashed for post-signin replay).
+    // Lets us tell anon-blocked clicks apart from real toggles in the
+    // funnel — different conversion semantics.
+    gated?: boolean;
   };
   "signup_modal.shown": {
     trigger: "heart" | "detail_view_count" | "manual" | "paywall" | "checkout" | "pendingListing";
@@ -128,6 +144,19 @@ export type EventMap = {
     from_idx: number;
     to_idx: number;
     ms: number;
+  };
+  /** Card image load duration: from React render → onLoad fired.
+   *  Only emitted for `eager` images (the above-the-fold cards on
+   *  Browse/Discover/Saved). Lazy images defer their fetch until
+   *  intersection so a "duration" wouldn't be meaningful — they get
+   *  measured separately if we ever wire an IntersectionObserver
+   *  start-stamp. `idx` is the photo carousel index, `source` is the
+   *  surface so PostHog can compare browse vs discover vs saved. */
+  "perf.card_image_load": {
+    listing_id: string;
+    idx: number;
+    ms: number;
+    source: "browse" | "discover" | "saved";
   };
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */

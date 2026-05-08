@@ -226,7 +226,12 @@ export function adaptListing(raw: any): Listing {
     has_text_overlay:
       typeof raw.has_text_overlay === "boolean" ? raw.has_text_overlay : null,
     first_seen_date: daysSince(raw.first_seen_at),
-    days_listed: typeof raw.days_listed === "number" ? raw.days_listed : 0,
+    // Source-of-truth listing age: comes from the scraper's parse of
+    // the original posting's mod_dt. `null` means we couldn't extract
+    // it from the source — DON'T conflate with 0 ("posted today"),
+    // because 0 would falsely fire the "Nuevo" badge for stale
+    // listings whose source date was unparseable.
+    days_listed: typeof raw.days_listed === "number" ? raw.days_listed : null,
     is_repriced: Boolean(raw.is_repriced),
     source_type: sourceType,
     source_label: sourceLabel,

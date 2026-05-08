@@ -106,6 +106,27 @@ function ProfileSection({ app }) {
   const [saved, setSaved] = aUseState(false);
   const dirty = JSON.stringify(values) !== JSON.stringify(initial);
 
+  // Country picker is a `<datalist>` combobox: 250-row native `<select>`
+  // is unfilterable on mobile (just a long alpha-stride list). Datalist
+  // gives free type-to-filter with zero deps. We track the displayed
+  // *name* alongside the stored ISO code; on blur, an unrecognised
+  // string reverts to the last valid country's name so the form never
+  // ends up with a half-typed value silently saving as "".
+  const codeToName = (code) => {
+    const c = COUNTRIES.find(x => x.code === code);
+    return c ? c.name : "";
+  };
+  const [countryInput, setCountryInput] = aUseState(() => codeToName(initial.country));
+  const onCountryInputChange = (typed) => {
+    setCountryInput(typed);
+    const match = COUNTRIES.find(c => c.name === typed);
+    if (match) setValues(v => ({ ...v, country: match.code }));
+  };
+  const onCountryInputBlur = () => {
+    const match = COUNTRIES.find(c => c.name === countryInput);
+    if (!match) setCountryInput(codeToName(values.country));
+  };
+
   const onSave = (e) => {
     e.preventDefault();
     setSaved(true);
@@ -146,18 +167,23 @@ function ProfileSection({ app }) {
       </FieldRow>
 
       <FieldRow label={t("account.profile.country", app.locale)}>
-        {/* Full ISO 3166-1 list — Pulpo's user base isn't restricted
-            to the previous 4-country whitelist. The select still
-            supports type-ahead (browser native) so finding a country
-            in a long list is fast. */}
-        <select
-          value={values.country}
-          onChange={(e) => setValues(v => ({ ...v, country: e.target.value }))}
-        >
+        {/* Full ISO 3166-1 list as a `<datalist>` combobox — type-to-
+            filter on mobile and desktop. We show the country *name*
+            but persist the ISO code (values.country). */}
+        <input
+          type="text"
+          list="pulpo-country-options"
+          value={countryInput}
+          onChange={(e) => onCountryInputChange(e.target.value)}
+          onBlur={onCountryInputBlur}
+          autoComplete="country-name"
+          placeholder={t("account.profile.country_placeholder", app.locale)}
+        />
+        <datalist id="pulpo-country-options">
           {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>{c.name}</option>
+            <option key={c.code} value={c.name} />
           ))}
-        </select>
+        </datalist>
       </FieldRow>
 
       <FieldRow label={t("account.profile.lang", app.locale)}>
@@ -399,15 +425,24 @@ function SubscriptionSection({ app }) {
   const plan = app.user.plan || "free";
   const status = "active"; // 'active' | 'paused' | 'payment_issue'
 
-  const orders = [
-    { date: "5 May 2026",   desc: "Pulpo Monthly — May 2026",   status: "paid",    amount: "€10.00" },
-    { date: "5 Apr 2026",   desc: "Pulpo Monthly — Apr 2026",   status: "paid",    amount: "€10.00" },
-    { date: "5 Mar 2026",   desc: "Pulpo Monthly — Mar 2026",   status: "paid",    amount: "€10.00" },
-    { date: "5 Feb 2026",   desc: "Pulpo Monthly — Feb 2026",   status: "paid",    amount: "€10.00" },
-    { date: "5 Jan 2026",   desc: "Pulpo Monthly — Jan 2026",   status: "paid",    amount: "€10.00" },
-  ];
-
   const isPaid = plan !== "free";
+
+  // Open the Stripe Customer Portal — Stripe owns the invoice list,
+  // so we hand off rather than render fabricated rows that drift out
+  // of date the moment the user actually pays.
+  const onOpenInvoices = () => {
+    openStripePortal({
+      onError: (code) => {
+        if (code === "sign_in_required") {
+          app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+        } else if (code === "no_customer") {
+          app.showToast(t("account.sub.portal_no_customer", app.locale));
+        } else {
+          app.showToast(t("account.sub.portal_error", app.locale));
+        }
+      },
+    });
+  };
 
   return (
     <div className="account-section">
@@ -484,61 +519,24 @@ function SubscriptionSection({ app }) {
                   },
                 });
               }}
-            >Upgrade to Pro</button>
+            >{t("common.upgrade_to_pro_cta", app.locale)}</button>
           )}
         </div>
       </div>
 
-      {/* Block 2 — Order history */}
+      {/* Block 2 — Invoices (handed off to Stripe Customer Portal) */}
       <div className="sub-divider" />
-      <h3 className="account-subhead">Order history</h3>
+      <h3 className="account-subhead">{t("account.sub.invoices_heading", app.locale)}</h3>
       {isPaid ? (
-        <>
-          <div className="orders-table-wrap">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Status</th>
-                  <th className="num">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o, i) => (
-                  <tr key={i}>
-                    <td>{o.date}</td>
-                    <td>{o.desc}</td>
-                    <td>
-                      <span className={`status-pill status-${o.status === "paid" ? "active" : o.status === "failed" ? "payment_issue" : "paused"}`}>
-                        {o.status === "paid" ? "Paid" : o.status === "failed" ? "Payment Failed" : "Pending"}
-                      </span>
-                    </td>
-                    <td className="num">{o.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Mobile cards */}
-          <div className="orders-cards">
-            {orders.map((o, i) => (
-              <div className="order-card" key={i}>
-                <div className="order-card-line1">
-                  <span>{o.date}</span>
-                  <span>{o.desc}</span>
-                </div>
-                <div className="order-card-line2">
-                  <span className={`status-pill status-active`}>Paid</span>
-                  <span className="num">{o.amount}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+        <p className="section-intro">
+          {t("account.sub.invoices_intro", app.locale)}{" "}
+          <button type="button" className="link-btn" onClick={onOpenInvoices}>
+            {t("account.sub.invoices_cta", app.locale)}
+          </button>
+        </p>
       ) : (
         <div className="orders-empty">
-          No orders yet. Your billing history will appear here once your first payment is processed.
+          {t("account.sub.invoices_empty", app.locale)}
         </div>
       )}
 
@@ -626,7 +624,12 @@ function ClerkSecuritySection({ app, clerkReady }) {
       <div className="sub-divider"/>
       <h3 className="account-subhead">{t("account.security.signout.heading", app.locale)}</h3>
       <p className="section-intro">{t("account.security.signout.intro", app.locale)}</p>
-      <button className="btn-ghost" onClick={onSignout}>
+      <button
+        className="btn-ghost"
+        onClick={onSignout}
+        disabled={app.isSigningOut}
+        aria-busy={app.isSigningOut || undefined}
+      >
         {t("account.security.signout.cta", app.locale)}
       </button>
     </div>
