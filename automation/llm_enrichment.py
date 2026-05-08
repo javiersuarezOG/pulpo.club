@@ -252,8 +252,13 @@ def _enrich_one(client, li: Any, schema: EnrichmentSchema
     On success, the listing is mutated in-place via apply_response().
     On failure, the listing is left untouched (no partial save).
     """
-    description = _g(li, "description") or ""
-    user_prompt = render_user_prompt(description)
+    user_prompt = render_user_prompt(
+        _g(li, "description"),
+        location_text = _g(li, "location_text"),
+        municipality  = _g(li, "municipality"),
+        department    = _g(li, "department"),
+        country       = _g(li, "country"),
+    )
 
     t0 = time.monotonic()
     resp = client.chat.completions.create(
