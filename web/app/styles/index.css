@@ -2182,6 +2182,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 600;
 }
 
+/* Account → Security (Clerk path) — short bullet list of what
+   the hosted UserProfile covers, above the "Open account &
+   security" CTA. */
+.security-clerk-list {
+  list-style: none; padding: 0; margin: 0 0 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 14px; color: var(--ink-2, var(--ink));
+}
+.security-clerk-list li::before {
+  content: "•";
+  display: inline-block;
+  margin-right: 10px;
+  color: var(--ink-3);
+}
+
 .toggle {
   flex-shrink: 0;
   width: 44px; height: 26px; border-radius: 999px;

@@ -69,6 +69,12 @@ function ClerkActionsBinder({ onActions }) {
       // catches it. `clerk.session` populates as soon as Clerk hydrates,
       // earlier than the reactive `useUser()` propagation.
       isSignedIn: () => !!clerk.session || !!clerk.user,
+      // Opens Clerk's hosted UserProfile modal — that single modal
+      // covers password change, email/phone management, MFA, active
+      // sessions, connected OAuth accounts, and account deletion.
+      // Account → Security calls this when Clerk is enabled instead
+      // of mounting the dead local password form.
+      openUserProfile: (opts) => clerk.openUserProfile(opts || {}),
     });
     return () => onActions(null);
   }, [clerk, onActions]);
