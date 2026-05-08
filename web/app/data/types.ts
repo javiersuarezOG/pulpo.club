@@ -38,8 +38,11 @@ export type Listing = {
   // agency overlays). True excludes the listing from the elite featured
   // pool. null = no OCR signal (Tesseract absent or undecodable image).
   has_text_overlay: boolean | null;
-  first_seen_date: number;     // days ago (computed at adapter time)
-  days_listed: number;
+  first_seen_date: number;     // days ago Pulpo first scraped this listing
+  // Days since the source published the listing (from the scraper's
+  // parse of mod_dt). `null` when the source date was unparseable —
+  // distinct from 0 ("posted today"). Consumers must null-guard.
+  days_listed: number | null;
   is_repriced: boolean;
   source_type: "on_market" | "off_market";
   source_label: string;
