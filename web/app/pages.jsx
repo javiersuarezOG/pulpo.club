@@ -12,6 +12,7 @@ import { clerkEnabled } from "./auth/clerk-shell.jsx";
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
 import { SHELVES, PILLS, ZONES } from "./data.jsx";
+import { getCategoryImage } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
   readFilterFromURL,
@@ -548,18 +549,21 @@ function StyleCarousel({ app, onPickStyle }) {
         const shelf = SHELVES.find(s => s.key === key);
         if (!pill || !shelf) return null;
         const matches = LISTINGS.filter(l => !l.is_sold).filter(shelf.filter);
-        const photoFull = matches.find(l => l.photos[0])?.photos[0] || null;
-        // Serve a smaller crop for the carousel — tiles are ~280×210.
-        let photo = null;
-        if (photoFull) {
-          try {
-            const u = new URL(photoFull);
-            u.searchParams.set("w", "560");
-            u.searchParams.set("h", "360");
-            u.searchParams.set("fit", "crop");
-            u.searchParams.set("q", "70");
-            photo = u.toString();
-          } catch { photo = photoFull; }
+        // Prefer the curated, art-directed category image. Fall back to a
+        // representative listing photo only if the curated asset is missing.
+        let photo = getCategoryImage(key);
+        if (!photo) {
+          const photoFull = matches.find(l => l.photos[0])?.photos[0] || null;
+          if (photoFull) {
+            try {
+              const u = new URL(photoFull);
+              u.searchParams.set("w", "560");
+              u.searchParams.set("h", "360");
+              u.searchParams.set("fit", "crop");
+              u.searchParams.set("q", "70");
+              photo = u.toString();
+            } catch { photo = photoFull; }
+          }
         }
         return { key, label: pill.label, count: matches.length, photo };
       })
