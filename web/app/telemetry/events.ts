@@ -59,6 +59,17 @@ export type EventMap = {
   "plans.viewed": { source: "topnav" | "footer" | "paywall" | "manual" };
   "view_original.clicked": { listing_id: string; source_label: string };
 
+  // ───── Upgrade flow (Stripe Checkout) ─────
+  // Fires when the upgrade button is clicked and we kick off
+  // /api/stripe/create-checkout-session. Pairs with the return-URL
+  // event below to compute checkout completion rate.
+  "upgrade.checkout_started": Record<string, never>;
+  // Fires when the user lands back at /preview/?upgrade=success or
+  // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
+  // is the source of truth for the actual plan flip; this event is
+  // user-experience-only.
+  "upgrade.checkout_returned": { result: "success" | "cancelled" };
+
   // ───── Locale ─────
   "locale.changed": { from: string; to: string };
 

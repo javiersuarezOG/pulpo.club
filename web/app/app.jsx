@@ -121,6 +121,36 @@ function App() {
     bootWebVitals();
   }, []);
 
+  // Handle the Stripe Checkout return URL. The server's create-checkout-
+  // session sends success → /preview/?upgrade=success&session_id=...
+  // and cancel → /preview/?upgrade=cancelled. Without this, the user
+  // lands back here after paying and nothing visible happens (the
+  // webhook flips the Clerk plan async, but that lands silently). Fires
+  // once per app mount, then strips the query so a refresh doesn't
+  // re-toast. Captures `locale` at mount time which is always the user's
+  // first-paint locale — accurate for the moment they're returning.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("upgrade");
+    if (!status) return;
+    if (status === "success") {
+      track("upgrade.checkout_returned", { result: "success" });
+      setToast({ id: Date.now(), message: t("upgrade.success_toast", locale) });
+    } else if (status === "cancelled") {
+      track("upgrade.checkout_returned", { result: "cancelled" });
+      setToast({ id: Date.now(), message: t("upgrade.cancelled_toast", locale) });
+    }
+    params.delete("upgrade");
+    params.delete("session_id");
+    const newSearch = params.toString();
+    const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
+    window.history.replaceState({}, "", newUrl);
+    // Intentionally only on mount — re-running on locale change would
+    // re-toast a stripped URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (user) localStorage.setItem("pulpo-user", JSON.stringify(user));
     else localStorage.removeItem("pulpo-user");
@@ -140,13 +170,45 @@ function App() {
 
   const showToast = useCallback((message) => setToast({ id: Date.now(), message }), []);
 
-  // Auto-close the SignupModal on user transition to signed-in.
-  // Covers both the legacy signin() callback (which already clears
-  // it inline) and Clerk's hosted modal flow where ClerkUserSync
-  // sets user asynchronously after the modal closes itself.
+  // Single post-signin effect: when user transitions to signed-in,
+  // close the SignupModal AND fire any pending action carried on the
+  // modal config. Covers both the legacy signin() callback and
+  // Clerk's hosted modal flow (ClerkUserSync sets user async after
+  // the hosted modal self-closes). Before this lived here, only the
+  // legacy path fired pending actions — Clerk users dropped them on
+  // the floor (e.g. clicked Heart-while-anonymous → signed in via
+  // Clerk → save was lost, since signin() never ran).
+  //
+  // Supported pending actions on signupModal:
+  //   pendingSave    — listing_id to add to saved set
+  //   pendingListing — listing_id to open the detail panel for
+  //   pendingAction  — "checkout" → kick off Stripe Checkout redirect
   useEffect(() => {
-    if (user && signupModal) setSignupModal(null);
-  }, [user, signupModal]);
+    if (!user || !signupModal) return;
+    const cfg = signupModal;
+    setSignupModal(null);
+    if (cfg.pendingSave) {
+      setSavedIds(prev => prev.has(cfg.pendingSave) ? prev : new Set([...prev, cfg.pendingSave]));
+    }
+    if (cfg.pendingListing) {
+      setTimeout(() => setOpenListingId(cfg.pendingListing), 400);
+    }
+    if (cfg.pendingAction === "checkout") {
+      // Lazy-load the helper so the Stripe-checkout chunk only fires
+      // for users who actually intended to upgrade.
+      import("./auth/stripe-checkout.js").then(({ startStripeCheckout }) => {
+        startStripeCheckout({
+          onError: (code) => {
+            // sign_in_required shouldn't happen here (we just signed
+            // in), but if it does, swallow rather than re-prompting.
+            if (code !== "sign_in_required") {
+              showToast(t("plans.checkout_error_toast", locale));
+            }
+          },
+        });
+      });
+    }
+  }, [user, signupModal, locale, showToast]);
 
   // Auth telemetry. Fires once per transition for both Clerk-on
   // (ClerkUserSync drives setUser) and legacy (signin/signout
@@ -292,14 +354,12 @@ function App() {
   const closeSignup = useCallback(() => setSignupModal(null), []);
 
   const signin = useCallback(({ email, provider }) => {
+    // Just flip user state. The post-signin effect above closes the
+    // modal AND chains any pending action — keeping the wiring in one
+    // place so Clerk and legacy paths behave identically.
     setUser({ email, provider: provider || "email", joined: Date.now() });
-    const pendingSave = signupModal?.pendingSave;
-    const pendingListing = signupModal?.pendingListing;
-    setSignupModal(null);
-    if (pendingSave) setSavedIds(prev => new Set([...prev, pendingSave]));
     showToast(t("toast.welcome", locale));
-    if (pendingListing) setTimeout(() => setOpenListingId(pendingListing), 400);
-  }, [signupModal, showToast]);
+  }, [showToast, locale]);
 
   const signout = useCallback(() => {
     setUser(null); setDetailViewCount(0);

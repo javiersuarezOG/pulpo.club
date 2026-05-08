@@ -344,7 +344,10 @@ function SubscriptionSection({ app }) {
                 startStripeCheckout({
                   onError: (code) => {
                     if (code === "sign_in_required") {
-                      app.openSignup({ mode: "signup" });
+                      // Carry pendingAction so app.jsx's post-signin
+                      // effect chains the Stripe redirect after auth
+                      // completes — no second click required.
+                      app.openSignup({ mode: "signup", pendingAction: "checkout" });
                     } else {
                       app.go("plans");
                     }

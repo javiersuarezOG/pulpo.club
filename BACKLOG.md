@@ -28,7 +28,7 @@ Last updated: 2026-05-08.
 
 ## Telemetry
 
-- [ ] **Wire client-side `web-vitals` to PostHog.** The `web-vitals` package is in `package.json` but isn't actually emitting events. There's no `web_vitals.cls` insight today, so flicker / layout-shift bugs have to be triaged by eyeball. Hook `onCLS` / `onLCP` / `onFID` to `track("web_vitals.<metric>", { value, rating })` from `web/app/app.jsx`. Then build the corresponding insights in PostHog.
+- [x] ~~Wire client-side `web-vitals` to PostHog.~~ **Already shipped.** Re-audited 2026-05-08: `web/app/telemetry/web-vitals.ts` boots `onCLS`/`onLCP`/`onINP`/`onTTFB`, called from [`app.jsx:121`](web/app/app.jsx). Events are typed in [`telemetry/events.ts`](web/app/telemetry/events.ts) (`web_vitals.lcp` / `inp` / `cls` / `ttfb`). Followup: build the actual PostHog insights/dashboards consuming these events — the data is flowing but no triage view exists yet.
 
 ## Pre-existing tech debt
 
@@ -38,10 +38,36 @@ Last updated: 2026-05-08.
 
 These shipped in [PR-150](https://github.com/javiersuarezOG/pulpo.club/pull/150) but were verified only in Chromium / dev. Worth a real-device spot check before relying on them:
 
-- [ ] Real Stripe checkout end-to-end (need a real signed-in user + Stripe test card).
+- [ ] **Real Stripe checkout end-to-end** with a Stripe test card (4242 4242 4242 4242, any future date, any CVC). Steps:
+  1. Sign in as a Free user.
+  2. Click "Upgrade — $10/month" on the Plans page.
+  3. Verify redirect to `https://checkout.stripe.com/...` lands.
+  4. Pay with the test card.
+  5. Verify return to `/preview/?upgrade=success` and the success toast fires.
+  6. Watch the Clerk Dashboard for `publicMetadata.plan = "pro"` (webhook should set it).
+  7. Reload the app — UI should reflect Pro tier (no upgrade prompts, full gallery, off-market unlocked).
+  8. Hit the cancel-flow too: click Upgrade again on a fresh test user, hit "back" / cancel during Checkout, verify the cancel toast.
+  Wiring already verified by [`tests/e2e/preview-smoke.spec.ts`](tests/e2e/preview-smoke.spec.ts) (mocked endpoint + return-URL handling); the end-to-end roundtrip is the part that needs a Stripe test key + a human.
+- [x] ~~ES locale visual~~ — verified in PR-153 via Playwright on the Plans page; remaining surfaces (Account, SignupModal, BottomNav) still untested visually.
 - [ ] Real iPhone Safari + Android Chrome — only Chromium emulated viewports were tested.
-- [ ] ES locale — added translations exist, never visually inspected in-app.
 - [ ] Tablet (768–1023px) — only mobile and desktop endpoints tested.
+
+## PR-9.5 — Pro account-management UI (Stripe Customer Portal)
+
+The original plan ([`~/.claude/plans/use-the-ux-fluffy-cocke.md`](~/.claude/plans/use-the-ux-fluffy-cocke.md), line 995) calls for a **PR-9.5** that embeds the Stripe Customer Portal so paid users can update payment method / change plan / cancel without leaving the app. **Not shipped.**
+
+- The "Manage plan" link in [`web/app/account.jsx:333`](web/app/account.jsx) is a dead static `<a>` with no href.
+- No `/api/stripe/billing-portal` endpoint exists yet.
+- The mock orders in `account.jsx:301-305` are still hardcoded — billing history doesn't pull from Stripe.
+
+To ship: add a server endpoint that calls `stripe.billingPortal.sessions.create({ customer: ..., return_url: ... })` and returns the URL; wire the "Manage plan" button to fetch it and `window.location.assign(url)`. ~30 lines per plan.
+
+## Other PR-9 gaps surfaced during the upgrade-flow audit
+
+- [ ] **Detail-view soft prompt @ view 5 / hard gate @ view 8** — the counter exists in [`app.jsx:309`](web/app/app.jsx) but no UI enforces the prompts. Plan called for a "soft prompt at 5, hard gate at 8" funnel for free users.
+- [ ] **Free-plan upgrade strips** — sticky banner ("Pulpo Free: 3 of 8 detail views this month") on Discover/Browse/Saved for logged-in-free users. Plan §985.
+- [ ] **Save-cap inline card at save 10** — currently a toast; plan called for an inline upgrade card in the Saved page when the cap hits.
+- [ ] **Redacted `/api/listings/:id`** — confirm the endpoint actually omits broker fields for unauth requests (the CSS blur is visual only per plan §506; the truth is server-side).
 
 ## Map (deferred from PR-150)
 
