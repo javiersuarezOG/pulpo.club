@@ -128,13 +128,20 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # to 600×400. Resolution + sharpness need full-res input;
             # post-thumbnail bytes are already lossy.
             try:
-                from automation.photo_quality import compute_score as _compute_photo_score
+                from automation.photo_quality import (
+                    compute_score as _compute_photo_score,
+                    detect_text_overlay as _detect_text_overlay,
+                )
                 li.hero_photo_quality_score = _compute_photo_score(r.content)
+                # OCR-based brochure detection. None on Tesseract-missing /
+                # decode-fail; the elite filter treats None as not-flagged.
+                li.has_text_overlay = _detect_text_overlay(r.content)
             except Exception as score_err:
                 # Photo scoring is non-fatal — never kill the download
                 # because of an OpenCV/PIL edge case.
                 print(f"[photos] score failed for {li.source}|{li.source_id}: {score_err!r}")
                 li.hero_photo_quality_score = None
+                li.has_text_overlay = None
             from PIL import Image
             img = Image.open(io.BytesIO(r.content))
             img.thumbnail((600, 400), Image.LANCZOS)

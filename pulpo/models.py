@@ -93,6 +93,11 @@ class Listing:
     # None = not yet scored (offline mode, OpenCV unavailable, or
     # download failed). Featured-listing picker filters on this.
     hero_photo_quality_score: Optional[int] = None
+    # OCR-based text-overlay detector for hero photos. True = the image
+    # has significant text/banner overlays (brochure-style); excluded
+    # from the elite featured-listing pool. None = no signal (Tesseract
+    # not installed, image undecodable, or scoring skipped).
+    has_text_overlay: Optional[bool] = None
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker

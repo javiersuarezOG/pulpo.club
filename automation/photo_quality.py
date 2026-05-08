@@ -178,3 +178,128 @@ def score_band(score: Optional[int]) -> str:
     if score >= 20:
         return "poor"
     return "reject"
+
+
+# ── Text-overlay detection (brochure-style hero exclusion) ─────────────
+#
+# Brokers often submit listings with the first photo being a brochure:
+# property image + price stamp + agency logo + "FOR SALE" banner. These
+# read as advertising rather than property and look bad as a full-bleed
+# hero. detect_text_overlay() flags such images so they can be excluded
+# from the featured-listing pool (pulpo/featured_listing.py:_is_elite).
+#
+# Implementation: pytesseract over the raw image bytes. Words with
+# confidence >= TEXT_MIN_CONF count toward two thresholds — flagged
+# True if either holds. The two thresholds catch different failure
+# modes:
+#   - high word count → blocks of paragraph text (descriptions baked in)
+#   - high area % → big "FOR SALE / VENDIDO" banners (few words but huge)
+#
+# Returns None when pytesseract isn't importable OR the tesseract binary
+# isn't on PATH OR the image fails to decode. None means "no signal" —
+# the caller treats it as "do not exclude" (same null-tolerance pattern
+# as hero_photo_quality_score). A single warning is logged on the first
+# missing-binary error per process; we don't spam logs across hundreds
+# of photos in a nightly run.
+
+TEXT_MIN_CONF = 60          # Tesseract confidence threshold per word
+TEXT_MIN_WORDS = 8          # >= this many qualifying words → flag
+TEXT_MIN_AREA_PCT = 5.0     # >= this % of image covered by text → flag
+
+_TESSERACT_WARNED = False   # one-shot warning gate per process
+
+
+def _detector_unavailable(reason: str) -> None:
+    global _TESSERACT_WARNED
+    if not _TESSERACT_WARNED:
+        print(f"[photo_quality] text-overlay detection disabled: {reason}")
+        _TESSERACT_WARNED = True
+
+
+def detect_text_overlay(
+    raw_bytes: bytes,
+    *,
+    min_word_count: int = TEXT_MIN_WORDS,
+    min_area_pct: float = TEXT_MIN_AREA_PCT,
+    min_word_confidence: int = TEXT_MIN_CONF,
+) -> Optional[bool]:
+    """Return True if the image carries a significant text overlay.
+
+    Args:
+        raw_bytes: image file bytes (jpeg / png / webp).
+        min_word_count: word-count threshold for "lots of text".
+        min_area_pct: bounding-box area threshold for "huge banner".
+        min_word_confidence: ignore Tesseract words below this confidence.
+
+    Returns:
+        - True  → flagged: brochure-style or text-heavy
+        - False → no/minimal text detected
+        - None  → cannot decide (Tesseract missing, image undecodable, OCR error)
+
+    None is the "no-signal" sentinel — featured_listing._is_elite
+    treats a None as not-flagged, same convention as the score field.
+    """
+    if not raw_bytes:
+        return None
+
+    try:
+        import pytesseract                       # type: ignore
+    except ImportError:
+        _detector_unavailable("pytesseract not installed")
+        return None
+
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+
+    try:
+        img = Image.open(io.BytesIO(raw_bytes))
+        img.load()
+        width, height = img.size
+    except Exception:
+        return None
+
+    if width <= 0 or height <= 0:
+        return None
+
+    try:
+        data = pytesseract.image_to_data(
+            img,
+            output_type=pytesseract.Output.DICT,
+        )
+    except pytesseract.TesseractNotFoundError:
+        _detector_unavailable("tesseract binary not on PATH")
+        return None
+    except Exception as e:
+        _detector_unavailable(f"tesseract error: {e!r}")
+        return None
+
+    confs = data.get("conf", [])
+    texts = data.get("text", [])
+    widths = data.get("width", [])
+    heights = data.get("height", [])
+
+    img_area = float(width * height)
+    if img_area <= 0:
+        return None
+
+    qualifying_words = 0
+    text_area = 0
+    for conf, txt, w, h in zip(confs, texts, widths, heights):
+        try:
+            c = int(float(conf))
+        except (TypeError, ValueError):
+            continue
+        if c < min_word_confidence:
+            continue
+        if not txt or not txt.strip():
+            continue
+        qualifying_words += 1
+        try:
+            text_area += int(w) * int(h)
+        except (TypeError, ValueError):
+            continue
+
+    area_pct = 100.0 * text_area / img_area
+    return qualifying_words >= min_word_count or area_pct >= min_area_pct

@@ -123,8 +123,16 @@ def _is_elite(li: Any) -> bool:
 
     The photo-quality gate is permissive on null: the rank+photos
     proxies stand in until the scoring backfill catches up.
+
+    Brochure-style hero photos (text overlays, price stamps, agency
+    banners) are excluded — they read as advertising rather than
+    property and look bad full-bleed. `has_text_overlay is True` is
+    the only hard exclusion; None means no OCR signal (Tesseract
+    not available or image undecodable) and we keep the listing.
     """
     if _g(li, "is_sold") is True:
+        return False
+    if _g(li, "has_text_overlay") is True:
         return False
     if (_g(li, "photos_count") or 0) < MIN_PHOTOS_COUNT:
         return False

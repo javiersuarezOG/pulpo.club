@@ -61,6 +61,7 @@
       "photo_urls",
       "hero_photo_path",
       "hero_photo_quality_score",
+      "has_text_overlay",
       "first_seen_at",
       "broker_name",
       "broker_phone",
@@ -377,6 +378,12 @@
       "hero_photo_quality_score": {
         "type": [
           "integer",
+          "null"
+        ]
+      },
+      "has_text_overlay": {
+        "type": [
+          "boolean",
           "null"
         ]
       },

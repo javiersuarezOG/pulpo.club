@@ -132,6 +132,10 @@ export interface Listing {
     hero_photo_path: string | null;     // local /photos/<source>_<id>.jpg
     /** PR-7.6 — heuristic quality score (0..100) for hero_photo_path. null when not scored. */
     hero_photo_quality_score: number | null;
+    /** OCR-based text-overlay flag for hero photos. True = brochure-style image
+     *  (text/banner/agency overlays). Excludes listing from the elite featured pool.
+     *  null = no OCR signal (Tesseract absent or undecodable image). */
+    has_text_overlay: boolean | null;
     first_seen_at: string | null;       // ISO8601 UTC
 
     // ── Broker ──────────────────────────────────────────────────────

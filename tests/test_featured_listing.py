@@ -97,6 +97,31 @@ def test_filters_sold_listings_at_every_tier():
     assert pick_featured_pool([_li(is_sold=True)], now=_NOW) is None
 
 
+def test_elite_excludes_text_overlay_hero():
+    """OCR-flagged brochure-style hero photos are excluded from the
+    elite pool. Soft tier doesn't gate on this — text-overlay listings
+    are still acceptable as soft fallbacks since the bar is lower."""
+    pool = pick_featured_pool([_li(has_text_overlay=True)], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "soft"
+
+
+def test_elite_accepts_null_text_overlay():
+    """None means 'no OCR signal' (Tesseract absent / undecodable image).
+    Same null-tolerance pattern as hero_photo_quality_score — keep the
+    listing rather than dropping it on a missing-signal."""
+    pool = pick_featured_pool([_li(has_text_overlay=None)], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "elite"
+
+
+def test_elite_accepts_explicit_false_text_overlay():
+    """Explicit False = OCR ran and found no text. Same as null path."""
+    pool = pick_featured_pool([_li(has_text_overlay=False)], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "elite"
+
+
 # pool ordering + capping
 
 def test_pool_sorted_by_rank_score_desc():

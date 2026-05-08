@@ -34,6 +34,10 @@ export type Listing = {
   // PR-7.6 — heuristic quality score (0..100) for the hero photo.
   // null = pipeline didn't score this run (offline / no OpenCV).
   hero_photo_quality_score: number | null;
+  // OCR-flag for brochure-style hero photos (price stamps / banners /
+  // agency overlays). True excludes the listing from the elite featured
+  // pool. null = no OCR signal (Tesseract absent or undecodable image).
+  has_text_overlay: boolean | null;
   first_seen_date: number;     // days ago (computed at adapter time)
   days_listed: number;
   is_repriced: boolean;
