@@ -484,7 +484,7 @@ function SubscriptionSection({ app }) {
                   },
                 });
               }}
-            >Upgrade to Pro</button>
+            >{t("common.upgrade_to_pro_cta", app.locale)}</button>
           )}
         </div>
       </div>
