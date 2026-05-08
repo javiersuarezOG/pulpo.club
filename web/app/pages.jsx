@@ -205,20 +205,39 @@ function PillRail({ app, active }) {
 const HERO_ROTATE_MS    = 12_000;
 const HERO_SESSION_KEY  = "pulpo.hero.startIdx.v1";
 
+// Max time we'll hold the hero off-screen waiting for featured.json.
+// This is a safety net for slow networks / CDN cold-misses so the hero
+// isn't held hostage by the daily-data fetch when something's wrong.
+const HERO_FEATURED_TIMEOUT_MS = 600;
+
 function Hero({ app }) {
   const LISTINGS = useListings();
 
-  const [featuredJson, setFeaturedJson] = pUseState(null);
+  // 3-state machine. `loading` distinguishes "still fetching" from
+  // "settled with no pool" — without that distinction the hero used to
+  // render the legacy fallback on first paint, then pop to a different
+  // listing once featured.json resolved a tick later (the visible
+  // first-load flicker). `settled` carries the json (or null on
+  // failure/timeout) so downstream branches behave the same.
+  const [featuredState, setFeaturedState] = pUseState({ status: "loading", json: null });
   pUseEffect(() => {
-    let cancelled = false;
+    let settled = false;
+    const settle = (json) => {
+      if (settled) return;
+      settled = true;
+      setFeaturedState({ status: "settled", json });
+    };
     import("./telemetry/perf").then(({ timedFetch }) =>
       timedFetch("featured.json", "/data/featured.json", { headers: { Accept: "application/json" } })
     )
       .then(r => (r.ok ? r.json() : null))
-      .then(j => { if (!cancelled && j) setFeaturedJson(j); })
-      .catch(() => { /* swallow — fall back to client-side */ });
-    return () => { cancelled = true; };
+      .then(j => settle(j))
+      .catch(() => settle(null));
+    const tid = setTimeout(() => settle(null), HERO_FEATURED_TIMEOUT_MS);
+    return () => { settled = true; clearTimeout(tid); };
   }, []);
+
+  const featuredJson = featuredState.json;
 
   // Resolve the pool to live Listings. Backend ID format is
   // `source|source_id`; FE adapter uses `source-source_id`.
@@ -282,6 +301,55 @@ function Hero({ app }) {
     return () => clearInterval(timer);
   }, [heroPool.length]);
 
+  // Two-layer crossfade. Before this we used `key={`bg-${id}`}` on a
+  // single <img> — every rotation unmounted the old img and remounted
+  // the new one, so for ~1.6s the user saw the dark hero base color
+  // (--ink) bleeding through while the new img loaded + opacity
+  // animated 0→1. Holding the previous img painted under the incoming
+  // one turns the rotation into a smooth fade instead of a flash.
+  const [bgLayers, setBgLayers] = pUseState(() => {
+    if (heroPool.length === 0) return [];
+    const f = heroPool[idx % heroPool.length];
+    return f ? [{ id: f.id, src: f.photos[0] }] : [];
+  });
+
+  pUseEffect(() => {
+    if (heroPool.length === 0) return;
+    const f = heroPool[idx % heroPool.length];
+    if (!f) return;
+    setBgLayers(prev => {
+      const last = prev[prev.length - 1];
+      if (last && last.id === f.id) return prev;
+      return [...prev, { id: f.id, src: f.photos[0] }];
+    });
+  }, [idx, heroPool]);
+
+  // Drop the outgoing layer once its CSS fade-out has settled
+  // (heroOut is 1.2s; buffer to 1500ms for jank frames).
+  pUseEffect(() => {
+    if (bgLayers.length < 2) return;
+    const tid = setTimeout(() => setBgLayers(curr => curr.slice(-1)), 1500);
+    return () => clearTimeout(tid);
+  }, [bgLayers.length]);
+
+  // Pre-cache the next photo so the next rotation crossfade has a
+  // warm browser cache. Without this the layered fade can still flash
+  // dark for the new image's load duration on slow networks.
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    if (heroPool.length < 2) return;
+    const next = heroPool[(idx + 1) % heroPool.length];
+    const url = next && next.photos && next.photos[0];
+    if (!url) return;
+    const img = new Image();
+    img.src = url;
+  }, [idx, heroPool]);
+
+  // Gate the first paint on featured.json settling. Without this gate,
+  // Hero would render the legacy fallback while featured.json was still
+  // in flight, then re-render with a different elite-pool listing once
+  // the fetch resolved — the visible "hero pop" on cold loads.
+  if (featuredState.status === "loading") return null;
   if (heroPool.length === 0) return null;
   const cursor = idx % heroPool.length;
   const featured = heroPool[cursor];
@@ -289,14 +357,17 @@ function Hero({ app }) {
 
   return (
     <section className="hero">
-      {/* `key` per pool entry forces a remount so the heroIn keyframe
-          re-runs as a fade-in on each rotation. */}
-      <img
-        key={`bg-${featured.id}`}
-        className="hero-bg"
-        src={featured.photos[0]}
-        alt=""
-      />
+      {bgLayers.map((l, i) => {
+        const isCurrent = i === bgLayers.length - 1;
+        return (
+          <img
+            key={l.id}
+            className={`hero-bg ${isCurrent ? "is-current" : "is-prev"}`}
+            src={l.src}
+            alt=""
+          />
+        );
+      })}
       <div className="hero-overlay" />
       <div className="hero-content" key={`content-${featured.id}`}>
         <div className="hero-eyebrow">

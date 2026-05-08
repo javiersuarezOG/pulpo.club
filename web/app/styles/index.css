@@ -216,16 +216,26 @@ h1,h2,h3,h4,h5 { margin: 0; }
   width: 100%; height: 100%;
   object-fit: cover;
   filter: saturate(0.95);
-  animation: heroIn 1.6s var(--ease-out);
 }
+/* `is-current` is the incoming hero photo on rotation. `is-prev` is the
+   outgoing one, kept painted underneath for the duration of its
+   fade-out so the rotation reads as a crossfade rather than a flash to
+   the dark hero base color (--ink). */
+.hero-bg.is-current { animation: heroIn 1.6s var(--ease-out); }
+.hero-bg.is-prev    { animation: heroOut 1.2s var(--ease-out) forwards; z-index: 0; }
 
 @keyframes heroIn {
   from { transform: scale(1.06); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+@keyframes heroOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg { animation: none; }
+  .hero-bg.is-current { animation: none; }
+  .hero-bg.is-prev    { animation: none; opacity: 0; }
 }
 .hero-overlay {
   position: absolute; inset: 0;
