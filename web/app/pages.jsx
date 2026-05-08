@@ -41,6 +41,18 @@ import {
 } from "./components.jsx";
 import { LiveStats } from "./components/LiveStats.jsx";
 import { useUnits } from "./i18n.jsx";
+import { startStripeCheckout } from "./auth/stripe-checkout.js";
+
+// Hide the Agency plan tier until we're ready to ship it. Flip to true to
+// re-enable. Kept as a module constant so a single edit (no tweak panel,
+// no env var) restores the third card.
+const SHOW_AGENCY_PLAN = false;
+
+// Source-of-truth price for Pulpo Pro. Mirrors automation/stripe_setup.mjs
+// (PRICE_AMOUNT_USD = 1000 cents = $10/mo). When the Stripe price changes,
+// update both. The annual toggle was removed because there is no annual
+// price in Stripe today — re-introduce both when a yearly price ships.
+const PRO_PRICE_USD_PER_MONTH = 10;
 
 // ====== TopNav ======
 function TopNav({ app }) {
@@ -72,10 +84,14 @@ function TopNav({ app }) {
               <button className="link-btn" onClick={() => app.signout()}>{t("nav.logout", lc)}</button>
             </div>
           ) : (
-            <>
-              <button className="link-btn" onClick={() => app.openSignup({ mode: "login" })}>{t("nav.login", lc)}</button>
-              <button className="btn-primary" onClick={() => app.openSignup({ mode: "signup" })}>{t("nav.signup_free", lc)}</button>
-            </>
+            <button
+              className="topnav-auth-icon"
+              onClick={() => app.openSignup({ mode: "login" })}
+              aria-label={t("nav.account_or_sign_in", lc)}
+              title={t("nav.account_or_sign_in", lc)}
+            >
+              <Icon name="user" size={20}/>
+            </button>
           )}
         </div>
       </div>
@@ -632,10 +648,18 @@ function HomePage({ app }) {
   );
 }
 
-// ====== Newsletter sticky CTA (compact inline version) ======
+// ====== Newsletter sticky CTA (gated — opens the same SignupModal flow
+// as off-market listings so we don't maintain two competing email
+// capture surfaces. The inline email form was lying anyway: submitting
+// it set local "submitted" state and went nowhere. Anonymous users still
+// see this section (the !app.user guard upstream); logged-in users
+// already get the digest, so this disappears for them.)
 function NewsletterCTA({ app }) {
-  const [submitted, setSubmitted] = pUseState(false);
   const lc = app.locale;
+  const onClick = () => {
+    track("newsletter.cta_clicked", { source: "discover" });
+    app.openSignup({ mode: "signup", source: "newsletter" });
+  };
   return (
     <section className="newsletter-cta">
       <div className="nl-inner">
@@ -646,16 +670,9 @@ function NewsletterCTA({ app }) {
             <div className="nl-sub">{t("newsletter.sub", lc)}</div>
           </div>
         </div>
-        {submitted ? (
-          <div className="nl-success">
-            <Icon name="check" size={16} strokeWidth={2.4} /> {t("newsletter.success", lc)}
-          </div>
-        ) : (
-          <form className="nl-form" onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
-            <input type="email" placeholder={t("newsletter.placeholder", lc)} required aria-label={t("newsletter.placeholder", lc)}/>
-            <button type="submit" className="btn-primary">{t("newsletter.subscribe", lc)}</button>
-          </form>
-        )}
+        <button type="button" className="btn-primary nl-cta" onClick={onClick}>
+          {t("newsletter.signup_cta", lc)}
+        </button>
       </div>
     </section>
   );
@@ -1392,6 +1409,10 @@ function BrowsePage({ app }) {
       : "recent"
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
+  // Pagination — render in 60-card pages. Filters/sort/category changes
+  // reset back to one page. Avoids dumping ~870 cards into the DOM at once.
+  const PAGE_SIZE = 60;
+  const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
@@ -1414,6 +1435,13 @@ function BrowsePage({ app }) {
   }, [filters, sort, app.routeParams.category]);
 
   pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
+
+  // Reset pagination back to page 1 whenever the result set could change.
+  // Without this, a filter that drops the count below visibleCount leaves
+  // a stale "Load more (-N remaining)" button visible.
+  pUseEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filters, sort, app.routeParams.category]);
 
   // Debounce the slider-driven filter values 300ms so a single drag
   // doesn't fire dozens of applyFilters() passes. Chip toggles still
@@ -1580,19 +1608,39 @@ function BrowsePage({ app }) {
               setFilters={setFilters}
             />
           ) : view === "cards" ? (
-            <div className="card-grid">
-              {results.map(l => (
-                <ListingCard
-                  key={l.id}
-                  listing={l}
-                  app={app}
-                  onOpen={() => {
-                    track("card.clicked", { listing_id: l.id, source_view: "browse" });
-                    app.openListing(l.id);
-                  }}
-                />
-              ))}
-            </div>
+            <>
+              <div className="card-grid">
+                {results.slice(0, visibleCount).map(l => (
+                  <ListingCard
+                    key={l.id}
+                    listing={l}
+                    app={app}
+                    onOpen={() => {
+                      track("card.clicked", { listing_id: l.id, source_view: "browse" });
+                      app.openListing(l.id);
+                    }}
+                  />
+                ))}
+              </div>
+              {visibleCount < results.length && (
+                <div className="browse-load-more">
+                  <button
+                    className="btn-ghost lg"
+                    onClick={() => {
+                      const next = visibleCount + PAGE_SIZE;
+                      track("browse.load_more_clicked", {
+                        from: visibleCount,
+                        to: Math.min(next, results.length),
+                        total: results.length,
+                      });
+                      setVisibleCount(next);
+                    }}
+                  >
+                    {t("browse.load_more", app.locale, { n: results.length - visibleCount })}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} />
           )}
@@ -1750,16 +1798,35 @@ function ListingDetail({ listing, app, asPanel = true }) {
   };
 
   const lc = app.locale;
-  const facts = [
-    { icon: "road", label: t("detail.fact.road", lc), value: listing.road_access_type ? capitalize(listing.road_access_type) : "—" },
-    { icon: "droplet", label: t("detail.fact.water", lc), value: listing.has_water ? t("detail.fact.water_on", lc) : "—" },
-    { icon: "bolt", label: t("detail.fact.electricity", lc), value: listing.has_power ? t("detail.fact.power_at", lc) : "—" },
-    { icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) },
-    { icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: listing.beachfront_tier ? capitalize(listing.beachfront_tier.replace("_"," ")) : "—" },
-    { icon: "sun", label: t("detail.fact.ocean_view", lc), value: listing.has_ocean_view ? t("detail.fact.yes", lc) : "—" },
-    { icon: "zone", label: t("detail.fact.zoning", lc), value: capitalize(listing.zoning_use) },
-    { icon: "camera", label: t("detail.fact.photos", lc), value: `${listing.photos_count}` },
-  ];
+  // Only push facts that have real data — skipping the "—" placeholders
+  // we used to render. Facts with null/false/missing values disappear,
+  // and the parent section is hidden entirely when fewer than 2 remain
+  // (rendering one orphan fact reads as a render-time bug, not a feature).
+  const facts = [];
+  if (listing.road_access_type) {
+    facts.push({ icon: "road", label: t("detail.fact.road", lc), value: capitalize(listing.road_access_type) });
+  }
+  if (listing.has_water) {
+    facts.push({ icon: "droplet", label: t("detail.fact.water", lc), value: t("detail.fact.water_on", lc) });
+  }
+  if (listing.has_power) {
+    facts.push({ icon: "bolt", label: t("detail.fact.electricity", lc), value: t("detail.fact.power_at", lc) });
+  }
+  // Topography is always known (boolean), so it always shows.
+  facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
+  if (listing.beachfront_tier) {
+    facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: capitalize(listing.beachfront_tier.replace("_", " ")) });
+  }
+  if (listing.has_ocean_view) {
+    facts.push({ icon: "sun", label: t("detail.fact.ocean_view", lc), value: t("detail.fact.yes", lc) });
+  }
+  if (listing.zoning_use) {
+    facts.push({ icon: "zone", label: t("detail.fact.zoning", lc), value: capitalize(listing.zoning_use) });
+  }
+  if (listing.photos_count > 0) {
+    facts.push({ icon: "camera", label: t("detail.fact.photos", lc), value: `${listing.photos_count}` });
+  }
+  const showKeyFacts = facts.length >= 2;
 
   return (
     <div className={`detail ${asPanel ? "as-panel" : "as-page"}`}>
@@ -1885,20 +1952,22 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </ul>
         </div>
 
-        <div className="detail-section">
-          <h3 className="section-title">{t("detail.key_facts", lc)}</h3>
-          <div className="facts-grid">
-            {facts.map(f => (
-              <div className="fact-tile" key={f.label}>
-                <div className="fact-icon"><Icon name={f.icon} size={18}/></div>
-                <div className="fact-text">
-                  <div className="fact-label">{f.label}</div>
-                  <div className={`fact-value ${f.value === "—" ? "muted" : ""}`}>{f.value}</div>
+        {showKeyFacts && (
+          <div className="detail-section">
+            <h3 className="section-title">{t("detail.key_facts", lc)}</h3>
+            <div className="facts-grid">
+              {facts.map(f => (
+                <div className="fact-tile" key={f.label}>
+                  <div className="fact-icon"><Icon name={f.icon} size={18}/></div>
+                  <div className="fact-text">
+                    <div className="fact-label">{f.label}</div>
+                    <div className="fact-value">{f.value}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="detail-section">
           <h3 className="section-title">{t("detail.location", lc)}</h3>
@@ -1912,23 +1981,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <span className="dpill"><Icon name="plane" size={13} strokeWidth={1.6}/> {t("detail.km_to_airport", lc, { n: listing.dist_airport_km })}</span>
               <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t("detail.km_to_town", lc, { n: listing.dist_nearest_town_km })}</span>
             </div>
-            <div className={`static-map ${needsSignup ? "zone-only" : ""}`}>
-              <div className="static-map-grid"/>
-              {needsSignup ? (
-                <div className="static-map-zone-blob">
-                  <Icon name="map_pin" size={20} strokeWidth={1.4}/>
-                  <span>{t("detail.zone_area", lc, { zone: listing.zone_name })}</span>
-                </div>
-              ) : (
-                <div className="static-map-pin"><Icon name="map_pin" size={28} strokeWidth={1.4}/></div>
-              )}
-              <div className="static-map-zone">{listing.zone_name}</div>
-              {needsSignup && (
-                <button className="map-unlock-chip" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                  <Icon name="lock" size={12}/> {t("detail.signup_for_pin", lc)}
-                </button>
-              )}
-            </div>
+            {/* Real interactive map deferred — see plan followup. We
+                used to render a CSS .static-map illustration here, but
+                a fake map mislead users (no real coords behind it).
+                The zone label + distance pills above carry their own
+                weight; the section stays useful without the chrome. */}
           </div>
         </div>
 
@@ -2108,16 +2165,27 @@ function SavedPage({ app }) {
 
 // ====== Plans page ======
 function PlansPage({ app }) {
-  const [annual, setAnnual] = pUseState(true);
+  const lc = app.locale;
+  // Pro upgrade — fires the Stripe Managed Payments redirect via the same
+  // helper Account uses (account.jsx:344). On `sign_in_required` we open
+  // the signup modal so anonymous visitors can complete the flow without
+  // bouncing to a separate page; other errors surface a toast.
+  const onUpgrade = () => {
+    startStripeCheckout({
+      onError: (code) => {
+        if (code === "sign_in_required") {
+          app.openSignup({ mode: "signup" });
+        } else {
+          app.showToast(t("plans.checkout_error_toast", lc));
+        }
+      },
+    });
+  };
   return (
     <div className="page page-plans">
       <div className="plans-head">
         <h1>Pick a plan that fits how you invest.</h1>
         <p>Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.</p>
-        <div className="annual-toggle">
-          <button className={!annual ? "active" : ""} onClick={() => setAnnual(false)}>Monthly</button>
-          <button className={annual ? "active" : ""} onClick={() => setAnnual(true)}>Annual <span className="save">Save 20%</span></button>
-        </div>
       </div>
       <div className="plans-grid">
         <div className="plan-card">
@@ -2137,9 +2205,9 @@ function PlansPage({ app }) {
           <div className="plan-ribbon">Most popular</div>
           <div className="plan-name">Pulpo Pro</div>
           <div className="plan-price">
-            <span>${annual ? 19 : 24}</span><span className="per">/month</span>
+            <span>${PRO_PRICE_USD_PER_MONTH}</span><span className="per">/month</span>
           </div>
-          <div className="plan-tag">{annual ? "Billed $228/yr" : "Billed monthly"}</div>
+          <div className="plan-tag">Billed monthly</div>
           <ul className="plan-features">
             <li><Icon name="check" size={14} strokeWidth={2.4}/> Everything in Free</li>
             <li><Icon name="check" size={14} strokeWidth={2.4}/> Unlimited listing details</li>
@@ -2148,23 +2216,27 @@ function PlansPage({ app }) {
             <li><Icon name="check" size={14} strokeWidth={2.4}/> Save unlimited listings</li>
             <li><Icon name="check" size={14} strokeWidth={2.4}/> Price-drop alerts on saved</li>
           </ul>
-          <button className="btn-primary block lg">Start 7-day free trial</button>
+          <button className="btn-primary block lg" onClick={onUpgrade}>
+            {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_USD_PER_MONTH })}
+          </button>
         </div>
-        <div className="plan-card">
-          <div className="plan-name">Agency</div>
-          <div className="plan-price">
-            <span>${annual ? 79 : 99}</span><span className="per">/month</span>
+        {SHOW_AGENCY_PLAN && (
+          <div className="plan-card">
+            <div className="plan-name">Agency</div>
+            <div className="plan-price">
+              <span>$79</span><span className="per">/month</span>
+            </div>
+            <div className="plan-tag">For investor groups & brokers</div>
+            <ul className="plan-features">
+              <li><Icon name="check" size={14} strokeWidth={2.4}/> Everything in Pro</li>
+              <li><Icon name="check" size={14} strokeWidth={2.4}/> 5 team seats</li>
+              <li><Icon name="check" size={14} strokeWidth={2.4}/> Shared saved lists</li>
+              <li><Icon name="check" size={14} strokeWidth={2.4}/> CSV export</li>
+              <li><Icon name="check" size={14} strokeWidth={2.4}/> Priority off-market intros</li>
+            </ul>
+            <button className="btn-ghost block">Contact sales</button>
           </div>
-          <div className="plan-tag">For investor groups & brokers</div>
-          <ul className="plan-features">
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Everything in Pro</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> 5 team seats</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Shared saved lists</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> CSV export</li>
-            <li><Icon name="check" size={14} strokeWidth={2.4}/> Priority off-market intros</li>
-          </ul>
-          <button className="btn-ghost block">Contact sales</button>
-        </div>
+        )}
       </div>
       <div className="social-proof">
         <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/> <Icon name="star" size={14}/>
@@ -2228,7 +2300,7 @@ function LegacySignupModal({ app, m }) {
         </button>
         <div className="modal-head">
           <PulpoLogo />
-          <h2>{mode === "signup" ? "Discover land deals before they go public." : "Welcome back."}</h2>
+          <h2>{mode === "signup" ? "Discover properties before they go public." : "Welcome back."}</h2>
           <p>{mode === "signup" ? "Free account. No credit card. Cancel anytime." : "Log in to access your saved listings."}</p>
         </div>
         <button className="oauth-btn google" onClick={() => oauth("google")}>
