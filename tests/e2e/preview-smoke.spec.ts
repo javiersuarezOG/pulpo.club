@@ -206,15 +206,28 @@ test.describe("New app boots cleanly on key routes", () => {
 
   // PR-9.5 — verifies the "Manage plan" button on /account hits the new
   // /api/stripe/billing-portal endpoint. The button only renders for
-  // Pro users. To get there in CI without a real Clerk + Stripe round-
-  // trip we use the dev-panel auth-state mock: ?dev=1 enables the
-  // tweaks panel, the panel is opened via the host postMessage
-  // protocol, and the "Pro" segment in the auth-state radio flips
-  // app.user.plan to "pro" client-side. From there it's the same
-  // mock-the-endpoint shape as the create-checkout-session smoke above;
-  // the full Stripe-Portal roundtrip needs a real Stripe key + a human,
-  // documented in BACKLOG.md.
+  // Pro users. We seed `pulpo-user` in localStorage with a Pro plan;
+  // the legacy auth path hydrates `app.user` from there on first
+  // render. CI doesn't ship a Clerk publishable key, so
+  // `clerkEnabled()` returns false and the legacy path is the active
+  // one (see clerk-shell.jsx). The mock-the-endpoint pattern is the
+  // same as the create-checkout-session smoke above; the full Stripe-
+  // Portal roundtrip needs a real Stripe key + a human, documented in
+  // BACKLOG.md.
   test("account page Manage plan fires billing-portal POST", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "pulpo-user",
+        JSON.stringify({
+          email: "pro-tester@pulpo.club",
+          name: "Pro Tester",
+          plan: "pro",
+          joined: Date.now(),
+          provider: "email",
+        }),
+      );
+    });
+
     let postSeen = false;
     let postBody: string | null = null;
     await page.route("**/api/stripe/billing-portal", async (route) => {
@@ -230,21 +243,10 @@ test.describe("New app boots cleanly on key routes", () => {
       });
     });
 
-    await page.goto("/?dev=1", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "networkidle" });
 
-    // Open the tweaks panel via the host protocol the panel listens for
-    // (see web/app/tweaks-panel.jsx — `__activate_edit_mode` sets open).
-    await page.evaluate(() => {
-      window.postMessage({ type: "__activate_edit_mode" }, "*");
-    });
-    await page.locator(".twk-panel").waitFor({ state: "visible", timeout: 5_000 });
-
-    // Flip auth state → Pro. The auth-state radio is the first
-    // TweakRadio in the panel; pick the segment labelled "Pro".
-    await page.locator('.twk-panel [role="radio"]').filter({ hasText: /^Pro$/ }).first().click();
-
-    // Avatar only renders for signed-in users — appearance confirms
-    // the auth-state flip propagated to app.user.
+    // Avatar only renders for signed-in users — the localStorage seed
+    // gets us there on the legacy auth path.
     await page.locator(".avatar-btn").first().waitFor({ state: "visible", timeout: 5_000 });
     await page.locator(".avatar-btn").first().click();
 

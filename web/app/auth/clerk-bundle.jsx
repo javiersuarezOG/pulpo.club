@@ -2,7 +2,8 @@
 //
 // Importing this file pulls in @clerk/react. clerk-shell.jsx loads it
 // via React.lazy so the SDK ships in its own chunk (`clerk-bundle.js`)
-// that only fetches when VITE_USE_CLERK=1 + a publishable key is set.
+// that only fetches when `clerkEnabled()` is true (publishable key set,
+// VITE_USE_CLERK not "0"). See clerk-shell.jsx for the full gate.
 //
 // Don't import from here directly elsewhere — go through ClerkShell.
 //

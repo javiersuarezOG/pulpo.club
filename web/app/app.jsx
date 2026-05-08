@@ -42,7 +42,6 @@ function App() {
   // Tweakable defaults — host rewrites this block when the user changes a tweak,
   // so values persist across reloads.
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-    "authState": "signed_out",
     "density": "comfortable",
     "showStyleCarousel": true,
     "showFooterOnAccount": false
@@ -57,25 +56,11 @@ function App() {
     try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
   });
 
-  // Auth-state tweak — overrides persisted user when set to a non-default value.
-  // Lets the user preview the full app from any auth perspective without
-  // having to manually log in/out.
-  //
-  // PR-9b: when Clerk is the source of truth (flag on), this toggle is
-  // a no-op — Clerk's <ClerkUserSync> would immediately overwrite any
-  // setUser we did here, so they'd fight each frame. Use Clerk test
-  // users (free + pro) from the dashboard instead. PR-9d removes the
-  // toggle entirely.
-  useEffect(() => {
-    if (clerkEnabled()) return;
-    if (tweaks.authState === "signed_out") {
-      setUser(null);
-    } else if (tweaks.authState === "signed_in_free") {
-      setUser({ email: "you@pulpo.club", name: "Demo User", plan: "free", joined: Date.now() });
-    } else if (tweaks.authState === "signed_in_pro") {
-      setUser({ email: "you@pulpo.club", name: "Demo User", plan: "pro", joined: Date.now() });
-    }
-  }, [tweaks.authState]);
+  // PR-9d removed the dev-panel auth-state mock. Clerk drives `setUser`
+  // via ClerkUserSync when enabled (the production default). For the
+  // legacy auth path (e.g. local dev or CI without a Clerk publishable
+  // key) the localStorage seed in `useState` above is the source of
+  // truth — seed `pulpo-user` directly to fake an auth state in tests.
   const [savedIds, setSavedIds] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem("pulpo-saved")) || []); } catch { return new Set(); }
   });
@@ -488,18 +473,6 @@ function App() {
 
       {__PULPO_DEV_PANEL__ && showDevPanel && (
       <TweaksPanel>
-        <TweakSection label="Auth state" />
-        <TweakRadio
-          label="Signed in as"
-          value={tweaks.authState}
-          options={[
-            { value: "signed_out",     label: "Out" },
-            { value: "signed_in_free", label: "Free" },
-            { value: "signed_in_pro",  label: "Pro" },
-          ]}
-          onChange={(v) => setTweak("authState", v)}
-        />
-
         <TweakSection label="Layout" />
         <TweakRadio
           label="Density"
