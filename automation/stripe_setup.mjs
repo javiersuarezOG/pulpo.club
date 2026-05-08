@@ -2,7 +2,7 @@
 //
 // Idempotent: looks up an existing product by name first, and only
 // creates one if missing. The product carries a default monthly price
-// in USD. Prints the price ID at the end — paste it into Vercel +
+// in EUR. Prints the price ID at the end — paste it into Vercel +
 // .env as STRIPE_PRICE_ID_PRO.
 //
 // Run locally with the test secret key in your env:
@@ -17,7 +17,8 @@ import Stripe from "stripe";
 
 const PRODUCT_NAME      = "Pulpo Pro";
 const PRODUCT_DESC      = "Pulpo Pro — off-market access, broker contacts, unlimited views, unlimited saves.";
-const PRICE_AMOUNT_USD  = 1000;          // $10.00 / month
+const PRICE_AMOUNT      = 1000;          // €10.00 / month (1000 cents)
+const PRICE_CURRENCY    = "eur";
 const PRICE_INTERVAL    = "month";
 const TAX_CODE          = "txcd_10103100"; // digital service / SaaS
 const PREVIEW_VERSION   = "2026-02-25.preview";
@@ -50,8 +51,8 @@ async function main() {
         description: PRODUCT_DESC,
         tax_code:    TAX_CODE,
         default_price_data: {
-          unit_amount: PRICE_AMOUNT_USD,
-          currency:    "usd",
+          unit_amount: PRICE_AMOUNT,
+          currency:    PRICE_CURRENCY,
           recurring:   { interval: PRICE_INTERVAL },
         },
       },

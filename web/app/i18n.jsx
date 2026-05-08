@@ -330,8 +330,8 @@ const UI_STRINGS = {
                                              es: "Acceso prioritario a off-market" },
   "plans.agency.cta_contact": { en: "Contact sales",           es: "Contactar ventas" },
   // Stripe-wired Pro CTA + error toast.
-  "plans.upgrade_pro_cta":   { en: "Upgrade — ${price}/month",
-                               es: "Mejorar — ${price}/mes" },
+  "plans.upgrade_pro_cta":   { en: "Upgrade — €{price}/month",
+                               es: "Mejorar — €{price}/mes" },
   "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
                                   es: "No pudimos iniciar el pago — inténtalo de nuevo." },
   "plans.checkout_auth_mismatch": { en: "Couldn't verify your session. Please log out and back in, then try again.",

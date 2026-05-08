@@ -8,6 +8,7 @@ import { Icon, PulpoLogo, formatPrice, currentLocale } from "./components.jsx";
 import { startStripeCheckout } from "./auth/stripe-checkout.js";
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
+import { COUNTRIES } from "./lib/countries.js";
 
 function AccountPage({ app }) {
   const [section, setSection] = aUseState(() => app.routeParams.section || "profile");
@@ -145,14 +146,17 @@ function ProfileSection({ app }) {
       </FieldRow>
 
       <FieldRow label={t("account.profile.country", app.locale)}>
+        {/* Full ISO 3166-1 list — Pulpo's user base isn't restricted
+            to the previous 4-country whitelist. The select still
+            supports type-ahead (browser native) so finding a country
+            in a long list is fast. */}
         <select
           value={values.country}
           onChange={(e) => setValues(v => ({ ...v, country: e.target.value }))}
         >
-          <option value="SV">El Salvador</option>
-          <option value="CR">Costa Rica</option>
-          <option value="MX">Mexico</option>
-          <option value="US">United States</option>
+          {COUNTRIES.map(c => (
+            <option key={c.code} value={c.code}>{c.name}</option>
+          ))}
         </select>
       </FieldRow>
 
@@ -324,11 +328,11 @@ function SubscriptionSection({ app }) {
   const status = "active"; // 'active' | 'paused' | 'payment_issue'
 
   const orders = [
-    { date: "5 May 2026",   desc: "Pulpo Monthly — May 2026",   status: "paid",    amount: "$10.00" },
-    { date: "5 Apr 2026",   desc: "Pulpo Monthly — Apr 2026",   status: "paid",    amount: "$10.00" },
-    { date: "5 Mar 2026",   desc: "Pulpo Monthly — Mar 2026",   status: "paid",    amount: "$10.00" },
-    { date: "5 Feb 2026",   desc: "Pulpo Monthly — Feb 2026",   status: "paid",    amount: "$10.00" },
-    { date: "5 Jan 2026",   desc: "Pulpo Monthly — Jan 2026",   status: "paid",    amount: "$10.00" },
+    { date: "5 May 2026",   desc: "Pulpo Monthly — May 2026",   status: "paid",    amount: "€10.00" },
+    { date: "5 Apr 2026",   desc: "Pulpo Monthly — Apr 2026",   status: "paid",    amount: "€10.00" },
+    { date: "5 Mar 2026",   desc: "Pulpo Monthly — Mar 2026",   status: "paid",    amount: "€10.00" },
+    { date: "5 Feb 2026",   desc: "Pulpo Monthly — Feb 2026",   status: "paid",    amount: "€10.00" },
+    { date: "5 Jan 2026",   desc: "Pulpo Monthly — Jan 2026",   status: "paid",    amount: "€10.00" },
   ];
 
   const isPaid = plan !== "free";
