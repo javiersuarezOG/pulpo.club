@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-06T12:21:55.320527+00:00",
-  "started_at": "2026-05-06T11:32:47.137757+00:00",
-  "duration_seconds": 2948.18,
-  "total_listings": 873,
-  "dropped": 150,
+  "last_updated": "2026-05-08T15:00:13.682812+00:00",
+  "started_at": "2026-05-08T13:49:48.171901+00:00",
+  "duration_seconds": 4225.51,
+  "total_listings": 895,
+  "dropped": 148,
   "per_source_raw": {
-    "goodlife": 80,
-    "oceanside": 25,
+    "goodlife": 71,
+    "oceanside": 49,
     "century21": 15,
-    "bienesraices": 560,
-    "remax": 334,
+    "bienesraices": 561,
+    "remax": 338,
     "nexo": 9
   },
   "source_status": {
@@ -23,12 +23,12 @@
   "coverage": {
     "goodlife": {
       "supplier": null,
-      "pulled": 80,
+      "pulled": 71,
       "max_pages_hit": false
     },
     "oceanside": {
       "supplier": null,
-      "pulled": 25,
+      "pulled": 49,
       "max_pages_hit": false
     },
     "century21": {
@@ -38,12 +38,12 @@
     },
     "bienesraices": {
       "supplier": null,
-      "pulled": 560,
+      "pulled": 561,
       "max_pages_hit": false
     },
     "remax": {
       "supplier": null,
-      "pulled": 334,
+      "pulled": 338,
       "max_pages_hit": false
     },
     "nexo": {
@@ -52,9 +52,22 @@
       "max_pages_hit": false
     }
   },
+  "derived_field_population": {
+    "source_type_off_market": 0.0,
+    "source_type_on_market": 1.0,
+    "previous_price": 0.0022,
+    "beachfront_tier_on_beach": 0.1173,
+    "beachfront_tier_walk_to_beach": 0.0168,
+    "beachfront_tier_near_beach": 0.0123,
+    "land_type_agricultural": 0.2168,
+    "land_type_commercial": 0.0804,
+    "land_type_tourist": 0.0872,
+    "land_type_residential": 0.6156,
+    "is_motivated": 0.2022
+  },
   "field_completeness": {
     "bienesraices": {
-      "n_listings": 491,
+      "n_listings": 492,
       "fields": {
         "price_usd": 0.97,
         "area_m2": 0.97,
@@ -62,11 +75,11 @@
         "municipality": 0.98,
         "department": 0.99,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
-        "is_beachfront": 0.14,
+        "lat": 1.0,
+        "lng": 1.0,
+        "is_beachfront": 0.15,
         "has_paved_access": 0.32,
-        "has_water": 0.36,
+        "has_water": 0.37,
         "has_power": 0.31,
         "is_repriced": 0.0,
         "days_listed": 1.0,
@@ -87,8 +100,8 @@
         "municipality": 0.93,
         "department": 1.0,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
+        "lat": 1.0,
+        "lng": 1.0,
         "is_beachfront": 0.07,
         "has_paved_access": 0.33,
         "has_water": 0.73,
@@ -104,20 +117,20 @@
       }
     },
     "goodlife": {
-      "n_listings": 31,
+      "n_listings": 39,
       "fields": {
-        "price_usd": 0.9,
-        "area_m2": 0.97,
+        "price_usd": 0.92,
+        "area_m2": 0.85,
         "zone": 1.0,
         "municipality": 1.0,
         "department": 1.0,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
-        "is_beachfront": 0.06,
+        "lat": 1.0,
+        "lng": 1.0,
+        "is_beachfront": 0.1,
         "has_paved_access": 0.0,
-        "has_water": 0.16,
-        "has_power": 0.0,
+        "has_water": 0.18,
+        "has_power": 0.08,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -137,8 +150,8 @@
         "municipality": 0.44,
         "department": 0.78,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
+        "lat": 1.0,
+        "lng": 1.0,
         "is_beachfront": 0.0,
         "has_paved_access": 0.11,
         "has_water": 0.0,
@@ -154,20 +167,20 @@
       }
     },
     "oceanside": {
-      "n_listings": 11,
+      "n_listings": 22,
       "fields": {
-        "price_usd": 0.73,
+        "price_usd": 0.68,
         "area_m2": 0.91,
         "zone": 1.0,
         "municipality": 1.0,
         "department": 1.0,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
-        "is_beachfront": 0.36,
-        "has_paved_access": 0.0,
-        "has_water": 0.27,
-        "has_power": 0.36,
+        "lat": 1.0,
+        "lng": 1.0,
+        "is_beachfront": 0.59,
+        "has_paved_access": 0.05,
+        "has_water": 0.18,
+        "has_power": 0.32,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -179,21 +192,21 @@
       }
     },
     "remax": {
-      "n_listings": 316,
+      "n_listings": 318,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.93,
-        "municipality": 0.95,
-        "department": 0.96,
+        "zone": 0.92,
+        "municipality": 0.94,
+        "department": 0.95,
         "location_text": 1.0,
-        "lat": 0.0,
-        "lng": 0.0,
+        "lat": 1.0,
+        "lng": 1.0,
         "is_beachfront": 0.08,
-        "has_paved_access": 0.11,
-        "has_water": 0.21,
-        "has_power": 0.11,
-        "is_repriced": 0.0,
+        "has_paved_access": 0.15,
+        "has_water": 0.29,
+        "has_power": 0.37,
+        "is_repriced": 0.01,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 0.0,
@@ -205,28 +218,28 @@
     }
   },
   "property_type_counts": {
-    "condo": 8,
-    "land": 815,
-    "house": 50
+    "land": 812,
+    "condo": 11,
+    "house": 72
   },
   "validation_by_type": {
     "condo": {
-      "pass": 7,
+      "pass": 10,
       "flag": 1,
-      "drop": 2
+      "drop": 3
     },
     "land": {
-      "pass": 762,
+      "pass": 759,
       "flag": 53,
       "drop": 25
     },
     "house": {
-      "pass": 46,
-      "flag": 4,
-      "drop": 9
+      "pass": 66,
+      "flag": 6,
+      "drop": 11
     }
   },
-  "v_fallback_no_price": 36,
+  "v_fallback_no_price": 46,
   "v_fallback_no_comps": 0,
   "sources": [
     "goodlife",

@@ -56,10 +56,11 @@ import {
 const SHOW_AGENCY_PLAN = false;
 
 // Source-of-truth price for Pulpo Pro. Mirrors automation/stripe_setup.mjs
-// (PRICE_AMOUNT_USD = 1000 cents = $10/mo). When the Stripe price changes,
-// update both. The annual toggle was removed because there is no annual
-// price in Stripe today — re-introduce both when a yearly price ships.
-const PRO_PRICE_USD_PER_MONTH = 10;
+// (PRICE_AMOUNT = 1000 cents = €10/mo). The Stripe Price is denominated
+// in EUR. When the Stripe price changes, update both. The annual toggle
+// was removed because there is no annual price in Stripe today —
+// re-introduce both when a yearly price ships.
+const PRO_PRICE_EUR_PER_MONTH = 10;
 
 // ====== TopNav ======
 function TopNav({ app }) {
@@ -2375,7 +2376,7 @@ function PlansPage({ app }) {
           <div className="plan-ribbon">{t("plans.pro.ribbon", lc)}</div>
           <div className="plan-name">{t("plans.pro.name", lc)}</div>
           <div className="plan-price">
-            <span>${PRO_PRICE_USD_PER_MONTH}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
+            <span>€{PRO_PRICE_EUR_PER_MONTH}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
           </div>
           <div className="plan-tag">{t("plans.pro.tag", lc)}</div>
           <ul className="plan-features">
@@ -2387,14 +2388,14 @@ function PlansPage({ app }) {
             {feat("plans.pro.feat.price_alerts")}
           </ul>
           <button className="btn-primary block lg" onClick={onUpgrade}>
-            {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_USD_PER_MONTH })}
+            {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
           </button>
         </div>
         {SHOW_AGENCY_PLAN && (
           <div className="plan-card">
             <div className="plan-name">{t("plans.agency.name", lc)}</div>
             <div className="plan-price">
-              <span>$79</span><span className="per">{t("plans.pro.per_month", lc)}</span>
+              <span>€79</span><span className="per">{t("plans.pro.per_month", lc)}</span>
             </div>
             <div className="plan-tag">{t("plans.agency.tag", lc)}</div>
             <ul className="plan-features">
