@@ -187,6 +187,16 @@ function App() {
     if (!user || !signupModal) return;
     const cfg = signupModal;
     setSignupModal(null);
+    // signup.completed fires when the modal was a "signup" flow at the
+    // moment of transition. signin.completed (in the auth-telemetry
+    // effect below) fires for every transition — both surface in
+    // PostHog. Distinguishing the two lets the dashboard build a true
+    // acquisition-funnel completion metric.
+    if (cfg.mode === "signup") {
+      track("signup.completed", {
+        provider: (user.provider) || "legacy",
+      });
+    }
     if (cfg.pendingSave) {
       setSavedIds(prev => prev.has(cfg.pendingSave) ? prev : new Set([...prev, cfg.pendingSave]));
     }
@@ -341,6 +351,10 @@ function App() {
         return next;
       });
       if (r.error === "save_cap_reached") {
+        // Telemetry — save-cap is a paywall surface even though it
+        // presents as a toast today (BACKLOG: convert to inline upgrade
+        // card on Saved page).
+        track("paywall.shown", { kind: "save_cap", listing_id: id });
         showToast("Free plan caps at 10 saves — upgrade to keep adding.");
       } else if (r.status === 401) {
         showToast("Sign in to save listings.");
@@ -350,7 +364,22 @@ function App() {
     });
   }, [clerkUserId, showToast, locale]);
 
-  const openSignup = useCallback((cfg = {}) => setSignupModal(cfg), []);
+  const openSignup = useCallback((cfg = {}) => {
+    // Telemetry — fire `signup_modal.shown` once per open. Trigger is
+    // derived from the cfg we received (so callers don't have to pass
+    // it explicitly): pendingSave → heart, pendingAction:checkout →
+    // checkout, pendingListing → pendingListing, otherwise manual /
+    // paywall by inspection.
+    let trigger = "manual";
+    if (cfg.pendingSave) trigger = "heart";
+    else if (cfg.pendingAction === "checkout") trigger = "checkout";
+    else if (cfg.pendingListing) trigger = "pendingListing";
+    track("signup_modal.shown", {
+      trigger,
+      mode: cfg.mode === "login" ? "login" : "signup",
+    });
+    setSignupModal(cfg);
+  }, []);
   const closeSignup = useCallback(() => setSignupModal(null), []);
 
   const signin = useCallback(({ email, provider }) => {

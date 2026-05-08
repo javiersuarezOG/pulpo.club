@@ -401,6 +401,12 @@ const UI_STRINGS = {
                                es: "Tu plan, historial de pagos y detalles — todo en un solo lugar." },
   "account.sub.discover_nudge": { en: "Ready to keep exploring? Head back to Discover →",
                                es: "¿Listo para seguir explorando? Vuelve a Descubrir →" },
+  "account.sub.manage_plan": { en: "Manage plan →",
+                               es: "Gestionar plan →" },
+  "account.sub.portal_error": { en: "We couldn't open the billing portal. Please try again.",
+                               es: "No pudimos abrir el portal de facturación. Inténtalo de nuevo." },
+  "account.sub.portal_no_customer": { en: "We couldn't find your billing details. Please contact support.",
+                               es: "No encontramos tus datos de facturación. Contacta soporte." },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

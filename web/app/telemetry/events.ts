@@ -51,11 +51,21 @@ export type EventMap = {
     action: "add" | "remove";
   };
   "signup_modal.shown": {
-    trigger: "heart" | "detail_view_count" | "manual" | "paywall";
+    trigger: "heart" | "detail_view_count" | "manual" | "paywall" | "checkout" | "pendingListing";
+    mode: "signup" | "login";
   };
-  "signup.completed": { provider: "email" | "google" | "apple" | "magic_link" };
-  "paywall.shown": { kind: "detail_view" | "off_market" | "save_cap" };
-  "paywall.bypassed": { kind: "detail_view" | "off_market" | "save_cap"; action: "upgrade" | "dismiss" };
+  "signup.completed": { provider: "email" | "google" | "apple" | "magic_link" | "clerk" | "legacy" };
+  // signin.completed fires on every signed-in transition (including
+  // first-ever signups). signup.completed fires only when the SignupModal
+  // was open with mode==="signup" at the moment of transition. Either or
+  // both may fire for a given event in PostHog.
+  "signin.completed": {
+    provider: "clerk" | "legacy" | "email" | "google" | "apple" | "magic_link";
+    plan: "free" | "pro";
+  };
+  "signout.completed": Record<string, never>;
+  "paywall.shown": { kind: "detail_view" | "off_market" | "save_cap"; listing_id?: string };
+  "paywall.bypassed": { kind: "detail_view" | "off_market" | "save_cap"; action: "upgrade" | "dismiss" | "have_account"; listing_id?: string };
   "plans.viewed": { source: "topnav" | "footer" | "paywall" | "manual" };
   "view_original.clicked": { listing_id: string; source_label: string };
 
@@ -69,6 +79,13 @@ export type EventMap = {
   // is the source of truth for the actual plan flip; this event is
   // user-experience-only.
   "upgrade.checkout_returned": { result: "success" | "cancelled" };
+
+  // ───── Manage subscription (Stripe Customer Portal) ─────
+  // Fires when the Pro user clicks "Manage plan" on the Account page,
+  // before we POST /api/stripe/billing-portal. Pairs with `portal.error`
+  // to surface auth / config bugs that block the portal redirect.
+  "portal.opened": Record<string, never>;
+  "portal.error": { reason: string };
 
   // ───── Locale ─────
   "locale.changed": { from: string; to: string };

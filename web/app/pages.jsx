@@ -1818,6 +1818,15 @@ function ListingDetail({ listing, app, asPanel = true }) {
     if (app.user && !isSold) app.recordDetailView();
   }, [listing.id]);
 
+  // Paywall telemetry. Fires once per listing+lock transition when the
+  // off-market hard paywall renders. Bypass events fire on the buttons
+  // inside the overlay below, so the funnel
+  // shown → bypassed.action=upgrade → plans.viewed → checkout closes.
+  pUseEffect(() => {
+    if (!offMarketLocked) return;
+    track("paywall.shown", { kind: "off_market", listing_id: listing.id });
+  }, [listing.id, offMarketLocked]);
+
   // PR-5 — lightbox a11y. ESC closes, ←/→ navigate, Tab is trapped
   // inside the lightbox. Focus moves to the close button on open and
   // returns to the trigger on close.
@@ -2092,9 +2101,25 @@ function ListingDetail({ listing, app, asPanel = true }) {
               <Icon name="cat_off_market" size={28}/>
               <h3>{t("detail.paywall.title", lc)}</h3>
               <p>{t("detail.paywall.body", lc)}</p>
-              <button className="btn-primary lg" onClick={() => app.go("plans")}>{t("detail.paywall.see_plans", lc)}</button>
+              <button
+                className="btn-primary lg"
+                onClick={() => {
+                  track("paywall.bypassed", {
+                    kind: "off_market", action: "upgrade", listing_id: listing.id,
+                  });
+                  app.go("plans");
+                }}
+              >{t("detail.paywall.see_plans", lc)}</button>
               {!app.user && (
-                <button className="btn-ghost" onClick={() => app.openSignup({ mode: "login" })}>{t("detail.paywall.have_account", lc)}</button>
+                <button
+                  className="btn-ghost"
+                  onClick={() => {
+                    track("paywall.bypassed", {
+                      kind: "off_market", action: "have_account", listing_id: listing.id,
+                    });
+                    app.openSignup({ mode: "login" });
+                  }}
+                >{t("detail.paywall.have_account", lc)}</button>
               )}
             </div>
           </div>
