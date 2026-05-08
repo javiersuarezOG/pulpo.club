@@ -107,6 +107,36 @@ function App() {
     bootWebVitals();
   }, []);
 
+  // Marquee the document.title so the tab text scrolls like a
+  // marquesina. Pure-cosmetic — pauses entirely when the user has
+  // `prefers-reduced-motion: reduce` set (accessibility — animated
+  // tab titles can be disorienting). Resets to the original on
+  // unmount so the tab doesn't keep a stale rotated state.
+  useEffect(() => {
+    if (typeof window === "undefined" || !document) return;
+    const reduce = typeof window.matchMedia === "function"
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const original = document.title;
+    // The separator gives the eye a clear loop point + makes a one-
+    // word title readable as it scrolls back around. Three spaces
+    // either side of the bullet keep the words from running into
+    // each other on browsers that condense whitespace in the tab.
+    const text = original + "   •   ";
+    let offset = 0;
+    const tick = () => {
+      offset = (offset + 1) % text.length;
+      document.title = text.slice(offset) + text.slice(0, offset);
+    };
+    // 320ms per char ≈ Pulpo (5 letters + space) every ~2s. Faster
+    // becomes flicker on macOS Safari; slower reads as broken.
+    const id = setInterval(tick, 320);
+    return () => {
+      clearInterval(id);
+      document.title = original;
+    };
+  }, []);
+
   // Handle the Stripe Checkout return URL. The server's create-checkout-
   // session sends success → /preview/?upgrade=success&session_id=...
   // and cancel → /preview/?upgrade=cancelled. Without this, the user

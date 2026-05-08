@@ -1,9 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img">
   <title>pulpo.club mark</title>
-  <desc>Pinwheel-only favicon mark for pulpo.club.</desc>
-  <rect width="200" height="200" rx="40" fill="#0F2A3F"/>
+  <desc>Pulpo brand pinwheel — deep green on paper, matches the white + green palette set in tokens.css.</desc>
+  <!-- Backplate uses --accent-strong (oklch 0.28 0.08 165) ≈ #1f4a3e.
+       Tentacles use --paper-2 (oklch 0.97 0.012 160) ≈ #f0f5f1.
+       Center dot uses --accent-soft (oklch 0.93 0.035 160) ≈ #d4ead7
+       so it stays visible against the paper tentacles. -->
+  <rect width="200" height="200" rx="40" fill="#1f4a3e"/>
   <g transform="translate(100,100)">
-    <g fill="none" stroke="#FF6B6B" stroke-width="11" stroke-linecap="round">
+    <g fill="none" stroke="#f0f5f1" stroke-width="11" stroke-linecap="round">
       <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(0)"/>
       <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(45)"/>
       <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(90)"/>
@@ -13,6 +17,6 @@
       <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(270)"/>
       <path d="M 0 0 Q 22 -10, 48 -36" transform="rotate(315)"/>
     </g>
-    <circle cx="0" cy="0" r="12" fill="#FFF4E6"/>
+    <circle cx="0" cy="0" r="12" fill="#d4ead7"/>
   </g>
 </svg>
