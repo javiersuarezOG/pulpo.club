@@ -196,12 +196,18 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(postBody).toBeDefined();
 
     // Anonymous → 401 → SignupModal opens. With Clerk off in the dev
-    // env this surfaces as the legacy modal with the headline.
-    // (When Clerk is on, the hosted modal opens instead — both cases
-    // land at "the user is being prompted to sign in", which is the
-    // contract that matters.)
-    const modalOpen = await page.locator(".modal-signup, [data-clerk-component]").count();
-    expect(modalOpen, "signup modal didn't open after sign_in_required").toBeGreaterThan(0);
+    // env this surfaces as the legacy modal; with Clerk on the hosted
+    // modal opens instead — both cases land at "the user is being
+    // prompted to sign in", which is the contract that matters.
+    //
+    // `waitFor` handles the React state-flush tick between the fetch
+    // response landing and the modal mounting; using `count()` here
+    // races and flakes (mostly when the test is run as part of the
+    // full suite — the CPU-busier worker exposes the timing window).
+    await page
+      .locator(".modal-signup, [data-clerk-component]")
+      .first()
+      .waitFor({ state: "visible", timeout: 3_000 });
   });
 
   // PR-9.5 — verifies the "Manage plan" button on /account hits the new

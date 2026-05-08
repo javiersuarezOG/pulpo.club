@@ -54,8 +54,20 @@ module.exports = async (req, res) => {
   try {
     userId = await authenticateClerkRequest(req);
   } catch (err) {
-    logApi("saves", { status: 500, ms: Date.now() - t0, reason: "auth_throw", error: err.message });
-    return res.status(500).json({ error: "auth_failed" });
+    // Surface the message in the response so we can triage from the
+    // browser console without needing Vercel runtime logs. Clerk dev
+    // keys aren't sensitive; the message is normally just a class
+    // name + reason, no PII.
+    logApi("saves", {
+      status: 500, ms: Date.now() - t0, reason: "auth_throw",
+      error_class: err && err.constructor ? err.constructor.name : "Error",
+      error: err && err.message,
+    });
+    return res.status(500).json({
+      error: "auth_failed",
+      detail: err && err.message,
+      class: err && err.constructor ? err.constructor.name : undefined,
+    });
   }
   if (!userId) {
     logApi("saves", { status: 401, ms: Date.now() - t0, reason: "unauthenticated" });

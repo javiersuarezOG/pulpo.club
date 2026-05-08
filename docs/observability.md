@@ -84,6 +84,7 @@ Source of truth: [`web/app/telemetry/events.ts`](../web/app/telemetry/events.ts)
 | `signup_modal.shown` | `{ trigger, mode }` | `app.openSignup` — every modal-open ([app.jsx](../web/app/app.jsx)) |
 | `signin.completed` | `{ provider, plan }` | First user-state transition null → signed-in (auth-telemetry effect, [app.jsx](../web/app/app.jsx)) |
 | `signup.completed` | `{ provider }` | Same transition, **only when** the SignupModal was open with `mode="signup"` |
+| `auth.signout_started` | `{ had_clerk_actions }` | Logout button click — fires before any state change. Pair with `signout.completed` to detect signOut hangs / cookie re-hydration |
 | `signout.completed` | `{}` | User-state transition signed-in → null |
 
 **Trigger derivation for `signup_modal.shown`:**
@@ -123,6 +124,7 @@ Source of truth: [`web/app/telemetry/events.ts`](../web/app/telemetry/events.ts)
 | `locale.changed` | `{ from, to }` | LocaleToggle |
 | `data.fetch.failed` | `{ stage, error_class }` | `useListings` fetch error path |
 | `client.error` | `{ message, stack? }` | Top-level ErrorBoundary |
+| `api.error` | `{ endpoint, status, reason?, detail? }` | Any non-2xx response from `/api/saves`, `/api/stripe/*`. Wired in `saves-client.js`, `stripe-checkout.js`, `stripe-portal.js`. Lets the dashboard see API failure rate without needing Vercel runtime-log access. |
 
 ### Web Vitals
 

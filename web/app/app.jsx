@@ -376,9 +376,26 @@ function App() {
   }, [showToast, locale]);
 
   const signout = useCallback(() => {
+    track("auth.signout_started", { had_clerk_actions: !!clerkActions });
+    // Clerk path: clear the Clerk session FIRST. Without this,
+    // ClerkUserSync would re-hydrate the user from Clerk's persisted
+    // cookie on the next render — local setUser(null) gets undone
+    // immediately and the user appears to never log out. clerkActions
+    // becomes truthy when ClerkActionsBinder has wired up; if it
+    // isn't yet (very early click) we fall through and at least clear
+    // local state.
+    if (clerkActions && typeof clerkActions.signOut === "function") {
+      try {
+        clerkActions.signOut();
+      } catch (err) {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("[pulpo] clerk.signOut failed:", err);
+        }
+      }
+    }
     setUser(null); setDetailViewCount(0);
     showToast(t("toast.logged_out", locale));
-  }, [showToast, locale]);
+  }, [clerkActions, showToast, locale]);
 
   const recordDetailView = useCallback(() => setDetailViewCount(c => c + 1), []);
 
