@@ -131,6 +131,14 @@ PRICE_TOLERANCE_PCT = 0.25   # ±25% — generous enough for currency drift,
                              # broker price-ladder differences, partial
                              # listing updates
 
+# Maximum allowed ratio between two areas for them to count as the same
+# property. The Phase 1.1.5 audit (samples/dedup_audit_2026-05-08_v2.md)
+# found that 20 of 21 surviving cross-source coord pairs had area ratios
+# from 1.4× to 48.65× — the same coord but obviously different parcels.
+# 1.5× catches all 20 FPs while preserving the single UNCLEAR pair (1.07×).
+# Pinned by constant test so any future tweak forces a deliberate decision.
+MAX_AREA_RATIO = 1.5
+
 # Coords shared by ≥ this many listings are treated as fallback "centroids"
 # (a municipal/zone default the source falls back to when precise lat/lng
 # isn't available) and are excluded from coord-pair matching. Pinned by a
@@ -202,26 +210,28 @@ def _compute_centroids(listings: list[Any]) -> set[tuple[float, float]]:
 def _coord_pairs(
     listings: list[Any],
     centroids: set[tuple[float, float]] | None = None,
-) -> tuple[list[tuple[str, str, str]], int]:
-    """Pairs of distinct-source listings within COORD_RADIUS_M and
-    inside PRICE_TOLERANCE_PCT, with centroid coords excluded.
+) -> tuple[list[tuple[str, str, str]], int, int]:
+    """Pairs of distinct-source listings within COORD_RADIUS_M, after
+    centroid + price-band + area-band gates have run.
 
     Naive O(n²) cross-source pair scan. n ≈ 900 today → ~400k pairs,
     haversine ~10 FLOPs each → low milliseconds. We can move to a
     spatial index if the catalog crosses ~10k listings.
 
     Returns:
-      (pairs, suppressed_by_centroid):
+      (pairs, suppressed_by_centroid, suppressed_by_area):
         pairs:                  list of (key1, key2, source_pair)
-        suppressed_by_centroid: count of pairs that would have been
-                                flagged but were excluded because at
-                                least one endpoint sits at a centroid
-                                coord (telemetry — proves Phase 1.1 is
-                                actually doing something each nightly).
+        suppressed_by_centroid: pairs dropped because at least one
+                                endpoint sits at a centroid coord
+                                (Phase 1.1 telemetry).
+        suppressed_by_area:     pairs dropped because area ratio
+                                exceeded MAX_AREA_RATIO (Phase 1.2
+                                telemetry — proves the new gate is
+                                doing useful work each nightly).
     """
     centroids = centroids or set()
 
-    geo: list[tuple[Any, float, float, float | None,
+    geo: list[tuple[Any, float, float, float | None, float | None,
                      tuple[float, float]]] = []
     for li in listings:
         lat, lng = _g(li, "lat"), _g(li, "lng")
@@ -232,13 +242,19 @@ def _coord_pairs(
             round(latf, _CENTROID_ROUND_DECIMALS),
             round(lngf, _CENTROID_ROUND_DECIMALS),
         )
-        geo.append((li, latf, lngf, _g(li, "price_usd"), rounded))
+        geo.append((
+            li, latf, lngf,
+            _g(li, "price_usd"),
+            _g(li, "area_m2"),
+            rounded,
+        ))
 
     out: list[tuple[str, str, str]] = []
-    suppressed = 0
+    suppressed_centroid = 0
+    suppressed_area = 0
     for a, b in combinations(geo, 2):
-        la, lat_a, lng_a, p_a, ra = a
-        lb, lat_b, lng_b, p_b, rb = b
+        la, lat_a, lng_a, p_a, ar_a, ra = a
+        lb, lat_b, lng_b, p_b, ar_b, rb = b
         sa, sb = _g(la, "source"), _g(lb, "source")
         if sa == sb:
             continue
@@ -248,9 +264,9 @@ def _coord_pairs(
         # centroid coord, drop the pair. Aggressive on purpose — Phase 0
         # audit showed 95% of would-have-been-flags were FPs from this
         # pattern. We accept losing genuine condo-tower duplicates here
-        # (rare; addressed by photo-URL matching in Phase 1.2).
+        # (rare; addressable by photo-URL matching in a later phase).
         if ra in centroids or rb in centroids:
-            suppressed += 1
+            suppressed_centroid += 1
             continue
         # Price band check — same coords with wildly different prices
         # is more likely a multi-unit building (single condo tower
@@ -260,8 +276,22 @@ def _coord_pairs(
             ratio = max(p_a, p_b) / min(p_a, p_b) - 1
             if ratio > PRICE_TOLERANCE_PCT:
                 continue
+        # Area band check (Phase 1.2). Phase 1.1.5 audit found that 20 of
+        # 21 surviving pairs had area ratios from 1.4× to 48.65× — same
+        # coord, very different parcels (e.g. "11 manzanas Santa Ana
+        # commercial" 76,880 m² vs "Residencial Sinai lot" 431 m²). Real
+        # cross-posts share the property; areas should match within
+        # broker-measurement noise (well under 1.5×). Both areas must be
+        # present for the band to gate — when either is missing we
+        # default to keeping the pair (liberal, mirrors price-band).
+        if (ar_a is not None and ar_b is not None
+                and float(ar_a) > 0 and float(ar_b) > 0):
+            ar_ratio = max(float(ar_a), float(ar_b)) / min(float(ar_a), float(ar_b))
+            if ar_ratio > MAX_AREA_RATIO:
+                suppressed_area += 1
+                continue
         out.append((_key(la), _key(lb), _pair_key(sa, sb)))
-    return out, suppressed
+    return out, suppressed_centroid, suppressed_area
 
 
 # ── Public API ────────────────────────────────────────────────────────
@@ -292,6 +322,8 @@ def detect_duplicates(
         coord_pairs:                  int   # cross-source coord matches (post-suppression)
         coord_pairs_suppressed_centroid:
                                       int   # would-have-been-flags excluded by Phase 1.1
+        coord_pairs_suppressed_area:
+                                      int   # would-have-been-flags excluded by Phase 1.2
         union_pairs:                  int   # phone OR coord
         duplicate_listings_either:    int   # listings flagged in any pair
         unique_listings_estimate:     int   # total - duplicate_listings_either
@@ -320,8 +352,8 @@ def detect_duplicates(
     )
 
     phone_pairs = _phone_pairs(listings)
-    coord_pairs, coord_pairs_suppressed_centroid = _coord_pairs(
-        listings, centroids=centroids,
+    coord_pairs, coord_pairs_suppressed_centroid, coord_pairs_suppressed_area = (
+        _coord_pairs(listings, centroids=centroids)
     )
 
     # Union for the "duplicate_listings_either" headline metric. Counts
@@ -344,6 +376,7 @@ def detect_duplicates(
         "phone_pairs":                  len(phone_pairs),
         "coord_pairs":                  len(coord_pairs),
         "coord_pairs_suppressed_centroid": coord_pairs_suppressed_centroid,
+        "coord_pairs_suppressed_area":  coord_pairs_suppressed_area,
         "union_pairs":                  len(set(
             (k1, k2) for k1, k2, _ in phone_pairs + coord_pairs
         )),
