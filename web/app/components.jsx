@@ -201,9 +201,17 @@ function Badge({ listing }) {
 // PR-photo-nav-perf — accepts `eager` (loading="eager" + fetchpriority="high")
 // for the currently-visible card photo, and `onLoad` so callers can measure
 // click→render latency on photo-nav arrows.
+//
+// PR-image-priority — image-load duration is emitted as
+// `perf.card_image_load` for *eager* images only. The signal we want
+// is "how long did the above-the-fold images take to land" — lazy
+// images defer their fetch to intersection time, so a render→onLoad
+// delta there is mostly idle scroll time, not meaningful latency.
+// Caller passes `source` so PostHog can split browse vs discover vs
+// saved (and so we can confirm Browse-after-filter is fixed).
 function Photo({
   listing, idx = 0, ratio = "16/9", className = "",
-  lazy = true, eager = false, onLoad,
+  lazy = true, eager = false, onLoad, source,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
@@ -211,6 +219,14 @@ function Photo({
   // Without this, the skeleton stays hidden while the new image streams
   // in, and the user sees the OLD photo with stale "loaded" state.
   const url = listing.photos[idx];
+  // Stamp start-of-perceived-load on every URL change. useMemo runs
+  // during render, before the browser commits the <img src>, so the
+  // elapsed value covers React commit + network fetch + decode —
+  // i.e. what the user actually waits for.
+  const loadStart = useMemo(
+    () => (typeof performance !== "undefined" ? performance.now() : 0),
+    [url]
+  );
   useEffect(() => {
     setLoaded(false);
     setErrored(false);
@@ -240,7 +256,22 @@ function Photo({
         // fetchpriority is a recent (2023+) hint; browsers without
         // support fall through to the default queue order.
         fetchpriority={eager ? "high" : "auto"}
-        onLoad={() => { setLoaded(true); if (onLoad) onLoad(); }}
+        onLoad={() => {
+          setLoaded(true);
+          if (onLoad) onLoad();
+          // Eager-only perf signal — see comment block above the
+          // function. Source-less calls (e.g. detail panel) skip the
+          // emit; callers that want it in PostHog must pass `source`.
+          if (eager && source && typeof performance !== "undefined") {
+            const ms = Math.round(performance.now() - loadStart);
+            track("perf.card_image_load", {
+              listing_id: listing.id,
+              idx,
+              ms,
+              source,
+            });
+          }
+        }}
         onError={() => setErrored(true)}
         style={{ opacity: loaded ? 1 : 0 }}
       />
@@ -286,15 +317,22 @@ function HeartButton({ listingId, app, size = 18, variant = "overlay" }) {
 //   1. PRELOAD: the card pre-fetches photos[1..MAX_PRELOAD] as soon as
 //      it's hovered (desktop) or first seen (mobile). The browser
 //      caches the bytes so the swap-in is near-instant on click.
-//   2. EAGER: the currently-visible photo always uses loading="eager"
-//      and fetchpriority="high" so the first paint isn't queued
-//      behind below-the-fold images.
+//   2. EAGER: the currently-visible photo uses loading="eager" and
+//      fetchpriority="high" — but ONLY when the caller marks the card
+//      as `priority` (i.e. above-the-fold). Marking every card eager
+//      is what was killing Browse-after-filter: 60 cards mounting at
+//      once with high-priority hints saturates the priority lane and
+//      cards above-the-fold stall behind off-screen requests.
 //   3. TELEMETRY: card.photo_nav_latency captures click→render time
-//      so PostHog can aggregate the actual user perception, broken
-//      out by from_idx → to_idx.
+//      on arrow nav. perf.card_image_load (new) captures the initial
+//      eager-load duration so we can spot Browse perf regressions in
+//      PostHog.
 const PHOTO_PRELOAD_MAX = 5;
 
-function ListingCard({ listing, app, compact = false, onOpen, variant = "default" }) {
+function ListingCard({
+  listing, app, compact = false, onOpen, variant = "default",
+  priority = false, source,
+}) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
   const navStartRef = useRef(null);    // performance.now() at last arrow click
@@ -359,7 +397,14 @@ function ListingCard({ listing, app, compact = false, onOpen, variant = "default
       onMouseLeave={() => setHovered(false)}
     >
       <div className="listing-card-photo">
-        <Photo listing={listing} idx={photoIdx} ratio={isMag ? "4/3" : "16/9"} eager onLoad={onPhotoLoaded} />
+        <Photo
+          listing={listing}
+          idx={photoIdx}
+          ratio={isMag ? "4/3" : "16/9"}
+          eager={priority}
+          source={source}
+          onLoad={onPhotoLoaded}
+        />
         <div className="card-badge-row">
           <Badge listing={listing} />
         </div>

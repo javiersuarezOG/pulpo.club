@@ -471,9 +471,11 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
       </div>
       {expanded ? (
         <div className={isMagazine ? "shelf-magazine-grid" : "shelf-expanded-grid"}>
-          {items.map(l => (
+          {items.map((l, i) => (
             <ListingCard
               key={l.id} listing={l} app={app}
+              priority={i < 6}
+              source="discover"
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
                 app.openListing(l.id);
@@ -490,11 +492,15 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
         // the rail scrolls. Buttons are tab-after-cards by DOM order.
         <div className="shelf-rail-wrap">
           <div className={`shelf-rail ${isMagazine ? "shelf-rail-magazine" : ""}`} ref={scrollRef}>
-            {items.map(l => (
+            {/* Carousel rail: only the first ~4 cards are visible
+                without horizontal scroll, so eager-load just those. */}
+            {items.map((l, i) => (
               <div className="shelf-item" key={l.id}>
                 <ListingCard
                   listing={l}
                   app={app}
+                  priority={i < 4}
+                  source="discover"
                   onOpen={() => {
                     track("card.clicked", { listing_id: l.id, source_view: "discover", source_shelf: shelf.key });
                     app.openListing(l.id);
@@ -1499,6 +1505,11 @@ function BrowsePage({ app }) {
   // Pagination — render in 60-card pages. Filters/sort/category changes
   // reset back to one page. Avoids dumping ~870 cards into the DOM at once.
   const PAGE_SIZE = 60;
+  // Cards above this index get loading="eager" + fetchpriority="high".
+  // The rest fall back to native loading="lazy" and only fetch when
+  // they near the viewport, so a 60-card filter result doesn't slam
+  // the priority lane.
+  const ABOVE_FOLD_COUNT = 6;
   const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
@@ -1703,11 +1714,20 @@ function BrowsePage({ app }) {
           ) : view === "cards" ? (
             <>
               <div className="card-grid">
-                {results.slice(0, visibleCount).map(l => (
+                {/* `priority={i < ABOVE_FOLD_COUNT}` is the actual fix for
+                    Browse-after-filter slowness. Marking every card eager
+                    storms the high-priority lane the moment 60 cards
+                    mount, and above-fold cards stall behind off-screen
+                    fetches. 6 covers ~2 rows on a desktop auto-fill grid
+                    and ~3 rows on a typical mobile portrait — anything
+                    below that falls through to native loading="lazy". */}
+                {results.slice(0, visibleCount).map((l, i) => (
                   <ListingCard
                     key={l.id}
                     listing={l}
                     app={app}
+                    priority={i < ABOVE_FOLD_COUNT}
+                    source="browse"
                     onOpen={() => {
                       track("card.clicked", { listing_id: l.id, source_view: "browse" });
                       app.openListing(l.id);
@@ -2370,11 +2390,13 @@ function SavedPage({ app }) {
       </div>
       {view === "cards" ? (
         <div className="card-grid">
-          {sorted.map(l => (
+          {sorted.map((l, i) => (
             <ListingCard
               key={l.id}
               listing={l}
               app={app}
+              priority={i < 6}
+              source="saved"
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "saved" });
                 app.openListing(l.id);
