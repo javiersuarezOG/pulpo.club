@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VARA2 } from "./i18n.jsx";
 import { track } from "./telemetry/hook";
+import { uspsVisibleFor } from "./lib/gating.ts";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -359,12 +360,25 @@ function ListingCard({ listing, app, compact = false, onOpen, variant = "default
             <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}{ppmSuffix()}</span>
           )}
         </div>
-        {!compact && !isMag && listing.usps[0] && (
-          <ul className="listing-card-usps">
-            <li><Icon name="check" size={13} strokeWidth={2.4} />{tr(listing.usps[0], currentLocale())}</li>
-            {listing.usps[1] && <li><Icon name="check" size={13} strokeWidth={2.4} />{tr(listing.usps[1], currentLocale())}</li>}
-          </ul>
-        )}
+        {!compact && !isMag && listing.usps[0] && (() => {
+          // Same gate the detail panel uses — keep card and detail in
+          // lockstep via lib/gating.ts. Anonymous + Free see 1, paid
+          // see all. Cap is enforced via slice() so a user with 0
+          // visible reasons (theoretical) renders nothing rather than
+          // crashing on `usps[-1]`.
+          const visible = listing.usps.slice(0, uspsVisibleFor(app?.user));
+          if (visible.length === 0) return null;
+          return (
+            <ul className="listing-card-usps">
+              {visible.map((u, i) => (
+                <li key={i}>
+                  <Icon name="check" size={13} strokeWidth={2.4} />
+                  {tr(u, currentLocale())}
+                </li>
+              ))}
+            </ul>
+          );
+        })()}
         {!isMag && (
           <div className="listing-card-footer">
             {(() => {
