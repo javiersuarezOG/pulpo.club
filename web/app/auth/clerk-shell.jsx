@@ -1,9 +1,16 @@
-// PR-9a/9b — Clerk scaffolding behind a flag.
+// PR-9a/9b/9d — Clerk scaffolding behind a flag.
 //
 // `<ClerkShell>` is a pass-through wrapper that mounts `<ClerkProvider>`
-// only when both VITE_USE_CLERK=1 AND a publishable key is present.
-// In every other case it renders children unchanged, so today's prod
-// (flag off) is byte-for-byte the same as before.
+// only when a Clerk publishable key is present *and* the explicit
+// VITE_USE_CLERK=0 opt-out isn't set.
+//
+// Default flip (PR-9d): the env var is now opt-out rather than opt-in.
+// Any deploy or local-dev env that ships a `VITE_CLERK_PUBLISHABLE_KEY`
+// gets Clerk by default; setting `VITE_USE_CLERK=0` keeps the legacy
+// email/password path for cases where Clerk isn't wired (CI, fresh
+// clones without a key, the e2e dev server). With no publishable key,
+// Clerk stays off either way — that's the safe fallback so a missing
+// env var can never crash the app.
 //
 // Clerk is loaded via React.lazy + dynamic import so the SDK ships in
 // its own chunk that only loads when the flag is on. With the flag off
@@ -22,8 +29,13 @@ import React, { Suspense, lazy } from "react";
 const ClerkProviderLazy = lazy(() => import("./clerk-bundle.jsx"));
 
 export function clerkEnabled() {
+  // Opt-out: VITE_USE_CLERK="0" keeps the legacy auth path. Any other
+  // value (including unset) means Clerk is on as long as a publishable
+  // key is configured. The publishable-key check is the safety net —
+  // a missing key would crash <ClerkProvider>, so we keep Clerk off in
+  // that case regardless of the flag.
+  if (import.meta.env.VITE_USE_CLERK === "0") return false;
   return (
-    import.meta.env.VITE_USE_CLERK === "1" &&
     typeof import.meta.env.VITE_CLERK_PUBLISHABLE_KEY === "string" &&
     import.meta.env.VITE_CLERK_PUBLISHABLE_KEY.length > 0
   );
