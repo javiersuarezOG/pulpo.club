@@ -1785,6 +1785,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .plan-features li { font-size: 14px; display: flex; gap: 8px; align-items: flex-start; color: var(--ink-2); }
 .plan-features li svg { color: var(--moss); margin-top: 4px; flex-shrink: 0; }
 .plan-features li.muted { color: var(--ink-4); }
+.plan-currency-note {
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: center;
+  margin: 8px 0 0;
+}
 .social-proof {
   text-align: center;
   display: flex; justify-content: center; align-items: center; gap: 4px;

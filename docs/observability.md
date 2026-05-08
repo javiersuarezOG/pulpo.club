@@ -185,12 +185,13 @@ PostHog auto-segments each of the above by country, device_type, browser, referr
 
 Declared in `events.ts` but no call site as of 2026-05-08:
 
-- `consent.granted` / `consent.declined` — wire when ConsentBanner formally implements opt-out
 - `shelf.scrolled` — granular per-shelf event isn't fired
 - `browse.filter_changed` — partial coverage (price histogram, sort, view); other filters not yet wired
 - `plans.viewed` — declared, fire site needs adding to the Plans page mount
 
-Track these in `BACKLOG.md` under "Telemetry → wire dormant events" so they don't slip.
+`consent.granted` / `consent.declined` were wired in PR-177; both fire from `ConsentBanner` and PostHog `optIn()`/`optOut()` is now consent-gated in `telemetry/client.ts`.
+
+Track the remaining dormant events in `BACKLOG.md` under "Telemetry → wire dormant events" so they don't slip.
 
 ## Adding an event
 
@@ -199,3 +200,36 @@ Track these in `BACKLOG.md` under "Telemetry → wire dormant events" so they do
 3. PostHog's typed contract rejects unknown events at build time.
 4. PR description should list any new events introduced.
 5. **Update this doc** — the catalog above is the human-readable mirror of `events.ts`. Don't let them drift.
+
+---
+
+## Performance baseline (Lighthouse)
+
+We capture a Lighthouse run after every prod-shape change so regressions are diff-able rather than guessed at.
+
+Procedure:
+
+```bash
+# Headless run against prod (or a Vercel preview URL)
+npx lighthouse https://pulpo.club/ \
+  --output json --output html \
+  --output-path docs/observability/lighthouse-YYYY-MM-DD \
+  --chrome-flags="--headless"
+```
+
+Both files (`lighthouse-YYYY-MM-DD.report.json` + `.report.html`) commit to `docs/observability/`. The JSON is the diff source; the HTML is for humans.
+
+When to capture:
+
+- After **PR-A** (prod Clerk key rotation) — **next baseline owed**, currently blocked: prod is still serving Clerk dev keys (concrete-mackerel-86), and Vercel Security Checkpoint sometimes 403s the homepage. Capture once both are clean so the baseline isn't poisoned.
+- After any change to the entry HTML, the bundle splitter, or the data-loading shape (`ranked.json`, listing-detail JSON, hero images).
+- Once per quarter even with no change, so we catch dependency-driven creep.
+
+What "good" looks like for the new app right now:
+
+- LCP ≤ 2.5s on 4G mobile sim.
+- CLS ≤ 0.1 — hero swap is the usual offender; the rotation is `position: absolute` over a fixed-height container and *should* be cumulative-shift-free.
+- INP ≤ 200ms — Discover and Browse are shelf-scroll-heavy; watch the long-task list.
+- TBT ≤ 200ms — `clerk-bundle.js` (80KB gzipped) is lazy-loaded behind `clerkEnabled()`; if it shows up in the main critical path, something regressed.
+
+`web/app/telemetry/web-vitals.ts` already streams real-user LCP/INP/CLS/TTFB into PostHog (`web_vitals.lcp`, `web_vitals.inp`, `web_vitals.cls`, `web_vitals.ttfb`) — Lighthouse is a synthetic checkpoint on top of that.

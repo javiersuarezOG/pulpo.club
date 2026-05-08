@@ -2192,15 +2192,49 @@ function ListingDetail({ listing, app, asPanel = true }) {
         )}
       </div>
 
-      {/* Sticky bottom CTA */}
+      {/* Sticky bottom CTA. Source-listing link is Pro-only — the
+          vendor-URL outbound is a paid feature. Anonymous and free
+          users see Pro-upgrade prompts that chain to Stripe checkout
+          (anonymous chains via SignupModal pendingAction:checkout;
+          free goes direct). Off-market listings + sold listings
+          still use the legacy fallback above. */}
       {!isSold && !offMarketLocked && (
         <div className="detail-cta-bar">
-          {needsSignup ? (
+          {!isPaid ? (
             <button
               className="btn-primary lg block"
-              onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}
+              onClick={() => {
+                track("paywall.bypassed", {
+                  kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                });
+                if (needsSignup) {
+                  // Anonymous: signup then chained checkout. The
+                  // post-signin effect in app.jsx fires
+                  // startStripeCheckout when pendingAction is set,
+                  // so a single click covers the whole funnel.
+                  app.openSignup({
+                    mode: "signup",
+                    pendingListing: listing.id,
+                    pendingAction: "checkout",
+                  });
+                } else {
+                  // Free signed-in: straight to Stripe checkout.
+                  startStripeCheckout({
+                    onError: (code) => {
+                      if (code === "sign_in_required") {
+                        app.showToast(t("plans.checkout_auth_mismatch", lc));
+                      } else {
+                        app.go("plans");
+                      }
+                    },
+                  });
+                }
+              }}
             >
-              <Icon name="lock" size={16}/> {t("detail.signup_to_view_source", lc)}
+              <Icon name="lock" size={16}/> {t(
+                needsSignup ? "detail.signup_upgrade_to_view_source" : "detail.upgrade_to_view_source",
+                lc,
+              )}
             </button>
           ) : listing.original_url ? (
             <a
@@ -2432,6 +2466,7 @@ function PlansPage({ app }) {
           <button className="btn-primary block lg" onClick={onUpgrade}>
             {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
           </button>
+          <p className="plan-currency-note">{t("plans.pro.currency_note", lc)}</p>
         </div>
         {SHOW_AGENCY_PLAN && (
           <div className="plan-card">
