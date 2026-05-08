@@ -247,6 +247,12 @@ export function adaptListing(raw: any): Listing {
     dist_nearest_town_km:
       typeof raw.dist_nearest_town_km === "number" ? raw.dist_nearest_town_km : null,
     has_lat_lng: typeof raw.lat === "number" && typeof raw.lng === "number",
+    geocoding_confidence:
+      raw.geocoding_confidence === "high" ||
+      raw.geocoding_confidence === "medium" ||
+      raw.geocoding_confidence === "low"
+        ? raw.geocoding_confidence
+        : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
     rank_score: typeof raw.rank_score === "number" ? raw.rank_score : null,
