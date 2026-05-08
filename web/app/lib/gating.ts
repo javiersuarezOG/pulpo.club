@@ -43,8 +43,13 @@ export function needsSignup(user: GatingUser): boolean {
 // component call its helper. Don't sprinkle `if (!app.user)` checks.
 
 const USPS_VISIBLE_BY_TIER: Record<Tier, number> = {
+  // Anonymous teases 1; free gets 2 as a meaningful step up from
+  // anonymous (otherwise signup is invisible value); paid sees all.
+  // The detail panel renders an "upgrade to Pro to see N more"
+  // prompt for free users when there are hidden USPs — see
+  // pages.jsx where this cap is consumed.
   anonymous: 1,
-  free:      1,
+  free:      2,
   pro:       Infinity,
   agency:    Infinity,
 };
