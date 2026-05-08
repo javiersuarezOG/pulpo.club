@@ -2142,6 +2142,46 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 12px; color: var(--accent-strong);
 }
 
+/* Pro upsell card shown in Account → Notifications when user is on
+   the free plan (or anonymous). Same visual weight as a pref-list
+   block so it slots in cleanly above the platform-updates row. */
+.notif-upsell {
+  display: flex; gap: 16px;
+  padding: 20px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.notif-upsell-icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft, var(--paper));
+  border-radius: 999px;
+  color: var(--accent-strong);
+}
+.notif-upsell-body { flex: 1; }
+.notif-upsell-body h3 {
+  font-size: 15px; font-weight: 600; color: var(--ink);
+  margin: 0 0 6px;
+}
+.notif-upsell-body p {
+  font-size: 13px; color: var(--ink-3); line-height: 1.5;
+  margin: 0 0 10px;
+}
+.notif-upsell-list {
+  list-style: none; padding: 0; margin: 0 0 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 13px; color: var(--ink-2, var(--ink));
+}
+.notif-upsell-list li::before {
+  content: "✓";
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
 .toggle {
   flex-shrink: 0;
   width: 44px; height: 26px; border-radius: 999px;

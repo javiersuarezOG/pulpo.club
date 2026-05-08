@@ -397,6 +397,54 @@ const UI_STRINGS = {
   "account.notif.intro":     { en: "Choose what Pulpo sends you, and how.",
                                es: "Elige qué te envía Pulpo y cómo." },
   "account.notif.saved":     { en: "Preference saved.",             es: "Preferencia guardada." },
+
+  // Pro-gated notification categories. Free users see the upsell card
+  // below in place of these toggles.
+  "account.notif.newsletter.title":  { en: "Weekly newsletter",
+                                        es: "Boletín semanal" },
+  "account.notif.newsletter.desc":   { en: "The main Pulpo digest — new listings, price drops, curated picks.",
+                                        es: "El resumen principal de Pulpo — nuevos anuncios, bajadas de precio, selecciones curadas." },
+  "account.notif.price_drops.title": { en: "Price drop alerts",
+                                        es: "Alertas de bajada de precio" },
+  "account.notif.price_drops.desc":  { en: "Email when a saved listing drops in price.",
+                                        es: "Email cuando un anuncio guardado baja de precio." },
+  "account.notif.new_in_zones.title":{ en: "New listings in saved zones",
+                                        es: "Nuevos anuncios en zonas guardadas" },
+  "account.notif.new_in_zones.desc": { en: "Get early notice when something new appears in areas you've explored.",
+                                        es: "Entérate temprano cuando aparece algo nuevo en zonas que ya exploraste." },
+
+  // Free for everyone — product news, not premium content.
+  "account.notif.platform_updates.title": { en: "Platform updates",
+                                             es: "Novedades de Pulpo" },
+  "account.notif.platform_updates.desc":  { en: "Occasional product news and feature announcements.",
+                                             es: "Noticias y novedades del producto, sin spam." },
+
+  // Channels.
+  "account.notif.channels":     { en: "Channels",  es: "Canales" },
+  "account.notif.email":        { en: "Email",     es: "Email" },
+  "account.notif.email_desc":   { en: "Always on — primary product delivery channel.",
+                                  es: "Siempre activado — canal principal del producto." },
+  "account.notif.required":     { en: "Required",  es: "Obligatorio" },
+  "account.notif.whatsapp":     { en: "WhatsApp",  es: "WhatsApp" },
+  "account.notif.whatsapp_desc":{ en: "Optional opt-in. Stores your number for future deal alerts.",
+                                  es: "Opcional. Guarda tu número para alertas de oportunidades." },
+  "account.notif.whatsapp_confirm": { en: "We'll send deal alerts to {number}. You can opt out anytime.",
+                                       es: "Enviaremos alertas a {number}. Puedes desactivarlo cuando quieras." },
+
+  // Newsletter frequency (Pro-only — only renders when newsletter is on).
+  "account.notif.frequency":    { en: "Newsletter frequency", es: "Frecuencia del boletín" },
+  "account.notif.freq_weekly":  { en: "Weekly",   es: "Semanal" },
+  "account.notif.freq_biweekly":{ en: "Bi-weekly", es: "Quincenal" },
+  "account.notif.unsub_note":   { en: "You can also unsubscribe from any email using the link at the bottom of each message.",
+                                  es: "También puedes darte de baja desde el enlace al final de cada email." },
+
+  // Pro upsell shown to free / anonymous users in this subsection.
+  "account.notif.upsell.title": { en: "Get deal alerts with Pulpo Pro",
+                                  es: "Recibe alertas con Pulpo Pro" },
+  "account.notif.upsell.body":  { en: "Email alerts on saved listings, new listings in your zones, and the curated weekly digest are part of Pulpo Pro.",
+                                  es: "Las alertas por email de anuncios guardados, los nuevos en tus zonas y el boletín semanal son parte de Pulpo Pro." },
+  "account.notif.upsell.cta":   { en: "Upgrade to Pro",
+                                  es: "Mejorar a Pro" },
   "account.sub.intro":       { en: "Your plan, billing history, and payment details — all in one place.",
                                es: "Tu plan, historial de pagos y detalles — todo en un solo lugar." },
   "account.sub.discover_nudge": { en: "Ready to keep exploring? Head back to Discover →",
