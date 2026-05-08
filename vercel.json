@@ -6,7 +6,9 @@
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/", "destination": "/web/legacy.html" },
+    { "source": "/",                        "destination": "/web/dist/index.html" },
+    { "source": "/legacy",                  "destination": "/web/legacy.html" },
+    { "source": "/legacy/",                 "destination": "/web/legacy.html" },
     { "source": "/preview",                 "destination": "/web/dist/index.html" },
     { "source": "/preview/",                "destination": "/web/dist/index.html" },
     { "source": "/preview/assets/:file",    "destination": "/web/dist/assets/:file" },
