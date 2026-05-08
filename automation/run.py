@@ -587,6 +587,31 @@ def main() -> int:
           f"zone_table={df_metrics['scored_from_zone']}) "
           f"unscored={df_metrics['unscored']}")
 
+    # Cross-source duplicate detection — telemetry only (no listings dropped).
+    # Answers "are sources cross-posting?" before we sink effort into
+    # encuentra24 or other expansion paths. Pure function of the in-memory
+    # catalog; sidecar appends one row per nightly with phone-pair count,
+    # coord-pair count, and the by-source-pair breakdown.
+    from automation.duplicate_detection import detect_duplicates as _detect_duplicates  # type: ignore  # noqa: E402
+    dup_metrics = _detect_duplicates(
+        listings,
+        history_path=REPO / "web" / "data" / "duplicate_detection_history.jsonl",
+    )
+    print(f"[duplicate_detection] total={dup_metrics['total_listings']} "
+          f"phone_pairs={dup_metrics['phone_pairs']} "
+          f"coord_pairs={dup_metrics['coord_pairs']} "
+          f"flagged={dup_metrics['duplicate_listings_either']} "
+          f"({dup_metrics['duplicate_pct']}%) "
+          f"unique_estimate={dup_metrics['unique_listings_estimate']}")
+    if dup_metrics["by_source_pair"]:
+        # Top 5 source-pair buckets so the per-nightly print stays readable
+        # even if the long tail grows (defaults to dict, so sort by count).
+        top = sorted(
+            dup_metrics["by_source_pair"].items(),
+            key=lambda kv: kv[1], reverse=True,
+        )[:5]
+        print(f"[duplicate_detection] top_pairs={dict(top)}")
+
     # PRD WS2 — single-call DeepSeek enrichment. ONE LLM call per eligible
     # listing returns title + description + usps + latlong together (replacing
     # the previous 3-call OpenAI flow + Mapbox geocoding pass). Idempotent
