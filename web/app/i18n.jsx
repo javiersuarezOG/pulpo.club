@@ -250,9 +250,16 @@ const UI_STRINGS = {
   // Stripe checkout instead of the signup modal. Pro users hide
   // the row entirely.
   "detail.upgrade_more_reasons_one":   { en: "Upgrade to Pro to see 1 more reason we picked this listing",
-                                          es: "Mejora a Pro para ver 1 razón más por la que elegimos este terreno" },
+                                          es: "Contrata Pro para ver 1 razón más por la que elegimos este terreno" },
   "detail.upgrade_more_reasons_other": { en: "Upgrade to Pro to see {n} more reasons we picked this listing",
-                                          es: "Mejora a Pro para ver {n} razones más por las que elegimos este terreno" },
+                                          es: "Contrata Pro para ver {n} razones más por las que elegimos este terreno" },
+  // Source-listing link is Pro-only (PR after this one).
+  // Anonymous → signup + chained checkout. Free signed-in → direct
+  // checkout. Pro → outbound link (no prompt).
+  "detail.signup_upgrade_to_view_source": { en: "Sign up + upgrade to Pro to view source listing",
+                                             es: "Crea cuenta y contrata Pro para ver el anuncio original" },
+  "detail.upgrade_to_view_source":         { en: "Upgrade to Pro to view source listing",
+                                              es: "Contrata Pro para ver el anuncio original" },
   "detail.signup_more_photos": { en: "Sign up for {n}+ photos",
                                es: "Crea cuenta para ver {n}+ fotos" },
   "detail.more_photos":      { en: "+{n} photos",                   es: "+{n} fotos" },
@@ -302,7 +309,7 @@ const UI_STRINGS = {
   "plans.head.title":        { en: "Pick a plan that fits how you invest.",
                                es: "Elige un plan que se ajuste a cómo inviertes." },
   "plans.head.subtitle":     { en: "Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.",
-                               es: "Pulpo es gratis para explorar. Mejora tu plan para detalles ilimitados, acceso off-market y alertas semanales." },
+                               es: "Pulpo es gratis para explorar. Contrata Pro para detalles ilimitados, acceso off-market y alertas semanales." },
   // Free tier
   "plans.free.name":         { en: "Free",                    es: "Gratis" },
   "plans.free.tag":          { en: "Browse the catalogue",    es: "Explora el catálogo" },
@@ -343,7 +350,7 @@ const UI_STRINGS = {
   "plans.agency.cta_contact": { en: "Contact sales",           es: "Contactar ventas" },
   // Stripe-wired Pro CTA + error toast.
   "plans.upgrade_pro_cta":   { en: "Upgrade — €{price}/month",
-                               es: "Mejorar — €{price}/mes" },
+                               es: "Contrata Pro — €{price}/mes" },
   "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
                                   es: "No pudimos iniciar el pago — inténtalo de nuevo." },
   "plans.checkout_auth_mismatch": { en: "Couldn't verify your session. Please log out and back in, then try again.",
@@ -457,7 +464,12 @@ const UI_STRINGS = {
   "account.notif.upsell.body":  { en: "Email alerts on saved listings, new listings in your zones, and the curated weekly digest are part of Pulpo Pro.",
                                   es: "Las alertas por email de anuncios guardados, los nuevos en tus zonas y el boletín semanal son parte de Pulpo Pro." },
   "account.notif.upsell.cta":   { en: "Upgrade to Pro",
-                                  es: "Mejorar a Pro" },
+                                  es: "Contrata Pro" },
+  // Shared "Upgrade to Pro" button label — also used by the
+  // Subscription-section free-tier CTA. Prefer this over duplicating
+  // the literal in any new surface.
+  "common.upgrade_to_pro_cta":  { en: "Upgrade to Pro",
+                                  es: "Contrata Pro" },
 
   // Account → Security (Clerk-managed). Single CTA opens Clerk's
   // hosted UserProfile modal — that one modal covers everything we

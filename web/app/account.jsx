@@ -519,7 +519,7 @@ function SubscriptionSection({ app }) {
                   },
                 });
               }}
-            >Upgrade to Pro</button>
+            >{t("common.upgrade_to_pro_cta", app.locale)}</button>
           )}
         </div>
       </div>
@@ -624,7 +624,12 @@ function ClerkSecuritySection({ app, clerkReady }) {
       <div className="sub-divider"/>
       <h3 className="account-subhead">{t("account.security.signout.heading", app.locale)}</h3>
       <p className="section-intro">{t("account.security.signout.intro", app.locale)}</p>
-      <button className="btn-ghost" onClick={onSignout}>
+      <button
+        className="btn-ghost"
+        onClick={onSignout}
+        disabled={app.isSigningOut}
+        aria-busy={app.isSigningOut || undefined}
+      >
         {t("account.security.signout.cta", app.locale)}
       </button>
     </div>
