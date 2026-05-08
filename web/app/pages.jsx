@@ -1441,7 +1441,7 @@ function applyFilters(listings, f) {
     if (f.status.has("new") && l.first_seen_date > 7) return false;
     if (f.status.has("price_drop") && !l.is_repriced) return false;
     if (f.status.has("off_market") && l.source_type !== "off_market") return false;
-    if (f.status.has("motivated") && l.days_listed < 90) return false;
+    if (f.status.has("motivated") && (typeof l.days_listed !== "number" || l.days_listed < 90)) return false;
     if (l.readiness_score < f.readiness) return false;
     if ((f.score_min ?? 0) > 0 && (l.rank_score ?? 0) < f.score_min) return false;
     if (f.photos === "with" && (l.photos_count ?? 0) === 0) return false;
@@ -1547,7 +1547,13 @@ function BrowsePage({ app }) {
       price_desc: (a, b) => (b.price ?? -1) - (a.price ?? -1),
       size_desc: (a, b) => (b.size_m2 ?? 0) - (a.size_m2 ?? 0),
       ppm_asc: (a, b) => (a.price_per_m2 ?? Infinity) - (b.price_per_m2 ?? Infinity),
-      days_asc: (a, b) => a.days_listed - b.days_listed,
+      // Push null days_listed to the end of asc order (unknown age
+       // shouldn't masquerade as freshest).
+      days_asc: (a, b) => {
+        const av = typeof a.days_listed === "number" ? a.days_listed : Number.POSITIVE_INFINITY;
+        const bv = typeof b.days_listed === "number" ? b.days_listed : Number.POSITIVE_INFINITY;
+        return av - bv;
+      },
       ready_desc: (a, b) => b.readiness_score - a.readiness_score,
       stars_desc: (a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0),
       // Composite using user-overridden weights (PR-4b — feature parity).
@@ -1786,7 +1792,7 @@ function ResultsTable({ results, app, sort, setSort }) {
               <td className="num">{formatSize(l.size_m2)}</td>
               <td className="num bold">{formatPrice(l.price)}</td>
               <td className="num muted">{formatPpm(l.price_per_m2)}</td>
-              <td className={`num tone-${daysListedTone(l.days_listed)}`}>{l.days_listed}d</td>
+              <td className={`num tone-${daysListedTone(l.days_listed)}`}>{typeof l.days_listed === "number" ? `${l.days_listed}d` : "—"}</td>
               <td><Badge listing={l}/></td>
               <td onClick={(e) => e.stopPropagation()}><HeartButton listingId={l.id} app={app} variant="inline" size={16}/></td>
             </tr>
@@ -1946,7 +1952,9 @@ function ListingDetail({ listing, app, asPanel = true }) {
       {isSold && (
         <div className="sold-banner">
           <strong>{t("detail.sold_banner.title", lc)}</strong>
-          <span>{t("detail.sold_banner.days", lc, { n: listing.days_listed })}</span>
+          {typeof listing.days_listed === "number" && (
+            <span>{t("detail.sold_banner.days", lc, { n: listing.days_listed })}</span>
+          )}
           <button className="link-btn" onClick={() => app.goBrowse({ category: null, zones: [listing.zone_name] })}>{t("detail.sold_banner.cta", lc, { zone: listing.zone_name })}</button>
         </div>
       )}
@@ -2034,7 +2042,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
           <div className="kstat">
             <div className="kstat-label">{t("detail.days_listed", lc)}</div>
-            <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{listing.days_listed}</div>
+            <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{typeof listing.days_listed === "number" ? listing.days_listed : "—"}</div>
           </div>
         </div>
 
@@ -2307,7 +2315,11 @@ function SavedPage({ app }) {
       case "price_desc": arr.sort((a,b) => b.price - a.price); break;
       case "size_desc": arr.sort((a,b) => b.size_m2 - a.size_m2); break;
       case "ppm_asc": arr.sort((a,b) => a.price_per_m2 - b.price_per_m2); break;
-      case "days_asc": arr.sort((a,b) => a.days_listed - b.days_listed); break;
+      case "days_asc": arr.sort((a,b) => {
+        const av = typeof a.days_listed === "number" ? a.days_listed : Number.POSITIVE_INFINITY;
+        const bv = typeof b.days_listed === "number" ? b.days_listed : Number.POSITIVE_INFINITY;
+        return av - bv;
+      }); break;
       default: arr.sort((a,b) => b.first_seen_date - a.first_seen_date);
     }
     return arr;

@@ -172,12 +172,23 @@ const PulpoLogo = ({ size = 22 }) => (
 // ===== Badge =====
 function Badge({ listing }) {
   const lc = currentLocale();
+  // Effective listing age in days. Source-of-truth is `days_listed`
+  // (parsed from the original posting's mod_dt by the scraper). When
+  // that's null (source date unparseable), fall back to
+  // `first_seen_date` (days since Pulpo first scraped it) — but
+  // that's a weaker signal: a listing scraped today could have been
+  // posted on the source 10 months ago. Prior bug shipped "Nuevo"
+  // badges on listings whose footer simultaneously read "Publicado
+  // hace 10 meses" because we trusted first_seen_date directly.
+  const effectiveAgeDays = (typeof listing.days_listed === "number")
+    ? listing.days_listed
+    : listing.first_seen_date;
   let kind = null;
   if (listing.is_repriced) kind = { key: "drop", label: t("badge.price_drop", lc), color: "var(--badge-drop)" };
   else if (listing.source_type === "off_market") kind = { key: "off", label: t("badge.off_market", lc), color: "var(--badge-off)" };
-  else if (listing.first_seen_date <= 3) kind = { key: "new", label: t("badge.new", lc), color: "var(--badge-new)" };
+  else if (effectiveAgeDays <= 3) kind = { key: "new", label: t("badge.new", lc), color: "var(--badge-new)" };
   else if (listing.readiness_score >= 3) kind = { key: "ready", label: t("badge.build_ready", lc), color: "var(--badge-ready)" };
-  else if (listing.days_listed >= 90) kind = { key: "motivated", label: t("badge.motivated", lc), color: "var(--badge-motivated)" };
+  else if (typeof listing.days_listed === "number" && listing.days_listed >= 90) kind = { key: "motivated", label: t("badge.motivated", lc), color: "var(--badge-motivated)" };
   if (!kind) return null;
   return (
     <span className="pulpo-badge" style={{ background: kind.color }}>
@@ -223,7 +234,7 @@ function Photo({
       {!loaded && <div className="photo-skeleton" />}
       <img
         src={url}
-        alt={`${listing.title} — ${listing.zone_name}`}
+        alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
         loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
         decoding="async"
         // fetchpriority is a recent (2023+) hint; browsers without
