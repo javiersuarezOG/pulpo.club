@@ -17,7 +17,7 @@
 //    Spanish-localized URL (`?lang=es`) ranks for Spanish queries
 //    instead of being treated as duplicate content.
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import type { Route } from "./url-routing";
 import type { Listing } from "../data/types";
 
@@ -257,7 +257,11 @@ export function useDocumentMeta(args: {
   // We strip transient params (sort, weights, slider drags) so the meta
   // doesn't churn on every chip toggle. Filter chips that change the
   // canonical (cat) DO trigger an update — that's what we want.
-  useEffect(() => {
+  // useLayoutEffect (synchronous, runs before paint AND before any
+  // useEffect) so the title is up-to-date by the time the marquee
+  // effect snapshots it. Without this, the marquee captures the
+  // static index.html title and animates the wrong text on home.
+  useLayoutEffect(() => {
     const meta = listing
       ? metaForListing(listing, locale)
       : metaForSection(route, locale, search);

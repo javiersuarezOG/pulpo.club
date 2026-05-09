@@ -377,25 +377,34 @@ test.describe("New app boots cleanly on key routes", () => {
     });
   });
 
-  test("/preview is gone from vercel.json rewrites (config-level guard)", async () => {
+  test("/preview is fully gone from vercel.json (no rewrites at all)", async () => {
     // Local dev (`npm run dev`) is a Vite SPA — every path serves the
-    // app, regardless of vercel.json. Network-level enforcement happens
-    // only on the deployed preview/prod. So instead of asserting the
-    // HTTP status, assert the config: the /preview and /preview/ rewrite
-    // sources are gone from vercel.json. The /preview/assets/:file
-    // rewrite stays (build internals reference it).
+    // app regardless of vercel.json. Network-level enforcement happens
+    // only on the deployed preview/prod. Assert the config instead:
+    // ALL /preview* rewrites are gone. PR section-urls dropped /preview
+    // entirely (Vite base flipped to "/", build assets moved to /build/).
     const fs = await import("node:fs/promises");
     const json = JSON.parse(
       await fs.readFile("vercel.json", "utf-8"),
     ) as { rewrites?: { source: string; destination: string }[] };
     const rewrites = json.rewrites ?? [];
     const sources = rewrites.map((r) => r.source);
-    expect(sources, "/preview rewrite must be removed").not.toContain("/preview");
-    expect(sources, "/preview/ rewrite must be removed").not.toContain("/preview/");
-    // Build assets still need their path — /preview/assets/:file stays.
-    expect(sources, "/preview/assets/:file rewrite must remain (Vite base)").toContain(
-      "/preview/assets/:file",
-    );
+    const previewLeftovers = sources.filter((s) => s.startsWith("/preview"));
+    expect(previewLeftovers, "no /preview* rewrites should remain").toEqual([]);
+    // /build/:file replaces /preview/assets/:file as the Vite output path.
+    expect(sources, "/build/:file rewrite required (Vite output)").toContain("/build/:file");
+  });
+
+  test("built HTML references /build/* (not /preview/*) for entry assets", async () => {
+    // After the Vite-base flip, web/dist/index.html should ask for
+    // /build/index-<hash>.js + /build/index-<hash>.css. Any lingering
+    // /preview/ in src/href would break the deployed bundle (the
+    // /preview/* rewrites are gone).
+    const fs = await import("node:fs/promises");
+    const html = await fs.readFile("web/dist/index.html", "utf-8");
+    expect(html, "no /preview/ in built HTML").not.toMatch(/[\s"]\/preview\//);
+    expect(html, "expected /build/ entry script").toMatch(/src="\/build\/[^"]+\.js"/);
+    expect(html, "expected /build/ entry stylesheet").toMatch(/href="\/build\/[^"]+\.css"/);
   });
 
   test("robots.txt serves the static file", async ({ request }) => {
