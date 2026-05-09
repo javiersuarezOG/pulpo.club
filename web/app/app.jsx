@@ -36,6 +36,7 @@ import { ClerkShell, clerkEnabled } from "./auth/clerk-shell.jsx";
 import { fetchSaves, postSaveAction } from "./auth/saves-client.js";
 import { track } from "./telemetry/hook";
 import { bootWebVitals } from "./telemetry/web-vitals";
+import { bootAssetTelemetry } from "./telemetry/asset-load";
 import "./styles/index.css";
 
 function App() {
@@ -105,6 +106,7 @@ function App() {
   useEffect(() => {
     track("landing.viewed", { route: window.location.pathname || "/" });
     bootWebVitals();
+    bootAssetTelemetry();
   }, []);
 
   // Marquee the document.title so the tab text scrolls like a
