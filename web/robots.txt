@@ -1,0 +1,21 @@
+# Pulpo — Salvadoran beach + raw-land aggregator.
+#
+# Section paths (/, /browse, /browse?cat=…, /saved, /plans, /listing/:id)
+# are SPA-rendered. JS-aware crawlers (Googlebot, Bingbot) execute the
+# bundle and see the per-route <title> + meta tags set by useDocumentMeta.
+# Non-JS social crawlers (FB, Twitter, WhatsApp) see the static index.html
+# OG tags only — per-listing static stubs are tracked as a follow-up.
+
+User-agent: *
+Allow: /
+
+# Don't index the legacy frontend snapshot — it duplicates content from
+# the new app and would fragment ranking authority.
+Disallow: /legacy
+Disallow: /legacy/
+
+# Internal admin / dev paths.
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://pulpo.club/sitemap.xml
