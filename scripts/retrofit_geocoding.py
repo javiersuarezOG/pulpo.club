@@ -47,11 +47,11 @@ if not os.environ.get("DEEPSEEK_API_TOKEN"):
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-from automation.distance_fields import (  # type: ignore
+from automation.distance_fields import (  # type: ignore  # noqa: E402
     compute_dist_beach_km, compute_dist_airport_km,
 )
-from automation.llm_enrichment_prompts import SYSTEM_PROMPT, render_user_prompt  # type: ignore
-from scripts.audit_beach_distance_consistency import audit  # type: ignore
+from automation.llm_enrichment_prompts import SYSTEM_PROMPT, render_user_prompt  # type: ignore  # noqa: E402
+from scripts.audit_beach_distance_consistency import audit  # type: ignore  # noqa: E402
 
 
 RANKED  = REPO / "web" / "data" / "ranked.json"

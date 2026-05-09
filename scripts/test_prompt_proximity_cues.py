@@ -38,8 +38,8 @@ if not os.environ.get("DEEPSEEK_API_TOKEN"):
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-from automation.distance_fields import compute_dist_beach_km  # type: ignore
-from automation.llm_enrichment_prompts import (  # type: ignore
+from automation.distance_fields import compute_dist_beach_km  # type: ignore  # noqa: E402
+from automation.llm_enrichment_prompts import (  # type: ignore  # noqa: E402
     SYSTEM_PROMPT as PROPOSED_SYSTEM_PROMPT,
     render_user_prompt,
 )
@@ -223,13 +223,13 @@ def main() -> None:
                   f"src={old['source']} conf={old['confidence']} "
                   f"dist={old['dist_beach_km']}km  ref={old.get('reference')}")
         else:
-            print(f"  OLD:    (failed)")
+            print("  OLD:    (failed)")
         if "lat" in new and new.get("lat") is not None:
             print(f"  NEW:    lat={new['lat']:.4f} lng={new['lng']:.4f} "
                   f"src={new['source']} conf={new['confidence']} "
                   f"dist={new['dist_beach_km']}km  ref={new.get('reference')}")
         else:
-            print(f"  NEW:    (failed)")
+            print("  NEW:    (failed)")
         # Improvement signal
         if (
             isinstance(old.get("dist_beach_km"), (int, float))
