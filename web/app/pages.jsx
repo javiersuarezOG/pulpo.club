@@ -19,7 +19,6 @@ import {
   readSortFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
-import { pathForRoute, pathForListing } from "./lib/url-routing.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import {
@@ -63,35 +62,21 @@ const SHOW_AGENCY_PLAN = false;
 // re-introduce both when a yearly price ships.
 const PRO_PRICE_EUR_PER_MONTH = 10;
 
-// Click handler for any "client-side navigation with native fallback"
-// link. Modifier keys (cmd/ctrl/shift/alt), middle-click, and right-
-// click bypass the SPA so the browser does its standard "open in new
-// tab" / context-menu thing. Bare left-click triggers the SPA nav.
-function spaClickHandler(spaNav) {
-  return (e) => {
-    if (e.defaultPrevented) return;
-    if (e.button !== undefined && e.button !== 0) return;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    e.preventDefault();
-    spaNav();
-  };
-}
-
 // ====== TopNav ======
 function TopNav({ app }) {
   const lc = app.locale;
   return (
     <header className="topnav">
       <div className="topnav-inner">
-        <a href={pathForRoute("home")} className="logo-btn" onClick={spaClickHandler(() => app.go("home"))} aria-label={t("nav.tab.home", lc)}>
+        <button className="logo-btn" onClick={() => app.go("home")} aria-label={t("nav.tab.home", lc)}>
           <PulpoLogo />
-        </a>
+        </button>
         <nav className="topnav-links">
-          <a href={pathForRoute("home")} className={app.route === "home" ? "active" : ""} onClick={spaClickHandler(() => app.go("home"))}>{t("nav.discover", lc)}</a>
-          <a href={pathForRoute("browse")} className={app.route === "browse" ? "active" : ""} onClick={spaClickHandler(() => app.go("browse"))}>{t("nav.browse", lc)}</a>
-          <a href={pathForRoute("saved")} className={app.route === "saved" ? "active" : ""} onClick={spaClickHandler(() => app.go("saved"))}>
+          <button className={app.route === "home" ? "active" : ""} onClick={() => app.go("home")}>{t("nav.discover", lc)}</button>
+          <button className={app.route === "browse" ? "active" : ""} onClick={() => app.go("browse")}>{t("nav.browse", lc)}</button>
+          <button className={app.route === "saved" ? "active" : ""} onClick={() => app.go("saved")}>
             {t("nav.saved", lc)} {app.savedIds.size > 0 && <span className="count-badge">{app.savedIds.size}</span>}
-          </a>
+          </button>
         </nav>
         <div className="topnav-right">
           <LiveStats locale={lc} />
@@ -161,34 +146,22 @@ function BottomNav({ app }) {
   ];
   return (
     <nav className="bottomnav">
-      {tabs.map(t => {
-        const isProfile = t.key === "profile";
-        const className = (app.route === t.key || (isProfile && app.route === "account")) ? "active" : "";
-        // Profile tab is anchor-less for anonymous users (it opens the
-        // signin modal — there's no path to deep-link to). Signed-in
-        // users get an /account anchor for cmd-click correctness.
-        if (isProfile && !app.user) {
-          return (
-            <button key={t.key} className={className} onClick={() => app.openSignup({ mode: "login" })}>
-              <Icon name={t.icon} size={20} />
-              <span>{t.label}</span>
-            </button>
-          );
-        }
-        const targetRoute = isProfile ? "account" : t.key;
-        return (
-          <a
-            key={t.key}
-            href={pathForRoute(targetRoute)}
-            className={className}
-            onClick={spaClickHandler(() => app.go(targetRoute))}
-          >
-            <Icon name={t.icon} size={20} />
-            <span>{t.label}</span>
-            {t.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
-          </a>
-        );
-      })}
+      {tabs.map(t => (
+        <button
+          key={t.key}
+          className={(app.route === t.key || (t.key === "profile" && app.route === "account")) ? "active" : ""}
+          onClick={() => {
+            if (t.key === "profile") {
+              if (!app.user) app.openSignup({ mode: "login" });
+              else app.go("account");
+            } else app.go(t.key);
+          }}
+        >
+          <Icon name={t.icon} size={20} />
+          <span>{t.label}</span>
+          {t.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
+        </button>
+      ))}
     </nav>
   );
 }

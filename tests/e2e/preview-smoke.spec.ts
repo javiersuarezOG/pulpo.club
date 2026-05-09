@@ -117,9 +117,9 @@ test.describe("New app boots cleanly on key routes", () => {
     page.on("pageerror", (err) => errors.push(err.message));
 
     await page.goto("/", { waitUntil: "networkidle" });
-    // PR section-urls: TopNav links are now <a> elements (was <button>)
-    // for SEO + cmd-click correctness. Click the anchor.
-    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
+    // The app uses internal state for routing — click the Browse nav
+    // link in TopNav to navigate, then wait for the histogram to mount.
+    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
     const histo = page.locator(".histo-track");
     await histo.waitFor({ state: "visible", timeout: 10_000 });
 
@@ -325,8 +325,8 @@ test.describe("New app boots cleanly on key routes", () => {
   test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
     await page.goto("/", { waitUntil: "networkidle" });
 
-    // Discover → Browse via TopNav anchor
-    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
+    // Discover → Browse via TopNav button
+    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
     await page.waitForFunction(() => window.location.pathname === "/browse", null, {
       timeout: 5_000,
     });

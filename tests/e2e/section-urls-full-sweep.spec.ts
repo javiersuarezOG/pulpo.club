@@ -117,24 +117,7 @@ test.describe("Section URLs — full app sweep", () => {
     }
   });
 
-  // 5. Cmd-click on a TopNav anchor opens a new tab, leaves the
-  //    current tab where it was. This is the behaviour-level proof
-  //    that the anchor-tag conversion preserves browser semantics.
-  test("modifier-click on TopNav anchor leaves current tab unchanged", async ({ page, context }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
-    const browseLink = page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/);
-    await browseLink.waitFor({ state: "visible", timeout: 5_000 });
-    // Click with the meta key held down — playwright's middle-click
-    // shorthand. We can't open new tabs in headless reliably; instead
-    // assert the spaClickHandler short-circuits (URL doesn't change
-    // in this tab) when modifier is held.
-    const beforeUrl = page.url();
-    await browseLink.click({ modifiers: ["Meta"] });
-    await page.waitForTimeout(300);
-    expect(page.url(), "Meta-click should NOT navigate this tab").toBe(beforeUrl);
-  });
-
-  // 6. Listing-card hidden anchor exists + targets /listing/<id>.
+  // 5. Listing-card hidden anchor exists + targets /listing/<id>.
   //    Crawler-visibility check: the card body must contain a real
   //    <a href> for SEO + cmd-click.
   test("listing card has a crawlable anchor pointing at /listing/<id>", async ({ page }) => {
