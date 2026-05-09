@@ -205,17 +205,18 @@
         "es": "Zona emergente con alto potencial de crecimiento"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.6167,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata beach, La Libertad",
     "url_language": "en",
     "tokens_in": 975,
     "tokens_out": 593,
     "cost_usd": 0.00091555,
     "finish_reason": "stop",
-    "latency_ms": 10377
+    "latency_ms": 10377,
+    "retrofit_at": "2026-05-08T21:15:05Z"
   },
   "goodlife|second-row-land-in-el-zonte-bitcoin-beach": {
     "ts": "2026-05-08T14:40:25.990505+00:00",
@@ -251,17 +252,18 @@
         "es": "Rodeado de desarrollos emergentes"
       }
     ],
-    "lat": 13.495,
-    "lng": -89.408,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach, La Libertad",
     "url_language": "en",
     "tokens_in": 935,
     "tokens_out": 599,
     "cost_usd": 0.00091135,
     "finish_reason": "stop",
-    "latency_ms": 10740
+    "latency_ms": 10740,
+    "retrofit_at": "2026-05-08T21:16:49Z"
   },
   "goodlife|land-in-complejo-el-mirador-surf-city-1": {
     "ts": "2026-05-08T14:40:26.015872+00:00",
@@ -481,17 +483,18 @@
         "es": "Excelente inversión en zona en crecimiento"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.32,
+    "lng": -87.84,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Cocal, La Libertad, El Salvador",
+    "geocoding_reference": "Playa El Cocal, La Libertad",
     "url_language": "en",
     "tokens_in": 968,
     "tokens_out": 585,
     "cost_usd": 0.00090486,
     "finish_reason": "stop",
-    "latency_ms": 9718
+    "latency_ms": 9718,
+    "retrofit_at": "2026-05-08T21:11:57Z"
   },
   "goodlife|two-lots-in-comasagua": {
     "ts": "2026-05-08T14:40:34.119335+00:00",
@@ -987,17 +990,18 @@
         "es": "Ideal para uso personal o inversión"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 968,
     "tokens_out": 668,
     "cost_usd": 0.00099616,
     "finish_reason": "stop",
-    "latency_ms": 10359
+    "latency_ms": 10359,
+    "retrofit_at": "2026-05-08T21:09:17Z"
   },
   "goodlife|712-8-m2-of-land-in-xanadu-gated-community-175000": {
     "ts": "2026-05-08T14:40:46.981198+00:00",
@@ -1033,17 +1037,18 @@
         "es": "Precio competitivo frente a lotes cercanos sin acceso a la playa"
       }
     ],
-    "lat": 13.4883,
-    "lng": -89.3197,
+    "lat": 13.4869,
+    "lng": -89.3217,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Xanadú, La Libertad, El Salvador",
+    "geocoding_reference": "Xanadú community, La Libertad coast",
     "url_language": "en",
     "tokens_in": 984,
     "tokens_out": 613,
     "cost_usd": 0.00093998,
     "finish_reason": "stop",
-    "latency_ms": 13615
+    "latency_ms": 13615,
+    "retrofit_at": "2026-05-08T21:16:55Z"
   },
   "goodlife|2201-97m2-lot-with-panoramic-view-in-chiltiupan-195000": {
     "ts": "2026-05-08T14:40:48.224251+00:00",
@@ -1259,17 +1264,18 @@
         "es": "Ideal para casa de playa o proyecto de hospitalidad"
       }
     ],
-    "lat": 13.3833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Taquillo, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo",
     "url_language": "en",
     "tokens_in": 956,
     "tokens_out": 571,
     "cost_usd": 0.00088622,
     "finish_reason": "stop",
-    "latency_ms": 9444
+    "latency_ms": 9444,
+    "retrofit_at": "2026-05-08T21:06:55Z"
   },
   "goodlife|available-land-in-mizata-la-libertad-1-34-acres-525000": {
     "ts": "2026-05-08T14:40:55.598099+00:00",
@@ -1305,17 +1311,18 @@
         "es": "Ubicación privilegiada en la costa emergente de La Libertad"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.6167,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata beach, La Libertad",
     "url_language": "en",
     "tokens_in": 970,
     "tokens_out": 651,
     "cost_usd": 0.000978,
     "finish_reason": "stop",
-    "latency_ms": 10960
+    "latency_ms": 10960,
+    "retrofit_at": "2026-05-08T21:04:27Z"
   },
   "goodlife|three-cliffside-lots-near-el-zonte-399-1-1m": {
     "ts": "2026-05-08T14:40:56.747337+00:00",
@@ -1351,17 +1358,18 @@
         "es": "Privacidad y brisas marinas en una comunidad costera codiciada"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3667,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "en",
     "tokens_in": 976,
     "tokens_out": 682,
     "cost_usd": 0.00101372,
     "finish_reason": "stop",
-    "latency_ms": 10636
+    "latency_ms": 10636,
+    "retrofit_at": "2026-05-08T21:09:41Z"
   },
   "goodlife|new-ocean-view-house-in-solymar-el-sunzal-75500": {
     "ts": "2026-05-08T14:40:57.553111+00:00",
@@ -1489,17 +1497,18 @@
         "es": "Frente al estero con acceso directo a la playa"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 993,
     "tokens_out": 644,
     "cost_usd": 0.00097651,
     "finish_reason": "stop",
-    "latency_ms": 10413
+    "latency_ms": 10413,
+    "retrofit_at": "2026-05-08T21:24:41Z"
   },
   "goodlife|3-bedroom-house-in-el-zonte-850000": {
     "ts": "2026-05-08T14:41:00.343546+00:00",
@@ -1627,17 +1636,18 @@
         "es": "Alto potencial de alquiler en comunidad de surf"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.4167,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "en",
     "tokens_in": 1018,
     "tokens_out": 607,
     "cost_usd": 0.00094256,
     "finish_reason": "stop",
-    "latency_ms": 10305
+    "latency_ms": 10305,
+    "retrofit_at": "2026-05-08T21:11:50Z"
   },
   "goodlife|2-bed-condominium-at-zonset-el-zonte-445694": {
     "ts": "2026-05-08T14:41:05.583906+00:00",
@@ -1673,17 +1683,18 @@
         "es": "Alto potencial de alquiler para inversionistas"
       }
     ],
-    "lat": 13.3417,
-    "lng": -89.4167,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "en",
     "tokens_in": 1013,
     "tokens_out": 605,
     "cost_usd": 0.00093901,
     "finish_reason": "stop",
-    "latency_ms": 9985
+    "latency_ms": 9985,
+    "retrofit_at": "2026-05-08T21:01:10Z"
   },
   "goodlife|newly-built-condo-with-partial-ocean-view-at-zonset-el-zonte-340000": {
     "ts": "2026-05-08T14:41:06.734346+00:00",
@@ -1719,17 +1730,18 @@
         "es": "Alto potencial de alquiler en El Zonte"
       }
     ],
-    "lat": 13.338,
-    "lng": -89.352,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "en",
     "tokens_in": 1080,
     "tokens_out": 606,
     "cost_usd": 0.0009582,
     "finish_reason": "stop",
-    "latency_ms": 9181
+    "latency_ms": 9181,
+    "retrofit_at": "2026-05-08T21:02:46Z"
   },
   "goodlife|beautiful-oceanview-condominium-at-zonset-el-zonte-340000": {
     "ts": "2026-05-08T14:41:09.672720+00:00",
@@ -1765,17 +1777,18 @@
         "es": "Mejor oportunidad de precio en la zona con alto potencial de alquiler"
       }
     ],
-    "lat": 13.504,
-    "lng": -89.405,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "en",
     "tokens_in": 1082,
     "tokens_out": 808,
     "cost_usd": 0.00118094,
     "finish_reason": "stop",
-    "latency_ms": 12925
+    "latency_ms": 12925,
+    "retrofit_at": "2026-05-08T21:02:55Z"
   },
   "oceanside|13544": {
     "ts": "2026-05-08T14:41:10.324841+00:00",
@@ -1811,17 +1824,18 @@
         "es": "Opción de combinar con lote vecino para desarrollo más grande"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
+    "lat": 13.4844,
+    "lng": -89.6322,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Sunzal, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal beach",
     "url_language": "en",
     "tokens_in": 1146,
     "tokens_out": 709,
     "cost_usd": 0.00108932,
     "finish_reason": "stop",
-    "latency_ms": 12292
+    "latency_ms": 12292,
+    "retrofit_at": "2026-05-08T21:07:21Z"
   },
   "oceanside|13509": {
     "ts": "2026-05-08T14:41:11.070158+00:00",
@@ -1857,17 +1871,18 @@
         "es": "Alto potencial de inversión en Surf City"
       }
     ],
-    "lat": 13.495,
-    "lng": -89.363,
+    "lat": 13.4844,
+    "lng": -89.6322,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Cerromar, El Sunzal, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal beach",
     "url_language": "en",
     "tokens_in": 1170,
     "tokens_out": 648,
     "cost_usd": 0.0010287,
     "finish_reason": "stop",
-    "latency_ms": 10726
+    "latency_ms": 10726,
+    "retrofit_at": "2026-05-08T21:08:37Z"
   },
   "oceanside|13536": {
     "ts": "2026-05-08T14:41:12.585731+00:00",
@@ -1903,17 +1918,18 @@
         "es": "Lote contiguo también disponible para desarrollo más grande"
       }
     ],
-    "lat": 13.5,
-    "lng": -89.4,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Cerromar, El Sunzal, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal beach",
     "url_language": "en",
     "tokens_in": 1140,
     "tokens_out": 796,
     "cost_usd": 0.0011834,
     "finish_reason": "stop",
-    "latency_ms": 13339
+    "latency_ms": 13339,
+    "retrofit_at": "2026-05-08T21:07:12Z"
   },
   "oceanside|13290": {
     "ts": "2026-05-08T14:41:14.565753+00:00",
@@ -2041,17 +2057,18 @@
         "es": "Acceso conveniente al aeropuerto, capital y puntos de surf"
       }
     ],
-    "lat": 13.2,
-    "lng": -87.85,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Corral de Mulas, Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa Corral de Mulas (near Playa El Cuco)",
     "url_language": "en",
     "tokens_in": 1152,
     "tokens_out": 657,
     "cost_usd": 0.00103374,
     "finish_reason": "stop",
-    "latency_ms": 10760
+    "latency_ms": 10760,
+    "retrofit_at": "2026-05-08T21:06:21Z"
   },
   "oceanside|12706": {
     "ts": "2026-05-08T14:41:19.970679+00:00",
@@ -2087,17 +2104,18 @@
         "es": "Vistas al mar posibles desde pisos superiores"
       }
     ],
-    "lat": 13.3167,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Cangrejera, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Cangrejera (near Bocana San Diego)",
     "url_language": "en",
     "tokens_in": 1155,
     "tokens_out": 815,
     "cost_usd": 0.00120835,
     "finish_reason": "stop",
-    "latency_ms": 13236
+    "latency_ms": 13236,
+    "retrofit_at": "2026-05-08T21:11:41Z"
   },
   "oceanside|11079": {
     "ts": "2026-05-08T14:41:21.176242+00:00",
@@ -2271,17 +2289,18 @@
         "es": "Potencial de inversión privilegiado en la costa de El Salvador"
       }
     ],
-    "lat": 13.4867,
-    "lng": -89.3222,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Cerromar, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Cerromar gated community, near Sunzal beach",
     "url_language": "en",
     "tokens_in": 1160,
     "tokens_out": 642,
     "cost_usd": 0.0010194,
     "finish_reason": "stop",
-    "latency_ms": 10838
+    "latency_ms": 10838,
+    "retrofit_at": "2026-05-08T21:11:17Z"
   },
   "oceanside|12843": {
     "ts": "2026-05-08T14:41:25.821721+00:00",
@@ -2317,17 +2336,18 @@
         "es": "Ideal para alquileres vacacionales u hospitalidad boutique"
       }
     ],
-    "lat": 13.25,
-    "lng": -88.55,
-    "geocoding_confidence": "medium",
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Bahía de Jiquilisco, Jiquilisco, Usulután, El Salvador",
+    "geocoding_reference": "Bahía de Jiquilisco",
     "url_language": "en",
     "tokens_in": 1137,
     "tokens_out": 632,
     "cost_usd": 0.00100219,
     "finish_reason": "stop",
-    "latency_ms": 9477
+    "latency_ms": 9477,
+    "retrofit_at": "2026-05-08T21:24:57Z"
   },
   "oceanside|13638": {
     "ts": "2026-05-08T14:41:26.970757+00:00",
@@ -2363,17 +2383,18 @@
         "es": "Ubicación exclusiva en Playa Mizata, La Libertad"
       }
     ],
-    "lat": 13.45,
-    "lng": -89.5,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata Beach, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata Beach",
     "url_language": "en",
     "tokens_in": 1130,
     "tokens_out": 835,
     "cost_usd": 0.0012236,
     "finish_reason": "stop",
-    "latency_ms": 12405
+    "latency_ms": 12405,
+    "retrofit_at": "2026-05-08T21:14:01Z"
   },
   "oceanside|12906": {
     "ts": "2026-05-08T14:41:27.700795+00:00",
@@ -2409,17 +2430,18 @@
         "es": "Ubicación privilegiada en el corredor de desarrollo Surf City"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.49,
+    "lng": -89.6594,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Morral, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Majahual beach",
     "url_language": "en",
     "tokens_in": 1150,
     "tokens_out": 752,
     "cost_usd": 0.0011377,
     "finish_reason": "stop",
-    "latency_ms": 11848
+    "latency_ms": 11848,
+    "retrofit_at": "2026-05-08T21:04:05Z"
   },
   "oceanside|12566": {
     "ts": "2026-05-08T14:41:30.105317+00:00",
@@ -2455,17 +2477,18 @@
         "es": "Alto potencial de inversión en zona en crecimiento"
       }
     ],
-    "lat": 13.2,
-    "lng": -88.3,
-    "geocoding_confidence": "medium",
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Chirilagua, San Miguel, El Salvador",
+    "geocoding_reference": "Playa El Cuco",
     "url_language": "en",
     "tokens_in": 1136,
     "tokens_out": 573,
     "cost_usd": 0.00093702,
     "finish_reason": "stop",
-    "latency_ms": 8929
+    "latency_ms": 8929,
+    "retrofit_at": "2026-05-08T21:10:45Z"
   },
   "oceanside|12657": {
     "ts": "2026-05-08T14:41:31.302028+00:00",
@@ -2501,17 +2524,18 @@
         "es": "A 5 minutos del vibrante pueblo surfista El Tunco"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Atami complex, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Tunco beach",
     "url_language": "en",
     "tokens_in": 1140,
     "tokens_out": 724,
     "cost_usd": 0.0011042,
     "finish_reason": "stop",
-    "latency_ms": 11331
+    "latency_ms": 11331,
+    "retrofit_at": "2026-05-08T21:02:05Z"
   },
   "oceanside|12482": {
     "ts": "2026-05-08T14:41:31.802951+00:00",
@@ -2593,17 +2617,18 @@
         "es": "Zona de alta plusvalía con infraestructura y turismo en crecimiento"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Obispo, Puerto de La Libertad, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad (Punta Roca)",
     "url_language": "en",
     "tokens_in": 1170,
     "tokens_out": 841,
     "cost_usd": 0.001241,
     "finish_reason": "stop",
-    "latency_ms": 12721
+    "latency_ms": 12721,
+    "retrofit_at": "2026-05-08T21:01:20Z"
   },
   "oceanside|12288": {
     "ts": "2026-05-08T14:41:36.618809+00:00",
@@ -2639,17 +2664,18 @@
         "es": "Parte de la iniciativa Surf City con creciente inversión"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal Beach (5 minutes away)",
     "url_language": "en",
     "tokens_in": 1181,
     "tokens_out": 893,
     "cost_usd": 0.00130117,
     "finish_reason": "stop",
-    "latency_ms": 13194
+    "latency_ms": 13194,
+    "retrofit_at": "2026-05-08T21:17:14Z"
   },
   "oceanside|11468": {
     "ts": "2026-05-08T14:41:38.078860+00:00",
@@ -2685,17 +2711,18 @@
         "es": "Casa de cuidador y seguridad con portón"
       }
     ],
-    "lat": 13.4886,
-    "lng": -89.3196,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad",
     "url_language": "en",
     "tokens_in": 1154,
     "tokens_out": 723,
     "cost_usd": 0.00110688,
     "finish_reason": "stop",
-    "latency_ms": 12257
+    "latency_ms": 12257,
+    "retrofit_at": "2026-05-08T21:03:39Z"
   },
   "oceanside|9163": {
     "ts": "2026-05-08T14:41:38.404890+00:00",
@@ -2777,17 +2804,18 @@
         "es": "Gestión profesional en el lugar que maximiza los ingresos por alquiler a corto plazo"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Blas beach, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach, La Libertad",
     "url_language": "en",
     "tokens_in": 1129,
     "tokens_out": 801,
     "cost_usd": 0.00118593,
     "finish_reason": "stop",
-    "latency_ms": 11718
+    "latency_ms": 11718,
+    "retrofit_at": "2026-05-08T21:17:29Z"
   },
   "century21|738070": {
     "ts": "2026-05-08T14:41:41.681090+00:00",
@@ -2869,17 +2897,18 @@
         "es": "Ideal para desarrollos residenciales, turísticos o energéticos"
       }
     ],
-    "lat": 13.3167,
-    "lng": -88.0667,
-    "geocoding_confidence": "medium",
+    "lat": 13.181,
+    "lng": -88.355,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Cantón Tepeagua, Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa Las Flores, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1277,
     "tokens_out": 882,
     "cost_usd": 0.00131499,
     "finish_reason": "stop",
-    "latency_ms": 12859
+    "latency_ms": 12859,
+    "retrofit_at": "2026-05-08T21:03:06Z"
   },
   "century21|976159": {
     "ts": "2026-05-08T14:41:43.873555+00:00",
@@ -4195,17 +4224,18 @@
         "es": "Fácil acceso por calle e ideal para inversión en alquiler vacacional"
       }
     ],
-    "lat": 13.7167,
-    "lng": -89.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.706,
+    "lng": -89.974,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Barra de Santiago, Jujutla, Ahuachapán, El Salvador",
+    "geocoding_reference": "Barra de Santiago beach",
     "url_language": "es",
     "tokens_in": 1262,
     "tokens_out": 827,
     "cost_usd": 0.00125044,
     "finish_reason": "stop",
-    "latency_ms": 12847
+    "latency_ms": 12847,
+    "retrofit_at": "2026-05-08T21:23:52Z"
   },
   "bienesraices|2311": {
     "ts": "2026-05-08T14:42:19.598450+00:00",
@@ -4605,17 +4635,18 @@
         "es": "Alto potencial de plusvalía en zona residencial de lujo"
       }
     ],
-    "lat": 13.4333,
-    "lng": -89.3667,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Atami complex, near El Zonte beach",
     "url_language": "es",
     "tokens_in": 1272,
     "tokens_out": 759,
     "cost_usd": 0.00117834,
     "finish_reason": "stop",
-    "latency_ms": 12457
+    "latency_ms": 12457,
+    "retrofit_at": "2026-05-08T21:03:22Z"
   },
   "bienesraices|2296": {
     "ts": "2026-05-08T14:42:32.924961+00:00",
@@ -4651,17 +4682,18 @@
         "es": "Ideal para eco-resort, apartamentos o lotificación"
       }
     ],
-    "lat": 13.5044,
-    "lng": -89.4075,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach (Bitcoin Beach)",
     "url_language": "es",
     "tokens_in": 1252,
     "tokens_out": 775,
     "cost_usd": 0.00119054,
     "finish_reason": "stop",
-    "latency_ms": 11489
+    "latency_ms": 11489,
+    "retrofit_at": "2026-05-08T21:03:47Z"
   },
   "bienesraices|2295": {
     "ts": "2026-05-08T14:42:36.835842+00:00",
@@ -5295,17 +5327,18 @@
         "es": "Listo para mudarse con acabados de primera"
       }
     ],
-    "lat": 13.3167,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol, El Salvador",
     "url_language": "es",
     "tokens_in": 1220,
     "tokens_out": 607,
     "cost_usd": 0.0009971,
     "finish_reason": "stop",
-    "latency_ms": 9873
+    "latency_ms": 9873,
+    "retrofit_at": "2026-05-08T21:18:04Z"
   },
   "bienesraices|2252": {
     "ts": "2026-05-08T14:42:52.241170+00:00",
@@ -5617,17 +5650,18 @@
         "es": "Comunidad que permite Airbnb"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla beach",
     "url_language": "mixed",
     "tokens_in": 1133,
     "tokens_out": 648,
     "cost_usd": 0.00101871,
     "finish_reason": "stop",
-    "latency_ms": 9788
+    "latency_ms": 9788,
+    "retrofit_at": "2026-05-08T21:12:46Z"
   },
   "bienesraices|2230": {
     "ts": "2026-05-08T14:43:00.810518+00:00",
@@ -5893,17 +5927,18 @@
         "es": "Ubicación premium a 100 metros de la playa"
       }
     ],
-    "lat": 13.6833,
-    "lng": -89.8833,
-    "geocoding_confidence": "medium",
+    "lat": 13.706,
+    "lng": -89.974,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Barra de Santiago, Jujutla, Ahuachapán, El Salvador",
+    "geocoding_reference": "Barra de Santiago beach",
     "url_language": "es",
     "tokens_in": 1400,
     "tokens_out": 694,
     "cost_usd": 0.0011414,
     "finish_reason": "stop",
-    "latency_ms": 10407
+    "latency_ms": 10407,
+    "retrofit_at": "2026-05-08T21:05:32Z"
   },
   "bienesraices|2215": {
     "ts": "2026-05-08T14:43:10.088188+00:00",
@@ -6537,17 +6572,18 @@
         "es": "Inversión privilegiada en la costa de La Libertad"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Palmarcito, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "Playa El Zonte (nearest named beach in authoritative table)",
     "url_language": "es",
     "tokens_in": 1029,
     "tokens_out": 611,
     "cost_usd": 0.00094993,
     "finish_reason": "stop",
-    "latency_ms": 10220
+    "latency_ms": 10220,
+    "retrofit_at": "2026-05-08T21:12:29Z"
   },
   "bienesraices|2180": {
     "ts": "2026-05-08T14:43:29.562350+00:00",
@@ -6721,17 +6757,18 @@
         "es": "Lista para habitar o alquilar"
       }
     ],
-    "lat": 13.3167,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1240,
     "tokens_out": 737,
     "cost_usd": 0.0011455,
     "finish_reason": "stop",
-    "latency_ms": 11976
+    "latency_ms": 11976,
+    "retrofit_at": "2026-05-08T21:04:43Z"
   },
   "bienesraices|2169": {
     "ts": "2026-05-08T14:43:35.994530+00:00",
@@ -7135,17 +7172,18 @@
         "es": "Terreno de 680 m² con construcción sólida de dos niveles"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Diego (Bocana San Diego)",
     "url_language": "es",
     "tokens_in": 1221,
     "tokens_out": 775,
     "cost_usd": 0.00118217,
     "finish_reason": "stop",
-    "latency_ms": 11257
+    "latency_ms": 11257,
+    "retrofit_at": "2026-05-08T21:12:04Z"
   },
   "bienesraices|2151": {
     "ts": "2026-05-08T14:43:48.295767+00:00",
@@ -7223,17 +7261,18 @@
         "es": "Ubicada en comunidad cerrada con amenidades"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Atami, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Atami (El Zonte area)",
     "url_language": "es",
     "tokens_in": 1258,
     "tokens_out": 822,
     "cost_usd": 0.00124386,
     "finish_reason": "stop",
-    "latency_ms": 12223
+    "latency_ms": 12223,
+    "retrofit_at": "2026-05-08T21:18:20Z"
   },
   "bienesraices|2149": {
     "ts": "2026-05-08T14:43:51.132945+00:00",
@@ -7361,17 +7400,18 @@
         "es": "Ubicado en Hacienda Taquillo, Jicalapa"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.4167,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Jicalapa, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo",
     "url_language": "mixed",
     "tokens_in": 1085,
     "tokens_out": 673,
     "cost_usd": 0.00103325,
     "finish_reason": "stop",
-    "latency_ms": 10450
+    "latency_ms": 10450,
+    "retrofit_at": "2026-05-08T21:04:12Z"
   },
   "bienesraices|2129": {
     "ts": "2026-05-08T14:43:56.256418+00:00",
@@ -7499,17 +7539,18 @@
         "es": "Ubicación privilegiada cerca de esteros, marinas y mejores clubes de playa"
       }
     ],
-    "lat": 13.3167,
-    "lng": -89.0167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1213,
     "tokens_out": 776,
     "cost_usd": 0.00118111,
     "finish_reason": "stop",
-    "latency_ms": 11284
+    "latency_ms": 11284,
+    "retrofit_at": "2026-05-08T21:25:23Z"
   },
   "bienesraices|2124": {
     "ts": "2026-05-08T14:43:58.751490+00:00",
@@ -7679,8 +7720,8 @@
         "es": "Financiamiento flexible para inversionistas locales y extranjeros"
       }
     ],
-    "lat": 13.3072,
-    "lng": -87.8647,
+    "lat": 13.1733,
+    "lng": -87.9589,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
     "geocoding_reference": "Conchagua, La Unión, El Salvador",
@@ -7689,7 +7730,8 @@
     "tokens_out": 830,
     "cost_usd": 0.00124969,
     "finish_reason": "stop",
-    "latency_ms": 11684
+    "latency_ms": 11684,
+    "retrofit_at": "2026-05-08T21:21:41Z"
   },
   "bienesraices|2101": {
     "ts": "2026-05-08T14:44:06.608567+00:00",
@@ -8269,17 +8311,18 @@
         "es": "4 habitaciones con aire acondicionado y baño privado"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1127,
     "tokens_out": 733,
     "cost_usd": 0.00111059,
     "finish_reason": "stop",
-    "latency_ms": 11621
+    "latency_ms": 11621,
+    "retrofit_at": "2026-05-08T21:05:57Z"
   },
   "bienesraices|2059": {
     "ts": "2026-05-08T14:44:20.534420+00:00",
@@ -8545,17 +8588,18 @@
         "es": "Precio negociable a $85 por vara cuadrada"
       }
     ],
-    "lat": 13.505,
-    "lng": -89.415,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "Playa El Zonte",
     "url_language": "es",
     "tokens_in": 1169,
     "tokens_out": 709,
     "cost_usd": 0.00109553,
     "finish_reason": "stop",
-    "latency_ms": 10708
+    "latency_ms": 10708,
+    "retrofit_at": "2026-05-08T21:04:20Z"
   },
   "bienesraices|2050": {
     "ts": "2026-05-08T14:44:29.175788+00:00",
@@ -8637,17 +8681,18 @@
         "es": "Gran oportunidad de inversión"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.2667,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Carrizal, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Cuco (nearest beach in table)",
     "url_language": "es",
     "tokens_in": 1109,
     "tokens_out": 558,
     "cost_usd": 0.00091323,
     "finish_reason": "stop",
-    "latency_ms": 8803
+    "latency_ms": 8803,
+    "retrofit_at": "2026-05-08T21:15:53Z"
   },
   "bienesraices|2046": {
     "ts": "2026-05-08T14:44:29.921845+00:00",
@@ -8997,17 +9042,18 @@
         "es": "Baja cuota de mantenimiento mensual de $39"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.1,
-    "geocoding_confidence": "medium",
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Cuco, Chirilagua, San Miguel, El Salvador",
+    "geocoding_reference": "Playa El Cuco",
     "url_language": "es",
     "tokens_in": 1341,
     "tokens_out": 739,
     "cost_usd": 0.00117497,
     "finish_reason": "stop",
-    "latency_ms": 11336
+    "latency_ms": 11336,
+    "retrofit_at": "2026-05-08T21:06:48Z"
   },
   "bienesraices|2029": {
     "ts": "2026-05-08T14:44:40.210185+00:00",
@@ -9365,17 +9411,18 @@
         "es": "Cerca de spots de surf de clase mundial en KM 59, 60, 63"
       }
     ],
-    "lat": 13.3833,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Taquillo, Chiltiupan, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo, La Libertad",
     "url_language": "es",
     "tokens_in": 1124,
     "tokens_out": 737,
     "cost_usd": 0.00111418,
     "finish_reason": "stop",
-    "latency_ms": 11015
+    "latency_ms": 11015,
+    "retrofit_at": "2026-05-08T21:18:11Z"
   },
   "bienesraices|2012": {
     "ts": "2026-05-08T14:44:50.490512+00:00",
@@ -9687,17 +9734,18 @@
         "es": "Gran oportunidad de inversión en La Unión"
       }
     ],
-    "lat": 13.1833,
-    "lng": -87.7333,
-    "geocoding_confidence": "medium",
+    "lat": 13.18,
+    "lng": -87.733,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa El Jagüey, La Unión, El Salvador",
     "url_language": "es",
     "tokens_in": 1040,
     "tokens_out": 575,
     "cost_usd": 0.0009133,
     "finish_reason": "stop",
-    "latency_ms": 9736
+    "latency_ms": 9736,
+    "retrofit_at": "2026-05-08T21:09:48Z"
   },
   "bienesraices|2005": {
     "ts": "2026-05-08T14:44:59.970230+00:00",
@@ -9733,17 +9781,18 @@
         "es": "Ideal para casa de playa o campamento de surf"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Shutia, Chiltiupán, La Libertad",
+    "geocoding_reference": "Playa El Zonte (5 min away)",
     "url_language": "es",
     "tokens_in": 1077,
     "tokens_out": 650,
     "cost_usd": 0.00100579,
     "finish_reason": "stop",
-    "latency_ms": 10394
+    "latency_ms": 10394,
+    "retrofit_at": "2026-05-08T21:13:01Z"
   },
   "bienesraices|2006": {
     "ts": "2026-05-08T14:45:01.671298+00:00",
@@ -9779,17 +9828,18 @@
         "es": "Precio negociable a $105 por vara cuadrada"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Tunco beach, La Libertad",
     "url_language": "es",
     "tokens_in": 1280,
     "tokens_out": 773,
     "cost_usd": 0.0011959,
     "finish_reason": "stop",
-    "latency_ms": 12217
+    "latency_ms": 12217,
+    "retrofit_at": "2026-05-08T21:02:39Z"
   },
   "bienesraices|1996": {
     "ts": "2026-05-08T14:45:02.879486+00:00",
@@ -9871,17 +9921,18 @@
         "es": "Estacionamiento para 8 vehículos"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.7833,
-    "geocoding_confidence": "medium",
+    "lat": 13.541,
+    "lng": -89.805,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Los Cobanos, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Los Cóbanos beach",
     "url_language": "es",
     "tokens_in": 1305,
     "tokens_out": 832,
     "cost_usd": 0.00126755,
     "finish_reason": "stop",
-    "latency_ms": 12445
+    "latency_ms": 12445,
+    "retrofit_at": "2026-05-08T21:18:46Z"
   },
   "bienesraices|1989": {
     "ts": "2026-05-08T14:45:06.529790+00:00",
@@ -10005,17 +10056,18 @@
         "es": "Precio no negociable de $800,000"
       }
     ],
-    "lat": 13.25,
-    "lng": -88.25,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Los Mangos, Jucuarán, Usulután",
+    "geocoding_reference": "Playa Los Mangos (near Playa El Cuco)",
     "url_language": "es",
     "tokens_in": 1002,
     "tokens_out": 577,
     "cost_usd": 0.00090524,
     "finish_reason": "stop",
-    "latency_ms": 9251
+    "latency_ms": 9251,
+    "retrofit_at": "2026-05-08T21:20:31Z"
   },
   "bienesraices|1987": {
     "ts": "2026-05-08T14:45:09.750536+00:00",
@@ -10189,17 +10241,18 @@
         "es": "Vistas directas a La Puntilla"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Isla Tasajera, Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach, La Paz, El Salvador",
     "url_language": "es",
     "tokens_in": 924,
     "tokens_out": 634,
     "cost_usd": 0.00094688,
     "finish_reason": "stop",
-    "latency_ms": 10389
+    "latency_ms": 10389,
+    "retrofit_at": "2026-05-08T21:06:04Z"
   },
   "bienesraices|1982": {
     "ts": "2026-05-08T14:45:16.183431+00:00",
@@ -10235,17 +10288,18 @@
         "es": "Gran potencial para ingresos por alquiler vacacional"
       }
     ],
-    "lat": 13.2833,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1227,
     "tokens_out": 680,
     "cost_usd": 0.00107929,
     "finish_reason": "stop",
-    "latency_ms": 10987
+    "latency_ms": 10987,
+    "retrofit_at": "2026-05-08T21:14:10Z"
   },
   "bienesraices|1978": {
     "ts": "2026-05-08T14:45:17.562817+00:00",
@@ -10419,17 +10473,18 @@
         "es": "Alquiler competitivo de $3,000 más IVA"
       }
     ],
-    "lat": 13.4167,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Xanadu (El Zonte)",
     "url_language": "es",
     "tokens_in": 1021,
     "tokens_out": 532,
     "cost_usd": 0.00086087,
     "finish_reason": "stop",
-    "latency_ms": 8680
+    "latency_ms": 8680,
+    "retrofit_at": "2026-05-08T21:18:53Z"
   },
   "bienesraices|1980": {
     "ts": "2026-05-08T14:45:19.250549+00:00",
@@ -10695,17 +10750,18 @@
         "es": "Ubicación privilegiada cerca de la calle principal"
       }
     ],
-    "lat": 13.4889,
-    "lng": -89.3222,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Puerto de La Libertad, La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad beach",
     "url_language": "es",
     "tokens_in": 972,
     "tokens_out": 496,
     "cost_usd": 0.00080804,
     "finish_reason": "stop",
-    "latency_ms": 7901
+    "latency_ms": 7901,
+    "retrofit_at": "2026-05-08T21:19:23Z"
   },
   "bienesraices|1964": {
     "ts": "2026-05-08T14:45:27.179267+00:00",
@@ -10787,17 +10843,18 @@
         "es": "Acceso directo a olas de surf de clase mundial"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3333,
-    "geocoding_confidence": "medium",
+    "lat": 13.4927,
+    "lng": -89.5835,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Between El Tunco and El Zonte, near Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Between El Tunco and El Zonte, La Libertad coast",
     "url_language": "es",
     "tokens_in": 941,
     "tokens_out": 577,
     "cost_usd": 0.00088877,
     "finish_reason": "stop",
-    "latency_ms": 8663
+    "latency_ms": 8663,
+    "retrofit_at": "2026-05-08T21:15:25Z"
   },
   "bienesraices|1959": {
     "ts": "2026-05-08T14:45:29.651778+00:00",
@@ -10875,17 +10932,18 @@
         "es": "Ideal para inversión residencial o comercial"
       }
     ],
-    "lat": 13.5917,
-    "lng": -89.8281,
-    "geocoding_confidence": "medium",
+    "lat": 13.58,
+    "lng": -89.77,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Suncita, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Metalío beach",
     "url_language": "es",
     "tokens_in": 1317,
     "tokens_out": 832,
     "cost_usd": 0.00127079,
     "finish_reason": "stop",
-    "latency_ms": 13202
+    "latency_ms": 13202,
+    "retrofit_at": "2026-05-08T21:06:40Z"
   },
   "bienesraices|1956": {
     "ts": "2026-05-08T14:45:33.212913+00:00",
@@ -11013,17 +11071,18 @@
         "es": "Seguridad 24/7 y mantenimiento en residencial privado"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.8167,
-    "geocoding_confidence": "medium",
+    "lat": 13.541,
+    "lng": -89.805,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Los Cobanos, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Playa Los Cóbanos, Acajutla, Sonsonate",
     "url_language": "es",
     "tokens_in": 1228,
     "tokens_out": 784,
     "cost_usd": 0.00119396,
     "finish_reason": "stop",
-    "latency_ms": 12310
+    "latency_ms": 12310,
+    "retrofit_at": "2026-05-08T21:25:06Z"
   },
   "bienesraices|1944": {
     "ts": "2026-05-08T14:45:37.119193+00:00",
@@ -11105,17 +11164,18 @@
         "es": "Precio negociable a $40 por vara cuadrada"
       }
     ],
-    "lat": 13.6833,
-    "lng": -89.8667,
-    "geocoding_confidence": "medium",
+    "lat": 13.706,
+    "lng": -89.974,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Barra de Santiago, Jujutla, Ahuachapán, El Salvador",
+    "geocoding_reference": "Barra de Santiago beach",
     "url_language": "es",
     "tokens_in": 1019,
     "tokens_out": 562,
     "cost_usd": 0.00089333,
     "finish_reason": "stop",
-    "latency_ms": 8347
+    "latency_ms": 8347,
+    "retrofit_at": "2026-05-08T21:15:18Z"
   },
   "bienesraices|1953": {
     "ts": "2026-05-08T14:45:38.025002+00:00",
@@ -11151,17 +11211,18 @@
         "es": "Servicios: agua, electricidad, pozo, fosa séptica"
       }
     ],
-    "lat": 13.25,
-    "lng": -88.55,
-    "geocoding_confidence": "medium",
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Isla San Sebastián, Bahía de Jiquilisco, Usulután",
+    "geocoding_reference": "Bahía de Jiquilisco",
     "url_language": "es",
     "tokens_in": 1396,
     "tokens_out": 747,
     "cost_usd": 0.00119862,
     "finish_reason": "stop",
-    "latency_ms": 11843
+    "latency_ms": 11843,
+    "retrofit_at": "2026-05-08T21:14:57Z"
   },
   "bienesraices|1951": {
     "ts": "2026-05-08T14:45:38.175251+00:00",
@@ -11607,17 +11668,18 @@
         "es": "Precio flexible por vara cuadrada"
       }
     ],
-    "lat": 13.1833,
-    "lng": -87.7333,
-    "geocoding_confidence": "medium",
+    "lat": 13.18,
+    "lng": -87.733,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Jaguey, El Tamarindo, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa El Jagüey, La Unión",
     "url_language": "es",
     "tokens_in": 1126,
     "tokens_out": 725,
     "cost_usd": 0.00110152,
     "finish_reason": "stop",
-    "latency_ms": 10724
+    "latency_ms": 10724,
+    "retrofit_at": "2026-05-08T21:05:24Z"
   },
   "bienesraices|1917": {
     "ts": "2026-05-08T14:45:51.675629+00:00",
@@ -11791,17 +11853,18 @@
         "es": "Suministro de agua de pozo con motor y tanques"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla beach, Sonsonate",
     "url_language": "es",
     "tokens_in": 1208,
     "tokens_out": 717,
     "cost_usd": 0.00111486,
     "finish_reason": "stop",
-    "latency_ms": 10544
+    "latency_ms": 10544,
+    "retrofit_at": "2026-05-08T21:20:24Z"
   },
   "bienesraices|1909": {
     "ts": "2026-05-08T14:45:56.887332+00:00",
@@ -11883,17 +11946,18 @@
         "es": "Ubicación privilegiada en el Boulevard Costa del Sol"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.0,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1282,
     "tokens_out": 736,
     "cost_usd": 0.00115574,
     "finish_reason": "stop",
-    "latency_ms": 11488
+    "latency_ms": 11488,
+    "retrofit_at": "2026-05-08T21:22:30Z"
   },
   "bienesraices|1915": {
     "ts": "2026-05-08T14:45:57.553297+00:00",
@@ -11929,17 +11993,18 @@
         "es": "Alto potencial turístico para buceo, pesca y ecoturismo"
       }
     ],
-    "lat": 13.5167,
-    "lng": -89.8,
-    "geocoding_confidence": "medium",
+    "lat": 13.541,
+    "lng": -89.805,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Los Cóbanos, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Playa Los Cóbanos, Acajutla, Sonsonate",
     "url_language": "es",
     "tokens_in": 1215,
     "tokens_out": 814,
     "cost_usd": 0.00122345,
     "finish_reason": "stop",
-    "latency_ms": 11785
+    "latency_ms": 11785,
+    "retrofit_at": "2026-05-08T21:17:47Z"
   },
   "bienesraices|1908": {
     "ts": "2026-05-08T14:45:58.554402+00:00",
@@ -12937,17 +13002,18 @@
         "es": "Ubicación privilegiada entre El Zonte y Taquillo"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Jicalapa, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "es",
     "tokens_in": 1074,
     "tokens_out": 698,
     "cost_usd": 0.00105778,
     "finish_reason": "stop",
-    "latency_ms": 10935
+    "latency_ms": 10935,
+    "retrofit_at": "2026-05-08T21:02:29Z"
   },
   "bienesraices|1870": {
     "ts": "2026-05-08T14:46:27.561908+00:00",
@@ -12983,17 +13049,18 @@
         "es": "Techos altos y diseño moderno en toda la casa"
       }
     ],
-    "lat": 13.4417,
-    "lng": -89.2797,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach",
     "url_language": "es",
     "tokens_in": 1100,
     "tokens_out": 680,
     "cost_usd": 0.001045,
     "finish_reason": "stop",
-    "latency_ms": 10836
+    "latency_ms": 10836,
+    "retrofit_at": "2026-05-08T21:25:40Z"
   },
   "bienesraices|1864": {
     "ts": "2026-05-08T14:46:28.152041+00:00",
@@ -13075,17 +13142,18 @@
         "es": "El precio incluye derechos de marca y nombre de empresa prestigiosa"
       }
     ],
-    "lat": 13.4769,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas, La Libertad",
     "url_language": "es",
     "tokens_in": 1112,
     "tokens_out": 720,
     "cost_usd": 0.00109224,
     "finish_reason": "stop",
-    "latency_ms": 11565
+    "latency_ms": 11565,
+    "retrofit_at": "2026-05-08T21:24:16Z"
   },
   "bienesraices|1846": {
     "ts": "2026-05-08T14:46:30.317649+00:00",
@@ -13121,17 +13189,18 @@
         "es": "Ubicación privilegiada para el turismo de surf"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Mizata, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Mizata",
     "url_language": "es",
     "tokens_in": 1191,
     "tokens_out": 595,
     "cost_usd": 0.00097607,
     "finish_reason": "stop",
-    "latency_ms": 8846
+    "latency_ms": 8846,
+    "retrofit_at": "2026-05-08T21:15:33Z"
   },
   "bienesraices|1859": {
     "ts": "2026-05-08T14:46:30.857347+00:00",
@@ -13397,17 +13466,18 @@
         "es": "7 habitaciones y 6.5 baños para amplio espacio"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Diego (Bocana San Diego)",
     "url_language": "es",
     "tokens_in": 1064,
     "tokens_out": 665,
     "cost_usd": 0.00101878,
     "finish_reason": "stop",
-    "latency_ms": 10358
+    "latency_ms": 10358,
+    "retrofit_at": "2026-05-08T21:04:51Z"
   },
   "bienesraices|1836": {
     "ts": "2026-05-08T14:46:38.329583+00:00",
@@ -13673,17 +13743,18 @@
         "es": "Uso versátil: hotel, restaurante, apartamentos"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Taquillo, Jicalapa, La Libertad",
+    "geocoding_reference": "Playa Taquillo, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1216,
     "tokens_out": 597,
     "cost_usd": 0.00098502,
     "finish_reason": "stop",
-    "latency_ms": 8691
+    "latency_ms": 8691,
+    "retrofit_at": "2026-05-08T21:12:53Z"
   },
   "bienesraices|1806": {
     "ts": "2026-05-08T14:46:46.181537+00:00",
@@ -13945,17 +14016,18 @@
         "es": "Perfecto para casa de playa o inversión"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Espino beach, Jucuarán, Usulután",
+    "geocoding_reference": "Playa El Espino, Usulután, El Salvador",
     "url_language": "es",
     "tokens_in": 999,
     "tokens_out": 560,
     "cost_usd": 0.00088573,
     "finish_reason": "stop",
-    "latency_ms": 8836
+    "latency_ms": 8836,
+    "retrofit_at": "2026-05-08T21:07:53Z"
   },
   "bienesraices|1793": {
     "ts": "2026-05-08T14:46:53.689091+00:00",
@@ -13991,17 +14063,18 @@
         "es": "Destino de surf privilegiado en Surf City El Salvador"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, Jicalapa, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1028,
     "tokens_out": 678,
     "cost_usd": 0.00102336,
     "finish_reason": "stop",
-    "latency_ms": 10029
+    "latency_ms": 10029,
+    "retrofit_at": "2026-05-08T21:16:41Z"
   },
   "bienesraices|1792": {
     "ts": "2026-05-08T14:46:54.378112+00:00",
@@ -14037,17 +14110,18 @@
         "es": "Próxima calle pavimentada"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1166,
     "tokens_out": 627,
     "cost_usd": 0.00100452,
     "finish_reason": "stop",
-    "latency_ms": 9493
+    "latency_ms": 9493,
+    "retrofit_at": "2026-05-08T21:07:30Z"
   },
   "bienesraices|1788": {
     "ts": "2026-05-08T14:46:56.139709+00:00",
@@ -14175,17 +14249,18 @@
         "es": "Ubicación privilegiada para surf y turismo"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Xanadu (El Zonte)",
     "url_language": "es",
     "tokens_in": 1202,
     "tokens_out": 732,
     "cost_usd": 0.00112974,
     "finish_reason": "stop",
-    "latency_ms": 10756
+    "latency_ms": 10756,
+    "retrofit_at": "2026-05-08T21:13:52Z"
   },
   "bienesraices|1780": {
     "ts": "2026-05-08T14:47:00.512526+00:00",
@@ -14221,17 +14296,18 @@
         "es": "Acceso pavimentado para todo vehículo"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Tunco beach (4 minutes away)",
     "url_language": "es",
     "tokens_in": 1102,
     "tokens_out": 625,
     "cost_usd": 0.00098504,
     "finish_reason": "stop",
-    "latency_ms": 9216
+    "latency_ms": 9216,
+    "retrofit_at": "2026-05-08T21:10:37Z"
   },
   "bienesraices|1781": {
     "ts": "2026-05-08T14:47:00.863171+00:00",
@@ -14355,17 +14431,18 @@
         "es": "Gran lote de 4.0230 hectáreas (57,561.79 varas cuadradas)"
       }
     ],
-    "lat": 13.3333,
-    "lng": -87.8333,
+    "lat": 13.334,
+    "lng": -87.843,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "La Unión, Meanguera del Golfo, La Unión, El Salvador",
+    "geocoding_reference": "Gulf of Fonseca, La Unión bay",
     "url_language": "es",
     "tokens_in": 1077,
     "tokens_out": 552,
     "cost_usd": 0.00089799,
     "finish_reason": "stop",
-    "latency_ms": 8690
+    "latency_ms": 8690,
+    "retrofit_at": "2026-05-08T21:05:48Z"
   },
   "bienesraices|1764": {
     "ts": "2026-05-08T14:47:03.727047+00:00",
@@ -14539,17 +14616,18 @@
         "es": "Apto para todo tipo de negocios: restaurantes, tiendas, bodegas y más"
       }
     ],
-    "lat": 13.4417,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Conchalio, La Libertad, El Salvador",
+    "geocoding_reference": "Conchalio beach (El Zonte area)",
     "url_language": "es",
     "tokens_in": 1233,
     "tokens_out": 779,
     "cost_usd": 0.00118981,
     "finish_reason": "stop",
-    "latency_ms": 12119
+    "latency_ms": 12119,
+    "retrofit_at": "2026-05-08T21:22:06Z"
   },
   "bienesraices|1732": {
     "ts": "2026-05-08T14:47:10.253693+00:00",
@@ -14673,17 +14751,18 @@
         "es": "Estacionamiento para 4 vehículos y cisterna incluidos"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal beach",
     "url_language": "es",
     "tokens_in": 1121,
     "tokens_out": 708,
     "cost_usd": 0.00108147,
     "finish_reason": "stop",
-    "latency_ms": 10390
+    "latency_ms": 10390,
+    "retrofit_at": "2026-05-08T21:01:36Z"
   },
   "bienesraices|1731": {
     "ts": "2026-05-08T14:47:12.093451+00:00",
@@ -14766,16 +14845,17 @@
       }
     ],
     "lat": 13.5833,
-    "lng": -89.2167,
+    "lng": -89.1333,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Rosario de Mora, San Salvador, El Salvador",
+    "geocoding_reference": "Santo Tomás, Rosario de Mora, San Salvador",
     "url_language": "es",
     "tokens_in": 1270,
     "tokens_out": 808,
     "cost_usd": 0.0012317,
     "finish_reason": "stop",
-    "latency_ms": 11690
+    "latency_ms": 11690,
+    "retrofit_at": "2026-05-08T21:08:11Z"
   },
   "bienesraices|1724": {
     "ts": "2026-05-08T14:47:16.488964+00:00",
@@ -14811,17 +14891,18 @@
         "es": "Precio atractivo de $16,000 por manzana"
       }
     ],
-    "lat": 13.25,
-    "lng": -88.55,
-    "geocoding_confidence": "medium",
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Corral de Mulas, Bahía de Jiquilisco, Usulután",
+    "geocoding_reference": "Bahía de Jiquilisco",
     "url_language": "es",
     "tokens_in": 1009,
     "tokens_out": 663,
     "cost_usd": 0.00100173,
     "finish_reason": "stop",
-    "latency_ms": 10352
+    "latency_ms": 10352,
+    "retrofit_at": "2026-05-08T21:05:08Z"
   },
   "bienesraices|1720": {
     "ts": "2026-05-08T14:47:17.797023+00:00",
@@ -14857,17 +14938,18 @@
         "es": "Ideal para casa de vacaciones o inversión"
       }
     ],
-    "lat": 13.2833,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Dorada, Santa Isabel Ishuatán, Sonsonate, El Salvador",
+    "geocoding_reference": "Playa Dorada (Costa del Sol)",
     "url_language": "es",
     "tokens_in": 946,
     "tokens_out": 554,
     "cost_usd": 0.00086482,
     "finish_reason": "stop",
-    "latency_ms": 8809
+    "latency_ms": 8809,
+    "retrofit_at": "2026-05-08T21:10:52Z"
   },
   "bienesraices|1718": {
     "ts": "2026-05-08T14:47:18.035521+00:00",
@@ -14995,17 +15077,18 @@
         "es": "Precio de $130 por vara cuadrada"
       }
     ],
-    "lat": 13.2333,
-    "lng": -88.0667,
-    "geocoding_confidence": "low",
+    "lat": 13.181,
+    "lng": -88.355,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa Las Flores, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1011,
     "tokens_out": 544,
     "cost_usd": 0.00087137,
     "finish_reason": "stop",
-    "latency_ms": 8791
+    "latency_ms": 8791,
+    "retrofit_at": "2026-05-08T21:15:39Z"
   },
   "bienesraices|1698": {
     "ts": "2026-05-08T14:47:21.535259+00:00",
@@ -15271,17 +15354,18 @@
         "es": "Alto potencial de plusvalía en mercado turístico creciente"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.7833,
-    "geocoding_confidence": "medium",
+    "lat": 13.541,
+    "lng": -89.805,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Flor, Los Cobanos, Acajutla, Sonsonate",
+    "geocoding_reference": "Los Cóbanos beach (authoritative coordinates)",
     "url_language": "es",
     "tokens_in": 1223,
     "tokens_out": 638,
     "cost_usd": 0.00103201,
     "finish_reason": "stop",
-    "latency_ms": 10259
+    "latency_ms": 10259,
+    "retrofit_at": "2026-05-08T21:08:45Z"
   },
   "bienesraices|1689": {
     "ts": "2026-05-08T14:47:28.762862+00:00",
@@ -15589,17 +15673,18 @@
         "es": "Precio atractivo de $180,000"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
+    "lat": 13.58,
+    "lng": -89.77,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Playa El Suncita (near Metalío)",
     "url_language": "es",
     "tokens_in": 951,
     "tokens_out": 538,
     "cost_usd": 0.00084857,
     "finish_reason": "stop",
-    "latency_ms": 8439
+    "latency_ms": 8439,
+    "retrofit_at": "2026-05-08T21:17:21Z"
   },
   "bienesraices|1676": {
     "ts": "2026-05-08T14:47:35.922976+00:00",
@@ -15773,17 +15858,18 @@
         "es": "Casa de 2 habitaciones con baño compartido"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
+    "lat": 13.5928,
+    "lng": -89.8275,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Suncita, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla",
     "url_language": "es",
     "tokens_in": 1089,
     "tokens_out": 536,
     "cost_usd": 0.00088363,
     "finish_reason": "stop",
-    "latency_ms": 8434
+    "latency_ms": 8434,
+    "retrofit_at": "2026-05-08T21:14:16Z"
   },
   "bienesraices|1668": {
     "ts": "2026-05-08T14:47:42.372265+00:00",
@@ -15819,17 +15905,18 @@
         "es": "Ideal para negocio turístico o casa de vacaciones"
       }
     ],
-    "lat": 13.2833,
-    "lng": -89.0,
-    "geocoding_confidence": "medium",
+    "lat": 13.317,
+    "lng": -88.945,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Playa San Marcelino, Costa del Sol",
     "url_language": "es",
     "tokens_in": 1266,
     "tokens_out": 708,
     "cost_usd": 0.00112062,
     "finish_reason": "stop",
-    "latency_ms": 11148
+    "latency_ms": 11148,
+    "retrofit_at": "2026-05-08T21:15:46Z"
   },
   "bienesraices|1664": {
     "ts": "2026-05-08T14:47:42.643825+00:00",
@@ -16003,17 +16090,18 @@
         "es": "Ubicado en la exclusiva zona de El Zapote"
       }
     ],
-    "lat": 13.3167,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1110,
     "tokens_out": 651,
     "cost_usd": 0.0010158,
     "finish_reason": "stop",
-    "latency_ms": 9705
+    "latency_ms": 9705,
+    "retrofit_at": "2026-05-08T21:17:03Z"
   },
   "bienesraices|1646": {
     "ts": "2026-05-08T14:47:45.962880+00:00",
@@ -16049,17 +16137,18 @@
         "es": "A 40 minutos del Aeropuerto de Comalapa"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Diego (Bocana San Diego)",
     "url_language": "es",
     "tokens_in": 1031,
     "tokens_out": 588,
     "cost_usd": 0.00092517,
     "finish_reason": "stop",
-    "latency_ms": 8592
+    "latency_ms": 8592,
+    "retrofit_at": "2026-05-08T21:18:38Z"
   },
   "bienesraices|1637": {
     "ts": "2026-05-08T14:47:47.677897+00:00",
@@ -16095,17 +16184,18 @@
         "es": "Excelente oportunidad de inversión a $500,000"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.4575,
+    "lng": -89.3478,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa La Perla, Jicalapa, La Libertad, El Salvador",
+    "geocoding_reference": "Playa La Perla, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1135,
     "tokens_out": 583,
     "cost_usd": 0.00094775,
     "finish_reason": "stop",
-    "latency_ms": 8596
+    "latency_ms": 8596,
+    "retrofit_at": "2026-05-08T21:16:18Z"
   },
   "bienesraices|1630": {
     "ts": "2026-05-08T14:47:50.977971+00:00",
@@ -16187,17 +16277,18 @@
         "es": "Precio negociable de $1,000,000"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.1167,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Cuco, Chirilagua, San Miguel, El Salvador",
+    "geocoding_reference": "Playa El Cuco",
     "url_language": "es",
     "tokens_in": 1249,
     "tokens_out": 819,
     "cost_usd": 0.00123813,
     "finish_reason": "stop",
-    "latency_ms": 12262
+    "latency_ms": 12262,
+    "retrofit_at": "2026-05-08T21:10:20Z"
   },
   "bienesraices|1627": {
     "ts": "2026-05-08T14:47:52.932135+00:00",
@@ -16279,17 +16370,18 @@
         "es": "Ideal para casa de playa o desarrollo eco-turístico"
       }
     ],
-    "lat": 13.2333,
-    "lng": -87.6667,
-    "geocoding_confidence": "medium",
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Torola, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa Torola",
     "url_language": "es",
     "tokens_in": 1195,
     "tokens_out": 659,
     "cost_usd": 0.00104755,
     "finish_reason": "stop",
-    "latency_ms": 9746
+    "latency_ms": 9746,
+    "retrofit_at": "2026-05-08T21:10:11Z"
   },
   "bienesraices|1622": {
     "ts": "2026-05-08T14:47:55.435476+00:00",
@@ -16463,17 +16555,18 @@
         "es": "Amplios lotes de 10x20 metros con vistas espectaculares"
       }
     ],
-    "lat": 13.4769,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Blas, La Libertad, El Salvador (near Santa Tecla)",
+    "geocoding_reference": "San Blas beach",
     "url_language": "es",
     "tokens_in": 996,
     "tokens_out": 575,
     "cost_usd": 0.00090142,
     "finish_reason": "stop",
-    "latency_ms": 9067
+    "latency_ms": 9067,
+    "retrofit_at": "2026-05-08T21:25:45Z"
   },
   "bienesraices|1616": {
     "ts": "2026-05-08T14:47:58.613335+00:00",
@@ -17057,17 +17150,18 @@
         "es": "Privacidad total y estacionamiento para 3 vehículos"
       }
     ],
-    "lat": 13.4767,
-    "lng": -89.3272,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Atami, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Atami (near El Zonte)",
     "url_language": "es",
     "tokens_in": 1188,
     "tokens_out": 701,
     "cost_usd": 0.00109186,
     "finish_reason": "stop",
-    "latency_ms": 10956
+    "latency_ms": 10956,
+    "retrofit_at": "2026-05-08T21:11:25Z"
   },
   "bienesraices|1582": {
     "ts": "2026-05-08T14:48:16.677918+00:00",
@@ -17149,17 +17243,18 @@
         "es": "Potencial para uso comercial futuro con acceso a doble vía"
       }
     ],
-    "lat": 13.45,
-    "lng": -89.3,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Surf City I, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach, Surf City I area",
     "url_language": "es",
     "tokens_in": 1275,
     "tokens_out": 731,
     "cost_usd": 0.00114835,
     "finish_reason": "stop",
-    "latency_ms": 11524
+    "latency_ms": 11524,
+    "retrofit_at": "2026-05-08T21:12:38Z"
   },
   "bienesraices|1584": {
     "ts": "2026-05-08T14:48:18.409682+00:00",
@@ -17195,17 +17290,18 @@
         "es": "Financiamiento disponible con baja mensualidad"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.3833,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo",
     "url_language": "es",
     "tokens_in": 1339,
     "tokens_out": 805,
     "cost_usd": 0.00124703,
     "finish_reason": "stop",
-    "latency_ms": 11528
+    "latency_ms": 11528,
+    "retrofit_at": "2026-05-08T21:22:49Z"
   },
   "bienesraices|1590": {
     "ts": "2026-05-08T14:48:19.629806+00:00",
@@ -17563,17 +17659,18 @@
         "es": "Playa de anidación de tortugas marinas (4 especies)"
       }
     ],
-    "lat": 13.2,
-    "lng": -87.85,
-    "geocoding_confidence": "medium",
+    "lat": 13.175,
+    "lng": -88.225,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Icacal, Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa El Icacal",
     "url_language": "es",
     "tokens_in": 1029,
     "tokens_out": 606,
     "cost_usd": 0.00094443,
     "finish_reason": "stop",
-    "latency_ms": 9748
+    "latency_ms": 9748,
+    "retrofit_at": "2026-05-08T21:20:02Z"
   },
   "bienesraices|1562": {
     "ts": "2026-05-08T14:48:29.907845+00:00",
@@ -17655,17 +17752,18 @@
         "es": "Se aceptan Bitcoins; precio negociable"
       }
     ],
-    "lat": 13.2833,
-    "lng": -88.5833,
-    "geocoding_confidence": "medium",
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Corral de Mulas, Puerto El Triunfo, Usulután, El Salvador",
+    "geocoding_reference": "Bahía de Jiquilisco",
     "url_language": "es",
     "tokens_in": 1347,
     "tokens_out": 784,
     "cost_usd": 0.00122609,
     "finish_reason": "stop",
-    "latency_ms": 11224
+    "latency_ms": 11224,
+    "retrofit_at": "2026-05-08T21:24:32Z"
   },
   "bienesraices|1560": {
     "ts": "2026-05-08T14:48:31.727010+00:00",
@@ -17931,17 +18029,18 @@
         "es": "Precios desde $160,000"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach",
     "url_language": "es",
     "tokens_in": 1277,
     "tokens_out": 758,
     "cost_usd": 0.00117859,
     "finish_reason": "stop",
-    "latency_ms": 11634
+    "latency_ms": 11634,
+    "retrofit_at": "2026-05-08T21:18:30Z"
   },
   "bienesraices|1547": {
     "ts": "2026-05-08T14:48:39.894626+00:00",
@@ -17977,17 +18076,18 @@
         "es": "Incluye piscina, parqueo y bodega"
       }
     ],
-    "lat": 13.4889,
-    "lng": -89.3192,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas",
     "url_language": "es",
     "tokens_in": 1032,
     "tokens_out": 582,
     "cost_usd": 0.00091884,
     "finish_reason": "stop",
-    "latency_ms": 8825
+    "latency_ms": 8825,
+    "retrofit_at": "2026-05-08T21:19:18Z"
   },
   "bienesraices|1546": {
     "ts": "2026-05-08T14:48:39.908580+00:00",
@@ -18023,17 +18123,18 @@
         "es": "Terreno semi inclinado para arquitectura única"
       }
     ],
-    "lat": 13.45,
-    "lng": -89.3,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Isla San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1045,
     "tokens_out": 541,
     "cost_usd": 0.00087725,
     "finish_reason": "stop",
-    "latency_ms": 8181
+    "latency_ms": 8181,
+    "retrofit_at": "2026-05-08T21:26:26Z"
   },
   "bienesraices|1548": {
     "ts": "2026-05-08T14:48:40.177797+00:00",
@@ -18069,17 +18170,18 @@
         "es": "Estacionamiento para dos autos"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1138,
     "tokens_out": 644,
     "cost_usd": 0.00101566,
     "finish_reason": "stop",
-    "latency_ms": 10269
+    "latency_ms": 10269,
+    "retrofit_at": "2026-05-08T21:23:28Z"
   },
   "bienesraices|1541": {
     "ts": "2026-05-08T14:48:41.177638+00:00",
@@ -18157,17 +18259,18 @@
         "es": "Precio negociable a $193 por vara cuadrada"
       }
     ],
-    "lat": 13.1833,
-    "lng": -87.7167,
-    "geocoding_confidence": "medium",
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Maculis Beach, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa Maculís, La Unión, El Salvador",
     "url_language": "es",
     "tokens_in": 1156,
     "tokens_out": 731,
     "cost_usd": 0.00111622,
     "finish_reason": "stop",
-    "latency_ms": 11619
+    "latency_ms": 11619,
+    "retrofit_at": "2026-05-08T21:19:11Z"
   },
   "bienesraices|1532": {
     "ts": "2026-05-08T14:48:46.965114+00:00",
@@ -18337,17 +18440,18 @@
         "es": "Lote de 858 varas cuadradas, a $151 la vara"
       }
     ],
-    "lat": 13.5,
-    "lng": -89.4,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Sunzal beach, La Libertad",
+    "geocoding_reference": "El Tunco, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1037,
     "tokens_out": 596,
     "cost_usd": 0.00093559,
     "finish_reason": "stop",
-    "latency_ms": 9065
+    "latency_ms": 9065,
+    "retrofit_at": "2026-05-08T21:05:40Z"
   },
   "bienesraices|1527": {
     "ts": "2026-05-08T14:48:50.144630+00:00",
@@ -18425,17 +18529,18 @@
         "es": "Ubicación privilegiada en zona de surfistas"
       }
     ],
-    "lat": 13.4883,
-    "lng": -89.3864,
+    "lat": 13.487,
+    "lng": -89.6133,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Tunco, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Tunco beach",
     "url_language": "es",
     "tokens_in": 1051,
     "tokens_out": 674,
     "cost_usd": 0.00102517,
     "finish_reason": "stop",
-    "latency_ms": 10741
+    "latency_ms": 10741,
+    "retrofit_at": "2026-05-08T21:02:13Z"
   },
   "bienesraices|1530": {
     "ts": "2026-05-08T14:48:51.280586+00:00",
@@ -18743,17 +18848,18 @@
         "es": "Ideal para desarrollo o residencia privada"
       }
     ],
-    "lat": 13.2833,
-    "lng": -87.7833,
-    "geocoding_confidence": "medium",
+    "lat": 13.27,
+    "lng": -87.8,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Las Playitas, Cutuco, La Unión, El Salvador",
+    "geocoding_reference": "Playa Las Playitas, Gulf of Fonseca",
     "url_language": "es",
     "tokens_in": 1048,
     "tokens_out": 565,
     "cost_usd": 0.00090446,
     "finish_reason": "stop",
-    "latency_ms": 8576
+    "latency_ms": 8576,
+    "retrofit_at": "2026-05-08T21:15:12Z"
   },
   "bienesraices|1499": {
     "ts": "2026-05-08T14:48:58.944866+00:00",
@@ -19203,17 +19309,18 @@
         "es": "Incluye estudio preliminar de gas y permisos de turismo"
       }
     ],
-    "lat": 13.5925,
+    "lat": 13.5928,
     "lng": -89.8275,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla beach, Sonsonate, El Salvador",
     "url_language": "es",
     "tokens_in": 1085,
     "tokens_out": 698,
     "cost_usd": 0.00106075,
     "finish_reason": "stop",
-    "latency_ms": 11120
+    "latency_ms": 11120,
+    "retrofit_at": "2026-05-08T21:19:39Z"
   },
   "bienesraices|1473": {
     "ts": "2026-05-08T14:49:16.187823+00:00",
@@ -19985,17 +20092,18 @@
         "es": "Precio de $12 por vara cuadrada"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.5833,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata beach",
     "url_language": "es",
     "tokens_in": 1045,
     "tokens_out": 645,
     "cost_usd": 0.00099165,
     "finish_reason": "stop",
-    "latency_ms": 10490
+    "latency_ms": 10490,
+    "retrofit_at": "2026-05-08T21:01:27Z"
   },
   "bienesraices|1436": {
     "ts": "2026-05-08T14:49:37.723477+00:00",
@@ -20077,17 +20185,18 @@
         "es": "Precio negociable a $60.00 por V2"
       }
     ],
-    "lat": 13.4975,
-    "lng": -89.3517,
+    "lat": 13.4983,
+    "lng": -89.5538,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Zonte, Chiltiupán, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach coastline",
     "url_language": "es",
     "tokens_in": 1037,
     "tokens_out": 641,
     "cost_usd": 0.00098509,
     "finish_reason": "stop",
-    "latency_ms": 10521
+    "latency_ms": 10521,
+    "retrofit_at": "2026-05-08T21:03:12Z"
   },
   "bienesraices|1437": {
     "ts": "2026-05-08T14:49:39.767840+00:00",
@@ -20445,17 +20554,18 @@
         "es": "Oportunidad única frente a la playa por $275,000"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.5333,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata Beach, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata beach",
     "url_language": "mixed",
     "tokens_in": 1089,
     "tokens_out": 723,
     "cost_usd": 0.00108933,
     "finish_reason": "stop",
-    "latency_ms": 11939
+    "latency_ms": 11939,
+    "retrofit_at": "2026-05-08T21:02:22Z"
   },
   "bienesraices|1422": {
     "ts": "2026-05-08T14:49:50.554647+00:00",
@@ -20855,17 +20965,18 @@
         "es": "Ubicado en la popular Playa Torola con atractivos naturales"
       }
     ],
-    "lat": 13.2333,
-    "lng": -87.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Torola, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa Torola",
     "url_language": "es",
     "tokens_in": 1303,
     "tokens_out": 783,
     "cost_usd": 0.00121311,
     "finish_reason": "stop",
-    "latency_ms": 12811
+    "latency_ms": 12811,
+    "retrofit_at": "2026-05-08T21:09:02Z"
   },
   "bienesraices|1402": {
     "ts": "2026-05-08T14:50:02.144538+00:00",
@@ -20993,17 +21104,18 @@
         "es": "Alto potencial de plusvalía para inversión"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas",
     "url_language": "es",
     "tokens_in": 1263,
     "tokens_out": 728,
     "cost_usd": 0.00114181,
     "finish_reason": "stop",
-    "latency_ms": 10758
+    "latency_ms": 10758,
+    "retrofit_at": "2026-05-08T21:24:00Z"
   },
   "bienesraices|1366": {
     "ts": "2026-05-08T14:50:09.670972+00:00",
@@ -21039,17 +21151,18 @@
         "es": "Ideal para residencia de lujo o complejo turístico"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.8,
+    "lat": 13.541,
+    "lng": -89.805,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Los Cóbanos, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Los Cóbanos beach",
     "url_language": "es",
     "tokens_in": 1257,
     "tokens_out": 839,
     "cost_usd": 0.00126229,
     "finish_reason": "stop",
-    "latency_ms": 12123
+    "latency_ms": 12123,
+    "retrofit_at": "2026-05-08T21:16:34Z"
   },
   "bienesraices|1359": {
     "ts": "2026-05-08T14:50:10.341111+00:00",
@@ -21361,17 +21474,18 @@
         "es": "Opciones de construcción personalizada con materiales de calidad"
       }
     ],
-    "lat": 13.25,
-    "lng": -87.75,
-    "geocoding_confidence": "medium",
+    "lat": 13.215,
+    "lng": -87.85,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Cuevitas, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Playa Cuevitas, La Unión, El Salvador",
     "url_language": "es",
     "tokens_in": 1246,
     "tokens_out": 734,
     "cost_usd": 0.00114382,
     "finish_reason": "stop",
-    "latency_ms": 12166
+    "latency_ms": 12166,
+    "retrofit_at": "2026-05-08T21:21:09Z"
   },
   "bienesraices|1324": {
     "ts": "2026-05-08T14:50:19.125754+00:00",
@@ -21407,8 +21521,8 @@
         "es": "Vistas impresionantes al mar y acceso a la playa"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.1,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
     "geocoding_reference": "Playa El Cuco, Chirilagua, San Miguel, El Salvador",
@@ -21417,7 +21531,8 @@
     "tokens_out": 530,
     "cost_usd": 0.00085435,
     "finish_reason": "stop",
-    "latency_ms": 8784
+    "latency_ms": 8784,
+    "retrofit_at": "2026-05-08T21:14:24Z"
   },
   "bienesraices|1333": {
     "ts": "2026-05-08T14:50:19.832048+00:00",
@@ -21683,17 +21798,18 @@
         "es": "Habitaciones con aire acondicionado, TV por cable y WiFi"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Isla San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach",
     "url_language": "es",
     "tokens_in": 1188,
     "tokens_out": 654,
     "cost_usd": 0.00104016,
     "finish_reason": "stop",
-    "latency_ms": 9949
+    "latency_ms": 9949,
+    "retrofit_at": "2026-05-08T21:08:02Z"
   },
   "bienesraices|1313": {
     "ts": "2026-05-08T14:50:29.238107+00:00",
@@ -21775,17 +21891,18 @@
         "es": "Ubicación estratégica entre dos playas emblemáticas del oriente"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.1,
-    "geocoding_confidence": "medium",
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Punta de Peña, El Cuco, Chirilagua, San Miguel, El Salvador",
+    "geocoding_reference": "Playa El Cuco",
     "url_language": "es",
     "tokens_in": 1220,
     "tokens_out": 890,
     "cost_usd": 0.0013084,
     "finish_reason": "stop",
-    "latency_ms": 14507
+    "latency_ms": 14507,
+    "retrofit_at": "2026-05-08T21:17:39Z"
   },
   "bienesraices|1311": {
     "ts": "2026-05-08T14:50:30.329577+00:00",
@@ -21913,17 +22030,18 @@
         "es": "Financiamiento directo del propietario con 25% de prima y plazos flexibles"
       }
     ],
-    "lat": 13.3333,
-    "lng": -87.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Cocal, La Unión, El Salvador",
+    "geocoding_reference": "Playa El Cocal, La Unión Bay",
     "url_language": "es",
     "tokens_in": 1248,
     "tokens_out": 826,
     "cost_usd": 0.00124556,
     "finish_reason": "stop",
-    "latency_ms": 13855
+    "latency_ms": 13855,
+    "retrofit_at": "2026-05-08T21:12:21Z"
   },
   "bienesraices|1300": {
     "ts": "2026-05-08T14:50:34.153953+00:00",
@@ -21959,17 +22077,18 @@
         "es": "Incluye árboles frutales (zapote, mango, coco)"
       }
     ],
-    "lat": 13.45,
-    "lng": -89.28,
+    "lat": 13.4843,
+    "lng": -89.7163,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Cangrejera, La Libertad, El Salvador",
+    "geocoding_reference": "Bocana San Diego (nearest beach to Cangrejera)",
     "url_language": "es",
     "tokens_in": 1178,
     "tokens_out": 647,
     "cost_usd": 0.00102976,
     "finish_reason": "stop",
-    "latency_ms": 10627
+    "latency_ms": 10627,
+    "retrofit_at": "2026-05-08T21:06:29Z"
   },
   "bienesraices|1307": {
     "ts": "2026-05-08T14:50:34.825075+00:00",
@@ -22005,17 +22124,18 @@
         "es": "Se permiten mascotas en un condominio seguro"
       }
     ],
-    "lat": 13.4417,
-    "lng": -89.2797,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach, La Libertad",
     "url_language": "es",
     "tokens_in": 1277,
     "tokens_out": 729,
     "cost_usd": 0.00114669,
     "finish_reason": "stop",
-    "latency_ms": 12356
+    "latency_ms": 12356,
+    "retrofit_at": "2026-05-08T21:22:39Z"
   },
   "bienesraices|1299": {
     "ts": "2026-05-08T14:50:35.295735+00:00",
@@ -22051,17 +22171,18 @@
         "es": "Excelente inversión con potencial de plusvalía"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas",
     "url_language": "es",
     "tokens_in": 1061,
     "tokens_out": 634,
     "cost_usd": 0.00098387,
     "finish_reason": "stop",
-    "latency_ms": 10282
+    "latency_ms": 10282,
+    "retrofit_at": "2026-05-08T21:19:47Z"
   },
   "bienesraices|1298": {
     "ts": "2026-05-08T14:50:39.158479+00:00",
@@ -22097,17 +22218,18 @@
         "es": "Precio negociable de $290,000"
       }
     ],
-    "lat": 13.4667,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach",
     "url_language": "mixed",
     "tokens_in": 1156,
     "tokens_out": 645,
     "cost_usd": 0.00102162,
     "finish_reason": "stop",
-    "latency_ms": 9920
+    "latency_ms": 9920,
+    "retrofit_at": "2026-05-08T21:23:20Z"
   },
   "bienesraices|1286": {
     "ts": "2026-05-08T14:50:39.413635+00:00",
@@ -22143,17 +22265,18 @@
         "es": "Título claro y documentos legales"
       }
     ],
-    "lat": 13.3833,
-    "lng": -89.0667,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Las Hojas, San Pedro Masahuat, La Paz, El Salvador",
+    "geocoding_reference": "Playa Las Hojas (Costa del Sol area)",
     "url_language": "es",
     "tokens_in": 1067,
     "tokens_out": 582,
     "cost_usd": 0.00092829,
     "finish_reason": "stop",
-    "latency_ms": 9500
+    "latency_ms": 9500,
+    "retrofit_at": "2026-05-08T21:07:03Z"
   },
   "bienesraices|1284": {
     "ts": "2026-05-08T14:50:41.710014+00:00",
@@ -22277,17 +22400,18 @@
         "es": "Aire acondicionado en todos los espacios y finos acabados"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3333,
-    "geocoding_confidence": "medium",
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "El Zonte beach (Surf City area)",
     "url_language": "mixed",
     "tokens_in": 1009,
     "tokens_out": 614,
     "cost_usd": 0.00094783,
     "finish_reason": "stop",
-    "latency_ms": 9432
+    "latency_ms": 9432,
+    "retrofit_at": "2026-05-08T21:16:25Z"
   },
   "bienesraices|1279": {
     "ts": "2026-05-08T14:50:43.668603+00:00",
@@ -22323,17 +22447,18 @@
         "es": "Cerca del desarrollo Ocean Breeze"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3667,
-    "geocoding_confidence": "medium",
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Mizata Beach, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Mizata beach, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 992,
     "tokens_out": 572,
     "cost_usd": 0.00089704,
     "finish_reason": "stop",
-    "latency_ms": 9514
+    "latency_ms": 9514,
+    "retrofit_at": "2026-05-08T21:06:11Z"
   },
   "bienesraices|1275": {
     "ts": "2026-05-08T14:50:45.513107+00:00",
@@ -22461,17 +22586,18 @@
         "es": "Ideal para inversión o casa de vacaciones"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad",
     "url_language": "es",
     "tokens_in": 966,
     "tokens_out": 589,
     "cost_usd": 0.00090872,
     "finish_reason": "stop",
-    "latency_ms": 9003
+    "latency_ms": 9003,
+    "retrofit_at": "2026-05-08T21:20:52Z"
   },
   "bienesraices|1272": {
     "ts": "2026-05-08T14:50:51.008777+00:00",
@@ -22507,17 +22633,18 @@
         "es": "Perfecta para casa de vacaciones o inversión turística"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4575,
+    "lng": -89.3478,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa La Perla, La Libertad, El Salvador",
+    "geocoding_reference": "Playa La Perla, La Libertad",
     "url_language": "es",
     "tokens_in": 1185,
     "tokens_out": 782,
     "cost_usd": 0.00118015,
     "finish_reason": "stop",
-    "latency_ms": 11850
+    "latency_ms": 11850,
+    "retrofit_at": "2026-05-08T21:03:56Z"
   },
   "bienesraices|1265": {
     "ts": "2026-05-08T14:50:51.697004+00:00",
@@ -22645,17 +22772,18 @@
         "es": "Terrenos contiguos para desarrollo de mayor escala"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Espino",
     "url_language": "es",
     "tokens_in": 1158,
     "tokens_out": 690,
     "cost_usd": 0.00107166,
     "finish_reason": "stop",
-    "latency_ms": 11400
+    "latency_ms": 11400,
+    "retrofit_at": "2026-05-08T21:21:49Z"
   },
   "bienesraices|1256": {
     "ts": "2026-05-08T14:50:55.691166+00:00",
@@ -22825,17 +22953,18 @@
         "es": "Ideal para casa de playa o inversión"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.0333,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Punta Mango, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Cuco (nearest authoritative beach)",
     "url_language": "es",
     "tokens_in": 1052,
     "tokens_out": 569,
     "cost_usd": 0.00090994,
     "finish_reason": "stop",
-    "latency_ms": 9494
+    "latency_ms": 9494,
+    "retrofit_at": "2026-05-08T21:23:04Z"
   },
   "bienesraices|1244": {
     "ts": "2026-05-08T14:51:00.959105+00:00",
@@ -22917,17 +23046,18 @@
         "es": "Precio atractivo de $150,000"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.1333,
+    "lat": 13.1761,
+    "lng": -88.4836,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa Bongo (near Punta Mango, Las Tunas area)",
     "url_language": "es",
     "tokens_in": 986,
     "tokens_out": 597,
     "cost_usd": 0.00092292,
     "finish_reason": "stop",
-    "latency_ms": 9272
+    "latency_ms": 9272,
+    "retrofit_at": "2026-05-08T21:05:15Z"
   },
   "bienesraices|1242": {
     "ts": "2026-05-08T14:51:03.163259+00:00",
@@ -23005,17 +23135,18 @@
         "es": "Precio de $200,000 – una gran oportunidad de inversión"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.1,
+    "lat": 13.1761,
+    "lng": -88.4836,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Carrizal beach area, near Punta Mango, Intipucá, La Unión, El Salvador",
+    "geocoding_reference": "Playa El Carrizal (near Punta Mango)",
     "url_language": "es",
     "tokens_in": 1027,
     "tokens_out": 766,
     "cost_usd": 0.00111989,
     "finish_reason": "stop",
-    "latency_ms": 12680
+    "latency_ms": 12680,
+    "retrofit_at": "2026-05-08T21:08:28Z"
   },
   "bienesraices|1234": {
     "ts": "2026-05-08T14:51:06.366783+00:00",
@@ -23139,17 +23270,18 @@
         "es": "Gran potencial para desarrollo residencial o comercial"
       }
     ],
-    "lat": 13.2,
-    "lng": -88.2,
+    "lat": 13.1761,
+    "lng": -88.4836,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Punta Mango, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa Las Tunas (nearest named beach in table)",
     "url_language": "es",
     "tokens_in": 1010,
     "tokens_out": 592,
     "cost_usd": 0.0009239,
     "finish_reason": "stop",
-    "latency_ms": 9303
+    "latency_ms": 9303,
+    "retrofit_at": "2026-05-08T21:13:26Z"
   },
   "bienesraices|1229": {
     "ts": "2026-05-08T14:51:08.492413+00:00",
@@ -23503,17 +23635,18 @@
         "es": "Ideal para desarrollo de lujo o proyecto eco-turístico"
       }
     ],
-    "lat": 13.2803,
-    "lng": -88.8958,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "es",
     "tokens_in": 1078,
     "tokens_out": 656,
     "cost_usd": 0.00101266,
     "finish_reason": "stop",
-    "latency_ms": 10391
+    "latency_ms": 10391,
+    "retrofit_at": "2026-05-08T21:07:47Z"
   },
   "bienesraices|1178": {
     "ts": "2026-05-08T14:51:21.313589+00:00",
@@ -23917,17 +24050,18 @@
         "es": "Ideal para desarrollo residencial o comercial"
       }
     ],
-    "lat": 13.3833,
-    "lng": -89.0667,
+    "lat": 13.3372,
+    "lng": -88.9892,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Amatecampo, San Luis Talpa, La Paz, El Salvador",
+    "geocoding_reference": "Amatecampo, La Paz coast (Costa del Sol area)",
     "url_language": "es",
     "tokens_in": 1004,
     "tokens_out": 607,
     "cost_usd": 0.00093878,
     "finish_reason": "stop",
-    "latency_ms": 9613
+    "latency_ms": 9613,
+    "retrofit_at": "2026-05-08T21:20:38Z"
   },
   "bienesraices|1131": {
     "ts": "2026-05-08T14:51:32.298780+00:00",
@@ -24101,17 +24235,18 @@
         "es": "Precio de $300,000 al contado"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.58,
+    "lng": -89.77,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Metalio, Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Playa Metalío, Acajutla, Sonsonate",
     "url_language": "es",
     "tokens_in": 935,
     "tokens_out": 574,
     "cost_usd": 0.00088385,
     "finish_reason": "stop",
-    "latency_ms": 9030
+    "latency_ms": 9030,
+    "retrofit_at": "2026-05-08T21:22:21Z"
   },
   "bienesraices|1128": {
     "ts": "2026-05-08T14:51:35.269164+00:00",
@@ -24649,17 +24784,18 @@
         "es": "Ubicación privilegiada frente al mar en Playa El Espino"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Espino",
     "url_language": "es",
     "tokens_in": 1031,
     "tokens_out": 622,
     "cost_usd": 0.00096257,
     "finish_reason": "stop",
-    "latency_ms": 9995
+    "latency_ms": 9995,
+    "retrofit_at": "2026-05-08T21:21:15Z"
   },
   "bienesraices|1099": {
     "ts": "2026-05-08T14:51:51.900850+00:00",
@@ -24695,17 +24831,18 @@
         "es": "Cerca de las atracciones de La Libertad"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach",
     "url_language": "es",
     "tokens_in": 1248,
     "tokens_out": 587,
     "cost_usd": 0.00098266,
     "finish_reason": "stop",
-    "latency_ms": 9600
+    "latency_ms": 9600,
+    "retrofit_at": "2026-05-08T21:07:38Z"
   },
   "bienesraices|1071": {
     "ts": "2026-05-08T14:51:55.368059+00:00",
@@ -24833,17 +24970,18 @@
         "es": "Precio atractivo de $20.00 por v2"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.0833,
+    "lat": 13.3372,
+    "lng": -88.9892,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Amatecampo, San Luis Talpa, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol (nearest named beach in the area)",
     "url_language": "es",
     "tokens_in": 1056,
     "tokens_out": 575,
     "cost_usd": 0.00091762,
     "finish_reason": "stop",
-    "latency_ms": 9586
+    "latency_ms": 9586,
+    "retrofit_at": "2026-05-08T21:08:52Z"
   },
   "bienesraices|1073": {
     "ts": "2026-05-08T14:51:57.149056+00:00",
@@ -25017,17 +25155,18 @@
         "es": "Ideal para casa de playa o desarrollo comercial"
       }
     ],
-    "lat": 13.5,
-    "lng": -89.4,
+    "lat": 13.487,
+    "lng": -89.595,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Km 59, Shutia-Taquillo, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Taquillo (nearest named beach)",
     "url_language": "es",
     "tokens_in": 1087,
     "tokens_out": 679,
     "cost_usd": 0.00104039,
     "finish_reason": "stop",
-    "latency_ms": 10696
+    "latency_ms": 10696,
+    "retrofit_at": "2026-05-08T21:11:32Z"
   },
   "bienesraices|1067": {
     "ts": "2026-05-08T14:52:03.110500+00:00",
@@ -25155,17 +25294,18 @@
         "es": "Ideal para proyectos turísticos o residenciales"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.1333,
+    "lat": 13.1894,
+    "lng": -88.3858,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Punta Mango, Jucuaran, Usulutan",
+    "geocoding_reference": "Playa El Cuco (nearest named beach in table)",
     "url_language": "es",
     "tokens_in": 1109,
     "tokens_out": 586,
     "cost_usd": 0.00094403,
     "finish_reason": "stop",
-    "latency_ms": 9144
+    "latency_ms": 9144,
+    "retrofit_at": "2026-05-08T21:16:10Z"
   },
   "bienesraices|1062": {
     "ts": "2026-05-08T14:52:06.744468+00:00",
@@ -25201,17 +25341,18 @@
         "es": "Acceso a agua y factibilidad de energía eléctrica disponible"
       }
     ],
-    "lat": 13.2,
-    "lng": -87.7,
-    "geocoding_confidence": "medium",
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Maculis, El Tamarindo, Conchagua, La Unión",
+    "geocoding_reference": "Playa Maculis / El Tamarindo, Conchagua, La Unión",
     "url_language": "es",
     "tokens_in": 1104,
     "tokens_out": 675,
     "cost_usd": 0.00104058,
     "finish_reason": "stop",
-    "latency_ms": 10701
+    "latency_ms": 10701,
+    "retrofit_at": "2026-05-08T21:14:32Z"
   },
   "bienesraices|1059": {
     "ts": "2026-05-08T14:52:07.822945+00:00",
@@ -25247,17 +25388,18 @@
         "es": "Acceso directo a la playa con vistas impresionantes al océano"
       }
     ],
-    "lat": 13.1667,
-    "lng": -88.1,
-    "geocoding_confidence": "medium",
+    "lat": 13.175,
+    "lng": -88.225,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Cuco, near Bocana El Esterón, Intipucá, La Unión",
+    "geocoding_reference": "Playa El Icacal, near the mouth of El Esterón",
     "url_language": "es",
     "tokens_in": 1033,
     "tokens_out": 651,
     "cost_usd": 0.00099501,
     "finish_reason": "stop",
-    "latency_ms": 10417
+    "latency_ms": 10417,
+    "retrofit_at": "2026-05-08T21:03:30Z"
   },
   "bienesraices|1061": {
     "ts": "2026-05-08T14:52:07.874851+00:00",
@@ -25293,17 +25435,18 @@
         "es": "Ideal para desarrollo comercial o turístico"
       }
     ],
-    "lat": 13.3333,
-    "lng": -87.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Bahía de La Unión, Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "La Unión bay, Gulf of Fonseca",
     "url_language": "es",
     "tokens_in": 1146,
     "tokens_out": 658,
     "cost_usd": 0.00103322,
     "finish_reason": "stop",
-    "latency_ms": 10965
+    "latency_ms": 10965,
+    "retrofit_at": "2026-05-08T21:12:12Z"
   },
   "bienesraices|1044": {
     "ts": "2026-05-08T14:52:10.095892+00:00",
@@ -25339,8 +25482,8 @@
         "es": "Precio atractivo: $20 por vara²"
       }
     ],
-    "lat": 13.2833,
-    "lng": -88.5333,
+    "lat": 13.334,
+    "lng": -87.843,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
     "geocoding_reference": "Puerto El Triunfo, Usulután, El Salvador",
@@ -25349,7 +25492,8 @@
     "tokens_out": 738,
     "cost_usd": 0.00113013,
     "finish_reason": "stop",
-    "latency_ms": 11242
+    "latency_ms": 11242,
+    "retrofit_at": "2026-05-08T21:10:30Z"
   },
   "bienesraices|1032": {
     "ts": "2026-05-08T14:52:14.741963+00:00",
@@ -25385,17 +25529,18 @@
         "es": "Ideal para casa de playa o proyecto comercial"
       }
     ],
-    "lat": 13.3897,
-    "lng": -89.2736,
+    "lat": 13.53,
+    "lng": -89.7,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa Mizata, Teotepeque, La Libertad, El Salvador",
+    "geocoding_reference": "Playa Mizata, La Libertad, El Salvador",
     "url_language": "es",
     "tokens_in": 1204,
     "tokens_out": 653,
     "cost_usd": 0.00104338,
     "finish_reason": "stop",
-    "latency_ms": 10464
+    "latency_ms": 10464,
+    "retrofit_at": "2026-05-08T21:17:56Z"
   },
   "bienesraices|1042": {
     "ts": "2026-05-08T14:52:16.102089+00:00",
@@ -25477,17 +25622,18 @@
         "es": "Ubicación privilegiada cerca de olas para surf y actividades de ecoturismo"
       }
     ],
-    "lat": 13.7,
-    "lng": -89.95,
-    "geocoding_confidence": "medium",
+    "lat": 13.706,
+    "lng": -89.974,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Barra de Santiago, Jujutla, Ahuachapán, El Salvador",
+    "geocoding_reference": "Barra de Santiago beach",
     "url_language": "es",
     "tokens_in": 1338,
     "tokens_out": 794,
     "cost_usd": 0.00123466,
     "finish_reason": "stop",
-    "latency_ms": 13084
+    "latency_ms": 13084,
+    "retrofit_at": "2026-05-08T21:23:12Z"
   },
   "bienesraices|1015": {
     "ts": "2026-05-08T14:52:17.113526+00:00",
@@ -25569,17 +25715,18 @@
         "es": "Unidades de 1 a 4 habitaciones desde $232,807"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas",
     "url_language": "es",
     "tokens_in": 1243,
     "tokens_out": 737,
     "cost_usd": 0.00114631,
     "finish_reason": "stop",
-    "latency_ms": 11543
+    "latency_ms": 11543,
+    "retrofit_at": "2026-05-08T21:21:01Z"
   },
   "bienesraices|1020": {
     "ts": "2026-05-08T14:52:19.040874+00:00",
@@ -25615,17 +25762,18 @@
         "es": "Estacionamiento para 15–18 vehículos, cerca de El Tunco y El Encuentro"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa San Blas, La Libertad, El Salvador",
+    "geocoding_reference": "Playa San Blas, La Libertad",
     "url_language": "es",
     "tokens_in": 1227,
     "tokens_out": 784,
     "cost_usd": 0.00119369,
     "finish_reason": "stop",
-    "latency_ms": 12747
+    "latency_ms": 12747,
+    "retrofit_at": "2026-05-08T21:16:02Z"
   },
   "bienesraices|1018": {
     "ts": "2026-05-08T14:52:21.525703+00:00",
@@ -25657,17 +25805,18 @@
         "es": "Régimen de condominio con áreas verdes y seguridad"
       }
     ],
-    "lat": 13.5,
-    "lng": -89.4,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Sunzal, Tamanique, La Libertad, El Salvador",
+    "geocoding_reference": "El Sunzal beach, La Libertad, El Salvador",
     "url_language": "mixed",
     "tokens_in": 1243,
     "tokens_out": 847,
     "cost_usd": 0.00126731,
     "finish_reason": "stop",
-    "latency_ms": 13702
+    "latency_ms": 13702,
+    "retrofit_at": "2026-05-08T21:13:34Z"
   },
   "bienesraices|1014": {
     "ts": "2026-05-08T14:52:22.842624+00:00",
@@ -25883,17 +26032,18 @@
         "es": "Lotes desde $155,925 USD"
       }
     ],
-    "lat": 13.3167,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "mixed",
     "tokens_in": 1297,
     "tokens_out": 683,
     "cost_usd": 0.00110149,
     "finish_reason": "stop",
-    "latency_ms": 11465
+    "latency_ms": 11465,
+    "retrofit_at": "2026-05-08T21:25:15Z"
   },
   "bienesraices|1007": {
     "ts": "2026-05-08T14:52:29.105742+00:00",
@@ -25929,17 +26079,18 @@
         "es": "Precio fijo de $350,000 – inversión inteligente"
       }
     ],
-    "lat": 13.6767,
-    "lng": -89.2797,
-    "geocoding_confidence": "medium",
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "geocoding_reference": "San Blas beach, La Libertad",
     "url_language": "es",
     "tokens_in": 1193,
     "tokens_out": 840,
     "cost_usd": 0.00124611,
     "finish_reason": "stop",
-    "latency_ms": 12910
+    "latency_ms": 12910,
+    "retrofit_at": "2026-05-08T21:26:10Z"
   },
   "remax|003094333002": {
     "ts": "2026-05-08T14:52:30.065984+00:00",
@@ -26293,17 +26444,18 @@
         "es": "Excelente inversión con potencial de valorización"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Conchalío Beach, La Libertad, El Salvador",
+    "geocoding_reference": "Conchalío Beach, near Puerto de La Libertad",
     "url_language": "en",
     "tokens_in": 1045,
     "tokens_out": 644,
     "cost_usd": 0.00099055,
     "finish_reason": "stop",
-    "latency_ms": 11097
+    "latency_ms": 11097,
+    "retrofit_at": "2026-05-08T21:13:43Z"
   },
   "remax|001461165132": {
     "ts": "2026-05-08T14:52:39.535277+00:00",
@@ -27439,17 +27591,18 @@
         "es": "Ideal para proyectos turísticos y de inversión"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol Beach, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 933,
     "tokens_out": 591,
     "cost_usd": 0.00090201,
     "finish_reason": "stop",
-    "latency_ms": 10018
+    "latency_ms": 10018,
+    "retrofit_at": "2026-05-08T21:09:55Z"
   },
   "remax|001463592024": {
     "ts": "2026-05-08T14:53:16.014009+00:00",
@@ -28811,17 +28964,18 @@
         "es": "A pasos del océano con brisa marina y naturaleza"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.8,
+    "lat": 13.541,
+    "lng": -89.805,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Los Cobanos Beach, Sonsonate, El Salvador",
+    "geocoding_reference": "Los Cóbanos Beach, Sonsonate, El Salvador",
     "url_language": "en",
     "tokens_in": 1015,
     "tokens_out": 601,
     "cost_usd": 0.00093515,
     "finish_reason": "stop",
-    "latency_ms": 9688
+    "latency_ms": 9688,
+    "retrofit_at": "2026-05-08T21:20:09Z"
   },
   "remax|001462656029": {
     "ts": "2026-05-08T14:53:52.171348+00:00",
@@ -29221,17 +29375,18 @@
         "es": "Ideal para resorts de lujo, residencias y ecoturismo"
       }
     ],
-    "lat": 13.3,
-    "lng": -87.85,
+    "lat": 13.1733,
+    "lng": -87.9589,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Conchagua, La Unión, El Salvador",
+    "geocoding_reference": "Conchagua, La Unión, Gulf of Fonseca",
     "url_language": "en",
     "tokens_in": 999,
     "tokens_out": 728,
     "cost_usd": 0.00107053,
     "finish_reason": "stop",
-    "latency_ms": 11651
+    "latency_ms": 11651,
+    "retrofit_at": "2026-05-08T21:05:00Z"
   },
   "remax|002284078027": {
     "ts": "2026-05-08T14:54:03.381923+00:00",
@@ -29359,17 +29514,18 @@
         "es": "Ideal para desarrollo o inversión"
       }
     ],
-    "lat": 13.3372,
-    "lng": -87.8408,
+    "lat": 13.334,
+    "lng": -87.843,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Cocal beach, La Union, El Salvador",
+    "geocoding_reference": "Playa El Cocal, La Union Bay",
     "url_language": "en",
     "tokens_in": 1003,
     "tokens_out": 581,
     "cost_usd": 0.00090991,
     "finish_reason": "stop",
-    "latency_ms": 9495
+    "latency_ms": 9495,
+    "retrofit_at": "2026-05-08T21:11:00Z"
   },
   "remax|003094257013": {
     "ts": "2026-05-08T14:54:05.681462+00:00",
@@ -30501,17 +30657,18 @@
         "es": "Fácil acceso a la Carretera El Litoral y San Salvador"
       }
     ],
-    "lat": 13.488,
-    "lng": -89.366,
-    "geocoding_confidence": "medium",
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Río Grande 2, Tamanique, La Libertad, near Acantilados Hotel",
+    "geocoding_reference": "El Tunco Beach (5-minute walk)",
     "url_language": "en",
     "tokens_in": 1206,
     "tokens_out": 775,
     "cost_usd": 0.00117812,
     "finish_reason": "stop",
-    "latency_ms": 12912
+    "latency_ms": 12912,
+    "retrofit_at": "2026-05-08T21:14:41Z"
   },
   "remax|002472129076": {
     "ts": "2026-05-08T14:54:44.337853+00:00",
@@ -30685,17 +30842,18 @@
         "es": "Alto potencial de plusvalía en ubicación costera privilegiada"
       }
     ],
-    "lat": 13.5333,
-    "lng": -89.8167,
+    "lat": 13.5928,
+    "lng": -89.8275,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla, Sonsonate",
     "url_language": "en",
     "tokens_in": 1182,
     "tokens_out": 722,
     "cost_usd": 0.00111334,
     "finish_reason": "stop",
-    "latency_ms": 11709
+    "latency_ms": 11709,
+    "retrofit_at": "2026-05-08T21:13:11Z"
   },
   "remax|003063958002": {
     "ts": "2026-05-08T14:54:49.237990+00:00",
@@ -31639,17 +31797,18 @@
         "es": "Régimen de condominio seguro que garantiza privacidad y valor"
       }
     ],
-    "lat": 13.2833,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 638,
     "cost_usd": 0.00099556,
     "finish_reason": "stop",
-    "latency_ms": 10890
+    "latency_ms": 10890,
+    "retrofit_at": "2026-05-08T21:26:18Z"
   },
   "remax|002522430073": {
     "ts": "2026-05-08T14:55:17.296238+00:00",
@@ -31685,17 +31844,18 @@
         "es": "Régimen de condominio garantiza privacidad y plusvalía"
       }
     ],
-    "lat": 13.2833,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach, El Salvador",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 628,
     "cost_usd": 0.00098456,
     "finish_reason": "stop",
-    "latency_ms": 10216
+    "latency_ms": 10216,
+    "retrofit_at": "2026-05-08T21:26:00Z"
   },
   "remax|002522430071": {
     "ts": "2026-05-08T14:55:18.675531+00:00",
@@ -31731,17 +31891,18 @@
         "es": "Ubicación privilegiada en la creciente Costa del Sol"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 625,
     "cost_usd": 0.00098126,
     "finish_reason": "stop",
-    "latency_ms": 10392
+    "latency_ms": 10392,
+    "retrofit_at": "2026-05-08T21:24:48Z"
   },
   "remax|002522430072": {
     "ts": "2026-05-08T14:55:19.130584+00:00",
@@ -31777,17 +31938,18 @@
         "es": "Ubicación privilegiada en la creciente Costa del Sol"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 683,
     "cost_usd": 0.00104506,
     "finish_reason": "stop",
-    "latency_ms": 11485
+    "latency_ms": 11485,
+    "retrofit_at": "2026-05-08T21:25:31Z"
   },
   "remax|002522430068": {
     "ts": "2026-05-08T14:55:23.964363+00:00",
@@ -31823,17 +31985,18 @@
         "es": "Ubicación privilegiada en la creciente Costa del Sol"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 628,
     "cost_usd": 0.00098456,
     "finish_reason": "stop",
-    "latency_ms": 10658
+    "latency_ms": 10658,
+    "retrofit_at": "2026-05-08T21:23:43Z"
   },
   "remax|002522430070": {
     "ts": "2026-05-08T14:55:25.323452+00:00",
@@ -31869,17 +32032,18 @@
         "es": "Zona costera en crecimiento con alto potencial de inversión"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 729,
     "cost_usd": 0.00109566,
     "finish_reason": "stop",
-    "latency_ms": 12389
+    "latency_ms": 12389,
+    "retrofit_at": "2026-05-08T21:24:24Z"
   },
   "remax|002522430069": {
     "ts": "2026-05-08T14:55:25.565703+00:00",
@@ -31915,17 +32079,18 @@
         "es": "Ubicación privilegiada en Costa del Sol, zona costera de rápido crecimiento"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 754,
     "cost_usd": 0.00112316,
     "finish_reason": "stop",
-    "latency_ms": 12578
+    "latency_ms": 12578,
+    "retrofit_at": "2026-05-08T21:24:07Z"
   },
   "remax|003093245039": {
     "ts": "2026-05-08T14:55:26.637405+00:00",
@@ -31961,17 +32126,18 @@
         "es": "Financiamiento del 80% al 7% anual para locales y extranjeros"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.4167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Palmarcito, La Libertad, El Salvador",
+    "geocoding_reference": "Playa El Palmarcito (El Sunzal area)",
     "url_language": "es",
     "tokens_in": 1193,
     "tokens_out": 777,
     "cost_usd": 0.00117681,
     "finish_reason": "stop",
-    "latency_ms": 12835
+    "latency_ms": 12835,
+    "retrofit_at": "2026-05-08T21:09:10Z"
   },
   "remax|002522430067": {
     "ts": "2026-05-08T14:55:27.126588+00:00",
@@ -32007,17 +32173,18 @@
         "es": "Lotes de 368 varas cuadradas ideales para residencias playeras"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 726,
     "cost_usd": 0.00109236,
     "finish_reason": "stop",
-    "latency_ms": 11265
+    "latency_ms": 11265,
+    "retrofit_at": "2026-05-08T21:23:36Z"
   },
   "remax|002522430066": {
     "ts": "2026-05-08T14:55:28.099616+00:00",
@@ -32053,17 +32220,18 @@
         "es": "Ubicación privilegiada en la creciente Costa del Sol"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 687,
     "cost_usd": 0.00104946,
     "finish_reason": "stop",
-    "latency_ms": 10803
+    "latency_ms": 10803,
+    "retrofit_at": "2026-05-08T21:22:57Z"
   },
   "remax|002522430064": {
     "ts": "2026-05-08T14:55:30.703764+00:00",
@@ -32099,17 +32267,18 @@
         "es": "Lotes de 368 varas cuadradas (~257 m²) ideales para casas playeras"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9333,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 763,
     "cost_usd": 0.00113306,
     "finish_reason": "stop",
-    "latency_ms": 11573
+    "latency_ms": 11573,
+    "retrofit_at": "2026-05-08T21:21:32Z"
   },
   "remax|002522430065": {
     "ts": "2026-05-08T14:55:31.035770+00:00",
@@ -32145,17 +32314,18 @@
         "es": "Régimen de condominio garantiza privacidad y plusvalía a largo plazo"
       }
     ],
-    "lat": 13.3475,
-    "lng": -88.9833,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 739,
     "cost_usd": 0.00110666,
     "finish_reason": "stop",
-    "latency_ms": 12360
+    "latency_ms": 12360,
+    "retrofit_at": "2026-05-08T21:22:13Z"
   },
   "remax|002522430063": {
     "ts": "2026-05-08T14:55:35.601127+00:00",
@@ -32191,17 +32361,18 @@
         "es": "Ideal para disfrute personal o inversión a largo plazo"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.95,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Costa del Sol, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach, El Salvador",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 693,
     "cost_usd": 0.00105606,
     "finish_reason": "stop",
-    "latency_ms": 11636
+    "latency_ms": 11636,
+    "retrofit_at": "2026-05-08T21:20:46Z"
   },
   "remax|002522430062": {
     "ts": "2026-05-08T14:55:36.061153+00:00",
@@ -32237,17 +32408,18 @@
         "es": "Ideal para disfrute personal e inversión a largo plazo"
       }
     ],
-    "lat": 13.322,
-    "lng": -88.928,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 650,
     "cost_usd": 0.00100876,
     "finish_reason": "stop",
-    "latency_ms": 10737
+    "latency_ms": 10737,
+    "retrofit_at": "2026-05-08T21:19:54Z"
   },
   "remax|002874232010": {
     "ts": "2026-05-08T14:55:36.245524+00:00",
@@ -32329,17 +32501,18 @@
         "es": "Ubicación privilegiada en Costa del Sol, zona costera en crecimiento"
       }
     ],
-    "lat": 13.318,
-    "lng": -88.978,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Boulevard Costa del Sol, Km 75.7, Cantón El Zapote, San Luis La Herradura, La Paz",
+    "geocoding_reference": "Costa del Sol beach, La Paz, El Salvador",
     "url_language": "en",
     "tokens_in": 1088,
     "tokens_out": 740,
     "cost_usd": 0.00110776,
     "finish_reason": "stop",
-    "latency_ms": 11456
+    "latency_ms": 11456,
+    "retrofit_at": "2026-05-08T21:19:31Z"
   },
   "remax|002874232009": {
     "ts": "2026-05-08T14:55:38.058434+00:00",
@@ -33513,17 +33686,18 @@
         "es": "Crecientes desarrollos residenciales y de ecoturismo cercanos"
       }
     ],
-    "lat": 13.25,
-    "lng": -88.55,
-    "geocoding_confidence": "medium",
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Isla Madresal, Jiquilisco Bay, Usulután, El Salvador",
+    "geocoding_reference": "Bahía de Jiquilisco",
     "url_language": "en",
     "tokens_in": 1066,
     "tokens_out": 745,
     "cost_usd": 0.00110732,
     "finish_reason": "stop",
-    "latency_ms": 12434
+    "latency_ms": 12434,
+    "retrofit_at": "2026-05-08T21:19:02Z"
   },
   "remax|003113915005": {
     "ts": "2026-05-08T14:56:14.112063+00:00",
@@ -34245,17 +34419,18 @@
         "es": "Área urbanizada con infraestructura lista"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
+    "lat": 13.4869,
+    "lng": -89.3217,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Mirador complex, La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad",
     "url_language": "en",
     "tokens_in": 920,
     "tokens_out": 582,
     "cost_usd": 0.0008886,
     "finish_reason": "stop",
-    "latency_ms": 9473
+    "latency_ms": 9473,
+    "retrofit_at": "2026-05-08T21:20:15Z"
   },
   "remax|001461165120": {
     "ts": "2026-05-08T14:56:36.418114+00:00",
@@ -35663,17 +35838,18 @@
         "es": "Precio competitivo por dos lotes: $175,000"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Jiboa Country Club, Costa del Sol, El Salvador",
+    "geocoding_reference": "Costa del Sol",
     "url_language": "en",
     "tokens_in": 1121,
     "tokens_out": 829,
     "cost_usd": 0.00121457,
     "finish_reason": "stop",
-    "latency_ms": 13822
+    "latency_ms": 13822,
+    "retrofit_at": "2026-05-08T21:21:25Z"
   },
   "remax|003093966002": {
     "ts": "2026-05-08T14:57:20.766720+00:00",
@@ -35755,17 +35931,18 @@
         "es": "Acceso a canchas deportivas, piscinas y restaurante frente al mar"
       }
     ],
-    "lat": 13.3333,
-    "lng": -88.9167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Jiboa Country Club, Costa del Sol, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1121,
     "tokens_out": 766,
     "cost_usd": 0.00114527,
     "finish_reason": "stop",
-    "latency_ms": 12605
+    "latency_ms": 12605,
+    "retrofit_at": "2026-05-08T21:21:57Z"
   },
   "remax|002284078010": {
     "ts": "2026-05-08T14:57:25.060513+00:00",
@@ -36441,17 +36618,18 @@
         "es": "Lotes rectangulares desde 200 m²"
       }
     ],
-    "lat": 13.4167,
-    "lng": -89.2833,
+    "lat": 13.4843,
+    "lng": -89.7163,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "San Diego beach, La Libertad",
     "url_language": "en",
     "tokens_in": 1135,
     "tokens_out": 650,
     "cost_usd": 0.00102145,
     "finish_reason": "stop",
-    "latency_ms": 10913
+    "latency_ms": 10913,
+    "retrofit_at": "2026-05-08T21:09:25Z"
   },
   "remax|002873194024": {
     "ts": "2026-05-08T14:57:43.608503+00:00",
@@ -36533,17 +36711,18 @@
         "es": "Solo 30 minutos del aeropuerto"
       }
     ],
-    "lat": 13.4333,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "Bocana San Diego beach",
     "url_language": "en",
     "tokens_in": 1135,
     "tokens_out": 607,
     "cost_usd": 0.00097415,
     "finish_reason": "stop",
-    "latency_ms": 10958
+    "latency_ms": 10958,
+    "retrofit_at": "2026-05-08T21:09:33Z"
   },
   "remax|002522781094": {
     "ts": "2026-05-08T14:57:44.289576+00:00",
@@ -36763,17 +36942,18 @@
         "es": "Ideal para proyectos residenciales, de resort o comerciales"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután",
     "url_language": "en",
     "tokens_in": 1038,
     "tokens_out": 669,
     "cost_usd": 0.00101616,
     "finish_reason": "stop",
-    "latency_ms": 11197
+    "latency_ms": 11197,
+    "retrofit_at": "2026-05-08T21:13:19Z"
   },
   "remax|002682423180": {
     "ts": "2026-05-08T14:57:53.062084+00:00",
@@ -37357,17 +37537,18 @@
         "es": "Servicios disponibles: acceso a electricidad y agua"
       }
     ],
-    "lat": 13.1833,
-    "lng": -88.4667,
-    "geocoding_confidence": "medium",
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Espino Beach, Jucuarán, Usulután, El Salvador",
+    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután",
     "url_language": "en",
     "tokens_in": 1094,
     "tokens_out": 706,
     "cost_usd": 0.00107198,
     "finish_reason": "stop",
-    "latency_ms": 11009
+    "latency_ms": 11009,
+    "retrofit_at": "2026-05-08T21:10:03Z"
   },
   "remax|002474020009": {
     "ts": "2026-05-08T14:58:10.743026+00:00",
@@ -37675,17 +37856,18 @@
         "es": "Precio negociable de $150,000"
       }
     ],
-    "lat": 13.3333,
-    "lng": -89.2833,
+    "lat": 13.3372,
+    "lng": -88.9892,
     "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Playa El Amatal, La Libertad, El Salvador",
+    "geocoding_reference": "Playa El Amatal (Costa del Sol area)",
     "url_language": "es",
     "tokens_in": 1228,
     "tokens_out": 588,
     "cost_usd": 0.00097836,
     "finish_reason": "stop",
-    "latency_ms": 10142
+    "latency_ms": 10142,
+    "retrofit_at": "2026-05-08T21:04:35Z"
   },
   "remax|002282621034": {
     "ts": "2026-05-08T14:58:18.640406+00:00",
@@ -38729,17 +38911,18 @@
         "es": "Zona de alta demanda turística con fácil acceso y servicios"
       }
     ],
-    "lat": 13.5833,
-    "lng": -89.8333,
-    "geocoding_confidence": "medium",
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Acajutla, Sonsonate, El Salvador",
+    "geocoding_reference": "Acajutla beach",
     "url_language": "mixed",
     "tokens_in": 1160,
     "tokens_out": 691,
     "cost_usd": 0.0010733,
     "finish_reason": "stop",
-    "latency_ms": 11106
+    "latency_ms": 11106,
+    "retrofit_at": "2026-05-08T21:11:08Z"
   },
   "remax|002472155033": {
     "ts": "2026-05-08T14:58:48.768838+00:00",
@@ -39465,17 +39648,18 @@
         "es": "30 minutos del aeropuerto"
       }
     ],
-    "lat": 13.4333,
-    "lng": -89.2833,
-    "geocoding_confidence": "medium",
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Diego, La Libertad, El Salvador",
+    "geocoding_reference": "Bocana San Diego, La Libertad",
     "url_language": "en",
     "tokens_in": 1135,
     "tokens_out": 609,
     "cost_usd": 0.00097635,
     "finish_reason": "stop",
-    "latency_ms": 10790
+    "latency_ms": 10790,
+    "retrofit_at": "2026-05-08T21:14:48Z"
   },
   "remax|002682423122": {
     "ts": "2026-05-08T14:59:11.596279+00:00",
@@ -39879,17 +40063,18 @@
         "es": "Piscina y áreas de comedor únicas"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
+    "lat": 13.4882,
+    "lng": -89.3211,
     "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "Punta Roca Beach, La Libertad, El Salvador",
+    "geocoding_reference": "Punta Roca beach",
     "url_language": "en",
     "tokens_in": 962,
     "tokens_out": 573,
     "cost_usd": 0.00089004,
     "finish_reason": "stop",
-    "latency_ms": 9874
+    "latency_ms": 9874,
+    "retrofit_at": "2026-05-08T21:25:52Z"
   },
   "remax|002473227001": {
     "ts": "2026-05-08T14:59:23.203588+00:00",
@@ -40059,17 +40244,18 @@
         "es": "Área de entretenimiento al aire libre con BBQ y cocina exterior"
       }
     ],
-    "lat": 13.2833,
-    "lng": -89.0167,
-    "geocoding_confidence": "medium",
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "San Luis La Herradura, La Paz, El Salvador",
+    "geocoding_reference": "Costa del Sol beach",
     "url_language": "en",
     "tokens_in": 1175,
     "tokens_out": 912,
     "cost_usd": 0.00132045,
     "finish_reason": "stop",
-    "latency_ms": 14538
+    "latency_ms": 14538,
+    "retrofit_at": "2026-05-08T21:08:21Z"
   },
   "remax|001461331186": {
     "ts": "2026-05-08T14:59:29.737597+00:00",
@@ -40151,17 +40337,18 @@
         "es": "Listo para mudarse con diseño de bajo mantenimiento"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "medium",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
     "geocoding_source": "estimated",
-    "geocoding_reference": "La Libertad, El Salvador",
+    "geocoding_reference": "Puerto de La Libertad",
     "url_language": "en",
     "tokens_in": 1180,
     "tokens_out": 733,
     "cost_usd": 0.0011249,
     "finish_reason": "stop",
-    "latency_ms": 12600
+    "latency_ms": 12600,
+    "retrofit_at": "2026-05-08T21:01:46Z"
   },
   "remax|002521693073": {
     "ts": "2026-05-08T14:59:32.172288+00:00",
@@ -40565,17 +40752,18 @@
         "es": "A solo 30 minutos de San Salvador"
       }
     ],
-    "lat": 13.4833,
-    "lng": -89.3167,
-    "geocoding_confidence": "high",
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
     "geocoding_source": "estimated",
-    "geocoding_reference": "El Encuentro, La Libertad, El Salvador",
+    "geocoding_reference": "El Encuentro La Libertad shopping center, La Libertad",
     "url_language": "en",
     "tokens_in": 1245,
     "tokens_out": 870,
     "cost_usd": 0.00129315,
     "finish_reason": "stop",
-    "latency_ms": 14692
+    "latency_ms": 14692,
+    "retrofit_at": "2026-05-08T21:01:56Z"
   },
   "nexo|6_25": {
     "ts": "2026-05-08T14:59:41.988875+00:00",
