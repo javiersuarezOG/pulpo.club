@@ -367,12 +367,25 @@ function Hero({ app }) {
     <section className="hero">
       {bgLayers.map((l, i) => {
         const isCurrent = i === bgLayers.length - 1;
+        // The Hero photo is the LCP element on Discover landing.
+        // Without explicit priority hints it defaults to `auto` and
+        // loses the priority race to the 3 eager card photos in shelf
+        // 0 (which declare `fetchpriority="high"`). Mark only the
+        // *current* layer high — the outgoing crossfade layer can
+        // ride at default priority because it's already loaded.
+        // `decoding="sync"` on the LCP image asks the browser to
+        // block paint until decode rather than running a follow-up
+        // paint pass — slightly later first-byte but a single,
+        // sharper LCP frame.
         return (
           <img
             key={l.id}
             className={`hero-bg ${isCurrent ? "is-current" : "is-prev"}`}
             src={l.src}
             alt=""
+            loading="eager"
+            fetchpriority={isCurrent ? "high" : "auto"}
+            decoding={isCurrent ? "sync" : "async"}
           />
         );
       })}
@@ -429,7 +442,13 @@ function Shelf({ shelf, app, locked = false, layout = "standard", expanded = fal
     LISTINGS.filter(l => !l.is_sold).filter(shelf.filter),
     [shelf, LISTINGS]
   );
-  const items = expanded ? allItems : allItems.slice(0, 12);
+  // Was 12 — but only ~4 cards are visible per rail above the fold,
+  // so a 12-card budget × 15 shelves was mounting 180 ListingCards
+  // (and 180 <img> placeholders) on Discover landing. 6 covers the
+  // visible rail + a one-step horizontal scroll without the React
+  // commit overhead of 180 cards. The "see all" CTA still expands
+  // to the full result set when the user wants more.
+  const items = expanded ? allItems : allItems.slice(0, 6);
   if (allItems.length < 6 && !locked) return null;
   const scrollBy = (dir) => {
     const el = scrollRef.current;
