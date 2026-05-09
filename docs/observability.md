@@ -131,13 +131,16 @@ Source of truth: [`web/app/telemetry/events.ts`](../web/app/telemetry/events.ts)
 | Event | Payload | Fires from |
 |---|---|---|
 | `web_vitals.lcp` / `.inp` / `.cls` / `.ttfb` | `{ value, rating, route }` | [`web-vitals.ts`](../web/app/telemetry/web-vitals.ts), booted in `app.jsx` |
+| `web_vitals.lcp.attribution` | `{ element_tag, element_class?, url?, ms }` | Same emit site as `web_vitals.lcp`, paired so we can tell *which* DOM element won the LCP race. Imports from `web-vitals/attribution`. When the LCP element is an image, `url` is the resource URL — invaluable for diagnosing whether the Hero, a card photo, or hero text is the bottleneck. |
 
 ### App-specific perf
 
 | Event | Payload | Fires from |
 |---|---|---|
 | `card.photo_nav_latency` | `{ listing_id, from_idx, to_idx, ms }` | Card photo arrow click |
-| `perf.card_image_load` | `{ listing_id, idx, ms, source }` | Eager card image (above-the-fold on Browse / Discover / Saved). Fires on `<img onLoad>` for cards rendered with `priority`. Lazy cards do not emit — their fetch is intersection-deferred and would mostly measure idle scroll time. |
+| `perf.card_image_load` | `{ listing_id, idx, ms, source }` | Eager card image (above-the-fold on Browse / Discover / Saved). Fires on `<img onLoad>` for cards rendered with `priority`. Lazy cards emit `perf.card_image_lazy_load` instead. |
+| `perf.card_image_lazy_load` | `{ listing_id, idx, ms, source }` | Non-eager (lazy) card image. Stamped via `IntersectionObserver` on viewport entry, ended on `<img onLoad>`. `ms === 0` means native lazy-loading prefetched the bytes before the card became visible (optimal). |
+| `perf.asset_load` | `{ kind: "entry"\|"chunk"\|"css"\|"webp", url, ms, bytes, cache: "hit"\|"miss"\|"unknown" }` | [`asset-load.ts`](../web/app/telemetry/asset-load.ts) — `PerformanceObserver(type="resource")` over `/preview/assets/*` (and `/assets/*`). Tells us whether the Vite-built bundle/css/category-WebP chain is hitting browser cache on return visits. Use this to confirm the cache-control config landed end-to-end. |
 | `perf.data_fetch` | `{ file, ms, bytes, cache }` | `useListings` data fetch |
 | `perf.filter_recompute` | `{ ms, result_count, active_filters }` | Browse filter pipeline |
 | `perf.detail_open` | `{ listing_id, ms }` | Card click → detail render |
