@@ -273,4 +273,41 @@ test.describe("New app boots cleanly on key routes", () => {
     await expect.poll(() => postSeen, { timeout: 3_000 }).toBe(true);
     expect(postBody).toBeDefined();
   });
+
+  // Cache-control regression guard.
+  //
+  // Five PRs in a row tried to fix "slow Discover photos" without
+  // catching the underlying cause: every Vite-built bundle was being
+  // served with `cache-control: max-age=0, must-revalidate`. Browsers
+  // were paying a conditional-GET round-trip on every page load for
+  // the entry JS, CSS, and category WebPs. PR-2 of the perf plan
+  // content-hashes the filenames + sets `Cache-Control: max-age=
+  // 31536000, immutable` via vercel.json — but only Vercel applies
+  // that header in production. We can still smoke-test the *intent*
+  // by reading the built HTML at web/dist/index.html and asserting
+  // its bundle reference carries a content hash. If anyone reverts
+  // vite.config.js to pinned filenames the immutable cache becomes
+  // unsafe (year-long cache + no hash = users stuck on stale code) —
+  // this test fails before that ships.
+  test("Vite-built bundle filename carries a content hash (immutable-cache contract)", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const distHtml = path.resolve(process.cwd(), "web/dist/index.html");
+    if (!fs.existsSync(distHtml)) {
+      // Local dev runs without `npm run build`; skip rather than fail.
+      // CI's build job emits dist before tests run.
+      test.skip(!fs.existsSync(distHtml), "web/dist/index.html absent — run `npm run build` first");
+      return;
+    }
+    const html = fs.readFileSync(distHtml, "utf8");
+    const scriptMatch = html.match(/<script[^>]+src=["']([^"']*\/assets\/[^"']+\.js)["']/);
+    expect(scriptMatch, "built HTML should reference an /assets/...js bundle").toBeTruthy();
+    const src = scriptMatch![1];
+    // Hash format: "name-AbCd1234.js" (alphanumerics, ≥6 chars). If
+    // someone reverts to pinned filenames the cache-control will
+    // become unsafe — fail the build before it can ship.
+    expect(src, `bundle filename should carry a content hash; got "${src}"`).toMatch(
+      /\/assets\/[A-Za-z][A-Za-z0-9_-]*-[A-Za-z0-9]{6,}\.js$/,
+    );
+  });
 });
