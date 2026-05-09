@@ -2045,19 +2045,36 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 
 /* ============== Account area (A.3) ============== */
-.page-account { padding: 32px 24px 80px; }
+/* Overflow-safety cascade — every grid/flex container in this section
+ * gets `min-width: 0`. CSS Grid's `1fr` columns default to
+ * `minmax(auto, 1fr)`, where the `auto` minimum lets content force the
+ * track wider than viewport — long emails, Stripe IDs, or unbroken URLs
+ * pushed past 320px and the page scrolled horizontally on mobile. The
+ * `min-width: 0` overrides the auto-min so inner `width: 100%` inputs
+ * don't escape. Long-string fields also get `overflow-wrap: anywhere`
+ * so the strings themselves can break mid-character. The `.page-account
+ * { overflow-x: clip }` is the last-line safety net (preserves topnav
+ * `position: sticky`); when the responsive smoke test fires the
+ * diagnostic is "we missed a min-width somewhere," not "this is working
+ * as intended." Guardrail: tests/e2e/responsive-smoke.spec.ts. */
+.page-account {
+  padding: 32px 24px 80px;
+  overflow-x: clip;
+}
 .account-layout {
   max-width: 1080px; margin: 0 auto;
   display: grid; grid-template-columns: 220px 1fr;
   gap: 48px;
+  min-width: 0;
 }
+.account-layout > * { min-width: 0; }
 
 @media (max-width: 767px) {
   .account-layout { grid-template-columns: 1fr; gap: 24px; }
   .page-account { padding: 16px 16px 80px; }
 }
 
-.account-nav { position: sticky; top: 88px; align-self: start; }
+.account-nav { position: sticky; top: 88px; align-self: start; min-width: 0; }
 
 @media (max-width: 767px) { .account-nav { position: static; } }
 .account-nav-title {
@@ -2101,12 +2118,13 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 32px;
+  min-width: 0;
 }
 
 @media (max-width: 767px) {
   .account-content { padding: 20px; border-radius: 12px; }
 }
-.account-section { display: flex; flex-direction: column; gap: 20px; }
+.account-section { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .account-subhead {
   font-family: var(--font-display);
   font-size: 22px; font-weight: 400; letter-spacing: -0.01em;
@@ -2129,7 +2147,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .field-label { font-size: 13px; font-weight: 500; color: var(--ink-2); padding-top: 10px; }
 
 @media (max-width: 600px) { .field-label { padding-top: 0; } }
-.field-control { display: flex; flex-direction: column; gap: 6px; }
+.field-control { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .field-control input, .field-control select {
   width: 100%;
   padding: 10px 12px;
@@ -2142,7 +2160,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .field-control input:focus, .field-control select:focus {
   outline: 2px solid var(--accent); outline-offset: 1px;
 }
-.field-hint { font-size: 12px; color: var(--ink-3); }
+.field-hint { font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
 
 .profile-photo-row {
   display: flex; align-items: center; gap: 16px;
@@ -2188,7 +2206,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .pref-row:last-child { border-bottom: none; }
 .pref-text { flex: 1; }
 .pref-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-.pref-desc { font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+.pref-desc { font-size: 13px; color: var(--ink-3); line-height: 1.45; overflow-wrap: anywhere; }
 .pref-locked { font-size: 12px; font-weight: 500; color: var(--ink-3); padding: 6px 10px; background: var(--paper-2); border-radius: 999px; }
 .pref-inline-input {
   margin-top: 10px;
@@ -2306,8 +2324,8 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 24px; font-weight: 400;
   color: var(--ink);
 }
-.sub-plan-meta { font-size: 13px; color: var(--ink-3); margin-top: 4px; }
-.sub-plan-status-copy { font-size: 14px; color: var(--ink-2); }
+.sub-plan-meta { font-size: 13px; color: var(--ink-3); margin-top: 4px; overflow-wrap: anywhere; }
+.sub-plan-status-copy { font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
 .sub-plan-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 .status-pill {
