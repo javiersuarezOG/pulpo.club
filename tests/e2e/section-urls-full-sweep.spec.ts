@@ -8,28 +8,8 @@
 // this sweep is the deeper "did the routing PR introduce any
 // regressions across the app surface" check.
 
-import { test, expect, type ConsoleMessage } from "@playwright/test";
-
-const TOLERATED = [
-  /Download the React DevTools/,
-  /\[vite\]/,
-  /Content Security Policy.*'eval'/,
-];
-
-function isTolerated(msg: ConsoleMessage): boolean {
-  return TOLERATED.some((re) => re.test(msg.text()));
-}
-
-// Convenience: collect console errors for a single page lifecycle and
-// return them at the end so the test can assert on them.
-function attachErrorRecorder(page: import("@playwright/test").Page) {
-  const errors: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
-  });
-  page.on("pageerror", (err) => errors.push(err.message));
-  return errors;
-}
+import { test, expect } from "@playwright/test";
+import { attachErrorRecorder } from "./_helpers";
 
 test.describe("Section URLs — full app sweep", () => {
   // 1. Per-section cold load: URL stays put, no console errors, the

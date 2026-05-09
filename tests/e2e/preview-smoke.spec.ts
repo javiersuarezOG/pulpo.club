@@ -12,21 +12,8 @@
 //
 //   Runs in CI on every PR via .github/workflows/ci.yml frontend job.
 
-import { test, expect, type ConsoleMessage } from "@playwright/test";
-
-// Some console noise we tolerate (third-party libraries, dev-mode
-// React-DevTools detection prompts). Anything matched here is logged
-// but doesn't fail the build.
-const TOLERATED = [
-  /Download the React DevTools/,
-  /\[vite\]/,                          // Vite HMR connection logs
-  /Content Security Policy.*'eval'/,   // PostHog's eval-warning noise
-];
-
-function isTolerated(msg: ConsoleMessage): boolean {
-  const text = msg.text();
-  return TOLERATED.some((re) => re.test(text));
-}
+import { test, expect } from "@playwright/test";
+import { isTolerated, seedProUser } from "./_helpers";
 
 test.describe("New app boots cleanly on key routes", () => {
   for (const route of ["/", "/?dev=1"]) {
@@ -221,18 +208,7 @@ test.describe("New app boots cleanly on key routes", () => {
   // Portal roundtrip needs a real Stripe key + a human, documented in
   // BACKLOG.md.
   test("account page Manage plan fires billing-portal POST", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        "pulpo-user",
-        JSON.stringify({
-          email: "pro-tester@pulpo.club",
-          name: "Pro Tester",
-          plan: "pro",
-          joined: Date.now(),
-          provider: "email",
-        }),
-      );
-    });
+    await seedProUser(page);
 
     let postSeen = false;
     let postBody: string | null = null;
