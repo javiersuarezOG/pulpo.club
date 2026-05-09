@@ -133,6 +133,17 @@ test.describe("responsive — /account sub-sections (seeded user)", () => {
         await page.locator(".account-nav").waitFor({ state: "visible", timeout: 10_000 });
         await page.waitForTimeout(400);
 
+        // Assert overflow on the default-landing tab BEFORE any clicks.
+        // If the page is wider than viewport, the next .account-nav button
+        // click would time out trying to reach an off-screen element and
+        // fail the test with a confusing "element outside viewport" error
+        // instead of the actionable "widest descendant" message. Catch
+        // the layout regression first; tab clicks come second.
+        assertNoOverflow(
+          await measureOverflow(page),
+          `/account[default-landing] · ${seed} user @ ${vp.name}`,
+        );
+
         for (const tab of ACCOUNT_TABS) {
           const btn = page.locator(".account-nav button").filter({ hasText: tab.label }).first();
           if ((await btn.count()) === 0) continue; // tab may be hidden in some plan states
