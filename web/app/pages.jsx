@@ -1043,7 +1043,7 @@ function MethodologyModal({ open, onClose }) {
         <h2 id="meth-title">{lc === "es" ? "Cómo clasificamos" : "How we rank"}</h2>
         <p className="meth-tagline">
           {lc === "es"
-            ? "Cada terreno recibe un puntaje compuesto de 0–100 basado en tres dimensiones simples."
+            ? "Cada propiedad recibe un puntaje compuesto de 0–100 basado en tres dimensiones simples."
             : "Every listing gets a 0–100 composite score from three plain-English dimensions."}
         </p>
         <h3>{lc === "es" ? "Precio vs. comparables" : "Price vs. comparable lots"}</h3>
@@ -2037,9 +2037,20 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // it, so we filter that out explicitly alongside null/falsy checks.
   const isKnown = (v) =>
     v != null && v !== "" && v !== "unknown" && v !== "Unknown";
+  // Closed-set guard for enum→i18n lookups. If the pipeline ever ships
+  // a new enum value we haven't translated, capitalize() keeps it from
+  // showing the raw i18n key — but the en-only fallback IS a smell to
+  // catch in code review (add a new translation row when this trips).
+  const ROAD_ENUMS = new Set(["paved", "gravel", "dirt"]);
+  const BEACHFRONT_ENUMS = new Set(["on_beach", "walk_to_beach", "near_beach"]);
+
   const facts = [];
   if (isKnown(listing.road_access_type)) {
-    facts.push({ icon: "road", label: t("detail.fact.road", lc), value: capitalize(listing.road_access_type) });
+    const v = listing.road_access_type;
+    const roadValue = ROAD_ENUMS.has(v)
+      ? t(`detail.fact.road.${v}`, lc)
+      : capitalize(v);
+    facts.push({ icon: "road", label: t("detail.fact.road", lc), value: roadValue });
   }
   if (listing.has_water) {
     facts.push({ icon: "droplet", label: t("detail.fact.water", lc), value: t("detail.fact.water_on", lc) });
@@ -2050,12 +2061,21 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // Topography is always known (boolean), so it always shows.
   facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
   if (isKnown(listing.beachfront_tier)) {
-    facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: capitalize(listing.beachfront_tier.replace("_", " ")) });
+    const v = listing.beachfront_tier;
+    const beachValue = BEACHFRONT_ENUMS.has(v)
+      ? t(`detail.fact.beachfront_tier.${v}`, lc)
+      : capitalize(v.replace("_", " "));
+    facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: beachValue });
   }
   if (listing.has_ocean_view) {
     facts.push({ icon: "sun", label: t("detail.fact.ocean_view", lc), value: t("detail.fact.yes", lc) });
   }
   if (isKnown(listing.zoning_use)) {
+    // TODO(i18n): zoning_use is `string | null` in the type — no closed
+    // enum to translate yet, and the field is currently always null in
+    // ranked.json. If/when the pipeline starts populating this we'll
+    // need a `detail.fact.zoning.<value>` table along the lines of
+    // road / beachfront above. capitalize() until then.
     facts.push({ icon: "zone", label: t("detail.fact.zoning", lc), value: capitalize(listing.zoning_use) });
   }
   if (listing.photos_count > 0) {
@@ -2068,7 +2088,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
       <ListingJsonLd listing={listing} locale={app.locale} />
       <div className="detail-head">
         <button className="link-btn" onClick={() => app.closeListing()}>
-          <Icon name="arrow_left" size={16} strokeWidth={2}/> Back to results
+          <Icon name="arrow_left" size={16} strokeWidth={2}/> {t("detail.back", lc)}
         </button>
         <div className="detail-head-right">
           <HeartButton listingId={listing.id} app={app} variant="inline" size={20}/>
@@ -2619,8 +2639,29 @@ function PlansPage({ app }) {
 }
 
 // ====== Sign-up modal ======
+const CLERK_INTRO_SEEN_KEY = "pulpo-clerk-intro-seen";
+
 function SignupModal({ app }) {
   const m = app.signupModal;
+  const lc = app.locale;
+
+  // Pulpo intro shown before handing off to Clerk's hosted modal.
+  // Without this, users went from clicking "Sign in" → seeing a
+  // Clerk-branded prompt asking them to share info with no context
+  // for who Clerk is or why. The intro shows once per device; after
+  // confirm we set localStorage so subsequent sign-ins skip straight
+  // through. `null` = un-decided yet (still loading from storage),
+  // `true` = user has seen + acknowledged, `false` = needs intro.
+  const [introAcknowledged, setIntroAcknowledged] = pUseState(() => {
+    try { return localStorage.getItem(CLERK_INTRO_SEEN_KEY) === "1"; }
+    catch { return false; }
+  });
+  const acknowledgeIntro = (persist) => {
+    if (persist) {
+      try { localStorage.setItem(CLERK_INTRO_SEEN_KEY, "1"); } catch {}
+    }
+    setIntroAcknowledged(true);
+  };
 
   // Flag-on hand-off to Clerk. Trigger the hosted modal imperatively
   // via app.clerkActions (wired by ClerkActionsBinder once the SDK
@@ -2628,12 +2669,17 @@ function SignupModal({ app }) {
   // fire. If clerkActions isn't ready yet (cold first paint), we wait;
   // the effect re-runs when it lands.
   //
+  // The handoff is gated on `introAcknowledged` so first-time users
+  // see the Pulpo intro before Clerk's modal opens. Returning users
+  // (with the localStorage flag set) skip straight through.
+  //
   // Hook is at the top so order is stable across renders, regardless
   // of whether `m` or `clerkEnabled()` flip the early returns below.
   pUseEffect(() => {
     if (!m) return;
     if (!clerkEnabled()) return;
     if (!app.clerkActions) return;
+    if (!introAcknowledged) return;
     // Defensive: Clerk's hosted SignIn/SignUp throws
     // `cannot_render_single_session_enabled` when the user is already
     // signed in — and we have a race where consumers (e.g. the topnav
@@ -2664,11 +2710,58 @@ function SignupModal({ app }) {
       }
     }
     app.closeSignup();
-  }, [m, app.clerkActions, app.user]);
+  }, [m, app.clerkActions, app.user, introAcknowledged]);
 
   if (!m) return null;
-  if (clerkEnabled()) return null;   // Clerk's hosted modal takes over.
+  if (clerkEnabled()) {
+    // First-time on this device: show the Pulpo-branded intro before
+    // Clerk's hosted modal opens. Subsequent sign-ins skip this and
+    // hand off immediately (the effect above fires).
+    if (introAcknowledged) return null;
+    return <ClerkIntroModal app={app} lc={lc} onContinue={acknowledgeIntro} />;
+  }
   return <LegacySignupModal app={app} m={m} />;
+}
+
+// Brief Pulpo-branded intro shown the first time a user signs in.
+// Names Clerk explicitly so the user has context when they see Clerk's
+// hosted UI. Default-checked "don't show again" toggle keeps return
+// visits friction-free.
+function ClerkIntroModal({ app, lc, onContinue }) {
+  const [persist, setPersist] = pUseState(true);
+  return (
+    <div className="modal-backdrop" onClick={() => app.closeSignup()}>
+      <div
+        className="modal modal-clerk-intro"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="clerk-intro-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <PulpoLogo />
+        <h2 id="clerk-intro-title" className="confirm-title">
+          {t("auth.clerk_intro.title", lc)}
+        </h2>
+        <p className="confirm-body">{t("auth.clerk_intro.body", lc)}</p>
+        <label className="clerk-intro-skip">
+          <input
+            type="checkbox"
+            checked={persist}
+            onChange={(e) => setPersist(e.target.checked)}
+          />
+          <span>{t("auth.clerk_intro.dont_show", lc)}</span>
+        </label>
+        <div className="confirm-actions">
+          <button className="btn-ghost" onClick={() => app.closeSignup()}>
+            {t("auth.clerk_intro.cancel", lc)}
+          </button>
+          <button className="btn-primary" onClick={() => onContinue(persist)}>
+            {t("auth.clerk_intro.cta", lc)}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // Legacy email/password sign-in form. Only renders when VITE_USE_CLERK
@@ -2725,7 +2818,7 @@ function LegacySignupModal({ app, m }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 6 characters"
+              placeholder="At least 6 characters"  /* i18n-allow: LegacySignupModal only renders when Clerk is OFF (no VITE_CLERK_PUBLISHABLE_KEY) — tracked for full i18n in legacy-cleanup PR */
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
             />
           </label>
@@ -2835,7 +2928,7 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
       </div>
       <h3>
         {lc === "es"
-          ? "Ningún terreno coincide con tus filtros."
+          ? "Ninguna propiedad coincide con tus filtros."
           : "No listings match your filters."}
       </h3>
       {suggestion ? (
@@ -2924,12 +3017,18 @@ function BrowseSkeleton() {
 }
 
 // ====== Hard-error UI for permanent fetch failure (production) ======
+// Locale comes from <html lang> via currentLocale() — DataFetchFailed
+// renders before app context is established so we can't lean on a
+// prop-threaded locale. The lang attribute is set by useLocale very
+// early in app boot, so by the time this can render the value is
+// already correct.
 function DataFetchFailed({ onRetry }) {
+  const lc = currentLocale();
   return (
     <div className="empty-state lg" role="alert">
-      <h2>We couldn't load the listings.</h2>
-      <p>This is on us. The data feed didn't respond — try again in a moment.</p>
-      <button className="btn-primary" onClick={onRetry}>Retry</button>
+      <h2>{t("data_fetch_failed.title", lc)}</h2>
+      <p>{t("data_fetch_failed.body", lc)}</p>
+      <button className="btn-primary" onClick={onRetry}>{t("common.retry", lc)}</button>
     </div>
   );
 }

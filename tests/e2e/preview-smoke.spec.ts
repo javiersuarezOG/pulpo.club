@@ -418,4 +418,92 @@ test.describe("New app boots cleanly on key routes", () => {
       /\/(?:build|assets)\/[A-Za-z][A-Za-z0-9_-]*-[A-Za-z0-9_-]{6,}\.js$/,
     );
   });
+
+  // i18n regression guard.
+  //
+  // We've already had two i18n bugs reach production: a `road_access`
+  // key-fact rendering "Paved" in Spanish (capitalize() of the raw
+  // enum), and assorted hardcoded English in aria-labels, error UIs,
+  // and a "Back to results" button. The guideline (see CLAUDE.md →
+  // i18n) is: every user-visible string goes through `t()`. This test
+  // is the floor that catches regressions of that rule.
+  //
+  // Approach: switch the SPA into Spanish via localStorage (the same
+  // mechanism the locale toggle uses), wait for first paint, and
+  // assert the visible text on the home + a listing detail page does
+  // NOT contain any of a small canary set of English words that have
+  // historically slipped through. The test errs on the side of false
+  // positives — when one trips, EITHER add a `t()` lookup OR (if the
+  // word is genuinely shared between EN and ES, e.g. a brand name) add
+  // it to the per-test SHARED_TOKENS allowlist with a justification.
+  test("Spanish locale: no English canary words leak into rendered UI", async ({ page }) => {
+    // Words/phrases historically rendered in English on a Spanish-
+    // locale page. Each one is something we've actually shipped and
+    // had to fix; adding to this list = locking that fix in.
+    const ENGLISH_CANARIES = [
+      "Paved", "Gravel", "Dirt",                      // road_access_type enum (the report)
+      "On beach", "Walk to beach", "Near beach",      // beachfront_tier enum
+      "Back to results",                              // detail-panel back link
+      "Save listing", "Remove from saved",            // heart-button aria
+      "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)
+      "We couldn't load",                             // DataFetchFailed
+      "Upload photo",                                 // account profile
+    ];
+
+    // Tokens that legitimately exist in BOTH EN and ES copy and would
+    // false-positive a naive sweep. Add with a justification comment.
+    const SHARED_TOKENS = [
+      // (none yet — extend as needed)
+    ];
+    void SHARED_TOKENS;
+
+    await page.goto("/", { waitUntil: "networkidle" });
+    // Switch locale via the same localStorage key useLocale() reads at
+    // mount. Reload so the SPA bootstraps in Spanish from first paint
+    // (rather than re-rendering after a runtime locale flip — we want
+    // the "fresh load in ES" behaviour to match what a Spanish-locale
+    // user sees).
+    await page.evaluate(() => localStorage.setItem("pulpo-locale", "es"));
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
+    // Allow the i18n table + locale-driven re-render to settle.
+    await page.waitForTimeout(500);
+
+    // Sniff the visible body text for any canary. We use textContent
+    // (not innerText) so we don't pay layout costs; aria-labels are
+    // queried separately below.
+    const bodyText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of ENGLISH_CANARIES) {
+      expect(
+        bodyText,
+        `Spanish locale leaked English text: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+
+    // Click into the first card to mount the detail panel and re-sniff.
+    // The road_access "Paved" bug was on detail; we must check it.
+    await page.locator(".listing-card").first().click();
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+    await page.waitForTimeout(500);
+    const detailText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of ENGLISH_CANARIES) {
+      expect(
+        detailText,
+        `Spanish locale leaked English text on detail: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+
+    // aria-label sweep — these are only visible to AT users but still
+    // leak the wrong language. Spot-check the photo-nav + heart aria
+    // labels that we've fixed in this PR.
+    const ariaLabels: string[] = await page.evaluate(() =>
+      Array.from(document.querySelectorAll("[aria-label]")).map(
+        (el) => el.getAttribute("aria-label") || "",
+      ),
+    );
+    for (const word of ["Save listing", "Remove from saved", "Previous photo", "Next photo"]) {
+      const hit = ariaLabels.find((l) => l.includes(word));
+      expect(hit, `aria-label still in English: "${word}" — wire via t()`).toBeUndefined();
+    }
+  });
 });

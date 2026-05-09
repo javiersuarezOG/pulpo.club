@@ -360,7 +360,7 @@ function HeartButton({ listingId, app, size = 18, variant = "overlay" }) {
     <button
       className={`heart-btn heart-${variant} ${saved ? "is-saved" : ""} ${pulse ? "pulse" : ""}`}
       onClick={onClick}
-      aria-label={saved ? "Remove from saved" : "Save listing"}
+      aria-label={t(saved ? "card.heart.remove" : "card.heart.save", currentLocale())}
     >
       <svg width={size} height={size} viewBox="0 0 24 24"
            fill={saved ? "var(--accent-2)" : "none"}
@@ -499,12 +499,12 @@ function ListingCard({
           <>
             <button className="photo-nav prev"
               onClick={(e) => { e.stopPropagation(); navigateTo((photoIdx - 1 + listing.photos.length) % listing.photos.length); }}
-              aria-label="Previous photo">
+              aria-label={t("card.photo.prev", currentLocale())}>
               <Icon name="chevron_left" size={18} strokeWidth={2} />
             </button>
             <button className="photo-nav next"
               onClick={(e) => { e.stopPropagation(); navigateTo((photoIdx + 1) % listing.photos.length); }}
-              aria-label="Next photo">
+              aria-label={t("card.photo.next", currentLocale())}>
               <Icon name="chevron_right" size={18} strokeWidth={2} />
             </button>
             <div className="photo-dots">
