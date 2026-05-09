@@ -16,6 +16,7 @@
     { "source": "/data/featured.json",      "destination": "/web/data/featured.json" },
     { "source": "/photos/:file",            "destination": "/web/photos/:file" },
     { "source": "/assets/:file",            "destination": "/web/assets/:file" },
+    { "source": "/preview/assets/:file",    "destination": "/web/dist/assets/:file" },
     { "source": "/legal",                   "destination": "/web/legal.html" },
     { "source": "/sitemap.xml",             "destination": "/web/sitemap.xml" },
     { "source": "/robots.txt",              "destination": "/web/robots.txt" },
