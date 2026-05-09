@@ -414,4 +414,32 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(body).toMatch(/Sitemap:\s*https?:\/\//);
     expect(body).toMatch(/User-agent:\s*\*/);
   });
+
+  // Cache-control regression guard (originally PR-191).
+  //
+  // The Vite build's `Cache-Control: max-age=31536000, immutable` is
+  // only safe if every deploy emits new hashed filenames — without
+  // hashing, a year-long cache pins users to stale code. This test
+  // reads the built HTML and asserts the entry bundle carries a hash.
+  // PR section-urls moved Vite's output from /assets/ → /build/ so
+  // brand assets and build assets stop sharing a cache rule; the
+  // regex below tolerates either path.
+  test("Vite-built bundle filename carries a content hash (immutable-cache contract)", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const distHtml = path.resolve(process.cwd(), "web/dist/index.html");
+    if (!fs.existsSync(distHtml)) {
+      test.skip(!fs.existsSync(distHtml), "web/dist/index.html absent — run `npm run build` first");
+      return;
+    }
+    const html = fs.readFileSync(distHtml, "utf8");
+    const scriptMatch = html.match(/<script[^>]+src=["']([^"']*\/(?:build|assets)\/[^"']+\.js)["']/);
+    expect(scriptMatch, "built HTML should reference a /build/...js (or /assets/) bundle").toBeTruthy();
+    const src = scriptMatch![1];
+    // Hash format: "name-AbCd_12-3.js" — Vite uses base64url-style hashes
+    // (alphanumerics + _ + -), typically 8 chars but at least 6.
+    expect(src, `bundle filename should carry a content hash; got "${src}"`).toMatch(
+      /\/(?:build|assets)\/[A-Za-z][A-Za-z0-9_-]*-[A-Za-z0-9_-]{6,}\.js$/,
+    );
+  });
 });

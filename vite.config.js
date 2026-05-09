@@ -42,6 +42,12 @@ export default defineConfig(() => ({
     assetsDir: "build",
     rollupOptions: {
       output: {
+        // Content-hashed filenames so vercel.json's `/build/:file`
+        // 1y immutable cache is safe — every deploy emits new hashed
+        // names, no stale-cache risk. HTML stays max-age=0 so the
+        // next nav always picks up the fresh hash. PR section-urls
+        // moved this from /assets/ → /build/ so brand assets and
+        // build assets don't share a cache rule.
         entryFileNames: "build/[name]-[hash].js",
         chunkFileNames: "build/[name]-[hash].js",
         assetFileNames: "build/[name]-[hash][extname]",

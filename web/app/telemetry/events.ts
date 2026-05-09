@@ -158,6 +158,48 @@ export type EventMap = {
     ms: number;
     source: "browse" | "discover" | "saved";
   };
+  /** Lazy-loaded card image — viewport-entry → onLoad latency. Stamps
+   *  start time when an IntersectionObserver fires for the card's
+   *  Photo wrapper, ends when `<img onLoad>` fires. ms can be 0 when
+   *  native lazy-loading prefetched the bytes before the card became
+   *  visible (the optimal case). source matches perf.card_image_load
+   *  so PostHog can split browse vs discover vs saved. */
+  "perf.card_image_lazy_load": {
+    listing_id: string;
+    idx: number;
+    ms: number;
+    source: "browse" | "discover" | "saved";
+  };
+  /** Static asset (JS bundle / CSS / WebP image) load timing, observed
+   *  via PerformanceObserver(type="resource"). Lets us see whether the
+   *  Vite-built /preview/assets/* chain is hitting browser cache on
+   *  return visits. `kind` is derived from filename:
+   *    entry  — /preview/assets/index.js (or hashed equivalent)
+   *    chunk  — /preview/assets/<other>.js
+   *    css    — /preview/assets/*.css
+   *    webp   — /preview/assets/*.webp (category tile images)
+   *  cache:
+   *    hit       — served from browser cache (transferSize === 0 with
+   *                non-zero encodedBodySize, or deliveryType==="cache")
+   *    miss      — bytes were transferred over the wire
+   *    unknown   — neither signal available (older browsers) */
+  "perf.asset_load": {
+    kind: "entry" | "chunk" | "css" | "webp";
+    url: string;
+    ms: number;
+    bytes: number;
+    cache: "hit" | "miss" | "unknown";
+  };
+  /** Web Vitals LCP attribution. Tells us *what* the LCP element
+   *  actually is — `<img class="hero-bg">` vs a card photo vs the
+   *  hero text. When `url` is set, the LCP is an image and the URL
+   *  identifies which one. Pairs with web_vitals.lcp for diagnosis. */
+  "web_vitals.lcp.attribution": {
+    element_tag: string;
+    element_class?: string;
+    url?: string;
+    ms: number;
+  };
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */
   "perf.data_fetch": {

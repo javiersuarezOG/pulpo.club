@@ -231,6 +231,54 @@ function Photo({
     setLoaded(false);
     setErrored(false);
   }, [url]);
+
+  // Lazy-image telemetry. For non-eager cards we measure viewport-
+  // entry → onLoad (what the user perceives when scrolling to the
+  // card). Refs persist across re-renders without triggering one.
+  // We disconnect the IO + clear the refs whenever url changes so a
+  // carousel-arrow click doesn't trigger a stale emit against the
+  // old URL.
+  const wrapRef = useRef(null);
+  const lazyVisibleAtRef = useRef(null);
+  const lazyEmittedRef = useRef(false);
+  const lazyImgLoadedRef = useRef(false);
+  useEffect(() => {
+    lazyVisibleAtRef.current = null;
+    lazyEmittedRef.current = false;
+    lazyImgLoadedRef.current = false;
+    if (eager) return;
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") return;
+    const node = wrapRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          // Stamp visible-at the first time this card enters the
+          // viewport. If the image already loaded (browser pre-fetched
+          // ahead of intersection — the optimal case), emit zero.
+          if (lazyVisibleAtRef.current == null) {
+            lazyVisibleAtRef.current = performance.now();
+            if (lazyImgLoadedRef.current && source && !lazyEmittedRef.current) {
+              lazyEmittedRef.current = true;
+              track("perf.card_image_lazy_load", {
+                listing_id: listing.id,
+                idx,
+                ms: 0,
+                source,
+              });
+            }
+          }
+          obs.disconnect();
+          break;
+        }
+      },
+      { rootMargin: "0px", threshold: 0.01 }
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [url, eager, source, listing.id, idx]);
+
   if (!url || errored) {
     return (
       <div className={`photo-placeholder ${className}`} style={{ aspectRatio: ratio }}>
@@ -246,7 +294,7 @@ function Photo({
     );
   }
   return (
-    <div className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
+    <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
       {!loaded && <div className="photo-skeleton" />}
       <img
         src={url}
@@ -259,10 +307,9 @@ function Photo({
         onLoad={() => {
           setLoaded(true);
           if (onLoad) onLoad();
-          // Eager-only perf signal — see comment block above the
-          // function. Source-less calls (e.g. detail panel) skip the
-          // emit; callers that want it in PostHog must pass `source`.
-          if (eager && source && typeof performance !== "undefined") {
+          if (typeof performance === "undefined") return;
+          if (eager && source) {
+            // Eager perf signal (existing behaviour) — render→onLoad.
             const ms = Math.round(performance.now() - loadStart);
             track("perf.card_image_load", {
               listing_id: listing.id,
@@ -270,6 +317,21 @@ function Photo({
               ms,
               source,
             });
+          } else if (!eager && source) {
+            // Lazy perf signal — viewport-entry → onLoad. If load
+            // beat intersection (native lazy fetched ahead of time),
+            // we'll instead emit zero from the IO callback.
+            lazyImgLoadedRef.current = true;
+            if (lazyVisibleAtRef.current != null && !lazyEmittedRef.current) {
+              lazyEmittedRef.current = true;
+              const ms = Math.max(0, Math.round(performance.now() - lazyVisibleAtRef.current));
+              track("perf.card_image_lazy_load", {
+                listing_id: listing.id,
+                idx,
+                ms,
+                source,
+              });
+            }
           }
         }}
         onError={() => setErrored(true)}

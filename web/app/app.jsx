@@ -45,6 +45,7 @@ import {
 } from "./lib/url-routing";
 import { evaluateGate } from "./lib/route-gates";
 import { useDocumentMeta } from "./lib/use-document-meta";
+import { bootAssetTelemetry } from "./telemetry/asset-load";
 import "./styles/index.css";
 
 function App() {
@@ -140,6 +141,7 @@ function App() {
       trigger: "cold_load",
     });
     bootWebVitals();
+    bootAssetTelemetry();
   }, []);
 
   // Browser-default scrollRestoration is "auto" — it tries to restore a
