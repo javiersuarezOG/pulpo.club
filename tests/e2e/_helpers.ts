@@ -1,0 +1,60 @@
+// Shared test helpers — used by all tests/e2e/*.spec.ts files.
+// Single source of truth so we don't keep adding new patterns to every
+// spec file (today: TOLERATED appears verbatim in three places).
+
+import type { ConsoleMessage, Page } from "@playwright/test";
+
+// Console noise we tolerate (third-party libraries, dev-mode React-DevTools
+// detection prompts). Anything matched here is logged but doesn't fail the
+// build. Keep this list curated — every entry is a known-good signal that
+// would otherwise be mistaken for a regression.
+export const TOLERATED: RegExp[] = [
+  /Download the React DevTools/,
+  /\[vite\]/,                          // Vite HMR connection logs
+  /Content Security Policy.*'eval'/,   // PostHog's eval-warning noise
+];
+
+export function isTolerated(msg: ConsoleMessage): boolean {
+  return TOLERATED.some((re) => re.test(msg.text()));
+}
+
+// Wire up console + pageerror listeners that stash everything the test
+// assertion will care about into the returned array. The caller pushes
+// the array into an `expect(errors).toEqual([])` at the end. One pattern,
+// every spec.
+export function attachErrorRecorder(page: Page): string[] {
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+  });
+  page.on("pageerror", (err) => errors.push(err.message));
+  return errors;
+}
+
+// localStorage seed for the legacy auth path (Clerk-off CI runs). Must
+// run via addInitScript BEFORE the first navigation — sets the
+// `pulpo-user` blob the legacy auth code hydrates from on first render.
+// The plan field controls Pro vs Free behaviour everywhere it matters
+// (account.subscription, account.notifications, paywalls).
+export async function seedUser(
+  page: Page,
+  plan: "pro" | "free",
+): Promise<void> {
+  await page.addInitScript((p) => {
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: p === "pro" ? "pro-tester@pulpo.club" : "free-tester@pulpo.club",
+        name: p === "pro" ? "Pro Tester" : "Free Tester",
+        plan: p,
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  }, plan);
+}
+
+// Convenience for the existing Pro-user smoke test path.
+export async function seedProUser(page: Page): Promise<void> {
+  await seedUser(page, "pro");
+}
