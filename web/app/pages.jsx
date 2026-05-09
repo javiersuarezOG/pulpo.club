@@ -19,6 +19,7 @@ import {
   readSortFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
+import { pathForRoute, pathForListing } from "./lib/url-routing.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import {
@@ -62,21 +63,35 @@ const SHOW_AGENCY_PLAN = false;
 // re-introduce both when a yearly price ships.
 const PRO_PRICE_EUR_PER_MONTH = 10;
 
+// Click handler for any "client-side navigation with native fallback"
+// link. Modifier keys (cmd/ctrl/shift/alt), middle-click, and right-
+// click bypass the SPA so the browser does its standard "open in new
+// tab" / context-menu thing. Bare left-click triggers the SPA nav.
+function spaClickHandler(spaNav) {
+  return (e) => {
+    if (e.defaultPrevented) return;
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    spaNav();
+  };
+}
+
 // ====== TopNav ======
 function TopNav({ app }) {
   const lc = app.locale;
   return (
     <header className="topnav">
       <div className="topnav-inner">
-        <button className="logo-btn" onClick={() => app.go("home")} aria-label={t("nav.tab.home", lc)}>
+        <a href={pathForRoute("home")} className="logo-btn" onClick={spaClickHandler(() => app.go("home"))} aria-label={t("nav.tab.home", lc)}>
           <PulpoLogo />
-        </button>
+        </a>
         <nav className="topnav-links">
-          <button className={app.route === "home" ? "active" : ""} onClick={() => app.go("home")}>{t("nav.discover", lc)}</button>
-          <button className={app.route === "browse" ? "active" : ""} onClick={() => app.go("browse")}>{t("nav.browse", lc)}</button>
-          <button className={app.route === "saved" ? "active" : ""} onClick={() => app.go("saved")}>
+          <a href={pathForRoute("home")} className={app.route === "home" ? "active" : ""} onClick={spaClickHandler(() => app.go("home"))}>{t("nav.discover", lc)}</a>
+          <a href={pathForRoute("browse")} className={app.route === "browse" ? "active" : ""} onClick={spaClickHandler(() => app.go("browse"))}>{t("nav.browse", lc)}</a>
+          <a href={pathForRoute("saved")} className={app.route === "saved" ? "active" : ""} onClick={spaClickHandler(() => app.go("saved"))}>
             {t("nav.saved", lc)} {app.savedIds.size > 0 && <span className="count-badge">{app.savedIds.size}</span>}
-          </button>
+          </a>
         </nav>
         <div className="topnav-right">
           <LiveStats locale={lc} />
@@ -146,22 +161,34 @@ function BottomNav({ app }) {
   ];
   return (
     <nav className="bottomnav">
-      {tabs.map(t => (
-        <button
-          key={t.key}
-          className={(app.route === t.key || (t.key === "profile" && app.route === "account")) ? "active" : ""}
-          onClick={() => {
-            if (t.key === "profile") {
-              if (!app.user) app.openSignup({ mode: "login" });
-              else app.go("account");
-            } else app.go(t.key);
-          }}
-        >
-          <Icon name={t.icon} size={20} />
-          <span>{t.label}</span>
-          {t.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
-        </button>
-      ))}
+      {tabs.map(t => {
+        const isProfile = t.key === "profile";
+        const className = (app.route === t.key || (isProfile && app.route === "account")) ? "active" : "";
+        // Profile tab is anchor-less for anonymous users (it opens the
+        // signin modal — there's no path to deep-link to). Signed-in
+        // users get an /account anchor for cmd-click correctness.
+        if (isProfile && !app.user) {
+          return (
+            <button key={t.key} className={className} onClick={() => app.openSignup({ mode: "login" })}>
+              <Icon name={t.icon} size={20} />
+              <span>{t.label}</span>
+            </button>
+          );
+        }
+        const targetRoute = isProfile ? "account" : t.key;
+        return (
+          <a
+            key={t.key}
+            href={pathForRoute(targetRoute)}
+            className={className}
+            onClick={spaClickHandler(() => app.go(targetRoute))}
+          >
+            <Icon name={t.icon} size={20} />
+            <span>{t.label}</span>
+            {t.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
+          </a>
+        );
+      })}
     </nav>
   );
 }
@@ -1509,6 +1536,26 @@ function BrowsePage({ app }) {
       : "recent"
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
+
+  // popstate filter resync — BrowsePage stays mounted when the user
+  // goes Browse → Discover → back, or Browse → Listing → close → back.
+  // Mount-time filter seed only runs once, so without this effect the
+  // chips would render their last in-memory state, not what the URL
+  // says. Resync on every history-API event so the chips visually
+  // match the URL.
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPop = () => {
+      const seeded = buildFiltersForCategory(
+        new URLSearchParams(window.location.search).get("cat")
+      );
+      setFilters(readFilterFromURL(window.location.search, seeded));
+      setSort(readSortFromURL(window.location.search, "recent"));
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   // Pagination — render in 60-card pages. Filters/sort/category changes
   // reset back to one page. Avoids dumping ~870 cards into the DOM at once.
   const PAGE_SIZE = 60;
@@ -1831,6 +1878,65 @@ function ResultsTable({ results, app, sort, setSort }) {
 }
 
 // ====== Listing Detail ======
+// schema.org RealEstateListing JSON-LD for /listing/:id. Embedded as a
+// <script type="application/ld+json"> so Google + Bing get rich-result
+// metadata (price, area, geo, photos, datePosted). Crawlers that
+// execute JS see this; static social previews don't (the static-stub
+// follow-up will fix that).
+function ListingJsonLd({ listing, locale }) {
+  const json = pUseMemo(() => {
+    const lc = locale === "es" ? "es" : "en";
+    const title = listing.title?.[lc] ?? listing.title?.en ?? "";
+    const description = listing.description?.[lc] ?? listing.description?.en ?? "";
+    const url = typeof window !== "undefined"
+      ? new URL(`/listing/${encodeURIComponent(listing.id)}`, window.location.origin).toString()
+      : `https://pulpo.club/listing/${encodeURIComponent(listing.id)}`;
+    const photos = Array.isArray(listing.photos)
+      ? listing.photos.slice(0, 8).map((src) => {
+          try {
+            return typeof window !== "undefined" ? new URL(src, window.location.origin).toString() : src;
+          } catch { return src; }
+        })
+      : [];
+    const data = {
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "@id": url,
+      url,
+      name: title || "Pulpo listing",
+      description: description || undefined,
+      image: photos.length ? photos : undefined,
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "SV",
+        addressRegion: listing.region || undefined,
+        addressLocality: listing.zone_name || undefined,
+      },
+      offers: listing.price && !listing.is_sold && listing.source_type !== "off_market"
+        ? {
+            "@type": "Offer",
+            price: listing.price,
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+          }
+        : undefined,
+      floorSize: listing.size_m2
+        ? { "@type": "QuantitativeValue", value: listing.size_m2, unitCode: "MTK" }
+        : undefined,
+    };
+    // Strip undefined keys so the resulting JSON is clean.
+    const stripped = JSON.parse(JSON.stringify(data));
+    return JSON.stringify(stripped);
+  }, [listing.id, listing.title, listing.description, listing.photos, listing.price, listing.size_m2, listing.is_sold, listing.source_type, listing.region, listing.zone_name, locale]);
+  return (
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: json }}
+    />
+  );
+}
+
 function ListingDetail({ listing, app, asPanel = true }) {
   const [galleryIdx, setGalleryIdx] = pUseState(0);
   const [lightbox, setLightbox] = pUseState(false);
@@ -1967,6 +2073,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
 
   return (
     <div className={`detail ${asPanel ? "as-panel" : "as-page"}`}>
+      <ListingJsonLd listing={listing} locale={app.locale} />
       <div className="detail-head">
         <button className="link-btn" onClick={() => app.closeListing()}>
           <Icon name="arrow_left" size={16} strokeWidth={2}/> Back to results

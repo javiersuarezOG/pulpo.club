@@ -594,6 +594,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
   position: relative;
   overflow: hidden;
 }
+/* Crawlable + cmd/middle-click anchor (PR section-urls). Sits behind
+ * the rest of the card so HeartButton, photo nav arrows, and other
+ * interactive children still capture clicks first; the bare card area
+ * falls through to the anchor. Visually invisible. */
+.listing-card-anchor {
+  position: absolute; inset: 0;
+  z-index: 0;
+  text-indent: -9999px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.listing-card > *:not(.listing-card-anchor) {
+  position: relative;
+  z-index: 1;
+}
 .listing-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-2);
