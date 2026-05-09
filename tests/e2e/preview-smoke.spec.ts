@@ -273,4 +273,122 @@ test.describe("New app boots cleanly on key routes", () => {
     await expect.poll(() => postSeen, { timeout: 3_000 }).toBe(true);
     expect(postBody).toBeDefined();
   });
+
+  // PR-section-urls — section-specific URL routing smoke test.
+  //
+  // Each section path must boot the SPA, render its surface, and not
+  // crash. /listing/<id> is exercised inside the existing "detail
+  // panel opens" test; here we cover the bare-section paths and the
+  // back/forward sequence.
+  for (const route of ["/browse", "/saved", "/plans"]) {
+    test(`renders ${route} cold-load without console errors`, async ({ page }) => {
+      const errors: string[] = [];
+      const uncaught: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+      });
+      page.on("pageerror", (err) => uncaught.push(err.message));
+
+      await page.goto(route, { waitUntil: "networkidle" });
+
+      const errorBoundary = page.getByText("Something went wrong.");
+      const realApp = page.locator(".app, .topnav, .hero, .page-home, .page-browse, .saved-page, .plans-page");
+      await Promise.race([
+        realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
+        errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
+          throw new Error(
+            `ErrorBoundary fallback rendered on ${route} — uncaught exceptions: ${JSON.stringify(uncaught)}`
+          );
+        }),
+      ]);
+
+      // URL bar matches the cold-load path (no SPA redirect on mount).
+      expect(new URL(page.url()).pathname).toBe(route);
+
+      await page.waitForTimeout(1_500);
+      expect(uncaught, `uncaught exceptions on ${route}`).toEqual([]);
+      expect(errors, `console.error calls on ${route}`).toEqual([]);
+    });
+  }
+
+  test("/listing/<id> cold-load opens detail panel without crashing", async ({ page, request }) => {
+    // Pull a real listing id from the live data file so we don't
+    // hard-code an id that may have rotated out of the catalog.
+    const dataRes = await request.get("/data/ranked.json");
+    expect(dataRes.status()).toBe(200);
+    const json = await dataRes.json();
+    const sample = (Array.isArray(json) ? json : json.listings ?? []).find(
+      (l: { id?: string; source?: string; source_id?: string; source_type?: string; is_sold?: boolean }) =>
+        l.source_type !== "off_market" && !l.is_sold
+    );
+    expect(sample, "live data has at least one non-off-market listing").toBeTruthy();
+    const id = sample!.id ?? `${sample!.source}-${sample!.source_id}`;
+
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+    });
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await page.goto(`/listing/${id}`, { waitUntil: "networkidle" });
+
+    // Detail panel must mount within 5s. The skeleton state may
+    // render briefly while listings.json resolves; assert we end up
+    // at the resolved panel.
+    await page
+      .locator(".detail-panel")
+      .waitFor({ state: "visible", timeout: 10_000 });
+
+    expect(errors, `console errors on /listing/${id} cold-load`).toEqual([]);
+  });
+
+  test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+
+    // Discover → Browse via TopNav anchor
+    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
+    await page.waitForFunction(() => window.location.pathname === "/browse", null, {
+      timeout: 5_000,
+    });
+
+    // Open the first listing — the URL must change to /listing/<id>.
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".listing-card").first().click();
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+    await page.waitForFunction(() => window.location.pathname.startsWith("/listing/"), null, {
+      timeout: 3_000,
+    });
+
+    // Browser back → detail closes, URL returns to /browse
+    await page.goBack();
+    await page.locator(".detail-panel").waitFor({ state: "hidden", timeout: 3_000 });
+    await page.waitForFunction(() => window.location.pathname === "/browse", null, {
+      timeout: 3_000,
+    });
+
+    // Browser back again → URL returns to /
+    await page.goBack();
+    await page.waitForFunction(() => window.location.pathname === "/", null, {
+      timeout: 3_000,
+    });
+  });
+
+  test("/preview returns 404 (rewrites removed)", async ({ request }) => {
+    // The /preview alias was scaffolding from the new-UX rollout. After
+    // section URLs landed it was dropped; Vercel's default 404 fires.
+    // This test asserts the rewrite is gone (would otherwise serve the
+    // SPA shell with a 200).
+    const res = await request.get("/preview", { maxRedirects: 0 });
+    // Vercel's static 404 returns 404; some local dev servers may not
+    // emulate it perfectly. Accept any non-2xx.
+    expect(res.status()).toBeGreaterThanOrEqual(400);
+  });
+
+  test("robots.txt serves the static file", async ({ request }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body).toMatch(/Sitemap:\s*https?:\/\//);
+    expect(body).toMatch(/User-agent:\s*\*/);
+  });
 });
