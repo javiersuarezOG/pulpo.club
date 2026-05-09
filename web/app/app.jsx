@@ -36,6 +36,15 @@ import { ClerkShell, clerkEnabled } from "./auth/clerk-shell.jsx";
 import { fetchSaves, postSaveAction } from "./auth/saves-client.js";
 import { track } from "./telemetry/hook";
 import { bootWebVitals } from "./telemetry/web-vitals";
+import {
+  parseLocation,
+  pathForRoute,
+  pathForListing,
+  urlFor,
+  isSameLocation,
+} from "./lib/url-routing";
+import { evaluateGate } from "./lib/route-gates";
+import { useDocumentMeta } from "./lib/use-document-meta";
 import { bootAssetTelemetry } from "./telemetry/asset-load";
 import "./styles/index.css";
 
@@ -49,8 +58,21 @@ function App() {
   }/*EDITMODE-END*/;
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
-  const [route, setRoute] = useState("home");
+  // Mount-time route seed — read pathname so cold-loading /browse,
+  // /saved, /plans, /account, or /listing/:id renders the right section
+  // immediately. The `parsed.isListingPath` flag tells `closeListing`
+  // whether the user entered on the detail (in which case "back" must
+  // not exit the site — replaceState to "/" instead).
+  const _initialParsed = useMemo(() => {
+    if (typeof window === "undefined") return { route: "home", openListingId: null, isListingPath: false };
+    return parseLocation(window.location.pathname);
+  }, []);
+  const [route, setRoute] = useState(_initialParsed.route);
   const [routeParams, setRouteParams] = useState({});
+  // Tracks whether the current detail view was entered cold (no source
+  // section underneath). Reset to false whenever the user navigates to a
+  // section in-app; set true on cold-load entry.
+  const coldEnteredDetailRef = useRef(_initialParsed.isListingPath);
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
@@ -66,6 +88,10 @@ function App() {
     try { return new Set(JSON.parse(localStorage.getItem("pulpo-saved")) || []); } catch { return new Set(); }
   });
   const [signupModal, setSignupModal] = useState(null);
+  // Seed openListingId from the URL on mount so cold-loading
+  // /listing/:id opens the detail panel without a flicker. Listings
+  // load async via useListings(); the detail panel renders its own
+  // pending skeleton while the id hasn't resolved yet.
   // Hot-line for triggering Clerk's hosted sign-in / sign-up modal
   // imperatively, without a click-time Suspense boundary that would
   // throw React #426. <ClerkActionsBinder> inside ClerkShell wires
@@ -73,7 +99,11 @@ function App() {
   const [clerkActions, setClerkActions] = useState(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [toast, setToast] = useState(null);
-  const [openListingId, setOpenListingId] = useState(null);
+  const [openListingId, setOpenListingId] = useState(_initialParsed.openListingId);
+  // Guard against re-entry on rapid backdrop taps / Esc-then-click.
+  // history.back() is async — popstate fires next tick — so a second
+  // call mid-flight would close more than one history entry.
+  const closingRef = useRef(false);
   const [detailViewCount, setDetailViewCount] = useState(() => {
     return +localStorage.getItem("pulpo-detail-views") || 0;
   });
@@ -105,20 +135,86 @@ function App() {
   // lazy-loaded inside requestIdleCallback, so this runs cheaply.
   useEffect(() => {
     track("landing.viewed", { route: window.location.pathname || "/" });
+    track("route.changed", {
+      from_path: null,
+      to_path: window.location.pathname + window.location.search,
+      trigger: "cold_load",
+    });
     bootWebVitals();
     bootAssetTelemetry();
+  }, []);
+
+  // Browser-default scrollRestoration is "auto" — it tries to restore a
+  // scroll position that no longer exists once section content has
+  // changed under it, which produces flickers and "back-button leaves
+  // me at the top of a different page" weirdness. Take it manual; our
+  // `go()` callbacks scrollTo(0,0) explicitly.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prev = window.history.scrollRestoration;
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    return () => {
+      if ("scrollRestoration" in window.history && prev) {
+        window.history.scrollRestoration = prev;
+      }
+    };
+  }, []);
+
+  // popstate — back/forward navigation. Reseeds route + openListingId
+  // from the URL, scrolls to top, and fires telemetry. Browse filter
+  // params are reseeded inside BrowsePage's own popstate listener so the
+  // chips visually re-sync.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPop = (event) => {
+      const fromPath = ""; // popstate doesn't tell us where we came from.
+      const parsed = parseLocation(window.location.pathname);
+      // Detect direction from the event state shape. Without explicit
+      // state we treat a popstate as "back"; forward is also a popstate
+      // but the only practical difference for us is the trigger label.
+      const trigger = event && event.state && event.state.forward ? "forward" : "back";
+      setOpenListingId(parsed.openListingId);
+      setRoute(parsed.route);
+      // popstate landing on /listing/:id with no app-pushed state means
+      // the user navigated forward from history into a detail entry.
+      // It's not a cold-load (the SPA is already mounted), but the
+      // "back from here exits" semantic doesn't apply either — the
+      // popstate listener correctly handles the back chain.
+      coldEnteredDetailRef.current = false;
+      track("route.changed", {
+        from_path: fromPath || null,
+        to_path: window.location.pathname + window.location.search,
+        trigger,
+      });
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   // Marquee the document.title so the tab text scrolls like a
   // marquesina. Pure-cosmetic — pauses entirely when the user has
   // `prefers-reduced-motion: reduce` set (accessibility — animated
-  // tab titles can be disorienting). Resets to the original on
-  // unmount so the tab doesn't keep a stale rotated state.
+  // tab titles can be disorienting).
+  //
+  // Only runs on the home route. On other sections (/browse, /listing/:id,
+  // …) the title is informational ("Listing X in Zone Y — Pulpo") and
+  // benefits from being readable, not scrolling. useDocumentMeta sets
+  // the route-specific title; this effect re-runs on every route change
+  // and either kicks the marquee off home or stays out of the way
+  // elsewhere.
   useEffect(() => {
     if (typeof window === "undefined" || !document) return;
+    if (route !== "home" || openListingId) return;
     const reduce = typeof window.matchMedia === "function"
       && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
+    // Snapshot the current title — useDocumentMeta wrote it before this
+    // effect ran (effect ordering: useDocumentMeta is mounted higher).
+    // If the title changes mid-marquee (e.g. locale flip while on home)
+    // the dep array re-runs this effect and the snapshot refreshes.
     const original = document.title;
     // The separator gives the eye a clear loop point + makes a one-
     // word title readable as it scrolls back around. Three spaces
@@ -130,14 +226,12 @@ function App() {
       offset = (offset + 1) % text.length;
       document.title = text.slice(offset) + text.slice(0, offset);
     };
-    // 320ms per char ≈ Pulpo (5 letters + space) every ~2s. Faster
-    // becomes flicker on macOS Safari; slower reads as broken.
     const id = setInterval(tick, 320);
     return () => {
       clearInterval(id);
       document.title = original;
     };
-  }, []);
+  }, [route, openListingId, locale]);
 
   // Handle the Stripe Checkout return URL. The server's create-checkout-
   // session sends success → /preview/?upgrade=success&session_id=...
@@ -221,6 +315,14 @@ function App() {
     if (cfg.pendingListing) {
       setTimeout(() => setOpenListingId(cfg.pendingListing), 400);
     }
+    // postLoginRoute set by the route-gate effect (see below) when an
+    // anonymous user lands cold on /saved or /account. After sign-in
+    // the user is on the right path already (URL stays put while the
+    // modal is open) — but we re-confirm `route` matches in case the
+    // user navigated elsewhere with the modal open.
+    if (cfg.postLoginRoute && route !== cfg.postLoginRoute) {
+      setRoute(cfg.postLoginRoute);
+    }
     if (cfg.pendingAction === "checkout") {
       // Lazy-load the helper so the Stripe-checkout chunk only fires
       // for users who actually intended to upgrade.
@@ -236,6 +338,9 @@ function App() {
         });
       });
     }
+    // route is intentionally NOT in deps — the post-signin chain reads
+    // route once at the moment the user transitions, not later.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, signupModal, locale, showToast]);
 
   // Auth telemetry. Fires once per transition for both Clerk-on
@@ -303,23 +408,105 @@ function App() {
     }));
   }, []);
 
+  // Push a new history entry for a section navigation. `goBrowse` is a
+  // thin wrapper that also handles the category routeParam; we serialize
+  // the category into the URL via filter-url.ts inside BrowsePage's
+  // existing writer effect, so here we just pushState the path.
   const go = useCallback((r, params = {}) => {
     const from = route;
-    setRoute(r); setRouteParams(params); setOpenListingId(null);
-    window.scrollTo(0, 0);
+    const fromPath = typeof window !== "undefined"
+      ? window.location.pathname + window.location.search
+      : "";
+    const target = urlFor({ route: r }, "");
+    // Same-route, same-URL → no-op so the back button doesn't accumulate
+    // duplicate entries.
+    const same = typeof window !== "undefined"
+      && isSameLocation({ route: r }, window.location.pathname, "");
+    setRoute(r);
+    setRouteParams(params);
+    setOpenListingId(null);
+    coldEnteredDetailRef.current = false;
+    if (typeof window !== "undefined" && !same) {
+      window.history.pushState({ pulpo: true }, "", target);
+      track("route.changed", { from_path: fromPath, to_path: target, trigger: "click" });
+    }
+    if (typeof window !== "undefined") window.scrollTo(0, 0);
     if (from !== r) _measure("perf.route_transition", { from, to: r });
   }, [route, _measure]);
+
   const goBrowse = useCallback((params = {}) => {
     const from = route;
-    setRoute("browse"); setRouteParams(params); setOpenListingId(null);
-    window.scrollTo(0, 0);
+    const fromPath = typeof window !== "undefined"
+      ? window.location.pathname + window.location.search
+      : "";
+    setRoute("browse");
+    setRouteParams(params);
+    setOpenListingId(null);
+    coldEnteredDetailRef.current = false;
+    // BrowsePage's mount-time effect re-reads the URL and applies the
+    // category. We push the bare /browse path here; filter-url.ts's
+    // `writeFilterToURL` writes the cat= param via replaceState as
+    // soon as filters settle.
+    if (typeof window !== "undefined") {
+      const target = urlFor({ route: "browse" }, "");
+      const onBrowseAlready = window.location.pathname === "/browse";
+      if (onBrowseAlready) {
+        // Already on /browse — don't add a history entry; the filter
+        // effect inside BrowsePage will replaceState the category.
+      } else {
+        window.history.pushState({ pulpo: true }, "", target);
+        track("route.changed", { from_path: fromPath, to_path: target, trigger: "click" });
+      }
+      window.scrollTo(0, 0);
+    }
     if (from !== "browse") _measure("perf.route_transition", { from, to: "browse" });
   }, [route, _measure]);
+
   const openListing = useCallback((id) => {
+    if (!id) return;
+    const fromPath = typeof window !== "undefined"
+      ? window.location.pathname + window.location.search
+      : "";
     setOpenListingId(id);
+    if (typeof window !== "undefined") {
+      const target = pathForListing(id);
+      // Don't push duplicate if already on /listing/<id>.
+      if (window.location.pathname !== target) {
+        window.history.pushState({ pulpo: true, listing: id }, "", target);
+        track("route.changed", { from_path: fromPath, to_path: target, trigger: "click" });
+      }
+    }
     _measure("perf.detail_open", { listing_id: id });
   }, [_measure]);
-  const closeListing = useCallback(() => setOpenListingId(null), []);
+
+  const closeListing = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    // Reset the guard on next tick — popstate fires asynchronously.
+    setTimeout(() => { closingRef.current = false; }, 200);
+
+    if (typeof window === "undefined") {
+      setOpenListingId(null);
+      return;
+    }
+    if (coldEnteredDetailRef.current) {
+      // User landed cold on /listing/:id — there's no source section
+      // underneath. history.back() would exit the site. Instead replace
+      // the current entry with /, so Browser Back exits cleanly with no
+      // surprise loop.
+      const fromPath = window.location.pathname + window.location.search;
+      window.history.replaceState({ pulpo: true }, "", "/");
+      coldEnteredDetailRef.current = false;
+      setOpenListingId(null);
+      setRoute("home");
+      track("route.changed", { from_path: fromPath, to_path: "/", trigger: "click" });
+    } else {
+      // In-app open → history.back() pops the listing entry. The
+      // popstate listener below mutates state (setOpenListingId(null) +
+      // restores route from URL).
+      window.history.back();
+    }
+  }, []);
 
   const toggleSave = useCallback((id) => {
     const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
@@ -453,6 +640,53 @@ function App() {
   const listings = useListings();
   const listingsState = useListingsState();
 
+  // Resolve the open listing once (used both by route-meta below and
+  // the detail overlay further down). null while listings.json is still
+  // loading OR if the id doesn't resolve (deleted/sold).
+  const _openListingObj = openListingId
+    ? listings.find(l => l.id === openListingId)
+    : null;
+
+  // Per-route document title + OG meta + canonical + hreflang.
+  // Listing detail uses the resolved listing; sections fall back to the
+  // section-specific copy in metaForSection.
+  const _routeSearch = typeof window !== "undefined" ? window.location.search : "";
+  useDocumentMeta({
+    route,
+    locale,
+    listing: _openListingObj || null,
+    search: _routeSearch,
+  });
+
+  // Route gate enforcement — runs whenever the route or user changes.
+  // /saved and /account require >= free; anonymous users get the
+  // sign-in modal as an overlay (URL stays put so post-signin the
+  // content slot is already correct, no second redirect).
+  //
+  // The gate doesn't render anything itself — this effect just opens
+  // the modal. The page components show a placeholder behind it.
+  useEffect(() => {
+    const outcome = evaluateGate(route, user);
+    if (outcome.kind === "modal") {
+      // Already in a signup/login flow? Don't re-fire.
+      if (signupModal && (signupModal.mode === "login" || signupModal.mode === "signup")) {
+        return;
+      }
+      // Open login modal with the current route as the post-login
+      // destination so the post-signin chain effect lands them right
+      // back here.
+      setSignupModal({
+        mode: "login",
+        postLoginRoute: outcome.postLoginRoute,
+        gateReason: "auth_required",
+      });
+      track("signup_modal.shown", { trigger: "manual", mode: "login" });
+    }
+    // Intentionally not depending on signupModal — that would re-fire
+    // every time the modal closes. We only care about route + user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route, user]);
+
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout, isSigningOut,
@@ -470,7 +704,11 @@ function App() {
     clerkActions,
   };
 
-  const openListingObj = openListingId ? listings.find(l => l.id === openListingId) : null;
+  const openListingObj = _openListingObj;
+  // Detail panel pending state: URL says /listing/:id but listings.json
+  // hasn't resolved yet, OR the id doesn't match a known listing.
+  const listingPending = openListingId && !openListingObj && listingsState.status === "loading";
+  const listingMissing = openListingId && !openListingObj && listingsState.status !== "loading";
 
   return (
     // <ClerkShell> mounts <ClerkProvider> only when VITE_USE_CLERK=1.
@@ -526,10 +764,28 @@ function App() {
 
       <BottomNav app={app} />
 
-      {openListingObj && (
+      {(openListingObj || listingPending || listingMissing) && (
         <div className="detail-overlay" onClick={() => closeListing()}>
           <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
-            <ListingDetail listing={openListingObj} app={app} asPanel={true} />
+            {openListingObj ? (
+              <ListingDetail listing={openListingObj} app={app} asPanel={true} />
+            ) : listingPending ? (
+              <div className="detail-panel-pending" aria-busy="true" aria-live="polite">
+                <div className="detail-panel-pending-photo" />
+                <div className="detail-panel-pending-block" />
+                <div className="detail-panel-pending-block" style={{ width: "60%" }} />
+                <div className="detail-panel-pending-block" style={{ width: "80%" }} />
+              </div>
+            ) : (
+              <div className="detail-panel-empty">
+                <p>{locale === "es"
+                  ? "Este anuncio ya no está disponible."
+                  : "This listing is no longer available."}</p>
+                <button className="link-btn" onClick={() => closeListing()}>
+                  {locale === "es" ? "Volver a Descubrir" : "Back to Discover"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

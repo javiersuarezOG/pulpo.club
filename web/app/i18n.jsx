@@ -17,21 +17,89 @@ import React from "react";
 const LOCALES = ["en", "es"];
 const DEFAULT_LOCALE = "en";
 
-function getStoredLocale() {
-  try { return localStorage.getItem("pulpo-locale") || DEFAULT_LOCALE; }
-  catch { return DEFAULT_LOCALE; }
+// 3-tier locale resolver, in priority order:
+//   1. ?lang=es query param  — explicit user/share intent. URL wins so a
+//      shared link always renders the language the sharer chose.
+//   2. localStorage           — return-visit preference.
+//   3. navigator.language     — first-visit users with no other signal.
+//   4. DEFAULT_LOCALE         — final fallback.
+//
+// (1) sits above (2) so a Spanish-speaking user clicking ?lang=en doesn't
+// have their localStorage Spanish preference override the link's intent.
+function readUrlLocale() {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = new URLSearchParams(window.location.search).get("lang");
+    if (v && LOCALES.includes(v)) return v;
+  } catch { /* ignore */ }
+  return null;
+}
+
+function readStoredLocale() {
+  try {
+    const v = localStorage.getItem("pulpo-locale");
+    if (v && LOCALES.includes(v)) return v;
+  } catch { /* ignore */ }
+  return null;
+}
+
+function readBrowserLocale() {
+  if (typeof navigator === "undefined") return null;
+  // navigator.language can be "es", "es-MX", "es-419", etc. — match on prefix.
+  const lang = (navigator.language || "").toLowerCase();
+  if (lang.startsWith("es")) return "es";
+  if (lang.startsWith("en")) return "en";
+  return null;
+}
+
+function getInitialLocale() {
+  return readUrlLocale() || readStoredLocale() || readBrowserLocale() || DEFAULT_LOCALE;
+}
+
+// Push the chosen locale into the URL via replaceState — same pattern as
+// filter chips, no history pollution. Strips `?lang=` when the locale
+// matches the default-resolution path (DEFAULT_LOCALE without storage)
+// so we don't accumulate noise on links the user copies.
+function syncLocaleToUrl(locale) {
+  if (typeof window === "undefined") return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (locale === DEFAULT_LOCALE) {
+      params.delete("lang");
+    } else {
+      params.set("lang", locale);
+    }
+    const qs = params.toString();
+    const url = `${window.location.pathname}${qs ? `?${qs}` : ""}${window.location.hash}`;
+    window.history.replaceState(window.history.state, "", url);
+  } catch { /* ignore */ }
 }
 
 // React hook + global setter
 function useLocale() {
-  const [locale, setLocaleState] = React.useState(getStoredLocale);
+  const [locale, setLocaleState] = React.useState(getInitialLocale);
   const setLocale = React.useCallback((next) => {
     if (!LOCALES.includes(next)) return;
-    localStorage.setItem("pulpo-locale", next);
+    try { localStorage.setItem("pulpo-locale", next); } catch {}
     setLocaleState(next);
     document.documentElement.lang = next;
+    syncLocaleToUrl(next);
   }, []);
   React.useEffect(() => { document.documentElement.lang = locale; }, [locale]);
+
+  // popstate sync: forward/back navigation may carry a different ?lang=,
+  // so reseed locale from the URL on every history change. Skips the
+  // write to localStorage — the URL is authoritative for that nav.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPop = () => {
+      const next = readUrlLocale();
+      if (next && next !== locale) setLocaleState(next);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [locale]);
+
   return [locale, setLocale];
 }
 

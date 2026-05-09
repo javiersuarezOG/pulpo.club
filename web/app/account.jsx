@@ -41,11 +41,17 @@ function AccountPage({ app }) {
   // The previous shape violated the rule and was firing the redirect
   // during the Clerk-boot window.
   const clerkBooting = clerkEnabled() && !app.clerkActions;
+  // PR section-urls: the App-level route-gate handles opening the
+  // sign-in modal for anonymous /account hits, and the URL stays at
+  // /account so post-signin the content slot is already correct.
+  // We only need this effect to cover the Clerk-boot edge case where
+  // the gate hasn't run yet — open the modal as a safety net but DO
+  // NOT call app.go("home"), which would change the URL out from under
+  // the user.
   aUseEffect(() => {
     if (clerkBooting) return;
     if (app.user) return;
     app.openSignup({ mode: "login" });
-    app.go("home");
   }, [clerkBooting, app.user]);
 
   if (clerkBooting) {

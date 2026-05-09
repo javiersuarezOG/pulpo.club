@@ -130,9 +130,9 @@ test.describe("New app boots cleanly on key routes", () => {
     page.on("pageerror", (err) => errors.push(err.message));
 
     await page.goto("/", { waitUntil: "networkidle" });
-    // The app uses internal state for routing — click the Browse nav
-    // link in TopNav to navigate, then wait for the histogram to mount.
-    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
+    // PR section-urls: TopNav links are now <a> elements (was <button>)
+    // for SEO + cmd-click correctness. Click the anchor.
+    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
     const histo = page.locator(".histo-track");
     await histo.waitFor({ state: "visible", timeout: 10_000 });
 
@@ -274,40 +274,172 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(postBody).toBeDefined();
   });
 
-  // Cache-control regression guard.
+  // PR-section-urls — section-specific URL routing smoke test.
   //
-  // Five PRs in a row tried to fix "slow Discover photos" without
-  // catching the underlying cause: every Vite-built bundle was being
-  // served with `cache-control: max-age=0, must-revalidate`. Browsers
-  // were paying a conditional-GET round-trip on every page load for
-  // the entry JS, CSS, and category WebPs. PR-2 of the perf plan
-  // content-hashes the filenames + sets `Cache-Control: max-age=
-  // 31536000, immutable` via vercel.json — but only Vercel applies
-  // that header in production. We can still smoke-test the *intent*
-  // by reading the built HTML at web/dist/index.html and asserting
-  // its bundle reference carries a content hash. If anyone reverts
-  // vite.config.js to pinned filenames the immutable cache becomes
-  // unsafe (year-long cache + no hash = users stuck on stale code) —
-  // this test fails before that ships.
+  // Each section path must boot the SPA, render its surface, and not
+  // crash. /listing/<id> is exercised inside the existing "detail
+  // panel opens" test; here we cover the bare-section paths and the
+  // back/forward sequence.
+  // /account is included — anonymous cold-load opens the sign-in modal
+  // as an overlay (URL stays at /account). The modal is expected
+  // behaviour, not a bug; we just assert the path renders and doesn't
+  // crash the boundary.
+  for (const route of ["/browse", "/saved", "/plans", "/account"]) {
+    test(`renders ${route} cold-load without console errors`, async ({ page }) => {
+      const errors: string[] = [];
+      const uncaught: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+      });
+      page.on("pageerror", (err) => uncaught.push(err.message));
+
+      await page.goto(route, { waitUntil: "networkidle" });
+
+      const errorBoundary = page.getByText("Something went wrong.");
+      const realApp = page.locator(".app, .topnav, .hero, .page-home, .page-browse, .saved-page, .plans-page, .account-page");
+      await Promise.race([
+        realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
+        errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
+          throw new Error(
+            `ErrorBoundary fallback rendered on ${route} — uncaught exceptions: ${JSON.stringify(uncaught)}`
+          );
+        }),
+      ]);
+
+      // URL bar matches the cold-load path (no SPA redirect on mount).
+      expect(new URL(page.url()).pathname).toBe(route);
+
+      await page.waitForTimeout(1_500);
+      expect(uncaught, `uncaught exceptions on ${route}`).toEqual([]);
+      expect(errors, `console.error calls on ${route}`).toEqual([]);
+    });
+  }
+
+  test("/listing/<id> cold-load opens detail panel without crashing", async ({ page, request }) => {
+    // Pull a real listing id from the live data file so we don't
+    // hard-code an id that may have rotated out of the catalog.
+    const dataRes = await request.get("/data/ranked.json");
+    expect(dataRes.status()).toBe(200);
+    const json = await dataRes.json();
+    const sample = (Array.isArray(json) ? json : json.listings ?? []).find(
+      (l: { id?: string; source?: string; source_id?: string; source_type?: string; is_sold?: boolean }) =>
+        l.source_type !== "off_market" && !l.is_sold
+    );
+    expect(sample, "live data has at least one non-off-market listing").toBeTruthy();
+    const id = sample!.id ?? `${sample!.source}-${sample!.source_id}`;
+
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+    });
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await page.goto(`/listing/${id}`, { waitUntil: "networkidle" });
+
+    // Detail panel must mount within 5s. The skeleton state may
+    // render briefly while listings.json resolves; assert we end up
+    // at the resolved panel.
+    await page
+      .locator(".detail-panel")
+      .waitFor({ state: "visible", timeout: 10_000 });
+
+    expect(errors, `console errors on /listing/${id} cold-load`).toEqual([]);
+  });
+
+  test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+
+    // Discover → Browse via TopNav anchor
+    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
+    await page.waitForFunction(() => window.location.pathname === "/browse", null, {
+      timeout: 5_000,
+    });
+
+    // Open the first listing — the URL must change to /listing/<id>.
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".listing-card").first().click();
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+    await page.waitForFunction(() => window.location.pathname.startsWith("/listing/"), null, {
+      timeout: 3_000,
+    });
+
+    // Browser back → detail closes, URL returns to /browse
+    await page.goBack();
+    await page.locator(".detail-panel").waitFor({ state: "hidden", timeout: 3_000 });
+    await page.waitForFunction(() => window.location.pathname === "/browse", null, {
+      timeout: 3_000,
+    });
+
+    // Browser back again → URL returns to /
+    await page.goBack();
+    await page.waitForFunction(() => window.location.pathname === "/", null, {
+      timeout: 3_000,
+    });
+  });
+
+  test("/preview is fully gone from vercel.json (no rewrites at all)", async () => {
+    // Local dev (`npm run dev`) is a Vite SPA — every path serves the
+    // app regardless of vercel.json. Network-level enforcement happens
+    // only on the deployed preview/prod. Assert the config instead:
+    // ALL /preview* rewrites are gone. PR section-urls dropped /preview
+    // entirely (Vite base flipped to "/", build assets moved to /build/).
+    const fs = await import("node:fs/promises");
+    const json = JSON.parse(
+      await fs.readFile("vercel.json", "utf-8"),
+    ) as { rewrites?: { source: string; destination: string }[] };
+    const rewrites = json.rewrites ?? [];
+    const sources = rewrites.map((r) => r.source);
+    const previewLeftovers = sources.filter((s) => s.startsWith("/preview"));
+    expect(previewLeftovers, "no /preview* rewrites should remain").toEqual([]);
+    // /build/:file replaces /preview/assets/:file as the Vite output path.
+    expect(sources, "/build/:file rewrite required (Vite output)").toContain("/build/:file");
+  });
+
+  test("built HTML references /build/* (not /preview/*) for entry assets", async () => {
+    // After the Vite-base flip, web/dist/index.html should ask for
+    // /build/index-<hash>.js + /build/index-<hash>.css. Any lingering
+    // /preview/ in src/href would break the deployed bundle (the
+    // /preview/* rewrites are gone).
+    const fs = await import("node:fs/promises");
+    const html = await fs.readFile("web/dist/index.html", "utf-8");
+    expect(html, "no /preview/ in built HTML").not.toMatch(/[\s"]\/preview\//);
+    expect(html, "expected /build/ entry script").toMatch(/src="\/build\/[^"]+\.js"/);
+    expect(html, "expected /build/ entry stylesheet").toMatch(/href="\/build\/[^"]+\.css"/);
+  });
+
+  test("robots.txt serves the static file", async ({ request }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body).toMatch(/Sitemap:\s*https?:\/\//);
+    expect(body).toMatch(/User-agent:\s*\*/);
+  });
+
+  // Cache-control regression guard (originally PR-191).
+  //
+  // The Vite build's `Cache-Control: max-age=31536000, immutable` is
+  // only safe if every deploy emits new hashed filenames — without
+  // hashing, a year-long cache pins users to stale code. This test
+  // reads the built HTML and asserts the entry bundle carries a hash.
+  // PR section-urls moved Vite's output from /assets/ → /build/ so
+  // brand assets and build assets stop sharing a cache rule; the
+  // regex below tolerates either path.
   test("Vite-built bundle filename carries a content hash (immutable-cache contract)", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const distHtml = path.resolve(process.cwd(), "web/dist/index.html");
     if (!fs.existsSync(distHtml)) {
-      // Local dev runs without `npm run build`; skip rather than fail.
-      // CI's build job emits dist before tests run.
       test.skip(!fs.existsSync(distHtml), "web/dist/index.html absent — run `npm run build` first");
       return;
     }
     const html = fs.readFileSync(distHtml, "utf8");
-    const scriptMatch = html.match(/<script[^>]+src=["']([^"']*\/assets\/[^"']+\.js)["']/);
-    expect(scriptMatch, "built HTML should reference an /assets/...js bundle").toBeTruthy();
+    const scriptMatch = html.match(/<script[^>]+src=["']([^"']*\/(?:build|assets)\/[^"']+\.js)["']/);
+    expect(scriptMatch, "built HTML should reference a /build/...js (or /assets/) bundle").toBeTruthy();
     const src = scriptMatch![1];
-    // Hash format: "name-AbCd1234.js" (alphanumerics, ≥6 chars). If
-    // someone reverts to pinned filenames the cache-control will
-    // become unsafe — fail the build before it can ship.
+    // Hash format: "name-AbCd_12-3.js" — Vite uses base64url-style hashes
+    // (alphanumerics + _ + -), typically 8 chars but at least 6.
     expect(src, `bundle filename should carry a content hash; got "${src}"`).toMatch(
-      /\/assets\/[A-Za-z][A-Za-z0-9_-]*-[A-Za-z0-9]{6,}\.js$/,
+      /\/(?:build|assets)\/[A-Za-z][A-Za-z0-9_-]*-[A-Za-z0-9_-]{6,}\.js$/,
     );
   });
 });

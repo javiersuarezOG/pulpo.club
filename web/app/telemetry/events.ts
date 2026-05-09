@@ -222,6 +222,18 @@ export type EventMap = {
   "perf.lightbox_open": { listing_id: string; ms: number };
   /** Route transition (Discover ↔ Browse ↔ Saved ↔ Plans ↔ Account). */
   "perf.route_transition": { from: string; to: string; ms: number };
+
+  // ───── Section-URL routing (PR section-urls) ─────
+  /** Fires on every route change (pushState, popstate, or cold-load).
+   *  PostHog reconstructs the session graph from these. `trigger` lets
+   *  the analyst tell genuine user navigation apart from history-API
+   *  side-effects. `to_path` is the full pathname (including
+   *  `/listing/<id>`); `from_path` is null on cold-load. */
+  "route.changed": {
+    from_path: string | null;
+    to_path: string;
+    trigger: "click" | "back" | "forward" | "cold_load";
+  };
 };
 
 export type EventName = keyof EventMap;

@@ -451,6 +451,18 @@ function ListingCard({
     if (onOpen) onOpen(listing);
   };
 
+  // Crawlable + middle-click-friendly anchor over the card. The card's
+  // existing onClick still drives the SPA on bare left-click; the anchor
+  // is what Googlebot follows + what cmd-click / middle-click pick up.
+  // Modifier-key clicks fall through to the browser's native handling
+  // (open in new tab); plain left-clicks call openListing as today.
+  const cardHref = `/listing/${encodeURIComponent(listing.id)}`;
+  const onCardAnchorClick = (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    if (onOpen) onOpen(listing);
+  };
+
   return (
     <article
       className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""}`}
@@ -458,6 +470,18 @@ function ListingCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* SEO + middle-click anchor. aria-hidden + tabIndex=-1 keep it
+          out of the keyboard tab order — the card itself stays the
+          interactive target. The anchor sits behind interactive
+          children (heart, photo arrows) so those still get pointer
+          events first; everywhere else it gives Google a real <a>. */}
+      <a
+        className="listing-card-anchor"
+        href={cardHref}
+        onClick={onCardAnchorClick}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
       <div className="listing-card-photo">
         <Photo
           listing={listing}
