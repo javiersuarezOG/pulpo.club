@@ -34,15 +34,17 @@ export default defineConfig(({ mode }) => ({
     assetsDir: "assets",
     rollupOptions: {
       output: {
-        // Pinned filenames: vercel.json rewrites are exact-path. Cache
-        // invalidation comes from Vercel's Cache-Control headers, not URL
-        // hashing.
-        entryFileNames: "assets/index.js",
-        chunkFileNames: "assets/[name].js",
-        assetFileNames: (info) => {
-          if (info.name && info.name.endsWith(".css")) return "assets/index.css";
-          return "assets/[name][extname]";
-        },
+        // Content-hashed filenames so vercel.json's
+        // `Cache-Control: public, max-age=31536000, immutable` on
+        // /preview/assets/:file is safe — every deploy emits new
+        // hashed names, so a year-long client cache never serves
+        // stale code. The Vercel rewrite source `/preview/assets/:file`
+        // matches any single path segment so hashed names work without
+        // touching the rewrites. HTML stays max-age=0 so users always
+        // get the fresh hash on next navigation.
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
       },
     },
   },
