@@ -825,6 +825,17 @@ def main() -> int:
     except Exception as _e:
         print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
 
+    # SEO sitemap. Sections + per-listing entries (excluding off-market
+    # + sold). Non-fatal: a missing sitemap doesn't break the site,
+    # only delays reindexing on the next Search Console crawl.
+    try:
+        from automation.sitemap import write_sitemap
+        web_dir = web_data_dir.parent  # web/
+        n_urls = write_sitemap(web_dir / "sitemap.xml", ranked)
+        print(f"[sitemap] wrote {n_urls} urls to web/sitemap.xml")
+    except Exception as _e:
+        print(f"[sitemap] failed (non-fatal): {_e!r}")
+
     # Cron-stable Discover hero pool. Writes web/data/featured.json
     # with { tier, pool: [...], ... }. Non-fatal: a missing file just
     # lets the FE fall back to a client-side pick.
