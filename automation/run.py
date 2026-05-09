@@ -721,6 +721,28 @@ def main() -> int:
     except Exception as _e:
         print(f"[distance_fields:final] failed (non-fatal): {_e!r}")
 
+    # Unmapped-beach detector — surface listings whose copy claims
+    # walking-distance / beachfront but whose haversine to the nearest
+    # NAMED_BEACHES entry is > 5km. Two failure modes: a stale-prompt
+    # regression (LLM placed lat/lng inland despite the cue) OR a
+    # genuinely unmapped beach (we should append to NAMED_BEACHES in
+    # automation/distance_fields.py — see docs/named-beach-reference.md).
+    try:
+        from automation.unmapped_beach_detector import detect_unmapped_beach_clusters
+        ub = detect_unmapped_beach_clusters(listings)
+        if ub["suspect_count"]:
+            print(f"[unmapped_beaches] suspects={ub['suspect_count']} "
+                  f"clusters={ub['cluster_count']}")
+            for c in ub["top_clusters"][:5]:
+                print(f"  cluster ({c['lat']}, {c['lng']}) "
+                      f"count={c['count']} "
+                      f"median_dist_beach_km={c['median_dist_beach_km']} "
+                      f"sample_ids={c['sample_ids']}")
+        else:
+            print("[unmapped_beaches] suspects=0 (no coastal-claim listings far from named beaches)")
+    except Exception as _e:
+        print(f"[unmapped_beaches] failed (non-fatal): {_e!r}")
+
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
     # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.

@@ -58,34 +58,73 @@ AIRPORTS_LAT_LNG: dict[str, tuple[float, float]] = {
 }
 
 
-# PR-8.5 — representative coastline reference points along the
-# Salvadoran Pacific coast, from west (La Libertad) to east (La Unión).
-# Curated from prominent surf spots + tourist beaches; covers the full
-# coastline at ~5km spacing so haversine to nearest point gives a
-# reasonable proxy for "distance to coast."
+# Authoritative SV beach coordinates. Single source of truth for both
+#   1. dist_beach_km haversine reference points (this module), AND
+#   2. the LLM enrichment prompt's beach-anchor table (imported by
+#      automation/llm_enrichment_prompts.py).
+# Each entry is (name, lat, lng); covers the full Pacific coast from
+# Barra de Santiago (far west) to Conchagua / Golfo de Fonseca (far east)
+# at ~5km spacing. When the source mentions a named beach in this list
+# the prompt instructs the model to use these exact coordinates rather
+# than guessing, which kills the "high-confidence hallucination" failure
+# mode where the model invents lat/lng for a less-famous beach.
 #
-# Future upgrade: replace with a proper coastline polyline + nearest-
-# point-on-segment math. For now the point-set approximation is
-# good enough for the "Beach access · Xkm" editorial chip — the
-# precision difference is < 1km on coastal listings (where it matters)
-# and irrelevant for inland listings (5km vs 6km from beach reads the
-# same).
-COASTLINE_POINTS: tuple[tuple[float, float], ...] = (
-    (13.4843, -89.7163),   # Bocana San Diego (far west)
-    (13.4900, -89.6594),   # El Majahual
-    (13.4844, -89.6322),   # Sunzal
-    (13.4870, -89.6133),   # El Tunco
-    (13.4983, -89.5856),   # El Sunza
-    (13.4983, -89.5538),   # El Zonte
-    (13.4747, -89.4889),   # San Blas
-    (13.4575, -89.3478),   # La Perla
-    (13.3372, -88.9892),   # Costa del Sol
-    (13.2000, -88.5950),   # Bahía de Jiquilisco mouth
-    (13.1761, -88.4836),   # Las Tunas
-    (13.1894, -88.3858),   # Playa El Cuco
-    (13.1758, -88.2925),   # Playa Negra
-    (13.1822, -88.1839),   # Playa Esterón
-    (13.1733, -87.9589),   # Conchagua / Playas Orientales
+# Future upgrade: replace the point-set with a proper coastline
+# polyline + nearest-point-on-segment math. Until then, gaps in this
+# list cause the haversine to read several km even for genuinely
+# beachfront listings — so keep coverage dense at the well-known beaches
+# brokers actually mention.
+NAMED_BEACHES: tuple[tuple[str, float, float], ...] = (
+    # ── West (Sonsonate / Ahuachapán) ─────────────────────────────────
+    ("Barra de Santiago",         13.7060, -89.9740),
+    ("Metalío",                   13.5800, -89.7700),
+    ("Los Cóbanos",               13.5410, -89.8050),
+    ("Acajutla",                  13.5928, -89.8275),
+    # ── Surf City 1 (La Libertad) ─────────────────────────────────────
+    ("Bocana San Diego",          13.4843, -89.7163),
+    ("El Majahual",               13.4900, -89.6594),
+    ("El Sunzal",                 13.4844, -89.6322),
+    ("El Tunco",                  13.4870, -89.6133),
+    ("El Sunza",                  13.4983, -89.5856),
+    ("El Zonte",                  13.4983, -89.5538),
+    ("San Blas",                  13.4747, -89.4889),
+    ("Mizata",                    13.5300, -89.7000),
+    ("Playa La Perla",            13.4575, -89.3478),
+    ("Playa Taquillo",            13.4870, -89.5950),
+    ("Playa K59 / San Diego",     13.4843, -89.2500),
+    ("Puerto de La Libertad",     13.4869, -89.3217),
+    ("Punta Roca",                13.4882, -89.3211),
+    # ── Costa del Sol / La Paz ────────────────────────────────────────
+    ("Costa del Sol",             13.3372, -88.9892),
+    ("Playa San Marcelino",       13.3170, -88.9450),
+    # ── Surf City 2 (Usulután / San Miguel) ───────────────────────────
+    ("Bahía de Jiquilisco",       13.2000, -88.5950),
+    ("Playa El Espino",           13.1740, -88.5570),
+    ("Las Tunas",                 13.1761, -88.4836),
+    ("Playa El Cuco",             13.1894, -88.3858),
+    ("Playa Las Flores",          13.1810, -88.3550),
+    ("Playa Negra",               13.1758, -88.2925),
+    ("Playa Esterón",             13.1822, -88.1839),
+    ("Playa El Icacal",           13.1750, -88.2250),
+    # ── La Unión / Conchagua / Golfo de Fonseca (far east) ────────────
+    ("Playa El Tamarindo",        13.2050, -87.8420),
+    ("Playa Maculís",             13.2050, -87.8420),  # adjacent to Tamarindo
+    ("Playa Las Playitas",        13.2700, -87.8000),
+    ("Playa El Jagüey",           13.1800, -87.7330),
+    ("Playa El Cocal",            13.3200, -87.8400),
+    ("Playa Torola",              13.2050, -87.8420),  # within Tamarindo bay
+    ("Playa Cuevitas",            13.2150, -87.8500),
+    ("Conchagua",                 13.1733, -87.9589),
+    ("La Unión bay",              13.3340, -87.8430),
+)
+
+
+# Backward-compat alias: older code references COASTLINE_POINTS as
+# (lat, lng) tuples. Derived from NAMED_BEACHES so we keep one source
+# of truth — adding a beach above propagates to both haversine and the
+# LLM prompt.
+COASTLINE_POINTS: tuple[tuple[float, float], ...] = tuple(
+    (lat, lng) for _, lat, lng in NAMED_BEACHES
 )
 
 

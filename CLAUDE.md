@@ -79,6 +79,31 @@ The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`.
 - **Responsive:** every PR touching a visual surface attaches one mobile (375px) + one desktop (1280px) screenshot. Playwright smoke includes `page.setViewportSize({ width: 320, height: 568 })` and asserts no horizontal overflow on `/` and `/browse`.
 - **No backwards-compat shims** in the new app — the legacy is the legacy, the new is the new. Don't re-export old utilities to "ease migration."
 
+## Geocoding & beach reference table
+
+Coastal listings get their lat/lng from a single LLM call (DeepSeek). The
+prompt at `automation/llm_enrichment_prompts.py` includes an
+`AUTHORITATIVE BEACH COORDINATES` block rendered from
+`NAMED_BEACHES` in `automation/distance_fields.py`. **Same tuple feeds
+both the prompt's anchor table AND the `dist_beach_km` haversine grid.**
+Adding a beach in one place propagates to both.
+
+Read `docs/named-beach-reference.md` before:
+- adding a new country / region to the platform;
+- adding or moving a `NAMED_BEACHES` entry;
+- investigating "listing claims walk-to-beach but `dist_beach_km` is
+  several km".
+
+The nightly pipeline runs `automation/unmapped_beach_detector.py` and
+prints `[unmapped_beaches] suspects=N clusters=M` plus the top
+clusters. A non-zero cluster_count means new listings are landing in
+unmapped territory — the table needs an entry. History is appended to
+`web/data/unmapped_beaches_history.jsonl`.
+
+To force-retrofit existing listings after a prompt or table change:
+`python3 scripts/retrofit_geocoding.py` (dry-run with `--dry-run`,
+cap with `--limit N`).
+
 ## Commit Message Format
 - `feat:` new feature
 - `fix:` bug fix
