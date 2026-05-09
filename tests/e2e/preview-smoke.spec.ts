@@ -130,9 +130,9 @@ test.describe("New app boots cleanly on key routes", () => {
     page.on("pageerror", (err) => errors.push(err.message));
 
     await page.goto("/", { waitUntil: "networkidle" });
-    // The app uses internal state for routing — click the Browse nav
-    // link in TopNav to navigate, then wait for the histogram to mount.
-    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
+    // PR section-urls: TopNav links are now <a> elements (was <button>)
+    // for SEO + cmd-click correctness. Click the anchor.
+    await page.locator(".topnav-links a").getByText(/^Browse$|^Explorar$/).click();
     const histo = page.locator(".histo-track");
     await histo.waitFor({ state: "visible", timeout: 10_000 });
 
@@ -280,7 +280,11 @@ test.describe("New app boots cleanly on key routes", () => {
   // crash. /listing/<id> is exercised inside the existing "detail
   // panel opens" test; here we cover the bare-section paths and the
   // back/forward sequence.
-  for (const route of ["/browse", "/saved", "/plans"]) {
+  // /account is included — anonymous cold-load opens the sign-in modal
+  // as an overlay (URL stays at /account). The modal is expected
+  // behaviour, not a bug; we just assert the path renders and doesn't
+  // crash the boundary.
+  for (const route of ["/browse", "/saved", "/plans", "/account"]) {
     test(`renders ${route} cold-load without console errors`, async ({ page }) => {
       const errors: string[] = [];
       const uncaught: string[] = [];
@@ -292,7 +296,7 @@ test.describe("New app boots cleanly on key routes", () => {
       await page.goto(route, { waitUntil: "networkidle" });
 
       const errorBoundary = page.getByText("Something went wrong.");
-      const realApp = page.locator(".app, .topnav, .hero, .page-home, .page-browse, .saved-page, .plans-page");
+      const realApp = page.locator(".app, .topnav, .hero, .page-home, .page-browse, .saved-page, .plans-page, .account-page");
       await Promise.race([
         realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
         errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
@@ -373,15 +377,25 @@ test.describe("New app boots cleanly on key routes", () => {
     });
   });
 
-  test("/preview returns 404 (rewrites removed)", async ({ request }) => {
-    // The /preview alias was scaffolding from the new-UX rollout. After
-    // section URLs landed it was dropped; Vercel's default 404 fires.
-    // This test asserts the rewrite is gone (would otherwise serve the
-    // SPA shell with a 200).
-    const res = await request.get("/preview", { maxRedirects: 0 });
-    // Vercel's static 404 returns 404; some local dev servers may not
-    // emulate it perfectly. Accept any non-2xx.
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+  test("/preview is gone from vercel.json rewrites (config-level guard)", async () => {
+    // Local dev (`npm run dev`) is a Vite SPA — every path serves the
+    // app, regardless of vercel.json. Network-level enforcement happens
+    // only on the deployed preview/prod. So instead of asserting the
+    // HTTP status, assert the config: the /preview and /preview/ rewrite
+    // sources are gone from vercel.json. The /preview/assets/:file
+    // rewrite stays (build internals reference it).
+    const fs = await import("node:fs/promises");
+    const json = JSON.parse(
+      await fs.readFile("vercel.json", "utf-8"),
+    ) as { rewrites?: { source: string; destination: string }[] };
+    const rewrites = json.rewrites ?? [];
+    const sources = rewrites.map((r) => r.source);
+    expect(sources, "/preview rewrite must be removed").not.toContain("/preview");
+    expect(sources, "/preview/ rewrite must be removed").not.toContain("/preview/");
+    // Build assets still need their path — /preview/assets/:file stays.
+    expect(sources, "/preview/assets/:file rewrite must remain (Vite base)").toContain(
+      "/preview/assets/:file",
+    );
   });
 
   test("robots.txt serves the static file", async ({ request }) => {
