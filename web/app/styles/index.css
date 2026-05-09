@@ -1355,6 +1355,45 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .empty-state p { margin-bottom: 18px; font-size: 14px; }
 
+/* ============== Detail panel — pending + missing states (PR section-urls) ============== */
+/* Cold-load /listing/:id renders the panel chrome before listings.json
+ * resolves. This is the skeleton state — subtle pulse, no surprise
+ * empty modal. The "missing" state lands when the id doesn't resolve
+ * (deleted/sold/typo). Both share the panel chrome so the back-button
+ * UX feels identical. */
+.detail-panel-pending {
+  padding: 32px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.detail-panel-pending-photo {
+  width: 100%; height: 320px;
+  background: var(--paper-2);
+  border-radius: 12px;
+  animation: pulpoPending 1.4s ease-in-out infinite;
+}
+.detail-panel-pending-block {
+  height: 18px; width: 100%;
+  background: var(--paper-2);
+  border-radius: 6px;
+  animation: pulpoPending 1.4s ease-in-out infinite;
+}
+@keyframes pulpoPending {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1.0; }
+}
+.detail-panel-empty {
+  padding: 64px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+  align-items: flex-start;
+}
+.detail-panel-empty p {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink-2);
+}
+
 /* ============== Detail panel ============== */
 .detail-overlay {
   position: fixed; inset: 0; z-index: 90;
