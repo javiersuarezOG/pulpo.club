@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-09T14:14:49.443566+00:00",
-  "started_at": "2026-05-09T13:19:06.877333+00:00",
-  "duration_seconds": 3342.57,
-  "total_listings": 899,
-  "dropped": 148,
+  "last_updated": "2026-05-10T14:15:36.622354+00:00",
+  "started_at": "2026-05-10T13:20:04.605098+00:00",
+  "duration_seconds": 3332.02,
+  "total_listings": 906,
+  "dropped": 149,
   "per_source_raw": {
     "goodlife": 71,
-    "oceanside": 49,
+    "oceanside": 51,
     "century21": 15,
     "bienesraices": 565,
-    "remax": 336,
+    "remax": 342,
     "nexo": 9,
     "encuentra24": 2
   },
@@ -30,7 +30,7 @@
     },
     "oceanside": {
       "supplier": null,
-      "pulled": 49,
+      "pulled": 51,
       "max_pages_hit": false
     },
     "century21": {
@@ -45,7 +45,7 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 336,
+      "pulled": 342,
       "max_pages_hit": false
     },
     "nexo": {
@@ -63,14 +63,14 @@
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
     "previous_price": 0.0022,
-    "beachfront_tier_on_beach": 0.119,
-    "beachfront_tier_walk_to_beach": 0.0167,
-    "beachfront_tier_near_beach": 0.01,
-    "land_type_agricultural": 0.2191,
-    "land_type_commercial": 0.079,
-    "land_type_tourist": 0.0879,
-    "land_type_residential": 0.614,
-    "is_motivated": 0.2024
+    "beachfront_tier_on_beach": 0.1181,
+    "beachfront_tier_walk_to_beach": 0.0166,
+    "beachfront_tier_near_beach": 0.0132,
+    "land_type_agricultural": 0.2174,
+    "land_type_commercial": 0.0817,
+    "land_type_tourist": 0.0872,
+    "land_type_residential": 0.6137,
+    "is_motivated": 0.2031
   },
   "field_completeness": {
     "bienesraices": {
@@ -199,9 +199,9 @@
       }
     },
     "oceanside": {
-      "n_listings": 22,
+      "n_listings": 23,
       "fields": {
-        "price_usd": 0.68,
+        "price_usd": 0.7,
         "area_m2": 0.91,
         "zone": 1.0,
         "municipality": 1.0,
@@ -209,10 +209,10 @@
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.59,
-        "has_paved_access": 0.05,
-        "has_water": 0.18,
-        "has_power": 0.32,
+        "is_beachfront": 0.57,
+        "has_paved_access": 0.09,
+        "has_water": 0.17,
+        "has_power": 0.35,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -224,7 +224,7 @@
       }
     },
     "remax": {
-      "n_listings": 317,
+      "n_listings": 323,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -236,8 +236,8 @@
         "lng": 1.0,
         "is_beachfront": 0.08,
         "has_paved_access": 0.15,
-        "has_water": 0.29,
-        "has_power": 0.37,
+        "has_water": 0.3,
+        "has_power": 0.38,
         "is_repriced": 0.01,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -250,7 +250,7 @@
     }
   },
   "property_type_counts": {
-    "land": 813,
+    "land": 820,
     "condo": 12,
     "house": 74
   },
@@ -261,7 +261,7 @@
       "drop": 3
     },
     "land": {
-      "pass": 759,
+      "pass": 766,
       "flag": 54,
       "drop": 25
     },
