@@ -90,8 +90,15 @@ function scheduleInit() {
       posthog.init(POSTHOG_KEY, {
         api_host: POSTHOG_HOST,
         autocapture: false,             // explicit catalog only
-        capture_pageview: false,        // we fire landing.viewed ourselves
-        capture_pageleave: false,
+        // PostHog Web Analytics (Visitors / Pageviews / Sessions / Paths /
+        // Channels / Bounce rate / etc.) is hard-coded to $pageview +
+        // $pageleave. 'history_change' fires $pageview on cold-load AND
+        // every pushState/popstate, which is what the SPA section URLs
+        // (/, /browse, /saved, /plans, /account, /listing/:id) need.
+        // The custom landing.viewed / route.changed events keep flowing
+        // alongside — this is purely additive.
+        capture_pageview: "history_change",
+        capture_pageleave: true,
         disable_session_recording: !recordingEnabled,
         session_recording: { maskAllInputs: true, sampleRate: 0.1 },
         persistence: "localStorage+cookie",
