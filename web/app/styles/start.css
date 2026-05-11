@@ -84,8 +84,47 @@
   font-size: 17px;
   line-height: 26px;
   color: var(--ink-2);
-  margin: 0 0 var(--space-7);
+  margin: 0 0 var(--space-6);
   max-width: 56ch;
+}
+
+.start-hero-usps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.start-hero-usps li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 22px;
+}
+.start-hero-usps li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.start-hero-code-note {
+  margin: var(--space-4) 0 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.start-hero-error {
+  margin: var(--space-4) 0 0;
+  color: var(--tone-urgent);
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .start-hero-ctas {

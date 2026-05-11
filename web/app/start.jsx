@@ -201,11 +201,6 @@ export default function StartPage() {
     [lc, urlCode, postCheckout]
   );
 
-  const scrollToJoin = useCallback(() => {
-    const el = document.getElementById("join");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
-
   return (
     <div className="start-page">
       <header className="start-nav">
@@ -220,15 +215,31 @@ export default function StartPage() {
           <div className="start-hero-eyebrow">{t("start.hero.eyebrow", lc)}</div>
           <h1 className="start-hero-h1">{t("start.hero.h1", lc)}</h1>
           <p className="start-hero-sub">{t("start.hero.sub", lc)}</p>
+          <ul className="start-hero-usps" aria-label={t("start.aria.usps", lc)}>
+            <li>{t("start.hero.usp_1", lc)}</li>
+            <li>{t("start.hero.usp_2", lc)}</li>
+            <li>{t("start.hero.usp_3", lc)}</li>
+          </ul>
           <div className="start-hero-ctas">
             <button
               type="button"
               className="start-cta-primary"
-              onClick={scrollToJoin}
+              onClick={handleSubmit}
+              disabled={submitting}
             >
-              {t("start.hero.cta_primary", lc, { price: price.displayString })}
+              {submitting
+                ? t("start.join.paid.cta_submitting", lc)
+                : t("start.hero.cta_primary", lc, { price: price.displayString })}
             </button>
           </div>
+          {urlCode && (
+            <p className="start-hero-code-note" aria-live="polite">
+              {t("start.code.applied_note", lc)}
+            </p>
+          )}
+          {error && (
+            <p className="start-hero-error" role="alert">{error}</p>
+          )}
           <p className="start-hero-trust">{t("start.hero.trust_micro", lc)}</p>
         </div>
         <div
