@@ -130,6 +130,15 @@ jobs:
           # picked up next nightly via the sidecar cache. The pipeline
           # ALWAYS ships rather than dying inside the LLM loop.
           PULPO_LLM_DEADLINE_SECONDS: "5400"   # 90 min
+          # PostHog server-side telemetry — feeds the Analytics-basics
+          # dashboard (pipeline_started/completed, crawl_succeeded/failed,
+          # llm_enrichment_completed, regression_guard_triggered). Same
+          # `phc_...` project key as the frontend (it's the ingest write
+          # key, safe to reuse server-side). When the secret is unset the
+          # pipeline runs unchanged — automation/posthog_client.py
+          # silent-no-ops.
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
