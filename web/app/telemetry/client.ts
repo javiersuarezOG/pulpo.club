@@ -23,6 +23,7 @@ type QueuedEvent = {
 type PostHog = {
   init: (key: string, opts: Record<string, unknown>) => void;
   capture: (name: string, props?: Record<string, unknown>) => void;
+  captureException: (error: unknown, extra?: Record<string, unknown>) => void;
   identify: (id: string, props?: Record<string, unknown>) => void;
   reset: () => void;
   opt_out_capturing: () => void;
@@ -30,8 +31,11 @@ type PostHog = {
   has_opted_out_capturing: () => boolean;
 };
 
+type QueuedException = { error: unknown; extra?: Record<string, unknown>; ts: number };
+
 let posthog: PostHog | null = null;
 const queue: QueuedEvent[] = [];
+const exceptionQueue: QueuedException[] = [];
 let initStarted = false;
 
 const POSTHOG_KEY = (import.meta.env.VITE_POSTHOG_KEY as string | undefined) ?? "";
@@ -124,6 +128,10 @@ function drainQueue() {
     const { name, props } = queue.shift()!;
     try { posthog.capture(name, props as Record<string, unknown>); } catch { /* ignore */ }
   }
+  while (exceptionQueue.length) {
+    const { error, extra } = exceptionQueue.shift()!;
+    try { posthog.captureException(error, extra); } catch { /* ignore */ }
+  }
 }
 
 export function track<K extends EventName>(name: K, props: EventMap[K]) {
@@ -137,6 +145,22 @@ export function track<K extends EventName>(name: K, props: EventMap[K]) {
   try {
     posthog.capture(name, props as Record<string, unknown>);
   } catch { /* ignore */ }
+}
+
+// Exception capture — feeds PostHog's Error Tracking surface (emits a
+// native $exception event). Called from ErrorBoundary.componentDidCatch
+// and the global window.onerror / unhandledrejection handlers in
+// telemetry/errors.ts. Queues like track() so exceptions fired before
+// the SDK has loaded still land once init completes.
+export function captureException(error: unknown, extra?: Record<string, unknown>) {
+  if (!SHOULD_TELEMETER) return;
+  if (!posthog) {
+    exceptionQueue.push({ error, extra, ts: Date.now() });
+    scheduleInit();
+    return;
+  }
+  if (posthog.has_opted_out_capturing && posthog.has_opted_out_capturing()) return;
+  try { posthog.captureException(error, extra); } catch { /* ignore */ }
 }
 
 export function identify(id: string, props?: Record<string, unknown>) {
