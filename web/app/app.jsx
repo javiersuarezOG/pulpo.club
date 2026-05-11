@@ -888,10 +888,42 @@ function DebugPanel({ app }) {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <ErrorBoundary>
-    <ListingsProvider>
-      <App />
-    </ListingsProvider>
-  </ErrorBoundary>
-);
+// Mount-time route branch. /start and /welcome are public marketing
+// surfaces that render without the app shell (no TopNav, no BottomNav,
+// no ListingsProvider). They're hard navigations away from the SPA —
+// not state-routed — so we dispatch on the pathname before <App /> runs.
+// Each page is dynamically imported so its chunk only loads when the user
+// is actually on that path; the SPA bundle stays clean for everyone else.
+(() => {
+  const path = typeof window !== "undefined" ? window.location.pathname : "/";
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  if (path === "/start" || path === "/start/") {
+    import("./start.jsx").then((mod) => {
+      const StartPage = mod.default;
+      root.render(
+        <ErrorBoundary>
+          <StartPage />
+        </ErrorBoundary>
+      );
+    });
+    return;
+  }
+  if (path === "/welcome" || path === "/welcome/") {
+    import("./welcome.jsx").then((mod) => {
+      const WelcomePage = mod.default;
+      root.render(
+        <ErrorBoundary>
+          <WelcomePage />
+        </ErrorBoundary>
+      );
+    });
+    return;
+  }
+  root.render(
+    <ErrorBoundary>
+      <ListingsProvider>
+        <App />
+      </ListingsProvider>
+    </ErrorBoundary>
+  );
+})();

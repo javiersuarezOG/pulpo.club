@@ -114,6 +114,44 @@ export type EventMap = {
   // user-experience-only.
   "upgrade.checkout_returned": { result: "success" | "cancelled" };
 
+  // ───── /start landing (acquisition funnel) ─────
+  // Standalone marketing page that funnels visitors into Stripe Checkout
+  // without a Clerk sign-up wall. UTMs are auto-attached by PostHog at
+  // the event-meta layer; do NOT duplicate them in payloads here. The
+  // funnel reads cleanly as:
+  //   $pageview (auto) → start.viewed
+  //                    → start.cta_clicked
+  //                    → start.checkout_redirected
+  //                    → upgrade.checkout_returned (result=success)
+  // and then later, post-invitation-accept, the existing signin.completed
+  // closes the loop with the (now-identified) PostHog person.
+  /** Cold-load of /start. `has_code` mirrors whether the URL carried
+   *  `?code=…`; everything else (utm_*, country, device_type) is auto-
+   *  attached by PostHog. */
+  "start.viewed": { has_code: boolean };
+  /** User clicks either CTA on /start. `type` distinguishes the paid
+   *  card from the code card; `email_entered` / `code_prefilled` surface
+   *  form-state so the dashboard can break down by completion stage. */
+  "start.cta_clicked": {
+    type: "paid" | "code";
+    email_entered: boolean;
+    code_prefilled: boolean;
+  };
+  /** Fires immediately before window.location.assign(stripeUrl). Pairs
+   *  with the existing upgrade.checkout_returned event so the same funnel
+   *  logic computes completion rate for /start as it does for /plans. */
+  "start.checkout_redirected": {
+    type: "paid" | "code";
+    had_promo_code: boolean;
+  };
+  /** Invalid / exhausted promo code path — inline error rendered, no
+   *  redirect. Mirrors paywall.shown / signup_modal.shown naming. */
+  "start.code_error_shown": { reason: "invalid_promo_code" | "exhausted" };
+  /** Cold-load of /welcome (post-payment landing for the anonymous flow).
+   *  No fields — /welcome is only reached by the anonymous /start path
+   *  in v1; PostHog auto-fires $pageview alongside. */
+  "welcome.viewed": Record<string, never>;
+
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
   // before we POST /api/stripe/billing-portal. Pairs with `portal.error`

@@ -24,7 +24,9 @@
     { "source": "/saved",                   "destination": "/web/dist/index.html" },
     { "source": "/plans",                   "destination": "/web/dist/index.html" },
     { "source": "/account",                 "destination": "/web/dist/index.html" },
-    { "source": "/listing/:id",             "destination": "/web/dist/index.html" }
+    { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
+    { "source": "/start",                   "destination": "/web/dist/index.html" },
+    { "source": "/welcome",                 "destination": "/web/dist/index.html" }
   ],
   "headers": [
     {
