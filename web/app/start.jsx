@@ -213,7 +213,7 @@ export default function StartPage() {
   return (
     <div className="start-page" data-mode={codeMode ? "code" : "paid"}>
       <header className="start-nav">
-        <a href="/" className="start-logo" aria-label="Pulpo home">
+        <a href="/" className="start-logo" aria-label={t("start.aria.logo_home", lc)}>
           <PulpoLogo size={28} />
         </a>
         <a href="/" className="start-nav-link">{t("start.nav.login_link", lc)}</a>
@@ -274,7 +274,7 @@ export default function StartPage() {
         </div>
       </section>
 
-      <section className="start-trust" aria-label="Social proof">
+      <section className="start-trust" aria-label={t("start.aria.social_proof", lc)}>
         <p className="start-trust-stat">
           {t("start.trust.stat", lc, { n: CATALOG_COUNT })}
         </p>
@@ -387,7 +387,7 @@ export default function StartPage() {
       </footer>
 
       {stickyVisible && (
-        <div className="start-sticky-cta" role="region" aria-label="Sticky upgrade CTA">
+        <div className="start-sticky-cta" role="region" aria-label={t("start.aria.sticky_cta", lc)}>
           <button
             type="button"
             className="start-cta-primary"

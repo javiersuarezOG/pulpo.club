@@ -727,6 +727,12 @@ const UI_STRINGS = {
                                 es: "Ir a Pulpo →" },
   "welcome.resend_link":      { en: "Didn't get the email? Contact us.",
                                 es: "¿No recibiste el correo? Contáctanos." },
+  "start.aria.logo_home":     { en: "Pulpo home",
+                                es: "Inicio Pulpo" },
+  "start.aria.social_proof":  { en: "Social proof",
+                                es: "Prueba social" },
+  "start.aria.sticky_cta":    { en: "Sticky upgrade CTA",
+                                es: "Botón fijo de mejora" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

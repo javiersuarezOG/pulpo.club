@@ -23,7 +23,7 @@ export default function WelcomePage() {
   return (
     <div className="welcome-page">
       <header className="welcome-nav">
-        <a href="/" className="welcome-logo" aria-label="Pulpo home">
+        <a href="/" className="welcome-logo" aria-label={t("start.aria.logo_home", locale)}>
           <PulpoLogo size={28} />
         </a>
       </header>
