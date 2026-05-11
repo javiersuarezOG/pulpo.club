@@ -1,0 +1,95 @@
+/* /welcome — post-payment "check your inbox" landing.
+   Tokens-only; no app shell. Mirrors the editorial tone of /start. */
+
+.welcome-page {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-nav {
+  padding: var(--space-6);
+  display: flex;
+  align-items: center;
+}
+
+.welcome-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.welcome-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.welcome-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  padding: var(--space-9) var(--space-7);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.welcome-icon {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: var(--space-6);
+}
+
+.welcome-headline {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.1;
+  margin: 0 0 var(--space-5);
+  color: var(--ink);
+}
+
+.welcome-body {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink-2);
+  margin: 0 0 var(--space-7);
+}
+
+.welcome-cta {
+  display: inline-block;
+  padding: 14px 28px;
+  background: var(--accent-strong);
+  color: var(--paper);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: var(--space-5);
+}
+
+.welcome-cta:hover { background: var(--accent); }
+.welcome-cta:active { transform: scale(0.98); }
+
+.welcome-resend {
+  display: block;
+  color: var(--ink-3);
+  font-size: 13px;
+  text-decoration: underline;
+}
+.welcome-resend:hover { color: var(--ink-2); }
+
+@media (max-width: 480px) {
+  .welcome-card {
+    padding: var(--space-7) var(--space-5);
+  }
+  .welcome-headline {
+    font-size: 26px;
+  }
+}
