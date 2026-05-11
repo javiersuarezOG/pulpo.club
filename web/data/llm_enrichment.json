@@ -41676,5 +41676,185 @@
     "cost_usd": 0.00139371,
     "finish_reason": "stop",
     "latency_ms": 10430
+  },
+  "remax|002522781115": {
+    "ts": "2026-05-11T15:51:45.108191+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "The Cliff: Oceanfront Lots in El Sunzal",
+      "es": "The Cliff: Lotes frente al mar en El Sunzal"
+    },
+    "short_description_canonical": {
+      "en": "Discover The Cliff, a gated community in El Sunzal offering panoramic ocean views and expansive green areas. Just 3 minutes from the best waves, these spacious plots (800-1,200 sq. yards) are designed to maximize views. Located 25 km from San Salvador and 30 minutes from the airport, this development is part of the growing Surf City area. Enjoy security, controlled access, and a condominium regime that ensures harmony and maintenance. Prices start at $305 per sq. yard. Reserve your plot with $5,000 and secure your spot in this coastal paradise.",
+      "es": "Descubre The Cliff, una comunidad cerrada en El Sunzal con vistas panorámicas al océano y amplias áreas verdes. A solo 3 minutos de las mejores olas, estos espaciosos lotes (800-1,200 yardas cuadradas) están diseñados para maximizar las vistas. Ubicado a 25 km de San Salvador y 30 minutos del aeropuerto, este desarrollo es parte del creciente Surf City. Disfruta de seguridad, acceso controlado y un régimen de condominio que garantiza armonía y mantenimiento. Precios desde $305 por yarda cuadrada. Reserva tu lote con $5,000 y asegura tu lugar en este paraíso costero."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3 minutes from the best waves",
+        "es": "A 3 minutos de las mejores olas"
+      },
+      {
+        "en": "Panoramic ocean views",
+        "es": "Vistas panorámicas al océano"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Spacious lots from 800 to 1,200 sq. yards",
+        "es": "Lotes amplios de 800 a 1,200 yardas cuadradas"
+      },
+      {
+        "en": "Prime location in Surf City development area",
+        "es": "Ubicación privilegiada en la zona de desarrollo Surf City"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "en",
+    "tokens_in": 2643,
+    "tokens_out": 585,
+    "cost_usd": 0.00135711,
+    "finish_reason": "stop",
+    "latency_ms": 9199
+  },
+  "remax|002522781114": {
+    "ts": "2026-05-11T15:51:45.436015+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "The Cliff: Ocean View Lots in El Sunzal",
+      "es": "The Cliff: Lotes con Vista al Mar en El Sunzal"
+    },
+    "short_description_canonical": {
+      "en": "Welcome to The Cliff, a gated community in the heart of Surf City, El Salvador. Just 3 minutes from the world-class waves of El Sunzal, these spacious residential lots offer panoramic ocean views and lush green areas. Each plot, ranging from 800 to 1,200 square yards, is designed to maximize the breathtaking scenery. Enjoy the harmony of a condominium regime with 24/7 security and controlled access. Located 25 km from San Salvador and 30 minutes from the airport, this is the perfect spot for your dream home or investment. Prices start at $285 per square yard. Reserve your plot today with a $5,000 deposit.",
+      "es": "Bienvenido a The Cliff, una comunidad cerrada en el corazón de Surf City, El Salvador. A solo 3 minutos de las mejores olas de El Sunzal, estos amplios lotes residenciales ofrecen vistas panorámicas al océano y extensas áreas verdes. Cada lote, de 800 a 1,200 yardas cuadradas, está diseñado para maximizar las vistas. Disfruta de la armonía de un régimen de condominio con seguridad 24/7 y acceso controlado. Ubicado a 25 km de San Salvador y 30 minutos del aeropuerto, es el lugar perfecto para tu casa soñada o inversión. Precios desde $285 por yarda cuadrada. ¡Reserva tu lote hoy con un depósito de $5,000!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3 minutes from El Sunzal's best waves",
+        "es": "A 3 minutos de las mejores olas de El Sunzal"
+      },
+      {
+        "en": "Panoramic ocean views from every lot",
+        "es": "Vistas panorámicas al océano desde cada lote"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "25 km from San Salvador, 30 min from airport",
+        "es": "25 km de San Salvador, 30 min del aeropuerto"
+      },
+      {
+        "en": "Flexible lot sizes from 800 to 1,200 sq yd",
+        "es": "Tamaños de lote flexibles de 800 a 1,200 yd²"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "en",
+    "tokens_in": 2731,
+    "tokens_out": 646,
+    "cost_usd": 0.00144797,
+    "finish_reason": "stop",
+    "latency_ms": 9527
+  },
+  "encuentra24|32324408": {
+    "ts": "2026-05-11T15:51:45.756297+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Townhouse for Sale in Portal La Castellana",
+      "es": "Casa en Venta en Portal La Castellana"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning townhouse in the exclusive Portal La Castellana complex, located in the prestigious Distrito El Espino, Colonia San Benito. This 500 v2 (approx. 700 m²) lot features a 305 m² home with 4 bedrooms, 4 bathrooms, formal living and dining rooms, family room, study with full bath, and a terrace integrated into the living area. Enjoy resort-style amenities including 24/7 security, pool, gym, basketball, tennis, and soccer courts, event area, and children's playground. Priced at $850,000. Contact us for a private showing.",
+      "es": "Descubre esta impresionante casa tipo townhouse en el exclusivo complejo Portal La Castellana, ubicado en el prestigioso Distrito El Espino, Colonia San Benito. El terreno de 500 v2 (aproximadamente 700 m²) alberga una vivienda de 305 m² con 4 habitaciones, 4 baños, sala formal, comedor, sala familiar, estudio con baño completo y terraza integrada a la sala. Disfruta de amenidades de primer nivel como seguridad 24/7, piscina, gimnasio, canchas de baloncesto, tenis y fútbol, área de eventos y jardín infantil. Precio: $850,000. Contáctanos para una visita privada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive gated community with 24/7 security",
+        "es": "Comunidad cerrada exclusiva con seguridad 24/7"
+      },
+      {
+        "en": "Resort-style amenities: pool, gym, sports courts",
+        "es": "Amenidades tipo resort: piscina, gimnasio, canchas deportivas"
+      },
+      {
+        "en": "Prime location in Distrito El Espino, San Benito",
+        "es": "Ubicación privilegiada en Distrito El Espino, San Benito"
+      },
+      {
+        "en": "Spacious 305 m² home with 4 bedrooms and study",
+        "es": "Amplia casa de 305 m² con 4 habitaciones y estudio"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol (nearest beach)",
+    "url_language": "es",
+    "tokens_in": 2714,
+    "tokens_out": 601,
+    "cost_usd": 0.00139388,
+    "finish_reason": "stop",
+    "latency_ms": 9846
+  },
+  "remax|002522781113": {
+    "ts": "2026-05-11T15:51:46.145891+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "The Cliff: Ocean View Lots in Surf City",
+      "es": "The Cliff: Lotes con Vista al Mar en Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Discover The Cliff, a residential development in El Sunzal, La Libertad, within the vibrant Surf City corridor. Just 3 minutes from world-class waves, these lots offer panoramic ocean views and expansive green areas. Plots range from 800 to 1,200 sq. yd. (669 to 1,003 m²), designed to maximize the vista. The gated condominium ensures security and harmony. Located 25 km from San Salvador and 30 minutes from the airport. Prices start at $265/sq. yd. Reserve your plot for $5,000, with a 25% down payment at promise of sale and 75% at closing. Choose from clusters Puerto Escondido and Bali.",
+      "es": "Descubre The Cliff, un desarrollo residencial en El Sunzal, La Libertad, dentro del vibrante corredor de Surf City. A solo 3 minutos de las mejores olas, estos lotes ofrecen vistas panorámicas al océano y amplias áreas verdes. Los lotes van de 800 a 1,200 yardas cuadradas (669 a 1,003 m²), diseñados para maximizar la vista. El condominio cerrado garantiza seguridad y armonía. Ubicado a 25 km de San Salvador y 30 minutos del aeropuerto. Precios desde $265/yd². Reserva tu lote por $5,000, con un 25% de enganche en la promesa de compraventa y 75% al cierre. Elige entre los clústeres Puerto Escondido y Bali."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3 minutes from the best surf waves",
+        "es": "A 3 minutos de las mejores olas de surf"
+      },
+      {
+        "en": "Panoramic ocean views from every lot",
+        "es": "Vistas panorámicas al océano desde cada lote"
+      },
+      {
+        "en": "Gated condominium with security and controlled access",
+        "es": "Condominio cerrado con seguridad y acceso controlado"
+      },
+      {
+        "en": "Close to San Salvador and the airport",
+        "es": "Cerca de San Salvador y el aeropuerto"
+      },
+      {
+        "en": "Flexible payment plan with low reservation fee",
+        "es": "Plan de pago flexible con baja cuota de reserva"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "en",
+    "tokens_in": 2798,
+    "tokens_out": 642,
+    "cost_usd": 0.00146166,
+    "finish_reason": "stop",
+    "latency_ms": 10236
   }
 }
