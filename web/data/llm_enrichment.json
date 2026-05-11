@@ -40986,5 +40986,695 @@
     "cost_usd": 0.00074956,
     "finish_reason": "stop",
     "latency_ms": 8259
+  },
+  "remax|001461165123": {
+    "ts": "2026-05-09T14:14:29.338691+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Highland Land in Chalatenango with Pine Forests",
+      "es": "Terreno en Chalatenango con Bosques de Pinos"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity to own land in the cool highlands of Chalatenango, near Cerro El Pital. These lots, starting at 4.3 acres, are surrounded by pine forests and offer breathtaking views of Las Pilas and the surrounding mountains. The property features a natural spring and electricity is available for connection. Ideal for agriculture (fruits, vegetables, high-altitude flowers), residential development, glamping, or cabin construction. Owner financing available. Contact us at 503 7887 6119 to schedule your visit.",
+      "es": "Descubra una oportunidad única de poseer un terreno en las frescas tierras altas de Chalatenango, cerca del Cerro El Pital. Estos lotes, desde 4.3 acres, están rodeados de bosques de pinos y ofrecen impresionantes vistas de Las Pilas y las montañas circundantes. La propiedad cuenta con un manantial natural y electricidad disponible para conexión. Ideal para agricultura (frutas, verduras, flores de altura), desarrollo residencial, glamping o construcción de cabañas. Financiamiento directo del propietario. Contáctenos al 503 7887 6119 para agendar su visita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Cool climate and pine forests near Cerro El Pital",
+        "es": "Clima fresco y bosques de pinos cerca del Cerro El Pital"
+      },
+      {
+        "en": "Natural spring on the property",
+        "es": "Manantial natural en la propiedad"
+      },
+      {
+        "en": "Electricity available for connection",
+        "es": "Electricidad disponible para conexión"
+      },
+      {
+        "en": "Versatile use: agriculture, residential, glamping, cabins",
+        "es": "Uso versátil: agricultura, residencial, glamping, cabañas"
+      },
+      {
+        "en": "Owner financing available",
+        "es": "Financiamiento directo del propietario"
+      }
+    ],
+    "lat": 14.3833,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalatenango municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2439,
+    "tokens_out": 559,
+    "cost_usd": 0.00127343,
+    "finish_reason": "stop",
+    "latency_ms": 11112
+  },
+  "bienesraices|1260": {
+    "ts": "2026-05-09T14:14:30.036270+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Amanelli: Luxury Living at Lake Coatepeque",
+      "es": "Amanelli: Lujo y Naturaleza en el Lago de Coatepeque"
+    },
+    "short_description_canonical": {
+      "en": "Wake up to the majestic beauty of Lake Coatepeque every day at Amanelli. This exclusive apartment project blends the serenity of one of El Salvador's most iconic natural destinations with world-class resort amenities. Choose from 1-bedroom (from 50 m²), 2-bedroom (70-78 m²), or 3-bedroom (up to 85 m²) apartments, each with modern finishes and panoramic lake views. Enjoy the Crystal Lagoons technology for a pristine swimming experience. Your personal lakeside sanctuary awaits.",
+      "es": "Despierta cada día con la majestuosidad del Lago de Coatepeque en Amanelli. Este exclusivo proyecto de apartamentos combina la serenidad de uno de los destinos naturales más icónicos de El Salvador con comodidades de resort de clase mundial. Elige entre apartamentos de 1 habitación (desde 50 m²), 2 habitaciones (70-78 m²) o 3 habitaciones (hasta 85 m²), todos con acabados modernos y vistas panorámicas al lago. Disfruta de la tecnología Crystal Lagoons para una experiencia de natación impecable. Tu refugio personal a orillas del lago te espera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lake Coatepeque front location with stunning views",
+        "es": "Ubicación frente al Lago de Coatepeque con vistas impresionantes"
+      },
+      {
+        "en": "Crystal Lagoons technology for a pristine swimming lagoon",
+        "es": "Tecnología Crystal Lagoons para una laguna de natación cristalina"
+      },
+      {
+        "en": "Modern apartments from 50 to 85 m² with premium finishes",
+        "es": "Apartamentos modernos de 50 a 85 m² con acabados premium"
+      },
+      {
+        "en": "Resort-style amenities in a natural paradise",
+        "es": "Comodidades estilo resort en un paraíso natural"
+      },
+      {
+        "en": "Ideal for vacation home or investment",
+        "es": "Ideal para casa de vacaciones o inversión"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lake Coatepeque, Santa Ana, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2702,
+    "tokens_out": 605,
+    "cost_usd": 0.00139504,
+    "finish_reason": "stop",
+    "latency_ms": 11810
+  },
+  "bienesraices|2352": {
+    "ts": "2026-05-09T14:14:30.536393+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Land in Playa El Espino, Usulután",
+      "es": "Terreno frente al mar en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exceptional opportunity in the heart of Playa El Espino, Usulután. Two adjacent lots offered together, directly on the coastline. This area is experiencing rapid growth, high property value appreciation, and unmatched natural beauty. Playa El Espino is one of the longest and safest beaches in the country, attracting national and international visitors. The combined lot has 40 meters of beach frontage (20 meters each) and 70 meters depth, totaling 2,800 square meters of flat, buildable land. Ideal for a boutique hotel, eco-resort, private villas, or a long-term investment in one of El Salvador's most promising tourist destinations.",
+      "es": "Descubra una oportunidad excepcional en el corazón de Playa El Espino, Usulután. Se ofrecen dos lotes colindantes juntos, directamente sobre la costa. Esta zona experimenta un crecimiento acelerado, alta plusvalía y una belleza natural inigualable. Playa El Espino es una de las playas más extensas y seguras del país, atrayendo visitantes nacionales e internacionales. El lote combinado tiene 40 metros de frente de playa (20 metros cada uno) y 70 metros de fondo, totalizando 2,800 metros cuadrados de terreno plano y aprovechable. Ideal para un hotel boutique, eco-resort, villas privadas o una inversión patrimonial en uno de los destinos turísticos más prometedores de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "40 meters of direct beach frontage",
+        "es": "40 metros de frente directo a la playa"
+      },
+      {
+        "en": "2,800 sqm flat, buildable land",
+        "es": "2,800 m² de terreno plano y aprovechable"
+      },
+      {
+        "en": "Located in a high-growth tourist area",
+        "es": "Ubicado en una zona turística de alto crecimiento"
+      },
+      {
+        "en": "Ideal for hotel, resort, or villa development",
+        "es": "Ideal para desarrollo hotelero, resort o villas"
+      },
+      {
+        "en": "One of the safest and longest beaches in El Salvador",
+        "es": "Una de las playas más seguras y extensas de El Salvador"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Usulután",
+    "url_language": "es",
+    "tokens_in": 2704,
+    "tokens_out": 637,
+    "cost_usd": 0.00143078,
+    "finish_reason": "stop",
+    "latency_ms": 12311
+  },
+  "bienesraices|2353": {
+    "ts": "2026-05-09T14:14:31.897834+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "85-Mz Agro-Industrial Estate with River in Quezaltepeque",
+      "es": "Finca Agroindustrial de 85 Mz con Río en Quezaltepeque"
+    },
+    "short_description_canonical": {
+      "en": "This exceptional 85-manzana property, located just 7 km from downtown Quezaltepeque, offers a rare combination of fertile land, abundant water resources, and strategic location for agro-industrial development. Its greatest asset is a perennial river that traverses the land, providing a natural, inexhaustible water source for livestock, reducing dependence on mechanical wells. The farm also has potable water supply and electrical grid connectivity. Ready for immediate cattle operations, it features robust corrals and 50 installed feeders, ideal for beef or dairy production. The land has proven highly productive with successful corn and bean cycles, showcasing deep, well-drained soil suitable for large-scale agriculture. Proximity to Quezaltepeque facilitates logistics, labor access, and connectivity to major routes toward San Salvador and northern El Salvador. This is a strategic investment for high-level agricultural ventures.",
+      "es": "Esta excepcional propiedad de 85 manzanas, ubicada a solo 7 km del casco urbano de Quezaltepeque, ofrece una combinación única de tierra fértil, abundantes recursos hídricos y ubicación estratégica para el desarrollo agroindustrial. Su mayor activo es un río propio que atraviesa el terreno, proporcionando una fuente de agua natural e inagotable para el ganado, reduciendo la dependencia de pozos mecánicos. La finca cuenta además con suministro de agua potable y conectividad a la red eléctrica. Lista para operaciones ganaderas inmediatas, dispone de corrales robustos y 50 comederos instalados, ideales para ganado de engorde o lechero. La tierra ha demostrado ser altamente productiva con exitosos ciclos de maíz y frijol, mostrando un suelo profundo y bien drenado apto para agricultura a gran escala. Su cercanía a Quezaltepeque facilita la logística, el acceso a mano de obra y la conectividad con las principales rutas hacia San Salvador y la zona norte. Una inversión estratégica para emprendimientos agropecuarios de alto nivel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "85 manzanas of fertile, well-drained land",
+        "es": "85 manzanas de tierra fértil y bien drenada"
+      },
+      {
+        "en": "Perennial river provides natural water for livestock",
+        "es": "Río propio proporciona agua natural para el ganado"
+      },
+      {
+        "en": "Ready-to-use cattle infrastructure with 50 feeders",
+        "es": "Infraestructura ganadera lista con 50 comederos"
+      },
+      {
+        "en": "Proven agricultural productivity (corn and beans)",
+        "es": "Productividad agrícola comprobada (maíz y frijol)"
+      },
+      {
+        "en": "Only 7 km from Quezaltepeque with easy access to San Salvador",
+        "es": "A solo 7 km de Quezaltepeque con fácil acceso a San Salvador"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quezaltepeque, La Libertad, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2707,
+    "tokens_out": 791,
+    "cost_usd": 0.00160099,
+    "finish_reason": "stop",
+    "latency_ms": 13673
+  },
+  "remax|002523392029": {
+    "ts": "2026-05-09T14:14:31.899443+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Flat Lot Near Airport – Ideal for Investment",
+      "es": "Lote Plano Cerca del Aeropuerto – Ideal para Inversión"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional 200 m² (286 varas² / 2,153 ft²) flat lot, perfectly suited for residential construction or investment. With a generous 10 m x 20 m layout (14.3 varas x 28.6 varas), the space is optimized for efficient use. The property already includes a front wall and one side wall, and the rear wall will be completed before sale. An independent front access ensures added privacy and convenience. Utilities such as potable water and electricity are readily available. Fruit trees dot the lot, creating a fresh, natural ambiance. Its size and location offer great potential for a residential development or multiple homes, making it a prime investment opportunity. Located in a quiet, easily accessible area just 20 minutes from El Salvador International Airport. Price: $34,000 per lot.",
+      "es": "Descubra este excepcional lote plano de 200 m² (286 varas² / 2,153 ft²), perfecto para construcción residencial o inversión. Con un generoso diseño de 10 m x 20 m (14.3 varas x 28.6 varas), el espacio está optimizado para un uso eficiente. La propiedad ya incluye un muro frontal y un muro lateral, y el muro trasero se completará antes de la venta. Un acceso frontal independiente garantiza mayor privacidad y comodidad. Los servicios básicos como agua potable y electricidad están disponibles. Árboles frutales salpican el lote, creando un ambiente fresco y natural. Su tamaño y ubicación ofrecen un gran potencial para un desarrollo residencial o varias viviendas, convirtiéndolo en una excelente oportunidad de inversión. Ubicado en una zona tranquila y de fácil acceso, a solo 20 minutos del Aeropuerto Internacional de El Salvador. Precio: $34,000 por lote."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 200 m² lot with excellent layout",
+        "es": "Lote plano de 200 m² con excelente distribución"
+      },
+      {
+        "en": "Pre-built walls and independent access",
+        "es": "Muros preconstruidos y acceso independiente"
+      },
+      {
+        "en": "Utilities available (water & electricity)",
+        "es": "Servicios básicos disponibles (agua y electricidad)"
+      },
+      {
+        "en": "Fruit trees for a natural environment",
+        "es": "Árboles frutales para un ambiente natural"
+      },
+      {
+        "en": "20 minutes from El Salvador International Airport",
+        "es": "20 minutos del Aeropuerto Internacional de El Salvador"
+      }
+    ],
+    "lat": 13.4409,
+    "lng": -89.0557,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador International Airport (SAL)",
+    "url_language": "en",
+    "tokens_in": 2529,
+    "tokens_out": 710,
+    "cost_usd": 0.00146383,
+    "finish_reason": "stop",
+    "latency_ms": 13673
+  },
+  "remax|002284078031": {
+    "ts": "2026-05-09T14:14:33.051392+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Lot in La Bocana, Costa Azul",
+      "es": "Lote frente al mar en La Bocana, Costa Azul"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exceptional investment opportunity in Costa Azul, Ahuachapán, within the private residential community of La Bocana. This rustic lot offers the perfect setting to build a beach house, vacation home, or retreat in an area with growing tourism potential and strong property appreciation. The property features a generous 1,400 m² (2,003.12 square varas) rectangular lot with 20 meters of frontage and 70 meters of depth, providing privacy, spaciousness, and architectural flexibility. Located just two blocks from the beach and three blocks from the bocana (third row), it combines tranquility, natural surroundings, and ocean proximity. The lot borders a 7-meter-wide main road for convenient vehicle access, and electricity and internet service feasibility is already in place. The new owner will need to install a private water well and septic system, allowing for autonomous infrastructure management. This is an ideal choice for those seeking quality of life or a tourism rental investment.",
+      "es": "Descubra una excelente oportunidad de inversión en Costa Azul, Ahuachapán, dentro de la comunidad residencial privada de La Bocana. Este lote rústico ofrece el escenario ideal para construir una casa de playa, residencia vacacional o retiro en una zona con creciente potencial turístico y fuerte plusvalía. La propiedad cuenta con un generoso lote rectangular de 1,400 m² (2,003.12 varas cuadradas) con 20 metros de frente y 70 metros de fondo, brindando privacidad, amplitud y flexibilidad arquitectónica. Ubicado a solo dos cuadras de la playa y tres cuadras de la bocana (tercera fila), combina tranquilidad, entorno natural y cercanía al océano. El lote colinda con una calle principal de 7 metros de ancho para acceso vehicular conveniente, y ya cuenta con factibilidad de servicios de electricidad e internet. El nuevo propietario deberá instalar su propio pozo de agua y sistema séptico, permitiendo una gestión autónoma de la infraestructura. Es una opción ideal para quienes buscan calidad de vida o una inversión en alquiler turístico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location just two blocks from the beach",
+        "es": "Ubicación privilegiada a solo dos cuadras de la playa"
+      },
+      {
+        "en": "Generous 1,400 m² rectangular lot with 20 m frontage",
+        "es": "Amplio lote rectangular de 1,400 m² con 20 m de frente"
+      },
+      {
+        "en": "Private residential community with controlled access",
+        "es": "Comunidad residencial privada con acceso controlado"
+      },
+      {
+        "en": "Electricity and internet feasibility already in place",
+        "es": "Factibilidad de electricidad e internet ya disponible"
+      },
+      {
+        "en": "Growing tourism area with strong appreciation potential",
+        "es": "Zona turística en crecimiento con alto potencial de plusvalía"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach (La Bocana)",
+    "url_language": "en",
+    "tokens_in": 2582,
+    "tokens_out": 796,
+    "cost_usd": 0.00157274,
+    "finish_reason": "stop",
+    "latency_ms": 14825
+  },
+  "encuentra24|31886564": {
+    "ts": "2026-05-09T14:14:40.224157+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Condo in Atami, La Libertad",
+      "es": "Condominio frente al mar en Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover a turnkey investment in the exclusive Atami residential community, offering breathtaking ocean views and a proven track record of vacation rental success. This fully furnished property has been optimized for short-term rentals with six years of rental history and excellent guest ratings. Key features include a private water well and a carefully designed layout ensuring wheelchair accessibility and ease of movement. Perfect for investors seeking a high-yield property in a prime beachfront location.",
+      "es": "Descubra una inversión llave en mano en la exclusiva comunidad residencial Atami, con impresionantes vistas al mar y un historial comprobado de éxito en alquiler vacacional. Esta propiedad totalmente amueblada ha sido optimizada para alquileres a corto plazo con seis años de historial de rentas y excelentes calificaciones de huéspedes. Las características clave incluyen un pozo de agua privado y un diseño cuidadosamente planificado que garantiza accesibilidad para sillas de ruedas y facilidad de movimiento. Perfecto para inversores que buscan una propiedad de alto rendimiento en una ubicación privilegiada frente al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront in private Atami community",
+        "es": "Frente al mar en comunidad privada Atami"
+      },
+      {
+        "en": "Proven vacation rental income with 6-year track record",
+        "es": "Ingreso comprobado de alquiler vacacional con 6 años de historial"
+      },
+      {
+        "en": "Fully furnished and turnkey ready",
+        "es": "Totalmente amueblado y listo para usar"
+      },
+      {
+        "en": "Private water well for self-sufficiency",
+        "es": "Pozo de agua privado para autosuficiencia"
+      },
+      {
+        "en": "Wheelchair accessible design",
+        "es": "Diseño accesible para sillas de ruedas"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Atami, La Libertad (coastal area near Puerto de La Libertad)",
+    "url_language": "es",
+    "tokens_in": 2401,
+    "tokens_out": 558,
+    "cost_usd": 0.00126207,
+    "finish_reason": "stop",
+    "latency_ms": 10188
+  },
+  "encuentra24|31979477": {
+    "ts": "2026-05-09T14:14:43.228812+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Luxury Home in Costa del Sol",
+      "es": "Casa de Playa de Lujo en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Price reduced to $735,000! This elegant first-row beach house in Costa del Sol combines comfort, privacy, and a design that lets you fully enjoy panoramic ocean views. The residence features 362 square meters of construction with a main house of 4 bedrooms and 2 bathrooms, ideal for comfortably accommodating large families and guests. Right on the beach, there is a two-story gazebo perfect for enjoying sunsets, social gatherings, and the sound of the waves. The property includes a beautiful private pool with a solar heating system, accompanied by a hydromassage jacuzzi. Additionally, there is a social bathroom next to the pool area for added convenience. At the entrance of the ranch, there is an independent guard house equipped with 2 bedrooms and a bathroom, providing everything needed for year-round security. This is a unique opportunity to acquire a luxury residence in one of the most exclusive coastal areas of the country. Live the lifestyle you've always dreamed of, right by the sea, with all the comforts you deserve.",
+      "es": "¡Precio rebajado a $735,000! Esta elegante casa de playa de primera fila en Costa del Sol combina comodidad, privacidad y un diseño que permite disfrutar al máximo de las vistas panorámicas al océano. La residencia cuenta con 362 metros cuadrados de construcción, con una casa principal de 4 recámaras y 2 baños, ideal para alojar cómodamente a familias grandes e invitados. A la orilla de la playa se encuentra una glorieta de dos pisos, perfecta para disfrutar atardeceres, reuniones sociales y el sonido de las olas. La propiedad incluye una hermosa piscina privada con sistema de calentador solar, acompañada de un jacuzzi con hidromasaje. Además, dispone de un baño social junto al área de piscina para mayor comodidad. A la entrada del rancho se encuentra una casa independiente para vigilante, equipada con dos recámaras y un baño, proporcionando lo necesario para mantener seguridad durante todo el año. Esta es una oportunidad única de adquirir una residencia de lujo en una de las zonas costeras más exclusivas del país. Viva el estilo de vida que siempre ha soñado frente al mar con todas las comodidades que merece."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "First-row beachfront with panoramic ocean views",
+        "es": "Primera fila frente al mar con vistas panorámicas al océano"
+      },
+      {
+        "en": "Private pool with solar heating and hydromassage jacuzzi",
+        "es": "Piscina privada con calentador solar y jacuzzi con hidromasaje"
+      },
+      {
+        "en": "Two-story gazebo on the beach for sunset gatherings",
+        "es": "Glorieta de dos pisos en la playa para reuniones al atardecer"
+      },
+      {
+        "en": "Independent guard house with 2 bedrooms for added security",
+        "es": "Casa independiente para vigilante con 2 recámaras para mayor seguridad"
+      },
+      {
+        "en": "Price reduced to $735,000 – luxury living in Costa del Sol",
+        "es": "Precio rebajado a $735,000 – vida de lujo en Costa del Sol"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2607,
+    "tokens_out": 853,
+    "cost_usd": 0.00164219,
+    "finish_reason": "stop",
+    "latency_ms": 13890
+  },
+  "remax|001463160061": {
+    "ts": "2026-05-10T14:15:16.836545+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lots in San Diego, La Libertad",
+      "es": "Lotes con Vista al Mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique opportunity to own a piece of paradise in the picturesque hills of San Diego, La Libertad. This new subdivision offers stunning ocean views from most lots, just steps from the main road. Enjoy a tranquil, exclusive setting perfect for building your dream home. Electricity and potable water are available, with septic tank installation required. Lots start at 200 m² (20m x 10m), with larger options. Amenities include a clubhouse with panoramic ocean views and a pool, plus a beachfront clubhouse with direct sand access. Only 30 minutes from the airport.",
+      "es": "Descubra una oportunidad única para poseer un pedazo de paraíso en las pintorescas colinas de San Diego, La Libertad. Este nuevo fraccionamiento ofrece impresionantes vistas al mar desde la mayoría de los lotes, a pocos metros de la carretera principal. Disfrute de un entorno tranquilo y exclusivo, perfecto para construir la casa de sus sueños. Electricidad y agua potable disponibles; instalación de tanque séptico por cuenta del comprador. Lotes desde 200 m² (20m x 10m), con opciones más grandes. Amenidades incluyen casa club con vistas panorámicas y piscina, y otra casa club frente a la playa con acceso directo a la arena. A solo 30 minutos del aeropuerto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Stunning ocean views from most lots",
+        "es": "Impresionantes vistas al mar desde la mayoría de los lotes"
+      },
+      {
+        "en": "Tranquil and exclusive setting",
+        "es": "Entorno tranquilo y exclusivo"
+      },
+      {
+        "en": "Utilities available (electricity & water)",
+        "es": "Servicios disponibles (electricidad y agua)"
+      },
+      {
+        "en": "Clubhouse with pool and beachfront clubhouse",
+        "es": "Casa club con piscina y casa club frente a la playa"
+      },
+      {
+        "en": "30 minutes from the airport",
+        "es": "30 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "tokens_in": 2593,
+    "tokens_out": 591,
+    "cost_usd": 0.00135021,
+    "finish_reason": "stop",
+    "latency_ms": 10559
+  },
+  "remax|001463160059": {
+    "ts": "2026-05-10T14:15:16.971184+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lots in San Diego, La Libertad",
+      "es": "Lotes con Vista al Mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique opportunity to own land in a new subdivision nestled in the scenic hills of San Diego, La Libertad. This exclusive development offers lots with breathtaking ocean views, just steps from the main road. Enjoy a tranquil and secure environment to build your dream home, with electricity and potable water ready. Each lot is rectangular, starting at 200 m², with larger options available. Amenities include a clubhouse with panoramic ocean views and a pool, plus a beachfront clubhouse with direct sand access. Located 30 minutes from the airport, this is the perfect investment for nature lovers seeking peace and convenience.",
+      "es": "Descubra una oportunidad única de poseer un terreno en un nuevo fraccionamiento enclavado en las pintorescas colinas de San Diego, La Libertad. Este desarrollo exclusivo ofrece lotes con impresionantes vistas al océano, a pocos metros de la carretera principal. Disfrute de un entorno tranquilo y seguro para construir la casa de sus sueños, con electricidad y agua potable listas. Cada lote es rectangular, desde 200 m², con opciones más grandes disponibles. Las comodidades incluyen una casa club con vistas panorámicas al océano y piscina, además de una casa club frente a la playa con acceso directo a la arena. Ubicado a 30 minutos del aeropuerto, es la inversión perfecta para los amantes de la naturaleza que buscan paz y conveniencia."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Stunning ocean views from most lots",
+        "es": "Impresionantes vistas al océano desde la mayoría de los lotes"
+      },
+      {
+        "en": "Electricity and potable water ready",
+        "es": "Electricidad y agua potable listas"
+      },
+      {
+        "en": "Clubhouse with pool and beachfront clubhouse",
+        "es": "Casa club con piscina y casa club frente a la playa"
+      },
+      {
+        "en": "30 minutes from the airport",
+        "es": "30 minutos del aeropuerto"
+      },
+      {
+        "en": "Tranquil and secure environment",
+        "es": "Entorno tranquilo y seguro"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "tokens_in": 2593,
+    "tokens_out": 611,
+    "cost_usd": 0.00137221,
+    "finish_reason": "stop",
+    "latency_ms": 10693
+  },
+  "remax|001463160058": {
+    "ts": "2026-05-10T14:15:17.234845+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lots in San Blas, La Libertad",
+      "es": "Lotes con Vista al Mar en San Blas, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover exclusive land lots in the new San Blas Land Subdivision, Surfcity1, La Libertad. Each lot offers breathtaking ocean views and direct street access in a serene, secure setting. Infrastructure is ready with electricity and water connections; buyers install their own septic tank. Located just one minute from El Encuentro shopping center and minutes from Sunset Park, Punta Roca, El Tunco, Sunzal, Atami, and El Zonte. Only 45 minutes from the airport. Build your dream home where nature meets modern convenience.",
+      "es": "Descubra lotes exclusivos en el nuevo fraccionamiento San Blas Land Subdivision, Surfcity1, La Libertad. Cada lote ofrece impresionantes vistas al océano y acceso directo desde la calle principal en un entorno sereno y seguro. La infraestructura está lista con conexiones de electricidad y agua potable; el comprador instala su propio tanque séptico. Ubicado a solo un minuto del centro comercial El Encuentro y minutos de Sunset Park, Punta Roca, El Tunco, Sunzal, Atami y El Zonte. A solo 45 minutos del aeropuerto. Construya la casa de sus sueños donde la naturaleza se encuentra con la comodidad moderna."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Breathtaking ocean views from every lot",
+        "es": "Impresionantes vistas al océano desde cada lote"
+      },
+      {
+        "en": "Ready infrastructure: electricity and water connections",
+        "es": "Infraestructura lista: conexiones de electricidad y agua"
+      },
+      {
+        "en": "1 minute from El Encuentro shopping center",
+        "es": "1 minuto del centro comercial El Encuentro"
+      },
+      {
+        "en": "Minutes from top surf spots: Punta Roca, El Tunco, Sunzal",
+        "es": "Minutos de los mejores spots de surf: Punta Roca, El Tunco, Sunzal"
+      },
+      {
+        "en": "45 minutes from the airport",
+        "es": "45 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "en",
+    "tokens_in": 2605,
+    "tokens_out": 598,
+    "cost_usd": 0.00136115,
+    "finish_reason": "stop",
+    "latency_ms": 10957
+  },
+  "remax|001463160060": {
+    "ts": "2026-05-10T14:15:17.462732+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lots in San Diego, La Libertad",
+      "es": "Lotes con Vista al Mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique opportunity to own a piece of paradise in the picturesque hills of San Diego, La Libertad. This new subdivision offers stunning ocean views from most lots, just minutes from the main road. Enjoy a tranquil, exclusive setting perfect for building your dream home. Electricity and potable water are available, with each buyer responsible for their own septic tank. Lots start at 200 m² (20m x 10m), with larger options. Amenities include a clubhouse with panoramic ocean views and a pool, plus a beachfront clubhouse with direct beach access. Located approximately 30 minutes from the airport.",
+      "es": "Descubra una oportunidad única de poseer un pedazo de paraíso en las pintorescas colinas de San Diego, La Libertad. Este nuevo fraccionamiento ofrece impresionantes vistas al mar desde la mayoría de los lotes, a solo minutos de la carretera principal. Disfrute de un entorno tranquilo y exclusivo, perfecto para construir la casa de sus sueños. Se cuenta con factibilidad de electricidad y agua potable, siendo cada comprador responsable de su propia fosa séptica. Los lotes comienzan desde 200 m² (20m x 10m), con opciones más grandes. Las amenidades incluyen una casa club con vistas panorámicas al mar y piscina, además de una casa club frente a la playa con acceso directo a la arena. Ubicado aproximadamente a 30 minutos del aeropuerto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Stunning ocean views from most lots",
+        "es": "Impresionantes vistas al mar desde la mayoría de los lotes"
+      },
+      {
+        "en": "Tranquil and exclusive setting in the hills",
+        "es": "Entorno tranquilo y exclusivo en las colinas"
+      },
+      {
+        "en": "Clubhouse with panoramic views and pool",
+        "es": "Casa club con vistas panorámicas y piscina"
+      },
+      {
+        "en": "Beachfront clubhouse with direct beach access",
+        "es": "Casa club frente a la playa con acceso directo a la arena"
+      },
+      {
+        "en": "30 minutes from the airport",
+        "es": "30 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "tokens_in": 2593,
+    "tokens_out": 623,
+    "cost_usd": 0.00138541,
+    "finish_reason": "stop",
+    "latency_ms": 11185
+  },
+  "remax|001463160062": {
+    "ts": "2026-05-10T14:15:18.127046+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lots in San Blas, La Libertad",
+      "es": "Lotes con Vista al Mar en San Blas, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover the newest land subdivision in San Blas, Surfcity1, La Libertad, El Salvador. We offer exclusive lots with breathtaking ocean views and direct street access. Each lot provides a prime location with stunning sea vistas, ensuring a serene and secure environment for your dream home. All lots are strategically positioned to overlook the ocean, offering tranquility away from the hustle and bustle. Infrastructure is ready with electricity and potable water connections available. Buyers are responsible for installing their own septic tank. Located just a minute from the new El Encuentro shopping center and minutes from Sunset Park, the development is a 45-minute drive from the airport and close to iconic surf spots like Punta Roca, El Tunco, Sunzal, Atami, and El Zonte. Seize this opportunity to be part of a visionary community where nature meets modern convenience.",
+      "es": "Descubre el nuevo fraccionamiento de lotes en San Blas, Surfcity1, La Libertad, El Salvador. Ofrecemos lotes exclusivos con impresionantes vistas al océano y acceso directo desde la calle principal. Cada lote cuenta con una ubicación privilegiada con vistas panorámicas al mar, garantizando un entorno sereno y seguro para tu hogar soñado. Todos los lotes están estratégicamente ubicados para contemplar el océano, ofreciendo tranquilidad lejos del bullicio. La infraestructura está lista con conexiones de electricidad y agua potable disponibles. Los compradores son responsables de instalar su propio tanque séptico. Ubicado a solo un minuto del nuevo centro comercial El Encuentro y a minutos de Sunset Park, el desarrollo está a 45 minutos del aeropuerto y cerca de destinos de surf icónicos como Punta Roca, El Tunco, Sunzal, Atami y El Zonte. Aprovecha esta oportunidad de ser parte de una comunidad visionaria donde la naturaleza se encuentra con la comodidad moderna."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Breathtaking ocean views from every lot",
+        "es": "Impresionantes vistas al océano desde cada lote"
+      },
+      {
+        "en": "Direct street access and ready infrastructure",
+        "es": "Acceso directo desde la calle e infraestructura lista"
+      },
+      {
+        "en": "Minutes from El Encuentro shopping center and Sunset Park",
+        "es": "Minutos del centro comercial El Encuentro y Sunset Park"
+      },
+      {
+        "en": "Close to iconic surf destinations",
+        "es": "Cerca de destinos de surf icónicos"
+      },
+      {
+        "en": "45 minutes from the airport",
+        "es": "A 45 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "en",
+    "tokens_in": 2605,
+    "tokens_out": 728,
+    "cost_usd": 0.00150415,
+    "finish_reason": "stop",
+    "latency_ms": 11850
+  },
+  "oceanside|15402": {
+    "ts": "2026-05-10T14:15:19.586414+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Ocean View Land in Surf City 2 Corridor",
+      "es": "Terreno Premium con Vista al Mar en Corredor Surf City 2"
+    },
+    "short_description_canonical": {
+      "en": "Seize a rare investment opportunity in El Salvador's most dynamic coastal corridor. This 3,322.62 m² plot is strategically positioned just before Tunnel 2, on the high-growth stretch between KM 59 and Mizata. The property's topography offers uninterrupted panoramic views of the Pacific Ocean, ideal for a boutique development or a private luxury estate. Priced at $250,000 USD (negotiable), this land sits at the heart of the Surf City 2 initiative, benefiting from massive infrastructure upgrades including the Litoral Highway expansion, modern utility grids, and improved access roads. As the government channels investment into this emerging luxury tourism destination, appreciation potential is exceptional. Secure your foothold in the new frontier of El Salvador's coastline.",
+      "es": "Aproveche una oportunidad de inversión única en el corredor costero más dinámico de El Salvador. Este terreno de 3,322.62 m² está estratégicamente ubicado justo antes del Túnel 2, en el tramo de alto crecimiento entre KM 59 y Mizata. Su topografía ofrece vistas panorámicas ininterrumpidas del Océano Pacífico, ideal para un desarrollo boutique o una finca privada de lujo. Con un precio de $250,000 USD (negociable), este terreno se encuentra en el corazón de la iniciativa Surf City 2, beneficiándose de enormes mejoras de infraestructura, incluyendo la expansión de la Carretera Litoral, redes de servicios públicos modernas y caminos de acceso mejorados. A medida que el gobierno canaliza inversiones hacia este destino turístico de lujo emergente, el potencial de apreciación es excepcional. Asegure su lugar en la nueva frontera de la costa salvadoreña."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,322.62 m² with panoramic Pacific Ocean views",
+        "es": "3,322.62 m² con vistas panorámicas al Océano Pacífico"
+      },
+      {
+        "en": "Located in the high-growth KM 59 to Mizata corridor",
+        "es": "Ubicado en el corredor de alto crecimiento entre KM 59 y Mizata"
+      },
+      {
+        "en": "Directly benefits from Surf City 2 infrastructure investments",
+        "es": "Se beneficia directamente de las inversiones en infraestructura de Surf City 2"
+      },
+      {
+        "en": "Ideal for boutique development or luxury private estate",
+        "es": "Ideal para desarrollo boutique o finca privada de lujo"
+      },
+      {
+        "en": "Negotiable price at $250,000 USD",
+        "es": "Precio negociable de $250,000 USD"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego (KM 59 area)",
+    "url_language": "en",
+    "tokens_in": 2593,
+    "tokens_out": 723,
+    "cost_usd": 0.00149541,
+    "finish_reason": "stop",
+    "latency_ms": 13310
+  },
+  "remax|002523229005": {
+    "ts": "2026-05-10T14:15:27.267126+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Lot in Residencial El Sinaí, Santa Ana",
+      "es": "Lote Premium en Residencial El Sinaí, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Build your dream home in one of Santa Ana's most exclusive and high-value areas. This 279.62 m² lot is located in Residencial El Sinaí, a private, modern, and secure community offering 24/7 security, parks, green areas, and fully urbanized streets. Enjoy a peaceful atmosphere surrounded by modern homes, with easy access to the Pan-American Highway and close to shopping centers, supermarkets, universities, and restaurants. Priced at $145,900 (negotiable), this is a rare opportunity to invest in a prestigious, fast-growing city. Ideal for living or investment with strong appreciation potential. Contact us for a visit!",
+      "es": "Construye la casa de tus sueños en una de las zonas más exclusivas y de alto valor de Santa Ana. Este lote de 279.62 m² está ubicado en Residencial El Sinaí, una comunidad privada, moderna y segura que ofrece seguridad 24/7, parques, áreas verdes y calles totalmente urbanizadas. Disfruta de un ambiente tranquilo rodeado de casas modernas, con fácil acceso a la Carretera Panamericana y cerca de centros comerciales, supermercados, universidades y restaurantes. Precio: $145,900 (negociable). ¡Una oportunidad única para invertir en una ciudad prestigiosa y de rápido crecimiento! Ideal para vivir o invertir con alto potencial de plusvalía. ¡Contáctanos para agendar tu visita!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive private community with 24/7 security",
+        "es": "Comunidad privada exclusiva con seguridad 24/7"
+      },
+      {
+        "en": "Prime location near Pan-American Highway and amenities",
+        "es": "Ubicación privilegiada cerca de la Carretera Panamericana y servicios"
+      },
+      {
+        "en": "279.62 m² lot with fully urbanized streets",
+        "es": "Lote de 279.62 m² con calles totalmente urbanizadas"
+      },
+      {
+        "en": "High appreciation potential in growing Santa Ana",
+        "es": "Alto potencial de plusvalía en la creciente Santa Ana"
+      },
+      {
+        "en": "Negotiable price at $145,900",
+        "es": "Precio negociable de $145,900"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana city centroid",
+    "url_language": "en",
+    "tokens_in": 2583,
+    "tokens_out": 633,
+    "cost_usd": 0.00139371,
+    "finish_reason": "stop",
+    "latency_ms": 10430
   }
 }
