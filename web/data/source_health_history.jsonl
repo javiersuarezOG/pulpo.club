@@ -61,3 +61,10 @@
 {"ts": "2026-05-10T13:20:04.605098+00:00", "source": "remax", "status": "green", "count": 342, "duration_s": 1200.82, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
 {"ts": "2026-05-10T13:20:04.605098+00:00", "source": "nexo", "status": "green", "count": 9, "duration_s": 25.68, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
 {"ts": "2026-05-10T13:20:04.605098+00:00", "source": "encuentra24", "status": "green", "count": 2, "duration_s": 322.85, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "goodlife", "status": "green", "count": 71, "duration_s": 126.08, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "oceanside", "status": "green", "count": 51, "duration_s": 4.64, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "century21", "status": "green", "count": 15, "duration_s": 54.85, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "bienesraices", "status": "green", "count": 565, "duration_s": 1652.84, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "remax", "status": "green", "count": 345, "duration_s": 1195.94, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "nexo", "status": "green", "count": 9, "duration_s": 25.3, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
+{"ts": "2026-05-11T14:54:01.689146+00:00", "source": "encuentra24", "status": "green", "count": 3, "duration_s": 383.97, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false}
