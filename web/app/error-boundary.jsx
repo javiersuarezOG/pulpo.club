@@ -1,8 +1,10 @@
 import React from "react";
+import { captureException } from "./telemetry/client";
 
 // Top-level error boundary. Catches any render-time exception and renders a
 // branded fallback instead of blanking the page. Wired in app.jsx around
-// <App />. PostHog hookup lands in PR-2 — for now it just console.errors.
+// <App />. Forwards the error to PostHog (Error Tracking surface) via
+// captureException so the team gets paged via PostHog alerts.
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -15,6 +17,9 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, info) {
     console.error("[pulpo] uncaught error", error, info);
+    try {
+      captureException(error, { componentStack: info?.componentStack, kind: "react.errorBoundary" });
+    } catch { /* never let telemetry break the fallback render */ }
   }
 
   render() {
