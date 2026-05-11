@@ -29,7 +29,7 @@ export default function WelcomePage() {
       </header>
       <main className="welcome-main">
         <div className="welcome-card">
-          <div className="welcome-icon" aria-hidden="true">📬</div>
+          <div className="welcome-eyebrow">{t("welcome.eyebrow", locale)}</div>
           <h1 className="welcome-headline">{t("welcome.headline", locale)}</h1>
           <p className="welcome-body">{t("welcome.body", locale)}</p>
           <a className="welcome-cta" href="/">

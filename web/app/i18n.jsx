@@ -657,6 +657,12 @@ const UI_STRINGS = {
                                 es: "Obtener acceso — {price}/mes" },
   "start.hero.trust_micro":   { en: "Cancel anytime. No commitment.",
                                 es: "Cancela cuando quieras. Sin compromiso." },
+  "start.hero.usp_1":         { en: "All properties, updated daily",
+                                es: "Todas las propiedades, actualizadas a diario" },
+  "start.hero.usp_2":         { en: "Off-market deals before the portals",
+                                es: "Ofertas off-market antes que los portales" },
+  "start.hero.usp_3":         { en: "Price history & investment signals",
+                                es: "Historial de precios y señales de inversión" },
   "start.value.a.label":      { en: "Before the portals",
                                 es: "Antes que los portales" },
   "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
@@ -719,6 +725,10 @@ const UI_STRINGS = {
                                 es: "Prueba social" },
   "start.aria.sticky_cta":    { en: "Sticky upgrade CTA",
                                 es: "Botón fijo de mejora" },
+  "start.aria.usps":          { en: "What's included",
+                                es: "Qué incluye" },
+  "welcome.eyebrow":          { en: "You're in",
+                                es: "Ya está" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation
