@@ -45,6 +45,10 @@ from automation.pipeline_steps import (  # noqa: E402
     phase_normalize, phase_validate, phase_write_outputs, phase_print_summary,
     compute_derived_population, check_population_regression,
 )
+from automation.posthog_client import (  # noqa: E402
+    capture as _ph_capture,
+    set_run_id as _ph_set_run_id,
+)
 
 import hashlib  # noqa: E402
 import io      # noqa: E402
@@ -239,6 +243,17 @@ def main() -> int:
     sources = (os.environ.get("PULPO_SOURCES") or ",".join(REGISTRY.keys())).split(",")
 
     started = datetime.now(timezone.utc)
+    # PostHog: tag every subsequent capture() in this process with a
+    # shared run_id so we can filter the full lifecycle of one nightly
+    # invocation in the Events view.
+    run_id = _ph_set_run_id()
+    print(f"[posthog] run_id={run_id}")
+    _ph_capture("pipeline_started", {
+        "sources": sources,
+        "sources_count": len(sources),
+        "offline": offline,
+        "limit": limit,
+    })
     raw: list[dict] = []
     per_source_count: dict[str, int] = {}
     errors: list[str] = []
@@ -302,6 +317,27 @@ def main() -> int:
         for r in recs:
             r.setdefault("source", src)
             raw.append(r)
+
+    # ── PostHog: per-source crawl results ────────────────────────────
+    # Emit one event per source after the loop completes (success or
+    # failure) so the Scraper-health dashboard and Pipeline funnel tiles
+    # populate. Ordering inside the loop would also work; out-of-loop
+    # keeps the loop body focused.
+    for _src in sources:
+        _src = _src.strip()
+        _had_error = _src in source_errors
+        _ph_capture(
+            "crawl_failed" if _had_error else "crawl_succeeded",
+            {
+                "source":        _src,
+                "count":         per_source_count.get(_src, 0),
+                "duration_s":    source_durations.get(_src),
+                "error_class":   source_error_class.get(_src),
+                "error_msg":     (source_errors.get(_src) or "")[:300] or None,
+                "max_pages_hit": source_meta.get(_src, {}).get("max_pages_hit", False),
+                "limit_hit":     source_meta.get(_src, {}).get("limit_hit", False),
+            },
+        )
 
     # ── Per-listing type-classifier shadow log ───────────────────────
     # Goodlife already runs the multi-signal classifier inline and writes
@@ -671,6 +707,32 @@ def main() -> int:
         if llm_metrics.get("failure_reasons"):
             print(f"[llm_enrich] failure_reasons={llm_metrics['failure_reasons']}")
 
+    # PostHog: LLM cost + throughput. Feeds the "LLM enrichment cost trend"
+    # tile and pairs with cost_usd for spend-alert thresholds. Emitted
+    # for every code path (no-token / no-package / live) so the dashboard
+    # can distinguish "skipped because misconfigured" from "ran cleanly".
+    _lat = llm_metrics.get("latency_ms") or []
+    _lat_p50 = _lat_p95 = None
+    if _lat:
+        _srt = sorted(_lat)
+        _lat_p50 = _srt[len(_srt) // 2]
+        _lat_p95 = _srt[max(0, int(len(_srt) * 0.95) - 1)]
+    _ph_capture("llm_enrichment_completed", {
+        "eligible":          llm_metrics.get("eligible"),
+        "cache_hits":        llm_metrics.get("cache_hits"),
+        "enriched":          llm_metrics.get("enriched"),
+        "skipped":           llm_metrics.get("skipped"),
+        "failed":            llm_metrics.get("failed"),
+        "cost_usd":          llm_metrics.get("cost_usd"),
+        "latency_p50_ms":    _lat_p50,
+        "latency_p95_ms":    _lat_p95,
+        "global_error_seen": bool(llm_metrics.get("global_error_seen")),
+        "skip_reasons":      llm_metrics.get("skip_reasons"),
+        "failure_reasons":   llm_metrics.get("failure_reasons"),
+        "skipped_no_token":  bool(llm_metrics.get("skipped_no_token")),
+        "skipped_no_package": bool(llm_metrics.get("skipped_no_package")),
+    })
+
     # Deterministic fallback templates (PRD §8.1 + §8.3) for listings the
     # LLM skipped or couldn't enrich. Fills title_canonical and
     # reasons_to_buy from the rule tables; short_description_canonical
@@ -778,6 +840,14 @@ def main() -> int:
             print(f"[regression-guard] could not parse previous last_updated.json: {_e!r}")
     regressions = check_population_regression(prev_meta, new_rates, threshold=0.20)
     if regressions:
+        # PostHog: emit BEFORE SystemExit so a failing run still reports.
+        # atexit flush in posthog_client guarantees the event ships before
+        # the process dies.
+        _ph_capture("regression_guard_triggered", {
+            "regression_count": len(regressions),
+            "regressions":      regressions[:20],   # cap payload size
+            "override_active":  os.getenv("PULPO_ALLOW_POPULATION_REGRESSION") == "1",
+        })
         msg = "[regression-guard] population-rate drops exceeded 20% threshold:\n  " + "\n  ".join(regressions)
         if os.getenv("PULPO_ALLOW_POPULATION_REGRESSION") == "1":
             print(f"{msg}\n[regression-guard] override active — continuing.")
@@ -811,6 +881,22 @@ def main() -> int:
         dropped=dropped,
         validation_by_type=val_counts.get('by_type'),
     )
+
+    # PostHog: pipeline run completed. Feeds the "Pipeline run volume"
+    # and "Listing pipeline funnel" dashboards. Funnel events chain to
+    # pipeline_started via the shared distinct_id (`pipeline:nightly`),
+    # so PostHog stitches them by run order; per-run drill-down uses
+    # the run_id property propagated by posthog_client.set_run_id.
+    _ph_capture("pipeline_completed", {
+        "ranked_count":            len(ranked),
+        "dropped":                 dropped,
+        "errors_count":            len(errors),
+        "sources_succeeded":       sum(1 for s in sources if s.strip() not in source_errors and per_source_count.get(s.strip(), 0) > 0),
+        "sources_failed":          len([s for s in sources if s.strip() in source_errors]),
+        "duration_s":              round((finished - started).total_seconds(), 2),
+        "offline":                 offline,
+        "fixture_fallback_active": fixture_fallback_active,
+    })
 
     # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}
     # so weekly drift in field populations is visible without a manual re-run.

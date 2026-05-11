@@ -19,3 +19,11 @@ openai>=1.0,<2.0
 # featured-listing filter falls back to "not flagged" — pipeline still
 # runs, just without text-overlay exclusion.
 pytesseract>=0.3.10
+# PostHog server-side SDK. Sends nightly pipeline telemetry
+# (pipeline_started/completed, crawl_succeeded/failed,
+# llm_enrichment_completed, regression_guard_triggered) to the
+# Analytics basics dashboard. Optional at runtime: when
+# POSTHOG_PROJECT_TOKEN is unset, automation/posthog_client.py
+# silent-no-ops and the pipeline runs unchanged.
+posthog>=3.0
+
