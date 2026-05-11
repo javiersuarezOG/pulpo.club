@@ -4,19 +4,30 @@
 //
 // Why this exists: the prior "Discover feels slow" investigations
 // shipped four PRs without confirming the underlying cache behaviour
-// from telemetry. After PR-185 fixed /photos and /data, the
-// /preview/assets/* chain (entry bundle, dynamic chunks, CSS, category
-// WebPs) was still serving with `max-age=0, must-revalidate`. We want
-// PostHog to show this directly so the next regression is caught
-// before users notice.
+// from telemetry. After PR-185 fixed /photos and /data, the asset
+// chain (entry bundle, dynamic chunks, CSS, category WebPs) was
+// still serving with `max-age=0, must-revalidate`. We want PostHog to
+// show this directly so the next regression is caught before users
+// notice.
 //
 // Implementation: a PerformanceObserver subscribes to "resource"
-// entries and filters to the Vite-built /preview/assets/* (or /assets/*
-// post-cutover) tree. For each match we emit `perf.asset_load` with
-// kind/url/ms/bytes/cache. The observer also drains already-finished
-// resources via getEntriesByType — those load before bootAssetTelemetry
-// runs (it boots after React mount; the entry bundle has already
-// finished by then).
+// entries and filters to the Vite-built tree. For each match we emit
+// `perf.asset_load` with kind/url/ms/bytes/cache. The observer also
+// drains already-finished resources via getEntriesByType — those
+// load before bootAssetTelemetry runs (it boots after React mount;
+// the entry bundle has already finished by then).
+//
+// URL paths covered:
+//   /build/*           — current Vite output (post PR-193, base="/"
+//                        and assetsDir="build"). Hashed JS / CSS /
+//                        category WebPs.
+//   /preview/assets/*  — legacy path from before PR-193 dropped the
+//                        /preview prefix. Matched for back-compat in
+//                        case someone has a stale tab open right after
+//                        the cutover.
+//   /assets/*          — brand-asset namespace (favicon, logo SVG).
+//                        No Vite-built JS lives here today; matched
+//                        defensively in case the structure shifts.
 
 import { track } from "./client";
 
@@ -25,19 +36,18 @@ type AssetKind = "entry" | "chunk" | "css" | "webp";
 const ENTRY_FILENAMES = new Set(["index.js"]);
 
 function classify(url: string): AssetKind | null {
-  // Only track our own asset tree. /preview/assets/* is the current
-  // path; a future PR will switch to /assets/* (post Vite-base flip)
-  // — match both so this telemetry continues working through the
-  // cutover.
-  const m = url.match(/\/(?:preview\/)?assets\/([^/?#]+)/);
+  // Match Vite output across the /build/* (current), /preview/assets/*
+  // (legacy / stale tabs), and /assets/* (brand-asset namespace) URL
+  // shapes. Single regex — capture group is the filename.
+  const m = url.match(/\/(?:build|preview\/assets|assets)\/([^/?#]+)/);
   if (!m) return null;
   const filename = m[1];
   if (filename.endsWith(".css")) return "css";
   if (filename.endsWith(".webp")) return "webp";
   if (filename.endsWith(".js")) {
-    // After PR-2 the bundle will be content-hashed (e.g.
-    // "index-abc123.js"). Treat anything starting with "index" as the
-    // entry; the rest are chunks.
+    // Bundle is content-hashed (e.g. "index-abc123.js"). Treat
+    // anything starting with "index" as the entry; the rest are
+    // dynamically-imported chunks.
     if (
       ENTRY_FILENAMES.has(filename) ||
       filename.startsWith("index-") ||

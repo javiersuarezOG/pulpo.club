@@ -2425,6 +2425,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .confirm-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 8px; }
 
+/* ====== Clerk handoff intro modal ====== */
+.modal-clerk-intro {
+  max-width: 480px;
+  padding: 28px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.modal-clerk-intro .pulpo-logo,
+.modal-clerk-intro svg { align-self: flex-start; }
+.clerk-intro-skip {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--ink-3);
+  padding-top: 4px; cursor: pointer;
+}
+.clerk-intro-skip input[type="checkbox"] { cursor: pointer; }
+
 
 /* ============== Tweak: density ============== */
 .density-compact .shelf { margin-bottom: 24px; }

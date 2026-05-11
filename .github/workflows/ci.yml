@@ -55,5 +55,40 @@ jobs:
           cache: npm
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
+      # Static i18n guard — catches hardcoded English in JSX attribute
+      # strings (`aria-label`, `placeholder`, `alt`, `title`) under
+      # web/app/. ~1s, runs before the heavier checks. See
+      # scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
+      - run: node scripts/i18n_lint.mjs
       - run: npm run test --if-present
       - run: npm run build
+
+  e2e-smoke:
+    name: e2e (Playwright smoke)
+    runs-on: ubuntu-latest
+    needs: frontend
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      # Browsers + system deps for Playwright. --with-deps installs the
+      # libnss / libatk packages that Chromium needs on bare ubuntu.
+      - run: npx playwright install --with-deps chromium
+      # Build the dist so the immutable-cache content-hash assertion in
+      # tests/e2e/preview-smoke.spec.ts has something to read.
+      - run: npm run build
+      # Runs everything under tests/e2e/. The Spanish-canary spec is
+      # the i18n regression guard for JSX text content (the static lint
+      # above only covers attribute strings).
+      - run: npm run e2e:smoke
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

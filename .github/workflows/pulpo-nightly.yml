@@ -255,7 +255,7 @@ jobs:
         # tuned against 7 days of real nightly runs.  Until then, violations are
         # printed but do NOT fail the workflow so we can calibrate thresholds.
         env:
-          LOG_ONLY: "true"   # flip to "false" after the 7-day soak window
+          LOG_ONLY: "false"   # flip to "false" after the 7-day soak window
         run: |
           python3 - <<'EOF'
           import json, re, sys, os
