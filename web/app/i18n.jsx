@@ -168,10 +168,15 @@ const UI_STRINGS = {
   "pill.all":                { en: "All",                 es: "Todos" },
 
   // Card
-  "card.listings_count":     { en: "listings",            es: "terrenos" },
+  // Pulpo's catalog now includes houses + lots, not just plots of
+  // land. Spanish copy uses "propiedades" (inclusive) rather than
+  // "terrenos" (which would translate "listing" → "plot of land").
+  // Keep "terreno" only where the string is genuinely about parcels
+  // of land specifically — see `type.raw`, `filter.feature.flat`.
+  "card.listings_count":     { en: "listings",            es: "propiedades" },
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
-  "browse.in_country":       { en: "listings in El Salvador",    es: "terrenos en El Salvador" },
+  "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   "card.listed_days_ago":    { en: "Listed {n} days ago", es: "Publicado hace {n} días" },
   "card.listed_1_month":     { en: "Listed 1 month ago",  es: "Publicado hace 1 mes" },
@@ -199,7 +204,13 @@ const UI_STRINGS = {
   "filter.clear":            { en: "Clear all",           es: "Limpiar todo" },
   "filter.zone":             { en: "Zone",                es: "Zona" },
   "filter.price":            { en: "Price",               es: "Precio" },
-  "filter.land_type":        { en: "Land type",           es: "Tipo de terreno" },
+  // Filter values cover residential / agricultural / commercial /
+  // tourist / mixed / raw — broad use categories, not strictly
+  // plots-of-land. Renamed to "Property type" / "Tipo de propiedad"
+  // to match Pulpo's broadened scope (houses + lots, not just land).
+  // The i18n key keeps `land_type` for back-compat with the filter
+  // state shape — only the user-visible label changes.
+  "filter.land_type":        { en: "Property type",       es: "Tipo de propiedad" },
   "filter.size":             { en: "Size",                es: "Tamaño" },
   "filter.features":         { en: "Key features",        es: "Características" },
   "filter.infrastructure":   { en: "Infrastructure",      es: "Infraestructura" },
@@ -218,9 +229,9 @@ const UI_STRINGS = {
   // Saved
   "saved.title":             { en: "Saved",               es: "Guardados" },
   "saved.empty.title":       { en: "Your saved listings will appear here",
-                               es: "Tus terrenos guardados aparecerán aquí" },
+                               es: "Tus propiedades guardadas aparecerán aquí" },
   "saved.empty.body":        { en: "Browse listings and tap ♡ to save the ones that interest you.",
-                               es: "Explora los terrenos y toca ♡ para guardar los que te interesen." },
+                               es: "Explora las propiedades y toca ♡ para guardar las que te interesen." },
 
   // Toasts
   "toast.saved":             { en: "Saved to your shortlist", es: "Guardado en tu lista" },
@@ -233,7 +244,7 @@ const UI_STRINGS = {
   "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
                                es: "Propiedades que valen la pena en El Salvador." },
   "footer.country_badge":    { en: "Listings in El Salvador",
-                               es: "Terrenos en El Salvador" },
+                               es: "Propiedades en El Salvador" },
 
   // Find Your Style carousel (A.2)
   "style.title":             { en: "Find Your Style",  es: "Encuentra tu estilo" },
@@ -242,7 +253,7 @@ const UI_STRINGS = {
 
   // Live header stats (PR-4c)
   "stats.sources":           { en: "sources",  es: "fuentes" },
-  "stats.listings":          { en: "listings", es: "terrenos" },
+  "stats.listings":          { en: "listings", es: "propiedades" },
   "stats.updated":           { en: "updated",  es: "actualizado" },
   "stats.info_label":        { en: "Pulpo data freshness", es: "Frescura de los datos de Pulpo" },
 
@@ -291,6 +302,13 @@ const UI_STRINGS = {
   "detail.km_to_town":       { en: "{n}km to nearest town",         es: "{n}km al pueblo más cercano" },
   "detail.km_to_town_approx": { en: "ca. {n}km to nearest town",    es: "aprox. {n}km al pueblo más cercano" },
   "detail.fact.road":        { en: "Road access",                   es: "Acceso vial" },
+  // Per-enum-value labels for road_access_type — adapter emits one of
+  // {paved, gravel, dirt, unknown}. Previously the FE called
+  // `capitalize(value)` which produced "Paved" in Spanish too. Each
+  // enum value gets its own row so the FE can do a typed lookup.
+  "detail.fact.road.paved":  { en: "Paved",                         es: "Pavimentado" },
+  "detail.fact.road.gravel": { en: "Gravel",                        es: "Ripio" },
+  "detail.fact.road.dirt":   { en: "Dirt",                          es: "Tierra" },
   "detail.fact.water":       { en: "Water supply",                  es: "Suministro de agua" },
   "detail.fact.water_on":    { en: "On site",                       es: "En sitio" },
   "detail.fact.electricity": { en: "Electricity",                   es: "Electricidad" },
@@ -299,6 +317,12 @@ const UI_STRINGS = {
   "detail.fact.flat_yes":    { en: "Mostly flat",                   es: "Mayormente plano" },
   "detail.fact.flat_no":     { en: "Sloped",                        es: "Inclinado" },
   "detail.fact.beachfront_tier": { en: "Beachfront tier",           es: "Nivel de playa" },
+  // Per-enum-value labels for beachfront_tier — same fix as
+  // detail.fact.road.* above. Backend emits {on_beach, walk_to_beach,
+  // near_beach}; FE was rendering the underscored slug capitalized.
+  "detail.fact.beachfront_tier.on_beach":      { en: "On the beach",      es: "Frente al mar" },
+  "detail.fact.beachfront_tier.walk_to_beach": { en: "Walk to the beach", es: "A pasos del mar" },
+  "detail.fact.beachfront_tier.near_beach":    { en: "Near the beach",    es: "Cerca de la playa" },
   "detail.fact.ocean_view":  { en: "Ocean view",                    es: "Vista al mar" },
   "detail.fact.yes":         { en: "Yes",                           es: "Sí" },
   "detail.fact.zoning":      { en: "Zoning",                        es: "Zonificación" },
@@ -311,16 +335,16 @@ const UI_STRINGS = {
   "detail.save":             { en: "Save",                          es: "Guardar" },
   "detail.saved":            { en: "Saved",                         es: "Guardado" },
   "detail.signup_more_reasons_one": { en: "Sign up to see 1 more reason we picked this listing",
-                               es: "Crea cuenta para ver 1 razón más por la que elegimos este terreno" },
+                               es: "Crea cuenta para ver 1 razón más por la que elegimos esta propiedad" },
   "detail.signup_more_reasons_other": { en: "Sign up to see {n} more reasons we picked this listing",
-                               es: "Crea cuenta para ver {n} razones más por las que elegimos este terreno" },
+                               es: "Crea cuenta para ver {n} razones más por las que elegimos esta propiedad" },
   // Free signed-in users: same gated row, but the CTA goes to
   // Stripe checkout instead of the signup modal. Pro users hide
   // the row entirely.
   "detail.upgrade_more_reasons_one":   { en: "Upgrade to Pro to see 1 more reason we picked this listing",
-                                          es: "Contrata Pro para ver 1 razón más por la que elegimos este terreno" },
+                                          es: "Contrata Pro para ver 1 razón más por la que elegimos esta propiedad" },
   "detail.upgrade_more_reasons_other": { en: "Upgrade to Pro to see {n} more reasons we picked this listing",
-                                          es: "Contrata Pro para ver {n} razones más por las que elegimos este terreno" },
+                                          es: "Contrata Pro para ver {n} razones más por las que elegimos esta propiedad" },
   // Source-listing link is Pro-only (PR after this one).
   // Anonymous → signup + chained checkout. Free signed-in → direct
   // checkout. Pro → outbound link (no prompt).
@@ -333,14 +357,14 @@ const UI_STRINGS = {
   "detail.more_photos":      { en: "+{n} photos",                   es: "+{n} fotos" },
   "detail.signup_for_pin":   { en: "Sign up for precise pin",       es: "Crea cuenta para ver el pin exacto" },
   "detail.sold_banner.title": { en: "This listing has been sold or removed.",
-                               es: "Este terreno fue vendido o retirado." },
+                               es: "Esta propiedad fue vendida o retirada." },
   "detail.sold_banner.days": { en: "It was on the market for {n} days.",
                                es: "Estuvo en el mercado durante {n} días." },
   "detail.sold_banner.cta":  { en: "Browse similar listings in {zone} →",
-                               es: "Ver terrenos similares en {zone} →" },
+                               es: "Ver propiedades similares en {zone} →" },
   "detail.paywall.title":    { en: "Off-market deal",               es: "Trato off-market" },
   "detail.paywall.body":     { en: "This listing isn't public anywhere else. Pulpo Pro members get direct access plus broker intros.",
-                               es: "Este terreno no es público en ningún otro lugar. Los miembros Pulpo Pro tienen acceso directo y conexiones con corredores." },
+                               es: "Esta propiedad no es pública en ningún otro lugar. Los miembros Pulpo Pro tienen acceso directo y conexiones con corredores." },
   "detail.paywall.see_plans": { en: "See plans",                    es: "Ver planes" },
   "detail.paywall.have_account": { en: "I have an account",         es: "Ya tengo cuenta" },
   "detail.gallery.open":     { en: "Open photo gallery",            es: "Abrir galería de fotos" },
@@ -358,7 +382,40 @@ const UI_STRINGS = {
   "common.close":            { en: "Close",                         es: "Cerrar" },
   "common.scroll_left":      { en: "Scroll left",                   es: "Desplazar a la izquierda" },
   "common.scroll_right":     { en: "Scroll right",                  es: "Desplazar a la derecha" },
+  "common.retry":            { en: "Retry",                         es: "Reintentar" },
   "locale.toggle_aria":      { en: "Language",                      es: "Idioma" },
+
+  // Clerk handoff intro modal — shown before Pulpo hands authentication
+  // off to the Clerk hosted modal. Clerk's branding is unfamiliar to
+  // most users; without this they'd see a "share info with Clerk"
+  // prompt with no context for who Clerk is. The intro shows once per
+  // device (localStorage `pulpo-clerk-intro-seen`); subsequent sign-ins
+  // skip straight to Clerk.
+  "auth.clerk_intro.title":  { en: "Sign in securely with Clerk",
+                               es: "Inicia sesión de forma segura con Clerk" },
+  "auth.clerk_intro.body":   { en: "Pulpo uses Clerk to handle sign-in and account security. Clerk is a trusted authentication provider — your password and session are managed by them, never stored on Pulpo's servers.",
+                               es: "Pulpo usa Clerk para gestionar el inicio de sesión y la seguridad de tu cuenta. Clerk es un proveedor de autenticación confiable — tu contraseña y sesión las gestiona Clerk, nunca se almacenan en los servidores de Pulpo." },
+  "auth.clerk_intro.cta":    { en: "Continue to Clerk",
+                               es: "Continuar con Clerk" },
+  "auth.clerk_intro.cancel": { en: "Cancel",                         es: "Cancelar" },
+  "auth.clerk_intro.dont_show": { en: "Don't show this next time",   es: "No mostrar la próxima vez" },
+  "auth.clerk_provider_note":   { en: "Powered by Clerk — secure authentication.",
+                                  es: "Con tecnología de Clerk — autenticación segura." },
+
+  // ListingCard aria-labels (heart save/remove + photo carousel nav).
+  // Were hardcoded English; surfaced by the i18n sweep tied to the
+  // road_access "Paved"/"Pavimentado" report.
+  "card.heart.save":         { en: "Save listing",                  es: "Guardar propiedad" },
+  "card.heart.remove":       { en: "Remove from saved",             es: "Quitar de guardados" },
+  "card.photo.prev":         { en: "Previous photo",                es: "Foto anterior" },
+  "card.photo.next":         { en: "Next photo",                    es: "Foto siguiente" },
+
+  // DataFetchFailed — hard error UI shown when /data/ranked.json
+  // doesn't load. Was full English; same i18n sweep.
+  "data_fetch_failed.title": { en: "We couldn't load the listings.",
+                               es: "No pudimos cargar las propiedades." },
+  "data_fetch_failed.body":  { en: "This is on us. The data feed didn't respond — try again in a moment.",
+                               es: "Es de nuestro lado. El feed de datos no respondió — inténtalo en un momento." },
 
   // Newsletter CTA (Discover footer + dedicated form)
   "newsletter.title":        { en: "Get the top 10 property deals every week",
@@ -438,12 +495,12 @@ const UI_STRINGS = {
   "consent.accept":          { en: "Accept",                        es: "Aceptar" },
 
   // Saved page CTA
-  "saved.browse_cta":        { en: "Browse listings →",             es: "Ver terrenos →" },
+  "saved.browse_cta":        { en: "Browse listings →",             es: "Ver propiedades →" },
 
   // Filter chip labels (PR-6)
   "filter.photos":           { en: "Photos",                        es: "Fotos" },
   "filter.size_min":         { en: "Min: {n} ha",                   es: "Mín: {n} ha" },
-  "filter.show_count":       { en: "Show {n} listings",             es: "Ver {n} terrenos" },
+  "filter.show_count":       { en: "Show {n} listings",             es: "Ver {n} propiedades" },
   "filter.feature.beachfront":   { en: "Beachfront",     es: "Frente a la playa" },
   "filter.feature.ocean_view":   { en: "Ocean View",     es: "Vista al mar" },
   "filter.feature.mountain_view": { en: "Mountain View", es: "Vista a la montaña" },
@@ -462,7 +519,7 @@ const UI_STRINGS = {
   "filter.readiness.2":      { en: "Some",                          es: "Algo" },
   "filter.readiness.3":      { en: "Most",                          es: "Mayoría" },
   "filter.readiness.4":      { en: "Fully ready",                   es: "Totalmente listo" },
-  "filter.photos_all":       { en: "All listings",                  es: "Todos los terrenos" },
+  "filter.photos_all":       { en: "All listings",                  es: "Todas las propiedades" },
   "filter.photos_with":      { en: "With photos",                   es: "Con fotos" },
   "filter.photos_none":      { en: "No photos",                     es: "Sin fotos" },
 
@@ -476,6 +533,8 @@ const UI_STRINGS = {
   "account.profile.name":    { en: "Full name",                     es: "Nombre completo" },
   "account.profile.email":   { en: "Email address",                 es: "Correo electrónico" },
   "account.profile.photo":   { en: "Profile photo",                 es: "Foto de perfil" },
+  "account.profile.upload_photo": { en: "Upload photo",              es: "Subir foto" },
+  "account.profile.name_placeholder": { en: "Your name",              es: "Tu nombre" },
   "account.profile.country": { en: "Country / region",              es: "País / región" },
   "account.profile.country_placeholder": { en: "Type to search…",   es: "Escribe para buscar…" },
   "account.profile.lang":    { en: "Preferred language",            es: "Idioma preferido" },
@@ -580,6 +639,86 @@ const UI_STRINGS = {
                                es: "Ver facturas en el portal de Stripe →" },
   "account.sub.invoices_empty":   { en: "No invoices yet — your billing history will appear in the Stripe portal once your first payment is processed.",
                                es: "Aún no hay facturas — tu historial aparecerá en el portal de Stripe tras tu primer pago." },
+
+  // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
+  // Public marketing surfaces that funnel cold visitors into Stripe
+  // Checkout without a Clerk sign-up wall. EN + ES from day one — the
+  // smoke-test guardrail at tests/e2e/preview-smoke.spec.ts fails if a
+  // canary EN word leaks into the ES render.
+  "start.nav.login_link":     { en: "Already a member? Log in →",
+                                es: "¿Ya tienes cuenta? Inicia sesión →" },
+  "start.hero.eyebrow":       { en: "Real estate in El Salvador",
+                                es: "Bienes raíces en El Salvador" },
+  "start.hero.h1":            { en: "The deals your family back home can't find for you",
+                                es: "Las oportunidades que tu familia en El Salvador no puede encontrarte" },
+  "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                es: "Pulpo recopila propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales. Un resumen semanal. Sin ruido." },
+  "start.hero.cta_primary":   { en: "Get access — {price}/month",
+                                es: "Obtener acceso — {price}/mes" },
+  "start.hero.trust_micro":   { en: "Cancel anytime. No commitment.",
+                                es: "Cancela cuando quieras. Sin compromiso." },
+  "start.value.a.label":      { en: "Before the portals",
+                                es: "Antes que los portales" },
+  "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
+                                es: "La mayoría de los bienes raíces en El Salvador nunca llegan a Encuentra24 ni Facebook. Los vendedores se mueven rápido, los tratos se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al inbox." },
+  "start.value.b.label":      { en: "Land, homes, commercial",
+                                es: "Terrenos, casas, locales" },
+  "start.value.b.body":       { en: "Residential plots, beachfront land, homes, and commercial properties — all in one place, with the data you actually need.",
+                                es: "Terrenos residenciales, tierra frente al mar, casas y propiedades comerciales — todo en un solo lugar, con la información que realmente necesitas." },
+  "start.value.c.label":      { en: "Investment-grade signals",
+                                es: "Señales de nivel inversor" },
+  "start.value.c.body":       { en: "Price history, days on market, road access, utilities — the data points serious buyers need, in plain language.",
+                                es: "Historial de precios, días en mercado, acceso vial, servicios — los datos que los compradores serios necesitan, en lenguaje claro." },
+  "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
+                                es: "{n}+ propiedades monitoreadas en todo El Salvador" },
+  "start.join.heading":       { en: "Join Pulpo",
+                                es: "Únete a Pulpo" },
+  "start.join.paid.label":    { en: "Full access",
+                                es: "Acceso completo" },
+  "start.join.paid.price":    { en: "{price} / month",
+                                es: "{price} / mes" },
+  "start.join.paid.feat_1":   { en: "All properties, updated daily",
+                                es: "Todas las propiedades, actualizadas a diario" },
+  "start.join.paid.feat_2":   { en: "Weekly deal digest to your inbox",
+                                es: "Resumen semanal de ofertas en tu inbox" },
+  "start.join.paid.feat_3":   { en: "Price history & investment signals",
+                                es: "Historial de precios y señales de inversión" },
+  "start.join.paid.cta":      { en: "Get access",
+                                es: "Obtener acceso" },
+  "start.join.paid.cta_submitting": { en: "Opening checkout…",
+                                      es: "Abriendo pago…" },
+  "start.join.paid.sub":      { en: "Cancel anytime · Stripe-secured payment · Email collected at checkout",
+                                es: "Cancela cuando quieras · Pago seguro por Stripe · Correo recogido en el pago" },
+  "start.code.applied_note":  { en: "✓ Discount applied at checkout",
+                                es: "✓ Descuento aplicado al pagar" },
+  "start.error.generic":      { en: "Something went wrong — please try again.",
+                                es: "Algo salió mal — inténtalo de nuevo." },
+  "start.error.rate_limited": { en: "Too many attempts. Wait a moment and try again.",
+                                es: "Demasiados intentos. Espera un momento e inténtalo de nuevo." },
+  "start.footer.privacy":     { en: "Privacy",
+                                es: "Privacidad" },
+  "start.footer.terms":       { en: "Terms",
+                                es: "Términos" },
+  "start.footer.stripe":      { en: "Payments secured by Stripe",
+                                es: "Pagos asegurados por Stripe" },
+  "start.sticky_cta":         { en: "Get access — {price}/month",
+                                es: "Obtener acceso — {price}/mes" },
+  "start.cancelled_notice":   { en: "Checkout cancelled. Try again whenever you're ready.",
+                                es: "Pago cancelado. Inténtalo de nuevo cuando quieras." },
+  "welcome.headline":         { en: "Check your inbox",
+                                es: "Revisa tu correo" },
+  "welcome.body":             { en: "Your Pulpo Pro subscription is active. We just sent you an email with a link to set your password and start browsing.",
+                                es: "Tu suscripción a Pulpo Pro está activa. Te acabamos de enviar un correo con un enlace para crear tu contraseña y empezar a explorar." },
+  "welcome.cta":              { en: "Go to Pulpo →",
+                                es: "Ir a Pulpo →" },
+  "welcome.resend_link":      { en: "Didn't get the email? Contact us.",
+                                es: "¿No recibiste el correo? Contáctanos." },
+  "start.aria.logo_home":     { en: "Pulpo home",
+                                es: "Inicio Pulpo" },
+  "start.aria.social_proof":  { en: "Social proof",
+                                es: "Prueba social" },
+  "start.aria.sticky_cta":    { en: "Sticky upgrade CTA",
+                                es: "Botón fijo de mejora" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

@@ -23,6 +23,7 @@ type QueuedEvent = {
 type PostHog = {
   init: (key: string, opts: Record<string, unknown>) => void;
   capture: (name: string, props?: Record<string, unknown>) => void;
+  captureException: (error: unknown, extra?: Record<string, unknown>) => void;
   identify: (id: string, props?: Record<string, unknown>) => void;
   reset: () => void;
   opt_out_capturing: () => void;
@@ -30,8 +31,11 @@ type PostHog = {
   has_opted_out_capturing: () => boolean;
 };
 
+type QueuedException = { error: unknown; extra?: Record<string, unknown>; ts: number };
+
 let posthog: PostHog | null = null;
 const queue: QueuedEvent[] = [];
+const exceptionQueue: QueuedException[] = [];
 let initStarted = false;
 
 const POSTHOG_KEY = (import.meta.env.VITE_POSTHOG_KEY as string | undefined) ?? "";
@@ -90,8 +94,15 @@ function scheduleInit() {
       posthog.init(POSTHOG_KEY, {
         api_host: POSTHOG_HOST,
         autocapture: false,             // explicit catalog only
-        capture_pageview: false,        // we fire landing.viewed ourselves
-        capture_pageleave: false,
+        // PostHog Web Analytics (Visitors / Pageviews / Sessions / Paths /
+        // Channels / Bounce rate / etc.) is hard-coded to $pageview +
+        // $pageleave. 'history_change' fires $pageview on cold-load AND
+        // every pushState/popstate, which is what the SPA section URLs
+        // (/, /browse, /saved, /plans, /account, /listing/:id) need.
+        // The custom landing.viewed / route.changed events keep flowing
+        // alongside — this is purely additive.
+        capture_pageview: "history_change",
+        capture_pageleave: true,
         disable_session_recording: !recordingEnabled,
         session_recording: { maskAllInputs: true, sampleRate: 0.1 },
         persistence: "localStorage+cookie",
@@ -117,6 +128,10 @@ function drainQueue() {
     const { name, props } = queue.shift()!;
     try { posthog.capture(name, props as Record<string, unknown>); } catch { /* ignore */ }
   }
+  while (exceptionQueue.length) {
+    const { error, extra } = exceptionQueue.shift()!;
+    try { posthog.captureException(error, extra); } catch { /* ignore */ }
+  }
 }
 
 export function track<K extends EventName>(name: K, props: EventMap[K]) {
@@ -130,6 +145,22 @@ export function track<K extends EventName>(name: K, props: EventMap[K]) {
   try {
     posthog.capture(name, props as Record<string, unknown>);
   } catch { /* ignore */ }
+}
+
+// Exception capture — feeds PostHog's Error Tracking surface (emits a
+// native $exception event). Called from ErrorBoundary.componentDidCatch
+// and the global window.onerror / unhandledrejection handlers in
+// telemetry/errors.ts. Queues like track() so exceptions fired before
+// the SDK has loaded still land once init completes.
+export function captureException(error: unknown, extra?: Record<string, unknown>) {
+  if (!SHOULD_TELEMETER) return;
+  if (!posthog) {
+    exceptionQueue.push({ error, extra, ts: Date.now() });
+    scheduleInit();
+    return;
+  }
+  if (posthog.has_opted_out_capturing && posthog.has_opted_out_capturing()) return;
+  try { posthog.captureException(error, extra); } catch { /* ignore */ }
 }
 
 export function identify(id: string, props?: Record<string, unknown>) {
