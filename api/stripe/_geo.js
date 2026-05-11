@@ -15,15 +15,14 @@ const DEFAULT_CURRENCY = "usd";
 // Lowercase ISO 4217 codes — Stripe expects lowercase in the Checkout
 // Session `currency` param. Stripe accepts uppercase too but the SDK
 // normalizes; staying lowercase keeps logs predictable.
+//
+// v1 ships two currencies (EUR + USD) — every other geo falls back to
+// USD via the DEFAULT_CURRENCY. To add MXN/ARS later: add the rows
+// here AND add the matching amounts to the Stripe Pulpo Pro Price
+// (`currency_options`). Asking Stripe for a currency that isn't in
+// the Price's options 500s the checkout, so the two MUST move together.
 const COUNTRY_TO_CURRENCY = {
-  // ── USD region (also default for unmapped diaspora geos) ──
-  SV: "usd",  // El Salvador — legal tender USD since 2001
-  US: "usd",
-  CA: "usd",  // close enough; diaspora-facing, not a CAD market today
-  GB: "usd",  // UK diaspora — easier than carrying GBP for one country
-  AU: "usd",
-  AE: "usd",
-  // ── EUR region ──
+  // ── EUR region (must match the EUR row on the Pulpo Pro Price) ──
   ES: "eur",  // Spain diaspora — large EU node
   DE: "eur",
   FR: "eur",
@@ -33,10 +32,11 @@ const COUNTRY_TO_CURRENCY = {
   AT: "eur",
   IE: "eur",
   PT: "eur",
-  // ── MXN region ──
-  MX: "mxn",
-  // ── ARS region ──
-  AR: "ars",
+  // Every other country resolves to USD via DEFAULT_CURRENCY below:
+  //   - El Salvador (legal tender USD since 2001)
+  //   - US, CA, GB, AU, AE — diaspora hubs
+  //   - MX, AR, and every other unmapped geo — until we add their
+  //     currencies to the Stripe Price.
 };
 
 // Map a country code to a currency, with a USD fallback for any country

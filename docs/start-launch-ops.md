@@ -9,15 +9,13 @@ accompany the `/start` rollout. Pair this with the engineering plan at
 ### Multi-currency on the Pulpo Pro Price (required for PR-A)
 
 The Checkout Session created by `api/stripe/start-checkout.js` passes a
-`currency` parameter picked from the visitor's geo (USD / EUR / MXN / ARS).
-For Stripe to accept that, the Price object must list every currency in
-its `currency_options`.
+`currency` parameter picked from the visitor's geo. v1 supports two
+currencies: **EUR** (EU diaspora) and **USD** (everywhere else, including
+El Salvador's legal tender). Every other geo falls back to USD.
 
 1. Stripe Dashboard → **Products → Pulpo Pro → Pulpo Pro Price**.
-2. Click "Add another currency" three times. Set:
-   - `USD` — $10.00
-   - `MXN` — MX$199 (psychological round price, not FX-derived from EUR)
-   - `ARS` — AR$12,900 (likewise — adjust as inflation moves)
+2. Click "Add a price by currency". Add:
+   - `USD` — $10.00 (round marketing price — *do not* let Stripe pre-fill an FX-converted value like $12)
 3. `EUR` stays as the base — €10.00.
 4. **Do NOT** enable Adaptive Pricing. It conflicts with explicit
    `currency_options`. If Stripe surfaces an "Adaptive Pricing is on"
@@ -26,7 +24,13 @@ its `currency_options`.
    does not change).
 
 Verify by clicking "Preview" on the Price — Stripe should show a
-currency-selector with all four codes listed.
+currency-selector with EUR + USD.
+
+**Adding MXN / ARS later** (when the regional channels start producing
+traffic in PostHog): add the row to the Stripe Price *and* add the matching
+country → currency line in `api/stripe/_geo.js` in the same PR. The geo
+map only returns currencies that exist on the Stripe Price — adding to
+one without the other 500s the checkout for that geo.
 
 ### "3 months free" coupon + promo codes (required for PR-A)
 
