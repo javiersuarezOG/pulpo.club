@@ -118,23 +118,6 @@
   cursor: not-allowed;
 }
 
-.start-cta-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 24px;
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  min-height: 44px;
-}
-.start-cta-secondary:hover { background: var(--paper-2); }
-
 .start-hero-trust {
   font-size: 13px;
   color: var(--ink-3);
@@ -224,30 +207,17 @@
   color: var(--ink);
   font-weight: 500;
 }
-.start-join-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-6);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.start-card {
-  padding: var(--space-7);
+.start-join-card {
+  background: var(--paper);
+  border: 2px solid var(--accent-strong);
   border-radius: var(--radius-md, 10px);
+  padding: var(--space-7);
+  box-shadow: 0 2px 12px oklch(0% 0 0 / 6%);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.start-card.is-primary {
-  background: var(--paper);
-  border: 2px solid var(--accent-strong);
-  box-shadow: 0 2px 12px oklch(0% 0 0 / 6%);
-}
-.start-card.is-secondary {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
+  max-width: 480px;
+  margin: 0 auto;
 }
 .start-card-label {
   font-family: var(--font-mono);
@@ -261,12 +231,6 @@
   font-size: 32px;
   line-height: 1;
   color: var(--ink);
-}
-.start-card-description {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 15px;
-  line-height: 22px;
 }
 .start-card-features {
   list-style: none;
@@ -292,42 +256,10 @@
   font-weight: 600;
 }
 
-.start-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-.start-field-label {
-  font-size: 13px;
-  color: var(--ink-2);
-  font-weight: 500;
-}
-.start-field input {
-  padding: 12px 14px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
-  font-size: 16px; /* ≥16px prevents iOS auto-zoom */
-  font-family: var(--font-sans);
-  color: var(--ink);
-  background: var(--paper);
-  min-height: 44px;
-}
-.start-field input:focus {
-  outline: none;
-  border-color: var(--accent-strong);
-}
-.start-field input[aria-invalid="true"] {
-  border-color: var(--tone-urgent);
-}
-.start-field input:disabled {
-  background: var(--paper-2);
-  cursor: not-allowed;
-}
-
 .start-card-cta {
   padding: 14px 24px;
   border-radius: var(--radius-sm);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-sans);
@@ -338,15 +270,18 @@
   background: var(--accent-strong);
   color: var(--paper);
 }
-.start-card-cta-primary:hover:not(:disabled) { background: var(--accent); }
-.start-card-cta-secondary {
-  background: var(--ink);
-  color: var(--paper);
-}
-.start-card-cta-secondary:hover:not(:disabled) { background: var(--ink-2); }
 .start-card-cta:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.start-code-applied-note {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  text-align: center;
 }
 
 .start-card-error {
@@ -412,10 +347,8 @@
 
 /* ── Tablet+ ────────────────────────────────────────────────── */
 @media (min-width: 640px) {
-  .start-hero-ctas { flex-direction: row; }
-  .start-cta-primary, .start-cta-secondary { flex: 1; }
   .start-value { padding: var(--space-9) var(--space-7); }
-  .start-join-cards { grid-template-columns: 1fr 1fr; }
+  .start-join-card { padding: var(--space-8); }
 }
 
 /* ── Desktop ────────────────────────────────────────────────── */

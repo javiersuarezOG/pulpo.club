@@ -80,23 +80,35 @@ module.exports = async (req, res) => {
   }
 
   const body = await readJsonBody(req);
-  const email = safeStr(body.email).trim().toLowerCase();
+  // Email is now OPTIONAL on this endpoint. The /start landing page
+  // doesn't collect it — Stripe Checkout's hosted page asks for it
+  // when `customer_email` is unset. The webhook later reads
+  // session.customer_details.email regardless of who provided it.
+  // Backward-compat: any caller that DOES send an email gets the
+  // pre-validated + pre-filled behaviour.
+  const rawEmail = safeStr(body.email).trim().toLowerCase();
+  const email = rawEmail && EMAIL_RE.test(rawEmail) && rawEmail.length <= 254
+    ? rawEmail
+    : null;
   const promoCode = safeStr(body.promoCode).trim().toUpperCase();
   const locale = SUPPORTED_LOCALES.has(safeStr(body.locale))
     ? body.locale === "es" ? "es-419" : "en"
     : null;
   const utms = pickUtms(body);
 
-  if (!email || !EMAIL_RE.test(email) || email.length > 254) {
+  // If a non-empty email was supplied but failed validation, surface a
+  // 400 so the caller knows to fix it. (Empty/missing email is fine.)
+  if (rawEmail && !email) {
     logApi("stripe.start_checkout", {
       status: 400, ms: Date.now() - t0, reason: "invalid_email",
     });
     return res.status(400).json({ error: "invalid_email" });
   }
 
-  // Rate limit AFTER validating the email shape — that way we don't spend
-  // a rate-limit slot on obviously garbage input.
-  const rl = rateLimitHit(req, email);
+  // Rate limit per (IP, email-or-empty). Without an email we throttle
+  // per-IP only — fine, since the limiter exists to stop scripted abuse,
+  // not to deduplicate legitimate users.
+  const rl = rateLimitHit(req, email || "");
   if (!rl.allowed) {
     res.setHeader("Retry-After", String(Math.ceil(rl.retryAfterMs / 1000)));
     logApi("stripe.start_checkout", {
@@ -154,17 +166,27 @@ module.exports = async (req, res) => {
     mode: "subscription",
     managed_payments: { enabled: true },
     line_items: [{ price: priceId, quantity: 1 }],
-    customer_email: email,
     currency,
     // No client_reference_id — that's the signal to the webhook that this
-    // is an anonymous /start flow that should resolve the user via email.
+    // is an anonymous /start flow that should resolve the user via email
+    // (which the webhook reads from session.customer_details.email,
+    // populated either by Stripe's hosted form or by our customer_email
+    // pre-fill below).
     subscription_data: {
-      metadata: { ...sessionMetadata, email },
+      metadata: sessionMetadata,
     },
     metadata: sessionMetadata,
     success_url: `${origin}/welcome?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${origin}/start?cancelled=1`,
   };
+
+  // Pre-fill email on the Stripe form when we have it; otherwise let
+  // Stripe collect it. Don't stamp the session subscription metadata
+  // with email when we don't have one — keeps the data honest.
+  if (email) {
+    sessionParams.customer_email = email;
+    sessionParams.subscription_data.metadata.email = email;
+  }
 
   if (discounts) {
     sessionParams.discounts = discounts;

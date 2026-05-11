@@ -129,23 +129,19 @@ export type EventMap = {
    *  `?code=…`; everything else (utm_*, country, device_type) is auto-
    *  attached by PostHog. */
   "start.viewed": { has_code: boolean };
-  /** User clicks either CTA on /start. `type` distinguishes the paid
-   *  card from the code card; `email_entered` / `code_prefilled` surface
-   *  form-state so the dashboard can break down by completion stage. */
-  "start.cta_clicked": {
-    type: "paid" | "code";
-    email_entered: boolean;
-    code_prefilled: boolean;
-  };
+  /** User clicks "Get access". /start is a single-button page — no
+   *  email or code inputs (Stripe collects both). `has_code` echoes
+   *  whether a `?code=…` URL param was attached so PostHog funnels
+   *  can break down marketing-link conversion vs organic. */
+  "start.cta_clicked": { has_code: boolean };
   /** Fires immediately before window.location.assign(stripeUrl). Pairs
    *  with the existing upgrade.checkout_returned event so the same funnel
    *  logic computes completion rate for /start as it does for /plans. */
-  "start.checkout_redirected": {
-    type: "paid" | "code";
-    had_promo_code: boolean;
-  };
-  /** Invalid / exhausted promo code path — inline error rendered, no
-   *  redirect. Mirrors paywall.shown / signup_modal.shown naming. */
+  "start.checkout_redirected": { had_promo_code: boolean };
+  /** URL-supplied promo code didn't resolve (typo, exhausted, test-vs-
+   *  live mismatch). The frontend soft-fails: retries the API call
+   *  without the code, sends the user to Stripe at full price. This
+   *  event fires so we can surface broken campaign URLs in PostHog. */
   "start.code_error_shown": { reason: "invalid_promo_code" | "exhausted" };
   /** Cold-load of /welcome (post-payment landing for the anonymous flow).
    *  No fields — /welcome is only reached by the anonymous /start path

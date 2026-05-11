@@ -41,6 +41,11 @@ const SECTIONS = [
   { path: "/plans",   surface: ".plans-page, .plan-card",    gated: false },
   { path: "/saved",   surface: ".saved-page, .modal-signup", gated: true  },
   { path: "/account", surface: ".account-page, .modal-signup", gated: true },
+  // Public marketing surfaces — no app shell, mount-time branch in app.jsx.
+  // /start has its own hero + join card; /welcome is the simpler "check
+  // your inbox" page. Both must layout cleanly at every mobile width.
+  { path: "/start",   surface: ".start-page",                 gated: false },
+  { path: "/welcome", surface: ".welcome-page",               gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.
