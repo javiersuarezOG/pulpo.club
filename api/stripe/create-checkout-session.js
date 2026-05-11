@@ -83,6 +83,12 @@ module.exports = async (req, res) => {
       mode: "subscription",
       managed_payments: { enabled: true },
       line_items: [{ price: priceId, quantity: 1 }],
+      // Surface the "Add promotion code" link on Stripe-hosted checkout.
+      // Codes are validated against active Promotion Codes in the Stripe
+      // Dashboard (Product catalogue → Coupons → Promotion codes). Test-
+      // and live-mode promo codes are separate ledgers — create live-mode
+      // codes after rotating to live keys.
+      allow_promotion_codes: true,
       // client_reference_id surfaces on the Session for webhook lookups;
       // subscription metadata persists for renewal / cancel events that
       // reference the Subscription rather than the Session.
