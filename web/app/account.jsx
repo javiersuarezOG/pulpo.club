@@ -147,7 +147,7 @@ function ProfileSection({ app }) {
         <div className="profile-avatar">{initials}</div>
         <div>
           <div className="profile-photo-label">{t("account.profile.photo", app.locale)}</div>
-          <button type="button" className="link-btn">Upload photo</button>
+          <button type="button" className="link-btn">{t("account.profile.upload_photo", app.locale)}</button>
         </div>
       </div>
 
@@ -155,7 +155,7 @@ function ProfileSection({ app }) {
         <input
           type="text"
           value={values.name}
-          placeholder="Your name"
+          placeholder={t("account.profile.name_placeholder", app.locale)}
           onChange={(e) => setValues(v => ({ ...v, name: e.target.value }))}
         />
       </FieldRow>
@@ -712,7 +712,7 @@ function LegacySecuritySection({ app }) {
 
       {showSignoutModal && (
         <ConfirmModal
-          title="Sign out of all devices?"
+          title="Sign out of all devices?"  /* i18n-allow: LegacySecuritySection only renders when Clerk is OFF (no VITE_CLERK_PUBLISHABLE_KEY) — tracked for full i18n in legacy-cleanup PR */
           body="This will sign you out everywhere. You'll need to log in again on each device."
           confirmLabel="Sign out everywhere"
           onConfirm={() => { setShowSignoutModal(false); app.signout(); app.go("home"); }}
@@ -722,7 +722,7 @@ function LegacySecuritySection({ app }) {
 
       {showDeleteModal && (
         <ConfirmModal
-          title="Delete your account?"
+          title="Delete your account?"  /* i18n-allow: LegacySecuritySection — see signout dialog above */
           body="This removes your profile, saved listings, and notification preferences. To confirm, type DELETE below."
           destructive
           confirmLabel="Delete account"
@@ -731,7 +731,7 @@ function LegacySecuritySection({ app }) {
             <input
               type="text"
               className="confirm-input"
-              placeholder="Type DELETE to confirm"
+              placeholder="Type DELETE to confirm"  /* i18n-allow: LegacySecuritySection — see signout dialog above */
               value={deleteText}
               onChange={(e) => setDeleteText(e.target.value)}
             />

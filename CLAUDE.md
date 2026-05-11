@@ -79,6 +79,40 @@ The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`.
 - **Responsive:** every PR touching a visual surface attaches one mobile (375px) + one desktop (1280px) screenshot. The Playwright responsive-smoke spec at `tests/e2e/responsive-smoke.spec.ts` iterates every public section (`/`, `/browse`, `/saved`, `/plans`, `/account`) at four viewports (320×568, 375×812, 414×896, 768×1024), asserts `documentElement.scrollWidth ≤ innerWidth + 1`, and on failure prints the widest descendant's `outerHTML` so the diagnostic is actionable. For `/account` specifically the spec also clicks every sub-section tab (profile / notifications / subscription / security) at every viewport with both Free and Pro user seeds — different content paths render different DOM, so testing only the default landing tab misses three of four sub-sections. **Shared test helpers live at `tests/e2e/_helpers.ts`** (`TOLERATED`, `isTolerated`, `attachErrorRecorder`, `seedUser`, `seedProUser`); new specs import from there instead of inlining a fourth copy of the noise allowlist.
 - **No backwards-compat shims** in the new app — the legacy is the legacy, the new is the new. Don't re-export old utilities to "ease migration."
 
+## i18n — every user-visible string goes through `t()`
+
+The app supports EN + ES (and will gain more). Every string a user can see — JSX text, `aria-label`, `placeholder`, `alt`, button labels, error copy — is looked up from [`web/app/i18n.jsx`](web/app/i18n.jsx)'s `UI_STRINGS` table via `t(key, locale)`. **No exceptions** for anywhere in `web/app/` *except* the LegacySignupModal block (only renders when Clerk is OFF, never in prod).
+
+The trap that keeps biting us: rendering raw enum values via `capitalize()` (e.g. `road_access_type === "paved"` → "Paved" in any locale). For enum values, use a closed-set guard plus a per-value i18n key:
+
+```js
+const ROAD_ENUMS = new Set(["paved", "gravel", "dirt"]);
+const roadValue = ROAD_ENUMS.has(v)
+  ? t(`detail.fact.road.${v}`, lc)
+  : capitalize(v);  // safety net for unknown enums; shouldn't be reached
+```
+
+The matching i18n keys (`detail.fact.road.paved`, `detail.fact.road.gravel`, `detail.fact.road.dirt`) live next to their parent label so future contributors find them all together.
+
+**Adding a new translatable string:**
+
+1. Add a row to `UI_STRINGS` in `web/app/i18n.jsx` with `{ en: "…", es: "…" }`. Group by surface (detail / nav / browse / etc.) — there are existing section comments to slot under.
+2. Call `t("your.key", locale)` at the render site. `locale` is available as `app.locale`, `lc`, or via `currentLocale()` if the component is leaf-only and has no app prop.
+3. If the string carries variables, use `{name}` placeholders + `t(key, locale, { name: value })`.
+
+**Adding a new locale:**
+
+Add the language code to `LOCALES` at the top of `i18n.jsx`. Every existing entry in `UI_STRINGS` gracefully falls back to `DEFAULT_LOCALE` (en) when the new key is missing — meaning a partial translation ships safely. Add an entry to the locale toggle (search `useLocale` for the call site) and the document.documentElement.lang sync is automatic.
+
+**The smoke-test guardrail:**
+
+[`tests/e2e/preview-smoke.spec.ts`](tests/e2e/preview-smoke.spec.ts) → "Spanish locale: no English canary words leak into rendered UI". The test loads `/`, switches `localStorage.pulpo-locale = "es"`, reloads, and asserts the body text + a sample of aria-labels do NOT contain a curated list of English canary words ("Paved", "Back to results", "Save listing", etc.). Each canary represents an i18n bug we've already fixed once. **When this test fails:**
+
+- The right move 99% of the time is to add the offending string to `UI_STRINGS` and call `t()` from the render site.
+- The wrong move is to add the word to the test's `SHARED_TOKENS` allowlist. Reserve that for words that genuinely exist in BOTH EN and ES copy (e.g. brand names, "Pulpo Pro").
+
+When you add a new translatable string, **also add an English canary for it to the smoke test if it's the kind of word that would silently look fine in English**. Cheap insurance.
+
 ## Geocoding & beach reference table
 
 Coastal listings get their lat/lng from a single LLM call (DeepSeek). The
