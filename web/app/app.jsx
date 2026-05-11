@@ -46,6 +46,7 @@ import {
 import { evaluateGate } from "./lib/route-gates";
 import { useDocumentMeta } from "./lib/use-document-meta";
 import { bootAssetTelemetry } from "./telemetry/asset-load";
+import { bootGlobalErrorHandlers } from "./telemetry/errors";
 import "./styles/index.css";
 
 function App() {
@@ -142,6 +143,7 @@ function App() {
     });
     bootWebVitals();
     bootAssetTelemetry();
+    bootGlobalErrorHandlers();
   }, []);
 
   // Browser-default scrollRestoration is "auto" — it tries to restore a
