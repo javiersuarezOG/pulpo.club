@@ -53,6 +53,69 @@ export type EventMap = {
   // conversion separately from hero/heart triggers.
   "newsletter.cta_clicked": { source: "discover" };
 
+  // ───── New homepage (rewrite Phase 4) ─────
+  // Email form on the rewritten hero. Phase 6 wires the actual
+  // /api/newsletter endpoint; the event fires regardless so we can
+  // see submit-rate trends before the backend lands. PII rule (per
+  // the rewrite plan §10e): NEVER send the raw email — only the
+  // domain after @. result ∈ submit-outcomes; validation_failed
+  // fires on client-side regex failure before any network call.
+  "hero.email_submitted": {
+    source: "homepage_hero";
+    email_domain_only: string;
+    result: "success" | "error" | "validation_failed" | "already_subscribed" | "rate_limited";
+  };
+  // Proof-row card surfaces. Impression fires when a card enters the
+  // viewport (IntersectionObserver, debounced 500ms, once per page-view).
+  // Click fires on tap. Payloads share shape so PostHog can join them
+  // with a `card.clicked` group for the funnel.
+  "proof_row.card_impression": {
+    listing_id: string;
+    rank: number;
+    star_rating: number;
+    position: 1 | 2 | 3;
+    master_category: "beach" | "lake" | null;
+    subcategory: "homes" | "condos" | "land" | null;
+    proof_row_tier: "override" | "strict" | "relaxed_rank" | "relaxed_eligibility" | "shortfall" | null;
+  };
+  "proof_row.card_clicked": {
+    listing_id: string;
+    rank: number;
+    star_rating: number;
+    position: 1 | 2 | 3;
+    master_category: "beach" | "lake" | null;
+    subcategory: "homes" | "condos" | "land" | null;
+    proof_row_tier: "override" | "strict" | "relaxed_rank" | "relaxed_eligibility" | "shortfall" | null;
+  };
+  // Category grid — 6 tiles for the beach × {homes,condos,land} +
+  // lake × same matrix. Listing counts at click time so a sparsely
+  // populated bucket shows up in the funnel even if conversion is
+  // identical to a dense one.
+  "category_grid.tile_clicked": {
+    master_category: "beach" | "lake";
+    subcategory: "homes" | "condos" | "land";
+    listing_count_at_click: number;
+  };
+  "category_grid.browse_all_clicked": {
+    master_category: "beach" | "lake";
+    listing_count_at_click: number;
+  };
+  // Discovery pill row — All / ★ Top rated / Under $250K / Gated /
+  // Waterfront. source_page lets us tell the homepage row apart from
+  // the same pills surfaced on /browse.
+  "discovery_pill.clicked": {
+    filter: "all" | "top_rated" | "under_250k" | "gated" | "waterfront";
+    source_page: "homepage" | "browse";
+  };
+  // Top nav — link clicks routed through this single event so the
+  // funnel doesn't have to enumerate every destination. link_destination
+  // is the path the user lands on; link_label is the visible text in
+  // the locale at click time (NOT i18n key — actual rendered label).
+  "nav.link_clicked": {
+    link_label: string;
+    link_destination: string;
+  };
+
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
   "detail.photo_lightbox_opened": { listing_id: string };
