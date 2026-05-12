@@ -9,16 +9,29 @@ import { startStripeCheckout } from "./auth/stripe-checkout.js";
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 import { COUNTRIES } from "./lib/countries.js";
+import { track } from "./telemetry/hook";
 
 function AccountPage({ app }) {
-  const [section, setSection] = aUseState(() => app.routeParams.section || "profile");
+  // Source of truth for the active tab is `app.routeParams.section` — set
+  // by the URL parser on cold-load + popstate, and by `app.go("account",
+  // { section })` on in-app clicks. Default to "profile" when the URL is
+  // bare `/account` (no segment).
+  const section = app.routeParams.section || "profile";
 
-  // Resync if route params change (e.g. nav from a deep link)
+  // Section-viewed telemetry. Fires on every resolved tab — cold-load,
+  // in-app click, browser back/forward. `_entry` is a private hint set
+  // by app.jsx's `go` / popstate listener; absent on cold-load → "url".
+  // The dependency on `section` covers tab switching; `_entry` is read
+  // off routeParams at fire time so we don't need it in the dep array.
   aUseEffect(() => {
-    if (app.routeParams.section && app.routeParams.section !== section) {
-      setSection(app.routeParams.section);
-    }
-  }, [app.routeParams.section]);
+    if (clerkEnabled() && !app.clerkActions) return; // wait for Clerk hydrate
+    if (!app.user) return;                            // gate still resolving
+    const entry = app.routeParams._entry === "nav_click" ? "nav_click"
+      : app.routeParams._entry === "popstate" ? "popstate"
+      : "url";
+    track("account.section_viewed", { section, entry });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section, app.user, app.clerkActions]);
 
   // Auth gate. The Account area is auth-only — anonymous users get
   // redirected to /home with the Sign-in modal teed up. There's a race
@@ -89,7 +102,7 @@ function AccountPage({ app }) {
               <li key={s.key}>
                 <button
                   className={section === s.key ? "is-active" : ""}
-                  onClick={() => setSection(s.key)}
+                  onClick={() => app.go("account", { section: s.key })}
                 >
                   <Icon name={s.icon} size={16}/>
                   <span>{s.label}</span>

@@ -89,11 +89,16 @@ function App() {
   // whether the user entered on the detail (in which case "back" must
   // not exit the site — replaceState to "/" instead).
   const _initialParsed = useMemo(() => {
-    if (typeof window === "undefined") return { route: "home", openListingId: null, isListingPath: false };
+    if (typeof window === "undefined") return { route: "home", openListingId: null, isListingPath: false, section: null };
     return parseLocation(window.location.pathname);
   }, []);
   const [route, setRoute] = useState(_initialParsed.route);
-  const [routeParams, setRouteParams] = useState({});
+  // Seed `section` from the cold-load URL so `/account/notifications`
+  // mounts straight on the Notifications tab — without this, AccountPage
+  // would render Profile for one frame and then resync.
+  const [routeParams, setRouteParams] = useState(() => (
+    _initialParsed.section ? { section: _initialParsed.section } : {}
+  ));
   // Tracks whether the current detail view was entered cold (no source
   // section underneath). Reset to false whenever the user navigates to a
   // section in-app; set true on cold-load entry.
@@ -247,6 +252,18 @@ function App() {
       const trigger = event && event.state && event.state.forward ? "forward" : "back";
       setOpenListingId(parsed.openListingId);
       setRoute(parsed.route);
+      // Account sub-section deep-links (`/account/notifications` etc.)
+      // round-trip through popstate too — re-seed routeParams.section so
+      // browser-back from /account/security to /account/profile lands on
+      // the right tab. `_entry` is consumed by AccountPage's section-
+      // viewed telemetry so popstate transitions are attributable; the
+      // underscore prefix marks it as an internal hint, not a public
+      // routeParam.
+      setRouteParams(
+        parsed.section
+          ? { section: parsed.section, _entry: "popstate" }
+          : (parsed.route === "account" ? { _entry: "popstate" } : {})
+      );
       // popstate landing on /listing/:id with no app-pushed state means
       // the user navigated forward from history into a detail entry.
       // It's not a cold-load (the SPA is already mounted), but the
@@ -547,13 +564,20 @@ function App() {
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
       : "";
-    const target = urlFor({ route: r }, "");
+    // Account sub-sections round-trip through the URL — `/account/notifications`
+    // is shareable. For every other route, `section` is ignored by urlFor.
+    const section = r === "account" ? (params.section || null) : null;
+    const target = urlFor({ route: r, section }, "");
     // Same-route, same-URL → no-op so the back button doesn't accumulate
     // duplicate entries.
     const same = typeof window !== "undefined"
-      && isSameLocation({ route: r }, window.location.pathname, "");
+      && isSameLocation({ route: r, section }, window.location.pathname, "");
     setRoute(r);
-    setRouteParams(params);
+    // `_entry` is consumed by AccountPage's section-viewed telemetry so
+    // in-app clicks are distinguishable from cold-load / popstate. Marked
+    // internal with a leading underscore — pages should read public
+    // routeParam keys (e.g. `section`), not this.
+    setRouteParams({ ...params, _entry: "nav_click" });
     setOpenListingId(null);
     coldEnteredDetailRef.current = false;
     if (typeof window !== "undefined" && !same) {
