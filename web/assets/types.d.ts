@@ -195,4 +195,10 @@ export interface Listing {
     subcategory: "homes" | "condos" | "land" | null;
     discovery_tags: ("top_rated" | "under_250k" | "gated" | "waterfront")[];
     star_rating: number;  // 0.0..5.0 in 0.5 increments; 0.0 = no rank_score
+
+    // ── Image-enrichment protocol (hero rewrite Phase 2) ────────────
+    // <file>.hero.jpg meets 1600×1200 + aspect 1.4–1.85 + ≤ 5MB; <file>.jpg
+    // meets 800×600. Both default false until the pipeline populates them.
+    hero_eligible: boolean;
+    card_eligible: boolean;
 }

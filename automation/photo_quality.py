@@ -165,6 +165,114 @@ def compute_score(raw_bytes: bytes, byte_size: Optional[int] = None) -> int:
     return max(0, min(100, score))
 
 
+# ── Image-enrichment metadata (hero rewrite Phase 2) ───────────────────
+#
+# Image-enrichment is a separate concern from the per-photo quality
+# score above. The eligibility flags below gate which photos can serve
+# as the homepage hero / proof-row image vs. the card thumbnail. The
+# numeric score still feeds the featured-pool ranker tie-break; the
+# flags answer the structural question "is this file the right size +
+# aspect for this surface."
+#
+# Gates (per the rewrite plan):
+#   hero_eligible: width >= 1600 AND height >= 1200
+#                  AND 1.4 <= aspect_ratio <= 1.85
+#                  AND file_size_kb <= 5120 (5 MB)
+#   card_eligible: width >= 800 AND height >= 600
+#
+# Both are evaluated against the on-disk derivative file, not the raw
+# source bytes. Source bytes are discarded after pipeline processing
+# (we keep only the thumbnail at <file>.jpg and the hero derivative
+# at <file>.hero.jpg). Sidecar JSONs at <file>.jpg.meta.json and
+# <file>.hero.jpg.meta.json record the per-file dimensions so re-
+# computation is fast on subsequent runs.
+
+HERO_MIN_WIDTH_PX   = 1600
+HERO_MIN_HEIGHT_PX  = 1200
+HERO_MIN_ASPECT     = 1.4
+HERO_MAX_ASPECT     = 1.85
+HERO_MAX_SIZE_KB    = 5120
+
+CARD_MIN_WIDTH_PX   = 800
+CARD_MIN_HEIGHT_PX  = 600
+
+
+def compute_image_metadata(raw_bytes: bytes, *, file_size_bytes: Optional[int] = None) -> Optional[dict]:
+    """Return the sidecar metadata dict for an image, or None when undecodable.
+
+    Args:
+        raw_bytes: image file bytes (jpeg/png/webp).
+        file_size_bytes: optional override for on-disk size. Defaults to
+                         ``len(raw_bytes)``. Pass the wire size when the
+                         bytes have been recompressed since the on-disk
+                         write so the sidecar reflects file truth.
+
+    Returns:
+        ``{width, height, aspect_ratio, file_size_kb, hero_eligible,
+        card_eligible, computed_at}`` or ``None`` when Pillow isn't
+        installed or the bytes don't decode.
+
+    The ``hero_eligible`` / ``card_eligible`` flags reflect the gates
+    against THIS file's properties. A 600×400 thumbnail file will
+    always be card_eligible=False (under 800×600) — that's correct;
+    the on-disk file IS the surface a card consumes. The card flag is
+    only useful when the original source was at least 800×600 and we
+    chose not to downsample.
+    """
+    if not raw_bytes:
+        return None
+
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+
+    import io
+    try:
+        img = Image.open(io.BytesIO(raw_bytes))
+        img.load()
+        width, height = img.size
+    except Exception:
+        return None
+
+    if width <= 0 or height <= 0:
+        return None
+
+    size_bytes = file_size_bytes if file_size_bytes is not None else len(raw_bytes)
+    file_size_kb = round(size_bytes / 1024, 1)
+
+    # Aspect ratio is the long/short side so portrait photos read the
+    # same value as their landscape rotation. The hero gate also bounds
+    # via this normalized value — a portrait 600×1600 image would have
+    # aspect 2.67 which fails the hero gate (correctly: we don't want
+    # vertical phone photos full-bleed).
+    long_side  = max(width, height)
+    short_side = min(width, height)
+    aspect = round(long_side / short_side, 3) if short_side > 0 else 0.0
+
+    hero_eligible = (
+        width >= HERO_MIN_WIDTH_PX
+        and height >= HERO_MIN_HEIGHT_PX
+        and HERO_MIN_ASPECT <= aspect <= HERO_MAX_ASPECT
+        and file_size_kb <= HERO_MAX_SIZE_KB
+    )
+    card_eligible = (
+        width >= CARD_MIN_WIDTH_PX
+        and height >= CARD_MIN_HEIGHT_PX
+    )
+
+    from datetime import datetime, timezone
+    return {
+        "width":         width,
+        "height":        height,
+        "aspect_ratio":  aspect,
+        "file_size_kb":  file_size_kb,
+        "hero_eligible": bool(hero_eligible),
+        "card_eligible": bool(card_eligible),
+        "computed_at":   datetime.now(timezone.utc).isoformat(),
+    }
+
+
 def score_band(score: Optional[int]) -> str:
     """Human-readable band — used in run.py log output + featured pick."""
     if score is None:

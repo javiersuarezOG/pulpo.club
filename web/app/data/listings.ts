@@ -250,6 +250,11 @@ export function adaptListing(raw: any): Listing {
       typeof raw.hero_photo_quality_score === "number" ? raw.hero_photo_quality_score : null,
     has_text_overlay:
       typeof raw.has_text_overlay === "boolean" ? raw.has_text_overlay : null,
+    // Image-enrichment flags. Defensive defaults (false) keep older
+    // ranked.json records valid during the rollout window before the
+    // first nightly populates the sidecars.
+    hero_eligible: raw.hero_eligible === true,
+    card_eligible: raw.card_eligible === true,
     first_seen_date: daysSince(raw.first_seen_at),
     // Source-of-truth listing age: comes from the scraper's parse of
     // the original posting's mod_dt. `null` means we couldn't extract

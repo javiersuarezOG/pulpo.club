@@ -62,6 +62,8 @@
       "hero_photo_path",
       "hero_photo_quality_score",
       "has_text_overlay",
+      "hero_eligible",
+      "card_eligible",
       "first_seen_at",
       "broker_name",
       "broker_phone",
@@ -390,6 +392,12 @@
           "boolean",
           "null"
         ]
+      },
+      "hero_eligible": {
+        "type": "boolean"
+      },
+      "card_eligible": {
+        "type": "boolean"
       },
       "first_seen_at": {
         "type": [
