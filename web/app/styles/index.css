@@ -3759,3 +3759,67 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 14px;
   padding: 5px 12px;
 }
+
+/* ── Shelf rail (activity shelves on the new homepage) ──── */
+
+.shelf-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: 0 var(--space-5);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.shelf-rail-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.shelf-rail-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.shelf-rail-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.shelf-rail-icon {
+  display: inline-flex;
+  color: var(--accent);
+}
+.shelf-rail-subline {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+.shelf-rail-list {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-3);
+  scroll-padding-left: var(--space-5);
+}
+.shelf-rail-list::-webkit-scrollbar { display: none; }
+.shelf-rail-list { scrollbar-width: none; }
+.shelf-rail-item {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+}
+@media (min-width: 768px) {
+  .shelf-rail-title { font-size: 26px; }
+  .shelf-rail-item { flex: 0 0 320px; }
+}

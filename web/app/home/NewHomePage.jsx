@@ -20,6 +20,7 @@
 // want shelves click through to /browse.
 import React from "react";
 import { Hero, ProofRow, CategoryGrid, DiscoveryPills, USPRow } from "./index.js";
+import { ShelfRail } from "./ShelfRail.jsx";
 
 /**
  * @param {object} props
@@ -34,6 +35,11 @@ export function NewHomePage({ app }) {
       <CategoryGrid app={app} locale={locale} />
       <DiscoveryPills app={app} locale={locale} sourcePage="homepage" />
       <USPRow locale={locale} />
+      {/* Activity shelves — 2 in the reduced config: new_this_week +
+          price_drops. ShelfRail self-hides empty shelves + the whole
+          rail when nothing qualifies, so a thin catalog won't render
+          a broken section. */}
+      <ShelfRail app={app} locale={locale} />
     </div>
   );
 }

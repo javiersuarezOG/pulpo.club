@@ -231,6 +231,10 @@ const UI_STRINGS = {
   "star_pill.aria":              { en: "{value} stars out of 5",
                                    es: "{value} estrellas de 5" },
 
+  // Shelf rail ARIA wrapper (screen-reader landmark name).
+  "shelf_rail.aria":             { en: "Activity shelves",
+                                   es: "Estantes de actividad" },
+
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
 

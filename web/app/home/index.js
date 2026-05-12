@@ -8,4 +8,5 @@ export { ProofRow } from "./ProofRow.jsx";
 export { CategoryGrid } from "./CategoryGrid.jsx";
 export { DiscoveryPills } from "./DiscoveryPills.jsx";
 export { USPRow } from "./USPRow.jsx";
+export { ShelfRail } from "./ShelfRail.jsx";
 export { NewHomePage } from "./NewHomePage.jsx";
