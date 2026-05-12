@@ -36,7 +36,7 @@ test.describe("New app boots cleanly on key routes", () => {
       // editorial vocabulary). If we see the ErrorBoundary fallback
       // text, fail with that copy in the failure message.
       const errorBoundary = page.getByText("Something went wrong.");
-      const realApp = page.locator(".app, .topnav, .new-homepage, .new-hero, .hero, .page-home");
+      const realApp = page.locator(".app, .topnav, .homepage-v2, .new-homepage, .new-hero");
       await Promise.race([
         realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
         errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
@@ -59,8 +59,10 @@ test.describe("New app boots cleanly on key routes", () => {
     // The specific crash we hit: listing.price_per_m2 was null on a
     // real listing, .toFixed(0) threw. This test asserts at least one
     // ListingCard renders (which means the per-card render didn't
-    // crash on real data).
-    await page.goto("/", { waitUntil: "networkidle" });
+    // crash on real data). The homepage v2 redesign moved real
+    // listings off /; ListingCard now mounts on /browse, so check
+    // there.
+    await page.goto("/browse", { waitUntil: "networkidle" });
     // Any of the listing-card variants. .listing-card is the base
     // class shared by both default + magazine variants.
     await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
@@ -77,7 +79,9 @@ test.describe("New app boots cleanly on key routes", () => {
     });
     page.on("pageerror", (err) => errors.push(err.message));
 
-    await page.goto("/", { waitUntil: "networkidle" });
+    // Homepage v2 redesign: ListingCard moved to /browse. Boot the
+    // detail-panel test there.
+    await page.goto("/browse", { waitUntil: "networkidle" });
     const card = page.locator(".listing-card").first();
     await card.waitFor({ state: "visible", timeout: 10_000 });
     await card.click();
@@ -116,10 +120,10 @@ test.describe("New app boots cleanly on key routes", () => {
     });
     page.on("pageerror", (err) => errors.push(err.message));
 
-    await page.goto("/", { waitUntil: "networkidle" });
-    // The app uses internal state for routing — click the Browse nav
-    // link in TopNav to navigate, then wait for the histogram to mount.
-    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
+    // Homepage v2 hides the shared TopNav on /, so navigating to
+    // /browse via topnav-links from / isn't possible. Cold-load
+    // /browse directly — the test's intent is the histogram itself.
+    await page.goto("/browse", { waitUntil: "networkidle" });
     const histo = page.locator(".histo-track");
     await histo.waitFor({ state: "visible", timeout: 10_000 });
     // Scroll the histogram into view before clicking — Playwright's
@@ -179,9 +183,10 @@ test.describe("New app boots cleanly on key routes", () => {
       });
     });
 
-    await page.goto("/", { waitUntil: "networkidle" });
-    // Open Plans via the footer link (the topnav doesn't expose it).
-    await page.locator(".site-footer button").getByText(/^Plans$/).first().click();
+    // Homepage v2 hides the shared footer on /; navigate to /plans
+    // directly. The test's intent is the Pro CTA POST, not the
+    // footer-link wiring.
+    await page.goto("/plans", { waitUntil: "networkidle" });
     await page.locator(".plan-card.featured").waitFor({ state: "visible", timeout: 5_000 });
     // Click the Pro CTA — its label uses the new t("plans.upgrade_pro_cta") key.
     await page.locator(".plan-card.featured .btn-primary").click();
@@ -233,12 +238,10 @@ test.describe("New app boots cleanly on key routes", () => {
       });
     });
 
-    await page.goto("/", { waitUntil: "networkidle" });
-
-    // Avatar only renders for signed-in users — the localStorage seed
-    // gets us there on the legacy auth path.
-    await page.locator(".avatar-btn").first().waitFor({ state: "visible", timeout: 5_000 });
-    await page.locator(".avatar-btn").first().click();
+    // Homepage v2 hides the shared TopNav on /, so the avatar isn't
+    // visible there. Cold-load /account directly; the seeded Pro user
+    // gets past the route gate and lands on Profile by default.
+    await page.goto("/account", { waitUntil: "networkidle" });
 
     // Account lands on Profile by default; pivot to Subscription
     // sub-section.
@@ -280,7 +283,7 @@ test.describe("New app boots cleanly on key routes", () => {
       await page.goto(route, { waitUntil: "networkidle" });
 
       const errorBoundary = page.getByText("Something went wrong.");
-      const realApp = page.locator(".app, .topnav, .new-homepage, .new-hero, .hero, .page-home, .page-browse, .saved-page, .plans-page, .account-page");
+      const realApp = page.locator(".app, .topnav, .homepage-v2, .new-homepage, .new-hero, .page-browse, .saved-page, .plans-page, .account-page");
       await Promise.race([
         realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
         errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
@@ -331,10 +334,13 @@ test.describe("New app boots cleanly on key routes", () => {
   });
 
   test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
+    // Homepage v2 hides the shared TopNav on /. Use the Pick Your
+    // Shoreline card to navigate from / → /browse, then open a
+    // listing for the back/forward chain.
     await page.goto("/", { waitUntil: "networkidle" });
 
-    // Discover → Browse via TopNav button
-    await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
+    // Click the Beach shoreline card to navigate to /browse.
+    await page.locator(".hp-shoreline-card-beach").click();
     await page.waitForFunction(() => window.location.pathname === "/browse", null, {
       timeout: 5_000,
     });
@@ -456,6 +462,16 @@ test.describe("New app boots cleanly on key routes", () => {
       "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)
       "We couldn't load",                             // DataFetchFailed
       "Upload photo",                                 // account profile
+      // Homepage v2 (redesign) — every CTA, label, or section heading
+      // that would be visible to a cold ES visitor on /. Trips when
+      // hard-coded EN strings sneak in instead of t() lookups.
+      "Start free month", "See sample deals",         // hero CTAs + header CTA
+      "Pick your shoreline", "Featured deal",         // section headings
+      "Built by locals", "For subscribers only",      // USP band
+      "Top 10 deals", "Price drops", "New this week", // shelf headings
+      "View all",                                     // shelf "View all" links
+      "Sign in",                                      // header "Sign in" link
+      "How it works", "Pricing",                      // header nav
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
@@ -473,7 +489,10 @@ test.describe("New app boots cleanly on key routes", () => {
     // user sees).
     await page.evaluate(() => localStorage.setItem("pulpo-locale", "es"));
     await page.reload({ waitUntil: "networkidle" });
-    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
+    // Homepage v2 mounts under .homepage-v2; .listing-card lives on
+    // /browse, not /. Wait for the homepage root, sweep, then navigate
+    // to /browse to mount the detail panel for the second sweep.
+    await page.locator(".homepage-v2").first().waitFor({ state: "visible", timeout: 10_000 });
     // Allow the i18n table + locale-driven re-render to settle.
     await page.waitForTimeout(500);
 
@@ -484,12 +503,15 @@ test.describe("New app boots cleanly on key routes", () => {
     for (const word of ENGLISH_CANARIES) {
       expect(
         bodyText,
-        `Spanish locale leaked English text: "${word}". Wire the source via t() against an i18n.jsx key.`,
+        `Spanish locale leaked English text on home: "${word}". Wire the source via t() against an i18n.jsx key.`,
       ).not.toContain(word);
     }
 
-    // Click into the first card to mount the detail panel and re-sniff.
-    // The road_access "Paved" bug was on detail; we must check it.
+    // Navigate to /browse and click into the first card to mount the
+    // detail panel. The road_access "Paved" bug was on detail; we must
+    // check it.
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.locator(".listing-card").first().click();
     await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
     await page.waitForTimeout(500);

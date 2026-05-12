@@ -153,4 +153,41 @@
   --bp-md: 768px;
   --bp-lg: 1024px;
   --bp-xl: 1280px;
+
+  /* ============== HOMEPAGE-V2 PALETTE ============== */
+  /* Editorial coastal palette for the redesigned homepage. These hex
+     values are the source of truth for the new homepage only — every
+     other surface in the app continues to read from the oklch tokens
+     above. Stylelint allowlists tokens.css for hex/rgba (see
+     .stylelintrc.json:53-76), so this block is the legal home for
+     these literals. */
+  /* token-exception: homepage-v2 palette is hex-keyed by design spec; tokens-only file */
+  --color-bg-cream:        #F4EFE6;
+  --color-bg-white:        #FFFFFF;
+  --color-bg-cream-soft:   #F8F4EC;
+  --color-bg-sage:         #DDE9DC;
+  --color-bg-sage-2:       #C9DBC7;
+  --color-bg-peach:        #F5DDC9;
+  --color-bg-pebble:       #EEE9DF;
+  --color-ink-primary:     #1A1916;
+  --color-ink-secondary:   #5A5650;
+  --color-ink-muted:       #888780;
+  --color-forest-deep:     #1F3D31;
+  --color-forest-mid:      #3D6450;
+  --color-forest-soft:     #5A7A60;
+  --color-forest-bg:       #14281D;
+  --color-clay-primary:    #B8643C;
+  --color-clay-mid:        #C77D52;
+  --color-clay-dark:       #7A3D1F;
+  --color-clay-deeper:     #6B3719;
+  --color-navy-primary:    #1E2A3A;
+  --color-navy-mid:        #2E4055;
+  --color-navy-deep:       #0F1825;
+  --color-button-dark:     #18211C;
+  --color-button-text:     #F4EFE6;
+  --color-burgundy-text:   #6B2C2C;
+  --color-burgundy-bg:     #F5E3E0;
+  --color-line-soft:       rgba(0, 0, 0, 0.08); /* token-exception: card hairline */
+  --color-line-faint:      rgba(0, 0, 0, 0.06); /* token-exception: usp card hairline */
+  --color-overlay-white-95: rgba(255, 255, 255, 0.95); /* token-exception: badge pill */
 }

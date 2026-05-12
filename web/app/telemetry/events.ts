@@ -121,6 +121,43 @@ export type EventMap = {
     link_destination: string;
   };
 
+  // ── Homepage v2 (redesign) ────────────────────────────────────────
+  // The redesigned homepage (NewHomePage rewrite #2) replaces the
+  // Hero email form + ProofRow + CategoryGrid + DiscoveryPills with
+  // a CTA-led hero + Featured deal + USP band + Pick Shoreline + 3
+  // editorial shelves. Old event names (hero.email_submitted,
+  // proof_row.*, category_grid.*, discovery_pill.*) stay in this
+  // catalog for funnel-history continuity but no longer fire from
+  // the homepage. New events below.
+  "homepage.cta_clicked": {
+    location: "header" | "hero_primary" | "hero_secondary";
+    cta_text: string;
+  };
+  "homepage.featured_deal_clicked": Record<string, never>;
+  "homepage.section_viewed": {
+    section: "hero" | "featured" | "usps" | "shoreline" | "top_10" | "price_drops" | "new_this_week";
+  };
+  "homepage.shelf_view_all_clicked": {
+    shelf: "top_10" | "price_drops" | "new_this_week";
+  };
+  "homepage.shelf_card_clicked": {
+    shelf: "top_10" | "price_drops" | "new_this_week";
+    position: number;
+    listing_id: string;
+  };
+  "homepage.shelf_scrolled": {
+    shelf: "top_10" | "price_drops" | "new_this_week";
+    max_position_reached: number;
+  };
+  "shoreline_card_clicked": {
+    shoreline: "beach" | "lake";
+  };
+  "mobile_nav.opened": Record<string, never>;
+  "mobile_nav.closed": Record<string, never>;
+  "mobile_nav.link_clicked": {
+    link: "lake" | "beach" | "how_it_works" | "pricing" | "sign_in";
+  };
+
   // ── Cutover marker (rewrite Phase 7) ─────────────────────────────
   // One-time event fired per browser when the user first encounters
   // the new homepage shelf config (reduced from 15 → 2 per Q6 of the

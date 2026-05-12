@@ -1,12 +1,17 @@
-// Barrel export for the new homepage components + shell. The shell
-// (NewHomePage) composes the five components in the section order
-// the rewrite brief specifies. The flag check (VITE_NEW_HOMEPAGE)
-// lives in app.jsx — this module stays pure data.
-
-export { Hero } from "./Hero.jsx";
-export { ProofRow } from "./ProofRow.jsx";
-export { CategoryGrid } from "./CategoryGrid.jsx";
-export { DiscoveryPills } from "./DiscoveryPills.jsx";
-export { USPRow } from "./USPRow.jsx";
-export { ShelfRail } from "./ShelfRail.jsx";
+// Barrel export for the homepage v2 shell + sections.
+//
+// The homepage v2 shell (NewHomePage) composes the sections in the
+// order specified by the design spec: header → hero → featured →
+// USP band → pick shoreline → top 10 → price drops → new this week.
+//
+// Previous v1 components (Hero email form, ProofRow, CategoryGrid,
+// DiscoveryPills, USPRow, ShelfRail) were retired in the v2 redesign.
+// Their files have been removed; their event types remain in
+// telemetry/events.ts for PostHog funnel-history continuity.
 export { NewHomePage } from "./NewHomePage.jsx";
+export { HomepageHeader } from "./HomepageHeader.jsx";
+export { HeroV2 } from "./HeroV2.jsx";
+export { FeaturedDeal } from "./FeaturedDeal.jsx";
+export { USPBand } from "./USPBand.jsx";
+export { PickShoreline } from "./PickShoreline.jsx";
+export { TopTenShelf, PriceDropsShelf, NewThisWeekShelf, HomeShelf } from "./HomeShelf.jsx";

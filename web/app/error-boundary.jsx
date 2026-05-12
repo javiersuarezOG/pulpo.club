@@ -18,12 +18,33 @@ export class ErrorBoundary extends React.Component {
   componentDidCatch(error, info) {
     console.error("[pulpo] uncaught error", error, info);
     try {
-      captureException(error, { componentStack: info?.componentStack, kind: "react.errorBoundary" });
+      captureException(error, {
+        componentStack: info?.componentStack,
+        kind: "react.errorBoundary",
+        // `section` is opt-in. Section-scoped boundaries (homepage v2)
+        // tag PostHog with the failing surface so dashboards can split
+        // "hero crashed" from "shelf crashed" cleanly.
+        section: this.props.section || undefined,
+      });
     } catch { /* never let telemetry break the fallback render */ }
   }
 
   render() {
     if (this.state.error) {
+      // Compact fallback — a single section failed inside a larger
+      // tree. Renders inline so the rest of the page is unaffected.
+      if (this.props.compact) {
+        return (
+          <div
+            role="alert"
+            data-testid="error-boundary-fallback"
+            data-section={this.props.section || undefined}
+            style={compactStyle}
+          >
+            This section is unavailable.
+          </div>
+        );
+      }
       return (
         <div role="alert" data-testid="error-boundary-fallback" style={fallbackStyle}>
           <h1 style={{ margin: 0, fontSize: 22 }}>Something went wrong.</h1>
@@ -40,6 +61,18 @@ export class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+const compactStyle = {
+  padding: "24px 20px",
+  textAlign: "center",
+  color: "#5A5650",
+  fontSize: 13,
+  fontFamily: "Inter, system-ui, sans-serif",
+  background: "#F8F4EC",
+  borderRadius: 8,
+  margin: "16px auto",
+  maxWidth: 480,
+};
 
 const fallbackStyle = {
   display: "flex",
