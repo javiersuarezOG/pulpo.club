@@ -21,6 +21,9 @@ import {
 } from "./data/filter-url.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
+import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
+import { captureCampaignParams } from "./lib/campaign";
 import {
   Icon,
   PulpoLogo,
@@ -711,6 +714,33 @@ function HomePage({ app }) {
     setLayout(v);
     try { localStorage.setItem("pulpo-discover-layout", v); } catch {}
   };
+
+  // PR-B.5 — home-page Pulpo Pro upsell modal trigger. Mounts the
+  // modal once per page load when the URL carries a campaign signal
+  // (utm_*, ?code=…, or ?upsell=1) AND the user isn't already Pro
+  // AND we're not inside the 7-day dismissal window. Pure decision
+  // logic lives in lib/upsell-config.ts so flipping default behaviour
+  // (e.g. enabling for direct traffic) is a one-line config change.
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    if (app.proUpsellModal) return; // already open — don't re-fire
+    const params = new URLSearchParams(window.location.search);
+    const isProUser = !!(app.user && app.user.plan === "pro");
+    const decision = decideShouldShowUpsell({ searchParams: params, isProUser });
+    if (!decision.show) return;
+    // Capture full campaign params (UTMs + code) once via the shared
+    // helper so the modal posts the same payload /start would.
+    const campaign = captureCampaignParams();
+    app.openProUpsellModal({
+      trigger: decision.trigger,
+      urlCode: campaign.urlCode,
+      utms: campaign.utms,
+    });
+    // Intentional one-shot — only re-evaluates if the user signs in
+    // (becomes Pro) between renders. Don't depend on `app` itself
+    // because every render rebuilds the object reference.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.user]);
 
   // === Hooks done — branch on load state. ===
   if (listingsState.state.status === "loading") return <DiscoverSkeleton />;
@@ -3251,9 +3281,206 @@ function WelcomeModal({ app, state, onClose }) {
   );
 }
 
+// ────────────────────────────────────────────────────────────────────
+// ProUpsellModal — home-page Pulpo Pro acquisition overlay (PR-B.5).
+//
+// Mounted on / when the URL carries a campaign signal (utm_*, ?code=…,
+// or ?upsell=1). Pro signed-in users never see it. The decision logic
+// lives in lib/upsell-config.ts so flipping the trigger rules
+// (e.g. enabling for direct traffic) is a one-line edit.
+//
+// Mirrors the /start single-button funnel: 3 canonical Pro USPs +
+// geo-derived price + "Get access" CTA → POST /api/stripe/start-checkout
+// → window.location.assign(stripeUrl). Same backend, same Stripe page,
+// same /account?welcome=1 redirect on success.
+//
+// Soft-fail on bad `?code=`: silent retry without the code so the user
+// always reaches Stripe.
+function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
+  const lc = app.locale;
+  const dialogRef = React.useRef(null);
+  const [submitting, setSubmitting] = pUseState(false);
+  const [error, setError] = pUseState(null);
+  // Geo-derived display price. Starts with the synchronous default
+  // (USD) and refines once /api/geo resolves the visitor's country.
+  const [price, setPrice] = pUseState(() => priceForCountry(null));
+
+  React.useEffect(() => {
+    track("pro_upsell.shown", { trigger, has_code: !!urlCode });
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => {
+      if (!cancelled) setPrice(p);
+    });
+    return () => { cancelled = true; };
+  }, [trigger, urlCode]);
+
+  // ESC dismiss + focus trap entry.
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        track("pro_upsell.dismissed", { trigger, action: "esc" });
+        markUpsellDismissed();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    if (dialogRef.current) dialogRef.current.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [trigger, onClose]);
+
+  const onBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      track("pro_upsell.dismissed", { trigger, action: "backdrop" });
+      markUpsellDismissed();
+      onClose();
+    }
+  };
+
+  const postCheckout = async (includeCode) => {
+    return fetch("/api/stripe/start-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        promoCode: includeCode && urlCode ? urlCode : null,
+        locale: lc,
+        ...utms,
+      }),
+    });
+  };
+
+  const onCta = async () => {
+    setError(null);
+    track("pro_upsell.cta_clicked", { trigger, had_promo_code: !!urlCode });
+    setSubmitting(true);
+    try {
+      let res = await postCheckout(true);
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        const reason = detail && detail.error;
+        if (reason === "invalid_promo_code" && urlCode) {
+          // Soft-fail: drop the bad code, retry once.
+          res = await postCheckout(false);
+        } else if (reason === "rate_limited") {
+          setError(t("pro_upsell.error", lc));
+          setSubmitting(false);
+          return;
+        } else {
+          track("api.error", {
+            endpoint: "/api/stripe/start-checkout",
+            status: res.status,
+            reason,
+            detail: detail && detail.detail,
+          });
+          setError(t("pro_upsell.error", lc));
+          setSubmitting(false);
+          return;
+        }
+      }
+      const data = await res.json();
+      if (!data || !data.url) {
+        setError(t("pro_upsell.error", lc));
+        setSubmitting(false);
+        return;
+      }
+      track("pro_upsell.checkout_redirected", {
+        trigger, had_promo_code: !!urlCode,
+      });
+      window.location.assign(data.url);
+    } catch (err) {
+      track("api.error", {
+        endpoint: "/api/stripe/start-checkout",
+        status: 0, reason: "network", detail: err && err.message,
+      });
+      setError(t("pro_upsell.error", lc));
+      setSubmitting(false);
+    }
+  };
+
+  const onMaybeLater = () => {
+    track("pro_upsell.dismissed", { trigger, action: "maybe_later" });
+    markUpsellDismissed();
+    onClose();
+  };
+
+  return (
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onClick={onBackdropClick}
+    >
+      <div
+        ref={dialogRef}
+        className="modal pro-upsell-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("pro_upsell.aria.dialog", lc)}
+        tabIndex={-1}
+      >
+        <button
+          type="button"
+          className="modal-close"
+          aria-label={t("pro_upsell.aria.close", lc)}
+          onClick={() => {
+            track("pro_upsell.dismissed", { trigger, action: "close" });
+            markUpsellDismissed();
+            onClose();
+          }}
+        >
+          ×
+        </button>
+        <div className="pro-upsell-eyebrow">{t("pro_upsell.eyebrow", lc)}</div>
+        <h2 className="pro-upsell-headline">{t("pro_upsell.headline", lc)}</h2>
+        <ul className="pro-upsell-usps">
+          <li>
+            <span className="pro-upsell-usp-headline">{t("pro.usp.alerts.headline", lc)}</span>
+            <span className="pro-upsell-usp-body">{t("pro.usp.alerts.body", lc)}</span>
+          </li>
+          <li>
+            <span className="pro-upsell-usp-headline">{t("pro.usp.browse.headline", lc)}</span>
+            <span className="pro-upsell-usp-body">{t("pro.usp.browse.body", lc)}</span>
+          </li>
+          <li>
+            <span className="pro-upsell-usp-headline">{t("pro.usp.links.headline", lc)}</span>
+            <span className="pro-upsell-usp-body">{t("pro.usp.links.body", lc)}</span>
+          </li>
+        </ul>
+        <div className="pro-upsell-price">
+          {t("pro_upsell.price", lc, { price: price.displayString })}
+        </div>
+        <button
+          type="button"
+          className="pro-upsell-cta-primary"
+          onClick={onCta}
+          disabled={submitting}
+        >
+          {submitting
+            ? t("pro_upsell.cta_primary_submitting", lc)
+            : t("pro_upsell.cta_primary", lc, { price: price.displayString })}
+        </button>
+        {urlCode && (
+          <p className="pro-upsell-code-note" aria-live="polite">
+            {t("pro_upsell.code_applied_note", lc)}
+          </p>
+        )}
+        {error && (
+          <p className="pro-upsell-error" role="alert">{error}</p>
+        )}
+        <button
+          type="button"
+          className="pro-upsell-cta-dismiss"
+          onClick={onMaybeLater}
+        >
+          {t("pro_upsell.cta_dismiss", lc)}
+        </button>
+        <p className="pro-upsell-price-sub">{t("pro_upsell.price_sub", lc)}</p>
+      </div>
+    </div>
+  );
+}
+
 export {
   TopNav, BottomNav, PillRail, HomePage, BrowsePage, ListingDetail,
-  SavedPage, PlansPage, SignupModal, WelcomeModal, ToastHost,
+  SavedPage, PlansPage, SignupModal, WelcomeModal, ProUpsellModal, ToastHost,
   makeDefaultFilters, applyFilters,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
 };

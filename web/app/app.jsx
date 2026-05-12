@@ -20,6 +20,7 @@ import {
   ListingDetail,
   SignupModal,
   WelcomeModal,
+  ProUpsellModal,
   ToastHost,
   ConsentBanner,
 } from "./pages.jsx";
@@ -780,11 +781,21 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route, user]);
 
+  // PR-B.5 — home-page Pulpo Pro upsell modal. Triggered by HomePage's
+  // mount-time effect when the URL carries a campaign signal (see
+  // lib/upsell-config.ts). State is { trigger, urlCode, utms } or null
+  // when not open. App owns it (rather than HomePage) so the modal can
+  // outlive a route change if needed.
+  const [proUpsellModal, setProUpsellModal] = useState(null);
+  const openProUpsellModal = useCallback((cfg) => setProUpsellModal(cfg), []);
+  const closeProUpsellModal = useCallback(() => setProUpsellModal(null), []);
+
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout, isSigningOut,
     savedIds, toggleSave,
     signupModal, openSignup, closeSignup,
+    proUpsellModal, openProUpsellModal, closeProUpsellModal,
     openListing, closeListing, openListingId,
     detailViewCount, recordDetailView,
     showToast, toast,
@@ -889,6 +900,15 @@ function App() {
           app={app}
           state={welcomeModalState}
           onClose={closeWelcomeModal}
+        />
+      )}
+      {proUpsellModal && (
+        <ProUpsellModal
+          app={app}
+          trigger={proUpsellModal.trigger}
+          urlCode={proUpsellModal.urlCode}
+          utms={proUpsellModal.utms}
+          onClose={closeProUpsellModal}
         />
       )}
       <ToastHost app={app} />

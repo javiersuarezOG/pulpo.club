@@ -45,6 +45,10 @@ const SECTIONS = [
   // /welcome was removed in PR-B.4b; the post-payment landing is now a
   // modal on /account?welcome=1 (covered by the /account row above).
   { path: "/start",   surface: ".start-page",                 gated: false },
+  // PR-B.5 — campaign-tagged home renders the <ProUpsellModal> overlay
+  // on top of the regular home page. Both the underlying page AND the
+  // modal must fit at every mobile width without horizontal overflow.
+  { path: "/?utm_source=test", surface: ".pro-upsell-modal, .hero, .page-home", gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.

@@ -163,6 +163,36 @@ export type EventMap = {
   "welcome_modal.cta_inbox_clicked": Record<string, never>;
   /** Anonymous-variant secondary CTA → POSTs /api/clerk/resend-invitation. */
   "welcome_modal.cta_resend_clicked": Record<string, never>;
+
+  /** / home-page Pro upsell modal mounted (PR-B.5). `trigger` reflects
+   *  which URL signal opened the modal — utm_* params, a ?code=… link,
+   *  an explicit ?upsell=1, or (when the direct-traffic flag is on)
+   *  direct. PostHog funnels can break down conversion by trigger to
+   *  see which channel converts best. */
+  "pro_upsell.shown": {
+    trigger: "utm" | "code" | "explicit" | "direct";
+    has_code: boolean;
+  };
+  /** Modal dismissed without converting. `action` distinguishes the
+   *  paths so we can compare "users who close vs ESC vs Maybe later". */
+  "pro_upsell.dismissed": {
+    trigger: "utm" | "code" | "explicit" | "direct";
+    action: "close" | "esc" | "backdrop" | "maybe_later";
+  };
+  /** Primary CTA clicked → frontend POSTs /api/stripe/start-checkout
+   *  (same backend as /start). `had_promo_code` mirrors whether a
+   *  URL `?code=…` got pre-applied. */
+  "pro_upsell.cta_clicked": {
+    trigger: "utm" | "code" | "explicit" | "direct";
+    had_promo_code: boolean;
+  };
+  /** Fires immediately before window.location.assign(stripeUrl). Pairs
+   *  with the existing upgrade.checkout_returned event for end-to-end
+   *  funnel completion. */
+  "pro_upsell.checkout_redirected": {
+    trigger: "utm" | "code" | "explicit" | "direct";
+    had_promo_code: boolean;
+  };
   /** User clicks the /start "Log in" link. Funnel-side measure of
    *  returning-customer traffic vs new acquisition. */
   "start.login_link_clicked": Record<string, never>;
