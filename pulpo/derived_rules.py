@@ -335,3 +335,137 @@ def derive_land_type(li: Any) -> Optional[str]:
     if pt in ("land", "house", "condo"):
         return "residential"
     return None
+
+
+# ─────────────────────────────────────────────────────────────────────
+# New IA derives — master_category, subcategory, discovery_tags,
+# star_rating. Power the homepage category grid + discovery pills +
+# star pill badge on every card. Called AFTER ranker.rank() so
+# rank_score is populated.
+# ─────────────────────────────────────────────────────────────────────
+
+from pulpo.ia_config import (  # noqa: E402
+    BEACH_PROXIMITY_KM,
+    LAKE_ZONE_SLUG_PREFIX,
+    STAR_BINS,
+    TOP_RATED_MIN_RANK_SCORE,
+    UNDER_250K_USD,
+)
+
+
+def derive_master_category(li: Any) -> Optional[str]:
+    """Map a listing to 'beach' | 'lake' | None.
+
+    Rules, in priority order:
+      1. zone slug starts with 'lago-' → lake
+         (current zones: lago-coatepeque, lago-ilopango — see
+          pulpo/normalize.py ZONE_PATTERNS)
+      2. dist_beach_km <= BEACH_PROXIMITY_KM → beach
+      3. beachfront_tier in {on_beach, walk_to_beach, near_beach} → beach
+      4. else → None (interior listings; won't appear in the homepage
+         category grid by design — they're still browsable via /browse)
+
+    The lake rule wins over the beach rule: a hypothetical Lago de
+    Ilopango listing geocoded within 5km of the coast still surfaces
+    as lake (the zone slug is the more specific signal).
+    """
+    zone = _g(li, "zone")
+    if isinstance(zone, str) and zone.startswith(LAKE_ZONE_SLUG_PREFIX):
+        return "lake"
+    dist = _g(li, "dist_beach_km")
+    if isinstance(dist, (int, float)) and dist <= BEACH_PROXIMITY_KM:
+        return "beach"
+    tier = _g(li, "beachfront_tier")
+    if tier in ("on_beach", "walk_to_beach", "near_beach"):
+        return "beach"
+    return None
+
+
+def derive_subcategory(li: Any) -> Optional[str]:
+    """Map property_type to the homepage's subcategory enum.
+
+    house → homes, condo → condos, land → land. None when
+    property_type is missing or an unknown literal (defensive).
+    """
+    pt = _g(li, "property_type")
+    if pt == "house":
+        return "homes"
+    if pt == "condo":
+        return "condos"
+    if pt == "land":
+        return "land"
+    return None
+
+
+def derive_discovery_tags(li: Any) -> list[str]:
+    """Compute the subset of {top_rated, under_250k, gated, waterfront}
+    that applies to this listing.
+
+    Stored as a list (not a set) so JSON serialization stays simple and
+    the order is deterministic for snapshot tests. Order matches
+    DISCOVERY_TAGS in ia_config.py.
+
+    Rules:
+      - top_rated  : rank_score ≥ TOP_RATED_MIN_RANK_SCORE (70.0)
+      - under_250k : price_usd < UNDER_250K_USD (250,000)
+      - gated      : is_in_development is True
+      - waterfront : beachfront_tier == 'on_beach' (direct beach
+                     frontage). Lake-frontage signal is sparse today;
+                     extend this rule when lake-direct-access NLP
+                     keywords land.
+    """
+    tags: list[str] = []
+    rank = _g(li, "rank_score")
+    if isinstance(rank, (int, float)) and rank >= TOP_RATED_MIN_RANK_SCORE:
+        tags.append("top_rated")
+    price = _g(li, "price_usd")
+    if isinstance(price, (int, float)) and price < UNDER_250K_USD:
+        tags.append("under_250k")
+    if _g(li, "is_in_development") is True:
+        tags.append("gated")
+    if _g(li, "beachfront_tier") == "on_beach":
+        tags.append("waterfront")
+    return tags
+
+
+def derive_star_rating(li: Any) -> float:
+    """Map rank_score (0..100) → star rating in 0.5 increments.
+
+    Returns 0.0 when rank_score is missing or below the 1-star floor.
+    Bins live in pulpo.ia_config.STAR_BINS so the frontend mirror at
+    web/app/components/StarPill.jsx can read identical thresholds.
+
+    The newsletter template + browse cards + detail page all consume
+    this value directly — no client-side recompute, no drift.
+    """
+    score = _g(li, "rank_score")
+    if not isinstance(score, (int, float)) or score < 1:
+        return 0.0
+    for threshold, stars in STAR_BINS:
+        if score >= threshold:
+            return stars
+    return 0.0
+
+
+def apply_ia_derives(li: Any) -> dict[str, Any]:
+    """Compute and write all four IA-axis derives in one pass.
+
+    Called from automation/run.py *after* ranker.rank() so rank_score
+    is populated. Pure: same inputs → same outputs.
+
+    Returns a dict of the written values for log/telemetry roll-ups.
+    """
+    mc  = derive_master_category(li)
+    sub = derive_subcategory(li)
+    tags = derive_discovery_tags(li)
+    stars = derive_star_rating(li)
+    _set(li, "master_category", mc)
+    _set(li, "subcategory",     sub)
+    _set(li, "discovery_tags",  tags)
+    _set(li, "star_rating",     stars)
+    return {
+        "master_category": mc,
+        "subcategory":     sub,
+        "discovery_tags":  tags,
+        "star_rating":     stars,
+    }

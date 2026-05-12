@@ -83,6 +83,10 @@
       "location_score",
       "momentum_score",
       "rank_reasons",
+      "master_category",
+      "subcategory",
+      "discovery_tags",
+      "star_rating",
       "data_quality_score",
       "investment_signal",
       "readiness_score",
@@ -570,6 +574,27 @@
         "items": {
           "type": "string"
         }
+      },
+      "master_category": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "subcategory": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "discovery_tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "star_rating": {
+        "type": "number"
       },
       "data_quality_score": {
         "type": [

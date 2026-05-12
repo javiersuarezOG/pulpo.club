@@ -16,8 +16,28 @@
 //     (PR-8 ships the full enum).
 //   - land_type is a placeholder until PR-8's classifier.
 
-import type { Listing } from "./types";
+import type { DiscoveryTag, Listing, MasterCategory, Subcategory } from "./types";
 import { decodeHtmlEntities } from "./decode-html";
+
+const VALID_MASTER_CATEGORIES: ReadonlySet<MasterCategory> = new Set(["beach", "lake"]);
+const VALID_SUBCATEGORIES:     ReadonlySet<Subcategory>    = new Set(["homes", "condos", "land"]);
+const VALID_DISCOVERY_TAGS:    ReadonlySet<DiscoveryTag>   = new Set([
+  "top_rated", "under_250k", "gated", "waterfront",
+]);
+
+function adaptDiscoveryTags(raw: unknown): DiscoveryTag[] {
+  // Always returns an array (possibly empty) — never null/undefined.
+  // The backend writes a deterministic list; this filter rejects any
+  // unknown literal that might sneak in during a schema rollout.
+  if (!Array.isArray(raw)) return [];
+  const out: DiscoveryTag[] = [];
+  for (const t of raw) {
+    if (typeof t === "string" && VALID_DISCOVERY_TAGS.has(t as DiscoveryTag)) {
+      out.push(t as DiscoveryTag);
+    }
+  }
+  return out;
+}
 
 // Off-market sources per the user's rule. The literal labels never
 // reach the UI for these — we emit "Off-market" instead.
@@ -271,6 +291,21 @@ export function adaptListing(raw: any): Listing {
     momentum_score: typeof raw.momentum_score === "number" ? raw.momentum_score : null,
     property_type: typeof raw.property_type === "string" ? raw.property_type : null,
     bedrooms: typeof raw.bedrooms === "number" ? raw.bedrooms : null,
+    // IA-axis fields. During the rollout window, ranked.json may not
+    // yet carry them — graceful nulls keep the legacy homepage code
+    // working unchanged while the backend catches up.
+    master_category:
+      typeof raw.master_category === "string" &&
+      VALID_MASTER_CATEGORIES.has(raw.master_category as MasterCategory)
+        ? (raw.master_category as MasterCategory)
+        : null,
+    subcategory:
+      typeof raw.subcategory === "string" &&
+      VALID_SUBCATEGORIES.has(raw.subcategory as Subcategory)
+        ? (raw.subcategory as Subcategory)
+        : null,
+    discovery_tags: adaptDiscoveryTags(raw.discovery_tags),
+    star_rating: typeof raw.star_rating === "number" ? raw.star_rating : 0,
   };
 }
 
