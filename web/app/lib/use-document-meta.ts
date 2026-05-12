@@ -22,8 +22,13 @@ import type { Route } from "./url-routing";
 import type { Listing } from "../data/types";
 
 const SITE_NAME = "Pulpo";
-const SITE_DESCRIPTION_EN = "Beach + raw land for sale in El Salvador. Pulpo brings together titled and off-market listings — land, beachfront homes, and more — in one place.";
-const SITE_DESCRIPTION_ES = "Frente al mar y terrenos en El Salvador. Pulpo reúne anuncios titulados y off-market — terrenos, casas frente al mar y más — en un solo lugar.";
+// Rewrite Phase 8 — homepage description now aligns with the new hero
+// copy ("Every beach and lake home in El Salvador, ranked by value")
+// while remaining accurate for the legacy homepage during the rollout
+// window. Both versions surface beach + lake properties + a value
+// ranking; the copy works regardless of which UI a SERP click lands on.
+const SITE_DESCRIPTION_EN = "Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every two weeks.";
+const SITE_DESCRIPTION_ES = "Cada casa de playa y lago en El Salvador, ordenada por valor. Explora cientos de propiedades verificadas de playa y lago — y recibe las 10 mejores en tu correo cada dos semanas.";
 
 // One brand image for sections; listing detail uses the listing's first
 // photo. The brand image lives next to the legacy assets and is also
@@ -142,8 +147,8 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
   // home
   return {
     title: isEs
-      ? "Pulpo — Terrenos y casas frente al mar en El Salvador"
-      : "Pulpo — Beach + raw land for sale in El Salvador",
+      ? "Pulpo — Casas y terrenos de playa y lago en El Salvador, ordenados por valor"
+      : "Pulpo — Beach and lake homes in El Salvador, ranked by value",
     description: isEs ? SITE_DESCRIPTION_ES : SITE_DESCRIPTION_EN,
     image: BRAND_OG_IMAGE,
     canonicalPath: "/",
