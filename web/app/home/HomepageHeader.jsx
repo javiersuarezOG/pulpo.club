@@ -119,12 +119,12 @@ export function HomepageHeader({ app, locale }) {
           type="button"
           className="hp-header-logo"
           onClick={() => { if (app && typeof app.go === "function") app.go("home"); }}
-          aria-label="Pulpo"
+          aria-label="Pulpo" // i18n-allow: brand name, identical in EN and ES
         >
           <PulpoLogo size={18} />
         </button>
 
-        <nav className="hp-header-nav" aria-label="Primary">
+        <nav className="hp-header-nav" aria-label={t("home.header.nav_aria", locale)}>
           <button type="button" className="hp-header-link" onClick={goLake}>
             {t("home.header.nav.lake", locale)}
           </button>
@@ -180,7 +180,7 @@ export function HomepageHeader({ app, locale }) {
               <IconX size={22} strokeWidth={1.8} />
             </button>
           </div>
-          <nav className="hp-mobile-sheet-nav" aria-label="Mobile primary">
+          <nav className="hp-mobile-sheet-nav" aria-label={t("home.header.mobile_nav_aria", locale)}>
             <button type="button" className="hp-mobile-link" onClick={goLake}>
               {t("home.header.nav.lake", locale)}
             </button>

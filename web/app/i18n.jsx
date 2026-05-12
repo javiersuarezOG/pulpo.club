@@ -253,6 +253,10 @@ const UI_STRINGS = {
                                    es: "Abrir menú" },
   "home.header.close_menu":      { en: "Close menu",
                                    es: "Cerrar menú" },
+  "home.header.nav_aria":        { en: "Primary",
+                                   es: "Principal" },
+  "home.header.mobile_nav_aria": { en: "Mobile primary",
+                                   es: "Principal móvil" },
 
   "home.hero.coords":            { en: "N 13°47′ · W 89°12′",
                                    es: "N 13°47′ · O 89°12′" },
