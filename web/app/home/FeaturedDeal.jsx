@@ -8,6 +8,7 @@ import React, { useCallback } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { IconArrowRight } from "./icons.jsx";
+import { getCategoryImage } from "../assets/categories/index.js";
 
 export function FeaturedDeal({ app, locale }) {
   const onClick = useCallback(() => {
@@ -42,6 +43,13 @@ export function FeaturedDeal({ app, locale }) {
               <span className="hp-featured-tag">{t("home.featured.tag", locale)}</span>
             </div>
             <div className="hp-featured-art">
+              <img
+                src={getCategoryImage("water_features")}
+                alt=""
+                className="hp-featured-art-img"
+                loading="eager"
+                decoding="async"
+              />
               <span className="hp-featured-discount">{t("home.featured.discount", locale)}</span>
             </div>
             <dl className="hp-featured-stats">

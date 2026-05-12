@@ -4470,11 +4470,23 @@ h1,h2,h3,h4,h5 { margin: 0; }
   letter-spacing: 0.02em;
 }
 .homepage-v2 .hp-featured-art {
-  height: 80px;
+  height: 120px;
   margin: 10px 0 12px;
   border-radius: 8px;
-  background: radial-gradient(ellipse at 30% 30%, var(--color-forest-mid), var(--color-forest-bg));
+  background: var(--color-bg-sage);
   position: relative;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .homepage-v2 .hp-featured-art { height: 160px; }
+}
+.homepage-v2 .hp-featured-art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .homepage-v2 .hp-featured-discount {
   position: absolute;
@@ -4853,8 +4865,32 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .homepage-v2 .hp-shelf-card:hover { box-shadow: var(--shadow-1); }
 .homepage-v2 .hp-shelf-card-art {
   position: relative;
-  height: 100px;
+  height: 140px;
+  overflow: hidden;
 }
+@media (min-width: 640px) {
+  .homepage-v2 .hp-shelf-card-art { height: 160px; }
+}
+.homepage-v2 .hp-shelf-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Subtle darkening at the top + bottom corners so the badges on
+   light or busy images stay readable. Image stays largely uncovered
+   in the middle for editorial impact. */
+.homepage-v2 .hp-shelf-card-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 28%) 0%, rgb(0 0 0 / 0%) 30%, rgb(0 0 0 / 0%) 70%, rgb(0 0 0 / 22%) 100%); /* token-exception: photo-card scrim */
+}
+/* Legacy gradient blocks — kept as fallback when an image key isn't
+   provided (e.g. a placeholder card during catalog gaps). */
 .homepage-v2 .hp-shelf-card-art-forest {
   background: linear-gradient(135deg, var(--color-forest-mid), var(--color-forest-bg));
 }
