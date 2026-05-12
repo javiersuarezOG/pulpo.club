@@ -20,11 +20,18 @@ test.describe("Section URLs — full app sweep", () => {
     // (the legacy HomePage was deleted). New homepage uses
     // `.new-homepage` / `.new-hero`. Legacy names kept in OR list as
     // no-op fallback in case any partial restore re-introduces them.
-    { path: "/",        surface: ".new-homepage, .new-hero, .hero, .page-home", modalExpected: false },
-    { path: "/browse",  surface: ".page-browse, .browse-page",        modalExpected: false },
-    { path: "/saved",   surface: ".saved-page, .modal-signup",        modalExpected: true  },
-    { path: "/plans",   surface: ".plans-page, .plan-card",           modalExpected: false },
-    { path: "/account", surface: ".account-page, .modal-signup",      modalExpected: true  },
+    { path: "/",                       surface: ".new-homepage, .new-hero, .hero, .page-home", modalExpected: false },
+    { path: "/browse",                 surface: ".page-browse, .browse-page",        modalExpected: false },
+    { path: "/saved",                  surface: ".saved-page, .modal-signup",        modalExpected: true  },
+    { path: "/plans",                  surface: ".plans-page, .plan-card",           modalExpected: false },
+    { path: "/account",                surface: ".account-page, .modal-signup",      modalExpected: true  },
+    // /account/<section> sub-paths (added in #232) — anonymous users
+    // get the same sign-in modal as /account; the URL must stay put so
+    // post-signin AccountPage mounts straight on the right tab.
+    { path: "/account/profile",        surface: ".account-page, .modal-signup",      modalExpected: true  },
+    { path: "/account/notifications",  surface: ".account-page, .modal-signup",      modalExpected: true  },
+    { path: "/account/subscription",   surface: ".account-page, .modal-signup",      modalExpected: true  },
+    { path: "/account/security",       surface: ".account-page, .modal-signup",      modalExpected: true  },
   ];
 
   for (const { path, surface, modalExpected } of SECTIONS) {
@@ -61,11 +68,15 @@ test.describe("Section URLs — full app sweep", () => {
   //    section's title contains a section-specific substring that
   //    survives even when the marquee wraps.
   const TITLE_NEEDLES: Record<string, RegExp> = {
-    "/":        /Salvador|Beach|raw land/i,
-    "/browse":  /Browse|Explorar|beachfront/i,
-    "/saved":   /saved|guardad/i,
-    "/plans":   /Plans|pricing|Planes/i,
-    "/account": /account|cuenta/i,
+    "/":                      /Salvador|Beach|raw land/i,
+    "/browse":                /Browse|Explorar|beachfront/i,
+    "/saved":                 /saved|guardad/i,
+    "/plans":                 /Plans|pricing|Planes/i,
+    "/account":               /account|cuenta/i,
+    "/account/profile":       /account|cuenta/i,
+    "/account/notifications": /account|cuenta/i,
+    "/account/subscription":  /account|cuenta/i,
+    "/account/security":      /account|cuenta/i,
   };
   test("each section sets a unique, descriptive document.title", async ({ page }) => {
     const titles: Record<string, string> = {};
@@ -75,13 +86,13 @@ test.describe("Section URLs — full app sweep", () => {
       titles[path] = await page.title();
       expect(titles[path], `${path} title`).toMatch(TITLE_NEEDLES[path]);
     }
-    // Non-home titles should all be distinct (no marquee mutating them).
-    const uniqueNonHome = new Set(
-      Object.entries(titles)
-        .filter(([k]) => k !== "/")
-        .map(([, v]) => v),
-    );
-    expect(uniqueNonHome.size, "non-home titles all distinct").toBe(SECTIONS.length - 1);
+    // Top-level sections (excluding home + /account/<sub> paths) must
+    // have distinct titles — the marquee only animates "/". Sub-section
+    // paths share the parent /account title; that's intentional and not
+    // asserted here.
+    const TOP_LEVEL_NON_HOME = ["/browse", "/saved", "/plans", "/account"];
+    const uniqueNonHome = new Set(TOP_LEVEL_NON_HOME.map((p) => titles[p]));
+    expect(uniqueNonHome.size, "non-home top-level titles all distinct").toBe(TOP_LEVEL_NON_HOME.length);
   });
 
   // 3. Canonical URL + hreflang sanity per section.
@@ -119,6 +130,47 @@ test.describe("Section URLs — full app sweep", () => {
         .count();
       expect(n, `/preview anchors on ${path}`).toBe(0);
     }
+  });
+
+  // 4b. /account sub-section URL ↔ tab-state round-trip (seeded user so
+  //     the gate is open and the nav is visible).
+  test("/account sub-section URL round-trips through nav clicks + browser back/forward", async ({ page }) => {
+    // Seed a logged-in user via the legacy auth path so the route gate
+    // passes and AccountPage's <aside> nav renders.
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem("pulpo-user", JSON.stringify({
+          email: "section-urls@pulpo.club",
+          plan: "free",
+          joined: Date.now(),
+          provider: "email",
+        }));
+      } catch {}
+    });
+    const errors = attachErrorRecorder(page);
+
+    // Cold-load on /account/notifications — URL must survive mount.
+    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    await page.locator(".account-nav").waitFor({ state: "visible", timeout: 10_000 });
+    expect(new URL(page.url()).pathname, "URL after cold-load").toBe("/account/notifications");
+    await expect(
+      page.locator(".account-nav button").filter({ hasText: /Notifications|Notificaciones/ }),
+      "Notifications tab is active",
+    ).toHaveClass(/is-active/);
+
+    // Click Profile in the in-page nav → URL becomes /account/profile.
+    await page.locator(".account-nav button").filter({ hasText: /Profile|Perfil/ }).click();
+    await expect.poll(() => new URL(page.url()).pathname).toBe("/account/profile");
+
+    // Browser back → /account/notifications.
+    await page.goBack();
+    await expect.poll(() => new URL(page.url()).pathname).toBe("/account/notifications");
+
+    // Browser forward → /account/profile again.
+    await page.goForward();
+    await expect.poll(() => new URL(page.url()).pathname).toBe("/account/profile");
+
+    expect(errors, "console errors during /account round-trip").toEqual([]);
   });
 
   // 5. Listing-card hidden anchor exists + targets /listing/<id>.

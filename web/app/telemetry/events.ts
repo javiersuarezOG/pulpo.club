@@ -279,6 +279,40 @@ export type EventMap = {
    *  replaceState'd to /. Surfaces broken inbound links in PostHog. */
   "route.fallback_redirected": { from_path: string };
 
+  // ───── Account sub-section deep-links (PR account-section-urls) ─────
+  /** Fires once per resolved /account/<section> tab — cold-load (URL
+   *  hit), in-app nav click, and browser back/forward all emit. Lets
+   *  PostHog answer "did anyone actually deep-link a sub-section?",
+   *  which is the justification for these dedicated URLs. `entry`
+   *  distinguishes inbound traffic vs intra-page navigation so the
+   *  dashboards don't conflate the two. */
+  "account.section_viewed": {
+    section: "profile" | "notifications" | "subscription" | "security";
+    entry: "url" | "nav_click" | "popstate";
+  };
+
+  // ───── Preferred category chip selector (PR preferred-categories) ─────
+  /** Fires every time a chip is toggled inside the /account/notifications
+   *  preference selector. `selected_categories_after` is the resulting
+   *  array (post-change), so dashboards can compute the most-common
+   *  picks without joining sequential events. Categories are the same
+   *  vocabulary that powers Discover shelves + Browse pills (see
+   *  web/app/lib/categories.ts) — same field will drive newsletter
+   *  filtering and future personalization. */
+  "account.preferred_categories_toggled": {
+    category: string;
+    action: "select" | "deselect";
+    selected_count_after: number;
+    selected_categories_after: string[];
+  };
+  /** Fires when the user tries to select a 5th chip while already at
+   *  PREFERENCE_CATEGORIES_MAX (today: 4). Instructive signal for
+   *  whether the cap should rise. */
+  "account.preferred_categories_limit_hit": {
+    attempted_category: string;
+    current_selection: string[];
+  };
+
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
   // before we POST /api/stripe/billing-portal. Pairs with `portal.error`

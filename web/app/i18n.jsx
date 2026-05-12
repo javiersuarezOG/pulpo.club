@@ -669,6 +669,32 @@ const UI_STRINGS = {
   "account.notif.unsub_note":   { en: "You can also unsubscribe from any email using the link at the bottom of each message.",
                                   es: "También puedes darte de baja desde el enlace al final de cada email." },
 
+  // Preferred-category chip selector (PR-B). Rendered under the newsletter
+  // toggle for Pro users; captures up to PREFERENCE_CATEGORIES_MAX picks
+  // that the newsletter generator + future personalization read off
+  // user.profile.preferred_categories. The vocabulary itself lives in
+  // web/app/lib/categories.ts — see README-categories.md for lifecycle.
+  "account.notif.pref_cat.heading": { en: "Category preferences",
+                                      es: "Preferencias de categoría" },
+  "account.notif.pref_cat.intro":   { en: "Tell us what kind of land you're looking for and we'll prioritise it across alerts, the weekly digest, and future personalisation. Leave all unselected to keep the unfiltered experience.",
+                                      es: "Cuéntanos qué tipo de propiedad buscas y la priorizaremos en las alertas, el resumen semanal y la futura personalización. Déjalo todo sin seleccionar para mantener la experiencia sin filtros." },
+  "account.notif.pref_cat.limit_hint": { en: "You can select up to {max} categories.",
+                                          es: "Puedes seleccionar hasta {max} categorías." },
+  // Chip labels. Keep these short — the chip rail is responsive and
+  // long phrases force two-line wrap on 320px viewports.
+  "account.notif.pref_cat.new_this_week":  { en: "New this week",
+                                              es: "Nuevos esta semana" },
+  "account.notif.pref_cat.price_drops":    { en: "Price drops",
+                                              es: "Bajadas de precio" },
+  "account.notif.pref_cat.beachfront":     { en: "Beachfront / near the beach",
+                                              es: "Frente al mar / cerca de la playa" },
+  "account.notif.pref_cat.water_features": { en: "Lakefront / near water",
+                                              es: "Frente al lago / cerca del agua" },
+  "account.notif.pref_cat.under_50k":      { en: "Under $50K",
+                                              es: "Menos de $50.000" },
+  "account.notif.pref_cat.under_100k":     { en: "$50K–$100K",
+                                              es: "Entre $50.000 y $100.000" },
+
   // Pro upsell shown to free / anonymous users in this subsection.
   "account.notif.upsell.title": { en: "Get deal alerts with Pulpo Pro",
                                   es: "Recibe alertas con Pulpo Pro" },
