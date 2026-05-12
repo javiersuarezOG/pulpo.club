@@ -2461,6 +2461,38 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 12px; color: var(--accent-strong);
 }
 
+/* Preferred-category chip selector (PR-B). Sits under the newsletter
+   pref-row when the master toggle is on. Uses the shared .chip /
+   .chip.is-active design-system primitives — see L1025. Wrapper just
+   handles vertical spacing, helper text, and a 44×44 minimum touch
+   target on the chips themselves (WCAG 2.5.5). All values come from
+   tokens; no hex literals. */
+.notif-categories {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.notif-categories .account-subhead { margin: 0; }
+.notif-categories-intro {
+  font-size: 13px; color: var(--ink-3); line-height: 1.5; max-width: 60ch;
+  margin: 0;
+}
+.notif-categories-grid {
+  /* gap inherited from .chip-grid; this just isolates targeting. */
+}
+/* Touch-target uplift: .chip is 32px tall by default (fine on
+   desktop, under WCAG 44×44 on touch). Bumping padding-block here
+   keeps the chrome visually identical elsewhere but lifts the
+   preferences chips to a proper hit target. min-height clamp covers
+   the case where line-height shrinks below the threshold. */
+.notif-categories-grid .chip {
+  padding-block: 10px;
+  min-height: 44px;
+  display: inline-flex; align-items: center;
+}
+.notif-categories-limit {
+  font-size: 12px; color: var(--ink-3); line-height: 1.45;
+  padding-block: 2px;
+}
+
 /* Pro upsell card shown in Account → Notifications when user is on
    the free plan (or anonymous). Same visual weight as a pref-list
    block so it slots in cleanly above the platform-updates row. */
