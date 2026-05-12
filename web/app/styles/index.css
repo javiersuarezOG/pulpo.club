@@ -3823,3 +3823,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .shelf-rail-title { font-size: 26px; }
   .shelf-rail-item { flex: 0 0 320px; }
 }
+
+/* Map view placeholder — disabled toggle next to cards/table.
+   Renders identical to the active toggles but with reduced opacity +
+   not-allowed cursor so the affordance is clear. Removed in the
+   follow-up PR that ships the actual map view. */
+.map-view-placeholder {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

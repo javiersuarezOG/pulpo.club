@@ -235,6 +235,31 @@ const UI_STRINGS = {
   "shelf_rail.aria":             { en: "Activity shelves",
                                    es: "Estantes de actividad" },
 
+  // ── Browse filters — Phase 5B (new IA axes on the FilterPanel) ─────
+  "filter.master_category":      { en: "Beach or lake",   es: "Playa o lago" },
+  "filter.master.beach":         { en: "Beach",           es: "Playa" },
+  "filter.master.lake":          { en: "Lake",            es: "Lago" },
+  "filter.subcategory":          { en: "Property type",   es: "Tipo de propiedad" },
+  "filter.sub.homes":            { en: "Homes",           es: "Casas" },
+  "filter.sub.condos":           { en: "Condos",          es: "Condominios" },
+  "filter.sub.land":             { en: "Land",            es: "Terrenos" },
+  "filter.discovery_tags":       { en: "Quick filters",   es: "Filtros rápidos" },
+  "filter.tag.top_rated":        { en: "★ Top rated",     es: "★ Mejor valorados" },
+  "filter.tag.under_250k":       { en: "Under $250K",     es: "Menos de $250K" },
+  "filter.tag.gated":            { en: "Gated",           es: "Privado / cerrado" },
+  "filter.tag.waterfront":       { en: "Waterfront",      es: "Frente al agua" },
+
+  // Sort dropdown — rewrite-canonical labels (existing sort keys
+  // stay; only the visible label changes so saved URLs still work).
+  "sort.highest_value":          { en: "Highest value",   es: "Mejor valor" },
+  "sort.lowest_price":           { en: "Lowest price",    es: "Menor precio" },
+  "sort.newest":                 { en: "Newest",          es: "Más recientes" },
+  "sort.largest_plot":           { en: "Largest plot",    es: "Lote más grande" },
+
+  // Map view placeholder — disabled toggle next to cards/table view.
+  "view.map_coming_soon":        { en: "Map (coming soon)",
+                                   es: "Mapa (próximamente)" },
+
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
 
