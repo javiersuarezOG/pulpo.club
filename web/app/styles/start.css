@@ -30,11 +30,26 @@
   color: var(--ink);
 }
 .start-nav-link {
+  display: inline-flex;
+  align-items: center;
   color: var(--ink-2);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
+  /* ≥44px tap target — padding + min-height. The visible text is tight; the
+     hit area is comfortable for both fingers and accidental hover skim. */
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
 }
-.start-nav-link:hover { color: var(--ink); }
+.start-nav-link:hover {
+  color: var(--ink);
+  background: var(--paper-2);
+}
+.start-nav-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
 
 /* ── Hero ────────────────────────────────────────────────────── */
 .start-hero {
@@ -52,10 +67,18 @@
 }
 .start-hero-visual {
   order: 1;
-  min-height: 280px;
+  /* Fixed aspect ratio so the layout doesn't reflow as different
+     rotated hero photos load (PR-B.4 — pickHeroPhoto). 16:10
+     landscape — works for the category images we rotate through and
+     reads cleanly above the text on mobile. */
+  aspect-ratio: 16 / 10;
+  width: 100%;
   background-size: cover;
   background-position: center;
   background-color: var(--paper-3);
+  /* Gradient is the synchronous first-paint backdrop — the image loads
+     on top once the WebP arrives. Falls back to gradient if any image
+     URL 404s. */
   background-image: linear-gradient(135deg, var(--accent-soft), var(--paper-3));
   border-radius: var(--radius-md, 10px);
 }
@@ -400,6 +423,9 @@
   .start-hero-text { order: 1; }
   .start-hero-visual {
     order: 2;
+    /* Desktop: photo fills the column's natural height (set by the
+       text column). Override mobile's 16:10 lock. */
+    aspect-ratio: auto;
     min-height: 480px;
     align-self: stretch;
   }

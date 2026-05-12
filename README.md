@@ -35,7 +35,7 @@ pulpo-sv/
 ├── fixtures/sample_listings.json   # 15 realistic SV listings for offline runs
 ├── samples/ranked.csv              # generated CSV with all rank columns
 ├── tests/test_units.py             # unit-conversion + parser tests
-├── assets/                         # pinwheel logo (SVG)
+├── assets/                         # brand mark (logo_mark_only.svg — favicon + Clerk email template)
 ├── .github/workflows/pulpo-nightly.yml
 ├── vercel.json
 ├── package.json

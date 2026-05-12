@@ -160,8 +160,13 @@ def test_hero_download_404_sets_null_and_logs(tmp_repo):
     assert any("404" in e.get("error", "") for e in entries)
 
 
-def test_hero_download_skips_unchanged_url(tmp_repo):
-    """Re-running with same URL uses the cached file (no re-fetch)."""
+def test_hero_download_skips_when_all_derivatives_present(tmp_repo):
+    """Re-running with same URL skips the fetch when ALL four files exist:
+    thumbnail + hero derivative + both sidecars. Phase 2 of the rewrite
+    tightened the skip-check from thumbnail+hash to the full derivative
+    set so pre-Phase-2 cached entries get their hero file produced on
+    the next nightly — see test_hero_download_refetches_when_hero_missing
+    below for the migration path."""
     pytest.importorskip("PIL")
     import hashlib
     from pulpo.models import Listing
@@ -170,9 +175,19 @@ def test_hero_download_skips_unchanged_url(tmp_repo):
     url = "https://example.com/cached.jpg"
     url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
     fname = "remax_cache-001.jpg"
-    fpath = tmp_repo / "web" / "photos" / fname
-    fpath.write_bytes(b"fake")
-    (tmp_repo / "web" / "photos" / (fname + ".hash")).write_text(url_hash)
+    photos_dir = tmp_repo / "web" / "photos"
+    fpath = photos_dir / fname
+    hero_fpath = photos_dir / "remax_cache-001.hero.jpg"
+    # All four files the skip-path now verifies.
+    fpath.write_bytes(b"fake-thumbnail")
+    hero_fpath.write_bytes(b"fake-hero")
+    (photos_dir / (fname + ".hash")).write_text(url_hash)
+    (photos_dir / (fname + ".meta.json")).write_text(
+        '{"width": 600, "height": 400, "card_eligible": true, "hero_eligible": false}'
+    )
+    (photos_dir / "remax_cache-001.hero.jpg.meta.json").write_text(
+        '{"width": 1920, "height": 1080, "card_eligible": true, "hero_eligible": true}'
+    )
 
     li = Listing(
         source="remax", source_id="cache-001",
@@ -188,6 +203,61 @@ def test_hero_download_skips_unchanged_url(tmp_repo):
 
     assert result["skipped"] == 1
     assert li.hero_photo_path == f"/photos/{fname}"
+    # Eligibility flags re-populated from the sidecars on the skip path.
+    assert li.card_eligible is True
+    assert li.hero_eligible is True
+
+
+def test_hero_download_refetches_when_hero_missing(tmp_repo):
+    """Pre-Phase-2 cached entries (thumbnail + hash only, no hero file)
+    trigger a re-fetch even when the URL hash matches. This is how the
+    catalog migrates to the dual-derivative storage scheme over the
+    first nightly post-deploy — without this, the homepage proof row
+    would never see hero_eligible photos for legacy listings."""
+    pytest.importorskip("PIL")
+    import hashlib
+    from pulpo.models import Listing
+    from automation.run import _download_hero_photos
+
+    url = "https://example.com/legacy.jpg"
+    url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
+    fname = "remax_legacy-001.jpg"
+    photos_dir = tmp_repo / "web" / "photos"
+    # Only the OLD files exist — no .hero.jpg, no .meta.json sidecars.
+    (photos_dir / fname).write_bytes(b"fake-thumbnail")
+    (photos_dir / (fname + ".hash")).write_text(url_hash)
+
+    li = Listing(
+        source="remax", source_id="legacy-001",
+        url="https://example.com/listing",
+        scraped_at="2026-01-01T00:00:00Z",
+        title="Legacy listing",
+        photo_urls=[url],
+    )
+
+    # Stub httpx.get with a real image so the post-fetch processing
+    # path completes (otherwise the hero-thumbnail step would fail
+    # decoding fake bytes).
+    from PIL import Image as PILImage
+    import io
+    img = PILImage.new("RGB", (2000, 1300), (128, 128, 128))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    fake_response = mock.Mock()
+    fake_response.content = buf.getvalue()
+    fake_response.raise_for_status = mock.Mock()
+
+    with mock.patch("httpx.get", return_value=fake_response) as mock_get:
+        result = _download_hero_photos([li], tmp_repo)
+        mock_get.assert_called_once()  # the missing-hero forces re-fetch
+
+    assert result["ok"] == 1
+    assert result["skipped"] == 0
+    # All four files now exist after the re-fetch
+    assert (photos_dir / fname).exists()
+    assert (photos_dir / "remax_legacy-001.hero.jpg").exists()
+    assert (photos_dir / (fname + ".meta.json")).exists()
+    assert (photos_dir / "remax_legacy-001.hero.jpg.meta.json").exists()
 
 
 def test_no_photo_listing_skipped(tmp_repo):

@@ -1898,6 +1898,247 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .modal-head p { color: var(--ink-3); margin-top: 6px; font-size: 14px; }
 
+/* ============== Welcome modal (PR-B.4b) ==============
+   Mounted on /account?welcome=1 — covers both the post-Stripe anon
+   landing and the post-magic-link signed-in landing. Reuses the
+   shared .modal / .modal-backdrop / .modal-close infrastructure; the
+   rules below are content-specific only. Tokens-only, mobile-first
+   (the shared .modal styles already collapse to a bottom-sheet at
+   ≤600px via the existing media query). */
+.welcome-modal {
+  text-align: center;
+  max-width: 480px;
+}
+.welcome-modal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--type-eyebrow-size);
+  line-height: var(--type-eyebrow-line);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 16px;
+}
+.welcome-modal-headline {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+.welcome-modal-body {
+  color: var(--ink-2);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  margin: 0 0 24px;
+  text-wrap: pretty;
+}
+.welcome-modal-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--accent-strong);
+  color: var(--paper);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  min-height: 48px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+  margin-bottom: 8px;
+}
+.welcome-modal-cta-primary:hover { background: var(--accent); }
+.welcome-modal-cta-primary:active { transform: scale(0.98); }
+.welcome-modal-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--ink-2);
+  border: none;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.welcome-modal-cta-secondary:hover { color: var(--ink); }
+.welcome-modal-cta-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.welcome-modal-resend-ok {
+  margin: 8px 0 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+.welcome-modal-resend-err {
+  margin: 8px 0 0;
+  color: var(--tone-urgent);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+@media (min-width: 640px) {
+  .welcome-modal-headline {
+    font-size: 32px;
+  }
+  .welcome-modal-cta-primary,
+  .welcome-modal-cta-secondary {
+    width: auto;
+    min-width: 240px;
+  }
+}
+
+/* ============== Pro upsell modal (PR-B.5) ==============
+   Mounted on / when the URL carries a campaign signal (utm_*, code,
+   ?upsell=1). Reuses .modal / .modal-backdrop / .modal-close. The
+   rules below are content-specific only — same tokens-only,
+   mobile-first patterns as the rest of the project. */
+.pro-upsell-modal {
+  text-align: left;
+  max-width: 480px;
+}
+.pro-upsell-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--type-eyebrow-size);
+  line-height: var(--type-eyebrow-line);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.pro-upsell-headline {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 20px;
+  text-align: center;
+  text-wrap: balance;
+}
+.pro-upsell-usps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pro-upsell-usps li {
+  position: relative;
+  padding-left: 24px;
+}
+.pro-upsell-usps li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+.pro-upsell-usp-headline {
+  display: block;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 22px;
+}
+.pro-upsell-usp-body {
+  display: block;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 20px;
+  margin-top: 2px;
+}
+.pro-upsell-price {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.pro-upsell-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--accent-strong);
+  color: var(--paper);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  min-height: 48px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.pro-upsell-cta-primary:hover:not(:disabled) { background: var(--accent); }
+.pro-upsell-cta-primary:active { transform: scale(0.98); }
+.pro-upsell-cta-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pro-upsell-cta-dismiss {
+  display: block;
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--ink-2);
+  border: none;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: center;
+}
+.pro-upsell-cta-dismiss:hover { color: var(--ink); }
+.pro-upsell-code-note {
+  margin: 8px 0 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+.pro-upsell-error {
+  margin: 8px 0 0;
+  color: var(--tone-urgent);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+.pro-upsell-price-sub {
+  margin: 12px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+@media (min-width: 640px) {
+  .pro-upsell-headline {
+    font-size: 28px;
+  }
+}
+
 .oauth-btn {
   width: 100%;
   display: flex; align-items: center; justify-content: center; gap: 10px;
