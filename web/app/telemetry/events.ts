@@ -116,6 +116,17 @@ export type EventMap = {
     link_destination: string;
   };
 
+  // ── Cutover marker (rewrite Phase 7) ─────────────────────────────
+  // One-time event fired per browser when the user first encounters
+  // the new homepage shelf config (reduced from 15 → 2 per Q6 of the
+  // rewrite plan). PostHog dashboards key off this to split sessions
+  // into pre-rewrite vs post-rewrite buckets cleanly. The localStorage
+  // gate that backs "one-time per browser" lives in app.jsx.
+  "shelf.config_changed": {
+    old_keys: string[];   // RETIRED_SHELF_KEYS from web/app/config/shelves.ts
+    new_keys: string[];   // active shelf keys at fire time
+  };
+
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
   "detail.photo_lightbox_opened": { listing_id: string };

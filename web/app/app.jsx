@@ -151,6 +151,27 @@ function App() {
       to_path: window.location.pathname + window.location.search,
       trigger: "cold_load",
     });
+    // Cutover marker — fires ONCE per browser when the user first
+    // encounters the post-rewrite shelf config (15 → 2 per Q6).
+    // localStorage gate persists the "fired" state so PostHog gets
+    // exactly one marker per visitor; subsequent sessions don't
+    // re-emit. Dashboards key off this event's existence to split
+    // sessions into pre-rewrite vs post-rewrite buckets cleanly.
+    try {
+      const SHELF_MARKER_KEY = "pulpo-shelf-cutover-fired";
+      if (!localStorage.getItem(SHELF_MARKER_KEY)) {
+        // Lazy-import the config so this code path doesn't pull the
+        // shelves config (and its filter predicates) into the boot
+        // bundle. Module is small but the principle stands.
+        import("./config/shelves.ts").then(({ activeShelves, RETIRED_SHELF_KEYS }) => {
+          track("shelf.config_changed", {
+            old_keys: [...RETIRED_SHELF_KEYS],
+            new_keys: activeShelves().map((s) => s.key),
+          });
+          try { localStorage.setItem(SHELF_MARKER_KEY, "1"); } catch { /* ignore */ }
+        }).catch(() => { /* ignore — boot must never fail on this */ });
+      }
+    } catch { /* localStorage disabled → skip the marker, no harm */ }
     bootWebVitals();
     bootAssetTelemetry();
     bootGlobalErrorHandlers();
