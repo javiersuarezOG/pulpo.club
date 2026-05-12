@@ -203,7 +203,29 @@ function drainQueue() {
   }
 }
 
+// Test-mode capture hook (rewrite Phase 8). When the URL carries
+// `?posthog_capture=1` we ALSO push every track() call to a
+// window-attached buffer so Playwright specs can assert the right
+// events fired without needing real PostHog network round-trips or
+// a fake POSTHOG_KEY. The flag is opt-in per request, never reads
+// in production unless the URL explicitly includes the param —
+// production traffic shouldn't carry it.
+const TEST_CAPTURE_ENABLED = (() => {
+  try {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).has("posthog_capture");
+  } catch { return false; }
+})();
+function testModePush(name: string, props: unknown) {
+  if (!TEST_CAPTURE_ENABLED) return;
+  if (typeof window === "undefined") return;
+  const w = window as unknown as { __pulpoEvents__?: Array<{ name: string; props: unknown; ts: number }> };
+  if (!Array.isArray(w.__pulpoEvents__)) w.__pulpoEvents__ = [];
+  w.__pulpoEvents__.push({ name, props, ts: Date.now() });
+}
+
 export function track<K extends EventName>(name: K, props: EventMap[K]) {
+  testModePush(name, props);
   if (!SHOULD_TELEMETER) return;
   if (!posthog) {
     queue.push({ name, props, ts: Date.now() });
