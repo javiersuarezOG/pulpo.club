@@ -115,7 +115,7 @@ apply in **Clerk Dashboard → Customizations → Email Templates → Invitation
 
 **Brand assets to set first** in `Customizations → Branding`:
 
-- **Logo:** upload `web/assets/logo_mark_only.svg` (deep-green octopus mark).
+- **Logo:** upload `assets/logo_mark_only.svg` from the repo root (deep-green octopus mark — same file as the favicon). Or download from `https://pulpo.club/assets/logo_mark_only.svg`.
 - **Application name:** `Pulpo`.
 - **Primary colour:** the `--accent-strong` token from `web/app/styles/tokens.css`
   is `oklch(0.28 0.08 165)`. Clerk's colour picker expects hex; convert to

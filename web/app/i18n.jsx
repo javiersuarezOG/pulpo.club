@@ -768,6 +768,31 @@ const UI_STRINGS = {
                                 es: "Qué incluye" },
   "start.nav.login_link":     { en: "Log in",
                                 es: "Iniciar sesión" },
+  // /  home-page Pro upsell modal (PR-B.5). Triggered when the URL
+  // carries a campaign signal (utm_*, code, or ?upsell=1). Pro signed-in
+  // users never see it. Mobile-first; reuses the .modal infra in index.css.
+  "pro_upsell.eyebrow":             { en: "Get Pulpo Pro",
+                                      es: "Hazte Pulpo Pro" },
+  "pro_upsell.headline":            { en: "Find your next property — faster.",
+                                      es: "Encuentra tu próxima propiedad — más rápido." },
+  "pro_upsell.price":               { en: "{price} / month",
+                                      es: "{price} / mes" },
+  "pro_upsell.price_sub":           { en: "Cancel anytime · Stripe-secured",
+                                      es: "Cancela cuando quieras · Pago seguro por Stripe" },
+  "pro_upsell.cta_primary":         { en: "Get access — {price}/month",
+                                      es: "Obtener acceso — {price}/mes" },
+  "pro_upsell.cta_primary_submitting": { en: "Opening checkout…",
+                                         es: "Abriendo pago…" },
+  "pro_upsell.cta_dismiss":         { en: "Maybe later",
+                                      es: "Quizás más tarde" },
+  "pro_upsell.code_applied_note":   { en: "✓ Discount applied at checkout",
+                                      es: "✓ Descuento aplicado al pagar" },
+  "pro_upsell.error":               { en: "Something went wrong — please try again.",
+                                      es: "Algo salió mal — inténtalo de nuevo." },
+  "pro_upsell.aria.dialog":         { en: "Get Pulpo Pro",
+                                      es: "Hazte Pulpo Pro" },
+  "pro_upsell.aria.close":          { en: "Close",
+                                      es: "Cerrar" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

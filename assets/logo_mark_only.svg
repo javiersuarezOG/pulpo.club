@@ -1,10 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img">
   <title>pulpo.club mark</title>
-  <desc>Pulpo brand pinwheel — deep green on paper, matches the white + green palette set in tokens.css.</desc>
-  <!-- Backplate uses --accent-strong (oklch 0.28 0.08 165) ≈ #1f4a3e.
-       Tentacles use --paper-2 (oklch 0.97 0.012 160) ≈ #f0f5f1.
-       Center dot uses --accent-soft (oklch 0.93 0.035 160) ≈ #d4ead7
-       so it stays visible against the paper tentacles. -->
+  <desc>Pulpo brand mark — deep green octopus on a rounded backplate.</desc>
   <rect width="200" height="200" rx="40" fill="#1f4a3e"/>
   <g transform="translate(100,100)">
     <g fill="none" stroke="#f0f5f1" stroke-width="11" stroke-linecap="round">
