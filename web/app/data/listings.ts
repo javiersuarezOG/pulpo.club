@@ -192,7 +192,12 @@ export function adaptListing(raw: any): Listing {
           if (typeof s === "string" && s.length > 0) return { en: s };
           return null;
         })
-        .filter((u: { en: string; es?: string } | null): u is { en: string; es?: string } => u !== null))
+        // Drop entries with no usable English text. The LLM-enrichment
+        // path occasionally produces `{en: ""}` placeholders; without
+        // this guard the card renders an empty <li> with just a check
+        // icon. Trim before measuring so whitespace-only strings drop too.
+        .filter((u: { en: string; es?: string } | null): u is { en: string; es?: string } =>
+          u !== null && u.en.trim().length > 0))
     : [];
 
   const urlLanguage: "en" | "es" | "mixed" | null =

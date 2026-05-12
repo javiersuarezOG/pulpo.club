@@ -68,6 +68,70 @@ function readConsent(): "granted" | "declined" | "" {
   } catch { return ""; }
 }
 
+// Allow-list of query parameters permitted to flow through to PostHog on
+// any URL-bearing event property. Anything not in this set is stripped
+// before send. Conservative by design: when adding a new param, weigh
+// whether it could ever carry PII (auth tokens, emails, OTPs, session
+// IDs) before adding. The cold-load $pageview fires BEFORE app.jsx gets
+// a chance to replaceState the URL clean, so without this scrubber a
+// visit to /?email=foo leaks the email into PostHog's $current_url.
+const URL_PARAM_ALLOWLIST = new Set([
+  // Marketing attribution — preserved for funnel analysis.
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  "ref", "gclid", "fbclid",
+  // Locale.
+  "lang",
+  // Browse filter state (must round-trip for funnel analysis).
+  "cat", "sort",
+  "pmin", "pmax", "smin", "ready", "score_min",
+  "wv", "wl", "wm",
+  "zones", "types", "features", "infra", "status",
+  // Dev tooling.
+  "dev", "debug", "ph",
+]);
+
+// Event properties that carry a URL or path+search string. Scrubbed
+// against URL_PARAM_ALLOWLIST in before_send.
+const URL_PROPS_TO_SCRUB: readonly string[] = [
+  // PostHog auto-populated.
+  "$current_url", "$initial_current_url",
+  "$referrer", "$initial_referrer",
+  "$pathname",
+  // Custom pulpo properties (see route.changed in events.ts).
+  "from_path", "to_path",
+];
+
+function scrubUrl(input: unknown): unknown {
+  if (typeof input !== "string" || input.length === 0) return input;
+  let url: URL;
+  try {
+    // Use a throwaway base so relative paths parse. We only return the
+    // original origin if the caller passed a fully-qualified URL.
+    url = new URL(input, "https://pulpo.club");
+  } catch {
+    return input;
+  }
+  const toDelete: string[] = [];
+  url.searchParams.forEach((_value, key) => {
+    if (!URL_PARAM_ALLOWLIST.has(key)) toDelete.push(key);
+  });
+  for (const key of toDelete) url.searchParams.delete(key);
+  if (!/^https?:\/\//i.test(input)) {
+    return `${url.pathname}${url.search}${url.hash}`;
+  }
+  return url.toString();
+}
+
+function scrubEventUrls(event: { properties?: Record<string, unknown> } | null | undefined) {
+  if (!event || !event.properties) return event;
+  for (const prop of URL_PROPS_TO_SCRUB) {
+    if (prop in event.properties) {
+      event.properties[prop] = scrubUrl(event.properties[prop]);
+    }
+  }
+  return event;
+}
+
 function scheduleInit() {
   if (initStarted) return;
   initStarted = true;
@@ -106,6 +170,11 @@ function scheduleInit() {
         disable_session_recording: !recordingEnabled,
         session_recording: { maskAllInputs: true, sampleRate: 0.1 },
         persistence: "localStorage+cookie",
+        // Scrub URL-bearing properties against the param allow-list
+        // before sending. Catches the cold-load $pageview window where
+        // app.jsx's replaceState hasn't run yet to clean a /?email=…
+        // entry URL.
+        before_send: scrubEventUrls,
         loaded: () => drainQueue(),
       });
     } catch (err) {
