@@ -145,8 +145,16 @@ export type EventMap = {
   "start.code_error_shown": { reason: "invalid_promo_code" | "exhausted" };
   /** Cold-load of /welcome (post-payment landing for the anonymous flow).
    *  No fields — /welcome is only reached by the anonymous /start path
-   *  in v1; PostHog auto-fires $pageview alongside. */
+   *  in v1; PostHog auto-fires $pageview alongside.
+   *  TODO PR-B.4b: rename to `welcome_modal.shown { variant }` when
+   *  /welcome is collapsed into a modal on /account. */
   "welcome.viewed": Record<string, never>;
+  /** User clicks the /start "Log in" link. Funnel-side measure of
+   *  returning-customer traffic vs new acquisition. */
+  "start.login_link_clicked": Record<string, never>;
+  /** Fires when an unrecognized URL (e.g. /test) gets cleanly
+   *  replaceState'd to /. Surfaces broken inbound links in PostHog. */
+  "route.fallback_redirected": { from_path: string };
 
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
