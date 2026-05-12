@@ -372,6 +372,39 @@ export type EventMap = {
   /** Route transition (Discover ↔ Browse ↔ Saved ↔ Plans ↔ Account). */
   "perf.route_transition": { from: string; to: string; ms: number };
 
+  // ───── Image lifecycle ─────
+  /** Browser's <img onerror> fired — real load failure (404, decode
+   *  error, DNS, CORS, etc.). The Photo component falls back to the
+   *  zoned placeholder; this event is what surfaces the failure in
+   *  PostHog (image errors don't bubble as JS exceptions, so they
+   *  bypass $exception capture). Group by `source` + `is_local` to
+   *  triage: is_local=true → local /photos/* file broken (regression
+   *  in nightly download or rewrite); is_local=false → third-party
+   *  CDN failure (expected baseline). */
+  "image.error": {
+    url: string;
+    listing_id: string;
+    idx: number;
+    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    is_local: boolean;
+  };
+  /** Fires when an image neither loaded nor errored within 8 s of the
+   *  URL change. Catches the React+browser-cache opacity-stuck class
+   *  (onLoad doesn't fire for cache hits if React attached the listener
+   *  after the synchronous load completed) AND slow CDNs that never
+   *  resolve. Post-fix this should baseline near zero; a non-zero rate
+   *  is a regression signal. `was_cached_likely`=true when the <img>
+   *  element's `.complete` flag was true at the 8 s mark but `loaded`
+   *  state was still false — i.e., the opacity-stuck signature. */
+  "image.stuck": {
+    url: string;
+    listing_id: string;
+    idx: number;
+    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    is_local: boolean;
+    was_cached_likely: boolean;
+  };
+
   // ───── Section-URL routing (PR section-urls) ─────
   /** Fires on every route change (pushState, popstate, or cold-load).
    *  PostHog reconstructs the session graph from these. `trigger` lets
