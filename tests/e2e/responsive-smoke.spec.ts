@@ -36,7 +36,13 @@ const VIEWPORTS = [
 // (anonymous) or seed a user so the real surface renders — both are
 // testable layouts.
 const SECTIONS = [
-  { path: "/",        surface: ".hero, .page-home",          gated: false },
+  // Phase 9 cutover: `.hero`/`.page-home` belonged to the legacy
+  // HomePage which is now deleted. The rewritten homepage uses the
+  // `.new-homepage` root + `.new-hero` section. The legacy names
+  // stay in the OR list as no-ops (they just don't match anything)
+  // so this spec doesn't need a second round of edits if a future
+  // PR partially restores either selector.
+  { path: "/",        surface: ".new-homepage, .new-hero, .hero, .page-home", gated: false },
   { path: "/browse",  surface: ".page-browse, .browse-page", gated: false },
   { path: "/plans",   surface: ".plans-page, .plan-card",    gated: false },
   { path: "/saved",   surface: ".saved-page, .modal-signup", gated: true  },
@@ -48,7 +54,7 @@ const SECTIONS = [
   // PR-B.5 — campaign-tagged home renders the <ProUpsellModal> overlay
   // on top of the regular home page. Both the underlying page AND the
   // modal must fit at every mobile width without horizontal overflow.
-  { path: "/?utm_source=test", surface: ".pro-upsell-modal, .hero, .page-home", gated: false },
+  { path: "/?utm_source=test", surface: ".pro-upsell-modal, .new-homepage, .new-hero, .hero, .page-home", gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.

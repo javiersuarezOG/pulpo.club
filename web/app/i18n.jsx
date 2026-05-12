@@ -157,14 +157,11 @@ const UI_STRINGS = {
   "nav.tab.profile":         { en: "Profile",             es: "Perfil" },
   "nav.tab.signin":          { en: "Sign in",             es: "Entrar" },
 
-  // Hero
-  "hero.sub":                { en: "Find properties worth wanting in El Salvador. Pulpo brings together titled and off-market listings — land, beachfront homes, and more — in one place.",
-                               es: "Encuentra propiedades que valen la pena en El Salvador. Pulpo reúne anuncios titulados y off-market — terrenos, casas frente al mar y más — en un solo lugar." },
-  "hero.cta.browse":         { en: "Browse all listings", es: "Ver todas las propiedades" },
-  "hero.cta.see_listing":    { en: "See this listing",    es: "Ver este anuncio" },
-  "hero.featured_today":     { en: "Featured today",      es: "Destacado hoy" },
-
-  // ── New homepage rewrite (Phase 4) ─────────────────────────────────
+  // ── Hero / New homepage rewrite (Phase 4) ─────────────────────────
+  // Legacy "hero.*" keys (hero.sub, hero.cta.browse, hero.cta.see_listing,
+  // hero.featured_today) were dropped in the rewrite cutover (Phase 9):
+  // the legacy Hero in pages.jsx that consumed them no longer exists.
+  // Everything below is the new-hero copy backing web/app/home/Hero.jsx.
   // All keys below land bilingual at write time per Q1 of the rewrite
   // plan. Spanish copy targets a SV audience — natural register, not
   // literal translation. Sebastian/colleague should still spot-check.
@@ -342,10 +339,8 @@ const UI_STRINGS = {
   "footer.country_badge":    { en: "Listings in El Salvador",
                                es: "Propiedades en El Salvador" },
 
-  // Find Your Style carousel (A.2)
-  "style.title":             { en: "Find Your Style",  es: "Encuentra tu estilo" },
-  "style.sub":               { en: "Every property in Pulpo has a mood. Pick yours.",
-                               es: "Cada propiedad en Pulpo tiene una vibra. Elige la tuya." },
+  // Find Your Style carousel — deleted in the rewrite cutover (Phase 9)
+  // with the legacy StyleCarousel component. Keys removed.
 
   // Live header stats (PR-4c)
   "stats.sources":           { en: "sources",  es: "fuentes" },
@@ -513,17 +508,9 @@ const UI_STRINGS = {
   "data_fetch_failed.body":  { en: "This is on us. The data feed didn't respond — try again in a moment.",
                                es: "Es de nuestro lado. El feed de datos no respondió — inténtalo en un momento." },
 
-  // Newsletter CTA (Discover footer + dedicated form)
-  "newsletter.title":        { en: "Get the top 10 property deals every week",
-                               es: "Recibe las 10 mejores propiedades cada semana" },
-  "newsletter.sub":          { en: "Beachfront, build-ready and off-market — straight to your inbox. Unsubscribe anytime.",
-                               es: "Frente a la playa, listas para construir y off-market — directo a tu correo. Cancela cuando quieras." },
-  "newsletter.placeholder":  { en: "your@email.com",                es: "tu@correo.com" },
-  "newsletter.subscribe":    { en: "Subscribe",                     es: "Suscribirme" },
-  "newsletter.signup_cta":   { en: "Sign up to unlock the weekly digest",
-                               es: "Crea cuenta para recibir el resumen semanal" },
-  "newsletter.success":      { en: "You're in. First digest Monday.",
-                               es: "Listo. Primer resumen el lunes." },
+  // Newsletter CTA — deleted in the rewrite cutover (Phase 9) with the
+  // legacy NewsletterCTA component. The new homepage's hero email
+  // form (Hero.jsx) reads the new_hero.* keys higher up in this file.
 
   // Plans page — full string set. PRO_PRICE_USD_PER_MONTH lives in
   // pages.jsx and mirrors automation/stripe_setup.mjs.

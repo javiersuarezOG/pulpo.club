@@ -17,10 +17,21 @@ export type EventMap = {
   "consent.declined": { region?: string };
 
   // ───── Discover ─────
-  "hero.cta_clicked": { destination: "browse" | "see_listing" };
-  "shelf.scrolled": { shelf_key: string; scroll_pct: number; items_visible: number };
+  // hero.cta_clicked: legacy Hero CTA — now fires from NewHomePage's
+  // Hero email form via the "newsletter_signup" destination value.
+  // The original "browse" / "see_listing" destinations are retained
+  // in the union for backward compatibility with any in-flight
+  // PostHog funnels that filter on them; new code uses the email
+  // path.
+  "hero.cta_clicked": { destination: "browse" | "see_listing" | "newsletter_signup" };
   "shelf.see_all_clicked": { shelf_key: string };
-  "style_carousel.tile_clicked": { style_key: string };
+  // Phase 9 cutover: shelf.scrolled (defined but never fired since
+  // the catalog landed), style_carousel.tile_clicked (UI deleted with
+  // the legacy HomePage), and newsletter.cta_clicked (replaced by
+  // hero.email_submitted in #223) have been removed from the type
+  // catalog. PostHog historical data is unaffected — it still
+  // accepts ANY event name; the type removal just prevents new code
+  // from referencing the retired events.
 
   // ───── Browse ─────
   "card.clicked": {
@@ -46,12 +57,6 @@ export type EventMap = {
   // click; `total` is the total filtered result count so we can tell
   // a page-2 load apart from page-N.
   "browse.load_more_clicked": { from: number; to: number; total: number };
-
-  // ───── Discover / Newsletter ─────
-  // Anonymous-only sticky CTA on Discover. Opens the SignupModal in
-  // signup mode; we use this event to compute newsletter-CTA → signup
-  // conversion separately from hero/heart triggers.
-  "newsletter.cta_clicked": { source: "discover" };
 
   // ───── New homepage (rewrite Phase 4) ─────
   // Email form on the rewritten hero. Phase 6 wires the actual
@@ -320,7 +325,6 @@ export type EventMap = {
 
   // ───── System ─────
   "data.fetch.failed": { stage: string; error_class: string };
-  "client.error": { message: string; stack?: string };
 
   // ───── Web Vitals ─────
   "web_vitals.lcp": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string };
