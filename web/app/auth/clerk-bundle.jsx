@@ -81,6 +81,39 @@ function ClerkActionsBinder({ onActions }) {
       // Account → Security calls this when Clerk is enabled instead
       // of mounting the dead local password form.
       openUserProfile: (opts) => clerk.openUserProfile(opts || {}),
+      // Persists a profile patch through the backend. Frontend SDK
+      // can't write `publicMetadata` directly (Clerk blocks it — the
+      // user can't be trusted to set their own plan / preferences),
+      // so we POST to /api/clerk/update-profile, which uses the
+      // server-side secret key. Caller (app.updateUserProfile) does
+      // the optimistic local update first and rolls back on the
+      // returned promise rejection.
+      //
+      // Returns a promise resolving to the merged profile object on
+      // success, rejecting with an Error on any failure (network,
+      // auth, server). Same-origin fetch → Clerk session cookie
+      // accompanies the request automatically; no manual token
+      // handling required.
+      updateProfile: async (patch) => {
+        const res = await fetch("/api/clerk/update-profile", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patch: patch || {} }),
+        });
+        if (!res.ok) {
+          let detail = null;
+          try { detail = await res.json(); } catch { /* keep null */ }
+          const err = new Error(
+            (detail && detail.error) || `update_profile_failed_${res.status}`,
+          );
+          err.status = res.status;
+          err.code = detail && detail.error;
+          throw err;
+        }
+        const data = await res.json();
+        return data && data.profile;
+      },
     });
     return () => onActions(null);
   }, [clerk, onActions]);
