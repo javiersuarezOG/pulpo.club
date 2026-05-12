@@ -286,10 +286,13 @@ function NotificationsSection({ app }) {
   // everyone because it's product news, not premium content.
   const isPaid = !!(app.user && app.user.plan && app.user.plan !== "free");
 
+  // Pro notification rows. `price_drops` and `new_in_zones` are wired
+  // in the UI table but their delivery features don't exist yet — hide
+  // them rather than promise something we can't deliver. To re-enable
+  // when the features ship, restore the two rows below; the i18n keys
+  // and the local prefs-state defaults are intentionally preserved.
   const proCats = [
     { key: "newsletter",   title: t("account.notif.newsletter.title",   app.locale), desc: t("account.notif.newsletter.desc",   app.locale) },
-    { key: "price_drops",  title: t("account.notif.price_drops.title",  app.locale), desc: t("account.notif.price_drops.desc",  app.locale) },
-    { key: "new_in_zones", title: t("account.notif.new_in_zones.title", app.locale), desc: t("account.notif.new_in_zones.desc", app.locale) },
   ];
   const freeCats = [
     { key: "platform_updates", title: t("account.notif.platform_updates.title", app.locale), desc: t("account.notif.platform_updates.desc", app.locale) },
@@ -436,9 +439,10 @@ function NotifProUpsell({ app }) {
         <h3>{t("account.notif.upsell.title", app.locale)}</h3>
         <p>{t("account.notif.upsell.body", app.locale)}</p>
         <ul className="notif-upsell-list">
+          {/* price_drops + new_in_zones bullets removed alongside the
+              matching toggles in NotificationsSection — restore here
+              once the delivery features actually ship. */}
           <li>{t("account.notif.newsletter.title", app.locale)}</li>
-          <li>{t("account.notif.price_drops.title", app.locale)}</li>
-          <li>{t("account.notif.new_in_zones.title", app.locale)}</li>
         </ul>
         <button className="btn-primary" onClick={onUpgrade}>
           {t("account.notif.upsell.cta", app.locale)}
