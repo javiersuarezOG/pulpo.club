@@ -14,6 +14,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 # Ensure repo root is on sys.path
 REPO = Path(__file__).resolve().parents[1]
@@ -80,11 +81,66 @@ def _classify_error(exc: BaseException) -> str:
     return "Unknown"
 
 
-def _download_hero_photos(listings, repo: Path) -> dict:
-    """Download + resize the first photo_url for each listing with photos.
+def _hero_file_path(thumbnail_path: Path) -> Path:
+    """`<file>.jpg` → `<file>.hero.jpg` (dual-derivative photo storage)."""
+    stem = thumbnail_path.name[:-len(".jpg")] if thumbnail_path.name.endswith(".jpg") else thumbnail_path.stem
+    return thumbnail_path.parent / f"{stem}.hero.jpg"
 
-    Saves to web/photos/{source}_{source_id}.jpg (max 600×400, JPEG Q75).
-    Uses a URL-hash sidecar (.hash file) to skip unchanged photos.
+
+def _meta_sidecar_path(image_path: Path) -> Path:
+    """`<file>.jpg` → `<file>.jpg.meta.json`. Per the image-enrichment
+    protocol: one sidecar per derivative file."""
+    return image_path.parent / (image_path.name + ".meta.json")
+
+
+def _write_sidecar(image_path: Path, raw_bytes: bytes) -> Optional[dict]:
+    """Compute image metadata from raw_bytes + write sidecar JSON next
+    to image_path. Returns the metadata dict, or None when Pillow isn't
+    available / the image fails to decode.
+    """
+    try:
+        from automation.photo_quality import compute_image_metadata
+    except ImportError:
+        return None
+    meta = compute_image_metadata(raw_bytes, file_size_bytes=len(raw_bytes))
+    if meta is None:
+        return None
+    sidecar_path = _meta_sidecar_path(image_path)
+    sidecar_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    return meta
+
+
+def _read_sidecar(image_path: Path) -> Optional[dict]:
+    """Read the sidecar JSON beside image_path. Returns None if missing
+    or malformed. Used by the skip-path so we don't re-decode every
+    cached photo on every nightly run."""
+    sidecar_path = _meta_sidecar_path(image_path)
+    if not sidecar_path.exists():
+        return None
+    try:
+        return json.loads(sidecar_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _download_hero_photos(listings, repo: Path) -> dict:
+    """Download the first photo_url for each listing with photos, then write
+    two derivatives:
+
+    - ``<file>.jpg``        thumbnail (max 600×400, JPEG Q75) — drives cards
+    - ``<file>.hero.jpg``   hero (max 1920×1080, JPEG Q85)   — drives proof row
+                            + the rewritten featured-pool picker
+
+    Per-file sidecars at ``<file>.jpg.meta.json`` +
+    ``<file>.hero.jpg.meta.json`` record dimensions + eligibility flags
+    so the cached-skip path can re-populate ``hero_eligible`` /
+    ``card_eligible`` on the Listing without re-decoding the image.
+
+    Uses the URL-hash sidecar (.hash) to skip unchanged photos. Skip
+    path also verifies the hero derivative + both meta sidecars are
+    present — if either is missing (existed-before-this-rewrite case),
+    the URL is re-fetched and the missing files are produced.
+
     Logs failures to web/data/photo_fetch_log.jsonl (non-fatal).
     Returns summary counts.
     """
@@ -93,7 +149,16 @@ def _download_hero_photos(listings, repo: Path) -> dict:
         from PIL import Image  # noqa: F401
     except ImportError:
         print("[photos] Pillow not installed — skipping hero download")
-        return {"attempted": 0, "ok": 0, "skipped": 0, "failed": 0, "elapsed_s": 0.0}
+        return {"attempted": 0, "ok": 0, "skipped": 0, "failed": 0, "elapsed_s": 0.0,
+                "hero_eligible": 0, "card_eligible": 0}
+
+    # Pillow 10+ moved the resampling enum to Image.Resampling.* and
+    # removed the top-level Image.LANCZOS alias. Detect at module load
+    # so we don't pay the attribute lookup per-listing.
+    try:
+        _LANCZOS = Image.Resampling.LANCZOS  # type: ignore[attr-defined]
+    except AttributeError:
+        _LANCZOS = Image.LANCZOS  # type: ignore[attr-defined]
 
     import httpx
 
@@ -102,6 +167,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     log_path = repo / "web" / "data" / "photo_fetch_log.jsonl"
 
     attempted = ok = skipped = failed = 0
+    hero_eligible_count = 0
+    card_eligible_count = 0
     budget_s = float(os.environ.get("PULPO_PHOTO_BUDGET_S", "600"))
     t0 = _time.monotonic()
     budget_hit = False
@@ -115,23 +182,44 @@ def _download_hero_photos(listings, repo: Path) -> dict:
         url = li.photo_urls[0]
         fname = f"{li.source}_{li.source_id}.jpg"
         fpath = photos_dir / fname
+        hero_fpath = _hero_file_path(fpath)
         hash_path = photos_dir / (fname + ".hash")
 
-        # Skip if URL unchanged
+        # Skip if URL unchanged AND both derivatives + both sidecars are
+        # present. The "all four files present" check kicks pre-Phase-2
+        # cached entries into the re-fetch path so they get a hero file
+        # too — without this guard, the homepage proof row would stay
+        # empty until the next time each broker's photo URL changes.
         url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
-        if fpath.exists() and hash_path.exists():
-            if hash_path.read_text().strip() == url_hash:
-                li.hero_photo_path = f"/photos/{fname}"
-                skipped += 1
-                continue
+        thumb_meta_path = _meta_sidecar_path(fpath)
+        hero_meta_path  = _meta_sidecar_path(hero_fpath)
+        all_files_present = (
+            fpath.exists() and hash_path.exists()
+            and hero_fpath.exists()
+            and thumb_meta_path.exists() and hero_meta_path.exists()
+        )
+        if all_files_present and hash_path.read_text().strip() == url_hash:
+            li.hero_photo_path = f"/photos/{fname}"
+            thumb_meta = _read_sidecar(fpath)
+            hero_meta = _read_sidecar(hero_fpath)
+            if thumb_meta:
+                li.card_eligible = bool(thumb_meta.get("card_eligible", False))
+            if hero_meta:
+                li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+            if li.card_eligible:
+                card_eligible_count += 1
+            if li.hero_eligible:
+                hero_eligible_count += 1
+            skipped += 1
+            continue
 
         attempted += 1
         try:
             r = httpx.get(url, timeout=5.0, follow_redirects=True)
             r.raise_for_status()
-            # PR-7.6 — score the *original* bytes BEFORE we down-resample
-            # to 600×400. Resolution + sharpness need full-res input;
-            # post-thumbnail bytes are already lossy.
+            # PR-7.6 — score the *original* bytes BEFORE we down-resample.
+            # Resolution + sharpness need full-res input; post-thumbnail
+            # bytes are already lossy.
             try:
                 from automation.photo_quality import (
                     compute_score as _compute_photo_score,
@@ -147,16 +235,44 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 print(f"[photos] score failed for {li.source}|{li.source_id}: {score_err!r}")
                 li.hero_photo_quality_score = None
                 li.has_text_overlay = None
+
             from PIL import Image
-            img = Image.open(io.BytesIO(r.content))
-            img.thumbnail((600, 400), Image.LANCZOS)
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
-            buf = io.BytesIO()
-            img.save(buf, format="JPEG", quality=75, optimize=True)
-            fpath.write_bytes(buf.getvalue())
+
+            # ── Thumbnail (600×400, Q75) — drives every card ──────────
+            thumb_img = Image.open(io.BytesIO(r.content))
+            thumb_img.thumbnail((600, 400), _LANCZOS)
+            if thumb_img.mode in ("RGBA", "P"):
+                thumb_img = thumb_img.convert("RGB")
+            thumb_buf = io.BytesIO()
+            thumb_img.save(thumb_buf, format="JPEG", quality=75, optimize=True)
+            thumb_bytes = thumb_buf.getvalue()
+            fpath.write_bytes(thumb_bytes)
+            thumb_meta = _write_sidecar(fpath, thumb_bytes)
+            if thumb_meta:
+                li.card_eligible = bool(thumb_meta.get("card_eligible", False))
+
+            # ── Hero (1920×1080 max, Q85) — drives proof row + featured ─
+            # Pillow's thumbnail() preserves aspect AND only ever down-
+            # samples — sources smaller than 1920×1080 stay at source
+            # size, so the hero_eligible gate correctly fails for them.
+            hero_img = Image.open(io.BytesIO(r.content))
+            hero_img.thumbnail((1920, 1080), _LANCZOS)
+            if hero_img.mode in ("RGBA", "P"):
+                hero_img = hero_img.convert("RGB")
+            hero_buf = io.BytesIO()
+            hero_img.save(hero_buf, format="JPEG", quality=85, optimize=True)
+            hero_bytes = hero_buf.getvalue()
+            hero_fpath.write_bytes(hero_bytes)
+            hero_meta = _write_sidecar(hero_fpath, hero_bytes)
+            if hero_meta:
+                li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
+            if li.card_eligible:
+                card_eligible_count += 1
+            if li.hero_eligible:
+                hero_eligible_count += 1
             ok += 1
         except Exception as e:
             failed += 1
@@ -178,23 +294,42 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     _prune_orphan_photos(photos_dir, {f"{li.source}_{li.source_id}.jpg" for li in listings})
 
     return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
-            "elapsed_s": elapsed, "budget_hit": budget_hit}
+            "elapsed_s": elapsed, "budget_hit": budget_hit,
+            "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count}
 
 
 def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
-    """Move orphaned hero photos to _archive/<date>/, delete those older than 30d."""
+    """Move orphaned hero photos to _archive/<date>/, delete those older than 30d.
+
+    Skips ``.hero.jpg`` files in the glob — those are paired with their
+    thumbnail and prune together (the live_filenames set holds thumbnail
+    names only). Also moves the matching sidecar JSONs + hash file
+    alongside the thumbnail + hero derivative so the archive is
+    self-contained.
+    """
     from datetime import timedelta
     archive_base = photos_dir / "_archive"
     today_dir = archive_base / datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     for f in photos_dir.glob("*.jpg"):
+        # Skip the hero derivative — it's keyed off its thumbnail's
+        # live-ness, not its own. Handled in the rename block below.
+        if f.name.endswith(".hero.jpg"):
+            continue
         if f.name not in live_filenames:
             today_dir.mkdir(parents=True, exist_ok=True)
-            f.rename(today_dir / f.name)
-            # Remove matching .hash sidecar
-            h = photos_dir / (f.name + ".hash")
-            if h.exists():
-                h.unlink()
+            # Move the thumbnail + hero + every sidecar together so the
+            # archive directory holds a complete set per listing.
+            related = [
+                f,                                       # <file>.jpg
+                _hero_file_path(f),                      # <file>.hero.jpg
+                _meta_sidecar_path(f),                   # <file>.jpg.meta.json
+                _meta_sidecar_path(_hero_file_path(f)),  # <file>.hero.jpg.meta.json
+                photos_dir / (f.name + ".hash"),         # <file>.jpg.hash
+            ]
+            for related_path in related:
+                if related_path.exists():
+                    related_path.rename(today_dir / related_path.name)
 
     # Delete archives older than 30 days
     if not archive_base.exists():
@@ -819,7 +954,9 @@ def main() -> int:
     print(f"[photos] attempted={photo_results['attempted']} "
           f"ok={photo_results['ok']} skipped={photo_results['skipped']} "
           f"failed={photo_results['failed']} "
-          f"elapsed={photo_results['elapsed_s']:.1f}s")
+          f"elapsed={photo_results['elapsed_s']:.1f}s "
+          f"hero_eligible={photo_results.get('hero_eligible', 0)} "
+          f"card_eligible={photo_results.get('card_eligible', 0)}")
     ranked = ranked_pre
 
     # IA-axis derives — master_category × subcategory + discovery_tags

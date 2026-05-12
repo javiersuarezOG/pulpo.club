@@ -164,6 +164,73 @@ const UI_STRINGS = {
   "hero.cta.see_listing":    { en: "See this listing",    es: "Ver este anuncio" },
   "hero.featured_today":     { en: "Featured today",      es: "Destacado hoy" },
 
+  // ── New homepage rewrite (Phase 4) ─────────────────────────────────
+  // All keys below land bilingual at write time per Q1 of the rewrite
+  // plan. Spanish copy targets a SV audience — natural register, not
+  // literal translation. Sebastian/colleague should still spot-check.
+  //
+  // Eyebrow + headline + tagline + CTA + sub-text per the brief.
+  "new_hero.eyebrow":        { en: "★ Ranked by value",
+                               es: "★ Ordenado por valor" },
+  "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
+                               es: "Cada casa de playa y lago en El Salvador, ordenada por valor." },
+  "new_hero.tagline":        { en: "No more scrolling through 50 listing sites. We rank every beach and lake listing by value and deliver the 10 best to your inbox every two weeks.",
+                               es: "Deja de revisar 50 sitios. Ordenamos cada anuncio de playa y lago por valor y te enviamos los 10 mejores al correo cada dos semanas." },
+  "new_hero.email_placeholder": { en: "you@example.com",
+                                  es: "tú@ejemplo.com" },
+  "new_hero.cta":            { en: "Get the 10 best",     es: "Recibir los 10 mejores" },
+  "new_hero.cta_loading":    { en: "Sending…",            es: "Enviando…" },
+  "new_hero.sub":            { en: "Free. Unsubscribe whenever.",
+                               es: "Gratis. Cancela cuando quieras." },
+  "new_hero.success":        { en: "Done — check your inbox.",
+                                es: "Listo — revisa tu correo." },
+  "new_hero.error_generic":  { en: "Couldn't sign you up. Try again?",
+                               es: "No pudimos suscribirte. ¿Intentas de nuevo?" },
+  "new_hero.error_invalid_email": { en: "That email looks off — check it?",
+                                    es: "Ese correo no se ve bien — ¿lo revisas?" },
+  "new_hero.error_already":  { en: "You're already on the list. Welcome back.",
+                               es: "Ya estás en la lista. Qué bueno verte." },
+
+  // Proof row — "This week's top 3 deals"
+  "proof_row.heading":       { en: "This week's top 3 deals",
+                               es: "Los 3 mejores tratos de esta semana" },
+  "proof_row.see_all":       { en: "See all",                es: "Ver todas" },
+  "proof_row.empty":         { en: "Fresh picks land here every week.",
+                               es: "Cada semana publicamos nuevos hallazgos aquí." },
+
+  // Category grid — Beach × {Homes, Condos, Land} + Lake × same.
+  // Section headers + tile titles + tile descriptions (bilingual tile
+  // copy also lives in web/app/config/ia.ts; these strings are the
+  // section-level UI chrome around the tiles).
+  "category_grid.beach_heading": { en: "Beach properties", es: "Propiedades de playa" },
+  "category_grid.lake_heading":  { en: "Lake properties",  es: "Propiedades de lago" },
+  "category_grid.browse_all":    { en: "Browse all {n} →", es: "Ver las {n} →" },
+  "category_grid.browse_all_aria": { en: "Browse all {n} {master} properties",
+                                     es: "Ver las {n} propiedades de {master}" },
+
+  // Discovery pills (All / ★ Top rated / Under $250K / Gated / Waterfront)
+  "discovery_pill.all":          { en: "All",          es: "Todas" },
+  "discovery_pill.heading":      { en: "Explore by",   es: "Explora por" },
+
+  // USP row — three columns under the category grid.
+  "usp.row_heading":             { en: "Why Pulpo",    es: "Por qué Pulpo" },
+  "usp.col_1_title":             { en: "10 best deals, every 2 weeks",
+                                   es: "10 mejores tratos, cada 2 semanas" },
+  "usp.col_1_body":              { en: "Matched to your location, budget, and size. Delivered to your inbox.",
+                                   es: "Filtrados por ubicación, presupuesto y tamaño. Directo a tu correo." },
+  "usp.col_2_title":             { en: "Full catalogue, anytime",
+                                   es: "Catálogo completo, cuando quieras" },
+  "usp.col_2_body":              { en: "Browse, sort, and save hundreds of vetted beach and lake properties.",
+                                   es: "Explora, ordena y guarda cientos de propiedades verificadas de playa y lago." },
+  "usp.col_3_title":             { en: "Built by locals",
+                                   es: "Hecho por locales" },
+  "usp.col_3_body":              { en: "We live on this coast. We know which listings are real and which are overpriced.",
+                                   es: "Vivimos en esta costa. Sabemos qué anuncios son reales y cuáles están sobrevalorados." },
+
+  // Star pill ARIA — "4.5 stars out of 5"
+  "star_pill.aria":              { en: "{value} stars out of 5",
+                                   es: "{value} estrellas de 5" },
+
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
 

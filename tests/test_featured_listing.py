@@ -259,3 +259,228 @@ def test_entry_carries_photos_count():
     assert pool is not None
     assert isinstance(pool.entries[0], FeaturedEntry)
     assert pool.entries[0].photos_count == 15
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Proof-row picker tests (hero rewrite Phase 3)
+# ─────────────────────────────────────────────────────────────────────
+
+from pulpo.featured_listing import (   # noqa: E402
+    PROOF_ROW_PICK_COUNT,
+    pick_proof_row,
+)
+
+
+def _pr(**overrides) -> dict:
+    """Listing dict that satisfies every proof-row STRICT gate by default
+    (rank ≥ 75, days ≤ 60, hero_eligible, not sold, no overlay). Each
+    helper invocation gets a unique source_id so the dedupe-by-key
+    inside _pick_diverse doesn't collapse rows."""
+    base = dict(_li())  # inherit not-sold + photos baseline
+    base.update({
+        "rank_score":      80.0,
+        "days_listed":     30,
+        "hero_eligible":   True,
+        "card_eligible":   True,
+        "master_category": "beach",
+        "subcategory":     "homes",
+    })
+    base.update(overrides)
+    return base
+
+
+def test_proof_row_strict_returns_three_with_diversity():
+    """Three rank-eligible listings spanning three buckets → all chosen."""
+    listings = [
+        _pr(source_id="A", rank_score=92, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=88, master_category="lake",  subcategory="land"),
+        _pr(source_id="C", rank_score=85, master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "strict"
+    assert len(picks) == 3
+    assert {p["source_id"] for p in picks} == {"A", "B", "C"}
+
+
+def test_proof_row_prefers_unseen_buckets_over_rank():
+    """A higher-rank duplicate-bucket loses to a lower-rank fresh bucket
+    until count-or-buckets-exhausted, then rank-desc fill."""
+    listings = [
+        _pr(source_id="A", rank_score=99, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=95, master_category="beach", subcategory="homes"),  # dup
+        _pr(source_id="C", rank_score=80, master_category="lake",  subcategory="land"),
+        _pr(source_id="D", rank_score=78, master_category="beach", subcategory="condos"),
+    ]
+    picks, _tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    ids = [p["source_id"] for p in picks]
+    # A wins on rank (first beach-homes), then C (fresh lake bucket), then
+    # D (fresh beach-condos bucket). B (duplicate beach-homes) skipped.
+    assert ids == ["A", "C", "D"]
+
+
+def test_proof_row_enforces_beach_lake_invariant():
+    """Even when 3 highest-rank eligible listings are all beach, one slot
+    is swapped for the highest-rank lake candidate to satisfy the
+    'must include ≥1 beach AND ≥1 lake' contract.
+
+    All listings in the test set must clear the strict gate (rank ≥ 75)
+    — the invariant only swaps within the eligible pool, not from
+    outside. A below-threshold lake listing wouldn't be considered."""
+    listings = [
+        _pr(source_id="A", rank_score=99, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=95, master_category="beach", subcategory="condos"),
+        _pr(source_id="C", rank_score=90, master_category="beach", subcategory="land"),
+        _pr(source_id="D", rank_score=78, master_category="lake",  subcategory="homes"),
+        _pr(source_id="E", rank_score=82, master_category="beach", subcategory="homes"),  # dup
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "strict"
+    masters = {p["master_category"] for p in picks}
+    assert "beach" in masters and "lake" in masters
+    # Should have kept the two highest-rank beach picks + injected D for lake
+    ids = {p["source_id"] for p in picks}
+    assert "D" in ids
+
+
+def test_proof_row_invariant_unsatisfiable_returns_unchanged():
+    """When the eligible pool has zero lake listings, the invariant
+    can't be satisfied — picks come back beach-only and the tier is
+    reported as-is. Caller sees the constraint slip via observability."""
+    listings = [
+        _pr(source_id="A", rank_score=99, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=95, master_category="beach", subcategory="condos"),
+        _pr(source_id="C", rank_score=90, master_category="beach", subcategory="land"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "strict"
+    assert {p["master_category"] for p in picks} == {"beach"}
+
+
+def test_proof_row_falls_back_to_relaxed_rank():
+    """Strict pool < 3 (rank >= 75) but relaxed pool (rank >= 50) hits 3."""
+    listings = [
+        _pr(source_id="A", rank_score=80, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=60, master_category="lake",  subcategory="land"),
+        _pr(source_id="C", rank_score=55, master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "relaxed_rank"
+    assert len(picks) == 3
+
+
+def test_proof_row_falls_back_to_relaxed_eligibility():
+    """All listings are card_eligible only (hero_eligible=False) — the
+    relaxed_eligibility tier accepts them."""
+    listings = [
+        _pr(source_id="A", rank_score=80, hero_eligible=False, card_eligible=True,
+            master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=60, hero_eligible=False, card_eligible=True,
+            master_category="lake",  subcategory="land"),
+        _pr(source_id="C", rank_score=55, hero_eligible=False, card_eligible=True,
+            master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "relaxed_eligibility"
+    assert len(picks) == 3
+
+
+def test_proof_row_shortfall_returns_partial():
+    """Even the loosest gate can't yield 3 — return whatever passed
+    with the shortfall tier so operators see the constraint slip."""
+    listings = [
+        _pr(source_id="A", rank_score=80, master_category="beach", subcategory="homes"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "shortfall"
+    assert len(picks) == 1
+
+
+def test_proof_row_excludes_sold_and_overlay():
+    """Sold + has_text_overlay listings never reach the picker."""
+    listings = [
+        _pr(source_id="A", is_sold=True, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", has_text_overlay=True, master_category="lake", subcategory="land"),
+        _pr(source_id="C", rank_score=80, master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=Path("/dev/null"))
+    assert tier == "shortfall"
+    assert {p["source_id"] for p in picks} == {"C"}
+
+
+def test_proof_row_override_wins_when_valid(tmp_path: Path):
+    """A complete + resolvable override file beats the auto-pick. The
+    picks land in override order, not rank order."""
+    override = tmp_path / "override.json"
+    override.write_text(json.dumps({
+        "week_starting": "2026-05-12",
+        "picks": ["goodlife|X", "goodlife|Y", "goodlife|Z"],
+    }))
+    listings = [
+        _pr(source_id="X", rank_score=10, master_category="beach", subcategory="land"),
+        _pr(source_id="Y", rank_score=20, master_category="lake",  subcategory="condos"),
+        _pr(source_id="Z", rank_score=30, master_category="beach", subcategory="homes"),
+        _pr(source_id="ignored", rank_score=99, master_category="beach", subcategory="homes"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=override)
+    assert tier == "override"
+    assert [p["source_id"] for p in picks] == ["X", "Y", "Z"]
+
+
+def test_proof_row_override_falls_through_when_stale(tmp_path: Path):
+    """Override IDs that don't resolve (deleted listings) cause a fall-
+    through to the auto-pick when fewer than 3 ids resolve."""
+    override = tmp_path / "override.json"
+    override.write_text(json.dumps({
+        "week_starting": "2026-05-12",
+        "picks": ["gone|1", "gone|2", "goodlife|REAL"],
+    }))
+    listings = [
+        _pr(source_id="REAL", rank_score=80, master_category="beach", subcategory="homes"),
+        _pr(source_id="B",    rank_score=70, master_category="lake",  subcategory="land"),
+        _pr(source_id="C",    rank_score=65, master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=override)
+    # 1-of-3 resolved → not enough, auto-pick kicks in. Auto-pick
+    # against this set lands in either strict or relaxed_rank.
+    assert tier in ("strict", "relaxed_rank")
+    assert len(picks) == 3
+
+
+def test_proof_row_override_malformed_silently_ignored(tmp_path: Path):
+    """A malformed override file (non-JSON, missing keys, wrong shape)
+    falls through to the auto-pick without raising."""
+    override = tmp_path / "override.json"
+    override.write_text("{ not json")
+    listings = [
+        _pr(source_id="A", master_category="beach", subcategory="homes"),
+        _pr(source_id="B", master_category="lake",  subcategory="land"),
+        _pr(source_id="C", master_category="beach", subcategory="condos"),
+    ]
+    picks, tier = pick_proof_row(listings, override_path=override)
+    assert tier == "strict"
+    assert len(picks) == 3
+
+
+def test_write_featured_json_includes_picks_for_proof_row(tmp_path: Path):
+    """End-to-end: featured.json now carries both the legacy `pool` and
+    the new `picks_for_proof_row` + `proof_row_tier` fields."""
+    listings = [
+        _pr(source_id="A", rank_score=90, master_category="beach", subcategory="homes"),
+        _pr(source_id="B", rank_score=85, master_category="lake",  subcategory="land"),
+        _pr(source_id="C", rank_score=80, master_category="beach", subcategory="condos"),
+    ]
+    out = tmp_path / "featured.json"
+    write_featured_json(out, listings, now=_NOW, override_path=tmp_path / "missing.json")
+    payload = json.loads(out.read_text())
+    assert "pool" in payload  # legacy rotation
+    assert "picks_for_proof_row" in payload
+    assert "proof_row_tier" in payload
+    assert payload["proof_row_tier"] == "strict"
+    assert len(payload["picks_for_proof_row"]) == PROOF_ROW_PICK_COUNT
+    # Each proof-row entry carries the bucket fields the FE needs
+    for entry in payload["picks_for_proof_row"]:
+        assert "listing_id" in entry
+        assert "master_category" in entry
+        assert "subcategory" in entry
+        assert "star_rating" in entry
+        assert "hero_eligible" in entry
