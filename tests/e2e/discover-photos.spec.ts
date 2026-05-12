@@ -40,7 +40,16 @@ test.describe("Discover photos — no skeleton-stuck after navigation", () => {
 
     // 3. Open a detail panel — exercises the detail-photo render path
     // and (importantly) keeps the cards in the browser image cache.
-    const firstCard = page.locator("a[href^='/listing/'], [data-listing-id]").first();
+    //
+    // Target the .listing-card ARTICLE wrapper rather than the bare
+    // anchor. The anchor (.listing-card-anchor) exists for SEO +
+    // middle-click but is positioned absolutely BEHIND the card-body
+    // div, so Playwright's actionability check reports "<div
+    // class='listing-card-body'> intercepts pointer events" and the
+    // click retries until the test times out. The article wrapper is
+    // the real interactive surface — onClick=handleClick is wired to
+    // openListing, same path as a user tap.
+    const firstCard = page.locator("article.listing-card").first();
     if (await firstCard.count()) {
       await firstCard.click();
       await page.waitForLoadState("networkidle");
