@@ -25,7 +25,7 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div role="alert" style={fallbackStyle}>
+        <div role="alert" data-testid="error-boundary-fallback" style={fallbackStyle}>
           <h1 style={{ margin: 0, fontSize: 22 }}>Something went wrong.</h1>
           <p style={{ margin: 0, color: "#555", maxWidth: 420 }}>
             We hit an unexpected error. Reload the page — if it persists, the
