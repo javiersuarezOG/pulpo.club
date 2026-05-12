@@ -35,54 +35,22 @@ import { PulpoLogo } from "./components.jsx";
 import { track } from "./telemetry/hook";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { pickHeroPhoto } from "./lib/hero-photos";
+import { useCampaignParams } from "./lib/campaign";
 import "./styles/start.css";
 
 // Total catalog size — surfaced in the trust strip. Hardcoded for v1;
 // follow-up adds a /api/catalog-count endpoint or a build-time env var.
 const CATALOG_COUNT = 900;
 
-function readQueryParam(name) {
-  if (typeof window === "undefined") return null;
-  try {
-    return new URLSearchParams(window.location.search).get(name);
-  } catch { return null; }
-}
-
-const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
-
-function captureUtms() {
-  if (typeof window === "undefined") return {};
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const out = {};
-    for (const k of UTM_KEYS) {
-      const v = params.get(k);
-      if (v) {
-        out[k] = v;
-        try { sessionStorage.setItem(`pulpo-${k}`, v); } catch {}
-      } else {
-        try {
-          const cached = sessionStorage.getItem(`pulpo-${k}`);
-          if (cached) out[k] = cached;
-        } catch {}
-      }
-    }
-    return out;
-  } catch { return {}; }
-}
-
 export default function StartPage() {
   const [locale] = useLocale();
   const lc = locale;
 
-  // `?code=` is honored server-side only. We render an acknowledgement
-  // note ("✓ Discount applied at checkout") but never the code itself
-  // as an input field — Stripe's hosted page handles that surface.
-  const urlCode = useMemo(() => {
-    const c = readQueryParam("code");
-    return c ? c.trim().toUpperCase() : "";
-  }, []);
-  const initialCancelled = useMemo(() => readQueryParam("cancelled") === "1", []);
+  // Campaign params (?code= + utm_* + ?cancelled=1) come from a shared
+  // hook so /start and the home-page <ProUpsellModal> capture the
+  // exact same data. The hook also persists the UTMs to sessionStorage
+  // so the values survive the Stripe redirect.
+  const { urlCode, utms, isCancelled: initialCancelled } = useCampaignParams();
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -93,8 +61,6 @@ export default function StartPage() {
   // friendly pool. Memoized so a re-render within the same mount
   // doesn't swap the image visibly.
   const heroPhoto = useMemo(() => pickHeroPhoto("random"), []);
-
-  const utms = useMemo(() => captureUtms(), []);
 
   useEffect(() => {
     track("start.viewed", { has_code: urlCode.length > 0 });
