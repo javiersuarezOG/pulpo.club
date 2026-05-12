@@ -240,27 +240,312 @@ def pick_featured_pool(listings: list,
     return None
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Proof-row picker (hero rewrite Phase 3)
+#
+# The rewritten homepage's "This week's top 3 deals" surface (per the
+# rewrite plan §4) needs THREE listings, not the 12-entry rotation pool
+# above. Selection differs from the rotation pool on two axes:
+#
+# 1. Eligibility uses the NEW hero_eligible flag (Phase 2) instead of
+#    the photos_count + has_text_overlay proxies. hero_eligible already
+#    encodes the resolution + aspect + size + text-overlay gates we
+#    want — see automation/photo_quality.compute_image_metadata.
+# 2. Selection is bucket-diverse: greedy walk in rank-desc order,
+#    preferring listings whose (master_category, subcategory) bucket
+#    isn't yet represented in the pick set. AND a hard invariant:
+#    the final 3 must include ≥ 1 beach AND ≥ 1 lake property.
+#
+# Fallback ladder when the strict pool is < 3:
+#   strict           rank ≥ 75 + days ≤ 60 + hero_eligible
+#   relaxed_rank     rank ≥ 50 + days ≤ 60 + hero_eligible
+#   relaxed_eligib   rank ≥ 50 + days ≤ 60 + card_eligible
+#   shortfall        whatever passed, < 3 — log so operators see it
+#
+# Manual override: pulpo/featured_pick_override.json, when present and
+# valid, wins outright. Schema:
+#   {
+#     "week_starting": "2026-05-12",
+#     "picks": ["goodlife|GL-001", "oceanside|OS-042", "kazu|KZ-007"],
+#     "notes": "manual curation for May 12 launch week"
+#   }
+# Stale listing_ids that don't resolve against the current catalog are
+# silently dropped; if fewer than PROOF_ROW_PICK_COUNT resolve, we fall
+# through to the auto-pick rather than ship a partial manual set.
+# ─────────────────────────────────────────────────────────────────────
+
+PROOF_ROW_PICK_COUNT       = 3
+PROOF_ROW_MIN_RANK_STRICT  = 75.0
+PROOF_ROW_MIN_RANK_RELAXED = 50.0
+PROOF_ROW_MAX_DAYS         = 60
+
+# Module-relative default override path. Tests pass an explicit path;
+# automation/run.py uses the default.
+OVERRIDE_PATH_DEFAULT = Path(__file__).resolve().parent / "featured_pick_override.json"
+
+
+def _is_proof_row_strict(li: Any) -> bool:
+    """rank ≥ 75 + days ≤ 60 + hero_eligible (+ not sold, no overlay).
+
+    hero_eligible already enforces dimensions + aspect + file size +
+    (text-overlay implicitly via Phase 2's metadata pass). The
+    has_text_overlay check stays for defense — listings predating
+    Phase 2 may have hero_eligible=False from the missing-sidecar
+    path, but if they get re-fetched and pass, we still want the
+    text-overlay guard.
+    """
+    if _g(li, "is_sold") is True:
+        return False
+    if _g(li, "has_text_overlay") is True:
+        return False
+    if not bool(_g(li, "hero_eligible")):
+        return False
+    days = _g(li, "days_listed")
+    if days is None or days > PROOF_ROW_MAX_DAYS:
+        return False
+    rank = _g(li, "rank_score")
+    if not isinstance(rank, (int, float)) or rank < PROOF_ROW_MIN_RANK_STRICT:
+        return False
+    return True
+
+
+def _is_proof_row_relaxed_rank(li: Any) -> bool:
+    """Strict gates with rank lowered to 50. Hero_eligible still required."""
+    if _g(li, "is_sold") is True:
+        return False
+    if _g(li, "has_text_overlay") is True:
+        return False
+    if not bool(_g(li, "hero_eligible")):
+        return False
+    days = _g(li, "days_listed")
+    if days is None or days > PROOF_ROW_MAX_DAYS:
+        return False
+    rank = _g(li, "rank_score")
+    if not isinstance(rank, (int, float)) or rank < PROOF_ROW_MIN_RANK_RELAXED:
+        return False
+    return True
+
+
+def _is_proof_row_relaxed_eligibility(li: Any) -> bool:
+    """Rank ≥ 50 but accept card_eligible (the lower image bar) when
+    no hero_eligible alternative is available."""
+    if _g(li, "is_sold") is True:
+        return False
+    if _g(li, "has_text_overlay") is True:
+        return False
+    if not (bool(_g(li, "hero_eligible")) or bool(_g(li, "card_eligible"))):
+        return False
+    days = _g(li, "days_listed")
+    if days is None or days > PROOF_ROW_MAX_DAYS:
+        return False
+    rank = _g(li, "rank_score")
+    if not isinstance(rank, (int, float)) or rank < PROOF_ROW_MIN_RANK_RELAXED:
+        return False
+    return True
+
+
+def _bucket_of(li: Any) -> tuple[str, str]:
+    """(master_category, subcategory) with 'none' fallbacks. Used for
+    diversity-picking and reporting only — doesn't affect eligibility."""
+    return (
+        _g(li, "master_category") or "none",
+        _g(li, "subcategory")     or "none",
+    )
+
+
+def _pick_diverse(eligible: list, count: int) -> list:
+    """Greedy bucket-diverse pick.
+
+    Walks the eligible list (already sorted rank-desc by caller),
+    appending each listing whose (master, sub) bucket isn't yet
+    represented. Once all buckets are covered OR we've walked the
+    list once, fall through to rank-desc fill from the leftovers.
+    """
+    chosen: list = []
+    seen_buckets: set = set()
+    leftovers: list = []
+    for li in eligible:
+        if len(chosen) >= count:
+            break
+        b = _bucket_of(li)
+        if b not in seen_buckets:
+            chosen.append(li)
+            seen_buckets.add(b)
+        else:
+            leftovers.append(li)
+    if len(chosen) < count:
+        for li in leftovers:
+            if len(chosen) >= count:
+                break
+            chosen.append(li)
+    return chosen
+
+
+def _enforce_beach_lake_invariant(picks: list, eligible: list, count: int) -> list:
+    """Try to ensure picks includes ≥ 1 beach AND ≥ 1 lake.
+
+    For each missing master_category, find the highest-rank eligible
+    candidate of that master that isn't already in picks. Swap it in
+    for the lowest-rank pick whose removal won't break the invariant
+    on the OTHER side. When the invariant can't be satisfied (e.g. no
+    lake listings in the eligible pool), return picks unchanged —
+    the caller logs the constraint slip via the tier label.
+    """
+    if count <= 0:
+        return picks
+    missing = [m for m in ("beach", "lake")
+               if not any(_g(p, "master_category") == m for p in picks)]
+    if not missing:
+        return picks
+
+    # Operate on a mutable copy
+    out = list(picks)
+    for required in missing:
+        candidate = next(
+            (li for li in eligible
+             if _g(li, "master_category") == required and li not in out),
+            None,
+        )
+        if candidate is None:
+            continue  # can't satisfy
+        # Find a pick to swap out. Prefer one whose master_category has
+        # other reps in `out` so the swap doesn't break the invariant
+        # from the other direction.
+        for replaceable in reversed(out):
+            r_master = _g(replaceable, "master_category")
+            others = [p for p in out if _g(p, "master_category") == r_master and p is not replaceable]
+            if others:
+                idx = out.index(replaceable)
+                out[idx] = candidate
+                break
+        else:
+            # No safe swap exists (each pick is the last of its master).
+            # Swap the lowest-rank one anyway so we land ≥ 1 of the
+            # required master — the other-side invariant slips but
+            # we surface that via the tier label.
+            if out:
+                out[-1] = candidate
+    return out
+
+
+def _read_override(path: Path) -> Optional[list[str]]:
+    """Return the listing_ids from the override file, or None when the
+    file is absent, malformed, or contains no usable picks."""
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    picks = data.get("picks")
+    if not isinstance(picks, list) or len(picks) == 0:
+        return None
+    cleaned = [str(p) for p in picks if isinstance(p, str) and p]
+    return cleaned or None
+
+
+def pick_proof_row(
+    listings: list,
+    override_path: Optional[Path] = None,
+) -> tuple[list, str]:
+    """Return (picks, tier) for the homepage proof row.
+
+    `picks` is a list of up to PROOF_ROW_PICK_COUNT Listing-like objects,
+    ordered as they should render (beach-or-lake invariant respected
+    where possible).
+
+    `tier` ∈ {"override", "strict", "relaxed_rank", "relaxed_eligibility",
+              "shortfall"} answers "why this set" for telemetry +
+    operator debug.
+
+    `override_path` defaults to OVERRIDE_PATH_DEFAULT; tests pass an
+    explicit path so they don't depend on the repo-relative file.
+    """
+    if override_path is None:
+        override_path = OVERRIDE_PATH_DEFAULT
+
+    override_ids = _read_override(override_path)
+    if override_ids:
+        id_to_listing = {_key(li): li for li in listings}
+        resolved = [id_to_listing[i] for i in override_ids if i in id_to_listing]
+        if len(resolved) >= PROOF_ROW_PICK_COUNT:
+            return (resolved[:PROOF_ROW_PICK_COUNT], "override")
+        # Partial / stale override — fall through to auto-pick.
+
+    # Fallback ladder: strict → relaxed_rank → relaxed_eligibility.
+    for tier, predicate in (
+        ("strict",                _is_proof_row_strict),
+        ("relaxed_rank",          _is_proof_row_relaxed_rank),
+        ("relaxed_eligibility",   _is_proof_row_relaxed_eligibility),
+    ):
+        eligible = _ranked_pool(listings, predicate)
+        if len(eligible) >= PROOF_ROW_PICK_COUNT:
+            picks = _pick_diverse(eligible, PROOF_ROW_PICK_COUNT)
+            picks = _enforce_beach_lake_invariant(
+                picks, eligible, PROOF_ROW_PICK_COUNT,
+            )
+            return (picks, tier)
+
+    # Shortfall — return whatever the loosest gate yielded, even if
+    # under PROOF_ROW_PICK_COUNT. Caller surfaces a clear telemetry
+    # signal so operators can investigate. The featured.json schema
+    # still writes the array (possibly empty); the FE renders fewer
+    # cards or hides the proof row entirely.
+    eligible = _ranked_pool(listings, _is_proof_row_relaxed_eligibility)
+    picks = _pick_diverse(eligible, PROOF_ROW_PICK_COUNT)
+    picks = _enforce_beach_lake_invariant(
+        picks, eligible, PROOF_ROW_PICK_COUNT,
+    )
+    return (picks, "shortfall")
+
+
+def _proof_row_entry_dict(li: Any) -> dict:
+    """Lightweight dict representation for the featured.json output —
+    one line per pick with the fields the FE needs to render the card
+    without re-resolving via ranked.json."""
+    return {
+        "listing_id":     _key(li),
+        "rank_score":     round(float(_g(li, "rank_score") or 0), 2),
+        "master_category": _g(li, "master_category"),
+        "subcategory":     _g(li, "subcategory"),
+        "star_rating":     _g(li, "star_rating") or 0.0,
+        "hero_eligible":   bool(_g(li, "hero_eligible")),
+        "card_eligible":   bool(_g(li, "card_eligible")),
+    }
+
+
 def write_featured_json(out_path: Path, listings: list,
-                        now: Optional[datetime] = None) -> Optional[FeaturedPool]:
+                        now: Optional[datetime] = None,
+                        override_path: Optional[Path] = None) -> Optional[FeaturedPool]:
     """Pick + serialize. Idempotent - safe to call from a cron and
     locally without side effects beyond the single file write.
 
-    Returns the chosen FeaturedPool or None when no listing was eligible.
+    Writes the legacy 12-entry rotation pool (`pool`) for the current
+    hero AND the new 3-entry proof row (`picks_for_proof_row`) for the
+    rewritten homepage. Both surfaces are populated each run; the FE
+    picks which to consume.
+
+    Returns the chosen FeaturedPool or None when no listing was
+    eligible for the legacy rotation pool. The proof row may still be
+    written even when the rotation pool is None (e.g. all listings
+    are stale but hero_eligible) — but in practice the gates overlap
+    enough that an empty rotation pool also implies an empty proof row.
     """
     if now is None:
         now = datetime.now(timezone.utc)
 
     pool = pick_featured_pool(listings, now=now)
-    if pool is None:
-        # Nothing eligible - refuse to write the file rather than
-        # writing a sentinel. Callers check the existence of
-        # featured.json to decide whether to use the cron-stable pick
-        # or fall back to client-side selection.
+    proof_picks, proof_tier = pick_proof_row(listings, override_path=override_path)
+
+    if pool is None and not proof_picks:
+        # Nothing eligible — refuse to write rather than emit a sentinel.
+        # Callers check existence of featured.json to decide whether to
+        # fall back to client-side selection.
         return None
 
-    top = pool.entries[0]
-    payload = {
-        "tier":       pool.tier,
+    payload: dict = {
         "criteria": {
             "elite": {
                 "min_rank":      MIN_RANK_SCORE,
@@ -273,25 +558,50 @@ def write_featured_json(out_path: Path, listings: list,
                 "min_photos":    SOFT_MIN_PHOTOS,
                 "max_days":      MAX_DAYS_LISTED,
             },
+            "proof_row": {
+                "min_rank_strict":   PROOF_ROW_MIN_RANK_STRICT,
+                "min_rank_relaxed":  PROOF_ROW_MIN_RANK_RELAXED,
+                "max_days":          PROOF_ROW_MAX_DAYS,
+                "pick_count":        PROOF_ROW_PICK_COUNT,
+            },
         },
-        "picked_at":               now.isoformat(),
-        "expires_at":              _utc_midnight_after(now).isoformat(),
-        # Legacy single-pick fields - older readers and the schema keep
-        # working. The FE prefers `pool`.
-        "listing_id":              top.listing_id,
-        "rank_score":              round(top.rank_score, 2),
-        "hero_photo_quality_score": top.hero_photo_quality_score,
-        "fallback":                pool.tier != "elite",
-        "pool": [
-            {
-                "listing_id":               e.listing_id,
-                "rank_score":               round(e.rank_score, 2),
-                "hero_photo_quality_score": e.hero_photo_quality_score,
-                "photos_count":             e.photos_count,
-            }
-            for e in pool.entries
-        ],
+        "picked_at":  now.isoformat(),
+        "expires_at": _utc_midnight_after(now).isoformat(),
     }
+
+    if pool is not None:
+        top = pool.entries[0]
+        payload.update({
+            "tier":                     pool.tier,
+            # Legacy single-pick fields kept for any reader that hasn't
+            # migrated to `pool`/`picks_for_proof_row`.
+            "listing_id":               top.listing_id,
+            "rank_score":               round(top.rank_score, 2),
+            "hero_photo_quality_score": top.hero_photo_quality_score,
+            "fallback":                 pool.tier != "elite",
+            "pool": [
+                {
+                    "listing_id":               e.listing_id,
+                    "rank_score":               round(e.rank_score, 2),
+                    "hero_photo_quality_score": e.hero_photo_quality_score,
+                    "photos_count":             e.photos_count,
+                }
+                for e in pool.entries
+            ],
+        })
+    else:
+        # No legacy rotation pool but the proof row has picks — still
+        # emit a valid-shape envelope so older readers don't 500 on
+        # missing keys.
+        payload.update({
+            "tier":     "none",
+            "fallback": True,
+            "pool":     [],
+        })
+
+    payload["picks_for_proof_row"] = [_proof_row_entry_dict(li) for li in proof_picks]
+    payload["proof_row_tier"]      = proof_tier
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
     return pool

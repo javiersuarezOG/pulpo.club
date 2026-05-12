@@ -1,0 +1,14 @@
+{
+  "_comment_1": "Manual override for the homepage proof row's 3 picks. Copy this file to pulpo/featured_pick_override.json (no .example suffix), edit, and commit. The nightly pipeline reads it on the next run.",
+  "_comment_2": "When this file is present AND >= 3 picks resolve against the current catalog, the auto-picker is bypassed. Stale listing_ids (deleted listings) are silently dropped; if fewer than 3 resolve, the file is ignored and the auto-picker takes over.",
+  "_comment_3": "listing_id format: `{source}|{source_id}` — match what's in web/data/ranked.json. The FE adapter substitutes `|` for `-` at render time.",
+  "_comment_4": "week_starting is informational only — used for audit, not enforced. Use ISO date.",
+
+  "week_starting": "2026-05-12",
+  "picks": [
+    "goodlife|GL-EXAMPLE-001",
+    "oceanside|OC-EXAMPLE-002",
+    "remax|RX-EXAMPLE-003"
+  ],
+  "notes": "Example overrides for the May 12 launch week. Replace listing_ids with real ones from web/data/ranked.json before committing the live file."
+}
