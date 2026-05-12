@@ -36,7 +36,7 @@ test.describe("New app boots cleanly on key routes", () => {
       // editorial vocabulary). If we see the ErrorBoundary fallback
       // text, fail with that copy in the failure message.
       const errorBoundary = page.getByText("Something went wrong.");
-      const realApp = page.locator(".app, .topnav, .hero, .page-home");
+      const realApp = page.locator(".app, .topnav, .new-homepage, .new-hero, .hero, .page-home");
       await Promise.race([
         realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
         errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {
@@ -280,7 +280,7 @@ test.describe("New app boots cleanly on key routes", () => {
       await page.goto(route, { waitUntil: "networkidle" });
 
       const errorBoundary = page.getByText("Something went wrong.");
-      const realApp = page.locator(".app, .topnav, .hero, .page-home, .page-browse, .saved-page, .plans-page, .account-page");
+      const realApp = page.locator(".app, .topnav, .new-homepage, .new-hero, .hero, .page-home, .page-browse, .saved-page, .plans-page, .account-page");
       await Promise.race([
         realApp.first().waitFor({ state: "visible", timeout: 15_000 }),
         errorBoundary.waitFor({ state: "visible", timeout: 15_000 }).then(() => {

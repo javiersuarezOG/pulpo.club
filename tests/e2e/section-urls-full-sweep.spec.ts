@@ -16,7 +16,11 @@ test.describe("Section URLs — full app sweep", () => {
   //    expected page surface is visible. The /saved + /account paths
   //    open the sign-in modal as an overlay (URL still stays put).
   const SECTIONS: Array<{ path: string; surface: string; modalExpected: boolean }> = [
-    { path: "/",        surface: ".hero, .page-home",                 modalExpected: false },
+    // Phase 9 cutover: legacy `.hero`/`.page-home` selectors are gone
+    // (the legacy HomePage was deleted). New homepage uses
+    // `.new-homepage` / `.new-hero`. Legacy names kept in OR list as
+    // no-op fallback in case any partial restore re-introduces them.
+    { path: "/",        surface: ".new-homepage, .new-hero, .hero, .page-home", modalExpected: false },
     { path: "/browse",  surface: ".page-browse, .browse-page",        modalExpected: false },
     { path: "/saved",   surface: ".saved-page, .modal-signup",        modalExpected: true  },
     { path: "/plans",   surface: ".plans-page, .plan-card",           modalExpected: false },
