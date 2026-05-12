@@ -16,11 +16,11 @@ test.describe("Section URLs — full app sweep", () => {
   //    expected page surface is visible. The /saved + /account paths
   //    open the sign-in modal as an overlay (URL still stays put).
   const SECTIONS: Array<{ path: string; surface: string; modalExpected: boolean }> = [
-    // Phase 9 cutover: legacy `.hero`/`.page-home` selectors are gone
-    // (the legacy HomePage was deleted). New homepage uses
-    // `.new-homepage` / `.new-hero`. Legacy names kept in OR list as
-    // no-op fallback in case any partial restore re-introduces them.
-    { path: "/",                       surface: ".new-homepage, .new-hero, .hero, .page-home", modalExpected: false },
+    // Homepage v2 (redesign) mounts under `.homepage-v2`. Legacy
+    // `.new-homepage` / `.new-hero` from the prior shell are kept in
+    // the OR list as no-op fallbacks during the transition; remove
+    // once the v2 has shipped + dashboards confirm no rollback.
+    { path: "/",                       surface: ".homepage-v2, .new-homepage, .new-hero", modalExpected: false },
     { path: "/browse",                 surface: ".page-browse, .browse-page",        modalExpected: false },
     { path: "/saved",                  surface: ".saved-page, .modal-signup",        modalExpected: true  },
     { path: "/plans",                  surface: ".plans-page, .plan-card",           modalExpected: false },
@@ -176,8 +176,11 @@ test.describe("Section URLs — full app sweep", () => {
   // 5. Listing-card hidden anchor exists + targets /listing/<id>.
   //    Crawler-visibility check: the card body must contain a real
   //    <a href> for SEO + cmd-click.
+  //    Homepage v2's editorial shelves render static placeholder
+  //    cards (not ListingCard); the real ListingCard with its
+  //    crawlable anchor lives on /browse, so we navigate there.
   test("listing card has a crawlable anchor pointing at /listing/<id>", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/browse", { waitUntil: "networkidle" });
     const card = page.locator(".listing-card").first();
     await card.waitFor({ state: "visible", timeout: 10_000 });
     const anchorHref = await card.locator(".listing-card-anchor").getAttribute("href");

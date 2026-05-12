@@ -886,8 +886,12 @@ function App() {
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
-    <div className={`app density-${tweaks.density}`}>
-      <TopNav app={app} />
+    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}`}>
+      {/* Homepage v2 owns its own header + footer chrome (HomepageHeader
+          inside NewHomePage). Suppress the shared TopNav + site-footer
+          on route === "home" so the page isn't double-headed. Every
+          other route still gets the shared chrome. */}
+      {route !== "home" && <TopNav app={app} />}
       <main className="main">
         {route === "home" && <NewHomePage app={app} />}
         {route === "browse" && <BrowsePage app={app} />}
@@ -896,7 +900,7 @@ function App() {
         {route === "account" && <AccountPage app={app} />}
       </main>
 
-      {route !== "browse" && (route !== "account" || tweaks.showFooterOnAccount) && (
+      {route !== "home" && route !== "browse" && (route !== "account" || tweaks.showFooterOnAccount) && (
         <footer className="site-footer">
           <div className="footer-inner">
             <div className="footer-brand">

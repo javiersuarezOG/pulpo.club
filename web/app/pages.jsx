@@ -141,28 +141,29 @@ function LocaleToggle({ app }) {
 
 // ====== Mobile bottom tab bar ======
 function BottomNav({ app }) {
+  const lc = app.locale;
   const tabs = [
-    { key: "home", label: "Discover", icon: "home" },
-    { key: "browse", label: "Browse", icon: "search" },
-    { key: "saved", label: "Saved", icon: "heart" },
-    { key: "profile", label: app.user ? "Profile" : "Sign in", icon: "user" },
+    { key: "home",    labelKey: "nav.tab.home",    icon: "home" },
+    { key: "browse",  labelKey: "nav.tab.browse",  icon: "search" },
+    { key: "saved",   labelKey: "nav.tab.saved",   icon: "heart" },
+    { key: "profile", labelKey: app.user ? "nav.tab.profile" : "nav.tab.signin", icon: "user" },
   ];
   return (
     <nav className="bottomnav">
-      {tabs.map(t => (
+      {tabs.map(tab => (
         <button
-          key={t.key}
-          className={(app.route === t.key || (t.key === "profile" && app.route === "account")) ? "active" : ""}
+          key={tab.key}
+          className={(app.route === tab.key || (tab.key === "profile" && app.route === "account")) ? "active" : ""}
           onClick={() => {
-            if (t.key === "profile") {
+            if (tab.key === "profile") {
               if (!app.user) app.openSignup({ mode: "login" });
               else app.go("account");
-            } else app.go(t.key);
+            } else app.go(tab.key);
           }}
         >
-          <Icon name={t.icon} size={20} />
-          <span>{t.label}</span>
-          {t.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
+          <Icon name={tab.icon} size={20} />
+          <span>{t(tab.labelKey, lc)}</span>
+          {tab.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
         </button>
       ))}
     </nav>
