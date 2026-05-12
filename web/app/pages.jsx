@@ -835,11 +835,20 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
     if (s.has(val)) s.delete(val); else s.add(val);
     update({ [key]: s });
   };
+  // Rewrite Phase 5B — single-select toggle for master/subcategory.
+  // Click an active chip again → clears (null). Click another → swaps.
+  const toggleSingle = (key, val) => {
+    update({ [key]: filters[key] === val ? null : val });
+  };
   const zoneList = ZONES.map(z => z.name);
   const activeCount = (filters.zones?.size || 0)
     + filters.land_types.size + filters.features.size
     + filters.infra.size + filters.status.size
-    + (filters.price_max != null || filters.price_min > 0 ? 1 : 0);
+    + (filters.price_max != null || filters.price_min > 0 ? 1 : 0)
+    // Phase 5B new IA axes — each contributes one to the badge.
+    + (filters.master_category ? 1 : 0)
+    + (filters.subcategory ? 1 : 0)
+    + (filters.discovery_tags?.size || 0);
   const lc = app?.locale || currentLocale();
 
   return (
@@ -871,6 +880,49 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
           </div>
         </div>
       )}
+
+      {/* ── Rewrite Phase 5B — new IA axes (master/sub/tags) ────── */}
+      <FilterGroup title={t("filter.master_category", lc)}>
+        <div className="chip-grid">
+          {["beach", "lake"].map((m) => (
+            <button
+              key={m}
+              className={`chip ${filters.master_category === m ? "is-active" : ""}`}
+              onClick={() => toggleSingle("master_category", m)}
+            >
+              {t(`filter.master.${m}`, lc)}
+            </button>
+          ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.subcategory", lc)}>
+        <div className="chip-grid">
+          {["homes", "condos", "land"].map((s) => (
+            <button
+              key={s}
+              className={`chip ${filters.subcategory === s ? "is-active" : ""}`}
+              onClick={() => toggleSingle("subcategory", s)}
+            >
+              {t(`filter.sub.${s}`, lc)}
+            </button>
+          ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.discovery_tags", lc)}>
+        <div className="chip-grid">
+          {["top_rated", "under_250k", "gated", "waterfront"].map((tag) => (
+            <button
+              key={tag}
+              className={`chip ${filters.discovery_tags?.has(tag) ? "is-active" : ""}`}
+              onClick={() => toggleSet("discovery_tags", tag)}
+            >
+              {t(`filter.tag.${tag}`, lc)}
+            </button>
+          ))}
+        </div>
+      </FilterGroup>
 
       <FilterGroup title={t("filter.zone", lc)}>
         <div className="chip-grid">
@@ -1464,6 +1516,13 @@ function makeDefaultFilters() {
     score_min: 0,                             // 0–100 score floor
     weights: { ...WEIGHT_DEFAULTS },          // V/L/M weights, sum = 100
     photos: "all",                            // "all" | "with" | "none"
+    // Rewrite Phase 5B — new IA filter axes (Beach/Lake × Homes/
+    // Condos/Land + 4 discovery tags). The homepage CategoryGrid /
+    // DiscoveryPills navigate here with these pre-set via
+    // buildFiltersForCategory.
+    master_category: null,                    // "beach" | "lake" | null
+    subcategory: null,                        // "homes" | "condos" | "land" | null
+    discovery_tags: new Set(),                // subset of {top_rated, under_250k, gated, waterfront}
   };
 }
 
@@ -1508,6 +1567,16 @@ function applyFilters(listings, f) {
     if ((f.score_min ?? 0) > 0 && (l.rank_score ?? 0) < f.score_min) return false;
     if (f.photos === "with" && (l.photos_count ?? 0) === 0) return false;
     if (f.photos === "none" && (l.photos_count ?? 0) > 0) return false;
+    // Rewrite Phase 5B — new IA filters. master/sub are single-select;
+    // discovery_tags is multi-select (every selected tag must apply).
+    if (f.master_category && l.master_category !== f.master_category) return false;
+    if (f.subcategory && l.subcategory !== f.subcategory) return false;
+    if (f.discovery_tags && f.discovery_tags.size > 0) {
+      const tags = Array.isArray(l.discovery_tags) ? l.discovery_tags : [];
+      for (const required of f.discovery_tags) {
+        if (!tags.includes(required)) return false;
+      }
+    }
     return true;
   });
 }
@@ -1534,6 +1603,21 @@ function buildFiltersForCategory(category) {
     under_100k: () => { f.price_max = 100000; },
     under_50k: () => { f.price_max = 50000; },
     build_ready: () => { f.readiness = 3; },
+    // Rewrite Phase 5B — new IA category slugs. Homepage CategoryGrid
+    // emits `${master}_${sub}` ("beach_homes") + master-only ("beach"
+    // for "Browse all"); DiscoveryPills emits the tag name directly.
+    beach:        () => { f.master_category = "beach"; },
+    lake:         () => { f.master_category = "lake"; },
+    beach_homes:  () => { f.master_category = "beach"; f.subcategory = "homes"; },
+    beach_condos: () => { f.master_category = "beach"; f.subcategory = "condos"; },
+    beach_land:   () => { f.master_category = "beach"; f.subcategory = "land"; },
+    lake_homes:   () => { f.master_category = "lake";  f.subcategory = "homes"; },
+    lake_condos:  () => { f.master_category = "lake";  f.subcategory = "condos"; },
+    lake_land:    () => { f.master_category = "lake";  f.subcategory = "land"; },
+    top_rated:    () => { f.discovery_tags.add("top_rated"); },
+    under_250k:   () => { f.discovery_tags.add("under_250k"); },
+    gated:        () => { f.discovery_tags.add("gated"); },
+    waterfront:   () => { f.discovery_tags.add("waterfront"); },
   };
   map[category]?.();
   return f;
@@ -1746,15 +1830,21 @@ function BrowsePage({ app }) {
               <button className="filter-mobile-btn" onClick={() => setFilterDrawerOpen(true)}>
                 <Icon name="sliders" size={16} /> {t("view.filters", app.locale)} {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
               </button>
+              {/* Rewrite Phase 5B — top 4 options now lead the dropdown
+                  with the brief's canonical labels (Highest value /
+                  Lowest price / Newest / Largest plot). The underlying
+                  sort KEYS are unchanged so saved URLs (?sort=stars_desc
+                  etc.) keep working; only the visible labels move. The
+                  legacy options stay below for power-user access. */}
               <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
+                <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
+                <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
+                <option value="days_asc">{t("sort.newest", app.locale)}</option>
+                <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
                 <option value="recent">{t("sort.recent", app.locale)}</option>
-                <option value="price_asc">{t("sort.price_asc", app.locale)}</option>
                 <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
-                <option value="size_desc">{t("sort.size_desc", app.locale)}</option>
                 <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
-                <option value="days_asc">{t("sort.days_asc", app.locale)}</option>
                 <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
-                <option value="stars_desc">{t("sort.stars_desc", app.locale)}</option>
                 <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
               </select>
               <div className="view-toggle">
@@ -1763,6 +1853,17 @@ function BrowsePage({ app }) {
                 </button>
                 <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label={t("view.cards", app.locale)}>
                   <Icon name="grid" size={16}/>
+                </button>
+                {/* Map view placeholder per rewrite plan step 6. Disabled
+                    until the map prototype lands; the tooltip explains
+                    that to users who try clicking. */}
+                <button
+                  disabled
+                  className="map-view-placeholder"
+                  aria-label={t("view.map_coming_soon", app.locale)}
+                  title={t("view.map_coming_soon", app.locale)}
+                >
+                  <Icon name="map_pin" size={16}/>
                 </button>
               </div>
             </div>

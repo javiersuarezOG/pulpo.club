@@ -122,6 +122,14 @@ test.describe("New app boots cleanly on key routes", () => {
     await page.locator(".topnav-links button").getByText(/^Browse$|^Explorar$/).click();
     const histo = page.locator(".histo-track");
     await histo.waitFor({ state: "visible", timeout: 10_000 });
+    // Scroll the histogram into view before clicking — Playwright's
+    // `mouse.click(x, y)` uses absolute viewport coords without
+    // auto-scrolling. The filter panel's vertical layout can shift
+    // (e.g. adding new chip groups above) pushing the histogram
+    // below the viewport, which makes the click land on nothing.
+    // scrollIntoViewIfNeeded makes the bar-click coords reliable
+    // regardless of panel layout.
+    await histo.scrollIntoViewIfNeeded();
 
     // Click roughly bar 5 of 24 (midway-low, where most listings cluster).
     const box = await histo.boundingBox();

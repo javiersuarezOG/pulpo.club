@@ -31,7 +31,12 @@ export function DiscoveryPills({ app, locale, sourcePage, activeTag }) {
       app.goBrowse({});
       return;
     }
-    app.goBrowse({ tag });
+    // Pass the tag as the category slug — BrowsePage's
+    // buildFiltersForCategory expands "top_rated" / "under_250k" /
+    // "gated" / "waterfront" into the corresponding discovery_tags
+    // filter entry. Reusing the category param keeps URL contract
+    // + popstate resync simple.
+    app.goBrowse({ category: tag });
   };
 
   return (

@@ -2,7 +2,7 @@
 // through URLSearchParams so the browser back button, refresh, and
 // shared links all reproduce the same view.
 //
-// Keys:
+// Keys (legacy):
 //   cat              — pill / category (drives the rest)
 //   zones            — comma-separated zone names
 //   types            — comma-separated land types
@@ -15,6 +15,20 @@
 //   score_min        — score floor (0–100)
 //   wv / wl / wm     — Value / Location / Momentum weight (0–100)
 //   sort             — sort key
+//
+// Keys (rewrite Phase 5B — new IA axes):
+//   master           — "beach" | "lake" (single-select)
+//   sub              — "homes" | "condos" | "land" (single-select)
+//   tag              — comma-separated discovery tags
+//                      (top_rated, under_250k, gated, waterfront)
+
+import type { DiscoveryTag, MasterCategory, Subcategory } from "./types";
+
+const VALID_MASTER: ReadonlySet<MasterCategory>  = new Set(["beach", "lake"]);
+const VALID_SUB:    ReadonlySet<Subcategory>     = new Set(["homes", "condos", "land"]);
+const VALID_TAGS:   ReadonlySet<DiscoveryTag>    = new Set([
+  "top_rated", "under_250k", "gated", "waterfront",
+]);
 
 export type FilterShape = {
   zones: Set<string>;
@@ -28,6 +42,11 @@ export type FilterShape = {
   readiness: number;
   score_min?: number;
   weights?: { value: number; location: number; momentum: number };
+  // Rewrite Phase 5B — new IA filter axes. null = "all" for the
+  // single-selects. discovery_tags is multi-select.
+  master_category: MasterCategory | null;
+  subcategory: Subcategory | null;
+  discovery_tags: Set<DiscoveryTag>;
 };
 
 // Visual scale for the price histogram. Listings above this still pass
@@ -46,8 +65,34 @@ function parseInt0(value: string | null, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function parseMaster(value: string | null): MasterCategory | null {
+  if (!value) return null;
+  return VALID_MASTER.has(value as MasterCategory) ? (value as MasterCategory) : null;
+}
+
+function parseSub(value: string | null): Subcategory | null {
+  if (!value) return null;
+  return VALID_SUB.has(value as Subcategory) ? (value as Subcategory) : null;
+}
+
+function parseTags(value: string | null): Set<DiscoveryTag> {
+  const raw = parseSet(value);
+  const out = new Set<DiscoveryTag>();
+  raw.forEach((t) => {
+    if (VALID_TAGS.has(t as DiscoveryTag)) out.add(t as DiscoveryTag);
+  });
+  return out;
+}
+
 export function readFilterFromURL(search: string, baseDefaults: FilterShape): FilterShape {
   const p = new URLSearchParams(search);
+  // master/sub/tag from URL win over the baseDefaults values when
+  // present. The baseDefaults already carry any preset injected by
+  // buildFiltersForCategory (legacy cat= slug expansion), so we OR
+  // them in: explicit URL wins, otherwise the preset stands.
+  const masterFromUrl = parseMaster(p.get("master"));
+  const subFromUrl    = parseSub(p.get("sub"));
+  const tagsFromUrl   = parseTags(p.get("tag"));
   const out: FilterShape = {
     ...baseDefaults,
     zones: parseSet(p.get("zones")),
@@ -59,6 +104,9 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     price_max: p.get("pmax") != null ? parseInt0(p.get("pmax"), 0) : null,
     size_min: parseInt0(p.get("smin"), 0),
     readiness: parseInt0(p.get("ready"), 0),
+    master_category: masterFromUrl ?? baseDefaults.master_category,
+    subcategory:     subFromUrl    ?? baseDefaults.subcategory,
+    discovery_tags:  tagsFromUrl.size > 0 ? tagsFromUrl : baseDefaults.discovery_tags,
   };
   const sm = p.get("score_min");
   if (sm != null) out.score_min = parseInt0(sm, 0);
@@ -116,6 +164,11 @@ export function writeFilterToURL(
     p.delete("wm");
   }
   setOrRemove("sort", sort && sort !== "recent" ? sort : "");
+  // Rewrite Phase 5B — new IA axes. Single-selects omitted when null;
+  // tags omitted when empty.
+  setOrRemove("master", filters.master_category ?? "");
+  setOrRemove("sub",    filters.subcategory ?? "");
+  setOrRemove("tag",    [...filters.discovery_tags].join(","));
   const qs = p.toString();
   const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
   history.replaceState({}, "", url);
