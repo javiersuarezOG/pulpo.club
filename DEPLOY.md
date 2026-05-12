@@ -239,3 +239,42 @@ PULPO_LIMIT=1000
 Without this, each source is capped at 30 raw listings per run regardless
 of how many the broker publishes. The coverage audit will report
 `limit_hit=yes` for any source that publishes more than 30 land listings.
+
+## Newsletter signup — Resend env vars
+
+The rewritten homepage's hero form (POST `/api/newsletter`) subscribes
+emails to a Resend Audience. Two env vars must be set in Vercel for
+the endpoint to work; until they're set the endpoint returns 503 and
+the FE shows the generic error toast (graceful degrade, no crash).
+
+```bash
+RESEND_API_KEY      # re_… from https://resend.com/api-keys
+RESEND_AUDIENCE_ID  # UUID of the audience the homepage feeds into
+```
+
+Set both via the Vercel dashboard (Settings → Environment Variables →
+Production + Preview + Development). The endpoint reads them at
+request time, so flipping the env vars on does not require a redeploy.
+
+To verify after setup:
+
+```bash
+curl -X POST https://pulpo.club/api/newsletter \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","source":"homepage_hero"}'
+```
+
+Expected responses:
+
+| Code | Body | Meaning |
+|---|---|---|
+| 200 | `{ok: true}` | Subscribed |
+| 400 | `{error: "invalid_email"}` | Email shape rejected client-side regex |
+| 409 | `{error: "already_subscribed"}` | Already in audience |
+| 429 | `{error: "rate_limited", retry_after_s: N}` | 5 attempts per IP / 5 min |
+| 502 | `{error: "upstream_error"}` | Resend returned a non-dedup error |
+| 503 | `{error: "service_unavailable"}` | One or both env vars missing |
+| 500 | `{error: "internal_error"}` | Network / SDK throw |
+
+PII: the endpoint NEVER logs the raw email — only `email_domain_only`
+(after the @). Vercel runtime logs are safe to share.
