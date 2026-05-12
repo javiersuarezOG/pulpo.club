@@ -57,7 +57,20 @@ function AccountPage({ app }) {
   if (clerkBooting) {
     return <div className="page page-account account-loading" aria-busy="true" />;
   }
-  if (!app.user) return null;
+  // /account?welcome=1 — post-Stripe (or post-magic-link) landing.
+  // The route gate (route-gates.ts) allowed an anonymous render through
+  // for this URL; we show a neutral placeholder that the <WelcomeModal>
+  // sits on top of. Refresh strips the param (see app.jsx's effect)
+  // so the user only ever sees this state for one render cycle while
+  // the modal is up.
+  if (!app.user) {
+    const isWelcomeLanding = typeof window !== "undefined"
+      && new URLSearchParams(window.location.search).get("welcome") === "1";
+    if (isWelcomeLanding) {
+      return <div className="page page-account account-welcome-preview" aria-busy="true" />;
+    }
+    return null;
+  }
 
   const subs = [
     { key: "profile",       label: t("account.profile", app.locale),       icon: "user" },

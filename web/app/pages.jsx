@@ -3094,8 +3094,166 @@ function ConsentBanner({ locale = "en" }) {
   );
 }
 
+// ────────────────────────────────────────────────────────────────────
+// WelcomeModal — post-payment / post-magic-link landing overlay.
+//
+// Mounted by app.jsx when ?welcome=1 is detected in the URL. Two
+// variants based on `app.user` state:
+//   - anon: user just completed Stripe Checkout but hasn't accepted
+//           the Clerk magic-link yet. Modal says "check your inbox"
+//           with a primary CTA to open Gmail and a secondary "resend"
+//           button that hits /api/clerk/resend-invitation.
+//   - signed_in: user accepted the magic-link and is now signed in.
+//           Modal says "you're all set" with a single "start exploring"
+//           CTA that dismisses + auto-dismisses after ~3s.
+//
+// Tokens-only CSS in web/app/styles/index.css's .welcome-modal block.
+// Mobile-first; ESC + backdrop click dismiss.
+function WelcomeModal({ app, state, onClose }) {
+  const lc = app.locale;
+  const isSignedIn = !!app.user;
+  const variant = isSignedIn ? "signed_in" : "anon";
+  const [resending, setResending] = pUseState(false);
+  const [resendResult, setResendResult] = pUseState(null);
+  const dialogRef = React.useRef(null);
+
+  // Fire `welcome_modal.shown` once per mount with the resolved variant.
+  React.useEffect(() => {
+    track("welcome_modal.shown", { variant, surface: "account" });
+    // Auto-dismiss the signed-in variant after a brief acknowledgement
+    // so the user lands on the real signed-in /account page.
+    if (variant === "signed_in") {
+      const id = setTimeout(() => {
+        track("welcome_modal.dismissed", { variant, action: "auto" });
+        onClose();
+      }, 3200);
+      return () => clearTimeout(id);
+    }
+    return undefined;
+  }, [variant, onClose]);
+
+  // ESC dismiss + focus trap entry — modeled on the SignupModal pattern.
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        track("welcome_modal.dismissed", { variant, action: "esc" });
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    if (dialogRef.current) dialogRef.current.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [variant, onClose]);
+
+  const onBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      track("welcome_modal.dismissed", { variant, action: "backdrop" });
+      onClose();
+    }
+  };
+
+  const onResend = async () => {
+    if (resending || !state || !state.sessionId) {
+      setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
+      return;
+    }
+    setResending(true);
+    setResendResult(null);
+    track("welcome_modal.cta_resend_clicked", {});
+    try {
+      const res = await fetch("/api/clerk/resend-invitation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: state.sessionId }),
+      });
+      if (!res.ok) {
+        setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
+      } else {
+        setResendResult({ ok: true, msg: t("welcome_modal.anon.resend_done", lc) });
+      }
+    } catch {
+      setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
+    }
+    setResending(false);
+  };
+
+  return (
+    <div
+      className="modal-backdrop"
+      role="presentation"
+      onClick={onBackdropClick}
+    >
+      <div
+        ref={dialogRef}
+        className="modal welcome-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("welcome_modal.aria.dialog", lc)}
+        tabIndex={-1}
+      >
+        <button
+          type="button"
+          className="modal-close"
+          aria-label={t("welcome_modal.aria.close", lc)}
+          onClick={() => {
+            track("welcome_modal.dismissed", { variant, action: "close" });
+            onClose();
+          }}
+        >
+          ×
+        </button>
+        <div className="welcome-modal-eyebrow">{t("welcome_modal.eyebrow", lc)}</div>
+        {variant === "anon" ? (
+          <>
+            <h2 className="welcome-modal-headline">{t("welcome_modal.anon.headline", lc)}</h2>
+            <p className="welcome-modal-body">{t("welcome_modal.anon.body", lc)}</p>
+            <a
+              className="welcome-modal-cta-primary"
+              href="https://mail.google.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
+            >
+              {t("welcome_modal.anon.cta_inbox", lc)}
+            </a>
+            <button
+              type="button"
+              className="welcome-modal-cta-secondary"
+              onClick={onResend}
+              disabled={resending}
+            >
+              {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
+            </button>
+            {resendResult && (
+              <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
+                {resendResult.msg}
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="welcome-modal-headline">{t("welcome_modal.signedin.headline", lc)}</h2>
+            <p className="welcome-modal-body">{t("welcome_modal.signedin.body", lc)}</p>
+            <button
+              type="button"
+              className="welcome-modal-cta-primary"
+              onClick={() => {
+                track("welcome_modal.dismissed", { variant, action: "explore" });
+                onClose();
+              }}
+            >
+              {t("welcome_modal.signedin.cta_explore", lc)}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export {
   TopNav, BottomNav, PillRail, HomePage, BrowsePage, ListingDetail,
-  SavedPage, PlansPage, SignupModal, ToastHost, makeDefaultFilters, applyFilters,
+  SavedPage, PlansPage, SignupModal, WelcomeModal, ToastHost,
+  makeDefaultFilters, applyFilters,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
 };
