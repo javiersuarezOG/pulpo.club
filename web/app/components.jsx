@@ -227,10 +227,54 @@ function Photo({
     () => (typeof performance !== "undefined" ? performance.now() : 0),
     [url]
   );
+  // Ref on the <img> element so the URL-change effect can check
+  // `complete + naturalWidth` for browser-cache hits. Without this,
+  // cached images load synchronously before React attaches onLoad,
+  // setLoaded never fires, opacity stays at 0 forever, and the
+  // skeleton sits over a fully decoded image. The Discover/Browse/
+  // detail-panel cycle re-renders the same listings so this used to
+  // happen reliably on the second visit to a section.
+  const imgRef = useRef(null);
   useEffect(() => {
     setLoaded(false);
     setErrored(false);
+    // queueMicrotask defers to after the <img> element mounts and the
+    // browser has had a tick to honour the synchronous cache hit, so
+    // `el.complete` is meaningful. Without the defer this runs during
+    // the URL-change React commit when imgRef.current may still be the
+    // OLD <img> element.
+    queueMicrotask(() => {
+      const el = imgRef.current;
+      if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
+    });
   }, [url]);
+
+  // Stuck-image telemetry — fire if the image neither loaded nor
+  // errored after 8 s. Pre-fix the opacity-stuck bug was invisible to
+  // PostHog (image failures bypass JS exceptions + we never wired the
+  // onerror handler). Post-fix this should baseline near zero; a
+  // non-zero rate is a regression signal we want to see.
+  useEffect(() => {
+    if (!url) return;
+    let cancelled = false;
+    const handle = setTimeout(() => {
+      if (cancelled) return;
+      if (loaded || errored) return;
+      try {
+        const el = imgRef.current;
+        const wasCachedLikely = !!(el && el.complete && el.naturalWidth > 0);
+        track("image.stuck", {
+          url: String(url).slice(0, 200),
+          listing_id: listing.id,
+          idx,
+          source: source || "unknown",
+          is_local: String(url).startsWith("/photos/"),
+          was_cached_likely: wasCachedLikely,
+        });
+      } catch { /* never let telemetry break the render */ }
+    }, 8000);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [url, loaded, errored, listing.id, idx, source]);
 
   // Lazy-image telemetry. For non-eager cards we measure viewport-
   // entry → onLoad (what the user perceives when scrolling to the
@@ -297,6 +341,7 @@ function Photo({
     <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
       {!loaded && <div className="photo-skeleton" />}
       <img
+        ref={imgRef}
         src={url}
         alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
         loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
@@ -334,7 +379,20 @@ function Photo({
             }
           }
         }}
-        onError={() => setErrored(true)}
+        onError={() => {
+          setErrored(true);
+          // Telemetry — see events.ts "image.error". Wrapped in try/catch
+          // so a telemetry hiccup never breaks the placeholder fallback.
+          try {
+            track("image.error", {
+              url: String(url || "").slice(0, 200),
+              listing_id: listing.id,
+              idx,
+              source: source || "unknown",
+              is_local: String(url || "").startsWith("/photos/"),
+            });
+          } catch { /* ignore */ }
+        }}
         style={{ opacity: loaded ? 1 : 0 }}
       />
     </div>
