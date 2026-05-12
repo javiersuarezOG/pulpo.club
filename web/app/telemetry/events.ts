@@ -274,6 +274,18 @@ export type EventMap = {
    *  replaceState'd to /. Surfaces broken inbound links in PostHog. */
   "route.fallback_redirected": { from_path: string };
 
+  // ───── Account sub-section deep-links (PR account-section-urls) ─────
+  /** Fires once per resolved /account/<section> tab — cold-load (URL
+   *  hit), in-app nav click, and browser back/forward all emit. Lets
+   *  PostHog answer "did anyone actually deep-link a sub-section?",
+   *  which is the justification for these dedicated URLs. `entry`
+   *  distinguishes inbound traffic vs intra-page navigation so the
+   *  dashboards don't conflate the two. */
+  "account.section_viewed": {
+    section: "profile" | "notifications" | "subscription" | "security";
+    entry: "url" | "nav_click" | "popstate";
+  };
+
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
   // before we POST /api/stripe/billing-portal. Pairs with `portal.error`
