@@ -47,6 +47,12 @@ function ClerkUserSync({ setUser }) {
       joined:   user.createdAt ? +new Date(user.createdAt) : Date.now(),
       provider: "clerk",
       clerkId:  user.id,
+      // Open profile dict (see web/app/lib/user-profile.ts). Read-only
+      // hydration today — PR-C wires the write path so Clerk becomes
+      // the cross-device source of truth.
+      profile:  (user.publicMetadata && user.publicMetadata.profile && typeof user.publicMetadata.profile === "object")
+        ? user.publicMetadata.profile
+        : {},
     });
   }, [isLoaded, isSignedIn, user, setUser]);
   return null;

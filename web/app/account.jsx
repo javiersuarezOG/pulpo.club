@@ -10,6 +10,13 @@ import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 import { COUNTRIES } from "./lib/countries.js";
 import { track } from "./telemetry/hook";
+import {
+  PREFERENCE_CATEGORY_KEYS,
+  PREFERENCE_CATEGORY_LABEL_KEY,
+  PREFERENCE_CATEGORIES_MAX,
+  sanitizePreferredCategories,
+} from "./lib/categories";
+import { readProfile } from "./lib/user-profile";
 
 function AccountPage({ app }) {
   // Source of truth for the active tab is `app.routeParams.section` — set
@@ -279,10 +286,13 @@ function NotificationsSection({ app }) {
   // everyone because it's product news, not premium content.
   const isPaid = !!(app.user && app.user.plan && app.user.plan !== "free");
 
+  // Pro notification rows. `price_drops` and `new_in_zones` are wired
+  // in the UI table but their delivery features don't exist yet — hide
+  // them rather than promise something we can't deliver. To re-enable
+  // when the features ship, restore the two rows below; the i18n keys
+  // and the local prefs-state defaults are intentionally preserved.
   const proCats = [
     { key: "newsletter",   title: t("account.notif.newsletter.title",   app.locale), desc: t("account.notif.newsletter.desc",   app.locale) },
-    { key: "price_drops",  title: t("account.notif.price_drops.title",  app.locale), desc: t("account.notif.price_drops.desc",  app.locale) },
-    { key: "new_in_zones", title: t("account.notif.new_in_zones.title", app.locale), desc: t("account.notif.new_in_zones.desc", app.locale) },
   ];
   const freeCats = [
     { key: "platform_updates", title: t("account.notif.platform_updates.title", app.locale), desc: t("account.notif.platform_updates.desc", app.locale) },
@@ -311,6 +321,11 @@ function NotificationsSection({ app }) {
           ))}
         </div>
       )}
+
+      {/* Category preferences — sits directly under the newsletter toggle.
+          Hidden when newsletter is off (spec). Selection persists across
+          reloads via app.user.profile; cross-device sync arrives in PR-C. */}
+      {isPaid && prefs.newsletter && <PreferredCategoryChips app={app} />}
 
       <div className="pref-list">
         {freeCats.map(c => (
@@ -424,14 +439,117 @@ function NotifProUpsell({ app }) {
         <h3>{t("account.notif.upsell.title", app.locale)}</h3>
         <p>{t("account.notif.upsell.body", app.locale)}</p>
         <ul className="notif-upsell-list">
+          {/* price_drops + new_in_zones bullets removed alongside the
+              matching toggles in NotificationsSection — restore here
+              once the delivery features actually ship. */}
           <li>{t("account.notif.newsletter.title", app.locale)}</li>
-          <li>{t("account.notif.price_drops.title", app.locale)}</li>
-          <li>{t("account.notif.new_in_zones.title", app.locale)}</li>
         </ul>
         <button className="btn-primary" onClick={onUpgrade}>
           {t("account.notif.upsell.cta", app.locale)}
         </button>
       </div>
+    </div>
+  );
+}
+
+// Preferred categories — multi-select pill chips capped at
+// PREFERENCE_CATEGORIES_MAX. Selection is mirrored to
+// app.user.profile.preferred_categories via `app.updateUserProfile`,
+// which persists to localStorage today and (PR-C) Clerk.
+//
+// Hidden when newsletter is off (parent gates rendering). When unmounted,
+// the selection stays in `profile` — toggling newsletter back on
+// re-renders the same chips active. Only the UI is conditional.
+//
+// Categories live in lib/categories.ts (single source of truth across
+// the app). See lib/README-categories.md for the lifecycle.
+function PreferredCategoryChips({ app }) {
+  const profile = readProfile(app.user);
+  const selected = aUseMemo(
+    () => sanitizePreferredCategories(profile.preferred_categories),
+    [profile.preferred_categories],
+  );
+  const [limitHit, setLimitHit] = aUseState(false);
+  const limitHitTimerRef = React.useRef(null);
+
+  // Auto-clear the limit hint after ~3s. Re-firing the click resets
+  // the timer so the message stays visible while the user keeps
+  // tapping the capped chip.
+  const flashLimitHit = (attemptedKey) => {
+    setLimitHit(true);
+    if (limitHitTimerRef.current) clearTimeout(limitHitTimerRef.current);
+    limitHitTimerRef.current = setTimeout(() => setLimitHit(false), 3000);
+    track("account.preferred_categories_limit_hit", {
+      attempted_category: attemptedKey,
+      current_selection: selected,
+    });
+  };
+
+  aUseEffect(() => () => {
+    if (limitHitTimerRef.current) clearTimeout(limitHitTimerRef.current);
+  }, []);
+
+  const onToggle = (key) => {
+    const isSelected = selected.includes(key);
+    let next;
+    let action;
+    if (isSelected) {
+      next = selected.filter((k) => k !== key);
+      action = "deselect";
+      // Deselecting always clears any visible limit hint — the user
+      // just freed up a slot.
+      setLimitHit(false);
+    } else {
+      if (selected.length >= PREFERENCE_CATEGORIES_MAX) {
+        flashLimitHit(key);
+        return;
+      }
+      next = [...selected, key];
+      action = "select";
+    }
+    app.updateUserProfile({ preferred_categories: next });
+    track("account.preferred_categories_toggled", {
+      category: key,
+      action,
+      selected_count_after: next.length,
+      selected_categories_after: next,
+    });
+  };
+
+  return (
+    <div className="notif-categories">
+      <h3 className="account-subhead">
+        {t("account.notif.pref_cat.heading", app.locale)}
+      </h3>
+      <p className="notif-categories-intro">
+        {t("account.notif.pref_cat.intro", app.locale)}
+      </p>
+      <div className="chip-grid notif-categories-grid" role="group"
+           aria-label={t("account.notif.pref_cat.heading", app.locale)}>
+        {PREFERENCE_CATEGORY_KEYS.map((key) => {
+          const isSelected = selected.includes(key);
+          return (
+            <button
+              key={key}
+              type="button"
+              role="switch"
+              aria-checked={isSelected}
+              data-category-key={key}
+              className={`chip ${isSelected ? "is-active" : ""}`}
+              onClick={() => onToggle(key)}
+            >
+              {t(PREFERENCE_CATEGORY_LABEL_KEY[key], app.locale)}
+            </button>
+          );
+        })}
+      </div>
+      {limitHit && (
+        <div className="notif-categories-limit" role="status" aria-live="polite">
+          {t("account.notif.pref_cat.limit_hint", app.locale, {
+            max: PREFERENCE_CATEGORIES_MAX,
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -857,6 +857,19 @@ function App() {
   const openProUpsellModal = useCallback((cfg) => setProUpsellModal(cfg), []);
   const closeProUpsellModal = useCallback(() => setProUpsellModal(null), []);
 
+  // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
+  // Merges the patch into the existing profile object; missing profile
+  // is created on first write. The pulpo-user localStorage effect at
+  // L414 picks this up automatically. PR-C extends this callback to
+  // also push the patch to Clerk publicMetadata for cross-device sync.
+  const updateUserProfile = useCallback((patch) => {
+    if (!patch || typeof patch !== "object") return;
+    setUser((u) => {
+      if (!u) return u;
+      return { ...u, profile: { ...(u.profile || {}), ...patch } };
+    });
+  }, []);
+
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout, isSigningOut,
@@ -873,6 +886,7 @@ function App() {
     listings,
     listingsState,
     clerkActions,
+    updateUserProfile,
   };
 
   const openListingObj = _openListingObj;
