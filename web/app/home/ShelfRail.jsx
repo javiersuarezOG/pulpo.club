@@ -14,7 +14,7 @@
 // Both add pure activity signal that doesn't duplicate the category
 // grid above.
 import React, { useMemo } from "react";
-import { tr } from "../i18n.jsx";
+import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { useListings } from "../data/use-listings.tsx";
 import { activeShelves, SHELF_MIN_ITEMS_DEFAULT } from "../config/shelves.ts";
@@ -64,7 +64,7 @@ export function ShelfRail({ app, locale }) {
   if (resolved.length === 0) return null;
 
   return (
-    <section className="shelf-rail" aria-label="Activity shelves">
+    <section className="shelf-rail" aria-label={t("shelf_rail.aria", locale)}>
       {resolved.map(({ shelf, items }) => (
         <Shelf key={shelf.key} shelf={shelf} items={items} app={app} locale={locale} />
       ))}
