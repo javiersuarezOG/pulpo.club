@@ -506,4 +506,72 @@ test.describe("New app boots cleanly on key routes", () => {
       expect(hit, `aria-label still in English: "${word}" — wire via t()`).toBeUndefined();
     }
   });
+
+  // PR-C — /start ES canary. Same guardrail as the home-page canary
+  // above but for the public marketing surface. Every t()-able string
+  // on /start must render in Spanish when localStorage says ES.
+  test("/start in Spanish — no English canary words leak", async ({ page }) => {
+    const START_CANARIES = [
+      // Hero
+      "Property in El Salvador",         // start.hero.h1
+      "Pulpo curates properties",        // start.hero.sub
+      "Cancel anytime",                  // start.hero.trust_micro / .start-card-sub
+      // USPs (short variants from pro.usp.*)
+      "Weekly 10 picks",                 // pro.usp.alerts.short
+      "Filters + smart sorting",         // pro.usp.browse.short
+      "Direct seller links",             // pro.usp.links.short
+      // Join card
+      "Full access",                     // start.join.paid.label
+      "Get access",                      // CTA labels
+      "Log in",                          // start.nav.login_link
+    ];
+
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "es"));
+    await page.goto("/start", { waitUntil: "networkidle" });
+    await page.locator(".start-page").waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(400);
+
+    const bodyText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of START_CANARIES) {
+      expect(
+        bodyText,
+        `Spanish /start leaked English text: "${word}". Wire via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+  });
+
+  // PR-C — Home-page Pro upsell modal ES canary. The modal mounts when
+  // the URL carries a campaign signal; assert the modal copy is Spanish.
+  test("/?utm_source=test in Spanish — no English canary words in upsell modal", async ({ page }) => {
+    const UPSELL_CANARIES = [
+      "Get Pulpo Pro",                   // pro_upsell.eyebrow
+      "Find your next property",         // pro_upsell.headline
+      "Get access",                      // pro_upsell.cta_primary
+      "Maybe later",                     // pro_upsell.cta_dismiss
+      // Long USP variants
+      "Weekly 10 picks, in your inbox",  // pro.usp.alerts.headline
+      "Filter and sort by what matters", // pro.usp.browse.headline
+      "Direct links to every listing",   // pro.usp.links.headline
+    ];
+
+    // Clear suppression so the modal actually mounts.
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-upsell-dismissed-at"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "es");
+    });
+    await page.goto("/?utm_source=test", { waitUntil: "networkidle" });
+    await page.locator(".pro-upsell-modal").waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(300);
+
+    const modalText: string = await page.evaluate(() => {
+      const m = document.querySelector(".pro-upsell-modal");
+      return m ? m.textContent || "" : "";
+    });
+    for (const word of UPSELL_CANARIES) {
+      expect(
+        modalText,
+        `Spanish upsell modal leaked English text: "${word}". Wire via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+  });
 });
