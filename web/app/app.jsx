@@ -24,7 +24,15 @@ import {
   ToastHost,
   ConsentBanner,
 } from "./pages.jsx";
+import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
+
+// Feature flag for the rewritten homepage (rewrite plan Phase 4C).
+// Set VITE_NEW_HOMEPAGE=1 in the deploy env to opt this preview in.
+// Read once at module load — flipping the env var on a long-running
+// session won't take effect until reload, which matches every other
+// VITE_* env-driven flag in the app (Clerk, PostHog, etc.).
+const USE_NEW_HOMEPAGE = import.meta.env.VITE_NEW_HOMEPAGE === "1";
 import {
   useTweaks,
   TweaksPanel,
@@ -824,7 +832,7 @@ function App() {
     <div className={`app density-${tweaks.density}`}>
       <TopNav app={app} />
       <main className="main">
-        {route === "home" && <HomePage app={app} />}
+        {route === "home" && (USE_NEW_HOMEPAGE ? <NewHomePage app={app} /> : <HomePage app={app} />)}
         {route === "browse" && <BrowsePage app={app} />}
         {route === "saved" && <SavedPage app={app} />}
         {route === "plans" && <PlansPage app={app} />}

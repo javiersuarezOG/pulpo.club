@@ -63,6 +63,11 @@
   --accent-2: oklch(0.62 0.20 25);      /* heart red */
   --moss: oklch(0.55 0.08 145);
   --gold: oklch(0.72 0.13 80);
+  /* Homepage rewrite — section accents for the category grid.
+     Beach reuses the brand green; Lake gets its own blue so the
+     two sections read distinct without overpowering. */
+  --accent-beach: var(--accent);
+  --accent-lake:  oklch(0.45 0.10 235); /* deep blue, AAA on paper */
 
   /* Semantic badges (one color per state) */
   --badge-drop: oklch(0.58 0.18 25);
