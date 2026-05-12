@@ -22,6 +22,7 @@ const {
 } = require("./_stripe");
 const { currencyForCountry, countryFromRequest } = require("./_geo");
 const { hit: rateLimitHit } = require("./_rate_limit");
+const posthog = require("../_posthog");
 
 // Loose RFC 5321 email check — only rejects obvious garbage so the user
 // sees Stripe's stricter validation rather than ours. Trims whitespace
@@ -96,12 +97,21 @@ module.exports = async (req, res) => {
     : null;
   const utms = pickUtms(body);
 
+  // Distinct ID used for every PostHog event below — hashed email when
+  // available so we can chain anonymous client-side events through the
+  // server-side funnel via PostHog's alias machinery.
+  const distinctId = posthog.emailDistinctId(email);
+
   // If a non-empty email was supplied but failed validation, surface a
   // 400 so the caller knows to fix it. (Empty/missing email is fine.)
   if (rawEmail && !email) {
     logApi("stripe.start_checkout", {
       status: 400, ms: Date.now() - t0, reason: "invalid_email",
     });
+    posthog.capture(distinctId, "start_checkout.rejected", {
+      reason: "invalid_email", ms: Date.now() - t0,
+    });
+    await posthog.flush();
     return res.status(400).json({ error: "invalid_email" });
   }
 
@@ -114,6 +124,10 @@ module.exports = async (req, res) => {
     logApi("stripe.start_checkout", {
       status: 429, ms: Date.now() - t0, reason: "rate_limited", retry_ms: rl.retryAfterMs,
     });
+    posthog.capture(distinctId, "start_checkout.rejected", {
+      reason: "rate_limited", retry_ms: rl.retryAfterMs, ms: Date.now() - t0,
+    });
+    await posthog.flush();
     return res.status(429).json({ error: "rate_limited" });
   }
 
@@ -140,6 +154,11 @@ module.exports = async (req, res) => {
           status: 400, ms: Date.now() - t0, reason: "invalid_promo_code",
           code: promoCode, key_prefix: keyPrefix,
         });
+        posthog.capture(distinctId, "start_checkout.rejected", {
+          reason: "invalid_promo_code", promo_code: promoCode,
+          stripe_key_prefix: keyPrefix, ms: Date.now() - t0,
+        });
+        await posthog.flush();
         return res.status(400).json({ error: "invalid_promo_code" });
       }
       discounts = [{ promotion_code: codes.data[0].id }];
@@ -148,6 +167,11 @@ module.exports = async (req, res) => {
         status: 500, ms: Date.now() - t0, reason: "promo_lookup_failed",
         error: err && err.message,
       });
+      posthog.capture(distinctId, "start_checkout.failed", {
+        reason: "promo_lookup_failed", error_message: err && err.message,
+        ms: Date.now() - t0,
+      });
+      await posthog.flush();
       return res.status(500).json({ error: "promo_lookup_failed" });
     }
   }
@@ -207,6 +231,10 @@ module.exports = async (req, res) => {
     logApi("stripe.start_checkout", {
       status: 500, ms: Date.now() - t0, reason: "stripe_error", error: err.message,
     });
+    posthog.capture(distinctId, "start_checkout.failed", {
+      reason: "stripe_error", error_message: err.message, ms: Date.now() - t0,
+    });
+    await posthog.flush();
     return res.status(500).json({ error: "stripe_error", message: err.message });
   }
 
@@ -219,5 +247,19 @@ module.exports = async (req, res) => {
     utm_source: utms.utm_source || "",
     utm_campaign: utms.utm_campaign || "",
   });
+  posthog.capture(distinctId, "start_checkout.session_created", {
+    session_id: session.id,
+    currency, country: country || "",
+    has_promo: !!discounts,
+    has_email_prefill: !!email,
+    locale: locale || "auto",
+    utm_source: utms.utm_source || "",
+    utm_medium: utms.utm_medium || "",
+    utm_campaign: utms.utm_campaign || "",
+    utm_term: utms.utm_term || "",
+    utm_content: utms.utm_content || "",
+    ms: Date.now() - t0,
+  });
+  await posthog.flush();
   return res.status(200).json({ url: session.url, sessionId: session.id });
 };

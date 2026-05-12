@@ -32,6 +32,7 @@ const {
   readRawBody,
   logApi,
 } = require("./_stripe");
+const posthog = require("../_posthog");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 
@@ -107,6 +108,10 @@ module.exports = async (req, res) => {
     logApi("stripe.webhook", {
       status: 400, ms: Date.now() - t0, reason: "verify_failed", error: err.message,
     });
+    posthog.capture(null, "webhook.verify_failed", {
+      ms: Date.now() - t0, error_message: err.message,
+    });
+    await posthog.flush();
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -125,7 +130,29 @@ module.exports = async (req, res) => {
           || (session.metadata && session.metadata.email)
           || null;
         const source = session.metadata && session.metadata.source ? String(session.metadata.source) : null;
+        const country = session.metadata && session.metadata.country ? String(session.metadata.country) : "";
+        const currency = typeof session.currency === "string" ? session.currency : "";
+        const amountTotal = typeof session.amount_total === "number" ? session.amount_total : 0;
+        const hasDiscount = Array.isArray(session.discounts) && session.discounts.length > 0;
         const utms = pickUtms(session.metadata);
+
+        // Shared props for every webhook.checkout_completed event. PostHog
+        // funnels can break down by path / source / utm_* / country.
+        const baseProps = {
+          event_id: event.id,
+          session_id: session.id,
+          source: source || "",
+          country,
+          currency,
+          amount_total: amountTotal,
+          has_discount: hasDiscount,
+          utm_source: utms.utm_source || "",
+          utm_medium: utms.utm_medium || "",
+          utm_campaign: utms.utm_campaign || "",
+          utm_term: utms.utm_term || "",
+          utm_content: utms.utm_content || "",
+        };
+        const distinctId = posthog.emailDistinctId(email);
 
         // Path A — existing auth-gated upgrade. client_reference_id was
         // set by /api/stripe/create-checkout-session.js, so we know the
@@ -139,6 +166,10 @@ module.exports = async (req, res) => {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "auth_gated", clerk_user_id: explicitUserId,
           });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "auth_gated",
+            clerk_user_id: explicitUserId, ms: Date.now() - t0,
+          });
           break;
         }
 
@@ -150,6 +181,9 @@ module.exports = async (req, res) => {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_no_email", session_id: session.id,
+          });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "anonymous_no_email", ms: Date.now() - t0,
           });
           break;
         }
@@ -165,6 +199,10 @@ module.exports = async (req, res) => {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_existing_user", clerk_user_id: existing.id,
           });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "anonymous_existing_user",
+            clerk_user_id: existing.id, ms: Date.now() - t0,
+          });
           break;
         }
 
@@ -173,6 +211,10 @@ module.exports = async (req, res) => {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_dupe_invitation_skipped", session_id: session.id,
+          });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "anonymous_dupe_invitation_skipped",
+            ms: Date.now() - t0,
           });
           break;
         }
@@ -185,7 +227,7 @@ module.exports = async (req, res) => {
         const origin = `${proto}://${host}`;
 
         try {
-          await clerk.invitations.createInvitation({
+          const invitation = await clerk.invitations.createInvitation({
             emailAddress: email,
             redirectUrl:  `${origin}/?welcome=1`,
             publicMetadata: { plan: "pro" },
@@ -199,6 +241,12 @@ module.exports = async (req, res) => {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_invitation_created", session_id: session.id,
+            invitation_id: (invitation && invitation.id) || "",
+          });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "anonymous_invitation_created",
+            invitation_id: (invitation && invitation.id) || "",
+            ms: Date.now() - t0,
           });
         } catch (err) {
           // Race recovery: if a Clerk user was created in parallel (e.g.
@@ -218,10 +266,21 @@ module.exports = async (req, res) => {
                 status: 200, ms: Date.now() - t0, type: event.type,
                 path: "anonymous_race_recovered", clerk_user_id: racedUser.id,
               });
+              posthog.capture(distinctId, "webhook.checkout_completed", {
+                ...baseProps, path: "anonymous_race_recovered",
+                clerk_user_id: racedUser.id, ms: Date.now() - t0,
+              });
               break;
             }
           }
-          throw err; // genuine failure — let Stripe retry
+          // Genuine failure — fire an explicit telemetry event before the
+          // throw so PostHog catches it even though Stripe will retry.
+          posthog.capture(distinctId, "webhook.checkout_completed_failed", {
+            ...baseProps, path: "anonymous_invitation_failed",
+            error_code: code || "", error_message: (err && err.message) || "",
+            ms: Date.now() - t0,
+          });
+          throw err; // re-throw — let Stripe retry on 500
         }
         break;
       }
@@ -234,17 +293,25 @@ module.exports = async (req, res) => {
         // start-checkout.js) — fall back to email lookup when the
         // clerkUserId isn't present.
         let userId = sub.metadata && sub.metadata.clerkUserId;
-        if (!userId) {
-          const email = (sub.metadata && sub.metadata.email) || null;
-          if (email) {
-            const user = await findClerkUserByEmail(clerk, email);
-            if (user) userId = user.id;
-          }
+        const subEmail = (sub.metadata && sub.metadata.email) || null;
+        if (!userId && subEmail) {
+          const user = await findClerkUserByEmail(clerk, subEmail);
+          if (user) userId = user.id;
         }
         const isActive = event.type === "customer.subscription.deleted"
           ? false
           : ACTIVE_STATUSES.has(sub.status);
         await setPlanForClerkUser(clerk, userId, isActive ? "pro" : "free");
+        posthog.capture(posthog.emailDistinctId(subEmail), "webhook.subscription_changed", {
+          event_id: event.id,
+          subscription_id: sub.id,
+          type: event.type,
+          status: sub.status,
+          is_active: isActive,
+          clerk_user_id: userId || "",
+          source: (sub.metadata && sub.metadata.source) ? String(sub.metadata.source) : "",
+          ms: Date.now() - t0,
+        });
         break;
       }
       default:
@@ -255,6 +322,13 @@ module.exports = async (req, res) => {
     logApi("stripe.webhook", {
       status: 500, ms: Date.now() - t0, type: event.type, error: err.message,
     });
+    posthog.capture(null, "webhook.handler_error", {
+      event_id: event.id,
+      type: event.type,
+      error_message: err && err.message,
+      ms: Date.now() - t0,
+    });
+    await posthog.flush();
     // 500 makes Stripe retry, which is what we want for transient Clerk
     // failures. Stripe gives up after ~3 days of retries.
     return res.status(500).end();
@@ -263,6 +337,7 @@ module.exports = async (req, res) => {
   logApi("stripe.webhook", {
     status: 200, ms: Date.now() - t0, type: event.type, event_id: event.id,
   });
+  await posthog.flush();
   return res.status(200).json({ received: true });
 };
 

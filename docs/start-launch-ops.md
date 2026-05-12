@@ -132,7 +132,12 @@ Confirm both are set in Vercel:
 
 ### Env vars
 
-No new env vars introduced by PR-A. The endpoint reads:
+PR-A introduced no env vars. **PR-B.3 added server-side PostHog telemetry** for the webhook + public checkout endpoint, reusing the env vars the Python nightly pipeline already uses:
+
+- `POSTHOG_PROJECT_TOKEN` — same project token the pipeline + frontend use. The webhook silently no-ops when missing, so this is a soft requirement (telemetry just won't flow until set).
+- `POSTHOG_HOST` — optional, defaults to `https://eu.i.posthog.com`.
+
+Plus all the existing endpoint reads:
 
 - `STRIPE_SECRET_KEY` (existing)
 - `STRIPE_PRICE_ID_PRO` (existing)
