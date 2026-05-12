@@ -34,16 +34,12 @@ import { t, useLocale } from "./i18n.jsx";
 import { PulpoLogo } from "./components.jsx";
 import { track } from "./telemetry/hook";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
+import { pickHeroPhoto } from "./lib/hero-photos";
 import "./styles/start.css";
 
 // Total catalog size — surfaced in the trust strip. Hardcoded for v1;
 // follow-up adds a /api/catalog-count endpoint or a build-time env var.
 const CATALOG_COUNT = 900;
-
-// Hero photo. Sits in web/photos/, served via the /photos/:file rewrite
-// in vercel.json. CSS gradient renders synchronously underneath as the
-// first paint, so the hero never shows a blank slot.
-const HERO_PHOTO_URL = "/photos/bienesraices_1014.jpg";
 
 function readQueryParam(name) {
   if (typeof window === "undefined") return null;
@@ -93,6 +89,10 @@ export default function StartPage() {
   const [price, setPrice] = useState(() => priceForCountry(null));
   const [stickyVisible, setStickyVisible] = useState(false);
   const heroSentinelRef = useRef(null);
+  // Rotate the hero photo on each mount among the curated landscape-
+  // friendly pool. Memoized so a re-render within the same mount
+  // doesn't swap the image visibly.
+  const heroPhoto = useMemo(() => pickHeroPhoto("random"), []);
 
   const utms = useMemo(() => captureUtms(), []);
 
@@ -207,7 +207,13 @@ export default function StartPage() {
         <a href="/" className="start-logo" aria-label={t("start.aria.logo_home", lc)}>
           <PulpoLogo size={28} />
         </a>
-        <a href="/" className="start-nav-link">{t("start.nav.login_link", lc)}</a>
+        <a
+          href="/?login=1"
+          className="start-nav-link"
+          onClick={() => track("start.login_link_clicked", {})}
+        >
+          {t("start.nav.login_link", lc)}
+        </a>
       </header>
 
       <section className="start-hero">
@@ -216,9 +222,9 @@ export default function StartPage() {
           <h1 className="start-hero-h1">{t("start.hero.h1", lc)}</h1>
           <p className="start-hero-sub">{t("start.hero.sub", lc)}</p>
           <ul className="start-hero-usps" aria-label={t("start.aria.usps", lc)}>
-            <li>{t("start.hero.usp_1", lc)}</li>
-            <li>{t("start.hero.usp_2", lc)}</li>
-            <li>{t("start.hero.usp_3", lc)}</li>
+            <li>{t("pro.usp.alerts.short", lc)}</li>
+            <li>{t("pro.usp.browse.short", lc)}</li>
+            <li>{t("pro.usp.links.short", lc)}</li>
           </ul>
           <div className="start-hero-ctas">
             <button
@@ -244,7 +250,7 @@ export default function StartPage() {
         </div>
         <div
           className="start-hero-visual"
-          style={{ backgroundImage: `url(${HERO_PHOTO_URL})` }}
+          style={{ backgroundImage: `url(${heroPhoto.url})` }}
           aria-hidden="true"
         />
       </section>
@@ -288,9 +294,9 @@ export default function StartPage() {
             {t("start.join.paid.price", lc, { price: price.displayString })}
           </div>
           <ul className="start-card-features">
-            <li>{t("start.join.paid.feat_1", lc)}</li>
-            <li>{t("start.join.paid.feat_2", lc)}</li>
-            <li>{t("start.join.paid.feat_3", lc)}</li>
+            <li>{t("pro.usp.alerts.short", lc)}</li>
+            <li>{t("pro.usp.browse.short", lc)}</li>
+            <li>{t("pro.usp.links.short", lc)}</li>
           </ul>
           <button
             type="button"

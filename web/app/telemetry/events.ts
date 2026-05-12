@@ -143,10 +143,32 @@ export type EventMap = {
    *  without the code, sends the user to Stripe at full price. This
    *  event fires so we can surface broken campaign URLs in PostHog. */
   "start.code_error_shown": { reason: "invalid_promo_code" | "exhausted" };
-  /** Cold-load of /welcome (post-payment landing for the anonymous flow).
-   *  No fields — /welcome is only reached by the anonymous /start path
-   *  in v1; PostHog auto-fires $pageview alongside. */
-  "welcome.viewed": Record<string, never>;
+  /** /account?welcome=1 modal mounted (PR-B.4b). `variant` reflects
+   *  auth state at render time: anon = post-Stripe, no Clerk session
+   *  yet; signed_in = post-Clerk-magic-link, Clerk session resolved.
+   *  `surface` is "account" today but reserved so the same modal can
+   *  surface elsewhere later without renaming the event. */
+  "welcome_modal.shown": {
+    variant: "anon" | "signed_in";
+    surface: "account";
+  };
+  /** Modal dismissed — `action` distinguishes user-initiated dismissals
+   *  (close button, ESC, backdrop, primary CTA) from the auto-dismiss
+   *  on the signed-in variant after the brief acknowledgement. */
+  "welcome_modal.dismissed": {
+    variant: "anon" | "signed_in";
+    action: "close" | "esc" | "backdrop" | "explore" | "auto";
+  };
+  /** Anonymous-variant CTA → opens Gmail in a new tab. */
+  "welcome_modal.cta_inbox_clicked": Record<string, never>;
+  /** Anonymous-variant secondary CTA → POSTs /api/clerk/resend-invitation. */
+  "welcome_modal.cta_resend_clicked": Record<string, never>;
+  /** User clicks the /start "Log in" link. Funnel-side measure of
+   *  returning-customer traffic vs new acquisition. */
+  "start.login_link_clicked": Record<string, never>;
+  /** Fires when an unrecognized URL (e.g. /test) gets cleanly
+   *  replaceState'd to /. Surfaces broken inbound links in PostHog. */
+  "route.fallback_redirected": { from_path: string };
 
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,

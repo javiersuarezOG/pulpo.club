@@ -106,6 +106,77 @@ email to set up their account.
 4. Send a test invitation to your own email to verify deliverability +
    tone.
 
+### Invitation email template — Pulpo-branded magic-link copy (PR-B.4b)
+
+The post-PR-B.4b flow lands users on `/account?welcome=1` after Stripe.
+A modal there tells them to "check your inbox" for a magic-link sign-in.
+The Clerk template needs to feel like Pulpo, not Clerk-dev. Sebastian to
+apply in **Clerk Dashboard → Customizations → Email Templates → Invitation**:
+
+**Brand assets to set first** in `Customizations → Branding`:
+
+- **Logo:** upload `web/assets/logo_mark_only.svg` (deep-green octopus mark).
+- **Application name:** `Pulpo`.
+- **Primary colour:** the `--accent-strong` token from `web/app/styles/tokens.css`
+  is `oklch(0.28 0.08 165)`. Clerk's colour picker expects hex; convert to
+  the closest sRGB equivalent (`#1a3d33` is a safe approximation — verify in
+  the Clerk preview that the button reads as the same deep green as the
+  in-app primary button).
+- **Background colour:** `--paper` token (oklch(1 0 0) — white, `#ffffff`).
+- **Font:** Clerk supports a curated font list. Pick **Inter** if present
+  (matches Pulpo's UI font); otherwise pick the closest neo-grotesque.
+
+**Template content:**
+
+- **Subject:** `Welcome to Pulpo Pro — sign in here`
+- **From name:** `Pulpo`
+- **Body** (Markdown / Clerk template syntax):
+
+  ```
+  {{> app_logo}}
+
+  ## Welcome to Pulpo Pro
+
+  Your subscription is active. Tap below to sign in and start
+  browsing.
+
+  [Sign in to my account →]({{action_url}})
+
+  This link expires in 24 hours. If the button doesn't work,
+  paste this URL into your browser:
+  {{action_url}}
+
+  © {{current_year}} Pulpo
+  ```
+
+- **CTA button text:** `Sign in to my account →`
+
+Pulpo voice is declarative + trim. We do NOT recap the USPs in the
+email — the user just paid, they know what they bought. The CTA goes
+to `{{action_url}}` which our `createInvitation` call sets to
+`${origin}/account?welcome=1` so the user lands back on the same
+modal (now in its `signed_in` variant) after Clerk's sign-in flow.
+
+**Known limitation:** the customized template assumes every invitation
+is post-payment (the current state — `clerk.invitations.createInvitation`
+is only called from the Stripe webhook). If a future Pulpo flow needs
+neutral invitation copy (team invites, beta access), Sebastian will need
+to either (a) accept the Pro-flavoured copy as a temporary mismatch, (b)
+build a "Delivered via emails webhook" custom-SMTP path that lets us
+template per-flow, or (c) wait for Clerk to add per-flow template overrides.
+
+### Magic-link-only authentication
+
+PR-B.4b assumes a single auth path: the Clerk invitation magic-link.
+Sebastian to disable password / Google / Apple in **Clerk Dashboard →
+User & Authentication → Email, Phone, Username → Authentication
+strategies**. Keep only `Email address` with `Email link` as the
+sign-in method.
+
+Why: one path means one surface to brand, one funnel to instrument,
+and fewer support tickets per acquired user. Once the funnel is
+proven, SSO can be re-enabled as a follow-up.
+
 ### Google SSO enabled (recommended for PR-A)
 
 When the user clicks the invitation link, Clerk's hosted sign-up page is
@@ -132,7 +203,12 @@ Confirm both are set in Vercel:
 
 ### Env vars
 
-No new env vars introduced by PR-A. The endpoint reads:
+PR-A introduced no env vars. **PR-B.3 added server-side PostHog telemetry** for the webhook + public checkout endpoint, reusing the env vars the Python nightly pipeline already uses:
+
+- `POSTHOG_PROJECT_TOKEN` — same project token the pipeline + frontend use. The webhook silently no-ops when missing, so this is a soft requirement (telemetry just won't flow until set).
+- `POSTHOG_HOST` — optional, defaults to `https://eu.i.posthog.com`.
+
+Plus all the existing endpoint reads:
 
 - `STRIPE_SECRET_KEY` (existing)
 - `STRIPE_PRICE_ID_PRO` (existing)
