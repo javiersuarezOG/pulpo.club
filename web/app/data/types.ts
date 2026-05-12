@@ -45,6 +45,11 @@ export type Listing = {
   // agency overlays). True excludes the listing from the elite featured
   // pool. null = no OCR signal (Tesseract absent or undecodable image).
   has_text_overlay: boolean | null;
+  // Image-enrichment protocol flags (hero rewrite Phase 2). Source of
+  // truth is pulpo/models.py Listing; pipeline writes the derivative
+  // files + sidecars and sets these flags.
+  hero_eligible: boolean;  // <file>.hero.jpg ≥ 1600×1200 + aspect 1.4–1.85 + ≤ 5MB
+  card_eligible: boolean;  // <file>.jpg ≥ 800×600
   first_seen_date: number;     // days ago Pulpo first scraped this listing
   // Days since the source published the listing (from the scraper's
   // parse of mod_dt). `null` when the source date was unparseable —

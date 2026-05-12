@@ -98,6 +98,22 @@ class Listing:
     # from the elite featured-listing pool. None = no signal (Tesseract
     # not installed, image undecodable, or scoring skipped).
     has_text_overlay: Optional[bool] = None
+    # Image-enrichment protocol eligibility flags (hero rewrite Phase 2).
+    # Populated by automation/run.py:_download_hero_photos when new
+    # photos are fetched (or by `python -m pulpo.cli enrich-photos` when
+    # walking the existing on-disk set). Both default False so listings
+    # without a downloaded photo correctly fall through every eligibility
+    # gate. Source of truth is the per-file sidecar at
+    # web/photos/<file>.jpg.meta.json + web/photos/<file>.hero.jpg.meta.json.
+    #
+    # hero_eligible : the high-resolution hero derivative <file>.hero.jpg
+    #                 has width≥1600, height≥1200, aspect in [1.4, 1.85],
+    #                 file_size_kb ≤ 5120. Drives the homepage proof row +
+    #                 the rewritten featured-pool picker.
+    # card_eligible : the thumbnail <file>.jpg meets width≥800,
+    #                 height≥600. Drives card rendering on every surface.
+    hero_eligible: bool = False
+    card_eligible: bool = False
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker
