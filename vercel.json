@@ -26,7 +26,12 @@
     { "source": "/account",                 "destination": "/web/dist/index.html" },
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
-    { "source": "/welcome",                 "destination": "/web/dist/index.html" }
+    { "source": "/welcome",                 "destination": "/web/dist/index.html" },
+    {
+      "//": "404 fallback — any single-segment path that didn't match above (e.g. /test, /foo) rewrites to the SPA. app.jsx's mount-time effect then replaceState's to / and fires route.fallback_redirected telemetry. Single-segment-only on purpose: avoids accidentally rewriting nested static paths like /data/ranked.json (already matched above) or /api/* (Vercel functions bypass rewrites). Multi-segment unknowns like /foo/bar still 404 — acceptable for v1 since they're more likely to be malicious / scanner traffic than legitimate typos.",
+      "source": "/:slug([A-Za-z0-9_-]+)",
+      "destination": "/web/dist/index.html"
+    }
   ],
   "headers": [
     {
