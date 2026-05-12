@@ -147,6 +147,17 @@ class Listing:
     momentum_score: Optional[float] = None   # 0..100, repriced-rate-per-zone (delta signal)
     rank_reasons: list[str] = field(default_factory=list)
 
+    # IA-axis derives (homepage category grid + discovery pills + star
+    # pill badge). Populated by pulpo.derived_rules.apply_ia_derives
+    # *after* ranker.rank() runs so star_rating + discovery_tags can
+    # read rank_score. See pulpo/ia_config.py for the threshold + tile-
+    # copy single source of truth.
+    master_category: Optional[str] = None    # 'beach' | 'lake' | None
+    subcategory: Optional[str] = None        # 'homes' | 'condos' | 'land' | None
+    discovery_tags: list[str] = field(default_factory=list)
+                                              # subset of {top_rated, under_250k, gated, waterfront}
+    star_rating: float = 0.0                 # 0.0..5.0 in 0.5 steps; 0.0 when rank_score missing
+
     # PRD §FR-7 derived signals (Phase 1)
     data_quality_score: Optional[float] = None  # 0..1, populated_fields / scoreable_total
     investment_signal: Optional[str] = None     # 'deal'|'hot'|'stale'|'new'|None

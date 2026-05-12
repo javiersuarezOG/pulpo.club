@@ -4,6 +4,13 @@
 
 export type Localized = { en: string; es?: string };
 
+// IA-axis literals. Single source of truth lives in pulpo/ia_config.py;
+// web/app/config/ia.ts re-exports identical literals so this file +
+// the runtime config stay in lockstep.
+export type MasterCategory = "beach" | "lake";
+export type Subcategory    = "homes" | "condos" | "land";
+export type DiscoveryTag   = "top_rated" | "under_250k" | "gated" | "waterfront";
+
 export type Listing = {
   id: string;
   title: Localized;
@@ -79,4 +86,14 @@ export type Listing = {
   momentum_score: number | null;
   property_type: string | null;
   bedrooms: number | null;
+  // IA-axis derives (populated by pulpo.derived_rules.apply_ia_derives).
+  // master_category/subcategory are null for interior land, raw, or
+  // property_type that doesn't map to the homes/condos/land trichotomy.
+  // discovery_tags is always an array (possibly empty). star_rating is
+  // always a number (0.0 when rank_score is missing). See
+  // pulpo/ia_config.py for the threshold definitions.
+  master_category: MasterCategory | null;
+  subcategory: Subcategory | null;
+  discovery_tags: DiscoveryTag[];
+  star_rating: number;
 };

@@ -186,4 +186,13 @@ export interface Listing {
     dist_beach_km: number | null;
     dist_highway_km: number | null;
     dist_nearest_town_km: number | null;
+
+    // ── IA-axis derives (homepage rewrite) ──────────────────────────
+    // Populated by pulpo.derived_rules.apply_ia_derives after ranker.
+    // Threshold + tile-copy single source of truth lives in
+    // pulpo/ia_config.py + web/app/config/ia.ts.
+    master_category: "beach" | "lake" | null;
+    subcategory: "homes" | "condos" | "land" | null;
+    discovery_tags: ("top_rated" | "under_250k" | "gated" | "waterfront")[];
+    star_rating: number;  // 0.0..5.0 in 0.5 increments; 0.0 = no rank_score
 }

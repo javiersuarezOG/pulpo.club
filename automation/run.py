@@ -36,6 +36,7 @@ from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
 )
 from pulpo.derived_rules import (   # type: ignore  # noqa: E402
     apply_all as _apply_derived_rules,
+    apply_ia_derives as _apply_ia_derives,
     derive_source_type as _derive_source_type,
     derive_previous_price as _derive_previous_price,
     derive_beachfront_tier as _derive_beachfront_tier,
@@ -820,6 +821,30 @@ def main() -> int:
           f"failed={photo_results['failed']} "
           f"elapsed={photo_results['elapsed_s']:.1f}s")
     ranked = ranked_pre
+
+    # IA-axis derives — master_category × subcategory + discovery_tags
+    # + star_rating. Runs AFTER rank() so star_rating + the top_rated
+    # discovery tag can read rank_score, and AFTER the second
+    # apply_distances pass so master_category sees the haversine-derived
+    # dist_beach_km on listings that needed Nominatim geocoding.
+    ia_bucket_counts: dict[str, int] = {}
+    ia_tag_counts:    dict[str, int] = {}
+    ia_star_counts:   dict[float, int] = {}
+    ia_master_counts: dict[str, int] = {"beach": 0, "lake": 0, "none": 0}
+    for li in ranked:
+        out = _apply_ia_derives(li)
+        mc = out["master_category"]
+        sub = out["subcategory"]
+        bucket_key = f"{mc or 'none'}_{sub or 'none'}"
+        ia_bucket_counts[bucket_key] = ia_bucket_counts.get(bucket_key, 0) + 1
+        ia_master_counts[mc or "none"] = ia_master_counts.get(mc or "none", 0) + 1
+        for tag in out["discovery_tags"]:
+            ia_tag_counts[tag] = ia_tag_counts.get(tag, 0) + 1
+        ia_star_counts[out["star_rating"]] = ia_star_counts.get(out["star_rating"], 0) + 1
+    print(f"[ia_derives] master={dict(ia_master_counts)} "
+          f"buckets={dict(sorted(ia_bucket_counts.items()))} "
+          f"tags={dict(sorted(ia_tag_counts.items()))} "
+          f"stars={dict(sorted(ia_star_counts.items()))}")
 
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
