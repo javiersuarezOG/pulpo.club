@@ -146,6 +146,29 @@ function App() {
     bootGlobalErrorHandlers();
   }, []);
 
+  // 404 fallback — Vercel rewrites every unknown path to the SPA, so a
+  // typo like `/test` boots <App /> with the URL still showing `/test`.
+  // parseLocation then defaults to route="home" but the URL doesn't
+  // clean up, which (a) confuses users who shared the bad URL, (b)
+  // pollutes PostHog's $pageview path breakdown. Detect "unknown path
+  // that fell through to home" on mount and replaceState to `/` so the
+  // URL matches what the user actually sees. Listing paths
+  // (`/listing/...`) are real even when the id doesn't resolve, so they
+  // keep their URL — the detail panel's missing-state covers UX there.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const path = window.location.pathname;
+    if (path === "/") return;
+    // Known section + listing paths produce a non-home route OR
+    // isListingPath=true. Anything else is a 404 fall-through.
+    if (_initialParsed.route !== "home" || _initialParsed.isListingPath) return;
+    track("route.fallback_redirected", { from_path: path });
+    window.history.replaceState({}, "", "/" + window.location.search + window.location.hash);
+    // Intentional one-shot, not reactive — runs at mount with the
+    // resolved _initialParsed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Browser-default scrollRestoration is "auto" — it tries to restore a
   // scroll position that no longer exists once section content has
   // changed under it, which produces flickers and "back-button leaves
@@ -264,6 +287,39 @@ function App() {
     // re-toast a stripped URL.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle `?login=1` — set by /start's "Log in" link so anonymous
+  // visitors who already have an account land on `/` and immediately
+  // see the Clerk hosted sign-in modal. Fires once clerkActions is
+  // wired (Suspense boundary inside ClerkShell resolves it lazily).
+  // When Clerk isn't enabled, fall back to the legacy SignupModal in
+  // login mode so the link still does something useful in CI / dev.
+  // Strips `?login=1` after firing so a refresh doesn't loop.
+  const loginParamHandledRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (loginParamHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("login") !== "1") return;
+
+    // Strip the param synchronously so a re-render doesn't re-enter.
+    params.delete("login");
+    const newSearch = params.toString();
+    const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
+    window.history.replaceState({}, "", newUrl);
+    loginParamHandledRef.current = true;
+
+    // Clerk path — wait for clerkActions to bind, then open the hosted
+    // sign-in modal. ClerkShell mounts lazily so clerkActions may be
+    // null on the first render; the effect re-runs when it lands.
+    if (clerkActions && typeof clerkActions.openSignIn === "function") {
+      clerkActions.openSignIn();
+      return;
+    }
+    // Legacy path — open the in-app SignupModal in login mode. This
+    // also serves as the fallback when Clerk isn't enabled in CI / dev.
+    setSignupModal({ mode: "login", source: "start_login_link" });
+  }, [clerkActions]);
 
   useEffect(() => {
     if (user) localStorage.setItem("pulpo-user", JSON.stringify(user));

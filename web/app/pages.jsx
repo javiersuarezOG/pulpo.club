@@ -2592,8 +2592,10 @@ function PlansPage({ app }) {
             {feat("plans.free.feat.browsing")}
             {feat("plans.free.feat.detail_views")}
             {feat("plans.free.feat.saves_cap")}
-            {featMuted("plans.free.feat.off_market_excluded")}
-            {featMuted("plans.free.feat.newsletter_excluded")}
+            {/* The three "this is what Pro adds" mirrors, muted on Free. */}
+            {featMuted("pro.usp.alerts.short")}
+            {featMuted("pro.usp.browse.short")}
+            {featMuted("pro.usp.links.short")}
           </ul>
           <button className="btn-ghost block" disabled={!app.user}>
             {app.user ? t("plans.free.cta_current", lc) : t("plans.free.cta_signup", lc)}
@@ -2607,12 +2609,10 @@ function PlansPage({ app }) {
           </div>
           <div className="plan-tag">{t("plans.pro.tag", lc)}</div>
           <ul className="plan-features">
+            {feat("pro.usp.alerts.headline")}
+            {feat("pro.usp.browse.headline")}
+            {feat("pro.usp.links.headline")}
             {feat("plans.pro.feat.everything_in_free")}
-            {feat("plans.pro.feat.unlimited_details")}
-            {feat("plans.pro.feat.off_market")}
-            {feat("plans.pro.feat.newsletter")}
-            {feat("plans.pro.feat.unlimited_saves")}
-            {feat("plans.pro.feat.price_alerts")}
           </ul>
           <button className="btn-primary block lg" onClick={onUpgrade}>
             {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}

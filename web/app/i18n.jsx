@@ -441,8 +441,9 @@ const UI_STRINGS = {
   "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Exploración ilimitada de tarjetas" },
   "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 vistas de detalle al mes" },
   "plans.free.feat.saves_cap":        { en: "Save up to 10 listings",       es: "Guarda hasta 10 propiedades" },
-  "plans.free.feat.off_market_excluded": { en: "Off-market deals",          es: "Ofertas off-market" },
-  "plans.free.feat.newsletter_excluded": { en: "Weekly newsletter",         es: "Boletín semanal" },
+  // The Free plan card "what Pro adds" mirrors live at pro.usp.*.short
+  // (used with the featMuted variant). The two old `_excluded` keys are
+  // gone with the rest of the deprecated Pro USP copy.
   "plans.free.cta_current":  { en: "Your plan",                es: "Tu plan" },
   "plans.free.cta_signup":   { en: "Sign up free",             es: "Crear cuenta gratis" },
   // Pro tier
@@ -455,13 +456,13 @@ const UI_STRINGS = {
   // This footnote prevents "why is my plan in euros?" confusion.
   "plans.pro.currency_note": { en: "Listings are priced in USD; Pulpo Pro is billed in EUR.",
                                es: "Las propiedades aparecen en USD; Pulpo Pro se cobra en EUR." },
+  // Pro feature list — PlansPage now uses the three canonical `pro.usp.*.headline`
+  // keys above, plus this single "Everything in Free" caboose. The five legacy
+  // bullets (unlimited_details, off_market, newsletter, unlimited_saves,
+  // price_alerts) were removed in PR-B.4a — their content is covered by the
+  // three canonical USPs (alerts covers newsletter + price_alerts; browse
+  // covers unlimited_details; links covers off_market access).
   "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo del plan Gratis" },
-  "plans.pro.feat.unlimited_details":  { en: "Unlimited listing details", es: "Detalles de propiedades ilimitados" },
-  "plans.pro.feat.off_market":         { en: "Off-market deal access",    es: "Acceso a ofertas off-market" },
-  "plans.pro.feat.newsletter":         { en: "Weekly curated newsletter", es: "Boletín semanal curado" },
-  "plans.pro.feat.unlimited_saves":    { en: "Save unlimited listings",   es: "Guarda propiedades ilimitadas" },
-  "plans.pro.feat.price_alerts":       { en: "Price-drop alerts on saved",
-                                         es: "Alertas de bajada de precio en guardados" },
   // Agency tier (hidden by default — see SHOW_AGENCY_PLAN in pages.jsx).
   "plans.agency.name":       { en: "Agency",                   es: "Agencia" },
   "plans.agency.tag":        { en: "For investor groups & brokers",
@@ -645,24 +646,43 @@ const UI_STRINGS = {
   // Checkout without a Clerk sign-up wall. EN + ES from day one — the
   // smoke-test guardrail at tests/e2e/preview-smoke.spec.ts fails if a
   // canary EN word leaks into the ES render.
-  "start.nav.login_link":     { en: "Already a member? Log in →",
-                                es: "¿Ya tienes cuenta? Inicia sesión →" },
+  // Login link → opens Clerk hosted sign-in modal (PR-B.4). Keep wording
+  // identical to the in-app TopNav so the user sees a consistent "Log in"
+  // across surfaces.
   "start.hero.eyebrow":       { en: "Real estate in El Salvador",
                                 es: "Bienes raíces en El Salvador" },
-  "start.hero.h1":            { en: "The deals your family back home can't find for you",
-                                es: "Las oportunidades que tu familia en El Salvador no puede encontrarte" },
+  "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                es: "Propiedades en El Salvador, antes de que las vea el resto de internet." },
   "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
                                 es: "Pulpo recopila propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales. Un resumen semanal. Sin ruido." },
   "start.hero.cta_primary":   { en: "Get access — {price}/month",
                                 es: "Obtener acceso — {price}/mes" },
   "start.hero.trust_micro":   { en: "Cancel anytime. No commitment.",
                                 es: "Cancela cuando quieras. Sin compromiso." },
-  "start.hero.usp_1":         { en: "All properties, updated daily",
-                                es: "Todas las propiedades, actualizadas a diario" },
-  "start.hero.usp_2":         { en: "Off-market deals before the portals",
-                                es: "Ofertas off-market antes que los portales" },
-  "start.hero.usp_3":         { en: "Price history & investment signals",
-                                es: "Historial de precios y señales de inversión" },
+  // Canonical Pro USPs — short variants, used in /start hero + join card
+  // bullets and any future tight slot. Long variants live below as
+  // `pro.usp.*` and are used in /plans + the home-page upsell modal.
+  // Do NOT duplicate or shadow these keys; if a new slot needs USP copy,
+  // reference these.
+  "pro.usp.alerts.short":     { en: "Weekly 10 picks in your inbox",
+                                es: "Top-10 semanal en tu inbox" },
+  "pro.usp.browse.short":     { en: "Filters + smart sorting",
+                                es: "Filtros + orden inteligente" },
+  "pro.usp.links.short":      { en: "Direct seller links",
+                                es: "Enlaces directos al vendedor" },
+  // Long variants — /plans Pro card + home-page upsell modal.
+  "pro.usp.alerts.headline":  { en: "Weekly 10 picks, in your inbox.",
+                                es: "Top 10 semanal, en tu inbox." },
+  "pro.usp.alerts.body":      { en: "Set your filters once. Pulpo emails you the best new matches every week.",
+                                es: "Configura tus filtros una vez. Pulpo te envía las mejores coincidencias cada semana." },
+  "pro.usp.browse.headline":  { en: "Filter and sort by what matters.",
+                                es: "Filtra y ordena por lo que importa." },
+  "pro.usp.browse.body":      { en: "Beachfront. Under €50k. Build-ready. Pulpo gives you the precision tool — free is just the raw list.",
+                                es: "Frente al mar. Bajo €50k. Listo para construir. Pulpo te da precisión — gratis es solo la lista cruda." },
+  "pro.usp.links.headline":   { en: "Direct links to every listing.",
+                                es: "Enlaces directos a cada propiedad." },
+  "pro.usp.links.body":       { en: "Free shows you the photo. Pro hands you the link to the seller.",
+                                es: "Gratis te muestra la foto. Pro te entrega el enlace al vendedor." },
   "start.value.a.label":      { en: "Before the portals",
                                 es: "Antes que los portales" },
   "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
@@ -683,12 +703,12 @@ const UI_STRINGS = {
                                 es: "Acceso completo" },
   "start.join.paid.price":    { en: "{price} / month",
                                 es: "{price} / mes" },
-  "start.join.paid.feat_1":   { en: "All properties, updated daily",
-                                es: "Todas las propiedades, actualizadas a diario" },
-  "start.join.paid.feat_2":   { en: "Weekly deal digest to your inbox",
-                                es: "Resumen semanal de ofertas en tu inbox" },
-  "start.join.paid.feat_3":   { en: "Price history & investment signals",
-                                es: "Historial de precios y señales de inversión" },
+  // /start join card features now use the canonical short USPs via
+  // pro.usp.*.short — these `start.join.paid.feat_*` keys are kept as
+  // aliases for now (deprecation path) so the diff is small. New code
+  // should reference pro.usp.*.short directly.
+  // (Aliases retained for one PR to avoid mass-rename churn; remove in
+  // a follow-up.)
   "start.join.paid.cta":      { en: "Get access",
                                 es: "Obtener acceso" },
   "start.join.paid.cta_submitting": { en: "Opening checkout…",
@@ -711,14 +731,33 @@ const UI_STRINGS = {
                                 es: "Obtener acceso — {price}/mes" },
   "start.cancelled_notice":   { en: "Checkout cancelled. Try again whenever you're ready.",
                                 es: "Pago cancelado. Inténtalo de nuevo cuando quieras." },
-  "welcome.headline":         { en: "Check your inbox",
-                                es: "Revisa tu correo" },
-  "welcome.body":             { en: "Your Pulpo Pro subscription is active. We just sent you an email with a link to set your password and start browsing.",
-                                es: "Tu suscripción a Pulpo Pro está activa. Te acabamos de enviar un correo con un enlace para crear tu contraseña y empezar a explorar." },
-  "welcome.cta":              { en: "Go to Pulpo →",
-                                es: "Ir a Pulpo →" },
-  "welcome.resend_link":      { en: "Didn't get the email? Contact us.",
-                                es: "¿No recibiste el correo? Contáctanos." },
+  // /account?welcome=1 popup — fired after Stripe redirect (anon
+  // variant, user hasn't accepted the Clerk magic link yet) and after
+  // Clerk magic-link sign-in completes (signed_in variant).
+  "welcome_modal.eyebrow":              { en: "You're in",
+                                          es: "Ya está" },
+  "welcome_modal.anon.headline":        { en: "Welcome to Pulpo Pro",
+                                          es: "Bienvenido a Pulpo Pro" },
+  "welcome_modal.anon.body":            { en: "Your subscription is active. We just emailed you a magic link to sign in. Open it from any device and you'll land back here, signed in.",
+                                          es: "Tu suscripción está activa. Te enviamos un enlace mágico por correo para iniciar sesión. Ábrelo desde cualquier dispositivo y volverás aquí con sesión iniciada." },
+  "welcome_modal.anon.cta_inbox":       { en: "Open my inbox →",
+                                          es: "Abrir mi correo →" },
+  "welcome_modal.anon.cta_resend":      { en: "Resend the link",
+                                          es: "Reenviar el enlace" },
+  "welcome_modal.anon.resend_done":     { en: "Sent. Check your inbox.",
+                                          es: "Enviado. Revisa tu correo." },
+  "welcome_modal.anon.resend_failed":   { en: "Couldn't resend. Email hello@pulpo.club if it doesn't arrive.",
+                                          es: "No pudimos reenviar. Escribe a hello@pulpo.club si no llega." },
+  "welcome_modal.signedin.headline":    { en: "You're all set",
+                                          es: "Todo listo" },
+  "welcome_modal.signedin.body":        { en: "Welcome to Pulpo Pro. Start exploring the marketplace.",
+                                          es: "Bienvenido a Pulpo Pro. Empieza a explorar el marketplace." },
+  "welcome_modal.signedin.cta_explore": { en: "Start exploring →",
+                                          es: "Empezar a explorar →" },
+  "welcome_modal.aria.dialog":          { en: "Welcome to Pulpo Pro",
+                                          es: "Bienvenido a Pulpo Pro" },
+  "welcome_modal.aria.close":           { en: "Close",
+                                          es: "Cerrar" },
   "start.aria.logo_home":     { en: "Pulpo home",
                                 es: "Inicio Pulpo" },
   "start.aria.social_proof":  { en: "Social proof",
@@ -727,8 +766,8 @@ const UI_STRINGS = {
                                 es: "Botón fijo de mejora" },
   "start.aria.usps":          { en: "What's included",
                                 es: "Qué incluye" },
-  "welcome.eyebrow":          { en: "You're in",
-                                es: "Ya está" },
+  "start.nav.login_link":     { en: "Log in",
+                                es: "Iniciar sesión" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation
