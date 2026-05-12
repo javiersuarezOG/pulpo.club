@@ -200,7 +200,14 @@ module.exports = async (req, res) => {
       metadata: sessionMetadata,
     },
     metadata: sessionMetadata,
-    success_url: `${origin}/welcome?session_id={CHECKOUT_SESSION_ID}`,
+    // Post-payment landing: /account?welcome=1 (PR-B.4b). Stripe runs
+    // first → success_url loads /account before the Clerk session
+    // exists. The route gate detects ?welcome=1 and renders /account
+    // in a "logged-out preview" with the <WelcomeModal> on top. Once
+    // the user clicks the Clerk magic-link email and signs in, Clerk
+    // redirects back to the same /account?welcome=1 URL — the modal
+    // re-renders in its signed-in variant.
+    success_url: `${origin}/account?welcome=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${origin}/start?cancelled=1`,
   };
 

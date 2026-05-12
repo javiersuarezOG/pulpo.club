@@ -19,6 +19,7 @@ import {
   PlansPage,
   ListingDetail,
   SignupModal,
+  WelcomeModal,
   ToastHost,
   ConsentBanner,
 } from "./pages.jsx";
@@ -287,6 +288,33 @@ function App() {
     // re-toast a stripped URL.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle `?welcome=1` — set by Stripe `success_url` after a /start
+  // checkout AND by Clerk's invitation `redirectUrl` after a magic-link
+  // accept. Both moments converge on the same surface; the
+  // <WelcomeModal> picks its variant from `user` state (anon vs
+  // signed-in). Fires once on mount, then strips the param so a
+  // refresh doesn't re-open the modal.
+  const [welcomeModalState, setWelcomeModalState] = useState(null);
+  const welcomeParamHandledRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (welcomeParamHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") !== "1") return;
+    welcomeParamHandledRef.current = true;
+    const sessionId = params.get("session_id") || null;
+    params.delete("welcome");
+    params.delete("session_id");
+    const newSearch = params.toString();
+    const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
+    window.history.replaceState({}, "", newUrl);
+    setWelcomeModalState({ sessionId });
+    // Telemetry fires from inside the WelcomeModal component on mount
+    // (so the `variant` field reflects the auth state at render time,
+    // not the moment of the URL detection).
+  }, []);
+  const closeWelcomeModal = useCallback(() => setWelcomeModalState(null), []);
 
   // Handle `?login=1` — set by /start's "Log in" link so anonymous
   // visitors who already have an account land on `/` and immediately
@@ -724,7 +752,14 @@ function App() {
   // The gate doesn't render anything itself — this effect just opens
   // the modal. The page components show a placeholder behind it.
   useEffect(() => {
-    const outcome = evaluateGate(route, user);
+    // Pass current URL search params so route-gates.ts can honour the
+    // `?welcome=1` bypass for /account (post-Stripe / post-magic-link
+    // landing where the user has paid but doesn't have a Clerk session
+    // yet — PR-B.4b).
+    const searchParams = typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : undefined;
+    const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
       // Already in a signup/login flow? Don't re-fire.
       if (signupModal && (signupModal.mode === "login" || signupModal.mode === "signup")) {
@@ -849,6 +884,13 @@ function App() {
       )}
 
       <SignupModal app={app} />
+      {welcomeModalState && (
+        <WelcomeModal
+          app={app}
+          state={welcomeModalState}
+          onClose={closeWelcomeModal}
+        />
+      )}
       <ToastHost app={app} />
       <ConsentBanner locale={locale} />
 
@@ -944,12 +986,15 @@ function DebugPanel({ app }) {
   );
 }
 
-// Mount-time route branch. /start and /welcome are public marketing
-// surfaces that render without the app shell (no TopNav, no BottomNav,
-// no ListingsProvider). They're hard navigations away from the SPA —
-// not state-routed — so we dispatch on the pathname before <App /> runs.
-// Each page is dynamically imported so its chunk only loads when the user
-// is actually on that path; the SPA bundle stays clean for everyone else.
+// Mount-time route branch. /start is a public marketing surface that
+// renders without the app shell (no TopNav, no BottomNav, no
+// ListingsProvider). It's a hard navigation away from the SPA — not
+// state-routed — so we dispatch on the pathname before <App /> runs.
+// The chunk is dynamically imported so it only loads when the user
+// is actually on /start; the SPA bundle stays clean for everyone else.
+//
+// /welcome was previously a sibling here; PR-B.4b replaced it with a
+// modal on /account?welcome=1, so the page is gone.
 (() => {
   const path = typeof window !== "undefined" ? window.location.pathname : "/";
   const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -959,17 +1004,6 @@ function DebugPanel({ app }) {
       root.render(
         <ErrorBoundary>
           <StartPage />
-        </ErrorBoundary>
-      );
-    });
-    return;
-  }
-  if (path === "/welcome" || path === "/welcome/") {
-    import("./welcome.jsx").then((mod) => {
-      const WelcomePage = mod.default;
-      root.render(
-        <ErrorBoundary>
-          <WelcomePage />
         </ErrorBoundary>
       );
     });

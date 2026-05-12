@@ -229,7 +229,12 @@ module.exports = async (req, res) => {
         try {
           const invitation = await clerk.invitations.createInvitation({
             emailAddress: email,
-            redirectUrl:  `${origin}/?welcome=1`,
+            // After accepting the Clerk magic-link, land back on
+            // /account?welcome=1 — same surface as the post-Stripe
+            // redirect. The WelcomeModal re-renders in its signed-in
+            // variant for a brief acknowledgement, then auto-dismisses
+            // leaving the user on a fully signed-in /account page.
+            redirectUrl:  `${origin}/account?welcome=1`,
             publicMetadata: { plan: "pro" },
             privateMetadata: {
               stripeCustomerId: customerId || undefined,
