@@ -1918,7 +1918,10 @@ function ListingJsonLd({ listing, locale }) {
     };
     // Strip undefined keys so the resulting JSON is clean.
     const stripped = JSON.parse(JSON.stringify(data));
-    return JSON.stringify(stripped);
+    // Escape `<` so a description containing `</script>` (from a scrape
+    // or LLM enrichment) can't break out of the JSON-LD island and run
+    // as HTML. JSON.stringify doesn't escape `<` by default.
+    return JSON.stringify(stripped).replace(/</g, "\\u003c");
   }, [listing.id, listing.title, listing.description, listing.photos, listing.price, listing.size_m2, listing.is_sold, listing.source_type, listing.region, listing.zone_name, locale]);
   return (
     <script
