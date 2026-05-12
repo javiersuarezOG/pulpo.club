@@ -829,7 +829,58 @@ function NewsletterCTA({ app }) {
 
 // ====== Browse — filter sidebar ======
 function FilterPanel({ filters, setFilters, count, onClose, app }) {
-  const update = (patch) => setFilters({ ...filters, ...patch });
+  // Helper to count active filters from a CANDIDATE filter shape — used
+  // by the telemetry below to compute active_count POST-toggle without
+  // double-rendering. Mirrors the logic of `activeCount` below.
+  const countActive = (f) =>
+    (f.zones?.size || 0)
+    + (f.land_types?.size || 0) + (f.features?.size || 0)
+    + (f.infra?.size || 0) + (f.status?.size || 0)
+    + (f.price_max != null || f.price_min > 0 ? 1 : 0)
+    + (f.master_category ? 1 : 0)
+    + (f.subcategory ? 1 : 0)
+    + (f.discovery_tags?.size || 0);
+
+  // Telemetry — fire browse.filter_changed once per logical filter
+  // change. The event type has existed in events.ts since the
+  // catalog landed (#212-era) but had no consumer; Phase 7 wires it.
+  // Payload normalizes Set values to a count (PostHog can't serialize
+  // Sets), keeps scalars, and reports active_count POST-update so
+  // the funnel can join with the post-state.
+  //
+  // Suppressed keys (tuning sliders, not discrete filters): the
+  // V/L/M weight sliders fire `update({weights})` on every tick
+  // during a drag — emitting telemetry per tick would flood the
+  // funnel with no signal value. `score_min` is the same pattern.
+  // Both are excluded.
+  const FILTER_CHANGE_SUPPRESSED = new Set(["weights", "score_min"]);
+  const emitFilterChange = (key, value, candidate) => {
+    if (FILTER_CHANGE_SUPPRESSED.has(key)) return;
+    let normalizedValue;
+    if (value instanceof Set) {
+      // Set values are multi-select state — emit the set's size as
+      // a useful scalar; the actual contents are visible elsewhere
+      // (filter chips, URL).
+      normalizedValue = value.size;
+    } else if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      normalizedValue = value;
+    } else {
+      normalizedValue = null;
+    }
+    track("browse.filter_changed", {
+      filter_key: key,
+      value: normalizedValue,
+      active_count: countActive(candidate),
+    });
+  };
+
+  const update = (patch) => {
+    const next = { ...filters, ...patch };
+    for (const [key, value] of Object.entries(patch)) {
+      emitFilterChange(key, value, next);
+    }
+    setFilters(next);
+  };
   const toggleSet = (key, val) => {
     const s = new Set(filters[key]);
     if (s.has(val)) s.delete(val); else s.add(val);
@@ -841,14 +892,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
     update({ [key]: filters[key] === val ? null : val });
   };
   const zoneList = ZONES.map(z => z.name);
-  const activeCount = (filters.zones?.size || 0)
-    + filters.land_types.size + filters.features.size
-    + filters.infra.size + filters.status.size
-    + (filters.price_max != null || filters.price_min > 0 ? 1 : 0)
-    // Phase 5B new IA axes — each contributes one to the badge.
-    + (filters.master_category ? 1 : 0)
-    + (filters.subcategory ? 1 : 0)
-    + (filters.discovery_tags?.size || 0);
+  const activeCount = countActive(filters);
   const lc = app?.locale || currentLocale();
 
   return (
@@ -2674,6 +2718,23 @@ function SavedPage({ app }) {
 // ====== Plans page ======
 function PlansPage({ app }) {
   const lc = app.locale;
+  // Telemetry — plans.viewed fires once per PlansPage mount. The event
+  // type has existed in events.ts since the catalog landed but had no
+  // consumer; Phase 7 wires it. `source` differentiates entry points
+  // (topnav / footer / paywall / manual). The routeParams.plansSource
+  // hint is set by callers that know the entry context (topnav click,
+  // paywall upgrade button, etc.); cold loads + arrows-back land here
+  // without that hint so we fall through to "manual".
+  pUseEffect(() => {
+    const source = app.routeParams && app.routeParams.plansSource;
+    const validSources = ["topnav", "footer", "paywall", "manual"];
+    track("plans.viewed", {
+      source: validSources.includes(source) ? source : "manual",
+    });
+    // Mount-only effect — re-mounting on app.routeParams change is
+    // not desirable (would double-fire on a routeParam tweak).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Pro upgrade — fires the Stripe Managed Payments redirect via the same
   // helper Account uses (account.jsx:344). On `sign_in_required` we open
   // the signup modal so anonymous visitors can complete the flow without
