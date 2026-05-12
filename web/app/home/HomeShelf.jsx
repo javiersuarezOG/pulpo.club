@@ -15,6 +15,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
+import { getCategoryImage } from "../assets/categories/index.js";
 
 // ────────────────────────────────────────────────────────────────────
 // Shared shelf scaffold
@@ -85,9 +86,23 @@ function ShelfCard({ card, position, shelfKey, app }) {
     }
   }, [shelfKey, position, card.id, app]);
 
+  const imgSrc = card.image ? getCategoryImage(card.image) : null;
+
   return (
     <article className="hp-shelf-card" onClick={onClick}>
-      <div className={`hp-shelf-card-art hp-shelf-card-art-${card.gradient}`}>
+      <div className={`hp-shelf-card-art ${imgSrc ? "" : `hp-shelf-card-art-${card.gradient}`}`}>
+        {imgSrc ? (
+          <>
+            <img
+              src={imgSrc}
+              alt=""
+              className="hp-shelf-card-img"
+              loading="eager"
+              decoding="async"
+            />
+            <span className="hp-shelf-card-scrim" aria-hidden="true" />
+          </>
+        ) : null}
         {card.badgeLeft ? (
           <span className={`hp-shelf-card-badge hp-shelf-card-badge-left hp-shelf-card-badge-${card.badgeLeftKind || "dark"}`}>
             {card.badgeLeft}
@@ -181,21 +196,21 @@ export function HomeShelf({
 // placeholders so the cold-load page is dense.
 
 const TOP_10_CARDS = [
-  { gradient: "forest", badgeLeft: "A+ deal", badgeLeftKind: "dark", badgeRight: "−31%", badgeRightKind: "forest", price: "$324,000", meta: "Lago de Coatepeque · 2bd" },
-  { gradient: "clay",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−28%", badgeRightKind: "forest", price: "$615,000", meta: "El Tunco · 3bd beach" },
-  { gradient: "navy",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−26%", badgeRightKind: "forest", price: "$198,500", meta: "Lago de Suchitlán · land" },
+  { image: "water_features", gradient: "forest", badgeLeft: "A+ deal", badgeLeftKind: "dark", badgeRight: "−31%", badgeRightKind: "forest", price: "$324,000", meta: "Lago de Coatepeque · 2bd" },
+  { image: "beachfront",     gradient: "clay",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−28%", badgeRightKind: "forest", price: "$615,000", meta: "El Tunco · 3bd beach" },
+  { image: "agricultural",   gradient: "navy",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−26%", badgeRightKind: "forest", price: "$198,500", meta: "Lago de Suchitlán · land" },
 ];
 
 const PRICE_DROPS_CARDS = [
-  { gradient: "forest", badgeLeft: "−$45k", badgeLeftKind: "burgundy", price: "$425,000", priceWas: "$470k", meta: "Lago de Ilopango · 4bd" },
-  { gradient: "clay",   badgeLeft: "−$30k", badgeLeftKind: "burgundy", price: "$720,000", priceWas: "$750k", meta: "Costa del Sol · 3bd condo" },
-  { gradient: "gray",   badgeLeft: "−$22k", badgeLeftKind: "burgundy", price: "$268,000", priceWas: "$290k", meta: "El Sunzal · 2bd cottage" },
+  { image: "water_features", gradient: "forest", badgeLeft: "−$45k", badgeLeftKind: "burgundy", price: "$425,000", priceWas: "$470k", meta: "Lago de Ilopango · 4bd" },
+  { image: "ocean_view",     gradient: "clay",   badgeLeft: "−$30k", badgeLeftKind: "burgundy", price: "$720,000", priceWas: "$750k", meta: "Costa del Sol · 3bd condo" },
+  { image: "mountain_view",  gradient: "gray",   badgeLeft: "−$22k", badgeLeftKind: "burgundy", price: "$268,000", priceWas: "$290k", meta: "El Sunzal · 2bd cottage" },
 ];
 
 const NEW_THIS_WEEK_CARDS = [
-  { gradient: "clay",   badgeRight: "today",      badgeRightKind: "forest-cream", price: "$845,000", meta: "Las Flores · oceanfront" },
-  { gradient: "forest", badgeRight: "2 days ago", badgeRightKind: "forest-cream", price: "$389,000", meta: "Lago de Güija · 3bd" },
-  { gradient: "navy",   badgeRight: "5 days ago", badgeRightKind: "forest-cream", price: "$152,000", meta: "Lago de Coatepeque · lot" },
+  { image: "beachfront",     gradient: "clay",   badgeRight: "today",      badgeRightKind: "forest-cream", price: "$845,000", meta: "Las Flores · oceanfront" },
+  { image: "water_features", gradient: "forest", badgeRight: "2 days ago", badgeRightKind: "forest-cream", price: "$389,000", meta: "Lago de Güija · 3bd" },
+  { image: "flat_buildable", gradient: "navy",   badgeRight: "5 days ago", badgeRightKind: "forest-cream", price: "$152,000", meta: "Lago de Coatepeque · lot" },
 ];
 
 export function TopTenShelf({ app, locale }) {
