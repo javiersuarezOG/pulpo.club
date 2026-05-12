@@ -28,11 +28,25 @@ import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
 
 // Feature flag for the rewritten homepage (rewrite plan Phase 4C).
-// Set VITE_NEW_HOMEPAGE=1 in the deploy env to opt this preview in.
-// Read once at module load — flipping the env var on a long-running
-// session won't take effect until reload, which matches every other
-// VITE_* env-driven flag in the app (Clerk, PostHog, etc.).
-const USE_NEW_HOMEPAGE = import.meta.env.VITE_NEW_HOMEPAGE === "1";
+// Set VITE_NEW_HOMEPAGE=1 in the deploy env to opt this preview in
+// globally. Per-session override via `?new=1` query param — useful
+// for staged QA on production (test the new homepage on the live
+// deploy before flipping the env var) AND for Playwright specs
+// targeting the new surfaces.
+//
+// Read once at module load — flipping mid-session won't take effect
+// until reload, matching every other VITE_* env-driven flag (Clerk,
+// PostHog, etc.).
+const USE_NEW_HOMEPAGE = (() => {
+  if (import.meta.env.VITE_NEW_HOMEPAGE === "1") return true;
+  try {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.has("new");
+  } catch {
+    return false;
+  }
+})();
 import {
   useTweaks,
   TweaksPanel,
