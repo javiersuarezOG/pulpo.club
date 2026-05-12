@@ -30,7 +30,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto("/", { waitUntil: "networkidle" });
-    await page.locator(".page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".new-homepage, .new-hero, .page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
     // Give the post-mount HomePage effect a tick to fire (it would
     // open the modal if the decision said yes).
     await page.waitForTimeout(800);
@@ -62,7 +62,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
 
   test("/?utm_source=reddit&upsell=0 → no modal (force-off wins)", async ({ page }) => {
     await page.goto("/?utm_source=reddit&upsell=0", { waitUntil: "networkidle" });
-    await page.locator(".page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".new-homepage, .new-hero, .page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.waitForTimeout(800);
     await expect(page.locator(MODAL)).toHaveCount(0);
   });
@@ -70,7 +70,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
   test("Pro signed-in user → no modal even with utm", async ({ page }) => {
     await seedProUser(page);
     await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
-    await page.locator(".page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".new-homepage, .new-hero, .page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.waitForTimeout(800);
     await expect(page.locator(MODAL)).toHaveCount(0);
   });
@@ -87,7 +87,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
     // Reload with the same utm — the 7-day suppression should suppress
     // re-show.
     await page.reload({ waitUntil: "networkidle" });
-    await page.locator(".page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".new-homepage, .new-hero, .page-home, .hero").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.waitForTimeout(800);
     await expect(page.locator(MODAL)).toHaveCount(0);
   });

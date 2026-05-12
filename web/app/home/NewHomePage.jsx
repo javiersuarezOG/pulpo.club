@@ -18,9 +18,10 @@
 // Keeping the homepage tight: hero + proof + category + pills + USPs
 // is enough surface for cold-visitor conversion; warm visitors who
 // want shelves click through to /browse.
-import React from "react";
+import React, { useEffect } from "react";
 import { Hero, ProofRow, CategoryGrid, DiscoveryPills, USPRow } from "./index.js";
 import { ShelfRail } from "./ShelfRail.jsx";
+import { decideShouldShowUpsell } from "../lib/upsell-config.ts";
 
 /**
  * @param {object} props
@@ -28,6 +29,40 @@ import { ShelfRail } from "./ShelfRail.jsx";
  */
 export function NewHomePage({ app }) {
   const locale = app.locale;
+
+  // Pro upsell modal trigger (PR-B.5, ported in Phase 9 cutover from
+  // the deleted legacy HomePage). decideShouldShowUpsell reads the
+  // URL's campaign params + Pro state + 7-day suppression and decides
+  // show/no-show. Pure function — same source of truth as the test
+  // suite. The trigger fires once on mount; subsequent route changes
+  // don't re-evaluate.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!app.openProUpsellModal) return;
+    let urls;
+    try { urls = new URLSearchParams(window.location.search); } catch { return; }
+    const decision = decideShouldShowUpsell({
+      searchParams: urls,
+      isProUser: !!(app.user && app.user.plan === "pro"),
+    });
+    if (!decision.show) return;
+    // Collect a small payload so the modal can show context (e.g. the
+    // referral code) + so telemetry can attribute conversions.
+    const utms = {};
+    for (const k of ["utm_source", "utm_medium", "utm_campaign"]) {
+      const v = urls.get(k);
+      if (v) utms[k] = v;
+    }
+    app.openProUpsellModal({
+      trigger: decision.trigger,
+      urlCode: urls.get("code") || null,
+      utms,
+    });
+    // Mount-only — re-running on a routeParams tweak would re-fire
+    // after the user dismisses the modal.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="new-homepage">
       <Hero locale={locale} />
