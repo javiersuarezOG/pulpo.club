@@ -842,17 +842,59 @@ function App() {
   const closeProUpsellModal = useCallback(() => setProUpsellModal(null), []);
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
-  // Merges the patch into the existing profile object; missing profile
-  // is created on first write. The pulpo-user localStorage effect at
-  // L414 picks this up automatically. PR-C extends this callback to
-  // also push the patch to Clerk publicMetadata for cross-device sync.
+  //
+  // Flow:
+  //   1. Snapshot the prior profile (for rollback).
+  //   2. Optimistic local update — `setUser` immediately so the UI
+  //      reflects the change before the network round-trip. The
+  //      pulpo-user localStorage effect at L414 mirrors it to disk.
+  //   3. If Clerk is signed in, POST the patch to
+  //      /api/clerk/update-profile (which writes publicMetadata.profile
+  //      with the secret key). On success, re-sync local state from
+  //      the server's authoritative response so client + Clerk stay
+  //      in lockstep even if the server merged differently. On
+  //      failure: revert, toast, and fire account.profile_sync_failed
+  //      so we can spot persistence regressions from PostHog.
+  //
+  // The Clerk leg is fire-and-forget from the caller's perspective —
+  // returns void. Callers that need confirmation should subscribe to
+  // the user state.
   const updateUserProfile = useCallback((patch) => {
     if (!patch || typeof patch !== "object") return;
+    let priorProfile = null;
     setUser((u) => {
       if (!u) return u;
-      return { ...u, profile: { ...(u.profile || {}), ...patch } };
+      priorProfile = u.profile || {};
+      return { ...u, profile: { ...priorProfile, ...patch } };
     });
-  }, []);
+    // Clerk write — only fires when the user has a Clerk session AND
+    // the action binder has surfaced an updateProfile callback. The
+    // legacy localStorage-only auth path (CI, dev without Clerk key)
+    // skips this leg entirely; localStorage is the source of truth
+    // there.
+    if (clerkActions && typeof clerkActions.updateProfile === "function") {
+      clerkActions
+        .updateProfile(patch)
+        .then((serverProfile) => {
+          if (!serverProfile || typeof serverProfile !== "object") return;
+          // Re-sync from the server's merged response. Keeps the
+          // client honest even if the server allow-list drops a key
+          // we tried to write.
+          setUser((u) => (u ? { ...u, profile: serverProfile } : u));
+        })
+        .catch((err) => {
+          // Roll back to the snapshot. setUser is functional so a
+          // concurrent unrelated patch on the user won't be lost.
+          setUser((u) => (u ? { ...u, profile: priorProfile || {} } : u));
+          track("account.profile_sync_failed", {
+            keys: Object.keys(patch).join(","),
+            reason: (err && err.code) || (err && err.message) || "unknown",
+            status: (err && err.status) || 0,
+          });
+          showToast(t("account.profile.sync_failed", locale));
+        });
+    }
+  }, [clerkActions, showToast, locale]);
 
   const app = {
     route, routeParams, go, goBrowse,

@@ -349,6 +349,17 @@ export type EventMap = {
     attempted_category: string;
     current_selection: string[];
   };
+  /** Fires when a profile update (e.g. preferred categories) wrote
+   *  successfully to local state but failed to persist to Clerk —
+   *  network blip, expired session, server-side write error. Pairs
+   *  with the rollback in `app.updateUserProfile`; the UI reverts
+   *  to the prior state and surfaces a toast. Non-zero rate here
+   *  is the leading indicator that cross-device sync is broken. */
+  "account.profile_sync_failed": {
+    keys: string;
+    reason: string;
+    status: number;
+  };
 
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,

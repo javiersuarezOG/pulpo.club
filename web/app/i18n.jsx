@@ -747,6 +747,10 @@ const UI_STRINGS = {
   "account.profile.save":    { en: "Save changes",                  es: "Guardar cambios" },
   "account.profile.saved":   { en: "Changes saved.",                es: "Cambios guardados." },
   "account.profile.email_note": { en: "Email change requires verification.", es: "Cambiar el correo requiere verificación." },
+  // Surfaced when an optimistic profile update (preferred categories,
+  // future fields) fails to persist to Clerk and the UI rolls back.
+  "account.profile.sync_failed": { en: "Couldn't save your preferences — please try again.",
+                                    es: "No pudimos guardar tus preferencias — inténtalo de nuevo." },
   "account.notif.intro":     { en: "Choose what Pulpo sends you, and how.",
                                es: "Elige qué te envía Pulpo y cómo." },
   "account.notif.saved":     { en: "Preference saved.",             es: "Preferencia guardada." },
