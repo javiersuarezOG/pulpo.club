@@ -237,8 +237,8 @@ const UI_STRINGS = {
   // category_grid.* / discovery_pill.* / usp.* keys above are no longer
   // read by any homepage component — kept in this table to avoid breaking
   // imports anywhere unforeseen, and because they're cheap to keep.
-  "home.header.cta":             { en: "Start free month",
-                                   es: "Empieza tu mes gratis" },
+  "home.header.cta":             { en: "Try a free month",
+                                   es: "Prueba un mes gratis" },
   "home.header.signin":          { en: "Sign in",
                                    es: "Inicia sesión" },
   "home.header.nav.lake":        { en: "Lake",
@@ -258,30 +258,55 @@ const UI_STRINGS = {
   "home.header.mobile_nav_aria": { en: "Mobile primary",
                                    es: "Principal móvil" },
 
-  "home.hero.coords":            { en: "N 13°47′ · W 89°12′",
-                                   es: "N 13°47′ · O 89°12′" },
-  "home.hero.eyebrow":           { en: "El Salvador · Coastal Index",
-                                   es: "El Salvador · Índice Costero" },
+  // Homepage v3 hero. `home.hero.coords` was removed when the top-right
+  // coords label was replaced by the LIVE NOW counter card. The pre-label
+  // eyebrow is split — "SCANNING " + "{n} SOURCES" (clay span at the call
+  // site) + " EVERY 90 SECONDS" — so the count substitution does not need
+  // a placeholder walk inside a styled span. {n} resolves at runtime from
+  // /data/last_updated.json source_status; falls back to last-cached, then
+  // to SOURCE_COUNT_FALLBACK in heroConfig.
+  "home.hero.eyebrow_before":    { en: "SCANNING ",
+                                   es: "REVISANDO " },
+  "home.hero.eyebrow_sources":   { en: "{n} SOURCES",
+                                   es: "{n} FUENTES" },
+  "home.hero.eyebrow_after":     { en: " EVERY 90 SECONDS",
+                                   es: " CADA 90 SEGUNDOS" },
   "home.hero.h1.before":         { en: "Every beach and lake property in El Salvador,",
-                                   es: "Cada propiedad de playa y lago en El Salvador," },
+                                   es: "Cada propiedad de playa y lago en El Salvador," },
   "home.hero.h1.italic":         { en: "ranked.",
                                    es: "ordenadas." },
   "home.hero.subhead":           { en: "We scan every site, rank every beach and lake listing by value, and deliver the 10 best to your inbox every two weeks.",
                                    es: "Revisamos cada sitio, ordenamos cada anuncio de playa y lago por valor y enviamos los 10 mejores a tu correo cada dos semanas." },
-  "home.hero.cta_primary":       { en: "Start free month",
-                                   es: "Empieza tu mes gratis" },
-  "home.hero.cta_secondary":     { en: "See sample deals",
-                                   es: "Ver ejemplos" },
+  "home.hero.cta_primary":       { en: "Try a free month",
+                                   es: "Prueba un mes gratis" },
+  "home.hero.cta_secondary":     { en: "See this week's top 10",
+                                   es: "Ver el top 10 de la semana" },
   "home.hero.microcopy":         { en: "$5/month after · cancel anytime",
                                    es: "$5/mes luego · cancela cuando quieras" },
+  // Live counter card (top-right, hides <768px).
+  "home.hero.counter_live":      { en: "LIVE NOW",
+                                   es: "EN VIVO" },
+  "home.hero.counter_template":  { en: "{count} listings · {sources} sources",
+                                   es: "{count} propiedades · {sources} fuentes" },
   "home.hero.preview.label":     { en: "Pulpo weekly",
                                    es: "Pulpo semanal" },
-  "home.hero.preview.headline":  { en: "Top 10 · Week 23",
-                                   es: "Top 10 · Semana 23" },
+  "home.hero.preview.headline":  { en: "Top 10 · updating live",
+                                   es: "Top 10 · en directo" },
   "home.hero.preview.live":      { en: "LIVE",
                                    es: "EN VIVO" },
-  "home.hero.preview.sr":        { en: "Preview: top 10 listings ranked from A+ to B-",
-                                   es: "Vista previa: 10 mejores anuncios, de A+ a B-" },
+  "home.hero.preview.sr":        { en: "Preview: top 10 listings ranked from A+ to C-",
+                                   es: "Vista previa: 10 mejores anuncios, de A+ a C-" },
+  // Just In pill — clay-orange floating card that pops on each leaderboard cycle.
+  "home.hero.just_in_label":     { en: "JUST IN",
+                                   es: "RECIÉN" },
+  "home.hero.just_in_position":  { en: "→ #{n}",
+                                   es: "→ #{n}" },
+  "home.hero.off_the_board":     { en: "off the board",
+                                   es: "fuera del top 10" },
+  "home.hero.just_in_aria":      { en: "Just in: {name} — sign up to see more",
+                                   es: "Recién: {name} — regístrate para ver más" },
+  "home.hero.new_badge":         { en: "NEW",
+                                   es: "NUEVO" },
 
   "home.featured.eyebrow":       { en: "FEATURED DEAL",
                                    es: "OFERTA DESTACADA" },

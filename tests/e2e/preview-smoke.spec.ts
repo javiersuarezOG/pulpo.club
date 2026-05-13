@@ -462,10 +462,14 @@ test.describe("New app boots cleanly on key routes", () => {
       "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)
       "We couldn't load",                             // DataFetchFailed
       "Upload photo",                                 // account profile
-      // Homepage v2 (redesign) — every CTA, label, or section heading
-      // that would be visible to a cold ES visitor on /. Trips when
-      // hard-coded EN strings sneak in instead of t() lookups.
-      "Start free month", "See sample deals",         // hero CTAs + header CTA
+      // Homepage v3 (dark hero redesign) — every CTA, label, or section
+      // heading visible to a cold ES visitor on /. Trips when hardcoded
+      // EN strings sneak in instead of t() lookups.
+      "Try a free month",                             // hero primary + header CTA
+      "See this week's top 10",                       // hero secondary CTA
+      "Scanning",                                     // hero pre-label "SCANNING N SOURCES"
+      "Just in",                                      // hero Just In pill
+      "Live now",                                     // hero LIVE NOW counter
       "Pick your shoreline", "Featured deal",         // section headings
       "Built by locals", "For subscribers only",      // USP band
       "Top 10 deals", "Price drops", "New this week", // shelf headings
