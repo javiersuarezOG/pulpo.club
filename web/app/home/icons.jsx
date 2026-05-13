@@ -113,3 +113,22 @@ export const IconX = (p = {}) => svg(
     <line x1="6" y1="6" x2="18" y2="18" />
   </>, p,
 );
+
+// Filled bolt — used by the Just In pill in the v3 hero. Tabler-style
+// lightning glyph rendered as a filled shape rather than stroke so it
+// reads bold against the clay-orange pill background. Skips the stroke
+// settings from svg() by inlining its own.
+export const IconBoltFilled = ({ size = 24, className = "", title } = {}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden={title ? undefined : true}
+    role={title ? "img" : undefined}
+  >
+    {title ? <title>{title}</title> : null}
+    <path d="M13 2 L4 14 L11 14 L10 22 L20 10 L13 10 Z" />
+  </svg>
+);

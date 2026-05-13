@@ -60,14 +60,40 @@ test.describe("Homepage v2 — redesign smoke", () => {
     const errors = attachErrorRecorder(page);
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
-    // The hero CTA is the first .hp-cta-dark inside the hero.
-    const heroCta = page.locator(".hp-hero .hp-cta-dark").first();
+    // Homepage v3 hero CTA class is .hp-hero-cta-primary ("Try a free
+    // month"); the v2 .hp-cta-dark fallback selector stays in the OR
+    // list so a partial rollback doesn't silently break this test.
+    const heroCta = page.locator(
+      ".hp-hero .hp-hero-cta-primary, .hp-hero .hp-cta-dark",
+    ).first();
     await heroCta.click();
 
     // The shared SignupModal renders with class .modal-signup.
     await expect(page.locator(".modal-signup").first()).toBeVisible({ timeout: 5_000 });
 
     expect(errors).toEqual([]);
+  });
+
+  test("reduced-motion: leaderboard does not start the cycle (no Just In pill)", async ({ browser }) => {
+    // Per the v3 perf rules, the hero MUST short-circuit the cycle
+    // when the OS prefers reduced motion. The leaderboard renders
+    // statically with the initial widths and the Just In pill is
+    // suppressed (the pill is a motion artifact).
+    const ctx = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await ctx.newPage();
+    const errors = attachErrorRecorder(page);
+    await page.goto(URL_HOME, { waitUntil: "networkidle" });
+
+    // Hero renders, leaderboard rows are present.
+    await expect(page.locator(".hp-hero")).toBeVisible();
+    await expect(page.locator(".hp-hero-preview-row")).toHaveCount(10);
+
+    // Just In pill is NOT in the DOM (component returns null under
+    // reduced motion).
+    await expect(page.locator(".hp-hero-justin")).toHaveCount(0);
+
+    expect(errors).toEqual([]);
+    await ctx.close();
   });
 
   test("Pick Your Shoreline → /browse with master filter", async ({ page }) => {

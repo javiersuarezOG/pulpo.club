@@ -158,6 +158,34 @@ export type EventMap = {
     link: "lake" | "beach" | "how_it_works" | "pricing" | "sign_in";
   };
 
+  // ── Homepage v3 hero (dynamic live leaderboard) ──────────────────
+  // The hero's animated leaderboard is the centerpiece of the v3
+  // redesign. We do NOT fire an event per cycle (hundreds per session
+  // would blow up the analytics bill); instead we fire start/pause/
+  // resume so dashboards can answer "did the user see it run, and
+  // for how long". reduced_motion=true means the user's OS prefers
+  // reduced motion AND we short-circuited the interval — the event
+  // still fires so we can size the audience receiving the static
+  // fallback. cycle_ms echoes the production interval the page is
+  // running at (so an experiment that shortens it shows up clearly).
+  "hero_live_leaderboard_started": {
+    reduced_motion: boolean;
+    cycle_ms: number;
+  };
+  // Pause/resume cycle. Fires on IntersectionObserver-leave (hero
+  // scrolled offscreen) and on document.visibilitychange (tab hidden).
+  "hero_live_leaderboard_paused": Record<string, never>;
+  "hero_live_leaderboard_resumed": Record<string, never>;
+  // Just In pill click. Pill is a button — clicking it opens the
+  // signup modal (same destination as the primary CTA) so the
+  // existing signup_modal.shown funnel picks up the conversion.
+  // listing_id is a slug of the sample listing name until backend
+  // listings replace the fixture.
+  "hero_just_in_clicked": {
+    position: number | null; // 1-10 if the entry made the board, null = off
+    listing_id: string;
+  };
+
   // ── Cutover marker (rewrite Phase 7) ─────────────────────────────
   // One-time event fired per browser when the user first encounters
   // the new homepage shelf config (reduced from 15 → 2 per Q6 of the
