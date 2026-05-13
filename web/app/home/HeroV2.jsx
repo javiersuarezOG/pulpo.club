@@ -415,8 +415,10 @@ export function HeroV2({ app, locale }) {
       <div className="hp-hero-inner">
         {/* Live counter card (top-right, hidden <768px). Lives inside
             hp-hero-inner so its right edge anchors to the centered
-            1280px content frame, lining up with the preview's right
-            edge on desktop. */}
+            1280px content frame on wide monitors instead of drifting
+            to the viewport edge. The copy + preview pair sits in a
+            narrower 720px subgroup on the left; the counter is the
+            only thing pinned to the wide frame's right edge. */}
         <aside
           className="hp-hero-counter"
           aria-label={t("home.hero.counter_live", locale)}
@@ -462,104 +464,108 @@ export function HeroV2({ app, locale }) {
             </span>
           </h1>
 
-          <p className="hp-hero-subhead">{t("home.hero.subhead", locale)}</p>
+          <div className="hp-hero-grid">
+            <div className="hp-hero-grid-left">
+              <p className="hp-hero-subhead">{t("home.hero.subhead", locale)}</p>
 
-          <div className="hp-hero-ctas">
-            <button type="button" className="hp-cta hp-hero-cta-primary hp-cta-block" onClick={onPrimaryCta}>
-              <span>{t("home.hero.cta_primary", locale)}</span>
-              <IconArrowRight size={15} />
-            </button>
-            <button type="button" className="hp-cta hp-hero-cta-secondary hp-cta-block" onClick={onSecondaryCta}>
-              <span>{t("home.hero.cta_secondary", locale)}</span>
-            </button>
-          </div>
-
-          <p className="hp-hero-microcopy">{t("home.hero.microcopy", locale)}</p>
-        </div>
-
-        {/* Tilted newsletter preview wrap — now a direct grid child of
-            hp-hero-inner so on desktop the preview sits at the right
-            edge of the 1280px content frame, balancing the H1 on the
-            left. On mobile (<1024px) the grid collapses to one column
-            and the preview stacks below the copy. Visual is aria-
-            hidden; SR gets a hidden text equivalent. The Just In pill
-            IS interactive so it's outside the aria-hidden subtree. */}
-        <div className="hp-hero-preview-wrap">
-          <div className="hp-hero-preview" aria-hidden="true">
-            <div className="hp-hero-preview-echo hp-hero-preview-echo-1" />
-            <div className="hp-hero-preview-echo hp-hero-preview-echo-2" />
-            <div className="hp-hero-preview-front">
-              <div className="hp-hero-preview-head">
-                <div className="hp-hero-preview-head-text">
-                  <span className="hp-hero-preview-label">{t("home.hero.preview.label", locale)}</span>
-                  <span className="hp-hero-preview-headline">{previewHeadline}</span>
-                </div>
-                <span className="hp-hero-preview-live">
-                  <span className="hp-hero-preview-live-dot" />
-                  {t("home.hero.preview.live", locale)}
-                </span>
+              <div className="hp-hero-ctas">
+                <button type="button" className="hp-cta hp-hero-cta-primary hp-cta-block" onClick={onPrimaryCta}>
+                  <span>{t("home.hero.cta_primary", locale)}</span>
+                  <IconArrowRight size={15} />
+                </button>
+                <button type="button" className="hp-cta hp-hero-cta-secondary hp-cta-block" onClick={onSecondaryCta}>
+                  <span>{t("home.hero.cta_secondary", locale)}</span>
+                </button>
               </div>
-              <ol className="hp-hero-preview-rows">
-                {widths.map((w, i) => {
-                  const grade = gradeFor(w);
-                  const tone = toneFor(w);
-                  const isInserted = insertedRow === i && !reducedMotion;
-                  return (
-                    <li
-                      key={i}
-                      className={`hp-hero-preview-row${isInserted ? " hp-hero-preview-row-new" : ""}`}
-                    >
-                      <span className="hp-hero-preview-pos">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="hp-hero-preview-bar">
-                        <span
-                          className={`hp-hero-preview-bar-fill hp-hero-preview-bar-fill-${tone}`}
-                          style={{ width: `${w}%` }}
-                        />
-                      </span>
-                      <span className="hp-hero-preview-score">{grade}</span>
-                      {isInserted ? (
-                        <span className="hp-hero-preview-new-badge">{t("home.hero.new_badge", locale)}</span>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ol>
+
+              <p className="hp-hero-microcopy">{t("home.hero.microcopy", locale)}</p>
+            </div>
+
+            {/* Tilted newsletter preview wrap. Visual is aria-hidden;
+                SR gets a hidden text equivalent. The Just In pill IS
+                interactive so it's outside the aria-hidden subtree.
+                Sits in the right column of .hp-hero-grid, which is
+                capped at 720px and left-aligned within the 1280px
+                outer frame so the preview hugs the subhead/CTAs row
+                rather than drifting to the viewport edge. */}
+            <div className="hp-hero-preview-wrap">
+              <div className="hp-hero-preview" aria-hidden="true">
+                <div className="hp-hero-preview-echo hp-hero-preview-echo-1" />
+                <div className="hp-hero-preview-echo hp-hero-preview-echo-2" />
+                <div className="hp-hero-preview-front">
+                  <div className="hp-hero-preview-head">
+                    <div className="hp-hero-preview-head-text">
+                      <span className="hp-hero-preview-label">{t("home.hero.preview.label", locale)}</span>
+                      <span className="hp-hero-preview-headline">{previewHeadline}</span>
+                    </div>
+                    <span className="hp-hero-preview-live">
+                      <span className="hp-hero-preview-live-dot" />
+                      {t("home.hero.preview.live", locale)}
+                    </span>
+                  </div>
+                  <ol className="hp-hero-preview-rows">
+                    {widths.map((w, i) => {
+                      const grade = gradeFor(w);
+                      const tone = toneFor(w);
+                      const isInserted = insertedRow === i && !reducedMotion;
+                      return (
+                        <li
+                          key={i}
+                          className={`hp-hero-preview-row${isInserted ? " hp-hero-preview-row-new" : ""}`}
+                        >
+                          <span className="hp-hero-preview-pos">{String(i + 1).padStart(2, "0")}</span>
+                          <span className="hp-hero-preview-bar">
+                            <span
+                              className={`hp-hero-preview-bar-fill hp-hero-preview-bar-fill-${tone}`}
+                              style={{ width: `${w}%` }}
+                            />
+                          </span>
+                          <span className="hp-hero-preview-score">{grade}</span>
+                          {isInserted ? (
+                            <span className="hp-hero-preview-new-badge">{t("home.hero.new_badge", locale)}</span>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              </div>
+              <span className="sr-only">{previewSr}</span>
+
+              {/* Just In pill — interactive, sits outside aria-hidden
+                  subtree. Hidden under reduced-motion (pill is a
+                  motion artifact; subscribers in that mode get the
+                  static board only). */}
+              {!reducedMotion && pill ? (
+                <button
+                  type="button"
+                  className="hp-hero-justin"
+                  onClick={onJustInClick}
+                  aria-label={pillAria}
+                  aria-live="polite"
+                  // Bumping key forces React to remount → CSS pop
+                  // keyframe replays. Stable across same-cycle re-
+                  // renders so the animation isn't double-fired.
+                  key={pillPopKey}
+                >
+                  <span className="hp-hero-justin-head">
+                    <span className="hp-hero-justin-icon" aria-hidden="true">
+                      <IconBoltFilled size={11} />
+                    </span>
+                    <span className="hp-hero-justin-label">{t("home.hero.just_in_label", locale)}</span>
+                    <span className="hp-hero-justin-position">{pillPositionText}</span>
+                  </span>
+                  <span className="hp-hero-justin-name">{pill.listing.name}</span>
+                  <span className="hp-hero-justin-row">
+                    <span className="hp-hero-justin-price">{fmtShortPrice(pill.listing.price)}</span>
+                    <span className={`hp-hero-justin-grade hp-hero-justin-grade-${pill.grade[0].toLowerCase()}`}>
+                      {pill.grade}
+                    </span>
+                  </span>
+                </button>
+              ) : null}
             </div>
           </div>
-          <span className="sr-only">{previewSr}</span>
-
-          {/* Just In pill — interactive, sits outside aria-hidden
-              subtree. Hidden under reduced-motion (pill is a
-              motion artifact; subscribers in that mode get the
-              static board only). */}
-          {!reducedMotion && pill ? (
-            <button
-              type="button"
-              className="hp-hero-justin"
-              onClick={onJustInClick}
-              aria-label={pillAria}
-              aria-live="polite"
-              // Bumping key forces React to remount → CSS pop
-              // keyframe replays. Stable across same-cycle re-
-              // renders so the animation isn't double-fired.
-              key={pillPopKey}
-            >
-              <span className="hp-hero-justin-head">
-                <span className="hp-hero-justin-icon" aria-hidden="true">
-                  <IconBoltFilled size={11} />
-                </span>
-                <span className="hp-hero-justin-label">{t("home.hero.just_in_label", locale)}</span>
-                <span className="hp-hero-justin-position">{pillPositionText}</span>
-              </span>
-              <span className="hp-hero-justin-name">{pill.listing.name}</span>
-              <span className="hp-hero-justin-row">
-                <span className="hp-hero-justin-price">{fmtShortPrice(pill.listing.price)}</span>
-                <span className={`hp-hero-justin-grade hp-hero-justin-grade-${pill.grade[0].toLowerCase()}`}>
-                  {pill.grade}
-                </span>
-              </span>
-            </button>
-          ) : null}
         </div>
       </div>
 
