@@ -4197,9 +4197,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-hero-grid {
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: minmax(0, 1fr) 280px;
     align-items: end;
     gap: 32px;
+    /* Cap the two-column block independently of .hp-hero-inner so the
+       newsletter preview hugs the copy on wide monitors instead of
+       drifting to the 1280px right edge. The H1 + eyebrow above
+       still span the full inner width for editorial sweep. */
+    max-width: 720px;
   }
 }
 .homepage-v2 .hp-hero-subhead {
