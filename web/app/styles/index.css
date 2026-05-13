@@ -4138,11 +4138,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
   z-index: 0;
 }
 
-/* LIVE NOW counter card (top-right, hides <768px) */
+/* LIVE NOW counter card. Pinned to the top-right of hp-hero-inner
+   (which has position: relative + max-width: 1280px) so on wide
+   monitors the counter's right edge aligns with the preview card's
+   right edge rather than drifting to the viewport edge. Hides
+   <768px to free up horizontal space on phones. */
 .homepage-v2 .hp-hero-counter {
   position: absolute;
-  top: 18px;
-  right: 20px;
+  top: 0;
+  right: 0;
   display: none;
   align-items: center;
   gap: 9px;
@@ -4181,11 +4185,31 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-variant-numeric: tabular-nums;
 }
 
+/* hp-hero-inner doubles as the desktop 2-column grid container:
+   copy column on the left, tilted newsletter preview on the right
+   sitting flush against the right edge of the 1280px content frame.
+   The LIVE NOW counter is absolutely positioned inside this same
+   container so its right edge aligns with the preview's right edge
+   on wide monitors — never drifts off into viewport-edge dead space.
+
+   Mobile-first: stacked single column. The preview-wrap's own
+   max-width: 320px + margin: 0 auto keeps it centered below the
+   copy on phones. ≥1024px: switch to the 2-col grid. */
 .homepage-v2 .hp-hero-inner {
   position: relative;
   max-width: 1280px;
   margin: 0 auto;
   z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-inner {
+    grid-template-columns: minmax(0, 1fr) 285px;
+    align-items: end;
+    gap: 32px;
+  }
 }
 
 /* Pre-label pill */
@@ -4260,25 +4284,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
   pointer-events: none;
 }
 
-/* Grid block (left col copy + right col preview). Capped narrow on
-   desktop so the preview hugs the copy. */
-.homepage-v2 .hp-hero-v3 .hp-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  margin-top: 20px;
+/* The two-column split now lives on hp-hero-inner itself (see the
+   rule above). hp-hero-copy is a plain block container holding
+   eyebrow + H1 + subhead + CTAs + microcopy as a vertical flow.
+   Block-level (not flex) so inline-flex children like the eyebrow
+   pill don't get stretched to the column's full width. */
+.homepage-v2 .hp-hero-v3 .hp-hero-copy {
+  display: block;
 }
-@media (min-width: 1024px) {
-  .homepage-v2 .hp-hero-v3 .hp-hero-grid {
-    grid-template-columns: minmax(0, 1fr) 285px;
-    align-items: end;
-    gap: 20px;
-    max-width: 720px;
-  }
-}
-
 .homepage-v2 .hp-hero-v3 .hp-hero-subhead {
-  margin: 0;
+  margin: 20px 0 0;
   color: #C8C4BB; /* token-exception: dark-hero muted cream, ~7:1 on forest-bg */
   font-size: 16px;
   line-height: 1.5;
