@@ -343,43 +343,11 @@ function NotificationsSection({ app }) {
         ))}
       </div>
 
-      <h3 className="account-subhead">{t("account.notif.channels", app.locale)}</h3>
-      <div className="pref-list">
-        <div className="pref-row">
-          <div className="pref-text">
-            <div className="pref-title">{t("account.notif.email", app.locale)}</div>
-            <div className="pref-desc">{t("account.notif.email_desc", app.locale)}</div>
-          </div>
-          <span className="pref-locked">{t("account.notif.required", app.locale)}</span>
-        </div>
-        {isPaid && (
-          <div className="pref-row">
-            <div className="pref-text">
-              <div className="pref-title">{t("account.notif.whatsapp", app.locale)}</div>
-              <div className="pref-desc">{t("account.notif.whatsapp_desc", app.locale)}</div>
-              {prefs.whatsapp && (
-                <input
-                  type="tel"
-                  className="pref-inline-input"
-                  placeholder="+503 7000 0000"
-                  value={prefs.whatsapp_number}
-                  onChange={(e) => setPrefs(p => ({ ...p, whatsapp_number: e.target.value }))}
-                />
-              )}
-              {prefs.whatsapp && prefs.whatsapp_number && (
-                <div className="pref-confirm">
-                  {t("account.notif.whatsapp_confirm", app.locale, { number: prefs.whatsapp_number })}
-                </div>
-              )}
-            </div>
-            <Toggle
-              checked={prefs.whatsapp}
-              onChange={v => setKey("whatsapp", v)}
-              ariaLabel={t("account.notif.whatsapp", app.locale)}
-            />
-          </div>
-        )}
-      </div>
+      {/* "Channels" block (Email-always-on + WhatsApp opt-in) hidden
+          for now — email is the only delivery channel today, and a
+          single locked "Email — Required" row reads as noise. Restore
+          this whole block when WhatsApp delivery actually ships; i18n
+          keys + local prefs-state defaults are intentionally preserved. */}
 
       {isPaid && prefs.newsletter && (
         <>
