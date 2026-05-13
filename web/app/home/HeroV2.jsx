@@ -412,21 +412,26 @@ export function HeroV2({ app, locale }) {
         <path d="M320,210 Q450,250 580,230 T760,260" />
       </svg>
 
-      {/* Live counter card (top-right, hidden <768px) */}
-      <aside
-        className="hp-hero-counter"
-        aria-label={t("home.hero.counter_live", locale)}
-      >
-        <span className="hp-hero-counter-dot" aria-hidden="true" />
-        <div className="hp-hero-counter-text">
-          <span className="hp-hero-counter-label">{t("home.hero.counter_live", locale)}</span>
-          <span className="hp-hero-counter-value" id="hero-live-count">
-            {counterTemplate}
-          </span>
-        </div>
-      </aside>
-
       <div className="hp-hero-inner">
+        {/* Live counter card (top-right, hidden <768px). Lives inside
+            hp-hero-inner so its right edge anchors to the centered
+            1280px content frame on wide monitors instead of drifting
+            to the viewport edge. The copy + preview pair sits in a
+            narrower 720px subgroup on the left; the counter is the
+            only thing pinned to the wide frame's right edge. */}
+        <aside
+          className="hp-hero-counter"
+          aria-label={t("home.hero.counter_live", locale)}
+        >
+          <span className="hp-hero-counter-dot" aria-hidden="true" />
+          <div className="hp-hero-counter-text">
+            <span className="hp-hero-counter-label">{t("home.hero.counter_live", locale)}</span>
+            <span className="hp-hero-counter-value" id="hero-live-count">
+              {counterTemplate}
+            </span>
+          </div>
+        </aside>
+
         <div className="hp-hero-copy">
           {/* Pre-label pill */}
           <span className="hp-hero-eyebrow">
@@ -476,9 +481,13 @@ export function HeroV2({ app, locale }) {
               <p className="hp-hero-microcopy">{t("home.hero.microcopy", locale)}</p>
             </div>
 
-            {/* Tilted newsletter preview wrap. Visual is aria-hidden; SR
-                gets a hidden text equivalent. The Just In pill IS
-                interactive so it's outside the aria-hidden subtree. */}
+            {/* Tilted newsletter preview wrap. Visual is aria-hidden;
+                SR gets a hidden text equivalent. The Just In pill IS
+                interactive so it's outside the aria-hidden subtree.
+                Sits in the right column of .hp-hero-grid, which is
+                capped at 720px and left-aligned within the 1280px
+                outer frame so the preview hugs the subhead/CTAs row
+                rather than drifting to the viewport edge. */}
             <div className="hp-hero-preview-wrap">
               <div className="hp-hero-preview" aria-hidden="true">
                 <div className="hp-hero-preview-echo hp-hero-preview-echo-1" />

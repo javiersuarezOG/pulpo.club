@@ -4138,11 +4138,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
   z-index: 0;
 }
 
-/* LIVE NOW counter card (top-right, hides <768px) */
+/* LIVE NOW counter card. Pinned to the top-right of hp-hero-inner
+   (which has position: relative + max-width: 1280px) so on wide
+   monitors the counter's right edge aligns with the preview card's
+   right edge rather than drifting to the viewport edge. Hides
+   <768px to free up horizontal space on phones. */
 .homepage-v2 .hp-hero-counter {
   position: absolute;
-  top: 18px;
-  right: 20px;
+  top: 0;
+  right: 0;
   display: none;
   align-items: center;
   gap: 9px;
@@ -4181,6 +4185,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-variant-numeric: tabular-nums;
 }
 
+/* The hero's outer 1280px content frame. Positioning ancestor for
+   the LIVE NOW counter (which pins to the right edge of this frame
+   on wide monitors rather than drifting to the viewport edge).
+   The inner copy + preview pair lives inside .hp-hero-grid and is
+   capped at a much narrower 720px so the preview hugs the
+   subhead/CTAs row — see that rule below. */
 .homepage-v2 .hp-hero-inner {
   position: relative;
   max-width: 1280px;
@@ -4261,7 +4271,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 /* Grid block (left col copy + right col preview). Capped narrow on
-   desktop so the preview hugs the copy. */
+   desktop so the preview hugs the copy column. Left-aligned within
+   the 1280px outer .hp-hero-inner so the H1's left edge aligns with
+   the eyebrow above it; the LIVE counter still pins to the right
+   edge of the 1280px frame, not this 720px subgroup. */
 .homepage-v2 .hp-hero-v3 .hp-hero-grid {
   display: grid;
   grid-template-columns: 1fr;
