@@ -35,9 +35,17 @@ export type CampaignParams = {
 };
 
 const SS_KEY_PREFIX = "pulpo-";
+const SS_KEY_CODE = "pulpo-code";
 
 // Read URL → capture into sessionStorage → return a normalized snapshot.
 // Memoized at the component level via useCampaignParams() below.
+//
+// `urlCode` and UTMs both follow URL-wins + sessionStorage-fallback
+// semantics: the same campaign tag should apply to a Stripe checkout
+// that fires several pages later in the same session, even after the
+// browser has navigated off the campaign URL. Wave 2 added urlCode to
+// the persistence set after we found that landing at `/?code=REDDIT01`
+// and then clicking Upgrade from /plans lost the code mid-session.
 export function captureCampaignParams(): CampaignParams {
   if (typeof window === "undefined") {
     return { urlCode: "", utms: {}, isCancelled: false, upsellOverride: null };
@@ -63,8 +71,20 @@ export function captureCampaignParams(): CampaignParams {
     }
   }
 
+  // Promo code: URL takes precedence; persist to sessionStorage so the
+  // code survives later same-session navigation off the campaign URL.
+  // A fresh `?code=X` overwrites the stored value (new campaign link
+  // wins) — matches UTM precedence.
   const rawCode = params.get("code");
-  const urlCode = rawCode ? rawCode.trim().toUpperCase() : "";
+  let urlCode = rawCode ? rawCode.trim().toUpperCase() : "";
+  if (urlCode) {
+    try { sessionStorage.setItem(SS_KEY_CODE, urlCode); } catch { /* ignore */ }
+  } else {
+    try {
+      const cached = sessionStorage.getItem(SS_KEY_CODE);
+      if (cached) urlCode = cached;
+    } catch { /* ignore */ }
+  }
   const isCancelled = params.get("cancelled") === "1";
   const upsellFlag = params.get("upsell");
   const upsellOverride: "1" | "0" | null =

@@ -274,7 +274,21 @@ export type EventMap = {
   // Fires when the upgrade button is clicked and we kick off
   // /api/stripe/create-checkout-session. Pairs with the return-URL
   // event below to compute checkout completion rate.
-  "upgrade.checkout_started": Record<string, never>;
+  // Wave-2: `has_promo` reports whether the click carried a promo code
+  // (from URL or sessionStorage) when fired. Splits the funnel by
+  // promo-vs-no-promo conversion. Optional for backward-compat with
+  // any in-flight session that emitted the event before the prop landed.
+  "upgrade.checkout_started": { has_promo?: boolean };
+  // Wave-2: fires server-side from /api/stripe/create-checkout-session
+  // and /api/stripe/start-checkout whenever a promo code is attempted.
+  // `succeeded` reflects whether Stripe's promotion-code lookup matched
+  // an active code. `source` distinguishes the two endpoints so
+  // dashboards can split the funnel.
+  "promo_code_applied": {
+    code: string;
+    succeeded: boolean;
+    source: "start_checkout" | "create_checkout_session";
+  };
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is

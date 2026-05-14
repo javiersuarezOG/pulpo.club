@@ -25,6 +25,7 @@ import {
 } from "./pages.jsx";
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
+import { captureCampaignParams } from "./lib/campaign";
 
 // Rewrite cutover (Phase 9). NewHomePage is now the only homepage —
 // the legacy HomePage / StyleCarousel / NewsletterCTA were deleted
@@ -178,6 +179,11 @@ function App() {
     bootWebVitals();
     bootAssetTelemetry();
     bootGlobalErrorHandlers();
+    // Wave-2: capture URL campaign params (code + UTMs) into
+    // sessionStorage on first mount regardless of entry path. A user
+    // deep-linked at /plans?code=X needs persistence too; the homepage
+    // upsell effect only fires on `/`.
+    try { captureCampaignParams(); } catch { /* never crash boot on telemetry */ }
   }, []);
 
   // 404 fallback — Vercel rewrites every unknown path to the SPA, so a
