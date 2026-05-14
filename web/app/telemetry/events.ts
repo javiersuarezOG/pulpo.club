@@ -318,6 +318,17 @@ export type EventMap = {
   "usp_popup.cta_clicked": {
     trigger: "url_param" | "scroll" | "timer" | "exit_intent";
   };
+
+  // Wave-5b: fires when FeaturedDeal resolves a real listing from
+  // featured.json + the local cache. Absent → the card fell back to
+  // the hardcoded placeholder (flag off, fetch failed, or the pool's
+  // listing id didn't match the local catalogue). Dashboards can
+  // compare engagement on real vs hardcoded by joining on whether
+  // this event fired for the session.
+  "featured_deal_resolved": {
+    listing_id: string;
+    user_state: string;
+  };
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is
