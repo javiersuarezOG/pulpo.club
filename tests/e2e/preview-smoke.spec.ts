@@ -313,7 +313,7 @@ test.describe("New app boots cleanly on key routes", () => {
         l.source_type !== "off_market" && !l.is_sold
     );
     expect(sample, "live data has at least one non-off-market listing").toBeTruthy();
-    const id = sample!.id ?? `${sample!.source}-${sample!.source_id}`;
+    const id = sample!.id ?? `${sample!.source}__${sample!.source_id}`;
 
     const errors: string[] = [];
     page.on("console", (msg) => {
