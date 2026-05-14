@@ -289,6 +289,18 @@ export type EventMap = {
     succeeded: boolean;
     source: "start_checkout" | "create_checkout_session";
   };
+
+  // Wave-4: fires once per homepage mount with the resolved block list
+  // from home/blockRegistry.ts. Tells us in production whether the
+  // paid-home filter is engaging — when `flag_enabled: false` everyone
+  // gets the same 7-block list (today's behavior); when true, paid
+  // users get the filtered 4-block list. The string[] values are
+  // BlockId values, in render order.
+  "paid_home_rendered": {
+    user_state: "anonymous" | "free" | "pro" | "agency";
+    blocks_visible: string[];
+    flag_enabled: boolean;
+  };
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is
