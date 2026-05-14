@@ -20,6 +20,24 @@ const {
   logApi,
 } = require("./_stripe");
 const { toWebRequest } = require("../_clerk");
+const posthog = require("../_posthog");
+
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+
+function safeStr(v) {
+  return typeof v === "string" ? v : "";
+}
+
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString("utf8");
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch { return {}; }
+}
 
 module.exports = async (req, res) => {
   const t0 = Date.now();
@@ -77,36 +95,81 @@ module.exports = async (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const origin = `${proto}://${host}`;
 
+  // Wave-2: read Body for forwarded promo code + UTMs. Signed-in flow
+  // is intentionally more lenient than /start: on an invalid code we
+  // fall through silently (no 4xx) so the user lands on Stripe at full
+  // price rather than seeing a wall during a paid-conversion moment.
+  // Telemetry records `succeeded: false` so the funnel still sees it.
+  const body = await readJsonBody(req);
+  const promoCode = safeStr(body.promoCode).trim().toUpperCase();
+  const utms = {};
+  for (const k of UTM_KEYS) {
+    const v = safeStr(body[k]).slice(0, 100);
+    if (v) utms[k] = v;
+  }
+
+  let discounts = null;
+  let promoSucceeded = null; // null = not attempted, true/false = lookup result
+  if (promoCode) {
+    try {
+      const codes = await stripeClient().promotionCodes.list({
+        code: promoCode,
+        active: true,
+        limit: 1,
+      });
+      if (codes.data && codes.data.length > 0) {
+        discounts = [{ promotion_code: codes.data[0].id }];
+        promoSucceeded = true;
+      } else {
+        promoSucceeded = false;
+      }
+    } catch (err) {
+      // Don't fail the checkout because Stripe's promotion-code endpoint
+      // hiccupped. Log + proceed at full price; the user keeps moving.
+      logApi("stripe.create_checkout_session", {
+        status: 0, ms: Date.now() - t0, reason: "promo_lookup_failed_soft",
+        error: err && err.message,
+      });
+      promoSucceeded = false;
+    }
+  }
+
+  const sessionParams = {
+    mode: "subscription",
+    managed_payments: { enabled: true },
+    line_items: [{ price: priceId, quantity: 1 }],
+    // client_reference_id surfaces on the Session for webhook lookups;
+    // subscription metadata persists for renewal / cancel events that
+    // reference the Subscription rather than the Session.
+    client_reference_id: userId,
+    subscription_data: {
+      // Stamp UTMs into subscription metadata so cohort attribution
+      // survives renewals. clerkUserId is always present.
+      metadata: { clerkUserId: userId, ...utms },
+    },
+    // If we already have a Stripe customer for this user, reuse it
+    // so card-on-file + billing history stay attached. Otherwise let
+    // Stripe create one based on the email we collected from Clerk.
+    customer:       existingCustomerId || undefined,
+    customer_email: existingCustomerId ? undefined : (userEmail || undefined),
+    // PR-10 cutover: returns to `/` (the new app at the canonical
+    // root). The /preview/ rewrite is kept as a one-week fallback,
+    // so existing in-flight checkout sessions still resolve.
+    success_url: `${origin}/?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${origin}/?upgrade=cancelled`,
+  };
+  // Stripe rejects `discounts` and `allow_promotion_codes: true` set
+  // together — pick one. Pre-applied code wins; otherwise surface the
+  // hosted-checkout "Add promotion code" link.
+  if (discounts) {
+    sessionParams.discounts = discounts;
+  } else {
+    sessionParams.allow_promotion_codes = true;
+  }
+
   let session;
   try {
-    session = await stripeClient().checkout.sessions.create({
-      mode: "subscription",
-      managed_payments: { enabled: true },
-      line_items: [{ price: priceId, quantity: 1 }],
-      // Surface the "Add promotion code" link on Stripe-hosted checkout.
-      // Codes are validated against active Promotion Codes in the Stripe
-      // Dashboard (Product catalogue → Coupons → Promotion codes). Test-
-      // and live-mode promo codes are separate ledgers — create live-mode
-      // codes after rotating to live keys.
-      allow_promotion_codes: true,
-      // client_reference_id surfaces on the Session for webhook lookups;
-      // subscription metadata persists for renewal / cancel events that
-      // reference the Subscription rather than the Session.
-      client_reference_id: userId,
-      subscription_data: {
-        metadata: { clerkUserId: userId },
-      },
-      // If we already have a Stripe customer for this user, reuse it
-      // so card-on-file + billing history stay attached. Otherwise let
-      // Stripe create one based on the email we collected from Clerk.
-      customer:       existingCustomerId || undefined,
-      customer_email: existingCustomerId ? undefined : (userEmail || undefined),
-      // PR-10 cutover: returns to `/` (the new app at the canonical
-      // root). The /preview/ rewrite is kept as a one-week fallback,
-      // so existing in-flight checkout sessions still resolve.
-      success_url: `${origin}/?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${origin}/?upgrade=cancelled`,
-    }, {
+    session = await stripeClient().checkout.sessions.create(sessionParams, {
       apiVersion: MANAGED_PAYMENTS_VERSION,
     });
   } catch (err) {
@@ -118,6 +181,22 @@ module.exports = async (req, res) => {
 
   logApi("stripe.create_checkout_session", {
     status: 200, ms: Date.now() - t0, user_id: userId, session_id: session.id,
+    has_promo: discounts ? 1 : 0,
+    promo_succeeded: promoSucceeded === null ? "" : (promoSucceeded ? 1 : 0),
   });
+
+  // Wave-2: fire promo_code_applied server-side when a code was
+  // attempted (regardless of outcome). distinctId is the Clerk userId
+  // so the event chains with the client-side identify() that already
+  // ran when the user signed in.
+  if (promoCode) {
+    posthog.capture(userId, "promo_code_applied", {
+      code: promoCode,
+      succeeded: promoSucceeded === true,
+      source: "create_checkout_session",
+    });
+    await posthog.flush();
+  }
+
   return res.status(200).json({ url: session.url, sessionId: session.id });
 };

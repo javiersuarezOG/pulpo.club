@@ -138,6 +138,11 @@ module.exports = async (req, res) => {
 
   // Resolve the promo code if present. Stripe rejects combinations of
   // `discounts: [...]` and `allow_promotion_codes: true` — pick one.
+  // /start is intentionally strict on invalid codes (4xx) — the marketing
+  // page should surface a typo'd code so the user can fix it. The
+  // signed-in flow (create-checkout-session.js) falls through silently.
+  // Wave-2: both flows fire `promo_code_applied` so the cross-flow
+  // funnel sees every attempt.
   let discounts = null;
   if (promoCode) {
     try {
@@ -158,10 +163,16 @@ module.exports = async (req, res) => {
           reason: "invalid_promo_code", promo_code: promoCode,
           stripe_key_prefix: keyPrefix, ms: Date.now() - t0,
         });
+        posthog.capture(distinctId, "promo_code_applied", {
+          code: promoCode, succeeded: false, source: "start_checkout",
+        });
         await posthog.flush();
         return res.status(400).json({ error: "invalid_promo_code" });
       }
       discounts = [{ promotion_code: codes.data[0].id }];
+      posthog.capture(distinctId, "promo_code_applied", {
+        code: promoCode, succeeded: true, source: "start_checkout",
+      });
     } catch (err) {
       logApi("stripe.start_checkout", {
         status: 500, ms: Date.now() - t0, reason: "promo_lookup_failed",
@@ -170,6 +181,9 @@ module.exports = async (req, res) => {
       posthog.capture(distinctId, "start_checkout.failed", {
         reason: "promo_lookup_failed", error_message: err && err.message,
         ms: Date.now() - t0,
+      });
+      posthog.capture(distinctId, "promo_code_applied", {
+        code: promoCode, succeeded: false, source: "start_checkout",
       });
       await posthog.flush();
       return res.status(500).json({ error: "promo_lookup_failed" });
