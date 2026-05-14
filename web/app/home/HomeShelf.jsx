@@ -16,6 +16,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
+import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { readFeatureFlag } from "../lib/feature-flag";
 
 // ────────────────────────────────────────────────────────────────────
 // Shared shelf scaffold
@@ -81,9 +83,22 @@ function ShelfCard({ card, position, shelfKey, app }) {
         listing_id: card.id || `placeholder-${shelfKey}-${position}`,
       });
     } catch { /* ignore */ }
-    if (app && typeof app.openSignup === "function") {
-      app.openSignup({ mode: "signup" });
+
+    // Wave-1 routing: hardcoded editorial cards have no listing target,
+    // so signed-in tiers resolve to passthrough → no-op. Anon falls into
+    // free_signup. When real listings replace placeholders, swap the
+    // passthrough branch to app.openListing(card.id).
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      if (app && typeof app.openSignup === "function") {
+        app.openSignup({ mode: "signup" });
+      }
+      return;
     }
+    const branch = routeCtaForState("shelf_card", app?.user);
+    trackCtaRouted("shelf_card", app?.user, branch, true);
+    if (branch === "passthrough") return; // placeholder cards: no destination yet
+    void dispatchCentralBranch(branch, app);
   }, [shelfKey, position, card.id, app]);
 
   const imgSrc = card.image ? getCategoryImage(card.image) : null;

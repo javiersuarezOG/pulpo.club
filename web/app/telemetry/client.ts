@@ -29,6 +29,8 @@ type PostHog = {
   opt_out_capturing: () => void;
   opt_in_capturing: () => void;
   has_opted_out_capturing: () => boolean;
+  isFeatureEnabled: (key: string) => boolean | undefined;
+  onFeatureFlags: (cb: () => void) => void;
 };
 
 type QueuedException = { error: unknown; extra?: Record<string, unknown>; ts: number };
@@ -175,7 +177,18 @@ function scheduleInit() {
         // app.jsx's replaceState hasn't run yet to clean a /?email=…
         // entry URL.
         before_send: scrubEventUrls,
-        loaded: () => drainQueue(),
+        loaded: () => {
+          drainQueue();
+          // Subscribe to feature-flag arrival so React consumers can
+          // re-render once values are known. PostHog calls this on the
+          // first flag load AND on subsequent reloads; we only need to
+          // signal once, so de-dupe with the flagsLoaded sentinel.
+          try {
+            posthog?.onFeatureFlags(() => {
+              if (!flagsLoaded) notifyFlagsLoaded();
+            });
+          } catch { /* ignore */ }
+        },
       });
     } catch (err) {
       // Silent failure; tracking just doesn't happen.
@@ -276,6 +289,48 @@ export function optOut() {
 
 export function optIn() {
   try { posthog?.opt_in_capturing(); } catch { /* ignore */ }
+}
+
+// ── Feature flags ────────────────────────────────────────────────────
+//
+// Boolean PostHog feature flags. Used by Wave-1 CTA routing for runtime
+// kill-switch capability — flip the flag in PostHog (rollout 100% → 0%)
+// to revert behavior without a deploy.
+//
+// PostHog loads flags asynchronously after init; before they arrive,
+// callers receive `fallback`. Subscribers via `onFeatureFlagsLoaded`
+// are notified once at first load so React hooks can re-render.
+
+const flagsLoadedSubs = new Set<() => void>();
+let flagsLoaded = false;
+
+function notifyFlagsLoaded() {
+  flagsLoaded = true;
+  for (const cb of flagsLoadedSubs) {
+    try { cb(); } catch { /* ignore */ }
+  }
+}
+
+export function isFeatureEnabled(key: string, fallback: boolean): boolean {
+  if (!posthog) return fallback;
+  try {
+    const v = posthog.isFeatureEnabled(key);
+    if (typeof v === "boolean") return v;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function onFeatureFlagsLoaded(cb: () => void): () => void {
+  if (flagsLoaded) {
+    // Already loaded — fire async so subscribers don't run synchronously
+    // inside their own setup effect.
+    setTimeout(() => { try { cb(); } catch { /* ignore */ } }, 0);
+    return () => {};
+  }
+  flagsLoadedSubs.add(cb);
+  return () => { flagsLoadedSubs.delete(cb); };
 }
 
 // Boot the lazy init now so the queue starts draining as soon as the

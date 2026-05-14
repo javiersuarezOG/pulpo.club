@@ -9,6 +9,8 @@ import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { PulpoLogo } from "../components.jsx";
 import { IconMenu2, IconX, IconArrowRight } from "./icons.jsx";
+import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { readFeatureFlag } from "../lib/feature-flag";
 
 const CTA_LOCATION = "header";
 
@@ -109,7 +111,18 @@ export function HomepageHeader({ app, locale }) {
     try {
       track("homepage.cta_clicked", { location: CTA_LOCATION, cta_text: label });
     } catch { /* ignore */ }
-    fireSignup(app, "signup");
+
+    // Wave-1 routing: paid users no longer see the upsell modal. Behind
+    // cta_routing_v2 — flip the flag in PostHog to revert.
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      fireSignup(app, "signup");
+      return;
+    }
+    const branch = routeCtaForState("header_primary", app?.user);
+    trackCtaRouted("header_primary", app?.user, branch, true);
+    if (branch === "passthrough") return; // paid user → no-op; Wave 4 hides the CTA
+    void dispatchCentralBranch(branch, app);
   }, [app, locale]);
 
   return (

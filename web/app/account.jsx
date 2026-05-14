@@ -17,6 +17,8 @@ import {
   sanitizePreferredCategories,
 } from "./lib/categories";
 import { readProfile } from "./lib/user-profile";
+import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
+import { readFeatureFlag } from "./lib/feature-flag";
 
 function AccountPage({ app }) {
   // Source of truth for the active tab is `app.routeParams.section` — set
@@ -384,19 +386,31 @@ function NotificationsSection({ app }) {
 // existing pendingAction chain).
 function NotifProUpsell({ app }) {
   const onUpgrade = () => {
-    startStripeCheckout({
-      onError: (code) => {
-        if (code === "sign_in_required") {
-          if (app.user) {
-            app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+    // Wave-1 routing: the old path fired startStripeCheckout
+    // unconditionally and only fell back to signup on a Stripe 401,
+    // which flashed a redirect attempt before showing the modal.
+    // Now anon → login_ui, free → paywall (/plans), paid → no-op.
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      startStripeCheckout({
+        onError: (code) => {
+          if (code === "sign_in_required") {
+            if (app.user) {
+              app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+            } else {
+              app.openSignup({ mode: "signup", pendingAction: "checkout" });
+            }
           } else {
-            app.openSignup({ mode: "signup", pendingAction: "checkout" });
+            app.go("plans");
           }
-        } else {
-          app.go("plans");
-        }
-      },
-    });
+        },
+      });
+      return;
+    }
+    const branch = routeCtaForState("newsletter_activation", app?.user);
+    trackCtaRouted("newsletter_activation", app?.user, branch, true);
+    if (branch === "passthrough") return; // paid → UI already shows toggles
+    void dispatchCentralBranch(branch, app);
   };
   return (
     <div className="notif-upsell">

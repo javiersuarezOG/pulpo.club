@@ -247,6 +247,29 @@ export type EventMap = {
   "plans.viewed": { source: "topnav" | "footer" | "paywall" | "manual" };
   "view_original.clicked": { listing_id: string; source_label: string };
 
+  // Wave-1 CTA routing — fires once per click on any CTA that flows
+  // through lib/cta-routing.ts. Property shape is locked at ship; the
+  // branch enum mirrors the Branch type in cta-routing.ts. flag_enabled
+  // tells us which path executed (new routing on / rollback on) so we
+  // can compare conversion across a kill-switch flip.
+  // user_state matches gating.ts's Tier ("agency" is paid-tier-equivalent
+  // to "pro"; preserved separately for analytics segmentation).
+  "cta_routed": {
+    cta_id:
+      | "header_primary"
+      | "hero_primary"
+      | "hero_just_in"
+      | "featured_deal"
+      | "newsletter_activation"
+      | "shelf_card"
+      | "broker_outbound"
+      | "favorites_action"
+      | "account_entry";
+    user_state: "anonymous" | "free" | "pro" | "agency";
+    branch: "stripe_checkout" | "paywall" | "free_signup" | "login_ui" | "passthrough";
+    flag_enabled: boolean;
+  };
+
   // ───── Upgrade flow (Stripe Checkout) ─────
   // Fires when the upgrade button is clicked and we kick off
   // /api/stripe/create-checkout-session. Pairs with the return-URL
