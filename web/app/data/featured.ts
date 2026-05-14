@@ -164,9 +164,12 @@ export async function loadFeaturedJson(timeoutMs = 600): Promise<FeaturedJson | 
 }
 
 /** Convert featured-pool listing IDs (`source|source_id`) to the
- *  hyphen-form used by data/listings.ts ids. Centralised here so the
- *  Phase 4 proof-row component can resolve picks against the
- *  useListings() set without duplicating the substitution. */
+ *  double-underscore form used by data/listings.ts ids today.
+ *  PR #244 standardised the ID format on `${source}__${source_id}`
+ *  to match what `/api/social/listings` emits (pulpo-social embeds
+ *  these ids in IG/FB UTM links — a separator mismatch 404s the
+ *  shared listing). Helper was hyphen-form before that change;
+ *  Wave-5b updated it when wiring FeaturedDeal to real listings. */
 export function featuredIdToListingId(featuredId: string): string {
-  return featuredId.replace("|", "-");
+  return featuredId.replace("|", "__");
 }

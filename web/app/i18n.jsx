@@ -313,10 +313,19 @@ const UI_STRINGS = {
 
   "home.featured.eyebrow":       { en: "FEATURED DEAL",
                                    es: "OFERTA DESTACADA" },
+  // Wave-5b: when featured_deal_real_v1 flag is on, the card renders a
+  // real listing from featured.json. Title + body switch to generic
+  // curation copy (the listing varies; the section narrative doesn't).
+  // The hardcoded title/body below stay as the flag-off fallback so a
+  // rollback is byte-for-byte identical to today.
   "home.featured.title":         { en: "3-bed lakefront at Lago de Coatepeque, 23% under comps.",
                                    es: "Casa de 3 habitaciones frente al Lago de Coatepeque, 23% bajo comparables." },
   "home.featured.body":          { en: "0.4 acre, private dock, listed two days ago and already scored A+ by our comp engine.",
                                    es: "0.16 ha, muelle privado, publicada hace dos días y ya con A+ de nuestro motor de comparables." },
+  "home.featured.title_real":    { en: "This week's standout deal.",
+                                   es: "El destacado de la semana." },
+  "home.featured.body_real":     { en: "Hand-picked by our comp engine. Tap to see the full listing.",
+                                   es: "Elegido por nuestro motor de comparables. Toca para ver el anuncio." },
   "home.featured.cta_aria":      { en: "Open featured deal",
                                    es: "Ver oferta destacada" },
   "home.featured.zone":          { en: "Lago de Coatepeque",
@@ -327,6 +336,9 @@ const UI_STRINGS = {
                                    es: "−23%" },
   "home.featured.stat_asking":   { en: "Asking",
                                    es: "Precio" },
+  // home.featured.stat_value retained for flag-off rollback. The
+  // value-estimate stat doesn't exist in the data model — Wave-5b
+  // dropped it from the real-data variant.
   "home.featured.stat_value":    { en: "Est. value",
                                    es: "Valor estimado" },
   "home.featured.stat_days":     { en: "Days on market",
