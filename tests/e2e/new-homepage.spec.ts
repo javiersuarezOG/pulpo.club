@@ -56,8 +56,19 @@ test.describe("Homepage v2 — redesign smoke", () => {
     expect(errors).toEqual([]);
   });
 
-  test("primary hero CTA opens the signup modal (conversion path)", async ({ page }) => {
+  test("primary hero CTA routes anonymous users to /start (Wave-1 conversion path)", async ({ page, context }) => {
     const errors = attachErrorRecorder(page);
+
+    // Wave-1 routing change: anon clicks no longer open a signup modal
+    // intermediary — they redirect to /start which handles email +
+    // Stripe checkout in one flow. Intercept the redirect so the test
+    // doesn't navigate away before we can assert.
+    let startRedirectHit = false;
+    await context.route("**/start**", (route) => {
+      startRedirectHit = true;
+      void route.fulfill({ status: 204, body: "" });
+    });
+
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
     // Homepage v3 hero CTA class is .hp-hero-cta-primary ("Try a free
@@ -68,8 +79,10 @@ test.describe("Homepage v2 — redesign smoke", () => {
     ).first();
     await heroCta.click();
 
-    // The shared SignupModal renders with class .modal-signup.
-    await expect(page.locator(".modal-signup").first()).toBeVisible({ timeout: 5_000 });
+    await expect.poll(() => startRedirectHit, {
+      timeout: 3_000,
+      message: "expected anon click to redirect to /start (Wave-1 routing)",
+    }).toBe(true);
 
     expect(errors).toEqual([]);
   });

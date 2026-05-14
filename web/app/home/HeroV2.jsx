@@ -48,6 +48,8 @@ import {
   slugifyListing,
 } from "./heroLeaderboard";
 import { readLiveCounterCache, writeLiveCounterCache } from "../lib/live-counter-cache";
+import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { readFeatureFlag } from "../lib/feature-flag";
 
 // ───── helpers ─────────────────────────────────────────────────────
 
@@ -160,9 +162,20 @@ export function HeroV2({ app, locale }) {
     try {
       track("homepage.cta_clicked", { location: "hero_primary", cta_text: ctaText });
     } catch { /* never crash render */ }
-    if (app && typeof app.openSignup === "function") {
-      app.openSignup({ mode: "signup" });
+
+    // Wave-1 routing: paid users no longer get a signup modal. Behind
+    // the cta_routing_v2 flag so we can flip back without a deploy.
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      if (app && typeof app.openSignup === "function") {
+        app.openSignup({ mode: "signup" });
+      }
+      return;
     }
+    const branch = routeCtaForState("hero_primary", app?.user);
+    trackCtaRouted("hero_primary", app?.user, branch, true);
+    if (branch === "passthrough") return; // paid user → no-op; Wave 4 hides the CTA entirely
+    void dispatchCentralBranch(branch, app);
   }, [app, locale]);
 
   const onSecondaryCta = useCallback(() => {
@@ -188,9 +201,25 @@ export function HeroV2({ app, locale }) {
         listing_id: slug,
       });
     } catch { /* ignore */ }
-    if (app && typeof app.openSignup === "function") {
-      app.openSignup({ mode: "signup" });
+
+    // Wave-1 routing: paid + free now open the named listing instead of
+    // a signup modal. Anon falls through to the free-signup branch.
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      if (app && typeof app.openSignup === "function") {
+        app.openSignup({ mode: "signup" });
+      }
+      return;
     }
+    const branch = routeCtaForState("hero_just_in", app?.user);
+    trackCtaRouted("hero_just_in", app?.user, branch, true);
+    if (branch === "passthrough") {
+      if (app && typeof app.openListing === "function") {
+        app.openListing(slug);
+      }
+      return;
+    }
+    void dispatchCentralBranch(branch, app);
   }, [pill, app]);
 
   // ── Live counter fetch (real numbers from /data/last_updated.json) ─

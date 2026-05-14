@@ -9,13 +9,28 @@ import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { IconArrowRight } from "./icons.jsx";
 import { getCategoryImage } from "../assets/categories/index.js";
+import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { readFeatureFlag } from "../lib/feature-flag";
 
 export function FeaturedDeal({ app, locale }) {
   const onClick = useCallback(() => {
     try { track("homepage.featured_deal_clicked", {}); } catch { /* ignore */ }
-    if (app && typeof app.openSignup === "function") {
-      app.openSignup({ mode: "signup" });
+
+    // Wave-1 routing: free + paid users no longer get a signup modal.
+    // The card has no real listing target today, so signed-in tiers
+    // resolve to passthrough → no-op. Wave 4 hides the block from
+    // paid users via the home block registry.
+    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
+    if (!flagEnabled) {
+      if (app && typeof app.openSignup === "function") {
+        app.openSignup({ mode: "signup" });
+      }
+      return;
     }
+    const branch = routeCtaForState("featured_deal", app?.user);
+    trackCtaRouted("featured_deal", app?.user, branch, true);
+    if (branch === "passthrough") return; // no listing destination yet — no-op
+    void dispatchCentralBranch(branch, app);
   }, [app]);
 
   return (

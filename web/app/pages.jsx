@@ -52,6 +52,7 @@ import {
   galleryThumbsUnlockedFor,
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
+import { trackCtaRouted } from "./lib/cta-routing";
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1854,44 +1855,24 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
         </div>
 
-        {offMarketLocked && (
-          <div className="paywall-overlay hard">
-            <div className="pw-card">
-              <Icon name="cat_off_market" size={28}/>
-              <h3>{t("detail.paywall.title", lc)}</h3>
-              <p>{t("detail.paywall.body", lc)}</p>
-              <button
-                className="btn-primary lg"
-                onClick={() => {
-                  track("paywall.bypassed", {
-                    kind: "off_market", action: "upgrade", listing_id: listing.id,
-                  });
-                  app.go("plans");
-                }}
-              >{t("detail.paywall.see_plans", lc)}</button>
-              {!app.user && (
-                <button
-                  className="btn-ghost"
-                  onClick={() => {
-                    track("paywall.bypassed", {
-                      kind: "off_market", action: "have_account", listing_id: listing.id,
-                    });
-                    app.openSignup({ mode: "login" });
-                  }}
-                >{t("detail.paywall.have_account", lc)}</button>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Wave-1: the off-market full-page overlay used to live here
+            and blocked anon + free users from seeing the detail body
+            entirely. Removed because off-market should be LESS scary
+            to non-paid users, not more — the more they see, the more
+            they want Pro. The CTA bar below now handles the gate at
+            the broker-outbound link (free/anon see an upgrade button,
+            paid see the outbound). USP + gallery soft caps inside the
+            body still apply via gating.ts. */}
       </div>
 
       {/* Sticky bottom CTA. Source-listing link is Pro-only — the
           vendor-URL outbound is a paid feature. Anonymous and free
           users see Pro-upgrade prompts that chain to Stripe checkout
           (anonymous chains via SignupModal pendingAction:checkout;
-          free goes direct). Off-market listings + sold listings
-          still use the legacy fallback above. */}
-      {!isSold && !offMarketLocked && (
+          free goes direct). Renders for both on-market and off-market
+          listings; sold listings opt out (no point upselling on a
+          finished sale). */}
+      {!isSold && (
         <div className="detail-cta-bar">
           {!isPaid ? (
             <button
@@ -1900,6 +1881,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 track("paywall.bypassed", {
                   kind: "detail_view", action: "upgrade", listing_id: listing.id,
                 });
+                // Wave-1 funnel-debug event. Branch reflects the
+                // dispatch this CTA bar performs (the upgrade button
+                // IS the per-CTA paywall when the user can't see the
+                // broker URL). Dispatch logic unchanged below.
+                trackCtaRouted("broker_outbound", app.user, "paywall", true);
                 if (needsSignup) {
                   // Anonymous: signup then chained checkout. The
                   // post-signin effect in app.jsx fires
@@ -1935,10 +1921,13 @@ function ListingDetail({ listing, app, asPanel = true }) {
               href={listing.original_url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => track("view_original.clicked", {
-                listing_id: listing.id,
-                source_label: listing.source_label,
-              })}
+              onClick={() => {
+                track("view_original.clicked", {
+                  listing_id: listing.id,
+                  source_label: listing.source_label,
+                });
+                trackCtaRouted("broker_outbound", app.user, "passthrough", true);
+              }}
             >
               {t("detail.view_on", lc, { source: listing.source_label })} <Icon name="arrow_up_right" size={16} strokeWidth={2}/>
             </a>
