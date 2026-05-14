@@ -1,3 +1,9 @@
+// TODO (Phase 2 backlog, tracked in pulpo-social PRD v2 §4.3):
+// Schedule automation/photo_quality.py::detect_text_overlay to run against ALL
+// existing listings during the nightly pipeline, not just newly scraped ones.
+// Once has_text_overlay is populated for >=90% of ranked.json rows, promote
+// the null check in passesQualityGate() from "allow null" to "hard reject null".
+//
 // GET /api/social/listings — internal endpoint for the pulpo-social automation service.
 //
 // Bearer-token gated (PULPO_INTERNAL_API_KEY). Reads web/data/ranked.json and returns
