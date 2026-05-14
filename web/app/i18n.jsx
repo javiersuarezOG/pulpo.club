@@ -287,6 +287,19 @@ const UI_STRINGS = {
   "home.hero.microcopy":         { en: "$5/month after · cancel anytime",
                                    es: "$5/mes luego · cancela cuando quieras" },
   // Live counter card (top-right, hides <768px).
+  // Wave 5#7+#9 (hero_v4 flag) — white photo-led hero. Reuses
+  // home.hero.h1.before / h1.italic / cta_primary / microcopy /
+  // counter_template; the strings below cover the new kicker,
+  // simplified subhead, photo aria, and featured-pill.
+  "home.hero.v4.kicker":         { en: "PULPO · BEACH + LAKE",
+                                   es: "PULPO · PLAYA + LAGO" },
+  "home.hero.v4.subhead":        { en: "We score every listing. No ads. No fluff.",
+                                   es: "Puntuamos cada anuncio. Sin anuncios. Sin relleno." },
+  "home.hero.v4.featured_pill":  { en: "Featured this week",
+                                   es: "Destacado esta semana" },
+  "home.hero.v4.photo_aria":     { en: "Open this week's featured listing in {name}",
+                                   es: "Abrir el destacado de esta semana en {name}" },
+
   "home.hero.counter_live":      { en: "LIVE NOW",
                                    es: "EN VIVO" },
   "home.hero.counter_template":  { en: "{count} listings · {sources} sources",
