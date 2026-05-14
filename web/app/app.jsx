@@ -11,8 +11,6 @@ import { t, useLocale, useUnits } from "./i18n.jsx";
 import { ListingsProvider, useListings, useListingsState } from "./data/use-listings.tsx";
 import { PulpoLogo } from "./components.jsx";
 import {
-  TopNav,
-  BottomNav,
   BrowsePage,
   SavedPage,
   PlansPage,
@@ -26,6 +24,12 @@ import {
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
 import { captureCampaignParams } from "./lib/campaign";
+// Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
+// inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
+// extracted out for the same reason — single chrome component per role.
+import { SiteHeader } from "./components/SiteHeader.jsx";
+import { SiteFooter } from "./components/SiteFooter.jsx";
+import { BottomNav } from "./components/BottomNav.jsx";
 
 // Rewrite cutover (Phase 9). NewHomePage is now the only homepage —
 // the legacy HomePage / StyleCarousel / NewsletterCTA were deleted
@@ -935,11 +939,9 @@ function App() {
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
     <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}`}>
-      {/* Homepage v2 owns its own header + footer chrome (HomepageHeader
-          inside NewHomePage). Suppress the shared TopNav + site-footer
-          on route === "home" so the page isn't double-headed. Every
-          other route still gets the shared chrome. */}
-      {route !== "home" && <TopNav app={app} />}
+      {/* Wave-3a: single SiteHeader on every route. The homepage's hero
+          still owns its conversion CTAs; the header is pure navigation. */}
+      <SiteHeader app={app} />
       <main className="main">
         {route === "home" && <NewHomePage app={app} />}
         {route === "browse" && <BrowsePage app={app} />}
@@ -948,40 +950,7 @@ function App() {
         {route === "account" && <AccountPage app={app} />}
       </main>
 
-      {route !== "home" && route !== "browse" && (route !== "account" || tweaks.showFooterOnAccount) && (
-        <footer className="site-footer">
-          <div className="footer-inner">
-            <div className="footer-brand">
-              <PulpoLogo size={20}/>
-              <p>{t("footer.tagline", locale)}</p>
-              <div className="footer-country">🇸🇻 {t("footer.country_badge", locale)}</div>
-            </div>
-            <div className="footer-cols">
-              <div>
-                <h5>Browse</h5>
-                <button className="link-btn" onClick={() => goBrowse({ category: "beachfront" })}>Beachfront</button>
-                <button className="link-btn" onClick={() => goBrowse({ category: "build_ready" })}>Build-ready</button>
-                <button className="link-btn" onClick={() => goBrowse({ category: "off_market" })}>Off-market</button>
-                <button className="link-btn" onClick={() => goBrowse({ category: "agricultural" })}>Agricultural</button>
-              </div>
-              <div>
-                <h5>Pulpo</h5>
-                <button className="link-btn" onClick={() => go("plans")}>Plans</button>
-                <a className="link-btn">About</a>
-                <a className="link-btn">Newsletter</a>
-                <a className="link-btn">Press</a>
-              </div>
-              <div>
-                <h5>Legal</h5>
-                <a className="link-btn">Terms</a>
-                <a className="link-btn">Privacy</a>
-                <a className="link-btn">Contact</a>
-              </div>
-            </div>
-          </div>
-          <div className="footer-fine">© 2026 Pulpo · A discovery-first land investment marketplace</div>
-        </footer>
-      )}
+      <SiteFooter app={app} locale={locale} tweaks={tweaks} />
 
       <BottomNav app={app} />
 

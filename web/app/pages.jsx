@@ -66,110 +66,12 @@ const SHOW_AGENCY_PLAN = false;
 // re-introduce both when a yearly price ships.
 const PRO_PRICE_EUR_PER_MONTH = 10;
 
-// ====== TopNav ======
-function TopNav({ app }) {
-  const lc = app.locale;
-  return (
-    <header className="topnav">
-      <div className="topnav-inner">
-        <button className="logo-btn" onClick={() => app.go("home")} aria-label={t("nav.tab.home", lc)}>
-          <PulpoLogo />
-        </button>
-        <nav className="topnav-links">
-          <button className={app.route === "home" ? "active" : ""} onClick={() => app.go("home")}>{t("nav.discover", lc)}</button>
-          <button className={app.route === "browse" ? "active" : ""} onClick={() => app.go("browse")}>{t("nav.browse", lc)}</button>
-          <button className={app.route === "saved" ? "active" : ""} onClick={() => app.go("saved")}>
-            {t("nav.saved", lc)} {app.savedIds.size > 0 && <span className="count-badge">{app.savedIds.size}</span>}
-          </button>
-        </nav>
-        <div className="topnav-right">
-          <LiveStats locale={lc} />
-          <LocaleToggle app={app} />
-          {app.user ? (
-            <div className="profile-chip">
-              <button
-                className="avatar avatar-btn"
-                onClick={() => app.go("account")}
-                title={t("nav.account", lc)}
-                aria-label={t("nav.account", lc)}
-              >{app.user.email[0].toUpperCase()}</button>
-              <button
-                className="link-btn"
-                onClick={() => app.signout()}
-                disabled={app.isSigningOut}
-                aria-busy={app.isSigningOut || undefined}
-              >{t("nav.logout", lc)}</button>
-            </div>
-          ) : (
-            <button
-              className="topnav-auth-icon"
-              onClick={() => app.openSignup({ mode: "login" })}
-              aria-label={t("nav.account_or_sign_in", lc)}
-              title={t("nav.account_or_sign_in", lc)}
-            >
-              <Icon name="user" size={20}/>
-            </button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
-}
-
-// Compact EN/ES toggle. In production this would be a proper menu with full
-// language names and flag-free regional labels (CR, MX, etc.) plus URL routing.
-function LocaleToggle({ app }) {
-  return (
-    <div className="locale-toggle" role="group" aria-label={t("locale.toggle_aria", app.locale)}>
-      {LOCALES.map(lc => (
-        <button
-          key={lc}
-          className={app.locale === lc ? "active" : ""}
-          onClick={() => {
-            const prev = app.locale;
-            if (prev !== lc) {
-              track("locale.changed", { from: prev, to: lc });
-            }
-            app.setLocale(lc);
-          }}
-        >
-          {lc.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ====== Mobile bottom tab bar ======
-function BottomNav({ app }) {
-  const lc = app.locale;
-  const tabs = [
-    { key: "home",    labelKey: "nav.tab.home",    icon: "home" },
-    { key: "browse",  labelKey: "nav.tab.browse",  icon: "search" },
-    { key: "saved",   labelKey: "nav.tab.saved",   icon: "heart" },
-    { key: "profile", labelKey: app.user ? "nav.tab.profile" : "nav.tab.signin", icon: "user" },
-  ];
-  return (
-    <nav className="bottomnav">
-      {tabs.map(tab => (
-        <button
-          key={tab.key}
-          className={(app.route === tab.key || (tab.key === "profile" && app.route === "account")) ? "active" : ""}
-          onClick={() => {
-            if (tab.key === "profile") {
-              if (!app.user) app.openSignup({ mode: "login" });
-              else app.go("account");
-            } else app.go(tab.key);
-          }}
-        >
-          <Icon name={tab.icon} size={20} />
-          <span>{t(tab.labelKey, lc)}</span>
-          {tab.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
-        </button>
-      ))}
-    </nav>
-  );
-}
+// TopNav, BottomNav, and LocaleToggle were extracted in Wave-3a:
+//   web/app/components/SiteHeader.jsx  — replaces TopNav + LocaleToggle
+//   web/app/components/BottomNav.jsx   — same logic, own file
+// app.jsx imports them directly now; the re-exports below kept the
+// pages.jsx surface stable during the rewrite phase and are no longer
+// needed.
 
 // ====== Pill rail ======
 function PillRail({ app, active }) {
@@ -2999,7 +2901,7 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
 }
 
 export {
-  TopNav, BottomNav, PillRail, BrowsePage, ListingDetail,
+  PillRail, BrowsePage, ListingDetail,
   SavedPage, PlansPage, SignupModal, WelcomeModal, ProUpsellModal, ToastHost,
   makeDefaultFilters, applyFilters,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
