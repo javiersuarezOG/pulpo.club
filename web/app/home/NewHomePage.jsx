@@ -28,14 +28,54 @@ import { FeaturedDeal } from "./FeaturedDeal.jsx";
 import { USPBand } from "./USPBand.jsx";
 import { PickShoreline } from "./PickShoreline.jsx";
 import { TopTenShelf, PriceDropsShelf, NewThisWeekShelf } from "./HomeShelf.jsx";
+import { visibleBlocksFor } from "./blockRegistry";
+import { readFeatureFlag } from "../lib/feature-flag";
+import { tierFor } from "../lib/gating";
+import { track } from "../telemetry/hook";
 
 /**
  * @param {object} props
  * @param {object} props.app  — App state with goBrowse(...), openListing(...),
  *                              openSignup(...), go(...), locale
  */
+// Wave-4: id → render-fn map. Each entry must match a BlockId in
+// blockRegistry.ts; if you add a block to the registry, add the
+// corresponding renderer here. Wrapping happens at the call site
+// (one ErrorBoundary per block).
+const BLOCK_COMPONENTS = {
+  hero:          ({ app, locale }) => <HeroV2 app={app} locale={locale} />,
+  featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
+  usps:          ({ locale })      => <USPBand locale={locale} />,
+  shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
+  top_10:        ({ app, locale }) => <TopTenShelf app={app} locale={locale} />,
+  price_drops:   ({ app, locale }) => <PriceDropsShelf app={app} locale={locale} />,
+  new_this_week: ({ app, locale }) => <NewThisWeekShelf app={app} locale={locale} />,
+};
+
 export function NewHomePage({ app }) {
   const locale = app.locale;
+
+  // Wave-4: resolve the block list once per mount. The flag governs
+  // whether paid users see a filtered homepage; default off until
+  // we're ready to roll out paid-home-variant-v1.
+  const flagEnabled = readFeatureFlag("paid_home_variant_v1", false);
+  const blocks = visibleBlocksFor(app.user, flagEnabled);
+
+  // Fire `paid_home_rendered` once per mount with the resolved list.
+  // Tells us in production whether the registry filter is engaging
+  // (i.e. whether paid users actually see the trimmed homepage).
+  useEffect(() => {
+    try {
+      track("paid_home_rendered", {
+        user_state: tierFor(app.user),
+        blocks_visible: [...blocks],
+        flag_enabled: flagEnabled,
+      });
+    } catch { /* never crash a render on telemetry */ }
+    // Mount-only — don't re-fire on locale flips or block-list
+    // tweaks (the registry is deterministic per (user, flag) pair).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Pro upsell modal trigger (carried over from the previous shell).
   // Mount-only so re-renders from routeParams tweaks don't re-fire
@@ -66,27 +106,14 @@ export function NewHomePage({ app }) {
   return (
     <div className="homepage-v2">
       <main className="homepage-v2-main">
-        <ErrorBoundary compact section="hero">
-          <HeroV2 app={app} locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="featured">
-          <FeaturedDeal app={app} locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="usps">
-          <USPBand locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="shoreline">
-          <PickShoreline app={app} locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="top_10">
-          <TopTenShelf app={app} locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="price_drops">
-          <PriceDropsShelf app={app} locale={locale} />
-        </ErrorBoundary>
-        <ErrorBoundary compact section="new_this_week">
-          <NewThisWeekShelf app={app} locale={locale} />
-        </ErrorBoundary>
+        {blocks.map((blockId) => {
+          const Block = BLOCK_COMPONENTS[blockId];
+          return (
+            <ErrorBoundary key={blockId} compact section={blockId}>
+              <Block app={app} locale={locale} />
+            </ErrorBoundary>
+          );
+        })}
       </main>
     </div>
   );
