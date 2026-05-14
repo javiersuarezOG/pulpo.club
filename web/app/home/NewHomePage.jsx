@@ -1,14 +1,17 @@
 // Homepage v2 — editorial coastal-index design.
 //
 // Sections, top to bottom:
-//   1. HomepageHeader   — wordmark + nav + Start free month CTA + mobile sheet
-//   2. HeroV2           — H1 with serif-italic "ranked.", CTAs, CSS-only newsletter preview
-//   3. FeaturedDeal     — single editorial card between hero and USPs
-//   4. USPBand          — "For subscribers only" + 3 cards on white
-//   5. PickShoreline    — Lake / Beach nav cards with editorial mockups
-//   6. TopTenShelf      — Top 10 deals right now
-//   7. PriceDropsShelf  — Price drops + ↘ N cuts pill
-//   8. NewThisWeekShelf — New this week + ✦ N added pill
+//   1. HeroV2           — H1 with serif-italic "ranked.", CTAs, CSS-only newsletter preview
+//   2. FeaturedDeal     — single editorial card between hero and USPs
+//   3. USPBand          — "For subscribers only" + 3 cards on white
+//   4. PickShoreline    — Lake / Beach nav cards with editorial mockups
+//   5. TopTenShelf      — Top 10 deals right now
+//   6. PriceDropsShelf  — Price drops + ↘ N cuts pill
+//   7. NewThisWeekShelf — New this week + ✦ N added pill
+//
+// Wave-3a: HomepageHeader removed — SiteHeader (mounted at the app
+// level) is the single header for every route. The hero still owns the
+// "Try a free month" CTA so the home page's conversion path is intact.
 //
 // Each section is wrapped in an ErrorBoundary so a render failure in
 // one shelf doesn't blank the whole page. The boundary's onError
@@ -20,7 +23,6 @@
 import React, { useEffect } from "react";
 import { decideShouldShowUpsell } from "../lib/upsell-config.ts";
 import { ErrorBoundary } from "../error-boundary.jsx";
-import { HomepageHeader } from "./HomepageHeader.jsx";
 import { HeroV2 } from "./HeroV2.jsx";
 import { FeaturedDeal } from "./FeaturedDeal.jsx";
 import { USPBand } from "./USPBand.jsx";
@@ -63,9 +65,6 @@ export function NewHomePage({ app }) {
 
   return (
     <div className="homepage-v2">
-      <ErrorBoundary compact section="header">
-        <HomepageHeader app={app} locale={locale} />
-      </ErrorBoundary>
       <main className="homepage-v2-main">
         <ErrorBoundary compact section="hero">
           <HeroV2 app={app} locale={locale} />

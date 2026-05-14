@@ -143,17 +143,20 @@ function tr(value, locale) {
 // UI strings table.
 // Keep keys descriptive and grouped. In a real app this becomes en.json / es.json.
 const UI_STRINGS = {
-  // Nav
+  // Nav — Wave 3a renamed the three section labels:
+  //   * Home tab stays "Home" (the /browse tab took the "Discover" label).
+  //   * /browse is labelled "Discover" — catalog/search is where you discover.
+  //   * /saved is labelled "Favorites" — consumer mental model.
+  // URL paths still say /browse and /saved; the URL rename is Wave 3b
+  // (gated on a PostHog dashboard audit). One key per surface concept;
+  // SiteHeader and BottomNav read the same strings.
+  "nav.home":                { en: "Home",                es: "Inicio" },
   "nav.discover":            { en: "Discover",            es: "Descubrir" },
-  "nav.browse":              { en: "Browse",              es: "Explorar" },
-  "nav.saved":               { en: "Saved",               es: "Guardados" },
+  "nav.favorites":           { en: "Favorites",           es: "Favoritos" },
   "nav.login":               { en: "Log in",              es: "Iniciar sesión" },
   "nav.signup_free":         { en: "Sign up — free",      es: "Crear cuenta — gratis" },
   "nav.logout":              { en: "Log out",             es: "Cerrar sesión" },
   "nav.account_or_sign_in":  { en: "Sign in or create an account", es: "Inicia sesión o crea una cuenta" },
-  "nav.tab.home":            { en: "Home",                es: "Inicio" },
-  "nav.tab.browse":          { en: "Browse",              es: "Explorar" },
-  "nav.tab.saved":           { en: "Saved",               es: "Guardados" },
   "nav.tab.profile":         { en: "Profile",             es: "Perfil" },
   "nav.tab.signin":          { en: "Sign in",             es: "Entrar" },
 
@@ -466,8 +469,11 @@ const UI_STRINGS = {
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
 
-  // Saved
-  "saved.title":             { en: "Saved",               es: "Guardados" },
+  // Saved — page title matches the nav-bar label ("Favorites"). The
+  // URL is still /saved (Wave 3b renames it). Past-tense "saved"
+  // strings (toast.saved, etc.) stay as-is — they're verbs, not the
+  // page brand.
+  "saved.title":             { en: "Favorites",           es: "Favoritos" },
   "saved.empty.title":       { en: "Your saved listings will appear here",
                                es: "Tus propiedades guardadas aparecerán aquí" },
   "saved.empty.body":        { en: "Browse listings and tap ♡ to save the ones that interest you.",
@@ -756,7 +762,10 @@ const UI_STRINGS = {
 
   // Account area (A.3)
   "nav.account":             { en: "Account",                       es: "Cuenta" },
-  "account.back":            { en: "← Back to Discover",            es: "← Volver a Descubrir" },
+  // Wave 3a: button navigates to `home` route (account.jsx:122). After
+  // the nav rename "Discover" labels /browse, so this label moved to
+  // "Home" to match the actual destination.
+  "account.back":            { en: "← Back to Home",                es: "← Volver al Inicio" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
   "account.notifications":   { en: "Notifications",                 es: "Notificaciones" },
   "account.subscription":    { en: "Manage Subscription",           es: "Suscripción" },

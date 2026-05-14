@@ -41,7 +41,8 @@ test.describe("Homepage v2 — redesign smoke", () => {
     const errors = attachErrorRecorder(page);
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
-    await expect(page.locator(".hp-header")).toBeVisible();
+    // Wave-3a: HomepageHeader replaced by the shared SiteHeader.
+    await expect(page.locator('[data-testid="site-header"]')).toBeVisible();
     await expect(page.locator(".hp-hero")).toBeVisible();
     await expect(page.locator(".hp-featured")).toBeVisible();
     await expect(page.locator(".hp-usp")).toBeVisible();
@@ -124,27 +125,8 @@ test.describe("Homepage v2 — redesign smoke", () => {
     expect(errors).toEqual([]);
   });
 
-  test("mobile menu opens, lists nav links, closes on Escape", async ({ page, browserName }) => {
-    // Force a mobile viewport so the hamburger is visible.
-    await page.setViewportSize({ width: 375, height: 812 });
-    const errors = attachErrorRecorder(page);
-    await page.goto(URL_HOME, { waitUntil: "networkidle" });
-
-    await page.locator(".hp-header-burger").click();
-
-    // The sheet renders with role="dialog" + aria-modal.
-    const sheet = page.locator(".hp-mobile-sheet");
-    await expect(sheet).toBeVisible();
-    // Nav links inside the sheet are 48px tap targets (the close
-    // button is checked separately by visual review).
-    await expect(sheet.locator(".hp-mobile-link")).toHaveCount(5);
-
-    // Escape closes.
-    await page.keyboard.press("Escape");
-    await expect(sheet).toHaveCount(0);
-
-    expect(errors).toEqual([]);
-    // Quietly use browserName so noUnusedParams doesn't trip.
-    expect(typeof browserName).toBe("string");
-  });
+  // Wave-3a: the mobile-hamburger sheet was a HomepageHeader-only
+  // feature. The new SiteHeader is TopNav-style with BottomNav
+  // handling mobile section navigation. The "mobile menu opens..."
+  // test was removed with HomepageHeader.jsx.
 });
