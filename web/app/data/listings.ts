@@ -154,7 +154,15 @@ function buildPhotos(raw: any): string[] {
 export function adaptListing(raw: any): Listing {
   const sourceKey = String(raw.source ?? "unknown");
   const sourceId = String(raw.source_id ?? "");
-  const id = `${sourceKey}-${sourceId}` || `pulpo-${Math.random().toString(36).slice(2)}`;
+  // ID format must match what `/api/social/listings` exposes (see
+  // `api/social/listings.js`: `${source}__${source_id}`). pulpo-social
+  // embeds these ids in IG + FB UTM links; if the frontend uses a different
+  // separator the linked listings 404 with "This listing is no longer
+  // available." (regression caught after Phase 2 first auto-publishes —
+  // 2026-05-14.)
+  const id = sourceKey && sourceId
+    ? `${sourceKey}__${sourceId}`
+    : `pulpo__${Math.random().toString(36).slice(2)}`;
   // PR-7 — prefer the backend-derived source_type when present (the
   // pipeline now sets it via pulpo/derived_rules.derive_source_type).
   // Fallback to the FE-side derivation keeps things rendering during
