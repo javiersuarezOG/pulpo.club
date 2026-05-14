@@ -15,10 +15,12 @@ const free: User = { plan: "free" };
 const pro: User = { plan: "pro" };
 const agency: User = { plan: "agency" };
 
-const ALL_FLAGS_OFF = { paid_home_variant_v1: false, usp_popup_v1: false };
-const PAID_HOME_ON  = { paid_home_variant_v1: true,  usp_popup_v1: false };
-const POPUP_ON      = { paid_home_variant_v1: false, usp_popup_v1: true  };
-const BOTH_ON       = { paid_home_variant_v1: true,  usp_popup_v1: true  };
+const ALL_FLAGS_OFF = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: false };
+const PAID_HOME_ON  = { paid_home_variant_v1: true,  usp_popup_v1: false, hero_v4: false };
+const POPUP_ON      = { paid_home_variant_v1: false, usp_popup_v1: true,  hero_v4: false };
+const BOTH_ON       = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: false };
+const HERO_V4_ON    = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: true  };
+const ALL_FLAGS_ON  = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: true  };
 
 const ALL_BLOCKS: readonly BlockId[] = [
   "hero", "featured", "usps",
@@ -111,6 +113,42 @@ describe("HOME_BLOCKS — author-order + tier coverage invariants", () => {
         expect.arrayContaining(["anonymous", "free", "pro", "agency"]),
       );
     }
+  });
+});
+
+describe("visibleBlocksFor — hero_v4 flag", () => {
+  // Wave 5#7+#9: the new white hero absorbs the featured-listing visually,
+  // so the standalone `featured` block drops from the homepage flow.
+  it.each([
+    ["anonymous", anon],
+    ["free",      free],
+    ["pro",       pro],
+    ["agency",    agency],
+  ])("drops `featured` for %s", (_, user) => {
+    const out = visibleBlocksFor(user as never, HERO_V4_ON);
+    expect(out).not.toContain("featured");
+    // Other blocks unaffected.
+    expect(out).toContain("hero");
+    expect(out).toContain("usps");
+    expect(out).toContain("shoreline");
+  });
+
+  it("composes with usp_popup_v1: both `featured` and `usps` gone", () => {
+    const out = visibleBlocksFor(anon as never, {
+      paid_home_variant_v1: false,
+      usp_popup_v1:         true,
+      hero_v4:              true,
+    });
+    expect(out).not.toContain("featured");
+    expect(out).not.toContain("usps");
+    expect(out).toContain("hero");
+  });
+
+  it("composes with all flags on for paid: hero + featured + usps all gone", () => {
+    const out = visibleBlocksFor(pro as never, ALL_FLAGS_ON);
+    // paid_home_variant filters out NON_PAID blocks (hero/featured/usps)
+    // and hero_v4 also filters out featured; usp_popup also filters usps.
+    expect(out).toEqual(["shoreline", "top_10", "price_drops", "new_this_week"]);
   });
 });
 

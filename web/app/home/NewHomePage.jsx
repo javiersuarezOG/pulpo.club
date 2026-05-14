@@ -24,6 +24,7 @@ import React, { useEffect, useState } from "react";
 import { decideShouldShowUpsell } from "../lib/upsell-config.ts";
 import { ErrorBoundary } from "../error-boundary.jsx";
 import { HeroV2 } from "./HeroV2.jsx";
+import { HeroV4 } from "./HeroV4.jsx";
 import { FeaturedDeal } from "./FeaturedDeal.jsx";
 import { USPBand } from "./USPBand.jsx";
 import { PickShoreline } from "./PickShoreline.jsx";
@@ -44,8 +45,14 @@ import { decideArm, armPassiveTriggers } from "../lib/usp-popup-trigger";
 // blockRegistry.ts; if you add a block to the registry, add the
 // corresponding renderer here. Wrapping happens at the call site
 // (one ErrorBoundary per block).
+//
+// `hero` accepts an extra `heroV4` flag so the same registry slot can
+// render the dark v2 hero or the new white v4 hero depending on the
+// homepage flag map.
 const BLOCK_COMPONENTS = {
-  hero:          ({ app, locale }) => <HeroV2 app={app} locale={locale} />,
+  hero:          ({ app, locale, heroV4 }) => (
+    heroV4 ? <HeroV4 app={app} locale={locale} /> : <HeroV2 app={app} locale={locale} />
+  ),
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
   usps:          ({ locale })      => <USPBand locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
@@ -63,9 +70,11 @@ export function NewHomePage({ app }) {
   // historical meaning) so dashboards stay stable.
   const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", false);
   const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
+  const heroV4Flag   = readFeatureFlag("hero_v4", false);
   const blocks = visibleBlocksFor(app.user, {
     paid_home_variant_v1: paidHomeFlag,
     usp_popup_v1:         uspPopupFlag,
+    hero_v4:              heroV4Flag,
   });
 
   // Fire `paid_home_rendered` once per mount with the resolved list.
@@ -138,13 +147,13 @@ export function NewHomePage({ app }) {
   }, []);
 
   return (
-    <div className="homepage-v2">
+    <div className={`homepage-v2${heroV4Flag ? " hero-v4" : ""}`}>
       <main className="homepage-v2-main">
         {blocks.map((blockId) => {
           const Block = BLOCK_COMPONENTS[blockId];
           return (
             <ErrorBoundary key={blockId} compact section={blockId}>
-              <Block app={app} locale={locale} />
+              <Block app={app} locale={locale} heroV4={heroV4Flag} />
             </ErrorBoundary>
           );
         })}

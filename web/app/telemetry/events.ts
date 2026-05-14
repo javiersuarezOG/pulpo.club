@@ -329,6 +329,13 @@ export type EventMap = {
     listing_id: string;
     user_state: string;
   };
+
+  // Wave 5#7+#9 (hero_v4 flag) — fires once per homepage mount when
+  // the new white photo-led hero renders. Joining this event against
+  // homepage.cta_clicked + cta_routed tells us whether the visual
+  // refresh moves conversion. Empty payload — flag/user_state already
+  // captured by paid_home_rendered and cta_routed.
+  "hero_v4_viewed": Record<string, never>;
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is

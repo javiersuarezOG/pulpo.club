@@ -55,9 +55,13 @@ export const HOME_BLOCKS: readonly BlockEntry[] = [
 export type RegistryFlags = {
   // Wave 4: filter by tier (paid users skip upsell blocks).
   paid_home_variant_v1: boolean;
-  // Wave 5: remove the usps block from the homepage (it migrates to a
-  // triggered popup mounted at the page root).
+  // Wave 5#8: remove the usps block from the homepage (it migrates to
+  // a triggered popup mounted at the page root).
   usp_popup_v1: boolean;
+  // Wave 5#7+#9: white photo-led hero. The new hero "owns" the
+  // featured listing visually, so the standalone `featured` block is
+  // suppressed when the flag is on.
+  hero_v4: boolean;
 };
 
 // Resolve the rendered block list for the current user.
@@ -67,6 +71,7 @@ export type RegistryFlags = {
 // equivalent to pre-Wave-4 behavior. Filters compose:
 //   * paid_home_variant_v1 → paid users see only ALL_TIERS blocks
 //   * usp_popup_v1         → `usps` is excluded for every tier
+//   * hero_v4              → `featured` is excluded (absorbed into hero)
 export function visibleBlocksFor(
   user: GatingUser,
   flags: RegistryFlags,
@@ -78,6 +83,9 @@ export function visibleBlocksFor(
   }
   if (flags.usp_popup_v1) {
     blocks = blocks.filter((b) => b.id !== "usps");
+  }
+  if (flags.hero_v4) {
+    blocks = blocks.filter((b) => b.id !== "featured");
   }
   return blocks.map((b) => b.id);
 }
