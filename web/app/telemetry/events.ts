@@ -301,6 +301,23 @@ export type EventMap = {
     blocks_visible: string[];
     flag_enabled: boolean;
   };
+
+  // Wave-5 USP popup. Replaces the inline USPBand surface with a
+  // triggered modal. `trigger` distinguishes the four arming paths so
+  // dashboards can see which funnels conversion best. shown/dismissed/
+  // cta_clicked share the trigger label for cross-event joins.
+  "usp_popup.shown": {
+    trigger: "url_param" | "scroll" | "timer" | "exit_intent";
+    user_state: string;  // tierFor() result; left open-string to
+                         // avoid event-type churn if a new tier lands.
+  };
+  "usp_popup.dismissed": {
+    trigger: "url_param" | "scroll" | "timer" | "exit_intent";
+    action: "escape" | "backdrop" | "close_button" | "maybe_later";
+  };
+  "usp_popup.cta_clicked": {
+    trigger: "url_param" | "scroll" | "timer" | "exit_intent";
+  };
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is

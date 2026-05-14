@@ -20,7 +20,7 @@
 // The Pro upsell modal trigger is preserved from the previous shell —
 // it reads URL campaign params on mount and asks app.openProUpsellModal
 // to decide show/no-show. Mount-only.
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { decideShouldShowUpsell } from "../lib/upsell-config.ts";
 import { ErrorBoundary } from "../error-boundary.jsx";
 import { HeroV2 } from "./HeroV2.jsx";
@@ -32,6 +32,8 @@ import { visibleBlocksFor } from "./blockRegistry";
 import { readFeatureFlag } from "../lib/feature-flag";
 import { tierFor } from "../lib/gating";
 import { track } from "../telemetry/hook";
+import { UspPopup } from "../components/UspPopup.jsx";
+import { decideArm, armPassiveTriggers } from "../lib/usp-popup-trigger";
 
 /**
  * @param {object} props
@@ -55,11 +57,16 @@ const BLOCK_COMPONENTS = {
 export function NewHomePage({ app }) {
   const locale = app.locale;
 
-  // Wave-4: resolve the block list once per mount. The flag governs
-  // whether paid users see a filtered homepage; default off until
-  // we're ready to roll out paid-home-variant-v1.
-  const flagEnabled = readFeatureFlag("paid_home_variant_v1", false);
-  const blocks = visibleBlocksFor(app.user, flagEnabled);
+  // Resolve flags + block list once per mount. The registry composes
+  // filters from the flag map; downstream the legacy paid_home_rendered
+  // event still reports `flag_enabled` as the paid-home flag (its
+  // historical meaning) so dashboards stay stable.
+  const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", false);
+  const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
+  const blocks = visibleBlocksFor(app.user, {
+    paid_home_variant_v1: paidHomeFlag,
+    usp_popup_v1:         uspPopupFlag,
+  });
 
   // Fire `paid_home_rendered` once per mount with the resolved list.
   // Tells us in production whether the registry filter is engaging
@@ -69,7 +76,7 @@ export function NewHomePage({ app }) {
       track("paid_home_rendered", {
         user_state: tierFor(app.user),
         blocks_visible: [...blocks],
-        flag_enabled: flagEnabled,
+        flag_enabled: paidHomeFlag,
       });
     } catch { /* never crash a render on telemetry */ }
     // Mount-only — don't re-fire on locale flips or block-list
@@ -77,12 +84,39 @@ export function NewHomePage({ app }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Wave-5: USP popup. The trigger module decides whether to fire
+  // synchronously (url_param) or arm passive listeners (scroll /
+  // timer / exit-intent). State is null when no popup; otherwise the
+  // trigger label tells UspPopup which arming path won the race.
+  const [uspPopupTrigger, setUspPopupTrigger] = useState(null);
+
+  useEffect(() => {
+    if (!uspPopupFlag) return;
+    const decision = decideArm({ user: app.user });
+    if (decision.kind === "fire_now") {
+      setUspPopupTrigger(decision.trigger);
+      return;
+    }
+    if (decision.kind !== "arm") return;
+    const teardown = armPassiveTriggers((trigger) => setUspPopupTrigger(trigger));
+    return teardown;
+    // Mount-only — re-arming on locale/user flips would create
+    // double-fires for users who change locale mid-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Pro upsell modal trigger (carried over from the previous shell).
   // Mount-only so re-renders from routeParams tweaks don't re-fire
   // after the user dismisses the modal.
+  //
+  // Wave-5: when `usp_popup_v1` is on, UspPopup is the upsell-modal-
+  // of-record on the homepage; the legacy ProUpsellModal stays for
+  // any future surface that calls openProUpsellModal directly but
+  // does NOT fire from the homepage trigger logic.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!app.openProUpsellModal) return;
+    if (uspPopupFlag) return;
     let urls;
     try { urls = new URLSearchParams(window.location.search); } catch { return; }
     const decision = decideShouldShowUpsell({
@@ -115,6 +149,15 @@ export function NewHomePage({ app }) {
           );
         })}
       </main>
+      {uspPopupTrigger && (
+        <ErrorBoundary compact section="usp_popup">
+          <UspPopup
+            app={app}
+            trigger={uspPopupTrigger}
+            onClose={() => setUspPopupTrigger(null)}
+          />
+        </ErrorBoundary>
+      )}
     </div>
   );
 }
