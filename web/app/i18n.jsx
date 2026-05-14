@@ -1062,6 +1062,19 @@ const UI_STRINGS = {
                                       es: "Hazte Pulpo Pro" },
   "pro_upsell.aria.close":          { en: "Close",
                                       es: "Cerrar" },
+
+  // Wave-5 USP popup. Reuses the USPBand 3-card content (home.usp.*)
+  // for the body; these keys cover the CTAs and aria labels specific
+  // to the popup. Separate from pro_upsell.* so analytics and copy
+  // tweaks don't cross-contaminate between the two modals.
+  "usp_popup.cta_primary":          { en: "Try a free month",
+                                      es: "Prueba un mes gratis" },
+  "usp_popup.cta_dismiss":          { en: "Maybe later",
+                                      es: "Quizás más tarde" },
+  "usp_popup.aria.dialog":          { en: "Why Pulpo Pro",
+                                      es: "Por qué Pulpo Pro" },
+  "usp_popup.aria.close":           { en: "Close",
+                                      es: "Cerrar" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

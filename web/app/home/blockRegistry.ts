@@ -49,17 +49,35 @@ export const HOME_BLOCKS: readonly BlockEntry[] = [
   { id: "new_this_week", visibleFor: ALL_TIERS },
 ];
 
+// Flag map controlling the registry's filter behavior. Each wave adds
+// its own flag here so the consumer can read both without breaking
+// older call sites.
+export type RegistryFlags = {
+  // Wave 4: filter by tier (paid users skip upsell blocks).
+  paid_home_variant_v1: boolean;
+  // Wave 5: remove the usps block from the homepage (it migrates to a
+  // triggered popup mounted at the page root).
+  usp_popup_v1: boolean;
+};
+
 // Resolve the rendered block list for the current user.
 //
-// `flagEnabled` controls whether the registry filters by tier at all.
-// When false (Wave-4 ship default + rollback path), every tier sees
-// every block — byte-for-byte identical to pre-Wave-4 behavior.
-// When true, paid users get the upsell-free homepage.
+// The flag map governs which filters apply. When every flag is off the
+// returned list is HOME_BLOCKS in author order — byte-for-byte
+// equivalent to pre-Wave-4 behavior. Filters compose:
+//   * paid_home_variant_v1 → paid users see only ALL_TIERS blocks
+//   * usp_popup_v1         → `usps` is excluded for every tier
 export function visibleBlocksFor(
   user: GatingUser,
-  flagEnabled: boolean,
+  flags: RegistryFlags,
 ): readonly BlockId[] {
-  if (!flagEnabled) return HOME_BLOCKS.map((b) => b.id);
-  const tier = tierFor(user);
-  return HOME_BLOCKS.filter((b) => b.visibleFor.includes(tier)).map((b) => b.id);
+  let blocks: readonly BlockEntry[] = HOME_BLOCKS;
+  if (flags.paid_home_variant_v1) {
+    const tier = tierFor(user);
+    blocks = blocks.filter((b) => b.visibleFor.includes(tier));
+  }
+  if (flags.usp_popup_v1) {
+    blocks = blocks.filter((b) => b.id !== "usps");
+  }
+  return blocks.map((b) => b.id);
 }
