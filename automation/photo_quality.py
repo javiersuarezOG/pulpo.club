@@ -196,6 +196,16 @@ HERO_MAX_SIZE_KB    = 5120
 CARD_MIN_WIDTH_PX   = 800
 CARD_MIN_HEIGHT_PX  = 600
 
+# Hi-res derivative gate — the new <file>.hires.jpg pipeline (plan v2)
+# preserves the broker's native resolution. We require the source to be
+# at least the social canonical (1080×1080) on both axes since anything
+# smaller forces /api/social/image to upscale, which pulpo-social's
+# resdet gate rejects. No aspect-ratio bound here — hires serves the
+# pre-crop bytes; the social endpoint does its own cover-crop.
+HIRES_MIN_WIDTH_PX  = 1080
+HIRES_MIN_HEIGHT_PX = 1080
+HIRES_MAX_SIZE_KB   = 10240  # 10 MB ceiling; brokers rarely exceed this
+
 
 def compute_image_metadata(raw_bytes: bytes, *, file_size_bytes: Optional[int] = None) -> Optional[dict]:
     """Return the sidecar metadata dict for an image, or None when undecodable.
@@ -260,16 +270,22 @@ def compute_image_metadata(raw_bytes: bytes, *, file_size_bytes: Optional[int] =
         width >= CARD_MIN_WIDTH_PX
         and height >= CARD_MIN_HEIGHT_PX
     )
+    hires_eligible = (
+        width >= HIRES_MIN_WIDTH_PX
+        and height >= HIRES_MIN_HEIGHT_PX
+        and file_size_kb <= HIRES_MAX_SIZE_KB
+    )
 
     from datetime import datetime, timezone
     return {
-        "width":         width,
-        "height":        height,
-        "aspect_ratio":  aspect,
-        "file_size_kb":  file_size_kb,
-        "hero_eligible": bool(hero_eligible),
-        "card_eligible": bool(card_eligible),
-        "computed_at":   datetime.now(timezone.utc).isoformat(),
+        "width":          width,
+        "height":         height,
+        "aspect_ratio":   aspect,
+        "file_size_kb":   file_size_kb,
+        "hero_eligible":  bool(hero_eligible),
+        "card_eligible":  bool(card_eligible),
+        "hires_eligible": bool(hires_eligible),
+        "computed_at":    datetime.now(timezone.utc).isoformat(),
     }
 
 
