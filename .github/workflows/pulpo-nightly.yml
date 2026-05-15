@@ -139,6 +139,21 @@ jobs:
           # silent-no-ops.
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+          # ── Plan v2 — parallel hi-res photo pipeline ──────────────
+          # All defaults below are OFF so the merge of this PR is a
+          # no-op. Phase 2 of the plan flips PULPO_HIRES_ENABLED=1 +
+          # populates PULPO_HIRES_SOURCES + PULPO_HIRES_SHADOW=1.
+          # See ~/.claude/plans/cuddly-pondering-frost.md and TODOS.md
+          # in this repo for the full rollout sequence.
+          PULPO_HIRES_ENABLED: "0"
+          PULPO_HIRES_SOURCES: ""
+          PULPO_HIRES_BUDGET_S: "1500"
+          PULPO_HIRES_LIMIT: "0"
+          PULPO_HIRES_SHADOW: "0"
+          # api/social/image.js gate. When set to "0", the endpoint
+          # ignores .hires.jpg files even if they exist on disk —
+          # operator-controlled cutover from shadow → live.
+          PULPO_HIRES_SERVE: "0"
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
@@ -315,7 +330,7 @@ jobs:
           sys.exit(1 if fail else 0)
           EOF
 
-      - name: Photo storage canary (100 MB limit)
+      - name: Photo storage canary (1 GB limit; plan v2 lifted from 100 MB)
         run: |
           python3 - <<'EOF'
           import os, sys, json
@@ -339,10 +354,88 @@ jobs:
           with log.open("a", encoding="utf-8") as f:
               f.write(json.dumps({"ts": datetime.now(timezone.utc).isoformat(), "mb": round(mb, 2)}) + "\n")
 
-          print(f"Photo storage: {mb:.1f} MB (limit 100 MB)")
-          if mb > 100:
-              print("CANARY FAIL: photo storage exceeds 100 MB — migrate to external storage", file=sys.stderr)
+          # Limit lifted from 100 MB → 1024 MB (1 GB) when plan v2 landed:
+          # the new hires pipeline writes to web/photos-hires/ (separate
+          # canary below) but the existing pipeline now also backfills all
+          # 832 listings with .hero.jpg derivatives on next run, growing
+          # this directory by ~400 MB. See cuddly-pondering-frost.md.
+          LIMIT_MB = 1024
+          print(f"Photo storage: {mb:.1f} MB (limit {LIMIT_MB} MB)")
+          if mb > LIMIT_MB:
+              print(f"CANARY FAIL: photo storage exceeds {LIMIT_MB} MB — migrate to external storage", file=sys.stderr)
               sys.exit(1)
+          EOF
+
+      - name: Hires photo storage canary (1 GB limit; plan v2)
+        run: |
+          python3 - <<'EOF'
+          import os, sys, json
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          photos_hires = Path("web/photos-hires")
+          if not photos_hires.exists():
+              print("Hires photo storage canary: no photos-hires directory yet — OK")
+              sys.exit(0)
+
+          total = sum(f.stat().st_size for f in photos_hires.rglob("*.jpg"))
+          mb = total / (1024 * 1024)
+
+          log = Path("web/data/hires_storage_size.jsonl")
+          with log.open("a", encoding="utf-8") as f:
+              f.write(json.dumps({"ts": datetime.now(timezone.utc).isoformat(), "mb": round(mb, 2)}) + "\n")
+
+          LIMIT_MB = 1024
+          print(f"Hires photo storage: {mb:.1f} MB (limit {LIMIT_MB} MB)")
+          if mb > LIMIT_MB:
+              print(f"CANARY FAIL: hires photo storage exceeds {LIMIT_MB} MB — migrate to Vercel Blob (see TODOS.md [hires-storage])", file=sys.stderr)
+              sys.exit(1)
+          EOF
+
+      - name: Hires pipeline health canary (plan v2)
+        run: |
+          python3 - <<'EOF'
+          import os, sys, json
+          from pathlib import Path
+
+          # Only fire when hires is supposed to be running. If disabled,
+          # the metrics file simply doesn't grow.
+          if os.environ.get("PULPO_HIRES_ENABLED", "0") in ("", "0", "false", "no"):
+              print("Hires pipeline canary: PULPO_HIRES_ENABLED is off — OK")
+              sys.exit(0)
+
+          metrics_path = Path("web/data/hires_pipeline_metrics.jsonl")
+          if not metrics_path.exists():
+              print("CANARY FAIL: PULPO_HIRES_ENABLED=1 but no hires_pipeline_metrics.jsonl found — the step didn't write its summary row", file=sys.stderr)
+              sys.exit(1)
+
+          # Read the last JSONL row.
+          last_line = None
+          with metrics_path.open("r", encoding="utf-8") as f:
+              for ln in f:
+                  ln = ln.strip()
+                  if ln:
+                      last_line = ln
+          if not last_line:
+              print("CANARY FAIL: hires_pipeline_metrics.jsonl exists but is empty", file=sys.stderr)
+              sys.exit(1)
+
+          try:
+              row = json.loads(last_line)
+          except json.JSONDecodeError as e:
+              print(f"CANARY FAIL: last hires metrics row is invalid JSON: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          results = row.get("results", {})
+          attempted = results.get("attempted", 0)
+          errored = results.get("error", 0)
+          if attempted < 1:
+              print(f"CANARY FAIL: hires step attempted={attempted} (silent no-op despite enabled)", file=sys.stderr)
+              sys.exit(1)
+          if attempted > 0 and (errored / attempted) > 0.5:
+              print(f"CANARY FAIL: hires error rate {errored}/{attempted} > 50% (broker-side broken)", file=sys.stderr)
+              sys.exit(1)
+          print(f"Hires pipeline canary OK: attempted={attempted} ok={results.get('ok',0)} error={errored}")
           EOF
 
       - name: Commit refreshed data via PR
@@ -359,6 +452,9 @@ jobs:
           # Optional files — only add if they exist
           git add web/data/photo_fetch_log.jsonl 2>/dev/null || true
           git add web/data/photo_storage_size.jsonl 2>/dev/null || true
+          # Plan v2 — hires pipeline outputs
+          git add web/data/hires_pipeline_metrics.jsonl 2>/dev/null || true
+          git add web/data/hires_storage_size.jsonl 2>/dev/null || true
           git add web/data/prd_feasibility.json 2>/dev/null || true
           git add web/data/prd_feasibility.md 2>/dev/null || true
           git add web/data/source_health_history.jsonl 2>/dev/null || true
@@ -375,6 +471,8 @@ jobs:
           git add web/data/llm_enrichment.json 2>/dev/null || true
           git add web/data/llm_enrichment_log.jsonl 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
+          # Plan v2 — hires derivatives + sidecars + quarantine markers + hash cache
+          git add "web/photos-hires/" 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No data changes — skipping commit."
             echo "committed=false" >> "$GITHUB_OUTPUT"

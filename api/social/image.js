@@ -9,6 +9,15 @@
 //   ratio   "1:1" | "4:5"             default "1:1"
 //
 // Output dimensions: 1080x1080 (1:1) or 1080x1350 (4:5). Format: JPEG, quality 85.
+//
+// Candidate-resolution order (plan v2):
+//   1. <file>.hires.jpg  — broker native resolution. Skipped when a
+//      .quarantine marker exists or PULPO_HIRES_SERVE=0.
+//   2. <file>.hero.jpg   — legacy 1920x1080 derivative.
+//   3. <file>.jpg        — legacy 600x400 thumbnail.
+// First existing non-quarantined candidate wins. The X-Pulpo-Image-Source
+// response header reports which tier served the response so operators
+// (and pulpo-social's photo gate logs) can audit coverage in production.
 
 const fs = require("fs");
 const path = require("path");
@@ -19,29 +28,70 @@ const SIZES = {
   "4:5": { width: 1080, height: 1350 },
 };
 
-function resolveHeroPath(id) {
+const HIRES_SERVE_DISABLED = process.env.PULPO_HIRES_SERVE === "0";
+
+function resolveImage(id) {
   const idx = id.indexOf("__");
   if (idx < 1) return null;
   const source = id.slice(0, idx);
   const sourceId = id.slice(idx + 2);
   // Allow only safe slug chars to prevent path traversal.
   if (!/^[a-z0-9_-]+$/i.test(source) || !/^[a-z0-9_.-]+$/i.test(sourceId)) return null;
-  const filename = `${source}_${sourceId}.hero.jpg`;
-  const candidates = [
-    path.join(__dirname, "..", "..", "web", "photos", filename),
-    path.join(process.cwd(), "web", "photos", filename),
-    // Pipeline also writes a plain .jpg (card derivative) as fallback.
-    path.join(__dirname, "..", "..", "web", "photos", `${source}_${sourceId}.jpg`),
-    path.join(process.cwd(), "web", "photos", `${source}_${sourceId}.jpg`),
+
+  const repoRoot = path.join(__dirname, "..", "..");
+  const cwd = process.cwd();
+
+  // Tier 1: hires.jpg (broker native, plan v2). Skip when quarantined or
+  // when serving is disabled.
+  if (!HIRES_SERVE_DISABLED) {
+    const hiresName = `${source}_${sourceId}.hires.jpg`;
+    const hiresCandidates = [
+      path.join(repoRoot, "web", "photos-hires", hiresName),
+      path.join(cwd, "web", "photos-hires", hiresName),
+    ];
+    for (const p of hiresCandidates) {
+      try {
+        if (fs.statSync(p).isFile() && !fs.existsSync(p + ".quarantine")) {
+          return { path: p, source: "hires" };
+        }
+      } catch (_) {
+        // try next
+      }
+    }
+  }
+
+  // Tier 2: legacy hero.jpg.
+  const heroName = `${source}_${sourceId}.hero.jpg`;
+  const heroCandidates = [
+    path.join(repoRoot, "web", "photos", heroName),
+    path.join(cwd, "web", "photos", heroName),
   ];
-  for (const p of candidates) {
+  for (const p of heroCandidates) {
     try {
-      const stat = fs.statSync(p);
-      if (stat.isFile()) return p;
+      if (fs.statSync(p).isFile()) {
+        return { path: p, source: "hero" };
+      }
     } catch (_) {
       // try next
     }
   }
+
+  // Tier 3: legacy thumbnail.
+  const thumbName = `${source}_${sourceId}.jpg`;
+  const thumbCandidates = [
+    path.join(repoRoot, "web", "photos", thumbName),
+    path.join(cwd, "web", "photos", thumbName),
+  ];
+  for (const p of thumbCandidates) {
+    try {
+      if (fs.statSync(p).isFile()) {
+        return { path: p, source: "jpg" };
+      }
+    } catch (_) {
+      // try next
+    }
+  }
+
   return null;
 }
 
@@ -52,18 +102,21 @@ module.exports = async (req, res) => {
   if (!id || !size) {
     return res.status(400).json({ error: "bad_request", detail: "id and ratio=1:1|4:5 required" });
   }
-  const heroPath = resolveHeroPath(id);
-  if (!heroPath) {
+  const resolved = resolveImage(id);
+  if (!resolved) {
     return res.status(404).json({ error: "not_found" });
   }
   try {
-    const buf = await sharp(heroPath)
+    const buf = await sharp(resolved.path)
       .resize(size.width, size.height, { fit: "cover", position: "attention" })
       .jpeg({ quality: 85, mozjpeg: true })
       .toBuffer();
     res.setHeader("Content-Type", "image/jpeg");
     res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
     res.setHeader("Content-Length", buf.length);
+    // Observability: which derivative actually served this response.
+    // Visible in pulpo-social photo-gate logs + browser devtools.
+    res.setHeader("X-Pulpo-Image-Source", resolved.source);
     return res.status(200).send(buf);
   } catch (err) {
     return res.status(500).json({ error: "resize_failed", detail: String(err && err.message) });

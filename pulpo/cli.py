@@ -78,15 +78,22 @@ _SUBCOMMANDS = {"enrich-photos", "check-hero-pool"}
 
 
 def _run_enrich_photos(argv: list[str]) -> int:
-    """Idempotent walk over web/photos/*.jpg — write a sidecar JSON for
-    each thumbnail + hero derivative that doesn't already have one.
+    """Idempotent walk over photo directories — write a sidecar JSON for
+    each derivative that doesn't already have one.
 
     Doesn't fetch from the network, doesn't touch ranked.json. Pure
     filesystem operation. Safe to re-run; the only output is per-file
     metadata captured against the on-disk dimensions.
 
+    Targets:
+      thumbs (web/photos/*.jpg minus *.hero.jpg)
+      hero   (web/photos/*.hero.jpg)
+      hires  (web/photos-hires/*.hires.jpg)   ← plan v2
+      all    (default; walk all of the above)
+
     Usage:
         python -m pulpo.cli enrich-photos
+        python -m pulpo.cli enrich-photos --target hires
         python -m pulpo.cli enrich-photos --force   # re-write existing sidecars
     """
     sp = argparse.ArgumentParser(prog="pulpo enrich-photos",
@@ -94,7 +101,11 @@ def _run_enrich_photos(argv: list[str]) -> int:
     sp.add_argument("--force", action="store_true",
                     help="Overwrite sidecars even if they already exist.")
     sp.add_argument("--photos-dir", type=str, default=None,
-                    help="Override photos directory (default: <repo>/web/photos).")
+                    help="Override legacy photos directory (default: <repo>/web/photos).")
+    sp.add_argument("--photos-hires-dir", type=str, default=None,
+                    help="Override hires photos directory (default: <repo>/web/photos-hires).")
+    sp.add_argument("--target", choices=["thumbs", "hero", "hires", "all"], default="all",
+                    help="Which derivative set to walk (default: all).")
     args = sp.parse_args(argv)
 
     try:
@@ -105,31 +116,58 @@ def _run_enrich_photos(argv: list[str]) -> int:
 
     repo_root = Path(__file__).resolve().parents[1]
     photos_dir = Path(args.photos_dir) if args.photos_dir else repo_root / "web" / "photos"
-    if not photos_dir.exists():
-        print(f"enrich-photos: photos dir not found: {photos_dir}", file=sys.stderr)
-        return 1
+    photos_hires_dir = (
+        Path(args.photos_hires_dir) if args.photos_hires_dir
+        else repo_root / "web" / "photos-hires"
+    )
+
+    # Collect targets honoring --target. Each entry is (file iter, label).
+    targets: list[tuple[list[Path], str]] = []
+    if args.target in ("thumbs", "all"):
+        if photos_dir.exists():
+            thumbs = [f for f in sorted(photos_dir.glob("*.jpg")) if not f.name.endswith(".hero.jpg")]
+            targets.append((thumbs, "thumbs"))
+        elif args.target == "thumbs":
+            print(f"enrich-photos: photos dir not found: {photos_dir}", file=sys.stderr)
+            return 1
+    if args.target in ("hero", "all"):
+        if photos_dir.exists():
+            heros = list(sorted(photos_dir.glob("*.hero.jpg")))
+            targets.append((heros, "hero"))
+        elif args.target == "hero":
+            print(f"enrich-photos: photos dir not found: {photos_dir}", file=sys.stderr)
+            return 1
+    if args.target in ("hires", "all"):
+        if photos_hires_dir.exists():
+            hires = list(sorted(photos_hires_dir.glob("*.hires.jpg")))
+            targets.append((hires, "hires"))
+        elif args.target == "hires":
+            print(f"enrich-photos: hires dir not found: {photos_hires_dir}", file=sys.stderr)
+            return 1
 
     scanned = wrote = skipped = failed = 0
-    for f in sorted(photos_dir.glob("*.jpg")):
-        scanned += 1
-        sidecar = f.parent / (f.name + ".meta.json")
-        if sidecar.exists() and not args.force:
-            skipped += 1
-            continue
-        try:
-            raw = f.read_bytes()
-        except OSError as e:
-            print(f"enrich-photos: read failed for {f.name}: {e}", file=sys.stderr)
-            failed += 1
-            continue
-        meta = compute_image_metadata(raw, file_size_bytes=len(raw))
-        if meta is None:
-            print(f"enrich-photos: undecodable or Pillow missing for {f.name}")
-            failed += 1
-            continue
-        sidecar.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
-        wrote += 1
-    print(f"[enrich-photos] scanned={scanned} wrote={wrote} "
+    for files, label in targets:
+        for f in files:
+            scanned += 1
+            sidecar = f.parent / (f.name + ".meta.json")
+            if sidecar.exists() and not args.force:
+                skipped += 1
+                continue
+            try:
+                raw = f.read_bytes()
+            except OSError as e:
+                print(f"enrich-photos[{label}]: read failed for {f.name}: {e}", file=sys.stderr)
+                failed += 1
+                continue
+            meta = compute_image_metadata(raw, file_size_bytes=len(raw))
+            if meta is None:
+                print(f"enrich-photos[{label}]: undecodable or Pillow missing for {f.name}")
+                failed += 1
+                continue
+            sidecar.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+            wrote += 1
+
+    print(f"[enrich-photos] target={args.target} scanned={scanned} wrote={wrote} "
           f"skipped={skipped} failed={failed}")
     return 0
 
