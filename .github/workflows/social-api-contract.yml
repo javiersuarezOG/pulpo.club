@@ -35,7 +35,9 @@ jobs:
         env:
           PULPO_API_BASE: ${{ secrets.PULPO_PREVIEW_URL }}
           PULPO_INTERNAL_API_KEY: ${{ secrets.PULPO_INTERNAL_API_KEY }}
-        run: npx vitest run tests/contracts/
+        # vite.config.js sets root: web/, so vitest discovers tests under
+        # web/. Mirror that path here.
+        run: npx vitest run web/tests/contracts/
 
       - name: notify slack on failure
         if: failure() && github.event_name == 'schedule'
