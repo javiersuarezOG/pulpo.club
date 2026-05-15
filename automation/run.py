@@ -123,6 +123,100 @@ def _read_sidecar(image_path: Path) -> Optional[dict]:
         return None
 
 
+def _select_best_hero_url(li, http_client, max_candidates: int = 5) -> Optional[str]:
+    """Pick the highest-scoring photo from a listing's photo_urls.
+
+    Phase B5 of the photo-quality consolidation plan (see pulpo-social's
+    cuddly-pondering-frost.md). Today the pipeline blindly uses
+    ``photo_urls[0]`` as the hero — which is whatever order the broker
+    site happened to list. The chosen photo is often not the best one
+    of the listing's set (broker carousel order != hero candidate
+    ranking).
+
+    Strategy:
+      1. Fetch up to ``max_candidates`` photo_urls.
+      2. Score each via ``compute_score`` (resolution + size + sharpness
+         + aspect — same scorer used today on the single hero).
+      3. Return the URL with the highest score. Ties broken by order
+         (earlier wins — broker hero is the most likely "true" hero).
+      4. Memoize selection in
+         ``web/photos/<source>_<id>.hero-selection.json`` so re-runs
+         don't pay the network + score cost.
+
+    Returns None when there are no fetchable candidates (network all
+    fails or scoring returns 0 across the board) — caller falls back to
+    ``photo_urls[0]``.
+
+    NOTE: This is the v1 hero-selection implementation. The canonical
+    algorithm long-term lives in pulpo-social's @pulpo/photo-quality
+    package; once a Python parity port lands, this function should
+    delegate to it (specifically score_for_hero(metrics, aesthetic?)).
+    For now it reuses the existing automation/photo_quality.compute_score.
+    """
+    urls = li.photo_urls or []
+    if len(urls) <= 1:
+        return urls[0] if urls else None
+
+    repo_root = Path(__file__).resolve().parents[1]
+    photos_dir = repo_root / "web" / "photos"
+    selection_path = photos_dir / f"{li.source}_{li.source_id}.hero-selection.json"
+
+    # Cached selection?
+    if selection_path.exists():
+        try:
+            cached = json.loads(selection_path.read_text(encoding="utf-8"))
+            chosen = cached.get("chosen_url")
+            if isinstance(chosen, str) and chosen in urls:
+                return chosen
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    try:
+        from automation.photo_quality import compute_score
+    except ImportError:
+        return urls[0]
+
+    best_url: Optional[str] = None
+    best_score = -1
+    scored: list[dict] = []
+    for u in urls[:max_candidates]:
+        try:
+            r = http_client.get(u, timeout=5.0, follow_redirects=True)
+            r.raise_for_status()
+            score = compute_score(r.content)
+        except Exception as e:
+            scored.append({"url": u, "score": None, "error": str(e)})
+            continue
+        scored.append({"url": u, "score": int(score)})
+        if score > best_score:
+            best_score = int(score)
+            best_url = u
+
+    # Memoize even when the choice is the broker's default — so future
+    # runs short-circuit.
+    if best_url is None:
+        best_url = urls[0]
+    try:
+        from datetime import datetime, timezone
+        selection_path.write_text(
+            json.dumps(
+                {
+                    "chosen_url": best_url,
+                    "best_score": best_score if best_score >= 0 else None,
+                    "candidates_scored": scored,
+                    "computed_at": datetime.now(timezone.utc).isoformat(),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+    return best_url
+
+
 def _download_hero_photos(listings, repo: Path) -> dict:
     """Download the first photo_url for each listing with photos, then write
     two derivatives:
@@ -179,7 +273,12 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             break
         if not li.photo_urls:
             continue
-        url = li.photo_urls[0]
+        # Phase B5 — pick the best photo from the broker's set, not just
+        # the first. _select_best_hero_url memoizes its choice in a
+        # sidecar so this is a free no-op on subsequent runs. Falls back
+        # to photo_urls[0] when scoring fails (network errors, missing
+        # Pillow, etc.).
+        url = _select_best_hero_url(li, httpx) or li.photo_urls[0]
         fname = f"{li.source}_{li.source_id}.jpg"
         fpath = photos_dir / fname
         hero_fpath = _hero_file_path(fpath)
