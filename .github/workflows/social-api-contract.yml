@@ -1,0 +1,49 @@
+# Mirror of pulpo-social's contract-tests.yml — catches contract regressions
+# from the pulpo.club side too. Without this, a renaming PR landing here
+# would only fail at 06:00 UTC the next day (when pulpo-social's nightly
+# fires) — too late to prevent the 10:00 UTC publish from going sideways.
+#
+# Runs nightly at 05:30 UTC (30 min before the pulpo-social mirror so any
+# alert here surfaces first) AND on every PR/push.
+name: social-api-contract
+
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: install deps
+        run: npm ci
+
+      - name: run contract test
+        env:
+          PULPO_API_BASE: ${{ secrets.PULPO_PREVIEW_URL }}
+          PULPO_INTERNAL_API_KEY: ${{ secrets.PULPO_INTERNAL_API_KEY }}
+        run: npx vitest run tests/contracts/
+
+      - name: notify slack on failure
+        if: failure() && github.event_name == 'schedule'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -sS -X POST -H 'Content-type: application/json' \
+              --data '{"text":":rotating_light: pulpo.club ↔ pulpo-social contract test failed — see https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+              "$SLACK_WEBHOOK_URL"
+          fi
