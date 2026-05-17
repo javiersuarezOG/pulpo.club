@@ -18,8 +18,10 @@ const PULPO_INTERNAL_API_KEY = process.env.PULPO_INTERNAL_API_KEY;
 const ENABLED = Boolean(PULPO_API_BASE);
 
 function authHeaders(): Record<string, string> {
+  // api/social/listings.js authenticates via `Authorization: Bearer …`,
+  // matching pulpo-social's listingsFetcher. NOT a custom header.
   return PULPO_INTERNAL_API_KEY
-    ? { "x-pulpo-internal-key": PULPO_INTERNAL_API_KEY }
+    ? { authorization: `Bearer ${PULPO_INTERNAL_API_KEY}` }
     : {};
 }
 
