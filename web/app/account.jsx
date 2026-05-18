@@ -16,7 +16,13 @@ import {
   PREFERENCE_CATEGORIES_MAX,
   sanitizePreferredCategories,
 } from "./lib/categories";
-import { readProfile } from "./lib/user-profile";
+import {
+  readProfile,
+  readNewsletterPreference,
+  NEWSLETTER_CADENCES,
+  NEWSLETTER_LOCALES,
+  NEWSLETTER_PROPERTY_TYPES,
+} from "./lib/user-profile";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
 
@@ -351,6 +357,8 @@ function NotificationsSection({ app }) {
           this whole block when WhatsApp delivery actually ships; i18n
           keys + local prefs-state defaults are intentionally preserved. */}
 
+      {isPaid && prefs.newsletter && <NewsletterFilterChips app={app} />}
+
       {isPaid && prefs.newsletter && (
         <>
           <h3 className="account-subhead">{t("account.notif.frequency", app.locale)}</h3>
@@ -507,6 +515,7 @@ function PreferredCategoryChips({ app }) {
         {t("account.notif.pref_cat.intro", app.locale)}
       </p>
       <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="preferred-categories"
            aria-label={t("account.notif.pref_cat.heading", app.locale)}>
         {PREFERENCE_CATEGORY_KEYS.map((key) => {
           const isSelected = selected.includes(key);
@@ -532,6 +541,179 @@ function PreferredCategoryChips({ app }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+// Vocabulary lives next to the renderer (the cron is the consumer); we
+// surface the same labels in the account UI. Departments are the six
+// Salvadoran coastal / lake departments where Pulpo has continuous
+// listing coverage. Anything else gets a "request a region" CTA in
+// a future PR — out of scope here.
+const NEWSLETTER_DEPARTMENT_KEYS = [
+  "La Libertad",
+  "La Paz",
+  "La Unión",
+  "Usulután",
+  "Sonsonate",
+  "Santa Ana",
+];
+
+const NEWSLETTER_PRICE_BANDS = [
+  { key: "none",    max: null,    label_en: "No cap",     label_es: "Sin tope"   },
+  { key: "50k",     max:  50_000, label_en: "Under $50k", label_es: "Hasta $50k" },
+  { key: "100k",    max: 100_000, label_en: "Under $100k", label_es: "Hasta $100k" },
+  { key: "250k",    max: 250_000, label_en: "Under $250k", label_es: "Hasta $250k" },
+  { key: "500k",    max: 500_000, label_en: "Under $500k", label_es: "Hasta $500k" },
+  { key: "1m",      max: 1_000_000, label_en: "Under $1M", label_es: "Hasta $1M" },
+];
+
+// Newsletter filter chip groups — persists to `profile.newsletter` via
+// the same updateUserProfile path that PreferredCategoryChips uses. The
+// fortnightly cron reads the same blob off Clerk publicMetadata to slice
+// ranked.json per-recipient (automation/newsletter/build_issue.py).
+//
+// Each toggle writes the full `newsletter` sub-object back — partial
+// patches would race against the cleanPatch validator on the server,
+// which expects a complete object shape.
+function NewsletterFilterChips({ app }) {
+  const pref = readNewsletterPreference(app.user);
+  const selectedDepts   = Array.isArray(pref.departments)    ? pref.departments    : [];
+  const selectedTypes   = Array.isArray(pref.property_types) ? pref.property_types : [];
+  const selectedMax     = pref.max_price_usd ?? null;
+  const selectedLocale  = NEWSLETTER_LOCALES.includes(pref.locale) ? pref.locale : "en";
+
+  const write = (patch) => {
+    const next = { ...pref, ...patch };
+    // Strip null/empty fields so the stored blob stays compact and the
+    // server validator's "no opinion" path (missing key) is preferred
+    // over an explicit null we'd have to defend.
+    const cleaned = {};
+    for (const [k, v] of Object.entries(next)) {
+      if (v === null || v === undefined) continue;
+      if (Array.isArray(v) && v.length === 0) continue;
+      cleaned[k] = v;
+    }
+    app.updateUserProfile({ newsletter: cleaned });
+    track("account.newsletter_pref_changed", {
+      changed_keys: Object.keys(patch),
+      departments_count: (cleaned.departments || []).length,
+      property_types_count: (cleaned.property_types || []).length,
+      has_max_price: cleaned.max_price_usd != null,
+    });
+  };
+
+  const toggleDept = (d) => {
+    const next = selectedDepts.includes(d)
+      ? selectedDepts.filter((x) => x !== d)
+      : [...selectedDepts, d];
+    write({ departments: next });
+  };
+
+  const toggleType = (typ) => {
+    const next = selectedTypes.includes(typ)
+      ? selectedTypes.filter((x) => x !== typ)
+      : [...selectedTypes, typ];
+    write({ property_types: next });
+  };
+
+  const setMaxPrice = (band) => {
+    write({ max_price_usd: band.max });
+  };
+
+  return (
+    <div className="notif-categories">
+      <h3 className="account-subhead">
+        {t("account.notif.newsletter_filter.heading", app.locale)}
+      </h3>
+      <p className="notif-categories-intro">
+        {t("account.notif.newsletter_filter.intro", app.locale)}
+      </p>
+
+      <div className="account-subhead-mini">
+        {t("account.notif.newsletter_filter.departments", app.locale)}
+      </div>
+      <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-departments"
+           aria-label={t("account.notif.newsletter_filter.departments", app.locale)}>
+        {NEWSLETTER_DEPARTMENT_KEYS.map((d) => {
+          const isSelected = selectedDepts.includes(d);
+          return (
+            <button
+              key={d}
+              type="button"
+              role="switch"
+              aria-checked={isSelected}
+              className={`chip ${isSelected ? "is-active" : ""}`}
+              onClick={() => toggleDept(d)}
+            >
+              {d}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="account-subhead-mini">
+        {t("account.notif.newsletter_filter.property_types", app.locale)}
+      </div>
+      <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-property-types"
+           aria-label={t("account.notif.newsletter_filter.property_types", app.locale)}>
+        {NEWSLETTER_PROPERTY_TYPES.map((typ) => {
+          const isSelected = selectedTypes.includes(typ);
+          return (
+            <button
+              key={typ}
+              type="button"
+              role="switch"
+              aria-checked={isSelected}
+              className={`chip ${isSelected ? "is-active" : ""}`}
+              onClick={() => toggleType(typ)}
+            >
+              {t(`account.notif.newsletter_filter.type.${typ}`, app.locale)}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="account-subhead-mini">
+        {t("account.notif.newsletter_filter.price_band", app.locale)}
+      </div>
+      <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-price-band"
+           aria-label={t("account.notif.newsletter_filter.price_band", app.locale)}>
+        {NEWSLETTER_PRICE_BANDS.map((b) => {
+          const isSelected = selectedMax === b.max;
+          return (
+            <button
+              key={b.key}
+              type="button"
+              role="switch"
+              aria-checked={isSelected}
+              className={`chip ${isSelected ? "is-active" : ""}`}
+              onClick={() => setMaxPrice(b)}
+            >
+              {app.locale === "es" ? b.label_es : b.label_en}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="account-subhead-mini">
+        {t("account.notif.newsletter_filter.locale", app.locale)}
+      </div>
+      <div className="freq-toggle">
+        {NEWSLETTER_LOCALES.map((lc) => (
+          <button
+            key={lc}
+            type="button"
+            className={selectedLocale === lc ? "active" : ""}
+            onClick={() => write({ locale: lc })}
+          >
+            {t(`account.notif.newsletter_filter.locale.${lc}`, app.locale)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

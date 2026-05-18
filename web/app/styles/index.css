@@ -2600,6 +2600,17 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 12px; color: var(--ink-3); line-height: 1.45;
   padding-block: 2px;
 }
+/* Secondary header inside the Newsletter filter card. Three chip groups
+   live under the same card heading; each gets a smaller sub-heading so
+   the chip rails read as separate axes without bloating the surface. */
+.account-subhead-mini {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 12px;
+}
 
 /* Pro upsell card shown in Account → Notifications when user is on
    the free plan (or anonymous). Same visual weight as a pref-list

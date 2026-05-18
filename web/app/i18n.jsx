@@ -884,6 +884,37 @@ const UI_STRINGS = {
   "account.notif.pref_cat.under_100k":     { en: "$50K–$100K",
                                               es: "Entre $50.000 y $100.000" },
 
+  // ── Newsletter filter (PR-NL-3) ──────────────────────────────────────
+  // Persists to publicMetadata.profile.newsletter and is read by the
+  // fortnightly cron (automation/newsletter/build_issue.py). Strings are
+  // separate from the broader category-preferences block above because
+  // the newsletter filter is more specific (department × type × price
+  // band) and the surface needs its own copy.
+  "account.notif.newsletter_filter.heading":
+    { en: "Newsletter filter",
+      es: "Filtro del boletín" },
+  "account.notif.newsletter_filter.intro":
+    { en: "Pulpo will scan the next 14 days against this filter and ship the ten that match. Leave a row unselected to keep that axis open.",
+      es: "Pulpo revisará los próximos 14 días contra este filtro y enviará las diez que coincidan. Deja una fila sin seleccionar para mantener ese eje abierto." },
+  "account.notif.newsletter_filter.departments":
+    { en: "Departments",                                  es: "Departamentos" },
+  "account.notif.newsletter_filter.property_types":
+    { en: "Property type",                                es: "Tipo de propiedad" },
+  "account.notif.newsletter_filter.price_band":
+    { en: "Price ceiling",                                es: "Precio máximo" },
+  "account.notif.newsletter_filter.locale":
+    { en: "Language",                                     es: "Idioma" },
+  "account.notif.newsletter_filter.type.land":
+    { en: "Land",                                         es: "Terreno" },
+  "account.notif.newsletter_filter.type.house":
+    { en: "House",                                        es: "Casa" },
+  "account.notif.newsletter_filter.type.condo":
+    { en: "Condo",                                        es: "Apartamento" },
+  "account.notif.newsletter_filter.locale.en":
+    { en: "English",                                      es: "Inglés" },
+  "account.notif.newsletter_filter.locale.es":
+    { en: "Spanish",                                      es: "Español" },
+
   // Pro upsell shown to free / anonymous users in this subsection.
   "account.notif.upsell.title": { en: "Get deal alerts with Pulpo Pro",
                                   es: "Recibe alertas con Pulpo Pro" },
