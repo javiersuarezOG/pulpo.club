@@ -26,6 +26,10 @@ import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
 
+// Per-shelf listing limits (hero_v4 on). Desktop renders all of these
+// in a wrapping grid; mobile keeps a horizontal scroll-snap rail.
+const REAL_LIMITS = { top_10: 10, price_drops: 10, new_this_week: 10 };
+
 // ────────────────────────────────────────────────────────────────────
 // Shared shelf scaffold (telemetry, viewport observers — unchanged)
 
@@ -264,7 +268,6 @@ export function HomeShelf({
   listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
   heroV4 = false,  // gates the new card markup
   onViewAll,
-  scrollHintRemainder,
 }) {
   const sectionRef = useRef(null);
   const listRef = useRef(null);
@@ -272,7 +275,10 @@ export function HomeShelf({
   useShelfScrolled(shelfKey, listRef);
 
   const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
-  const items = useReal ? listings.slice(0, cards.length) : cards;
+  // Mobile renders the list as a horizontal scroll-snap rail; desktop
+  // renders it as a wrapping grid (see CSS). The component just emits
+  // the items in source order either way.
+  const items = useReal ? listings : cards;
 
   const onViewAllClick = useCallback(() => {
     try { track("homepage.shelf_view_all_clicked", { shelf: shelfKey }); } catch { /* ignore */ }
@@ -298,9 +304,11 @@ export function HomeShelf({
               {t(headingKey, locale)}
             </h2>
           </div>
-          <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
-            {t("home.shelf.view_all", locale)}
-          </button>
+          <div className="hp-shelf-head-right">
+            <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
+              {t("home.shelf.view_all", locale)}
+            </button>
+          </div>
         </header>
         <div ref={listRef} className="hp-shelf-list" role="list">
           {items.map((item, i) => (
@@ -326,13 +334,6 @@ export function HomeShelf({
             </div>
           ))}
         </div>
-        {scrollHintRemainder ? (
-          <p className="hp-shelf-scroll-hint" aria-hidden="true">
-            {typeof t("home.shelf.scroll_hint", locale) === "string"
-              ? t("home.shelf.scroll_hint", locale).replace("{n}", String(scrollHintRemainder))
-              : null}
-          </p>
-        ) : null}
       </div>
     </section>
   );
@@ -362,7 +363,7 @@ const NEW_THIS_WEEK_CARDS = [
 
 export function TopTenShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, TOP_10_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, REAL_LIMITS.top_10) : []), [all, heroV4]);
   return (
     <HomeShelf
       app={app}
@@ -374,7 +375,6 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
       cards={TOP_10_CARDS}
       listings={listings}
       heroV4={heroV4}
-      scrollHintRemainder={7}
       onViewAll={() => app && app.goBrowse && app.goBrowse({})}
     />
   );
@@ -382,7 +382,7 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
 
 export function PriceDropsShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, PRICE_DROPS_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, REAL_LIMITS.price_drops) : []), [all, heroV4]);
   const pill = t("home.shelf.dropsCount", locale);
   return (
     <HomeShelf
@@ -403,7 +403,7 @@ export function PriceDropsShelf({ app, locale, heroV4 = false }) {
 
 export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, NEW_THIS_WEEK_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, REAL_LIMITS.new_this_week) : []), [all, heroV4]);
   const pill = t("home.shelf.newCount", locale);
   return (
     <HomeShelf
