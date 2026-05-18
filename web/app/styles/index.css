@@ -5717,10 +5717,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .homepage-v2.hero-v4 .hp-shelf-h2 {
   font-family: var(--font-sans);
-  font-size: clamp(24px, 3.5vw, 32px);
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-ink-primary);
+}
+@media (min-width: 768px) {
+  .homepage-v2.hero-v4 .hp-shelf-h2 { font-size: 26px; }
+}
+@media (min-width: 1280px) {
+  .homepage-v2.hero-v4 .hp-shelf-h2 { font-size: 30px; }
 }
 .homepage-v2.hero-v4 .hp-shelf-pill {
   display: none; /* Pill chips compete with the cleaner header rhythm */
@@ -5984,22 +5990,22 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .app.hero-v4 .homepage-v2 .hp-hero-v4 { padding: 48px 40px 64px; }
 }
 .app.hero-v4 .homepage-v2 .hp-usp {
-  padding: 32px 20px;
+  padding: 28px 20px;
 }
 @media (min-width: 1024px) {
-  .app.hero-v4 .homepage-v2 .hp-usp { padding: 56px 40px; }
+  .app.hero-v4 .homepage-v2 .hp-usp { padding: 36px 40px; }
 }
 .app.hero-v4 .homepage-v2 .hp-shoreline {
-  padding: 16px 20px 24px;
+  padding: 12px 20px 20px;
 }
 @media (min-width: 1024px) {
-  .app.hero-v4 .homepage-v2 .hp-shoreline { padding: 32px 40px 40px; }
+  .app.hero-v4 .homepage-v2 .hp-shoreline { padding: 20px 40px 28px; }
 }
 .app.hero-v4 .homepage-v2 .hp-shelf {
-  padding: 16px 20px 32px;
+  padding: 12px 20px 24px;
 }
 @media (min-width: 1024px) {
-  .app.hero-v4 .homepage-v2 .hp-shelf { padding: 24px 40px 40px; }
+  .app.hero-v4 .homepage-v2 .hp-shelf { padding: 16px 40px 28px; }
 }
 .app.hero-v4 .page-browse,
 .app.hero-v4 .page-saved {
@@ -6218,116 +6224,77 @@ h1,h2,h3,h4,h5 { margin: 0; }
   left: 10px;
 }
 
-/* ────── 5. Scroll-for-more hint — visible + readable ────── */
-
-.app.hero-v4 .hp-shelf-scroll-hint {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-ink-secondary);
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.app.hero-v4 .hp-shelf-scroll-hint::before {
-  content: "→";
-  font-weight: 700;
-  color: var(--color-ink-primary);
-}
-
 /* ===========================================================================
-   Wave 5 carousel — rotating shelf listings with prev/next arrows
+   Shelf layout — mobile rail + desktop wrapping grid
    ===========================================================================
-   Real-listing shelves under hero_v4 carry 8-12 cards each (vs. the
-   hardcoded fallback's 3). Desktop swaps the 3-column grid for a
-   horizontal scroller with arrow buttons in the header. Mobile keeps
-   its native scroll-snap swipe behavior (arrows hidden under 768px —
-   touch is the affordance there).
+   Each real-listing shelf carries 10 cards. Desktop renders them in a
+   wrapping grid so all 10 are visible without a hidden-state carousel.
+   Mobile keeps a horizontal scroll-snap rail (native swipe affordance);
+   the peeking second card is the only "more behind" hint we need.
    --------------------------------------------------------------------------- */
 
-/* Shelf head layout — view-all sits with the arrows on the right. */
 .app.hero-v4 .hp-shelf-head-right {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
-/* Arrow group */
-.app.hero-v4 .hp-shelf-arrows {
-  display: none;
+.app.hero-v4 .hp-shelf-view-all {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
-@media (min-width: 768px) {
-  .app.hero-v4 .hp-shelf-arrows {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+@media (max-width: 639px) {
+  .app.hero-v4 .hp-shelf-view-all {
+    padding: 8px 14px;
+    font-size: 13px;
   }
 }
-.app.hero-v4 .hp-shelf-arrow {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--color-bg-white);
-  border: 1px solid var(--color-line-soft);
-  color: var(--color-ink-primary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--shadow-1);
-  transition: background var(--dur-fast) var(--ease-out),
-              transform var(--dur-fast) var(--ease-out),
-              opacity var(--dur-fast) var(--ease-out);
-}
-.app.hero-v4 .hp-shelf-arrow:hover:not(:disabled) {
-  background: var(--color-bg-cream-soft);
-  transform: scale(1.04);
-}
-.app.hero-v4 .hp-shelf-arrow:disabled {
-  opacity: 0.35;
-  cursor: default;
-  box-shadow: none;
+
+/* Align inner widths with the hero so section edges line up. */
+.app.hero-v4 .homepage-v2 .hp-shelf-inner,
+.app.hero-v4 .homepage-v2 .hp-shoreline-inner {
+  max-width: 1280px;
 }
 
-/* Desktop horizontal scroll — override the 3-col grid for real shelves */
-@media (min-width: 640px) {
+/* Mobile rail polish — tighter peek, no edge-flush first card. Bounded
+   under 640px since the base CSS swaps to a 2-col grid above that. */
+@media (max-width: 639px) {
   .app.hero-v4 .hp-shelf-list {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 24px;
-    scroll-snap-type: x mandatory;
-    scroll-padding-left: 4px;
-    /* Hide native scrollbars — arrows are the affordance. */
-    scrollbar-width: none;
-  }
-  .app.hero-v4 .hp-shelf-list::-webkit-scrollbar {
-    display: none;
+    gap: 12px;
+    margin: 0 -20px;
+    padding: 2px 20px 6px;
+    scroll-padding-left: 20px;
   }
   .app.hero-v4 .hp-shelf-list-item {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    width: calc((100% - 48px) / 3);
-    min-width: 240px;
-    max-width: 320px;
+    flex: 0 0 78%;
+  }
+}
+
+/* Desktop wrapping grid — show all 10 listings, no hidden carousel state. */
+@media (min-width: 768px) {
+  .app.hero-v4 .hp-shelf-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px 20px;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  .app.hero-v4 .hp-shelf-list-item {
+    width: auto;
+    min-width: 0;
+    max-width: none;
   }
 }
 @media (min-width: 1024px) {
-  .app.hero-v4 .hp-shelf-list-item {
-    width: calc((100% - 48px) / 3);
+  .app.hero-v4 .hp-shelf-list {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 @media (min-width: 1280px) {
-  .app.hero-v4 .hp-shelf-list-item {
-    width: calc((100% - 72px) / 4);
+  .app.hero-v4 .hp-shelf-list {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
-/* Carousel renders many listings — no need for the scroll-hint
-   on real-shelf rendering since the arrows ARE the affordance. */
-.app.hero-v4 .hp-shelf-real-carousel + .hp-shelf-scroll-hint,
-.app.hero-v4 .hp-shelf-list:has(.hp-shelf-card-real) ~ .hp-shelf-scroll-hint {
-  display: none;
-}
+/* Drop the legacy scroll-hint anywhere it might still render. */
+.app.hero-v4 .hp-shelf-scroll-hint { display: none; }
