@@ -1127,8 +1127,8 @@ const UI_STRINGS = {
                                           es: "Cerrar" },
   "free_month_modal.error":            { en: "Couldn't open checkout. Try again.",
                                           es: "No se pudo abrir el checkout. Inténtalo de nuevo." },
-  "free_month_modal.code_applied_note":{ en: "✓ Discount applied at checkout",
-                                          es: "✓ Descuento aplicado al pagar" },
+  "free_month_modal.code_applied_note":{ en: "✓ First month free, applied at checkout",
+                                          es: "✓ Primer mes gratis, aplicado al pagar" },
 
   // Trimmed footer (home + browse).
   "footer.fine_print":                 { en: "© {year} Pulpo",
