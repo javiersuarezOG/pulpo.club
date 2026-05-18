@@ -59,16 +59,47 @@ function authHeaders(): Record<string, string> {
       expect("hero_photo_quality_score" in quality).toBe(true);
     });
 
-    it("GET /api/social/image?id=<first>&ratio=1:1 returns a valid JPEG", async () => {
-      const listingsRes = await fetch(
-        `${PULPO_API_BASE}/api/social/listings?limit=1`,
+    // Pick the first listing whose source is large enough for the 4:5 crop
+    // (the strictest of the two canonical sizes — 1080×1350). #255's
+    // refuse-to-upscale guard returns 404 source_too_small for anything
+    // smaller, so the rank-#1 listing isn't a safe pick unless its hero
+    // happens to be ≥1080×1350. We page through the listings response,
+    // mirroring pulpo-social's pre-filter logic.
+    async function findEligibleListingId(): Promise<string> {
+      const res = await fetch(
+        `${PULPO_API_BASE}/api/social/listings?limit=50`,
         { headers: authHeaders() }
       );
-      const data = (await listingsRes.json()) as {
-        listings: Array<{ id: string }>;
+      expect(res.status).toBe(200);
+      const data = (await res.json()) as {
+        listings: Array<{
+          id: string;
+          quality?: {
+            source_width?: number | null;
+            source_height?: number | null;
+          };
+        }>;
       };
-      const id = data.listings[0]!.id;
+      const TARGET_W = 1080;
+      const TARGET_H = 1350; // 4:5 is the tallest canonical
+      const hit = data.listings.find((l) => {
+        const w = l.quality?.source_width ?? 0;
+        const h = l.quality?.source_height ?? 0;
+        return w >= TARGET_W && h >= TARGET_H;
+      });
+      if (!hit) {
+        throw new Error(
+          `no listing with source ≥${TARGET_W}×${TARGET_H} in top 50 — ` +
+          `data drift or hero-eligibility regression. ` +
+          `Check pulpo-nightly's photo pipeline and source_width/source_height ` +
+          `population in ranked.json.`
+        );
+      }
+      return hit.id;
+    }
 
+    it("GET /api/social/image?ratio=1:1 returns a valid JPEG for an eligible listing", async () => {
+      const id = await findEligibleListingId();
       const imgRes = await fetch(
         `${PULPO_API_BASE}/api/social/image?id=${encodeURIComponent(id)}&ratio=1:1`,
         { headers: authHeaders() }
@@ -82,14 +113,7 @@ function authHeaders(): Record<string, string> {
       // Catches a regression in the 4:5 (Reels-friendly) crop path. The 1:1
       // path is exercised every cron tick; the 4:5 path is rarer and would
       // otherwise rot.
-      const listingsRes = await fetch(
-        `${PULPO_API_BASE}/api/social/listings?limit=1`,
-        { headers: authHeaders() }
-      );
-      const data = (await listingsRes.json()) as {
-        listings: Array<{ id: string }>;
-      };
-      const id = data.listings[0]!.id;
+      const id = await findEligibleListingId();
       const imgRes = await fetch(
         `${PULPO_API_BASE}/api/social/image?id=${encodeURIComponent(id)}&ratio=4:5`,
         { headers: authHeaders() }
