@@ -8,6 +8,7 @@ import React, { useCallback } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { IconRipple, IconBeach, IconArrowRight } from "./icons.jsx";
+import { getCategoryImage } from "../assets/categories/index.js";
 
 const LAKE_ROWS = [
   { price: "$324k", zone: "Lago de Coatepeque", body: "2bd cabin · -31%" },
@@ -37,6 +38,13 @@ function ShorelineCard({ shoreline, locale, app }) {
     return typeof tpl === "string" ? tpl.replace("{shoreline}", t(labelKey, locale)) : t(labelKey, locale);
   })();
 
+  // Photo backdrop (hero_v4 only — legacy uses the colored "tail" mockup
+  // below). Lake → water_features photo; Beach → beachfront photo.
+  // Rendered as an <img> so Vite's asset bundler resolves the hashed
+  // URL; CSS background-image with a static path doesn't work in dev.
+  const photoKey = shoreline === "lake" ? "water_features" : "beachfront";
+  const photoSrc = getCategoryImage(photoKey);
+
   return (
     <button
       type="button"
@@ -44,6 +52,16 @@ function ShorelineCard({ shoreline, locale, app }) {
       onClick={onClick}
       aria-label={ariaLabel}
     >
+      {photoSrc && (
+        <img
+          src={photoSrc}
+          alt=""
+          className="hp-shoreline-photo"
+          loading="eager"
+          decoding="async"
+          aria-hidden="true"
+        />
+      )}
       <div className="hp-shoreline-head">
         <div className="hp-shoreline-head-left">
           <span className="hp-shoreline-icon" aria-hidden="true">
