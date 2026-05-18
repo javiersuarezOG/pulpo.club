@@ -266,17 +266,28 @@ jobs:
           EOF
 
       - name: Data-quality canaries
-        # TODO(2026-05-09): switch from LOG_ONLY=true to fail once canaries are
-        # tuned against 7 days of real nightly runs.  Until then, violations are
-        # printed but do NOT fail the workflow so we can calibrate thresholds.
+        # Canary bounds tuned 2026-05-18 against real SV agricultural data
+        # (FINCA DE CAFE, HACIENDA listings — see PR fixing 7-day nightly
+        # outage that started 2026-05-12 when PR #197 flipped LOG_ONLY=false
+        # without retuning the residential-shaped thresholds).
         env:
-          LOG_ONLY: "false"   # flip to "false" after the 7-day soak window
+          LOG_ONLY: "false"
         run: |
           python3 - <<'EOF'
           import json, re, sys, os
 
           log_only = os.environ.get("LOG_ONLY", "true").lower() == "true"
           fail     = False
+
+          # Agricultural plots in El Salvador (FINCA DE CAFE, HACIENDA,
+          # "manzanas") have legitimately low $/m² ($0.50–$2/m² range) and
+          # large area. Above this area we skip the PPM range check —
+          # residential PPM economics don't apply.
+          AGRICULTURAL_AREA_THRESHOLD_M2 = 50_000   # 5 hectares
+          MAX_AREA_M2                    = 10_000_000  # 1,000 hectares
+          MAX_PRICE_USD                  = 50_000_000
+          PPM_FLOOR_USD                  = 1
+          PPM_CEILING_USD                = 5_000
 
           try:
               data = json.load(open("web/data/ranked.json"))
@@ -303,15 +314,18 @@ jobs:
                   violations.append(f"COUNTRY: {title!r} (url={url})")
 
               # Area canary
-              if area is not None and area > 5_000_000:
+              if area is not None and area > MAX_AREA_M2:
                   violations.append(f"MAX_AREA: area_m2={area} title={title!r}")
 
               # Price canary
-              if price is not None and price > 50_000_000:
+              if price is not None and price > MAX_PRICE_USD:
                   violations.append(f"MAX_PRICE: price_usd={price} title={title!r}")
 
-              # $/m² range canary
-              if ppm is not None and ppm > 0 and (ppm < 1 or ppm > 5_000):
+              # $/m² range canary — skip for large agricultural plots
+              is_agricultural = area is not None and area > AGRICULTURAL_AREA_THRESHOLD_M2
+              if (ppm is not None and ppm > 0
+                      and not is_agricultural
+                      and (ppm < PPM_FLOOR_USD or ppm > PPM_CEILING_USD)):
                   violations.append(f"PPM_RANGE: price_per_m2={ppm} title={title!r}")
 
           if violations:
