@@ -117,7 +117,7 @@ def _write_sidecar(image_path: Path, raw_bytes: bytes) -> Optional[dict]:
 _PHOTO_CANDIDATES_CAP_DEFAULT = 5
 
 
-def _pick_best_photo_url(photo_urls):
+def _pick_best_photo_url(photo_urls, on_url_error=None):
     """Phase 4 U1 — hero re-escalation.
 
     Old behavior: hero was always ``photo_urls[0]`` regardless of
@@ -141,6 +141,12 @@ def _pick_best_photo_url(photo_urls):
     photo_urls : list[str]
         Ordered candidate URLs from the scraper. Truncated to the
         per-listing cap before download.
+    on_url_error : callable(url, exception) -> None, optional
+        Per-URL fetch-error callback. The caller uses this to write the
+        underlying httpx/decode error to the photo_fetch_log alongside
+        the URL it occurred on — so the existing 404-logging test (and
+        any operator triage) still sees the real error rather than just
+        "no candidates downloaded".
     """
     if not photo_urls:
         return (None, None, None, None)
@@ -164,7 +170,12 @@ def _pick_best_photo_url(photo_urls):
         try:
             r = httpx.get(url, timeout=5.0, follow_redirects=True)
             r.raise_for_status()
-        except Exception:
+        except Exception as e:
+            if on_url_error is not None:
+                try:
+                    on_url_error(url, e)
+                except Exception:
+                    pass
             continue
         try:
             score = _compute_photo_score(r.content) if _compute_photo_score else None
@@ -320,14 +331,34 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # U1 — pick the BEST photo from up to `cap` candidates
             # instead of blindly using photo_urls[0]. Returns the
             # winner's URL + bytes (already downloaded so we don't
-            # re-fetch) + its score + text-overlay flag.
+            # re-fetch) + its score + text-overlay flag. We pass an
+            # on_url_error callback so per-URL fetch failures are
+            # logged with the underlying httpx/decode message (the
+            # operator-facing log historically showed "404 Not Found"
+            # for those rows; preserved by routing each error
+            # individually rather than synthesizing a meta-error
+            # after-the-fact).
+            def _log_url_error(url, exc, _li=li, _log_path=log_path):
+                try:
+                    with _log_path.open("a", encoding="utf-8") as _lf:
+                        _lf.write(json.dumps({
+                            "source_id": _li.source_id,
+                            "source": _li.source,
+                            "url": url,
+                            "error": str(exc),
+                            "ts": datetime.now(timezone.utc).isoformat(),
+                        }) + "\n")
+                except Exception:
+                    pass
+
             winning_url, winning_content, winning_score, winning_has_text = (
-                _pick_best_photo_url(candidate_urls)
+                _pick_best_photo_url(candidate_urls, on_url_error=_log_url_error)
             )
             if winning_url is None:
-                # Every candidate failed to download. Record one entry
-                # so the operator sees which listing burnt budget for
-                # nothing.
+                # Every candidate failed to download. The individual
+                # per-URL errors are already in the log via the
+                # callback above; raise to bump the failed counter and
+                # skip the derivative-write step for this listing.
                 raise RuntimeError(
                     f"no_candidate_downloaded_from_{len(candidate_urls)}_urls"
                 )

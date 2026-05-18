@@ -304,9 +304,14 @@ def test_pick_best_photo_picks_highest_scoring(tmp_repo):
         url, content, score, has_text = _pick_best_photo_url(list(responses.keys()))
 
     # The full-HD image should win — it's the only one in tier 100.
+    # We assert the URL rather than an absolute score because PR-7.6
+    # composes the final score from resolution + size + sharpness, and
+    # a solid-color JPEG has near-zero sharpness so the total lands
+    # below the resolution-tier ceiling. The relative ordering is what
+    # matters.
     assert url == "https://example.com/big.jpg"
     assert content == big
-    assert score >= 100
+    assert score > 0
 
 
 def test_pick_best_photo_deprioritizes_text_overlay(tmp_repo):
