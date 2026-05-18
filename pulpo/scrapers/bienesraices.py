@@ -22,6 +22,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries, DEFAULT_REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
@@ -209,6 +210,7 @@ class BienesRaicesScraper:
                 _add(img.get("image") or img.get("photo") or img.get("url") or img.get("src") or "")
             elif isinstance(img, str):
                 _add(img)
+        photo_urls = upgrade_photo_urls("bienesraices", photo_urls, payload=prop)
 
         # Build the base record. The lot-area field (`terrain_area`) is the
         # `area_m2` for ALL types: for land it's THE area; for houses it's
