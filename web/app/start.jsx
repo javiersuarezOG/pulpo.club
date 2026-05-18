@@ -34,6 +34,7 @@ import { t, useLocale } from "./i18n.jsx";
 import { PulpoLogo } from "./components.jsx";
 import { track } from "./telemetry/hook";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
+import { getDistinctId } from "./telemetry/hook";
 import { pickHeroPhoto } from "./lib/hero-photos";
 import { useCampaignParams } from "./lib/campaign";
 import "./styles/start.css";
@@ -103,6 +104,9 @@ export default function StartPage() {
         body: JSON.stringify({
           promoCode: includeCode && urlCode ? urlCode : null,
           locale: lc,
+          // Funnel-stitching: lets the webhook alias() the anon
+          // session id to the email-derived id so PostHog joins them.
+          posthog_anon_id: getDistinctId(),
           ...utms,
         }),
       });

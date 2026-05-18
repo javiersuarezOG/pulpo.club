@@ -154,6 +154,27 @@ module.exports = async (req, res) => {
         };
         const distinctId = posthog.emailDistinctId(email);
 
+        // Alias the client-side anonymous PostHog distinct_id (carried
+        // through Stripe session metadata by start-checkout.js) to the
+        // server-side email-derived id. This stitches the anon→paid
+        // funnel so PostHog sees one person for the full sequence:
+        //   $pageview → free_month_modal.shown → ... → webhook.checkout_completed.
+        // Tolerates missing/equal/empty ids — alias is a no-op then.
+        const posthogAnonId = session.metadata && session.metadata.posthog_anon_id
+          ? String(session.metadata.posthog_anon_id) : "";
+        if (posthogAnonId && distinctId && posthogAnonId !== distinctId) {
+          try {
+            posthog.alias(posthogAnonId, distinctId);
+          } catch (err) {
+            // Never let an alias failure block the webhook — it's
+            // funnel-attribution sugar, not a payment correctness gate.
+            logApi("stripe.webhook", {
+              status: 200, type: event.type, alias_failed: true,
+              error: err && err.message,
+            });
+          }
+        }
+
         // Path A — existing auth-gated upgrade. client_reference_id was
         // set by /api/stripe/create-checkout-session.js, so we know the
         // Clerk user up front. Unchanged behaviour.

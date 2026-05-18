@@ -40,8 +40,10 @@ import {
 import { useListings } from "../data/use-listings.tsx";
 import { loadFeaturedJson, featuredIdToListingId } from "../data/featured";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { tierFor } from "../lib/gating";
 import { readFeatureFlag } from "../lib/feature-flag";
 import { pickHeroPhoto } from "../lib/hero-photos";
+import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 
 function fmtCount(n, locale) {
   try {
@@ -115,6 +117,18 @@ export function HeroV4({ app, locale }) {
     try { track("hero_v4_viewed", {}); } catch { /* ignore */ }
   }, []);
 
+  // ── Paid-tier detection (hides CTA + microcopy for pro/agency) ─────
+  const tier = tierFor(app?.user);
+  const isPaid = tier === "pro" || tier === "agency";
+
+  // ── Geo-derived display price for the microcopy ─────────────────────
+  const [price, setPrice] = useState(() => priceForCountry(null));
+  useEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
+
   // ── CTA + photo click handlers ─────────────────────────────────────
   const onPrimaryCta = useCallback(() => {
     const ctaText = t("home.hero.cta_primary", locale);
@@ -131,7 +145,7 @@ export function HeroV4({ app, locale }) {
     const branch = routeCtaForState("hero_primary", app?.user);
     trackCtaRouted("hero_primary", app?.user, branch, true);
     if (branch === "passthrough") return;
-    void dispatchCentralBranch(branch, app);
+    void dispatchCentralBranch(branch, app, { trigger: "hero_cta" });
   }, [app, locale]);
 
   const onPhotoClick = useCallback(() => {
@@ -154,7 +168,10 @@ export function HeroV4({ app, locale }) {
       }
       return;
     }
-    void dispatchCentralBranch(branch, app, { pendingListing: resolved.id });
+    void dispatchCentralBranch(branch, app, {
+      pendingListing: resolved.id,
+      trigger: "featured_deal",
+    });
   }, [app, resolved]);
 
   const counterLine = t("home.hero.counter_template", locale, {
@@ -173,15 +190,21 @@ export function HeroV4({ app, locale }) {
             <span className="hp-hero-v4-h1-italic">{t("home.hero.h1.italic", locale)}</span>
           </h1>
           <p className="hp-hero-v4-subhead">{t("home.hero.v4.subhead", locale)}</p>
-          <button
-            type="button"
-            className="hp-hero-v4-cta"
-            onClick={onPrimaryCta}
-          >
-            <span>{t("home.hero.cta_primary", locale)}</span>
-            <IconArrowRight size={16} />
-          </button>
-          <p className="hp-hero-v4-microcopy">{t("home.hero.microcopy", locale)}</p>
+          {!isPaid && (
+            <>
+              <button
+                type="button"
+                className="hp-hero-v4-cta"
+                onClick={onPrimaryCta}
+              >
+                <span>{t("home.hero.cta_primary", locale)}</span>
+                <IconArrowRight size={16} />
+              </button>
+              <p className="hp-hero-v4-microcopy">
+                {t("home.hero.microcopy", locale, { price: price.displayString })}
+              </p>
+            </>
+          )}
           <div className="hp-hero-v4-live" aria-label={t("home.hero.counter_live", locale)}>
             <span className="hp-hero-v4-live-dot" aria-hidden="true" />
             <span>{counterLine}</span>

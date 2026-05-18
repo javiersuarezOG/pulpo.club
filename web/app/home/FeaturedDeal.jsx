@@ -84,7 +84,10 @@ export function FeaturedDeal({ app, locale }) {
     }
     // Anon → free_signup. Carry the listing id (if we have one) so
     // the post-signin chain lands on the detail panel.
-    void dispatchCentralBranch(branch, app, useReal ? { pendingListing: resolved.id } : {});
+    void dispatchCentralBranch(branch, app, {
+      trigger: "featured_deal",
+      ...(useReal ? { pendingListing: resolved.id } : {}),
+    });
   }, [app, useReal, resolved]);
 
   // Telemetry once per mount so dashboards can see real-vs-hardcoded
