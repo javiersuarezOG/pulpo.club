@@ -2192,6 +2192,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .free-month-modal-cta-primary {
   width: 100%;
   min-height: 48px;
+  /* .btn-primary is inline-flex with align-items:center but no
+     horizontal centering by default — the .block helper class adds it.
+     The modal CTA is always full-width so we bake centering in here
+     and don't require callers to remember .block. */
+  justify-content: center;
+  text-align: center;
 }
 .free-month-modal-cta-dismiss {
   display: block;

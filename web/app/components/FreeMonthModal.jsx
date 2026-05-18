@@ -37,7 +37,15 @@ export function FreeMonthModal({ app, trigger, onClose }) {
   // hook /start and ProUpsellModal use. Without this, a Reddit promo
   // visitor who clicked through the hero CTA after dismissing the
   // auto-mount ProUpsellModal would lose their pre-applied discount.
-  const { urlCode, utms } = useCampaignParams();
+  const { urlCode: rawUrlCode, utms } = useCampaignParams();
+  // Default discount code for the modal flow: every visitor who reaches
+  // this surface gets the first month free pre-applied on the Stripe
+  // session. A URL-supplied ?code= (Reddit / partner campaigns) wins
+  // because it may carry a richer offer; the default is the fallback.
+  // The Stripe-side coupon is "PULPOFREEMONTH" — must exist + be active
+  // in Stripe, else start-checkout soft-fails and retries without it
+  // so the visitor still reaches Stripe (see stripe-modal-checkout.ts).
+  const urlCode = rawUrlCode || "PULPOFREEMONTH";
 
   // Geo-derived display price. Starts with USD fallback (synchronous so
   // the modal renders immediately with a real price); refines via the
@@ -56,7 +64,7 @@ export function FreeMonthModal({ app, trigger, onClose }) {
         // passthrough. But the schema is open-string'd to anon/free only
         // for safety.
         flag_enabled: true,
-        has_code: !!urlCode,
+        has_code: !!rawUrlCode,
         geo_currency: price.currency,
         price_amount: price.amount,
       });
