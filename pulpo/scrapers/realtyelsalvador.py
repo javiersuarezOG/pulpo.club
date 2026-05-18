@@ -28,6 +28,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries
 from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 
 BASE         = "https://realtyelsalvador.com"
 API_BASE     = f"{BASE}/wp-json/wp/v2/propiedades"
@@ -113,7 +114,7 @@ def _extract_photo_urls(rec: dict) -> list[str]:
             if src:
                 _add(src)
 
-    return urls
+    return upgrade_photo_urls("realtyelsalvador", urls, payload=rec)
 
 
 def _map(rec: dict) -> Optional[dict]:

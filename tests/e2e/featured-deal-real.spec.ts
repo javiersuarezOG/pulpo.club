@@ -25,7 +25,7 @@ test.describe("FeaturedDeal real-listing wiring (Wave 5b)", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_featured_deal_real_v1=0",
+      "/?posthog_capture=1&ff_featured_deal_real_v1=0&ff_hero_v4=0",
       { waitUntil: "networkidle" },
     );
 
@@ -45,7 +45,7 @@ test.describe("FeaturedDeal real-listing wiring (Wave 5b)", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_featured_deal_real_v1=1",
+      "/?posthog_capture=1&ff_featured_deal_real_v1=1&ff_hero_v4=0",
       { waitUntil: "networkidle" },
     );
 
@@ -79,7 +79,7 @@ test.describe("FeaturedDeal real-listing wiring (Wave 5b)", () => {
     await context.route("**/data/featured.json", (route) => route.fulfill({ status: 404, body: "" }));
 
     await page.goto(
-      "/?posthog_capture=1&ff_featured_deal_real_v1=1",
+      "/?posthog_capture=1&ff_featured_deal_real_v1=1&ff_hero_v4=0",
       { waitUntil: "networkidle" },
     );
 
@@ -103,7 +103,7 @@ test.describe("FeaturedDeal real-listing wiring (Wave 5b)", () => {
     await seedProUser(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_featured_deal_real_v1=1&ff_paid_home_variant_v1=0",
+      "/?posthog_capture=1&ff_featured_deal_real_v1=1&ff_paid_home_variant_v1=0&ff_hero_v4=0",
       { waitUntil: "networkidle" },
     );
 

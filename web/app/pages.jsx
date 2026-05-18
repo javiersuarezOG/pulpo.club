@@ -859,6 +859,23 @@ function recomputeComposite(l, w) {
   return (v * w.value + ll * w.location + m * w.momentum) / total;
 }
 
+// "Top 10" rank map: listing id → 1..10 based on global rank_score desc.
+// Filters out sold + missing-rank listings before slicing, so the chip
+// represents the 10 best *available* listings rather than the 10
+// highest scores including sold/null entries. Same map is consumed by
+// BrowsePage and SavedPage so the chip means the same thing on both
+// surfaces — and stays attached to the listing regardless of filter
+// or sort.
+function buildTopRankMap(listings, n = 10) {
+  const out = new Map();
+  const ranked = [...listings]
+    .filter((l) => !l.is_sold && l.rank_score != null)
+    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
+    .slice(0, n);
+  ranked.forEach((l, i) => out.set(l.id, i + 1));
+  return out;
+}
+
 function applyFilters(listings, f) {
   return listings.filter(l => {
     if (l.is_sold) return false;
@@ -1022,6 +1039,8 @@ function BrowsePage({ app }) {
   // doesn't fire dozens of applyFilters() passes. Chip toggles still
   // feel instant — the debounced snapshot tracks the live value.
   const debouncedFilters = useDebouncedValue(filters, 300);
+
+  const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
 
   const results = pUseMemo(() => {
     // PR-photo-nav-perf — filter+sort cost is the most expensive
@@ -1222,6 +1241,7 @@ function BrowsePage({ app }) {
                     app={app}
                     priority={i < ABOVE_FOLD_COUNT}
                     source="browse"
+                    topRank={topRankMap.get(l.id)}
                     onOpen={() => {
                       track("card.clicked", { listing_id: l.id, source_view: "browse" });
                       // Route through the matrix so anon + free hit the
@@ -1260,7 +1280,7 @@ function BrowsePage({ app }) {
               )}
             </>
           ) : (
-            <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} />
+            <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} topRankMap={topRankMap} />
           )}
         </div>
       </div>
@@ -1278,7 +1298,7 @@ function BrowsePage({ app }) {
 }
 
 // ====== Results table ======
-function ResultsTable({ results, app, sort, setSort }) {
+function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   const headerSortable = (key, label) => {
     const map = { price: "price_asc", days: "days_asc", size: "size_desc", ppm: "ppm_asc" };
     const active = sort === map[key];
@@ -1311,7 +1331,15 @@ function ResultsTable({ results, app, sort, setSort }) {
               <td className="thumb-cell">
                 {l.photos[0] ? <img src={l.photos[0]} alt=""/> : <div className="thumb-placeholder"/>}
               </td>
-              <td className="title-cell">{tr(l.title, app.locale)}</td>
+              <td className="title-cell">
+                {topRankMap && topRankMap.get(l.id) != null && (
+                  <span className="pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
+                    <span className="pulpo-rank-inline-star">★</span>
+                    <span className="pulpo-rank-inline-num">#{topRankMap.get(l.id)}</span>
+                  </span>
+                )}
+                {tr(l.title, app.locale)}
+              </td>
               <td>{l.zone_name}</td>
               <td><span className={`type-pill type-${l.land_type}`}>{landTypeLabel(l.land_type)}</span></td>
               <td className="num">{formatSize(l.size_m2)}</td>
@@ -1904,6 +1932,8 @@ function SavedPage({ app }) {
   const [sort, setSort] = pUseState("recent");
   pUseEffect(() => { localStorage.setItem("pulpo-saved-view", view); }, [view]);
 
+  const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
+
   const sorted = pUseMemo(() => {
     const arr = [...items];
     switch (sort) {
@@ -1973,6 +2003,7 @@ function SavedPage({ app }) {
               app={app}
               priority={i < 6}
               source="saved"
+              topRank={topRankMap.get(l.id)}
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "saved" });
                 app.openListing(l.id);
@@ -1981,7 +2012,7 @@ function SavedPage({ app }) {
           ))}
         </div>
       ) : (
-        <ResultsTable results={sorted} app={app} sort={sort} setSort={setSort} />
+        <ResultsTable results={sorted} app={app} sort={sort} setSort={setSort} topRankMap={topRankMap} />
       )}
     </div>
   );

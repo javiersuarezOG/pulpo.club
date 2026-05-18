@@ -201,4 +201,8 @@ export interface Listing {
     // meets 800×600. Both default false until the pipeline populates them.
     hero_eligible: boolean;
     card_eligible: boolean;
+    // Source-side photo dimensions in pixels (from the hero sidecar's
+    // width/height). null on rows that pre-date the Phase-A3 backfill.
+    source_width: number | null;
+    source_height: number | null;
 }

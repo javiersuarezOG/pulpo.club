@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo — Issue 01 · 18 May 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Pulpo Newsletter — built on the live design tokens
+     Tokens mirrored from web/app/styles/tokens.css so this email
+     reads as the same product, not a separate brand.
+     ============================================================ */
+  :root {
+    --paper:        #F4EFE6;   /* cream background */
+    --paper-2:      #F8F4EC;   /* soft cream */
+    --paper-3:      #EEE9DF;   /* pebble */
+    --white:        #FFFFFF;
+    --ink:          #1A1916;   /* primary text */
+    --ink-2:        #5A5650;   /* secondary text */
+    --ink-3:        #888780;   /* muted */
+    --line:         rgba(0, 0, 0, 0.08);
+    --line-2:       rgba(0, 0, 0, 0.14);
+    --forest:       #1F3D31;   /* deep green — brand */
+    --forest-mid:   #3D6450;
+    --sage:         #DDE9DC;
+    --clay:         #B8643C;   /* warm clay accent */
+    --clay-deep:    #7A3D1F;
+    --navy:         #1E2A3A;
+    --button-dark:  #18211C;
+    --button-text:  #F4EFE6;
+    --burgundy:     #6B2C2C;
+    --burgundy-bg:  #F5E3E0;
+
+    --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+
+  body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--clay); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { display: block; max-width: 100%; height: auto; border: 0; }
+  table { border-collapse: collapse; }
+
+  .wrap   { width: 100%; background: var(--paper); padding: 32px 0; }
+  .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+  .pad    { padding: 40px 48px; }
+  .pad-md { padding: 28px 48px; }
+  .pad-sm { padding: 18px 48px; }
+
+  .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+  .sans    { font-family: var(--font-sans); }
+  .mono    { font-family: var(--font-mono); }
+
+  .ink     { color: var(--ink); }
+  .ink-2   { color: var(--ink-2); }
+  .muted   { color: var(--ink-3); }
+  .forest  { color: var(--forest); }
+  .clay    { color: var(--clay); }
+
+  .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
+  .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
+  .rule-clay   { border: 0; border-top: 2px solid var(--clay); width: 56px; margin: 0; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    font-weight: 500;
+  }
+  .eyebrow.clay { color: var(--clay); }
+  .eyebrow.muted { color: var(--ink-3); }
+
+  .h-hero  { font-family: var(--font-display); font-size: 56px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 14px 0 12px; color: var(--ink); }
+  .h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 12px 0 8px; color: var(--ink); }
+  .h2      { font-family: var(--font-display); font-size: 30px; line-height: 1.12; letter-spacing: -0.01em; font-weight: 400; margin: 14px 0 6px; color: var(--ink); }
+  .h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 8px 0 4px; color: var(--ink); }
+
+  .lede    { font-family: var(--font-sans); font-size: 17px; line-height: 1.6; color: var(--ink); font-weight: 400; }
+  .body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
+  .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+  .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+  .meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
+
+  .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+  .price-2     { font-family: var(--font-display); font-size: 22px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+  .price-note  { font-family: var(--font-sans); font-size: 12.5px; color: var(--ink-3); }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 5px 9px;
+    background: var(--paper-3);
+    color: var(--ink-2);
+    margin: 0 5px 6px 0;
+    border-radius: 999px;
+  }
+  .pill-forest  { background: var(--sage); color: var(--forest); }
+  .pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
+  .pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
+
+  .cta {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 11px 18px;
+    background: var(--button-dark);
+    color: var(--button-text) !important;
+    border-radius: 999px;
+  }
+  .cta:hover { background: var(--forest); text-decoration: none; }
+  .cta-ghost {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--ink) !important;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+  }
+  .cta-ghost:hover { background: var(--ink); color: var(--paper) !important; text-decoration: none; }
+
+  .glance td { padding: 12px 0; border-bottom: 1px solid var(--line); font-family: var(--font-sans); font-size: 14px; vertical-align: top; color: var(--ink); }
+  .glance .num { font-family: var(--font-mono); color: var(--clay); font-weight: 500; width: 32px; font-size: 12px; padding-top: 14px; }
+  .glance .where { font-family: var(--font-mono); color: var(--ink-3); font-size: 11px; letter-spacing: 0.04em; }
+  .glance .pricecol { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap; }
+
+  .keytable td { padding: 7px 14px 7px 0; vertical-align: top; }
+  .keytable .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest); padding-right: 10px; }
+  .keytable .v { font-family: var(--font-sans); font-size: 14px; color: var(--ink); }
+
+  .callout { background: var(--paper-2); padding: 18px 22px; border-left: 3px solid var(--clay); margin: 16px 0; }
+  .callout .label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); }
+  .callout .body  { margin-top: 6px; font-size: 14.5px; line-height: 1.6; color: var(--ink); }
+
+  .footer-strip { background: var(--forest); color: var(--paper); }
+  .footer-strip .small { color: var(--paper-3); }
+  .footer-strip a { color: var(--paper); }
+
+  @media (max-width: 560px) {
+    .pad, .pad-md, .pad-sm { padding-left: 22px; padding-right: 22px; }
+    .h-hero { font-size: 40px; }
+    .h1 { font-size: 30px; }
+    .h2 { font-size: 24px; }
+    .price { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
+
+    <!-- ============ HEADER STRIP ============ -->
+    <tr><td class="pad-sm" style="border-bottom: 1px solid var(--line);">
+      <table width="100%" role="presentation"><tr>
+        <td style="vertical-align: middle;">
+          <!-- Pulpo wordmark + octopus mark, pulled from web/app/components.jsx -->
+          <table role="presentation"><tr>
+            <td style="vertical-align: middle; padding-right: 8px;">
+              <svg width="22" height="22" viewBox="0 0 32 32" fill="none" style="color: #1F3D31;">
+                <ellipse cx="16" cy="11" rx="9" ry="7.5" fill="#1F3D31"/>
+                <circle cx="12.5" cy="10" r="1.3" fill="#FFFFFF"/>
+                <circle cx="19.5" cy="10" r="1.3" fill="#FFFFFF"/>
+                <path d="M8 17c-.5 3-2.5 4-3 7"   stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M11 18c-.5 3.5-1 5-1 8" stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M14 18.5c-.3 4-.5 5.5 0 8.5" stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M18 18.5c.3 4 .5 5.5 0 8.5"  stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M21 18c.5 3.5 1 5 1 8" stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M24 17c.5 3 2.5 4 3 7"  stroke="#1F3D31" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              </svg>
+            </td>
+            <td style="vertical-align: middle;">
+              <span class="display" style="font-size: 24px; font-weight: 500; letter-spacing: -0.02em; color: #1F3D31; line-height: 1;">pulpo</span>
+            </td>
+          </tr></table>
+        </td>
+        <td align="right" style="vertical-align: middle;">
+          <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em;">ISSUE 01 &middot; 18 MAY 2026</span>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <!-- ============ HERO ============ -->
+    <tr><td class="pad" style="padding-top: 56px; padding-bottom: 36px;">
+      <div class="eyebrow">Hand-picked for Javier</div>
+      <h1 class="h-hero">The 10 best, this fortnight.</h1>
+      <hr class="rule-clay" style="margin: 8px 0 22px;" />
+      <p class="lede" style="margin: 0 0 18px; max-width: 540px;">Pulpo scanned 910 active beach and lake properties across El&nbsp;Salvador this fortnight. These ten matched your filter closely enough to make the cut.</p>
+
+      <!-- Filter chips -->
+      <div style="margin-top: 16px;">
+        <span class="pill pill-filter">La Libertad</span>
+        <span class="pill pill-filter">Under $500k</span>
+        <span class="pill pill-filter">Land OK</span>
+        <span class="pill pill-filter">Character over polish</span>
+      </div>
+    </td></tr>
+
+    <!-- ============ AT A GLANCE ============ -->
+    <tr><td class="pad" style="padding-top: 8px; padding-bottom: 8px;">
+      <hr class="rule" />
+      <div style="margin-top: 24px;">
+        <div class="eyebrow">At a glance</div>
+        <h2 class="h2">Nine to consider. One to skip.</h2>
+        <table class="glance" width="100%" role="presentation" style="margin-top: 16px;">
+          <tr><td class="num">01</td><td><strong>Coffee farm with a river</strong><br/><span class="where">17.5 acres, working land · Chiltiupán</span></td><td align="right" class="pricecol">$185,000</td></tr>
+          <tr><td class="num">02</td><td><strong>Two-bed at Zonset</strong><br/><span class="where">Finished build, 2 min to the break · El Zonte</span></td><td align="right" class="pricecol">$445,694</td></tr>
+          <tr><td class="num">03</td><td><strong>Ocean-view lot above El Tunco</strong><br/><span class="where">The cheapest way in · Tamanique</span></td><td align="right" class="pricecol">$60,000</td></tr>
+          <tr><td class="num">04</td><td><strong>The Cliff, El Sunzal</strong><br/><span class="where">Gated, build-to-spec · El Sunzal</span></td><td align="right" class="pricecol">from $199,386</td></tr>
+          <tr><td class="num">05</td><td><strong>43 acres in the Bálsamo</strong><br/><span class="where">Two rivers, the ambition pick · Chiltiupán</span></td><td align="right" class="pricecol">$375,000</td></tr>
+          <tr><td class="num">06</td><td><strong>Mountain manzana near El Zonte</strong><br/><span class="where">Simplest paperwork on the list · Chiltiupán</span></td><td align="right" class="pricecol">$240,000</td></tr>
+          <tr><td class="num">07</td><td><strong>3.6-acre oceanview tract</strong><br/><span class="where">For a small subdivision · Tamanique</span></td><td align="right" class="pricecol">$980,000</td></tr>
+          <tr><td class="num">08</td><td><strong>Prime corridor lot, Tunco &amp; Sunzal</strong><br/><span class="where">Developer-shaped, sloped · Tamanique</span></td><td align="right" class="pricecol">$150,000</td></tr>
+          <tr><td class="num">09</td><td><strong>One-manzana cliff, Costa Brava</strong><br/><span class="where">Boutique hotel scale · Chiltiupán</span></td><td align="right" class="pricecol">$450,000</td></tr>
+          <tr><td class="num" style="color: var(--ink-3);">×</td><td><strong>Oceanfront cliff, El Obispo</strong><br/><span class="where">Why this one didn't make the cut · La Libertad</span></td><td align="right" class="pricecol" style="color: var(--ink-3);">$1,053,600</td></tr>
+        </table>
+      </div>
+    </td></tr>
+
+    <!-- ============ TOP PICK 1 ============ -->
+    <tr><td style="padding: 36px 0 0 0;">
+      <img src="https://remaxcaribbeanandcentralamerica.azureedge.net/images/003094257004/v3/HDPhotos/415217.png" alt="Coffee farm in the Balsam Mountains, Chiltiupán" width="680" />
+    </td></tr>
+    <tr><td class="pad" style="padding-top: 28px;">
+      <div>
+        <span class="pill pill-forest">Top pick · 01</span>
+        <span class="pill">Working land</span>
+        <span class="pill">Coffee · river · trees</span>
+      </div>
+      <h2 class="h1">17.5-acre coffee farm with a river running through it.</h2>
+      <div class="meta" style="margin: 6px 0 16px;">Chiltiupán · La Libertad · 25 min to El Zonte beach</div>
+      <div class="price">$185,000 <span class="price-note">· negotiable · paperwork is clean</span></div>
+
+      <p class="body" style="margin-top: 22px;">The listing photos are weak and the title undersells it. What's actually on the property: 11 acres of rust-resistant coffee already producing, 5,000 new seedlings planted this season, the El&nbsp;Zonte river crossing the land with two swimmable natural pools, year-round spring water, electricity, and roughly $50k in standing timber (cedar, mahogany, balsam) by the broker's count. The small casita needs to be gutted.</p>
+
+      <div class="callout">
+        <div class="label">Three things have to be true</div>
+        <div class="body">(1)&nbsp;You're fine with a 4×4 in the wet season. (2)&nbsp;You either want to run coffee yourself or you'll pay a manager $400–600/mo to do it. (3)&nbsp;You're not in a hurry to sleep on-site — the house is a 6–12 month project. If all three check, $1.50/m² for productive land this close to El&nbsp;Zonte is a price that doesn't repeat.</div>
+      </div>
+
+      <table class="keytable" role="presentation" style="margin-top: 14px;">
+        <tr><td class="k">Built</td><td class="v">Small casita, needs remodel</td><td class="k">Access</td><td class="v">4×4, via Comasagua</td></tr>
+        <tr><td class="k">Utilities</td><td class="v">Electric · spring water</td><td class="k">Vs zone</td><td class="v">−98.8% per m²*</td></tr>
+        <tr><td class="k">Drive</td><td class="v">25 min El Zonte · 42 km SAL</td><td class="k">Listed</td><td class="v">New this fortnight</td></tr>
+      </table>
+
+      <p class="small" style="margin-top: 10px;">* The zone median is dragged up by small surf-adjacent lots that sell by the m². This is rural agricultural land — different product, different math.</p>
+
+      <p style="margin-top: 22px;"><a class="cta" href="https://www.remax-elsalvador.com/003094257004">Open the file →</a></p>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- ============ TOP PICK 2 ============ -->
+    <tr><td>
+      <img src="https://goodlifeelsalvador.com/wp-content/uploads/2026/04/DSC02001-1024x683.jpg" alt="Zonset two-bed condo, El Zonte" width="680" />
+    </td></tr>
+    <tr><td class="pad" style="padding-top: 28px;">
+      <div>
+        <span class="pill pill-forest">Top pick · 02</span>
+        <span class="pill">Move-in ready</span>
+        <span class="pill">Rental-friendly</span>
+      </div>
+      <h2 class="h1">Two-bed at Zonset, two-minute walk to the beach.</h2>
+      <div class="meta" style="margin: 6px 0 16px;">El Zonte · Chiltiupán · 105&nbsp;m² · 2 bed · 2 bath</div>
+      <div class="price">$445,694 <span class="price-note">· developer price · no negotiation reported</span></div>
+
+      <p class="body" style="margin-top: 22px;">For a buyer who wants to fly in and unlock a door, this is the strongest finished build in the issue. El&nbsp;Zonte absorbed the 2021–2024 surge and stayed functional — schools, a real grocery, three good restaurants. The Zonset unit is honest construction: exposed concrete, warm wood, a balcony facing greenery instead of the next building.</p>
+
+      <div class="callout">
+        <div class="label">The rental math</div>
+        <div class="body">Comparable two-beds in El&nbsp;Zonte clear roughly $180–230/night in high season (Nov–Apr) and $90–110 in low. At 55% occupancy that's gross ~$32k/yr, net ~$22k after HOA and management. About 5% yield, with appreciation as the upside.</div>
+      </div>
+
+      <div class="callout">
+        <div class="label">The catch</div>
+        <div class="body">This is a 47-unit development across three towers — real rental supply is coming online at the same time you are. The math holds if the unit will also be personally used 6–10 weeks a year. Pure-investment buyers should run sensitivity on occupancy down to 40%.</div>
+      </div>
+
+      <table class="keytable" role="presentation" style="margin-top: 14px;">
+        <tr><td class="k">Built m²</td><td class="v">105</td><td class="k">HOA</td><td class="v">Ask broker (likely $180–250/mo)</td></tr>
+        <tr><td class="k">To beach</td><td class="v">2 min on foot</td><td class="k">To SAL</td><td class="v">54 km · ~55 min</td></tr>
+        <tr><td class="k">Tower</td><td class="v">1 of 3 · 47 units total</td><td class="k">Listed</td><td class="v">New this fortnight</td></tr>
+      </table>
+
+      <p style="margin-top: 22px;"><a class="cta" href="https://goodlifeelsalvador.com/property-item/2-bed-condominium-at-zonset-el-zonte-445694/">Open the file →</a></p>
+    </td></tr>
+
+    <!-- ============ SHORTLIST HEADER ============ -->
+    <tr><td class="pad" style="padding-top: 36px; padding-bottom: 4px;">
+      <hr class="rule" />
+      <div style="margin-top: 28px;">
+        <div class="eyebrow">The shortlist</div>
+        <h2 class="h1">Seven more — situational picks.</h2>
+        <p class="body-2" style="margin-top: 8px; max-width: 480px;">Each one is the right answer for a specific buyer. Read the frame first; skip if it isn't yours.</p>
+      </div>
+    </td></tr>
+
+    <!-- SHORTLIST ROW 1: rank 1 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://remax-central.com.sv/storage/properties/5KHV67pR4GvrRwTqV1Jj-large.png" alt="Ocean-view lot above El Tunco" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">Cheapest way in</div>
+          <h3 class="h3" style="margin-top: 6px;">Ocean-view lot above El Tunco</h3>
+          <div class="price-2" style="margin: 6px 0;">$60,000 <span class="price-note">· 1,263&nbsp;m²</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">5&nbsp;km from El&nbsp;Tunco beach on the Tamanique side. Ocean visible from the upper third only — see it before falling for a render. Power, internet and a water tank already on. Realistic build budget: $90–120k for a 1-bed cabin, $180–240k for a small 2-bed with a plunge pool.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://www.remax-elsalvador.com/001461165132">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 2: rank 4 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781113/v3/HDPhotos/Post 02 -General _Mesa de trabajo 1 copia.png" alt="The Cliff, El Sunzal" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">Pre-sale, lower risk than raw land</div>
+          <h3 class="h3" style="margin-top: 6px;">The Cliff · El Sunzal</h3>
+          <div class="price-2" style="margin: 6px 0;">from $199,386 <span class="price-note">· 559–1,003&nbsp;m² lots</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">Gated development, 3&nbsp;min drive to the El&nbsp;Sunzal break. $5k holds a plot, 25% at promise of sale, 75% at close. Two clusters: Puerto&nbsp;Escondido and Bali — ask which lots get afternoon shade. Verify the entrega date and HOA structure before signing.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://www.remax-elsalvador.com/002522781113">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 3: rank 3 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://remaxcaribbeanandcentralamerica.azureedge.net/images/003094257003/v3/HDPhotos/20260105_165847_0000.png" alt="43-acre farm in the Balsam Mountains" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">Bigger version of the top pick</div>
+          <h3 class="h3" style="margin-top: 6px;">43 acres in the Bálsamo range</h3>
+          <div class="price-2" style="margin: 6px 0;">$375,000 <span class="price-note">· 30&nbsp;ha · two rivers</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">9 acres of coffee, 200+ usable balsam trees, an existing main house overlooking a river, BBQ kiosks already built. Listed as ecotourism + adventure (motocross, ATV trails). 2.5× the size of the top pick at 2× the price — better $/acre, but you need a clear plan for the extra land.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://www.remax-elsalvador.com/003094257003">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 4: rank 8 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://goodlifeelsalvador.com/wp-content/uploads/2025/08/lot-in-chiltiupan-for-sale02-1024x683.jpg" alt="Mountain manzana near El Zonte" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">Simplest paperwork on the list</div>
+          <h3 class="h3" style="margin-top: 6px;">Mountain manzana near El&nbsp;Zonte</h3>
+          <div class="price-2" style="margin: 6px 0;">$240,000 <span class="price-note">· ~4,200&nbsp;m² (1 manzana)</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">20 min inland from El&nbsp;Zonte. Cooler at night — you'll sleep without AC. Blueprints already drawn, municipal water and electricity at the property line, easement and boundaries clearly marked. Pricier per m² than the others; you're paying for the lack of surprises.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://goodlifeelsalvador.com/property-item/1-04-acres-of-land-in-chiltiupan-240000/">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 5: rank 7 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://goodlifeelsalvador.com/wp-content/uploads/2026/03/land-for-sale-in-el-tunco-2-1024x576.jpg" alt="3.6-acre oceanview land near El Tunco" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">For a small subdivision play</div>
+          <h3 class="h3" style="margin-top: 6px;">3.6-acre oceanview tract near El&nbsp;Tunco</h3>
+          <div class="price-2" style="margin: 6px 0;">$980,000 <span class="price-note">· 14,690&nbsp;m²</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">Sits above the corridor, 3.5 km to the beach. Versatile topography supports a 6–8 lot subdivision or a small boutique resort. Math only works at this price with a clear subdivision plan in hand — model conservatively at $65/vara² resale and account for road work and water connections.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://goodlifeelsalvador.com/property-item/oceanview-land-near-el-tunco-3-63-acres-980000/">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 6: rank 9 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://assets.easybroker.com/property_images/2474863/39189745/EB-IM4863.jpg?rasterize=true&amp;version=1633438933" alt="2,100m² corridor lot, Tunco/Sunzal" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">For a developer, not a homeowner</div>
+          <h3 class="h3" style="margin-top: 6px;">Prime corridor lot, El&nbsp;Tunco &amp; Sunzal</h3>
+          <div class="price-2" style="margin: 6px 0;">$150,000 <span class="price-note">· 2,100&nbsp;m² · $45/vara²</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">Behind the El&nbsp;Tunco entrance, direct access from the Litoral and the Tamanique road. Mostly sloped — terraces, retaining walls and a thoughtful design are mandatory, not optional. Priced at the new corridor floor of $45/vara²; an honest deal for the right buyer with a build crew.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://bienesraicesenelsalvador.com/propiedad/terreno-3005vr2-tamanique-playa-el-tunco-y-el-sunzal-sc1-pr010-2008">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <!-- SHORTLIST ROW 7: rank 10 -->
+    <tr><td class="pad-md">
+      <table width="100%" role="presentation"><tr>
+        <td width="38%" style="vertical-align: top; padding-right: 22px;">
+          <img src="https://assets.easybroker.com/property_images/1291243/19226648/EB-DY1243.jpg?rasterize=true&amp;version=1571096022" alt="One-manzana cliff lot, Costa Brava" width="100%" />
+        </td>
+        <td style="vertical-align: top;">
+          <div class="eyebrow">Boutique hospitality scale</div>
+          <h3 class="h3" style="margin-top: 6px;">One-manzana cliff lot, Costa Brava</h3>
+          <div class="price-2" style="margin: 6px 0;">$450,000 <span class="price-note">· ~7,000&nbsp;m² · $45/vara²</span></div>
+          <p class="body-2" style="margin: 8px 0 0;">Cliffside, 150 m from Km&nbsp;57.5 of the Litoral, just past the first tunnel before El&nbsp;Zonte. Big enough for a 6–10 room hotel or restaurant project; small enough to be a generous private compound. Same per-vara floor as the corridor lots — the size unlocks the use.</p>
+          <p style="margin-top: 12px;"><a class="cta-ghost" href="https://bienesraicesenelsalvador.com/propiedad/turismo-terreno-julupe-1mz-acantilado-km57-1er-tunel-adelante-el-zonte-ceatp-2059">Open the file →</a></p>
+        </td>
+      </tr></table>
+    </td></tr>
+
+    <!-- ============ SKIP ============ -->
+    <tr><td class="pad" style="padding-top: 36px;">
+      <hr class="rule" />
+      <div style="margin-top: 28px;">
+        <div class="eyebrow clay">Skip this one</div>
+        <h2 class="h1">Oceanfront cliff, Playa El Obispo.</h2>
+        <div class="meta" style="margin: 6px 0 16px; color: var(--clay);">$1,053,600 · 117 days on market · flagged "stale" by Pulpo's tracker</div>
+        <p class="body">It photographs well: cliff edge, private cove, natural saltwater pools, walking distance to Punta&nbsp;Roca. The existing structure needs to be demolished or fully rebuilt — at list price the buyer is paying $1M+ for the lot and the demolition bill, not for a finished home.</p>
+        <p class="body">The math could work as a boutique hospitality project at roughly $800k, or at list with seller financing at 4–5% for the build period. At ask with conventional financing the numbers don't pencil. Worth a viewing only if going in with an offer 20–25% below ask.</p>
+      </div>
+    </td></tr>
+
+    <!-- ============ MARKET CONTEXT ============ -->
+    <tr><td class="pad" style="background: var(--paper-2); padding-top: 36px; padding-bottom: 36px; margin-top: 12px;">
+      <div class="eyebrow">Market context</div>
+      <h2 class="h1">Four things worth knowing this fortnight.</h2>
+      <p class="body"><strong>The Litoral is repaved</strong> from Km&nbsp;42 to Km&nbsp;57. El&nbsp;Tunco to El&nbsp;Zonte is now 22 minutes instead of 40 in traffic. Land valuations in the corridor haven't fully repriced yet — expect that over the next 6–9 months.</p>
+      <p class="body"><strong>Rains started May&nbsp;12</strong>, earlier than 2025. For viewings in Chiltiupán or anywhere off the Litoral, a sedan rental is a $400 mistake. Go with the broker's 4×4 or rent one.</p>
+      <p class="body"><strong>Sunset Park opened</strong> on the La&nbsp;Libertad malecón. Real demand signal for the El&nbsp;Obispo / Punta&nbsp;Roca pocket — more family tourism, fewer late-night pickup trucks. Helps values there; little spillover into the Tunco–Zonte corridor.</p>
+      <p class="body"><strong>A viewing trip for this list</strong> is realistically 3–4 days. Stay in El&nbsp;Zonte, group brokers by afternoon, allow 90 minutes between properties for the road and the conversation.</p>
+    </td></tr>
+
+    <!-- ============ ONE NUMBER ============ -->
+    <tr><td class="pad" style="padding-top: 36px;">
+      <div class="eyebrow">One number worth knowing</div>
+      <h2 class="h1">$45 per vara² — the new floor in the corridor.</h2>
+      <p class="body">Two listings in this issue are priced at exactly $45/vara² (~$65/m²): the corridor plot at Tunco/Sunzal and the Costa&nbsp;Brava cliff in El&nbsp;Zonte. Eighteen months ago the same product was trading at $28–32. Every new listing between Km&nbsp;52 and Km&nbsp;60 has cleared $40 in 2026.</p>
+      <p class="body">Practical implication for the lot picks above: $55–60/vara² by late 2027 is a reasonable base-case exit. Don't underwrite higher without a specific catalyst, and budget for a Q4 dip if the Surf&nbsp;City&nbsp;II infrastructure tranche slows permitting — current broker chatter suggests it will.</p>
+    </td></tr>
+
+    <!-- ============ NEXT ISSUE ============ -->
+    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 36px;">
+      <hr class="rule" />
+      <div style="margin-top: 24px;">
+        <div class="eyebrow">Next issue</div>
+        <h3 class="h3" style="margin-top: 6px;">Monday, 1 June 2026.</h3>
+        <p class="body" style="max-width: 520px;">Pulpo will scan the next 14 days of inventory against your filter and ship the next ten. Adjust filters anytime — changes apply to the next issue.</p>
+        <p style="margin-top: 16px;"><a class="cta-ghost" href="https://pulpo.club/account">Adjust your filters</a></p>
+      </div>
+    </td></tr>
+
+    <!-- ============ FOOTER ============ -->
+    <tr><td class="pad footer-strip">
+      <table width="100%" role="presentation"><tr>
+        <td style="vertical-align: top; padding-bottom: 16px;">
+          <table role="presentation"><tr>
+            <td style="vertical-align: middle; padding-right: 8px;">
+              <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+                <ellipse cx="16" cy="11" rx="9" ry="7.5" fill="#F4EFE6"/>
+                <circle cx="12.5" cy="10" r="1.3" fill="#1F3D31"/>
+                <circle cx="19.5" cy="10" r="1.3" fill="#1F3D31"/>
+                <path d="M8 17c-.5 3-2.5 4-3 7"   stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M11 18c-.5 3.5-1 5-1 8" stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M14 18.5c-.3 4-.5 5.5 0 8.5" stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M18 18.5c.3 4 .5 5.5 0 8.5"  stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M21 18c.5 3.5 1 5 1 8" stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                <path d="M24 17c.5 3 2.5 4 3 7"  stroke="#F4EFE6" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+              </svg>
+            </td>
+            <td style="vertical-align: middle;">
+              <span class="display" style="font-size: 22px; font-weight: 500; letter-spacing: -0.02em; color: var(--paper); line-height: 1;">pulpo</span>
+            </td>
+          </tr></table>
+        </td>
+      </tr></table>
+      <p class="small" style="color: var(--paper-3); margin-top: 8px;">Every beach and lake home in El&nbsp;Salvador, ranked by value. You're getting this because your filter is set to <em>La&nbsp;Libertad · under $500k · land OK</em>.</p>
+      <p class="small" style="margin-top: 14px;">
+        <a href="https://pulpo.club/account" style="color: var(--paper);">Change filters</a> &middot;
+        <a href="https://pulpo.club/account" style="color: var(--paper);">Change cadence</a> &middot;
+        <a href="https://pulpo.club/unsubscribe" style="color: var(--paper);">Unsubscribe</a>
+      </p>
+      <p class="small" style="color: var(--paper-3); margin-top: 18px;">Pulpo doesn't take commission and doesn't list its own properties. We pick from what's already on the market and tell you which ones are worth your time.</p>
+      <p class="small" style="color: var(--paper-3); margin-top: 18px;">© 2026 Pulpo Club &middot; La Libertad, El Salvador &middot; <span class="mono">pulpo.club</span></p>
+    </td></tr>
+
+  </table>
+</div>
+</body>
+</html>

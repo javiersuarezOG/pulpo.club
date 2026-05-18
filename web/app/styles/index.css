@@ -5633,12 +5633,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .homepage-v2.hero-v4 .hp-usp-cards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 40px;
+  gap: 24px;
 }
 @media (min-width: 768px) {
   .homepage-v2.hero-v4 .hp-usp-cards {
     grid-template-columns: repeat(3, 1fr);
-    gap: 48px;
+    gap: 32px;
   }
 }
 .homepage-v2.hero-v4 .hp-usp-card,
@@ -5717,10 +5717,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .homepage-v2.hero-v4 .hp-shelf-h2 {
   font-family: var(--font-sans);
-  font-size: clamp(24px, 3.5vw, 32px);
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-ink-primary);
+}
+@media (min-width: 768px) {
+  .homepage-v2.hero-v4 .hp-shelf-h2 { font-size: 26px; }
+}
+@media (min-width: 1280px) {
+  .homepage-v2.hero-v4 .hp-shelf-h2 { font-size: 30px; }
 }
 .homepage-v2.hero-v4 .hp-shelf-pill {
   display: none; /* Pill chips compete with the cleaner header rhythm */
@@ -5953,3 +5959,531 @@ h1,h2,h3,h4,h5 { margin: 0; }
   transform: translateY(-2px);
   box-shadow: var(--shadow-2);
 }
+
+/* ===========================================================================
+   Wave 5 polish (hero_v4) — round 3
+   ===========================================================================
+   Punch list:
+     1. Tighten section whitespace (everything was 1.5x what it should be).
+     2. PickShoreline → Airbnb category-card pattern (drop preview rows).
+     3. Pages + modals + filters + listing-detail + sticky-header all
+        adopt Inter sans (drop Instrument Serif except for "ranked.").
+     4. Fix heart-icon overlap on shelf cards that also have a
+        right-side badge (e.g. "today" on NewThisWeek).
+     5. Make the "scroll for more" shelf hint readable (was muted +
+        tiny). Bump to body weight + ink-secondary.
+
+   Scope: `.app.hero-v4` everywhere so flag-off is byte-for-byte
+   identical to legacy. Brand: keep forest-green accents +
+   Instrument Serif italic on the hero's "ranked." word.
+   --------------------------------------------------------------------------- */
+
+/* ────── 1. Whitespace — uniform, tight vertical rhythm ──────
+   Every section uses the SAME Y padding at the SAME breakpoint so the
+   visual gap between any two consecutive sections is constant. Tight
+   numbers below: mobile 16, tablet 20, desktop 24 — gives 32/40/48px
+   between sections, which reads as deliberate spacing rather than
+   "too much air". */
+
+.app.hero-v4 .homepage-v2 .hp-hero-v4,
+.app.hero-v4 .homepage-v2 .hp-usp,
+.app.hero-v4 .homepage-v2 .hp-shoreline,
+.app.hero-v4 .homepage-v2 .hp-shelf {
+  padding: 16px 20px;
+}
+@media (min-width: 768px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4,
+  .app.hero-v4 .homepage-v2 .hp-usp,
+  .app.hero-v4 .homepage-v2 .hp-shoreline,
+  .app.hero-v4 .homepage-v2 .hp-shelf {
+    padding: 20px 32px;
+  }
+}
+@media (min-width: 1024px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4,
+  .app.hero-v4 .homepage-v2 .hp-usp,
+  .app.hero-v4 .homepage-v2 .hp-shoreline,
+  .app.hero-v4 .homepage-v2 .hp-shelf {
+    padding: 24px 40px;
+  }
+}
+
+/* Hero card internal padding — trim the trailing whitespace below
+   "910 listings · 7 sources" so the section gap reads as the section
+   gap, not card-inside + section-outside stacked. */
+.app.hero-v4 .homepage-v2 .hp-hero-v4-card {
+  padding: 20px 4px 12px;
+}
+@media (min-width: 1024px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4-card {
+    padding: 24px 28px 16px;
+  }
+}
+.app.hero-v4 .page-browse,
+.app.hero-v4 .page-saved {
+  padding-top: 16px;
+}
+
+/* ────── 2. PickShoreline — Airbnb category-card pattern ────── */
+
+.app.hero-v4 .hp-shoreline-h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink-primary);
+}
+.app.hero-v4 .hp-shoreline-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .app.hero-v4 .hp-shoreline-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+}
+.app.hero-v4 .hp-shoreline-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 260px;
+  padding: 0;
+  /* Transparent so the ::before category photo shows through;
+     the scrim ::after lays on top of the photo for label legibility. */
+  background: transparent;
+  border: 0;
+  box-shadow: var(--shadow-1);
+  text-align: left;
+  cursor: pointer;
+}
+.app.hero-v4 .hp-shoreline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+/* Hide the decorative preview rows + subtitle in v4 — Airbnb cards
+   are photo-led with a single label, not a mockup list. */
+.app.hero-v4 .hp-shoreline-tail,
+.app.hero-v4 .hp-shoreline-subtitle {
+  display: none;
+}
+/* Background photo per shoreline — sourced from PickShoreline.jsx's
+   <img class="hp-shoreline-photo"> (Vite-bundled hashed URL). Sits
+   behind the head + scrim via z-index ladder. */
+.app.hero-v4 .hp-shoreline-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  border-radius: 20px;
+}
+/* Light scrim so the head label stays readable. */
+.app.hero-v4 .hp-shoreline-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%);
+  z-index: 1;
+  border-radius: 20px;
+}
+.app.hero-v4 .hp-shoreline-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  gap: 12px;
+  background: transparent;
+}
+.app.hero-v4 .hp-shoreline-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app.hero-v4 .hp-shoreline-icon {
+  background: var(--color-bg-white);
+  color: var(--color-ink-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.app.hero-v4 .hp-shoreline-label {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-bg-white);
+  letter-spacing: -0.01em;
+}
+.app.hero-v4 .hp-shoreline-arrow {
+  background: var(--color-bg-white);
+  color: var(--color-ink-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ────── 3. Modals + filters + listing-detail + sticky-header — Inter sans ────── */
+
+/* Modal infrastructure */
+.app.hero-v4 .modal-backdrop {
+  background: rgba(20, 12, 5, 0.45);
+}
+.app.hero-v4 .modal {
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: var(--shadow-modal);
+}
+@media (max-width: 600px) {
+  .app.hero-v4 .modal { border-radius: 24px 24px 0 0; }
+}
+.app.hero-v4 .modal-head h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-ink-primary);
+}
+.app.hero-v4 .modal-head p {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink-secondary);
+}
+
+/* FreeMonthModal headline */
+.app.hero-v4 .free-month-modal-headline {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* UspPopup title */
+.app.hero-v4 .usp-popup-modal .hp-usp-h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--color-ink-primary);
+}
+
+/* Browse / Saved / Plans page titles */
+.app.hero-v4 .page-header h1,
+.app.hero-v4 .plans-head h1,
+.app.hero-v4 .empty-state h2,
+.app.hero-v4 .empty-state h3,
+.app.hero-v4 .section-title,
+.app.hero-v4 .results-count .num,
+.app.hero-v4 .results-cat-meta .num {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink-primary);
+}
+
+/* Filter panel header */
+.app.hero-v4 .filter-head h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-ink-primary);
+}
+
+/* Listing detail panel */
+.app.hero-v4 .detail-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink-primary);
+}
+.app.hero-v4 .kstat-value {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Sticky header (SiteHeader = .topnav) — already mostly there;
+   bump weight + tighten letter-spacing to match v4 aesthetic. */
+.app.hero-v4 .topnav {
+  background: var(--color-bg-white);
+}
+.app.hero-v4 .topnav-links button {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.app.hero-v4 .topnav-links button.active {
+  font-weight: 600;
+}
+
+/* ────── 4. Heart icon overlap on shelf cards ────── */
+
+/* When the shelf is "new this week" the badge is on the right
+   ("today" / "N days ago"). Force ALL badges to the left under
+   v4 so the heart at top-right never collides. */
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge-right {
+  right: auto;
+  left: 10px;
+}
+
+/* ────── Pulpo Ranked badge — best-deal mark ──────
+   Editorial two-line badge that combines the brand's signature
+   elements:
+     • the ★ + small-caps eyebrow language ("★ Ranked by value")
+     • the Instrument Serif italic treatment used on "ranked." in the
+       hero H1
+     • the forest-deep / cream / clay palette
+   Used on Home shelves (position in shelf) and on Browse/Saved cards
+   for listings in the global Top-10 by rank_score. */
+
+.pulpo-rank-badge {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 5px 10px 6px;
+  border-radius: 8px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.22);
+  line-height: 1;
+  /* Clay underline below the number echoes the hero's brush stroke
+     under "ranked." — keeps the badge feeling brand-original instead
+     of a generic numbered pill. */
+  border-bottom: 2px solid var(--color-clay-mid);
+}
+
+.pulpo-rank-badge-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--color-clay-mid);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pulpo-rank-badge-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--color-button-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.hp-shelf-card-rank.pulpo-rank-badge {
+  top: 10px;
+  left: 10px;
+}
+
+/* Push the kind badge below the Pulpo Ranked badge so the two stack
+   rather than overlap (price_drops + new_this_week shelves). */
+.app.hero-v4 .hp-shelf-card-real .pulpo-rank-badge ~ .hp-shelf-card-badge {
+  top: 62px;
+}
+
+.listing-card-rank.pulpo-rank-badge {
+  top: 12px;
+  left: 12px;
+}
+
+/* Push the existing pulpo-badge row below the Pulpo Ranked badge. */
+.pulpo-rank-badge ~ .card-badge-row {
+  top: 66px;
+}
+
+/* Inline mark in the Results table title cell — same brand language,
+   single-line so it fits a table row. */
+.pulpo-rank-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  vertical-align: middle;
+  line-height: 1.2;
+}
+.pulpo-rank-inline-star {
+  font-size: 10px;
+  color: var(--color-clay-mid);
+}
+.pulpo-rank-inline-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .pulpo-rank-badge {
+    padding: 4px 8px 5px;
+    gap: 0;
+  }
+  .pulpo-rank-badge-eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.12em;
+  }
+  .pulpo-rank-badge-num {
+    font-size: 15px;
+  }
+  .app.hero-v4 .hp-shelf-card-real .pulpo-rank-badge ~ .hp-shelf-card-badge {
+    top: 56px;
+  }
+  .pulpo-rank-badge ~ .card-badge-row {
+    top: 60px;
+  }
+}
+
+/* ===========================================================================
+   Shelf carousel — horizontal scroll-snap rail at every breakpoint
+   ===========================================================================
+   Same interaction model across viewports: horizontal scroll-snap with a
+   half-card peek so the "more behind" affordance is built into the layout.
+   Card-per-viewport target:
+     <640px : 1.3 cards visible (one full + ~30% peek)
+     640-1023: 2.4 cards
+     1024-1279: 3.4 cards
+     ≥1280  : 3.5 cards (three full + half of the fourth)
+   Desktop ≥768px gets prev/next arrow buttons in the header; mobile relies
+   on native swipe, which is the universal touch affordance.
+   --------------------------------------------------------------------------- */
+
+.app.hero-v4 .hp-shelf-head-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app.hero-v4 .hp-shelf-view-all {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+@media (max-width: 639px) {
+  .app.hero-v4 .hp-shelf-view-all {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Align inner widths with the hero so section edges line up. */
+.app.hero-v4 .homepage-v2 .hp-shelf-inner,
+.app.hero-v4 .homepage-v2 .hp-shoreline-inner {
+  max-width: 1280px;
+}
+
+/* Arrow buttons — desktop only (mobile uses native swipe). */
+.app.hero-v4 .hp-shelf-arrows {
+  display: none;
+}
+@media (min-width: 768px) {
+  .app.hero-v4 .hp-shelf-arrows {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+.app.hero-v4 .hp-shelf-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-line-soft);
+  color: var(--color-ink-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out);
+}
+.app.hero-v4 .hp-shelf-arrow:hover:not(:disabled) {
+  background: var(--color-bg-cream-soft);
+  transform: scale(1.04);
+}
+.app.hero-v4 .hp-shelf-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* The list itself: horizontal scroll-snap, no scrollbar, edge bleed so
+   the peek lands naturally against the screen edge. */
+.app.hero-v4 .hp-shelf-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  gap: 16px;
+  margin: 0 -20px;
+  padding: 4px 20px 8px;
+  scroll-padding-left: 20px;
+  scroll-padding-right: 20px;
+}
+.app.hero-v4 .hp-shelf-list::-webkit-scrollbar { display: none; }
+.app.hero-v4 .hp-shelf-list-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  /* Mobile: 1.3 cards visible (one full + ~30% peek of the second). */
+  width: 76%;
+  min-width: 0;
+  max-width: none;
+}
+
+@media (min-width: 640px) {
+  .app.hero-v4 .hp-shelf-list {
+    gap: 18px;
+    margin: 0 -32px;
+    padding: 4px 32px 8px;
+    scroll-padding-left: 32px;
+    scroll-padding-right: 32px;
+  }
+  /* 2.4 cards visible. (clientWidth - 32 padding - 18*2 gap*2) / 2.4 */
+  .app.hero-v4 .hp-shelf-list-item {
+    width: calc((100% - 36px) / 2.4);
+  }
+}
+@media (min-width: 1024px) {
+  .app.hero-v4 .hp-shelf-list {
+    gap: 20px;
+    margin: 0 -40px;
+    padding: 6px 40px 10px;
+    scroll-padding-left: 40px;
+    scroll-padding-right: 40px;
+  }
+  /* 3.4 cards visible. */
+  .app.hero-v4 .hp-shelf-list-item {
+    width: calc((100% - 60px) / 3.4);
+  }
+}
+@media (min-width: 1280px) {
+  /* 3.5 cards visible — three full + half of the fourth as the user-
+     requested "obvious continuation" peek. */
+  .app.hero-v4 .hp-shelf-list-item {
+    width: calc((100% - 60px) / 3.5);
+  }
+}
+
+/* Drop the legacy scroll-hint anywhere it might still render. */
+.app.hero-v4 .hp-shelf-scroll-hint { display: none; }

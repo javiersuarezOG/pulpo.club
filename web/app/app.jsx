@@ -1003,7 +1003,7 @@ function App() {
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
-    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", false) ? " hero-v4" : ""}`}>
+    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", true) ? " hero-v4" : ""}`}>
       {/* Wave-3a: single SiteHeader on every route. The homepage's hero
           still owns its conversion CTAs; the header is pure navigation. */}
       <SiteHeader app={app} />

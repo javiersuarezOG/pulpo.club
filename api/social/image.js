@@ -107,8 +107,21 @@ module.exports = async (req, res) => {
     return res.status(404).json({ error: "not_found" });
   }
   try {
+    // Refuse to upscale: sources below the requested canonical dimensions
+    // produce visibly pixelated 1080-wide outputs (see pulpo-social photo-gate
+    // Round 1 diagnostic — every passer in the 50-listing cohort was a 3x
+    // upscale of a 600x400 thumbnail). The contract requires Meta-sized
+    // images, so we 404 here and let pre-filters (e.g. pulpo-social's
+    // source_width/source_height check) skip these listings before request.
+    const meta = await sharp(resolved.path).metadata();
+    if ((meta.width ?? 0) < size.width || (meta.height ?? 0) < size.height) {
+      return res.status(404).json({
+        error: "source_too_small",
+        detail: `source ${meta.width}x${meta.height} is below target ${size.width}x${size.height}; refuse to upscale`,
+      });
+    }
     const buf = await sharp(resolved.path)
-      .resize(size.width, size.height, { fit: "cover", position: "attention" })
+      .resize(size.width, size.height, { fit: "cover", position: "attention", withoutEnlargement: true })
       .jpeg({ quality: 85, mozjpeg: true })
       .toBuffer();
     res.setHeader("Content-Type", "image/jpeg");

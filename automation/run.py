@@ -117,57 +117,35 @@ def _write_sidecar(image_path: Path, raw_bytes: bytes) -> Optional[dict]:
 _PHOTO_CANDIDATES_CAP_DEFAULT = 5
 
 
-def _pick_best_photo_url(photo_urls, on_url_error=None):
-    """Phase 4 U1 — hero re-escalation.
+def _score_candidates_cheap(photo_urls, on_url_error=None):
+    """Phase 4 cost-gating Pass 1 — download + cheap scoring only.
 
-    Old behavior: hero was always ``photo_urls[0]`` regardless of
-    quality. A listing whose first photo was a watermarked brochure or
-    a pixelated thumbnail would still post that exact photo to
-    Instagram + Facebook (verified 2026-05-18 live incident).
+    Returns a list of candidate dicts:
+        {url, content, score (technical 0-100), has_text_overlay,
+         hero_eligible, cheap_score}
 
-    New behavior: download up to N candidates, run the existing PR-7.6
-    ``compute_score()`` + ``detect_text_overlay()`` on each, then pick
-    the highest-scoring one that does NOT carry a text overlay. If
-    every candidate is flagged, fall back to argmax(score) across the
-    flagged set — we still want a hero rather than blocking the post,
-    and pulpo-social's local gate is the last line of defense.
-
-    Returns ``(url, content, score, has_text_overlay)`` for the winning
-    candidate, or ``(None, None, None, None)`` if every download/decode
-    failed.
-
-    Parameters
-    ----------
-    photo_urls : list[str]
-        Ordered candidate URLs from the scraper. Truncated to the
-        per-listing cap before download.
-    on_url_error : callable(url, exception) -> None, optional
-        Per-URL fetch-error callback. The caller uses this to write the
-        underlying httpx/decode error to the photo_fetch_log alongside
-        the URL it occurred on — so the existing 404-logging test (and
-        any operator triage) still sees the real error rather than just
-        "no candidates downloaded".
+    No LLM call here. ``aesthetic`` is intentionally absent — it gets
+    added later by ``_apply_aesthetic_to_eligible`` for candidates the
+    orchestrator selected into the top-X% pool. Per-URL fetch errors
+    invoke ``on_url_error(url, exception)`` so the caller can log them
+    alongside the originating URL.
     """
     if not photo_urls:
-        return (None, None, None, None)
+        return []
 
     import httpx
     try:
         from automation.photo_quality import (
             compute_score as _compute_photo_score,
             detect_text_overlay as _detect_text_overlay,
+            compute_image_metadata as _compute_image_metadata,
+            cheap_quality_score as _cheap_quality_score,
         )
     except Exception:
         _compute_photo_score = None
         _detect_text_overlay = None
-    # U3 (2026-05-18) — opt-in LLM-vision aesthetic booster. The module
-    # is fail-soft by design: when LLM_VISION_ENABLED is unset or the
-    # configured provider has no API key, score_aesthetic returns None
-    # for every candidate and the picker behaves identically to today.
-    try:
-        from automation.aesthetic_vision import score_aesthetic as _score_aesthetic
-    except Exception:
-        _score_aesthetic = None
+        _compute_image_metadata = None
+        _cheap_quality_score = None
 
     cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
                               _PHOTO_CANDIDATES_CAP_DEFAULT))
@@ -194,48 +172,165 @@ def _pick_best_photo_url(photo_urls, on_url_error=None):
         except Exception:
             has_text = None
         try:
-            aesthetic = _score_aesthetic(r.content) if _score_aesthetic else None
+            meta = _compute_image_metadata(r.content) if _compute_image_metadata else None
         except Exception:
-            aesthetic = None
+            meta = None
+        hero_elig = bool(meta.get("hero_eligible")) if isinstance(meta, dict) else None
+        try:
+            cheap = _cheap_quality_score(
+                r.content,
+                technical=score,
+                has_text_overlay=has_text,
+                hero_eligible=hero_elig,
+            ) if _cheap_quality_score else (score if score is not None else 0)
+        except Exception:
+            cheap = score if score is not None else 0
         candidates.append({
             "url": url,
             "content": r.content,
             "score": score if score is not None else 0,
             "has_text_overlay": has_text,
-            "aesthetic": aesthetic,
+            "hero_eligible": hero_elig,
+            "cheap_score": cheap,
         })
+    return candidates
 
-    if not candidates:
+
+def _apply_aesthetic_to_eligible(scored_candidates, eligible_urls=None):
+    """Phase 4 cost-gating Pass 2 — call score_aesthetic on the
+    subset of candidates whose URLs are in ``eligible_urls``. Cached
+    candidates (whose bytes-hash is already in
+    web/data/llm_vision_cache.json) get their cached score for free
+    regardless of eligibility — the cache lookup happens inside
+    score_aesthetic. Mutates ``scored_candidates`` in place, adding
+    an ``aesthetic`` key per candidate (None when uneligible-and-
+    uncached or when the provider returned None).
+
+    When ``eligible_urls`` is None (backward-compat for the
+    ``_pick_best_photo_url`` wrapper called by tests/test_photos.py),
+    every candidate is eligible — matches today's per-listing
+    "score every candidate" behavior.
+    """
+    try:
+        from automation.aesthetic_vision import score_aesthetic as _score_aesthetic
+    except Exception:
+        _score_aesthetic = None
+
+    for c in scored_candidates:
+        if _score_aesthetic is None:
+            c["aesthetic"] = None
+            continue
+        if eligible_urls is not None and c["url"] not in eligible_urls:
+            c["aesthetic"] = None
+            continue
+        try:
+            c["aesthetic"] = _score_aesthetic(c["content"])
+        except Exception:
+            c["aesthetic"] = None
+
+
+def _pick_winner_from_scored(
+    scored_candidates,
+) -> "tuple[Optional[str], Optional[bytes], Optional[int], Optional[bool]]":
+    """Phase 4 cost-gating winner-selection — same composite ranking as
+    pre-refactor ``_pick_best_photo_url``: prefer non-text-overlay
+    candidates; rank by 70% aesthetic + 30% technical when at least one
+    aesthetic score is present, else by technical alone. Returns the
+    legacy ``(url, content, score, has_text_overlay)`` tuple."""
+    if not scored_candidates:
         return (None, None, None, None)
 
     # Prefer photos that are NOT flagged as text overlay. Treat None
     # (OCR unavailable or decode-fail) as "not flagged" so missing OCR
     # support doesn't disqualify every candidate.
-    non_text = [c for c in candidates if c["has_text_overlay"] is not True]
-    pool = non_text if non_text else candidates
-    # Composite ranking — when LLM-vision returned a score for at least
-    # one candidate in the pool we blend 70% aesthetic + 30% technical
-    # (matches the plan's §U3 weighting). Aesthetic is 0-10, technical
-    # is 0-100; normalize both to 0-100. When aesthetic is None across
-    # the board (booster disabled / budget exhausted / provider down),
-    # fall back to pure-technical sorting — today's behavior.
-    any_aesthetic = any(c["aesthetic"] is not None for c in pool)
+    non_text = [c for c in scored_candidates if c.get("has_text_overlay") is not True]
+    pool = non_text if non_text else list(scored_candidates)
+
+    any_aesthetic = any(c.get("aesthetic") is not None for c in pool)
     if any_aesthetic:
         def _composite(c):
             tech = float(c["score"])
-            aes = c["aesthetic"]
+            aes = c.get("aesthetic")
             if aes is None:
-                # Candidate didn't get scored (mid-day budget exhaustion
-                # or a transient provider blip). Use technical-only so
-                # it doesn't lose to a peer just because the LLM was
-                # unavailable for that one call.
+                # Candidate didn't get scored (uneligible for top-X%,
+                # mid-day budget exhaustion, or a transient provider
+                # blip). Use technical-only so it doesn't lose to a peer
+                # just because the LLM was unavailable for that one call.
                 return tech
             return 0.3 * tech + 0.7 * (float(aes) * 10.0)
         pool.sort(key=_composite, reverse=True)
     else:
         pool.sort(key=lambda c: c["score"], reverse=True)
     w = pool[0]
-    return (w["url"], w["content"], w["score"], w["has_text_overlay"])
+    return (w["url"], w["content"], w["score"], w.get("has_text_overlay"))
+
+
+def _pick_best_photo_url(photo_urls, on_url_error=None):
+    """Phase 4 U1 — hero re-escalation. Backward-compat wrapper around
+    the refactored two-pass picker. Tests and per-listing callers can
+    still invoke this directly; the orchestrator (``_download_hero_photos``)
+    uses the underlying primitives so it can compute the global top-X%
+    gate across all listings.
+
+    Returns ``(url, content, score, has_text_overlay)`` for the winning
+    candidate, or ``(None, None, None, None)`` if every download failed.
+    """
+    candidates = _score_candidates_cheap(photo_urls, on_url_error=on_url_error)
+    # No global gate at this entry point — preserve today's per-listing
+    # behavior (every candidate eligible for an aesthetic call).
+    _apply_aesthetic_to_eligible(candidates, eligible_urls=None)
+    return _pick_winner_from_scored(candidates)
+
+
+def _select_top_pct_eligible(scored_per_listing, top_pct: int) -> set:
+    """Phase 4 cost-gating Pass-1.5 — global gate.
+
+    Given each listing's Phase-1 scored candidates, return the set of
+    URLs that should receive an aesthetic LLM call this run. The gate
+    operates on **uncached** candidates only (per the plan §4): a
+    candidate whose bytes-hash is already in the aesthetic cache pays
+    nothing to score this run, so it doesn't count toward the gate.
+    The cache fills naturally over many nights without operator
+    intervention.
+
+    Per-listing lone-candidate optimization is the caller's job — this
+    helper operates on raw candidate dicts, agnostic to listing structure.
+
+    ``top_pct=100`` means "score every uncached candidate this run."
+    ``top_pct=0`` means "score none." Both endpoints are valid operator
+    settings.
+    """
+    try:
+        from automation.aesthetic_vision import _load_cache, _cache_key
+    except Exception:
+        # Aesthetic module unavailable — no candidates eligible, the
+        # pipeline runs in cheap-only mode. Matches the LLM-off fail-soft
+        # contract from the plan.
+        return set()
+    cache = _load_cache()
+
+    uncached = []
+    for scored in scored_per_listing:
+        for c in scored:
+            content = c.get("content")
+            if content is None:
+                continue
+            key = _cache_key(content)
+            if key in cache:
+                continue
+            uncached.append(c)
+
+    if not uncached or top_pct <= 0:
+        return set()
+    # Sort by cheap_score desc; ties broken by technical score. Stable
+    # secondary key prevents flakey nondeterminism on equal cheap_score.
+    uncached.sort(
+        key=lambda c: (c.get("cheap_score", 0), c.get("score", 0)),
+        reverse=True,
+    )
+    cutoff = max(1, int(len(uncached) * top_pct / 100))
+    eligible = {c["url"] for c in uncached[:cutoff]}
+    return eligible
 
 
 def _read_sidecar(image_path: Path) -> Optional[dict]:
@@ -301,20 +396,26 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     budget_s = float(os.environ.get("PULPO_PHOTO_BUDGET_S", "600"))
     t0 = _time.monotonic()
     budget_hit = False
+    cap = max(1, int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
+                                     _PHOTO_CANDIDATES_CAP_DEFAULT)))
 
+    # State stashed for each non-skipped listing — feeds Phase C below.
+    # ``None`` entries mark listings the URL-hash cache skipped or that
+    # failed download outright; Phase C iterates with a None guard.
+    pending: list = []
+
+    # ── Phase A — URL-hash cache resolution + per-listing cheap scoring ──
+    # No LLM calls in this loop; every candidate download is cheap
+    # (httpx) + cheap scoring (Pillow + optional OpenCV/Tesseract).
     for li in listings:
         if _time.monotonic() - t0 > budget_s:
             budget_hit = True
             break
         if not li.photo_urls:
             continue
-        # U1 (2026-05-18) — cache key now hashes the WHOLE candidate set
-        # (in submission order so re-ordering by the scraper retriggers
-        # selection). A listing's hero file name still keys off the
-        # listing id; only the contents and the chosen URL change.
-        cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
-                                  _PHOTO_CANDIDATES_CAP_DEFAULT))
-        cap = max(1, cap)
+        # U1 (2026-05-18) — cache key hashes the WHOLE candidate set
+        # in submission order so a scraper re-ordering retriggers
+        # selection. The hero file name still keys off the listing id.
         candidate_urls = li.photo_urls[:cap]
         url_hash = hashlib.sha1(
             "|".join(candidate_urls).encode()
@@ -324,14 +425,9 @@ def _download_hero_photos(listings, repo: Path) -> dict:
         fpath = photos_dir / fname
         hero_fpath = _hero_file_path(fpath)
         hash_path = photos_dir / (fname + ".hash")
-
-        # Skip if the candidate set hash matches AND both derivatives +
-        # both sidecars are present. Migration note: pre-U1 cached rows
-        # were keyed off a single-URL hash, so the first post-deploy run
-        # invalidates them and re-fetches; that's intended — we want the
-        # better-hero pick to land everywhere.
         thumb_meta_path = _meta_sidecar_path(fpath)
         hero_meta_path  = _meta_sidecar_path(hero_fpath)
+
         all_files_present = (
             fpath.exists() and hash_path.exists()
             and hero_fpath.exists()
@@ -345,8 +441,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 li.card_eligible = bool(thumb_meta.get("card_eligible", False))
             if hero_meta:
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
-                # Re-populate quality fields from the hero sidecar so the
-                # cached-skip path doesn't drop them between runs.
+                # Hero file's dimensions == source dimensions clamped to ≤1920×1080.
+                # Surfaced through /api/social/listings so consumers can pre-filter
+                # listings whose source is too small to render cleanly at the
+                # requested output ratio (e.g. social 1080×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
                 qs = hero_meta.get("hero_photo_quality_score")
                 if qs is not None:
                     li.hero_photo_quality_score = qs
@@ -361,40 +463,102 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             continue
 
         attempted += 1
-        try:
-            # U1 — pick the BEST photo from up to `cap` candidates
-            # instead of blindly using photo_urls[0]. Returns the
-            # winner's URL + bytes (already downloaded so we don't
-            # re-fetch) + its score + text-overlay flag. We pass an
-            # on_url_error callback so per-URL fetch failures are
-            # logged with the underlying httpx/decode message (the
-            # operator-facing log historically showed "404 Not Found"
-            # for those rows; preserved by routing each error
-            # individually rather than synthesizing a meta-error
-            # after-the-fact).
-            def _log_url_error(url, exc, _li=li, _log_path=log_path):
-                try:
-                    with _log_path.open("a", encoding="utf-8") as _lf:
-                        _lf.write(json.dumps({
-                            "source_id": _li.source_id,
-                            "source": _li.source,
-                            "url": url,
-                            "error": str(exc),
-                            "ts": datetime.now(timezone.utc).isoformat(),
-                        }) + "\n")
-                except Exception:
-                    pass
 
-            winning_url, winning_content, winning_score, winning_has_text = (
-                _pick_best_photo_url(candidate_urls, on_url_error=_log_url_error)
-            )
-            if winning_url is None:
-                # Every candidate failed to download. The individual
-                # per-URL errors are already in the log via the
-                # callback above; raise to bump the failed counter and
-                # skip the derivative-write step for this listing.
+        def _log_url_error(url, exc, _li=li, _log_path=log_path):
+            try:
+                with _log_path.open("a", encoding="utf-8") as _lf:
+                    _lf.write(json.dumps({
+                        "source_id": _li.source_id,
+                        "source": _li.source,
+                        "url": url,
+                        "error": str(exc),
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                    }) + "\n")
+            except Exception:
+                pass
+
+        try:
+            scored = _score_candidates_cheap(candidate_urls,
+                                              on_url_error=_log_url_error)
+            if not scored:
                 raise RuntimeError(
                     f"no_candidate_downloaded_from_{len(candidate_urls)}_urls"
+                )
+            pending.append({
+                "li": li,
+                "scored": scored,
+                "candidate_urls": candidate_urls,
+                "url_hash": url_hash,
+                "fname": fname,
+                "fpath": fpath,
+                "hero_fpath": hero_fpath,
+                "hash_path": hash_path,
+                "hero_meta_path": hero_meta_path,
+            })
+        except Exception as e:
+            failed += 1
+            with log_path.open("a", encoding="utf-8") as lf:
+                lf.write(json.dumps({
+                    "source_id": li.source_id, "source": li.source,
+                    "candidate_urls": candidate_urls,
+                    "error": str(e),
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                }) + "\n")
+
+    # ── Phase B — global top-X% eligibility across uncached candidates ──
+    # Operator knob: LLM_VISION_TOP_PCT (default 5). With LLM_VISION_ENABLED
+    # unset / false, _apply_aesthetic_to_eligible's import of
+    # score_aesthetic returns None for every candidate regardless of
+    # eligibility — the gate effectively becomes a no-op without us
+    # having to special-case it here. That's the load-bearing
+    # fail-soft contract from the plan.
+    top_pct = int(os.environ.get("LLM_VISION_TOP_PCT", "5"))
+    # Lone-candidate optimization — a listing whose pool reduces to one
+    # non-text-overlay survivor has no ranking choice to make. Exclude
+    # its candidates from the eligibility pool entirely so the LLM
+    # never sees them. (Cached candidates still get their cached score
+    # via _apply_aesthetic_to_eligible's fall-through; the gate only
+    # controls fresh paid calls.)
+    pools_for_gate = []
+    for state in pending:
+        scored = state["scored"]
+        non_text = sum(1 for c in scored if c.get("has_text_overlay") is not True)
+        if non_text > 1:
+            pools_for_gate.append(scored)
+    eligible_urls = _select_top_pct_eligible(pools_for_gate, top_pct=top_pct)
+
+    # ── Phase C — aesthetic scoring + winner pick + derivative write ──
+    for state in pending:
+        if _time.monotonic() - t0 > budget_s:
+            budget_hit = True
+            break
+        li = state["li"]
+        scored = state["scored"]
+        candidate_urls = state["candidate_urls"]
+        fpath = state["fpath"]
+        hero_fpath = state["hero_fpath"]
+        hash_path = state["hash_path"]
+        hero_meta_path = state["hero_meta_path"]
+        fname = state["fname"]
+        url_hash = state["url_hash"]
+
+        try:
+            # Per-listing lone-candidate skip: when the pool after the
+            # text-overlay filter is exactly one survivor, calling the
+            # LLM is wasted spend — pass an empty eligibility set so
+            # _apply_aesthetic_to_eligible only consults the cache.
+            non_text = sum(1 for c in scored if c.get("has_text_overlay") is not True)
+            if non_text > 1:
+                _apply_aesthetic_to_eligible(scored, eligible_urls=eligible_urls)
+            else:
+                _apply_aesthetic_to_eligible(scored, eligible_urls=set())
+
+            winning_url, winning_content, winning_score, winning_has_text = (
+                _pick_winner_from_scored(scored)
+            )
+            if winning_url is None or winning_content is None:
+                raise RuntimeError(
+                    f"winner_pick_failed_from_{len(candidate_urls)}_urls"
                 )
 
             li.hero_photo_quality_score = winning_score if winning_score else None
@@ -416,9 +580,6 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 li.card_eligible = bool(thumb_meta.get("card_eligible", False))
 
             # ── Hero (1920×1080 max, Q85) — drives proof row + featured ─
-            # Pillow's thumbnail() preserves aspect AND only ever down-
-            # samples — sources smaller than 1920×1080 stay at source
-            # size, so the hero_eligible gate correctly fails for them.
             hero_img = Image.open(io.BytesIO(winning_content))
             hero_img.thumbnail((1920, 1080), _LANCZOS)
             if hero_img.mode in ("RGBA", "P"):
@@ -428,10 +589,6 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             hero_bytes = hero_buf.getvalue()
             hero_fpath.write_bytes(hero_bytes)
             hero_meta = _write_sidecar(hero_fpath, hero_bytes)
-            # Embed the quality verdict and the chosen URL into the hero
-            # sidecar so /api/social/listings (and pulpo-social's
-            # trust-upstream short-circuit) can rely on the cached
-            # values without re-decoding the bytes.
             if hero_meta is not None:
                 hero_meta["hero_photo_quality_score"] = winning_score
                 hero_meta["has_text_overlay"] = winning_has_text
@@ -440,6 +597,13 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Mirror the cached-skip path: source_width/source_height
+                # are the hero derivative's pixel dimensions (which equal
+                # original source dimensions clamped to ≤1920×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"

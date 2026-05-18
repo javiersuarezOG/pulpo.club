@@ -64,6 +64,8 @@
       "has_text_overlay",
       "hero_eligible",
       "card_eligible",
+      "source_width",
+      "source_height",
       "first_seen_at",
       "broker_name",
       "broker_phone",
@@ -398,6 +400,18 @@
       },
       "card_eligible": {
         "type": "boolean"
+      },
+      "source_width": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "source_height": {
+        "type": [
+          "integer",
+          "null"
+        ]
       },
       "first_seen_at": {
         "type": [

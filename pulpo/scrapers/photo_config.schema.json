@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulpo.club/schemas/photo_config.schema.json",
+  "title": "Pulpo per-source photo config",
+  "type": "object",
+  "required": ["version", "sources", "defaults"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "sources": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/source" }
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_source_long_side_px": { "type": "integer", "minimum": 1 },
+        "deprioritize_weight": { "type": "number", "minimum": 0 },
+        "validate_via_head": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "full_res": { "$ref": "#/$defs/full_res" },
+        "min_source_long_side_px": { "type": "integer", "minimum": 1 },
+        "deprioritize_weight": { "type": "number", "minimum": 0 }
+      }
+    },
+    "full_res": {
+      "type": "object",
+      "required": ["strategy"],
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "noop",
+            "url_replace",
+            "field_swap",
+            "wordpress_size_strip",
+            "cloudfront_image_handler"
+          ]
+        },
+        "rules": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "validate_via_head": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -154,6 +154,21 @@ jobs:
           # ignores .hires.jpg files even if they exist on disk —
           # operator-controlled cutover from shadow → live.
           PULPO_HIRES_SERVE: "0"
+          # Phase 4 U3 — LLM-vision aesthetic booster. Default OFF
+          # everywhere (LLM_VISION_ENABLED unset → score_aesthetic
+          # returns None → picker falls back to technical-only). To
+          # ship the booster in production, set repo secret
+          # LLM_VISION_ENABLED=true plus one of QWEN_API_KEY /
+          # SEGMIND_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY.
+          # Daily budget cap defaults to $1.00 (in
+          # automation/aesthetic_vision.py). Top-X% gating defaults to
+          # 5 — see .env.example for the full knob list.
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED }}
+          LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
+          LLM_VISION_DAILY_BUDGET_USD: ${{ secrets.LLM_VISION_DAILY_BUDGET_USD }}
+          LLM_VISION_TOP_PCT: ${{ secrets.LLM_VISION_TOP_PCT }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
@@ -266,11 +281,10 @@ jobs:
           EOF
 
       - name: Data-quality canaries
-        # TODO(2026-05-09): switch from LOG_ONLY=true to fail once canaries are
-        # tuned against 7 days of real nightly runs.  Until then, violations are
-        # printed but do NOT fail the workflow so we can calibrate thresholds.
+        # Enforcing: violations fail the workflow.  Set LOG_ONLY="true" to
+        # temporarily downgrade to log-only while recalibrating thresholds.
         env:
-          LOG_ONLY: "false"   # flip to "false" after the 7-day soak window
+          LOG_ONLY: "false"
         run: |
           python3 - <<'EOF'
           import json, re, sys, os
@@ -302,16 +316,21 @@ jobs:
               if NON_SV_TITLE_RE.search(title):
                   violations.append(f"COUNTRY: {title!r} (url={url})")
 
-              # Area canary
-              if area is not None and area > 5_000_000:
+              # Area canary — 15M m² ≈ 1500 ha covers the biggest real fincas
+              # we've seen; absurd values (unit-conversion slip) still trip.
+              if area is not None and area > 15_000_000:
                   violations.append(f"MAX_AREA: area_m2={area} title={title!r}")
 
               # Price canary
               if price is not None and price > 50_000_000:
                   violations.append(f"MAX_PRICE: price_usd={price} title={title!r}")
 
-              # $/m² range canary
-              if ppm is not None and ppm > 0 and (ppm < 1 or ppm > 5_000):
+              # $/m² range canary — agricultural land (>5 ha) trades far
+              # lower than urban lots, so lower the floor for that cohort.
+              ptype = (r.get("property_type") or "").lower()
+              is_agri = ptype == "land" and area is not None and area > 50_000
+              ppm_floor = 0.10 if is_agri else 1.0
+              if ppm is not None and ppm > 0 and (ppm < ppm_floor or ppm > 5_000):
                   violations.append(f"PPM_RANGE: price_per_m2={ppm} title={title!r}")
 
           if violations:

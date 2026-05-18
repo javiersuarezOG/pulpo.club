@@ -74,7 +74,7 @@ def _row(li: Listing) -> dict:
 # slug and dispatches there before argparse ever runs. Anything else
 # falls through to the original rank-pipeline flow unchanged.
 
-_SUBCOMMANDS = {"enrich-photos", "check-hero-pool"}
+_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "backfill-listing-photo-meta"}
 
 
 def _run_enrich_photos(argv: list[str]) -> int:
@@ -259,11 +259,134 @@ def _run_check_hero_pool(argv: list[str]) -> int:
     return 0
 
 
+def _run_backfill_listing_photo_meta(argv: list[str]) -> int:
+    """Propagate per-photo sidecar metadata onto existing ranked.json rows.
+
+    For each listing in web/data/ranked.json:
+      1. Locate the on-disk hero sidecar (web/photos/<source>_<id>.hero.jpg.meta.json)
+         and the thumbnail sidecar (web/photos/<source>_<id>.jpg.meta.json).
+      2. Populate the listing's source_width / source_height fields from the
+         hero sidecar when available (the hero file was created via Pillow's
+         thumbnail() which only ever downsamples, so hero dimensions equal
+         source dimensions clamped to <=1920x1080). Fall back to the thumb
+         sidecar's dimensions when no hero sidecar exists.
+      3. Set hero_eligible / card_eligible from whichever sidecar provides them.
+
+    Idempotent — re-running on a listing whose sidecar has the same numbers
+    produces an identical row.
+
+    Usage:
+        python -m pulpo.cli backfill-listing-photo-meta
+        python -m pulpo.cli backfill-listing-photo-meta --dry-run
+        python -m pulpo.cli backfill-listing-photo-meta --ranked-path /tmp/r.json
+    """
+    sp = argparse.ArgumentParser(
+        prog="pulpo backfill-listing-photo-meta",
+        description="Propagate photo sidecar metadata onto ranked.json rows.",
+    )
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Report counts without writing ranked.json.")
+    sp.add_argument("--ranked-path", type=str, default=None,
+                    help="Override ranked.json path (default: <repo>/web/data/ranked.json).")
+    sp.add_argument("--photos-dir", type=str, default=None,
+                    help="Override photos dir (default: <repo>/web/photos).")
+    args = sp.parse_args(argv)
+
+    repo_root = Path(__file__).resolve().parents[1]
+    ranked_path = Path(args.ranked_path) if args.ranked_path else repo_root / "web" / "data" / "ranked.json"
+    photos_dir = Path(args.photos_dir) if args.photos_dir else repo_root / "web" / "photos"
+
+    if not ranked_path.exists():
+        print(f"backfill: ranked.json not found at {ranked_path}", file=sys.stderr)
+        return 1
+
+    try:
+        data = json.loads(ranked_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"backfill: malformed ranked.json: {e}", file=sys.stderr)
+        return 1
+    if not isinstance(data, list):
+        print("backfill: ranked.json is not a list", file=sys.stderr)
+        return 1
+
+    scanned = updated = missing = unchanged = 0
+    for rec in data:
+        if not isinstance(rec, dict):
+            continue
+        scanned += 1
+        source = rec.get("source")
+        source_id = rec.get("source_id")
+        if not source or not source_id:
+            continue
+        fname_stem = f"{source}_{source_id}"
+        thumb_meta_path = photos_dir / f"{fname_stem}.jpg.meta.json"
+        hero_meta_path = photos_dir / f"{fname_stem}.hero.jpg.meta.json"
+
+        # Prefer hero sidecar; thumbnail is downsampled to 600x400 max so its
+        # width/height understates the source.
+        meta_src = None
+        if hero_meta_path.exists():
+            try:
+                meta_src = json.loads(hero_meta_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                meta_src = None
+        if meta_src is None and thumb_meta_path.exists():
+            try:
+                meta_src = json.loads(thumb_meta_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                meta_src = None
+        if meta_src is None:
+            missing += 1
+            continue
+
+        new_w = meta_src.get("width")
+        new_h = meta_src.get("height")
+        new_hero_eligible = meta_src.get("hero_eligible")
+        new_card_eligible = meta_src.get("card_eligible")
+
+        # Only patch fields that resolve; leave existing values alone otherwise.
+        changed = False
+        if new_w is not None and rec.get("source_width") != int(new_w):
+            rec["source_width"] = int(new_w)
+            changed = True
+        if new_h is not None and rec.get("source_height") != int(new_h):
+            rec["source_height"] = int(new_h)
+            changed = True
+        # Eligibility flags only update when reading from the *hero* sidecar
+        # (thumbnail-only listings have meaningless hero_eligible). Detect by
+        # whether the source dict came from the hero path.
+        if hero_meta_path.exists() and meta_src is not None:
+            if new_hero_eligible is not None and rec.get("hero_eligible") != bool(new_hero_eligible):
+                rec["hero_eligible"] = bool(new_hero_eligible)
+                changed = True
+        if new_card_eligible is not None and rec.get("card_eligible") != bool(new_card_eligible):
+            rec["card_eligible"] = bool(new_card_eligible)
+            changed = True
+
+        if changed:
+            updated += 1
+        else:
+            unchanged += 1
+
+    if args.dry_run:
+        print(f"[backfill] DRY RUN — scanned={scanned} would_update={updated} "
+              f"unchanged={unchanged} no_sidecar={missing}")
+        return 0
+
+    ranked_path.write_text(json.dumps(data, indent=2, default=str) + "\n",
+                           encoding="utf-8")
+    print(f"[backfill] scanned={scanned} updated={updated} "
+          f"unchanged={unchanged} no_sidecar={missing}")
+    return 0
+
+
 def _dispatch_subcommand(name: str, argv: list[str]) -> int:
     if name == "enrich-photos":
         return _run_enrich_photos(argv)
     if name == "check-hero-pool":
         return _run_check_hero_pool(argv)
+    if name == "backfill-listing-photo-meta":
+        return _run_backfill_listing_photo_meta(argv)
     print(f"pulpo: unknown subcommand '{name}'", file=sys.stderr)
     return 2
 

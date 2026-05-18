@@ -28,6 +28,7 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
@@ -268,6 +269,7 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
             u = og.attributes.get("content") or ""
             if u.startswith("http"):
                 photo_urls.append(u)
+    photo_urls = upgrade_photo_urls("remax", photo_urls)
 
     if not title:
         return None
