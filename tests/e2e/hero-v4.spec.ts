@@ -8,7 +8,7 @@
 //     SiteHeader/footer/BottomNav/routing all unchanged.
 //   * Flag on + paid user (paid_home_variant_v1 also on) → hero block
 //     suppressed entirely (paid user filter wins).
-//   * Flag on + click hero CTA → /start redirect (Wave-1 routing intact).
+//   * Flag on + click hero CTA → opens FreeMonthModal (post-#262 routing).
 //   * Flag on + click hero photo → opens listing detail (Wave-1
 //     featured_deal passthrough).
 
@@ -77,14 +77,8 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     expect(errors).toEqual([]);
   });
 
-  test("anon clicking hero CTA → /start redirect (Wave-1 routing intact)", async ({ page, context }) => {
+  test("anon clicking hero CTA → opens FreeMonthModal (post-#262 routing)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
-
-    let startRedirectHit = false;
-    await context.route("**/start**", (route) => {
-      startRedirectHit = true;
-      void route.fulfill({ status: 204, body: "" });
-    });
 
     await page.goto(
       "/?posthog_capture=1&ff_hero_v4=1",
@@ -93,17 +87,18 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
 
     await page.locator(".hp-hero-v4-cta").click();
 
-    await expect.poll(() => startRedirectHit, {
-      timeout: 3_000,
-      message: "expected anon hero CTA to redirect to /start",
-    }).toBe(true);
+    // Post-#262 anon path: in-page modal instead of /start redirect.
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
 
     const events = await getEvents(page);
     expect(
       events.find((e) => e.name === "homepage.cta_clicked" && e.props.location === "hero_primary"),
     ).toBeTruthy();
+    const routed = events.find((e) => e.name === "cta_routed" && e.props.cta_id === "hero_primary");
+    expect(routed).toBeTruthy();
+    expect(routed!.props.branch).toBe("free_month_modal");
     expect(
-      events.find((e) => e.name === "cta_routed" && e.props.cta_id === "hero_primary"),
+      events.find((e) => e.name === "free_month_modal.shown" && e.props.trigger === "hero_cta"),
     ).toBeTruthy();
 
     expect(errors).toEqual([]);

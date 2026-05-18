@@ -57,33 +57,23 @@ test.describe("Homepage v2 — redesign smoke", () => {
     expect(errors).toEqual([]);
   });
 
-  test("primary hero CTA routes anonymous users to /start (Wave-1 conversion path)", async ({ page, context }) => {
+  test("primary hero CTA opens FreeMonthModal for anonymous users (post-#262)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
-    // Wave-1 routing change: anon clicks no longer open a signup modal
-    // intermediary — they redirect to /start which handles email +
-    // Stripe checkout in one flow. Intercept the redirect so the test
-    // doesn't navigate away before we can assert.
-    let startRedirectHit = false;
-    await context.route("**/start**", (route) => {
-      startRedirectHit = true;
-      void route.fulfill({ status: 204, body: "" });
-    });
-
+    // Post-#262: anon clicks no longer redirect to /start — they open
+    // the in-page FreeMonthModal which fronts the Stripe Checkout call.
+    // The Wave-1 stripe_checkout → /start flow lives only as the
+    // cta_routing_v2 kill-switch fallback.
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
-    // Homepage v3 hero CTA class is .hp-hero-cta-primary ("Try a free
-    // month"); the v2 .hp-cta-dark fallback selector stays in the OR
-    // list so a partial rollback doesn't silently break this test.
     const heroCta = page.locator(
       ".hp-hero .hp-hero-cta-primary, .hp-hero .hp-cta-dark",
     ).first();
     await heroCta.click();
 
-    await expect.poll(() => startRedirectHit, {
-      timeout: 3_000,
-      message: "expected anon click to redirect to /start (Wave-1 routing)",
-    }).toBe(true);
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
+    // URL must stay on / — no page redirect.
+    expect(new URL(page.url()).pathname).toBe("/");
 
     expect(errors).toEqual([]);
   });
