@@ -24,7 +24,7 @@ async function getEvents(page: Page): Promise<CapturedEvent[]> {
 }
 
 test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
-  test("pro user + flag on: hero/featured/usps suppressed, carousels visible", async ({ page }) => {
+  test("pro user + flag on: featured/usps/shoreline suppressed, hero image + shelves visible", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);
 
@@ -33,13 +33,15 @@ test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
       { waitUntil: "networkidle" },
     );
 
-    // Upsell-oriented blocks must not mount.
-    await expect(page.locator(".hp-hero")).toHaveCount(0);
+    // Post-#262: paid users see the hero image (CTA + microcopy gated
+    // in the component). featured + usps + shoreline are NON_PAID and
+    // don't mount.
+    await expect(page.locator(".hp-hero, .hp-hero-v4")).toBeVisible();
     await expect(page.locator(".hp-featured")).toHaveCount(0);
     await expect(page.locator(".hp-usp")).toHaveCount(0);
+    await expect(page.locator(".hp-shoreline")).toHaveCount(0);
 
     // Carousel surfaces remain.
-    await expect(page.locator(".hp-shoreline")).toBeVisible();
     await expect(page.locator("#hp-shelf-top10")).toBeVisible();
     await expect(page.locator("#hp-shelf-drops")).toBeVisible();
     await expect(page.locator("#hp-shelf-new")).toBeVisible();
@@ -50,7 +52,7 @@ test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
     expect(ev!.props.user_state).toBe("pro");
     expect(ev!.props.flag_enabled).toBe(true);
     expect(ev!.props.blocks_visible).toEqual([
-      "shoreline", "top_10", "price_drops", "new_this_week",
+      "hero", "top_10", "price_drops", "new_this_week",
     ]);
 
     expect(errors).toEqual([]);

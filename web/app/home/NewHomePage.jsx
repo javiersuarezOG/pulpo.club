@@ -56,9 +56,9 @@ const BLOCK_COMPONENTS = {
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
   usps:          ({ app, locale }) => <USPBand app={app} locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
-  top_10:        ({ app, locale }) => <TopTenShelf app={app} locale={locale} />,
-  price_drops:   ({ app, locale }) => <PriceDropsShelf app={app} locale={locale} />,
-  new_this_week: ({ app, locale }) => <NewThisWeekShelf app={app} locale={locale} />,
+  top_10:        ({ app, locale, heroV4 }) => <TopTenShelf app={app} locale={locale} heroV4={heroV4} />,
+  price_drops:   ({ app, locale, heroV4 }) => <PriceDropsShelf app={app} locale={locale} heroV4={heroV4} />,
+  new_this_week: ({ app, locale, heroV4 }) => <NewThisWeekShelf app={app} locale={locale} heroV4={heroV4} />,
 };
 
 export function NewHomePage({ app }) {
