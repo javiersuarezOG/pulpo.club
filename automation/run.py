@@ -160,6 +160,14 @@ def _pick_best_photo_url(photo_urls, on_url_error=None):
     except Exception:
         _compute_photo_score = None
         _detect_text_overlay = None
+    # U3 (2026-05-18) — opt-in LLM-vision aesthetic booster. The module
+    # is fail-soft by design: when LLM_VISION_ENABLED is unset or the
+    # configured provider has no API key, score_aesthetic returns None
+    # for every candidate and the picker behaves identically to today.
+    try:
+        from automation.aesthetic_vision import score_aesthetic as _score_aesthetic
+    except Exception:
+        _score_aesthetic = None
 
     cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
                               _PHOTO_CANDIDATES_CAP_DEFAULT))
@@ -185,11 +193,16 @@ def _pick_best_photo_url(photo_urls, on_url_error=None):
             has_text = _detect_text_overlay(r.content) if _detect_text_overlay else None
         except Exception:
             has_text = None
+        try:
+            aesthetic = _score_aesthetic(r.content) if _score_aesthetic else None
+        except Exception:
+            aesthetic = None
         candidates.append({
             "url": url,
             "content": r.content,
             "score": score if score is not None else 0,
             "has_text_overlay": has_text,
+            "aesthetic": aesthetic,
         })
 
     if not candidates:
@@ -200,7 +213,27 @@ def _pick_best_photo_url(photo_urls, on_url_error=None):
     # support doesn't disqualify every candidate.
     non_text = [c for c in candidates if c["has_text_overlay"] is not True]
     pool = non_text if non_text else candidates
-    pool.sort(key=lambda c: c["score"], reverse=True)
+    # Composite ranking — when LLM-vision returned a score for at least
+    # one candidate in the pool we blend 70% aesthetic + 30% technical
+    # (matches the plan's §U3 weighting). Aesthetic is 0-10, technical
+    # is 0-100; normalize both to 0-100. When aesthetic is None across
+    # the board (booster disabled / budget exhausted / provider down),
+    # fall back to pure-technical sorting — today's behavior.
+    any_aesthetic = any(c["aesthetic"] is not None for c in pool)
+    if any_aesthetic:
+        def _composite(c):
+            tech = float(c["score"])
+            aes = c["aesthetic"]
+            if aes is None:
+                # Candidate didn't get scored (mid-day budget exhaustion
+                # or a transient provider blip). Use technical-only so
+                # it doesn't lose to a peer just because the LLM was
+                # unavailable for that one call.
+                return tech
+            return 0.3 * tech + 0.7 * (float(aes) * 10.0)
+        pool.sort(key=_composite, reverse=True)
+    else:
+        pool.sort(key=lambda c: c["score"], reverse=True)
     w = pool[0]
     return (w["url"], w["content"], w["score"], w["has_text_overlay"])
 
