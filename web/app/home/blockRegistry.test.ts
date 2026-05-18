@@ -5,8 +5,8 @@
 // dashboards filtering on `paid_home_rendered.blocks_visible` will
 // disagree with what production actually renders.
 
-import { describe, expect, it } from "vitest";
-import { visibleBlocksFor, HOME_BLOCKS, type BlockId } from "./blockRegistry";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { visibleBlocksFor, type BlockId } from "./blockRegistry";
 
 type User = { plan?: "free" | "pro" | "agency" } | null;
 
@@ -26,16 +26,35 @@ const ALL_BLOCKS: readonly BlockId[] = [
   "hero", "featured", "usps",
   "shoreline", "top_10", "price_drops", "new_this_week",
 ];
+// Post-Wave-5 paid trim: hero stays (image-only — CTA gated in
+// component), featured/usps/shoreline drop. Catalogue shelves stay.
 const PAID_BLOCKS: readonly BlockId[] = [
-  "shoreline", "top_10", "price_drops", "new_this_week",
+  "hero", "top_10", "price_drops", "new_this_week",
 ];
 const ALL_BLOCKS_NO_USPS: readonly BlockId[] = [
   "hero", "featured",
   "shoreline", "top_10", "price_drops", "new_this_week",
 ];
 
+// localStorage stub — visibleBlocksFor reads window.localStorage for
+// per-block dev overrides. Default to empty so tests aren't polluted
+// by a real browser state.
+beforeEach(() => {
+  vi.stubGlobal("window", {
+    localStorage: {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    },
+  } as unknown as Window);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("visibleBlocksFor — all flags off (rollback path)", () => {
-  // Pre-Wave-4 behavior: every tier sees every block, in author order.
+  // Legacy behavior: every tier sees every block, in author order.
   it.each([
     ["anonymous", anon],
     ["free",      free],
@@ -55,11 +74,11 @@ describe("visibleBlocksFor — paid_home_variant_v1 only", () => {
     expect(visibleBlocksFor(free as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS);
   });
 
-  it("pro sees the trimmed paid-home list", () => {
+  it("pro sees the trimmed paid-home list (hero image + shelves)", () => {
     expect(visibleBlocksFor(pro as never, PAID_HOME_ON)).toEqual(PAID_BLOCKS);
   });
 
-  it("agency sees the trimmed paid-home list", () => {
+  it("agency sees the trimmed paid-home list (hero image + shelves)", () => {
     expect(visibleBlocksFor(agency as never, PAID_HOME_ON)).toEqual(PAID_BLOCKS);
   });
 });
@@ -92,44 +111,29 @@ describe("visibleBlocksFor — both flags on (compose)", () => {
   });
 });
 
-describe("HOME_BLOCKS — author-order + tier coverage invariants", () => {
-  it("renders in the author order encoded in HOME_BLOCKS (all flags off)", () => {
-    const authored = HOME_BLOCKS.map((b) => b.id);
-    expect(visibleBlocksFor(anon as never, ALL_FLAGS_OFF)).toEqual(authored);
-  });
-
-  it("every block lists at least one tier — no orphan entries", () => {
-    for (const block of HOME_BLOCKS) {
-      expect(block.visibleFor.length).toBeGreaterThan(0);
-    }
-  });
-
-  it("the carousel blocks are visible for every tier (no accidental gate)", () => {
-    const carousels: BlockId[] = ["shoreline", "top_10", "price_drops", "new_this_week"];
-    for (const id of carousels) {
-      const entry = HOME_BLOCKS.find((b) => b.id === id);
-      expect(entry).toBeDefined();
-      expect(entry!.visibleFor).toEqual(
-        expect.arrayContaining(["anonymous", "free", "pro", "agency"]),
-      );
-    }
-  });
-});
-
 describe("visibleBlocksFor — hero_v4 flag", () => {
   // Wave 5#7+#9: the new white hero absorbs the featured-listing visually,
   // so the standalone `featured` block drops from the homepage flow.
   it.each([
     ["anonymous", anon],
     ["free",      free],
-    ["pro",       pro],
-    ["agency",    agency],
-  ])("drops `featured` for %s", (_, user) => {
+  ])("drops `featured` for %s, keeps the rest", (_, user) => {
     const out = visibleBlocksFor(user as never, HERO_V4_ON);
     expect(out).not.toContain("featured");
-    // Other blocks unaffected.
     expect(out).toContain("hero");
     expect(out).toContain("usps");
+    expect(out).toContain("shoreline");
+  });
+
+  it.each([
+    ["pro",       pro],
+    ["agency",    agency],
+  ])("for paid %s with paid_home off: drops `featured` only", (_, user) => {
+    const out = visibleBlocksFor(user as never, HERO_V4_ON);
+    expect(out).not.toContain("featured");
+    // shoreline is visible when paid_home flag is off — the legacy
+    // rollback path. The matrix VISIBILITY value for paid is false, but
+    // it only applies when paid_home_variant_v1 is on.
     expect(out).toContain("shoreline");
   });
 
@@ -144,11 +148,9 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
     expect(out).toContain("hero");
   });
 
-  it("composes with all flags on for paid: hero + featured + usps all gone", () => {
+  it("composes with all flags on for paid: only hero + shelves remain", () => {
     const out = visibleBlocksFor(pro as never, ALL_FLAGS_ON);
-    // paid_home_variant filters out NON_PAID blocks (hero/featured/usps)
-    // and hero_v4 also filters out featured; usp_popup also filters usps.
-    expect(out).toEqual(["shoreline", "top_10", "price_drops", "new_this_week"]);
+    expect(out).toEqual(["hero", "top_10", "price_drops", "new_this_week"]);
   });
 });
 
@@ -161,5 +163,32 @@ describe("visibleBlocksFor — defensive defaults", () => {
     expect(
       visibleBlocksFor({ plan: "mystery_tier" as never } as never, PAID_HOME_ON),
     ).toEqual(ALL_BLOCKS);
+  });
+});
+
+describe("visibleBlocksFor — per-block dev overrides", () => {
+  it("force_show overrides a tier-hidden block", () => {
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (k: string) =>
+          k === "pulpo-block-overrides" ? JSON.stringify({ shoreline: "force_show" }) : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    } as unknown as Window);
+    // Pro user with paid_home on normally hides shoreline. Override wins.
+    expect(visibleBlocksFor(pro as never, PAID_HOME_ON)).toContain("shoreline");
+  });
+
+  it("force_hide overrides a tier-visible block", () => {
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (k: string) =>
+          k === "pulpo-block-overrides" ? JSON.stringify({ hero: "force_hide" }) : null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    } as unknown as Window);
+    expect(visibleBlocksFor(anon as never, ALL_FLAGS_OFF)).not.toContain("hero");
   });
 });

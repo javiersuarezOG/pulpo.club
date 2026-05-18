@@ -95,8 +95,25 @@ async function flush() {
   }
 }
 
+// Alias an anonymous client-side distinct_id to the server-side
+// identity. Used by the Stripe webhook to stitch a visitor's anon
+// session (page-views, modal clicks) to the post-payment email-derived
+// id so PostHog funnels resolve a single person across the boundary.
+// Never throws.
+function alias(previousId, distinctId) {
+  const client = _init();
+  if (client === null) return;
+  if (!previousId || !distinctId || previousId === distinctId) return;
+  try {
+    client.alias({ distinctId, alias: previousId });
+  } catch (err) {
+    console.warn(`[posthog] alias failed (non-fatal): ${err && err.message}`);
+  }
+}
+
 module.exports = {
   capture,
   flush,
   emailDistinctId,
+  alias,
 };

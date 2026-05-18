@@ -194,9 +194,17 @@ module.exports = async (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const origin = `${proto}://${host}`;
 
+  // Client-side anonymous PostHog distinct_id. Carried through the
+  // Stripe session metadata so the webhook can alias() it to the
+  // email-derived id post-payment, stitching the anon→paid funnel into
+  // one PostHog person. Empty string if the client didn't send one
+  // (cold load, declined consent) — webhook tolerates absence.
+  const posthogAnonId = safeStr(body.posthog_anon_id).slice(0, 128);
+
   const sessionMetadata = {
     source: "start",
     country: country || "",
+    posthog_anon_id: posthogAnonId,
     ...utms,
   };
 

@@ -31,6 +31,7 @@ type PostHog = {
   has_opted_out_capturing: () => boolean;
   isFeatureEnabled: (key: string) => boolean | undefined;
   onFeatureFlags: (cb: () => void) => void;
+  get_distinct_id?: () => string | undefined;
 };
 
 type QueuedException = { error: unknown; extra?: Record<string, unknown>; ts: number };
@@ -281,6 +282,21 @@ export function identify(id: string, props?: Record<string, unknown>) {
 
 export function resetIdentity() {
   try { posthog?.reset(); } catch { /* ignore */ }
+}
+
+// Returns the current anonymous PostHog distinct_id, or null if the SDK
+// hasn't loaded yet (which is normal during the deferred-init window).
+// Used by the Stripe checkout helpers to propagate the anon session ID
+// through to the server webhook so post-payment events stitch into the
+// same person_id as the pre-payment client events.
+export function getDistinctId(): string | null {
+  if (!posthog) return null;
+  try {
+    const id = posthog.get_distinct_id?.();
+    return typeof id === "string" && id.length > 0 ? id : null;
+  } catch {
+    return null;
+  }
 }
 
 export function optOut() {

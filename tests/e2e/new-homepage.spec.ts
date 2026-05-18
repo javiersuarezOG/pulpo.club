@@ -19,7 +19,12 @@
 import { test, expect } from "@playwright/test";
 import { attachErrorRecorder } from "./_helpers";
 
-const URL_HOME = "/";
+// Legacy hero-v3 surface — these tests assert section landmarks +
+// behaviors that live on the dark-forest HeroV2 path. Hero v4 became
+// the default-on visual in production (the readFeatureFlag fallback
+// is `true`); opt out here so the V3 surface is exercised. Coverage
+// of the v4 surface lives in tests/e2e/hero-v4.spec.ts.
+const URL_HOME = "/?ff_hero_v4=0";
 
 test.describe("Homepage v2 — redesign smoke", () => {
   test("boots cleanly with the rewrite title", async ({ page }) => {
@@ -57,33 +62,23 @@ test.describe("Homepage v2 — redesign smoke", () => {
     expect(errors).toEqual([]);
   });
 
-  test("primary hero CTA routes anonymous users to /start (Wave-1 conversion path)", async ({ page, context }) => {
+  test("primary hero CTA opens FreeMonthModal for anonymous users (post-#262)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
-    // Wave-1 routing change: anon clicks no longer open a signup modal
-    // intermediary — they redirect to /start which handles email +
-    // Stripe checkout in one flow. Intercept the redirect so the test
-    // doesn't navigate away before we can assert.
-    let startRedirectHit = false;
-    await context.route("**/start**", (route) => {
-      startRedirectHit = true;
-      void route.fulfill({ status: 204, body: "" });
-    });
-
+    // Post-#262: anon clicks no longer redirect to /start — they open
+    // the in-page FreeMonthModal which fronts the Stripe Checkout call.
+    // The Wave-1 stripe_checkout → /start flow lives only as the
+    // cta_routing_v2 kill-switch fallback.
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
-    // Homepage v3 hero CTA class is .hp-hero-cta-primary ("Try a free
-    // month"); the v2 .hp-cta-dark fallback selector stays in the OR
-    // list so a partial rollback doesn't silently break this test.
     const heroCta = page.locator(
       ".hp-hero .hp-hero-cta-primary, .hp-hero .hp-cta-dark",
     ).first();
     await heroCta.click();
 
-    await expect.poll(() => startRedirectHit, {
-      timeout: 3_000,
-      message: "expected anon click to redirect to /start (Wave-1 routing)",
-    }).toBe(true);
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
+    // URL must stay on / — no page redirect.
+    expect(new URL(page.url()).pathname).toBe("/");
 
     expect(errors).toEqual([]);
   });

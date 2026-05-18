@@ -24,6 +24,7 @@ import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
+import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
 import {
   Icon,
   PulpoLogo,
@@ -52,7 +53,7 @@ import {
   galleryThumbsUnlockedFor,
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
-import { trackCtaRouted } from "./lib/cta-routing";
+import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/cta-routing";
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -858,6 +859,23 @@ function recomputeComposite(l, w) {
   return (v * w.value + ll * w.location + m * w.momentum) / total;
 }
 
+// "Top 10" rank map: listing id → 1..10 based on global rank_score desc.
+// Filters out sold + missing-rank listings before slicing, so the chip
+// represents the 10 best *available* listings rather than the 10
+// highest scores including sold/null entries. Same map is consumed by
+// BrowsePage and SavedPage so the chip means the same thing on both
+// surfaces — and stays attached to the listing regardless of filter
+// or sort.
+function buildTopRankMap(listings, n = 10) {
+  const out = new Map();
+  const ranked = [...listings]
+    .filter((l) => !l.is_sold && l.rank_score != null)
+    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
+    .slice(0, n);
+  ranked.forEach((l, i) => out.set(l.id, i + 1));
+  return out;
+}
+
 function applyFilters(listings, f) {
   return listings.filter(l => {
     if (l.is_sold) return false;
@@ -1021,6 +1039,8 @@ function BrowsePage({ app }) {
   // doesn't fire dozens of applyFilters() passes. Chip toggles still
   // feel instant — the debounced snapshot tracks the live value.
   const debouncedFilters = useDebouncedValue(filters, 300);
+
+  const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
 
   const results = pUseMemo(() => {
     // PR-photo-nav-perf — filter+sort cost is the most expensive
@@ -1221,9 +1241,21 @@ function BrowsePage({ app }) {
                     app={app}
                     priority={i < ABOVE_FOLD_COUNT}
                     source="browse"
+                    topRank={topRankMap.get(l.id)}
                     onOpen={() => {
                       track("card.clicked", { listing_id: l.id, source_view: "browse" });
-                      app.openListing(l.id);
+                      // Route through the matrix so anon + free hit the
+                      // FreeMonthModal (paid users open the listing).
+                      const branch = routeCtaForState("shelf_card", app?.user);
+                      trackCtaRouted("shelf_card", app?.user, branch, true);
+                      if (branch === "passthrough") {
+                        app.openListing(l.id);
+                        return;
+                      }
+                      void dispatchCentralBranch(branch, app, {
+                        trigger: "browse_card",
+                        pendingListing: l.id,
+                      });
                     }}
                   />
                 ))}
@@ -1248,7 +1280,7 @@ function BrowsePage({ app }) {
               )}
             </>
           ) : (
-            <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} />
+            <ResultsTable results={results} app={app} sort={sort} setSort={setSortTelemeter} topRankMap={topRankMap} />
           )}
         </div>
       </div>
@@ -1266,7 +1298,7 @@ function BrowsePage({ app }) {
 }
 
 // ====== Results table ======
-function ResultsTable({ results, app, sort, setSort }) {
+function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   const headerSortable = (key, label) => {
     const map = { price: "price_asc", days: "days_asc", size: "size_desc", ppm: "ppm_asc" };
     const active = sort === map[key];
@@ -1299,7 +1331,14 @@ function ResultsTable({ results, app, sort, setSort }) {
               <td className="thumb-cell">
                 {l.photos[0] ? <img src={l.photos[0]} alt=""/> : <div className="thumb-placeholder"/>}
               </td>
-              <td className="title-cell">{tr(l.title, app.locale)}</td>
+              <td className="title-cell">
+                {topRankMap && topRankMap.get(l.id) != null && (
+                  <span className="results-table-rank" aria-label={`Rank ${topRankMap.get(l.id)}`}>
+                    #{topRankMap.get(l.id)}
+                  </span>
+                )}
+                {tr(l.title, app.locale)}
+              </td>
               <td>{l.zone_name}</td>
               <td><span className={`type-pill type-${l.land_type}`}>{landTypeLabel(l.land_type)}</span></td>
               <td className="num">{formatSize(l.size_m2)}</td>
@@ -1892,6 +1931,8 @@ function SavedPage({ app }) {
   const [sort, setSort] = pUseState("recent");
   pUseEffect(() => { localStorage.setItem("pulpo-saved-view", view); }, [view]);
 
+  const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
+
   const sorted = pUseMemo(() => {
     const arr = [...items];
     switch (sort) {
@@ -1961,6 +2002,7 @@ function SavedPage({ app }) {
               app={app}
               priority={i < 6}
               source="saved"
+              topRank={topRankMap.get(l.id)}
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "saved" });
                 app.openListing(l.id);
@@ -1969,7 +2011,7 @@ function SavedPage({ app }) {
           ))}
         </div>
       ) : (
-        <ResultsTable results={sorted} app={app} sort={sort} setSort={setSort} />
+        <ResultsTable results={sorted} app={app} sort={sort} setSort={setSort} topRankMap={topRankMap} />
       )}
     </div>
   );
@@ -2758,64 +2800,31 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
     }
   };
 
-  const postCheckout = async (includeCode) => {
-    return fetch("/api/stripe/start-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        promoCode: includeCode && urlCode ? urlCode : null,
-        locale: lc,
-        ...utms,
-      }),
-    });
-  };
-
+  // Shared with FreeMonthModal — single implementation of the
+  // postCheckout / soft-fail-on-bad-code retry / rate-limited / network
+  // error / redirect chain. Lives in lib/stripe-modal-checkout.ts.
   const onCta = async () => {
     setError(null);
     track("pro_upsell.cta_clicked", { trigger, had_promo_code: !!urlCode });
     setSubmitting(true);
-    try {
-      let res = await postCheckout(true);
-      if (!res.ok) {
-        const detail = await res.json().catch(() => ({}));
-        const reason = detail && detail.error;
-        if (reason === "invalid_promo_code" && urlCode) {
-          // Soft-fail: drop the bad code, retry once.
-          res = await postCheckout(false);
-        } else if (reason === "rate_limited") {
-          setError(t("pro_upsell.error", lc));
-          setSubmitting(false);
-          return;
-        } else {
-          track("api.error", {
-            endpoint: "/api/stripe/start-checkout",
-            status: res.status,
-            reason,
-            detail: detail && detail.detail,
-          });
-          setError(t("pro_upsell.error", lc));
-          setSubmitting(false);
-          return;
-        }
-      }
-      const data = await res.json();
-      if (!data || !data.url) {
-        setError(t("pro_upsell.error", lc));
-        setSubmitting(false);
-        return;
-      }
+
+    const result = await startCheckoutFromModal({
+      locale: lc,
+      utms,
+      urlCode,
+    });
+
+    if (result.kind === "redirect") {
       track("pro_upsell.checkout_redirected", {
         trigger, had_promo_code: !!urlCode,
       });
-      window.location.assign(data.url);
-    } catch (err) {
-      track("api.error", {
-        endpoint: "/api/stripe/start-checkout",
-        status: 0, reason: "network", detail: err && err.message,
-      });
-      setError(t("pro_upsell.error", lc));
-      setSubmitting(false);
+      window.location.assign(result.url);
+      return;
     }
+    // rate_limited and error both surface the same user-visible copy;
+    // the helper already fired api.error for non-rate-limited failures.
+    setError(t("pro_upsell.error", lc));
+    setSubmitting(false);
   };
 
   const onMaybeLater = () => {

@@ -22,4 +22,4 @@ export function useTelemetry() {
   return { track, identify, reset };
 }
 
-export { track, identify, resetIdentity, optIn, optOut } from "./client";
+export { track, identify, resetIdentity, optIn, optOut, getDistinctId } from "./client";

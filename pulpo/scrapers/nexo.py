@@ -23,6 +23,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import SELECTOLAX_OK, HTTPX_OK, is_offline, load_fixtures, make_client, with_retries
 from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser
@@ -88,6 +89,7 @@ def _parse_listing_page(html: str) -> list[dict]:
         # Full-size: replace _thumbnail.jpg with .jpg
         full_src = re.sub(r"_thumbnail(\.[a-z]+)$", r"\1", thumb_src)
         photo_urls = [_abs(full_src)] if full_src else []
+        photo_urls = upgrade_photo_urls("nexo", photo_urls)
 
         out.append({
             "source_id":    source_id,
