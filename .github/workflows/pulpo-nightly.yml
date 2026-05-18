@@ -1,9 +1,15 @@
 name: pulpo nightly run
 
-# Every night at 12:00 UTC = 06:00 in El Salvador (UTC-6).
+# Every night at 02:00 UTC. Pulled forward from 12:00 UTC so the pipeline
+# completes before 8am Europe/Madrid year-round:
+#   02:00 UTC = 04:00 CEST (summer) = 03:00 CET (winter).
+# Typical run is 50–70 min → data PR + Vercel deploy land by ~03:30 UTC =
+# 05:30 CEST / 04:30 CET. Watchdog at 05:00 UTC (+3h offset) still leads
+# 8am Madrid by ≥3h.
+# 20:00 El Salvador local — bot push runs while ES sleeps.
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "0 2 * * *"
   workflow_dispatch: {}    # also allow manual runs
 
 # Single-flight: a manual trigger or a backed-up cron must not race a
@@ -139,16 +145,17 @@ jobs:
           # silent-no-ops.
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
-          # Phase 4 U3 — LLM-vision aesthetic booster. Default OFF
-          # everywhere (LLM_VISION_ENABLED unset → score_aesthetic
-          # returns None → picker falls back to technical-only). To
-          # ship the booster in production, set repo secret
-          # LLM_VISION_ENABLED=true plus one of QWEN_API_KEY /
-          # SEGMIND_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY.
-          # Daily budget cap defaults to $1.00 (in
-          # automation/aesthetic_vision.py). Top-X% gating defaults to
-          # 5 — see .env.example for the full knob list.
-          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED }}
+          # Phase 4 U3 — LLM-vision aesthetic booster. Default ON via
+          # the `|| 'true'` fallback so the picker always tries to
+          # blend aesthetic + technical scores. When no provider key
+          # (QWEN_API_KEY / SEGMIND_API_KEY / OPENAI_API_KEY /
+          # ANTHROPIC_API_KEY) is configured, score_aesthetic returns
+          # None and the picker silently falls back to technical-only
+          # — pipeline runs unchanged. Set repo secret
+          # LLM_VISION_ENABLED=false to force-disable. Daily budget
+          # cap defaults to $1.00 (automation/aesthetic_vision.py);
+          # top-X% gating defaults to 5 — see .env.example.
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED || 'true' }}
           LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
           LLM_VISION_DAILY_BUDGET_USD: ${{ secrets.LLM_VISION_DAILY_BUDGET_USD }}
           LLM_VISION_TOP_PCT: ${{ secrets.LLM_VISION_TOP_PCT }}
