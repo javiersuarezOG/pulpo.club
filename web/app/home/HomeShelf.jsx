@@ -199,10 +199,10 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
             source="home_shelf"
           />
           {rank != null && (
-            <div className="pulpo-rank-badge hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
-              <span className="pulpo-rank-badge-eyebrow">★ RANKED</span>
-              <span className="pulpo-rank-badge-num">#{rank}</span>
-            </div>
+            <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
+              <span className="pulpo-rank-star" aria-hidden="true">★</span>
+              <span className="pulpo-rank-num">{rank}</span>
+            </span>
           )}
           {badge && (
             <span className={`hp-shelf-card-badge hp-shelf-card-badge-${badge.side} hp-shelf-card-badge-${badge.kind}`}>
