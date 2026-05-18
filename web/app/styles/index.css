@@ -6236,6 +6236,97 @@ h1,h2,h3,h4,h5 { margin: 0; }
   left: 10px;
 }
 
+/* ────── Rank chip — shelf cards + ListingCard ──────
+   Shows the listing's position in its shelf (home) or in the global
+   rank_score top-10 (browse / saved). Anchored top-left of the
+   photo. On shelf cards we also shift the kind badge below so the
+   two stack cleanly rather than overlapping. */
+
+.hp-shelf-card-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+}
+
+/* When the rank chip and a kind badge are both present on a shelf
+   card (price_drops, new_this_week — top_10 drops its kind badge),
+   push the kind badge to the row beneath the rank chip. */
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-rank ~ .hp-shelf-card-badge {
+  top: 44px;
+}
+
+.listing-card-rank {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+
+/* When the rank chip is present, push the existing pulpo-badge row
+   below it so they stack rather than overlap. */
+.listing-card-rank ~ .card-badge-row {
+  top: 46px;
+}
+
+/* Inline rank pill in the Results table title cell. */
+.results-table-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 6px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+  .hp-shelf-card-rank,
+  .listing-card-rank {
+    min-width: 26px;
+    height: 22px;
+    font-size: 11px;
+    padding: 0 7px;
+  }
+}
+
 /* ===========================================================================
    Shelf carousel — horizontal scroll-snap rail at every breakpoint
    ===========================================================================
