@@ -100,6 +100,20 @@ function projectListing(l, locale) {
       hero_photo_quality_score: l.hero_photo_quality_score ?? null,
       has_text_overlay: l.has_text_overlay ?? null,
       data_quality_score: l.data_quality_score ?? null,
+      // Source-side dimensions (px) — set from the hero derivative's
+      // sidecar by automation/run.py. Equal to the original source
+      // dimensions clamped to ≤1920×1080. Null when the hero sidecar
+      // hasn't been generated yet (pre-Phase-A3 backfill rows).
+      // Consumers should reject when max(w,h) is below the target
+      // canonical size (e.g. 1080 for social 1:1) to avoid upscaled
+      // garbage from /api/social/image.
+      source_width: l.source_width ?? null,
+      source_height: l.source_height ?? null,
+      // Pre-computed eligibility flags from automation/photo_quality.py.
+      // hero_eligible: width≥1600, height≥1200, aspect∈[1.4,1.85], ≤5MB.
+      // card_eligible: width≥800, height≥600.
+      hero_eligible: l.hero_eligible === true ? true : (l.hero_eligible === false ? false : null),
+      card_eligible: l.card_eligible === true ? true : (l.card_eligible === false ? false : null),
     },
     created_at: l.first_seen_at ?? null,
     updated_at: l.enriched_at || l.scraped_at || null,

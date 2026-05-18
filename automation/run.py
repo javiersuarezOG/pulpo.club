@@ -441,6 +441,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 li.card_eligible = bool(thumb_meta.get("card_eligible", False))
             if hero_meta:
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Hero file's dimensions == source dimensions clamped to ≤1920×1080.
+                # Surfaced through /api/social/listings so consumers can pre-filter
+                # listings whose source is too small to render cleanly at the
+                # requested output ratio (e.g. social 1080×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
                 qs = hero_meta.get("hero_photo_quality_score")
                 if qs is not None:
                     li.hero_photo_quality_score = qs
@@ -589,6 +597,13 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Mirror the cached-skip path: source_width/source_height
+                # are the hero derivative's pixel dimensions (which equal
+                # original source dimensions clamped to ≤1920×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
@@ -620,6 +635,344 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
             "elapsed_s": elapsed, "budget_hit": budget_hit,
             "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count}
+
+
+def _hires_file_path(photos_hires_dir: Path, source: str, source_id: str) -> Path:
+    """`<source>_<id>` → `<source>_<id>.hires.jpg` (hires-derivative storage)."""
+    return photos_hires_dir / f"{source}_{source_id}.hires.jpg"
+
+
+def _resdet_upscale_check(image_path: Path) -> Optional[dict]:
+    """Run vendored resdet against a hires file. Returns dict or None on error.
+
+    Result shape: ``{"detected_width": int, "detected_height": int,
+                     "upscaled": bool}``. The upscale judgment compares
+    detected dims to the file's actual dims (read by Pillow). Returns
+    None when resdet isn't vendored (skip the check silently — caller
+    should treat as "unknown" and still keep the file).
+    """
+    import subprocess
+    repo_root = Path(__file__).resolve().parents[1]
+    binary = repo_root / "vendor" / "resdet" / "resdet-linux-x64"
+    if not binary.exists():
+        return None
+    try:
+        proc = subprocess.run(
+            [str(binary), "-v1", str(image_path)],
+            capture_output=True, timeout=10, text=True,
+        )
+        parts = proc.stdout.strip().split()
+        if len(parts) < 2:
+            return None
+        dw = int(parts[0])
+        dh = int(parts[1])
+        # Read the actual file dims to compare.
+        try:
+            from PIL import Image
+            with Image.open(image_path) as img:
+                aw, ah = img.size
+        except Exception:
+            return None
+        wdelta = aw - dw
+        hdelta = ah - dh
+        upscaled = (wdelta >= 12 and dw > 0) or (hdelta >= 12 and dh > 0)
+        return {
+            "detected_width": dw,
+            "detected_height": dh,
+            "upscaled": bool(upscaled),
+        }
+    except (subprocess.TimeoutExpired, ValueError, OSError):
+        return None
+
+
+def _download_hires_photos(listings, repo: Path) -> dict:
+    """Phase 1 of plan v2 — parallel hi-res photo pipeline.
+
+    Fetches the broker's native-resolution photo bytes (bypassing the
+    1920×1080 down-sample applied by the existing hero pipeline) and
+    writes them to ``web/photos-hires/<source>_<id>.hires.jpg`` with a
+    per-file sidecar capturing: dimensions, file size, JPEG quality
+    estimate, `compute_score` result, resdet detection, deterministic
+    aesthetic score, and the source URL we fetched.
+
+    Gated on ``PULPO_HIRES_ENABLED=1``; defaults OFF so this function
+    is a no-op when the env var isn't set. Other env vars:
+
+    - ``PULPO_HIRES_SOURCES`` — comma-separated allowlist, e.g.
+      ``"bienesraices,remax,century21,oceanside,nexo"``. Sources not in
+      the list are skipped entirely.
+    - ``PULPO_HIRES_BUDGET_S`` — wall-clock budget in seconds, default 1500.
+    - ``PULPO_HIRES_LIMIT`` — process at most N listings (top by
+      rank_score). 0 / unset = process all.
+    - ``PULPO_HIRES_SHADOW`` — informational; doesn't change behavior in
+      this function (the gating happens in ``api/social/image.js`` via
+      ``PULPO_HIRES_SERVE``). When set, the metrics row records the
+      shadow flag.
+
+    Output side-effects:
+    - ``web/photos-hires/<source>_<id>.hires.jpg`` per processed listing
+      (skipped on cache hit, omitted on per-listing failure).
+    - ``web/photos-hires/<source>_<id>.hires.jpg.meta.json`` per file.
+    - ``web/photos-hires/<source>_<id>.hires.jpg.quarantine`` marker
+      file when resdet says the bytes are upscaled despite our fetch
+      (broker lied about resolution; the social endpoint will skip
+      quarantined files).
+    - ``web/photos-hires/<source>_<id>.hires.jpg.hash`` URL-hash cache.
+    - Appends one row to ``web/data/hires_pipeline_metrics.jsonl``.
+    - Per-listing log lines on stderr (`[hires] start/ok/reject/error/skip/budget`).
+    """
+    enabled = os.environ.get("PULPO_HIRES_ENABLED", "0").lower() not in ("", "0", "false", "no")
+    if not enabled:
+        return {"enabled": False}
+
+    allow_csv = (os.environ.get("PULPO_HIRES_SOURCES") or "").strip()
+    allow_set = {s.strip() for s in allow_csv.split(",") if s.strip()}
+    if not allow_set:
+        print("[hires] PULPO_HIRES_SOURCES is empty — nothing to do", file=sys.stderr)
+        return {"enabled": True, "skipped_no_allowlist": True}
+
+    try:
+        budget_s = float(os.environ.get("PULPO_HIRES_BUDGET_S") or "1500")
+    except ValueError:
+        budget_s = 1500.0
+    try:
+        limit_n = int(os.environ.get("PULPO_HIRES_LIMIT") or "0")
+    except ValueError:
+        limit_n = 0
+    shadow = os.environ.get("PULPO_HIRES_SHADOW", "0").lower() not in ("", "0", "false", "no")
+
+    try:
+        from PIL import Image  # noqa: F401  -- decode sanity check
+    except ImportError:
+        print("[hires] Pillow not installed — aborting", file=sys.stderr)
+        return {"enabled": True, "error": "pillow_missing"}
+    try:
+        import httpx
+    except ImportError:
+        print("[hires] httpx not installed — aborting", file=sys.stderr)
+        return {"enabled": True, "error": "httpx_missing"}
+
+    from automation.hires_url_transform import transform_hires_url, describe_transform
+    from automation.photo_quality import compute_image_metadata, compute_score
+    from automation.aesthetic_deterministic import assess_deterministic_aesthetic
+
+    photos_hires_dir = repo / "web" / "photos-hires"
+    photos_hires_dir.mkdir(parents=True, exist_ok=True)
+    metrics_path = repo / "web" / "data" / "hires_pipeline_metrics.jsonl"
+    log_path = repo / "web" / "data" / "photo_fetch_log.jsonl"
+
+    # Filter + order: only allow-listed sources, sorted by rank_score desc.
+    in_scope = [li for li in listings if li.source in allow_set and li.photo_urls]
+    in_scope.sort(key=lambda li: (-(li.rank_score or 0), li.source, li.source_id))
+    if limit_n > 0:
+        in_scope = in_scope[:limit_n]
+
+    attempted = ok = rejected_upscaled = rejected_too_small = errored = skipped_cache = 0
+    by_source: dict[str, dict] = {s: {"in_scope": 0, "with_hires": 0} for s in allow_set}
+    for li in listings:
+        if li.source in by_source:
+            by_source[li.source]["in_scope"] += 0  # placeholder; set below
+    for li in in_scope:
+        by_source.setdefault(li.source, {"in_scope": 0, "with_hires": 0})
+        by_source[li.source]["in_scope"] += 1
+
+    fetch_times_ms: list[float] = []
+    t0 = _time.monotonic()
+    budget_hit = False
+
+    for li in in_scope:
+        elapsed_now = _time.monotonic() - t0
+        if elapsed_now > budget_s:
+            print(f"[hires] budget {li.source}__{li.source_id} reason=time_budget_exceeded "
+                  f"budget_s={budget_s} elapsed_s={elapsed_now:.1f}", file=sys.stderr)
+            budget_hit = True
+            break
+
+        original_url = li.photo_urls[0]
+        url = transform_hires_url(li.source, original_url)
+        url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
+
+        hires_path = _hires_file_path(photos_hires_dir, li.source, li.source_id)
+        hires_meta_path = _meta_sidecar_path(hires_path)
+        hash_path = photos_hires_dir / (hires_path.name + ".hash")
+
+        # URL-hash cache skip path.
+        if hires_path.exists() and hires_meta_path.exists() and hash_path.exists():
+            try:
+                if hash_path.read_text().strip() == url_hash:
+                    skipped_cache += 1
+                    print(f"[hires] skip   {li.source}__{li.source_id} reason=cache_hit", file=sys.stderr)
+                    by_source[li.source]["with_hires"] += 1
+                    continue
+            except OSError:
+                pass
+
+        attempted += 1
+        print(f"[hires] start  {li.source}__{li.source_id} url={url}", file=sys.stderr)
+        fetch_t0 = _time.monotonic()
+        try:
+            r = httpx.get(url, timeout=8.0, follow_redirects=True)
+            r.raise_for_status()
+            raw = r.content
+        except Exception as e:
+            errored += 1
+            print(f"[hires] error  {li.source}__{li.source_id} {type(e).__name__}: {e}", file=sys.stderr)
+            try:
+                with log_path.open("a", encoding="utf-8") as lf:
+                    lf.write(json.dumps({
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "derivative": "hires",
+                        "source": li.source,
+                        "source_id": li.source_id,
+                        "url": url,
+                        "error_type": _classify_error(e),
+                        "error_message": str(e)[:300],
+                    }) + "\n")
+            except OSError:
+                pass
+            continue
+        fetch_ms = (_time.monotonic() - fetch_t0) * 1000.0
+        fetch_times_ms.append(fetch_ms)
+
+        # Decode + measure dimensions before writing.
+        meta = compute_image_metadata(raw, file_size_bytes=len(raw))
+        if meta is None:
+            errored += 1
+            print(f"[hires] error  {li.source}__{li.source_id} reason=decode_failed", file=sys.stderr)
+            continue
+        if not meta.get("hires_eligible", False):
+            rejected_too_small += 1
+            print(f"[hires] reject {li.source}__{li.source_id} reason=below_1080 "
+                  f"dims={meta['width']}x{meta['height']}", file=sys.stderr)
+            continue
+
+        # Write the file before resdet — resdet operates on a path.
+        try:
+            hires_path.write_bytes(raw)
+        except OSError as e:
+            errored += 1
+            print(f"[hires] error  {li.source}__{li.source_id} reason=write_failed {e}", file=sys.stderr)
+            continue
+
+        # In-loop QC: resdet validation + compute_score + deterministic aesthetic.
+        resdet_result = _resdet_upscale_check(hires_path)
+        score = compute_score(raw, byte_size=len(raw))
+        aesthetic = assess_deterministic_aesthetic(raw)
+
+        quarantined = False
+        if resdet_result is not None and resdet_result.get("upscaled", False):
+            quarantined = True
+            quarantine_marker = photos_hires_dir / (hires_path.name + ".quarantine")
+            try:
+                quarantine_marker.write_text(
+                    json.dumps({
+                        "reason": "resdet_upscaled",
+                        "detected_width": resdet_result["detected_width"],
+                        "detected_height": resdet_result["detected_height"],
+                        "actual_width": meta["width"],
+                        "actual_height": meta["height"],
+                        "computed_at": datetime.now(timezone.utc).isoformat(),
+                    }, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+            except OSError:
+                pass
+
+        # Compose the sidecar.
+        sidecar = {
+            **meta,
+            "source_url": url,
+            "original_url": original_url,
+            "transform_used": describe_transform(li.source),
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "hires_photo_quality_score": score,
+            "resdet_detected_width": resdet_result["detected_width"] if resdet_result else None,
+            "resdet_detected_height": resdet_result["detected_height"] if resdet_result else None,
+            "resdet_upscaled": resdet_result["upscaled"] if resdet_result else None,
+            "quarantined": quarantined,
+            "aesthetic": aesthetic,
+        }
+        try:
+            hires_meta_path.write_text(json.dumps(sidecar, indent=2) + "\n", encoding="utf-8")
+            hash_path.write_text(url_hash)
+        except OSError as e:
+            errored += 1
+            print(f"[hires] error  {li.source}__{li.source_id} reason=sidecar_write_failed {e}",
+                  file=sys.stderr)
+            continue
+
+        if quarantined:
+            rejected_upscaled += 1
+            print(f"[hires] reject {li.source}__{li.source_id} reason=resdet_upscaled "
+                  f"detected={resdet_result['detected_width']}x{resdet_result['detected_height']}",
+                  file=sys.stderr)
+        else:
+            ok += 1
+            by_source[li.source]["with_hires"] += 1
+            aesthetic_val = aesthetic.get("visual_appeal") if aesthetic else None
+            print(f"[hires] ok     {li.source}__{li.source_id} "
+                  f"dims={meta['width']}x{meta['height']} "
+                  f"bytes={int(meta['file_size_kb'])}KB score={score} "
+                  f"aesthetic={aesthetic_val} fetched_in={int(fetch_ms)}ms",
+                  file=sys.stderr)
+
+    wall = _time.monotonic() - t0
+
+    def _pct(numer: int, denom: int) -> float:
+        return round(100 * numer / denom, 1) if denom > 0 else 0.0
+
+    p50 = round(sorted(fetch_times_ms)[len(fetch_times_ms) // 2], 1) if fetch_times_ms else 0
+    p95_idx = max(0, int(0.95 * len(fetch_times_ms)) - 1) if fetch_times_ms else 0
+    p95 = round(sorted(fetch_times_ms)[p95_idx], 1) if fetch_times_ms else 0
+
+    summary = {
+        "run_id": datetime.now(timezone.utc).isoformat(),
+        "git_sha": os.environ.get("GITHUB_SHA", "")[:7],
+        "config": {
+            "enabled": True,
+            "shadow": shadow,
+            "sources": sorted(allow_set),
+            "budget_s": budget_s,
+            "limit": limit_n,
+        },
+        "results": {
+            "attempted": attempted,
+            "ok": ok,
+            "rejected_upscaled": rejected_upscaled,
+            "rejected_too_small": rejected_too_small,
+            "error": errored,
+            "skipped_cache_hit": skipped_cache,
+            "budget_hit": budget_hit,
+        },
+        "performance": {
+            "wall_clock_s": round(wall, 1),
+            "p50_fetch_ms": p50,
+            "p95_fetch_ms": p95,
+        },
+        "coverage": {
+            "total_listings_in_scope": sum(b["in_scope"] for b in by_source.values()),
+            "with_hires": sum(b["with_hires"] for b in by_source.values()),
+            "by_source": {
+                s: {
+                    "in_scope": b["in_scope"],
+                    "with_hires": b["with_hires"],
+                    "pct": _pct(b["with_hires"], b["in_scope"]),
+                }
+                for s, b in by_source.items()
+            },
+        },
+    }
+    try:
+        with metrics_path.open("a", encoding="utf-8") as mf:
+            mf.write(json.dumps(summary) + "\n")
+    except OSError as e:
+        print(f"[hires] WARN: failed to append metrics JSONL: {e}", file=sys.stderr)
+
+    print(f"[hires] done attempted={attempted} ok={ok} rejected_upscaled={rejected_upscaled} "
+          f"rejected_too_small={rejected_too_small} error={errored} skipped_cache_hit={skipped_cache} "
+          f"wall={wall:.1f}s budget_hit={budget_hit}", file=sys.stderr)
+
+    return summary
 
 
 def _prune_orphan_photos(photos_dir: Path, live_filenames: set) -> None:
@@ -1281,6 +1634,12 @@ def main() -> int:
           f"elapsed={photo_results['elapsed_s']:.1f}s "
           f"hero_eligible={photo_results.get('hero_eligible', 0)} "
           f"card_eligible={photo_results.get('card_eligible', 0)}")
+    # Plan v2 — parallel hi-res pipeline. Runs immediately after the
+    # existing hero step with its own time budget. Gated on
+    # PULPO_HIRES_ENABLED=1 (default off); when disabled, no-ops in
+    # microseconds. Failures here are isolated to the hires layer and
+    # never break the rest of the nightly.
+    _download_hires_photos(ranked_pre, REPO)
     ranked = ranked_pre
 
     # IA-axis derives — master_category × subcategory + discovery_tags

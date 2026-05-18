@@ -1,0 +1,9 @@
+# Hi-res derivative storage (plan v2)
+#
+# This directory holds <source>_<id>.hires.jpg files produced by the
+# new parallel pipeline at automation/_download_hires_photos. Sized
+# under a 1 GB CI canary; if growth becomes unmanageable see the
+# [hires-storage] backlog item in /TODOS.md.
+#
+# Files committed here are served as Vercel static assets, same as the
+# legacy web/photos/ directory.

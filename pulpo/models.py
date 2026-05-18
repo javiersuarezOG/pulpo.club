@@ -114,6 +114,17 @@ class Listing:
     #                 height≥600. Drives card rendering on every surface.
     hero_eligible: bool = False
     card_eligible: bool = False
+    # Source-side photo dimensions (in pixels) as observed when the hero
+    # derivative was generated. Set from the hero sidecar's width/height
+    # since `Image.thumbnail((1920, 1080))` only ever downsamples — so the
+    # hero file's dimensions equal the original source dimensions clamped
+    # to ≤1920×1080. Consumed by /api/social/listings to let downstream
+    # pipelines (pulpo-social, future email marketing, recommendation
+    # engine, etc.) reject listings whose source is too small for a given
+    # output channel BEFORE requesting the resize. None when no hero
+    # sidecar exists yet (pre-Phase-A3 backfill rows).
+    source_width: Optional[int] = None
+    source_height: Optional[int] = None
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker
