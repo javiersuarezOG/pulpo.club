@@ -143,7 +143,7 @@ function badgeForListing(listing, shelfKey) {
 // Real listings get a `<Photo>` + heart + computed badge + real
 // price/meta. Hardcoded cards keep their static layout.
 
-function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
+function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank }) {
   const isReal = !!listing;
   const id = isReal ? listing.id : (card?.id || `placeholder-${shelfKey}-${position}`);
 
@@ -181,7 +181,12 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
 
   // Real-listing rendering path
   if (isReal && heroV4) {
-    const badge = badgeForListing(listing, shelfKey);
+    // Rank chip subsumes the grade-letter "A+ / A / B+ deal" badge on
+    // the top_10 shelf — the explicit #1..#10 number is a stronger,
+    // less duplicative signal than the grade. Other shelves keep their
+    // contextual badge alongside the rank chip (rank top-left, kind
+    // badge stacked beneath via CSS).
+    const badge = shelfKey === "top_10" ? null : badgeForListing(listing, shelfKey);
     return (
       <article className="hp-shelf-card hp-shelf-card-real" onClick={onClick}>
         <div className="hp-shelf-card-art">
@@ -193,6 +198,11 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
             eager={eager}
             source="home_shelf"
           />
+          {rank != null && (
+            <span className="hp-shelf-card-rank" aria-label={`Rank ${rank}`}>
+              #{rank}
+            </span>
+          )}
           {badge && (
             <span className={`hp-shelf-card-badge hp-shelf-card-badge-${badge.side} hp-shelf-card-badge-${badge.kind}`}>
               {badge.text}
@@ -384,6 +394,7 @@ export function HomeShelf({
                 <ShelfCard
                   listing={item}
                   position={i + 1}
+                  rank={i + 1}
                   shelfKey={shelfKey}
                   app={app}
                   heroV4={heroV4}
