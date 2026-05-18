@@ -476,6 +476,14 @@ test.describe("New app boots cleanly on key routes", () => {
       "View all",                                     // shelf "View all" links
       "Sign in",                                      // header "Sign in" link
       "How it works", "Pricing",                      // header nav
+      // FreeMonthModal — would be visible on ES if a click opens it
+      // before the i18n keys land. Catches a regression where the
+      // modal's copy gets hardcoded EN by accident.
+      "Property in El Salvador",                      // free_month_modal.headline
+      "Pulpo curates properties",                     // free_month_modal.body opener
+      "Weekly 10 picks",                              // free_month_modal.bullet.1
+      "Direct seller links",                          // free_month_modal.bullet.3
+      "Maybe later",                                  // free_month_modal.cta_dismiss
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would

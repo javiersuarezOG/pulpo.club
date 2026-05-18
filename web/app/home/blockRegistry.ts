@@ -1,17 +1,13 @@
 // Wave-4: home-page block registry. Single source of truth for which
 // homepage sections render for each user tier.
 //
-// Authoring order = render order. Adding a block: add a row + map the
-// id to a Component in NewHomePage.jsx's lookup table.
+// Authoring order in the VISIBILITY matrix = render order. Adding a
+// block: append a row to the matrix + map the id to a Component in
+// NewHomePage.jsx's lookup table.
 //
-// Why a registry rather than inline conditionals: when Wave-4 ships,
-// paid users see ~half the blocks. Wave-5 may add or reorder blocks.
-// Touching one file rather than chasing if-tier-then-render branches
-// across NewHomePage keeps the surface tractable.
-//
-// Wave-4 semantics: anon + free see every block (today's behavior).
-// Paid users skip upsell-oriented blocks (hero CTAs, featured deal,
-// USP pitch). They get straight to the catalog carousels.
+// Why a registry rather than inline conditionals: paid users see
+// ~half the blocks; adding/reordering blocks should touch one file
+// rather than chasing if-tier-then-render branches across NewHomePage.
 
 import { tierFor, type GatingUser, type Tier } from "../lib/gating";
 
@@ -28,25 +24,35 @@ export type BlockId =
   | "price_drops"
   | "new_this_week";
 
-export type BlockEntry = {
-  id: BlockId;
-  // Tiers that see this block. A block hidden from a tier doesn't
-  // mount at all — no DOM, no telemetry, no chance of an inadvertent
-  // upsell click.
-  visibleFor: readonly Tier[];
+// ╭───────────────────────────────────────────────────────────────────╮
+// │ HOME PAGE BLOCK VISIBILITY MATRIX                                  │
+// │                                                                    │
+// │ Edit a cell to change who sees what. No other code needs to        │
+// │ change. Each row = a block. Each column = a user tier.             │
+// │                                                                    │
+// │ Authoring order = render order — drag a row to reorder visually.   │
+// ╰───────────────────────────────────────────────────────────────────╯
+const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
+  // block          anon    free    pro     agency
+  hero:          { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
+  featured:      { anonymous: true,  free: true,  pro: false, agency: false },
+  usps:          { anonymous: true,  free: true,  pro: false, agency: false },
+  shoreline:     { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
+  top_10:        { anonymous: true,  free: true,  pro: true,  agency: true  },
+  price_drops:   { anonymous: true,  free: true,  pro: true,  agency: true  },
+  new_this_week: { anonymous: true,  free: true,  pro: true,  agency: true  },
 };
 
-const ALL_TIERS: readonly Tier[] = ["anonymous", "free", "pro", "agency"];
-const NON_PAID: readonly Tier[] = ["anonymous", "free"];
-
-export const HOME_BLOCKS: readonly BlockEntry[] = [
-  { id: "hero",          visibleFor: NON_PAID  }, // upsell-oriented
-  { id: "featured",      visibleFor: NON_PAID  }, // upsell-oriented
-  { id: "usps",          visibleFor: NON_PAID  }, // upsell-oriented
-  { id: "shoreline",     visibleFor: ALL_TIERS },
-  { id: "top_10",        visibleFor: ALL_TIERS },
-  { id: "price_drops",   visibleFor: ALL_TIERS },
-  { id: "new_this_week", visibleFor: ALL_TIERS },
+// Render order — authoring order in the matrix is the rendered order.
+// Keep this in sync with VISIBILITY's key order.
+const BLOCK_ORDER: readonly BlockId[] = [
+  "hero",
+  "featured",
+  "usps",
+  "shoreline",
+  "top_10",
+  "price_drops",
+  "new_this_week",
 ];
 
 // Flag map controlling the registry's filter behavior. Each wave adds
@@ -64,28 +70,53 @@ export type RegistryFlags = {
   hero_v4: boolean;
 };
 
+// Per-block dev override. When set, forces a block on or off for the
+// current user regardless of tier/flag rules. Persisted in
+// localStorage by the dev tweaks panel (see tweaks-panel.jsx).
+// Production traffic never sees overrides — they're a dev preview tool.
+export type BlockOverride = "auto" | "force_show" | "force_hide";
+
+export function readBlockOverrides(): Partial<Record<BlockId, BlockOverride>> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem("pulpo-block-overrides");
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as Partial<Record<BlockId, BlockOverride>>;
+  } catch {
+    return {};
+  }
+}
+
 // Resolve the rendered block list for the current user.
 //
-// The flag map governs which filters apply. When every flag is off the
-// returned list is HOME_BLOCKS in author order — byte-for-byte
-// equivalent to pre-Wave-4 behavior. Filters compose:
-//   * paid_home_variant_v1 → paid users see only ALL_TIERS blocks
-//   * usp_popup_v1         → `usps` is excluded for every tier
-//   * hero_v4              → `featured` is excluded (absorbed into hero)
+// The flag map governs which filters apply. When `paid_home_variant_v1`
+// is off, every tier sees every block (legacy behavior). When on, the
+// VISIBILITY matrix governs. The other flags layer additional cuts:
+//   * usp_popup_v1 → `usps` is excluded for every tier
+//   * hero_v4      → `featured` is excluded (absorbed into hero)
+// Per-block localStorage overrides win above everything (dev preview).
 export function visibleBlocksFor(
   user: GatingUser,
   flags: RegistryFlags,
 ): readonly BlockId[] {
-  let blocks: readonly BlockEntry[] = HOME_BLOCKS;
-  if (flags.paid_home_variant_v1) {
-    const tier = tierFor(user);
-    blocks = blocks.filter((b) => b.visibleFor.includes(tier));
-  }
-  if (flags.usp_popup_v1) {
-    blocks = blocks.filter((b) => b.id !== "usps");
-  }
-  if (flags.hero_v4) {
-    blocks = blocks.filter((b) => b.id !== "featured");
-  }
-  return blocks.map((b) => b.id);
+  const tier = tierFor(user);
+  const overrides = readBlockOverrides();
+
+  return BLOCK_ORDER.filter((blockId) => {
+    const override = overrides[blockId];
+    if (override === "force_show") return true;
+    if (override === "force_hide") return false;
+
+    // Tier visibility. When the paid-home flag is off, every block is
+    // visible to every tier — matches pre-Wave-4 behavior.
+    if (flags.paid_home_variant_v1) {
+      if (!VISIBILITY[blockId][tier]) return false;
+    }
+    // Wave 5 flag-driven exclusions, applied after tier filtering.
+    if (flags.usp_popup_v1 && blockId === "usps") return false;
+    if (flags.hero_v4 && blockId === "featured") return false;
+    return true;
+  });
 }

@@ -44,13 +44,43 @@ export function priceForCountry(cc: string | null | undefined): PriceDisplay {
 // Convenience: fetch /api/geo (Vercel-edge-derived) and resolve to the
 // display price. Falls back to USD on any error so the hero always renders
 // a price, even if the geo endpoint is down or the request is offline.
+//
+// Module-level cache: a single anon session can ask for the price from
+// 5+ surfaces (hero microcopy, USP h2, FreeMonthModal, ProUpsellModal,
+// /start). Without a cache that's 5 round-trips. We cache the resolved
+// PriceDisplay after the first successful call, and dedupe concurrent
+// in-flight requests so multiple components mounting on the same frame
+// share one fetch.
+let cachedPrice: PriceDisplay | null = null;
+let inFlight: Promise<PriceDisplay> | null = null;
+
 export async function fetchPriceForCurrentGeo(): Promise<PriceDisplay> {
-  try {
-    const res = await fetch("/api/geo", { credentials: "omit" });
-    if (!res.ok) return PRICES[DEFAULT_CURRENCY];
-    const data = (await res.json()) as { country?: string | null; currency?: string };
-    return priceForCountry(data && data.country ? data.country : null);
-  } catch {
-    return PRICES[DEFAULT_CURRENCY];
-  }
+  if (cachedPrice) return cachedPrice;
+  if (inFlight) return inFlight;
+  inFlight = (async () => {
+    try {
+      const res = await fetch("/api/geo", { credentials: "omit" });
+      if (!res.ok) {
+        // Don't cache on failure — let the next call retry. The caller
+        // already has a USD fallback rendered, so retry is cheap.
+        return PRICES[DEFAULT_CURRENCY];
+      }
+      const data = (await res.json()) as { country?: string | null; currency?: string };
+      const resolved = priceForCountry(data && data.country ? data.country : null);
+      cachedPrice = resolved;
+      return resolved;
+    } catch {
+      return PRICES[DEFAULT_CURRENCY];
+    } finally {
+      inFlight = null;
+    }
+  })();
+  return inFlight;
+}
+
+// Test-only escape hatch — clears the cache so unit tests don't bleed
+// state across cases. Not used in production code.
+export function _resetGeoPriceCacheForTests(): void {
+  cachedPrice = null;
+  inFlight = null;
 }

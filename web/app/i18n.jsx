@@ -284,8 +284,8 @@ const UI_STRINGS = {
                                    es: "Prueba un mes gratis" },
   "home.hero.cta_secondary":     { en: "See this week's top 10",
                                    es: "Ver el top 10 de la semana" },
-  "home.hero.microcopy":         { en: "$5/month after · cancel anytime",
-                                   es: "$5/mes luego · cancela cuando quieras" },
+  "home.hero.microcopy":         { en: "{price}/month after · cancel anytime",
+                                   es: "{price}/mes luego · cancela cuando quieras" },
   // Live counter card (top-right, hides <768px).
   // Wave 5#7+#9 (hero_v4 flag) — white photo-led hero. Reuses
   // home.hero.h1.before / h1.italic / cta_primary / microcopy /
@@ -359,8 +359,8 @@ const UI_STRINGS = {
 
   "home.usp.eyebrow":            { en: "FOR SUBSCRIBERS ONLY",
                                    es: "SOLO PARA SUSCRIPTORES" },
-  "home.usp.h2":                 { en: "What your $5 a month buys you.",
-                                   es: "Lo que te trae $5 al mes." },
+  "home.usp.h2":                 { en: "What your {price} a month buys you.",
+                                   es: "Lo que te trae {price} al mes." },
   "home.usp.card1.title":        { en: "10 best deals,\never 2 weeks",
                                    es: "10 mejores tratos,\ncada 2 semanas" },
   "home.usp.card1.body":         { en: "Matched to your location, budget, and size. Delivered to your inbox.",
@@ -1100,6 +1100,43 @@ const UI_STRINGS = {
                                       es: "Por qué Pulpo Pro" },
   "usp_popup.aria.close":           { en: "Close",
                                       es: "Cerrar" },
+
+  // Free-month conversion modal. Opens from hero CTA, USP section,
+  // and listing-card clicks for anon + free users (paid users skip).
+  // Replaces the previous "redirect to /start?intent=upgrade" page
+  // jump with an in-page modal that POSTs to /api/stripe/start-checkout.
+  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                          es: "Propiedades en El Salvador, antes que el resto del internet las vea." },
+  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                          es: "Pulpo cura propiedades en El Salvador — terrenos, casas, comercial — antes de que lleguen a los grandes portales. Un boletín semanal. Sin ruido." },
+  "free_month_modal.bullet.1":         { en: "Weekly 10 picks in your inbox",
+                                          es: "10 propiedades cada semana en tu correo" },
+  "free_month_modal.bullet.2":         { en: "Filters + smart sorting",
+                                          es: "Filtros y ordenamiento inteligente" },
+  "free_month_modal.bullet.3":         { en: "Direct seller links",
+                                          es: "Enlaces directos al vendedor" },
+  "free_month_modal.cta_primary":      { en: "Try a free month — {price}/month after",
+                                          es: "Prueba un mes gratis — {price}/mes después" },
+  "free_month_modal.cta_primary_submitting": { en: "Opening checkout…",
+                                          es: "Abriendo checkout…" },
+  "free_month_modal.cta_dismiss":      { en: "Maybe later",
+                                          es: "Quizás más tarde" },
+  "free_month_modal.aria.dialog":      { en: "Try a free month",
+                                          es: "Prueba un mes gratis" },
+  "free_month_modal.aria.close":       { en: "Close",
+                                          es: "Cerrar" },
+  "free_month_modal.error":            { en: "Couldn't open checkout. Try again.",
+                                          es: "No se pudo abrir el checkout. Inténtalo de nuevo." },
+  "free_month_modal.code_applied_note":{ en: "✓ Discount applied at checkout",
+                                          es: "✓ Descuento aplicado al pagar" },
+
+  // Trimmed footer (home + browse).
+  "footer.fine_print":                 { en: "© {year} Pulpo",
+                                          es: "© {year} Pulpo" },
+  "footer.link.terms":                 { en: "Terms",
+                                          es: "Términos" },
+  "footer.link.privacy":               { en: "Privacy",
+                                          es: "Privacidad" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

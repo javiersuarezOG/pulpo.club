@@ -49,6 +49,8 @@ import {
 } from "./heroLeaderboard";
 import { readLiveCounterCache, writeLiveCounterCache } from "../lib/live-counter-cache";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { tierFor } from "../lib/gating";
+import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 import { readFeatureFlag } from "../lib/feature-flag";
 
 // ───── helpers ─────────────────────────────────────────────────────
@@ -155,6 +157,19 @@ export function HeroV2({ app, locale }) {
   const pausedRef = useRef(false);
   const heroRef = useRef(null);
 
+  // Paid users skip the CTA + microcopy entirely (image-only hero).
+  const tier = tierFor(app?.user);
+  const isPaid = tier === "pro" || tier === "agency";
+
+  // Geo-derived display price for the microcopy. Synchronous fallback
+  // (USD) renders first; refines via the cached /api/geo lookup.
+  const [price, setPrice] = useState(() => priceForCountry(null));
+  useEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
+
   // ── CTA handlers (preserved telemetry: homepage.cta_clicked) ─────
 
   const onPrimaryCta = useCallback(() => {
@@ -175,7 +190,7 @@ export function HeroV2({ app, locale }) {
     const branch = routeCtaForState("hero_primary", app?.user);
     trackCtaRouted("hero_primary", app?.user, branch, true);
     if (branch === "passthrough") return; // paid user → no-op; Wave 4 hides the CTA entirely
-    void dispatchCentralBranch(branch, app);
+    void dispatchCentralBranch(branch, app, { trigger: "hero_cta" });
   }, [app, locale]);
 
   const onSecondaryCta = useCallback(() => {
@@ -219,7 +234,7 @@ export function HeroV2({ app, locale }) {
       }
       return;
     }
-    void dispatchCentralBranch(branch, app);
+    void dispatchCentralBranch(branch, app, { trigger: "hero_just_in" });
   }, [pill, app]);
 
   // ── Live counter fetch (real numbers from /data/last_updated.json) ─
@@ -498,16 +513,22 @@ export function HeroV2({ app, locale }) {
               <p className="hp-hero-subhead">{t("home.hero.subhead", locale)}</p>
 
               <div className="hp-hero-ctas">
-                <button type="button" className="hp-cta hp-hero-cta-primary hp-cta-block" onClick={onPrimaryCta}>
-                  <span>{t("home.hero.cta_primary", locale)}</span>
-                  <IconArrowRight size={15} />
-                </button>
+                {!isPaid && (
+                  <button type="button" className="hp-cta hp-hero-cta-primary hp-cta-block" onClick={onPrimaryCta}>
+                    <span>{t("home.hero.cta_primary", locale)}</span>
+                    <IconArrowRight size={15} />
+                  </button>
+                )}
                 <button type="button" className="hp-cta hp-hero-cta-secondary hp-cta-block" onClick={onSecondaryCta}>
                   <span>{t("home.hero.cta_secondary", locale)}</span>
                 </button>
               </div>
 
-              <p className="hp-hero-microcopy">{t("home.hero.microcopy", locale)}</p>
+              {!isPaid && (
+                <p className="hp-hero-microcopy">
+                  {t("home.hero.microcopy", locale, { price: price.displayString })}
+                </p>
+              )}
             </div>
 
             {/* Tilted newsletter preview wrap. Visual is aria-hidden;

@@ -98,7 +98,7 @@ function ShelfCard({ card, position, shelfKey, app }) {
     const branch = routeCtaForState("shelf_card", app?.user);
     trackCtaRouted("shelf_card", app?.user, branch, true);
     if (branch === "passthrough") return; // placeholder cards: no destination yet
-    void dispatchCentralBranch(branch, app);
+    void dispatchCentralBranch(branch, app, { trigger: "shelf_card" });
   }, [shelfKey, position, card.id, app]);
 
   const imgSrc = card.image ? getCategoryImage(card.image) : null;

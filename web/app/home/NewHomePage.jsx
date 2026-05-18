@@ -54,7 +54,7 @@ const BLOCK_COMPONENTS = {
     heroV4 ? <HeroV4 app={app} locale={locale} /> : <HeroV2 app={app} locale={locale} />
   ),
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
-  usps:          ({ locale })      => <USPBand locale={locale} />,
+  usps:          ({ app, locale }) => <USPBand app={app} locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
   top_10:        ({ app, locale }) => <TopTenShelf app={app} locale={locale} />,
   price_drops:   ({ app, locale }) => <PriceDropsShelf app={app} locale={locale} />,
