@@ -6236,119 +6236,87 @@ h1,h2,h3,h4,h5 { margin: 0; }
   left: 10px;
 }
 
-/* ────── Pulpo Ranked badge — best-deal mark ──────
-   Editorial two-line badge that combines the brand's signature
-   elements:
-     • the ★ + small-caps eyebrow language ("★ Ranked by value")
-     • the Instrument Serif italic treatment used on "ranked." in the
-       hero H1
-     • the forest-deep / cream / clay palette
-   Used on Home shelves (position in shelf) and on Browse/Saved cards
-   for listings in the global Top-10 by rank_score. */
+/* ────── Pulpo rank mark — best-deal pill ──────
+   Small white pill, hairline border, clay ★ + forest-deep numeral.
+   Mirrors the v4 design language used on shoreline cards and shelf
+   pills (white bg + soft border + 999px radius). Restrained, legible
+   on any photo. Used on Home shelves (position in shelf) and on
+   Browse/Saved cards (global Top-10 by rank_score). */
 
-.pulpo-rank-badge {
-  position: absolute;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
+.pulpo-rank {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 1px;
-  padding: 5px 10px 6px;
-  border-radius: 8px;
-  background: var(--color-forest-deep);
-  color: var(--color-button-text);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.22);
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-white);
+  border: 0.5px solid var(--color-line-soft);
+  box-shadow: var(--shadow-1);
   line-height: 1;
-  /* Clay underline below the number echoes the hero's brush stroke
-     under "ranked." — keeps the badge feeling brand-original instead
-     of a generic numbered pill. */
-  border-bottom: 2px solid var(--color-clay-mid);
-}
-
-.pulpo-rank-badge-eyebrow {
-  font-family: var(--font-sans);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--color-clay-mid);
-  text-transform: uppercase;
   white-space: nowrap;
-}
-
-.pulpo-rank-badge-num {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  color: var(--color-button-text);
   font-variant-numeric: tabular-nums;
 }
 
-.hp-shelf-card-rank.pulpo-rank-badge {
+.pulpo-rank-star {
+  color: var(--color-clay-primary);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.pulpo-rank-num {
+  color: var(--color-forest-deep);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Photo-anchored variants — shelves + listing cards. */
+.hp-shelf-card-rank.pulpo-rank {
+  position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 3;
 }
-
-/* Push the kind badge below the Pulpo Ranked badge so the two stack
-   rather than overlap (price_drops + new_this_week shelves). */
-.app.hero-v4 .hp-shelf-card-real .pulpo-rank-badge ~ .hp-shelf-card-badge {
-  top: 62px;
-}
-
-.listing-card-rank.pulpo-rank-badge {
+.listing-card-rank.pulpo-rank {
+  position: absolute;
   top: 12px;
   left: 12px;
+  z-index: 3;
 }
 
-/* Push the existing pulpo-badge row below the Pulpo Ranked badge. */
-.pulpo-rank-badge ~ .card-badge-row {
-  top: 66px;
+/* Push the existing kind badge / pulpo-badge row below the rank pill
+   so the two stack with breathing room rather than overlap. */
+.app.hero-v4 .hp-shelf-card-real .pulpo-rank ~ .hp-shelf-card-badge {
+  top: 42px;
+}
+.pulpo-rank ~ .card-badge-row {
+  top: 46px;
 }
 
-/* Inline mark in the Results table title cell — same brand language,
-   single-line so it fits a table row. */
+/* Inline variant for the Results table title cell — same pill, sits
+   in a table row without absolute positioning. */
 .pulpo-rank-inline {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
   margin-right: 8px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: var(--color-forest-deep);
-  color: var(--color-button-text);
   vertical-align: middle;
-  line-height: 1.2;
-}
-.pulpo-rank-inline-star {
-  font-size: 10px;
-  color: var(--color-clay-mid);
-}
-.pulpo-rank-inline-num {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 480px) {
-  .pulpo-rank-badge {
-    padding: 4px 8px 5px;
-    gap: 0;
+  .pulpo-rank {
+    padding: 3px 9px;
+    gap: 3px;
   }
-  .pulpo-rank-badge-eyebrow {
-    font-size: 7px;
-    letter-spacing: 0.12em;
+  .pulpo-rank-star {
+    font-size: 9px;
   }
-  .pulpo-rank-badge-num {
-    font-size: 15px;
+  .pulpo-rank-num {
+    font-size: 12px;
   }
-  .app.hero-v4 .hp-shelf-card-real .pulpo-rank-badge ~ .hp-shelf-card-badge {
-    top: 56px;
+  .app.hero-v4 .hp-shelf-card-real .pulpo-rank ~ .hp-shelf-card-badge {
+    top: 38px;
   }
-  .pulpo-rank-badge ~ .card-badge-row {
-    top: 60px;
+  .pulpo-rank ~ .card-badge-row {
+    top: 42px;
   }
 }
 
