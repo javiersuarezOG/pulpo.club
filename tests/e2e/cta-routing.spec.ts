@@ -1,10 +1,12 @@
-// Wave-1 CTA routing — end-to-end smoke for the three user states.
-// Covers the bleeding-bug fixes:
-//   * Paid user no longer gets a signup modal from the hero CTA.
-//   * Free user lands on /plans (the per-CTA paywall surface) instead
-//     of a signup modal on a Pro-gated click.
-//   * Anonymous user routes to /start (the email-collect Stripe entry)
-//     instead of a signup-modal intermediary.
+// CTA routing — end-to-end smoke for the three user states.
+//
+// Post-#262 contract:
+//   * Paid user: hero CTA passthrough → no-op (no modal). Unchanged.
+//   * Anon + free: hero / header / featured / shelf / favorites CTAs
+//     all route to `free_month_modal` → FreeMonthModal opens in-page
+//     (no /start or /plans navigation).
+//   * Wave-1 rollback path (ff_cta_routing_v2=0) still falls back to
+//     app.openSignup() for anon, unchanged.
 //
 // Mechanism: `?posthog_capture=1` pushes every track() call to
 // window.__pulpoEvents__ so the spec can assert which branch fired
@@ -35,16 +37,9 @@ function findCtaRouted(events: CapturedEvent[], ctaId: string) {
   );
 }
 
-test.describe("CTA routing (Wave 1) — hero primary CTA branches per user state", () => {
-  test("anonymous user → cta_routed branch is stripe_checkout (routes to /start)", async ({ page, context }) => {
+test.describe("CTA routing — hero primary CTA branches per user state", () => {
+  test("anonymous user → cta_routed branch=free_month_modal; FreeMonthModal opens", async ({ page }) => {
     const errors = attachErrorRecorder(page);
-
-    // Intercept the /start redirect so we don't navigate away mid-test;
-    // the event we care about has already fired by the time
-    // location.assign is called.
-    await context.route("**/start**", (route) => {
-      void route.fulfill({ status: 204, body: "" });
-    });
 
     await page.goto(URL_HOME, { waitUntil: "networkidle" });
 
@@ -56,13 +51,18 @@ test.describe("CTA routing (Wave 1) — hero primary CTA branches per user state
     const ev = findCtaRouted(await getEvents(page), "hero_primary");
     expect(ev, "cta_routed should fire on hero primary click").toBeTruthy();
     expect(ev!.props.user_state).toBe("anonymous");
-    expect(ev!.props.branch).toBe("stripe_checkout");
+    expect(ev!.props.branch).toBe("free_month_modal");
     expect(ev!.props.flag_enabled).toBe(true);
+
+    // The post-#262 contract: clicking the hero CTA opens the in-page
+    // FreeMonthModal instead of navigating to /start. URL stays on /.
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
+    expect(new URL(page.url()).pathname).toBe("/");
 
     expect(errors).toEqual([]);
   });
 
-  test("free user → cta_routed branch is paywall (lands on /plans)", async ({ page }) => {
+  test("free user → cta_routed branch=free_month_modal; FreeMonthModal opens (no /plans nav)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedUser(page, "free");
 
@@ -74,14 +74,15 @@ test.describe("CTA routing (Wave 1) — hero primary CTA branches per user state
 
     await expect.poll(
       async () => (findCtaRouted(await getEvents(page), "hero_primary") || {}).props?.branch,
-      { timeout: 3_000, message: "expected cta_routed branch=paywall for free user" },
-    ).toBe("paywall");
+      { timeout: 3_000, message: "expected cta_routed branch=free_month_modal for free user" },
+    ).toBe("free_month_modal");
 
     const ev = findCtaRouted(await getEvents(page), "hero_primary")!;
     expect(ev.props.user_state).toBe("free");
 
-    // Free user should land on /plans (the central paywall dispatch).
-    await page.waitForURL(/\/plans/, { timeout: 3_000 });
+    // Post-#262: free users get the modal too (no /plans navigation).
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
+    expect(new URL(page.url()).pathname).toBe("/");
 
     expect(errors).toEqual([]);
   });
