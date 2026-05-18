@@ -17,7 +17,7 @@ test.describe("/account/notifications — preferred categories", () => {
     const errors = attachErrorRecorder(page);
     await page.goto("/account/notifications", { waitUntil: "networkidle" });
 
-    const grid = page.locator(".notif-categories-grid");
+    const grid = page.locator('[data-chip-group="preferred-categories"]');
     await grid.waitFor({ state: "visible", timeout: 10_000 });
 
     // Exactly six chips render (matches PREFERENCE_CATEGORY_KEYS length).
@@ -73,13 +73,13 @@ test.describe("/account/notifications — preferred categories", () => {
       }
     });
     await page.goto("/account/notifications", { waitUntil: "networkidle" });
-    await page.locator(".notif-categories-grid").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     await page.locator('[data-category-key="beachfront"]').click();
     await page.locator('[data-category-key="under_100k"]').click();
 
     await page.reload({ waitUntil: "networkidle" });
-    await page.locator(".notif-categories-grid").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     await expect(page.locator('[data-category-key="beachfront"]')).toHaveAttribute("aria-checked", "true");
     await expect(page.locator('[data-category-key="under_100k"]')).toHaveAttribute("aria-checked", "true");
@@ -90,7 +90,7 @@ test.describe("/account/notifications — preferred categories", () => {
   test("toggling newsletter off hides the chip group entirely", async ({ page }) => {
     await seedProUser(page);
     await page.goto("/account/notifications", { waitUntil: "networkidle" });
-    await page.locator(".notif-categories-grid").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     // The newsletter toggle is a role="switch" with aria-label set to
     // the newsletter title — flip it.
@@ -99,7 +99,7 @@ test.describe("/account/notifications — preferred categories", () => {
       .first();
     await newsletterToggle.click();
 
-    await expect(page.locator(".notif-categories-grid")).toHaveCount(0);
+    await expect(page.locator('[data-chip-group="preferred-categories"]')).toHaveCount(0);
   });
 
   test("ES locale: chips render Spanish copy; English canaries absent", async ({ page }) => {
@@ -108,9 +108,9 @@ test.describe("/account/notifications — preferred categories", () => {
       try { localStorage.setItem("pulpo-locale", "es"); } catch {}
     });
     await page.goto("/account/notifications", { waitUntil: "networkidle" });
-    await page.locator(".notif-categories-grid").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
-    const gridText = (await page.locator(".notif-categories-grid").innerText()).toLowerCase();
+    const gridText = (await page.locator('[data-chip-group="preferred-categories"]').innerText()).toLowerCase();
     // Spanish copy present.
     expect(gridText).toContain("nuevos");
     expect(gridText).toContain("bajadas de precio");

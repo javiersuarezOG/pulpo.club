@@ -515,6 +515,7 @@ function PreferredCategoryChips({ app }) {
         {t("account.notif.pref_cat.intro", app.locale)}
       </p>
       <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="preferred-categories"
            aria-label={t("account.notif.pref_cat.heading", app.locale)}>
         {PREFERENCE_CATEGORY_KEYS.map((key) => {
           const isSelected = selected.includes(key);
@@ -633,6 +634,7 @@ function NewsletterFilterChips({ app }) {
         {t("account.notif.newsletter_filter.departments", app.locale)}
       </div>
       <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-departments"
            aria-label={t("account.notif.newsletter_filter.departments", app.locale)}>
         {NEWSLETTER_DEPARTMENT_KEYS.map((d) => {
           const isSelected = selectedDepts.includes(d);
@@ -655,6 +657,7 @@ function NewsletterFilterChips({ app }) {
         {t("account.notif.newsletter_filter.property_types", app.locale)}
       </div>
       <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-property-types"
            aria-label={t("account.notif.newsletter_filter.property_types", app.locale)}>
         {NEWSLETTER_PROPERTY_TYPES.map((typ) => {
           const isSelected = selectedTypes.includes(typ);
@@ -677,6 +680,7 @@ function NewsletterFilterChips({ app }) {
         {t("account.notif.newsletter_filter.price_band", app.locale)}
       </div>
       <div className="chip-grid notif-categories-grid" role="group"
+           data-chip-group="newsletter-price-band"
            aria-label={t("account.notif.newsletter_filter.price_band", app.locale)}>
         {NEWSLETTER_PRICE_BANDS.map((b) => {
           const isSelected = selectedMax === b.max;
