@@ -7,8 +7,9 @@ preferences all live here so the template stays simple.
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Any, Optional
 
 from . import commentary as commentary_mod
 from . import i18n
@@ -16,6 +17,7 @@ from .segments import select_picks
 from .store import excluded_source_ids_for, last_send_at_for
 from .types import (
     Cohort,
+    Commentary,
     Issue,
     IssuePick,
     Locale,
@@ -26,6 +28,91 @@ from .types import (
 ISSUE_DEFAULT_TOP_N = 10
 ISSUE_TOP_PICKS_RICH = 2   # picks rendered with a full hero image + callouts
 DEFAULT_WINDOW_DAYS = 14
+
+LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
+
+
+def _telemetry_capture(event: str, props: dict) -> None:
+    """Fire a PostHog event if telemetry is wired. Never raises."""
+    try:
+        from automation import posthog_client  # type: ignore
+    except Exception:                              # noqa: BLE001
+        return
+    try:
+        posthog_client.capture(event, props)
+    except Exception:                              # noqa: BLE001
+        pass
+
+
+def _llm_or_deterministic_commentary(
+    *,
+    cohort: str,
+    locale: Locale,
+    pref: Preference,
+    display_name: Optional[str],
+    n_scanned: int,
+    picks: list[dict],
+    skip_pick: Optional[dict],
+    recipient_hash: str,
+    issue_id: str,
+    llm_client_override: Any = None,
+) -> Commentary:
+    """Decide LLM vs deterministic + fire the matching telemetry event.
+
+    Deterministic is the safe fallback for every error path the LLM module
+    can return through `LlmResult.error` (no_token, no_package, bad_json,
+    schema_miss, finish_reason_length, exception). Cost is non-zero only
+    when the LLM successfully responded — telemetry records the cost either
+    way so we can audit any unexpected billing.
+    """
+    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
+    fallback = commentary_mod.deterministic_commentary(
+        cohort=cohort,
+        locale=locale,
+        pref=pref,
+        display_name=display_name,
+        n_scanned=n_scanned,
+        picks=picks,
+        skip_pick=skip_pick,
+    )
+
+    if not use_llm and llm_client_override is None:
+        _telemetry_capture("newsletter.commentary_generated", {
+            "issue_id": issue_id,
+            "recipient_hash": recipient_hash,
+            "cohort": cohort,
+            "locale": locale,
+            "source": "deterministic",
+        })
+        return fallback
+
+    # Local import so the deterministic-only test suite doesn't have to
+    # import the LLM module (which would still work — no top-level side
+    # effects — but the symmetry is nicer).
+    from . import llm_commentary as llm_mod
+    result = llm_mod.llm_commentary(
+        cohort=cohort,
+        locale=locale,
+        pref=pref,
+        display_name=display_name,
+        n_scanned=n_scanned,
+        picks=picks,
+        skip_pick=skip_pick,
+        client_override=llm_client_override,
+    )
+    _telemetry_capture("newsletter.commentary_generated", {
+        "issue_id": issue_id,
+        "recipient_hash": recipient_hash,
+        "cohort": cohort,
+        "locale": locale,
+        "source": "llm" if result.commentary else "deterministic_fallback",
+        "llm_error": result.error,
+        "tokens_in": result.tokens_in,
+        "tokens_out": result.tokens_out,
+        "cost_usd": result.cost_usd,
+        "latency_ms": result.latency_ms,
+    })
+    return result.commentary or fallback
 
 
 def detect_cohort(recipient: Recipient) -> Cohort:
@@ -253,6 +340,7 @@ def build_issue(
     issue_date: Optional[datetime] = None,
     history_rows: Optional[list] = None,
     site_root: str = "https://pulpo.club",
+    llm_client_override: Any = None,
 ) -> Issue:
     """Compose a personalised Issue ready for render_html.
 
@@ -339,7 +427,8 @@ def build_issue(
             "muted": True,
         })
 
-    commentary = commentary_mod.deterministic_commentary(
+    issue_id = issue_date.strftime("%Y-%m-%d")
+    commentary = _llm_or_deterministic_commentary(
         cohort=cohort,
         locale=locale,
         pref=effective_pref,
@@ -347,7 +436,23 @@ def build_issue(
         n_scanned=len(ranked_listings),
         picks=kept_listings,
         skip_pick=skip_pick_listing,
+        recipient_hash=recipient.email_hash,
+        issue_id=issue_id,
+        llm_client_override=llm_client_override,
     )
+
+    _telemetry_capture("newsletter.issue_built", {
+        "issue_id": issue_id,
+        "issue_number": issue_number,
+        "recipient_hash": recipient.email_hash,
+        "cohort": cohort,
+        "locale": locale,
+        "tier": recipient.tier,
+        "has_account": recipient.has_account,
+        "picks_total": len(kept_listings),
+        "has_skip": skip_pick_listing is not None,
+        "paywall_banner": paywall_all,
+    })
 
     # ── URLs ────────────────────────────────────────────────────────────
     settings_url = f"{site_root.rstrip('/')}/account?ref=newsletter_issue_{issue_number}"
@@ -364,7 +469,7 @@ def build_issue(
         )
 
     return Issue(
-        issue_id=issue_date.strftime("%Y-%m-%d"),
+        issue_id=issue_id,
         issue_number=issue_number,
         issue_date_human=issue_date.strftime("%-d %b %Y") if hasattr(issue_date, "strftime") else "",
         recipient=recipient,

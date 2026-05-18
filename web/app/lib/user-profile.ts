@@ -17,6 +17,33 @@
 
 import type { PreferenceCategoryKey } from "./categories";
 
+// Cadences the fortnightly newsletter knows how to schedule. The Python
+// build_issue module reads this same vocabulary off Clerk publicMetadata
+// (see automation/newsletter/build_issue.py) — keep the two in sync.
+export const NEWSLETTER_CADENCES = ["fortnight", "monthly", "off"] as const;
+export type NewsletterCadence = typeof NEWSLETTER_CADENCES[number];
+
+export const NEWSLETTER_LOCALES = ["en", "es"] as const;
+export type NewsletterLocale = typeof NEWSLETTER_LOCALES[number];
+
+export const NEWSLETTER_PROPERTY_TYPES = ["land", "house", "condo"] as const;
+export type NewsletterPropertyType = typeof NEWSLETTER_PROPERTY_TYPES[number];
+
+// Filter spec the cron applies to ranked.json to compute a recipient's
+// top-N. Every field is optional — missing keys default to "no opinion"
+// inside the Python segmenter (web/data/ranked.json is then sliced into
+// the broadest fallback cohort).
+export type NewsletterPreference = {
+  zones?: string[];                       // zone slugs from web/data/ranked.json
+  departments?: string[];                 // "La Libertad", "La Paz", …
+  property_types?: NewsletterPropertyType[];
+  max_price_usd?: number | null;
+  min_price_usd?: number | null;
+  categories?: PreferenceCategoryKey[];   // subset of categories.ts vocabulary
+  locale?: NewsletterLocale;              // overrides browser locale for the email
+  cadence?: NewsletterCadence;            // "off" pauses without unsubscribing
+};
+
 export type UserProfile = {
   // The categories the user wants prioritized — newsletter, future
   // Discover personalization, "alerts for new listings matching",
@@ -24,11 +51,11 @@ export type UserProfile = {
   // their unfiltered default.
   preferred_categories?: PreferenceCategoryKey[];
 
-  // Future fields (none in this PR — listed as anchors for the README;
-  // remove the comment once one of these actually ships):
-  //   budget_range?: { min: number; max: number; currency: "USD" };
-  //   preferred_zones?: string[];
-  //   notification_quiet_hours?: { start: string; end: string; tz: string };
+  // Newsletter-specific filter spec. Persisted to Clerk publicMetadata.profile.newsletter
+  // and read by the fortnightly cron (see api/clerk/update-profile.js for
+  // the matching server-side validator, and automation/newsletter/build_issue.py
+  // for the Python consumer).
+  newsletter?: NewsletterPreference;
 };
 
 // Safe accessor. Tolerates missing / malformed `profile` blobs (older
@@ -38,4 +65,15 @@ export function readProfile(user: { profile?: unknown } | null | undefined): Use
   const raw = (user as { profile?: unknown }).profile;
   if (!raw || typeof raw !== "object") return {};
   return raw as UserProfile;
+}
+
+// Narrowing accessor for the newsletter block specifically. Always returns
+// an object so callers can read with `.zones ?? []` without an extra guard.
+export function readNewsletterPreference(
+  user: { profile?: unknown } | null | undefined,
+): NewsletterPreference {
+  const profile = readProfile(user);
+  const raw = profile.newsletter;
+  if (!raw || typeof raw !== "object") return {};
+  return raw;
 }
