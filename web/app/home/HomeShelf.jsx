@@ -17,11 +17,11 @@
 // a shelf (small dataset / strict filter), the shelf falls back to
 // the hardcoded editorial cards so the surface never goes empty.
 
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
-import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed } from "../components.jsx";
+import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
@@ -86,7 +86,7 @@ function useShelfScrolled(shelfKey, listRef) {
 // ────────────────────────────────────────────────────────────────────
 // Real-listing pickers — Wave 5 polish
 
-const MIN_REAL_LISTINGS = 3;
+const MIN_REAL_LISTINGS = 5;
 
 // Top 10: rank_score-sorted, must have at least one photo.
 function pickTopRanked(listings, n) {
@@ -275,15 +275,60 @@ export function HomeShelf({
   useShelfScrolled(shelfKey, listRef);
 
   const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
-  // Mobile renders the list as a horizontal scroll-snap rail; desktop
-  // renders it as a wrapping grid (see CSS). The component just emits
-  // the items in source order either way.
   const items = useReal ? listings : cards;
+
+  // hero_v4: a shelf with too few real listings is hidden entirely rather
+  // than falling back to editorial cards — the user explicitly asked for
+  // shelves to disappear when there's not enough real data behind them.
+  const hideShelf = heroV4 && Array.isArray(listings) && listings.length < MIN_REAL_LISTINGS;
+
+  // Carousel state for the prev/next arrows (desktop ≥768px). Track
+  // whether we can scroll further in each direction so the arrows can
+  // disable cleanly at the endpoints.
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = listRef.current;
+    if (!el) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    const max = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(max > 4 && el.scrollLeft < max - 4);
+  }, []);
+
+  useEffect(() => {
+    if (!useReal || hideShelf) return;
+    const el = listRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, [useReal, hideShelf, items.length, updateArrows]);
+
+  const scrollByPage = useCallback((direction) => {
+    const el = listRef.current;
+    if (!el) return;
+    // Page = three card-slots forward so each click reveals a fresh
+    // batch while still keeping a half-card peek on the trailing edge.
+    const firstChild = el.firstElementChild;
+    const slot = firstChild ? firstChild.getBoundingClientRect().width + 20 : 280;
+    el.scrollBy({ left: direction * slot * 3, behavior: "smooth" });
+  }, []);
 
   const onViewAllClick = useCallback(() => {
     try { track("homepage.shelf_view_all_clicked", { shelf: shelfKey }); } catch { /* ignore */ }
     if (typeof onViewAll === "function") onViewAll();
   }, [shelfKey, onViewAll]);
+
+  if (hideShelf) return null;
 
   return (
     <section
@@ -305,6 +350,28 @@ export function HomeShelf({
             </h2>
           </div>
           <div className="hp-shelf-head-right">
+            {useReal && (
+              <div className="hp-shelf-arrows" aria-hidden="true">
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(-1)}
+                  disabled={!canScrollLeft}
+                  aria-label={t("home.shelf.prev", locale)}
+                >
+                  <Icon name="chevron_left" size={18} strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(1)}
+                  disabled={!canScrollRight}
+                  aria-label={t("home.shelf.next", locale)}
+                >
+                  <Icon name="chevron_right" size={18} strokeWidth={2} />
+                </button>
+              </div>
+            )}
             <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
               {t("home.shelf.view_all", locale)}
             </button>
@@ -320,7 +387,7 @@ export function HomeShelf({
                   shelfKey={shelfKey}
                   app={app}
                   heroV4={heroV4}
-                  eager={i < 3}
+                  eager={i < 4}
                 />
               ) : (
                 <ShelfCard
