@@ -5978,38 +5978,45 @@ h1,h2,h3,h4,h5 { margin: 0; }
    Instrument Serif italic on the hero's "ranked." word.
    --------------------------------------------------------------------------- */
 
-/* ────── 1. Whitespace — uniform vertical rhythm ──────
-   Every non-hero section uses the SAME Y padding at the SAME breakpoint
-   so the gap between any two consecutive sections is constant. Hero
-   keeps a slightly taller bottom pad as the page lead. */
+/* ────── 1. Whitespace — uniform, tight vertical rhythm ──────
+   Every section uses the SAME Y padding at the SAME breakpoint so the
+   visual gap between any two consecutive sections is constant. Tight
+   numbers below: mobile 16, tablet 20, desktop 24 — gives 32/40/48px
+   between sections, which reads as deliberate spacing rather than
+   "too much air". */
 
-.app.hero-v4 .homepage-v2 .hp-hero-v4 {
-  padding: 20px 20px 32px;
-}
-@media (min-width: 768px) {
-  .app.hero-v4 .homepage-v2 .hp-hero-v4 { padding: 32px 32px 40px; }
-}
-@media (min-width: 1280px) {
-  .app.hero-v4 .homepage-v2 .hp-hero-v4 { padding: 40px 40px 48px; }
-}
-/* All non-hero sections share one rule so the rhythm stays homogeneous. */
+.app.hero-v4 .homepage-v2 .hp-hero-v4,
 .app.hero-v4 .homepage-v2 .hp-usp,
 .app.hero-v4 .homepage-v2 .hp-shoreline,
 .app.hero-v4 .homepage-v2 .hp-shelf {
-  padding: 20px 20px;
+  padding: 16px 20px;
 }
 @media (min-width: 768px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4,
   .app.hero-v4 .homepage-v2 .hp-usp,
   .app.hero-v4 .homepage-v2 .hp-shoreline,
   .app.hero-v4 .homepage-v2 .hp-shelf {
-    padding: 24px 32px;
+    padding: 20px 32px;
   }
 }
 @media (min-width: 1024px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4,
   .app.hero-v4 .homepage-v2 .hp-usp,
   .app.hero-v4 .homepage-v2 .hp-shoreline,
   .app.hero-v4 .homepage-v2 .hp-shelf {
-    padding: 32px 40px;
+    padding: 24px 40px;
+  }
+}
+
+/* Hero card internal padding — trim the trailing whitespace below
+   "910 listings · 7 sources" so the section gap reads as the section
+   gap, not card-inside + section-outside stacked. */
+.app.hero-v4 .homepage-v2 .hp-hero-v4-card {
+  padding: 20px 4px 12px;
+}
+@media (min-width: 1024px) {
+  .app.hero-v4 .homepage-v2 .hp-hero-v4-card {
+    padding: 24px 28px 16px;
   }
 }
 .app.hero-v4 .page-browse,
