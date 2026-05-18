@@ -21,6 +21,7 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
@@ -148,6 +149,7 @@ class GoodLifeScraper:
                 u = og.attributes.get("content") or ""
                 if u.startswith("http"):
                     photo_urls.append(u)
+        photo_urls = upgrade_photo_urls("goodlife", photo_urls)
 
         # Multi-signal classifier — supersedes the previous hardcode of
         # "land". The hardcode misclassified built listings (real example:
