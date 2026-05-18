@@ -255,7 +255,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     except AttributeError:
         _LANCZOS = Image.LANCZOS  # type: ignore[attr-defined]
 
-    import httpx
+    # httpx is now imported inside _pick_best_photo_url (U1, 2026-05-18).
+    # No direct httpx use here anymore — keeping the line would fail ruff.
 
     photos_dir = repo / "web" / "photos"
     photos_dir.mkdir(parents=True, exist_ok=True)
