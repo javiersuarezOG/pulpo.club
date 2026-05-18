@@ -32,7 +32,8 @@ Last updated: 2026-05-08 (post-PR-9.5 ship).
 
 ## Pre-existing tech debt
 
-- [ ] **Local pytest mismatch:** `tests/test_photos.py::test_hero_download_creates_jpeg` fails locally with `Wrong JPEG library version: library is 90, caller expects 80`. Pillow vs `libjpeg` mismatch in Sebastian's env. CI passes. `pip install --force-reinstall Pillow` should fix it.
+- [ ] **Local pytest mismatch (libjpeg):** seven tests in `tests/test_photos.py` (`test_hero_download_creates_jpeg`, `test_hero_download_refetches_when_hero_missing`, `test_hero_download_picks_best_of_multiple`, all four `test_pick_best_photo_*`) fail locally with `Wrong JPEG library version: library is 90, caller expects 80` whenever they call `_make_jpeg()`. Pillow built against libjpeg-90 vs system libjpeg-80 in Sebastian's env. CI passes — both the encoder and the system lib match there. `pip install --force-reinstall Pillow` should re-link against the system libjpeg. Until then, run the PNG-based equivalents in `tests/test_photo_quality.py` for fast local feedback. Re-confirmed scope post-PR-segmind-vlm-gating (2026-05-18).
+- [ ] **Smoke-test env pollution (`PULPO_SOURCES` leak):** `tests/test_pipeline_smoke.py::test_offline_pipeline_produces_ranked_json` asserts `len(data) >= 15` but does NOT explicitly set `PULPO_SOURCES` in its monkeypatch. When the test runs in isolation it inherits the default (all registered sources) → ~21 listings → pass. When it runs as part of the full suite, some earlier test (or pytest's dotenv discovery) loads `.env` → `PULPO_SOURCES=goodlife,oceanside,kazu` (the local-dev value) leaks in → only 10 listings → fail. Two fixes possible: (1) the smoke test should `monkeypatch.setenv("PULPO_SOURCES", "<all-sources>")` to an explicit value, or (2) drop `kazu` from the local `.env` and revise the smoke assertion. Pre-existing; surfaced during the PR-segmind-vlm-gating test sweep on 2026-05-18.
 
 ## Untested caveats from PR-150 (Discover/Detail UX punch-list)
 

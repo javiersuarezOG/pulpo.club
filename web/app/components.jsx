@@ -451,7 +451,7 @@ const PHOTO_PRELOAD_MAX = 5;
 
 function ListingCard({
   listing, app, compact = false, onOpen, variant = "default",
-  priority = false, source,
+  priority = false, source, topRank,
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -549,6 +549,11 @@ function ListingCard({
           source={source}
           onLoad={onPhotoLoaded}
         />
+        {topRank != null && (
+          <span className="listing-card-rank" aria-label={`Rank ${topRank}`}>
+            #{topRank}
+          </span>
+        )}
         <div className="card-badge-row">
           <Badge listing={listing} />
         </div>

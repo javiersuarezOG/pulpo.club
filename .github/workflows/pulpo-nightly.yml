@@ -139,6 +139,21 @@ jobs:
           # silent-no-ops.
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+          # Phase 4 U3 — LLM-vision aesthetic booster. Default OFF
+          # everywhere (LLM_VISION_ENABLED unset → score_aesthetic
+          # returns None → picker falls back to technical-only). To
+          # ship the booster in production, set repo secret
+          # LLM_VISION_ENABLED=true plus one of QWEN_API_KEY /
+          # SEGMIND_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY.
+          # Daily budget cap defaults to $1.00 (in
+          # automation/aesthetic_vision.py). Top-X% gating defaults to
+          # 5 — see .env.example for the full knob list.
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED }}
+          LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
+          LLM_VISION_DAILY_BUDGET_USD: ${{ secrets.LLM_VISION_DAILY_BUDGET_USD }}
+          LLM_VISION_TOP_PCT: ${{ secrets.LLM_VISION_TOP_PCT }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)

@@ -28,6 +28,7 @@ mode, identical to pointing the SDK at DeepSeek.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 import re
@@ -40,17 +41,34 @@ from typing import Optional
 # automation/run.py for web/data writes.
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# Per-call dollar cost rough estimate. Qwen3-VL Flash via DashScope is
-# ~$0.0006 per call for a single 1080×1080 image at the prompt size
-# below (input ~700 tokens, output ~80 tokens). The number is
-# deliberately a single conservative figure rather than a per-token
-# breakdown — we don't have real-time pricing, and the goal is to
-# protect against runaway spend, not bill-accurate accounting. Override
-# via LLM_VISION_COST_PER_CALL_USD for other providers (Claude
-# claude-haiku-4-5 is ~$0.001 per image at similar prompt size).
-_DEFAULT_COST_PER_CALL_USD = 0.0006
+# Per-call dollar cost rough estimate. The numbers are deliberately
+# conservative single figures rather than per-token breakdowns — we
+# don't have real-time pricing, and the goal is to protect against
+# runaway spend, not bill-accurate accounting. Override via
+# LLM_VISION_COST_PER_CALL_USD if you need a different cap basis.
+#
+# Provider notes:
+#   - qwen      DashScope Qwen3-VL Flash ~$0.0006/call for a 1080² image
+#   - segmind   Segmind Qwen3-VL Flash ~$0.0008/call at the same prompt size
+#   - openai    gpt-4o-mini vision ~$0.0008/image
+#   - anthropic claude-haiku-4-5 vision ~$0.001/image
+_DEFAULT_COSTS_BY_PROVIDER = {
+    "qwen":      0.0006,
+    "segmind":   0.0008,
+    "openai":    0.0008,
+    "anthropic": 0.001,
+}
+# Back-compat for callers/tests that referenced the old single constant.
+_DEFAULT_COST_PER_CALL_USD = _DEFAULT_COSTS_BY_PROVIDER["qwen"]
 
 _DEFAULT_BUDGET_USD = 1.0
+
+# Aesthetic-score cache. Keyed on sha1(image_bytes)[:16] so identical
+# images across runs reuse the prior score for free. The cache lives in
+# web/data/ alongside the budget log; commit it (same policy as other
+# generated web/data/*.json outputs) so CI / fresh clones don't cold-
+# start with $-spend per candidate.
+_CACHE_MAX_ROWS = 50_000
 
 _SYSTEM_PROMPT = (
     "You are a real-estate marketing photo critic. Score the photo's "
@@ -84,7 +102,17 @@ def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
     provider = _resolve_provider()
     if provider is None:
         return None
-    if _budget_exhausted():
+    # Cache hit — short-circuit the provider call. No spend recorded
+    # because none was incurred. We still return the score for ranking.
+    key = _cache_key(raw_bytes)
+    cache = _load_cache()
+    hit = cache.get(key)
+    if hit is not None:
+        cached_score = hit.get("score")
+        if isinstance(cached_score, (int, float)):
+            return float(cached_score)
+
+    if _budget_exhausted(provider=provider):
         _log_budget_event("llm_vision_budget_exceeded", provider=provider)
         return None
 
@@ -92,6 +120,8 @@ def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
     try:
         if provider == "qwen":
             score = _call_qwen(raw_bytes)
+        elif provider == "segmind":
+            score = _call_segmind(raw_bytes)
         elif provider == "openai":
             score = _call_openai(raw_bytes)
         elif provider == "anthropic":
@@ -107,6 +137,7 @@ def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
     # Record the spend even when the score parsing succeeds — keeps the
     # budget honest in the face of a 200 response we couldn't parse.
     _record_spend(provider=provider, score=score)
+    _write_cache(cache, key, provider=provider, score=score)
     return score
 
 
@@ -117,20 +148,28 @@ def _is_enabled() -> bool:
 
 def _resolve_provider() -> Optional[str]:
     """Return the active provider name when its API key is configured,
-    else None. Priority: explicit env override → qwen → openai →
-    anthropic. No silent fallback across providers when the operator
+    else None. Priority: explicit env override → qwen → segmind → openai
+    → anthropic. No silent fallback across providers when the operator
     explicitly named one — surfaces config errors loudly."""
     explicit = os.environ.get("LLM_VISION_PROVIDER", "").strip().lower()
     if explicit == "qwen":
         return "qwen" if os.environ.get("QWEN_API_KEY") else None
+    if explicit == "segmind":
+        return "segmind" if os.environ.get("SEGMIND_API_KEY") else None
     if explicit == "openai":
         return "openai" if os.environ.get("OPENAI_API_KEY") else None
     if explicit == "anthropic" or explicit == "claude":
         return "anthropic" if os.environ.get("ANTHROPIC_API_KEY") else None
 
-    # No explicit pick — auto-detect the first configured key.
+    # No explicit pick — auto-detect the first configured key. DashScope
+    # stays first per .env.example's "recommended" guidance; Segmind is
+    # opt-in but ranks ahead of openai/anthropic because it's a cheaper
+    # peer of the same Qwen3-VL model rather than a different model
+    # family.
     if os.environ.get("QWEN_API_KEY"):
         return "qwen"
+    if os.environ.get("SEGMIND_API_KEY"):
+        return "segmind"
     if os.environ.get("OPENAI_API_KEY"):
         return "openai"
     if os.environ.get("ANTHROPIC_API_KEY"):
@@ -169,6 +208,49 @@ def _call_qwen(raw_bytes: bytes) -> Optional[float]:
         ],
     )
     content = resp.choices[0].message.content or ""
+    return _parse_score(content)
+
+
+def _call_segmind(raw_bytes: bytes) -> Optional[float]:
+    """Qwen3-VL Flash via Segmind's model-specific endpoint.
+
+    Segmind is NOT a standard OpenAI-compatible chat-completions
+    endpoint — the URL embeds the model name, and auth is an
+    ``x-api-key`` header instead of ``Authorization: Bearer``. So we
+    bypass the OpenAI SDK and POST directly. Body shape mirrors the
+    OpenAI vision spec (Segmind documents it as "OpenAI GPT (Standard
+    Format)" but only on the request body, not the transport layer).
+    """
+    import httpx
+    base_url = os.environ.get("SEGMIND_BASE_URL", "https://api.segmind.com/v1").rstrip("/")
+    model = os.environ.get("SEGMIND_VISION_MODEL", "qwen3-vl-flash")
+    url = f"{base_url}/{model}"
+    headers = {
+        "x-api-key": os.environ["SEGMIND_API_KEY"],
+        "Content-Type": "application/json",
+    }
+    data_url = _data_url(raw_bytes)
+    payload = {
+        "messages": [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": _USER_PROMPT_TEXT},
+                    {"type": "image_url", "image_url": {"url": data_url}},
+                ],
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": 256,
+    }
+    resp = httpx.post(url, headers=headers, json=payload, timeout=30.0)
+    resp.raise_for_status()
+    body = resp.json()
+    try:
+        content = body["choices"][0]["message"]["content"] or ""
+    except (KeyError, IndexError, TypeError):
+        return None
     return _parse_score(content)
 
 
@@ -273,13 +355,20 @@ def _today_iso() -> str:
     return date.today().isoformat()
 
 
-def _cost_per_call() -> float:
+def _cost_per_call(provider: Optional[str] = None) -> float:
+    """Per-call cost estimate. Operator override via
+    LLM_VISION_COST_PER_CALL_USD always wins; otherwise the provider's
+    listed default is returned. When ``provider`` is None (legacy
+    callsite), the qwen default holds — matches pre-refactor behavior.
+    """
     raw = os.environ.get("LLM_VISION_COST_PER_CALL_USD")
     if raw:
         try:
             return float(raw)
         except ValueError:
             pass
+    if provider and provider in _DEFAULT_COSTS_BY_PROVIDER:
+        return _DEFAULT_COSTS_BY_PROVIDER[provider]
     return _DEFAULT_COST_PER_CALL_USD
 
 
@@ -316,8 +405,8 @@ def _spent_today() -> float:
     return total
 
 
-def _budget_exhausted() -> bool:
-    return _spent_today() + _cost_per_call() > _daily_budget_usd()
+def _budget_exhausted(provider: Optional[str] = None) -> bool:
+    return _spent_today() + _cost_per_call(provider=provider) > _daily_budget_usd()
 
 
 def _record_spend(provider: str, score: float) -> None:
@@ -328,7 +417,7 @@ def _record_spend(provider: str, score: float) -> None:
         "ts": datetime.now(timezone.utc).isoformat(),
         "date": _today_iso(),
         "provider": provider,
-        "cost_usd": _cost_per_call(),
+        "cost_usd": _cost_per_call(provider=provider),
         "score": round(score, 2),
     }
     try:
@@ -355,6 +444,79 @@ def _log_budget_event(event: str, **kwargs: object) -> None:
             f.write(json.dumps(row) + "\n")
     except OSError:
         pass
+
+
+# ── Aesthetic-score cache ─────────────────────────────────────────────────
+
+def _cache_path() -> Path:
+    return _REPO_ROOT / "web" / "data" / "llm_vision_cache.json"
+
+
+def _cache_key(raw_bytes: bytes) -> str:
+    """SHA1 prefix of the image bytes. 16 hex chars = 64 bits of entropy
+    which is comfortably below the birthday-collision threshold for the
+    cache's 50k-row cap."""
+    return hashlib.sha1(raw_bytes).hexdigest()[:16]
+
+
+def _load_cache() -> dict:
+    """Return the on-disk cache as a dict, or {} on any failure. The
+    cache is fail-soft by design — a corrupt file just means the next
+    call pays full price (and overwrites the corruption on the next
+    successful write)."""
+    path = _cache_path()
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _write_cache(cache: dict, key: str, *, provider: str, score: float) -> None:
+    """Insert (key → {score, provider, model, ts}) and persist. Evicts
+    the oldest rows when the cache grows past _CACHE_MAX_ROWS. Write is
+    atomic (tmp file + rename) so a crash mid-write can't corrupt the
+    cache."""
+    cache[key] = {
+        "score": round(float(score), 2),
+        "provider": provider,
+        "model": _model_for_provider(provider),
+        "ts": datetime.now(timezone.utc).isoformat(),
+    }
+    if len(cache) > _CACHE_MAX_ROWS:
+        # Sort by ts ascending and drop the oldest 10% in one pass —
+        # cheaper than evicting one-at-a-time on subsequent writes.
+        rows = sorted(cache.items(), key=lambda kv: kv[1].get("ts", ""))
+        drop = max(1, len(cache) - _CACHE_MAX_ROWS) + (_CACHE_MAX_ROWS // 10)
+        cache = dict(rows[drop:])
+    path = _cache_path()
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp.write_text(json.dumps(cache, indent=2) + "\n", encoding="utf-8")
+        tmp.replace(path)
+    except OSError:
+        # Mirrors the budget-log policy: a write failure doesn't bubble
+        # up — the booster already scored this candidate, we just can't
+        # cache it. Worst case is one extra paid call next run.
+        pass
+
+
+def _model_for_provider(provider: str) -> str:
+    """The model name a provider was configured against — embedded in
+    cache rows so an operator swapping the model env var doesn't get
+    cross-model cache hits."""
+    if provider == "qwen":
+        return os.environ.get("QWEN_VISION_MODEL", "qwen3-vl-flash")
+    if provider == "segmind":
+        return os.environ.get("SEGMIND_VISION_MODEL", "qwen3-vl-flash")
+    if provider == "openai":
+        return os.environ.get("OPENAI_VISION_MODEL", "gpt-4o-mini")
+    if provider == "anthropic":
+        return os.environ.get("ANTHROPIC_VISION_MODEL", "claude-haiku-4-5-20251001")
+    return provider
 
 
 def daily_summary() -> dict:

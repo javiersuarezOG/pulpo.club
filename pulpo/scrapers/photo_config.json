@@ -1,0 +1,51 @@
+{
+  "$schema": "./photo_config.schema.json",
+  "version": 1,
+  "sources": {
+    "bienesraices": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "century21": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "encuentra24": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "goodlife": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "nexo": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "oceanside": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "realtyelsalvador": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "remax": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    }
+  },
+  "defaults": {
+    "min_source_long_side_px": 1080,
+    "deprioritize_weight": 1.0,
+    "validate_via_head": false
+  }
+}

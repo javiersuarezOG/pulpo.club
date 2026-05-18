@@ -46,10 +46,13 @@ def _isolate_budget_log(tmp_path, monkeypatch):
         "LLM_VISION_DAILY_BUDGET_USD",
         "LLM_VISION_COST_PER_CALL_USD",
         "QWEN_API_KEY",
+        "SEGMIND_API_KEY",
         "OPENAI_API_KEY",
         "ANTHROPIC_API_KEY",
         "QWEN_BASE_URL",
         "QWEN_VISION_MODEL",
+        "SEGMIND_BASE_URL",
+        "SEGMIND_VISION_MODEL",
     ):
         monkeypatch.delenv(k, raising=False)
 
@@ -269,3 +272,184 @@ def test_daily_summary_counts_today_only(tmp_path, monkeypatch):
     assert s["by_provider"] == {"qwen": 2}
     # Rounded to 4 decimals in the summary.
     assert s["spend_usd"] == pytest.approx(0.0012, abs=1e-6)
+
+
+# ── Segmind provider ──────────────────────────────────────────────────────
+
+
+def test_segmind_call_returns_score_and_records_spend(tmp_path, monkeypatch):
+    """Segmind's endpoint is custom (URL embeds model, auth via x-api-key
+    header). The OpenAI SDK isn't usable here, so the call goes through
+    httpx.post directly. Verify: score parsed, budget row written with
+    provider=segmind and the Segmind default cost."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+    monkeypatch.setenv("LLM_VISION_DAILY_BUDGET_USD", "1.00")
+
+    fake_response = mock.MagicMock()
+    fake_response.raise_for_status.return_value = None
+    fake_response.json.return_value = {
+        "choices": [{"message": {"content": '{"visual_appeal": 6.0}'}}]
+    }
+    with mock.patch("httpx.post", return_value=fake_response) as fake_post:
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(b"fake_jpeg_segmind")
+
+    assert score == 6.0
+    fake_post.assert_called_once()
+    call_kwargs = fake_post.call_args.kwargs
+    assert call_kwargs["headers"]["x-api-key"] == "sk-test-segmind"
+    # URL must embed the model name per Segmind's API contract.
+    assert fake_post.call_args.args[0].endswith("/qwen3-vl-flash")
+
+    rows = _budget_rows(tmp_path)
+    assert len(rows) == 1
+    assert rows[0]["event"] == "llm_vision_call"
+    assert rows[0]["provider"] == "segmind"
+    assert rows[0]["score"] == 6.0
+    # Segmind's per-call default is $0.0008, not the qwen $0.0006.
+    assert rows[0]["cost_usd"] == pytest.approx(0.0008, abs=1e-6)
+
+
+def test_segmind_http_error_returns_none_and_logs(tmp_path, monkeypatch):
+    """Fail-soft contract: provider HTTP errors must not raise."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+
+    with mock.patch("httpx.post", side_effect=RuntimeError("502 bad gateway")):
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(b"fake_jpeg_segmind")
+
+    assert score is None
+    rows = _budget_rows(tmp_path)
+    assert any(r["event"] == "llm_vision_call_failed" and r.get("provider") == "segmind"
+               for r in rows)
+
+
+# ── Provider resolution ───────────────────────────────────────────────────
+
+
+def test_provider_resolution_segmind_explicit(monkeypatch):
+    """LLM_VISION_PROVIDER=segmind resolves to segmind only when the
+    Segmind key is set. Without the key, returns None (NOT a silent
+    fallback to a different provider) — matches the existing 'surface
+    config errors loudly' design for explicit provider picks."""
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("QWEN_API_KEY", "sk-qwen-also-set")  # decoy
+    from automation.aesthetic_vision import _resolve_provider
+    assert _resolve_provider() is None
+
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+    assert _resolve_provider() == "segmind"
+
+
+def test_provider_resolution_auto_detect_prefers_qwen_over_segmind(monkeypatch):
+    """Auto-detect order keeps DashScope (qwen) first per the
+    .env.example's 'recommended' guidance, then Segmind ahead of
+    openai/anthropic."""
+    monkeypatch.setenv("QWEN_API_KEY", "sk-qwen")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-segmind")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-openai")
+    from automation.aesthetic_vision import _resolve_provider
+    assert _resolve_provider() == "qwen"
+
+
+def test_provider_resolution_auto_detect_segmind_when_no_qwen(monkeypatch):
+    """When QWEN_API_KEY is absent, Segmind wins over openai/anthropic."""
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-segmind")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-openai")
+    from automation.aesthetic_vision import _resolve_provider
+    assert _resolve_provider() == "segmind"
+
+
+# ── Aesthetic-score cache ─────────────────────────────────────────────────
+
+
+def test_cache_hit_skips_provider_and_spend(tmp_path, monkeypatch):
+    """A cache entry for the exact image bytes (sha1 prefix) must
+    short-circuit the provider call and NOT record a budget row.
+
+    This is the load-bearing test for the cost-protection design: a
+    photo that recurs across runs pays the provider exactly once."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+    from automation.aesthetic_vision import _cache_key, _cache_path
+
+    raw = b"cached_image_bytes"
+    cache_path = _cache_path()
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(json.dumps({
+        _cache_key(raw): {
+            "score": 8.5,
+            "provider": "segmind",
+            "model": "qwen3-vl-flash",
+            "ts": "2026-05-18T00:00:00+00:00",
+        }
+    }))
+
+    # If the cache short-circuit fires, httpx is never invoked.
+    with mock.patch("httpx.post", side_effect=AssertionError("provider must not be called")):
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(raw)
+
+    assert score == 8.5
+    assert _budget_rows(tmp_path) == []  # no spend recorded
+
+
+def test_cache_miss_records_score_and_persists(monkeypatch):
+    """Cache miss → provider called → score returned → cache file
+    written with the new entry. The autouse fixture handles tmp_path
+    via the _REPO_ROOT monkeypatch — no explicit param needed here."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+
+    fake_response = mock.MagicMock()
+    fake_response.raise_for_status.return_value = None
+    fake_response.json.return_value = {
+        "choices": [{"message": {"content": '{"visual_appeal": 4.5}'}}]
+    }
+    raw = b"never_before_seen_bytes"
+    with mock.patch("httpx.post", return_value=fake_response):
+        from automation.aesthetic_vision import score_aesthetic, _cache_key, _cache_path
+        score = score_aesthetic(raw)
+
+    assert score == 4.5
+    cache = json.loads(_cache_path().read_text(encoding="utf-8"))
+    assert _cache_key(raw) in cache
+    entry = cache[_cache_key(raw)]
+    assert entry["score"] == 4.5
+    assert entry["provider"] == "segmind"
+    assert entry["model"] == "qwen3-vl-flash"
+
+
+def test_cache_corruption_falls_through_to_provider(monkeypatch):
+    """A corrupt cache file must NOT crash the booster — it just gets
+    treated as empty, and the next successful write overwrites the
+    corruption. Validates the fail-soft cache contract. The autouse
+    fixture handles tmp_path via the _REPO_ROOT monkeypatch."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+    from automation.aesthetic_vision import _cache_path
+
+    cache_path = _cache_path()
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text("{ this is not valid json at all")
+
+    fake_response = mock.MagicMock()
+    fake_response.raise_for_status.return_value = None
+    fake_response.json.return_value = {
+        "choices": [{"message": {"content": '{"visual_appeal": 3.0}'}}]
+    }
+    with mock.patch("httpx.post", return_value=fake_response):
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(b"fresh_bytes")
+
+    assert score == 3.0
+    # The cache file is now valid JSON (overwritten by the successful call).
+    cache = json.loads(cache_path.read_text(encoding="utf-8"))
+    assert isinstance(cache, dict) and len(cache) == 1
