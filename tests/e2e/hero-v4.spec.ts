@@ -130,6 +130,41 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     expect(errors).toEqual([]);
   });
 
+  test("shelves render real listing cards with photos + heart icons", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+
+    await page.goto(
+      "/?posthog_capture=1&ff_hero_v4=1",
+      { waitUntil: "networkidle" },
+    );
+
+    // Wave-5 polish: real-listing card variant active on shelves.
+    // The .hp-shelf-card-real class only renders when we successfully
+    // resolved >= 3 real listings for the shelf criterion.
+    await expect(page.locator(".hp-shelf-card-real").first()).toBeVisible({ timeout: 5_000 });
+    // Heart icon overlay present (positioned absolutely inside the photo).
+    await expect(page.locator(".hp-shelf-card-real .heart-btn").first()).toBeVisible();
+
+    expect(errors).toEqual([]);
+  });
+
+  test("Browse page picks up the Airbnb card restyle when flag is on", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+
+    await page.goto(
+      "/browse?ff_hero_v4=1",
+      { waitUntil: "networkidle" },
+    );
+
+    // .app root carries the flag class so Browse/Saved scoped CSS applies.
+    await expect(page.locator(".app.hero-v4")).toBeVisible();
+    // ListingCard still renders (no logic break) and the page background
+    // turned to clean white via the scoped CSS.
+    await expect(page.locator(".listing-card").first()).toBeVisible({ timeout: 5_000 });
+
+    expect(errors).toEqual([]);
+  });
+
   test("paid user with paid_home_variant_v1 + hero_v4: hero image visible, no CTA, no upsell blocks", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);

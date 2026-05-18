@@ -25,6 +25,7 @@ import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
 import { captureCampaignParams } from "./lib/campaign";
+import { readFeatureFlag } from "./lib/feature-flag";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
 // inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
 // extracted out for the same reason — single chrome component per role.
@@ -1002,7 +1003,7 @@ function App() {
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
-    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}`}>
+    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", false) ? " hero-v4" : ""}`}>
       {/* Wave-3a: single SiteHeader on every route. The homepage's hero
           still owns its conversion CTAs; the header is pure navigation. */}
       <SiteHeader app={app} />
