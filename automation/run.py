@@ -110,6 +110,90 @@ def _write_sidecar(image_path: Path, raw_bytes: bytes) -> Optional[dict]:
     return meta
 
 
+# U1 (hero re-escalation, 2026-05-18) — cap on how many candidates we
+# score per listing. Real-estate listings routinely carry 10–30 photos;
+# 5 covers the typical "first few" the broker chose to feature without
+# blowing the bandwidth budget. Override via PULPO_PHOTO_MAX_CANDIDATES.
+_PHOTO_CANDIDATES_CAP_DEFAULT = 5
+
+
+def _pick_best_photo_url(photo_urls):
+    """Phase 4 U1 — hero re-escalation.
+
+    Old behavior: hero was always ``photo_urls[0]`` regardless of
+    quality. A listing whose first photo was a watermarked brochure or
+    a pixelated thumbnail would still post that exact photo to
+    Instagram + Facebook (verified 2026-05-18 live incident).
+
+    New behavior: download up to N candidates, run the existing PR-7.6
+    ``compute_score()`` + ``detect_text_overlay()`` on each, then pick
+    the highest-scoring one that does NOT carry a text overlay. If
+    every candidate is flagged, fall back to argmax(score) across the
+    flagged set — we still want a hero rather than blocking the post,
+    and pulpo-social's local gate is the last line of defense.
+
+    Returns ``(url, content, score, has_text_overlay)`` for the winning
+    candidate, or ``(None, None, None, None)`` if every download/decode
+    failed.
+
+    Parameters
+    ----------
+    photo_urls : list[str]
+        Ordered candidate URLs from the scraper. Truncated to the
+        per-listing cap before download.
+    """
+    if not photo_urls:
+        return (None, None, None, None)
+
+    import httpx
+    try:
+        from automation.photo_quality import (
+            compute_score as _compute_photo_score,
+            detect_text_overlay as _detect_text_overlay,
+        )
+    except Exception:
+        _compute_photo_score = None
+        _detect_text_overlay = None
+
+    cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
+                              _PHOTO_CANDIDATES_CAP_DEFAULT))
+    cap = max(1, cap)
+
+    candidates = []
+    for url in photo_urls[:cap]:
+        try:
+            r = httpx.get(url, timeout=5.0, follow_redirects=True)
+            r.raise_for_status()
+        except Exception:
+            continue
+        try:
+            score = _compute_photo_score(r.content) if _compute_photo_score else None
+        except Exception:
+            score = None
+        try:
+            has_text = _detect_text_overlay(r.content) if _detect_text_overlay else None
+        except Exception:
+            has_text = None
+        candidates.append({
+            "url": url,
+            "content": r.content,
+            "score": score if score is not None else 0,
+            "has_text_overlay": has_text,
+        })
+
+    if not candidates:
+        return (None, None, None, None)
+
+    # Prefer photos that are NOT flagged as text overlay. Treat None
+    # (OCR unavailable or decode-fail) as "not flagged" so missing OCR
+    # support doesn't disqualify every candidate.
+    non_text = [c for c in candidates if c["has_text_overlay"] is not True]
+    pool = non_text if non_text else candidates
+    pool.sort(key=lambda c: c["score"], reverse=True)
+    w = pool[0]
+    return (w["url"], w["content"], w["score"], w["has_text_overlay"])
+
+
 def _read_sidecar(image_path: Path) -> Optional[dict]:
     """Read the sidecar JSON beside image_path. Returns None if missing
     or malformed. Used by the skip-path so we don't re-decode every
@@ -179,18 +263,28 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             break
         if not li.photo_urls:
             continue
-        url = li.photo_urls[0]
+        # U1 (2026-05-18) — cache key now hashes the WHOLE candidate set
+        # (in submission order so re-ordering by the scraper retriggers
+        # selection). A listing's hero file name still keys off the
+        # listing id; only the contents and the chosen URL change.
+        cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
+                                  _PHOTO_CANDIDATES_CAP_DEFAULT))
+        cap = max(1, cap)
+        candidate_urls = li.photo_urls[:cap]
+        url_hash = hashlib.sha1(
+            "|".join(candidate_urls).encode()
+        ).hexdigest()[:12]
+
         fname = f"{li.source}_{li.source_id}.jpg"
         fpath = photos_dir / fname
         hero_fpath = _hero_file_path(fpath)
         hash_path = photos_dir / (fname + ".hash")
 
-        # Skip if URL unchanged AND both derivatives + both sidecars are
-        # present. The "all four files present" check kicks pre-Phase-2
-        # cached entries into the re-fetch path so they get a hero file
-        # too — without this guard, the homepage proof row would stay
-        # empty until the next time each broker's photo URL changes.
-        url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
+        # Skip if the candidate set hash matches AND both derivatives +
+        # both sidecars are present. Migration note: pre-U1 cached rows
+        # were keyed off a single-URL hash, so the first post-deploy run
+        # invalidates them and re-fetches; that's intended — we want the
+        # better-hero pick to land everywhere.
         thumb_meta_path = _meta_sidecar_path(fpath)
         hero_meta_path  = _meta_sidecar_path(hero_fpath)
         all_files_present = (
@@ -206,6 +300,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 li.card_eligible = bool(thumb_meta.get("card_eligible", False))
             if hero_meta:
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Re-populate quality fields from the hero sidecar so the
+                # cached-skip path doesn't drop them between runs.
+                qs = hero_meta.get("hero_photo_quality_score")
+                if qs is not None:
+                    li.hero_photo_quality_score = qs
+                ho = hero_meta.get("has_text_overlay")
+                if ho is not None:
+                    li.has_text_overlay = ho
             if li.card_eligible:
                 card_eligible_count += 1
             if li.hero_eligible:
@@ -215,31 +317,28 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
         attempted += 1
         try:
-            r = httpx.get(url, timeout=5.0, follow_redirects=True)
-            r.raise_for_status()
-            # PR-7.6 — score the *original* bytes BEFORE we down-resample.
-            # Resolution + sharpness need full-res input; post-thumbnail
-            # bytes are already lossy.
-            try:
-                from automation.photo_quality import (
-                    compute_score as _compute_photo_score,
-                    detect_text_overlay as _detect_text_overlay,
+            # U1 — pick the BEST photo from up to `cap` candidates
+            # instead of blindly using photo_urls[0]. Returns the
+            # winner's URL + bytes (already downloaded so we don't
+            # re-fetch) + its score + text-overlay flag.
+            winning_url, winning_content, winning_score, winning_has_text = (
+                _pick_best_photo_url(candidate_urls)
+            )
+            if winning_url is None:
+                # Every candidate failed to download. Record one entry
+                # so the operator sees which listing burnt budget for
+                # nothing.
+                raise RuntimeError(
+                    f"no_candidate_downloaded_from_{len(candidate_urls)}_urls"
                 )
-                li.hero_photo_quality_score = _compute_photo_score(r.content)
-                # OCR-based brochure detection. None on Tesseract-missing /
-                # decode-fail; the elite filter treats None as not-flagged.
-                li.has_text_overlay = _detect_text_overlay(r.content)
-            except Exception as score_err:
-                # Photo scoring is non-fatal — never kill the download
-                # because of an OpenCV/PIL edge case.
-                print(f"[photos] score failed for {li.source}|{li.source_id}: {score_err!r}")
-                li.hero_photo_quality_score = None
-                li.has_text_overlay = None
+
+            li.hero_photo_quality_score = winning_score if winning_score else None
+            li.has_text_overlay = winning_has_text
 
             from PIL import Image
 
             # ── Thumbnail (600×400, Q75) — drives every card ──────────
-            thumb_img = Image.open(io.BytesIO(r.content))
+            thumb_img = Image.open(io.BytesIO(winning_content))
             thumb_img.thumbnail((600, 400), _LANCZOS)
             if thumb_img.mode in ("RGBA", "P"):
                 thumb_img = thumb_img.convert("RGB")
@@ -255,7 +354,7 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # Pillow's thumbnail() preserves aspect AND only ever down-
             # samples — sources smaller than 1920×1080 stay at source
             # size, so the hero_eligible gate correctly fails for them.
-            hero_img = Image.open(io.BytesIO(r.content))
+            hero_img = Image.open(io.BytesIO(winning_content))
             hero_img.thumbnail((1920, 1080), _LANCZOS)
             if hero_img.mode in ("RGBA", "P"):
                 hero_img = hero_img.convert("RGB")
@@ -264,7 +363,17 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             hero_bytes = hero_buf.getvalue()
             hero_fpath.write_bytes(hero_bytes)
             hero_meta = _write_sidecar(hero_fpath, hero_bytes)
-            if hero_meta:
+            # Embed the quality verdict and the chosen URL into the hero
+            # sidecar so /api/social/listings (and pulpo-social's
+            # trust-upstream short-circuit) can rely on the cached
+            # values without re-decoding the bytes.
+            if hero_meta is not None:
+                hero_meta["hero_photo_quality_score"] = winning_score
+                hero_meta["has_text_overlay"] = winning_has_text
+                hero_meta["winning_url"] = winning_url
+                hero_meta["candidate_count"] = len(candidate_urls)
+                hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
+                                          encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
 
             hash_path.write_text(url_hash)
@@ -279,7 +388,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             with log_path.open("a", encoding="utf-8") as lf:
                 lf.write(json.dumps({
                     "source_id": li.source_id, "source": li.source,
-                    "url": url, "error": str(e),
+                    "candidate_urls": candidate_urls,
+                    "error": str(e),
                     "ts": datetime.now(timezone.utc).isoformat(),
                 }) + "\n")
 
