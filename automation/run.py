@@ -441,6 +441,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 li.card_eligible = bool(thumb_meta.get("card_eligible", False))
             if hero_meta:
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Hero file's dimensions == source dimensions clamped to ≤1920×1080.
+                # Surfaced through /api/social/listings so consumers can pre-filter
+                # listings whose source is too small to render cleanly at the
+                # requested output ratio (e.g. social 1080×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
                 qs = hero_meta.get("hero_photo_quality_score")
                 if qs is not None:
                     li.hero_photo_quality_score = qs
@@ -589,6 +597,13 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
+                # Mirror the cached-skip path: source_width/source_height
+                # are the hero derivative's pixel dimensions (which equal
+                # original source dimensions clamped to ≤1920×1080).
+                if hero_meta.get("width") is not None:
+                    li.source_width = int(hero_meta["width"])
+                if hero_meta.get("height") is not None:
+                    li.source_height = int(hero_meta["height"])
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
