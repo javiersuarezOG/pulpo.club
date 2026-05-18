@@ -51,6 +51,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import SELECTOLAX_OK, is_offline, load_fixtures
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
@@ -222,7 +223,7 @@ def _parse_photos(html: str, listing_id: str) -> list[str]:
             continue
         seen.add(u)
         out.append(u)
-    return out
+    return upgrade_photo_urls("encuentra24", out)
 
 
 def _build_raw_record(html: str, url: str) -> Optional[dict]:
