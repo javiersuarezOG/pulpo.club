@@ -70,7 +70,7 @@ export function NewHomePage({ app }) {
   // historical meaning) so dashboards stay stable.
   const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", false);
   const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
-  const heroV4Flag   = readFeatureFlag("hero_v4", false);
+  const heroV4Flag   = readFeatureFlag("hero_v4", true);
   const blocks = visibleBlocksFor(app.user, {
     paid_home_variant_v1: paidHomeFlag,
     usp_popup_v1:         uspPopupFlag,
