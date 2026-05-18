@@ -79,6 +79,11 @@ test.describe("New app boots cleanly on key routes", () => {
     });
     page.on("pageerror", (err) => errors.push(err.message));
 
+    // Post-#262: anon + free clicks on a listing-card route through the
+    // FreeMonthModal (matrix `shelf_card` branch). Seed a pro user so
+    // the click passes through to openListing → detail panel renders.
+    await seedProUser(page);
+
     // Homepage v2 redesign: ListingCard moved to /browse. Boot the
     // detail-panel test there.
     await page.goto("/browse", { waitUntil: "networkidle" });
@@ -334,6 +339,13 @@ test.describe("New app boots cleanly on key routes", () => {
   });
 
   test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
+    // Post-#262: anon listing-card clicks open FreeMonthModal, not the
+    // detail panel. Seed pro user so the matrix routes to passthrough.
+    // Pro user with no flag set also still sees the shoreline block
+    // (paid_home_variant_v1 is off by default — the rollback path
+    // exposes all blocks to all tiers).
+    await seedProUser(page);
+
     // Homepage v2 hides the shared TopNav on /. Use the Pick Your
     // Shoreline card to navigate from / → /browse, then open a
     // listing for the back/forward chain.
@@ -522,6 +534,14 @@ test.describe("New app boots cleanly on key routes", () => {
     // Navigate to /browse and click into the first card to mount the
     // detail panel. The road_access "Paved" bug was on detail; we must
     // check it.
+    //
+    // Post-#262: anon clicks on /browse listing-cards open FreeMonthModal
+    // (not the detail panel) because the routing matrix sends
+    // shelf_card → free_month_modal for anon + free. Seed a pro user
+    // here so the click passthrough opens the detail panel. The home
+    // scan above already exercised the ES anon surface.
+    await seedProUser(page);
+
     await page.goto("/browse", { waitUntil: "networkidle" });
     await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.locator(".listing-card").first().click();

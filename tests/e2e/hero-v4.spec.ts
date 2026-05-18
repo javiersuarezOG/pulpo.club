@@ -130,7 +130,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     expect(errors).toEqual([]);
   });
 
-  test("paid user with paid_home_variant_v1 + hero_v4: entire hero block suppressed", async ({ page }) => {
+  test("paid user with paid_home_variant_v1 + hero_v4: hero image visible, no CTA, no upsell blocks", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);
 
@@ -139,13 +139,17 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
       { waitUntil: "networkidle" },
     );
 
-    // paid_home_variant_v1 filters out the upsell-oriented `hero` block
-    // for paid users — and hero_v4 ALSO filters out `featured`. Result:
-    // the homepage opens with carousels (shoreline first).
-    await expect(page.locator(".hp-hero-v4")).toHaveCount(0);
-    await expect(page.locator(".hp-hero-v3")).toHaveCount(0);
+    // Post-#262: paid users SEE the hero v4 (image-led), but the CTA +
+    // microcopy are gated in the component on !isPaid. Featured is
+    // filtered (hero_v4 absorbs it). USPs + Shoreline are filtered by
+    // the paid_home_variant_v1 matrix (NON_PAID). Carousels visible.
+    await expect(page.locator(".hp-hero-v4")).toBeVisible();
+    await expect(page.locator(".hp-hero-v4-cta")).toHaveCount(0);
+    await expect(page.locator(".hp-hero-v4-microcopy")).toHaveCount(0);
     await expect(page.locator(".hp-featured")).toHaveCount(0);
-    await expect(page.locator(".hp-shoreline")).toBeVisible();
+    await expect(page.locator(".hp-usp")).toHaveCount(0);
+    await expect(page.locator(".hp-shoreline")).toHaveCount(0);
+    await expect(page.locator("#hp-shelf-top10")).toBeVisible();
 
     expect(errors).toEqual([]);
   });
