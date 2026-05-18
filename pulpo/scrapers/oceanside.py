@@ -31,6 +31,7 @@ from pulpo.agents.html_crawler import is_offline, load_fixtures, make_client, wi
 from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
+from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 API_BASE   = "https://oceansideelsalvador.com/wp-json/wp/v2"
@@ -178,7 +179,7 @@ def _extract_photo_urls(rec: dict) -> list[str]:
             continue
         if u.startswith("http") and u not in urls:
             urls.append(u)
-    return urls
+    return upgrade_photo_urls("oceanside", urls, payload=rec)
 
 
 def _map(rec: dict, land_term_id: Optional[int], broker_type: str = "land") -> Optional[dict]:
