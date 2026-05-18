@@ -17,14 +17,18 @@
 // a shelf (small dataset / strict filter), the shelf falls back to
 // the hardcoded editorial cards so the surface never goes empty.
 
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
-import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed } from "../components.jsx";
+import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
+
+// Per-shelf listing limits (hero_v4 on). Desktop renders all of these
+// in a wrapping grid; mobile keeps a horizontal scroll-snap rail.
+const REAL_LIMITS = { top_10: 10, price_drops: 10, new_this_week: 10 };
 
 // ────────────────────────────────────────────────────────────────────
 // Shared shelf scaffold (telemetry, viewport observers — unchanged)
@@ -82,7 +86,7 @@ function useShelfScrolled(shelfKey, listRef) {
 // ────────────────────────────────────────────────────────────────────
 // Real-listing pickers — Wave 5 polish
 
-const MIN_REAL_LISTINGS = 3;
+const MIN_REAL_LISTINGS = 5;
 
 // Top 10: rank_score-sorted, must have at least one photo.
 function pickTopRanked(listings, n) {
@@ -139,7 +143,7 @@ function badgeForListing(listing, shelfKey) {
 // Real listings get a `<Photo>` + heart + computed badge + real
 // price/meta. Hardcoded cards keep their static layout.
 
-function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
+function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank }) {
   const isReal = !!listing;
   const id = isReal ? listing.id : (card?.id || `placeholder-${shelfKey}-${position}`);
 
@@ -177,7 +181,12 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
 
   // Real-listing rendering path
   if (isReal && heroV4) {
-    const badge = badgeForListing(listing, shelfKey);
+    // Rank chip subsumes the grade-letter "A+ / A / B+ deal" badge on
+    // the top_10 shelf — the explicit #1..#10 number is a stronger,
+    // less duplicative signal than the grade. Other shelves keep their
+    // contextual badge alongside the rank chip (rank top-left, kind
+    // badge stacked beneath via CSS).
+    const badge = shelfKey === "top_10" ? null : badgeForListing(listing, shelfKey);
     return (
       <article className="hp-shelf-card hp-shelf-card-real" onClick={onClick}>
         <div className="hp-shelf-card-art">
@@ -189,6 +198,11 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager }) {
             eager={eager}
             source="home_shelf"
           />
+          {rank != null && (
+            <span className="hp-shelf-card-rank" aria-label={`Rank ${rank}`}>
+              #{rank}
+            </span>
+          )}
           {badge && (
             <span className={`hp-shelf-card-badge hp-shelf-card-badge-${badge.side} hp-shelf-card-badge-${badge.kind}`}>
               {badge.text}
@@ -264,7 +278,6 @@ export function HomeShelf({
   listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
   heroV4 = false,  // gates the new card markup
   onViewAll,
-  scrollHintRemainder,
 }) {
   const sectionRef = useRef(null);
   const listRef = useRef(null);
@@ -272,12 +285,60 @@ export function HomeShelf({
   useShelfScrolled(shelfKey, listRef);
 
   const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
-  const items = useReal ? listings.slice(0, cards.length) : cards;
+  const items = useReal ? listings : cards;
+
+  // hero_v4: a shelf with too few real listings is hidden entirely rather
+  // than falling back to editorial cards — the user explicitly asked for
+  // shelves to disappear when there's not enough real data behind them.
+  const hideShelf = heroV4 && Array.isArray(listings) && listings.length < MIN_REAL_LISTINGS;
+
+  // Carousel state for the prev/next arrows (desktop ≥768px). Track
+  // whether we can scroll further in each direction so the arrows can
+  // disable cleanly at the endpoints.
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = listRef.current;
+    if (!el) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    const max = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(max > 4 && el.scrollLeft < max - 4);
+  }, []);
+
+  useEffect(() => {
+    if (!useReal || hideShelf) return;
+    const el = listRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, [useReal, hideShelf, items.length, updateArrows]);
+
+  const scrollByPage = useCallback((direction) => {
+    const el = listRef.current;
+    if (!el) return;
+    // Page = three card-slots forward so each click reveals a fresh
+    // batch while still keeping a half-card peek on the trailing edge.
+    const firstChild = el.firstElementChild;
+    const slot = firstChild ? firstChild.getBoundingClientRect().width + 20 : 280;
+    el.scrollBy({ left: direction * slot * 3, behavior: "smooth" });
+  }, []);
 
   const onViewAllClick = useCallback(() => {
     try { track("homepage.shelf_view_all_clicked", { shelf: shelfKey }); } catch { /* ignore */ }
     if (typeof onViewAll === "function") onViewAll();
   }, [shelfKey, onViewAll]);
+
+  if (hideShelf) return null;
 
   return (
     <section
@@ -298,9 +359,33 @@ export function HomeShelf({
               {t(headingKey, locale)}
             </h2>
           </div>
-          <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
-            {t("home.shelf.view_all", locale)}
-          </button>
+          <div className="hp-shelf-head-right">
+            {useReal && (
+              <div className="hp-shelf-arrows" aria-hidden="true">
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(-1)}
+                  disabled={!canScrollLeft}
+                  aria-label={t("home.shelf.prev", locale)}
+                >
+                  <Icon name="chevron_left" size={18} strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(1)}
+                  disabled={!canScrollRight}
+                  aria-label={t("home.shelf.next", locale)}
+                >
+                  <Icon name="chevron_right" size={18} strokeWidth={2} />
+                </button>
+              </div>
+            )}
+            <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
+              {t("home.shelf.view_all", locale)}
+            </button>
+          </div>
         </header>
         <div ref={listRef} className="hp-shelf-list" role="list">
           {items.map((item, i) => (
@@ -309,10 +394,11 @@ export function HomeShelf({
                 <ShelfCard
                   listing={item}
                   position={i + 1}
+                  rank={i + 1}
                   shelfKey={shelfKey}
                   app={app}
                   heroV4={heroV4}
-                  eager={i < 3}
+                  eager={i < 4}
                 />
               ) : (
                 <ShelfCard
@@ -326,13 +412,6 @@ export function HomeShelf({
             </div>
           ))}
         </div>
-        {scrollHintRemainder ? (
-          <p className="hp-shelf-scroll-hint" aria-hidden="true">
-            {typeof t("home.shelf.scroll_hint", locale) === "string"
-              ? t("home.shelf.scroll_hint", locale).replace("{n}", String(scrollHintRemainder))
-              : null}
-          </p>
-        ) : null}
       </div>
     </section>
   );
@@ -362,7 +441,7 @@ const NEW_THIS_WEEK_CARDS = [
 
 export function TopTenShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, TOP_10_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, REAL_LIMITS.top_10) : []), [all, heroV4]);
   return (
     <HomeShelf
       app={app}
@@ -374,7 +453,6 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
       cards={TOP_10_CARDS}
       listings={listings}
       heroV4={heroV4}
-      scrollHintRemainder={7}
       onViewAll={() => app && app.goBrowse && app.goBrowse({})}
     />
   );
@@ -382,7 +460,7 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
 
 export function PriceDropsShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, PRICE_DROPS_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, REAL_LIMITS.price_drops) : []), [all, heroV4]);
   const pill = t("home.shelf.dropsCount", locale);
   return (
     <HomeShelf
@@ -403,7 +481,7 @@ export function PriceDropsShelf({ app, locale, heroV4 = false }) {
 
 export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, NEW_THIS_WEEK_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, REAL_LIMITS.new_this_week) : []), [all, heroV4]);
   const pill = t("home.shelf.newCount", locale);
   return (
     <HomeShelf

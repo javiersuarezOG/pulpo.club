@@ -22,7 +22,12 @@ import { attachErrorRecorder, seedUser, seedProUser } from "./_helpers";
 
 type CapturedEvent = { name: string; props: Record<string, unknown>; ts: number };
 
-const URL_HOME = "/?posthog_capture=1&ff_cta_routing_v2=1";
+// Hero v4 is the default-on visual in production. These CTA-routing
+// tests target selectors on the legacy HeroV2 surface (.hp-hero /
+// .hp-hero-cta-primary etc.), so opt out of v4 here. CTA-routing
+// behavior is identical across hero versions; v4 coverage of the
+// same flows lives in tests/e2e/hero-v4.spec.ts.
+const URL_HOME = "/?posthog_capture=1&ff_cta_routing_v2=1&ff_hero_v4=0";
 
 async function getEvents(page: Page): Promise<CapturedEvent[]> {
   return page.evaluate(() => {
@@ -148,7 +153,7 @@ test.describe("CTA routing (Wave 1) — rollback flag", () => {
   test("anon user with cta_routing_v2 forced OFF falls back to old behavior (signup modal opens)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
-    await page.goto("/?posthog_capture=1&ff_cta_routing_v2=0", { waitUntil: "networkidle" });
+    await page.goto("/?posthog_capture=1&ff_cta_routing_v2=0&ff_hero_v4=0", { waitUntil: "networkidle" });
 
     const heroCta = page.locator('button.hp-hero-cta-primary');
     await heroCta.click();

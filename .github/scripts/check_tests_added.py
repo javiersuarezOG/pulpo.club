@@ -50,6 +50,11 @@ def check(added_files: list[str]) -> list[str]:
             stem = Path(f).name
             if stem in SKIP_FILES:
                 break
+            # Data / config files (e.g. photo_config.json) are covered by
+            # the schema-validation tests that live alongside the helper
+            # they configure — they aren't agents themselves.
+            if not stem.endswith(".py"):
+                break
 
             # Check for a collective test that covers this whole directory
             collective = COLLECTIVE_TESTS.get(agent_prefix)

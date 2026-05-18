@@ -288,6 +288,51 @@ def score_band(score: Optional[int]) -> str:
     return "reject"
 
 
+# ── Composite of cheap signals (Phase 4 U3 cost-gating helper) ─────────
+#
+# Used by automation/run.py to decide which candidate photos deserve an
+# expensive aesthetic LLM call. Combines the technical score with the
+# binary signals (text-overlay flag + hero-eligibility) into a single
+# 0-100 number suitable for sorting. The penalties are intentionally
+# coarse — the goal is to push obviously-bad candidates below the top-X%
+# threshold, not to rank fine differences between good photos.
+
+_TEXT_OVERLAY_PENALTY = 50
+_NOT_HERO_ELIGIBLE_PENALTY = 10
+
+
+def cheap_quality_score(
+    raw_bytes: bytes,
+    *,
+    technical: Optional[int] = None,
+    has_text_overlay: Optional[bool] = None,
+    hero_eligible: Optional[bool] = None,
+) -> int:
+    """Composite 0-100 of the non-LLM signals.
+
+    Caller pattern in automation/run.py — pass the already-computed
+    cheap-signal results so we don't re-decode the image:
+
+        score = cheap_quality_score(
+            raw,
+            technical=compute_score(raw),
+            has_text_overlay=detect_text_overlay(raw),
+            hero_eligible=compute_image_metadata(raw)["hero_eligible"],
+        )
+
+    Any of ``technical``, ``has_text_overlay``, ``hero_eligible`` may be
+    ``None`` — the helper falls back to ``compute_score(raw)`` for a
+    missing technical score and treats missing flags as neutral (no
+    penalty applied).
+    """
+    base = technical if technical is not None else compute_score(raw_bytes)
+    if has_text_overlay is True:
+        base -= _TEXT_OVERLAY_PENALTY
+    if hero_eligible is False:
+        base -= _NOT_HERO_ELIGIBLE_PENALTY
+    return max(0, min(100, base))
+
+
 # ── Text-overlay detection (brochure-style hero exclusion) ─────────────
 #
 # Brokers often submit listings with the first photo being a brochure:
