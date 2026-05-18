@@ -41856,5 +41856,1105 @@
     "cost_usd": 0.00146166,
     "finish_reason": "stop",
     "latency_ms": 10236
+  },
+  "remax|003284449003": {
+    "ts": "2026-05-18T23:27:20.441952+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Residential Lot in San Francisco Gotera, Morazán",
+      "es": "Lote Residencial en San Francisco Gotera, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Prime investment opportunity in a tranquil residential subdivision in San Francisco Gotera, Morazán. This 180.46 m² lot is located directly on the Ruta de Paz highway, just 2.2 km from downtown Gotera and close to Perquín. Enjoy privacy and security with only four property owners in the subdivision. The property offers spectacular panoramic views, access to potable water and electricity, and direct highway access. Ideal for building a family countryside home or as a long-term investment with strong appreciation potential in eastern El Salvador. Priced at $34,900.",
+      "es": "Excelente oportunidad de inversión en un tranquilo fraccionamiento residencial en San Francisco Gotera, Morazán. Este lote de 180.46 m² está ubicado directamente sobre la carretera Ruta de Paz, a solo 2.2 km del centro de Gotera y cerca de Perquín. Disfrute de privacidad y seguridad con solo cuatro propietarios en el fraccionamiento. La propiedad ofrece espectaculares vistas panorámicas, acceso a agua potable y electricidad, y acceso directo desde la carretera principal. Ideal para construir una casa de campo familiar o como inversión a largo plazo con alto potencial de plusvalía en el oriente de El Salvador. Precio: $34,900."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location on Ruta de Paz highway",
+        "es": "Ubicación privilegiada sobre la carretera Ruta de Paz"
+      },
+      {
+        "en": "Only 4 owners in private subdivision",
+        "es": "Solo 4 propietarios en fraccionamiento privado"
+      },
+      {
+        "en": "Spectacular panoramic views",
+        "es": "Espectaculares vistas panorámicas"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua potable y electricidad disponibles"
+      },
+      {
+        "en": "Strong appreciation potential in eastern El Salvador",
+        "es": "Alto potencial de plusvalía en el oriente de El Salvador"
+      }
+    ],
+    "lat": 13.6983,
+    "lng": -88.1083,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Francisco Gotera, Morazán, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2601,
+    "tokens_out": 585,
+    "cost_usd": 0.00134577,
+    "finish_reason": "stop",
+    "latency_ms": 4551
+  },
+  "oceanside|15463": {
+    "ts": "2026-05-18T23:27:20.492845+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lot in Bitcoin Beach El Zonte",
+      "es": "Lote con Vista al Mar en Bitcoin Beach El Zonte"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exceptional hillside property in Playa El Zonte, the world-famous Bitcoin Beach. This 2,739 m² lot offers 180-degree panoramic ocean views, a private bedroom with en-suite bathroom, a dedicated office for remote work, a fully equipped kitchen, and a laundry room. The expansive terrace is perfect for sunset dining, while the reinforced second roof allows for future expansion. With high ROI potential as an Airbnb, this is a rare opportunity in one of Central America's most dynamic markets. Priced at $350,000.",
+      "es": "Descubra una propiedad excepcional en Playa El Zonte, el mundialmente famoso Bitcoin Beach. Este lote de 2,739 m² en la ladera ofrece vistas panorámicas de 180 grados al océano, un dormitorio privado con baño en suite, una oficina dedicada para trabajo remoto, cocina totalmente equipada y cuarto de lavado. La amplia terraza es perfecta para cenas al atardecer, mientras que el segundo techo reforzado permite una futura expansión. Con alto potencial de retorno como Airbnb, es una oportunidad única en uno de los mercados más dinámicos de Centroamérica. Precio: $350,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "180° panoramic ocean views from the terrace",
+        "es": "Vistas panorámicas de 180° al océano desde la terraza"
+      },
+      {
+        "en": "Prime location in Bitcoin Beach, El Zonte",
+        "es": "Ubicación privilegiada en Bitcoin Beach, El Zonte"
+      },
+      {
+        "en": "2,739 m² lot with expansion potential",
+        "es": "Lote de 2,739 m² con potencial de expansión"
+      },
+      {
+        "en": "Dedicated office for remote work or business",
+        "es": "Oficina dedicada para trabajo remoto o negocios"
+      },
+      {
+        "en": "High ROI Airbnb potential in a growing market",
+        "es": "Alto potencial de retorno como Airbnb en un mercado en crecimiento"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Zonte (Bitcoin Beach)",
+    "url_language": "en",
+    "tokens_in": 2609,
+    "tokens_out": 593,
+    "cost_usd": 0.00135673,
+    "finish_reason": "stop",
+    "latency_ms": 4604
+  },
+  "bienesraices|2355": {
+    "ts": "2026-05-18T23:27:20.688358+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Unlimited Industrial Potential in Nejapa Logistics Hub",
+      "es": "Potencial Industrial Ilimitado en el Nodo Logístico de Nejapa"
+    },
+    "short_description_canonical": {
+      "en": "Located in one of El Salvador's fastest-growing industrial zones, this land offers the ultimate solution for businesses seeking connectivity, infrastructure, and operational efficiency. With a prime street frontage, the property ensures seamless logistics flow. It is technically prepared for large-scale operations: heavy logistics with access for 53-foot trailers, guaranteed water resources with an installed ANDA pump and shallow water table, high-voltage electrical power, and 100% flat topography that drastically reduces earthwork costs and accelerates construction of warehouses or industrial plants. Flexible purchase from 1 manzana (approx. 7,000 m²) onward, ideal for medium to large projects.",
+      "es": "Ubicado en una de las zonas de mayor auge industrial de El Salvador, este terreno ofrece la solución definitiva para empresas que buscan conectividad, infraestructura y eficiencia operativa. Con un frente privilegiado a orilla de calle, la propiedad garantiza un flujo logístico sin interrupciones. Está preparada técnicamente para operaciones de gran escala: logística pesada con acceso para rastras de hasta 53 pies, recursos hídricos garantizados con bomba de ANDA instalada y agua a baja profundidad, energía eléctrica de alto voltaje, y topografía 100% plana que reduce drásticamente los costos de terracería y agiliza la construcción de bodegas o naves industriales. Flexibilidad de compra desde 1 manzana en adelante, ideal para proyectos medianos a grandes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location in Nejapa's booming industrial corridor",
+        "es": "Ubicación privilegiada en el corredor industrial en auge de Nejapa"
+      },
+      {
+        "en": "Heavy logistics ready: access for 53-foot trailers",
+        "es": "Preparado para logística pesada: acceso para rastras de 53 pies"
+      },
+      {
+        "en": "Guaranteed water supply with installed ANDA pump",
+        "es": "Suministro de agua garantizado con bomba de ANDA instalada"
+      },
+      {
+        "en": "High-voltage electrical power available",
+        "es": "Energía eléctrica de alto voltaje disponible"
+      },
+      {
+        "en": "100% flat terrain reduces construction costs",
+        "es": "Terreno 100% plano reduce costos de construcción"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa municipality centroid",
+    "url_language": "es",
+    "tokens_in": 2676,
+    "tokens_out": 643,
+    "cost_usd": 0.00142982,
+    "finish_reason": "stop",
+    "latency_ms": 4799
+  },
+  "bienesraices|2358": {
+    "ts": "2026-05-18T23:27:20.873154+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Industrial Land for Rent in Nuevo Cuscatlán",
+      "es": "Terreno Industrial en Alquiler en Nuevo Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "Prime industrial land for rent in the booming Nuevo Cuscatlán development hub. This expansive 13,500 square vara lot (approx. 11,300 m²) is zoned for industrial use, making it ideal for distribution centers, warehouses, or manufacturing plants. Located on the road to Salamanca warehouses, it offers excellent connectivity to the La Libertad highway and proximity to major logistics centers. The property features a flat topography ready for customization. Monthly rent: $7,000 USD plus VAT. Secure your space in El Salvador's fastest-growing business corridor.",
+      "es": "Oportunidad única de terreno industrial en alquiler en el polo de desarrollo de Nuevo Cuscatlán. Este amplio lote de 13,500 varas cuadradas (aprox. 11,300 m²) cuenta con permiso industrial, ideal para centros de distribución, bodegas o plantas de producción. Ubicado sobre la calle hacia las bodegas de Salamanca, ofrece excelente conectividad con la Carretera al Puerto de La Libertad y cercanía a importantes centros logísticos. Topografía plana lista para adaptar a sus necesidades. Canon mensual: $7,000 USD más IVA. Asegure su espacio en el corredor empresarial de mayor crecimiento en El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "13,500 sq varas (approx. 11,300 m²) of industrial land",
+        "es": "13,500 varas cuadradas (aprox. 11,300 m²) de terreno industrial"
+      },
+      {
+        "en": "Industrial permit included for quick project start",
+        "es": "Permiso industrial incluido para inicio rápido de proyectos"
+      },
+      {
+        "en": "Strategic location on Salamanca warehouse road",
+        "es": "Ubicación estratégica sobre calle hacia bodegas de Salamanca"
+      },
+      {
+        "en": "Easy access to La Libertad highway and logistics hubs",
+        "es": "Fácil acceso a Carretera a La Libertad y centros logísticos"
+      },
+      {
+        "en": "Growing business hub with high property value appreciation",
+        "es": "Hub empresarial en crecimiento con alta plusvalía"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nuevo Cuscatlán, La Libertad, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2673,
+    "tokens_out": 619,
+    "cost_usd": 0.00140261,
+    "finish_reason": "stop",
+    "latency_ms": 4984
+  },
+  "oceanside|15443": {
+    "ts": "2026-05-18T23:27:20.906027+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime 490 m² Lot in Atami, La Libertad",
+      "es": "Lote Premium de 490 m² en Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity to own a 490.14 m² flat lot in Atami, one of El Salvador's most prestigious gated communities in La Libertad. Just steps from the Pacific Ocean, this prime coastal canvas offers constant sea breezes and easy beach access. Perfect for building a contemporary architectural masterpiece or a high-yield vacation rental. Enjoy 24/7 security, lush landscapes, and exclusive amenities including saltwater pools and a private beach club. Minutes from world-class surf breaks at El Palmarcito, K59, and Sunzal, plus nearby dining at Beto's Restaurante and Cadejo Brewing Co. Experience the ultimate Surf City lifestyle in a serene, secure setting.",
+      "es": "Descubra una oportunidad única de poseer un lote plano de 490.14 m² en Atami, una de las comunidades cerradas más prestigiosas de El Salvador en La Libertad. A pasos del Océano Pacífico, este lienzo costero privilegiado ofrece brisas marinas constantes y fácil acceso a la playa. Ideal para construir una obra maestra arquitectónica contemporánea o un alquiler vacacional de alto rendimiento. Disfrute de seguridad 24/7, paisajes frondosos y amenidades exclusivas que incluyen piscinas de agua salada y un club de playa privado. Minutos de las mejores olas del mundo en El Palmarcito, K59 y Sunzal, además de restaurantes cercanos como Beto's Restaurante y Cadejo Brewing Co. Viva la experiencia definitiva del estilo de vida Surf City en un entorno sereno y seguro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from the Pacific Ocean",
+        "es": "A pasos del Océano Pacífico"
+      },
+      {
+        "en": "490.14 m² flat, ready-to-build lot",
+        "es": "Lote plano de 490.14 m² listo para construir"
+      },
+      {
+        "en": "Exclusive gated community with 24/7 security",
+        "es": "Comunidad cerrada exclusiva con seguridad 24/7"
+      },
+      {
+        "en": "Access to saltwater pools and private beach club",
+        "es": "Acceso a piscinas de agua salada y club de playa privado"
+      },
+      {
+        "en": "Minutes from world-class surf breaks",
+        "es": "Minutos de las mejores olas del mundo"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Atami, La Libertad (near Playa K59/San Diego)",
+    "url_language": "en",
+    "tokens_in": 2615,
+    "tokens_out": 679,
+    "cost_usd": 0.00145295,
+    "finish_reason": "stop",
+    "latency_ms": 5018
+  },
+  "bienesraices|2357": {
+    "ts": "2026-05-18T23:27:20.944665+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "278-Man. Sugarcane Farm in Jiquilisco, Usulután",
+      "es": "Finca Cañera de 278 Mz. en Jiquilisco, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Prime agricultural investment in the heart of Usulután. Located in Cantón Tierra Blanca, Jiquilisco district, this 278-manzana property is one of the largest and most productive farmland opportunities in eastern El Salvador. With 175 manzanas currently planted in sugarcane, it generates immediate income, while 103 additional manzanas offer expansion potential for more cane, grains, or livestock. The land is 100% flat, ideal for mechanized farming and efficient irrigation. Jiquilisco is renowned for its fertile soil and agro-industrial climate. This property is strictly agricultural, with no lotification permits. Price: $8,500 per manzana, total $2,363,000 USD (fixed).",
+      "es": "Inversión agropecuaria de primer nivel en el corazón de Usulután. Ubicado en Cantón Tierra Blanca, distrito de Jiquilisco, este terreno de 278 manzanas representa una de las oportunidades más grandes y productivas del oriente salvadoreño. Con 175 manzanas actualmente cultivadas de caña de azúcar, genera ingresos inmediatos, mientras que 103 manzanas adicionales ofrecen potencial de expansión para más caña, granos básicos o ganadería. El terreno es 100% plano, ideal para mecanización agrícola y riego eficiente. Jiquilisco es reconocido por su fertilidad y clima agroindustrial. La propiedad es estrictamente agrícola, sin permisos de lotificación. Precio: $8,500 por manzana, total $2,363,000 USD (fijo)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "278 manzanas (2,780,000 v²) of flat, fertile land",
+        "es": "278 manzanas (2,780,000 v²) de terreno plano y fértil"
+      },
+      {
+        "en": "175 manzanas already producing sugarcane",
+        "es": "175 manzanas ya produciendo caña de azúcar"
+      },
+      {
+        "en": "103 manzanas ready for expansion or diversification",
+        "es": "103 manzanas listas para expansión o diversificación"
+      },
+      {
+        "en": "100% flat topography for easy mechanization",
+        "es": "Topografía 100% plana para fácil mecanización"
+      },
+      {
+        "en": "Fixed price of $2,363,000 USD ($8,500/mz)",
+        "es": "Precio fijo de $2,363,000 USD ($8,500/mz)"
+      }
+    ],
+    "lat": 13.3167,
+    "lng": -88.5833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jiquilisco, Usulután, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2701,
+    "tokens_out": 709,
+    "cost_usd": 0.00150917,
+    "finish_reason": "stop",
+    "latency_ms": 5055
+  },
+  "remax|003284449002": {
+    "ts": "2026-05-18T23:27:24.703622+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Residential Lot on Ruta de Paz, Morazán",
+      "es": "Lote Residencial Premium en Ruta de Paz, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Seize this exceptional investment opportunity in a rapidly growing residential area of Morazán, strategically located on the main Ruta de Paz highway between Gotera and Perquín. Just 2.2 km from downtown San Francisco Gotera, this 310.93 m² lot (12 x 26 meters) is part of an exclusive private subdivision with only four owners, ensuring privacy, tranquility, and security. Enjoy breathtaking panoramic views and easy access to potable water and electricity. Ideal for building a family countryside home or securing a high-appreciation asset in eastern El Salvador. Priced at $54,900, perfect for local buyers or Salvadorans abroad.",
+      "es": "Aproveche esta excepcional oportunidad de inversión en una zona residencial en crecimiento de Morazán, estratégicamente ubicada sobre la principal carretera Ruta de Paz entre Gotera y Perquín. A solo 2.2 km del centro de San Francisco Gotera, este lote de 310.93 m² (12 x 26 metros) forma parte de un exclusivo fraccionamiento privado con solo cuatro propietarios, garantizando privacidad, tranquilidad y seguridad. Disfrute de impresionantes vistas panorámicas y fácil acceso a agua potable y electricidad. Ideal para construir una casa de campo familiar o asegurar un activo con alto potencial de plusvalía en el oriente de El Salvador. Precio: $54,900, perfecto para compradores locales o salvadoreños en el exterior."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct access from Ruta de Paz highway",
+        "es": "Acceso directo desde la carretera Ruta de Paz"
+      },
+      {
+        "en": "Exclusive private subdivision with only 4 owners",
+        "es": "Fraccionamiento privado exclusivo con solo 4 propietarios"
+      },
+      {
+        "en": "Spectacular panoramic views",
+        "es": "Espectaculares vistas panorámicas"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua y electricidad disponibles"
+      },
+      {
+        "en": "2.2 km from downtown San Francisco Gotera",
+        "es": "A 2.2 km del centro de San Francisco Gotera"
+      }
+    ],
+    "lat": 13.6967,
+    "lng": -88.1036,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Francisco Gotera, Morazán",
+    "url_language": "en",
+    "tokens_in": 2626,
+    "tokens_out": 625,
+    "cost_usd": 0.00139652,
+    "finish_reason": "stop",
+    "latency_ms": 4261
+  },
+  "remax|001464215009": {
+    "ts": "2026-05-18T23:27:25.108723+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Award-Winning Cacao Farm in Usulután",
+      "es": "Finca de Cacao Premiado en Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional 12,832.50 square vara (approx. 0.9 hectares) portion of the Dominguez Farm, located in the San José Berlin canton of Usulután. The land is predominantly planted with export-quality cacao that has earned international recognition, including awards in France. This is a rare opportunity to own a piece of agricultural heritage with proven premium cacao production. Ideal for investors or farmers looking to expand their cacao operations in a fertile region of El Salvador.",
+      "es": "Descubra esta excepcional porción de 12,832.50 varas cuadradas (aproximadamente 0.9 hectáreas) de la Finca Domínguez, ubicada en el cantón San José Berlín, Usulután. El terreno está mayormente plantado con cacao de calidad de exportación que ha obtenido reconocimiento internacional, incluyendo premios en Francia. Esta es una oportunidad única para poseer una parte de la herencia agrícola con producción comprobada de cacao premium. Ideal para inversionistas o agricultores que buscan expandir sus operaciones de cacao en una región fértil de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Award-winning cacao recognized in France",
+        "es": "Cacao premiado reconocido en Francia"
+      },
+      {
+        "en": "12,832.50 sq varas of fertile land",
+        "es": "12,832.50 varas cuadradas de tierra fértil"
+      },
+      {
+        "en": "Export-quality cacao production",
+        "es": "Producción de cacao de calidad de exportación"
+      },
+      {
+        "en": "Located in San José Berlin, Usulután",
+        "es": "Ubicado en San José Berlín, Usulután"
+      },
+      {
+        "en": "Proven agricultural heritage",
+        "es": "Herencia agrícola comprobada"
+      }
+    ],
+    "lat": 13.3333,
+    "lng": -88.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Usulután municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2412,
+    "tokens_out": 550,
+    "cost_usd": 0.00125624,
+    "finish_reason": "stop",
+    "latency_ms": 4048
+  },
+  "remax|003093245048": {
+    "ts": "2026-05-18T23:27:25.231106+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "4 Adjoining Lots on Blvd. Constitución, San Salvador",
+      "es": "4 Lotes Contiguos en Blvd. Constitución, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "This set of four adjoining lots in Residencial Los Rosales, directly on Boulevard Constitución, San Salvador, represents a rare strategic development opportunity in one of the city's most connected and high-demand residential areas. Located in San Antonio Abad, the property offers immediate access to shopping centers, universities, hospitals, corporate districts, and major roads. With a total area of 815.26 varas² (approximately 681 m²) and excellent topography, it is ideal for boutique vertical development, modern residential homes, premium townhouses, or executive rental apartments. The asking price is $300,000 for all four lots. This is a prime investment in a high-growth area where available land is becoming increasingly scarce.",
+      "es": "Este conjunto de cuatro lotes contiguos en Residencial Los Rosales, directamente sobre el Boulevard Constitución, San Salvador, representa una rara oportunidad de desarrollo estratégico en una de las zonas residenciales más conectadas y demandadas de la ciudad. Ubicado en San Antonio Abad, la propiedad ofrece acceso inmediato a centros comerciales, universidades, hospitales, distritos corporativos y las principales vías de la ciudad. Con un área total de 815.26 varas² y una topografía excelente, es ideal para desarrollo vertical boutique, casas residenciales modernas, townhouses premium o apartamentos ejecutivos de renta. El precio de venta es de $300,000 por los cuatro lotes. Esta es una inversión privilegiada en una zona de alto crecimiento donde el suelo disponible es cada vez más escaso."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location on Boulevard Constitución, San Salvador's main artery",
+        "es": "Ubicación privilegiada sobre el Boulevard Constitución, arteria principal de San Salvador"
+      },
+      {
+        "en": "4 adjoining lots with total area of 815.26 varas²",
+        "es": "4 lotes contiguos con un área total de 815.26 varas²"
+      },
+      {
+        "en": "Excellent topography for development",
+        "es": "Topografía excelente para desarrollo"
+      },
+      {
+        "en": "Private and secure residential community",
+        "es": "Comunidad residencial privada y segura"
+      },
+      {
+        "en": "High-growth area with scarce available land",
+        "es": "Zona de alto crecimiento con suelo escaso"
+      }
+    ],
+    "lat": 13.6983,
+    "lng": -89.1914,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Antonio Abad, San Salvador",
+    "url_language": "en",
+    "tokens_in": 2623,
+    "tokens_out": 648,
+    "cost_usd": 0.00142101,
+    "finish_reason": "stop",
+    "latency_ms": 4357
+  },
+  "remax|002522781116": {
+    "ts": "2026-05-18T23:27:25.300283+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Beach Investment Land in Costa del Sol",
+      "es": "Terreno de Inversión Privilegiado en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exceptional investment opportunity in the coveted Costa del Sol. This prime second-row plot spans 6,974 v² (approx. 5,840 m²) with 29 meters of frontage and 200 meters of depth, located just steps from the sea. The land is completely flat, ready for development of beach villas, vacation rentals, or a private residential project. Priced at $500,000, this property offers high return potential in a booming tourism market driven by Surf City and growing investor interest. Secure a future-vision project in one of El Salvador's most desirable coastal destinations.",
+      "es": "Descubra una oportunidad de inversión excepcional en la codiciada Costa del Sol. Este terreno privilegiado de segunda línea cuenta con 6,974 v² (aproximadamente 5,840 m²), 29 metros de frente y 200 metros de fondo, ubicado a pasos del mar. El terreno es completamente plano, ideal para desarrollar villas playeras, alquileres vacacionales o un proyecto residencial privado. Con un precio de $500,000, esta propiedad ofrece un alto potencial de retorno en un mercado turístico en auge impulsado por Surf City y el creciente interés de inversores. Asegure un proyecto con visión de futuro en uno de los destinos costeros más deseables de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Just steps from the sea in Costa del Sol",
+        "es": "A pasos del mar en Costa del Sol"
+      },
+      {
+        "en": "6,974 v² flat land with 29m frontage",
+        "es": "6,974 v² de terreno plano con 29 m de frente"
+      },
+      {
+        "en": "High ROI potential in booming Surf City area",
+        "es": "Alto potencial de retorno en la creciente zona de Surf City"
+      },
+      {
+        "en": "Ideal for villas, vacation rentals, or private project",
+        "es": "Ideal para villas, alquileres vacacionales o proyecto privado"
+      },
+      {
+        "en": "Priced at $500,000 for prime beach investment",
+        "es": "Precio de $500,000 para inversión playera privilegiada"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "tokens_in": 2485,
+    "tokens_out": 617,
+    "cost_usd": 0.00134965,
+    "finish_reason": "stop",
+    "latency_ms": 4394
+  },
+  "remax|002283543022": {
+    "ts": "2026-05-18T23:27:25.517867+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Wood Cabin & Land in Armenia, Sonsonate",
+      "es": "Cabaña de Madera y Terreno en Armenia, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Escape to this charming wooden cabin set on a fully flat 300 m² lot in Cantón Los Mangos, Armenia, Sonsonate. Surrounded by avocado, mango, and banana trees, this fenced property offers privacy, fresh air, and natural shade. With water storage, nearby utilities, and double street access, it's ideal as a vacation home, Airbnb investment, or family residence. Just 15 minutes from El Encuentro Shopping Center and 20 minutes from downtown Armenia, you'll enjoy countryside tranquility while being close to Cerro Verde, Izalco Volcano, and the Ruta de Las Flores. Priced at $32,000, this is a rare opportunity to own a piece of paradise.",
+      "es": "Escápese a esta encantadora cabaña de madera en un terreno completamente plano de 300 m² en Cantón Los Mangos, Armenia, Sonsonate. Rodeada de árboles de aguacate, mango y banano, esta propiedad cercada ofrece privacidad, aire fresco y sombra natural. Con almacenamiento de agua, servicios públicos cercanos y doble acceso por dos calles, es ideal como casa de vacaciones, inversión en Airbnb o residencia familiar. A solo 15 minutos del Centro Comercial El Encuentro y 20 minutos del centro de Armenia, disfrutará de la tranquilidad del campo mientras está cerca de Cerro Verde, el Volcán de Izalco y la Ruta de Las Flores. Con un precio de $32,000, esta es una oportunidad única para poseer un pedazo de paraíso."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fully flat 300 m² lot with wooden cabin",
+        "es": "Terreno completamente plano de 300 m² con cabaña de madera"
+      },
+      {
+        "en": "Surrounded by fruit trees for shade and privacy",
+        "es": "Rodeado de árboles frutales para sombra y privacidad"
+      },
+      {
+        "en": "Double street access and fully fenced",
+        "es": "Doble acceso por dos calles y completamente cercado"
+      },
+      {
+        "en": "15 minutes from El Encuentro Shopping Center",
+        "es": "A 15 minutos del Centro Comercial El Encuentro"
+      },
+      {
+        "en": "Close to Cerro Verde, Izalco Volcano, and Ruta de Las Flores",
+        "es": "Cerca de Cerro Verde, Volcán de Izalco y Ruta de Las Flores"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -89.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cantón Los Mangos, Armenia, Sonsonate",
+    "url_language": "en",
+    "tokens_in": 2658,
+    "tokens_out": 675,
+    "cost_usd": 0.00146016,
+    "finish_reason": "stop",
+    "latency_ms": 5025
+  },
+  "remax|002283543021": {
+    "ts": "2026-05-18T23:27:25.752006+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Country Cabin with Huge Lot in Moncagua",
+      "es": "Cabaña Campestre con Amplio Terreno en Moncagua"
+    },
+    "short_description_canonical": {
+      "en": "Escape to this stunning countryside property in Moncagua, San Miguel, offering 4,221 m² of usable land with a brand-new rustic cabin. The home features excellent finishes and a cozy atmosphere, perfect for a vacation retreat, retirement home, or Airbnb investment. Enjoy the bounty of mature fruit trees, abundant vegetation, and a private water well with pump and storage basin. A multi-purpose structure provides space for storage, workshop, or farming activities. The fully fenced, semi-flat lot ensures privacy and security. With easy access from the main road and highway, this property is ready for immediate enjoyment. Priced at $85,000, it's a rare find with its own water source and productive trees. Schedule your visit today!",
+      "es": "Escápese a esta impresionante propiedad campestre en Moncagua, San Miguel, que ofrece 4,221 m² de terreno utilizable con una cabaña rústica nueva. El hogar cuenta con acabados excelentes y un ambiente acogedor, perfecto para una casa de vacaciones, retiro o inversión en Airbnb. Disfrute de la abundancia de árboles frutales maduros, vegetación exuberante y un pozo de agua privado con bomba y tanque de almacenamiento. Una estructura multiusos proporciona espacio para almacenamiento, taller o actividades agrícolas. El terreno semiplano y completamente cercado garantiza privacidad y seguridad. Con fácil acceso desde la carretera principal y la autopista, esta propiedad está lista para disfrutar desde el primer día. Precio de venta: $85,000. ¡Una oportunidad única con su propia fuente de agua y árboles productivos! Programe su visita hoy."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand-new rustic cabin with high-quality finishes",
+        "es": "Cabaña rústica nueva con acabados de alta calidad"
+      },
+      {
+        "en": "Private water well with pump and storage basin",
+        "es": "Pozo de agua privado con bomba y tanque de almacenamiento"
+      },
+      {
+        "en": "Mature fruit trees and lush vegetation",
+        "es": "Árboles frutales maduros y vegetación exuberante"
+      },
+      {
+        "en": "Multi-purpose structure for storage or workshop",
+        "es": "Estructura multiusos para almacenamiento o taller"
+      },
+      {
+        "en": "Fully fenced, semi-flat lot with easy access",
+        "es": "Terreno semiplano y completamente cercado con fácil acceso"
+      }
+    ],
+    "lat": 13.5333,
+    "lng": -88.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Moncagua, San Miguel, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2649,
+    "tokens_out": 695,
+    "cost_usd": 0.00147973,
+    "finish_reason": "stop",
+    "latency_ms": 5063
+  },
+  "remax|001464215008": {
+    "ts": "2026-05-18T23:27:26.317056+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Award-Winning Cacao Farm in Usulután",
+      "es": "Finca de Cacao Premiado en Usulután"
+    },
+    "short_description_canonical": {
+      "en": "This exceptional 21,685.09 square vara property in San José Berlín, Usulután, is a rare opportunity for cacao enthusiasts and investors. The farm is predominantly planted with export-quality cacao that has won awards in France, attesting to its superior quality. Located in a prime agricultural region, this land offers a turnkey operation for premium cacao production. Whether you are looking to expand your agricultural portfolio or start a new venture, this farm provides a solid foundation with proven success. The fertile soil and ideal climate of Usulután ensure continued high yields. Don't miss this chance to own a piece of award-winning agricultural history.",
+      "es": "Esta excepcional propiedad de 21,685.09 varas cuadradas en San José Berlín, Usulután, es una oportunidad única para entusiastas del cacao e inversionistas. La finca está mayormente plantada con cacao de calidad de exportación que ha ganado premios en Francia, lo que atestigua su calidad superior. Ubicada en una región agrícola privilegiada, esta tierra ofrece una operación llave en mano para la producción de cacao premium. Ya sea que busque expandir su portafolio agrícola o iniciar un nuevo emprendimiento, esta finca proporciona una base sólida con éxito comprobado. El suelo fértil y el clima ideal de Usulután aseguran rendimientos continuos. No pierda esta oportunidad de poseer un pedazo de historia agrícola galardonada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Award-winning cacao recognized in France",
+        "es": "Cacao premiado reconocido en Francia"
+      },
+      {
+        "en": "21,685.09 square varas of fertile land",
+        "es": "21,685.09 varas cuadradas de tierra fértil"
+      },
+      {
+        "en": "Export-quality cacao plantation",
+        "es": "Plantación de cacao de calidad de exportación"
+      },
+      {
+        "en": "Located in prime agricultural region of Usulután",
+        "es": "Ubicada en región agrícola privilegiada de Usulután"
+      },
+      {
+        "en": "Turnkey operation for premium cacao production",
+        "es": "Operación llave en mano para producción de cacao premium"
+      }
+    ],
+    "lat": 13.3453,
+    "lng": -88.4528,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Usulután municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2409,
+    "tokens_out": 636,
+    "cost_usd": 0.00135003,
+    "finish_reason": "stop",
+    "latency_ms": 4760
+  },
+  "remax|2523089030": {
+    "ts": "2026-05-18T23:27:26.460351+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Development Land in Aguilares, San Salvador",
+      "es": "Terreno Premium para Desarrollo en Aguilares, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Discover an outstanding investment opportunity with this magnificent flat land located in Aguilares, San Salvador, El Salvador. Strategically situated near the new Los Encuentros Shopping Center, this expansive property offers endless possibilities for residential or commercial projects. With a total area of 34,425 square varas (approximately 28,800 m²), the land is perfectly flat and ready for development. Located at kilometer 35 on the road to Chalatenango, it enjoys excellent connectivity to San Salvador and other key areas. Surrounded by natural landscapes, it provides panoramic views and a tranquil environment, ideal for projects prioritizing quality of life. Proximity to schools, supermarkets, and hospitals ensures convenience for future residents or clients. Priced at $700,000, this is a rare chance to invest in one of the most promising growth zones in San Salvador.",
+      "es": "Descubra una excelente oportunidad de inversión con este magnífico terreno plano ubicado en Aguilares, San Salvador, El Salvador. Estratégicamente situado cerca del nuevo Centro Comercial Los Encuentros, esta amplia propiedad ofrece infinitas posibilidades para proyectos residenciales o comerciales. Con una extensión total de 34,425 varas cuadradas (aproximadamente 28,800 m²), el terreno es completamente plano y listo para desarrollar. Ubicado en el kilómetro 35 de la carretera a Chalatenango, goza de excelente conectividad con San Salvador y otras áreas clave. Rodeado de paisajes naturales, ofrece vistas panorámicas y un ambiente tranquilo, ideal para proyectos que prioricen la calidad de vida. La proximidad a escuelas, supermercados y hospitales garantiza comodidad para futuros residentes o clientes. Con un precio de $700,000, es una oportunidad única para invertir en una de las zonas de mayor crecimiento en San Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "34,425 sq varas (≈28,800 m²) of flat, ready-to-build land",
+        "es": "34,425 varas cuadradas (≈28,800 m²) de terreno plano, listo para construir"
+      },
+      {
+        "en": "Prime location near Los Encuentros Shopping Center and km 35 highway",
+        "es": "Ubicación privilegiada cerca del Centro Comercial Los Encuentros y la carretera del km 35"
+      },
+      {
+        "en": "Excellent connectivity to San Salvador and Chalatenango",
+        "es": "Excelente conectividad con San Salvador y Chalatenango"
+      },
+      {
+        "en": "Surrounded by nature with panoramic views and peaceful environment",
+        "es": "Rodeado de naturaleza con vistas panorámicas y ambiente tranquilo"
+      },
+      {
+        "en": "Close to schools, supermarkets, and hospitals",
+        "es": "Cerca de escuelas, supermercados y hospitales"
+      }
+    ],
+    "lat": 13.9633,
+    "lng": -89.1856,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Aguilares, San Salvador, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2698,
+    "tokens_out": 763,
+    "cost_usd": 0.00156776,
+    "finish_reason": "stop",
+    "latency_ms": 5515
+  },
+  "remax|001464215007": {
+    "ts": "2026-05-18T23:27:28.096007+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Award-Winning Cocoa Farm in Berlin, Usulután",
+      "es": "Finca de Cacao Galardonada en Berlín, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional cocoa farm located in the heart of Berlin, Usulután. This property has earned international recognition, winning awards in France for its high-quality export cocoa. The farm is fully equipped with water and electricity services, making it ready for immediate operation. Ideal for investors seeking a productive agricultural asset with proven excellence in cocoa production.",
+      "es": "Descubra esta excepcional finca de cacao ubicada en el corazón de Berlín, Usulután. Esta propiedad ha obtenido reconocimiento internacional, ganando premios en Francia por su cacao de alta calidad para exportación. La finca cuenta con servicios de agua y electricidad, lista para operar de inmediato. Ideal para inversionistas que buscan un activo agrícola productivo con excelencia comprobada en la producción de cacao."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Award-winning cocoa exported to France",
+        "es": "Cacao galardonado exportado a Francia"
+      },
+      {
+        "en": "Located in the center of Berlin town",
+        "es": "Ubicada en el centro del pueblo de Berlín"
+      },
+      {
+        "en": "Water and electricity services available",
+        "es": "Servicios de agua y electricidad disponibles"
+      },
+      {
+        "en": "Proven high-quality export cocoa",
+        "es": "Cacao de alta calidad comprobada para exportación"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.5333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Berlin, Usulután, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2371,
+    "tokens_out": 438,
+    "cost_usd": 0.00112197,
+    "finish_reason": "stop",
+    "latency_ms": 3392
+  },
+  "remax|002523950002": {
+    "ts": "2026-05-18T23:27:29.629070+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Lot in Lomas de Villanueva, La Libertad",
+      "es": "Terreno Premium en Lomas de Villanueva, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Seize this exceptional opportunity to own a fully registered 848.97 m² lot in the rapidly growing Lomas de Villanueva area, La Libertad. Perfectly suited for building your dream home, a weekend retreat, or a long-term investment, this property offers a peaceful environment with pleasant weather. Enjoy convenient access to key areas of La Libertad and San Salvador, making it an ideal choice for those seeking tranquility without sacrificing connectivity. Legal documentation is in order, ready for immediate transfer. Contact us today for more details or to schedule a visit.",
+      "es": "Aproveche esta oportunidad excepcional de poseer un lote totalmente registrado de 848.97 m² en la zona de rápido crecimiento de Lomas de Villanueva, La Libertad. Ideal para construir su casa soñada, una residencia de fin de semana o una inversión a largo plazo, esta propiedad ofrece un entorno tranquilo con un clima agradable. Disfrute de un fácil acceso a las principales áreas de La Libertad y San Salvador, lo que la convierte en la opción perfecta para quienes buscan tranquilidad sin sacrificar la conectividad. La documentación legal está en orden, lista para la transferencia inmediata. Contáctenos hoy para más información o para programar una visita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "848.97 m² fully registered lot",
+        "es": "Lote de 848.97 m² totalmente registrado"
+      },
+      {
+        "en": "Prime location in fast-growing La Libertad",
+        "es": "Ubicación privilegiada en La Libertad de rápido crecimiento"
+      },
+      {
+        "en": "Ideal for dream home, vacation or investment",
+        "es": "Ideal para casa soñada, vacaciones o inversión"
+      },
+      {
+        "en": "Peaceful environment with pleasant weather",
+        "es": "Ambiente tranquilo con clima agradable"
+      },
+      {
+        "en": "Easy access to San Salvador and La Libertad",
+        "es": "Fácil acceso a San Salvador y La Libertad"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.3167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2475,
+    "tokens_out": 581,
+    "cost_usd": 0.00130735,
+    "finish_reason": "stop",
+    "latency_ms": 3877
+  },
+  "remax|001462660073": {
+    "ts": "2026-05-18T23:27:29.657755+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Land at Bahia Dorada Beach",
+      "es": "Terreno frente al mar en Bahía Dorada"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity to own land in the exclusive Bahia Dorada Beach community, located in La Libertad department just 75 km from San Salvador. This 2,172 V2 lot offers direct beach access and stunning ocean views. The gated community features 24/7 security, controlled access, a swimming pool, and a restaurant. With potable water and underground electricity already in place, you can start building your dream residential or tourism project immediately. Natural attractions include two cliffs with caves, blending seamlessly with the coastal landscape. Perfect for a high-end development. Call 22505358 for more details.",
+      "es": "Descubra una oportunidad única de poseer un terreno en la exclusiva comunidad de Bahía Dorada, en el departamento de La Libertad, a solo 75 km de San Salvador. Este lote de 2,172 V2 ofrece acceso directo a la playa y vistas espectaculares al océano. La comunidad cerrada cuenta con seguridad 24/7, acceso controlado, piscina y restaurante. Con agua potable y electricidad subterránea ya instaladas, puede comenzar a construir su proyecto residencial o turístico de inmediato. Los atractivos naturales incluyen dos acantilados con cuevas que se integran al paisaje costero. Ideal para un desarrollo de alto nivel. Llame al 22505358 para más información."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access with ocean views",
+        "es": "Acceso directo a la playa con vista al mar"
+      },
+      {
+        "en": "24/7 security and controlled access",
+        "es": "Seguridad 24/7 y acceso controlado"
+      },
+      {
+        "en": "Utilities ready: potable water and underground electricity",
+        "es": "Servicios listos: agua potable y electricidad subterránea"
+      },
+      {
+        "en": "Exclusive community with pool and restaurant",
+        "es": "Comunidad exclusiva con piscina y restaurante"
+      },
+      {
+        "en": "Natural cliffs and caves on the property",
+        "es": "Acantilados naturales y cuevas en la propiedad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bahia Dorada Beach, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2502,
+    "tokens_out": 600,
+    "cost_usd": 0.00133554,
+    "finish_reason": "stop",
+    "latency_ms": 4357
+  },
+  "remax|003093850009": {
+    "ts": "2026-05-18T23:27:29.795802+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Land in San Salvador Volcano, Santa Tecla",
+      "es": "Terreno en el Volcán de San Salvador, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique investment opportunity on the slopes of the San Salvador Volcano. This 15,431 m² rustic forest property is located in El Progreso Canton, Santa Tecla, just a 7-minute walk from Anchovy Park. With a cool climate at 1,800 meters above sea level, the land features pine, fruit, and hardwood trees, offering stunning mountain views. The terrain is 25% flat, 60% undulating, and 15% variable with seasonal ravines. Ideal for ecotourism, agriculture, nurseries, or building your dream retreat. Electricity is available 200 meters away. Priced at $220,000 (negotiable), this is your chance to invest in a growing tourist area.",
+      "es": "Descubra una oportunidad de inversión única en las faldas del Volcán de San Salvador. Esta propiedad forestal rústica de 15,431 m² se ubica en el Cantón El Progreso, Santa Tecla, a solo 7 minutos caminando del Parque Anchovy. Con clima fresco a 1,800 m s.n.m., el terreno cuenta con pinos, árboles frutales y maderables, ofreciendo impresionantes vistas a la montaña. El terreno es 25% plano, 60% ondulado y 15% variable con cárcavas de invierno. Ideal para ecoturismo, agricultura, viveros o construir la casa de descanso que desee. Energía eléctrica a 200 metros. Precio de $220,000 (negociable), su oportunidad de invertir en una zona de crecimiento turístico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location near Anchovy Park",
+        "es": "Ubicación privilegiada cerca del Parque Anchovy"
+      },
+      {
+        "en": "Cool climate at 1,800 m altitude",
+        "es": "Clima fresco a 1,800 m de altitud"
+      },
+      {
+        "en": "Versatile terrain for ecotourism or agriculture",
+        "es": "Terreno versátil para ecoturismo o agricultura"
+      },
+      {
+        "en": "Stunning mountain views",
+        "es": "Impresionantes vistas a la montaña"
+      },
+      {
+        "en": "Electricity available nearby",
+        "es": "Energía eléctrica disponible cerca"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2793,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "url_language": "mixed",
+    "tokens_in": 2532,
+    "tokens_out": 647,
+    "cost_usd": 0.00139534,
+    "finish_reason": "stop",
+    "latency_ms": 4564
+  },
+  "remax|002523950003": {
+    "ts": "2026-05-18T23:27:30.802869+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Build Your Dream Home Near La Toma Water Park",
+      "es": "Construye tu hogar soñado cerca del Parque Acuático La Toma"
+    },
+    "short_description_canonical": {
+      "en": "Discover the perfect lot to build your vacation home or next investment, just 1 minute from La Toma Water Park. Surrounded by nature, this property offers peace, privacy, strong appreciation potential, and strategic city access. The lot measures 319,792.293 m² (1,131.847 varas² / 8,528.16 sq ft). Part of the exclusive Quintas Campestres project within a 41-block master plan, it is surrounded by over 1,000 blocks of protected natural reserve, featuring a reforested volcanic rock ecosystem, crystal-clear water springs, and a fresh microclimate year-round. Amenities include spacious green areas, a clubhouse for gatherings, and gated security. Located 15 minutes from Nejapa Hospital and 30 minutes from San Salvador, with easy access via Constitución Boulevard, El Boquerón, and Los Chorros routes. Ideal for a vacation home, high-appreciation investment, or nature-filled lifestyle close to the city. Schedule your visit today!",
+      "es": "Descubre el lote perfecto para construir tu casa de vacaciones o próxima inversión, a solo 1 minuto del Parque Acuático La Toma. Rodeado de naturaleza, esta propiedad ofrece paz, privacidad, alto potencial de plusvalía y acceso estratégico a la ciudad. El lote mide 319,792.293 m² (1,131.847 varas² / 8,528.16 sq ft). Parte del exclusivo proyecto Quintas Campestres dentro de un plan maestro de 41 manzanas, está rodeado por más de 1,000 manzanas de reserva natural protegida, con un ecosistema de roca volcánica reforestada, manantiales de agua cristalina y un microclima fresco durante todo el año. Las comodidades incluyen amplias áreas verdes, casa club para reuniones y acceso controlado con seguridad. Ubicado a 15 minutos del Hospital de Nejapa y 30 minutos de San Salvador, con fácil acceso por el Bulevar Constitución, El Boquerón y la ruta Los Chorros. Ideal para casa de vacaciones, inversión de alta plusvalía o un estilo de vida rodeado de naturaleza cerca de la ciudad. ¡Agenda tu visita hoy!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 minute from La Toma Water Park",
+        "es": "1 minuto del Parque Acuático La Toma"
+      },
+      {
+        "en": "Surrounded by over 1,000 blocks of protected natural reserve",
+        "es": "Rodeado de más de 1,000 manzanas de reserva natural protegida"
+      },
+      {
+        "en": "Gated community with clubhouse and security",
+        "es": "Comunidad cerrada con casa club y seguridad"
+      },
+      {
+        "en": "30 minutes from San Salvador",
+        "es": "30 minutos de San Salvador"
+      },
+      {
+        "en": "Crystal-clear water springs and fresh microclimate",
+        "es": "Manantiales de agua cristalina y microclima fresco"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quezaltepeque, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2616,
+    "tokens_out": 810,
+    "cost_usd": 0.00159732,
+    "finish_reason": "stop",
+    "latency_ms": 5285
+  },
+  "remax|002472129094": {
+    "ts": "2026-05-18T23:27:31.571791+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Invest in La Ceiba Subdivision, Nueva Concepción",
+      "es": "Invierta en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Discover a prime investment opportunity in the growing semi-urban area of La Ceiba Subdivision, Nueva Concepción, Chalatenango. This residential development offers 95 lots (only 70 left in Phase 1) starting at 280 square varas. Enjoy a strategic location just 1 km from Central Park, 700 meters from Blvd. Arturo Gutiérrez, and 100 meters from Turicentro Splash. The land is completely flat with established surroundings and nearby projects. Each lot comes with individual deed, water connection (from a 170m deep well with permit pending), and electricity infrastructure (110v/220v). Gravel streets with curb and gutter are estimated for completion by March 2026. Financing available through BFA, FEDECREDITO, and ACACYPAC. Reserve with $1,000 and sign purchase agreement within 30 days. Secure your lot today!",
+      "es": "Descubra una oportunidad de inversión privilegiada en la creciente zona semiurbana de La Ceiba, Nueva Concepción, Chalatenango. Este desarrollo residencial ofrece 95 lotes (solo 70 disponibles en Fase 1) desde 280 varas cuadradas. Disfrute de una ubicación estratégica a 1 km del Parque Central, 700 metros del Blvd. Arturo Gutiérrez y 100 metros del Turicentro Splash. El terreno es completamente plano, con alrededores consolidados y proyectos cercanos. Cada lote incluye escritura individual, conexión de agua (pozo de 170 m con permiso en trámite) e infraestructura eléctrica (110v/220v). Calles de grava con cordón y cuneta estimadas para marzo de 2026. Financiamiento disponible a través de BFA, FEDECREDITO y ACACYPAC. Reserve con $1,000 y firme el contrato de compraventa en 30 días. ¡Asegure su lote hoy!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Strategic location near Central Park and Turicentro Splash",
+        "es": "Ubicación estratégica cerca del Parque Central y Turicentro Splash"
+      },
+      {
+        "en": "Individual deeds and legal security",
+        "es": "Escrituras individuales y seguridad jurídica"
+      },
+      {
+        "en": "Water and electricity infrastructure included",
+        "es": "Infraestructura de agua y electricidad incluida"
+      },
+      {
+        "en": "Flexible financing options available",
+        "es": "Opciones de financiamiento flexibles disponibles"
+      },
+      {
+        "en": "Only 70 lots left in Phase 1",
+        "es": "Solo 70 lotes disponibles en Fase 1"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "tokens_in": 2717,
+    "tokens_out": 732,
+    "cost_usd": 0.00153879,
+    "finish_reason": "stop",
+    "latency_ms": 5254
+  },
+  "remax|001464215006": {
+    "ts": "2026-05-18T23:27:31.713868+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Finca El Derrumbe: Eco-Hotel & Coffee Forest Paradise",
+      "es": "Finca El Derrumbe: Paraíso de Bosque de Café y Eco-Hotel"
+    },
+    "short_description_canonical": {
+      "en": "Discover Finca El Derrumbe, a spectacular 1,200–1,500 m altitude estate on the road from Alegría to Berlín, Usulután. Nestled on the north side of the Alegría Lagoon crater, this property offers breathtaking views of the turquoise waters of Laguna de Alegría, a renowned eastern tourist destination. The farm's name comes from a volcanic eruption 500 years ago, and its volcanic soils nurture a coffee forest with Bourbon, Red and Yellow Icatu, Costa Rican, and Cuscatleco varieties, plus newly planted Tabi and Kenia. The reserve features caverns, natural springs, and kilometers of stone retaining walls. Ideal for an eco-hotel with a lower-level restaurant, it boasts excellent birdwatching (owls, toucans) and wildlife (agoutis, pacas, rabbits, deer, coyotes). The property includes interior stone-paved streets, mule paths, and a water source. Originally worked by Italian immigrants in 1850, this land blends history, biodiversity, and tourism potential.",
+      "es": "Descubre Finca El Derrumbe, una espectacular propiedad a 1,200–1,500 m s.n.m. en la carretera de Alegría a Berlín, Usulután. Ubicada en el lado norte del cráter de la Laguna de Alegría, ofrece vistas impresionantes de sus aguas turquesas, un destino turístico emblemático del oriente. Su nombre proviene de una erupción volcánica hace 500 años, y sus suelos volcánicos albergan un bosque de café con variedades Bourbon, Icatu rojo y amarillo, café costarricense y cuscatleco, además de las recién plantadas Tabi y Kenia. La reserva incluye cavernas, manantiales naturales y kilómetros de muros de contención de piedra. Ideal para un eco-hotel con restaurante en el nivel inferior, es un excelente sitio para observación de aves (búhos, tucanes) y vida silvestre (tepezcuintles, cotuzas, conejos, venados, coyotes). Cuenta con calles internas empedradas, caminos de mulas y una fuente de agua. Trabajada por inmigrantes italianos desde 1850, esta tierra combina historia, biodiversidad y potencial turístico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Altitude 1,200–1,500 m with cool climate and stunning crater views",
+        "es": "Altitud de 1,200–1,500 m con clima fresco y vistas impresionantes al cráter"
+      },
+      {
+        "en": "Coffee forest with rare Bourbon, Icatu, and specialty varieties",
+        "es": "Bosque de café con variedades raras Bourbon, Icatu y especiales"
+      },
+      {
+        "en": "Rich biodiversity: birds, mammals, and endemic flora",
+        "es": "Rica biodiversidad: aves, mamíferos y flora endémica"
+      },
+      {
+        "en": "Historic stone walls and paths built by Italian immigrants",
+        "es": "Muros y caminos de piedra históricos construidos por inmigrantes italianos"
+      },
+      {
+        "en": "Perfect for eco-hotel development with restaurant",
+        "es": "Perfecto para desarrollo de eco-hotel con restaurante"
+      }
+    ],
+    "lat": 13.5069,
+    "lng": -88.4936,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Laguna de Alegría, Usulután, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2811,
+    "tokens_out": 895,
+    "cost_usd": 0.00174347,
+    "finish_reason": "stop",
+    "latency_ms": 6605
+  },
+  "remax|002472129093": {
+    "ts": "2026-05-18T23:27:32.204228+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Invest in La Ceiba Subdivision, Nueva Concepción",
+      "es": "Invierte en Residencial La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Seize this opportunity to invest in a growing semi-urban area with excellent location, individual deeds, and flexible financing. La Ceiba Subdivision offers lots from 280 square varas in a completely flat topography, ideal for residential development. Phase 1 features 95 lots, with only 70 remaining. The property is strategically located just 1 km from Central Park, 700 meters from Blvd. Arturo Gutiérrez, and 100 meters from Turicentro Splash, across from Las Palmeras neighborhood. Legal security is guaranteed with individual deeds, verified properties in the Land Registry, and a purchase agreement with earnest money. Water is provided by a 170-meter deep well with permits pending, and each lot includes a water connection, individual meter, and box. Electricity is available throughout with 110v and 220v power. Internal streets are gravel with curb and gutter, estimated completion by March 2026. Payment options include cash with a $1,000 reserve and bank financing through BFA, FEDECREDITO, or ACACYPAC. Don't miss this chance to build your future.",
+      "es": "Aprovecha esta oportunidad para invertir en una zona semiurbana en crecimiento con excelente ubicación, escrituras individuales y financiamiento flexible. Residencial La Ceiba ofrece lotes desde 280 varas cuadradas en una topografía completamente plana, ideal para desarrollo residencial. La Fase 1 cuenta con 95 lotes, solo 70 disponibles. La propiedad está estratégicamente ubicada a 1 km del Parque Central, 700 metros del Blvd. Arturo Gutiérrez y 100 metros del Turicentro Splash, frente a la colonia Las Palmeras. La seguridad legal está garantizada con escrituras individuales, propiedades verificadas en el Registro de la Propiedad y un contrato de compraventa con arras. El agua proviene de un pozo de 170 metros de profundidad con permisos en trámite, y cada lote incluye conexión de agua, medidor y caja individual. La electricidad está disponible en todo el desarrollo con energía de 110v y 220v. Las calles internas son de grava con cordón y cuneta, con fecha estimada de finalización en marzo de 2026. Las opciones de pago incluyen efectivo con una reserva de $1,000 y financiamiento bancario a través de BFA, FEDECREDITO o ACACYPAC. No pierdas esta oportunidad de construir tu futuro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds and legal security",
+        "es": "Escrituras individuales y seguridad legal"
+      },
+      {
+        "en": "Strategic location near parks and boulevards",
+        "es": "Ubicación estratégica cerca de parques y bulevares"
+      },
+      {
+        "en": "Flat topography ready for construction",
+        "es": "Topografía plana lista para construir"
+      },
+      {
+        "en": "Water and electricity infrastructure included",
+        "es": "Infraestructura de agua y electricidad incluida"
+      },
+      {
+        "en": "Flexible financing and bank options",
+        "es": "Financiamiento flexible y opciones bancarias"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "tokens_in": 2717,
+    "tokens_out": 834,
+    "cost_usd": 0.00165099,
+    "finish_reason": "stop",
+    "latency_ms": 5743
+  },
+  "remax|002472129092": {
+    "ts": "2026-05-18T23:27:33.938001+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "La Ceiba Subdivision: Secure Lots in Nueva Concepción",
+      "es": "Residencial La Ceiba: Lotes Seguros en Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique investment opportunity in La Ceiba Subdivision, a growing semi-urban residential development in Nueva Concepción, Chalatenango. With 95 lots in Phase 1 (only 70 remaining), each lot starts at 280 square varas and features a flat topography perfect for building. Enjoy a strategic location just 1 km from Central Park, 700 meters from Blvd. Arturo Gutiérrez, and 100 meters from Turicentro Splash, with direct street access. Legal security is guaranteed with individual deeds, verified land registry, and unencumbered properties. The development includes a 170-meter deep well with water connection, individual meters, and full electrical infrastructure with 110v and 220v power. Gravel streets with curb and gutter are estimated to be completed by March 2026. Financing options include cash or bank loans through BFA, FEDECREDITO, or ACACYPAC. Reserve your lot today with just $1,000 and secure your future in this thriving area.",
+      "es": "Descubra una oportunidad de inversión única en Residencial La Ceiba, un desarrollo residencial semiurbano en crecimiento en Nueva Concepción, Chalatenango. Con 95 lotes en la Fase 1 (solo 70 disponibles), cada lote desde 280 varas cuadradas y topografía completamente plana, ideal para construir. Disfrute de una ubicación estratégica a solo 1 km del Parque Central, 700 metros del Blvd. Arturo Gutiérrez y 100 metros del Turicentro Splash, con acceso directo en calle. Seguridad jurídica garantizada con escrituras individuales, registro de propiedad verificado y propiedades libres de gravámenes. El desarrollo cuenta con un pozo de 170 metros de profundidad con conexión de agua, medidores individuales e infraestructura eléctrica completa con energía de 110v y 220v. Calles de grava con cordón y cuneta con fecha estimada de finalización en marzo de 2026. Opciones de financiamiento: efectivo o préstamos bancarios a través de BFA, FEDECREDITO o ACACYPAC. Reserve su lote hoy con solo $1,000 y asegure su futuro en esta próspera zona."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Only 70 lots left in Phase 1",
+        "es": "Solo 70 lotes disponibles en la Fase 1"
+      },
+      {
+        "en": "Individual deeds and legal security",
+        "es": "Escrituras individuales y seguridad jurídica"
+      },
+      {
+        "en": "Strategic location near parks and boulevard",
+        "es": "Ubicación estratégica cerca de parques y bulevar"
+      },
+      {
+        "en": "Water and electricity infrastructure included",
+        "es": "Infraestructura de agua y electricidad incluida"
+      },
+      {
+        "en": "Flexible financing with low reservation",
+        "es": "Financiamiento flexible con baja reserva"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "tokens_in": 2717,
+    "tokens_out": 796,
+    "cost_usd": 0.00160919,
+    "finish_reason": "stop",
+    "latency_ms": 5841
+  },
+  "encuentra24|32217515": {
+    "ts": "2026-05-18T23:27:34.391670+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Exclusive Apartment for Sale at Costa del Sol Beach",
+      "es": "Venta de Apartamento Exclusivo en Playa Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning 2-bedroom, 3-bathroom apartment in a private complex directly on Costa del Sol Beach. With 104 m² (1,120 sq. ft.) of modern living space, enjoy panoramic ocean views, an open kitchen, dining and living areas, terrace, laundry area, and two parking spaces. The complex offers premium amenities: swimming pool, playground, gym, rooftop, bar, event terrace, 24/7 security, elevators, green areas, pet-friendly policy, and controlled access. Costa del Sol is one of El Salvador's finest beaches, ideal for water sports and relaxation, with growing value due to its proximity to the international airport. Priced at $350,000. Contact us for a visit!",
+      "es": "Descubre este espectacular apartamento de 2 habitaciones y 3 baños en un complejo privado directamente sobre la Playa Costa del Sol. Con 104 m² de espacio moderno, disfruta de vistas panorámicas al océano, cocina abierta, sala-comedor, terraza, área de lavado y dos parqueos. El complejo ofrece amenidades de primera: piscina, área de juegos, gimnasio, rooftop, bar, terraza para eventos, seguridad 24/7, ascensores, zonas verdes, pet-friendly y acceso controlado. Costa del Sol es una de las mejores playas de El Salvador, ideal para deportes acuáticos y relax, con plusvalía creciente por su cercanía al aeropuerto internacional. Precio: $350,000. ¡Contáctanos para una visita!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in a private complex",
+        "es": "Ubicación frente al mar en complejo privado"
+      },
+      {
+        "en": "104 m² with panoramic ocean views",
+        "es": "104 m² con vistas panorámicas al océano"
+      },
+      {
+        "en": "2 bedrooms, 3 bathrooms, 2 parking spaces",
+        "es": "2 habitaciones, 3 baños, 2 parqueos"
+      },
+      {
+        "en": "Premium amenities: pool, gym, rooftop, bar",
+        "es": "Amenidades premium: piscina, gimnasio, rooftop, bar"
+      },
+      {
+        "en": "Growing value near international airport",
+        "es": "Plusvalía creciente cerca del aeropuerto internacional"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Costa del Sol, La Paz",
+    "url_language": "es",
+    "tokens_in": 2717,
+    "tokens_out": 664,
+    "cost_usd": 0.00146399,
+    "finish_reason": "stop",
+    "latency_ms": 4762
   }
 }
