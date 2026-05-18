@@ -41,9 +41,12 @@ test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
     await expect(page.locator(".hp-usp")).toHaveCount(0);
     await expect(page.locator(".hp-shoreline")).toHaveCount(0);
 
-    // Carousel surfaces remain.
+    // Carousel surfaces remain. Note: under hero_v4 each shelf requires
+    // at least 5 qualifying listings; price_drops can render null when
+    // the catalog has too few repriced listings to surface. The block
+    // registry still emits it (asserted via blocks_visible below) — the
+    // DOM presence is data-gated.
     await expect(page.locator("#hp-shelf-top10")).toBeVisible();
-    await expect(page.locator("#hp-shelf-drops")).toBeVisible();
     await expect(page.locator("#hp-shelf-new")).toBeVisible();
 
     // paid_home_rendered fires with the trimmed list.
