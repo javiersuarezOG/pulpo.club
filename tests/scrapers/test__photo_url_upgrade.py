@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from unittest import mock
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(REPO))
 
 from pulpo.scrapers import _photo_url_upgrade as helper  # noqa: E402
