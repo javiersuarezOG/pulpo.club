@@ -17,14 +17,19 @@
 // a shelf (small dataset / strict filter), the shelf falls back to
 // the hardcoded editorial cards so the surface never goes empty.
 
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
-import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed } from "../components.jsx";
+import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
+
+// Wave-5 carousel — per-shelf limits when listings are wired (hero_v4
+// on). Older shelves capped at 3 to match the hardcoded editorial set;
+// the carousel lets users keep scrolling past the first three.
+const REAL_LIMITS = { top_10: 12, price_drops: 8, new_this_week: 8 };
 
 // ────────────────────────────────────────────────────────────────────
 // Shared shelf scaffold (telemetry, viewport observers — unchanged)
@@ -272,7 +277,49 @@ export function HomeShelf({
   useShelfScrolled(shelfKey, listRef);
 
   const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
-  const items = useReal ? listings.slice(0, cards.length) : cards;
+  // When real listings are wired, render the full picker output as a
+  // horizontal carousel. Fallback editorial cards stay capped at 3 — no
+  // carousel needed for the placeholder set.
+  const items = useReal ? listings : cards;
+
+  // Wave-5 carousel — track scroll position so the prev/next arrow
+  // buttons can disable at the endpoints. Only meaningful when the
+  // list is wider than its viewport (i.e. when there's something to
+  // scroll into). Arrows hidden entirely on mobile (touch swipe is
+  // the native affordance there) via CSS.
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < max - 4);
+  }, []);
+
+  useEffect(() => {
+    if (!useReal) return;
+    const el = listRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, [useReal, items.length, updateArrows]);
+
+  const scrollByPage = useCallback((direction) => {
+    const el = listRef.current;
+    if (!el) return;
+    // Page = roughly the viewport's width minus a peek of the next card
+    // so the user always sees the next slot mid-scroll. Smooth-scroll
+    // hands UX off to the browser.
+    const amount = Math.max(240, el.clientWidth - 80);
+    el.scrollBy({ left: direction * amount, behavior: "smooth" });
+  }, []);
 
   const onViewAllClick = useCallback(() => {
     try { track("homepage.shelf_view_all_clicked", { shelf: shelfKey }); } catch { /* ignore */ }
@@ -298,9 +345,33 @@ export function HomeShelf({
               {t(headingKey, locale)}
             </h2>
           </div>
-          <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
-            {t("home.shelf.view_all", locale)}
-          </button>
+          <div className="hp-shelf-head-right">
+            {useReal && (
+              <div className="hp-shelf-arrows" aria-hidden="true">
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(-1)}
+                  disabled={!canScrollLeft}
+                  aria-label={t("home.shelf.prev", locale)}
+                >
+                  <Icon name="chevron_left" size={18} strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  className="hp-shelf-arrow"
+                  onClick={() => scrollByPage(1)}
+                  disabled={!canScrollRight}
+                  aria-label={t("home.shelf.next", locale)}
+                >
+                  <Icon name="chevron_right" size={18} strokeWidth={2} />
+                </button>
+              </div>
+            )}
+            <button type="button" className="hp-shelf-view-all" onClick={onViewAllClick}>
+              {t("home.shelf.view_all", locale)}
+            </button>
+          </div>
         </header>
         <div ref={listRef} className="hp-shelf-list" role="list">
           {items.map((item, i) => (
@@ -362,7 +433,7 @@ const NEW_THIS_WEEK_CARDS = [
 
 export function TopTenShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, TOP_10_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, REAL_LIMITS.top_10) : []), [all, heroV4]);
   return (
     <HomeShelf
       app={app}
@@ -382,7 +453,7 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
 
 export function PriceDropsShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, PRICE_DROPS_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, REAL_LIMITS.price_drops) : []), [all, heroV4]);
   const pill = t("home.shelf.dropsCount", locale);
   return (
     <HomeShelf
@@ -403,7 +474,7 @@ export function PriceDropsShelf({ app, locale, heroV4 = false }) {
 
 export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, NEW_THIS_WEEK_CARDS.length) : []), [all, heroV4]);
+  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, REAL_LIMITS.new_this_week) : []), [all, heroV4]);
   const pill = t("home.shelf.newCount", locale);
   return (
     <HomeShelf

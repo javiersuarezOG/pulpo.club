@@ -6235,3 +6235,99 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 700;
   color: var(--color-ink-primary);
 }
+
+/* ===========================================================================
+   Wave 5 carousel — rotating shelf listings with prev/next arrows
+   ===========================================================================
+   Real-listing shelves under hero_v4 carry 8-12 cards each (vs. the
+   hardcoded fallback's 3). Desktop swaps the 3-column grid for a
+   horizontal scroller with arrow buttons in the header. Mobile keeps
+   its native scroll-snap swipe behavior (arrows hidden under 768px —
+   touch is the affordance there).
+   --------------------------------------------------------------------------- */
+
+/* Shelf head layout — view-all sits with the arrows on the right. */
+.app.hero-v4 .hp-shelf-head-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Arrow group */
+.app.hero-v4 .hp-shelf-arrows {
+  display: none;
+}
+@media (min-width: 768px) {
+  .app.hero-v4 .hp-shelf-arrows {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+.app.hero-v4 .hp-shelf-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-line-soft);
+  color: var(--color-ink-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out);
+}
+.app.hero-v4 .hp-shelf-arrow:hover:not(:disabled) {
+  background: var(--color-bg-cream-soft);
+  transform: scale(1.04);
+}
+.app.hero-v4 .hp-shelf-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Desktop horizontal scroll — override the 3-col grid for real shelves */
+@media (min-width: 640px) {
+  .app.hero-v4 .hp-shelf-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 24px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 4px;
+    /* Hide native scrollbars — arrows are the affordance. */
+    scrollbar-width: none;
+  }
+  .app.hero-v4 .hp-shelf-list::-webkit-scrollbar {
+    display: none;
+  }
+  .app.hero-v4 .hp-shelf-list-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: calc((100% - 48px) / 3);
+    min-width: 240px;
+    max-width: 320px;
+  }
+}
+@media (min-width: 1024px) {
+  .app.hero-v4 .hp-shelf-list-item {
+    width: calc((100% - 48px) / 3);
+  }
+}
+@media (min-width: 1280px) {
+  .app.hero-v4 .hp-shelf-list-item {
+    width: calc((100% - 72px) / 4);
+  }
+}
+
+/* Carousel renders many listings — no need for the scroll-hint
+   on real-shelf rendering since the arrows ARE the affordance. */
+.app.hero-v4 .hp-shelf-real-carousel + .hp-shelf-scroll-hint,
+.app.hero-v4 .hp-shelf-list:has(.hp-shelf-card-real) ~ .hp-shelf-scroll-hint {
+  display: none;
+}
