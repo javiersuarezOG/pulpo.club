@@ -512,7 +512,12 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     # eligibility — the gate effectively becomes a no-op without us
     # having to special-case it here. That's the load-bearing
     # fail-soft contract from the plan.
-    top_pct = int(os.environ.get("LLM_VISION_TOP_PCT", "5"))
+    # GH Actions passes `${{ secrets.LLM_VISION_TOP_PCT }}` which is the
+    # empty string when the secret is unset — `int("")` raises ValueError.
+    # The `or "5"` falls through to the default for both unset env and
+    # empty string. Matches the same pattern used by `_cost_per_call_usd`
+    # and `_daily_budget_usd` in aesthetic_vision.py.
+    top_pct = int(os.environ.get("LLM_VISION_TOP_PCT") or "5")
     # Lone-candidate optimization — a listing whose pool reduces to one
     # non-text-overlay survivor has no ranking choice to make. Exclude
     # its candidates from the eligibility pool entirely so the LLM
