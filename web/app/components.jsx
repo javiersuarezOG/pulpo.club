@@ -550,9 +550,10 @@ function ListingCard({
           onLoad={onPhotoLoaded}
         />
         {topRank != null && (
-          <span className="listing-card-rank" aria-label={`Rank ${topRank}`}>
-            #{topRank}
-          </span>
+          <div className="pulpo-rank-badge listing-card-rank" aria-label={`Pulpo ranked ${topRank}`}>
+            <span className="pulpo-rank-badge-eyebrow">★ RANKED</span>
+            <span className="pulpo-rank-badge-num">#{topRank}</span>
+          </div>
         )}
         <div className="card-badge-row">
           <Badge listing={listing} />
