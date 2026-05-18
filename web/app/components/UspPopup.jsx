@@ -10,7 +10,7 @@
 // dismiss paths, all four routed through the same `dismiss(action)`
 // helper so the telemetry shape stays uniform.
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import {
@@ -25,10 +25,20 @@ import {
 } from "../home/icons.jsx";
 import { markUspPopupDismissed } from "../lib/usp-popup-trigger";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
+import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 
 export function UspPopup({ app, trigger, onClose }) {
   const lc = app.locale;
   const dialogRef = useRef(null);
+
+  // Geo-derived display price for the templated h2 (mirrors USPBand
+  // since this popup reuses the same i18n key).
+  const [price, setPrice] = useState(() => priceForCountry(null));
+  useEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
 
   // Fire `usp_popup.shown` exactly once on mount. The trigger label
   // tells dashboards which arming path won the race.
@@ -82,7 +92,7 @@ export function UspPopup({ app, trigger, onClose }) {
     }
     // Don't await — dispatch may navigate; onClose() avoids the modal
     // sticking around if the dispatch fails silently.
-    void dispatchCentralBranch(branch, app);
+    void dispatchCentralBranch(branch, app, { trigger: "usp_section" });
     onClose();
   };
 
@@ -116,7 +126,7 @@ export function UspPopup({ app, trigger, onClose }) {
             <IconLock size={14} strokeWidth={1.8} className="hp-usp-eyebrow-icon" />
             {t("home.usp.eyebrow", lc)}
           </span>
-          <h2 className="hp-usp-h2">{t("home.usp.h2", lc)}</h2>
+          <h2 className="hp-usp-h2">{t("home.usp.h2", lc, { price: price.displayString })}</h2>
         </div>
 
         <div className="usp-popup-cards">

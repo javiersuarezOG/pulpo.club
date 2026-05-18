@@ -21,9 +21,11 @@ import {
   ToastHost,
   ConsentBanner,
 } from "./pages.jsx";
+import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
 import { captureCampaignParams } from "./lib/campaign";
+import { readFeatureFlag } from "./lib/feature-flag";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
 // inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
 // extracted out for the same reason — single chrome component per role.
@@ -62,6 +64,55 @@ import { useDocumentMeta } from "./lib/use-document-meta";
 import { bootAssetTelemetry } from "./telemetry/asset-load";
 import { bootGlobalErrorHandlers } from "./telemetry/errors";
 import "./styles/index.css";
+
+// Dev-panel-only: per-block override controls. Reads + writes
+// localStorage key `pulpo-block-overrides`. Production traffic never
+// hits this panel (gated by __PULPO_DEV_PANEL__).
+const HOME_BLOCK_IDS = ["hero", "featured", "usps", "shoreline", "top_10", "price_drops", "new_this_week"];
+const BLOCK_OVERRIDE_VALUES = ["auto", "force_show", "force_hide"];
+
+function HomeBlockOverridesPanel() {
+  const [overrides, setOverrides] = React.useState(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem("pulpo-block-overrides");
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
+  const update = (blockId, value) => {
+    const next = { ...overrides };
+    if (value === "auto") delete next[blockId];
+    else next[blockId] = value;
+    setOverrides(next);
+    try { window.localStorage.setItem("pulpo-block-overrides", JSON.stringify(next)); } catch { /* ignore */ }
+    // Force a reflow so visibleBlocksFor reads the new value. Cheaper
+    // than wiring a context — this is a dev preview tool.
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("pulpo:block-overrides-changed"));
+    }
+  };
+  return (
+    <div style={{ padding: "0 12px 8px", display: "flex", flexDirection: "column", gap: 4 }}>
+      {HOME_BLOCK_IDS.map((id) => (
+        <div key={id} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+          <span style={{ flex: 1, color: "rgba(41,38,27,0.72)" }}>{id}</span>
+          <select
+            value={overrides[id] || "auto"}
+            onChange={(e) => update(id, e.target.value)}
+            style={{
+              fontSize: 10, padding: "2px 4px", borderRadius: 4,
+              border: ".5px solid rgba(0,0,0,0.1)", background: "rgba(255,255,255,0.6)",
+            }}
+          >
+            {BLOCK_OVERRIDE_VALUES.map((v) => (
+              <option key={v} value={v}>{v.replace("_", " ")}</option>
+            ))}
+          </select>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function App() {
   // Tweakable defaults — host rewrites this block when the user changes a tweak,
@@ -848,8 +899,21 @@ function App() {
   // when not open. App owns it (rather than HomePage) so the modal can
   // outlive a route change if needed.
   const [proUpsellModal, setProUpsellModal] = useState(null);
-  const openProUpsellModal = useCallback((cfg) => setProUpsellModal(cfg), []);
+  // Free-month conversion modal — opens on hero/USP/listing-card clicks
+  // for anon + free users. Routed through lib/cta-routing's
+  // `free_month_modal` branch. Mutually exclusive with proUpsellModal
+  // so a campaign-URL visitor never sees two modals stacked.
+  const [freeMonthModal, setFreeMonthModal] = useState(null);
+  const openProUpsellModal = useCallback((cfg) => {
+    setFreeMonthModal(null);
+    setProUpsellModal(cfg);
+  }, []);
   const closeProUpsellModal = useCallback(() => setProUpsellModal(null), []);
+  const openFreeMonthModal = useCallback((cfg) => {
+    setProUpsellModal(null);
+    setFreeMonthModal(cfg);
+  }, []);
+  const closeFreeMonthModal = useCallback(() => setFreeMonthModal(null), []);
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //
@@ -912,6 +976,7 @@ function App() {
     savedIds, toggleSave,
     signupModal, openSignup, closeSignup,
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
+    freeMonthModal, openFreeMonthModal, closeFreeMonthModal,
     openListing, closeListing, openListingId,
     detailViewCount, recordDetailView,
     showToast, toast,
@@ -938,7 +1003,7 @@ function App() {
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
-    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}`}>
+    <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", false) ? " hero-v4" : ""}`}>
       {/* Wave-3a: single SiteHeader on every route. The homepage's hero
           still owns its conversion CTAs; the header is pure navigation. */}
       <SiteHeader app={app} />
@@ -997,6 +1062,13 @@ function App() {
           onClose={closeProUpsellModal}
         />
       )}
+      {freeMonthModal && (
+        <FreeMonthModal
+          app={app}
+          trigger={freeMonthModal.trigger}
+          onClose={closeFreeMonthModal}
+        />
+      )}
       <ToastHost app={app} />
       <ConsentBanner locale={locale} />
 
@@ -1025,6 +1097,12 @@ function App() {
           ]}
           onChange={(v) => setLocale(v)}
         />
+
+        <TweakSection label="Home blocks" />
+        <div style={{ padding: "0 12px 8px", fontSize: 10, color: "rgba(41,38,27,0.55)" }}>
+          Override per-block visibility on the home page. "auto" follows the tier matrix.
+        </div>
+        <HomeBlockOverridesPanel />
 
         <TweakSection label="Quick nav" />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: "0 12px 12px" }}>

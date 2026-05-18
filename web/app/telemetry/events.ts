@@ -266,7 +266,7 @@ export type EventMap = {
       | "favorites_action"
       | "account_entry";
     user_state: "anonymous" | "free" | "pro" | "agency";
-    branch: "stripe_checkout" | "paywall" | "free_signup" | "login_ui" | "passthrough";
+    branch: "stripe_checkout" | "paywall" | "free_signup" | "login_ui" | "passthrough" | "free_month_modal";
     flag_enabled: boolean;
   };
 
@@ -424,6 +424,83 @@ export type EventMap = {
   /** User clicks the /start "Log in" link. Funnel-side measure of
    *  returning-customer traffic vs new acquisition. */
   "start.login_link_clicked": Record<string, never>;
+
+  // ───── Free-month conversion modal (in-page Stripe upsell) ─────
+  // Replaces the previous "redirect to /start?intent=upgrade" page jump
+  // for anon AND free users on hero, USP section, listing-card, and
+  // featured-deal click paths. Paid users never see this modal.
+  // Properties match the pro_upsell.* shape so PostHog funnels can join
+  // the two modal surfaces, but `trigger` enumerates the click sources
+  // (not URL signals).
+  /** Mounted. Fires once per modal appearance. */
+  "free_month_modal.shown": {
+    trigger:
+      | "hero_cta"
+      | "header_cta"
+      | "usp_section"
+      | "shelf_card"
+      | "featured_deal"
+      | "hero_just_in"
+      | "favorites_action"
+      | "browse_card";
+    user_state: "anonymous" | "free";
+    flag_enabled: boolean;
+    has_code: boolean;
+    geo_currency: "usd" | "eur";
+    price_amount: number;
+  };
+  /** Dismissed without converting. */
+  "free_month_modal.dismissed": {
+    trigger:
+      | "hero_cta"
+      | "header_cta"
+      | "usp_section"
+      | "shelf_card"
+      | "featured_deal"
+      | "hero_just_in"
+      | "favorites_action"
+      | "browse_card";
+    action: "escape" | "backdrop" | "close_button" | "maybe_later";
+  };
+  /** Primary CTA clicked → POST /api/stripe/start-checkout. */
+  "free_month_modal.cta_clicked": {
+    trigger:
+      | "hero_cta"
+      | "header_cta"
+      | "usp_section"
+      | "shelf_card"
+      | "featured_deal"
+      | "hero_just_in"
+      | "favorites_action"
+      | "browse_card";
+    has_code: boolean;
+  };
+  /** Fires immediately before window.location.assign(stripeUrl). */
+  "free_month_modal.checkout_redirected": {
+    trigger:
+      | "hero_cta"
+      | "header_cta"
+      | "usp_section"
+      | "shelf_card"
+      | "featured_deal"
+      | "hero_just_in"
+      | "favorites_action"
+      | "browse_card";
+    has_code: boolean;
+  };
+  /** Surface-side error. `reason` mirrors pro_upsell.* for parity. */
+  "free_month_modal.error": {
+    trigger:
+      | "hero_cta"
+      | "header_cta"
+      | "usp_section"
+      | "shelf_card"
+      | "featured_deal"
+      | "hero_just_in"
+      | "favorites_action"
+      | "browse_card";
+    reason: string;
+  };
   /** Fires when an unrecognized URL (e.g. /test) gets cleanly
    *  replaceState'd to /. Surfaces broken inbound links in PostHog. */
   "route.fallback_redirected": { from_path: string };

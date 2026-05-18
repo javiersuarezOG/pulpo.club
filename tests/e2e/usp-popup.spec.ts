@@ -149,14 +149,8 @@ test.describe("USP popup (Wave 5) — dismiss + suppression", () => {
 });
 
 test.describe("USP popup (Wave 5) — CTA wiring", () => {
-  test("anon CTA click → /start redirect (Wave-1 routing intact)", async ({ page, context }) => {
+  test("anon CTA click → opens FreeMonthModal (post-#262 routing)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
-
-    let startRedirectHit = false;
-    await context.route("**/start**", (route) => {
-      startRedirectHit = true;
-      void route.fulfill({ status: 204, body: "" });
-    });
 
     await page.goto(
       "/?posthog_capture=1&ff_usp_popup_v1=1&upsell=1&ff_cta_routing_v2=1",
@@ -180,15 +174,18 @@ test.describe("USP popup (Wave 5) — CTA wiring", () => {
       return list.find((e) => e.name === "usp_popup.cta_clicked") ? true : false;
     }, { timeout: 3_000, message: "usp_popup.cta_clicked should fire" }).toBe(true);
 
-    await expect.poll(() => startRedirectHit, {
-      timeout: 3_000,
-      message: "expected anon CTA to redirect to /start",
-    }).toBe(true);
+    // Post-#262: UspPopup CTA dispatches to free_month_modal which
+    // opens FreeMonthModal in-page. UspPopup also unmounts (its
+    // onClose fires after dispatch).
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 3_000 });
 
     const events = await getEvents(page);
-    // Wave-1 cta_routed fires alongside.
-    expect(events.find((e) => e.name === "cta_routed" && e.props.cta_id === "header_primary"))
-      .toBeTruthy();
+    const routed = events.find((e) => e.name === "cta_routed" && e.props.cta_id === "header_primary");
+    expect(routed).toBeTruthy();
+    expect(routed!.props.branch).toBe("free_month_modal");
+    expect(
+      events.find((e) => e.name === "free_month_modal.shown" && e.props.trigger === "usp_section"),
+    ).toBeTruthy();
 
     expect(errors).toEqual([]);
   });

@@ -2139,6 +2139,95 @@ h1,h2,h3,h4,h5 { margin: 0; }
   }
 }
 
+/* Free-month conversion modal — opens on hero CTA, USP section, and
+   listing-card clicks for anon + free users. Distinct visual language
+   from ProUpsellModal (no eyebrow, no nested USP headlines) and from
+   USPBand (no icon-in-circle cards) so the three surfaces don't
+   visually conflate. Single anchor: the headline. */
+.free-month-modal {
+  text-align: left;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+.free-month-modal-headline {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+@media (min-width: 640px) {
+  .free-month-modal-headline { font-size: 28px; }
+}
+.free-month-modal-body {
+  margin: 0 0 20px;
+  color: var(--ink-2, var(--ink));
+  font-size: 15px;
+  line-height: 1.45;
+}
+.free-month-modal-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.free-month-modal-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.free-month-modal-bullet-mark {
+  color: var(--accent-strong);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.free-month-modal-cta-primary {
+  width: 100%;
+  min-height: 48px;
+  /* .btn-primary is inline-flex with align-items:center but no
+     horizontal centering by default — the .block helper class adds it.
+     The modal CTA is always full-width so we bake centering in here
+     and don't require callers to remember .block. */
+  justify-content: center;
+  text-align: center;
+}
+.free-month-modal-cta-dismiss {
+  display: block;
+  margin: 14px auto 0;
+  background: transparent;
+  border: none;
+  color: var(--ink-3);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.free-month-modal-cta-dismiss:hover { color: var(--ink); }
+.free-month-modal-code-note {
+  margin: 8px 0 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+.free-month-modal-error {
+  margin: 8px 0 0;
+  color: var(--tone-urgent);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+
 .oauth-btn {
   width: 100%;
   display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -2269,6 +2358,25 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
   .footer-cols { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Trimmed footer — home + browse only. Single low-weight row with
+   country badge, copyright, and two legal labels (non-clickable until
+   /terms + /privacy routes ship — tracked as a follow-up). */
+.site-footer-trimmed {
+  padding: 24px 16px;
+  margin-top: 24px;
+}
+.footer-trim-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: center;
+  gap: 8px 12px;
+  font-size: 13px; color: var(--ink-3);
+}
+.footer-trim-sep { color: var(--ink-4); }
+.footer-trim-badge,
+.footer-trim-copy,
+.footer-trim-link { white-space: nowrap; }
 
 /* ============== Reduced motion ============== */
 @media (prefers-reduced-motion: reduce) {
@@ -4808,6 +4916,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-usp { padding: 56px 24px; }
 }
+/* Clickable variant (anon + free): the whole section opens
+   FreeMonthModal. Hover lift only on devices that actually hover. */
+.homepage-v2 .hp-usp-clickable {
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+@media (hover: hover) {
+  .homepage-v2 .hp-usp-clickable:hover { background: var(--color-bg-elevated, #fafafa); }
+}
+.homepage-v2 .hp-usp-clickable:focus-visible {
+  outline: 2px solid var(--ink-1, #1a1a1a);
+  outline-offset: -2px;
+}
 .homepage-v2 .hp-usp-inner {
   max-width: 1100px;
   margin: 0 auto;
@@ -5633,4 +5754,202 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .homepage-v2.hero-v4 .hp-shoreline-card {
   border-radius: 20px;
   overflow: hidden;
+}
+
+/* ===========================================================================
+   Wave 5 polish (hero_v4) — real-listing shelf cards + Browse/Saved
+   Airbnb-style ListingCard restyle + PickShoreline polish
+   ===========================================================================
+   All rules scoped under `.app.hero-v4` so flag-off renders today's UI
+   byte-for-byte. The HomeShelf real-card rules are scoped under
+   `.app.hero-v4 .hp-shelf-card-real` so the hardcoded fallback card
+   keeps its original look on either flag state.
+   --------------------------------------------------------------------------- */
+
+/* ────── Browse + Saved: page background flips to clean white ────── */
+
+.app.hero-v4 .page-browse,
+.app.hero-v4 .page-saved {
+  background: var(--color-bg-white);
+}
+
+/* ────── ListingCard — Airbnb-style on every consumer (Home shelves
+        unchanged because they use .hp-shelf-card-real, not .listing-card) ────── */
+
+.app.hero-v4 .listing-card {
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+.app.hero-v4 .listing-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+.app.hero-v4 .listing-card-photo {
+  border-radius: 16px;
+  overflow: hidden;
+}
+.app.hero-v4 .listing-card-photo img {
+  border-radius: 16px;
+}
+.app.hero-v4 .listing-card-body {
+  padding: 12px 4px 0;
+}
+.app.hero-v4 .listing-card-title {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink-primary);
+  line-height: 1.3;
+  /* Truncate long titles to 2 lines so the grid stays tidy. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.app.hero-v4 .listing-card-meta {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-ink-secondary);
+  margin-top: 2px;
+}
+.app.hero-v4 .listing-card-price {
+  margin-top: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.app.hero-v4 .listing-card-price .price-main {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink-primary);
+}
+.app.hero-v4 .listing-card-price .price-was {
+  font-size: 13px;
+  color: var(--color-ink-muted);
+  text-decoration: line-through;
+}
+.app.hero-v4 .listing-card-price .price-sub {
+  display: none;
+}
+/* Cleaner Airbnb cards don't carry the USP bullet list or the
+   source/days pills row. The data is still rendered in the DOM
+   (telemetry observers + a11y don't change); just visually hidden. */
+.app.hero-v4 .listing-card-usps,
+.app.hero-v4 .listing-card-footer {
+  display: none;
+}
+/* Existing top-left badge becomes the white pill */
+.app.hero-v4 .card-badge-row .badge {
+  background: var(--color-bg-white);
+  color: var(--color-ink-primary);
+  box-shadow: var(--shadow-1);
+}
+
+/* ────── Browse + Saved grid rhythm — generous gaps, larger cards ────── */
+
+.app.hero-v4 .page-browse .listing-grid,
+.app.hero-v4 .page-saved .listing-grid {
+  gap: 32px 24px;
+}
+
+/* ────── HomeShelf — real-listing card variant ────── */
+
+.app.hero-v4 .hp-shelf-card-real {
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-art {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--color-bg-cream-soft);
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-img,
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge {
+  position: absolute;
+  top: 10px;
+  background: var(--color-bg-white);
+  color: var(--color-ink-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-1);
+  /* override gradient/colored kinds with the Airbnb white pill */
+  background-color: var(--color-bg-white) !important;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge-left { left: 10px; }
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge-right { right: 10px; }
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 4px;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-title {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink-primary);
+  line-height: 1.3;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-meta {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-ink-secondary);
+  margin: 0;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-price-row {
+  margin-top: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-price {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink-primary);
+}
+.app.hero-v4 .hp-shelf-card-real .hp-shelf-card-price-was {
+  font-size: 13px;
+  color: var(--color-ink-muted);
+  text-decoration: line-through;
+  font-weight: 400;
+}
+/* Heart button position inside the photo */
+.app.hero-v4 .hp-shelf-card-real .heart-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* ────── PickShoreline polish ────── */
+
+.app.hero-v4 .hp-shoreline-card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 0;
+  box-shadow: var(--shadow-1);
+  background: var(--color-bg-white);
+}
+.app.hero-v4 .hp-shoreline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
 }

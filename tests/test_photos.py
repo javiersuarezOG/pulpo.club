@@ -260,6 +260,206 @@ def test_hero_download_refetches_when_hero_missing(tmp_repo):
     assert (photos_dir / "remax_legacy-001.hero.jpg.meta.json").exists()
 
 
+# ── U1 hero re-escalation (2026-05-18) ──────────────────────────────────
+# Pre-U1 behavior: always picked photo_urls[0]. The 2026-05-18 incident
+# showed this published a pixelated + watermarked first photo even when
+# the listing carried better candidates. The new behavior scores up to
+# PULPO_PHOTO_MAX_CANDIDATES candidates and picks the winner.
+
+
+def _make_jpeg(size=(800, 600), color=(200, 200, 200), quality=85) -> bytes:
+    """Helper: build a JPEG with a specific size + color to vary the
+    PR-7.6 score across test candidates."""
+    pytest.importorskip("PIL")
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", size, color).save(buf, format="JPEG", quality=quality)
+    return buf.getvalue()
+
+
+def test_pick_best_photo_picks_highest_scoring(tmp_repo):
+    """Three candidates with different sizes — picker returns the
+    highest-resolution one (PR-7.6's resolution tier dominates the score
+    when sharpness + size are similar)."""
+    pytest.importorskip("PIL")
+    from automation.run import _pick_best_photo_url
+
+    big = _make_jpeg(size=(1920, 1080))      # full-HD → tier 100
+    mid = _make_jpeg(size=(1280, 720))       # HD → tier 70
+    small = _make_jpeg(size=(800, 600))      # passable → tier 40
+
+    responses = {
+        "https://example.com/small.jpg": small,
+        "https://example.com/mid.jpg": mid,
+        "https://example.com/big.jpg": big,
+    }
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = responses[url]
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        url, content, score, has_text = _pick_best_photo_url(list(responses.keys()))
+
+    # The full-HD image should win — it's the only one in tier 100.
+    # We assert the URL rather than an absolute score because PR-7.6
+    # composes the final score from resolution + size + sharpness, and
+    # a solid-color JPEG has near-zero sharpness so the total lands
+    # below the resolution-tier ceiling. The relative ordering is what
+    # matters.
+    assert url == "https://example.com/big.jpg"
+    assert content == big
+    assert score > 0
+
+
+def test_pick_best_photo_deprioritizes_text_overlay(tmp_repo):
+    """When one candidate is flagged has_text_overlay=True and others
+    are not, the picker prefers a non-flagged candidate even if it scores
+    lower."""
+    pytest.importorskip("PIL")
+    from automation.run import _pick_best_photo_url
+
+    flagged = _make_jpeg(size=(1920, 1080))   # high-res but flagged
+    clean = _make_jpeg(size=(800, 600))       # lower-res but clean
+
+    responses = {
+        "https://example.com/flagged.jpg": flagged,
+        "https://example.com/clean.jpg": clean,
+    }
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = responses[url]
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    def fake_text_overlay(content):
+        return content == flagged
+
+    with mock.patch("httpx.get", side_effect=fake_get), \
+         mock.patch("automation.photo_quality.detect_text_overlay",
+                    side_effect=fake_text_overlay):
+        url, _content, _score, has_text = _pick_best_photo_url(list(responses.keys()))
+
+    assert url == "https://example.com/clean.jpg"
+    assert has_text is False
+
+
+def test_pick_best_photo_falls_back_when_all_flagged(tmp_repo):
+    """If every candidate is flagged, return the highest-scoring flagged
+    one — we still want a hero rather than no hero at all."""
+    pytest.importorskip("PIL")
+    from automation.run import _pick_best_photo_url
+
+    big_flagged = _make_jpeg(size=(1920, 1080))
+    small_flagged = _make_jpeg(size=(600, 400))
+
+    responses = {
+        "https://example.com/big.jpg": big_flagged,
+        "https://example.com/small.jpg": small_flagged,
+    }
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = responses[url]
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get), \
+         mock.patch("automation.photo_quality.detect_text_overlay",
+                    return_value=True):
+        url, _content, _score, has_text = _pick_best_photo_url(list(responses.keys()))
+
+    assert url == "https://example.com/big.jpg"
+    assert has_text is True
+
+
+def test_pick_best_photo_returns_none_when_all_fail(tmp_repo):
+    """All downloads fail → returns (None, None, None, None) and the
+    caller increments the failure counter."""
+    from automation.run import _pick_best_photo_url
+
+    with mock.patch("httpx.get", side_effect=Exception("connection_refused")):
+        result = _pick_best_photo_url(["https://example.com/a.jpg",
+                                       "https://example.com/b.jpg"])
+    assert result == (None, None, None, None)
+
+
+def test_pick_best_photo_respects_candidates_cap(tmp_repo, monkeypatch):
+    """Only the first N candidates are downloaded (PULPO_PHOTO_MAX_CANDIDATES)."""
+    pytest.importorskip("PIL")
+    from automation.run import _pick_best_photo_url
+    monkeypatch.setenv("PULPO_PHOTO_MAX_CANDIDATES", "2")
+
+    fake = _make_jpeg(size=(1920, 1080))
+    calls = []
+
+    def fake_get(url, *_args, **_kwargs):
+        calls.append(url)
+        r = mock.MagicMock()
+        r.content = fake
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        _pick_best_photo_url([
+            "https://example.com/1.jpg",
+            "https://example.com/2.jpg",
+            "https://example.com/3.jpg",
+            "https://example.com/4.jpg",
+        ])
+
+    assert len(calls) == 2
+
+
+def test_hero_download_picks_best_of_multiple(tmp_repo):
+    """End-to-end: a listing with 3 photo_urls picks the best (highest
+    resolution + not flagged) as its hero, NOT photo_urls[0]."""
+    pytest.importorskip("PIL")
+    from pulpo.models import Listing
+    from automation.run import _download_hero_photos
+
+    bad_first = _make_jpeg(size=(600, 400))       # low-res — bad first
+    great_second = _make_jpeg(size=(1920, 1080))  # full HD — should win
+    mid_third = _make_jpeg(size=(1280, 720))
+
+    responses = {
+        "https://example.com/bad_first.jpg": bad_first,
+        "https://example.com/great_second.jpg": great_second,
+        "https://example.com/mid_third.jpg": mid_third,
+    }
+
+    li = Listing(
+        source="bienesraices", source_id="u1-multipick-001",
+        url="https://example.com/listing",
+        scraped_at="2026-01-01T00:00:00Z",
+        title="Multi-photo listing",
+        photo_urls=list(responses.keys()),
+    )
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = responses[url]
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        result = _download_hero_photos([li], tmp_repo)
+
+    assert result["ok"] == 1
+    assert li.hero_photo_path == "/photos/bienesraices_u1-multipick-001.jpg"
+
+    # The hero sidecar should record which URL won.
+    sidecar = tmp_repo / "web" / "photos" / "bienesraices_u1-multipick-001.hero.jpg.meta.json"
+    assert sidecar.exists()
+    sidecar_data = json.loads(sidecar.read_text())
+    assert sidecar_data["winning_url"] == "https://example.com/great_second.jpg", \
+        "Picker should have chosen the full-HD candidate over the 600x400 first"
+    assert sidecar_data["candidate_count"] == 3
+
+
 def test_no_photo_listing_skipped(tmp_repo):
     """Listings with empty photo_urls are not attempted."""
     pytest.importorskip("PIL")
