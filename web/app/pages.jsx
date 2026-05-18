@@ -1333,8 +1333,9 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
-                  <span className="results-table-rank" aria-label={`Rank ${topRankMap.get(l.id)}`}>
-                    #{topRankMap.get(l.id)}
+                  <span className="pulpo-rank pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
+                    <span className="pulpo-rank-star" aria-hidden="true">★</span>
+                    <span className="pulpo-rank-num">{topRankMap.get(l.id)}</span>
                   </span>
                 )}
                 {tr(l.title, app.locale)}
