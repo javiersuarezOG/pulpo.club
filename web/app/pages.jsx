@@ -24,6 +24,7 @@ import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
+import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
 import {
   Icon,
   PulpoLogo,
@@ -52,7 +53,7 @@ import {
   galleryThumbsUnlockedFor,
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
-import { trackCtaRouted } from "./lib/cta-routing";
+import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/cta-routing";
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1223,7 +1224,18 @@ function BrowsePage({ app }) {
                     source="browse"
                     onOpen={() => {
                       track("card.clicked", { listing_id: l.id, source_view: "browse" });
-                      app.openListing(l.id);
+                      // Route through the matrix so anon + free hit the
+                      // FreeMonthModal (paid users open the listing).
+                      const branch = routeCtaForState("shelf_card", app?.user);
+                      trackCtaRouted("shelf_card", app?.user, branch, true);
+                      if (branch === "passthrough") {
+                        app.openListing(l.id);
+                        return;
+                      }
+                      void dispatchCentralBranch(branch, app, {
+                        trigger: "browse_card",
+                        pendingListing: l.id,
+                      });
                     }}
                   />
                 ))}
@@ -2758,64 +2770,31 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
     }
   };
 
-  const postCheckout = async (includeCode) => {
-    return fetch("/api/stripe/start-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        promoCode: includeCode && urlCode ? urlCode : null,
-        locale: lc,
-        ...utms,
-      }),
-    });
-  };
-
+  // Shared with FreeMonthModal — single implementation of the
+  // postCheckout / soft-fail-on-bad-code retry / rate-limited / network
+  // error / redirect chain. Lives in lib/stripe-modal-checkout.ts.
   const onCta = async () => {
     setError(null);
     track("pro_upsell.cta_clicked", { trigger, had_promo_code: !!urlCode });
     setSubmitting(true);
-    try {
-      let res = await postCheckout(true);
-      if (!res.ok) {
-        const detail = await res.json().catch(() => ({}));
-        const reason = detail && detail.error;
-        if (reason === "invalid_promo_code" && urlCode) {
-          // Soft-fail: drop the bad code, retry once.
-          res = await postCheckout(false);
-        } else if (reason === "rate_limited") {
-          setError(t("pro_upsell.error", lc));
-          setSubmitting(false);
-          return;
-        } else {
-          track("api.error", {
-            endpoint: "/api/stripe/start-checkout",
-            status: res.status,
-            reason,
-            detail: detail && detail.detail,
-          });
-          setError(t("pro_upsell.error", lc));
-          setSubmitting(false);
-          return;
-        }
-      }
-      const data = await res.json();
-      if (!data || !data.url) {
-        setError(t("pro_upsell.error", lc));
-        setSubmitting(false);
-        return;
-      }
+
+    const result = await startCheckoutFromModal({
+      locale: lc,
+      utms,
+      urlCode,
+    });
+
+    if (result.kind === "redirect") {
       track("pro_upsell.checkout_redirected", {
         trigger, had_promo_code: !!urlCode,
       });
-      window.location.assign(data.url);
-    } catch (err) {
-      track("api.error", {
-        endpoint: "/api/stripe/start-checkout",
-        status: 0, reason: "network", detail: err && err.message,
-      });
-      setError(t("pro_upsell.error", lc));
-      setSubmitting(false);
+      window.location.assign(result.url);
+      return;
     }
+    // rate_limited and error both surface the same user-visible copy;
+    // the helper already fired api.error for non-rate-limited failures.
+    setError(t("pro_upsell.error", lc));
+    setSubmitting(false);
   };
 
   const onMaybeLater = () => {
