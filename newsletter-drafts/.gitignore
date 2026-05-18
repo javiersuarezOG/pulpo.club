@@ -1,0 +1,5 @@
+# Dry-run outputs are regenerable from `scripts/build_newsletter_dryrun.py`
+# and read live ranked.json, so they'd churn on every pipeline run. Only the
+# hand-authored design reference (pulpo-issue-01-*.html) is tracked.
+dryrun-*.html
+*.pdf
