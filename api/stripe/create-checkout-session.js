@@ -157,6 +157,12 @@ module.exports = async (req, res) => {
     // so existing in-flight checkout sessions still resolve.
     success_url: `${origin}/?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${origin}/?upgrade=cancelled`,
+    // Audit P0-5 — render the mandatory Terms checkbox on the Stripe
+    // Checkout page. See api/stripe/start-checkout.js for the full
+    // rationale; this is the auth-gated in-app upgrade flow's twin.
+    consent_collection: {
+      terms_of_service: "required",
+    },
   };
   // Stripe rejects `discounts` and `allow_promotion_codes: true` set
   // together — pick one. Pre-applied code wins; otherwise surface the
