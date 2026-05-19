@@ -129,13 +129,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--ink-3);
 }
 
-.profile-chip { display: flex; align-items: center; gap: 10px; }
+.profile-chip { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); color: white;
   display: grid; place-items: center;
   font-weight: 600; font-size: 13px;
   position: relative;
+  flex-shrink: 0;
 }
 
 /* ── Pulpo Pro identity ────────────────────────────────────────────────
@@ -173,6 +174,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 700;
   border: 1.5px solid var(--paper);
   box-sizing: content-box;
+}
+
+/* Mobile: tighten the topnav gap so the wordmark + Pro pill + right-side
+   chrome fit at the common phone widths (375–414px). Below 360px (the
+   smoke-test 320px viewport included) the pill drops out — the gold
+   avatar ring + ★ badge still carry Pro identity, and the wordmark +
+   chrome keep their space. */
+@media (max-width: 767px) {
+  .topnav-inner { gap: 16px; }
+  .pulpo-logo-pro { font-size: 12px; padding: 2px 6px 3px; }
+}
+@media (max-width: 360px) {
+  .pulpo-logo-pro { display: none; }
 }
 
 /* Single auth icon — replaces the dual "Log in" + "Sign up — free" pair.
@@ -678,29 +692,6 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-.photo-placeholder {
-  position: relative;
-  width: 100%;
-  background: linear-gradient(135deg, oklch(32% 0.04 60) 0%, oklch(22% 0.03 70) 100%);
-  border-radius: inherit;
-}
-.photo-placeholder-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  color: oklch(85% 0.04 60);
-  gap: 4px;
-}
-.photo-placeholder-zone {
-  font-family: var(--font-display);
-  font-size: 18px;
-  margin-top: 4px;
-}
-.photo-placeholder-type {
-  font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0.7;
-}
 
 .card-badge-row {
   position: absolute; top: 12px; left: 12px;
@@ -1580,10 +1571,34 @@ h1,h2,h3,h4,h5 { margin: 0; }
   text-decoration: line-through;
   margin-top: 2px;
 }
+/* Used on price/size when the broker hasn't shared the value (paired
+ * with the `value.notshared.short` i18n string + a tooltip). Softer
+ * weight and smaller scale so "Not shared" reads as a meta-note
+ * rather than competing with real data. */
+.kstat-value.muted {
+  color: var(--ink-3);
+  font-size: 18px;
+  font-style: italic;
+}
+.price-main.muted {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 400;
+}
+.detail-broker-note {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--ink-3);
+  background: var(--bg-soft, transparent);
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 @media (max-width: 600px) {
   .detail-keystats { grid-template-columns: repeat(2, 1fr); }
   .kstat-value { font-size: 22px; }
+  .kstat-value.muted { font-size: 16px; }
 }
 
 .detail-section { margin-top: 28px; position: relative; }

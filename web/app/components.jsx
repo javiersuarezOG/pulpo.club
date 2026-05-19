@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VARA2 } from "./i18n.jsx";
 import { track } from "./telemetry/hook";
 import { uspsVisibleFor } from "./lib/gating.ts";
+import { categoryImageForListing } from "./assets/categories";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -15,12 +16,18 @@ function currentLocale() {
 function currentUnits() {
   return document.documentElement.dataset.units === "vrs2" ? "vrs2" : "m2";
 }
+// `null` on price / size means the broker didn't share it. Render the
+// localized "Not shared" string instead of a bare em-dash so users know
+// the data gap exists at the source rather than as a render bug.
+// Incomplete listings are hidden from Discover shelves + the default
+// Browse view; users only see this copy after opting in via the chip,
+// or via a direct link to the detail page.
 function formatPrice(n) {
-  if (n == null) return "—";
+  if (n == null) return t("value.notshared.short", currentLocale());
   return formatPriceI18n(n, currentLocale());
 }
 function formatSize(m2) {
-  if (m2 == null) return "—";
+  if (m2 == null) return t("value.notshared.short", currentLocale());
   return formatSizeI18n(m2, currentLocale(), currentUnits());
 }
 function formatDaysListed(d) {
@@ -335,16 +342,19 @@ function Photo({
   }, [url, eager, source, listing.id, idx]);
 
   if (!url || errored) {
+    // Visual fallback — always an image, never a text card. Picks a
+    // bundled category WebP that matches the listing's master_category
+    // / land_type. See assets/categories/index.js#categoryImageForListing.
+    const fallbackUrl = categoryImageForListing(listing);
     return (
-      <div className={`photo-placeholder ${className}`} style={{ aspectRatio: ratio }}>
-        <div className="photo-placeholder-inner">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <path d="M3 20l5-9 4 6 3-4 6 7z"/>
-            <circle cx="17" cy="7" r="2"/>
-          </svg>
-          <div className="photo-placeholder-zone">{listing.zone_name}</div>
-          <div className="photo-placeholder-type">{landTypeLabel(listing.land_type)}</div>
-        </div>
+      <div className={`photo-wrap photo-fallback ${className}`} style={{ aspectRatio: ratio }}>
+        <img
+          src={fallbackUrl}
+          alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={eager ? "high" : "auto"}
+        />
       </div>
     );
   }
@@ -596,13 +606,26 @@ function ListingCard({
           {listing.zone_name} · {landTypeLabel(listing.land_type)}
         </div>
         <div className="listing-card-price">
-          <span className="price-main">{formatPrice(listing.price)}</span>
+          <span
+            className={listing.price == null ? "price-main muted" : "price-main"}
+            title={listing.price == null ? t("value.notshared.tooltip", currentLocale()) : undefined}
+          >{formatPrice(listing.price)}</span>
           {listing.previous_price && (
             <span className="price-was">{formatPrice(listing.previous_price)}</span>
           )}
-          {!isMag && (
-            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}{ppmSuffix()}</span>
-          )}
+          {!isMag && (() => {
+            // Size + ppm sub-row. When either price or size is null,
+            // ppm is meaningless (it's derived). Drop it cleanly so
+            // the user sees "· Not shared" once, not twice.
+            const sizeMissing = listing.size_m2 == null;
+            const ppmAvailable = listing.price != null && listing.size_m2 != null && listing.price_per_m2 != null;
+            return (
+              <span className="price-sub">
+                · <span title={sizeMissing ? t("value.notshared.tooltip", currentLocale()) : undefined}>{formatSize(listing.size_m2)}</span>
+                {ppmAvailable && ` · ${formatPpm(listing.price_per_m2)}${ppmSuffix()}`}
+              </span>
+            );
+          })()}
         </div>
         {!compact && !isMag && listing.usps[0] && (() => {
           // Same gate the detail panel uses — keep card and detail in

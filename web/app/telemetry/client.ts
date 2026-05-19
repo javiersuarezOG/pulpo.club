@@ -13,6 +13,7 @@
 // extensions → events drop, no errors surface to the user.
 
 import type { EventMap, EventName } from "./events";
+import { hasConsented, CONSENT_DECISION_EVENT } from "../lib/consent";
 
 type QueuedEvent = {
   name: EventName;
@@ -56,20 +57,14 @@ const SHOULD_TELEMETER = (() => {
   return !import.meta.env.DEV;
 })();
 
-// Read the consent decision recorded by ConsentBanner (pages.jsx). Three
-// states: "granted" (full telemetry), "declined" (opt-out before init),
-// or "" / unknown (boot-without-decision). Outside the EU the banner
-// auto-grants on first paint, so "" only happens for a tiny first-paint
-// window before that side-effect lands. We treat "" as granted-pending
-// so EU users get queued events flushed once they accept; declined users
-// have init replaced with a no-op that wires the opt-out.
-function readConsent(): "granted" | "declined" | "" {
-  try {
-    const v = localStorage.getItem("pulpo-consent") || "";
-    if (v === "granted" || v === "declined") return v;
-    return "";
-  } catch { return ""; }
-}
+// Consent gating — analytics category from web/app/lib/consent.ts.
+// Per PDF §3.2 #1 + #6, PostHog must NOT load until the user has
+// explicitly accepted the analytics category. The pre-rebuild
+// behaviour (treat undecided as "granted-pending" and flush a
+// queue on accept) is gone: undecided = no init, full stop. The
+// CONSENT_DECISION_EVENT listener below retries init when the user
+// later grants analytics so we don't lose events fired after the
+// grant moment.
 
 // Allow-list of query parameters permitted to flow through to PostHog on
 // any URL-bearing event property. Anything not in this set is stripped
@@ -137,22 +132,23 @@ function scrubEventUrls(event: { properties?: Record<string, unknown> } | null |
 
 function scheduleInit() {
   if (initStarted) return;
-  initStarted = true;
   if (typeof window === "undefined") return;
 
-  // Hard opt-out: if the user explicitly declined we never load the
-  // PostHog SDK at all — no init, no session recording, no network
-  // request to eu.i.posthog.com. The queue from earlier track() calls
-  // is dropped on the floor by every later track() short-circuiting on
-  // `posthog == null && !initStarted` (initStarted is true now).
-  const consent = readConsent();
-  if (consent === "declined") return;
+  // Hard gate: per the ConsentBanner contract, PostHog only loads
+  // after the user has explicitly accepted the `analytics` category.
+  // Undecided users get no init, no script, no network request — the
+  // banner is the source of truth and the only way out of this state.
+  // When the user later accepts, the CONSENT_DECISION_EVENT listener
+  // (initialized at the bottom of this module) re-calls scheduleInit
+  // and we proceed.
+  if (!hasConsented("analytics")) return;
 
-  // Session recording is the heaviest privacy surface — only run it
-  // when consent is explicitly granted. EU users with no decision yet
-  // ("") still init PostHog so we can capture page-view-class events,
-  // but recording stays off until they hit "Accept".
-  const recordingEnabled = consent === "granted";
+  initStarted = true;
+
+  // Session recording is the heaviest privacy surface — gated on the
+  // same analytics consent. (We could split it under a separate
+  // category later if session-replay opt-out becomes a frequent ask.)
+  const recordingEnabled = true;
 
   const start = async () => {
     try {
@@ -349,7 +345,24 @@ export function onFeatureFlagsLoaded(cb: () => void): () => void {
   return () => { flagsLoadedSubs.delete(cb); };
 }
 
-// Boot the lazy init now so the queue starts draining as soon as the
-// browser is idle. Calling this at module import time is fine because
-// requestIdleCallback is non-blocking and gracefully no-ops without a key.
+// Boot the lazy init now. With the post-PR-E consent gating,
+// scheduleInit() is a no-op until `hasConsented("analytics") === true`,
+// so calling this at module import time costs nothing for undecided
+// or declined users. They'll never see PostHog load.
 if (SHOULD_TELEMETER) scheduleInit();
+
+// Listen for the user's consent decision (fired by writeConsent() in
+// web/app/lib/consent.ts). If they accept analytics, retry init —
+// any track() calls queued during the undecided window then flush
+// via drainQueue() once PostHog loads.
+if (typeof window !== "undefined" && SHOULD_TELEMETER) {
+  window.addEventListener(CONSENT_DECISION_EVENT, () => {
+    if (hasConsented("analytics")) {
+      scheduleInit();
+    } else if (posthog) {
+      // User revoked. Best-effort opt out + reset distinct ID.
+      try { posthog.opt_out_capturing(); } catch { /* ignore */ }
+      try { posthog.reset(); } catch { /* ignore */ }
+    }
+  });
+}

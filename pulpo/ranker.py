@@ -88,7 +88,19 @@ def rank(listings: Iterable[Listing]) -> list[Listing]:
         reasons.append(f"weights V{wv:.2f} L{wl:.2f} M{wm:.2f} → {composite:.1f}")
         li.rank_reasons = reasons
 
-    items.sort(key=lambda x: (x.rank_score or 0), reverse=True)
+    # Incomplete listings (broker hasn't shared price or area) sort
+    # below every complete listing, regardless of their composite score.
+    # The composite is preserved so downstream copy can still cite the
+    # score, but the sort key guarantees they fall to the bottom of
+    # every ranked surface. The FE excludes them from Discover shelves
+    # and the default Browse view; users opt in via a filter chip.
+    items.sort(
+        key=lambda x: (
+            0 if getattr(x, "is_incomplete", False) else 1,
+            x.rank_score or 0,
+        ),
+        reverse=True,
+    )
     for i, li in enumerate(items, start=1):
         li.rank = i
 

@@ -319,6 +319,13 @@ export function adaptListing(raw: any): Listing {
         : null,
     discovery_tags: adaptDiscoveryTags(raw.discovery_tags),
     star_rating: typeof raw.star_rating === "number" ? raw.star_rating : 0,
+    // Backend writes `is_incomplete` directly. Fallback derives from
+    // the same rule client-side so the FE stays correct during the
+    // rollout window before the first nightly emits the flag.
+    is_incomplete:
+      typeof raw.is_incomplete === "boolean"
+        ? raw.is_incomplete
+        : raw.price_usd == null || raw.area_m2 == null,
   };
 }
 
