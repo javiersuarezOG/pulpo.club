@@ -1,0 +1,26 @@
+{
+  "width": 1638,
+  "height": 2048,
+  "aspect_ratio": 1.25,
+  "file_size_kb": 5176.4,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T13:57:49.778915+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781113/v3/HDPhotos/reconnect 0 Arte The Cliff.png",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781113/v3/HDPhotos/reconnect 0 Arte The Cliff.png",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T13:57:49.983233+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 6.2,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.182 color_entropy=0.435"
+  }
+}

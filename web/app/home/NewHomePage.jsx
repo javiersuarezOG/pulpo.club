@@ -68,7 +68,12 @@ export function NewHomePage({ app }) {
   // filters from the flag map; downstream the legacy paid_home_rendered
   // event still reports `flag_enabled` as the paid-home flag (its
   // historical meaning) so dashboards stay stable.
-  const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", false);
+  // Default-on as of the Pro-identity pass: the registry-driven block
+  // trim is now the production behavior. The flag still exists so the
+  // dev tweaks panel can force the legacy "everyone sees everything"
+  // path if a regression surfaces, but production should never read
+  // false unless someone explicitly sets it.
+  const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", true);
   const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
   const heroV4Flag   = readFeatureFlag("hero_v4", true);
   const blocks = visibleBlocksFor(app.user, {

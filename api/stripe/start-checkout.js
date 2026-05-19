@@ -238,6 +238,17 @@ module.exports = async (req, res) => {
     // re-renders in its signed-in variant.
     success_url: `${origin}/account?welcome=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${origin}/start?cancelled=1`,
+    // Audit P0-5 — Stripe Checkout must render a mandatory Terms of
+    // Service checkbox before the Pay button when we collect any
+    // subscription. Resolves against the Terms URL configured in
+    // Stripe Dashboard → Settings → Public details (must point at
+    // https://pulpo.club/terms). Without this setting Stripe ships
+    // an optional disclaimer link instead of an opt-in checkbox,
+    // which doesn't satisfy our Terms-of-Service-acceptance burden
+    // under Dutch consumer law or the EU Consumer Rights Directive.
+    consent_collection: {
+      terms_of_service: "required",
+    },
   };
 
   // Pre-fill email on the Stripe form when we have it; otherwise let

@@ -1,0 +1,26 @@
+{
+  "width": 3840,
+  "height": 2160,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 4312.5,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:01:12.945743+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/2523089030/v3/HDPhotos/dji_mimo_20260428_144630_20260428144630_1777500395412_photo.jpeg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/2523089030/v3/HDPhotos/dji_mimo_20260428_144630_20260428144630_1777500395412_photo.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:01:13.882220+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 3840,
+  "resdet_detected_height": 2160,
+  "resdet_upscaled": false,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.1,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.231 color_entropy=0.572"
+  }
+}

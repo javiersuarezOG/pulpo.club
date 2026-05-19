@@ -1,10 +1,16 @@
 import React from "react";
 import { captureException } from "./telemetry/client";
+import { sendErrorToServer } from "./telemetry/error-sink";
 
 // Top-level error boundary. Catches any render-time exception and renders a
 // branded fallback instead of blanking the page. Wired in app.jsx around
-// <App />. Forwards the error to PostHog (Error Tracking surface) via
-// captureException so the team gets paged via PostHog alerts.
+// <App />.
+//
+// Errors are forwarded to TWO sinks in parallel (audit P0-7):
+//   1. PostHog Error Tracking — funnel breaks, alerts, session replay link.
+//   2. /api/client-error → Vercel runtime logs — always-on backstop for
+//      when PostHog is blocked (ad-blockers, declined consent, SDK fail).
+// Both fire fire-and-forget; neither blocks the fallback render.
 export class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -17,16 +23,20 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, info) {
     console.error("[pulpo] uncaught error", error, info);
+    const extra = {
+      componentStack: info?.componentStack,
+      kind: "react.errorBoundary",
+      // `section` is opt-in. Section-scoped boundaries (homepage v2)
+      // tag PostHog with the failing surface so dashboards can split
+      // "hero crashed" from "shelf crashed" cleanly.
+      section: this.props.section || undefined,
+    };
     try {
-      captureException(error, {
-        componentStack: info?.componentStack,
-        kind: "react.errorBoundary",
-        // `section` is opt-in. Section-scoped boundaries (homepage v2)
-        // tag PostHog with the failing surface so dashboards can split
-        // "hero crashed" from "shelf crashed" cleanly.
-        section: this.props.section || undefined,
-      });
+      captureException(error, extra);
     } catch { /* never let telemetry break the fallback render */ }
+    try {
+      sendErrorToServer(error, extra);
+    } catch { /* same — telemetry must never throw */ }
   }
 
   render() {
