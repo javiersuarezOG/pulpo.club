@@ -484,6 +484,34 @@ jobs:
           print(f"Hires pipeline canary OK: attempted={attempted} ok={results.get('ok',0)} error={errored}")
           EOF
 
+      - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)
+        # PR-8 of the reliability plan — durable backup of every nightly's
+        # canary-validated ranked.json. Lives AFTER the canaries pass but
+        # BEFORE the data PR commit so a bad nightly (canary-blocked)
+        # never gets snapshotted; a good nightly gets snapshotted even if
+        # the commit step later fails.
+        #
+        # Best-effort: a snapshot failure does NOT fail the nightly. The
+        # script catches its own errors and exits 0 with the cause logged
+        # to stderr. BLOB_READ_WRITE_TOKEN unset = no-op (the script
+        # detects + warns), so workflows without Blob configured pass
+        # cleanly.
+        #
+        # Retention: 90 days. Storage envelope at ~2 MB × 90 = 180 MB,
+        # well inside the 1 GB Vercel Blob free tier. If retention needs
+        # to expand later (e.g. forensic recovery beyond 90d), bump the
+        # --prune-older-than value.
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: |
+          # Make sure the Node SDK is installed. npm install on the
+          # nightly runner is cheap (~10s) and avoids needing a separate
+          # cache step.
+          npm install --no-audit --no-fund --no-save @vercel/blob >/dev/null 2>&1 \
+            || echo "::warning::npm install @vercel/blob failed — snapshot may no-op"
+          node scripts/snapshot_ranked_json.mjs
+          node scripts/snapshot_ranked_json.mjs --prune-older-than 90
+
       - name: Commit refreshed data via PR
         id: commit
         env:
