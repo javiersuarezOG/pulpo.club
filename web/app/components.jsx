@@ -15,12 +15,18 @@ function currentLocale() {
 function currentUnits() {
   return document.documentElement.dataset.units === "vrs2" ? "vrs2" : "m2";
 }
+// `null` on price / size means the broker didn't share it. Render the
+// localized "Not shared" string instead of a bare em-dash so users know
+// the data gap exists at the source rather than as a render bug.
+// Incomplete listings are hidden from Discover shelves + the default
+// Browse view; users only see this copy after opting in via the chip,
+// or via a direct link to the detail page.
 function formatPrice(n) {
-  if (n == null) return "—";
+  if (n == null) return t("value.notshared.short", currentLocale());
   return formatPriceI18n(n, currentLocale());
 }
 function formatSize(m2) {
-  if (m2 == null) return "—";
+  if (m2 == null) return t("value.notshared.short", currentLocale());
   return formatSizeI18n(m2, currentLocale(), currentUnits());
 }
 function formatDaysListed(d) {
@@ -585,13 +591,26 @@ function ListingCard({
           {listing.zone_name} · {landTypeLabel(listing.land_type)}
         </div>
         <div className="listing-card-price">
-          <span className="price-main">{formatPrice(listing.price)}</span>
+          <span
+            className={listing.price == null ? "price-main muted" : "price-main"}
+            title={listing.price == null ? t("value.notshared.tooltip", currentLocale()) : undefined}
+          >{formatPrice(listing.price)}</span>
           {listing.previous_price && (
             <span className="price-was">{formatPrice(listing.previous_price)}</span>
           )}
-          {!isMag && (
-            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}{ppmSuffix()}</span>
-          )}
+          {!isMag && (() => {
+            // Size + ppm sub-row. When either price or size is null,
+            // ppm is meaningless (it's derived). Drop it cleanly so
+            // the user sees "· Not shared" once, not twice.
+            const sizeMissing = listing.size_m2 == null;
+            const ppmAvailable = listing.price != null && listing.size_m2 != null && listing.price_per_m2 != null;
+            return (
+              <span className="price-sub">
+                · <span title={sizeMissing ? t("value.notshared.tooltip", currentLocale()) : undefined}>{formatSize(listing.size_m2)}</span>
+                {ppmAvailable && ` · ${formatPpm(listing.price_per_m2)}${ppmSuffix()}`}
+              </span>
+            );
+          })()}
         </div>
         {!compact && !isMag && listing.usps[0] && (() => {
           // Same gate the detail panel uses — keep card and detail in

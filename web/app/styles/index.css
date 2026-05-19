@@ -1542,10 +1542,34 @@ h1,h2,h3,h4,h5 { margin: 0; }
   text-decoration: line-through;
   margin-top: 2px;
 }
+/* Used on price/size when the broker hasn't shared the value (paired
+ * with the `value.notshared.short` i18n string + a tooltip). Softer
+ * weight and smaller scale so "Not shared" reads as a meta-note
+ * rather than competing with real data. */
+.kstat-value.muted {
+  color: var(--ink-3);
+  font-size: 18px;
+  font-style: italic;
+}
+.price-main.muted {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 400;
+}
+.detail-broker-note {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--ink-3);
+  background: var(--bg-soft, transparent);
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 @media (max-width: 600px) {
   .detail-keystats { grid-template-columns: repeat(2, 1fr); }
   .kstat-value { font-size: 22px; }
+  .kstat-value.muted { font-size: 16px; }
 }
 
 .detail-section { margin-top: 28px; position: relative; }
