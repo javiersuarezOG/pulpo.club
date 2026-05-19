@@ -172,32 +172,32 @@ const UI_STRINGS = {
   //
   // Eyebrow + headline + tagline + CTA + sub-text per the brief.
   "new_hero.eyebrow":        { en: "★ Ranked by value",
-                               es: "★ Ordenado por valor" },
+                               es: "★ Rankeado por valor" },
   "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
-                               es: "Cada casa de playa y lago en El Salvador, ordenada por valor." },
+                               es: "Todas las casas de playa y lago de El Salvador, rankeadas por valor." },
   "new_hero.tagline":        { en: "No more scrolling through 50 listing sites. We rank every beach and lake listing by value and deliver the 10 best to your inbox every two weeks.",
-                               es: "Deja de revisar 50 sitios. Ordenamos cada anuncio de playa y lago por valor y te enviamos los 10 mejores al correo cada dos semanas." },
+                               es: "Olvídate de buscar en 50 sitios. Rankeamos cada propiedad de playa y lago por valor y te enviamos las 10 mejores al correo cada quince días." },
   "new_hero.email_placeholder": { en: "you@example.com",
-                                  es: "tú@ejemplo.com" },
-  "new_hero.cta":            { en: "Get the 10 best",     es: "Recibir los 10 mejores" },
+                                  es: "tucorreo@ejemplo.com" },
+  "new_hero.cta":            { en: "Get the 10 best",     es: "Quiero las 10 mejores" },
   "new_hero.cta_loading":    { en: "Sending…",            es: "Enviando…" },
   "new_hero.sub":            { en: "Free. Unsubscribe whenever.",
-                               es: "Gratis. Cancela cuando quieras." },
+                               es: "Gratis. Te das de baja cuando quieras." },
   "new_hero.success":        { en: "Done — check your inbox.",
                                 es: "Listo — revisa tu correo." },
   "new_hero.error_generic":  { en: "Couldn't sign you up. Try again?",
-                               es: "No pudimos suscribirte. ¿Intentas de nuevo?" },
+                               es: "No pudimos suscribirte. Inténtalo de nuevo." },
   "new_hero.error_invalid_email": { en: "That email looks off — check it?",
-                                    es: "Ese correo no se ve bien — ¿lo revisas?" },
+                                    es: "Ese correo no parece válido — revísalo." },
   "new_hero.error_already":  { en: "You're already on the list. Welcome back.",
-                               es: "Ya estás en la lista. Qué bueno verte." },
+                               es: "Ya estás en la lista. ¡Qué gusto tenerte de vuelta!" },
 
   // Proof row — "This week's top 3 deals"
   "proof_row.heading":       { en: "This week's top 3 deals",
-                               es: "Los 3 mejores tratos de esta semana" },
+                               es: "Las 3 mejores ofertas de la semana" },
   "proof_row.see_all":       { en: "See all",                es: "Ver todas" },
   "proof_row.empty":         { en: "Fresh picks land here every week.",
-                               es: "Cada semana publicamos nuevos hallazgos aquí." },
+                               es: "Cada semana publicamos nuevas oportunidades aquí." },
 
   // Category grid — Beach × {Homes, Condos, Land} + Lake × same.
   // Section headers + tile titles + tile descriptions (bilingual tile
@@ -216,17 +216,17 @@ const UI_STRINGS = {
   // USP row — three columns under the category grid.
   "usp.row_heading":             { en: "Why Pulpo",    es: "Por qué Pulpo" },
   "usp.col_1_title":             { en: "10 best deals, every 2 weeks",
-                                   es: "10 mejores tratos, cada 2 semanas" },
+                                   es: "Las 10 mejores ofertas, cada quince días" },
   "usp.col_1_body":              { en: "Matched to your location, budget, and size. Delivered to your inbox.",
-                                   es: "Filtrados por ubicación, presupuesto y tamaño. Directo a tu correo." },
+                                   es: "Filtradas por ubicación, presupuesto y tamaño. Directo a tu correo." },
   "usp.col_2_title":             { en: "Full catalogue, anytime",
                                    es: "Catálogo completo, cuando quieras" },
   "usp.col_2_body":              { en: "Browse, sort, and save hundreds of vetted beach and lake properties.",
-                                   es: "Explora, ordena y guarda cientos de propiedades verificadas de playa y lago." },
+                                   es: "Explora, ordena y guarda cientos de propiedades de playa y lago, todas revisadas." },
   "usp.col_3_title":             { en: "Built by locals",
-                                   es: "Hecho por locales" },
+                                   es: "Hecho aquí, por gente local" },
   "usp.col_3_body":              { en: "We live on this coast. We know which listings are real and which are overpriced.",
-                                   es: "Vivimos en esta costa. Sabemos qué anuncios son reales y cuáles están sobrevalorados." },
+                                   es: "Vivimos en la costa. Sabemos cuáles propiedades son reales y cuáles están infladas de precio." },
 
   // Star pill ARIA — "4.5 stars out of 5"
   "star_pill.aria":              { en: "{value} stars out of 5",
@@ -234,7 +234,7 @@ const UI_STRINGS = {
 
   // Shelf rail ARIA wrapper (screen-reader landmark name).
   "shelf_rail.aria":             { en: "Activity shelves",
-                                   es: "Estantes de actividad" },
+                                   es: "Secciones de actividad" },
 
   // ── Homepage v2 (redesign) ───────────────────────────────────────
   // Copy for the redesigned homepage. The previous new_hero.* / proof_row.* /
@@ -244,7 +244,7 @@ const UI_STRINGS = {
   "home.header.cta":             { en: "Try a free month",
                                    es: "Prueba un mes gratis" },
   "home.header.signin":          { en: "Sign in",
-                                   es: "Inicia sesión" },
+                                   es: "Iniciar sesión" },
   "home.header.nav.lake":        { en: "Lake",
                                    es: "Lago" },
   "home.header.nav.beach":       { en: "Beach",
@@ -270,23 +270,23 @@ const UI_STRINGS = {
   // /data/last_updated.json source_status; falls back to last-cached, then
   // to SOURCE_COUNT_FALLBACK in heroConfig.
   "home.hero.eyebrow_before":    { en: "SCANNING ",
-                                   es: "REVISANDO " },
+                                   es: "ESCANEANDO " },
   "home.hero.eyebrow_sources":   { en: "{n} SOURCES",
                                    es: "{n} FUENTES" },
   "home.hero.eyebrow_after":     { en: " EVERY 90 SECONDS",
                                    es: " CADA 90 SEGUNDOS" },
   "home.hero.h1.before":         { en: "Every beach and lake property in El Salvador,",
-                                   es: "Cada propiedad de playa y lago en El Salvador," },
+                                   es: "Todas las propiedades de playa y lago de El Salvador," },
   "home.hero.h1.italic":         { en: "ranked.",
-                                   es: "ordenadas." },
+                                   es: "rankeadas." },
   "home.hero.subhead":           { en: "We scan every site, rank every beach and lake listing by value, and deliver the 10 best to your inbox every two weeks.",
-                                   es: "Revisamos cada sitio, ordenamos cada anuncio de playa y lago por valor y enviamos los 10 mejores a tu correo cada dos semanas." },
+                                   es: "Revisamos todos los sitios, rankeamos cada propiedad de playa y lago por valor, y te enviamos las 10 mejores ofertas al correo cada quince días." },
   "home.hero.cta_primary":       { en: "Try a free month",
-                                   es: "Prueba un mes gratis" },
+                                   es: "Pruébalo un mes gratis" },
   "home.hero.cta_secondary":     { en: "See this week's top 10",
-                                   es: "Ver el top 10 de la semana" },
+                                   es: "Ver el Top 10 de la semana" },
   "home.hero.microcopy":         { en: "{price}/month after · cancel anytime",
-                                   es: "{price}/mes luego · cancela cuando quieras" },
+                                   es: "Después {price}/mes · cancela cuando quieras" },
   // Live counter card (top-right, hides <768px).
   // Wave 5#7+#9 (hero_v4 flag) — white photo-led hero. Reuses
   // home.hero.h1.before / h1.italic / cta_primary / microcopy /
@@ -295,7 +295,7 @@ const UI_STRINGS = {
   "home.hero.v4.kicker":         { en: "PULPO · BEACH + LAKE",
                                    es: "PULPO · PLAYA + LAGO" },
   "home.hero.v4.subhead":        { en: "We score every listing. No ads. No fluff.",
-                                   es: "Puntuamos cada anuncio. Sin anuncios. Sin relleno." },
+                                   es: "Puntuamos cada propiedad. Sin publicidad. Sin relleno." },
   "home.hero.v4.featured_pill":  { en: "Featured this week",
                                    es: "Destacado esta semana" },
   "home.hero.v4.photo_aria":     { en: "Open this week's featured listing in {name}",
@@ -308,11 +308,11 @@ const UI_STRINGS = {
   "home.hero.preview.label":     { en: "Pulpo weekly",
                                    es: "Pulpo semanal" },
   "home.hero.preview.headline":  { en: "Top 10 · updating live",
-                                   es: "Top 10 · en directo" },
+                                   es: "Top 10 · en vivo" },
   "home.hero.preview.live":      { en: "LIVE",
                                    es: "EN VIVO" },
   "home.hero.preview.sr":        { en: "Preview: top 10 listings ranked from A+ to C-",
-                                   es: "Vista previa: 10 mejores anuncios, de A+ a C-" },
+                                   es: "Vista previa: las 10 mejores propiedades, de A+ a C-" },
   // Just In pill — clay-orange floating card that pops on each leaderboard cycle.
   "home.hero.just_in_label":     { en: "JUST IN",
                                    es: "RECIÉN" },
@@ -321,7 +321,7 @@ const UI_STRINGS = {
   "home.hero.off_the_board":     { en: "off the board",
                                    es: "fuera del top 10" },
   "home.hero.just_in_aria":      { en: "Just in: {name} — sign up to see more",
-                                   es: "Recién: {name} — regístrate para ver más" },
+                                   es: "Recién listada: {name} — regístrate para ver más" },
   "home.hero.new_badge":         { en: "NEW",
                                    es: "NUEVO" },
 
