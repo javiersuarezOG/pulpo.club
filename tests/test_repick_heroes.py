@@ -160,7 +160,7 @@ def test_execute_writes_hero_and_mutates_ranked(fake_ranked: Path, tmp_path: Pat
     # Summary log written.
     lines = summary.read_text().strip().splitlines()
     assert len(lines) == 3  # one per filtered listing
-    rows = [json.loads(l) for l in lines]
+    rows = [json.loads(ln) for ln in lines]
     actions = {r["action"] for r in rows}
     assert "winner_picked" in actions
     assert "no_photo_urls" in actions

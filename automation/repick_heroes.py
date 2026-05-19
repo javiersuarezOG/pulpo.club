@@ -56,7 +56,7 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 # Import the production picker helpers — single source of truth.
-from automation.run import (
+from automation.run import (  # noqa: E402  -- sys.path manipulation above
     _apply_aesthetic_to_eligible,
     _hero_file_path,
     _meta_sidecar_path,
