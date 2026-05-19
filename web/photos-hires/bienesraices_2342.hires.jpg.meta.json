@@ -1,0 +1,26 @@
+{
+  "width": 1600,
+  "height": 1200,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 367.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T13:57:58.686287+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/2EPJF0KS9W/gqE8b6Y5JN/Finca_de_Caf%C3%A9_con_Caba%C3%B1a_en_Venta_en_Jayaque__Vista_Espectacular_y_Potencial_Urbano.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/2EPJF0KS9W/gqE8b6Y5JN/Finca_de_Caf%C3%A9_con_Caba%C3%B1a_en_Venta_en_Jayaque__Vista_Espectacular_y_Potencial_Urbano.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T13:57:58.911614+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1400,
+  "resdet_detected_height": 1050,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.9,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.218 color_entropy=0.553"
+  }
+}

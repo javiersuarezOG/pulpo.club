@@ -535,20 +535,28 @@ def _download_hero_photos(listings, repo: Path) -> dict:
         )
         if all_files_present and hash_path.read_text().strip() == url_hash:
             li.hero_photo_path = f"/photos/{fname}"
-            thumb_meta = _read_sidecar(fpath)
             hero_meta = _read_sidecar(hero_fpath)
-            if thumb_meta:
-                li.card_eligible = bool(thumb_meta.get("card_eligible", False))
             if hero_meta:
+                # After the source-bytes-eligibility fix, the hero sidecar's
+                # top-level width / height / hero_eligible / card_eligible /
+                # hires_eligible reflect SOURCE bytes (winning_content), not
+                # the 1920×1080-clamped derivative. The derivative dims are
+                # stashed under derivative_width / derivative_height for
+                # forensic purposes. card_eligible read here (was previously
+                # read from the thumbnail sidecar, which always lied False
+                # because 600×400 thumbs never clear the 800×600 floor).
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
-                # Hero file's dimensions == source dimensions clamped to ≤1920×1080.
-                # Surfaced through /api/social/listings so consumers can pre-filter
-                # listings whose source is too small to render cleanly at the
-                # requested output ratio (e.g. social 1080×1080).
+                li.card_eligible = bool(hero_meta.get("card_eligible", False))
                 if hero_meta.get("width") is not None:
                     li.source_width = int(hero_meta["width"])
                 if hero_meta.get("height") is not None:
                     li.source_height = int(hero_meta["height"])
+                qs = hero_meta.get("hero_photo_quality_score")
+                if qs is not None:
+                    li.hero_photo_quality_score = qs
+                ho = hero_meta.get("has_text_overlay")
+                if ho is not None:
+                    li.has_text_overlay = ho
                 qs = hero_meta.get("hero_photo_quality_score")
                 if qs is not None:
                     li.hero_photo_quality_score = qs
@@ -677,9 +685,12 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             thumb_img.save(thumb_buf, format="JPEG", quality=75, optimize=True)
             thumb_bytes = thumb_buf.getvalue()
             fpath.write_bytes(thumb_bytes)
-            thumb_meta = _write_sidecar(fpath, thumb_bytes)
-            if thumb_meta:
-                li.card_eligible = bool(thumb_meta.get("card_eligible", False))
+            # Thumbnail sidecar still written (other callers read its
+            # width/height for debugging) but its card_eligible field
+            # is permanently False — the thumb is 600×400 by design,
+            # below the 800×600 card floor. card_eligible is now
+            # computed on the SOURCE bytes via the hero sidecar below.
+            _write_sidecar(fpath, thumb_bytes)
 
             # ── Hero (1920×1080 max, Q85) — drives proof row + featured ─
             hero_img = Image.open(io.BytesIO(winning_content))
@@ -691,7 +702,39 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             hero_bytes = hero_buf.getvalue()
             hero_fpath.write_bytes(hero_bytes)
             hero_meta = _write_sidecar(hero_fpath, hero_bytes)
+
+            # Compute SOURCE-bytes metadata (winning_content is the raw
+            # broker JPG, pre-thumbnail). hero_eligible / card_eligible /
+            # hires_eligible should reflect what the SOURCE supports, not
+            # what the downsampled derivative happens to measure. Without
+            # this, hero_eligible is always False because the hero
+            # derivative caps at 1920×1080 and the gate requires height
+            # ≥ 1200 — the threshold is unreachable. See the upstream-gate
+            # diagnostic at pulpo-social/admin/trigger (2026-05-19) where
+            # 10/10 candidates rejected with `upstream_hero_ineligible`.
+            from automation.photo_quality import compute_image_metadata as _cim
+            source_meta = _cim(winning_content, file_size_bytes=len(winning_content))
+
             if hero_meta is not None:
+                # Stash the derivative's own dims under separate keys for
+                # forensic / debugging value; never read these for
+                # downstream eligibility checks.
+                hero_meta["derivative_width"]  = hero_meta.get("width")
+                hero_meta["derivative_height"] = hero_meta.get("height")
+                # Now overwrite the top-level dims + eligibility with the
+                # source-bytes view. This is what /api/social/listings
+                # consumers (pulpo-social, contract test, Reels gate)
+                # should read. compute_image_metadata returns None for
+                # decode failures — preserve the derivative-based values
+                # in that case as the safe fallback.
+                if source_meta is not None:
+                    hero_meta["width"]          = source_meta["width"]
+                    hero_meta["height"]         = source_meta["height"]
+                    hero_meta["aspect_ratio"]   = source_meta.get("aspect_ratio")
+                    hero_meta["file_size_kb"]   = source_meta.get("file_size_kb")
+                    hero_meta["hero_eligible"]  = source_meta.get("hero_eligible")
+                    hero_meta["card_eligible"]  = source_meta.get("card_eligible")
+                    hero_meta["hires_eligible"] = source_meta.get("hires_eligible")
                 hero_meta["hero_photo_quality_score"] = winning_score
                 hero_meta["has_text_overlay"] = winning_has_text
                 hero_meta["winning_url"] = winning_url
@@ -699,9 +742,11 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
-                # Mirror the cached-skip path: source_width/source_height
-                # are the hero derivative's pixel dimensions (which equal
-                # original source dimensions clamped to ≤1920×1080).
+                li.card_eligible = bool(hero_meta.get("card_eligible", False))
+                # source_width / source_height now reflect SOURCE dims
+                # (winning_content's intrinsic resolution), not the
+                # 1920×1080-clamped derivative. Field name finally
+                # matches semantics.
                 if hero_meta.get("width") is not None:
                     li.source_width = int(hero_meta["width"])
                 if hero_meta.get("height") is not None:

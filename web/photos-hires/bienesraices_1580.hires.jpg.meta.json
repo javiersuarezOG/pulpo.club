@@ -1,0 +1,28 @@
+{
+  "width": 1080,
+  "height": 1313,
+  "aspect_ratio": 1.216,
+  "file_size_kb": 306.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:00:22.705956+00:00",
+  "source_url": "https://assets.easybroker.com/property_images/4815921/81639165/EB-RM5921.jpg?rasterize=true&version=1729733141",
+  "original_url": "https://assets.easybroker.com/property_images/4815921/81639165/EB-RM5921.jpg?rasterize=true&version=1729733141",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:00:23.147780+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 945,
+  "resdet_detected_height": 1149,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 5.1,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.085 color_entropy=0.437"
+  }
+}

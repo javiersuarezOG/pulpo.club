@@ -1,0 +1,26 @@
+{
+  "width": 1530,
+  "height": 1530,
+  "aspect_ratio": 1.0,
+  "file_size_kb": 513.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T13:58:12.793159+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ICKJEX9EI6/xYxXFXDyQh/Finca_de_34_Manzanas_en_Cant%C3%B3n_El_Porvenir.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ICKJEX9EI6/xYxXFXDyQh/Finca_de_34_Manzanas_en_Cant%C3%B3n_El_Porvenir.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T13:58:13.206984+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1339,
+  "resdet_detected_height": 1339,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.8,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.246 color_entropy=0.404"
+  }
+}

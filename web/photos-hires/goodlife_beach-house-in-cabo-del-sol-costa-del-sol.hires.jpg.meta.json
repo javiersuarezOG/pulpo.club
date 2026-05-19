@@ -1,0 +1,28 @@
+{
+  "width": 3886,
+  "height": 2591,
+  "aspect_ratio": 1.5,
+  "file_size_kb": 2290.6,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:02:57.316762+00:00",
+  "source_url": "https://goodlifeelsalvador.com/wp-content/uploads/2024/12/cabo-del-sol-beach-house-1.jpg",
+  "original_url": "https://goodlifeelsalvador.com/wp-content/uploads/2024/12/cabo-del-sol-beach-house-1-1024x683.jpg",
+  "transform_used": "goodlife-strip-wp-size-suffix",
+  "fetched_at": "2026-05-19T14:03:07.640475+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 5.6,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.117 color_entropy=0.490"
+  }
+}

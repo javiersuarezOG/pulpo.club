@@ -1,0 +1,28 @@
+{
+  "width": 6000,
+  "height": 4000,
+  "aspect_ratio": 1.5,
+  "file_size_kb": 8972.0,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:01:27.924807+00:00",
+  "source_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/02/apaneca-el-salvador-1.jpg",
+  "original_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/02/apaneca-el-salvador-1-1024x683.jpg",
+  "transform_used": "goodlife-strip-wp-size-suffix",
+  "fetched_at": "2026-05-19T14:01:30.316470+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 960,
+  "resdet_detected_height": 4000,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.1,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.144 color_entropy=0.556"
+  }
+}
