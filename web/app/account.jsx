@@ -82,15 +82,21 @@ function AccountPage({ app }) {
     // /account?welcome=1 bypass — symmetric with the page-render
     // branch below. Without this, an anonymous post-Stripe landing
     // would trigger the SignupModal on top of the WelcomeModal,
-    // which is the Sebas-2026-05-19 bug. The App-level route-gate
-    // also bypasses on welcome=1 (see app.jsx welcomeModalState
-    // short-circuit); this check is the AccountPage-local belt that
-    // covers the Clerk-boot edge case.
-    const isWelcomeLanding = typeof window !== "undefined"
-      && new URLSearchParams(window.location.search).get("welcome") === "1";
-    if (isWelcomeLanding) return;
+    // which is the Sebas-2026-05-19 bug.
+    //
+    // Consume welcomeModalState from the app bag rather than re-reading
+    // window.location.search. The parent (app.jsx) initializes
+    // welcomeModalState SYNCHRONOUSLY from URL via useState's
+    // initializer and then strips ?welcome=1 from the URL in a
+    // separate effect. When Clerk is ON in prod, this auth-gate effect
+    // returns early on its first mount (clerkBooting=true) and re-fires
+    // only AFTER the URL has been stripped — so a live URL read here
+    // would always see the stripped URL and fail the bypass, popping
+    // SignupModal on top of WelcomeModal. welcomeModalState survives
+    // the strip and is the correct source of truth.
+    if (app.welcomeModalState) return;
     app.openSignup({ mode: "login" });
-  }, [clerkBooting, app.user]);
+  }, [clerkBooting, app.user, app.welcomeModalState]);
 
   if (clerkBooting) {
     return <div className="page page-account account-loading" aria-busy="true" />;
@@ -102,9 +108,11 @@ function AccountPage({ app }) {
   // so the user only ever sees this state for one render cycle while
   // the modal is up.
   if (!app.user) {
-    const isWelcomeLanding = typeof window !== "undefined"
-      && new URLSearchParams(window.location.search).get("welcome") === "1";
-    if (isWelcomeLanding) {
+    // Same source of truth as the auth-gate effect above. URL re-read
+    // would race the welcome-effect URL strip and miss the placeholder
+    // in production (Clerk-ON), leaving the WelcomeModal floating over
+    // a `return null` empty page instead of the loading shell.
+    if (app.welcomeModalState) {
       return <div className="page page-account account-welcome-preview" aria-busy="true" />;
     }
     return null;
