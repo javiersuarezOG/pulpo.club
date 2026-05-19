@@ -129,13 +129,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--ink-3);
 }
 
-.profile-chip { display: flex; align-items: center; gap: 10px; }
+.profile-chip { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); color: white;
   display: grid; place-items: center;
   font-weight: 600; font-size: 13px;
   position: relative;
+  flex-shrink: 0;
 }
 
 /* ── Pulpo Pro identity ────────────────────────────────────────────────
@@ -173,6 +174,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 700;
   border: 1.5px solid var(--paper);
   box-sizing: content-box;
+}
+
+/* Mobile: tighten the topnav gap so the wordmark + Pro pill + right-side
+   chrome fit at the common phone widths (375–414px). Below 360px (the
+   smoke-test 320px viewport included) the pill drops out — the gold
+   avatar ring + ★ badge still carry Pro identity, and the wordmark +
+   chrome keep their space. */
+@media (max-width: 767px) {
+  .topnav-inner { gap: 16px; }
+  .pulpo-logo-pro { font-size: 12px; padding: 2px 6px 3px; }
+}
+@media (max-width: 360px) {
+  .pulpo-logo-pro { display: none; }
 }
 
 /* Single auth icon — replaces the dual "Log in" + "Sign up — free" pair.
