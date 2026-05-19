@@ -467,6 +467,13 @@ const UI_STRINGS = {
   "card.see_all":            { en: "See all",             es: "Ver todos" },
   "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
+  // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
+  // so a user sees the slice when combining with Beach / Waterfront /
+  // price chips. Count = number of global Top 10 that match active
+  // filters; the "of 10" anchors the user to the global list.
+  "browse.top10.title":      { en: "Top 10",                     es: "Top 10" },
+  "browse.top10.of_ten":     { en: "of 10",                      es: "de 10" },
+  "browse.top10.clear":      { en: "Clear Top 10 filter",        es: "Quitar filtro Top 10" },
   "card.listed_days_ago":    { en: "Listed {n} days ago", es: "Publicado hace {n} días" },
   "card.listed_1_month":     { en: "Listed 1 month ago",  es: "Publicado hace 1 mes" },
   "card.listed_n_months":    { en: "Listed {n} months ago", es: "Publicado hace {n} meses" },
