@@ -1159,7 +1159,40 @@ function BrowsePage({ app }) {
         <div className="results-col">
           <div className="results-header">
             <div className="results-count">
-              {app.routeParams.category ? (() => {
+              {filters.rank_max === 10 ? (
+                // Top 10 chip is active. The Top 10 list is GLOBAL — chips
+                // like Beach / Waterfront slice it, they don't re-rank it.
+                // The "N of 10" meta makes the slice transparent: if Beach
+                // is also active and 6 of the global Top 10 are beach
+                // listings, the user sees "6 of 10" and understands they're
+                // looking at the intersection, not a re-ranked "Top 10 in
+                // beach."
+                <>
+                  <span className="results-cat-title">{t("browse.top10.title", app.locale)}</span>
+                  <span className="results-cat-meta">
+                    <span className="num">{results.length}</span> {t("browse.top10.of_ten", app.locale)}
+                    <button
+                      className="cat-clear"
+                      onClick={() => {
+                        // Clear rmax from URL so the user drops back to the
+                        // full ranked list. Other chips (master, tag, pmax)
+                        // stay applied — they're independent dimensions.
+                        if (typeof window !== "undefined") {
+                          const next = new URLSearchParams(window.location.search);
+                          next.delete("rmax");
+                          const qs = next.toString();
+                          window.history.pushState({}, "", `/browse${qs ? `?${qs}` : ""}`);
+                        }
+                        app.goBrowse({ category: null });
+                      }}
+                      aria-label={t("browse.top10.clear", app.locale)}
+                      title={t("browse.top10.clear", app.locale)}
+                    >
+                      <Icon name="close" size={14} strokeWidth={2}/>
+                    </button>
+                  </span>
+                </>
+              ) : app.routeParams.category ? (() => {
                 const cat = PILLS.find(p => p.key === app.routeParams.category)
                           || SHELVES.find(s => s.key === app.routeParams.category);
                 const label = cat ? tr(cat.label, app.locale) : app.routeParams.category;
