@@ -8,6 +8,15 @@ Funnel C: Detail-panel upgrade -> Paid (replaces post-#266 "Card intent"
           with trigger="detail_upgrade").
 Funnel D: Activation -> Account engagement (post-Stripe loop)
 Funnel E: Activation -> Continued browsing (post-Stripe loop)
+Funnel F: Activation email delivery — proves the Stripe → us →
+          Clerk → user chain is intact end-to-end. Starts at
+          webhook.received (signature verified) so Stripe-delivery
+          failures show up as step 0→1 drops. Step 2 is the new
+          welcome_modal.invitation_status_resolved client-side
+          confirmation that the invitation actually exists. Pairs
+          with the invitation_sent boolean on
+          webhook.checkout_completed to expose deliverability,
+          existing-user, and webhook-not-fired regressions.
 
 Funnels D + E share steps 0-2 (webhook.checkout_completed ->
 stripe.return_landed -> signin.completed[provider=clerk]) and diverge
@@ -309,6 +318,64 @@ def build_activation_browsing_funnel(date_from: str) -> dict:
     )
 
 
+def build_activation_email_delivery_funnel(date_from: str) -> dict:
+    # Funnel F (PR #2 of the post-Stripe activation flow): proves
+    # that Stripe → us → Clerk → user-acted is intact end-to-end,
+    # and pinpoints WHICH step drops users off when it isn't.
+    # Unlike Funnels D + E (which start at webhook.checkout_completed
+    # — already inside the server), this funnel starts at
+    # webhook.received so a Stripe-delivery failure is also visible
+    # as a step-0-to-step-1 drop. Steps:
+    #
+    #   0. webhook.received — Stripe delivered, signature verified.
+    #   1. webhook.checkout_completed (path=anonymous_invitation_created)
+    #      — the only Path-B branch that actually creates an
+    #      invitation. invitation_sent=true property is set here.
+    #   2. welcome_modal.invitation_status_resolved (status=invitation_pending)
+    #      — the client confirmed via GET /api/clerk/invitation-status
+    #      that the invitation exists. Drop-off between 1 and 2 means
+    #      the user never returned to /account?welcome=1 (closed tab,
+    #      redirect failed, etc.).
+    #   3. signin.completed (provider=clerk) — Clerk invitation
+    #      accepted, password created.
+    #
+    # Drop-off semantics:
+    #   0→1: webhook handler errored or took a non-invitation Path-B
+    #        branch (existing_user / no_email / dupe). Slice by
+    #        invitation_sent in PostHog to confirm.
+    #   1→2: client never landed on the welcome modal. Often a
+    #        Stripe→app redirect issue OR the user closed the tab
+    #        between paying and the redirect.
+    #   2→3: email deliverability or copy / UX dropped them. This is
+    #        the step that surfaces the Clerk-Dashboard items (B in
+    #        the plan: custom sending domain + DKIM/SPF/DMARC).
+    steps = [
+        step(0, "webhook.received",
+              [prop("type", "checkout.session.completed")]),
+        step(1, "webhook.checkout_completed",
+              [prop("path", "anonymous_invitation_created")]),
+        step(2, "welcome_modal.invitation_status_resolved",
+              [prop("status", "invitation_pending")]),
+        step(3, "signin.completed", [prop("provider", "clerk")]),
+    ]
+    return funnel_payload(
+        name="Funnel — Activation email delivery (auto)",
+        description=(
+            "webhook.received → webhook.checkout_completed "
+            "(anonymous_invitation_created) → "
+            "welcome_modal.invitation_status_resolved "
+            "(invitation_pending) → signin.completed (provider=clerk). "
+            "Owner: scripts/posthog_create_funnels.py. "
+            "Drop-offs: 0→1 webhook error or non-invitation path "
+            "(slice by invitation_sent); 1→2 client never returned to "
+            "welcome modal; 2→3 email deliverability or copy/UX "
+            "regression."
+        ),
+        steps=steps,
+        date_from=date_from,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--date-from", default="-30d", help="PostHog date range, e.g. -30d, -90d (default: -30d)")
@@ -328,6 +395,7 @@ def main() -> int:
         build_detail_panel_upgrade_funnel(args.date_from),
         build_activation_account_funnel(args.date_from),
         build_activation_browsing_funnel(args.date_from),
+        build_activation_email_delivery_funnel(args.date_from),
     ]
 
     if args.dry_run:
