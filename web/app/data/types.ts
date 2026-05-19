@@ -36,7 +36,17 @@ export type Listing = {
   price: number | null;
   previous_price: number | null;
   price_per_m2: number | null;
+  /** Gallery photos at the broker's native resolution. Excludes the
+   *  local thumbnail (which lives at `thumbnail_url`, sized for cards) —
+   *  putting both in the same array used to surface the same picture
+   *  twice in the carousel (slot 0 as a 600×400 upscaled thumb, slot K
+   *  as the same image at broker-native 1024–2048px). */
   photos: string[];
+  /** Local CDN-served thumbnail (≤600×400 JPEG produced by the hero
+   *  pipeline) — drives card paint on every list surface. null when the
+   *  pipeline produced no thumbnail (offline mode or photo-budget
+   *  exceeded). Carousels do NOT read this — they read `photos`. */
+  thumbnail_url: string | null;
   photos_count: number;
   // PR-7.6 — heuristic quality score (0..100) for the hero photo.
   // null = pipeline didn't score this run (offline / no OpenCV).

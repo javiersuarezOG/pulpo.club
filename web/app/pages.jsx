@@ -1351,7 +1351,11 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
           {results.map(l => (
             <tr key={l.id} onClick={() => app.openListing(l.id)}>
               <td className="thumb-cell">
-                {l.photos[0] ? <img src={l.photos[0]} alt=""/> : <div className="thumb-placeholder"/>}
+                {(l.thumbnail_url ?? l.photos[0]) ? (
+                  <img src={l.thumbnail_url ?? l.photos[0]} alt=""/>
+                ) : (
+                  <div className="thumb-placeholder"/>
+                )}
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (

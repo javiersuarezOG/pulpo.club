@@ -229,13 +229,22 @@ function Badge({ listing }) {
 function Photo({
   listing, idx = 0, ratio = "16/9", className = "",
   lazy = true, eager = false, onLoad, source,
+  thumbnail = false,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
   // Reset loaded state when the URL changes (carousel arrow click).
   // Without this, the skeleton stays hidden while the new image streams
   // in, and the user sees the OLD photo with stale "loaded" state.
-  const url = listing.photos[idx];
+  // `thumbnail` callers (cards) read the local 600×400 derivative at
+  // `thumbnail_url` — fast CDN paint, no broker dependency. Gallery
+  // callers (carousels) read `photos[idx]` — broker URLs at native
+  // resolution. The two were combined before, which surfaced the same
+  // image twice in the carousel (the thumb at slot 0 alongside the
+  // broker-native version a click away).
+  const url = thumbnail
+    ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
+    : listing.photos[idx];
   // Stamp start-of-perceived-load on every URL change. useMemo runs
   // during render, before the browser commits the <img src>, so the
   // elapsed value covers React commit + network fetch + decode —
@@ -565,6 +574,7 @@ function ListingCard({
           eager={priority}
           source={source}
           onLoad={onPhotoLoaded}
+          thumbnail={photoIdx === 0}
         />
         {topRank != null && (
           <span className="pulpo-rank listing-card-rank" aria-label={`Pulpo ranked ${topRank}`}>

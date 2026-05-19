@@ -225,6 +225,7 @@ const LISTINGS = Array.from({ length: 48 }, (_, i) => {
     previous_price: previousPrice,
     price_per_m2: Math.round(price / sizeM2 * 10) / 10,
     photos,
+    thumbnail_url: null,
     photos_count: photos.length,
     first_seen_date: daysListed,
     days_listed: daysListed,
