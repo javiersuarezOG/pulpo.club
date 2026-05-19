@@ -2452,6 +2452,13 @@ function ConsentBanner({ locale = "en" }) {
     try { return localStorage.getItem("pulpo-consent") || ""; }
     catch { return ""; }
   });
+  // `forcedOpen` is set when a user re-opens the banner via the footer's
+  // "Cookie Preferences" link (or anywhere else that calls
+  // `openConsentPreferences()`). It overrides the region gate so non-EU
+  // users can review their choice too — GDPR Art. 7(3) "withdrawal
+  // shall be as easy as giving consent" applies regardless of where
+  // the request originates.
+  const [forcedOpen, setForcedOpen] = pUseState(false);
   const region = detectEuRegion() ? "eu" : "non-eu";
   // First-paint side-effect for non-EU: silently auto-grant if no
   // decision is on file. Wrapped in useEffect so the localStorage
@@ -2467,8 +2474,22 @@ function ConsentBanner({ locale = "en" }) {
     optIn();
   }, [decided, region]);
 
+  // Listen for the footer's "Cookie Preferences" re-open signal.
+  // `openConsentPreferences()` clears localStorage and dispatches
+  // `pulpo:open-consent-preferences`; we reset our internal state so
+  // the banner re-renders even if it had previously decided.
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setDecided("");
+      setForcedOpen(true);
+    };
+    window.addEventListener("pulpo:open-consent-preferences", handler);
+    return () => window.removeEventListener("pulpo:open-consent-preferences", handler);
+  }, []);
+
   if (decided === "granted" || decided === "declined") return null;
-  if (region !== "eu") return null;
+  if (region !== "eu" && !forcedOpen) return null;
 
   const set = (decision) => {
     try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }

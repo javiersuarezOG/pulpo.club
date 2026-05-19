@@ -1,39 +1,85 @@
 // Wave-3a: extracted from app.jsx's inline footer.
 //
 // Post-Wave-5 split into two variants:
-//   * Trimmed (home + browse): one row — country badge · © · Terms · Privacy.
-//     Marketing-surface footer. Aria-light, no column links.
-//   * Full (saved + plans + account-when-enabled): the original 4-column
-//     layout with Discover / Pulpo / Legal columns + tagline. Utility
-//     pages where deeper navigation is appropriate.
+//   * Trimmed (home + browse + all legal-suite pages):
+//     one row — country badge · © · legal links · cookie preferences.
+//   * Full (saved + plans + account-when-enabled): the 4-column layout
+//     with Discover / Pulpo / Legal columns + tagline.
 //
-// Hardcoded EN column labels in the full variant are pre-existing tech
-// debt (called out in the file's prior header comment). The ES canary
-// in preview-smoke.spec.ts only sweeps `/`, which now renders the
-// trimmed variant — so the canary stays green without touching the
-// full variant's debt. A separate i18n sweep is the right follow-up
-// when those utility pages get a copy review.
+// Legal-suite (feat/footer-legal-links):
+//   * Trimmed + full footer now link to real /terms /privacy /cookies
+//     /subscription /imprint /contact routes — the previous spans + dead
+//     anchors were the audit's P0-2 finding.
+//   * A "Cookie Preferences" button in both variants calls
+//     `openConsentPreferences()` which clears the persisted consent
+//     decision and re-shows the ConsentBanner. GDPR Art. 7(3) requires
+//     withdrawal to be as easy as giving consent.
+//   * All footer-link clicks fire `footer.link_clicked` with the link
+//     key + surface variant.
 
 import React from "react";
 import { t } from "../i18n.jsx";
 import { PulpoLogo } from "../components.jsx";
+import { track } from "../telemetry/client";
+import { openConsentPreferences } from "../lib/consent";
 
 // Render conditions. Account opts in via a tweak; everything else
-// (home / browse / saved / plans) renders by default now.
+// (home / browse / saved / plans / legal-suite pages) renders by
+// default.
 export function shouldShowSiteFooter(route, opts = {}) {
   if (route === "account" && !opts.showFooterOnAccount) return false;
   return true;
 }
 
-// Variant resolution. Marketing landing surfaces get the trimmed
-// footer; utility pages get the full layout. Editing this is a
-// one-line change.
+// Variant resolution. Marketing landing surfaces + the legal-suite
+// pages get the trimmed footer. Utility pages (saved/plans) get the
+// full layout.
 export function siteFooterVariant(route) {
   if (route === "home" || route === "browse") return "trimmed";
+  // Legal pages are content-dense in their own right — trimmed footer
+  // keeps the chrome minimal so the reading column stays the focus.
+  if (
+    route === "terms" ||
+    route === "privacy" ||
+    route === "cookies" ||
+    route === "subscription" ||
+    route === "imprint" ||
+    route === "contact"
+  ) {
+    return "trimmed";
+  }
   return "full";
 }
 
-function SiteFooterTrimmed({ locale }) {
+// Shared link-click helper. Fires `footer.link_clicked` then navigates.
+// `linkKey` is the stable analytics identifier (NOT the user-visible
+// label, which is locale-dependent).
+function navigateAndTrack(app, surface, linkKey, target) {
+  track("footer.link_clicked", { link: linkKey, surface });
+  if (typeof target === "function") {
+    target();
+  } else if (target) {
+    app.go(target);
+  }
+}
+
+function CookiePreferencesButton({ surface, className, locale }) {
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={() => {
+        track("footer.link_clicked", { link: "cookie_preferences", surface });
+        track("consent.preferences_opened", { source: "footer" });
+        openConsentPreferences();
+      }}
+    >
+      {t("footer.link.cookie_preferences", locale)}
+    </button>
+  );
+}
+
+function SiteFooterTrimmed({ app, locale }) {
   const year = new Date().getFullYear();
   return (
     <footer className="site-footer site-footer-trimmed">
@@ -42,15 +88,50 @@ function SiteFooterTrimmed({ locale }) {
         <span className="footer-trim-sep" aria-hidden="true">·</span>
         <span className="footer-trim-copy">{t("footer.fine_print", locale, { year })}</span>
         <span className="footer-trim-sep" aria-hidden="true">·</span>
-        <span className="footer-trim-link">{t("footer.link.terms", locale)}</span>
+        <button
+          type="button"
+          className="footer-trim-link link-btn"
+          onClick={() => navigateAndTrack(app, "trimmed", "terms", "terms")}
+        >
+          {t("footer.link.terms", locale)}
+        </button>
         <span className="footer-trim-sep" aria-hidden="true">·</span>
-        <span className="footer-trim-link">{t("footer.link.privacy", locale)}</span>
+        <button
+          type="button"
+          className="footer-trim-link link-btn"
+          onClick={() => navigateAndTrack(app, "trimmed", "privacy", "privacy")}
+        >
+          {t("footer.link.privacy", locale)}
+        </button>
+        <span className="footer-trim-sep" aria-hidden="true">·</span>
+        <button
+          type="button"
+          className="footer-trim-link link-btn"
+          onClick={() => navigateAndTrack(app, "trimmed", "cookies", "cookies")}
+        >
+          {t("footer.link.cookies", locale)}
+        </button>
+        <span className="footer-trim-sep" aria-hidden="true">·</span>
+        <button
+          type="button"
+          className="footer-trim-link link-btn"
+          onClick={() => navigateAndTrack(app, "trimmed", "contact", "contact")}
+        >
+          {t("footer.link.contact", locale)}
+        </button>
+        <span className="footer-trim-sep" aria-hidden="true">·</span>
+        <CookiePreferencesButton
+          surface="trimmed"
+          className="footer-trim-link link-btn"
+          locale={locale}
+        />
       </div>
     </footer>
   );
 }
 
 function SiteFooterFull({ app, locale }) {
+  const year = new Date().getFullYear();
   return (
     <footer className="site-footer">
       <div className="footer-inner">
@@ -61,28 +142,100 @@ function SiteFooterFull({ app, locale }) {
         </div>
         <div className="footer-cols">
           <div>
-            <h5>Discover</h5>
-            <button className="link-btn" onClick={() => app.goBrowse({ category: "beachfront" })}>Beachfront</button>
-            <button className="link-btn" onClick={() => app.goBrowse({ category: "build_ready" })}>Build-ready</button>
-            <button className="link-btn" onClick={() => app.goBrowse({ category: "off_market" })}>Off-market</button>
-            <button className="link-btn" onClick={() => app.goBrowse({ category: "agricultural" })}>Agricultural</button>
+            <h5>{t("footer.col.discover.heading", locale)}</h5>
+            <button
+              className="link-btn"
+              onClick={() => {
+                track("footer.link_clicked", { link: "discover.beachfront", surface: "full" });
+                app.goBrowse({ category: "beachfront" });
+              }}
+            >
+              {t("footer.col.discover.beachfront", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => {
+                track("footer.link_clicked", { link: "discover.build_ready", surface: "full" });
+                app.goBrowse({ category: "build_ready" });
+              }}
+            >
+              {t("footer.col.discover.build_ready", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => {
+                track("footer.link_clicked", { link: "discover.off_market", surface: "full" });
+                app.goBrowse({ category: "off_market" });
+              }}
+            >
+              {t("footer.col.discover.off_market", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => {
+                track("footer.link_clicked", { link: "discover.agricultural", surface: "full" });
+                app.goBrowse({ category: "agricultural" });
+              }}
+            >
+              {t("footer.col.discover.agricultural", locale)}
+            </button>
           </div>
           <div>
-            <h5>Pulpo</h5>
-            <button className="link-btn" onClick={() => app.go("plans")}>Plans</button>
-            <a className="link-btn">About</a>
-            <a className="link-btn">Newsletter</a>
-            <a className="link-btn">Press</a>
+            <h5>{t("footer.col.pulpo.heading", locale)}</h5>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "plans", "plans")}
+            >
+              {t("footer.col.pulpo.plans", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "subscription", "subscription")}
+            >
+              {t("footer.link.subscription", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "contact", "contact")}
+            >
+              {t("footer.link.contact", locale)}
+            </button>
           </div>
           <div>
-            <h5>Legal</h5>
-            <a className="link-btn">Terms</a>
-            <a className="link-btn">Privacy</a>
-            <a className="link-btn">Contact</a>
+            <h5>{t("footer.col.legal.heading", locale)}</h5>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "terms", "terms")}
+            >
+              {t("footer.link.terms", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "privacy", "privacy")}
+            >
+              {t("footer.link.privacy", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "cookies", "cookies")}
+            >
+              {t("footer.link.cookies", locale)}
+            </button>
+            <button
+              className="link-btn"
+              onClick={() => navigateAndTrack(app, "full", "imprint", "imprint")}
+            >
+              {t("footer.link.imprint", locale)}
+            </button>
+            <CookiePreferencesButton
+              surface="full"
+              className="link-btn"
+              locale={locale}
+            />
           </div>
         </div>
       </div>
-      <div className="footer-fine">© 2026 Pulpo · A discovery-first land investment marketplace</div>
+      <div className="footer-fine">{t("footer.fine_print_full", locale, { year })}</div>
     </footer>
   );
 }
@@ -93,6 +246,6 @@ export function SiteFooter({ app, locale, tweaks }) {
   }
   const variant = siteFooterVariant(app.route);
   return variant === "trimmed"
-    ? <SiteFooterTrimmed locale={locale} />
+    ? <SiteFooterTrimmed app={app} locale={locale} />
     : <SiteFooterFull app={app} locale={locale} />;
 }

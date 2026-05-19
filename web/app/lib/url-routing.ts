@@ -3,7 +3,21 @@
 // way. Listing detail is rendered as an overlay on top of a section, so
 // `/listing/:id` parses to `{ route: <last section>, openListingId: <id> }`.
 
-export type Route = "home" | "browse" | "saved" | "plans" | "account";
+export type Route =
+  | "home"
+  | "browse"
+  | "saved"
+  | "plans"
+  | "account"
+  // Legal-suite pages — added in feat/legal-routes-shells.
+  // Each slug maps to a `LegalDocument` in `web/app/config/legal-content.ts`
+  // (except `contact`, which is a form rather than a static doc).
+  | "terms"
+  | "privacy"
+  | "cookies"
+  | "subscription"
+  | "imprint"
+  | "contact";
 
 // /account has nested sub-section paths (`/account/profile`, etc.). The
 // allow-list below is the only place the section keys live; AccountPage
@@ -32,11 +46,21 @@ export type ParsedLocation = {
 };
 
 const SECTION_PATHS: Record<string, Route> = {
-  "/":         "home",
-  "/browse":   "browse",
-  "/saved":    "saved",
-  "/plans":    "plans",
-  "/account":  "account",
+  "/":              "home",
+  "/browse":        "browse",
+  "/saved":         "saved",
+  "/plans":         "plans",
+  "/account":       "account",
+  // Legal-suite. `/impressum` is a German-law alias of `/imprint`; both
+  // render the same component (the German Telemediengesetz / DDG
+  // Impressum obligation applies extraterritorially to German users).
+  "/terms":         "terms",
+  "/privacy":       "privacy",
+  "/cookies":       "cookies",
+  "/subscription":  "subscription",
+  "/imprint":       "imprint",
+  "/impressum":     "imprint",
+  "/contact":       "contact",
 };
 
 const LISTING_PREFIX = "/listing/";
@@ -93,11 +117,17 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
 
 export function pathForRoute(route: Route, section?: AccountSection | null): string {
   switch (route) {
-    case "home":    return "/";
-    case "browse":  return "/browse";
-    case "saved":   return "/saved";
-    case "plans":   return "/plans";
-    case "account": return section ? `/account/${section}` : "/account";
+    case "home":         return "/";
+    case "browse":       return "/browse";
+    case "saved":        return "/saved";
+    case "plans":        return "/plans";
+    case "account":      return section ? `/account/${section}` : "/account";
+    case "terms":        return "/terms";
+    case "privacy":      return "/privacy";
+    case "cookies":      return "/cookies";
+    case "subscription": return "/subscription";
+    case "imprint":      return "/imprint";
+    case "contact":      return "/contact";
   }
 }
 
