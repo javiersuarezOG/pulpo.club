@@ -151,6 +151,7 @@ const UI_STRINGS = {
   // (gated on a PostHog dashboard audit). One key per surface concept;
   // SiteHeader and BottomNav read the same strings.
   "nav.home":                { en: "Home",                es: "Inicio" },
+  "nav.home_pro":            { en: "Home — Pulpo Pro member", es: "Inicio — Miembro Pulpo Pro" },
   "nav.discover":            { en: "Discover",            es: "Descubrir" },
   "nav.favorites":           { en: "Favorites",           es: "Favoritos" },
   "nav.login":               { en: "Log in",              es: "Iniciar sesión" },
@@ -764,6 +765,7 @@ const UI_STRINGS = {
 
   // Account area (A.3)
   "nav.account":             { en: "Account",                       es: "Cuenta" },
+  "nav.account_pro":         { en: "Account — Pulpo Pro member",    es: "Cuenta — Miembro Pulpo Pro" },
   // Wave 3a: button navigates to `home` route (account.jsx:122). After
   // the nav rename "Discover" labels /browse, so this label moved to
   // "Home" to match the actual destination.
