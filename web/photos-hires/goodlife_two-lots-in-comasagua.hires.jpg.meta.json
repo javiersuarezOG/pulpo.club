@@ -1,0 +1,29 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 695.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T09:26:27.155059+00:00",
+  "source_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/02/comasagua-el-salvador-7.jpg",
+  "original_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/02/comasagua-el-salvador-7-1024x576.jpg",
+  "transform_used": "goodlife-strip-wp-size-suffix",
+  "fetched_at": "2026-05-19T09:26:27.466590+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1680,
+  "resdet_detected_height": 945,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 5.0,
+    "issues": [
+      "uninteresting",
+      "low_quality"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.082 color_entropy=0.396"
+  }
+}
