@@ -813,6 +813,21 @@ export type EventMap = {
   "legal.page_viewed": {
     page: "terms" | "privacy" | "cookies" | "subscription" | "imprint" | "contact";
   };
+
+  // ───── Contact form (PR feat/contact-form) ─────
+  /** Fires once per /contact mount, the first time any form field gets
+   *  focus. Lets us split "viewed the page" from "started typing". */
+  "contact.form_opened": {
+    topic?: string;
+  };
+  /** Fires on every submit attempt — both the success path and every
+   *  failure path. NO PII in the payload: never includes email, name,
+   *  subject, or body. The server-side `api/contact.js` mirrors the
+   *  same shape. */
+  "contact.form_submitted": {
+    topic: string;
+    status: "success" | "validation_error" | "rate_limit" | "server_error";
+  };
 };
 
 export type EventName = keyof EventMap;
