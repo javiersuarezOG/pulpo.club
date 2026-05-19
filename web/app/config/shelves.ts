@@ -51,10 +51,10 @@ export const SHELVES: readonly ShelfConfig[] = [
   {
     key: "new_this_week",
     enabled: true,
-    label:   { en: "New this week",            es: "Nuevos esta semana" },
+    label:   { en: "New this week",            es: "Nuevas esta semana" },
     subline: {
       en: "Listings that hit the catalog in the last 7 days.",
-      es: "Anuncios que entraron al catálogo en los últimos 7 días.",
+      es: "Propiedades que entraron al catálogo en los últimos 7 días.",
     },
     icon: "cat_new",
     filter: (l) => l.first_seen_date <= 7,
@@ -62,10 +62,10 @@ export const SHELVES: readonly ShelfConfig[] = [
   {
     key: "price_drops",
     enabled: true,
-    label:   { en: "Just got more affordable", es: "Acaban de bajar de precio" },
+    label:   { en: "Just got more affordable", es: "Acaban de rebajar el precio" },
     subline: {
       en: "Owners cut their ask — your moment.",
-      es: "Los dueños bajaron el precio — tu momento.",
+      es: "Los dueños bajaron el precio — este es tu momento.",
     },
     icon: "cat_price_drop",
     filter: (l) => l.is_repriced,
