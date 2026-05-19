@@ -30,6 +30,7 @@ from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK  # noqa: E402
 from pulpo.ranker import rank  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
 from automation.llm_enrichment import enrich_listings as _llm_enrich  # type: ignore  # noqa: E402
+from automation._atomic import atomic_write_json as _atomic_write_json  # noqa: E402
 from automation.ai_enrichment_fallback import apply_fallbacks as _ai_fallback  # type: ignore  # noqa: E402
 from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
@@ -1357,8 +1358,7 @@ def main() -> int:
         if key not in first_seen:
             first_seen[key] = started_iso
         li.first_seen_at = first_seen[key]
-    with listings_history_path.open("w", encoding="utf-8") as f:
-        json.dump(first_seen, f, ensure_ascii=False)
+    _atomic_write_json(listings_history_path, first_seen)
 
     # Price history (PRD §FR-3). Sets is_repriced before derived rules and
     # AI run, so downstream fields reflect cross-run price comparison.
@@ -1397,8 +1397,7 @@ def main() -> int:
             else:
                 li.is_repriced = False
 
-    with prices_history_path.open("w", encoding="utf-8") as f:
-        json.dump(prices_history, f, ensure_ascii=False)
+    _atomic_write_json(prices_history_path, prices_history)
     print(f"[price_history] tracked={len(prices_history)} listings  "
           f"repriced_this_run={repriced_count}")
 

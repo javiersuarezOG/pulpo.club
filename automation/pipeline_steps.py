@@ -21,6 +21,7 @@ from pulpo.normalize import normalize as _normalize
 from pulpo.cli import _row, CSV_FIELDS
 from automation.validation import validate as _validate
 from automation.field_audit import build_completeness_block
+from automation._atomic import atomic_write_json
 
 
 # ── Phase: normalize ──────────────────────────────────────────────────
@@ -149,8 +150,7 @@ def phase_write_outputs(
         offline=offline, fixture_fallback_active=fixture_fallback_active,
         dropped=dropped, validation_by_type=validation_by_type,
     )
-    with (web_data_dir / "last_updated.json").open("w", encoding="utf-8") as f:
-        json.dump(meta, f, indent=2)
+    atomic_write_json(web_data_dir / "last_updated.json", meta, indent=2)
 
     _append_run_history(
         web_data_dir / "run_history.json",
@@ -175,8 +175,7 @@ def _write_ranked_json(ranked_dicts: list, path: Path) -> None:
     an auth-gated split that was never built; frontend reads ranked.json
     directly so the public version was dropped (saved ~1.1 MB per commit).
     """
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(ranked_dicts, f, indent=2, ensure_ascii=False, default=str)
+    atomic_write_json(path, ranked_dicts, indent=2, default=str)
 
 
 def _compute_source_status(sources: list[str], per_source_count: dict[str, int], source_errors: dict[str, str]) -> dict[str, str]:
@@ -338,8 +337,7 @@ def _append_run_history(path: Path, *, finished, ranked_count, dropped,
         "source_status":  source_status,
     })
     history = history[-60:]
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(history, f)
+    atomic_write_json(path, history)
 
 
 # ── Phase: print summary (stdout for CI logs) ─────────────────────────

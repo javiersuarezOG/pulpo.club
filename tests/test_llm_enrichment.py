@@ -25,6 +25,8 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
+import pytest
+
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
@@ -578,3 +580,126 @@ def test_global_error_does_not_catch_transient():
     class TimeoutError_(Exception):
         pass
     assert not _is_global_error(TimeoutError_("read timeout"))
+
+
+# ── Retry semantics — bounded retry on transient HTTP errors ─────────────
+
+@pytest.fixture
+def _no_sleep(monkeypatch):
+    """Neutralize time.sleep inside the module so retry tests don't burn
+    real wall-clock on the back-off pauses."""
+    import automation.llm_enrichment as mod
+    monkeypatch.setattr(mod.time, "sleep", lambda _s: None)
+
+
+def test_transient_error_then_success_retries_and_enriches(tmp_path, _no_sleep):
+    """One ConnectionError on the first attempt, success on the second.
+    The listing should end up enriched and metrics should reflect ONE
+    enrichment (not a failure). Proves a single network blip no longer
+    permanently skips a listing — the original PR-1 reliability win."""
+    li = _li()
+
+    class ConnectionError_(Exception):
+        pass
+
+    client = _StubClient(responses=[ConnectionError_, _OK_JSON])
+    metrics = enrich_listings([li], tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=1)
+    assert metrics["enriched"] == 1
+    assert metrics["failed"] == 0
+    # Both the failing attempt and the retry hit the client
+    assert len(client.chat.completions.calls) == 2
+    assert li["title_canonical"] is not None
+
+
+def test_exhausted_retries_become_single_failure(tmp_path, _no_sleep):
+    """All three attempts fail with a transient error → one structured
+    failure, no crash, no partial save. Caps the blast radius of a flaky
+    DeepSeek endpoint."""
+    li = _li()
+
+    class ConnectionError_(Exception):
+        pass
+
+    client = _StubClient(responses=[ConnectionError_,
+                                    ConnectionError_,
+                                    ConnectionError_])
+    metrics = enrich_listings([li], tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=1)
+    assert metrics["failed"] == 1
+    assert metrics["enriched"] == 0
+    # All three attempts ran
+    assert len(client.chat.completions.calls) == 3
+    # No partial save
+    assert li["title_canonical"] is None
+    # Failure reason carries the exception class name
+    assert any(k.startswith("http_error:ConnectionError_")
+               for k in metrics["failure_reasons"])
+
+
+def test_global_error_skips_retry(tmp_path, _no_sleep):
+    """Auth/quota errors are deterministic — retrying them just burns
+    log lines. The retry helper must short-circuit on _is_global_error
+    so the global handler still fires after exactly one attempt."""
+    listings = [_li(source_id="GL-0")]
+
+    class AuthenticationError(Exception):
+        pass
+
+    client = _StubClient(responses=[AuthenticationError,
+                                    AuthenticationError,
+                                    AuthenticationError])
+    metrics = enrich_listings(listings, tmp_path / "side.json",
+                              tmp_path / "log.jsonl",
+                              client=client, max_workers=1)
+    # ONE call — retry skipped — global handler tripped
+    assert len(client.chat.completions.calls) == 1
+    assert metrics["failed"] == 1
+    assert metrics["global_error_seen"] == "AuthenticationError"
+
+
+def test_retry_delay_within_jitter_bounds():
+    """The jittered delay must stay within ±20% of the base so we never
+    pause longer than the operator expects (matters for the deadline-
+    aware enrichment loop where a pause that's too long pushes work
+    past the cutoff)."""
+    from automation.llm_enrichment import _retry_delay, _RETRY_BASE_DELAYS
+
+    for attempt_idx, base in enumerate(_RETRY_BASE_DELAYS, start=1):
+        # Sample with rand=0 (lower bound) and rand=1 (upper bound)
+        lo = _retry_delay(attempt_idx, rand=lambda: 0.0)
+        hi = _retry_delay(attempt_idx, rand=lambda: 1.0)
+        assert lo == pytest.approx(base * 0.8)
+        assert hi == pytest.approx(base * 1.2)
+
+    # Out-of-range attempts return 0 (no further retry)
+    assert _retry_delay(0) == 0
+    assert _retry_delay(len(_RETRY_BASE_DELAYS) + 1) == 0
+
+
+def test_call_with_retry_invokes_sleep_between_attempts():
+    """Pin that a transient failure triggers exactly one sleep before
+    the second attempt. Catches regressions where the retry loop sleeps
+    after the LAST attempt (wasted wall-clock) or skips sleep entirely
+    (hot-loop hammering the upstream)."""
+    from automation.llm_enrichment import _call_with_retry
+
+    sleeps: list[float] = []
+    calls = {"n": 0}
+
+    def flaky():
+        calls["n"] += 1
+        if calls["n"] < 2:
+            raise RuntimeError("transient")
+        return "ok"
+
+    result = _call_with_retry(
+        flaky,
+        sleep=sleeps.append,
+        rand=lambda: 0.5,
+    )
+    assert result == "ok"
+    assert calls["n"] == 2
+    assert len(sleeps) == 1  # exactly one back-off pause
