@@ -777,4 +777,106 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(modalText).not.toContain("invitation");
     expect(modalText).not.toContain("Resend my invitation");
   });
+
+  // 2026-05-19 PR #2 — invitation-status branched copy.
+  //
+  // The anon-variant WelcomeModal now GETs /api/clerk/invitation-status
+  // on mount and renders copy that matches what the webhook actually
+  // did. Pre-PR the modal lied uniformly with "we just sent an
+  // invitation" regardless of outcome. Four tests, one per
+  // discriminated status, all intercepting the endpoint so we can
+  // exercise each branch without a real Stripe session.
+  //
+  // helper: stub /api/clerk/invitation-status to return a fixed
+  // payload. The modal fetches with the session_id from the URL —
+  // we don't need to verify session_id round-trips, only that the
+  // copy matches the returned status.
+  async function stubStatus(page: import("@playwright/test").Page, status: string, extra: Record<string, unknown> = {}) {
+    await page.route("**/api/clerk/invitation-status*", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ status, ...extra }),
+      });
+    });
+  }
+
+  test("welcome modal status: invitation_pending shows canonical 'invitation' copy", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await stubStatus(page, "invitation_pending", { email_domain: "test.com", sent_at: new Date().toISOString(), locale: "en" });
+    await page.goto("/account?welcome=1&session_id=cs_test_pending", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+    // Default-branch happy path: same copy as the pre-PR-2 anon body
+    // + Resend CTA visible.
+    const txt: string = await page.evaluate(() => document.querySelector(".welcome-modal")?.textContent || "");
+    expect(txt).toContain("invitation");
+    expect(txt).toContain("Resend my invitation");
+    // The status-specific copies must NOT leak into this branch.
+    expect(txt).not.toContain("already have a Pulpo account");
+    expect(txt).not.toContain("couldn't read your email");
+  });
+
+  test("welcome modal status: user_exists swaps to 'sign in' copy with new CTA", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await stubStatus(page, "user_exists", { email_domain: "gmail.com" });
+    await page.goto("/account?welcome=1&session_id=cs_test_user_exists", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+    // Give the status fetch a moment to resolve + re-render.
+    await page.waitForTimeout(500);
+    const txt: string = await page.evaluate(() => document.querySelector(".welcome-modal")?.textContent || "");
+    // Headline + body switch to the user_exists copy, email_domain
+    // gets interpolated (this also asserts the t() var interpolation
+    // path works for the new keys).
+    expect(txt).toContain("You already have a Pulpo account");
+    expect(txt).toContain("gmail.com");
+    expect(txt).toContain("Sign in");
+    // CRITICAL bug guards: the canonical anon "invitation" body and
+    // Resend CTA must NOT render here. Pre-PR-2 the modal showed both
+    // unconditionally and users had no recovery path.
+    expect(txt).not.toContain("Resend my invitation");
+    expect(txt).not.toContain("We just sent an invitation");
+  });
+
+  test("welcome modal status: no_email shows support escalation", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await stubStatus(page, "no_email");
+    await page.goto("/account?welcome=1&session_id=cs_test_no_email", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(500);
+    const txt: string = await page.evaluate(() => document.querySelector(".welcome-modal")?.textContent || "");
+    expect(txt).toContain("couldn't read your email");
+    expect(txt).toContain("hello@pulpo.club");
+    expect(txt).not.toContain("Resend my invitation");
+  });
+
+  test("welcome modal status: webhook_pending shows transient 'finishing your account' copy", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await stubStatus(page, "webhook_pending");
+    await page.goto("/account?welcome=1&session_id=cs_test_webhook_pending", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(500);
+    const txt: string = await page.evaluate(() => document.querySelector(".welcome-modal")?.textContent || "");
+    // webhook_pending shares the default-branch shape (headline +
+    // inbox + resend CTA), but the body switches to the
+    // 'still finishing your account setup' wording so we don't
+    // promise an email that hasn't been sent yet.
+    expect(txt).toContain("finishing your account setup");
+    // Resend remains available — it's the user-facing escape hatch.
+    expect(txt).toContain("Resend my invitation");
+    // We must NOT show the canonical 'we just sent an invitation'
+    // body here — the webhook hasn't fired yet so that would lie.
+    expect(txt).not.toContain("We just sent an invitation");
+  });
 });
