@@ -709,24 +709,24 @@ const UI_STRINGS = {
   // subscription is billed in EUR via the European Stripe entity.
   // This footnote prevents "why is my plan in euros?" confusion.
   "plans.pro.currency_note": { en: "Listings are priced in USD; Pulpo Pro is billed in EUR.",
-                               es: "Las propiedades aparecen en USD; Pulpo Pro se cobra en EUR." },
+                               es: "Los precios de las propiedades aparecen en USD; la suscripciÃ³n de Pulpo Pro se cobra en EUR." },
   // Pro feature list — PlansPage now uses the three canonical `pro.usp.*.headline`
   // keys above, plus this single "Everything in Free" caboose. The five legacy
   // bullets (unlimited_details, off_market, newsletter, unlimited_saves,
   // price_alerts) were removed in PR-B.4a — their content is covered by the
   // three canonical USPs (alerts covers newsletter + price_alerts; browse
   // covers unlimited_details; links covers off_market access).
-  "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo del plan Gratis" },
+  "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo que incluye el plan Gratis" },
   // Agency tier (hidden by default — see SHOW_AGENCY_PLAN in pages.jsx).
   "plans.agency.name":       { en: "Agency",                   es: "Agencia" },
   "plans.agency.tag":        { en: "For investor groups & brokers",
                                es: "Para grupos de inversión y corredores" },
   "plans.agency.feat.everything_in_pro": { en: "Everything in Pro",       es: "Todo lo del plan Pro" },
-  "plans.agency.feat.team_seats":        { en: "5 team seats",            es: "5 asientos de equipo" },
-  "plans.agency.feat.shared_lists":      { en: "Shared saved lists",      es: "Listas guardadas compartidas" },
+  "plans.agency.feat.team_seats":        { en: "5 team seats",            es: "5 cuentas para tu equipo" },
+  "plans.agency.feat.shared_lists":      { en: "Shared saved lists",      es: "Listas compartidas con el equipo" },
   "plans.agency.feat.csv_export":        { en: "CSV export",              es: "Exportación a CSV" },
   "plans.agency.feat.priority_off_market": { en: "Priority off-market intros",
-                                             es: "Acceso prioritario a off-market" },
+                                             es: "Conexiones off-market prioritarias" },
   "plans.agency.cta_contact": { en: "Contact sales",           es: "Contactar ventas" },
   // Stripe-wired Pro CTA + error toast.
   "plans.upgrade_pro_cta":   { en: "Upgrade — €{price}/month",
@@ -815,11 +815,11 @@ const UI_STRINGS = {
   "account.notif.newsletter.desc":   { en: "The main Pulpo digest — new listings, price drops, curated picks.",
                                         es: "El resumen principal de Pulpo — nuevos anuncios, bajadas de precio, selecciones curadas." },
   "account.notif.price_drops.title": { en: "Price drop alerts",
-                                        es: "Alertas de bajada de precio" },
+                                        es: "Alertas de rebajas de precio" },
   "account.notif.price_drops.desc":  { en: "Email when a saved listing drops in price.",
-                                        es: "Email cuando un anuncio guardado baja de precio." },
+                                        es: "Te avisamos por correo cuando una propiedad guardada baja de precio." },
   "account.notif.new_in_zones.title":{ en: "New listings in saved zones",
-                                        es: "Nuevos anuncios en zonas guardadas" },
+                                        es: "Nuevas propiedades en zonas guardadas" },
   "account.notif.new_in_zones.desc": { en: "Get early notice when something new appears in areas you've explored.",
                                         es: "Entérate temprano cuando aparece algo nuevo en zonas que ya exploraste." },
 
@@ -827,7 +827,7 @@ const UI_STRINGS = {
   "account.notif.platform_updates.title": { en: "Platform updates",
                                              es: "Novedades de Pulpo" },
   "account.notif.platform_updates.desc":  { en: "Occasional product news and feature announcements.",
-                                             es: "Noticias y novedades del producto, sin spam." },
+                                             es: "Noticias del producto y novedades, sin saturarte el correo." },
 
   // Channels.
   "account.notif.channels":     { en: "Channels",  es: "Canales" },
@@ -839,7 +839,7 @@ const UI_STRINGS = {
   "account.notif.whatsapp_desc":{ en: "Optional opt-in. Stores your number for future deal alerts.",
                                   es: "Opcional. Guarda tu número para alertas de oportunidades." },
   "account.notif.whatsapp_confirm": { en: "We'll send deal alerts to {number}. You can opt out anytime.",
-                                       es: "Enviaremos alertas a {number}. Puedes desactivarlo cuando quieras." },
+                                       es: "Te vamos a enviar alertas al {number}. Puedes desactivarlas cuando quieras." },
 
   // Newsletter frequency (Pro-only — only renders when newsletter is on).
   "account.notif.frequency":    { en: "Newsletter frequency", es: "Frecuencia del boletín" },
@@ -862,9 +862,9 @@ const UI_STRINGS = {
   // Chip labels. Keep these short — the chip rail is responsive and
   // long phrases force two-line wrap on 320px viewports.
   "account.notif.pref_cat.new_this_week":  { en: "New this week",
-                                              es: "Nuevos esta semana" },
+                                              es: "Nuevas esta semana" },
   "account.notif.pref_cat.price_drops":    { en: "Price drops",
-                                              es: "Bajadas de precio" },
+                                              es: "Rebajas de precio" },
   "account.notif.pref_cat.beachfront":     { en: "Beachfront / near the beach",
                                               es: "Frente al mar / cerca de la playa" },
   "account.notif.pref_cat.water_features": { en: "Lakefront / near water",
@@ -907,16 +907,16 @@ const UI_STRINGS = {
 
   // Pro upsell shown to free / anonymous users in this subsection.
   "account.notif.upsell.title": { en: "Get deal alerts with Pulpo Pro",
-                                  es: "Recibe alertas con Pulpo Pro" },
+                                  es: "Recibe alertas de ofertas con Pulpo Pro" },
   "account.notif.upsell.body":  { en: "Email alerts on saved listings, new listings in your zones, and the curated weekly digest are part of Pulpo Pro.",
                                   es: "Las alertas por email de anuncios guardados, los nuevos en tus zonas y el boletín semanal son parte de Pulpo Pro." },
   "account.notif.upsell.cta":   { en: "Upgrade to Pro",
-                                  es: "Contrata Pro" },
+                                  es: "Hazte Pro" },
   // Shared "Upgrade to Pro" button label — also used by the
   // Subscription-section free-tier CTA. Prefer this over duplicating
   // the literal in any new surface.
   "common.upgrade_to_pro_cta":  { en: "Upgrade to Pro",
-                                  es: "Contrata Pro" },
+                                  es: "Hazte Pro" },
 
   // Account → Security (Clerk-managed). Single CTA opens Clerk's
   // hosted UserProfile modal — that one modal covers everything we
@@ -954,7 +954,7 @@ const UI_STRINGS = {
   "account.sub.invoices_heading": { en: "Invoices",
                                es: "Facturas" },
   "account.sub.invoices_intro":   { en: "Stripe keeps your full billing history.",
-                               es: "Stripe guarda tu historial de pagos completo." },
+                               es: "Stripe guarda tu historial completo de pagos." },
   "account.sub.invoices_cta":     { en: "View invoices in the Stripe portal →",
                                es: "Ver facturas en el portal de Stripe →" },
   "account.sub.invoices_empty":   { en: "No invoices yet — your billing history will appear in the Stripe portal once your first payment is processed.",
