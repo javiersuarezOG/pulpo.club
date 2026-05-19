@@ -388,12 +388,18 @@ const UI_STRINGS = {
 
   "home.shelf.top10.h2":         { en: "Top 10 deals right now",
                                    es: "Las 10 mejores ofertas ahora mismo" },
+  "home.shelf.top10.sub":        { en: "The 10 best price-for-location lots in El Salvador. Ranked daily.",
+                                   es: "Los 10 mejores lotes por precio-ubicación en El Salvador. Ranqueados a diario." },
   "home.shelf.dropsHeading":     { en: "Price drops",
                                    es: "Rebajas de precio" },
+  "home.shelf.dropsSub":         { en: "Listings with a price cut this month.",
+                                   es: "Listados con bajada de precio este mes." },
   "home.shelf.dropsCount":       { en: "↘ {n} cuts",
                                    es: "↘ {n} rebajas" },
   "home.shelf.newHeading":       { en: "New this week",
                                    es: "Nuevas esta semana" },
+  "home.shelf.newSub":           { en: "Listings added in the last 7 days.",
+                                   es: "Listados agregados en los últimos 7 días." },
   "home.shelf.newCount":         { en: "✦ {n} added",
                                    es: "✦ {n} agregadas" },
   "home.shelf.prev":             { en: "Show previous listings",
@@ -443,6 +449,12 @@ const UI_STRINGS = {
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
+  // Group headers for the three-tier filter rail (WHERE / RANKING / FILTERS).
+  // Compose with the chips defined in data.jsx PILL_GROUPS.
+  "pill.rail.aria":          { en: "Filter listings",     es: "Filtrar listados" },
+  "pill.group.where":        { en: "Where",               es: "Dónde" },
+  "pill.group.ranking":      { en: "Ranking",             es: "Ranking" },
+  "pill.group.filters":      { en: "Filter",              es: "Filtros" },
 
   // Card
   // Pulpo's catalog now includes houses + lots, not just plots of
