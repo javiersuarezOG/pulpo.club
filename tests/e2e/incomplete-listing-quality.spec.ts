@@ -48,4 +48,23 @@ test.describe("Incomplete-listing quality gate", () => {
       "detail keystats should surface the 'Not shared' copy for missing fields"
     ).toBeTruthy();
   });
+
+  test("cold-load ?inc=1 expands the result count to include incomplete listings", async ({ page }) => {
+    // Regression for the URL-overlay fix: the BrowsePage category-resync
+    // useEffect re-fires on mount and was overwriting URL-parsed filter
+    // state (notably include_incomplete). Without the overlay in
+    // readFilterFromURL(), a direct cold-load on /browse?inc=1 silently
+    // reverted to the default-hide view. This test pins that path.
+    await page.goto("/browse", { waitUntil: "domcontentloaded" });
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 15_000 });
+    await page.waitForTimeout(1500);
+    const defaultCount = parseInt((await page.locator(".num").first().textContent()) || "0", 10);
+
+    await page.goto("/browse?inc=1", { waitUntil: "domcontentloaded" });
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 15_000 });
+    await page.waitForTimeout(1500);
+    const incCount = parseInt((await page.locator(".num").first().textContent()) || "0", 10);
+
+    expect(incCount).toBeGreaterThan(defaultCount);
+  });
 });

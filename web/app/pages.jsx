@@ -1027,15 +1027,19 @@ function BrowsePage({ app }) {
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
   // and stale filters carry over — clicking "All" leaves the previous category's
-  // chips still applied.
+  // chips still applied. We layer URL params on top so a cold-load with
+  // ?inc=1 / ?pmin=... survives the first render — without this overlay,
+  // the effect's mount-time fire reset URL-only flags to defaults.
   pUseEffect(() => {
     const f = buildFiltersForCategory(app.routeParams.category);
-    // Allow callers to seed additional filters via routeParams (e.g. zone scoping
-    // from "Browse similar listings in {zone}").
     if (Array.isArray(app.routeParams.zones) && app.routeParams.zones.length > 0) {
       f.zones = new Set(app.routeParams.zones);
     }
-    setFilters(f);
+    if (typeof window !== "undefined") {
+      setFilters(readFilterFromURL(window.location.search, f));
+    } else {
+      setFilters(f);
+    }
   }, [app.routeParams.category, app.routeParams.zones]);
 
   // Persist filter + sort + category to URLSearchParams (replaceState
