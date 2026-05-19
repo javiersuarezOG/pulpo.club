@@ -166,13 +166,10 @@ def build_home_funnel(date_from: str) -> dict:
     return funnel_payload(
         name="Funnel — Home → Paid (auto)",
         description=(
-            "Home pageview → intent (cta_routed) → free-month modal shown "
-            "→ modal CTA clicked → Stripe redirect → webhook confirms payment. "
-            "Ordered funnel; intermediate events (detail.opened, etc.) are "
-            "permitted between steps. Post-PR #305 the dominant anon/free "
-            "path runs through detail.opened between cta_routed and "
-            "modal.shown — the funnel still satisfies the ordering. "
-            "Identity stitched via posthog.alias() at webhook time. "
+            "/ $pageview → cta_routed → free_month_modal.shown → cta_clicked "
+            "→ checkout_redirected → webhook.checkout_completed. Ordered: "
+            "intermediate events (detail.opened post-#305) permitted between "
+            "steps. Identity stitched via posthog.alias() at webhook. "
             "Owner: scripts/posthog_create_funnels.py."
         ),
         steps=steps,
@@ -206,14 +203,12 @@ def build_listing_funnel(date_from: str) -> dict:
     return funnel_payload(
         name="Funnel — Listing detail → Paid (auto)",
         description=(
-            "detail.opened (any listing) → intent (cta_routed via "
-            "cta_id=detail_upgrade) → free-month modal shown (trigger="
-            "detail_upgrade) → modal CTA clicked → Stripe redirect → "
-            "webhook confirms payment. Post-PR #305: shelf/browse-card "
-            "clicks passthrough for every tier, so detail.opened captures "
-            "all card-click entrants. The in-panel upgrade CTAs dispatch "
-            "through the routing matrix so cta_routed fires uniformly at "
-            "step 1. Owner: scripts/posthog_create_funnels.py."
+            "detail.opened → cta_routed (cta_id=detail_upgrade) → "
+            "free_month_modal.shown (trigger=detail_upgrade) → cta_clicked "
+            "→ checkout_redirected → webhook.checkout_completed. Post-#305 "
+            "shelf/browse clicks passthrough → detail.opened captures every "
+            "card entrant; in-panel CTAs route through cta_id=detail_upgrade. "
+            "Owner: scripts/posthog_create_funnels.py."
         ),
         steps=steps,
         date_from=date_from,
@@ -243,11 +238,10 @@ def build_detail_panel_upgrade_funnel(date_from: str) -> dict:
     return funnel_payload(
         name="Funnel — Detail-panel upgrade → Paid (auto)",
         description=(
-            "detail.opened → in-panel upgrade CTA fires "
-            "free_month_modal.shown (trigger=detail_upgrade) → modal CTA "
-            "clicked → Stripe redirect → webhook confirms payment. Replaces "
-            "the legacy 'Card intent → Paid' funnel which became dead post-"
-            "PR #305 (shelf/browse cards now passthrough). Owner: "
+            "detail.opened → free_month_modal.shown / cta_clicked / "
+            "checkout_redirected (all trigger=detail_upgrade) → "
+            "webhook.checkout_completed. Replaces dead 'Card intent → Paid' "
+            "(shelf/browse passthrough post-#305). Owner: "
             "scripts/posthog_create_funnels.py."
         ),
         steps=steps,
@@ -275,15 +269,11 @@ def build_activation_account_funnel(date_from: str) -> dict:
         name="Funnel — Activation → Account engagement (auto)",
         description=(
             "webhook.checkout_completed → stripe.return_landed "
-            "(surface=account_welcome) → signin.completed (provider=clerk; "
-            "= Clerk invitation accepted, password created) → "
-            "account.section_viewed. Measures the 'updated account anyhow' "
-            "terminal state from the post-Stripe activation loop. "
-            "stripe.return_landed (immediate-fire on /account?welcome=1 mount) "
-            "anchors the funnel before Clerk hydration so deliverability and "
-            "Clerk SDK failures don't mask the 'returned from Stripe' signal. "
-            "Pairs with 'Activation → Continued browsing' which captures the "
-            "complementary terminal state. Owner: scripts/posthog_create_funnels.py."
+            "(account_welcome) → signin.completed (provider=clerk; Clerk "
+            "invitation accepted = password created) → account.section_viewed. "
+            "Terminal state: 'updated account'. Anchor on stripe.return_landed "
+            "(immediate, not Clerk-hydration-gated). Owner: "
+            "scripts/posthog_create_funnels.py."
         ),
         steps=steps,
         date_from=date_from,
@@ -308,13 +298,11 @@ def build_activation_browsing_funnel(date_from: str) -> dict:
         name="Funnel — Activation → Continued browsing (auto)",
         description=(
             "webhook.checkout_completed → stripe.return_landed "
-            "(surface=account_welcome) → signin.completed (provider=clerk; "
-            "= Clerk invitation accepted, password created) → route.changed "
-            "with to_path not containing '/account'. Measures the 'kept "
-            "browsing the website' terminal state from the post-Stripe "
-            "activation loop. Pairs with 'Activation → Account engagement' "
-            "which captures the complementary terminal state. Owner: "
-            "scripts/posthog_create_funnels.py."
+            "(account_welcome) → signin.completed (provider=clerk; Clerk "
+            "invitation accepted = password created) → route.changed "
+            "(to_path not_icontains '/account'). Terminal state: 'kept "
+            "browsing'. Pairs with Activation → Account engagement. "
+            "Owner: scripts/posthog_create_funnels.py."
         ),
         steps=steps,
         date_from=date_from,
