@@ -686,14 +686,14 @@ const UI_STRINGS = {
   // Plans page — full string set. PRO_PRICE_USD_PER_MONTH lives in
   // pages.jsx and mirrors automation/stripe_setup.mjs.
   "plans.head.title":        { en: "Pick a plan that fits how you invest.",
-                               es: "Elige un plan que se ajuste a cómo inviertes." },
+                               es: "Escoge el plan que mejor se ajuste a cómo inviertes." },
   "plans.head.subtitle":     { en: "Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.",
-                               es: "Pulpo es gratis para explorar. Contrata Pro para detalles ilimitados, acceso off-market y alertas semanales." },
+                               es: "Explorar Pulpo es gratis. Hazte Pro para ver detalles sin límite, acceso off-market y alertas semanales." },
   // Free tier
   "plans.free.name":         { en: "Free",                    es: "Gratis" },
   "plans.free.tag":          { en: "Browse the catalogue",    es: "Explora el catálogo" },
-  "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Exploración ilimitada de tarjetas" },
-  "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 vistas de detalle al mes" },
+  "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Explora tarjetas sin límite" },
+  "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 fichas detalladas al mes" },
   "plans.free.feat.saves_cap":        { en: "Save up to 10 listings",       es: "Guarda hasta 10 propiedades" },
   // The Free plan card "what Pro adds" mirrors live at pro.usp.*.short
   // (used with the featMuted variant). The two old `_excluded` keys are
