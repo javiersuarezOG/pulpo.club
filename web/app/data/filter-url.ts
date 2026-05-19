@@ -64,6 +64,23 @@ function parseSet(value: string | null): Set<string> {
   return new Set(value.split(",").map((s) => s.trim()).filter(Boolean));
 }
 
+// Mirror the master/sub/tag "OR onto baseDefaults" semantic for the
+// legacy multi-set keys: absent (key not in URL) → fall back to the
+// preset seeded by buildFiltersForCategory; present (even empty string)
+// → honour the URL. Without this, a category preset such as
+// status={"price_drop"} from cat=price_drops was wiped to an empty set
+// the moment readFilterFromURL ran with no status= in the URL, silently
+// dropping the filter on every "View all" from the homepage.
+function readSetOrFallback(
+  p: URLSearchParams,
+  key: string,
+  fallback: Set<string>,
+): Set<string> {
+  const v = p.get(key);
+  if (v == null) return fallback;
+  return parseSet(v);
+}
+
 function parseInt0(value: string | null, fallback: number): number {
   if (value == null) return fallback;
   const n = parseInt(value, 10);
@@ -100,11 +117,11 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
   const tagsFromUrl   = parseTags(p.get("tag"));
   const out: FilterShape = {
     ...baseDefaults,
-    zones: parseSet(p.get("zones")),
-    land_types: parseSet(p.get("types")),
-    features: parseSet(p.get("features")),
-    infra: parseSet(p.get("infra")),
-    status: parseSet(p.get("status")),
+    zones:      readSetOrFallback(p, "zones",    baseDefaults.zones),
+    land_types: readSetOrFallback(p, "types",    baseDefaults.land_types),
+    features:   readSetOrFallback(p, "features", baseDefaults.features),
+    infra:      readSetOrFallback(p, "infra",    baseDefaults.infra),
+    status:     readSetOrFallback(p, "status",   baseDefaults.status),
     price_min: parseInt0(p.get("pmin"), 0),
     price_max: p.get("pmax") != null ? parseInt0(p.get("pmax"), 0) : null,
     size_min: parseInt0(p.get("smin"), 0),

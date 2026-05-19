@@ -1042,6 +1042,14 @@ function BrowsePage({ app }) {
     }
   }, [app.routeParams.category, app.routeParams.zones]);
 
+  // Resync sort when a caller (e.g. home Top 10 "View all") navigates
+  // here with a sort routeParam. Mount-time sort is seeded from the URL
+  // by useState above; this picks up the value pushed by
+  // goBrowse({ sort: "..." }) from another route.
+  pUseEffect(() => {
+    if (app.routeParams.sort) setSort(app.routeParams.sort);
+  }, [app.routeParams.sort]);
+
   // Persist filter + sort + category to URLSearchParams (replaceState
   // — no new history entries on every chip toggle).
   pUseEffect(() => {
