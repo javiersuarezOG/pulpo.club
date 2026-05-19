@@ -171,7 +171,11 @@ const PulpoLogo = ({ size = 22, pro = false }) => (
       pulpo
     </span>
     {pro && (
-      <span className="pulpo-logo-pro" aria-label="Pulpo Pro member">Pro</span>
+      // "Pro" is a shared EN/ES brand mark. The parent button already
+      // carries the localized accessible name via `nav.home_pro`, so the
+      // span needs no aria-label (and shouldn't have one — nesting an
+      // aria-label inside a labelled button confuses screen readers).
+      <span className="pulpo-logo-pro">Pro</span>
     )}
   </div>
 );
