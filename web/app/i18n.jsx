@@ -971,7 +971,7 @@ const UI_STRINGS = {
   "start.hero.eyebrow":       { en: "Real estate in El Salvador",
                                 es: "Bienes raíces en El Salvador" },
   "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                es: "Propiedades en El Salvador, antes de que las vea el resto de internet." },
+                                es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
   "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
                                 es: "Pulpo recopila propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales. Un resumen semanal. Sin ruido." },
   "start.hero.cta_primary":   { en: "Get access — {price}/month",
@@ -984,30 +984,30 @@ const UI_STRINGS = {
   // Do NOT duplicate or shadow these keys; if a new slot needs USP copy,
   // reference these.
   "pro.usp.alerts.short":     { en: "Weekly 10 picks in your inbox",
-                                es: "Top-10 semanal en tu inbox" },
+                                es: "El Top 10 cada semana en tu correo" },
   "pro.usp.browse.short":     { en: "Filters + smart sorting",
                                 es: "Filtros + orden inteligente" },
   "pro.usp.links.short":      { en: "Direct seller links",
                                 es: "Enlaces directos al vendedor" },
   // Long variants — /plans Pro card + home-page upsell modal.
   "pro.usp.alerts.headline":  { en: "Weekly 10 picks, in your inbox.",
-                                es: "Top 10 semanal, en tu inbox." },
+                                es: "El Top 10 de la semana, en tu correo." },
   "pro.usp.alerts.body":      { en: "Set your filters once. Pulpo emails you the best new matches every week.",
                                 es: "Configura tus filtros una vez. Pulpo te envía las mejores coincidencias cada semana." },
   "pro.usp.browse.headline":  { en: "Filter and sort by what matters.",
-                                es: "Filtra y ordena por lo que importa." },
+                                es: "Filtra y ordena por lo que de verdad importa." },
   "pro.usp.browse.body":      { en: "Beachfront. Under €50k. Build-ready. Pulpo gives you the precision tool — free is just the raw list.",
                                 es: "Frente al mar. Bajo €50k. Listo para construir. Pulpo te da precisión — gratis es solo la lista cruda." },
   "pro.usp.links.headline":   { en: "Direct links to every listing.",
-                                es: "Enlaces directos a cada propiedad." },
+                                es: "Enlace directo a cada propiedad." },
   "pro.usp.links.body":       { en: "Free shows you the photo. Pro hands you the link to the seller.",
-                                es: "Gratis te muestra la foto. Pro te entrega el enlace al vendedor." },
+                                es: "Con el plan gratis ves la foto. Con Pro recibes el enlace directo al vendedor." },
   "start.value.a.label":      { en: "Before the portals",
                                 es: "Antes que los portales" },
   "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
                                 es: "La mayoría de los bienes raíces en El Salvador nunca llegan a Encuentra24 ni Facebook. Los vendedores se mueven rápido, los tratos se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al inbox." },
   "start.value.b.label":      { en: "Land, homes, commercial",
-                                es: "Terrenos, casas, locales" },
+                                es: "Terrenos, casas y locales" },
   "start.value.b.body":       { en: "Residential plots, beachfront land, homes, and commercial properties — all in one place, with the data you actually need.",
                                 es: "Terrenos residenciales, tierra frente al mar, casas y propiedades comerciales — todo en un solo lugar, con la información que realmente necesitas." },
   "start.value.c.label":      { en: "Investment-grade signals",
@@ -1015,7 +1015,7 @@ const UI_STRINGS = {
   "start.value.c.body":       { en: "Price history, days on market, road access, utilities — the data points serious buyers need, in plain language.",
                                 es: "Historial de precios, días en mercado, acceso vial, servicios — los datos que los compradores serios necesitan, en lenguaje claro." },
   "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
-                                es: "{n}+ propiedades monitoreadas en todo El Salvador" },
+                                es: "MÃ¡s de {n} propiedades revisadas en todo El Salvador" },
   "start.join.heading":       { en: "Join Pulpo",
                                 es: "Únete a Pulpo" },
   "start.join.paid.label":    { en: "Full access",
@@ -1029,7 +1029,7 @@ const UI_STRINGS = {
   // (Aliases retained for one PR to avoid mass-rename churn; remove in
   // a follow-up.)
   "start.join.paid.cta":      { en: "Get access",
-                                es: "Obtener acceso" },
+                                es: "Quiero acceso" },
   "start.join.paid.cta_submitting": { en: "Opening checkout…",
                                       es: "Abriendo pago…" },
   "start.join.paid.sub":      { en: "Cancel anytime · Stripe-secured payment · Email collected at checkout",
@@ -1045,7 +1045,7 @@ const UI_STRINGS = {
   "start.footer.terms":       { en: "Terms",
                                 es: "Términos" },
   "start.footer.stripe":      { en: "Payments secured by Stripe",
-                                es: "Pagos asegurados por Stripe" },
+                                es: "Pagos protegidos por Stripe" },
   "start.sticky_cta":         { en: "Get access — {price}/month",
                                 es: "Obtener acceso — {price}/mes" },
   "start.cancelled_notice":   { en: "Checkout cancelled. Try again whenever you're ready.",
@@ -1160,13 +1160,13 @@ const UI_STRINGS = {
   // Replaces the previous "redirect to /start?intent=upgrade" page
   // jump with an in-page modal that POSTs to /api/stripe/start-checkout.
   "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                          es: "Propiedades en El Salvador, antes que el resto del internet las vea." },
+                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
   "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
                                           es: "Pulpo cura propiedades en El Salvador — terrenos, casas, comercial — antes de que lleguen a los grandes portales. Un boletín semanal. Sin ruido." },
   "free_month_modal.bullet.1":         { en: "Weekly 10 picks in your inbox",
-                                          es: "10 propiedades cada semana en tu correo" },
+                                          es: "10 propiedades cada semana, en tu correo" },
   "free_month_modal.bullet.2":         { en: "Filters + smart sorting",
-                                          es: "Filtros y ordenamiento inteligente" },
+                                          es: "Filtros y orden inteligente" },
   "free_month_modal.bullet.3":         { en: "Direct seller links",
                                           es: "Enlaces directos al vendedor" },
   "free_month_modal.cta_primary":      { en: "Try a free month — {price}/month after",
@@ -1212,7 +1212,7 @@ const UI_STRINGS = {
   "footer.col.discover.build_ready":   { en: "Build-ready",
                                           es: "Listo para construir" },
   "footer.col.discover.off_market":    { en: "Off-market",
-                                          es: "Fuera de mercado" },
+                                          es: "Off-market" },
   "footer.col.discover.agricultural":  { en: "Agricultural",
                                           es: "Agrícola" },
   "footer.col.pulpo.heading":          { en: "Pulpo",
@@ -1246,7 +1246,7 @@ const UI_STRINGS = {
   "contact.page.inbox_list_label":     { en: "Or email us directly",
                                           es: "O escríbenos directamente" },
   "contact.page.success":              { en: "Message sent. We'll get back to you shortly.",
-                                          es: "Mensaje enviado. Te responderemos pronto." },
+                                          es: "Mensaje enviado. Te respondemos pronto." },
   "contact.page.error":                { en: "We couldn't send your message just now. Please try again, or email the inbox that best matches your enquiry directly.",
                                           es: "No pudimos enviar tu mensaje ahora mismo. Por favor inténtalo de nuevo, o escríbenos directamente al correo que mejor encaje con tu consulta." },
 
@@ -1295,7 +1295,7 @@ function t(key, locale, vars) {
 }
 
 // Locale-aware number / currency / size formatters
-const localeMap = { en: "en-US", es: "es-CR" };
+const localeMap = { en: "en-US", es: "es-SV" };
 function formatPriceI18n(n, locale) {
   if (n == null) return "—";
   return new Intl.NumberFormat(localeMap[locale] || "en-US", {
