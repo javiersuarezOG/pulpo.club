@@ -18,8 +18,20 @@
 // `authenticateClerkRequest`. No session → 401.
 
 const { clerkClient, authenticateClerkRequest } = require("./_clerk");
+const { makeRateLimiter, send429 } = require("./_rate_limit");
 
 const FREE_SAVE_CAP = 10;
+
+// 30 writes / 60s per user (or per IP for unauthenticated requests, which
+// 401 quickly anyway). Generous for legit use — a user couldn't realistically
+// click the heart icon 30 times in a minute — but cuts off a script-driven
+// loop within seconds. Keyed primarily on userId so a shared-IP household
+// doesn't share a bucket.
+const savesLimiter = makeRateLimiter({
+  windowMs: 60_000,
+  maxAttempts: 30,
+  name: "saves",
+});
 
 function planFromMetadata(publicMetadata) {
   return publicMetadata && publicMetadata.plan === "pro" ? "pro" : "free";
@@ -54,24 +66,32 @@ module.exports = async (req, res) => {
   try {
     userId = await authenticateClerkRequest(req);
   } catch (err) {
-    // Surface the message in the response so we can triage from the
-    // browser console without needing Vercel runtime logs. Clerk dev
-    // keys aren't sensitive; the message is normally just a class
-    // name + reason, no PII.
+    // Log internally with class + message for triage, but return a
+    // generic error to the client — leaking the exception class to the
+    // browser is an information-disclosure smell flagged in the
+    // reliability audit.
     logApi("saves", {
       status: 500, ms: Date.now() - t0, reason: "auth_throw",
       error_class: err && err.constructor ? err.constructor.name : "Error",
       error: err && err.message,
     });
-    return res.status(500).json({
-      error: "auth_failed",
-      detail: err && err.message,
-      class: err && err.constructor ? err.constructor.name : undefined,
-    });
+    return res.status(500).json({ error: "auth_failed" });
   }
   if (!userId) {
     logApi("saves", { status: 401, ms: Date.now() - t0, reason: "unauthenticated" });
     return res.status(401).json({ error: "sign_in_required" });
+  }
+
+  // Rate limit AFTER auth so unauthenticated brute-force traffic hits
+  // 401 first (cheaper) and authenticated callers get a per-user bucket
+  // rather than fighting their IP-mates for slots.
+  const rl = savesLimiter.hit(userId);
+  if (!rl.allowed) {
+    logApi("saves", {
+      status: 429, ms: Date.now() - t0, reason: "rate_limited",
+      retry_after_s: Math.ceil(rl.retryAfterMs / 1000),
+    });
+    return send429(res, rl, "saves");
   }
 
   if (req.method === "GET") {
