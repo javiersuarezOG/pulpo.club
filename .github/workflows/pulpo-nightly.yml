@@ -225,13 +225,16 @@ jobs:
         #   - classifier going haywire and tagging the majority of listings
         #     "uncertain" (signal that broker fields or text patterns shifted)
         #
-        # LOG_ONLY=true for the first 7 days so we calibrate thresholds against
-        # real nightly variance before enforcing. Floors set at ~80% of current
-        # production data (house=50, condo=8); ceiling on uncertain rate at 15%
-        # per the original PRD spec.
-        # TODO(2026-05-13): flip LOG_ONLY to false after 7-day soak window.
+        # ENFORCING (PR-5 of the reliability plan). The 7-day soak window from
+        # the PRD calibration period (2026-05-06 → 2026-05-13) is over and
+        # observed counts have been stable, so violations now fail the
+        # workflow instead of logging. Floors are at ~80% of current production
+        # data (house=50, condo=8); ceiling on uncertain rate at 15% per the
+        # original PRD spec. Set LOG_ONLY="true" to temporarily downgrade to
+        # log-only while recalibrating thresholds — mirrors the data-quality
+        # canary's escape hatch.
         env:
-          LOG_ONLY:        "true"
+          LOG_ONLY:        "false"
           HOUSE_FLOOR:     "40"   # ~80% of 50 — catches broadening collapse
           CONDO_FLOOR:     "5"    # ~60% of 8 (small N — looser tolerance)
           UNCERTAIN_PCT_CEILING: "15"
@@ -240,7 +243,7 @@ jobs:
           import json, os, sys
           from collections import Counter
 
-          log_only = os.environ.get("LOG_ONLY", "true").lower() == "true"
+          log_only = os.environ.get("LOG_ONLY", "false").lower() == "true"
           floors = {
               "house": int(os.environ.get("HOUSE_FLOOR",  "40")),
               "condo": int(os.environ.get("CONDO_FLOOR",  "5")),
