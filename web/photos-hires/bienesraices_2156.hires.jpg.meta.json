@@ -1,0 +1,26 @@
+{
+  "width": 1600,
+  "height": 1200,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 226.4,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:01:16.260890+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/TNLPM5C2RK/ELfxvLZqLD/Rancho_Frente_al_Mar_en_Playa_San_Diego.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/TNLPM5C2RK/ELfxvLZqLD/Rancho_Frente_al_Mar_en_Playa_San_Diego.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:01:16.481146+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1400,
+  "resdet_detected_height": 1050,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 7.3,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.228 color_entropy=0.629"
+  }
+}

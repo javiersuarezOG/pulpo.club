@@ -1,0 +1,26 @@
+{
+  "width": 5334,
+  "height": 3996,
+  "aspect_ratio": 1.335,
+  "file_size_kb": 2640.0,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T13:59:40.592690+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781069/v3/HDPhotos/Vector terrenos-02.png",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781069/v3/HDPhotos/Vector terrenos-02.png",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T13:59:48.080308+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1280,
+  "resdet_detected_height": 959,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.8,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.227 color_entropy=0.472"
+  }
+}

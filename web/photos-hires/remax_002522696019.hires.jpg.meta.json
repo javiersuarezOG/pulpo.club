@@ -1,0 +1,26 @@
+{
+  "width": 1600,
+  "height": 1198,
+  "aspect_ratio": 1.336,
+  "file_size_kb": 459.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:01:19.314857+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522696019/v3/HDPhotos/El Espino 1.4.jpeg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522696019/v3/HDPhotos/El Espino 1.4.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:01:21.359039+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1400,
+  "resdet_detected_height": 1048,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 7.7,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.285 color_entropy=0.573"
+  }
+}

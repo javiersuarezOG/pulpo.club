@@ -1,0 +1,28 @@
+{
+  "width": 2376,
+  "height": 1390,
+  "aspect_ratio": 1.709,
+  "file_size_kb": 1843.5,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:01:08.305509+00:00",
+  "source_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2025/08/Screenshot-2025-08-20-at-3.10.52-PM.png?fit=2376%2C1390&ssl=1",
+  "original_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2025/08/Screenshot-2025-08-20-at-3.10.52-PM.png?fit=2376%2C1390&ssl=1",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:01:08.467682+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 5.6,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.104 color_entropy=0.517"
+  }
+}
