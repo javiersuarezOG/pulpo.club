@@ -278,3 +278,85 @@ Expected responses:
 
 PII: the endpoint NEVER logs the raw email — only `email_domain_only`
 (after the @). Vercel runtime logs are safe to share.
+
+## ranked.json recovery — Vercel Blob snapshots
+
+Every successful nightly snapshots the canary-validated `ranked.json`
+to a Vercel Blob store keyed by UTC date:
+
+```
+snapshots/ranked-2026-05-19.json
+snapshots/ranked-2026-05-20.json
+…
+```
+
+Retention is 90 days (set in `pulpo-nightly.yml`'s snapshot step).
+Storage envelope: ~2 MB × 90 ≈ 180 MB, well inside the 1 GB free tier.
+Snapshots are **public-read** so a restore doesn't need the write
+token — just the URL or the date.
+
+### When to use this
+
+- A nightly produced a corrupt `ranked.json` and it landed on `main`
+  before anyone noticed.
+- The pipeline failed mid-write (PR-1's atomic-write helper makes this
+  very unlikely, but Murphy's law).
+- Forensic investigation: "what did ranked.json look like on 2026-05-12?"
+
+### Required env var
+
+```bash
+BLOB_READ_WRITE_TOKEN   # vercel_blob_rw_…  (write & list; reads are public)
+```
+
+For nightly runs this is wired via GitHub Actions secrets. For local
+ops use, get the token from Vercel dashboard → Storage →
+`pulpo-data-snapshots` → Tokens.
+
+### List what's available
+
+```bash
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... node scripts/restore_ranked_json.mjs --list
+```
+
+Output is newest-first:
+
+```
+2026-05-19  1923456B  https://…vercel-storage.com/snapshots/ranked-2026-05-19.json
+2026-05-18  1918002B  https://…vercel-storage.com/snapshots/ranked-2026-05-18.json
+…
+```
+
+### Restore — emergency recovery
+
+```bash
+# Latest known-good snapshot:
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... node scripts/restore_ranked_json.mjs
+
+# Specific date (UTC):
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... node scripts/restore_ranked_json.mjs --date 2026-05-12
+
+# Validate without writing (lets you confirm the snapshot is good before clobbering local):
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... node scripts/restore_ranked_json.mjs --dry-run
+```
+
+The script validates the snapshot parses as JSON + has an array root
+BEFORE overwriting `web/data/ranked.json`, and writes via tmpfile +
+rename (atomic, matches PR-1's pattern). A garbage snapshot can't
+corrupt your working copy.
+
+After a successful restore: commit `web/data/ranked.json` and push
+directly to `main` (the data-PR auto-flow is for nightly bot pushes;
+an ops recovery is a deliberate manual commit).
+
+### Manual snapshot (off-schedule)
+
+```bash
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... node scripts/snapshot_ranked_json.mjs
+```
+
+Useful for capturing a known-good state immediately before a risky
+pipeline change. Last-write-wins per UTC day, so a manual snapshot
+followed by the nightly run will overwrite — date-named, not append.
+If you need to keep an off-schedule snapshot distinct, just rename
+the resulting blob via the Vercel dashboard afterwards.
