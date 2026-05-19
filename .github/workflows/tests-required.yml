@@ -11,7 +11,14 @@ jobs:
   check-tests:
     name: Agent test coverage check
     runs-on: ubuntu-latest
-    if: "!contains(github.event.pull_request.labels.*.name, 'no-test-required')"
+    # NOTE: the bypass label gate intentionally lives INSIDE the script
+    # (PR-7 of the reliability plan), not at the job `if:` level. The
+    # legacy `if: !contains(labels, 'no-test-required')` SKIPPED the
+    # whole job — no audit trail, no annotation, the bypass was
+    # invisible to reviewers. Running the check unconditionally + having
+    # the script honor the label means a bypassed run still shows up in
+    # the PR's checks tab with a clear "BYPASS ACTIVE" annotation
+    # listing exactly which files would have needed tests.
 
     steps:
       - uses: actions/checkout@v6
@@ -29,4 +36,10 @@ jobs:
           python-version: "3.10"
 
       - name: Check test coverage for new agents
+        env:
+          # The script reads this to decide whether to honor the bypass
+          # label. Building the value here (rather than passing it via
+          # contains() in the if:) keeps the bypass loud in the workflow
+          # log and surfaces a "BYPASS ACTIVE" GitHub annotation.
+          PULPO_TESTS_BYPASS_ACTIVE: ${{ contains(github.event.pull_request.labels.*.name, 'no-test-required') && '1' || '0' }}
         run: python .github/scripts/check_tests_added.py /tmp/added_files.txt

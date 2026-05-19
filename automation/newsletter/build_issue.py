@@ -31,6 +31,37 @@ DEFAULT_WINDOW_DAYS = 14
 
 LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
 
+# Per-process cap on LLM commentary calls (PR-7 of the reliability plan,
+# audit item #17 — newsletter workflow_dispatch can flip the LLM toggle
+# without a cost guard). The dry-run workflow today fires ~5 cohorts;
+# the cap is set high enough to leave headroom for early production
+# audience growth, but low enough that an accidental loop / repeated
+# workflow_dispatch can't run away. Operators with a legitimate
+# higher-volume need can override via PULPO_NEWSLETTER_LLM_MAX_COMMENTARIES.
+#
+# Past the cap, _llm_or_deterministic_commentary silently falls back to
+# the deterministic generator (which is the safe path for every other
+# LLM failure mode anyway). One stderr line per skip so the operator
+# sees the cap was reached.
+LLM_COMMENTARY_CAP_ENV = "PULPO_NEWSLETTER_LLM_MAX_COMMENTARIES"
+LLM_COMMENTARY_CAP_DEFAULT = 50
+_llm_commentary_count = 0       # per-process counter, reset on import
+
+
+def _llm_commentary_cap() -> int:
+    """Read the cap from env, with the centralized PR-2 helper so an
+    empty / whitespace value falls back to the default cleanly."""
+    from automation._config import env_int
+    return env_int(LLM_COMMENTARY_CAP_ENV, LLM_COMMENTARY_CAP_DEFAULT)
+
+
+def reset_llm_commentary_counter() -> None:
+    """Test-only escape hatch — flushes the per-process counter so each
+    test can exercise the cap in isolation. Production code should never
+    need to call this."""
+    global _llm_commentary_count
+    _llm_commentary_count = 0
+
 
 def _telemetry_capture(event: str, props: dict) -> None:
     """Fire a PostHog event if telemetry is wired. Never raises."""
@@ -76,6 +107,28 @@ def _llm_or_deterministic_commentary(
         skip_pick=skip_pick,
     )
 
+    # Cost guard — refuse to issue a new LLM call past the per-process
+    # cap. Defends against an accidental workflow_dispatch loop or a
+    # future cohort-count expansion firing into runaway billing.
+    global _llm_commentary_count
+    cap = _llm_commentary_cap()
+    if use_llm and _llm_commentary_count >= cap and llm_client_override is None:
+        import sys as _sys
+        print(
+            f"[newsletter] LLM commentary cap reached "
+            f"({_llm_commentary_count}/{cap}); falling back to deterministic. "
+            f"Raise via {LLM_COMMENTARY_CAP_ENV}=N if intentional.",
+            file=_sys.stderr,
+        )
+        _telemetry_capture("newsletter.commentary_generated", {
+            "issue_id": issue_id,
+            "recipient_hash": recipient_hash,
+            "cohort": cohort,
+            "locale": locale,
+            "source": "deterministic_cap_reached",
+        })
+        return fallback
+
     if not use_llm and llm_client_override is None:
         _telemetry_capture("newsletter.commentary_generated", {
             "issue_id": issue_id,
@@ -90,6 +143,10 @@ def _llm_or_deterministic_commentary(
     # import the LLM module (which would still work — no top-level side
     # effects — but the symmetry is nicer).
     from . import llm_commentary as llm_mod
+    # Increment BEFORE the call so a crash inside llm_commentary still
+    # counts against the cap (defensive against an infinite retry loop
+    # tripping the cap-after-success-only path).
+    _llm_commentary_count += 1
     result = llm_mod.llm_commentary(
         cohort=cohort,
         locale=locale,
