@@ -18,6 +18,7 @@ from pulpo.derived_rules import (   # noqa: E402
     derive_source_type,
     derive_previous_price,
     derive_beachfront_tier,
+    derive_is_incomplete,
     derive_land_type,
     OFF_MARKET_SOURCES,
     SCOREABLE_FIELDS,
@@ -498,3 +499,29 @@ def test_land_type_none_for_unknown_property_type():
     # Override so dict-shape doesn't carry the default 'land'.
     li["property_type"] = "unknown"
     assert derive_land_type(li) is None
+
+
+# ── derive_is_incomplete ─────────────────────────────────────────────
+
+
+def test_is_incomplete_false_when_both_price_and_area_present():
+    assert derive_is_incomplete(_li(price_usd=150_000.0, area_m2=5000.0)) is False
+
+
+def test_is_incomplete_true_when_price_missing():
+    li = _li(area_m2=5000.0)
+    li["price_usd"] = None
+    assert derive_is_incomplete(li) is True
+
+
+def test_is_incomplete_true_when_area_missing():
+    li = _li(price_usd=150_000.0)
+    li["area_m2"] = None
+    assert derive_is_incomplete(li) is True
+
+
+def test_is_incomplete_true_when_both_missing():
+    li = _li()
+    li["price_usd"] = None
+    li["area_m2"] = None
+    assert derive_is_incomplete(li) is True

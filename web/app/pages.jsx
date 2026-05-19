@@ -113,7 +113,8 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
     + (f.price_max != null || f.price_min > 0 ? 1 : 0)
     + (f.master_category ? 1 : 0)
     + (f.subcategory ? 1 : 0)
-    + (f.discovery_tags?.size || 0);
+    + (f.discovery_tags?.size || 0)
+    + (f.include_incomplete ? 1 : 0);
 
   // Telemetry — fire browse.filter_changed once per logical filter
   // change. The event type has existed in events.ts since the
@@ -239,6 +240,15 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
               {t(`filter.tag.${tag}`, lc)}
             </button>
           ))}
+          {/* Inverse-semantic chip — opt-in to see listings where the
+              broker hasn't shared price or size. They sort below all
+              complete listings. */}
+          <button
+            className={`chip ${filters.include_incomplete ? "is-active" : ""}`}
+            onClick={() => update({ include_incomplete: !filters.include_incomplete })}
+          >
+            {t("filter.show_incomplete", lc)}
+          </button>
         </div>
       </FilterGroup>
 
@@ -841,6 +851,11 @@ function makeDefaultFilters() {
     master_category: null,                    // "beach" | "lake" | null
     subcategory: null,                        // "homes" | "condos" | "land" | null
     discovery_tags: new Set(),                // subset of {top_rated, under_250k, gated, waterfront}
+    // Inverse-semantic toggle. Defaults to false → listings where the
+    // broker hasn't shared price or size are hidden. Toggling on
+    // surfaces them at the bottom of the result set (ranker already
+    // hard-floored them, so the order is correct without extra work).
+    include_incomplete: false,
   };
 }
 
@@ -880,6 +895,9 @@ function buildTopRankMap(listings, n = 10) {
 function applyFilters(listings, f) {
   return listings.filter(l => {
     if (l.is_sold) return false;
+    // Quality gate — incomplete listings are hidden by default.
+    // The Browse FilterPanel chip flips `include_incomplete` to opt in.
+    if (l.is_incomplete && !f.include_incomplete) return false;
     if (f.zones.size && !f.zones.has(l.zone_name)) return false;
     if (f.land_types.size && !f.land_types.has(l.land_type)) return false;
     if (l.price < f.price_min) return false;
@@ -1010,15 +1028,19 @@ function BrowsePage({ app }) {
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
   // and stale filters carry over — clicking "All" leaves the previous category's
-  // chips still applied.
+  // chips still applied. We layer URL params on top so a cold-load with
+  // ?inc=1 / ?pmin=... survives the first render — without this overlay,
+  // the effect's mount-time fire reset URL-only flags to defaults.
   pUseEffect(() => {
     const f = buildFiltersForCategory(app.routeParams.category);
-    // Allow callers to seed additional filters via routeParams (e.g. zone scoping
-    // from "Browse similar listings in {zone}").
     if (Array.isArray(app.routeParams.zones) && app.routeParams.zones.length > 0) {
       f.zones = new Set(app.routeParams.zones);
     }
-    setFilters(f);
+    if (typeof window !== "undefined") {
+      setFilters(readFilterFromURL(window.location.search, f));
+    } else {
+      setFilters(f);
+    }
   }, [app.routeParams.category, app.routeParams.zones]);
 
   // Persist filter + sort + category to URLSearchParams (replaceState
@@ -1673,20 +1695,41 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
         </div>
 
+        {listing.is_incomplete && (
+          <div
+            className="detail-broker-note"
+            role="note"
+            title={t("value.notshared.tooltip", lc)}
+          >
+            {t("detail.broker_note", lc)}
+          </div>
+        )}
+
         <div className="detail-keystats">
           <div className="kstat">
             <div className="kstat-label">{t("detail.price", lc)}</div>
-            <div className="kstat-value">{formatPrice(listing.price)}</div>
+            <div
+              className={listing.price == null ? "kstat-value muted" : "kstat-value"}
+              title={listing.price == null ? t("value.notshared.tooltip", lc) : undefined}
+            >{formatPrice(listing.price)}</div>
             {listing.previous_price && <div className="kstat-sub strike">{formatPrice(listing.previous_price)}</div>}
           </div>
           <div className="kstat">
             <div className="kstat-label">{t("detail.size", lc)}</div>
-            <div className="kstat-value">{formatSize(listing.size_m2)}</div>
+            <div
+              className={listing.size_m2 == null ? "kstat-value muted" : "kstat-value"}
+              title={listing.size_m2 == null ? t("value.notshared.tooltip", lc) : undefined}
+            >{formatSize(listing.size_m2)}</div>
           </div>
-          <div className="kstat">
-            <div className="kstat-label">{`$${ppmSuffix()}`}</div>
-            <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
-          </div>
+          {/* PPM derives from price + size; suppress the tile when
+              either is null so users see "Not shared" once on the
+              source field rather than twice on a derived stat. */}
+          {listing.price != null && listing.size_m2 != null && (
+            <div className="kstat">
+              <div className="kstat-label">{`$${ppmSuffix()}`}</div>
+              <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
+            </div>
+          )}
           <div className="kstat">
             <div className="kstat-label">{t("detail.days_listed", lc)}</div>
             <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{typeof listing.days_listed === "number" ? listing.days_listed : "—"}</div>
