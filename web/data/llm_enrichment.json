@@ -42956,5 +42956,47 @@
     "cost_usd": 0.00146399,
     "finish_reason": "stop",
     "latency_ms": 4762
+  },
+  "goodlife|400-m2-of-ocean-view-land-in-surf-city-1-140000": {
+    "ts": "2026-05-19T07:11:56.493689+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Lot in Surf City 1",
+      "es": "Lote con Vista al Mar en Surf City 1"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity in Surf City 1: a lot with breathtaking 180-degree ocean views. Located just a 5-minute drive from the coast and 30 minutes from San Salvador, this property sits right by the bypass, ensuring a smooth commute and avoiding beach-area road construction. The area is developing rapidly with access to utilities, good roads, and proximity to supermarkets, banks, a shopping mall, and gas stations. It's also close to world-class surf spots. Ideal for a private residence, weekend retreat, or long-term investment in one of Surf City's most promising zones.",
+      "es": "Descubra una oportunidad única en Surf City 1: un lote con impresionantes vistas panorámicas al océano de 180 grados. Ubicado a solo 5 minutos en coche de la costa y 30 minutos de San Salvador, la propiedad está justo al lado del bypass, garantizando un viaje fluido y evitando la construcción de carreteras cerca de la playa. La zona se desarrolla rápidamente con acceso a servicios públicos, buenas carreteras y proximidad a supermercados, bancos, un centro comercial y gasolineras. También está cerca de famosos puntos de surf. Ideal para residencia privada, fin de semana o inversión a largo plazo en una de las áreas más prometedoras de Surf City."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "180-degree ocean views",
+        "es": "Vistas al océano de 180 grados"
+      },
+      {
+        "en": "5-minute drive to the coast",
+        "es": "A 5 minutos en coche de la costa"
+      },
+      {
+        "en": "30 minutes from San Salvador",
+        "es": "A 30 minutos de San Salvador"
+      },
+      {
+        "en": "Close to utilities, shops, and surf spots",
+        "es": "Cerca de servicios, tiendas y puntos de surf"
+      }
+    ],
+    "lat": 13.698,
+    "lng": -89.191,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2462,
+    "tokens_out": 537,
+    "cost_usd": 0.00125544,
+    "finish_reason": "stop",
+    "latency_ms": 8143
   }
 }
