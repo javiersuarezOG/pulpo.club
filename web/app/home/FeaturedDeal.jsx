@@ -48,7 +48,9 @@ export function FeaturedDeal({ app, locale }) {
       for (const entry of featured.pool) {
         const id = featuredIdToListingId(entry.listing_id);
         const match = listings.find((l) => l.id === id);
-        if (match) { setResolved(match); return; }
+        // Skip incomplete listings — the featured deal is a hero
+        // surface and only complete listings qualify.
+        if (match && !match.is_incomplete) { setResolved(match); return; }
       }
     }).catch(() => { /* swallow — hardcoded fallback already rendered */ });
     return () => { cancelled = true; };

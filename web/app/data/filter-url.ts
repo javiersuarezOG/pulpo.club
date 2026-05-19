@@ -47,6 +47,11 @@ export type FilterShape = {
   master_category: MasterCategory | null;
   subcategory: Subcategory | null;
   discovery_tags: Set<DiscoveryTag>;
+  // Quality-gate inverse toggle. Default false → incomplete listings
+  // are hidden. URL key: `inc=1` to opt in. The 0/absent value is
+  // intentionally the same so /browse without any query maintains
+  // the default-hide semantic.
+  include_incomplete: boolean;
 };
 
 // Visual scale for the price histogram. Listings above this still pass
@@ -107,6 +112,7 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     master_category: masterFromUrl ?? baseDefaults.master_category,
     subcategory:     subFromUrl    ?? baseDefaults.subcategory,
     discovery_tags:  tagsFromUrl.size > 0 ? tagsFromUrl : baseDefaults.discovery_tags,
+    include_incomplete: p.get("inc") === "1" ? true : baseDefaults.include_incomplete,
   };
   const sm = p.get("score_min");
   if (sm != null) out.score_min = parseInt0(sm, 0);
@@ -169,6 +175,7 @@ export function writeFilterToURL(
   setOrRemove("master", filters.master_category ?? "");
   setOrRemove("sub",    filters.subcategory ?? "");
   setOrRemove("tag",    [...filters.discovery_tags].join(","));
+  setOrRemove("inc",    filters.include_incomplete ? "1" : "");
   const qs = p.toString();
   const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
   history.replaceState({}, "", url);
