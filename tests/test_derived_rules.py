@@ -18,6 +18,7 @@ from pulpo.derived_rules import (   # noqa: E402
     derive_source_type,
     derive_previous_price,
     derive_beachfront_tier,
+    derive_discovery_tags,
     derive_is_incomplete,
     derive_land_type,
     OFF_MARKET_SOURCES,
@@ -525,3 +526,45 @@ def test_is_incomplete_true_when_both_missing():
     li["price_usd"] = None
     li["area_m2"] = None
     assert derive_is_incomplete(li) is True
+
+
+# ── derive_discovery_tags — waterfront covers beach AND lake ─────────
+
+def test_discovery_tags_waterfront_for_beach_direct():
+    """beachfront_tier='on_beach' fires waterfront (ocean frontage)."""
+    li = _li(beachfront_tier="on_beach", rank_score=50.0, price_usd=500_000.0)
+    tags = derive_discovery_tags(li)
+    assert "waterfront" in tags
+
+
+def test_discovery_tags_waterfront_for_lake_direct():
+    """is_on_lake=True fires waterfront (inland water frontage).
+
+    Mirrors the beach branch so the user-facing 'first line to the
+    water' chip matches both surf-city lots and Coatepeque lakefront.
+    """
+    li = _li(is_on_lake=True, rank_score=50.0, price_usd=500_000.0)
+    tags = derive_discovery_tags(li)
+    assert "waterfront" in tags
+
+
+def test_discovery_tags_waterfront_skipped_when_only_near_water():
+    """Only DIRECT frontage qualifies — near_beach / walk_to_beach
+    aren't 'first line to the water'."""
+    near = _li(beachfront_tier="near_beach", is_on_lake=False, rank_score=50.0, price_usd=500_000.0)
+    walk = _li(beachfront_tier="walk_to_beach", is_on_lake=False, rank_score=50.0, price_usd=500_000.0)
+    assert "waterfront" not in derive_discovery_tags(near)
+    assert "waterfront" not in derive_discovery_tags(walk)
+
+
+def test_discovery_tags_waterfront_independent_of_other_tags():
+    """waterfront fires alongside top_rated / under_250k / gated when
+    each rule independently passes."""
+    li = _li(
+        is_on_lake=True,
+        rank_score=85.0,           # top_rated
+        price_usd=180_000.0,       # under_250k
+        is_in_development=True,    # gated
+    )
+    tags = derive_discovery_tags(li)
+    assert set(tags) == {"top_rated", "under_250k", "gated", "waterfront"}

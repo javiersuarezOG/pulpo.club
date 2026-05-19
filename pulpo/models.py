@@ -73,6 +73,7 @@ class Listing:
     # `beachfront_tier` and `land_type` fields by derived_rules.py.
     is_on_beach: bool = False
     is_walk_to_beach: bool = False
+    is_on_lake: bool = False
     is_agricultural: bool = False
     is_commercial: bool = False
     is_tourist: bool = False

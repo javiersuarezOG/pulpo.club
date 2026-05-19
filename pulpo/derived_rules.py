@@ -426,10 +426,14 @@ def derive_discovery_tags(li: Any) -> list[str]:
       - top_rated  : rank_score ≥ TOP_RATED_MIN_RANK_SCORE (70.0)
       - under_250k : price_usd < UNDER_250K_USD (250,000)
       - gated      : is_in_development is True
-      - waterfront : beachfront_tier == 'on_beach' (direct beach
-                     frontage). Lake-frontage signal is sparse today;
-                     extend this rule when lake-direct-access NLP
-                     keywords land.
+      - waterfront : "first line to the water" — direct frontage on
+                     ocean OR lake. Fires when EITHER
+                     `beachfront_tier == 'on_beach'` (ocean) OR
+                     `is_on_lake is True` (inland water). The lake
+                     branch reads the same NLP-derived boolean used by
+                     the beach branch (populated from
+                     nlp_keywords/is_on_lake.json) so the tag has a
+                     single meaning the user-facing chip can rely on.
     """
     tags: list[str] = []
     rank = _g(li, "rank_score")
@@ -440,7 +444,7 @@ def derive_discovery_tags(li: Any) -> list[str]:
         tags.append("under_250k")
     if _g(li, "is_in_development") is True:
         tags.append("gated")
-    if _g(li, "beachfront_tier") == "on_beach":
+    if _g(li, "beachfront_tier") == "on_beach" or _g(li, "is_on_lake") is True:
         tags.append("waterfront")
     return tags
 
