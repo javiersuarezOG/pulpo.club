@@ -125,6 +125,22 @@ class Listing:
     # sidecar exists yet (pre-Phase-A3 backfill rows).
     source_width: Optional[int] = None
     source_height: Optional[int] = None
+    # ── Parallel hi-res derivative (plan v2). Populated by
+    # automation/run.py::_download_hires_photos when PULPO_HIRES_ENABLED=1.
+    # Source of truth is the per-file sidecar at
+    # web/photos-hires/<source>_<source_id>.hires.jpg.meta.json. These
+    # report the broker's NATIVE source dimensions (the existing
+    # source_width / source_height above report the post-clamp hero
+    # derivative dimensions — kept as-is for backward compatibility).
+    # All default to None so old ranked.json rows without a hires sidecar
+    # serialize cleanly.
+    hires_available: Optional[bool] = None       # True when .hires.jpg exists and is not quarantined
+    hires_eligible: Optional[bool] = None        # source ≥1080×1080 (photo_quality.HIRES_MIN_*)
+    hires_width: Optional[int] = None            # native broker width in px
+    hires_height: Optional[int] = None           # native broker height in px
+    hires_photo_quality_score: Optional[int] = None  # compute_score on native bytes, 0..100
+    hires_resdet_upscaled: Optional[bool] = None     # resdet detected upscale fraud
+    hires_quarantined: Optional[bool] = None         # True when .quarantine marker is present
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
 
     # Broker

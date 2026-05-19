@@ -146,20 +146,26 @@ jobs:
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
           # ── Plan v2 — parallel hi-res photo pipeline ──────────────
-          # All defaults below are OFF so the merge of this PR is a
-          # no-op. Phase 2 of the plan flips PULPO_HIRES_ENABLED=1 +
-          # populates PULPO_HIRES_SOURCES + PULPO_HIRES_SHADOW=1.
-          # See ~/.claude/plans/cuddly-pondering-frost.md and TODOS.md
-          # in this repo for the full rollout sequence.
-          PULPO_HIRES_ENABLED: "0"
-          PULPO_HIRES_SOURCES: ""
-          PULPO_HIRES_BUDGET_S: "1500"
-          PULPO_HIRES_LIMIT: "0"
-          PULPO_HIRES_SHADOW: "0"
+          # ENABLED for ongoing nightlies (2026-05-19). All 7 sources
+          # are in scope; goodlife + encuentra24 use per-source URL
+          # rewrites from automation/hires_url_transform.py, the other
+          # five run with identity transforms and rely on the
+          # hires_eligible ≥1080×1080 gate to reject sources whose
+          # URLs aren't actually native resolution. The first-run
+          # per-source coverage in hires_pipeline_metrics.jsonl tells
+          # us which sources need a transform added.
+          PULPO_HIRES_ENABLED: "1"
+          PULPO_HIRES_SOURCES: "bienesraices,century21,encuentra24,goodlife,nexo,oceanside,remax"
+          PULPO_HIRES_BUDGET_S: "5400"   # 90 min wall budget; cold first run ~60 min
+          PULPO_HIRES_LIMIT: "0"          # process every listing in scope
+          PULPO_HIRES_SHADOW: "0"         # informational only — not gated on serve
           # api/social/image.js gate. When set to "0", the endpoint
           # ignores .hires.jpg files even if they exist on disk —
-          # operator-controlled cutover from shadow → live.
-          PULPO_HIRES_SERVE: "0"
+          # operator-controlled cutover from shadow → live. Set to "1"
+          # so /api/social/image's Tier-1 hires path actually serves
+          # the new derivatives. Quarantined files (resdet upscale
+          # fraud) still fall back to hero automatically.
+          PULPO_HIRES_SERVE: "1"
           # Phase 4 U3 — LLM-vision aesthetic booster. Default ON via
           # the `|| 'true'` fallback so the picker always tries to
           # blend aesthetic + technical scores. When no provider key

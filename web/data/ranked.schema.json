@@ -66,6 +66,13 @@
       "card_eligible",
       "source_width",
       "source_height",
+      "hires_available",
+      "hires_eligible",
+      "hires_width",
+      "hires_height",
+      "hires_photo_quality_score",
+      "hires_resdet_upscaled",
+      "hires_quarantined",
       "first_seen_at",
       "broker_name",
       "broker_phone",
@@ -410,6 +417,48 @@
       "source_height": {
         "type": [
           "integer",
+          "null"
+        ]
+      },
+      "hires_available": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "hires_eligible": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "hires_width": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "hires_height": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "hires_photo_quality_score": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "hires_resdet_upscaled": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "hires_quarantined": {
+        "type": [
+          "boolean",
           "null"
         ]
       },

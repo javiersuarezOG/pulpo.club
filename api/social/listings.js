@@ -114,6 +114,22 @@ function projectListing(l, locale) {
       // card_eligible: width≥800, height≥600.
       hero_eligible: l.hero_eligible === true ? true : (l.hero_eligible === false ? false : null),
       card_eligible: l.card_eligible === true ? true : (l.card_eligible === false ? false : null),
+      // Parallel hi-res derivative (plan v2). These are populated by
+      // automation/run.py::_download_hires_photos when PULPO_HIRES_ENABLED=1.
+      // Source of truth: web/photos-hires/<source>_<source_id>.hires.jpg.meta.json.
+      // hires_width/hires_height report the broker's NATIVE source dimensions
+      // (in contrast to the legacy source_width/source_height above, which
+      // report the post-clamp 1920x1080 hero derivative dimensions). Downstream
+      // consumers (pulpo-social, Instagram Reels 4:5 path, etc.) should prefer
+      // hires_* fields when deciding whether a listing can render at a target
+      // canonical size. All null until the hires backfill has run.
+      hires_available: l.hires_available ?? null,
+      hires_eligible: l.hires_eligible ?? null,
+      hires_width: l.hires_width ?? null,
+      hires_height: l.hires_height ?? null,
+      hires_photo_quality_score: l.hires_photo_quality_score ?? null,
+      hires_resdet_upscaled: l.hires_resdet_upscaled ?? null,
+      hires_quarantined: l.hires_quarantined ?? null,
     },
     created_at: l.first_seen_at ?? null,
     updated_at: l.enriched_at || l.scraped_at || null,
