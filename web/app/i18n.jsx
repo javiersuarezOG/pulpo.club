@@ -658,23 +658,6 @@ const UI_STRINGS = {
   "common.retry":            { en: "Retry",                         es: "Reintentar" },
   "locale.toggle_aria":      { en: "Language",                      es: "Idioma" },
 
-  // Clerk handoff intro modal — shown before Pulpo hands authentication
-  // off to the Clerk hosted modal. Clerk's branding is unfamiliar to
-  // most users; without this they'd see a "share info with Clerk"
-  // prompt with no context for who Clerk is. The intro shows once per
-  // device (localStorage `pulpo-clerk-intro-seen`); subsequent sign-ins
-  // skip straight to Clerk.
-  "auth.clerk_intro.title":  { en: "Sign in securely with Clerk",
-                               es: "Inicia sesión de forma segura con Clerk" },
-  "auth.clerk_intro.body":   { en: "Pulpo uses Clerk to handle sign-in and account security. Clerk is a trusted authentication provider — your password and session are managed by them, never stored on Pulpo's servers.",
-                               es: "Pulpo usa Clerk para gestionar el inicio de sesión y la seguridad de tu cuenta. Clerk es un proveedor de autenticación confiable — tu contraseña y sesión las gestiona Clerk, nunca se almacenan en los servidores de Pulpo." },
-  "auth.clerk_intro.cta":    { en: "Continue to Clerk",
-                               es: "Continuar con Clerk" },
-  "auth.clerk_intro.cancel": { en: "Cancel",                         es: "Cancelar" },
-  "auth.clerk_intro.dont_show": { en: "Don't show this next time",   es: "No mostrar la próxima vez" },
-  "auth.clerk_provider_note":   { en: "Powered by Clerk — secure authentication.",
-                                  es: "Con tecnología de Clerk — autenticación segura." },
-
   // ListingCard aria-labels (heart save/remove + photo carousel nav).
   // Were hardcoded English; surfaced by the i18n sweep tied to the
   // road_access "Paved"/"Pavimentado" report.
