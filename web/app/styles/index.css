@@ -59,10 +59,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   backdrop-filter: saturate(140%) blur(10px);
   border-bottom: 1px solid var(--line);
 }
+/* Base = mobile. The 320px viewport budget is tight for Pro members:
+   Pulpo Pro pill, avatar ring, Logout text, LocaleToggle, and the
+   LiveStats toggle all share topnav-inner. Pre-PR-323 the Pro pill
+   didn't exist, so the original 24px/32px desktop values fit; after
+   #323 a Pro user blew past 320 by 42px. Desktop spacing is restored
+   at ≥768px below. */
 .topnav-inner {
   max-width: 1400px; margin: 0 auto;
-  display: flex; align-items: center; gap: 32px;
-  padding: 14px 24px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 14px 8px;
+}
+@media (min-width: 768px) {
+  .topnav-inner { gap: 32px; padding: 14px 24px; }
 }
 .logo-btn { display: flex; align-items: center; }
 .pulpo-logo { color: var(--accent); }
