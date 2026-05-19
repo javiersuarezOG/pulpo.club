@@ -25,8 +25,11 @@
 
 const crypto = require("crypto");
 const { capture, flush } = require("./_posthog");
+const { verifySvixSignature: sharedVerifySvixSignature, readRawBody: sharedReadRawBody } = require("./_svix");
 
 const SVIX_SECRET_ENV = "RESEND_WEBHOOK_SECRET";
+// Constants kept here for the existing test export contract; the live
+// values now come from api/_svix.js which is the single source of truth.
 const TIMESTAMP_TOLERANCE_S = 300;          // ±5 minutes
 const MAX_BODY_SIZE = 64 * 1024;            // 64 KB
 
@@ -46,79 +49,11 @@ function logApi(fields) {
   console.log(parts.join(" "));
 }
 
-async function readRawBody(req) {
-  // Vercel may have already parsed body; we need the RAW string for HMAC.
-  if (typeof req.body === "string") {
-    return req.body.slice(0, MAX_BODY_SIZE);
-  }
-  if (req.body && typeof req.body === "object") {
-    // Vercel parsed the JSON — reserialize. This is brittle (key order
-    // differences invalidate the signature), so the configured Vercel
-    // function should set `bodyParser: false` for this route in
-    // vercel.json. As a fallback, do a string-stable serialise.
-    try {
-      return JSON.stringify(req.body);
-    } catch {
-      return "";
-    }
-  }
-  const chunks = [];
-  let total = 0;
-  for await (const chunk of req) {
-    const buf = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
-    chunks.push(buf);
-    total += buf.length;
-    if (total > MAX_BODY_SIZE) break;
-  }
-  return Buffer.concat(chunks).toString("utf8").slice(0, MAX_BODY_SIZE);
-}
-
-// Svix sends one or more signatures comma-separated; format is
-// `v1,<base64>` per signature. Verify if any one matches.
-function verifySvixSignature({ secret, svixId, svixTimestamp, svixSignature, body }) {
-  if (!secret || !svixId || !svixTimestamp || !svixSignature || !body) return false;
-
-  // Timestamp freshness.
-  const ts = Number.parseInt(svixTimestamp, 10);
-  if (!Number.isFinite(ts)) return false;
-  const nowS = Math.floor(Date.now() / 1000);
-  if (Math.abs(nowS - ts) > TIMESTAMP_TOLERANCE_S) return false;
-
-  // Secret can be passed as `whsec_<base64>` (Svix convention) or as a
-  // raw base64 / hex string. Try base64 first; fall back to raw bytes.
-  let secretBytes;
-  const stripped = secret.startsWith("whsec_") ? secret.slice(6) : secret;
-  try {
-    secretBytes = Buffer.from(stripped, "base64");
-    if (secretBytes.length === 0) secretBytes = Buffer.from(secret, "utf8");
-  } catch {
-    secretBytes = Buffer.from(secret, "utf8");
-  }
-
-  const toSign = `${svixId}.${svixTimestamp}.${body}`;
-  const expected = crypto
-    .createHmac("sha256", secretBytes)
-    .update(toSign)
-    .digest("base64");
-
-  const candidates = svixSignature.split(" ").map(s => s.trim()).filter(Boolean);
-  for (const c of candidates) {
-    // Format: "v1,<sig>"
-    const idx = c.indexOf(",");
-    if (idx < 0) continue;
-    const sig = c.slice(idx + 1);
-    if (sig.length === 0) continue;
-    if (sig.length !== expected.length) continue;
-    try {
-      if (crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
-        return true;
-      }
-    } catch {
-      continue;
-    }
-  }
-  return false;
-}
+// Backwards-compatible re-exports — the test seam still pulls these
+// names off this module. Implementation lives in api/_svix.js as the
+// shared source of truth across webhook handlers (Resend, Clerk, etc).
+const readRawBody = sharedReadRawBody;
+const verifySvixSignature = sharedVerifySvixSignature;
 
 function pickPostHogProps(event, body) {
   const data = (body && body.data) || {};

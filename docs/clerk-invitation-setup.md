@@ -317,6 +317,96 @@ All three items complete + this checklist verified:
 - [ ] Item C — `pk_live_*` confirmed on the live app
 - [ ] End-to-end test — Stripe-sandbox checkout with a brand-new
   email lands in inbox + completes the full activation loop
+
+## 2026-05-19 update — current DNS state + the actual ask for Javier
+
+**Read-only `dig` audit on 2026-05-19** revealed the deliverability
+infrastructure is in a worst-case configuration, not a missing one:
+
+| Record | State | Implication |
+|---|---|---|
+| `pulpo.club` TXT (SPF) | **None** | No sender authorization for any third-party. |
+| `mail.pulpo.club` | **Doesn't exist** | The sending subdomain Item B specifies isn't set up. |
+| `_dmarc.pulpo.club` TXT | `v=DMARC1; p=quarantine; aspf=r; adkim=r; rua=mailto:dmarc_rua@onsecureserver.net` | **Actively hostile.** `p=quarantine` with no protective SPF + DKIM alignment means Gmail/Outlook quarantine any mail claiming to be from `pulpo.club`. The `rua=` reports go to the GoDaddy registrar default mailbox (not a Pulpo-owned address). |
+| Nameservers | `ns27.domaincontrol.com`, `ns28.domaincontrol.com` (GoDaddy) | DNS is at GoDaddy; Sebas has direct access. |
+| Resend SPF (`send.resend.com` TXT) | `v=spf1 include:amazonses.com ~all` | Resend sends via AWS SES under the hood. Any SPF record needs `include:_spf.resend.com` (Resend will surface the exact include in their Dashboard when a sending domain is added). |
+
+**Ownership realities clarified:**
+- **Sebas can:** publish DNS records at GoDaddy directly, create the Clerk webhook endpoint, set Vercel env vars.
+- **Javier owns:** Resend Dashboard login + the "Add sending domain" step inside Resend (which is what surfaces the exact records to publish), Clerk plan/billing decisions.
+
+### The pre-written paste-to-Javier ask
+
+```
+Hey — post-Stripe activation email isn't arriving for paying users.
+Clerk creates the invitation row correctly (audit log confirms it),
+but no email lands anywhere (inbox / spam / promotions).
+
+I just shipped /api/clerk/webhook so we get server-side telemetry
+on whether Clerk is even attempting the send (clerk.email_attempted
+in PostHog). Independent of what that tells us, two things only
+you can do:
+
+1. Resend Dashboard → Domains: is pulpo.club or mail.pulpo.club
+   already verified there? If yes, paste me the verified domain
+   name and I'll route Clerk through it. If no, please add
+   mail.pulpo.club and paste me the 4 DNS records Resend surfaces
+   (1 SPF TXT + 3 DKIM CNAMEs). I have GoDaddy DNS access so
+   once you give me the records I publish them myself, no further
+   work for you.
+
+2. Clerk plan check: Dashboard → Settings/Billing — what Clerk
+   tier are we on? And is the "Custom email provider" option
+   visible (typically under Customization → Emails → Provider or
+   User & Authentication → Advanced)? Some Clerk features gate
+   behind paid tiers. If it's not visible at our current tier,
+   tell me and we'll send activation emails ourselves via our
+   existing Resend integration (a ~1-day PR on my side, but
+   it's the durable fix).
+
+3. (Optional) _dmarc.pulpo.club currently routes failure reports
+   to dmarc_rua@onsecureserver.net (registrar default). Mind if
+   I re-point that to a Pulpo-owned mailbox so we get visibility
+   into bounces?
+
+Anything you can knock out in the next day or two?
+```
+
+### After Javier responds with the Resend records
+
+Once Javier pastes the records, Sebas:
+
+1. Logs into GoDaddy → DNS Management → pulpo.club.
+2. Adds the records exactly as Resend surfaced them. Typically:
+   - `mail.pulpo.club TXT v=spf1 include:_spf.resend.com ~all`
+   - `resend._domainkey.mail.pulpo.club CNAME resend._domainkey.<resend-region>.amazonses.com` (and 2 more CNAMEs)
+3. Wait for propagation: `dig +short TXT mail.pulpo.club` should return the SPF; `dig +short CNAME resend._domainkey.mail.pulpo.club` should return Resend's chain. Typically 5-30 min on GoDaddy.
+4. Confirm Resend Dashboard marks the domain "Verified."
+5. Move to either Item B (configure Clerk to use Resend as custom email provider) or PR #3.5 fallback (Pulpo sends activation emails directly).
+
+### Independent of Javier — what just shipped that helps debug
+
+PR (this one) ships `/api/clerk/webhook` plus extends
+`/api/admin/stripe-session-debug` with PostHog hints. After Sebas:
+
+1. Goes to Clerk Dashboard → Webhooks → Add Endpoint
+   - URL: `https://pulpo.club/api/clerk/webhook`
+   - Subscribe to: `email.created`, `invitation.created`,
+     `invitation.accepted`, `invitation.revoked`, `user.created`
+   - Copy the signing secret.
+2. Sets `CLERK_WEBHOOK_SECRET` in Vercel (all envs).
+3. Triggers a fresh Stripe-sandbox checkout.
+
+PostHog will then show, for the test session's email_hash:
+- `webhook.received` (Stripe webhook hit our server)
+- `webhook.checkout_completed[path=anonymous_invitation_created]`
+- `clerk.invitation_created` (Clerk's own confirmation)
+- `clerk.email_attempted[delivered_by_clerk=<true|false>]` **← the diagnostic**
+
+If `delivered_by_clerk=true` and the email still doesn't arrive: deliverability problem (Item B / Resend path is the fix).
+If `delivered_by_clerk=false` or the event never fires: Clerk-side issue (config / plan tier / Item C).
+
+That single field is the question we've been blind on.
   without going to spam
 
 When all four are checked, the original 2026-05-19 bug report
