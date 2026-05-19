@@ -148,6 +148,14 @@ function App() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
   });
+  // Tracks whether Clerk has finished hydrating. When Clerk is OFF
+  // (legacy CI / no publishable key) this defaults to true so the
+  // WelcomeModal hydration gate is a no-op for that codepath. When
+  // Clerk is ON it starts false and ClerkUserSync flips it via
+  // setAuthLoaded once `useUser().isLoaded` resolves. Read by the
+  // WelcomeModal to suppress the anon-variant flash during the
+  // post-Clerk-invitation round trip.
+  const [authLoaded, setAuthLoaded] = useState(() => !clerkEnabled());
 
   // PR-9d removed the dev-panel auth-state mock. Clerk drives `setUser`
   // via ClerkUserSync when enabled (the production default). For the
@@ -973,6 +981,7 @@ function App() {
   const app = {
     route, routeParams, go, goBrowse,
     user, signin, signout, isSigningOut,
+    authLoaded,
     savedIds, toggleSave,
     signupModal, openSignup, closeSignup,
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
@@ -1002,7 +1011,7 @@ function App() {
     // ClerkUserSync inside the provider that maps Clerk's user to
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
-    <ClerkShell setUser={setUser} onClerkActions={setClerkActions}>
+    <ClerkShell setUser={setUser} setAuthLoaded={setAuthLoaded} onClerkActions={setClerkActions}>
     <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", true) ? " hero-v4" : ""}`}>
       {/* Wave-3a: single SiteHeader on every route. The homepage's hero
           still owns its conversion CTAs; the header is pure navigation. */}

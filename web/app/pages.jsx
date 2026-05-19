@@ -1623,7 +1623,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 aria-label={locked ? t("detail.gallery.locked_aria", lc) : t("detail.gallery.open_n", lc, { n: i + 1 })}
                 onClick={() => {
                   if (locked) {
-                    app.openSignup({ mode: "signup", pendingListing: listing.id });
+                    track("paywall.bypassed", {
+                      kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                    });
+                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
                   } else {
                     openLightbox(i);
                   }
@@ -1637,7 +1640,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   <div className="more-photos">{t("detail.more_photos", lc, { n: listing.photos.length - 5 })}</div>
                 )}
                 {locked && i === 4 && (
-                  <div className="more-photos">{t("detail.signup_more_photos", lc, { n: listing.photos.length - 2 })}</div>
+                  <div className="more-photos">{t("detail.unlock_pro_free_month", lc)}</div>
                 )}
               </button>
               );
@@ -1692,43 +1695,24 @@ function ListingDetail({ listing, app, asPanel = true }) {
             {listing.usps.slice(0, uspCap).map((u, i) => (
               <li key={i}><Icon name="check" size={16} strokeWidth={2.4}/> {tr(u, app.locale)}</li>
             ))}
-            {/* Anonymous → "Sign up free to see N more" (chains to
-                signup modal, then the detail page re-renders with
-                free-tier USPs unlocked). Free → "Upgrade to Pro to
-                see N more" (chains to Stripe checkout). Paid users
-                hide both — they see every USP. */}
+            {/* Anon + free hit the same in-panel conversion CTA: opens
+                FreeMonthModal with `detail_upgrade` trigger, which
+                pre-applies PULPOFREEMONTH at /api/stripe/start-checkout.
+                Paid users see every USP and skip this row. */}
             {!isPaid && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
-                {needsSignup ? (
-                  <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                    {listing.usps.length - uspCap === 1
-                      ? t("detail.signup_more_reasons_one", lc)
-                      : t("detail.signup_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
-                  </button>
-                ) : (
-                  <button
-                    className="link-btn"
-                    onClick={() => {
-                      track("paywall.bypassed", {
-                        kind: "detail_view", action: "upgrade", listing_id: listing.id,
-                      });
-                      startStripeCheckout({
-                        onError: (code) => {
-                          if (code === "sign_in_required") {
-                            app.showToast(t("plans.checkout_auth_mismatch", lc));
-                          } else {
-                            app.go("plans");
-                          }
-                        },
-                      });
-                    }}
-                  >
-                    {listing.usps.length - uspCap === 1
-                      ? t("detail.upgrade_more_reasons_one", lc)
-                      : t("detail.upgrade_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
-                  </button>
-                )}
+                <button
+                  className="link-btn"
+                  onClick={() => {
+                    track("paywall.bypassed", {
+                      kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                    });
+                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                  }}
+                >
+                  {t("detail.unlock_pro_free_month", lc)}
+                </button>
               </li>
             )}
           </ul>
@@ -1808,12 +1792,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
       </div>
 
       {/* Sticky bottom CTA. Source-listing link is Pro-only — the
-          vendor-URL outbound is a paid feature. Anonymous and free
-          users see Pro-upgrade prompts that chain to Stripe checkout
-          (anonymous chains via SignupModal pendingAction:checkout;
-          free goes direct). Renders for both on-market and off-market
-          listings; sold listings opt out (no point upselling on a
-          finished sale). */}
+          vendor-URL outbound is a paid feature. Anon + free both land
+          on FreeMonthModal (single conversion surface, pre-applies
+          PULPOFREEMONTH on /api/stripe/start-checkout). Renders for
+          both on-market and off-market listings; sold listings opt out
+          (no point upselling on a finished sale). */}
       {!isSold && (
         <div className="detail-cta-bar">
           {!isPaid ? (
@@ -1823,39 +1806,15 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 track("paywall.bypassed", {
                   kind: "detail_view", action: "upgrade", listing_id: listing.id,
                 });
-                // Wave-1 funnel-debug event. Branch reflects the
-                // dispatch this CTA bar performs (the upgrade button
-                // IS the per-CTA paywall when the user can't see the
-                // broker URL). Dispatch logic unchanged below.
-                trackCtaRouted("broker_outbound", app.user, "paywall", true);
-                if (needsSignup) {
-                  // Anonymous: signup then chained checkout. The
-                  // post-signin effect in app.jsx fires
-                  // startStripeCheckout when pendingAction is set,
-                  // so a single click covers the whole funnel.
-                  app.openSignup({
-                    mode: "signup",
-                    pendingListing: listing.id,
-                    pendingAction: "checkout",
-                  });
-                } else {
-                  // Free signed-in: straight to Stripe checkout.
-                  startStripeCheckout({
-                    onError: (code) => {
-                      if (code === "sign_in_required") {
-                        app.showToast(t("plans.checkout_auth_mismatch", lc));
-                      } else {
-                        app.go("plans");
-                      }
-                    },
-                  });
-                }
+                // Branch label reflects what the matrix would route
+                // broker_outbound to for non-paid tiers; the actual
+                // dispatch goes straight to FreeMonthModal because the
+                // upgrade button IS the per-CTA paywall here.
+                trackCtaRouted("broker_outbound", app.user, "free_month_modal", true);
+                app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
               }}
             >
-              <Icon name="lock" size={16}/> {t(
-                needsSignup ? "detail.signup_upgrade_to_view_source" : "detail.upgrade_to_view_source",
-                lc,
-              )}
+              <Icon name="lock" size={16}/> {t("detail.unlock_pro_free_month", lc)}
             </button>
           ) : listing.original_url ? (
             <a
@@ -2517,30 +2476,66 @@ function ConsentBanner({ locale = "en" }) {
 }
 
 // ────────────────────────────────────────────────────────────────────
-// WelcomeModal — post-payment / post-magic-link landing overlay.
+// WelcomeModal — post-payment / post-Clerk-invitation landing overlay.
 //
 // Mounted by app.jsx when ?welcome=1 is detected in the URL. Two
 // variants based on `app.user` state:
 //   - anon: user just completed Stripe Checkout but hasn't accepted
-//           the Clerk magic-link yet. Modal says "check your inbox"
-//           with a primary CTA to open Gmail and a secondary "resend"
-//           button that hits /api/clerk/resend-invitation.
-//   - signed_in: user accepted the magic-link and is now signed in.
-//           Modal says "you're all set" with a single "start exploring"
-//           CTA that dismisses + auto-dismisses after ~3s.
+//           the Clerk invitation yet. Modal says "check your inbox"
+//           with a primary CTA to open Gmail and a secondary "resend
+//           my invitation" button that hits /api/clerk/resend-invitation.
+//   - signed_in: user accepted the invitation, set a password, and
+//           is now signed in. Modal says "you're all set" with a
+//           single "start exploring" CTA that auto-dismisses after ~3s.
+//
+// Hydration gate (2026-05-19): the same URL handles both moments,
+// and Clerk hydration is async. To prevent the anon-variant copy
+// from flashing during the post-invitation round trip while Clerk
+// is still booting, the modal returns null until `app.authLoaded`
+// flips true. A 5s safety-net timer renders the modal even if Clerk
+// never hydrates (SDK boot failure, ad-blocker, CSP regression) so
+// the modal can't hang forever — `welcome_modal.auth_load_timeout`
+// telemetry fires in that case so we can spot it in PostHog.
 //
 // Tokens-only CSS in web/app/styles/index.css's .welcome-modal block.
 // Mobile-first; ESC + backdrop click dismiss.
 function WelcomeModal({ app, state, onClose }) {
   const lc = app.locale;
+  // Gate rendering on Clerk hydration. If authLoaded is true (Clerk
+  // off OR Clerk on and isLoaded resolved) we can trust `app.user`.
+  // While false, render nothing — but only up to AUTH_LOAD_TIMEOUT_MS.
+  const AUTH_LOAD_TIMEOUT_MS = 5000;
+  const [authTimedOut, setAuthTimedOut] = pUseState(false);
+  const authLoaded = app.authLoaded !== false; // treat undefined as ready
+  const renderReady = authLoaded || authTimedOut;
   const isSignedIn = !!app.user;
   const variant = isSignedIn ? "signed_in" : "anon";
   const [resending, setResending] = pUseState(false);
   const [resendResult, setResendResult] = pUseState(null);
   const dialogRef = React.useRef(null);
 
-  // Fire `welcome_modal.shown` once per mount with the resolved variant.
+  // Safety-net timeout: if Clerk never finishes hydrating we still
+  // surface the modal (in whatever auth state we have) so the user
+  // isn't stuck on a blank backdrop. Telemetry tags whether `user`
+  // had populated by the time the timer fired — true = late
+  // hydration, false = SDK boot likely failed.
   React.useEffect(() => {
+    if (authLoaded) return undefined;
+    const id = setTimeout(() => {
+      setAuthTimedOut(true);
+      track("welcome_modal.auth_load_timeout", { resolved_user: !!app.user });
+    }, AUTH_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, [authLoaded, app.user]);
+
+  // Fire `welcome_modal.shown` once the variant is resolvable (auth
+  // gate cleared). Re-fires if the variant flips after the gate
+  // (e.g. late-hydration moves user from null → signed-in object
+  // while the modal is mounted). The hydration gate above ensures
+  // we don't double-fire as anon→signed_in during the normal boot
+  // race; this guard handles the post-timeout late-hydration case.
+  React.useEffect(() => {
+    if (!renderReady) return undefined;
     track("welcome_modal.shown", { variant, surface: "account" });
     // Auto-dismiss the signed-in variant after a brief acknowledgement
     // so the user lands on the real signed-in /account page.
@@ -2552,10 +2547,11 @@ function WelcomeModal({ app, state, onClose }) {
       return () => clearTimeout(id);
     }
     return undefined;
-  }, [variant, onClose]);
+  }, [renderReady, variant, onClose]);
 
   // ESC dismiss + focus trap entry — modeled on the SignupModal pattern.
   React.useEffect(() => {
+    if (!renderReady) return undefined;
     const onKey = (e) => {
       if (e.key === "Escape") {
         track("welcome_modal.dismissed", { variant, action: "esc" });
@@ -2565,7 +2561,11 @@ function WelcomeModal({ app, state, onClose }) {
     document.addEventListener("keydown", onKey);
     if (dialogRef.current) dialogRef.current.focus();
     return () => document.removeEventListener("keydown", onKey);
-  }, [variant, onClose]);
+  }, [renderReady, variant, onClose]);
+
+  // While Clerk is mid-hydration and the safety-net hasn't fired,
+  // render nothing — no backdrop, no flash of stale anon copy.
+  if (!renderReady) return null;
 
   const onBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -2576,6 +2576,7 @@ function WelcomeModal({ app, state, onClose }) {
 
   const onResend = async () => {
     if (resending || !state || !state.sessionId) {
+      track("welcome_modal.resend_failed", {});
       setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
       return;
     }
@@ -2589,11 +2590,23 @@ function WelcomeModal({ app, state, onClose }) {
         body: JSON.stringify({ session_id: state.sessionId }),
       });
       if (!res.ok) {
+        track("welcome_modal.resend_failed", {});
         setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
       } else {
-        setResendResult({ ok: true, msg: t("welcome_modal.anon.resend_done", lc) });
+        const data = await res.json().catch(() => ({}));
+        if (data && data.status === "user_exists") {
+          // Clerk already has a user for this email — there's no new
+          // invitation to re-send. Tell the user to refresh instead
+          // of lying with "check your inbox".
+          track("welcome_modal.resend_user_exists", {});
+          setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_user_exists", lc) });
+        } else {
+          track("welcome_modal.resend_done", {});
+          setResendResult({ ok: true, msg: t("welcome_modal.anon.resend_done", lc) });
+        }
       }
     } catch {
+      track("welcome_modal.resend_failed", {});
       setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
     }
     setResending(false);

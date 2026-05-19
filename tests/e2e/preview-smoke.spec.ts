@@ -496,6 +496,13 @@ test.describe("New app boots cleanly on key routes", () => {
       "Weekly 10 picks",                              // free_month_modal.bullet.1
       "Direct seller links",                          // free_month_modal.bullet.3
       "Maybe later",                                  // free_month_modal.cta_dismiss
+      // ListingDetail in-panel upgrade CTA (broker outbound + locked
+      // thumb + locked USP row). Anon + free see this CTA on ES as
+      // "Contrata Pulpo Pro — 1 mes gratis"; if EN leaks the canary
+      // catches it. Renders only for non-paid tiers — the detail-panel
+      // scan below runs anon so the CTA is in the body text.
+      "Start Pulpo Pro",                              // detail.unlock_pro_free_month (brand+plan half)
+      "first month free",                             // detail.unlock_pro_free_month (offer half)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
@@ -533,14 +540,12 @@ test.describe("New app boots cleanly on key routes", () => {
 
     // Navigate to /browse and click into the first card to mount the
     // detail panel. The road_access "Paved" bug was on detail; we must
-    // check it.
-    //
-    // Post-#262: anon clicks on /browse listing-cards open FreeMonthModal
-    // (not the detail panel) because the routing matrix sends
-    // shelf_card → free_month_modal for anon + free. Seed a pro user
-    // here so the click passthrough opens the detail panel. The home
-    // scan above already exercised the ES anon surface.
-    await seedProUser(page);
+    // check it. Post-listing-funnel: anon clicks on /browse listing-cards
+    // now passthrough to the detail panel (matrix `shelf_card` row is
+    // passthrough for all tiers), so we don't need to seed a paid user
+    // here — the panel renders for anon. That also lets the canary
+    // scan exercise the in-panel upgrade CTA ("Contrata Pulpo Pro —
+    // 1 mes gratis"), which renders only for non-paid tiers.
 
     await page.goto("/browse", { waitUntil: "networkidle" });
     await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
@@ -635,5 +640,89 @@ test.describe("New app boots cleanly on key routes", () => {
         `Spanish upsell modal leaked English text: "${word}". Wire via t() against an i18n.jsx key.`,
       ).not.toContain(word);
     }
+  });
+
+  // 2026-05-19 — WelcomeModal post-Stripe regression guards.
+  //
+  // The modal that mounts on /account?welcome=1 (the Stripe-success
+  // landing) shipped with copy that promised a "magic link" the user
+  // never received. The actual mechanism is a Clerk invitation (set
+  // your password) — so the copy created a story break with the email
+  // itself and users got stuck in a resend loop.
+  //
+  // Three tests, all on /account?welcome=1:
+  //   1. anon (Free seed) → modal renders "invitation" copy in EN+ES,
+  //      no "magic link"/"enlace mágico" anywhere
+  //   2. signed-in (Pro seed) → modal renders the "you're all set"
+  //      variant directly, never flashes the anon variant
+  //   3. resend button present + labelled correctly in both locales
+  test("welcome modal anon variant: 'invitation' copy renders in EN", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await page.goto("/account?welcome=1", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+
+    const modalText: string = await page.evaluate(() => {
+      const m = document.querySelector(".welcome-modal");
+      return m ? m.textContent || "" : "";
+    });
+    // Body now mentions "invitation" instead of "magic link".
+    expect(modalText).toContain("invitation");
+    // Resend button reads "Resend my invitation" (not "Resend the link").
+    expect(modalText).toContain("Resend my invitation");
+    // Bug guards: these phrases must never appear in the welcome modal
+    // in any locale, ever. Each is the literal copy users saw during
+    // the 2026-05-19 loop. Lock the fix in.
+    expect(modalText).not.toContain("magic link");
+    expect(modalText).not.toContain("Resend the link");
+  });
+
+  test("welcome modal anon variant: 'invitación' copy renders in ES (no English canaries)", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "es");
+    });
+    await page.goto("/account?welcome=1", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+
+    const modalText: string = await page.evaluate(() => {
+      const m = document.querySelector(".welcome-modal");
+      return m ? m.textContent || "" : "";
+    });
+    // Spanish copy mentions "invitación" instead of "enlace mágico".
+    expect(modalText).toContain("invitación");
+    expect(modalText).toContain("Reenviar la invitación");
+    // Bug guards mirroring the EN test — ES variants.
+    expect(modalText).not.toContain("enlace mágico");
+    expect(modalText).not.toContain("Reenviar el enlace");
+    // Cross-locale canary: never let the EN copy leak into the ES modal.
+    expect(modalText).not.toContain("magic link");
+  });
+
+  test("welcome modal signed-in variant: Pro seed shows 'You're all set' without anon flash", async ({ page }) => {
+    // Pro seed → app.user populated immediately via the localStorage
+    // seed (Clerk-off CI path). With authLoaded defaulting to true in
+    // the off-Clerk case, the modal must render the signed_in variant
+    // on first paint — no anon flash, no "invitation" copy.
+    await seedProUser(page);
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "en"));
+    await page.goto("/account?welcome=1", { waitUntil: "networkidle" });
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+
+    // Grab the modal text IMMEDIATELY after first visibility — the
+    // 3.2s auto-dismiss timer is what catches us if a tester races
+    // the assertion past the dismiss. We snapshot quickly.
+    const modalText: string = await page.evaluate(() => {
+      const m = document.querySelector(".welcome-modal");
+      return m ? m.textContent || "" : "";
+    });
+    // Signed-in headline.
+    expect(modalText).toContain("You're all set");
+    // The anon variant's "invitation" wording must not appear here.
+    // If the hydration gate breaks, this would catch the regression.
+    expect(modalText).not.toContain("invitation");
+    expect(modalText).not.toContain("Resend my invitation");
   });
 });
