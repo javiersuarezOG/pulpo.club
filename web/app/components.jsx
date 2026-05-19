@@ -141,6 +141,16 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     cat_off_market: <><path d="M2 12s4-7 10-7c2 0 4 .6 5.5 1.5"/><path d="M22 12s-4 7-10 7c-2 0-4-.6-5.5-1.5"/><path d="M3 3l18 18"/></>,
     cat_flat_land:  <><path d="M2 16h20"/><path d="M2 20h20" opacity="0.5"/><path d="M6 16V8"/><path d="M11 16V6"/><path d="M16 16v-9"/></>,
     cat_water:      <><path d="M12 3s6 7 6 12a6 6 0 1 1-12 0c0-5 6-12 6-12z"/><path d="M9 14c0 2 1 3 3 3" opacity="0.6"/></>,
+    /* Lake — ellipse + ripple. Distinct from cat_water (single drop) so
+       Beach (waves) vs Lake (still body of water) read at a glance. */
+    cat_lake:       <><ellipse cx="12" cy="15" rx="9" ry="3.5"/><path d="M5 11c2 0 2-1.5 5-1.5s3 1.5 5 1.5 3-1.5 5-1.5" opacity="0.7"/></>,
+    /* Waterfront — wave with a small flag-marker on top, signaling
+       "first line to the water." Works for ocean OR lake usage. */
+    cat_waterfront: <><path d="M2 18c2 0 2-1.5 5-1.5s3 1.5 5 1.5 3-1.5 5-1.5 3 1.5 5 1.5"/><path d="M2 22c2 0 2-1.5 5-1.5s3 1.5 5 1.5 3-1.5 5-1.5 3 1.5 5 1.5"/><path d="M12 12V3"/><path d="M12 3l5 2-5 2"/></>,
+    /* Top 10 — typographic "10" badge. The number IS the icon (Netflix
+       Top 10 pattern), so users pattern-match instantly. Rendered via
+       paths so it stays in the monochrome currentColor system. */
+    cat_top10:      <><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M7 9v6"/><path d="M13 12a3 3 0 0 1 3-3 3 3 0 0 1 3 3v3a3 3 0 0 1-3 3 3 3 0 0 1-3-3z"/></>,
     cat_mountain:   <><path d="M2 20l6-11 4 7"/><path d="M10 20l5-9 7 9z"/><circle cx="7" cy="5" r="1.5"/></>,
     cat_under_100k: <><circle cx="12" cy="12" r="9"/><path d="M15 9c-1-1-2-1.5-3-1.5-2 0-3 1-3 2.5 0 3 6 1.5 6 4.5 0 1.5-1 2.5-3 2.5-1.5 0-2.5-.5-3.5-1.5"/><path d="M12 6v12"/></>,
     cat_agricultural:<><path d="M12 21V9"/><path d="M12 9c0-3 2-5 5-5-1 4-3 5-5 5z"/><path d="M12 13c0-3-2-5-5-5 1 4 3 5 5 5z"/><path d="M5 21h14"/></>,

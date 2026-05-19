@@ -370,31 +370,77 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .hero-title em,
 .hero-title i { font-style: italic; font-weight: 400; }
 
-/* ============== Pill rail ============== */
+/* ============== Pill rail — three tiers (WHERE / RANKING / FILTERS) ============== */
+/* Mobile-first: tiers stack, label sits above each rail. At ≥768px the
+   label moves inline-left and the rail flows beside it (saves vertical
+   space on desktop). Sticky behavior dropped because three tiers would
+   eat ~170px of viewport — users scroll back to the top to refilter. */
 .pill-rail-wrap {
   border-bottom: 1px solid var(--line);
   background: var(--paper);
-  position: sticky; top: 65px; z-index: 20;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
-/* PR-4 — sticky-stack audit: on mobile, topnav (65px) + pill rail
-   (56px) + filter button + bottom nav consume too much screen.
-   Drop pill rail stickiness below 768px per Recommendations
-   §"Mobile & performance". */
-@media (max-width: 767px) {
-  .pill-rail-wrap { position: static; top: auto; }
+.pill-tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.pill-tier:last-child { border-bottom: none; padding-bottom: 12px; }
+.pill-tier-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3, var(--ink-2));
+  line-height: 1;
 }
 .pill-rail {
-  max-width: 1400px; margin: 0 auto;
+  max-width: 1400px;
   display: flex; gap: 8px;
-  padding: 14px 24px;
   overflow-x: auto;
   scrollbar-width: none;
+  /* Negative margin lets first chip align flush with tier padding
+     while leaving room for an end-fade on the right edge. */
+  margin: 0;
+  padding: 0 0 2px;
 }
 .pill-rail::-webkit-scrollbar { display: none; }
 .pill-rail-fade {
   pointer-events: none;
-  position: absolute; right: 0; top: 0; bottom: 0; width: 60px;
+  position: absolute; right: 0; bottom: 4px; width: 36px;
+  /* Match the rail height. Computed below per tier. */
+  height: 38px;
   background: linear-gradient(90deg, transparent, var(--paper));
+}
+@media (min-width: 768px) {
+  /* Inline label + rail layout on tablet+. Label sits to the left,
+     rail flows to the right. */
+  .pill-tier {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 24px;
+  }
+  .pill-tier-label {
+    flex: 0 0 auto;
+    min-width: 64px;
+  }
+  .pill-rail {
+    flex: 1 1 auto;
+    padding: 0;
+    margin: 0 auto 0 0;
+  }
+  .pill-rail-fade {
+    right: 24px;
+    bottom: 0;
+    top: 0;
+    height: auto;
+  }
 }
 .pill-chip {
   display: inline-flex; align-items: center; gap: 6px;
@@ -407,6 +453,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border: 1px solid var(--line);
   transition: all 160ms;
   white-space: nowrap;
+  cursor: pointer;
 }
 .pill-chip:hover { background: var(--paper-2); color: var(--ink); border-color: var(--line-2); }
 .pill-chip.is-active {
@@ -5258,6 +5305,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-shelf-h2 { font-size: 22px; }
+}
+/* Objective one-line description under each shelf h2. Says what's in
+   the shelf without marketing voice. Mobile-first sizing — slightly
+   smaller on phones to keep the head compact. */
+.homepage-v2 .hp-shelf-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--color-ink-secondary);
+  flex-basis: 100%;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-shelf-sub { font-size: 14px; }
 }
 .homepage-v2 .hp-shelf-view-all {
   background: transparent;
