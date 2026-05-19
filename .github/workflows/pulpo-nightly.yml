@@ -96,21 +96,25 @@ jobs:
           PULPO_LIMIT: "1000"
           # Disabled sources (re-add when the blocker is resolved):
           #   kazu              — Nuxt SPA, panel API denylisted; needs headless browser
-          #   realtyelsalvador  — disabled 2026-05-06 after 3 consecutive nightly
-          #                       failures with HTTP 403 from Azure datacenter IPs
-          #                       (PR #67's header workaround did not help).
-          #                       Local runs return ~126 listings cleanly. Re-add
-          #                       when we have a residential proxy, a non-Azure
-          #                       runner, or rewrite to scrape HTML detail pages
-          #                       which may not be WAF-gated.
-          # The scraper code, registration, and tests are kept in place — only
-          # the env list excludes it, so reverting is a one-line change.
+          #
+          # realtyelsalvador  — trial re-enabled 2026-05-20 (PR #346). It was
+          #   disabled 2026-05-06 after 3 consecutive 403s from Azure runner
+          #   IPs (PR #67's header workaround stopped working). Two weeks later
+          #   the WP REST endpoint still serves ~179 listings from a local IP,
+          #   and Cloudflare bot rules drift, so we're trialling a re-enable
+          #   before investing in an HTML rewrite or a residential proxy. The
+          #   source_health row from the next nightly will tell us:
+          #     • green / count>0  → WAF softened, leave it on
+          #     • red / count=0    → still blocked, revert this PR and pursue
+          #                          the HTML-page or proxy path
+          #   With PR #344's staleness guard landed, a single failed nightly
+          #   no longer spams the issue tracker.
           #
           # encuentra24 added 2026-05-08 (PR-E2 follow-up to PR #187). First
           # run capped at 200 via PULPO_E24_LIMIT below — at ~7s/detail-page
           # in Playwright that's ~25 min; lift the cap once we've validated
           # one full nightly's data lands cleanly in ranked.json.
-          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,encuentra24"
+          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,encuentra24,realtyelsalvador"
           # encuentra24-specific cap. Tightens against PULPO_LIMIT (the
           # global cap) but never raises it. Set to 200 for the first
           # validated runs; raise to e.g. 1000 once we've measured runtime
