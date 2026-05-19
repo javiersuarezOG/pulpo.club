@@ -1228,8 +1228,28 @@ const UI_STRINGS = {
                                           es: "Nos encantaría saber de ti. Elige la bandeja correcta para llegar antes a la persona indicada." },
   "contact.page.form_coming_soon":     { en: "A web form for contacting us is being added shortly. In the meantime, please email the inbox that best matches your enquiry.",
                                           es: "Estamos añadiendo un formulario de contacto en breve. Mientras tanto, escríbenos al correo que mejor encaje con tu consulta." },
-  "contact.page.inbox_list_label":     { en: "Topical inboxes",
-                                          es: "Bandejas por tema" },
+  "contact.page.inbox_list_label":     { en: "Or email us directly",
+                                          es: "O escríbenos directamente" },
+  "contact.page.success":              { en: "Message sent. We'll get back to you shortly.",
+                                          es: "Mensaje enviado. Te responderemos pronto." },
+  "contact.page.error":                { en: "We couldn't send your message just now. Please try again, or email the inbox that best matches your enquiry directly.",
+                                          es: "No pudimos enviar tu mensaje ahora mismo. Por favor inténtalo de nuevo, o escríbenos directamente al correo que mejor encaje con tu consulta." },
+
+  // /contact form fields.
+  "contact.form.name_label":           { en: "Your name (optional)",
+                                          es: "Tu nombre (opcional)" },
+  "contact.form.email_label":          { en: "Your email",
+                                          es: "Tu correo electrónico" },
+  "contact.form.topic_label":          { en: "What's this about?",
+                                          es: "¿Sobre qué nos escribes?" },
+  "contact.form.subject_label":        { en: "Subject (optional)",
+                                          es: "Asunto (opcional)" },
+  "contact.form.message_label":        { en: "Message",
+                                          es: "Mensaje" },
+  "contact.form.submit":               { en: "Send message",
+                                          es: "Enviar mensaje" },
+  "contact.form.submitting":           { en: "Sending…",
+                                          es: "Enviando…" },
 
   // Contact topic labels (also used by the topic dropdown when the
   // form lands in feat/contact-form). Default copy mirrors
