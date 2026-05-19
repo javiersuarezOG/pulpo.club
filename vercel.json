@@ -5,6 +5,11 @@
   "buildCommand": "npm install --no-audit --no-fund && npm run build",
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
+  "functions": {
+    "api/social/image.js": {
+      "excludeFiles": "web/photos/**,web/photos-hires/**"
+    }
+  },
   "rewrites": [
     { "source": "/",                        "destination": "/web/dist/index.html" },
     { "source": "/legacy",                  "destination": "/web/legacy.html" },
@@ -15,9 +20,16 @@
     { "source": "/data/run_history.json",   "destination": "/web/data/run_history.json" },
     { "source": "/data/featured.json",      "destination": "/web/data/featured.json" },
     { "source": "/photos/:file",            "destination": "/web/photos/:file" },
+    { "source": "/photos-hires/:file",      "destination": "/web/photos-hires/:file" },
     { "source": "/assets/:file",            "destination": "/web/assets/:file" },
     { "source": "/build/:file",             "destination": "/web/dist/build/:file" },
-    { "source": "/legal",                   "destination": "/web/legal.html" },
+    { "source": "/terms",                   "destination": "/web/dist/index.html" },
+    { "source": "/privacy",                 "destination": "/web/dist/index.html" },
+    { "source": "/cookies",                 "destination": "/web/dist/index.html" },
+    { "source": "/subscription",            "destination": "/web/dist/index.html" },
+    { "source": "/imprint",                 "destination": "/web/dist/index.html" },
+    { "source": "/impressum",               "destination": "/web/dist/index.html" },
+    { "source": "/contact",                 "destination": "/web/dist/index.html" },
     { "source": "/sitemap.xml",             "destination": "/web/sitemap.xml" },
     { "source": "/robots.txt",              "destination": "/web/robots.txt" },
     { "source": "/browse",                  "destination": "/web/dist/index.html" },
@@ -28,6 +40,9 @@
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/web/dist/index.html" }
+  ],
+  "redirects": [
+    { "source": "/legal", "destination": "/terms", "permanent": true }
   ],
   "headers": [
     {
@@ -58,6 +73,10 @@
     },
     {
       "source": "/photos/:file",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/photos-hires/:file",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800" }]
     },
     {

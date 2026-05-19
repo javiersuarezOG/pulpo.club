@@ -1,0 +1,16 @@
+{
+  "width": 800,
+  "height": 600,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 145.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T12:29:27.657139+00:00",
+  "hero_photo_quality_score": 60,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/70366/53912947/70366.jpg?rasterize=true&version=1666733430",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T12:29:27.657290+00:00"
+}

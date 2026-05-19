@@ -178,7 +178,27 @@ def _repick_one_listing(
         hero_bytes = hero_buf.getvalue()
         hero_fpath.write_bytes(hero_bytes)
         hero_meta = _write_sidecar(hero_fpath, hero_bytes)
+
+        # Compute SOURCE-bytes metadata so hero_eligible reflects the
+        # source's intrinsic resolution, not the 1920×1080-clamped
+        # derivative's. Mirrors automation/run.py::_download_hero_photos
+        # — same code path, same fix. See PR #319 commit message.
+        from automation.photo_quality import compute_image_metadata as _cim
+        source_meta = _cim(winning_content, file_size_bytes=len(winning_content))
+
         if hero_meta is not None:
+            # Stash derivative dims separately; never read these for
+            # eligibility decisions.
+            hero_meta["derivative_width"]  = hero_meta.get("width")
+            hero_meta["derivative_height"] = hero_meta.get("height")
+            if source_meta is not None:
+                hero_meta["width"]          = source_meta["width"]
+                hero_meta["height"]         = source_meta["height"]
+                hero_meta["aspect_ratio"]   = source_meta.get("aspect_ratio")
+                hero_meta["file_size_kb"]   = source_meta.get("file_size_kb")
+                hero_meta["hero_eligible"]  = source_meta.get("hero_eligible")
+                hero_meta["card_eligible"]  = source_meta.get("card_eligible")
+                hero_meta["hires_eligible"] = source_meta.get("hires_eligible")
             hero_meta["hero_photo_quality_score"] = winning_score
             hero_meta["has_text_overlay"] = winning_has_text
             hero_meta["winning_url"] = winning_url
@@ -204,10 +224,22 @@ def _repick_one_listing(
         }
 
     # Update the listing dict in place so the caller can rewrite
-    # ranked.json with fresh hero metadata.
+    # ranked.json with fresh hero metadata. Source-bytes eligibility
+    # values (hero_eligible / card_eligible / source_width /
+    # source_height) come from the sidecar's overwritten top-level
+    # fields, which now reflect the SOURCE bytes per the fix above.
     listing["hero_photo_path"] = f"/photos/{fname}"
     listing["hero_photo_quality_score"] = winning_score
     listing["has_text_overlay"] = winning_has_text
+    if hero_meta is not None:
+        if "hero_eligible" in hero_meta:
+            listing["hero_eligible"] = bool(hero_meta["hero_eligible"])
+        if "card_eligible" in hero_meta:
+            listing["card_eligible"] = bool(hero_meta["card_eligible"])
+        if hero_meta.get("width") is not None:
+            listing["source_width"] = int(hero_meta["width"])
+        if hero_meta.get("height") is not None:
+            listing["source_height"] = int(hero_meta["height"])
 
     return {
         "listing_id": listing_id,

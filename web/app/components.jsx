@@ -16,12 +16,18 @@ function currentLocale() {
 function currentUnits() {
   return document.documentElement.dataset.units === "vrs2" ? "vrs2" : "m2";
 }
+// `null` on price / size means the broker didn't share it. Render the
+// localized "Not shared" string instead of a bare em-dash so users know
+// the data gap exists at the source rather than as a render bug.
+// Incomplete listings are hidden from Discover shelves + the default
+// Browse view; users only see this copy after opting in via the chip,
+// or via a direct link to the detail page.
 function formatPrice(n) {
-  if (n == null) return "—";
+  if (n == null) return t("value.notshared.short", currentLocale());
   return formatPriceI18n(n, currentLocale());
 }
 function formatSize(m2) {
-  if (m2 == null) return "—";
+  if (m2 == null) return t("value.notshared.short", currentLocale());
   return formatSizeI18n(m2, currentLocale(), currentUnits());
 }
 function formatDaysListed(d) {
@@ -150,7 +156,11 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
 };
 
 // ===== Pulpo wordmark =====
-const PulpoLogo = ({ size = 22 }) => (
+// `pro` prop appends a small serif-italic "Pro" mark next to the wordmark
+// so subscribed users see their membership reinforced on every page in the
+// global header chrome. Styling lives in index.css (`.pulpo-logo-pro`) so
+// it can reference the gold-hairline tokens without inline literals.
+const PulpoLogo = ({ size = 22, pro = false }) => (
   <div className="pulpo-logo" style={{ display: "flex", alignItems: "center", gap: 8 }}>
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       {/* simple octopus mark */}
@@ -167,6 +177,13 @@ const PulpoLogo = ({ size = 22 }) => (
     <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 500, letterSpacing: "-0.02em", lineHeight: 1 }}>
       pulpo
     </span>
+    {pro && (
+      // "Pro" is a shared EN/ES brand mark. The parent button already
+      // carries the localized accessible name via `nav.home_pro`, so the
+      // span needs no aria-label (and shouldn't have one — nesting an
+      // aria-label inside a labelled button confuses screen readers).
+      <span className="pulpo-logo-pro">Pro</span>
+    )}
   </div>
 );
 
@@ -589,13 +606,26 @@ function ListingCard({
           {listing.zone_name} · {landTypeLabel(listing.land_type)}
         </div>
         <div className="listing-card-price">
-          <span className="price-main">{formatPrice(listing.price)}</span>
+          <span
+            className={listing.price == null ? "price-main muted" : "price-main"}
+            title={listing.price == null ? t("value.notshared.tooltip", currentLocale()) : undefined}
+          >{formatPrice(listing.price)}</span>
           {listing.previous_price && (
             <span className="price-was">{formatPrice(listing.previous_price)}</span>
           )}
-          {!isMag && (
-            <span className="price-sub">· {formatSize(listing.size_m2)} · {formatPpm(listing.price_per_m2)}{ppmSuffix()}</span>
-          )}
+          {!isMag && (() => {
+            // Size + ppm sub-row. When either price or size is null,
+            // ppm is meaningless (it's derived). Drop it cleanly so
+            // the user sees "· Not shared" once, not twice.
+            const sizeMissing = listing.size_m2 == null;
+            const ppmAvailable = listing.price != null && listing.size_m2 != null && listing.price_per_m2 != null;
+            return (
+              <span className="price-sub">
+                · <span title={sizeMissing ? t("value.notshared.tooltip", currentLocale()) : undefined}>{formatSize(listing.size_m2)}</span>
+                {ppmAvailable && ` · ${formatPpm(listing.price_per_m2)}${ppmSuffix()}`}
+              </span>
+            );
+          })()}
         </div>
         {!compact && !isMag && listing.usps[0] && (() => {
           // Same gate the detail panel uses — keep card and detail in

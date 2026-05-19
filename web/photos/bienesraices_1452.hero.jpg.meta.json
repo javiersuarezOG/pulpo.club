@@ -1,0 +1,16 @@
+{
+  "width": 1080,
+  "height": 699,
+  "aspect_ratio": 1.545,
+  "file_size_kb": 71.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T12:13:30.598845+00:00",
+  "hero_photo_quality_score": 50,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/5063418/86701633/EB-SL3418.jpeg?rasterize=true&version=1740688276",
+  "candidate_count": 5,
+  "picker_excluded_count": 2,
+  "repicked_at": "2026-05-19T12:13:30.598986+00:00"
+}

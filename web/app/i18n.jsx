@@ -151,6 +151,7 @@ const UI_STRINGS = {
   // (gated on a PostHog dashboard audit). One key per surface concept;
   // SiteHeader and BottomNav read the same strings.
   "nav.home":                { en: "Home",                es: "Inicio" },
+  "nav.home_pro":            { en: "Home — Pulpo Pro member", es: "Inicio — Miembro Pulpo Pro" },
   "nav.discover":            { en: "Discover",            es: "Descubrir" },
   "nav.favorites":           { en: "Favorites",           es: "Favoritos" },
   "nav.login":               { en: "Log in",              es: "Iniciar sesión" },
@@ -424,6 +425,10 @@ const UI_STRINGS = {
   "filter.tag.under_250k":       { en: "Under $250K",     es: "Menos de $250K" },
   "filter.tag.gated":            { en: "Gated",           es: "Privado / cerrado" },
   "filter.tag.waterfront":       { en: "Waterfront",      es: "Frente al agua" },
+  // Inverse-semantic chip: OFF by default hides listings where the
+  // broker hasn't shared price or size; ON brings them in at the
+  // bottom of the ranking.
+  "filter.show_incomplete":      { en: "Show missing details", es: "Ver con datos faltantes" },
 
   // Sort dropdown — rewrite-canonical labels (existing sort keys
   // stay; only the visible label changes so saved URLs still work).
@@ -497,6 +502,17 @@ const UI_STRINGS = {
   "detail.price":            { en: "Price",               es: "Precio" },
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
+  // Used on cards + detail keystats wherever price or size is null.
+  // Surfaces the "broker hasn't shared" semantic instead of a bare
+  // em-dash. The tooltip explains the next step.
+  "value.notshared.short":   { en: "Not shared",          es: "No compartido" },
+  "value.notshared.tooltip": { en: "The broker hasn't shared this. Contact them for details.",
+                               es: "El broker no ha compartido este dato. Contáctalo para más información." },
+  // Inline note rendered above the detail-page description for any
+  // listing where price OR size is missing. Pairs with the per-field
+  // "Not shared" copy.
+  "detail.broker_note":      { en: "The broker hasn't shared full details for this listing. Contact them to confirm price and size.",
+                               es: "El broker no ha compartido todos los datos de esta propiedad. Contáctalo para confirmar precio y tamaño." },
 
   // Saved — page title matches the nav-bar label ("Favorites"). The
   // URL is still /saved (Wave 3b renames it). Past-tense "saved"
@@ -726,12 +742,39 @@ const UI_STRINGS = {
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 
-  // Consent banner (GDPR)
+  // Consent banner (GDPR / ePrivacy / LGPD)
+  //
+  // Implements the 9-point ConsentBanner contract from
+  // legal_documents/03-cookie-policy.md. EN + ES coverage from day one;
+  // a Spanish-counsel review pass will follow before incorporation.
   "consent.aria":            { en: "Cookie consent",                es: "Consentimiento de cookies" },
-  "consent.body":            { en: "Pulpo uses analytics cookies to improve the site. No third-party ads.",
-                               es: "Pulpo usa cookies analíticas para mejorar el sitio. Sin anuncios de terceros." },
+  "consent.body":            { en: "Pulpo uses cookies to deliver the site, remember your preferences, and (with your permission) measure how the site is used. Strictly-necessary cookies are always on; everything else is off until you decide.",
+                               es: "Pulpo usa cookies para que el sitio funcione, recordar tus preferencias y (con tu permiso) entender cómo se usa el sitio. Las estrictamente necesarias siempre están activas; el resto se queda desactivado hasta que tú decidas." },
+  // Pre-rebuild keys kept for back-compat — no current call site after PR-E.
   "consent.decline":         { en: "Decline",                       es: "Rechazar" },
   "consent.accept":          { en: "Accept",                        es: "Aceptar" },
+  // PR-E new keys.
+  "consent.accept_all":      { en: "Accept all",                    es: "Aceptar todas" },
+  "consent.decline_all":     { en: "Decline all",                   es: "Rechazar todas" },
+  "consent.manage":          { en: "Manage preferences",            es: "Gestionar preferencias" },
+  "consent.save":            { en: "Save preferences",              es: "Guardar preferencias" },
+  "consent.prefs.title":     { en: "Cookie preferences",            es: "Preferencias de cookies" },
+  "consent.prefs.lede":      { en: "Strictly-necessary cookies are always on — the site can't function without them. The rest you can switch on or off.",
+                               es: "Las cookies estrictamente necesarias siempre están activas — el sitio no funciona sin ellas. El resto puedes activarlas o desactivarlas." },
+  "consent.category.always_active":               { en: "Always active",
+                                                    es: "Siempre activas" },
+  "consent.category.strictly_necessary.label":    { en: "Strictly necessary",
+                                                    es: "Estrictamente necesarias" },
+  "consent.category.strictly_necessary.desc":     { en: "Authentication, checkout session continuity, your stored preferences. These cannot be switched off.",
+                                                    es: "Autenticación, continuidad del pago en Stripe, tus preferencias guardadas. No se pueden desactivar." },
+  "consent.category.analytics.label":             { en: "Analytics",
+                                                    es: "Analíticas" },
+  "consent.category.analytics.desc":              { en: "PostHog product analytics + 10% session replay sample (input-masked, EU-hosted in Frankfurt). Helps us see what works.",
+                                                    es: "Analíticas de producto con PostHog + grabación de sesiones al 10% (con los campos enmascarados, alojado en Frankfurt). Nos ayuda a entender qué funciona." },
+  "consent.category.functional.label":            { en: "Functional",
+                                                    es: "Funcionales" },
+  "consent.category.functional.desc":             { en: "Mapbox map-tile caching and Resend newsletter open/click tracking. Improves the experience but not required.",
+                                                    es: "Caché de mosaicos de Mapbox y seguimiento de aperturas/clics del newsletter por Resend. Mejora la experiencia pero no es necesario." },
 
   // Saved page CTA
   "saved.browse_cta":        { en: "Browse listings →",             es: "Ver propiedades →" },
@@ -764,6 +807,7 @@ const UI_STRINGS = {
 
   // Account area (A.3)
   "nav.account":             { en: "Account",                       es: "Cuenta" },
+  "nav.account_pro":         { en: "Account — Pulpo Pro member",    es: "Cuenta — Miembro Pulpo Pro" },
   // Wave 3a: button navigates to `home` route (account.jsx:122). After
   // the nav rename "Discover" labels /browse, so this label moved to
   // "Home" to match the actual destination.
@@ -1059,6 +1103,26 @@ const UI_STRINGS = {
   // generic resend_done copy lies — there's no new inbox to check.
   "welcome_modal.anon.resend_user_exists": { en: "Looks like you're already signed up. Try refreshing this page.",
                                           es: "Parece que ya tienes cuenta. Refresca la página para continuar." },
+  // Status-branch copy — driven by /api/clerk/invitation-status on
+  // modal mount. The default anon variant ("invitation_pending"
+  // branch) keeps the existing body+resend wiring; these keys cover
+  // the three OTHER discriminated outcomes from the webhook. Before
+  // these existed the modal lied to users on any non-invitation
+  // path (e.g. existing-user / no-email / webhook-not-yet-fired).
+  "welcome_modal.anon.status.user_exists.headline": { en: "You already have a Pulpo account",
+                                          es: "Ya tienes una cuenta de Pulpo" },
+  "welcome_modal.anon.status.user_exists.body": { en: "Your subscription is active and linked to {email_domain}. Sign in with your existing password — no new email was sent.",
+                                          es: "Tu suscripción está activa y vinculada a {email_domain}. Inicia sesión con tu contraseña — no enviamos un correo nuevo." },
+  "welcome_modal.anon.status.user_exists.cta": { en: "Sign in →",
+                                          es: "Iniciar sesión →" },
+  "welcome_modal.anon.status.no_email.headline": { en: "We couldn't read your email",
+                                          es: "No pudimos leer tu correo" },
+  "welcome_modal.anon.status.no_email.body": { en: "Your subscription is active but your Stripe receipt didn't include an email we could match. Please email hello@pulpo.club so we can attach your subscription.",
+                                          es: "Tu suscripción está activa pero el recibo de Stripe no incluía un correo que pudiéramos vincular. Escríbenos a hello@pulpo.club para conectar tu suscripción." },
+  "welcome_modal.anon.status.no_email.cta": { en: "Email hello@pulpo.club →",
+                                          es: "Escribir a hello@pulpo.club →" },
+  "welcome_modal.anon.status.webhook_pending.body": { en: "Your subscription is active. We're finishing your account setup — your activation email should arrive in a moment. If it doesn't show up in 5 minutes, email hello@pulpo.club.",
+                                          es: "Tu suscripción está activa. Estamos terminando de configurar tu cuenta — tu correo de activación debería llegar en un momento. Si no aparece en 5 minutos, escríbenos a hello@pulpo.club." },
   "welcome_modal.signedin.headline":    { en: "You're all set",
                                           es: "Todo listo" },
   "welcome_modal.signedin.body":        { en: "Welcome to Pulpo Pro. Your account is active — start exploring the marketplace.",
@@ -1147,13 +1211,103 @@ const UI_STRINGS = {
   "free_month_modal.code_applied_note":{ en: "✓ First month free, applied at checkout",
                                           es: "✓ Primer mes gratis, aplicado al pagar" },
 
-  // Trimmed footer (home + browse).
+  // Trimmed footer (home + browse + all legal-suite pages).
   "footer.fine_print":                 { en: "© {year} Pulpo",
                                           es: "© {year} Pulpo" },
+  "footer.fine_print_full":            { en: "© {year} Pulpo · A discovery-first land investment marketplace",
+                                          es: "© {year} Pulpo · Un marketplace de inversión en suelo enfocado en el descubrimiento" },
   "footer.link.terms":                 { en: "Terms",
                                           es: "Términos" },
   "footer.link.privacy":               { en: "Privacy",
                                           es: "Privacidad" },
+  "footer.link.cookies":               { en: "Cookies",
+                                          es: "Cookies" },
+  "footer.link.subscription":          { en: "Subscription & Refunds",
+                                          es: "Suscripción y reembolsos" },
+  "footer.link.imprint":               { en: "Imprint",
+                                          es: "Aviso legal" },
+  "footer.link.contact":               { en: "Contact",
+                                          es: "Contacto" },
+  "footer.link.cookie_preferences":    { en: "Cookie Preferences",
+                                          es: "Preferencias de cookies" },
+
+  // Full footer column headings + items (saved / plans / account-when-enabled).
+  "footer.col.discover.heading":       { en: "Discover",
+                                          es: "Descubrir" },
+  "footer.col.discover.beachfront":    { en: "Beachfront",
+                                          es: "Frente al mar" },
+  "footer.col.discover.build_ready":   { en: "Build-ready",
+                                          es: "Listo para construir" },
+  "footer.col.discover.off_market":    { en: "Off-market",
+                                          es: "Fuera de mercado" },
+  "footer.col.discover.agricultural":  { en: "Agricultural",
+                                          es: "Agrícola" },
+  "footer.col.pulpo.heading":          { en: "Pulpo",
+                                          es: "Pulpo" },
+  "footer.col.pulpo.plans":            { en: "Plans",
+                                          es: "Planes" },
+  "footer.col.legal.heading":          { en: "Legal",
+                                          es: "Legal" },
+
+  // Legal-suite pages (/terms, /privacy, /cookies, /subscription, /imprint).
+  // Body prose lives in web/app/config/legal-content.ts (typed
+  // LegalDocument records); these keys are page chrome only.
+  "legal.back_to_home":                { en: "Back to home",
+                                          es: "Volver al inicio" },
+  "legal.last_updated":                { en: "Last updated",
+                                          es: "Actualizado" },
+  "legal.draft_banner":                { en: "This page is a working draft pending counsel review. Lawyer-blessed prose will replace this copy before the first live Stripe Checkout session.",
+                                          es: "Esta página es un borrador pendiente de revisión legal. El texto definitivo reemplazará este contenido antes del primer pago real con Stripe Checkout." },
+  "legal.incorporation_banner":        { en: "Pulpo is currently being incorporated. The entity details on this page will be finalised once incorporation completes.",
+                                          es: "Pulpo está en proceso de constitución. Los datos de la empresa en esta página se finalizarán al completarse la constitución." },
+
+  // /contact page.
+  "contact.page.title":                { en: "Contact Pulpo",
+                                          es: "Contactar con Pulpo" },
+  "contact.page.description":          { en: "Get in touch with the Pulpo team — general enquiries, billing, privacy requests, takedowns.",
+                                          es: "Ponte en contacto con el equipo de Pulpo — consultas generales, facturación, privacidad, eliminación de contenido." },
+  "contact.page.lede":                 { en: "We'd love to hear from you. Pick the right inbox below to reach the right person fast.",
+                                          es: "Nos encantaría saber de ti. Elige la bandeja correcta para llegar antes a la persona indicada." },
+  "contact.page.form_coming_soon":     { en: "A web form for contacting us is being added shortly. In the meantime, please email the inbox that best matches your enquiry.",
+                                          es: "Estamos añadiendo un formulario de contacto en breve. Mientras tanto, escríbenos al correo que mejor encaje con tu consulta." },
+  "contact.page.inbox_list_label":     { en: "Or email us directly",
+                                          es: "O escríbenos directamente" },
+  "contact.page.success":              { en: "Message sent. We'll get back to you shortly.",
+                                          es: "Mensaje enviado. Te responderemos pronto." },
+  "contact.page.error":                { en: "We couldn't send your message just now. Please try again, or email the inbox that best matches your enquiry directly.",
+                                          es: "No pudimos enviar tu mensaje ahora mismo. Por favor inténtalo de nuevo, o escríbenos directamente al correo que mejor encaje con tu consulta." },
+
+  // /contact form fields.
+  "contact.form.name_label":           { en: "Your name (optional)",
+                                          es: "Tu nombre (opcional)" },
+  "contact.form.email_label":          { en: "Your email",
+                                          es: "Tu correo electrónico" },
+  "contact.form.topic_label":          { en: "What's this about?",
+                                          es: "¿Sobre qué nos escribes?" },
+  "contact.form.subject_label":        { en: "Subject (optional)",
+                                          es: "Asunto (opcional)" },
+  "contact.form.message_label":        { en: "Message",
+                                          es: "Mensaje" },
+  "contact.form.submit":               { en: "Send message",
+                                          es: "Enviar mensaje" },
+  "contact.form.submitting":           { en: "Sending…",
+                                          es: "Enviando…" },
+
+  // Contact topic labels (also used by the topic dropdown when the
+  // form lands in feat/contact-form). Default copy mirrors
+  // CONTACT_TOPIC_DEFAULT_COPY in web/app/config/contact-routing.ts.
+  "contact.topic.general":             { en: "General enquiry",
+                                          es: "Consulta general" },
+  "contact.topic.billing":             { en: "Billing or subscription",
+                                          es: "Facturación o suscripción" },
+  "contact.topic.privacy":             { en: "Privacy / data request",
+                                          es: "Privacidad / solicitud de datos" },
+  "contact.topic.legal":               { en: "Legal / terms",
+                                          es: "Legal / términos" },
+  "contact.topic.press":               { en: "Press / partnerships",
+                                          es: "Prensa / colaboraciones" },
+  "contact.topic.abuse":               { en: "Takedown or abuse report",
+                                          es: "Eliminación de contenido o reporte de abuso" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

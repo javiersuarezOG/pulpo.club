@@ -13,8 +13,45 @@ export type EventMap = {
   "landing.viewed": {
     route: string;
   };
-  "consent.granted": { region?: string };
-  "consent.declined": { region?: string };
+  /** User accepted any optional cookie category. Pre-rebuild payload
+   *  carried only `region`; post-PR-E, `categories_accepted` and
+   *  `version` describe exactly what was granted. The optional `region`
+   *  stays for funnel backward-compat. */
+  "consent.granted": {
+    region?: string;
+    categories_accepted?: string[];
+    version?: number;
+  };
+  /** User declined all optional categories. Strictly-necessary stays on. */
+  "consent.declined": {
+    region?: string;
+    categories_accepted?: string[];
+    version?: number;
+  };
+  /** ConsentBanner rendered to the user. Distinguishes opt-out by
+   *  abandonment (no banner_shown follow-on event) from genuine opt-outs. */
+  "consent.banner_shown": { version: number };
+  /** User re-opened the ConsentBanner via a "Cookie Preferences" link.
+   *  `source` lets us tell footer-link drivers apart from in-banner
+   *  resets when that lands. */
+  "consent.preferences_opened": { source: "footer" | "banner" | "initial" };
+  /** User flipped a single category toggle in the preferences pane.
+   *  Lets us see drop-off mid-decision and which categories users
+   *  most often opt out of. */
+  "consent.category_toggled": {
+    category: "analytics" | "functional";
+    accepted: boolean;
+  };
+
+  // ───── Footer ─────
+  /** Any click on a footer link. `link` is a stable analytics key
+   *  (e.g. "terms", "privacy", "discover.beachfront", "cookie_preferences");
+   *  `surface` is the footer variant ("trimmed" on home/browse/legal pages,
+   *  "full" on saved/plans/account-when-enabled). */
+  "footer.link_clicked": {
+    link: string;
+    surface: "trimmed" | "full";
+  };
 
   // ───── Discover ─────
   // hero.cta_clicked: legacy Hero CTA — now fires from NewHomePage's
@@ -200,6 +237,21 @@ export type EventMap = {
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
   "detail.photo_lightbox_opened": { listing_id: string };
+  // Post-#305 the detail panel surfaces four in-panel upgrade CTAs.
+  // This event fires the moment any of them is clicked (before
+  // cta_routed / free_month_modal.shown) so dashboards can slice the
+  // detail-panel conversion funnel by which sub-CTA actually pulled
+  // the user into the modal. `listing_state` distinguishes off-market
+  // gated paths from active-listing gallery/USP unlocks.
+  "detail.upgrade_cta_clicked": {
+    cta_location:
+      | "broker_outbound"
+      | "locked_thumb"
+      | "locked_usp"
+      | "more_photos_overlay";
+    listing_id: string;
+    listing_state: "active" | "off_market";
+  };
   "save.toggled": {
     listing_id: string;
     auth_state: AuthState;
@@ -264,7 +316,12 @@ export type EventMap = {
       | "shelf_card"
       | "broker_outbound"
       | "favorites_action"
-      | "account_entry";
+      | "account_entry"
+      // PR #305 made shelf/browse cards passthrough → open ListingDetail;
+      // in-panel upgrade CTAs (broker outbound, locked thumb, locked USP,
+      // more-photos overlay) now route through this id so the conversion
+      // funnel reads a uniform cta_routed step regardless of entry surface.
+      | "detail_upgrade";
     user_state: "anonymous" | "free" | "pro" | "agency";
     branch: "stripe_checkout" | "paywall" | "free_signup" | "login_ui" | "passthrough" | "free_month_modal";
     flag_enabled: boolean;
@@ -341,6 +398,20 @@ export type EventMap = {
   // is the source of truth for the actual plan flip; this event is
   // user-experience-only.
   "upgrade.checkout_returned": { result: "success" | "cancelled" };
+  // Stripe → Pulpo landing anchor. Fires the moment the post-Stripe URL
+  // is detected (`?welcome=1` on /account or `?upgrade=success|cancelled`
+  // on /preview/), BEFORE Clerk hydration. Pair with welcome_modal.shown
+  // to distinguish "returned from Stripe" (this event) from "welcome
+  // modal mounted after Clerk hydration" (welcome_modal.shown variant=
+  // anon, can be delayed up to 5s). Post-Stripe activation funnels anchor
+  // on this rather than welcome_modal.shown.
+  "stripe.return_landed": {
+    surface:
+      | "account_welcome"
+      | "preview_upgrade_success"
+      | "preview_upgrade_cancelled";
+    result: "success" | "cancelled";
+  };
 
   // ───── /start landing (acquisition funnel) ─────
   // Standalone marketing page that funnels visitors into Stripe Checkout
@@ -421,6 +492,25 @@ export type EventMap = {
    *  with the user-visible "Couldn't resend" copy and feeds the
    *  support-volume signal. */
   "welcome_modal.resend_failed": Record<string, never>;
+  /** WelcomeModal anon variant fetched /api/clerk/invitation-status
+   *  on mount and got a discriminated response. `status` matches the
+   *  endpoint's return shape — invitation_pending is the happy path;
+   *  user_exists / no_email / webhook_pending are the previously-
+   *  silent failure modes the modal now surfaces to the user.
+   *  Slicing webhook.checkout_completed.invitation_sent against this
+   *  event tells us "what fraction of paying users see each variant"
+   *  end-to-end. */
+  "welcome_modal.invitation_status_resolved": {
+    status: "invitation_pending" | "user_exists" | "no_email"
+          | "webhook_pending" | "session_not_found" | "session_not_complete"
+          | "fetch_failed";
+  };
+  /** User_exists variant CTA → opens Clerk's hosted sign-in via
+   *  app.clerkActions.openSignIn (or falls back to legacy SignupModal
+   *  when Clerk is off). Captures the "I already have an account"
+   *  recovery path that pre-PR was completely silent — users sat on
+   *  the lying "check your inbox" copy forever. */
+  "welcome_modal.signin_existing_clicked": Record<string, never>;
 
   /** / home-page Pro upsell modal mounted (PR-B.5). `trigger` reflects
    *  which URL signal opened the modal — utm_* params, a ?code=… link,
@@ -472,7 +562,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     user_state: "anonymous" | "free";
     flag_enabled: boolean;
     has_code: boolean;
@@ -489,7 +580,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     action: "escape" | "backdrop" | "close_button" | "maybe_later";
   };
   /** Primary CTA clicked → POST /api/stripe/start-checkout. */
@@ -502,7 +594,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     has_code: boolean;
   };
   /** Fires immediately before window.location.assign(stripeUrl). */
@@ -515,7 +608,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     has_code: boolean;
   };
   /** Surface-side error. `reason` mirrors pro_upsell.* for parity. */
@@ -528,7 +622,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     reason: string;
   };
   /** Fires when an unrecognized URL (e.g. /test) gets cleanly
@@ -731,6 +826,30 @@ export type EventMap = {
     from_path: string | null;
     to_path: string;
     trigger: "click" | "back" | "forward" | "cold_load";
+  };
+
+  // ───── Legal-suite pages (PR legal-routes-shells) ─────
+  /** Fires on mount of any public legal route (/terms, /privacy, /cookies,
+   *  /subscription, /imprint, /contact). Lets us see drop-off + ToS-link
+   *  click-through from Stripe Checkout. `page=imprint` covers both the
+   *  /imprint and /impressum URLs (same route, two paths). */
+  "legal.page_viewed": {
+    page: "terms" | "privacy" | "cookies" | "subscription" | "imprint" | "contact";
+  };
+
+  // ───── Contact form (PR feat/contact-form) ─────
+  /** Fires once per /contact mount, the first time any form field gets
+   *  focus. Lets us split "viewed the page" from "started typing". */
+  "contact.form_opened": {
+    topic?: string;
+  };
+  /** Fires on every submit attempt — both the success path and every
+   *  failure path. NO PII in the payload: never includes email, name,
+   *  subject, or body. The server-side `api/contact.js` mirrors the
+   *  same shape. */
+  "contact.form_submitted": {
+    topic: string;
+    status: "success" | "validation_error" | "rate_limit" | "server_error";
   };
 };
 

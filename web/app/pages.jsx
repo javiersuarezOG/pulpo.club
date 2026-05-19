@@ -20,6 +20,7 @@ import {
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
+import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
@@ -112,7 +113,8 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
     + (f.price_max != null || f.price_min > 0 ? 1 : 0)
     + (f.master_category ? 1 : 0)
     + (f.subcategory ? 1 : 0)
-    + (f.discovery_tags?.size || 0);
+    + (f.discovery_tags?.size || 0)
+    + (f.include_incomplete ? 1 : 0);
 
   // Telemetry — fire browse.filter_changed once per logical filter
   // change. The event type has existed in events.ts since the
@@ -238,6 +240,15 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
               {t(`filter.tag.${tag}`, lc)}
             </button>
           ))}
+          {/* Inverse-semantic chip — opt-in to see listings where the
+              broker hasn't shared price or size. They sort below all
+              complete listings. */}
+          <button
+            className={`chip ${filters.include_incomplete ? "is-active" : ""}`}
+            onClick={() => update({ include_incomplete: !filters.include_incomplete })}
+          >
+            {t("filter.show_incomplete", lc)}
+          </button>
         </div>
       </FilterGroup>
 
@@ -840,6 +851,11 @@ function makeDefaultFilters() {
     master_category: null,                    // "beach" | "lake" | null
     subcategory: null,                        // "homes" | "condos" | "land" | null
     discovery_tags: new Set(),                // subset of {top_rated, under_250k, gated, waterfront}
+    // Inverse-semantic toggle. Defaults to false → listings where the
+    // broker hasn't shared price or size are hidden. Toggling on
+    // surfaces them at the bottom of the result set (ranker already
+    // hard-floored them, so the order is correct without extra work).
+    include_incomplete: false,
   };
 }
 
@@ -879,6 +895,9 @@ function buildTopRankMap(listings, n = 10) {
 function applyFilters(listings, f) {
   return listings.filter(l => {
     if (l.is_sold) return false;
+    // Quality gate — incomplete listings are hidden by default.
+    // The Browse FilterPanel chip flips `include_incomplete` to opt in.
+    if (l.is_incomplete && !f.include_incomplete) return false;
     if (f.zones.size && !f.zones.has(l.zone_name)) return false;
     if (f.land_types.size && !f.land_types.has(l.land_type)) return false;
     if (l.price < f.price_min) return false;
@@ -1009,15 +1028,19 @@ function BrowsePage({ app }) {
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
   // and stale filters carry over — clicking "All" leaves the previous category's
-  // chips still applied.
+  // chips still applied. We layer URL params on top so a cold-load with
+  // ?inc=1 / ?pmin=... survives the first render — without this overlay,
+  // the effect's mount-time fire reset URL-only flags to defaults.
   pUseEffect(() => {
     const f = buildFiltersForCategory(app.routeParams.category);
-    // Allow callers to seed additional filters via routeParams (e.g. zone scoping
-    // from "Browse similar listings in {zone}").
     if (Array.isArray(app.routeParams.zones) && app.routeParams.zones.length > 0) {
       f.zones = new Set(app.routeParams.zones);
     }
-    setFilters(f);
+    if (typeof window !== "undefined") {
+      setFilters(readFilterFromURL(window.location.search, f));
+    } else {
+      setFilters(f);
+    }
   }, [app.routeParams.category, app.routeParams.zones]);
 
   // Persist filter + sort + category to URLSearchParams (replaceState
@@ -1626,7 +1649,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
                     track("paywall.bypassed", {
                       kind: "detail_view", action: "upgrade", listing_id: listing.id,
                     });
-                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                    track("detail.upgrade_cta_clicked", {
+                      cta_location: i === 4 ? "more_photos_overlay" : "locked_thumb",
+                      listing_id: listing.id,
+                      listing_state: isOffMarket ? "off_market" : "active",
+                    });
+                    const branch = routeCtaForState("detail_upgrade", app?.user);
+                    trackCtaRouted("detail_upgrade", app?.user, branch, true);
+                    dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
                   } else {
                     openLightbox(i);
                   }
@@ -1665,20 +1695,41 @@ function ListingDetail({ listing, app, asPanel = true }) {
           </div>
         </div>
 
+        {listing.is_incomplete && (
+          <div
+            className="detail-broker-note"
+            role="note"
+            title={t("value.notshared.tooltip", lc)}
+          >
+            {t("detail.broker_note", lc)}
+          </div>
+        )}
+
         <div className="detail-keystats">
           <div className="kstat">
             <div className="kstat-label">{t("detail.price", lc)}</div>
-            <div className="kstat-value">{formatPrice(listing.price)}</div>
+            <div
+              className={listing.price == null ? "kstat-value muted" : "kstat-value"}
+              title={listing.price == null ? t("value.notshared.tooltip", lc) : undefined}
+            >{formatPrice(listing.price)}</div>
             {listing.previous_price && <div className="kstat-sub strike">{formatPrice(listing.previous_price)}</div>}
           </div>
           <div className="kstat">
             <div className="kstat-label">{t("detail.size", lc)}</div>
-            <div className="kstat-value">{formatSize(listing.size_m2)}</div>
+            <div
+              className={listing.size_m2 == null ? "kstat-value muted" : "kstat-value"}
+              title={listing.size_m2 == null ? t("value.notshared.tooltip", lc) : undefined}
+            >{formatSize(listing.size_m2)}</div>
           </div>
-          <div className="kstat">
-            <div className="kstat-label">{`$${ppmSuffix()}`}</div>
-            <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
-          </div>
+          {/* PPM derives from price + size; suppress the tile when
+              either is null so users see "Not shared" once on the
+              source field rather than twice on a derived stat. */}
+          {listing.price != null && listing.size_m2 != null && (
+            <div className="kstat">
+              <div className="kstat-label">{`$${ppmSuffix()}`}</div>
+              <div className="kstat-value">{formatPpm(listing.price_per_m2)}</div>
+            </div>
+          )}
           <div className="kstat">
             <div className="kstat-label">{t("detail.days_listed", lc)}</div>
             <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{typeof listing.days_listed === "number" ? listing.days_listed : "—"}</div>
@@ -1708,7 +1759,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
                     track("paywall.bypassed", {
                       kind: "detail_view", action: "upgrade", listing_id: listing.id,
                     });
-                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                    track("detail.upgrade_cta_clicked", {
+                      cta_location: "locked_usp",
+                      listing_id: listing.id,
+                      listing_state: isOffMarket ? "off_market" : "active",
+                    });
+                    const branch = routeCtaForState("detail_upgrade", app?.user);
+                    trackCtaRouted("detail_upgrade", app?.user, branch, true);
+                    dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
                   }}
                 >
                   {t("detail.unlock_pro_free_month", lc)}
@@ -1806,12 +1864,17 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 track("paywall.bypassed", {
                   kind: "detail_view", action: "upgrade", listing_id: listing.id,
                 });
-                // Branch label reflects what the matrix would route
-                // broker_outbound to for non-paid tiers; the actual
-                // dispatch goes straight to FreeMonthModal because the
-                // upgrade button IS the per-CTA paywall here.
-                trackCtaRouted("broker_outbound", app.user, "free_month_modal", true);
-                app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                track("detail.upgrade_cta_clicked", {
+                  cta_location: "broker_outbound",
+                  listing_id: listing.id,
+                  listing_state: isOffMarket ? "off_market" : "active",
+                });
+                // Uniform routing dispatch — the in-panel upgrade CTA is
+                // the per-CTA paywall here. detail_upgrade matrix row
+                // resolves to free_month_modal for anon/free.
+                const branch = routeCtaForState("detail_upgrade", app.user);
+                trackCtaRouted("detail_upgrade", app.user, branch, true);
+                dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
               }}
             >
               <Icon name="lock" size={16}/> {t("detail.unlock_pro_free_month", lc)}
@@ -2418,62 +2481,329 @@ function DataFetchFailed({ onRetry }) {
 }
 
 // ====== Cookie-consent banner shim ======
-// Defaults to opt-in outside the EU. EU detection is best-effort via
-// timezone — accurate enough for a non-binding consent prompt; the real
-// determination of GDPR applicability lives server-side once the
-// auth+legal stack lands.
-function detectEuRegion() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    return /^Europe\//.test(tz);
-  } catch { return false; }
-}
+// ConsentBanner — 9-point ConsentBanner technical contract from
+// legal_documents/03-cookie-policy.md (mirrors PDF §3.2). See
+// web/app/lib/consent.ts for the storage + migration helpers.
+//
+// Behaviour:
+//   - Shows on every visit until the user makes an affirmative choice.
+//     The pre-v1 "auto-grant outside the EU" behaviour is gone —
+//     ePrivacy + LGPD + UK PECR all require opt-in regardless, and
+//     the friction of one tap is worth the legal posture.
+//   - Two views: collapsed "summary" (Accept All / Decline All /
+//     Manage preferences) and expanded "preferences" (granular
+//     toggles per optional category + Save preferences).
+//   - Accept All + Decline All buttons have equal visual weight per
+//     PDF §3.2 #3. No dark patterns.
+//   - The Cookie Preferences footer button (#322) re-opens the banner
+//     by clearing the persisted record + dispatching the
+//     `pulpo:open-consent-preferences` event.
+//
+// Telemetry:
+//   - `consent.banner_shown { version }` on first render
+//   - `consent.granted` / `consent.declined` on each save with the
+//     accepted categories list
+//   - `consent.category_toggled` for each preferences-pane interaction
+//
+// PostHog opt-in / opt-out: optIn() only fires when the user accepts
+// the `analytics` category. telemetry/client.ts's `scheduleInit()`
+// is the load-bearing gate (no analytics script loads until
+// `hasConsented("analytics")`).
+
 function ConsentBanner({ locale = "en" }) {
-  const [decided, setDecided] = pUseState(() => {
-    try { return localStorage.getItem("pulpo-consent") || ""; }
-    catch { return ""; }
-  });
-  const region = detectEuRegion() ? "eu" : "non-eu";
-  // First-paint side-effect for non-EU: silently auto-grant if no
-  // decision is on file. Wrapped in useEffect so the localStorage
-  // write + telemetry emit happen exactly once and outside render.
-  // The event lets us tell auto-grants apart from explicit clicks
-  // when triaging consent funnels.
+  const [record, setRecord] = pUseState(readConsent);
+  const [view, setView] = pUseState("summary"); // "summary" | "preferences"
+  const [acceptAnalytics, setAcceptAnalytics] = pUseState(true);
+  const [acceptFunctional, setAcceptFunctional] = pUseState(true);
+  const [forcedOpen, setForcedOpen] = pUseState(false);
+  const shownFired = pUseRef(false);
+
+  const isOpen = record === null || forcedOpen;
+
+  // Fire `consent.banner_shown` once per render-into-view (one
+  // banner_shown per user-session "open"). The ref prevents double
+  // fire during StrictMode double-effect.
   pUseEffect(() => {
-    if (decided) return;
-    if (region !== "non-eu") return;
-    try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
-    setDecided("granted");
-    track("consent.granted", { region });
-    optIn();
-  }, [decided, region]);
+    if (!isOpen) return;
+    if (shownFired.current) return;
+    shownFired.current = true;
+    track("consent.banner_shown", { version: CONSENT_POLICY_VERSION });
+  }, [isOpen]);
 
-  if (decided === "granted" || decided === "declined") return null;
-  if (region !== "eu") return null;
+  // Re-open signal from the footer's Cookie Preferences button.
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setRecord(null);
+      setForcedOpen(true);
+      setView("summary");
+      setAcceptAnalytics(true);
+      setAcceptFunctional(true);
+      shownFired.current = false;
+    };
+    window.addEventListener("pulpo:open-consent-preferences", handler);
+    return () => window.removeEventListener("pulpo:open-consent-preferences", handler);
+  }, []);
 
-  const set = (decision) => {
-    try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }
-    setDecided(decision);
-    if (decision === "granted") {
-      track("consent.granted", { region });
-      optIn();
+  if (!isOpen) return null;
+
+  function commit(accepted) {
+    const r = writeConsent(accepted);
+    setRecord(r);
+    setForcedOpen(false);
+    setView("summary");
+
+    const acceptedAnalytics = accepted.includes("analytics");
+    const acceptedFunctional = accepted.includes("functional");
+    if (acceptedAnalytics) optIn(); else optOut();
+
+    if (acceptedAnalytics || acceptedFunctional) {
+      track("consent.granted", {
+        categories_accepted: r.accepted,
+        version: r.v,
+      });
     } else {
-      track("consent.declined", { region });
-      optOut();
+      track("consent.declined", {
+        categories_accepted: r.accepted,
+        version: r.v,
+      });
     }
+  }
+
+  const acceptAll  = () => commit(["analytics", "functional"]);
+  const declineAll = () => commit([]); // strictly_necessary only (implicit)
+  const saveCurrent = () => {
+    const accepted = [];
+    if (acceptAnalytics)  accepted.push("analytics");
+    if (acceptFunctional) accepted.push("functional");
+    commit(accepted);
   };
+
+  const onToggle = (category, next) => {
+    track("consent.category_toggled", { category, accepted: next });
+    if (category === "analytics")  setAcceptAnalytics(next);
+    if (category === "functional") setAcceptFunctional(next);
+  };
+
   return (
-    <div className="consent-banner" role="dialog" aria-label={t("consent.aria", locale)}>
-      <div className="consent-text">
-        {t("consent.body", locale)}
-      </div>
-      <div className="consent-actions">
-        <button className="btn-ghost" onClick={() => set("declined")}>{t("consent.decline", locale)}</button>
-        <button className="btn-primary" onClick={() => set("granted")}>{t("consent.accept", locale)}</button>
-      </div>
+    <div
+      className={`consent-banner consent-banner--${view}`}
+      role="dialog"
+      aria-modal="false"
+      aria-label={t("consent.aria", locale)}
+    >
+      <style>{CONSENT_BANNER_STYLES}</style>
+      {view === "summary" ? (
+        <>
+          <div className="consent-text">
+            {t("consent.body", locale)}
+          </div>
+          <div className="consent-actions">
+            <button
+              className="consent-btn consent-btn--manage"
+              onClick={() => {
+                track("consent.preferences_opened", { source: "banner" });
+                setView("preferences");
+              }}
+            >
+              {t("consent.manage", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--decline"
+              onClick={declineAll}
+            >
+              {t("consent.decline_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--accept"
+              onClick={acceptAll}
+            >
+              {t("consent.accept_all", locale)}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="consent-prefs">
+          <h2 className="consent-prefs__title">{t("consent.prefs.title", locale)}</h2>
+          <p className="consent-prefs__lede">{t("consent.prefs.lede", locale)}</p>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label">
+                {t("consent.category.strictly_necessary.label", locale)}
+              </label>
+              <span className="consent-prefs__category-always">
+                {t("consent.category.always_active", locale)}
+              </span>
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.strictly_necessary.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label" htmlFor="consent-toggle-analytics">
+                {t("consent.category.analytics.label", locale)}
+              </label>
+              <input
+                id="consent-toggle-analytics"
+                type="checkbox"
+                className="consent-prefs__toggle"
+                checked={acceptAnalytics}
+                onChange={(e) => onToggle("analytics", e.target.checked)}
+              />
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.analytics.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label" htmlFor="consent-toggle-functional">
+                {t("consent.category.functional.label", locale)}
+              </label>
+              <input
+                id="consent-toggle-functional"
+                type="checkbox"
+                className="consent-prefs__toggle"
+                checked={acceptFunctional}
+                onChange={(e) => onToggle("functional", e.target.checked)}
+              />
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.functional.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-actions consent-actions--prefs">
+            <button
+              className="consent-btn consent-btn--decline"
+              onClick={declineAll}
+            >
+              {t("consent.decline_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--accept"
+              onClick={acceptAll}
+            >
+              {t("consent.accept_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--save"
+              onClick={saveCurrent}
+            >
+              {t("consent.save", locale)}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+// Inline styles for the expanded preferences view. The base
+// `.consent-banner` rules live in styles/index.css.
+const CONSENT_BANNER_STYLES = `
+.consent-banner--preferences {
+  max-width: 560px;
+  align-items: stretch;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+.consent-prefs__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 28px;
+  margin: 0 0 4px;
+  color: var(--paper);
+  font-weight: 400;
+}
+.consent-prefs__lede {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--paper);
+  opacity: 0.85;
+  margin: 0 0 8px;
+}
+.consent-prefs__category {
+  padding: 12px 0;
+  border-top: 1px solid color-mix(in oklch, var(--paper) 20%, var(--ink));
+}
+.consent-prefs__category-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+.consent-prefs__category-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+}
+.consent-prefs__category-always {
+  font-size: 12px;
+  color: var(--paper);
+  opacity: 0.7;
+}
+.consent-prefs__category-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--paper);
+  opacity: 0.8;
+  margin: 6px 0 0;
+}
+.consent-prefs__toggle {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--paper);
+  cursor: pointer;
+}
+.consent-actions--prefs {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.consent-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.consent-btn--manage {
+  color: var(--paper);
+  background: transparent;
+  border-color: color-mix(in oklch, var(--paper) 40%, transparent);
+}
+.consent-btn--decline {
+  color: var(--paper);
+  background: transparent;
+  border-color: var(--paper);
+}
+.consent-btn--accept {
+  color: var(--ink);
+  background: var(--paper);
+}
+.consent-btn--save {
+  color: var(--ink);
+  background: var(--paper);
+}
+.consent-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+@media (max-width: 600px) {
+  .consent-banner--preferences { padding: 20px 16px; }
+  .consent-actions--prefs { justify-content: stretch; }
+  .consent-actions--prefs .consent-btn { flex: 1 1 auto; }
+}
+`;
 
 // ────────────────────────────────────────────────────────────────────
 // WelcomeModal — post-payment / post-Clerk-invitation landing overlay.
@@ -2512,6 +2842,15 @@ function WelcomeModal({ app, state, onClose }) {
   const variant = isSignedIn ? "signed_in" : "anon";
   const [resending, setResending] = pUseState(false);
   const [resendResult, setResendResult] = pUseState(null);
+  // Discriminated status from /api/clerk/invitation-status — fetched
+  // once on anon-variant mount (signed_in skips it; nothing to verify).
+  // Drives which copy the anon branch renders. Null = still fetching;
+  // see the four `welcome_modal.anon.status.*` i18n keys for the
+  // resolved-status copy. Pre-PR the anon body lied uniformly
+  // ("we just sent an invitation") regardless of which Path-B webhook
+  // outcome the user actually hit — see the postmortem in
+  // ~/.claude/plans/bug-report-post-stripe-bright-flurry.md.
+  const [statusInfo, setStatusInfo] = pUseState(null);
   const dialogRef = React.useRef(null);
 
   // Safety-net timeout: if Clerk never finishes hydrating we still
@@ -2548,6 +2887,59 @@ function WelcomeModal({ app, state, onClose }) {
     }
     return undefined;
   }, [renderReady, variant, onClose]);
+
+  // Invitation-status fetch — only meaningful for the anon variant.
+  // Mounts once when the modal is render-ready AND the user isn't
+  // signed in yet AND we have a session_id to verify against. The
+  // endpoint is read-only + idempotent so polling is safe; we poll
+  // ONCE on mount and re-poll after a 5s delay if the first response
+  // was `webhook_pending` (the only transient state — others are
+  // terminal). Pre-PR this whole flow was missing — the modal had no
+  // idea whether an invitation was actually created.
+  React.useEffect(() => {
+    if (!renderReady || isSignedIn) return undefined;
+    if (!state || !state.sessionId) return undefined;
+    let cancelled = false;
+    let retryTimer = null;
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch(
+          `/api/clerk/invitation-status?session_id=${encodeURIComponent(state.sessionId)}`,
+          { headers: { "Accept": "application/json" } },
+        );
+        if (cancelled) return;
+        if (!res.ok) {
+          setStatusInfo({ status: "fetch_failed" });
+          track("welcome_modal.invitation_status_resolved", { status: "fetch_failed" });
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        const status = (data && data.status) || "fetch_failed";
+        setStatusInfo({
+          status,
+          emailDomain: (data && data.email_domain) || "",
+        });
+        track("welcome_modal.invitation_status_resolved", { status });
+        // webhook_pending is transient — Stripe hasn't fired the
+        // webhook yet OR it's still inflight. Retry once after 5s
+        // to see if the server caught up. If still pending after
+        // the retry we leave the user on the pending copy with a
+        // "if it doesn't show up in 5 minutes, email us" escalation.
+        if (status === "webhook_pending") {
+          retryTimer = setTimeout(fetchStatus, 5000);
+        }
+      } catch {
+        if (cancelled) return;
+        setStatusInfo({ status: "fetch_failed" });
+        track("welcome_modal.invitation_status_resolved", { status: "fetch_failed" });
+      }
+    };
+    fetchStatus();
+    return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+  }, [renderReady, isSignedIn, state]);
 
   // ESC dismiss + focus trap entry — modeled on the SignupModal pattern.
   React.useEffect(() => {
@@ -2639,32 +3031,98 @@ function WelcomeModal({ app, state, onClose }) {
         </button>
         <div className="welcome-modal-eyebrow">{t("welcome_modal.eyebrow", lc)}</div>
         {variant === "anon" ? (
-          <>
-            <h2 className="welcome-modal-headline">{t("welcome_modal.anon.headline", lc)}</h2>
-            <p className="welcome-modal-body">{t("welcome_modal.anon.body", lc)}</p>
-            <a
-              className="welcome-modal-cta-primary"
-              href="https://mail.google.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
-            >
-              {t("welcome_modal.anon.cta_inbox", lc)}
-            </a>
-            <button
-              type="button"
-              className="welcome-modal-cta-secondary"
-              onClick={onResend}
-              disabled={resending}
-            >
-              {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
-            </button>
-            {resendResult && (
-              <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
-                {resendResult.msg}
-              </p>
-            )}
-          </>
+          (() => {
+            // Status-branched anon rendering — see the
+            // welcome_modal.anon.status.* i18n keys + the comment on
+            // statusInfo above. The default (statusInfo still null
+            // OR status === "invitation_pending") is the canonical
+            // "check inbox" copy. The three other branches surface
+            // outcomes the modal pre-PR rendered identically + wrong.
+            const status = statusInfo && statusInfo.status;
+            if (status === "user_exists") {
+              return (
+                <>
+                  <h2 className="welcome-modal-headline">{t("welcome_modal.anon.status.user_exists.headline", lc)}</h2>
+                  <p className="welcome-modal-body">
+                    {t("welcome_modal.anon.status.user_exists.body", lc, {
+                      email_domain: (statusInfo && statusInfo.emailDomain) || "your email",
+                    })}
+                  </p>
+                  <button
+                    type="button"
+                    className="welcome-modal-cta-primary"
+                    onClick={() => {
+                      track("welcome_modal.signin_existing_clicked", {});
+                      if (app.clerkActions && typeof app.clerkActions.openSignIn === "function") {
+                        app.clerkActions.openSignIn();
+                      } else if (typeof app.openSignup === "function") {
+                        app.openSignup({ mode: "login" });
+                      }
+                    }}
+                  >
+                    {t("welcome_modal.anon.status.user_exists.cta", lc)}
+                  </button>
+                </>
+              );
+            }
+            if (status === "no_email") {
+              return (
+                <>
+                  <h2 className="welcome-modal-headline">{t("welcome_modal.anon.status.no_email.headline", lc)}</h2>
+                  <p className="welcome-modal-body">{t("welcome_modal.anon.status.no_email.body", lc)}</p>
+                  <a
+                    className="welcome-modal-cta-primary"
+                    href="mailto:hello@pulpo.club?subject=Pulpo%20Pro%20activation%20help"
+                    onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
+                  >
+                    {t("welcome_modal.anon.status.no_email.cta", lc)}
+                  </a>
+                </>
+              );
+            }
+            // Default branch — covers invitation_pending (happy path,
+            // expected case), webhook_pending (still polling),
+            // session_not_found, session_not_complete, fetch_failed,
+            // AND the null-status pre-resolution window. Body switches
+            // to the webhook_pending wording when that's the resolved
+            // status so we don't lie about "we sent an invitation"
+            // while we're waiting for Stripe to actually fire the
+            // webhook. Resend CTA is always available — it's the
+            // user-facing escape hatch for any of the failure modes.
+            const isWebhookPending = status === "webhook_pending";
+            return (
+              <>
+                <h2 className="welcome-modal-headline">{t("welcome_modal.anon.headline", lc)}</h2>
+                <p className="welcome-modal-body">
+                  {isWebhookPending
+                    ? t("welcome_modal.anon.status.webhook_pending.body", lc)
+                    : t("welcome_modal.anon.body", lc)}
+                </p>
+                <a
+                  className="welcome-modal-cta-primary"
+                  href="https://mail.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
+                >
+                  {t("welcome_modal.anon.cta_inbox", lc)}
+                </a>
+                <button
+                  type="button"
+                  className="welcome-modal-cta-secondary"
+                  onClick={onResend}
+                  disabled={resending}
+                >
+                  {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
+                </button>
+                {resendResult && (
+                  <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
+                    {resendResult.msg}
+                  </p>
+                )}
+              </>
+            );
+          })()
         ) : (
           <>
             <h2 className="welcome-modal-headline">{t("welcome_modal.signedin.headline", lc)}</h2>

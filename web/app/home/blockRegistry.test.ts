@@ -65,13 +65,13 @@ describe("visibleBlocksFor — all flags off (rollback path)", () => {
   });
 });
 
-describe("visibleBlocksFor — paid_home_variant_v1 only", () => {
+describe("visibleBlocksFor — paid_home_variant_v1 only (production default)", () => {
   it("anonymous sees all blocks", () => {
     expect(visibleBlocksFor(anon as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS);
   });
 
-  it("free sees all blocks (filter is paid-only)", () => {
-    expect(visibleBlocksFor(free as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS);
+  it("free skips `usps` (the marketing band is anon-only) but keeps the rest", () => {
+    expect(visibleBlocksFor(free as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS_NO_USPS);
   });
 
   it("pro sees the trimmed paid-home list (hero image + shelves)", () => {
@@ -162,7 +162,7 @@ describe("visibleBlocksFor — defensive defaults", () => {
   it("treats unknown plan as free (per gating.ts tierFor)", () => {
     expect(
       visibleBlocksFor({ plan: "mystery_tier" as never } as never, PAID_HOME_ON),
-    ).toEqual(ALL_BLOCKS);
+    ).toEqual(ALL_BLOCKS_NO_USPS);
   });
 });
 

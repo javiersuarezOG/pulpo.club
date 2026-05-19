@@ -1,0 +1,26 @@
+{
+  "width": 2167,
+  "height": 1444,
+  "aspect_ratio": 1.501,
+  "file_size_kb": 4518.2,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:02:04.518418+00:00",
+  "source_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/07/cerromar-for-sale-3.png",
+  "original_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/07/cerromar-for-sale-3-1024x682.png",
+  "transform_used": "goodlife-strip-wp-size-suffix",
+  "fetched_at": "2026-05-19T14:02:04.770870+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 6.6,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.222 color_entropy=0.432"
+  }
+}

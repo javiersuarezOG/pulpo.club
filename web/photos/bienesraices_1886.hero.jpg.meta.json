@@ -1,0 +1,16 @@
+{
+  "width": 768,
+  "height": 1024,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 54.2,
+  "hero_eligible": false,
+  "card_eligible": false,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:39:01.950980+00:00",
+  "hero_photo_quality_score": 0,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/3666505/59854723/EB-NB6505.jpg?rasterize=true&version=1681054692",
+  "candidate_count": 5,
+  "picker_excluded_count": 5,
+  "repicked_at": "2026-05-19T13:39:01.951194+00:00"
+}

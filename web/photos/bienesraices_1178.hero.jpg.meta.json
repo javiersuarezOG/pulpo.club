@@ -1,0 +1,16 @@
+{
+  "width": 1024,
+  "height": 768,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 250.1,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T12:25:16.221948+00:00",
+  "hero_photo_quality_score": 70,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/5143376/88307346/EB-ST3376.jpg?rasterize=true&version=1755121104",
+  "candidate_count": 2,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T12:25:16.222140+00:00"
+}

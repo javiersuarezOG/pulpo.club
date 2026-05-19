@@ -1,0 +1,16 @@
+{
+  "width": 1024,
+  "height": 768,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 150.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:35:33.469351+00:00",
+  "hero_photo_quality_score": 60,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/4198764/69709244/EB-PC8764.jpeg?rasterize=true&version=1704050970",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T13:35:33.469513+00:00"
+}

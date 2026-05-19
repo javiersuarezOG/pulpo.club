@@ -24,6 +24,12 @@ import {
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
+// Legal-suite public routes (/terms, /privacy, /cookies, /subscription,
+// /imprint, /contact). LegalPage reads from web/app/config/legal-content.ts;
+// ContactPage is currently a shell — the actual form + api/contact.js
+// land in a follow-up PR.
+import { LegalPage } from "./pages/legal/LegalPage.jsx";
+import { ContactPage } from "./pages/legal/ContactPage.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
@@ -182,6 +188,17 @@ function App() {
   // history.back() is async — popstate fires next tick — so a second
   // call mid-flight would close more than one history entry.
   const closingRef = useRef(false);
+  // Body scrollY at the moment the user opened a listing from a section.
+  // Restored on close so back-from-detail lands them where they clicked,
+  // not at the top of the listings grid. Kept in a ref because the
+  // popstate listener captures it via the closure and stale state would
+  // restore yesterday's value.
+  const scrollBeforeListingOpenRef = useRef(null);
+  // Mirror of `route` for the popstate listener, which is registered
+  // once with [] deps and would otherwise see the route at mount.
+  // Needed to distinguish "modal close within the same section" (preserve
+  // scroll) from a real cross-section pop (scroll to top).
+  const routeRef = useRef(_initialParsed.route);
   const [detailViewCount, setDetailViewCount] = useState(() => {
     return +localStorage.getItem("pulpo-detail-views") || 0;
   });
@@ -303,6 +320,11 @@ function App() {
       // state we treat a popstate as "back"; forward is also a popstate
       // but the only practical difference for us is the trigger label.
       const trigger = event && event.state && event.state.forward ? "forward" : "back";
+      // Snapshot the route we're leaving before we schedule the update.
+      // The save/restore branch below needs to compare prev → next to
+      // tell "closing a detail panel within the same section" apart from
+      // a real cross-section pop.
+      const prevRoute = routeRef.current;
       setOpenListingId(parsed.openListingId);
       setRoute(parsed.route);
       // Account sub-section deep-links (`/account/notifications` etc.)
@@ -328,11 +350,39 @@ function App() {
         to_path: window.location.pathname + window.location.search,
         trigger,
       });
-      window.scrollTo(0, 0);
+      // Modal-close shape: detail panel is closing (openListingId →
+      // null), the underlying section is unchanged, and openListing
+      // captured a scrollY when the panel opened. Restore it on the
+      // next frame so React commits the overlay unmount first and the
+      // body's scrollHeight is back to the section's full extent
+      // (otherwise the browser clamps to whatever it currently is).
+      const isModalClose =
+        parsed.openListingId === null &&
+        prevRoute === parsed.route &&
+        scrollBeforeListingOpenRef.current != null;
+      if (isModalClose) {
+        const y = scrollBeforeListingOpenRef.current;
+        scrollBeforeListingOpenRef.current = null;
+        requestAnimationFrame(() => window.scrollTo(0, y));
+      } else {
+        // Real cross-section pop (or forward into a listing). Drop any
+        // stale saved scrollY — once the user leaves the originating
+        // section, the saved Y belongs to a layout that's no longer
+        // visible.
+        scrollBeforeListingOpenRef.current = null;
+        window.scrollTo(0, 0);
+      }
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+
+  // Keep routeRef in sync with the latest `route` state so the popstate
+  // listener (registered once with [] deps) reads the *current* route
+  // when it fires, not the route at mount time.
+  useEffect(() => {
+    routeRef.current = route;
+  }, [route]);
 
   // Marquee the document.title so the tab text scrolls like a
   // marquesina. Pure-cosmetic — pauses entirely when the user has
@@ -388,9 +438,17 @@ function App() {
     if (!status) return;
     if (status === "success") {
       track("upgrade.checkout_returned", { result: "success" });
+      track("stripe.return_landed", {
+        surface: "preview_upgrade_success",
+        result: "success",
+      });
       setToast({ id: Date.now(), message: t("upgrade.success_toast", locale) });
     } else if (status === "cancelled") {
       track("upgrade.checkout_returned", { result: "cancelled" });
+      track("stripe.return_landed", {
+        surface: "preview_upgrade_cancelled",
+        result: "cancelled",
+      });
       setToast({ id: Date.now(), message: t("upgrade.cancelled_toast", locale) });
     }
     params.delete("upgrade");
@@ -409,7 +467,23 @@ function App() {
   // <WelcomeModal> picks its variant from `user` state (anon vs
   // signed-in). Fires once on mount, then strips the param so a
   // refresh doesn't re-open the modal.
-  const [welcomeModalState, setWelcomeModalState] = useState(null);
+  // welcomeModalState is initialized SYNCHRONOUSLY from the URL via
+  // useState's initializer so the route-gate effect (which runs later
+  // in the same render-commit pass — see [./lib/route-gates.ts]) can
+  // see this state on first render. Prior implementation set it from
+  // a useEffect, by which point the URL strip below had already
+  // happened AND the gate effect had read the now-stripped URL → the
+  // ?welcome=1 bypass evaporated → the SignupModal opened on top of
+  // the WelcomeModal on every post-Stripe landing. The render-commit-
+  // pass ordering matters here; the test for it is in
+  // tests/e2e/preview-smoke.spec.ts ("welcome modal: gate-bypass
+  // prevents SignupModal flash").
+  const [welcomeModalState, setWelcomeModalState] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") !== "1") return null;
+    return { sessionId: params.get("session_id") || null };
+  });
   const welcomeParamHandledRef = useRef(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -417,16 +491,23 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("welcome") !== "1") return;
     welcomeParamHandledRef.current = true;
-    const sessionId = params.get("session_id") || null;
     params.delete("welcome");
     params.delete("session_id");
     const newSearch = params.toString();
     const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
     window.history.replaceState({}, "", newUrl);
-    setWelcomeModalState({ sessionId });
-    // Telemetry fires from inside the WelcomeModal component on mount
-    // (so the `variant` field reflects the auth state at render time,
-    // not the moment of the URL detection).
+    // Immediate-fire anchor for the post-Stripe activation funnel.
+    // welcome_modal.shown waits on Clerk hydration (up to 5s) and so is
+    // unreliable as a "did they return from Stripe?" signal. This event
+    // fires the moment the URL is detected — pair it with the later
+    // signin.completed to measure activation drop-off cleanly.
+    track("stripe.return_landed", {
+      surface: "account_welcome",
+      result: "success",
+    });
+    // welcomeModalState was already populated synchronously by the
+    // useState initializer above — no setState needed here. (See the
+    // race comment on the useState declaration.)
   }, []);
   const closeWelcomeModal = useCallback(() => setWelcomeModalState(null), []);
 
@@ -679,6 +760,14 @@ function App() {
       const target = pathForListing(id);
       // Don't push duplicate if already on /listing/<id>.
       if (window.location.pathname !== target) {
+        // Capture the section's scrollY so closing the panel returns
+        // the user where they clicked. Skip when already on a listing
+        // path (e.g. user navigated between detail entries) — the
+        // underlying section's Y was saved on the first open and we
+        // don't want to overwrite it with the detail panel's body Y.
+        if (!window.location.pathname.startsWith("/listing/")) {
+          scrollBeforeListingOpenRef.current = window.scrollY;
+        }
         window.history.pushState({ pulpo: true, listing: id }, "", target);
         track("route.changed", { from_path: fromPath, to_path: target, trigger: "click" });
       }
@@ -872,11 +961,16 @@ function App() {
   //
   // The gate doesn't render anything itself — this effect just opens
   // the modal. The page components show a placeholder behind it.
+  //
+  // /account?welcome=1 bypass: when the user is post-Stripe and
+  // doesn't have a Clerk session yet, welcomeModalState carries the
+  // signal (populated synchronously from URL via useState initializer
+  // higher up). The route-gates.ts searchParams check is kept as
+  // defense in depth, but the welcomeModalState short-circuit below
+  // is the load-bearing guard since the URL strip happens in the
+  // welcome effect.
   useEffect(() => {
-    // Pass current URL search params so route-gates.ts can honour the
-    // `?welcome=1` bypass for /account (post-Stripe / post-magic-link
-    // landing where the user has paid but doesn't have a Clerk session
-    // yet — PR-B.4b).
+    if (welcomeModalState) return;
     const searchParams = typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : undefined;
@@ -897,9 +991,23 @@ function App() {
       track("signup_modal.shown", { trigger: "manual", mode: "login" });
     }
     // Intentionally not depending on signupModal — that would re-fire
-    // every time the modal closes. We only care about route + user.
+    // every time the modal closes. We only care about route + user
+    // + welcomeModalState (for the post-Stripe bypass).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, user]);
+  }, [route, user, welcomeModalState]);
+
+  // Defensive close: if the gate already opened a SignupModal before
+  // welcomeModalState became truthy (e.g. a popstate that flipped
+  // route to /account with `?welcome=1` arriving on a later render),
+  // close that gate-triggered modal as soon as welcomeModalState
+  // resolves. Without this the user sees a stale SignupModal hanging
+  // around even after the WelcomeModal mounts.
+  useEffect(() => {
+    if (!welcomeModalState) return;
+    if (signupModal && signupModal.gateReason === "auth_required") {
+      setSignupModal(null);
+    }
+  }, [welcomeModalState, signupModal]);
 
   // PR-B.5 — home-page Pulpo Pro upsell modal. Triggered by HomePage's
   // mount-time effect when the URL carries a campaign signal (see
@@ -1022,6 +1130,12 @@ function App() {
         {route === "saved" && <SavedPage app={app} />}
         {route === "plans" && <PlansPage app={app} />}
         {route === "account" && <AccountPage app={app} />}
+        {route === "terms" && <LegalPage app={app} slug="terms" />}
+        {route === "privacy" && <LegalPage app={app} slug="privacy" />}
+        {route === "cookies" && <LegalPage app={app} slug="cookies" />}
+        {route === "subscription" && <LegalPage app={app} slug="subscription" />}
+        {route === "imprint" && <LegalPage app={app} slug="imprint" />}
+        {route === "contact" && <ContactPage app={app} />}
       </main>
 
       <SiteFooter app={app} locale={locale} tweaks={tweaks} />
