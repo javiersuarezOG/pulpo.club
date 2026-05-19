@@ -89,7 +89,7 @@ function useShelfScrolled(shelfKey, listRef) {
 const MIN_REAL_LISTINGS = 5;
 
 // Top 10: rank_score-sorted, must have at least one photo.
-function pickTopRanked(listings, n) {
+export function pickTopRanked(listings, n) {
   return [...listings]
     .filter((l) => l.rank_score != null && l.photos && l.photos.length > 0)
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))

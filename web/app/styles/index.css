@@ -641,29 +641,6 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-.photo-placeholder {
-  position: relative;
-  width: 100%;
-  background: linear-gradient(135deg, oklch(32% 0.04 60) 0%, oklch(22% 0.03 70) 100%);
-  border-radius: inherit;
-}
-.photo-placeholder-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  color: oklch(85% 0.04 60);
-  gap: 4px;
-}
-.photo-placeholder-zone {
-  font-family: var(--font-display);
-  font-size: 18px;
-  margin-top: 4px;
-}
-.photo-placeholder-type {
-  font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0.7;
-}
-
 .card-badge-row {
   position: absolute; top: 12px; left: 12px;
   display: flex; gap: 6px; z-index: 2;
