@@ -116,6 +116,43 @@ async function resolveImage(id) {
 }
 
 module.exports = async (req, res) => {
+  // ── Temporary diagnostic (remove after debugging post-PR #313 404s) ──
+  // Curl with ?debug=1 to see env + cdnBase + a live fetch outcome from
+  // inside the running serverless function.
+  if (req.query.debug === "1") {
+    const sample = "goodlife_2-bed-condominium-at-zonset-el-zonte-445694";
+    const base = cdnBaseUrl();
+    const heroViaBase = `${base}/photos/${sample}.hero.jpg`;
+    const heroViaPulpo = `https://pulpo.club/photos/${sample}.hero.jpg`;
+    const probe = async (url) => {
+      try {
+        const r = await fetch(url);
+        return {
+          ok: r.ok,
+          status: r.status,
+          contentLength: r.headers.get("content-length"),
+          contentType: r.headers.get("content-type"),
+        };
+      } catch (e) {
+        return { error: String(e && e.message), name: e && e.name };
+      }
+    };
+    return res.status(200).json({
+      env: {
+        PULPO_PUBLIC_BASE_URL: process.env.PULPO_PUBLIC_BASE_URL || null,
+        VERCEL_URL: process.env.VERCEL_URL || null,
+        VERCEL_BRANCH_URL: process.env.VERCEL_BRANCH_URL || null,
+        VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL || null,
+        VERCEL_REGION: process.env.VERCEL_REGION || null,
+        NODE_VERSION: process.version,
+      },
+      cdnBase: base,
+      probe_via_cdnBase: await probe(heroViaBase),
+      probe_via_pulpo_club: await probe(heroViaPulpo),
+      probe_external: await probe("https://example.com/"),
+    });
+  }
+
   const id = (req.query.id || "").toString();
   const ratio = (req.query.ratio || "1:1").toString();
   const size = SIZES[ratio];
