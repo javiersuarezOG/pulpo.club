@@ -30,6 +30,7 @@ The fallback path is the only behavior tests run.
 from __future__ import annotations
 
 import io
+import os
 from typing import Optional
 
 
@@ -315,6 +316,33 @@ def score_band(score: Optional[int]) -> str:
 
 _TEXT_OVERLAY_PENALTY = 50
 _NOT_HERO_ELIGIBLE_PENALTY = 10
+
+# Permanent picker exclusion threshold. Candidates with
+# cheap_quality_score < this value get flagged picker_excluded=True and
+# are never sent to the VLM booster on this run OR any future run
+# (persisted in web/data/picker_excluded.json keyed by sha1(bytes)).
+#
+# Rationale for 40: a 50 baseline minus the 10-point not-hero-eligible
+# penalty leaves a structurally-fine but resolution-borderline photo at
+# 40. Below 40 is either text-overlay (50pt penalty), or a bad technical
+# composite (small / blurry / wrong aspect). Tunable via
+# HERO_PICKER_MIN_CHEAP_SCORE env override.
+_DEFAULT_PICKER_MIN_CHEAP_SCORE = 40
+
+
+def picker_min_cheap_score() -> int:
+    """Effective floor — env override or default 40. Negative / unparseable
+    inputs fall through to the default; matches the same null-tolerance
+    pattern as the LLM_VISION_* knobs in aesthetic_vision.py."""
+    raw = os.environ.get("HERO_PICKER_MIN_CHEAP_SCORE")
+    if raw:
+        try:
+            v = int(raw)
+            if 0 <= v <= 100:
+                return v
+        except ValueError:
+            pass
+    return _DEFAULT_PICKER_MIN_CHEAP_SCORE
 
 
 def cheap_quality_score(

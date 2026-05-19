@@ -140,12 +140,29 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             detect_text_overlay as _detect_text_overlay,
             compute_image_metadata as _compute_image_metadata,
             cheap_quality_score as _cheap_quality_score,
+            picker_min_cheap_score as _picker_min_cheap_score,
         )
     except Exception:
         _compute_photo_score = None
         _detect_text_overlay = None
         _compute_image_metadata = None
         _cheap_quality_score = None
+        _picker_min_cheap_score = None
+
+    try:
+        from automation import picker_excluded as _picker_excluded_store
+    except Exception:
+        _picker_excluded_store = None
+
+    # Amortize the disk read across all candidates in this call.
+    if _picker_excluded_store is not None:
+        excluded_store = _picker_excluded_store.load_store()
+        excluded_store_dirty = False
+    else:
+        excluded_store = {}
+        excluded_store_dirty = False
+
+    floor = _picker_min_cheap_score() if _picker_min_cheap_score else 40
 
     cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
                               _PHOTO_CANDIDATES_CAP_DEFAULT))
@@ -185,6 +202,26 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             ) if _cheap_quality_score else (score if score is not None else 0)
         except Exception:
             cheap = score if score is not None else 0
+        # Quality-floor filter: a candidate whose cheap_score is below
+        # the floor gets permanently excluded — never sent to the VLM
+        # booster on this run OR any future run (persisted by sha1(bytes)
+        # in web/data/picker_excluded.json). Pre-existing entries in the
+        # store also flag the candidate as excluded; we don't re-evaluate
+        # the floor for known-excluded photos.
+        already_excluded = False
+        if _picker_excluded_store is not None:
+            if _picker_excluded_store.is_excluded(r.content, store=excluded_store):
+                already_excluded = True
+        picker_excluded = already_excluded or (cheap < floor)
+        if picker_excluded and not already_excluded and _picker_excluded_store is not None:
+            _picker_excluded_store.mark_excluded(
+                r.content,
+                cheap_score=cheap,
+                floor=floor,
+                store=excluded_store,
+                save=False,
+            )
+            excluded_store_dirty = True
         candidates.append({
             "url": url,
             "content": r.content,
@@ -192,7 +229,19 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             "has_text_overlay": has_text,
             "hero_eligible": hero_elig,
             "cheap_score": cheap,
+            "picker_excluded": picker_excluded,
         })
+    # Persist newly-flagged exclusions in one write per call. Cheap (single
+    # write), safe (atomic via Path.write_text), and amortized across all
+    # candidates the caller batched together.
+    if excluded_store_dirty and _picker_excluded_store is not None:
+        try:
+            _picker_excluded_store.save_store(excluded_store)
+        except Exception:
+            # Persistence failure is non-fatal — the in-memory flag still
+            # blocks the VLM call on this run. Future runs will just
+            # re-evaluate the floor.
+            pass
     return candidates
 
 
@@ -240,11 +289,16 @@ def _pick_winner_from_scored(
     if not scored_candidates:
         return (None, None, None, None)
 
-    # Prefer photos that are NOT flagged as text overlay. Treat None
-    # (OCR unavailable or decode-fail) as "not flagged" so missing OCR
-    # support doesn't disqualify every candidate.
-    non_text = [c for c in scored_candidates if c.get("has_text_overlay") is not True]
-    pool = non_text if non_text else list(scored_candidates)
+    # Prefer photos that are NOT flagged as text overlay AND NOT flagged
+    # picker_excluded (below quality floor). Same filter pattern: drop
+    # excluded ONLY when at least one non-excluded candidate exists so a
+    # listing with all-bad photos still gets a hero (graceful degrade —
+    # technical ranking decides among the dregs). Treat None for either
+    # flag as "not flagged" so missing signals don't disqualify everyone.
+    non_excluded = [c for c in scored_candidates if not c.get("picker_excluded")]
+    base = non_excluded if non_excluded else list(scored_candidates)
+    non_text = [c for c in base if c.get("has_text_overlay") is not True]
+    pool = non_text if non_text else base
 
     any_aesthetic = any(c.get("aesthetic") is not None for c in pool)
     if any_aesthetic:
@@ -314,6 +368,13 @@ def _select_top_pct_eligible(scored_per_listing, top_pct: int) -> set:
         for c in scored:
             content = c.get("content")
             if content is None:
+                continue
+            # Quality-floor filter: candidates flagged picker_excluded by
+            # _score_candidates_cheap (cheap_score below floor OR already
+            # in picker_excluded.json) never enter the VLM eligibility pool.
+            # Belt-and-suspenders: the flag is set in-memory upstream AND
+            # persisted by sha1 — either signal alone blocks the call.
+            if c.get("picker_excluded"):
                 continue
             key = _cache_key(content)
             if key in cache:
