@@ -200,6 +200,21 @@ export type EventMap = {
   // ───── Detail / Saves / Auth ─────
   "detail.opened": { listing_id: string; auth_state: AuthState; plan?: "free" | "pro" };
   "detail.photo_lightbox_opened": { listing_id: string };
+  // Post-#305 the detail panel surfaces four in-panel upgrade CTAs.
+  // This event fires the moment any of them is clicked (before
+  // cta_routed / free_month_modal.shown) so dashboards can slice the
+  // detail-panel conversion funnel by which sub-CTA actually pulled
+  // the user into the modal. `listing_state` distinguishes off-market
+  // gated paths from active-listing gallery/USP unlocks.
+  "detail.upgrade_cta_clicked": {
+    cta_location:
+      | "broker_outbound"
+      | "locked_thumb"
+      | "locked_usp"
+      | "more_photos_overlay";
+    listing_id: string;
+    listing_state: "active" | "off_market";
+  };
   "save.toggled": {
     listing_id: string;
     auth_state: AuthState;
@@ -264,7 +279,12 @@ export type EventMap = {
       | "shelf_card"
       | "broker_outbound"
       | "favorites_action"
-      | "account_entry";
+      | "account_entry"
+      // PR #305 made shelf/browse cards passthrough → open ListingDetail;
+      // in-panel upgrade CTAs (broker outbound, locked thumb, locked USP,
+      // more-photos overlay) now route through this id so the conversion
+      // funnel reads a uniform cta_routed step regardless of entry surface.
+      | "detail_upgrade";
     user_state: "anonymous" | "free" | "pro" | "agency";
     branch: "stripe_checkout" | "paywall" | "free_signup" | "login_ui" | "passthrough" | "free_month_modal";
     flag_enabled: boolean;
@@ -341,6 +361,20 @@ export type EventMap = {
   // is the source of truth for the actual plan flip; this event is
   // user-experience-only.
   "upgrade.checkout_returned": { result: "success" | "cancelled" };
+  // Stripe → Pulpo landing anchor. Fires the moment the post-Stripe URL
+  // is detected (`?welcome=1` on /account or `?upgrade=success|cancelled`
+  // on /preview/), BEFORE Clerk hydration. Pair with welcome_modal.shown
+  // to distinguish "returned from Stripe" (this event) from "welcome
+  // modal mounted after Clerk hydration" (welcome_modal.shown variant=
+  // anon, can be delayed up to 5s). Post-Stripe activation funnels anchor
+  // on this rather than welcome_modal.shown.
+  "stripe.return_landed": {
+    surface:
+      | "account_welcome"
+      | "preview_upgrade_success"
+      | "preview_upgrade_cancelled";
+    result: "success" | "cancelled";
+  };
 
   // ───── /start landing (acquisition funnel) ─────
   // Standalone marketing page that funnels visitors into Stripe Checkout
@@ -472,7 +506,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     user_state: "anonymous" | "free";
     flag_enabled: boolean;
     has_code: boolean;
@@ -489,7 +524,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     action: "escape" | "backdrop" | "close_button" | "maybe_later";
   };
   /** Primary CTA clicked → POST /api/stripe/start-checkout. */
@@ -502,7 +538,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     has_code: boolean;
   };
   /** Fires immediately before window.location.assign(stripeUrl). */
@@ -515,7 +552,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     has_code: boolean;
   };
   /** Surface-side error. `reason` mirrors pro_upsell.* for parity. */
@@ -528,7 +566,8 @@ export type EventMap = {
       | "featured_deal"
       | "hero_just_in"
       | "favorites_action"
-      | "browse_card";
+      | "browse_card"
+      | "detail_upgrade";
     reason: string;
   };
   /** Fires when an unrecognized URL (e.g. /test) gets cleanly

@@ -41,7 +41,8 @@ export type CtaId =
   | "shelf_card"            // home shelf card click (passthrough always)
   | "broker_outbound"       // detail-page CTA bar broker link (passthrough for paid)
   | "favorites_action"      // heart icon on a card / "Save" button
-  | "account_entry";        // nav avatar / "My account" entry point
+  | "account_entry"         // nav avatar / "My account" entry point
+  | "detail_upgrade";       // detail-panel in-panel upgrade CTAs (locked thumb/USP, broker outbound, more-photos overlay) — uniform dispatch via FreeMonthModal w/ trigger=detail_upgrade
 
 // ── Branch enum ──────────────────────────────────────────────────────
 //
@@ -155,6 +156,18 @@ const MATRIX: Record<CtaId, Record<Tier, Branch>> = {
     // they tap "My account" would be hostile.
     anonymous: "login_ui",
     free:      "passthrough",
+    pro:       "passthrough",
+    agency:    "passthrough",
+  },
+  detail_upgrade: {
+    // PR #305 made listing-card clicks passthrough so the user lands
+    // on the detail panel, then the in-panel upgrade CTAs (broker
+    // outbound, locked thumb, locked USP, more-photos overlay) all
+    // dispatch through this single id with trigger=detail_upgrade.
+    // Paid tiers should never see the in-panel upgrade CTAs (the
+    // panel renders the unlocked variants); passthrough is defensive.
+    anonymous: "free_month_modal",
+    free:      "free_month_modal",
     pro:       "passthrough",
     agency:    "passthrough",
   },
