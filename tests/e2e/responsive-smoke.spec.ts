@@ -45,9 +45,15 @@ const SECTIONS = [
   { path: "/plans",   surface: ".plans-page, .plan-card",    gated: false },
   { path: "/saved",   surface: ".saved-page, .modal-signup", gated: true  },
   { path: "/account", surface: ".account-page, .modal-signup", gated: true },
+  // 2026-05-19 — Post-Stripe activation landing. Anonymous render
+  // shows the WelcomeModal anon variant on top of the modal-signup
+  // overlay (gated /account). The new "invitation" body copy is
+  // longer than what shipped originally, so the 320px viewport is
+  // the one to watch for wrap/overflow regressions. Pro-seeded
+  // signed-in variant is covered in the "/account?welcome=1
+  // sub-sections (seeded user)" describe block below.
+  { path: "/account?welcome=1", surface: ".welcome-modal", gated: true },
   // Public marketing surface — no app shell, mount-time branch in app.jsx.
-  // /welcome was removed in PR-B.4b; the post-payment landing is now a
-  // modal on /account?welcome=1 (covered by the /account row above).
   { path: "/start",   surface: ".start-page",                 gated: false },
   // PR-B.5 — campaign-tagged home renders the <ProUpsellModal> overlay
   // on top of the regular home page. Both the underlying page AND the
@@ -131,6 +137,38 @@ const ACCOUNT_TABS = [
   { key: "subscription",  label: /Subscription|Suscripción/ },
   { key: "security",      label: /Security|Seguridad/ },
 ] as const;
+
+// 3. WelcomeModal signed-in variant — Pro seed lands on
+//    /account?welcome=1 and the modal renders its "you're all set"
+//    variant directly. The variant uses different DOM than the anon
+//    one (shorter body, single primary CTA) so overflow profiles
+//    differ — covered separately at every viewport. Free seed isn't
+//    tested here because the anon variant overflow is already
+//    exercised by the SECTIONS sweep above.
+test.describe("responsive — /account?welcome=1 signed-in (Pro seed)", () => {
+  for (const vp of VIEWPORTS) {
+    test(`/account?welcome=1 · pro user @ ${vp.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await seedUser(page, "pro");
+      const errors = attachErrorRecorder(page);
+
+      await page.goto("/account?welcome=1", { waitUntil: "networkidle" });
+      await page.locator(".welcome-modal").waitFor({
+        state: "visible",
+        timeout: 10_000,
+      });
+      // The signed-in variant auto-dismisses after ~3.2s. Measure
+      // overflow well before that so the modal is still in the DOM.
+      await page.waitForTimeout(300);
+
+      assertNoOverflow(
+        await measureOverflow(page),
+        `/account?welcome=1 · pro user @ ${vp.name}`,
+      );
+      expect(errors, `console errors on /account?welcome=1 · pro @ ${vp.name}`).toEqual([]);
+    });
+  }
+});
 
 test.describe("responsive — /account sub-sections (seeded user)", () => {
   for (const seed of ["free", "pro"] as const) {
