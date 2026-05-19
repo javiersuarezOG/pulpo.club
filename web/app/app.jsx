@@ -182,6 +182,17 @@ function App() {
   // history.back() is async — popstate fires next tick — so a second
   // call mid-flight would close more than one history entry.
   const closingRef = useRef(false);
+  // Body scrollY at the moment the user opened a listing from a section.
+  // Restored on close so back-from-detail lands them where they clicked,
+  // not at the top of the listings grid. Kept in a ref because the
+  // popstate listener captures it via the closure and stale state would
+  // restore yesterday's value.
+  const scrollBeforeListingOpenRef = useRef(null);
+  // Mirror of `route` for the popstate listener, which is registered
+  // once with [] deps and would otherwise see the route at mount.
+  // Needed to distinguish "modal close within the same section" (preserve
+  // scroll) from a real cross-section pop (scroll to top).
+  const routeRef = useRef(_initialParsed.route);
   const [detailViewCount, setDetailViewCount] = useState(() => {
     return +localStorage.getItem("pulpo-detail-views") || 0;
   });
@@ -303,6 +314,11 @@ function App() {
       // state we treat a popstate as "back"; forward is also a popstate
       // but the only practical difference for us is the trigger label.
       const trigger = event && event.state && event.state.forward ? "forward" : "back";
+      // Snapshot the route we're leaving before we schedule the update.
+      // The save/restore branch below needs to compare prev → next to
+      // tell "closing a detail panel within the same section" apart from
+      // a real cross-section pop.
+      const prevRoute = routeRef.current;
       setOpenListingId(parsed.openListingId);
       setRoute(parsed.route);
       // Account sub-section deep-links (`/account/notifications` etc.)
@@ -328,11 +344,39 @@ function App() {
         to_path: window.location.pathname + window.location.search,
         trigger,
       });
-      window.scrollTo(0, 0);
+      // Modal-close shape: detail panel is closing (openListingId →
+      // null), the underlying section is unchanged, and openListing
+      // captured a scrollY when the panel opened. Restore it on the
+      // next frame so React commits the overlay unmount first and the
+      // body's scrollHeight is back to the section's full extent
+      // (otherwise the browser clamps to whatever it currently is).
+      const isModalClose =
+        parsed.openListingId === null &&
+        prevRoute === parsed.route &&
+        scrollBeforeListingOpenRef.current != null;
+      if (isModalClose) {
+        const y = scrollBeforeListingOpenRef.current;
+        scrollBeforeListingOpenRef.current = null;
+        requestAnimationFrame(() => window.scrollTo(0, y));
+      } else {
+        // Real cross-section pop (or forward into a listing). Drop any
+        // stale saved scrollY — once the user leaves the originating
+        // section, the saved Y belongs to a layout that's no longer
+        // visible.
+        scrollBeforeListingOpenRef.current = null;
+        window.scrollTo(0, 0);
+      }
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+
+  // Keep routeRef in sync with the latest `route` state so the popstate
+  // listener (registered once with [] deps) reads the *current* route
+  // when it fires, not the route at mount time.
+  useEffect(() => {
+    routeRef.current = route;
+  }, [route]);
 
   // Marquee the document.title so the tab text scrolls like a
   // marquesina. Pure-cosmetic — pauses entirely when the user has
@@ -710,6 +754,14 @@ function App() {
       const target = pathForListing(id);
       // Don't push duplicate if already on /listing/<id>.
       if (window.location.pathname !== target) {
+        // Capture the section's scrollY so closing the panel returns
+        // the user where they clicked. Skip when already on a listing
+        // path (e.g. user navigated between detail entries) — the
+        // underlying section's Y was saved on the first open and we
+        // don't want to overwrite it with the detail panel's body Y.
+        if (!window.location.pathname.startsWith("/listing/")) {
+          scrollBeforeListingOpenRef.current = window.scrollY;
+        }
         window.history.pushState({ pulpo: true, listing: id }, "", target);
         track("route.changed", { from_path: fromPath, to_path: target, trigger: "click" });
       }
