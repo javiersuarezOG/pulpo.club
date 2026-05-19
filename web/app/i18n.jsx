@@ -520,7 +520,7 @@ const UI_STRINGS = {
   // page brand.
   "saved.title":             { en: "Favorites",           es: "Favoritos" },
   "saved.empty.title":       { en: "Your saved listings will appear here",
-                               es: "Tus propiedades guardadas aparecerán aquí" },
+                               es: "Aquí van a aparecer las propiedades que guardes" },
   "saved.empty.body":        { en: "Browse listings and tap ♡ to save the ones that interest you.",
                                es: "Explora las propiedades y toca ♡ para guardar las que te interesen." },
 
@@ -528,12 +528,12 @@ const UI_STRINGS = {
   "toast.saved":             { en: "Saved to your shortlist", es: "Guardado en tu lista" },
   "toast.removed":           { en: "Removed from saved",   es: "Eliminado de guardados" },
   "toast.welcome":           { en: "✓ Welcome! Your account is ready.",
-                               es: "✓ ¡Bienvenido! Tu cuenta está lista." },
+                               es: "✓ ¡Bienvenido! Tu cuenta ya está lista." },
   "toast.logged_out":        { en: "Logged out",           es: "Sesión cerrada" },
 
   // Footer
   "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
-                               es: "Propiedades que valen la pena en El Salvador." },
+                               es: "Las propiedades que valen la pena en El Salvador." },
   "footer.country_badge":    { en: "Listings in El Salvador",
                                es: "Propiedades en El Salvador" },
 
@@ -544,7 +544,7 @@ const UI_STRINGS = {
   "stats.sources":           { en: "sources",  es: "fuentes" },
   "stats.listings":          { en: "listings", es: "propiedades" },
   "stats.updated":           { en: "updated",  es: "actualizado" },
-  "stats.info_label":        { en: "Pulpo data freshness", es: "Frescura de los datos de Pulpo" },
+  "stats.info_label":        { en: "Pulpo data freshness", es: "Última actualización de los datos de Pulpo" },
 
   // Units toggle (PR-4c) — vrs² is the Salvadoran traditional area unit.
   "units.label":             { en: "Show areas in", es: "Mostrar áreas en" },
@@ -617,10 +617,10 @@ const UI_STRINGS = {
   "detail.fact.zoning":      { en: "Zoning",                        es: "Zonificación" },
   "detail.fact.photos":      { en: "Photos",                        es: "Fotos" },
   "detail.signup_to_view_source": { en: "Sign up free to view source listing",
-                               es: "Crea cuenta gratis para ver la fuente" },
+                               es: "Crea una cuenta gratis para ver el anuncio original" },
   "detail.view_on":          { en: "View on {source}",              es: "Ver en {source}" },
   "detail.off_market_inquire": { en: "Off-market — see Plans to inquire",
-                               es: "Off-market — consulta los planes" },
+                               es: "Off-market — mira los planes para contactar" },
   "detail.save":             { en: "Save",                          es: "Guardar" },
   "detail.saved":            { en: "Saved",                         es: "Guardado" },
   // Single shared CTA for every gated upgrade point inside ListingDetail
@@ -632,24 +632,24 @@ const UI_STRINGS = {
   // affordances + this single CTA convey enough; reintroduce per-site
   // keys later if A/B tests show a lift.
   "detail.unlock_pro_free_month": { en: "Start Pulpo Pro — first month free",
-                                     es: "Contrata Pulpo Pro — 1 mes gratis" },
+                                     es: "Empieza con Pulpo Pro — primer mes gratis" },
   "detail.more_photos":      { en: "+{n} photos",                   es: "+{n} fotos" },
-  "detail.signup_for_pin":   { en: "Sign up for precise pin",       es: "Crea cuenta para ver el pin exacto" },
+  "detail.signup_for_pin":   { en: "Sign up for precise pin",       es: "Crea una cuenta para ver la ubicación exacta" },
   "detail.sold_banner.title": { en: "This listing has been sold or removed.",
                                es: "Esta propiedad fue vendida o retirada." },
   "detail.sold_banner.days": { en: "It was on the market for {n} days.",
                                es: "Estuvo en el mercado durante {n} días." },
   "detail.sold_banner.cta":  { en: "Browse similar listings in {zone} →",
                                es: "Ver propiedades similares en {zone} →" },
-  "detail.paywall.title":    { en: "Off-market deal",               es: "Trato off-market" },
+  "detail.paywall.title":    { en: "Off-market deal",               es: "Oferta off-market" },
   "detail.paywall.body":     { en: "This listing isn't public anywhere else. Pulpo Pro members get direct access plus broker intros.",
-                               es: "Esta propiedad no es pública en ningún otro lugar. Los miembros Pulpo Pro tienen acceso directo y conexiones con corredores." },
+                               es: "Esta propiedad no está publicada en ningún otro sitio. Los miembros Pulpo Pro reciben acceso directo y conexión con el corredor." },
   "detail.paywall.see_plans": { en: "See plans",                    es: "Ver planes" },
-  "detail.paywall.have_account": { en: "I have an account",         es: "Ya tengo cuenta" },
+  "detail.paywall.have_account": { en: "I have an account",         es: "Ya tengo una cuenta" },
   "detail.gallery.open":     { en: "Open photo gallery",            es: "Abrir galería de fotos" },
   "detail.gallery.open_n":   { en: "Open photo {n}",                es: "Abrir foto {n}" },
   "detail.gallery.locked_aria": { en: "Sign up to unlock more photos",
-                               es: "Crea cuenta para desbloquear más fotos" },
+                               es: "Crea una cuenta para desbloquear más fotos" },
 
   // Lightbox
   "lightbox.close":          { en: "Close photo gallery (Escape)",  es: "Cerrar galería (Escape)" },
@@ -677,7 +677,7 @@ const UI_STRINGS = {
   "data_fetch_failed.title": { en: "We couldn't load the listings.",
                                es: "No pudimos cargar las propiedades." },
   "data_fetch_failed.body":  { en: "This is on us. The data feed didn't respond — try again in a moment.",
-                               es: "Es de nuestro lado. El feed de datos no respondió — inténtalo en un momento." },
+                               es: "El problema es nuestro. El servidor de datos no respondió — inténtalo en un momento." },
 
   // Newsletter CTA — deleted in the rewrite cutover (Phase 9) with the
   // legacy NewsletterCTA component. The new homepage's hero email
