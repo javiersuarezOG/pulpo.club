@@ -1,0 +1,16 @@
+{
+  "width": 1200,
+  "height": 900,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 260.2,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:00:48.584650+00:00",
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/3029913/48320874/EB-KP9913.jpg?rasterize=true&version=1654799577",
+  "candidate_count": 1,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T13:00:48.584800+00:00"
+}
