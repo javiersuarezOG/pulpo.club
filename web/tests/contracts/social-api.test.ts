@@ -59,12 +59,17 @@ function authHeaders(): Record<string, string> {
       expect("hero_photo_quality_score" in quality).toBe(true);
     });
 
-    // Pick the first listing whose source is large enough for the 4:5 crop
-    // (the strictest of the two canonical sizes — 1080×1350). #255's
+    // Pick the first listing whose hires source is large enough for the 4:5
+    // crop (the strictest of the two canonical sizes — 1080×1350). #255's
     // refuse-to-upscale guard returns 404 source_too_small for anything
-    // smaller, so the rank-#1 listing isn't a safe pick unless its hero
-    // happens to be ≥1080×1350. We page through the listings response,
-    // mirroring pulpo-social's pre-filter logic.
+    // smaller, so the rank-#1 listing isn't a safe pick unless its hires
+    // bytes are ≥1080×1350. We page through the listings response, mirroring
+    // pulpo-social's pre-filter logic.
+    //
+    // Reads quality.hires_width / quality.hires_height (populated by plan v2's
+    // _download_hires_photos from the broker's NATIVE bytes). The legacy
+    // quality.source_width / source_height fields report the post-clamp hero
+    // derivative dims (≤1920×1080) and so never clear the 1080×1350 4:5 bar.
     async function findEligibleListingId(): Promise<string> {
       const res = await fetch(
         `${PULPO_API_BASE}/api/social/listings?limit=50`,
@@ -75,24 +80,26 @@ function authHeaders(): Record<string, string> {
         listings: Array<{
           id: string;
           quality?: {
-            source_width?: number | null;
-            source_height?: number | null;
+            hires_width?: number | null;
+            hires_height?: number | null;
+            hires_available?: boolean | null;
           };
         }>;
       };
       const TARGET_W = 1080;
       const TARGET_H = 1350; // 4:5 is the tallest canonical
       const hit = data.listings.find((l) => {
-        const w = l.quality?.source_width ?? 0;
-        const h = l.quality?.source_height ?? 0;
-        return w >= TARGET_W && h >= TARGET_H;
+        const w = l.quality?.hires_width ?? 0;
+        const h = l.quality?.hires_height ?? 0;
+        const available = l.quality?.hires_available !== false;
+        return available && w >= TARGET_W && h >= TARGET_H;
       });
       if (!hit) {
         throw new Error(
-          `no listing with source ≥${TARGET_W}×${TARGET_H} in top 50 — ` +
-          `data drift or hero-eligibility regression. ` +
-          `Check pulpo-nightly's photo pipeline and source_width/source_height ` +
-          `population in ranked.json.`
+          `no listing with hires source ≥${TARGET_W}×${TARGET_H} in top 50 — ` +
+          `data drift or hires-backfill regression. ` +
+          `Check the hires pipeline (PULPO_HIRES_ENABLED) and hires_width/` +
+          `hires_height population in ranked.json.`
         );
       }
       return hit.id;

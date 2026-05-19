@@ -205,4 +205,22 @@ export interface Listing {
     // width/height). null on rows that pre-date the Phase-A3 backfill.
     source_width: number | null;
     source_height: number | null;
+
+    // ── Parallel hi-res derivative (plan v2) ────────────────────────────
+    // Populated by automation/run.py::_download_hires_photos when
+    // PULPO_HIRES_ENABLED=1. Source of truth is the per-file sidecar at
+    // web/photos-hires/<source>_<source_id>.hires.jpg.meta.json. These
+    // fields report the broker's NATIVE source dimensions (in contrast
+    // to source_width/source_height above, which reflect the post-clamp
+    // 1920×1080 hero derivative dims). Downstream consumers (pulpo-social,
+    // Instagram Reels 4:5 path, etc.) should prefer hires_* fields when
+    // deciding whether a listing can render at a target canonical size.
+    // All null until the hires backfill has run.
+    hires_available: boolean | null;
+    hires_eligible: boolean | null;
+    hires_width: number | null;
+    hires_height: number | null;
+    hires_photo_quality_score: number | null;
+    hires_resdet_upscaled: boolean | null;
+    hires_quarantined: boolean | null;
 }
