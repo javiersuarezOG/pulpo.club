@@ -170,3 +170,82 @@ class _ResponseShim:
     def __init__(self, payload):
         self.choices = [self._Choice(payload)]
         self.usage = self._Usage()
+
+
+# ── LLM commentary cost-guard cap (PR-7 audit item #17) ─────────────────
+
+def test_commentary_cap_falls_back_to_deterministic(captured_events, ranked_pool, monkeypatch):
+    """Once the per-process LLM commentary counter hits the cap, further
+    requests fall back to the deterministic generator regardless of the
+    LLM toggle. Defends against a runaway workflow_dispatch loop driving
+    DeepSeek spend without a cost guard."""
+    from tests.newsletter.test_llm_commentary import GOOD_PAYLOAD, StubClient
+    build_mod = _BUILD_ISSUE_MODULE   # see top-of-file comment about the function/module shadow
+
+    # Tight cap of 1 so a single issue uses up the budget. Reset the
+    # counter to a deterministic baseline — tests don't run in isolation
+    # by default.
+    monkeypatch.setenv(build_mod.LLM_COMMENTARY_CAP_ENV, "1")
+    build_mod.reset_llm_commentary_counter()
+
+    stub = StubClient(lambda _kw: _ResponseShim(GOOD_PAYLOAD))
+
+    # First call: under cap, uses LLM.
+    build_issue(
+        recipient=_make_recipient(),
+        ranked_listings=ranked_pool,
+        issue_number=1,
+        issue_date=ISSUE_DATE,
+        history_rows=[],
+        llm_client_override=stub,
+    )
+
+    # Second call: cap reached. Falls back to deterministic — but the
+    # client_override path still goes through the LLM branch unless we
+    # also turn off the override. The cap check ONLY trips when
+    # llm_client_override is None (production path), so simulate the
+    # production wiring by removing the override + flipping the env
+    # toggle on. The counter already incremented on the first call.
+    monkeypatch.setenv("PULPO_NEWSLETTER_USE_LLM", "1")
+    capture_count = len(captured_events)
+
+    build_issue(
+        recipient=_make_recipient(email_hash="second-rec"),
+        ranked_listings=ranked_pool,
+        issue_number=2,
+        issue_date=ISSUE_DATE,
+        history_rows=[],
+    )
+
+    # The new commentary event came from the cap-triggered fallback path.
+    new_events = captured_events[capture_count:]
+    commentary_props = next(p for name, p in new_events if name == "newsletter.commentary_generated")
+    assert commentary_props["source"] == "deterministic_cap_reached", (
+        f"expected cap-triggered fallback, got source={commentary_props['source']!r}"
+    )
+
+
+def test_commentary_cap_default_value():
+    """Pin the default cap so a future code edit doesn't silently raise
+    it (or worse, drop it to zero and disable the LLM path entirely)."""
+    build_mod = _BUILD_ISSUE_MODULE   # see top-of-file comment about the function/module shadow
+    assert build_mod.LLM_COMMENTARY_CAP_DEFAULT == 50, (
+        "Cap default changed — confirm the new value matches the "
+        "workflow cohort count + headroom (see audit item #17 in PR-7)."
+    )
+
+
+def test_commentary_cap_honors_env_override(monkeypatch):
+    """Operator can raise the cap via PULPO_NEWSLETTER_LLM_MAX_COMMENTARIES.
+    The reader uses the PR-2 env helper so empty / whitespace values
+    fall back to the default cleanly."""
+    build_mod = _BUILD_ISSUE_MODULE   # see top-of-file comment about the function/module shadow
+
+    monkeypatch.setenv(build_mod.LLM_COMMENTARY_CAP_ENV, "200")
+    assert build_mod._llm_commentary_cap() == 200
+
+    monkeypatch.setenv(build_mod.LLM_COMMENTARY_CAP_ENV, "")
+    assert build_mod._llm_commentary_cap() == build_mod.LLM_COMMENTARY_CAP_DEFAULT
+
+    monkeypatch.delenv(build_mod.LLM_COMMENTARY_CAP_ENV, raising=False)
+    assert build_mod._llm_commentary_cap() == build_mod.LLM_COMMENTARY_CAP_DEFAULT
