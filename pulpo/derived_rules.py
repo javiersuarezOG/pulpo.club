@@ -337,6 +337,23 @@ def derive_land_type(li: Any) -> Optional[str]:
     return None
 
 
+def derive_is_incomplete(li: Any) -> bool:
+    """Quality gate: True when the broker hasn't shared price or area.
+
+    Used by the ranker to hard-floor `rank_score` so a complete listing
+    always sorts above an incomplete one, and by the FE to exclude
+    incomplete listings from Discover shelves + the default Browse
+    view. Users opt back in via a filter chip; the detail page always
+    renders (direct links must work) and surfaces a "broker hasn't
+    shared full info" note plus per-field "Not shared" copy.
+
+    Runs *before* ranker.rank() in automation/run.py.
+    """
+    price = _g(li, "price_usd")
+    area = _g(li, "area_m2")
+    return price is None or area is None
+
+
 # ─────────────────────────────────────────────────────────────────────
 # New IA derives — master_category, subcategory, discovery_tags,
 # star_rating. Power the homepage category grid + discovery pills +

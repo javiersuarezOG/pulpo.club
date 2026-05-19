@@ -101,4 +101,10 @@ export type Listing = {
   subcategory: Subcategory | null;
   discovery_tags: DiscoveryTag[];
   star_rating: number;
+  // True when the source broker hasn't shared price OR size_m2.
+  // Excluded from Discover shelves and the default Browse view; users
+  // opt back in via the FilterPanel "Show missing details" chip. The
+  // detail page always renders (direct links must work) and shows a
+  // broker-hasn't-shared note plus per-field "Not shared" copy.
+  is_incomplete: boolean;
 };

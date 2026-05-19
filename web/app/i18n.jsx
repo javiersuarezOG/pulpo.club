@@ -425,6 +425,10 @@ const UI_STRINGS = {
   "filter.tag.under_250k":       { en: "Under $250K",     es: "Menos de $250K" },
   "filter.tag.gated":            { en: "Gated",           es: "Privado / cerrado" },
   "filter.tag.waterfront":       { en: "Waterfront",      es: "Frente al agua" },
+  // Inverse-semantic chip: OFF by default hides listings where the
+  // broker hasn't shared price or size; ON brings them in at the
+  // bottom of the ranking.
+  "filter.show_incomplete":      { en: "Show missing details", es: "Ver con datos faltantes" },
 
   // Sort dropdown — rewrite-canonical labels (existing sort keys
   // stay; only the visible label changes so saved URLs still work).
@@ -498,6 +502,17 @@ const UI_STRINGS = {
   "detail.price":            { en: "Price",               es: "Precio" },
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
+  // Used on cards + detail keystats wherever price or size is null.
+  // Surfaces the "broker hasn't shared" semantic instead of a bare
+  // em-dash. The tooltip explains the next step.
+  "value.notshared.short":   { en: "Not shared",          es: "No compartido" },
+  "value.notshared.tooltip": { en: "The broker hasn't shared this. Contact them for details.",
+                               es: "El broker no ha compartido este dato. Contáctalo para más información." },
+  // Inline note rendered above the detail-page description for any
+  // listing where price OR size is missing. Pairs with the per-field
+  // "Not shared" copy.
+  "detail.broker_note":      { en: "The broker hasn't shared full details for this listing. Contact them to confirm price and size.",
+                               es: "El broker no ha compartido todos los datos de esta propiedad. Contáctalo para confirmar precio y tamaño." },
 
   // Saved — page title matches the nav-bar label ("Favorites"). The
   // URL is still /saved (Wave 3b renames it). Past-tense "saved"
@@ -727,12 +742,39 @@ const UI_STRINGS = {
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 
-  // Consent banner (GDPR)
+  // Consent banner (GDPR / ePrivacy / LGPD)
+  //
+  // Implements the 9-point ConsentBanner contract from
+  // legal_documents/03-cookie-policy.md. EN + ES coverage from day one;
+  // a Spanish-counsel review pass will follow before incorporation.
   "consent.aria":            { en: "Cookie consent",                es: "Consentimiento de cookies" },
-  "consent.body":            { en: "Pulpo uses analytics cookies to improve the site. No third-party ads.",
-                               es: "Pulpo usa cookies analíticas para mejorar el sitio. Sin anuncios de terceros." },
+  "consent.body":            { en: "Pulpo uses cookies to deliver the site, remember your preferences, and (with your permission) measure how the site is used. Strictly-necessary cookies are always on; everything else is off until you decide.",
+                               es: "Pulpo usa cookies para que el sitio funcione, recordar tus preferencias y (con tu permiso) entender cómo se usa el sitio. Las estrictamente necesarias siempre están activas; el resto se queda desactivado hasta que tú decidas." },
+  // Pre-rebuild keys kept for back-compat — no current call site after PR-E.
   "consent.decline":         { en: "Decline",                       es: "Rechazar" },
   "consent.accept":          { en: "Accept",                        es: "Aceptar" },
+  // PR-E new keys.
+  "consent.accept_all":      { en: "Accept all",                    es: "Aceptar todas" },
+  "consent.decline_all":     { en: "Decline all",                   es: "Rechazar todas" },
+  "consent.manage":          { en: "Manage preferences",            es: "Gestionar preferencias" },
+  "consent.save":            { en: "Save preferences",              es: "Guardar preferencias" },
+  "consent.prefs.title":     { en: "Cookie preferences",            es: "Preferencias de cookies" },
+  "consent.prefs.lede":      { en: "Strictly-necessary cookies are always on — the site can't function without them. The rest you can switch on or off.",
+                               es: "Las cookies estrictamente necesarias siempre están activas — el sitio no funciona sin ellas. El resto puedes activarlas o desactivarlas." },
+  "consent.category.always_active":               { en: "Always active",
+                                                    es: "Siempre activas" },
+  "consent.category.strictly_necessary.label":    { en: "Strictly necessary",
+                                                    es: "Estrictamente necesarias" },
+  "consent.category.strictly_necessary.desc":     { en: "Authentication, checkout session continuity, your stored preferences. These cannot be switched off.",
+                                                    es: "Autenticación, continuidad del pago en Stripe, tus preferencias guardadas. No se pueden desactivar." },
+  "consent.category.analytics.label":             { en: "Analytics",
+                                                    es: "Analíticas" },
+  "consent.category.analytics.desc":              { en: "PostHog product analytics + 10% session replay sample (input-masked, EU-hosted in Frankfurt). Helps us see what works.",
+                                                    es: "Analíticas de producto con PostHog + grabación de sesiones al 10% (con los campos enmascarados, alojado en Frankfurt). Nos ayuda a entender qué funciona." },
+  "consent.category.functional.label":            { en: "Functional",
+                                                    es: "Funcionales" },
+  "consent.category.functional.desc":             { en: "Mapbox map-tile caching and Resend newsletter open/click tracking. Improves the experience but not required.",
+                                                    es: "Caché de mosaicos de Mapbox y seguimiento de aperturas/clics del newsletter por Resend. Mejora la experiencia pero no es necesario." },
 
   // Saved page CTA
   "saved.browse_cta":        { en: "Browse listings →",             es: "Ver propiedades →" },

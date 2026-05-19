@@ -503,6 +503,12 @@ test.describe("New app boots cleanly on key routes", () => {
       // scan below runs anon so the CTA is in the body text.
       "Start Pulpo Pro",                              // detail.unlock_pro_free_month (brand+plan half)
       "first month free",                             // detail.unlock_pro_free_month (offer half)
+      // Incomplete-listing quality gate (feat/incomplete-listing-quality):
+      // listing cards and detail page show "Not shared" when the
+      // broker hasn't shared price or size; Browse FilterPanel has a
+      // "Show missing details" opt-in chip. Both must localize.
+      "Not shared",                                   // value.notshared.short
+      "Show missing details",                         // filter.show_incomplete
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
