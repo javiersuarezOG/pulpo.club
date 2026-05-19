@@ -25,15 +25,41 @@ def test_per_type_canary_step_present():
     )
 
 
-def test_per_type_canary_uses_log_only_for_calibration():
-    """Per the original PRD spec — log-only for the first 7 days so we
-    calibrate thresholds against real nightly variance before enforcing.
-    Same pattern as the existing data-quality canaries."""
+def test_per_type_canary_is_blocking():
+    """PR-5 of the reliability plan: the 7-day calibration soak is over and
+    the canary now FAILS the workflow on violation (LOG_ONLY="false").
+
+    The audit flagged the mismatch where data-quality canaries blocked but
+    per-type canaries didn't, letting a classification regression silently
+    ship. This pins the post-PR-5 contract — a future edit that flips the
+    env back to "true" fails the test.
+
+    The escape-hatch path (`LOG_ONLY="true"` for recalibration) is
+    intentionally still supported in the inline Python — but the workflow
+    YAML default must be blocking. Mirrors the data-quality canary's
+    pattern documented at line 308 of the workflow."""
     yaml = _yaml_text()
-    # The env block sets LOG_ONLY: "true" — anchor on the canary section
     canary_section = yaml.split("Per-type canaries")[1].split("- name:")[0]
     assert 'LOG_ONLY:' in canary_section
-    assert '"true"' in canary_section.split('LOG_ONLY:')[1].split('\n')[0]
+    assert '"false"' in canary_section.split('LOG_ONLY:')[1].split('\n')[0], (
+        "Per-type canary env defaults LOG_ONLY to something other than \"false\" — "
+        "PR-5 promoted this to blocking. If you're recalibrating thresholds, "
+        "flip it temporarily and revert in the same PR."
+    )
+
+
+def test_per_type_canary_inline_default_matches_yaml_env():
+    """The inline Python reads LOG_ONLY from env with its own default
+    (os.environ.get("LOG_ONLY", "false")). If the YAML env is somehow
+    not propagated (e.g. a future refactor moves the step into a
+    reusable workflow), the inline default must still be blocking
+    so a silent regression doesn't slip through."""
+    yaml = _yaml_text()
+    canary_section = yaml.split("Per-type canaries")[1].split("- name:")[0]
+    assert 'os.environ.get("LOG_ONLY", "false")' in canary_section, (
+        "Inline-Python default for LOG_ONLY must be \"false\" (blocking). "
+        "Otherwise a missing env var silently downgrades the canary."
+    )
 
 
 def test_per_type_canary_floors_set_to_realistic_thresholds():
