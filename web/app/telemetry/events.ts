@@ -13,12 +13,35 @@ export type EventMap = {
   "landing.viewed": {
     route: string;
   };
-  "consent.granted": { region?: string };
-  "consent.declined": { region?: string };
+  /** User accepted any optional cookie category. Pre-rebuild payload
+   *  carried only `region`; post-PR-E, `categories_accepted` and
+   *  `version` describe exactly what was granted. The optional `region`
+   *  stays for funnel backward-compat. */
+  "consent.granted": {
+    region?: string;
+    categories_accepted?: string[];
+    version?: number;
+  };
+  /** User declined all optional categories. Strictly-necessary stays on. */
+  "consent.declined": {
+    region?: string;
+    categories_accepted?: string[];
+    version?: number;
+  };
+  /** ConsentBanner rendered to the user. Distinguishes opt-out by
+   *  abandonment (no banner_shown follow-on event) from genuine opt-outs. */
+  "consent.banner_shown": { version: number };
   /** User re-opened the ConsentBanner via a "Cookie Preferences" link.
    *  `source` lets us tell footer-link drivers apart from in-banner
    *  resets when that lands. */
   "consent.preferences_opened": { source: "footer" | "banner" | "initial" };
+  /** User flipped a single category toggle in the preferences pane.
+   *  Lets us see drop-off mid-decision and which categories users
+   *  most often opt out of. */
+  "consent.category_toggled": {
+    category: "analytics" | "functional";
+    accepted: boolean;
+  };
 
   // ───── Footer ─────
   /** Any click on a footer link. `link` is a stable analytics key

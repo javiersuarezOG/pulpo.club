@@ -20,6 +20,7 @@ import {
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
+import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
@@ -2484,83 +2485,329 @@ function DataFetchFailed({ onRetry }) {
 }
 
 // ====== Cookie-consent banner shim ======
-// Defaults to opt-in outside the EU. EU detection is best-effort via
-// timezone — accurate enough for a non-binding consent prompt; the real
-// determination of GDPR applicability lives server-side once the
-// auth+legal stack lands.
-function detectEuRegion() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    return /^Europe\//.test(tz);
-  } catch { return false; }
-}
-function ConsentBanner({ locale = "en" }) {
-  const [decided, setDecided] = pUseState(() => {
-    try { return localStorage.getItem("pulpo-consent") || ""; }
-    catch { return ""; }
-  });
-  // `forcedOpen` is set when a user re-opens the banner via the footer's
-  // "Cookie Preferences" link (or anywhere else that calls
-  // `openConsentPreferences()`). It overrides the region gate so non-EU
-  // users can review their choice too — GDPR Art. 7(3) "withdrawal
-  // shall be as easy as giving consent" applies regardless of where
-  // the request originates.
-  const [forcedOpen, setForcedOpen] = pUseState(false);
-  const region = detectEuRegion() ? "eu" : "non-eu";
-  // First-paint side-effect for non-EU: silently auto-grant if no
-  // decision is on file. Wrapped in useEffect so the localStorage
-  // write + telemetry emit happen exactly once and outside render.
-  // The event lets us tell auto-grants apart from explicit clicks
-  // when triaging consent funnels.
-  pUseEffect(() => {
-    if (decided) return;
-    if (region !== "non-eu") return;
-    try { localStorage.setItem("pulpo-consent", "granted"); } catch { /* ignore */ }
-    setDecided("granted");
-    track("consent.granted", { region });
-    optIn();
-  }, [decided, region]);
+// ConsentBanner — 9-point ConsentBanner technical contract from
+// legal_documents/03-cookie-policy.md (mirrors PDF §3.2). See
+// web/app/lib/consent.ts for the storage + migration helpers.
+//
+// Behaviour:
+//   - Shows on every visit until the user makes an affirmative choice.
+//     The pre-v1 "auto-grant outside the EU" behaviour is gone —
+//     ePrivacy + LGPD + UK PECR all require opt-in regardless, and
+//     the friction of one tap is worth the legal posture.
+//   - Two views: collapsed "summary" (Accept All / Decline All /
+//     Manage preferences) and expanded "preferences" (granular
+//     toggles per optional category + Save preferences).
+//   - Accept All + Decline All buttons have equal visual weight per
+//     PDF §3.2 #3. No dark patterns.
+//   - The Cookie Preferences footer button (#322) re-opens the banner
+//     by clearing the persisted record + dispatching the
+//     `pulpo:open-consent-preferences` event.
+//
+// Telemetry:
+//   - `consent.banner_shown { version }` on first render
+//   - `consent.granted` / `consent.declined` on each save with the
+//     accepted categories list
+//   - `consent.category_toggled` for each preferences-pane interaction
+//
+// PostHog opt-in / opt-out: optIn() only fires when the user accepts
+// the `analytics` category. telemetry/client.ts's `scheduleInit()`
+// is the load-bearing gate (no analytics script loads until
+// `hasConsented("analytics")`).
 
-  // Listen for the footer's "Cookie Preferences" re-open signal.
-  // `openConsentPreferences()` clears localStorage and dispatches
-  // `pulpo:open-consent-preferences`; we reset our internal state so
-  // the banner re-renders even if it had previously decided.
+function ConsentBanner({ locale = "en" }) {
+  const [record, setRecord] = pUseState(readConsent);
+  const [view, setView] = pUseState("summary"); // "summary" | "preferences"
+  const [acceptAnalytics, setAcceptAnalytics] = pUseState(true);
+  const [acceptFunctional, setAcceptFunctional] = pUseState(true);
+  const [forcedOpen, setForcedOpen] = pUseState(false);
+  const shownFired = pUseRef(false);
+
+  const isOpen = record === null || forcedOpen;
+
+  // Fire `consent.banner_shown` once per render-into-view (one
+  // banner_shown per user-session "open"). The ref prevents double
+  // fire during StrictMode double-effect.
+  pUseEffect(() => {
+    if (!isOpen) return;
+    if (shownFired.current) return;
+    shownFired.current = true;
+    track("consent.banner_shown", { version: CONSENT_POLICY_VERSION });
+  }, [isOpen]);
+
+  // Re-open signal from the footer's Cookie Preferences button.
   pUseEffect(() => {
     if (typeof window === "undefined") return;
     const handler = () => {
-      setDecided("");
+      setRecord(null);
       setForcedOpen(true);
+      setView("summary");
+      setAcceptAnalytics(true);
+      setAcceptFunctional(true);
+      shownFired.current = false;
     };
     window.addEventListener("pulpo:open-consent-preferences", handler);
     return () => window.removeEventListener("pulpo:open-consent-preferences", handler);
   }, []);
 
-  if (decided === "granted" || decided === "declined") return null;
-  if (region !== "eu" && !forcedOpen) return null;
+  if (!isOpen) return null;
 
-  const set = (decision) => {
-    try { localStorage.setItem("pulpo-consent", decision); } catch { /* ignore */ }
-    setDecided(decision);
-    if (decision === "granted") {
-      track("consent.granted", { region });
-      optIn();
+  function commit(accepted) {
+    const r = writeConsent(accepted);
+    setRecord(r);
+    setForcedOpen(false);
+    setView("summary");
+
+    const acceptedAnalytics = accepted.includes("analytics");
+    const acceptedFunctional = accepted.includes("functional");
+    if (acceptedAnalytics) optIn(); else optOut();
+
+    if (acceptedAnalytics || acceptedFunctional) {
+      track("consent.granted", {
+        categories_accepted: r.accepted,
+        version: r.v,
+      });
     } else {
-      track("consent.declined", { region });
-      optOut();
+      track("consent.declined", {
+        categories_accepted: r.accepted,
+        version: r.v,
+      });
     }
+  }
+
+  const acceptAll  = () => commit(["analytics", "functional"]);
+  const declineAll = () => commit([]); // strictly_necessary only (implicit)
+  const saveCurrent = () => {
+    const accepted = [];
+    if (acceptAnalytics)  accepted.push("analytics");
+    if (acceptFunctional) accepted.push("functional");
+    commit(accepted);
   };
+
+  const onToggle = (category, next) => {
+    track("consent.category_toggled", { category, accepted: next });
+    if (category === "analytics")  setAcceptAnalytics(next);
+    if (category === "functional") setAcceptFunctional(next);
+  };
+
   return (
-    <div className="consent-banner" role="dialog" aria-label={t("consent.aria", locale)}>
-      <div className="consent-text">
-        {t("consent.body", locale)}
-      </div>
-      <div className="consent-actions">
-        <button className="btn-ghost" onClick={() => set("declined")}>{t("consent.decline", locale)}</button>
-        <button className="btn-primary" onClick={() => set("granted")}>{t("consent.accept", locale)}</button>
-      </div>
+    <div
+      className={`consent-banner consent-banner--${view}`}
+      role="dialog"
+      aria-modal="false"
+      aria-label={t("consent.aria", locale)}
+    >
+      <style>{CONSENT_BANNER_STYLES}</style>
+      {view === "summary" ? (
+        <>
+          <div className="consent-text">
+            {t("consent.body", locale)}
+          </div>
+          <div className="consent-actions">
+            <button
+              className="consent-btn consent-btn--manage"
+              onClick={() => {
+                track("consent.preferences_opened", { source: "banner" });
+                setView("preferences");
+              }}
+            >
+              {t("consent.manage", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--decline"
+              onClick={declineAll}
+            >
+              {t("consent.decline_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--accept"
+              onClick={acceptAll}
+            >
+              {t("consent.accept_all", locale)}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="consent-prefs">
+          <h2 className="consent-prefs__title">{t("consent.prefs.title", locale)}</h2>
+          <p className="consent-prefs__lede">{t("consent.prefs.lede", locale)}</p>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label">
+                {t("consent.category.strictly_necessary.label", locale)}
+              </label>
+              <span className="consent-prefs__category-always">
+                {t("consent.category.always_active", locale)}
+              </span>
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.strictly_necessary.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label" htmlFor="consent-toggle-analytics">
+                {t("consent.category.analytics.label", locale)}
+              </label>
+              <input
+                id="consent-toggle-analytics"
+                type="checkbox"
+                className="consent-prefs__toggle"
+                checked={acceptAnalytics}
+                onChange={(e) => onToggle("analytics", e.target.checked)}
+              />
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.analytics.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-prefs__category">
+            <div className="consent-prefs__category-head">
+              <label className="consent-prefs__category-label" htmlFor="consent-toggle-functional">
+                {t("consent.category.functional.label", locale)}
+              </label>
+              <input
+                id="consent-toggle-functional"
+                type="checkbox"
+                className="consent-prefs__toggle"
+                checked={acceptFunctional}
+                onChange={(e) => onToggle("functional", e.target.checked)}
+              />
+            </div>
+            <p className="consent-prefs__category-desc">
+              {t("consent.category.functional.desc", locale)}
+            </p>
+          </div>
+
+          <div className="consent-actions consent-actions--prefs">
+            <button
+              className="consent-btn consent-btn--decline"
+              onClick={declineAll}
+            >
+              {t("consent.decline_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--accept"
+              onClick={acceptAll}
+            >
+              {t("consent.accept_all", locale)}
+            </button>
+            <button
+              className="consent-btn consent-btn--save"
+              onClick={saveCurrent}
+            >
+              {t("consent.save", locale)}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+// Inline styles for the expanded preferences view. The base
+// `.consent-banner` rules live in styles/index.css.
+const CONSENT_BANNER_STYLES = `
+.consent-banner--preferences {
+  max-width: 560px;
+  align-items: stretch;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+.consent-prefs__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 28px;
+  margin: 0 0 4px;
+  color: var(--paper);
+  font-weight: 400;
+}
+.consent-prefs__lede {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--paper);
+  opacity: 0.85;
+  margin: 0 0 8px;
+}
+.consent-prefs__category {
+  padding: 12px 0;
+  border-top: 1px solid color-mix(in oklch, var(--paper) 20%, var(--ink));
+}
+.consent-prefs__category-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+.consent-prefs__category-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+}
+.consent-prefs__category-always {
+  font-size: 12px;
+  color: var(--paper);
+  opacity: 0.7;
+}
+.consent-prefs__category-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--paper);
+  opacity: 0.8;
+  margin: 6px 0 0;
+}
+.consent-prefs__toggle {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--paper);
+  cursor: pointer;
+}
+.consent-actions--prefs {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.consent-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.consent-btn--manage {
+  color: var(--paper);
+  background: transparent;
+  border-color: color-mix(in oklch, var(--paper) 40%, transparent);
+}
+.consent-btn--decline {
+  color: var(--paper);
+  background: transparent;
+  border-color: var(--paper);
+}
+.consent-btn--accept {
+  color: var(--ink);
+  background: var(--paper);
+}
+.consent-btn--save {
+  color: var(--ink);
+  background: var(--paper);
+}
+.consent-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+@media (max-width: 600px) {
+  .consent-banner--preferences { padding: 20px 16px; }
+  .consent-actions--prefs { justify-content: stretch; }
+  .consent-actions--prefs .consent-btn { flex: 1 1 auto; }
+}
+`;
 
 // ────────────────────────────────────────────────────────────────────
 // WelcomeModal — post-payment / post-Clerk-invitation landing overlay.

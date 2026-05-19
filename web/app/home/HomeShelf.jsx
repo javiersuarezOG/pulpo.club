@@ -96,7 +96,7 @@ function isShelfEligible(l) {
 }
 
 // Top 10: rank_score-sorted, must have at least one photo.
-function pickTopRanked(listings, n) {
+export function pickTopRanked(listings, n) {
   return [...listings]
     .filter((l) => l.rank_score != null && isShelfEligible(l))
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
