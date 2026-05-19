@@ -115,6 +115,7 @@ export interface Listing {
     /** PR-8 — NLP-extracted booleans, composed into beachfront_tier / land_type. */
     is_on_beach: boolean;
     is_walk_to_beach: boolean;
+    is_on_lake: boolean;
     is_agricultural: boolean;
     is_commercial: boolean;
     is_tourist: boolean;

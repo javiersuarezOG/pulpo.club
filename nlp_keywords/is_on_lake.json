@@ -1,0 +1,50 @@
+{
+  "field": "is_on_lake",
+  "type": "boolean_with_negation",
+  "positive_en": [
+    "directly on the lake",
+    "right on the lake",
+    "lakefront",
+    "lake[\\s-]?front",
+    "on the lake",
+    "private lake access",
+    "private lake frontage",
+    "feet (?:in|on) the lake",
+    "first row lake",
+    "first line lake",
+    "lake frontage"
+  ],
+  "positive_es": [
+    "directamente en el lago",
+    "directo al lago",
+    "frente al lago",
+    "primera l[ií]nea de lago",
+    "primera l[ií]nea al lago",
+    "acceso privado al lago",
+    "salida directa al lago",
+    "orilla del lago",
+    "borde del lago",
+    "a orillas del lago",
+    "lago propio",
+    "muelle (?:propio|privado)"
+  ],
+  "negative_en": [
+    "near the lake",
+    "close to (?:the )?lake",
+    "minutes? from the lake",
+    "minutes? walk to the lake",
+    "short walk to the lake",
+    "from the lake",
+    "lake view"
+  ],
+  "negative_es": [
+    "cerca del lago",
+    "a [0-9]+ minutos? del lago",
+    "a [0-9]+ km del lago",
+    "a [0-9]+ metros del lago",
+    "vista al lago",
+    "minutos caminando al lago",
+    "a pasos del lago"
+  ],
+  "_comment": "Lake-frontage detection — mirror of is_on_beach.json for inland water bodies (Lago de Coatepeque, Lago de Ilopango, Lago de Suchitlán). Composes into the waterfront discovery_tag via derive_discovery_tags() in derived_rules.py so 'first line to the water' chip matches both beach AND lake direct frontage."
+}
