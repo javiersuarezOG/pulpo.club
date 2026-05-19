@@ -138,8 +138,37 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
         run: |
+          set -e
           git config user.name "pulpo-bot"
           git config user.email "bot@pulpo.club"
+
+          # Stash the pipeline's working-tree changes (data files, new
+          # photos, etc.) so we can fast-forward local main to whatever
+          # has landed on remote during the 2-hour repick window — then
+          # re-apply the changes on top. Critical because:
+          # (a) Stash includes untracked files, so freshly-downloaded
+          #     hires + hero JPGs aren't lost.
+          # (b) Fast-forwarding to origin/main ensures the new data
+          #     branch carries the LATEST workflow files. Without this,
+          #     PRs that landed during the run (e.g. PR #303 updated
+          #     pulpo-newsletter.yml on 2026-05-19) would leave the
+          #     bot's branch with a STALE workflow blob, which GitHub
+          #     interprets as the PAT trying to update the workflow
+          #     file — and PULPO_BOT_TOKEN doesn't carry `workflow`
+          #     scope, so the push gets remote-rejected:
+          #       "refusing to allow a Personal Access Token to create
+          #        or update workflow `.github/workflows/<file>.yml`
+          #        without `workflow` scope"
+          # See run 26088829398 (2026-05-19 11:41 UTC) for the failure.
+          git stash push --include-untracked --message "pipeline-outputs" || true
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+          # Restore the pipeline outputs on top of the refreshed tree.
+          # `|| true` covers the no-changes case (would be `git stash
+          # pop` returning "No stash entries found").
+          git stash pop || true
+
           git add web/data/ranked.json \
                   web/data/picker_excluded.json \
                   web/data/llm_vision_cache.json \
