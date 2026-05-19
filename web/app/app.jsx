@@ -1090,6 +1090,12 @@ function App() {
     route, routeParams, go, goBrowse,
     user, signin, signout, isSigningOut,
     authLoaded,
+    // welcomeModalState is initialized SYNCHRONOUSLY from the URL via
+    // useState's initializer (see ~line 481). Children consume this
+    // instead of re-reading window.location.search, which loses the
+    // race against the welcome-effect URL strip. See account.jsx's
+    // auth-gate effect for the consumer that motivated the export.
+    welcomeModalState,
     savedIds, toggleSave,
     signupModal, openSignup, closeSignup,
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
