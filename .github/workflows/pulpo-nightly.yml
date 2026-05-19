@@ -116,6 +116,17 @@ jobs:
           # validated runs; raise to e.g. 1000 once we've measured runtime
           # impact on a real nightly.
           PULPO_E24_LIMIT: "200"
+          # Hero-photo wall budget (Phase A download + Phase C derivative
+          # write inside automation/run.py::_download_hero_photos). The
+          # default 600s was too small for the post-encuentra24 baseline:
+          # 2026-05-19 nightly run #26079587684 burned 600s in Phase A on
+          # 237 fresh downloads and Phase C wrote zero heroes — leaving
+          # hero_photo_path=null for ALL 917 listings in ranked.json and
+          # collapsing api/social/listings to an empty response.
+          # 1800s (30 min) gives Phase A + C room to complete on a cold
+          # cache (~720 listings at ~2.5s each = ~30 min). Subsequent
+          # nightlies hit the URL-hash skip path and finish in seconds.
+          PULPO_PHOTO_BUDGET_S: "1800"
           # PRD §FR-6 AI enrichment. The single-call DeepSeek flow (PRs
           # #79-81) reads DEEPSEEK_API_TOKEN. When unset, llm_enrichment
           # graceful-skips and listings get fallback templates only —
