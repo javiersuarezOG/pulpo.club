@@ -15,6 +15,20 @@ export type EventMap = {
   };
   "consent.granted": { region?: string };
   "consent.declined": { region?: string };
+  /** User re-opened the ConsentBanner via a "Cookie Preferences" link.
+   *  `source` lets us tell footer-link drivers apart from in-banner
+   *  resets when that lands. */
+  "consent.preferences_opened": { source: "footer" | "banner" | "initial" };
+
+  // ───── Footer ─────
+  /** Any click on a footer link. `link` is a stable analytics key
+   *  (e.g. "terms", "privacy", "discover.beachfront", "cookie_preferences");
+   *  `surface` is the footer variant ("trimmed" on home/browse/legal pages,
+   *  "full" on saved/plans/account-when-enabled). */
+  "footer.link_clicked": {
+    link: string;
+    surface: "trimmed" | "full";
+  };
 
   // ───── Discover ─────
   // hero.cta_clicked: legacy Hero CTA — now fires from NewHomePage's
@@ -455,6 +469,25 @@ export type EventMap = {
    *  with the user-visible "Couldn't resend" copy and feeds the
    *  support-volume signal. */
   "welcome_modal.resend_failed": Record<string, never>;
+  /** WelcomeModal anon variant fetched /api/clerk/invitation-status
+   *  on mount and got a discriminated response. `status` matches the
+   *  endpoint's return shape — invitation_pending is the happy path;
+   *  user_exists / no_email / webhook_pending are the previously-
+   *  silent failure modes the modal now surfaces to the user.
+   *  Slicing webhook.checkout_completed.invitation_sent against this
+   *  event tells us "what fraction of paying users see each variant"
+   *  end-to-end. */
+  "welcome_modal.invitation_status_resolved": {
+    status: "invitation_pending" | "user_exists" | "no_email"
+          | "webhook_pending" | "session_not_found" | "session_not_complete"
+          | "fetch_failed";
+  };
+  /** User_exists variant CTA → opens Clerk's hosted sign-in via
+   *  app.clerkActions.openSignIn (or falls back to legacy SignupModal
+   *  when Clerk is off). Captures the "I already have an account"
+   *  recovery path that pre-PR was completely silent — users sat on
+   *  the lying "check your inbox" copy forever. */
+  "welcome_modal.signin_existing_clicked": Record<string, never>;
 
   /** / home-page Pro upsell modal mounted (PR-B.5). `trigger` reflects
    *  which URL signal opened the modal — utm_* params, a ?code=… link,
@@ -770,6 +803,15 @@ export type EventMap = {
     from_path: string | null;
     to_path: string;
     trigger: "click" | "back" | "forward" | "cold_load";
+  };
+
+  // ───── Legal-suite pages (PR legal-routes-shells) ─────
+  /** Fires on mount of any public legal route (/terms, /privacy, /cookies,
+   *  /subscription, /imprint, /contact). Lets us see drop-off + ToS-link
+   *  click-through from Stripe Checkout. `page=imprint` covers both the
+   *  /imprint and /impressum URLs (same route, two paths). */
+  "legal.page_viewed": {
+    page: "terms" | "privacy" | "cookies" | "subscription" | "imprint" | "contact";
   };
 };
 

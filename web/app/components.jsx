@@ -149,7 +149,11 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
 };
 
 // ===== Pulpo wordmark =====
-const PulpoLogo = ({ size = 22 }) => (
+// `pro` prop appends a small serif-italic "Pro" mark next to the wordmark
+// so subscribed users see their membership reinforced on every page in the
+// global header chrome. Styling lives in index.css (`.pulpo-logo-pro`) so
+// it can reference the gold-hairline tokens without inline literals.
+const PulpoLogo = ({ size = 22, pro = false }) => (
   <div className="pulpo-logo" style={{ display: "flex", alignItems: "center", gap: 8 }}>
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       {/* simple octopus mark */}
@@ -166,6 +170,13 @@ const PulpoLogo = ({ size = 22 }) => (
     <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 500, letterSpacing: "-0.02em", lineHeight: 1 }}>
       pulpo
     </span>
+    {pro && (
+      // "Pro" is a shared EN/ES brand mark. The parent button already
+      // carries the localized accessible name via `nav.home_pro`, so the
+      // span needs no aria-label (and shouldn't have one — nesting an
+      // aria-label inside a labelled button confuses screen readers).
+      <span className="pulpo-logo-pro">Pro</span>
+    )}
   </div>
 );
 

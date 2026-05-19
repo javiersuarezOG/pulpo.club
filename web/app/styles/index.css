@@ -135,6 +135,44 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--accent); color: white;
   display: grid; place-items: center;
   font-weight: 600; font-size: 13px;
+  position: relative;
+}
+
+/* ── Pulpo Pro identity ────────────────────────────────────────────────
+   The "Pro" mark next to the wordmark + gold ring + star badge on the
+   avatar are the global-header signals that membership is active. Tone:
+   editorial, not SaaS. Hairline border, serif italic, gold tokens.
+   See tokens.css → --pro-ink / --pro-line / --pro-ring. */
+.pulpo-logo-pro {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--pro-ink);
+  border: 1px solid var(--pro-line);
+  border-radius: 999px;
+  padding: 3px 8px 4px;
+  margin-left: 2px;
+  background: transparent;
+  white-space: nowrap;
+}
+.avatar-pro {
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--pro-ring);
+}
+.avatar-pro-badge {
+  position: absolute;
+  right: -2px; bottom: -2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--pro-line);
+  color: var(--paper);
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  font-weight: 700;
+  border: 1.5px solid var(--paper);
+  box-sizing: content-box;
 }
 
 /* Single auth icon — replaces the dual "Log in" + "Sign up — free" pair.

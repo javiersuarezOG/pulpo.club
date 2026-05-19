@@ -59,6 +59,17 @@ const SECTIONS = [
   // on top of the regular home page. Both the underlying page AND the
   // modal must fit at every mobile width without horizontal overflow.
   { path: "/?utm_source=test", surface: ".pro-upsell-modal, .homepage-v2, .new-homepage, .new-hero", gated: false },
+  // Legal-suite public routes (PR feat/legal-routes-shells). All five
+  // legal pages + /contact + /impressum (German alias of /imprint) get
+  // the same horizontal-scroll + widest-descendant assertion at every
+  // viewport. Long prose at 320px is the realistic failure mode here.
+  { path: "/terms",        surface: ".page-legal",   gated: false },
+  { path: "/privacy",      surface: ".page-legal",   gated: false },
+  { path: "/cookies",      surface: ".page-legal",   gated: false },
+  { path: "/subscription", surface: ".page-legal",   gated: false },
+  { path: "/imprint",      surface: ".page-legal",   gated: false },
+  { path: "/impressum",    surface: ".page-legal",   gated: false },
+  { path: "/contact",      surface: ".page-contact", gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.
