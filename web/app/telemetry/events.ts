@@ -371,11 +371,16 @@ export type EventMap = {
    *  without the code, sends the user to Stripe at full price. This
    *  event fires so we can surface broken campaign URLs in PostHog. */
   "start.code_error_shown": { reason: "invalid_promo_code" | "exhausted" };
-  /** /account?welcome=1 modal mounted (PR-B.4b). `variant` reflects
-   *  auth state at render time: anon = post-Stripe, no Clerk session
-   *  yet; signed_in = post-Clerk-magic-link, Clerk session resolved.
-   *  `surface` is "account" today but reserved so the same modal can
-   *  surface elsewhere later without renaming the event. */
+  /** /account?welcome=1 modal mounted (PR-B.4b). Fires AFTER Clerk
+   *  hydration resolves (or after the 5s `auth_load_timeout`
+   *  fallback). `variant=anon` means a paid user whose Clerk
+   *  invitation hasn't been accepted yet; `signed_in` means the
+   *  post-invitation round trip completed and the session is live.
+   *  Before the hydration gate (pre-2026-05-19), this event
+   *  briefly mis-attributed signed-in users as anon during the
+   *  Clerk SDK boot race — that flash is fixed by the gate.
+   *  `surface` is "account" today but reserved so the same modal
+   *  can surface elsewhere later without renaming the event. */
   "welcome_modal.shown": {
     variant: "anon" | "signed_in";
     surface: "account";
@@ -391,6 +396,31 @@ export type EventMap = {
   "welcome_modal.cta_inbox_clicked": Record<string, never>;
   /** Anonymous-variant secondary CTA → POSTs /api/clerk/resend-invitation. */
   "welcome_modal.cta_resend_clicked": Record<string, never>;
+  /** Modal mount gated on Clerk hydration but the 5s timeout fired
+   *  first — either Clerk SDK boot failed or hydration is unusually
+   *  slow. `resolved_user` lets us split true SDK failures (false)
+   *  from late-hydration cases where the user did eventually
+   *  populate after the timer fired (true). Non-zero rate is a
+   *  paging signal — Clerk auth is broken for some fraction of
+   *  paid users. */
+  "welcome_modal.auth_load_timeout": {
+    resolved_user: boolean;
+  };
+  /** Anonymous-variant resend hit Clerk's "user already exists"
+   *  branch in /api/clerk/resend-invitation. We show the
+   *  "refresh this page" copy instead of the "check your inbox"
+   *  copy. Counting these tells us how often the secondary loop
+   *  reported on 2026-05-19 actually happens. */
+  "welcome_modal.resend_user_exists": Record<string, never>;
+  /** Anonymous-variant resend completed normally — Clerk re-fired
+   *  the invitation email. Splits the cta_resend_clicked funnel
+   *  into success / user_exists / failed so we can compute a real
+   *  success rate. */
+  "welcome_modal.resend_done": Record<string, never>;
+  /** Anonymous-variant resend returned a non-2xx or threw. Pairs
+   *  with the user-visible "Couldn't resend" copy and feeds the
+   *  support-volume signal. */
+  "welcome_modal.resend_failed": Record<string, never>;
 
   /** / home-page Pro upsell modal mounted (PR-B.5). `trigger` reflects
    *  which URL signal opened the modal — utm_* params, a ?code=… link,

@@ -41,16 +41,25 @@ export function clerkEnabled() {
   );
 }
 
-export function ClerkShell({ setUser, onClerkActions, children }) {
+export function ClerkShell({ setUser, setAuthLoaded, onClerkActions, children }) {
   if (!clerkEnabled()) return children;
   // Suspense fallback renders the children directly while Clerk loads,
   // so the app is interactive immediately — Clerk just hydrates auth
   // state on top once its chunk arrives. This Suspense fires once on
   // boot, *not* in response to user input — that's the one #426 trap
   // we have to avoid (see SignupModal in pages.jsx).
+  //
+  // setAuthLoaded mirrors setUser: passed through to ClerkUserSync so
+  // App can know when Clerk has finished hydrating (isLoaded === true)
+  // and the modal-gate in WelcomeModal can stop showing the anon
+  // variant during the hydration race.
   return (
     <Suspense fallback={children}>
-      <ClerkProviderLazy setUser={setUser} onClerkActions={onClerkActions}>
+      <ClerkProviderLazy
+        setUser={setUser}
+        setAuthLoaded={setAuthLoaded}
+        onClerkActions={onClerkActions}
+      >
         {children}
       </ClerkProviderLazy>
     </Suspense>
