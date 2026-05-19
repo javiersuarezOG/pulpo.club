@@ -15,6 +15,20 @@ export type EventMap = {
   };
   "consent.granted": { region?: string };
   "consent.declined": { region?: string };
+  /** User re-opened the ConsentBanner via a "Cookie Preferences" link.
+   *  `source` lets us tell footer-link drivers apart from in-banner
+   *  resets when that lands. */
+  "consent.preferences_opened": { source: "footer" | "banner" | "initial" };
+
+  // ───── Footer ─────
+  /** Any click on a footer link. `link` is a stable analytics key
+   *  (e.g. "terms", "privacy", "discover.beachfront", "cookie_preferences");
+   *  `surface` is the footer variant ("trimmed" on home/browse/legal pages,
+   *  "full" on saved/plans/account-when-enabled). */
+  "footer.link_clicked": {
+    link: string;
+    surface: "trimmed" | "full";
+  };
 
   // ───── Discover ─────
   // hero.cta_clicked: legacy Hero CTA — now fires from NewHomePage's

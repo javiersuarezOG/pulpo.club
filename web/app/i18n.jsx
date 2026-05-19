@@ -1167,13 +1167,43 @@ const UI_STRINGS = {
   "free_month_modal.code_applied_note":{ en: "✓ First month free, applied at checkout",
                                           es: "✓ Primer mes gratis, aplicado al pagar" },
 
-  // Trimmed footer (home + browse).
+  // Trimmed footer (home + browse + all legal-suite pages).
   "footer.fine_print":                 { en: "© {year} Pulpo",
                                           es: "© {year} Pulpo" },
+  "footer.fine_print_full":            { en: "© {year} Pulpo · A discovery-first land investment marketplace",
+                                          es: "© {year} Pulpo · Un marketplace de inversión en suelo enfocado en el descubrimiento" },
   "footer.link.terms":                 { en: "Terms",
                                           es: "Términos" },
   "footer.link.privacy":               { en: "Privacy",
                                           es: "Privacidad" },
+  "footer.link.cookies":               { en: "Cookies",
+                                          es: "Cookies" },
+  "footer.link.subscription":          { en: "Subscription & Refunds",
+                                          es: "Suscripción y reembolsos" },
+  "footer.link.imprint":               { en: "Imprint",
+                                          es: "Aviso legal" },
+  "footer.link.contact":               { en: "Contact",
+                                          es: "Contacto" },
+  "footer.link.cookie_preferences":    { en: "Cookie Preferences",
+                                          es: "Preferencias de cookies" },
+
+  // Full footer column headings + items (saved / plans / account-when-enabled).
+  "footer.col.discover.heading":       { en: "Discover",
+                                          es: "Descubrir" },
+  "footer.col.discover.beachfront":    { en: "Beachfront",
+                                          es: "Frente al mar" },
+  "footer.col.discover.build_ready":   { en: "Build-ready",
+                                          es: "Listo para construir" },
+  "footer.col.discover.off_market":    { en: "Off-market",
+                                          es: "Fuera de mercado" },
+  "footer.col.discover.agricultural":  { en: "Agricultural",
+                                          es: "Agrícola" },
+  "footer.col.pulpo.heading":          { en: "Pulpo",
+                                          es: "Pulpo" },
+  "footer.col.pulpo.plans":            { en: "Plans",
+                                          es: "Planes" },
+  "footer.col.legal.heading":          { en: "Legal",
+                                          es: "Legal" },
 
   // Legal-suite pages (/terms, /privacy, /cookies, /subscription, /imprint).
   // Body prose lives in web/app/config/legal-content.ts (typed
