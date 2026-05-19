@@ -1174,6 +1174,46 @@ const UI_STRINGS = {
                                           es: "Términos" },
   "footer.link.privacy":               { en: "Privacy",
                                           es: "Privacidad" },
+
+  // Legal-suite pages (/terms, /privacy, /cookies, /subscription, /imprint).
+  // Body prose lives in web/app/config/legal-content.ts (typed
+  // LegalDocument records); these keys are page chrome only.
+  "legal.back_to_home":                { en: "Back to home",
+                                          es: "Volver al inicio" },
+  "legal.last_updated":                { en: "Last updated",
+                                          es: "Actualizado" },
+  "legal.draft_banner":                { en: "This page is a working draft pending counsel review. Lawyer-blessed prose will replace this copy before the first live Stripe Checkout session.",
+                                          es: "Esta página es un borrador pendiente de revisión legal. El texto definitivo reemplazará este contenido antes del primer pago real con Stripe Checkout." },
+  "legal.incorporation_banner":        { en: "Pulpo is currently being incorporated. The entity details on this page will be finalised once incorporation completes.",
+                                          es: "Pulpo está en proceso de constitución. Los datos de la empresa en esta página se finalizarán al completarse la constitución." },
+
+  // /contact page.
+  "contact.page.title":                { en: "Contact Pulpo",
+                                          es: "Contactar con Pulpo" },
+  "contact.page.description":          { en: "Get in touch with the Pulpo team — general enquiries, billing, privacy requests, takedowns.",
+                                          es: "Ponte en contacto con el equipo de Pulpo — consultas generales, facturación, privacidad, eliminación de contenido." },
+  "contact.page.lede":                 { en: "We'd love to hear from you. Pick the right inbox below to reach the right person fast.",
+                                          es: "Nos encantaría saber de ti. Elige la bandeja correcta para llegar antes a la persona indicada." },
+  "contact.page.form_coming_soon":     { en: "A web form for contacting us is being added shortly. In the meantime, please email the inbox that best matches your enquiry.",
+                                          es: "Estamos añadiendo un formulario de contacto en breve. Mientras tanto, escríbenos al correo que mejor encaje con tu consulta." },
+  "contact.page.inbox_list_label":     { en: "Topical inboxes",
+                                          es: "Bandejas por tema" },
+
+  // Contact topic labels (also used by the topic dropdown when the
+  // form lands in feat/contact-form). Default copy mirrors
+  // CONTACT_TOPIC_DEFAULT_COPY in web/app/config/contact-routing.ts.
+  "contact.topic.general":             { en: "General enquiry",
+                                          es: "Consulta general" },
+  "contact.topic.billing":             { en: "Billing or subscription",
+                                          es: "Facturación o suscripción" },
+  "contact.topic.privacy":             { en: "Privacy / data request",
+                                          es: "Privacidad / solicitud de datos" },
+  "contact.topic.legal":               { en: "Legal / terms",
+                                          es: "Legal / términos" },
+  "contact.topic.press":               { en: "Press / partnerships",
+                                          es: "Prensa / colaboraciones" },
+  "contact.topic.abuse":               { en: "Takedown or abuse report",
+                                          es: "Eliminación de contenido o reporte de abuso" },
 };
 
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation

@@ -24,6 +24,12 @@ import {
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { NewHomePage } from "./home";
 import { AccountPage } from "./account.jsx";
+// Legal-suite public routes (/terms, /privacy, /cookies, /subscription,
+// /imprint, /contact). LegalPage reads from web/app/config/legal-content.ts;
+// ContactPage is currently a shell — the actual form + api/contact.js
+// land in a follow-up PR.
+import { LegalPage } from "./pages/legal/LegalPage.jsx";
+import { ContactPage } from "./pages/legal/ContactPage.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
@@ -1072,6 +1078,12 @@ function App() {
         {route === "saved" && <SavedPage app={app} />}
         {route === "plans" && <PlansPage app={app} />}
         {route === "account" && <AccountPage app={app} />}
+        {route === "terms" && <LegalPage app={app} slug="terms" />}
+        {route === "privacy" && <LegalPage app={app} slug="privacy" />}
+        {route === "cookies" && <LegalPage app={app} slug="cookies" />}
+        {route === "subscription" && <LegalPage app={app} slug="subscription" />}
+        {route === "imprint" && <LegalPage app={app} slug="imprint" />}
+        {route === "contact" && <ContactPage app={app} />}
       </main>
 
       <SiteFooter app={app} locale={locale} tweaks={tweaks} />

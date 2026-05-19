@@ -38,6 +38,16 @@ const ROUTE_GATES: Record<Route, RouteGate> = {
   // the sign-in modal.
   saved:   { minTier: "free", onDenied: "modal" },
   account: { minTier: "free", onDenied: "modal" },
+
+  // Legal-suite public routes. Anyone reaches them — including
+  // anonymous EU users with declined consent who still have a
+  // right to read what we collect and why before deciding.
+  terms:        { minTier: "anonymous", onDenied: "modal" },
+  privacy:      { minTier: "anonymous", onDenied: "modal" },
+  cookies:      { minTier: "anonymous", onDenied: "modal" },
+  subscription: { minTier: "anonymous", onDenied: "modal" },
+  imprint:      { minTier: "anonymous", onDenied: "modal" },
+  contact:      { minTier: "anonymous", onDenied: "modal" },
 };
 
 const TIER_RANK: Record<Tier, number> = {
