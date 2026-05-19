@@ -205,6 +205,13 @@ module.exports = async (req, res) => {
     source: "start",
     country: country || "",
     posthog_anon_id: posthogAnonId,
+    // Stamp the user's UI locale so the webhook can pass it to
+    // Clerk's invitation API. Without this the activation email
+    // ships in Clerk's default language regardless of which Pulpo
+    // locale the user was browsing in. "es-419" or "en" (see the
+    // SUPPORTED_LOCALES mapping above); webhook normalizes to the
+    // BCP-47 root for Clerk.
+    locale: locale || "",
     ...utms,
   };
 
