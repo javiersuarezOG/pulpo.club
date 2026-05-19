@@ -1,16 +1,18 @@
 {
-  "width": 864,
-  "height": 1080,
+  "width": 1638,
+  "height": 2048,
   "aspect_ratio": 1.25,
-  "file_size_kb": 282.8,
+  "file_size_kb": 5176.4,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T12:06:51.994764+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:34:21.860663+00:00",
+  "derivative_width": 864,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781113/v3/HDPhotos/reconnect 0 Arte The Cliff.png",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:06:51.994938+00:00"
+  "repicked_at": "2026-05-19T21:34:21.898259+00:00"
 }

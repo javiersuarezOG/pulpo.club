@@ -2,15 +2,17 @@
   "width": 1000,
   "height": 569,
   "aspect_ratio": 1.757,
-  "file_size_kb": 181.8,
+  "file_size_kb": 250.4,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:31:13.798490+00:00",
+  "computed_at": "2026-05-19T21:39:32.065963+00:00",
+  "derivative_width": 1000,
+  "derivative_height": 569,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://remax-central.com.sv/storage/properties/xpEy56KSy4HXY8fN7rwq-large.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:31:13.798643+00:00"
+  "repicked_at": "2026-05-19T21:39:32.070245+00:00"
 }

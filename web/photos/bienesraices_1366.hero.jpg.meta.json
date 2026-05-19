@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 144.4,
+  "file_size_kb": 155.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:08:50.029230+00:00",
+  "computed_at": "2026-05-19T21:47:24.041328+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/TVT5GBUEKW/zEdz37nuHx/EB-RP2940.jpeg",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:08:50.029381+00:00"
+  "repicked_at": "2026-05-19T21:47:24.044417+00:00"
 }

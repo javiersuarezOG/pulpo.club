@@ -2,15 +2,17 @@
   "width": 1080,
   "height": 820,
   "aspect_ratio": 1.317,
-  "file_size_kb": 101.0,
+  "file_size_kb": 95.3,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:21:59.519479+00:00",
+  "computed_at": "2026-05-19T21:37:29.703931+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 820,
   "hero_photo_quality_score": 40,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4437669/74179377/EB-QA7669.jpg?rasterize=true&version=1713805320",
   "candidate_count": 5,
   "picker_excluded_count": 5,
-  "repicked_at": "2026-05-19T12:21:59.519658+00:00"
+  "repicked_at": "2026-05-19T21:37:29.706858+00:00"
 }

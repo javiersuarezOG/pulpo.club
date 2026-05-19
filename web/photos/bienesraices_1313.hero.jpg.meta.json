@@ -1,16 +1,18 @@
 {
-  "width": 921,
-  "height": 1080,
-  "aspect_ratio": 1.173,
-  "file_size_kb": 265.9,
+  "width": 1080,
+  "height": 1266,
+  "aspect_ratio": 1.172,
+  "file_size_kb": 294.0,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T13:14:36.293284+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:48:17.151594+00:00",
+  "derivative_width": 921,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5241524/90197977/EB-TD1524.jpg?rasterize=true&version=1750191144",
   "candidate_count": 4,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T13:14:36.293462+00:00"
+  "repicked_at": "2026-05-19T21:48:17.157599+00:00"
 }

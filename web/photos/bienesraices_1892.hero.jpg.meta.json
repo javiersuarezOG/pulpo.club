@@ -1,16 +1,18 @@
 {
-  "width": 810,
-  "height": 1080,
+  "width": 900,
+  "height": 1200,
   "aspect_ratio": 1.333,
-  "file_size_kb": 250.8,
+  "file_size_kb": 259.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:41:46.524237+00:00",
+  "computed_at": "2026-05-19T21:42:03.441638+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3640348/59363276/EB-MZ0348.jpg?rasterize=true&version=1679761851",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:41:46.524427+00:00"
+  "repicked_at": "2026-05-19T21:42:03.446201+00:00"
 }

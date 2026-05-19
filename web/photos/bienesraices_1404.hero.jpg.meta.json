@@ -1,16 +1,18 @@
 {
-  "width": 859,
-  "height": 1080,
-  "aspect_ratio": 1.257,
-  "file_size_kb": 103.5,
+  "width": 977,
+  "height": 1229,
+  "aspect_ratio": 1.258,
+  "file_size_kb": 107.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:39:34.848698+00:00",
+  "computed_at": "2026-05-19T21:41:42.633148+00:00",
+  "derivative_width": 859,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 80,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5156957/88570587/EB-SU6957.jpg?rasterize=true&version=1744133651",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:39:34.848908+00:00"
+  "repicked_at": "2026-05-19T21:41:42.637347+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 328,
   "height": 522,
   "aspect_ratio": 1.591,
-  "file_size_kb": 43.3,
+  "file_size_kb": 41.4,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:23:30.524319+00:00",
+  "computed_at": "2026-05-19T21:38:04.811836+00:00",
+  "derivative_width": 328,
+  "derivative_height": 522,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4024737/66460766/EB-OL4737.jpg?rasterize=true&version=1695424148",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:23:30.524455+00:00"
+  "repicked_at": "2026-05-19T21:38:04.812785+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 700,
   "aspect_ratio": 1.714,
-  "file_size_kb": 68.2,
+  "file_size_kb": 64.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:41:10.057991+00:00",
+  "computed_at": "2026-05-19T21:53:48.074922+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 700,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5639579/98324617/EB-UQ9579.jpg?rasterize=true&version=1762882137",
   "candidate_count": 4,
   "picker_excluded_count": 3,
-  "repicked_at": "2026-05-19T13:41:10.058145+00:00"
+  "repicked_at": "2026-05-19T21:53:48.077676+00:00"
 }

@@ -1,16 +1,18 @@
 {
-  "width": 810,
-  "height": 1080,
+  "width": 960,
+  "height": 1280,
   "aspect_ratio": 1.333,
-  "file_size_kb": 359.3,
+  "file_size_kb": 411.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:30:30.692713+00:00",
+  "computed_at": "2026-05-19T21:39:24.093938+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5445355/94268208/EB-TX5355.jpg?rasterize=true&version=1755030555",
   "candidate_count": 5,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:30:30.692877+00:00"
+  "repicked_at": "2026-05-19T21:39:24.102316+00:00"
 }

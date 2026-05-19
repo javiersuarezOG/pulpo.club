@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 110.8,
+  "file_size_kb": 100.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:29:13.989068+00:00",
+  "computed_at": "2026-05-19T21:51:30.588829+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5195026/89298311/EB-SY5026.jpeg?rasterize=true&version=1745504312",
   "candidate_count": 3,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:29:13.989233+00:00"
+  "repicked_at": "2026-05-19T21:51:30.591749+00:00"
 }

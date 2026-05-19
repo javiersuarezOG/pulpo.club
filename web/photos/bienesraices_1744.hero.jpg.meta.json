@@ -1,16 +1,18 @@
 {
-  "width": 782,
-  "height": 1080,
+  "width": 869,
+  "height": 1200,
   "aspect_ratio": 1.381,
-  "file_size_kb": 178.7,
+  "file_size_kb": 179.4,
   "hero_eligible": false,
-  "card_eligible": false,
+  "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:50:10.891943+00:00",
+  "computed_at": "2026-05-19T21:55:42.949944+00:00",
+  "derivative_width": 782,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4323184/72031286/EB-PP3184.jpg?rasterize=true&version=1709054017",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:50:10.892112+00:00"
+  "repicked_at": "2026-05-19T21:55:42.953588+00:00"
 }

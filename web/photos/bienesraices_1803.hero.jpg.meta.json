@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 780,
   "aspect_ratio": 1.538,
-  "file_size_kb": 186.3,
+  "file_size_kb": 175.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:19:10.378438+00:00",
+  "computed_at": "2026-05-19T21:49:10.950980+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 780,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4135159/68504970/EB-OW5159.jpg?rasterize=true&version=1700499914",
   "candidate_count": 3,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:19:10.378611+00:00"
+  "repicked_at": "2026-05-19T21:49:10.954889+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1080,
   "height": 810,
   "aspect_ratio": 1.333,
-  "file_size_kb": 121.3,
+  "file_size_kb": 115.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:07:51.312752+00:00",
+  "computed_at": "2026-05-19T21:47:15.299425+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 810,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5599383/97436652/EB-UM9383.jpg?rasterize=true&version=1761098150",
   "candidate_count": 5,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:07:51.312896+00:00"
+  "repicked_at": "2026-05-19T21:47:15.302497+00:00"
 }

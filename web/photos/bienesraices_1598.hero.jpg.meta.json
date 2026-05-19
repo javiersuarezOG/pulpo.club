@@ -1,16 +1,18 @@
 {
-  "width": 810,
-  "height": 1080,
+  "width": 1200,
+  "height": 1600,
   "aspect_ratio": 1.333,
-  "file_size_kb": 337.1,
+  "file_size_kb": 448.1,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T13:51:07.495358+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:55:49.448066+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4781527/80970573/EB-RJ1527.jpeg?rasterize=true&version=1728336159",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:51:07.495568+00:00"
+  "repicked_at": "2026-05-19T21:55:49.455421+00:00"
 }

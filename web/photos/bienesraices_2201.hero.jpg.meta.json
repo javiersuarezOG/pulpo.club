@@ -1,16 +1,18 @@
 {
-  "width": 810,
-  "height": 1080,
+  "width": 1200,
+  "height": 1600,
   "aspect_ratio": 1.333,
-  "file_size_kb": 249.1,
+  "file_size_kb": 389.7,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T12:33:59.562658+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:40:13.121963+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/S0Q0I1HSR7/rjJJ4fiXbL/Terreno_en_Venta_San_Mart%C3%ADn__4_Manzanas__Ideal_Desarrollo_Habitacional_o_Lotificaci%C3%B3n_1.jpeg",
   "candidate_count": 5,
   "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T12:33:59.562822+00:00"
+  "repicked_at": "2026-05-19T21:40:13.129678+00:00"
 }
