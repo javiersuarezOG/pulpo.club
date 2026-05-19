@@ -50,3 +50,14 @@ test-results/
 desktop-discover.png
 mobile-discover.png
 .gstack/
+
+# Legal-document working copies — markdown drafts that mirror the public
+# legal-page prose. Lawyer-reviewable; the live copy lands in
+# web/app/config/legal-content.ts. See legal_documents/README.md.
+legal_documents/
+
+# Local Pulpo Legal Document Suite PDF — Sebastian-supplied template.
+Pulpo Legal Document Suite.pdf
+
+# stripe-welcometopulpo-discount.png — local screenshot
+stripe-welcometopulpo-discount.png
