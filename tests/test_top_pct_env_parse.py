@@ -11,61 +11,57 @@ string when the secret is unset. `os.environ.get(..., "5")` returns ""
 raises ValueError → pipeline aborts after the LLM enrichment step,
 right before photo download, blocking the data-PR commit.
 
-Fix: use `os.environ.get(name) or "5"` so both unset AND empty-string
-fall through to the default.
+Original fix (PR a527237): `int(os.environ.get(name) or "5")`.
+PR-2 of the reliability plan: routed through `automation._config.env_int`,
+which centralizes the empty-string and whitespace-tolerance contract
+across every parser in the pipeline. See `tests/test_config_env.py`
+for the helper's behavior; this file remains as a callsite anchor so
+the run.py path doesn't silently regress to the legacy crash-prone
+pattern.
 """
 from __future__ import annotations
-import os
 import sys
 from pathlib import Path
-
-import pytest
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-
-def _resolve_top_pct() -> int:
-    """Mirrors the run.py snippet under test verbatim."""
-    return int(os.environ.get("LLM_VISION_TOP_PCT") or "5")
+from automation._config import env_int   # noqa: E402
 
 
 def test_unset_env_var_defaults_to_5(monkeypatch):
     monkeypatch.delenv("LLM_VISION_TOP_PCT", raising=False)
-    assert _resolve_top_pct() == 5
+    assert env_int("LLM_VISION_TOP_PCT", 5) == 5
 
 
 def test_empty_env_var_defaults_to_5(monkeypatch):
     """The bug case — GH Actions passes an empty string when the secret is unset."""
     monkeypatch.setenv("LLM_VISION_TOP_PCT", "")
-    assert _resolve_top_pct() == 5
+    assert env_int("LLM_VISION_TOP_PCT", 5) == 5
 
 
-def test_whitespace_env_var_still_raises():
-    """Whitespace-only env is operator error — should NOT silently default.
-    Documents intent; if you want to also tolerate whitespace, change
-    the fix to `(os.environ.get(...) or "").strip() or "5"`."""
-    # We do NOT add strip() in the fix. Keep this test red-on-change
-    # so a future contributor is forced to make a deliberate call.
-    os.environ["LLM_VISION_TOP_PCT"] = "   "
-    try:
-        with pytest.raises(ValueError):
-            _resolve_top_pct()
-    finally:
-        del os.environ["LLM_VISION_TOP_PCT"]
+def test_whitespace_env_var_defaults_to_5(monkeypatch):
+    """The PR-2 helper deliberately tolerates whitespace too — same-shape bug
+    as the empty-string case (operator typo, GH templating glitch, etc.).
+    The original test asserted ValueError here as a deliberate boundary;
+    the helper now treats whitespace as 'unset' for symmetry. Documented
+    in automation/_config.py."""
+    monkeypatch.setenv("LLM_VISION_TOP_PCT", "   ")
+    assert env_int("LLM_VISION_TOP_PCT", 5) == 5
 
 
 def test_explicit_value_is_honored(monkeypatch):
     monkeypatch.setenv("LLM_VISION_TOP_PCT", "12")
-    assert _resolve_top_pct() == 12
+    assert env_int("LLM_VISION_TOP_PCT", 5) == 12
 
 
-def test_callsite_matches_fix():
-    """Read the actual source of run.py and assert the fixed pattern is in place.
-    Guards against accidental revert."""
+def test_callsite_matches_helper():
+    """Read run.py and assert the LLM_VISION_TOP_PCT callsite is wired
+    through the helper. Guards against an accidental revert to
+    `int(os.environ.get(...))`."""
     src = (REPO / "automation" / "run.py").read_text()
-    # The fix uses `or "5"` rather than `, "5"` as the int() default.
-    assert 'int(os.environ.get("LLM_VISION_TOP_PCT") or "5")' in src, (
-        "run.py:507 must use `int(os.environ.get(...) or '5')` to tolerate "
-        "the empty-string env GH Actions passes when the secret is unset."
+    assert '_env_int("LLM_VISION_TOP_PCT", 5)' in src, (
+        "run.py must use `_env_int(\"LLM_VISION_TOP_PCT\", 5)` (or equivalent) "
+        "so empty / whitespace / unparseable values fall through to the default "
+        "instead of crashing the nightly. See automation/_config.py."
     )

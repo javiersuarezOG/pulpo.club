@@ -253,8 +253,9 @@ def _build_client(schema: EnrichmentSchema):
 # from _enrich_one, and retrying them would be deterministic-loss.
 # Global errors (auth, quota, billing) skip retry and fail fast: every
 # attempt would identically fail.
-_RETRY_MAX_ATTEMPTS = max(1, int(
-    os.environ.get("PULPO_LLM_RETRY_MAX_ATTEMPTS") or "3"))
+from automation._config import env_int as _env_int  # noqa: E402
+
+_RETRY_MAX_ATTEMPTS = max(1, _env_int("PULPO_LLM_RETRY_MAX_ATTEMPTS", 3))
 _RETRY_BASE_DELAYS = (0.5, 1.5)  # seconds before attempt 2, 3
 _RETRY_JITTER_RATIO = 0.4         # ±20% around the base
 
@@ -436,10 +437,8 @@ def enrich_listings(listings: list[Any],
         latency_ms:         list[int]         # per-call latencies (for p50/p95)
     """
     if max_workers is None:
-        max_workers = max(
-            1, int(os.environ.get("PULPO_LLM_CONCURRENCY",
-                                  str(DEFAULT_LLM_CONCURRENCY)))
-        )
+        max_workers = max(1, _env_int("PULPO_LLM_CONCURRENCY",
+                                      DEFAULT_LLM_CONCURRENCY))
 
     metrics: dict[str, Any] = {
         "eligible":           0,
