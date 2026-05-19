@@ -461,7 +461,10 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
       cards={TOP_10_CARDS}
       listings={listings}
       heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({})}
+      // Top 10 isn't a filter — it's the head of the rank-sorted list.
+      // Route to /browse with sort=stars_desc so the user sees the same
+      // ranking that produced the shelf, just unbounded.
+      onViewAll={() => app && app.goBrowse && app.goBrowse({ sort: "stars_desc" })}
     />
   );
 }
@@ -482,7 +485,7 @@ export function PriceDropsShelf({ app, locale, heroV4 = false }) {
       cards={PRICE_DROPS_CARDS}
       listings={listings}
       heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "price_drop" })}
+      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "price_drops" })}
     />
   );
 }
@@ -503,7 +506,7 @@ export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
       cards={NEW_THIS_WEEK_CARDS}
       listings={listings}
       heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "new" })}
+      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "new_this_week" })}
     />
   );
 }
