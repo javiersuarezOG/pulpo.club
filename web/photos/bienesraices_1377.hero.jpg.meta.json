@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 618,
   "aspect_ratio": 1.942,
-  "file_size_kb": 192.8,
+  "file_size_kb": 182.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:44:52.261051+00:00",
+  "computed_at": "2026-05-19T21:54:28.065613+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 618,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4693473/79235252/EB-RA3473.jpg?rasterize=true&version=1724513157",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:44:52.261213+00:00"
+  "repicked_at": "2026-05-19T21:54:28.069256+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 285.8,
+  "file_size_kb": 261.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:42:23.133173+00:00",
+  "computed_at": "2026-05-19T21:42:08.390409+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5403131/93431452/EB-TT3131.jpeg?rasterize=true&version=1753365564",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:42:23.133347+00:00"
+  "repicked_at": "2026-05-19T21:42:08.394589+00:00"
 }

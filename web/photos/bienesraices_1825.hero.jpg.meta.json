@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 539,
   "aspect_ratio": 2.226,
-  "file_size_kb": 250.7,
+  "file_size_kb": 236.6,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:49:28.395850+00:00",
+  "computed_at": "2026-05-19T21:55:38.832601+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 539,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3736090/61138253/EB-NI6090.jpg?rasterize=true&version=1683818440",
   "candidate_count": 5,
   "picker_excluded_count": 5,
-  "repicked_at": "2026-05-19T13:49:28.396041+00:00"
+  "repicked_at": "2026-05-19T21:55:38.836405+00:00"
 }

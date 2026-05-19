@@ -1,16 +1,18 @@
 {
-  "width": 1080,
-  "height": 1080,
+  "width": 1200,
+  "height": 1200,
   "aspect_ratio": 1.0,
-  "file_size_kb": 150.4,
+  "file_size_kb": 148.8,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T13:40:57.224216+00:00",
+  "computed_at": "2026-05-19T21:53:43.052866+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 80,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5315930/91722414/EB-TK5930.jpeg?rasterize=true&version=1750176049",
   "candidate_count": 2,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:40:57.224398+00:00"
+  "repicked_at": "2026-05-19T21:53:43.057001+00:00"
 }

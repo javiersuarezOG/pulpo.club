@@ -2,15 +2,17 @@
   "width": 697,
   "height": 456,
   "aspect_ratio": 1.529,
-  "file_size_kb": 66.5,
+  "file_size_kb": 63.4,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:13:30.856363+00:00",
+  "computed_at": "2026-05-19T21:35:41.585073+00:00",
+  "derivative_width": 697,
+  "derivative_height": 456,
   "hero_photo_quality_score": 0,
   "has_text_overlay": true,
   "winning_url": "https://assets.easybroker.com/property_images/3622939/59053403/EB-MX2939.jpg?rasterize=true&version=1679068857",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:13:30.863167+00:00"
+  "repicked_at": "2026-05-19T21:35:41.586621+00:00"
 }

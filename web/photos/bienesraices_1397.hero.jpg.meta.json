@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 768,
   "aspect_ratio": 1.333,
-  "file_size_kb": 190.9,
+  "file_size_kb": 179.8,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:23:12.612245+00:00",
+  "computed_at": "2026-05-19T21:49:48.567028+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 768,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5171428/88855709/EB-SW1428.jpg?rasterize=true&version=1744648028",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:23:12.612396+00:00"
+  "repicked_at": "2026-05-19T21:49:48.570248+00:00"
 }

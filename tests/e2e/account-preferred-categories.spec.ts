@@ -111,9 +111,11 @@ test.describe("/account/notifications — preferred categories", () => {
     await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     const gridText = (await page.locator('[data-chip-group="preferred-categories"]').innerText()).toLowerCase();
-    // Spanish copy present.
-    expect(gridText).toContain("nuevos");
-    expect(gridText).toContain("bajadas de precio");
+    // Spanish copy present. Note: i18n source uses "Nuevas esta semana"
+    // (feminine, matches "nuevas casas/propiedades") and "Rebajas de
+    // precio" — keep these assertions aligned with web/app/i18n.jsx.
+    expect(gridText).toContain("nuevas");
+    expect(gridText).toContain("rebajas de precio");
     expect(gridText).toContain("frente al mar");
     // English canaries absent — each represents an i18n bug we'd
     // otherwise ship silently. Adding a new chip whose EN label would

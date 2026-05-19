@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 630,
   "aspect_ratio": 1.905,
-  "file_size_kb": 182.2,
+  "file_size_kb": 170.2,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:43:36.495131+00:00",
+  "computed_at": "2026-05-19T21:54:17.828384+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 630,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3586462/58385913/EB-MT6462.jpg?rasterize=true&version=1677683854",
   "candidate_count": 4,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:43:36.495307+00:00"
+  "repicked_at": "2026-05-19T21:54:17.831545+00:00"
 }

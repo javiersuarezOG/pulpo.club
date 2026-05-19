@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 683,
   "aspect_ratio": 1.499,
-  "file_size_kb": 134.1,
+  "file_size_kb": 93.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:42:34.874139+00:00",
+  "computed_at": "2026-05-19T21:42:10.177460+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 683,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/11/zonte-cliff-lots-6-1024x683.jpg",
   "candidate_count": 5,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T12:42:34.874295+00:00"
+  "repicked_at": "2026-05-19T21:42:10.183332+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1080,
   "height": 1039,
   "aspect_ratio": 1.039,
-  "file_size_kb": 155.0,
+  "file_size_kb": 138.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:27:21.744281+00:00",
+  "computed_at": "2026-05-19T21:51:01.003779+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 1039,
   "hero_photo_quality_score": 80,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/DKZOWSPPG8/swcCC6JZvi/1001333071.jpeg",
   "candidate_count": 5,
   "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T13:27:21.744462+00:00"
+  "repicked_at": "2026-05-19T21:51:01.007526+00:00"
 }

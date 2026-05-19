@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 794,
   "aspect_ratio": 1.511,
-  "file_size_kb": 204.8,
+  "file_size_kb": 193.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:49:10.594481+00:00",
+  "computed_at": "2026-05-19T21:43:34.759168+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 794,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3600386/58633572/EB-MV0386.jpg?rasterize=true&version=1678227628",
   "candidate_count": 3,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:49:10.594669+00:00"
+  "repicked_at": "2026-05-19T21:43:34.763345+00:00"
 }

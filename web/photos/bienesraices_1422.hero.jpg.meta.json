@@ -2,15 +2,17 @@
   "width": 1182,
   "height": 747,
   "aspect_ratio": 1.582,
-  "file_size_kb": 259.6,
+  "file_size_kb": 246.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:34:43.447986+00:00",
+  "computed_at": "2026-05-19T21:52:26.775852+00:00",
+  "derivative_width": 1182,
+  "derivative_height": 747,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5025905/85968856/EB-SH5905.jpg?rasterize=true&version=1739367129",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:34:43.448162+00:00"
+  "repicked_at": "2026-05-19T21:52:26.780212+00:00"
 }
