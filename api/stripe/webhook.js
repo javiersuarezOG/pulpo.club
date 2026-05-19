@@ -130,6 +130,19 @@ module.exports = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  // Fires the moment we've successfully verified the Stripe signature
+  // and parsed the event, BEFORE any branching. Lets PostHog answer
+  // "did Stripe deliver this event to us at all?" — absence in the
+  // funnel for a given event_id means the webhook never reached us
+  // (misconfigured URL, network failure between Stripe and Vercel,
+  // signature secret mismatch caught above). Distinct from
+  // webhook.checkout_completed which fires per-path after processing.
+  posthog.capture(null, "webhook.received", {
+    event_id: event.id,
+    type: event.type,
+    ms: Date.now() - t0,
+  });
+
   try {
     const clerk = clerkClient();
     switch (event.type) {
@@ -207,9 +220,15 @@ module.exports = async (req, res) => {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "auth_gated", clerk_user_id: explicitUserId,
           });
+          // invitation_sent: false on auth_gated — the user was
+          // already signed in pre-checkout, so no activation email
+          // is needed or sent. Funnel-side this is the
+          // "% of paying users who actually receive activation
+          // email" denominator clarifier.
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "auth_gated",
-            clerk_user_id: explicitUserId, ms: Date.now() - t0,
+            clerk_user_id: explicitUserId, invitation_sent: false,
+            ms: Date.now() - t0,
           });
           break;
         }
@@ -224,7 +243,8 @@ module.exports = async (req, res) => {
             path: "anonymous_no_email", session_id: session.id,
           });
           posthog.capture(distinctId, "webhook.checkout_completed", {
-            ...baseProps, path: "anonymous_no_email", ms: Date.now() - t0,
+            ...baseProps, path: "anonymous_no_email",
+            invitation_sent: false, ms: Date.now() - t0,
           });
           break;
         }
@@ -241,9 +261,14 @@ module.exports = async (req, res) => {
             path: "anonymous_existing_user", clerk_user_id: existing.id,
             locale: stripeLocale,
           });
+          // invitation_sent: false on existing-user — Clerk already has
+          // a user record for this email, so no new invitation is sent.
+          // The WelcomeModal's status-poll surfaces this case as
+          // "user_exists" so the user knows to sign in, not check inbox.
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_existing_user",
-            clerk_user_id: existing.id, ms: Date.now() - t0,
+            clerk_user_id: existing.id, invitation_sent: false,
+            ms: Date.now() - t0,
           });
           break;
         }
@@ -255,9 +280,13 @@ module.exports = async (req, res) => {
             path: "anonymous_dupe_invitation_skipped", session_id: session.id,
             locale: stripeLocale,
           });
+          // invitation_sent: false on dupe — a pending invitation
+          // already exists from a prior webhook delivery. Counts as
+          // "no NEW email" for the activation funnel; the existing
+          // pending invitation may or may not have been delivered.
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_dupe_invitation_skipped",
-            ms: Date.now() - t0,
+            invitation_sent: false, ms: Date.now() - t0,
           });
           break;
         }
@@ -296,10 +325,15 @@ module.exports = async (req, res) => {
             invitation_id: (invitation && invitation.id) || "",
             locale: stripeLocale,
           });
+          // invitation_sent: true — this is the ONLY webhook path
+          // that actually fires Clerk's email. Slicing
+          // webhook.checkout_completed by invitation_sent gives us
+          // the "% of paying users who actually get an activation
+          // email" KPI directly.
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_invitation_created",
             invitation_id: (invitation && invitation.id) || "",
-            ms: Date.now() - t0,
+            invitation_sent: true, ms: Date.now() - t0,
           });
         } catch (err) {
           // Race recovery: if a Clerk user was created in parallel (e.g.
@@ -320,9 +354,13 @@ module.exports = async (req, res) => {
                 path: "anonymous_race_recovered", clerk_user_id: racedUser.id,
                 locale: stripeLocale,
               });
+              // invitation_sent: false on race_recovered — we found
+              // an existing Clerk user mid-invitation-create, bumped
+              // their plan, and skipped re-creating the invitation.
               posthog.capture(distinctId, "webhook.checkout_completed", {
                 ...baseProps, path: "anonymous_race_recovered",
-                clerk_user_id: racedUser.id, ms: Date.now() - t0,
+                clerk_user_id: racedUser.id, invitation_sent: false,
+                ms: Date.now() - t0,
               });
               break;
             }
