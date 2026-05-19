@@ -39,14 +39,20 @@ const SIZES = {
 
 const HIRES_SERVE_DISABLED = process.env.PULPO_HIRES_SERVE === "0";
 
-// Resolve the CDN base URL to fetch deployed static assets from. On Vercel
-// the deployment-specific VERCEL_URL points at the same deployment that
-// serves this function — perfect for content-addressed asset fetching.
+// Resolve the CDN base URL to fetch deployed static assets from.
 // PULPO_PUBLIC_BASE_URL takes precedence when set (lets local `vercel dev`
-// or non-Vercel hosts override). Final fallback is the production domain.
+// or non-Vercel hosts override). Default is the production alias — the
+// only URL guaranteed NOT to be behind Vercel Deployment Protection (SSO).
+//
+// VERCEL_URL deliberately NOT used here: it resolves to the
+// deployment-specific URL (e.g. `pulpo-club-abc.vercel.app`) which
+// Vercel auto-protects with SSO on this project. The function fetching
+// its own deployment URL gets a 401 SSO challenge, the response isn't
+// a JPEG, and every tier in resolveImage() falls through → 404.
+// Diagnosed via debug deploy on PR #315 / branch
+// fix/api-social-image-debug (2026-05-19 15:14 UTC).
 function cdnBaseUrl() {
   if (process.env.PULPO_PUBLIC_BASE_URL) return process.env.PULPO_PUBLIC_BASE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "https://pulpo.club";
 }
 
