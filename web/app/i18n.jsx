@@ -1044,26 +1044,35 @@ const UI_STRINGS = {
   "start.cancelled_notice":   { en: "Checkout cancelled. Try again whenever you're ready.",
                                 es: "Pago cancelado. Inténtalo de nuevo cuando quieras." },
   // /account?welcome=1 popup — fired after Stripe redirect (anon
-  // variant, user hasn't accepted the Clerk magic link yet) and after
-  // Clerk magic-link sign-in completes (signed_in variant).
+  // variant, user hasn't accepted the Clerk invitation yet) and
+  // after Clerk invitation sign-up completes (signed_in variant).
+  // Copy intentionally avoids the "magic link" phrasing — the
+  // mechanism is a Clerk invitation that prompts the user to set
+  // a password, NOT a passwordless magic-link sign-in. Mismatching
+  // copy here caused the post-Stripe loop reported on 2026-05-19.
   "welcome_modal.eyebrow":              { en: "You're in",
                                           es: "Ya está" },
   "welcome_modal.anon.headline":        { en: "Welcome to Pulpo Pro",
                                           es: "Bienvenido a Pulpo Pro" },
-  "welcome_modal.anon.body":            { en: "Your subscription is active. We just emailed you a magic link to sign in. Open it from any device and you'll land back here, signed in.",
-                                          es: "Tu suscripción está activa. Te enviamos un enlace mágico por correo para iniciar sesión. Ábrelo desde cualquier dispositivo y volverás aquí con sesión iniciada." },
+  "welcome_modal.anon.body":            { en: "Your subscription is active. We just sent an invitation to your inbox so you can finish setting up your account. Open it from any device — once you set your password you'll land back here, signed in.",
+                                          es: "Tu suscripción está activa. Acabamos de enviar una invitación a tu correo para que termines de configurar tu cuenta. Ábrela desde cualquier dispositivo — cuando elijas tu contraseña volverás aquí con sesión iniciada." },
   "welcome_modal.anon.cta_inbox":       { en: "Open my inbox →",
                                           es: "Abrir mi correo →" },
-  "welcome_modal.anon.cta_resend":      { en: "Resend the link",
-                                          es: "Reenviar el enlace" },
+  "welcome_modal.anon.cta_resend":      { en: "Resend my invitation",
+                                          es: "Reenviar la invitación" },
   "welcome_modal.anon.resend_done":     { en: "Sent. Check your inbox.",
                                           es: "Enviado. Revisa tu correo." },
   "welcome_modal.anon.resend_failed":   { en: "Couldn't resend. Email hello@pulpo.club if it doesn't arrive.",
                                           es: "No pudimos reenviar. Escribe a hello@pulpo.club si no llega." },
+  // Distinct copy for the resend-but-user-already-exists branch
+  // (Clerk returned a user; nothing to re-invite). Without this the
+  // generic resend_done copy lies — there's no new inbox to check.
+  "welcome_modal.anon.resend_user_exists": { en: "Looks like you're already signed up. Try refreshing this page.",
+                                          es: "Parece que ya tienes cuenta. Refresca la página para continuar." },
   "welcome_modal.signedin.headline":    { en: "You're all set",
                                           es: "Todo listo" },
-  "welcome_modal.signedin.body":        { en: "Welcome to Pulpo Pro. Start exploring the marketplace.",
-                                          es: "Bienvenido a Pulpo Pro. Empieza a explorar el marketplace." },
+  "welcome_modal.signedin.body":        { en: "Welcome to Pulpo Pro. Your account is active — start exploring the marketplace.",
+                                          es: "Bienvenido a Pulpo Pro. Tu cuenta está activa — empieza a explorar el marketplace." },
   "welcome_modal.signedin.cta_explore": { en: "Start exploring →",
                                           es: "Empezar a explorar →" },
   "welcome_modal.aria.dialog":          { en: "Welcome to Pulpo Pro",
