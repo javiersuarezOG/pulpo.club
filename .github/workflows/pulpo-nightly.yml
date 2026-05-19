@@ -73,7 +73,7 @@ jobs:
       # None and the elite featured-listing filter falls back to
       # "not flagged" — runs cleanly but without OCR exclusion.
       - name: Install Tesseract OCR
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-spa
 
       - name: Install dependencies
         run: pip install -r requirements.txt
