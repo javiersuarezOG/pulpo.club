@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 76.3,
+  "file_size_kb": 69.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:52:33.735352+00:00",
+  "computed_at": "2026-05-19T21:56:03.626667+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4729963/79952311/EB-RD9963.jpg?rasterize=true&version=1726068228",
   "candidate_count": 3,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:52:33.735510+00:00"
+  "repicked_at": "2026-05-19T21:56:03.629276+00:00"
 }

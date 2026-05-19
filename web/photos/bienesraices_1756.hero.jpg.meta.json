@@ -2,15 +2,17 @@
   "width": 1080,
   "height": 566,
   "aspect_ratio": 1.908,
-  "file_size_kb": 171.3,
+  "file_size_kb": 162.2,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:31:04.026978+00:00",
+  "computed_at": "2026-05-19T21:51:58.260043+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 566,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4286294/71364943/EB-PL6294.jpg?rasterize=true&version=1707671879",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:31:04.027164+00:00"
+  "repicked_at": "2026-05-19T21:51:58.263163+00:00"
 }

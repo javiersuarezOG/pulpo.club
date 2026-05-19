@@ -2,15 +2,17 @@
   "width": 1280,
   "height": 959,
   "aspect_ratio": 1.335,
-  "file_size_kb": 159.6,
+  "file_size_kb": 134.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:43:23.738480+00:00",
+  "computed_at": "2026-05-19T21:54:15.621667+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 959,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvT0NOSVVXRlhGQi9aYnE0Wk53OURoL1RlcnJlbm9fZW5fdmVudGFfZW5fU2FuX01pZ3VlbF8yLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
   "candidate_count": 4,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:43:23.738993+00:00"
+  "repicked_at": "2026-05-19T21:54:15.625669+00:00"
 }

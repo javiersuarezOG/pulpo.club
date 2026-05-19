@@ -1,16 +1,18 @@
 {
-  "width": 1040,
-  "height": 1080,
-  "aspect_ratio": 1.038,
-  "file_size_kb": 239.1,
+  "width": 1080,
+  "height": 1122,
+  "aspect_ratio": 1.039,
+  "file_size_kb": 221.0,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T12:25:48.716141+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:38:32.453621+00:00",
+  "derivative_width": 1040,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4998524/85412569/EB-SE8524.jpg?rasterize=true&version=1738258521",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:25:48.716344+00:00"
+  "repicked_at": "2026-05-19T21:38:32.458501+00:00"
 }

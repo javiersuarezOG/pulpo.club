@@ -7960,5 +7960,17 @@
     "provider": "segmind",
     "model": "qwen3-vl-flash",
     "ts": "2026-05-19T13:57:47.277643+00:00"
+  },
+  "335df8d24ff90806": {
+    "score": 4.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T21:36:21.625451+00:00"
+  },
+  "5c5997494d5af992": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T21:46:09.933041+00:00"
   }
 }

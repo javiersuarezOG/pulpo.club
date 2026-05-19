@@ -2,15 +2,17 @@
   "width": 1265,
   "height": 708,
   "aspect_ratio": 1.787,
-  "file_size_kb": 169.3,
+  "file_size_kb": 159.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:07:25.405407+00:00",
+  "computed_at": "2026-05-19T21:34:32.385262+00:00",
+  "derivative_width": 1265,
+  "derivative_height": 708,
   "hero_photo_quality_score": 60,
   "has_text_overlay": true,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003133456009/v3/HDPhotos/LOFT 1.4.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:07:25.405580+00:00"
+  "repicked_at": "2026-05-19T21:34:32.388868+00:00"
 }

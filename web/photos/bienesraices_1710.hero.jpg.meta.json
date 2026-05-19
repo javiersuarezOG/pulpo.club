@@ -2,15 +2,17 @@
   "width": 900,
   "height": 675,
   "aspect_ratio": 1.333,
-  "file_size_kb": 100.1,
+  "file_size_kb": 94.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:34:07.534773+00:00",
+  "computed_at": "2026-05-19T21:40:13.675023+00:00",
+  "derivative_width": 900,
+  "derivative_height": 675,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4486094/75111124/EB-QF6094.jpeg?rasterize=true&version=1715878310",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:34:07.534920+00:00"
+  "repicked_at": "2026-05-19T21:40:13.677196+00:00"
 }

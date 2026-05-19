@@ -1,16 +1,18 @@
 {
-  "width": 1080,
-  "height": 1080,
+  "width": 1530,
+  "height": 1530,
   "aspect_ratio": 1.0,
-  "file_size_kb": 348.1,
+  "file_size_kb": 513.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T12:17:28.897583+00:00",
+  "computed_at": "2026-05-19T21:36:39.735952+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ICKJEX9EI6/xYxXFXDyQh/Finca_de_34_Manzanas_en_Cant%C3%B3n_El_Porvenir.jpeg",
   "candidate_count": 3,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:17:28.897816+00:00"
+  "repicked_at": "2026-05-19T21:36:39.745806+00:00"
 }

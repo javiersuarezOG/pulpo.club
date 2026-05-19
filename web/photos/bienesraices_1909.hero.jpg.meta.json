@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 901,
   "aspect_ratio": 1.137,
-  "file_size_kb": 150.0,
+  "file_size_kb": 141.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:06:36.765206+00:00",
+  "computed_at": "2026-05-19T21:47:02.291606+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 901,
   "hero_photo_quality_score": 80,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3554426/57801596/EB-MQ4426.jpg?rasterize=true&version=1676415982",
   "candidate_count": 5,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T13:06:36.765361+00:00"
+  "repicked_at": "2026-05-19T21:47:02.294595+00:00"
 }

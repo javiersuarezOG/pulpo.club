@@ -1,16 +1,18 @@
 {
-  "width": 1442,
-  "height": 1080,
+  "width": 4160,
+  "height": 3116,
   "aspect_ratio": 1.335,
-  "file_size_kb": 647.2,
+  "file_size_kb": 3552.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T13:47:51.620464+00:00",
+  "computed_at": "2026-05-19T21:55:16.733931+00:00",
+  "derivative_width": 1442,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002523864001/v3/HDPhotos/Imagen de WhatsApp 2025-08-15 a las 12.48.12_43aec67d.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:47:51.620746+00:00"
+  "repicked_at": "2026-05-19T21:55:16.790689+00:00"
 }

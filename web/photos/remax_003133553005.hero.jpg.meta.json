@@ -1,16 +1,18 @@
 {
-  "width": 808,
-  "height": 1080,
-  "aspect_ratio": 1.337,
-  "file_size_kb": 181.0,
+  "width": 1839,
+  "height": 2457,
+  "aspect_ratio": 1.336,
+  "file_size_kb": 576.8,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T13:09:02.903600+00:00",
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:47:26.244209+00:00",
+  "derivative_width": 808,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003133553005/v3/HDPhotos/IMG_20250208_224733.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:09:02.903780+00:00"
+  "repicked_at": "2026-05-19T21:47:26.257721+00:00"
 }

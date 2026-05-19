@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 111.1,
+  "file_size_kb": 101.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:02:56.779321+00:00",
+  "computed_at": "2026-05-19T21:46:23.805182+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4251638/96272339/EB-PI1638.jpeg?rasterize=true&version=1758838431",
   "candidate_count": 3,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:02:56.779464+00:00"
+  "repicked_at": "2026-05-19T21:46:23.807666+00:00"
 }

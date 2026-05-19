@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 683,
   "aspect_ratio": 1.499,
-  "file_size_kb": 70.9,
+  "file_size_kb": 51.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:29:37.927141+00:00",
+  "computed_at": "2026-05-19T21:39:14.417983+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 683,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/06/atami-house-for-sale-15-1024x683.jpg",
   "candidate_count": 5,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T12:29:37.927287+00:00"
+  "repicked_at": "2026-05-19T21:39:14.422619+00:00"
 }

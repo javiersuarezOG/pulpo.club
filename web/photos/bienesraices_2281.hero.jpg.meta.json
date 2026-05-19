@@ -2,15 +2,17 @@
   "width": 1376,
   "height": 752,
   "aspect_ratio": 1.83,
-  "file_size_kb": 153.9,
+  "file_size_kb": 138.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:57:47.320905+00:00",
+  "computed_at": "2026-05-19T21:57:02.213027+00:00",
+  "derivative_width": 1376,
+  "derivative_height": 752,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/NJ9N7DT3AG/3kBY7njGzF/Venta_de_Terreno_de_5.jpeg",
   "candidate_count": 2,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:57:47.321100+00:00"
+  "repicked_at": "2026-05-19T21:57:02.216630+00:00"
 }

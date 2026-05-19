@@ -1,16 +1,18 @@
 {
-  "width": 745,
-  "height": 1080,
-  "aspect_ratio": 1.45,
-  "file_size_kb": 262.1,
+  "width": 1080,
+  "height": 1565,
+  "aspect_ratio": 1.449,
+  "file_size_kb": 410.8,
   "hero_eligible": false,
-  "card_eligible": false,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T12:42:44.982476+00:00",
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:42:12.166097+00:00",
+  "derivative_width": 745,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4815921/81639166/EB-RM5921.jpg?rasterize=true&version=1729733141",
   "candidate_count": 5,
   "picker_excluded_count": 3,
-  "repicked_at": "2026-05-19T12:42:44.982671+00:00"
+  "repicked_at": "2026-05-19T21:42:12.173142+00:00"
 }

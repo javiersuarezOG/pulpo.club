@@ -2,15 +2,17 @@
   "width": 1079,
   "height": 806,
   "aspect_ratio": 1.339,
-  "file_size_kb": 213.5,
+  "file_size_kb": 189.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:59:55.199273+00:00",
+  "computed_at": "2026-05-19T21:45:52.156477+00:00",
+  "derivative_width": 1079,
+  "derivative_height": 806,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/A2PZ2CGPMS/TncPgNcL6e/WhatsApp_Image_2026-01-06_at_7.jpeg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:59:55.199430+00:00"
+  "repicked_at": "2026-05-19T21:45:52.160516+00:00"
 }

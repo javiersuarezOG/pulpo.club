@@ -1421,6 +1421,12 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T13:41:04.002245+00:00"
   },
+  "4936a25935c14ba8": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T21:46:17.967194+00:00"
+  },
   "49859e34b475a3fc": {
     "cheap_score": 0,
     "floor": 40,
@@ -1966,6 +1972,12 @@
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T13:10:28.183352+00:00"
+  },
+  "68e27dad42f486ab": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T21:45:15.777976+00:00"
   },
   "69145a74b25453b2": {
     "cheap_score": 0,

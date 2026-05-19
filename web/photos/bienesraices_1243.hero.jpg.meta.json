@@ -1,16 +1,18 @@
 {
-  "width": 498,
-  "height": 1080,
-  "aspect_ratio": 2.169,
-  "file_size_kb": 155.0,
+  "width": 1080,
+  "height": 2340,
+  "aspect_ratio": 2.167,
+  "file_size_kb": 417.6,
   "hero_eligible": false,
-  "card_eligible": false,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T12:17:12.343486+00:00",
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:36:33.482759+00:00",
+  "derivative_width": 498,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
   "winning_url": "https://assets.easybroker.com/property_images/5351373/92398628/EB-TO1373.jpg?rasterize=true&version=1751401231",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:17:12.343693+00:00"
+  "repicked_at": "2026-05-19T21:36:33.491033+00:00"
 }
