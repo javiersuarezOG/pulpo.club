@@ -31,6 +31,12 @@ from pulpo.ranker import rank  # noqa: E402
 from automation.prd_feasibility import run_probe as run_feasibility_probe  # type: ignore  # noqa: E402
 from automation.llm_enrichment import enrich_listings as _llm_enrich  # type: ignore  # noqa: E402
 from automation._atomic import atomic_write_json as _atomic_write_json  # noqa: E402
+from automation._config import (  # noqa: E402
+    env_bool as _env_bool,
+    env_float as _env_float,
+    env_int as _env_int,
+    env_str as _env_str,
+)
 from automation.ai_enrichment_fallback import apply_fallbacks as _ai_fallback  # type: ignore  # noqa: E402
 from pulpo.nlp_extractor import (  # type: ignore  # noqa: E402
     load_dictionaries as _load_nlp_dicts,
@@ -165,9 +171,8 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
 
     floor = _picker_min_cheap_score() if _picker_min_cheap_score else 40
 
-    cap = int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
-                              _PHOTO_CANDIDATES_CAP_DEFAULT))
-    cap = max(1, cap)
+    cap = max(1, _env_int("PULPO_PHOTO_MAX_CANDIDATES",
+                          _PHOTO_CANDIDATES_CAP_DEFAULT))
 
     candidates = []
     for url in photo_urls[:cap]:
@@ -488,11 +493,11 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     attempted = ok = skipped = failed = 0
     hero_eligible_count = 0
     card_eligible_count = 0
-    budget_s = float(os.environ.get("PULPO_PHOTO_BUDGET_S", "600"))
+    budget_s = _env_float("PULPO_PHOTO_BUDGET_S", 600.0)
     t0 = _time.monotonic()
     budget_hit = False
-    cap = max(1, int(os.environ.get("PULPO_PHOTO_MAX_CANDIDATES",
-                                     _PHOTO_CANDIDATES_CAP_DEFAULT)))
+    cap = max(1, _env_int("PULPO_PHOTO_MAX_CANDIDATES",
+                          _PHOTO_CANDIDATES_CAP_DEFAULT))
 
     # State stashed for each non-skipped listing — feeds Phase C below.
     # ``None`` entries mark listings the URL-hash cache skipped or that
@@ -607,12 +612,9 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     # eligibility — the gate effectively becomes a no-op without us
     # having to special-case it here. That's the load-bearing
     # fail-soft contract from the plan.
-    # GH Actions passes `${{ secrets.LLM_VISION_TOP_PCT }}` which is the
-    # empty string when the secret is unset — `int("")` raises ValueError.
-    # The `or "5"` falls through to the default for both unset env and
-    # empty string. Matches the same pattern used by `_cost_per_call_usd`
-    # and `_daily_budget_usd` in aesthetic_vision.py.
-    top_pct = int(os.environ.get("LLM_VISION_TOP_PCT") or "5")
+    # _env_int handles the GH Actions footgun where unset secrets resolve
+    # to the empty string rather than absent (see automation/_config.py).
+    top_pct = _env_int("LLM_VISION_TOP_PCT", 5)
     # Lone-candidate optimization — a listing whose pool reduces to one
     # non-text-overlay survivor has no ranking choice to make. Exclude
     # its candidates from the eligibility pool entirely so the LLM
@@ -821,25 +823,18 @@ def _download_hires_photos(listings, repo: Path) -> dict:
     - Appends one row to ``web/data/hires_pipeline_metrics.jsonl``.
     - Per-listing log lines on stderr (`[hires] start/ok/reject/error/skip/budget`).
     """
-    enabled = os.environ.get("PULPO_HIRES_ENABLED", "0").lower() not in ("", "0", "false", "no")
-    if not enabled:
+    if not _env_bool("PULPO_HIRES_ENABLED", False):
         return {"enabled": False}
 
-    allow_csv = (os.environ.get("PULPO_HIRES_SOURCES") or "").strip()
+    allow_csv = _env_str("PULPO_HIRES_SOURCES", "")
     allow_set = {s.strip() for s in allow_csv.split(",") if s.strip()}
     if not allow_set:
         print("[hires] PULPO_HIRES_SOURCES is empty — nothing to do", file=sys.stderr)
         return {"enabled": True, "skipped_no_allowlist": True}
 
-    try:
-        budget_s = float(os.environ.get("PULPO_HIRES_BUDGET_S") or "1500")
-    except ValueError:
-        budget_s = 1500.0
-    try:
-        limit_n = int(os.environ.get("PULPO_HIRES_LIMIT") or "0")
-    except ValueError:
-        limit_n = 0
-    shadow = os.environ.get("PULPO_HIRES_SHADOW", "0").lower() not in ("", "0", "false", "no")
+    budget_s = _env_float("PULPO_HIRES_BUDGET_S", 1500.0)
+    limit_n = _env_int("PULPO_HIRES_LIMIT", 0)
+    shadow = _env_bool("PULPO_HIRES_SHADOW", False)
 
     try:
         from PIL import Image  # noqa: F401  -- decode sanity check
@@ -1168,9 +1163,14 @@ def _print_per_type_score_distribution(ranked: list) -> None:
 
 
 def main() -> int:
+    # NOTE: PULPO_OFFLINE intentionally keeps the strict `== "1"` semantics
+    # to stay bit-identical with pulpo/agents/html_crawler.py:is_offline().
+    # Migrating to env_bool here without the matching update there would
+    # silently let one module treat `PULPO_OFFLINE=true` as offline while
+    # the other doesn't. Migrate both in lock-step if/when needed.
     offline = os.environ.get("PULPO_OFFLINE") == "1"
-    limit = int(os.environ.get("PULPO_LIMIT", "30"))
-    sources = (os.environ.get("PULPO_SOURCES") or ",".join(REGISTRY.keys())).split(",")
+    limit = _env_int("PULPO_LIMIT", 30)
+    sources = _env_str("PULPO_SOURCES", ",".join(REGISTRY.keys())).split(",")
 
     started = datetime.now(timezone.utc)
     # PostHog: tag every subsequent capture() in this process with a
@@ -1598,11 +1598,9 @@ def main() -> int:
     #   (the sidecar persists progress, so cache_hits cover them).
     #   The point is that the pipeline always SHIPS — better to commit
     #   partially-enriched data than time out the whole nightly job.
-    _llm_deadline_s = os.environ.get("PULPO_LLM_DEADLINE_SECONDS")
+    _llm_deadline_s = _env_float("PULPO_LLM_DEADLINE_SECONDS", 0.0)
     _llm_deadline = (
-        _time.monotonic() + float(_llm_deadline_s)
-        if _llm_deadline_s and _llm_deadline_s.strip()
-        else None
+        _time.monotonic() + _llm_deadline_s if _llm_deadline_s > 0 else None
     )
     llm_metrics = _llm_enrich(
         listings,
@@ -1806,10 +1804,10 @@ def main() -> int:
         _ph_capture("regression_guard_triggered", {
             "regression_count": len(regressions),
             "regressions":      regressions[:20],   # cap payload size
-            "override_active":  os.getenv("PULPO_ALLOW_POPULATION_REGRESSION") == "1",
+            "override_active":  _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False),
         })
         msg = "[regression-guard] population-rate drops exceeded 20% threshold:\n  " + "\n  ".join(regressions)
-        if os.getenv("PULPO_ALLOW_POPULATION_REGRESSION") == "1":
+        if _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False):
             print(f"{msg}\n[regression-guard] override active — continuing.")
         else:
             print(msg, file=sys.stderr)

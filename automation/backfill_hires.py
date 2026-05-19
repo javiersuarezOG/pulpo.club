@@ -35,7 +35,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -135,8 +134,9 @@ def main() -> int:
         print("[backfill-hires] no listings matched filter — nothing to do")
         return 0
 
-    enabled = os.environ.get("PULPO_HIRES_ENABLED", "0").lower() not in ("", "0", "false", "no")
-    sources_env = os.environ.get("PULPO_HIRES_SOURCES", "")
+    from automation._config import env_bool, env_str
+    enabled = env_bool("PULPO_HIRES_ENABLED", False)
+    sources_env = env_str("PULPO_HIRES_SOURCES", "")
     print(f"[backfill-hires] mode={'execute' if args.execute else 'dry-run'} "
           f"listings={n_targets} PULPO_HIRES_ENABLED={enabled} "
           f"PULPO_HIRES_SOURCES='{sources_env}'")

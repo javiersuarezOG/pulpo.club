@@ -142,8 +142,8 @@ def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
 
 
 def _is_enabled() -> bool:
-    val = os.environ.get("LLM_VISION_ENABLED", "false").strip().lower()
-    return val in ("1", "true", "yes", "on")
+    from automation._config import env_bool
+    return env_bool("LLM_VISION_ENABLED", False)
 
 
 def _resolve_provider() -> Optional[str]:
@@ -361,25 +361,15 @@ def _cost_per_call(provider: Optional[str] = None) -> float:
     listed default is returned. When ``provider`` is None (legacy
     callsite), the qwen default holds — matches pre-refactor behavior.
     """
-    raw = os.environ.get("LLM_VISION_COST_PER_CALL_USD")
-    if raw:
-        try:
-            return float(raw)
-        except ValueError:
-            pass
-    if provider and provider in _DEFAULT_COSTS_BY_PROVIDER:
-        return _DEFAULT_COSTS_BY_PROVIDER[provider]
-    return _DEFAULT_COST_PER_CALL_USD
+    from automation._config import env_float
+    fallback = (_DEFAULT_COSTS_BY_PROVIDER.get(provider, _DEFAULT_COST_PER_CALL_USD)
+                if provider else _DEFAULT_COST_PER_CALL_USD)
+    return env_float("LLM_VISION_COST_PER_CALL_USD", fallback)
 
 
 def _daily_budget_usd() -> float:
-    raw = os.environ.get("LLM_VISION_DAILY_BUDGET_USD")
-    if raw:
-        try:
-            return float(raw)
-        except ValueError:
-            pass
-    return _DEFAULT_BUDGET_USD
+    from automation._config import env_float
+    return env_float("LLM_VISION_DAILY_BUDGET_USD", _DEFAULT_BUDGET_USD)
 
 
 def _spent_today() -> float:
