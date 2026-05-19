@@ -44,3 +44,22 @@ export const CATEGORY_IMAGES = {
 export function getCategoryImage(key) {
   return CATEGORY_IMAGES[key] || null;
 }
+
+// Deterministic visual fallback for a listing that has no usable photo
+// (no URL, or onerror). Picks from the bundled category WebPs so the
+// surface never renders a text-only placeholder. Priority chain:
+//   master_category → land_type → beachfront_tier → has_*_view flags →
+//   final fallback to `flat_buildable` (a neutral, photo-friendly land
+//   shot).
+export function categoryImageForListing(listing) {
+  if (!listing) return CATEGORY_IMAGES.flat_buildable;
+  if (listing.master_category === "beach") return CATEGORY_IMAGES.beachfront;
+  if (listing.master_category === "lake")  return CATEGORY_IMAGES.water_features;
+  if (listing.land_type === "agricultural") return CATEGORY_IMAGES.agricultural;
+  if (listing.land_type === "commercial")   return CATEGORY_IMAGES.commercial;
+  if (listing.beachfront_tier) return CATEGORY_IMAGES.beachfront;
+  if (listing.has_ocean_view)  return CATEGORY_IMAGES.ocean_view;
+  if (listing.has_mountain_view) return CATEGORY_IMAGES.mountain_view;
+  if (listing.has_water_body)  return CATEGORY_IMAGES.water_features;
+  return CATEGORY_IMAGES.flat_buildable;
+}

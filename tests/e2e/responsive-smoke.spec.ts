@@ -2,7 +2,7 @@
 // claimed it did. Catches the "horizontal scroll on mobile" class of bug
 // before it ships. Surface, viewport, and content-shape coverage:
 //
-//   for each viewport ∈ [320×568, 375×812, 414×896, 768×1024]:
+//   for each viewport ∈ [320×568, 375×812, 414×896, 768×1024, 1280×800]:
 //     for each section in [/, /browse, /saved, /plans, /account]:
 //       cold-load → assert documentElement.scrollWidth ≤ innerWidth + 1
 //
@@ -14,6 +14,11 @@
 // outerHTML so the engineer who breaks this in 18 months gets a useful
 // error message, not just "the page is too wide."
 //
+// Mobile-first is a hard rule per CLAUDE.md — but desktop has to keep
+// working too. The 1280×800 viewport is the standard laptop size and
+// catches "looks great on iPhone, two-column layout collapses into a
+// single 600px-wide stack on a MacBook" regressions.
+//
 // Why a separate file from preview-smoke + section-urls-full-sweep:
 //   - preview-smoke is the no-crash floor (every PR runs it)
 //   - section-urls-full-sweep is the routing/SEO sweep (one-time PR check)
@@ -24,10 +29,15 @@ import { test, expect } from "@playwright/test";
 import { attachErrorRecorder, seedUser } from "./_helpers";
 
 const VIEWPORTS = [
-  { name: "320×568 iPhone SE",        width: 320, height: 568  },
-  { name: "375×812 iPhone 13",        width: 375, height: 812  },
-  { name: "414×896 iPhone Pro Max",   width: 414, height: 896  },
-  { name: "768×1024 iPad portrait",   width: 768, height: 1024 },
+  { name: "320×568 iPhone SE",        width: 320,  height: 568  },
+  { name: "375×812 iPhone 13",        width: 375,  height: 812  },
+  { name: "414×896 iPhone Pro Max",   width: 414,  height: 896  },
+  { name: "768×1024 iPad portrait",   width: 768,  height: 1024 },
+  // Desktop. Hard-rule mobile-first means we must not lose the desktop
+  // surface either — this viewport catches "two-column layout collapses
+  // to single stack on a MacBook" regressions when the only media-query
+  // breakpoints were sized for mobile widths.
+  { name: "1280×800 desktop",         width: 1280, height: 800  },
 ] as const;
 
 // Public-or-modal-gated section paths. Matches section-urls-full-sweep.spec.ts.
