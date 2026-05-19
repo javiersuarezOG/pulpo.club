@@ -201,6 +201,13 @@ class Listing:
                                               # subset of {top_rated, under_250k, gated, waterfront}
     star_rating: float = 0.0                 # 0.0..5.0 in 0.5 steps; 0.0 when rank_score missing
 
+    # Quality gate — True when the source broker hasn't shared price OR
+    # area. Set by pulpo.derived_rules.derive_is_incomplete before
+    # ranker.rank() so the ranker can hard-floor the score; consumed by
+    # the FE to hide these listings from Discover shelves + Browse
+    # default, and to surface "Not shared" copy on the detail page.
+    is_incomplete: bool = False
+
     # PRD §FR-7 derived signals (Phase 1)
     data_quality_score: Optional[float] = None  # 0..1, populated_fields / scoreable_total
     investment_signal: Optional[str] = None     # 'deal'|'hot'|'stale'|'new'|None

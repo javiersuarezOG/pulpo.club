@@ -196,6 +196,12 @@ export interface Listing {
     discovery_tags: ("top_rated" | "under_250k" | "gated" | "waterfront")[];
     star_rating: number;  // 0.0..5.0 in 0.5 increments; 0.0 = no rank_score
 
+    // Quality gate — true when the broker hasn't shared price OR area_m2.
+    // Excluded from Discover shelves + the default Browse view; users opt
+    // in via the Browse "Show missing details" chip. The ranker hard-floors
+    // these so they always sort below complete listings.
+    is_incomplete: boolean;
+
     // ── Image-enrichment protocol (hero rewrite Phase 2) ────────────
     // <file>.hero.jpg meets 1600×1200 + aspect 1.4–1.85 + ≤ 5MB; <file>.jpg
     // meets 800×600. Both default false until the pipeline populates them.

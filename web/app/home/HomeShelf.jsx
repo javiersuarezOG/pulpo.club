@@ -88,10 +88,17 @@ function useShelfScrolled(shelfKey, listRef) {
 
 const MIN_REAL_LISTINGS = 5;
 
+// Curated shelves only surface complete listings. A listing missing
+// price or area never qualifies regardless of how strong its other
+// signals are — the shelf is a quality promise, not a recall surface.
+function isShelfEligible(l) {
+  return !l.is_incomplete && l.photos && l.photos.length > 0;
+}
+
 // Top 10: rank_score-sorted, must have at least one photo.
 function pickTopRanked(listings, n) {
   return [...listings]
-    .filter((l) => l.rank_score != null && l.photos && l.photos.length > 0)
+    .filter((l) => l.rank_score != null && isShelfEligible(l))
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
     .slice(0, n);
 }
@@ -99,7 +106,7 @@ function pickTopRanked(listings, n) {
 // Price drops: previous_price > price, sorted by % drop desc.
 function pickPriceDrops(listings, n) {
   return [...listings]
-    .filter((l) => l.previous_price && l.price && l.previous_price > l.price && l.photos && l.photos.length > 0)
+    .filter((l) => l.previous_price && l.price && l.previous_price > l.price && isShelfEligible(l))
     .map((l) => ({ l, dropPct: 1 - l.price / l.previous_price }))
     .sort((a, b) => b.dropPct - a.dropPct)
     .slice(0, n)
@@ -109,7 +116,7 @@ function pickPriceDrops(listings, n) {
 // New this week: days_listed ≤ 7, sorted by first_seen_date asc (most recent).
 function pickNewThisWeek(listings, n) {
   return [...listings]
-    .filter((l) => (l.days_listed ?? l.first_seen_date) <= 7 && l.photos && l.photos.length > 0)
+    .filter((l) => (l.days_listed ?? l.first_seen_date) <= 7 && isShelfEligible(l))
     .sort((a, b) => (a.first_seen_date ?? 999) - (b.first_seen_date ?? 999))
     .slice(0, n);
 }
