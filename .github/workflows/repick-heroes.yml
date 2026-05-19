@@ -1,0 +1,129 @@
+name: repick heroes (one-off retroactive)
+
+# Manual-trigger workflow that re-runs the picker across every listing
+# in web/data/ranked.json. No scrape, no DeepSeek enrichment, no
+# ranker. Wraps automation/repick_heroes.py in the same data-PR flow
+# pulpo-nightly.yml uses.
+#
+# Trigger:
+#   gh workflow run repick-heroes.yml -f floor=40 -f daily_budget_usd=5
+
+on:
+  workflow_dispatch:
+    inputs:
+      floor:
+        description: "Quality floor (0-100). Empty = default 40."
+        required: false
+        default: ""
+      limit:
+        description: "Operate on first N listings (empty = all)."
+        required: false
+        default: ""
+      source:
+        description: "Comma-separated source codes (empty = all sources)."
+        required: false
+        default: ""
+      daily_budget_usd:
+        description: "Override LLM_VISION_DAILY_BUDGET_USD (default 1.00)."
+        required: false
+        default: ""
+      booster_only_cached:
+        description: "Skip VLM calls. $0 spend."
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: pulpo-nightly
+  cancel-in-progress: true
+
+jobs:
+  repick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Tesseract OCR
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run repick_heroes CLI
+        env:
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED || 'true' }}
+          LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
+          LLM_VISION_DAILY_BUDGET_USD: ${{ github.event.inputs.daily_budget_usd || secrets.LLM_VISION_DAILY_BUDGET_USD }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+          HERO_PICKER_MIN_CHEAP_SCORE: ${{ github.event.inputs.floor }}
+        run: |
+          set -e
+          ARGS=(--execute)
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ github.event.inputs.limit }}")
+          fi
+          if [ -n "${{ github.event.inputs.source }}" ]; then
+            ARGS+=(--source "${{ github.event.inputs.source }}")
+          fi
+          if [ -n "${{ github.event.inputs.floor }}" ]; then
+            ARGS+=(--floor "${{ github.event.inputs.floor }}")
+          fi
+          if [ "${{ github.event.inputs.booster_only_cached }}" = "true" ]; then
+            ARGS+=(--booster-only-cached)
+          fi
+          python automation/repick_heroes.py "${ARGS[@]}"
+
+      - name: Commit refreshed data via PR
+        id: commit
+        env:
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "bot@pulpo.club"
+          git add web/data/ranked.json \
+                  web/data/picker_excluded.json \
+                  web/data/llm_vision_cache.json \
+                  web/data/llm_vision_budget.jsonl 2>/dev/null || true
+          git add web/data/repick_summary.jsonl 2>/dev/null || true
+          git add "web/photos/" 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No data changes."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          BRANCH="chore/repick-heroes-$(date -u +%Y-%m-%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(data): repick heroes $(date -u +%Y-%m-%d)"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore(data): repick heroes $(date -u +%Y-%m-%d)" \
+            --body "Automated retroactive picker run."
+          gh workflow run ci.yml --ref "$BRANCH" || true
+          gh workflow run tests-required.yml --ref "$BRANCH" || true
+          gh pr merge "$BRANCH" --squash --delete-branch --auto
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Vercel
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install -g vercel@latest
+          vercel deploy --prod --yes
