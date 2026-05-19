@@ -1,9 +1,387 @@
 {
+  "009ac198a72e9967": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:14.980594+00:00"
+  },
+  "010f68dadbecb4dc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:37:00.768564+00:00"
+  },
+  "012cc978df96c0f0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:33.545562+00:00"
+  },
+  "013a5f4cef96e450": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:12.847067+00:00"
+  },
+  "015b0b58982e3403": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:54.213716+00:00"
+  },
+  "01b99d8da66c2bec": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:05.940348+00:00"
+  },
+  "0317663cff449f36": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:35.679990+00:00"
+  },
+  "0363f1ada898072d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:41.588889+00:00"
+  },
+  "03841ba1e9748d3d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:41.492870+00:00"
+  },
+  "0392da727abb534a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:03.696032+00:00"
+  },
+  "0412feca98462915": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:56.059702+00:00"
+  },
+  "04193809278be02b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:19.868174+00:00"
+  },
+  "047d3927ed7b25e1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:10.153018+00:00"
+  },
+  "04a9c90721f91a14": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:59.253404+00:00"
+  },
+  "04e3390379eb49fa": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:00.113490+00:00"
+  },
+  "04e4fc8f516f004a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:40.440565+00:00"
+  },
+  "050ef4dcfe5ec44c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:04.665846+00:00"
+  },
+  "052a9fc6d625bb83": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:19.486276+00:00"
+  },
+  "05d32d16edbfc686": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:55.271666+00:00"
+  },
+  "05dbd1e553b909bd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:39.855330+00:00"
+  },
+  "05e040ecbbf29d5d": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:51.317426+00:00"
+  },
+  "07c2bb2b7731eec0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:20.865946+00:00"
+  },
+  "08867fee26efcd70": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:46.873440+00:00"
+  },
+  "08bf5a8ec81ceb1a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:39.496214+00:00"
+  },
+  "08e134a2a1133fa6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:05.326062+00:00"
+  },
+  "0917e67dd880fdf5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:24.579113+00:00"
+  },
+  "0950dd48364d3e60": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:54.817763+00:00"
+  },
+  "0978e6a0abe308a6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:23.680170+00:00"
+  },
+  "098e9617cdd64b1b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:40.874832+00:00"
+  },
+  "09ee5d408630033f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:26.483903+00:00"
+  },
+  "0a7fec826df7f101": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:03.419897+00:00"
+  },
+  "0a82d395ae7c8a10": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:50.203441+00:00"
+  },
+  "0a8ac6947fe1e557": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:14.651335+00:00"
+  },
+  "0b1c93577bb52b8b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:52.256865+00:00"
+  },
+  "0b76473f6a3b4c1d": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:17.924841+00:00"
+  },
+  "0b76ad72abe8042a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:46.690116+00:00"
+  },
+  "0c48ee3aaed6376d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:24.933249+00:00"
+  },
+  "0c9997164e5aca4c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:04.187327+00:00"
+  },
+  "0d10016b7a24408a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:59.225549+00:00"
+  },
+  "0d7d8bbf178d220e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:06:26.823099+00:00"
+  },
   "0dec1426d9ca770f": {
     "cheap_score": 0,
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:26:17.107095+00:00"
+  },
+  "0df6f1ca552b0012": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:30.692383+00:00"
+  },
+  "0e879c26515764c9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:56.416626+00:00"
+  },
+  "0f0a34ab0d92e06e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:27.500808+00:00"
+  },
+  "0f3e5832ab55ea06": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:53.429942+00:00"
+  },
+  "0f4e7a7f285e2b7f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:15.224314+00:00"
+  },
+  "0f9dd25bbb5ec381": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:52.829434+00:00"
+  },
+  "0ff43ebfe40294b4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:50.178654+00:00"
+  },
+  "102d66432ab307a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:17:43.490087+00:00"
+  },
+  "10857ef0f0530b21": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:21:59.488027+00:00"
+  },
+  "10f18b5b8decdc74": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:40.862930+00:00"
+  },
+  "1180d3b1010eda23": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:40.250873+00:00"
+  },
+  "11e8305e2675fbc9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:24.899600+00:00"
+  },
+  "12952189ef8e09e4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:14.164606+00:00"
+  },
+  "12bf0115ac090856": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:20:03.394214+00:00"
+  },
+  "134e224ffc197d27": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:35.032279+00:00"
+  },
+  "138271268b89773a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:05.129866+00:00"
+  },
+  "13be0992fb01885a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:02.841082+00:00"
+  },
+  "13d1b7babab7bf9d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:35.990203+00:00"
+  },
+  "13e7a693fd2f0418": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:06.955732+00:00"
+  },
+  "13fadd90b7e17512": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:42.647820+00:00"
+  },
+  "1418a80cee415743": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:07.137679+00:00"
+  },
+  "14ec35a7c5d4fd75": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:35.127185+00:00"
+  },
+  "14fe6d81d4440d58": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:06.421698+00:00"
   },
   "151261e5d8f6e6b4": {
     "cheap_score": 0,
@@ -11,11 +389,1205 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:26:16.746317+00:00"
   },
+  "153a4c89dfb5fde0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:05.190039+00:00"
+  },
+  "154e6f17351f56d2": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:34.311868+00:00"
+  },
+  "1633ca3a683690ef": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:46.474922+00:00"
+  },
+  "164621f08bf86bd6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:58.688785+00:00"
+  },
+  "1666583a7f27a51b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:16.129685+00:00"
+  },
+  "16c2a9905af9df6c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:36.780064+00:00"
+  },
+  "16f6f205048de5fc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.771946+00:00"
+  },
+  "17097bb63b9b7afc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:06.607282+00:00"
+  },
+  "17851a24ce0c3409": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:04.441374+00:00"
+  },
+  "17b695dccaffacb0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:15.677892+00:00"
+  },
+  "17ff3a7d300cca16": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:44.958148+00:00"
+  },
+  "180025003c9a416c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:47:32.267001+00:00"
+  },
+  "188a260118a5508f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:26.869329+00:00"
+  },
+  "189b14cf6120f72f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:15.974165+00:00"
+  },
+  "18c1311a49031815": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:18.313746+00:00"
+  },
+  "195a4dd09ab530fe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:36.579346+00:00"
+  },
+  "1a9eddc57e0bd3ef": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:09.534977+00:00"
+  },
+  "1aca1502ad2cfd8c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:38:07.987077+00:00"
+  },
+  "1ae7be35f63e1b08": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:58.732737+00:00"
+  },
+  "1b1a3a9053365c7f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:51.554420+00:00"
+  },
+  "1b35dca7c05ab7ac": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:23:17.783857+00:00"
+  },
+  "1baa42e5e7cbddf6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:28.356937+00:00"
+  },
+  "1bb34366ab9d519c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:45.989219+00:00"
+  },
+  "1be03e940fec30a8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:08:56.459609+00:00"
+  },
+  "1da4e23448ccbd49": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:15.159045+00:00"
+  },
   "1deadc1464804db6": {
     "cheap_score": 0,
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:26:16.923666+00:00"
+  },
+  "1e491c07f4cd3cbc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:25.240850+00:00"
+  },
+  "1e7c6b2244b84933": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:22:32.998059+00:00"
+  },
+  "1ed1f2d526d996e8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:23.645577+00:00"
+  },
+  "1ee34086006148fa": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:20:30.307928+00:00"
+  },
+  "1f9a418b8fa5fd62": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:52:18.937384+00:00"
+  },
+  "1fe76f5075d87347": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:17.896888+00:00"
+  },
+  "201525743890ba5a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:26:02.708457+00:00"
+  },
+  "203fa845521c5770": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:00.685588+00:00"
+  },
+  "207337eca069db04": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:43.048653+00:00"
+  },
+  "207f06b3a7be2fce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:17.040587+00:00"
+  },
+  "20ce37cf8d12531d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:24.380142+00:00"
+  },
+  "20e4bd8c72104130": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:33:21.219783+00:00"
+  },
+  "213f9baaf5a8fae4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:29.155335+00:00"
+  },
+  "2164d387d71841d3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:50.527635+00:00"
+  },
+  "216ba04f0b0e3c31": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:20:02.712814+00:00"
+  },
+  "21c289bb2d623f77": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:35.983996+00:00"
+  },
+  "21c98461028d754e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:35.095349+00:00"
+  },
+  "21cc7e9681c000c2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:59.803240+00:00"
+  },
+  "21daad3635c2f058": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:19.509380+00:00"
+  },
+  "227a1796ba9bf8ad": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:20:18.795036+00:00"
+  },
+  "22e2522fb52891d2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:23:00.857254+00:00"
+  },
+  "230d2cd6858cb4ba": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:17:36.215411+00:00"
+  },
+  "2364f7b1b26b03cc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:07.168029+00:00"
+  },
+  "244a4d84ad5010ea": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:47.409112+00:00"
+  },
+  "24cd259ddbdb10b3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:51:19.161753+00:00"
+  },
+  "2501f966f6575ea1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:06.376922+00:00"
+  },
+  "250a67dff402297f": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:20.822385+00:00"
+  },
+  "262028a79dd082dd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:26:02.196576+00:00"
+  },
+  "26b2d75d914b9ca6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:34.661507+00:00"
+  },
+  "26d07c57cf250879": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:32.696507+00:00"
+  },
+  "274b69bf602bd78e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:22:33.335516+00:00"
+  },
+  "2767a11a9f897f5a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:39.725404+00:00"
+  },
+  "2777fffc9665181f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:26.875470+00:00"
+  },
+  "2907b04b3c8be807": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:09.846916+00:00"
+  },
+  "294328c92cc9fab0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:50.535783+00:00"
+  },
+  "2a21abdfc69b6592": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:37.918776+00:00"
+  },
+  "2a62e6567e19163c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:30.838546+00:00"
+  },
+  "2b602ba63b1a0af2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:53.011243+00:00"
+  },
+  "2b817d598dd8dd6f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:51.989869+00:00"
+  },
+  "2b8819120c1f41a3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:46.916969+00:00"
+  },
+  "2bcaf9a9f27e73a0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:00.377863+00:00"
+  },
+  "2bd3c473ce39f002": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:31:12.578125+00:00"
+  },
+  "2bde924e58c680a5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:28.742231+00:00"
+  },
+  "2c594833c27e75b0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:07.469105+00:00"
+  },
+  "2d274a09b722b1c7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:18.092734+00:00"
+  },
+  "2d292246d3f8e35f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:05.404457+00:00"
+  },
+  "2d3c0dd039bb5467": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:32:08.224911+00:00"
+  },
+  "2d7afa43d4730392": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:39.976169+00:00"
+  },
+  "2de760d4f9de9fde": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:53.126467+00:00"
+  },
+  "2e29558b5da0b99c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:41.255196+00:00"
+  },
+  "2e36edaed4f2b2a8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:54:15.518642+00:00"
+  },
+  "2ec1ebe443abe482": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:51:19.499139+00:00"
+  },
+  "2ec2020ce96315b0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:51.050371+00:00"
+  },
+  "2f3af38384c73d46": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:23:02.293828+00:00"
+  },
+  "2f88a467c794276f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:27.928707+00:00"
+  },
+  "2fdac7b01fb2319e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:19.935914+00:00"
+  },
+  "2ff39d7f3588df96": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:21:58.921030+00:00"
+  },
+  "30197f87ade24b92": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:21.847031+00:00"
+  },
+  "30848bd235c55258": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:46:59.757984+00:00"
+  },
+  "30f71dc0961b93ce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:44.763433+00:00"
+  },
+  "3139f84b5abfd418": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:06.754910+00:00"
+  },
+  "315b1a566895380f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:00.015608+00:00"
+  },
+  "31c949bcaaf1c4fb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:37.435238+00:00"
+  },
+  "32098a5c04188b35": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:43.219522+00:00"
+  },
+  "3284765c89fefaa2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:50.683447+00:00"
+  },
+  "3292d336ace48147": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:14.241728+00:00"
+  },
+  "32983dd61a130c8e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:40.602849+00:00"
+  },
+  "33024caee7ca2265": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:55:22.687914+00:00"
+  },
+  "3320b27d91a45fa4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:07.981462+00:00"
+  },
+  "33529a09f6f07263": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:53.344392+00:00"
+  },
+  "339fe1a82e6a0bcd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:11:39.774600+00:00"
+  },
+  "33f09695d21f4fad": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:50.386882+00:00"
+  },
+  "340bf425c3bb567e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:51.595135+00:00"
+  },
+  "3452a5664e67d7c5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:41.059022+00:00"
+  },
+  "34971e897bcf0daa": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:14:26.829233+00:00"
+  },
+  "349b42b04d2be428": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:02.219840+00:00"
+  },
+  "34f68fda8f4efe26": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:56.021104+00:00"
+  },
+  "3547346fa24d717a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:42.000983+00:00"
+  },
+  "358a1be5648911f1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:32:08.007665+00:00"
+  },
+  "359c0967ea48aac5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:07.843180+00:00"
+  },
+  "35e0e1491595d520": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:43.491621+00:00"
+  },
+  "35eed627a32fc467": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:22.707167+00:00"
+  },
+  "36046776a0aaa512": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:21.807264+00:00"
+  },
+  "3616d15dac6e7ff6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:20.527024+00:00"
+  },
+  "3618371bbe81d93f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:28.502929+00:00"
+  },
+  "376c82e7f844ed76": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:14:27.990566+00:00"
+  },
+  "37a424e99d6abc57": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:20.323887+00:00"
+  },
+  "37a96e37053f80b2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:15.791781+00:00"
+  },
+  "381f24f429cd6617": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:58.363579+00:00"
+  },
+  "38298a3675a77b7c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:59.935613+00:00"
+  },
+  "3861f36059aa6b4e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:00.932860+00:00"
+  },
+  "38670e6492a2630c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:52.815883+00:00"
+  },
+  "38bc9c36ac7eef26": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:46.671308+00:00"
+  },
+  "3924179c8037f849": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:20.877466+00:00"
+  },
+  "3986a664dc4b09f2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:34.366197+00:00"
+  },
+  "39b1b7bdaa1bfeac": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:02.593262+00:00"
+  },
+  "39f804cc74b0e806": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:31.233085+00:00"
+  },
+  "3a26ef4beeddaa06": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:17.137992+00:00"
+  },
+  "3a9ccf095144cd2a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:07.709668+00:00"
+  },
+  "3abfbc9aab07f737": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:59.074361+00:00"
+  },
+  "3b0510741633ce75": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:09.871374+00:00"
+  },
+  "3bb341465de4beea": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:04.436615+00:00"
+  },
+  "3c1a9ee74db99fe1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:54.908431+00:00"
+  },
+  "3c74bfa2d4d2ec4d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:37.612849+00:00"
+  },
+  "3c93ac88d0f67785": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:56.700634+00:00"
+  },
+  "3cc23e17ede049a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:11.834280+00:00"
+  },
+  "3ce4c56e6ce71d27": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:35.393193+00:00"
+  },
+  "3d844e799fdea2a1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:08.548372+00:00"
+  },
+  "3d906e2d174e1a11": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:45.593819+00:00"
+  },
+  "3d9e940d184ca513": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:52.416230+00:00"
+  },
+  "3dbfc40bf1fe454a": {
+    "cheap_score": 10,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:59:56.104726+00:00"
+  },
+  "3de03f85a7a9acd7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:19:00.490908+00:00"
+  },
+  "3df9346b746fba65": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:19.202742+00:00"
+  },
+  "3e0ea1b80e358acd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:05.056473+00:00"
+  },
+  "3e49c05aa27f8db2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:06.373596+00:00"
+  },
+  "3ed4ed5575d01180": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:26:03.235999+00:00"
+  },
+  "3eea153e54a95f79": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:18.589725+00:00"
+  },
+  "3f2fdd78ea3057fb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:07.282379+00:00"
+  },
+  "3faf2721462f8ba1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:34.543477+00:00"
+  },
+  "3fc3e0d1159bc590": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:42.528360+00:00"
+  },
+  "4003029a816bbb05": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:28.504616+00:00"
+  },
+  "405adf48fb6fc5cb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:00.186457+00:00"
+  },
+  "407ec5cd841f2e48": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:16.024548+00:00"
+  },
+  "409712b78a9a166f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:30.522310+00:00"
+  },
+  "40a939067d8582ca": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:43.712895+00:00"
+  },
+  "40ad6e4b32d298eb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:56.175329+00:00"
+  },
+  "414a5a2446787299": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:18.597111+00:00"
+  },
+  "4159af3be9d409a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:04.890477+00:00"
+  },
+  "41c13de570426c36": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:20:29.777948+00:00"
+  },
+  "42102854c339d7f9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:02.578267+00:00"
+  },
+  "421609b1b1a18308": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:18.112660+00:00"
+  },
+  "422ec7e627cc5232": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:42.840283+00:00"
+  },
+  "428c5c3118931a58": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:41.563893+00:00"
+  },
+  "43883827fd310d12": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:44:40.685692+00:00"
+  },
+  "43adef311a1ae57e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:51:34.935909+00:00"
+  },
+  "446e1b3145686c21": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:28.724927+00:00"
+  },
+  "44bf2af4497b0fea": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:38.359448+00:00"
+  },
+  "45832405470a8c19": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:21.005726+00:00"
+  },
+  "4633e2f8980f2b95": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:49.318866+00:00"
+  },
+  "4695ba9806dd7ea8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:34.976769+00:00"
+  },
+  "469af200faa6b582": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:33.886111+00:00"
+  },
+  "46bbab55d24f3e23": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:15.786767+00:00"
+  },
+  "4732b1e8f491a7d6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:46.453460+00:00"
+  },
+  "474ac0db93d7be10": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:14.568141+00:00"
+  },
+  "479ce7e18a05a579": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:38.781023+00:00"
+  },
+  "48967fd29cb34b44": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:41:04.002245+00:00"
+  },
+  "49859e34b475a3fc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:22.767641+00:00"
+  },
+  "4a06521e6ca4922e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:51.804222+00:00"
+  },
+  "4a270a7e2f384456": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:16.147290+00:00"
+  },
+  "4a7fdb37711003bb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:53.405315+00:00"
+  },
+  "4ae6ec1bc11709b7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:01.592808+00:00"
+  },
+  "4b1efe74ca6bcf15": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:39.952721+00:00"
+  },
+  "4b3a308cd63cb717": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:22.008669+00:00"
+  },
+  "4b552f62a2dcbbce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:09.568675+00:00"
+  },
+  "4b83380ad383febc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:39.621033+00:00"
+  },
+  "4c6bb36a221c1ecd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:47.479724+00:00"
+  },
+  "4cf765218c0a20a4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:31.222508+00:00"
+  },
+  "4d542a91dda3f922": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:51.300624+00:00"
+  },
+  "4d87d86ba80884a6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:28.341606+00:00"
+  },
+  "4d8f8037aea9b840": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:23:01.305084+00:00"
+  },
+  "4ecaf62a6b2f998f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:03.149339+00:00"
+  },
+  "4eded7088e4d118e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:41.852456+00:00"
+  },
+  "4f2964a2684cf72e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:20.556132+00:00"
+  },
+  "4f4f7ad66e5a8457": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:08.361963+00:00"
+  },
+  "4f76e7a64a96ad0b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:28.580592+00:00"
+  },
+  "4fc5a56e9903f4b8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:11.095766+00:00"
+  },
+  "501a54c2e1950dd2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:10.401761+00:00"
+  },
+  "50eb3b1e290ba199": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:27.919972+00:00"
+  },
+  "50fcb7217b052ed5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:05.565764+00:00"
+  },
+  "51defa29ea1d76c2": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:45.195482+00:00"
+  },
+  "522662ff2f6c1dc7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:42.979885+00:00"
+  },
+  "5231270e09e840ed": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:07.439181+00:00"
+  },
+  "525e37ee88c1d249": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:02.350504+00:00"
+  },
+  "52fc853910627577": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:45.509465+00:00"
   },
   "53593fac260e7565": {
     "cheap_score": 0,
@@ -23,11 +1595,1439 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:23:46.042865+00:00"
   },
+  "538237f0cdc1e7e3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:28.164582+00:00"
+  },
+  "5445c4edf27c4310": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:00.045581+00:00"
+  },
+  "5446694fdff91d1f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:42.569747+00:00"
+  },
+  "54b0131954455c28": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:49.842096+00:00"
+  },
+  "54ce2b6725d52c8b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:01.611983+00:00"
+  },
+  "551447f0c1a8a5db": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:37.754311+00:00"
+  },
+  "5515f93491a83d6b": {
+    "cheap_score": 10,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:55.669664+00:00"
+  },
+  "56a25c5c11096626": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:51.135555+00:00"
+  },
+  "57a94269fd4fcfd5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:44.135284+00:00"
+  },
+  "57ceda5809197e4c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:18.574142+00:00"
+  },
+  "58256b6d965c5cc8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:29.358768+00:00"
+  },
+  "58564de78b97394f": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:46:59.324888+00:00"
+  },
+  "585a166fbb6f69de": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:50.293917+00:00"
+  },
+  "586e23a243c0a6ad": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:24.582178+00:00"
+  },
+  "586ed810c31ef8fd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:40:53.153357+00:00"
+  },
+  "58dc653852558b34": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:00.619619+00:00"
+  },
+  "58def57703e446e4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:33.444984+00:00"
+  },
+  "592d86f4117f2eed": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:12.280836+00:00"
+  },
+  "59b77a94ebcc04f1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:51.552419+00:00"
+  },
+  "5ab26c6435f51ca6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:07.908208+00:00"
+  },
+  "5ae03802b6994e07": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:33.932807+00:00"
+  },
+  "5c4323532a39c4a8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:02.736259+00:00"
+  },
+  "5c64362d4f78fd14": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:40:52.713621+00:00"
+  },
+  "5dce7870c1257f9e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:54.444381+00:00"
+  },
+  "5df644f2ce482ec2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:54.767568+00:00"
+  },
+  "5e041327771209c0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:31.556449+00:00"
+  },
+  "5e129a88304efc13": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:25.369013+00:00"
+  },
+  "5e44d50f1512255a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:32:07.763848+00:00"
+  },
+  "5ec49f3a49befddb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:27.636159+00:00"
+  },
+  "5f03834570da6830": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:19:20.745436+00:00"
+  },
+  "5f0f43ef4159d573": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:51.280370+00:00"
+  },
+  "5f9b7dc865f94565": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:27.926950+00:00"
+  },
+  "5fc14a43420f6416": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:25.574256+00:00"
+  },
+  "5fcf014a83ea3365": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:34.060948+00:00"
+  },
+  "5fe3f94bb7019494": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:36.148972+00:00"
+  },
+  "605846084310c319": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.440889+00:00"
+  },
+  "60aa6b459bb59248": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:45:22.448300+00:00"
+  },
+  "60d43d1419255a4b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:28.959051+00:00"
+  },
+  "60dd05a5d31379f3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:11.732085+00:00"
+  },
+  "61027c59e259985c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:21:57.899444+00:00"
+  },
+  "619ca8f8d2a19ba6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:17.123301+00:00"
+  },
+  "619d6421ff951367": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:41.913844+00:00"
+  },
+  "61cdbce0bc3cd647": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:03.449004+00:00"
+  },
+  "620e751fe6e4f20c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:58.221325+00:00"
+  },
+  "62957846c309509d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:12.476711+00:00"
+  },
+  "63a610547f323904": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:17.502802+00:00"
+  },
+  "63f46639adcb6a27": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:52.026084+00:00"
+  },
+  "6463cce62e1c805a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:52.307985+00:00"
+  },
+  "6496c0d7af61ed65": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:42.038649+00:00"
+  },
+  "64f4f685fa4b367b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:26.256548+00:00"
+  },
+  "64fb8211451cb4c3": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:03.326335+00:00"
+  },
+  "6507148393b2625a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:26.150474+00:00"
+  },
+  "65561c4cec65602f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:27.226706+00:00"
+  },
+  "655b5e1bc79ec0d3": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:15.028787+00:00"
+  },
+  "659dd326e131fde1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:52.850884+00:00"
+  },
+  "66a8785659e60cd3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:32:13.983456+00:00"
+  },
+  "6772352f042d8df0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:24.360926+00:00"
+  },
+  "679475c7226fc630": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:56.954552+00:00"
+  },
+  "67c458c1e4591a9e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:07.587428+00:00"
+  },
+  "67d6bf062ed9160a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:36.363559+00:00"
+  },
+  "67d978207b4b2018": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:26.324414+00:00"
+  },
+  "68a4a7ef60f868ab": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:28.183352+00:00"
+  },
+  "69145a74b25453b2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:14.868222+00:00"
+  },
+  "69c3900cf373d4b0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:40:21.622036+00:00"
+  },
+  "69f3616d37a15a6a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:51.789192+00:00"
+  },
+  "6b25e59059c0e482": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:47:32.636620+00:00"
+  },
+  "6b26a8970ab9d7f6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:33.327828+00:00"
+  },
+  "6b2c1b2b3bcc8431": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:07.484229+00:00"
+  },
+  "6baef1a0d00b186d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:51.794117+00:00"
+  },
+  "6bb1eb8407d3d24f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:55.161744+00:00"
+  },
+  "6be2fc3f051b2472": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:15.549609+00:00"
+  },
+  "6be69c088bfe7755": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:17:36.703804+00:00"
+  },
+  "6c2d66e4ba863648": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:15.091784+00:00"
+  },
+  "6c4a4f7001dd15eb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:27.794282+00:00"
+  },
+  "6cf33897fd48c1b2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:06.047556+00:00"
+  },
+  "6d37fd4a376f01a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:37.462789+00:00"
+  },
+  "6d4d31db085713a6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:18.017748+00:00"
+  },
+  "6d57f2630ff29a46": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:16.534523+00:00"
+  },
+  "6d5ab92200a95050": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:20:30.571752+00:00"
+  },
+  "6dd3bd4707aa696c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:35.686626+00:00"
+  },
+  "6e1b77917c58aded": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:06.979881+00:00"
+  },
+  "6e26a139e1b2de2b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:20:30.053341+00:00"
+  },
+  "6f34ebd9eb9c062c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:21.347373+00:00"
+  },
+  "6f59b7479b10b4c9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:30.656512+00:00"
+  },
+  "6fa66726439f0df6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:31:13.765924+00:00"
+  },
+  "6fda441c4b6f9c32": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:02.563559+00:00"
+  },
+  "701502554ffef48d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:59.199553+00:00"
+  },
+  "703aad6e711d82e1": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:47.339074+00:00"
+  },
+  "7082745dbad2d863": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:27.545961+00:00"
+  },
+  "7088e6bce3af1e23": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:24.138117+00:00"
+  },
+  "71574ce455af931b": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:16.629085+00:00"
+  },
+  "717ae239ace07783": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:52:19.780474+00:00"
+  },
+  "71d4d1b652a097fa": {
+    "cheap_score": 10,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:43.416890+00:00"
+  },
+  "71e8c5ce22644e77": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:11.428839+00:00"
+  },
+  "72c5d92ee577d01b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:00.369775+00:00"
+  },
+  "73552a6b76359467": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:02.657019+00:00"
+  },
+  "735b57e9b0efc08d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:50.396888+00:00"
+  },
+  "747decbc0dc706cd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:05.235118+00:00"
+  },
+  "7514433e068b447f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:22.845619+00:00"
+  },
+  "755eae702da2aa89": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:50.610290+00:00"
+  },
+  "75b3465296b8f3dc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:42.656196+00:00"
+  },
+  "775a63689a2e9b37": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:18.554102+00:00"
+  },
+  "777fa24dfc08c20e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:15.017976+00:00"
+  },
+  "77afe287b86d5df0": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:22:07.962637+00:00"
+  },
+  "77ce915ee98d73b1": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:29:28.656411+00:00"
+  },
   "77d7d00b89f2b5ef": {
     "cheap_score": 0,
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:23:46.246079+00:00"
+  },
+  "77fa4f93a8cf5ca5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:50.810345+00:00"
+  },
+  "78198dcc1913534b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:33.169990+00:00"
+  },
+  "783a966ba491c9c1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:24.244093+00:00"
+  },
+  "78b1f2476e8db8d1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:53.964315+00:00"
+  },
+  "78db66789129a47e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:52.339431+00:00"
+  },
+  "79074053ddbcfaf8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:23.630895+00:00"
+  },
+  "79609397fbd744a8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:27.839955+00:00"
+  },
+  "7963fff49c4e6dc9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:10.129783+00:00"
+  },
+  "798312efa271f454": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:52.376351+00:00"
+  },
+  "7adc025a700ccc14": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:09.260264+00:00"
+  },
+  "7b20949d5ac371a8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:51:18.980048+00:00"
+  },
+  "7ba773a5927d40a1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:15.650389+00:00"
+  },
+  "7be36519bdd6abfc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:21.456480+00:00"
+  },
+  "7c08db085736685b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:50.860468+00:00"
+  },
+  "7c6541558e015069": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:44.644766+00:00"
+  },
+  "7cac128e46a2940f": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:43:02.915975+00:00"
+  },
+  "7cd5b7f5b6f3d4d6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:44:41.009841+00:00"
+  },
+  "7d42fb65c0b9a4cc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:01.035181+00:00"
+  },
+  "7dba29dcc115b41e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:55.081711+00:00"
+  },
+  "7e66585125c184b5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:42.989098+00:00"
+  },
+  "7e90773affd76af7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:53.205590+00:00"
+  },
+  "7e9fed1bde36bacc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:35.978241+00:00"
+  },
+  "7f4b219d4f1ab77b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:39.947142+00:00"
+  },
+  "7f602c91f55613d4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:54.043547+00:00"
+  },
+  "7fc42c454bf7f511": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:06.789812+00:00"
+  },
+  "803e8d9626fe8c7a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:39.661686+00:00"
+  },
+  "8057c054fd506c09": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:32.572004+00:00"
+  },
+  "8167d3dc84cfdff0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:54.846664+00:00"
+  },
+  "81780f03a991dca6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:05.380402+00:00"
+  },
+  "826af16aec8a5d11": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:17.310396+00:00"
+  },
+  "82c1f481d902720c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:02.080203+00:00"
+  },
+  "82de0e335a0b5eb3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:17:37.684278+00:00"
+  },
+  "83e64f3350c3ea3d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:15.369725+00:00"
+  },
+  "84228a6dc31d8890": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:09.134259+00:00"
+  },
+  "846aeadcf425d8ee": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:33.455365+00:00"
+  },
+  "84774a4da604cded": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:11.659045+00:00"
+  },
+  "85c5ab7f4a524c53": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:43.877785+00:00"
+  },
+  "85d559cc6b5b404d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:33.750142+00:00"
+  },
+  "861fe76726e483ab": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:38.075783+00:00"
+  },
+  "86ec7facbd6901c2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:33.951789+00:00"
+  },
+  "8741a3bdaa992038": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:55.244769+00:00"
+  },
+  "8823194ee1e2666a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:32.093516+00:00"
+  },
+  "882ae3116ac6ee41": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:30.189951+00:00"
+  },
+  "8844b9c777f08ff1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:55:00.413100+00:00"
+  },
+  "88736cc6f8955f09": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:11.560595+00:00"
+  },
+  "888bb4356c964ce7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:57.396003+00:00"
+  },
+  "88efdcb61c0d9ef7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:22:33.501979+00:00"
+  },
+  "89a52db858544e55": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:46.399063+00:00"
+  },
+  "89a7f785f892a92d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:45.376182+00:00"
+  },
+  "8a1fd563fc40c674": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:37.091656+00:00"
+  },
+  "8a871ab88dc247d0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:55.712491+00:00"
+  },
+  "8ae5763a1fbb6db2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:38:07.558853+00:00"
+  },
+  "8bc4f6d871e791a9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:31.772563+00:00"
+  },
+  "8bca602ed7387666": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:59.689677+00:00"
+  },
+  "8c059d85083f64d4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:15.207157+00:00"
+  },
+  "8c2581eabc655b9a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:00.426840+00:00"
+  },
+  "8cd1e1d1eae424d4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:08.894940+00:00"
+  },
+  "8cf98be2a7e1ce03": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:03.745906+00:00"
+  },
+  "8d5ae1567f635053": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:05.614567+00:00"
+  },
+  "8e4ff0eb55bda41e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:40.551479+00:00"
+  },
+  "8e73d23daba454a2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:22.973347+00:00"
+  },
+  "8f2699f04490763a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:37:00.040588+00:00"
+  },
+  "8f6510ef28111a51": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:31.057817+00:00"
+  },
+  "8f9e5f1bd7780676": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:20:17.633779+00:00"
+  },
+  "8fa75f3a4fc79dd6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:07:51.855137+00:00"
+  },
+  "8fbc9f29e73c6252": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:16.394407+00:00"
+  },
+  "8fbf50e9bfab9470": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:50.037142+00:00"
+  },
+  "8fef0effa7348a70": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:59:06.554604+00:00"
+  },
+  "9004a961a7d62e36": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:20.643480+00:00"
+  },
+  "91a196c96a406a8c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:45.055795+00:00"
+  },
+  "91dc8b931df5af54": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:59.963040+00:00"
+  },
+  "9305db46003f009b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:10.664316+00:00"
+  },
+  "93066a6126cd36fc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:09.269282+00:00"
+  },
+  "931ecee9e65125dc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:45:22.049121+00:00"
+  },
+  "9387a8f5220af096": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:55:02.179557+00:00"
+  },
+  "93a8efc1cebe743c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:15.313950+00:00"
+  },
+  "93b777dc0eb29cc9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:53:18.595351+00:00"
+  },
+  "93b82bbcb5aa10cf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:47.290854+00:00"
+  },
+  "9427f7ca7f59d258": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:59.396569+00:00"
+  },
+  "945287a37a263222": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:54.211318+00:00"
+  },
+  "9478cbd472a7f381": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:54:51.048221+00:00"
+  },
+  "949658f4deab141c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:34.536299+00:00"
+  },
+  "9500d4a9fcc7d2a1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:33.197153+00:00"
+  },
+  "954c9f6314ffde75": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:29.734089+00:00"
+  },
+  "95dc4f37d19f9f02": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:21.603445+00:00"
+  },
+  "964a8c673988130e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:06.746711+00:00"
+  },
+  "967fd78cd8c13137": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:59.704181+00:00"
+  },
+  "96970b4f9281996f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:51:19.326340+00:00"
+  },
+  "970ad1a8dd66f015": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:43.697840+00:00"
+  },
+  "9779afd6033c58cd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:32.957210+00:00"
+  },
+  "97bead02b060fe79": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:30.521353+00:00"
+  },
+  "9898eb9b70d6ceb0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:54:14.402542+00:00"
+  },
+  "98f14be993248a52": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:01.301749+00:00"
+  },
+  "992873d7457d4c59": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:57.372297+00:00"
+  },
+  "99995a3fce9080ad": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:13.769477+00:00"
+  },
+  "99b60c999b8fd538": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:10.632373+00:00"
+  },
+  "9a0661f44b8b9afe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:17.699766+00:00"
+  },
+  "9a1318446cd9727d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:28.972584+00:00"
+  },
+  "9ad7e9dd0824c7c2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:31.923644+00:00"
+  },
+  "9b000fa675639ed0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:06.414788+00:00"
+  },
+  "9b00978321a14f90": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:16.514423+00:00"
+  },
+  "9b2345372d2ffb4e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.263592+00:00"
+  },
+  "9bae2c51cab7801f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:14.509911+00:00"
+  },
+  "9bfdab66e808bd28": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:01.113776+00:00"
+  },
+  "9c13ec3e7ad1136d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:03.993508+00:00"
+  },
+  "9c35af551d9e8032": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:50.952350+00:00"
+  },
+  "9c5ae8facc3efb1d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:17.261159+00:00"
+  },
+  "9d1bd1cd5708a003": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:01.485388+00:00"
+  },
+  "9d263fbc9b859c56": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:59.858501+00:00"
+  },
+  "9d26fb008b8b8df2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:52.868931+00:00"
+  },
+  "9d67ad721a98d78f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:34.155714+00:00"
+  },
+  "9d72d576763ce147": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:07.163667+00:00"
+  },
+  "9dc339e374a8511a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:59:47.209598+00:00"
+  },
+  "9dcbe52128a81210": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:21.931427+00:00"
+  },
+  "9e12f0beb2532cf3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:40:26.859609+00:00"
+  },
+  "9e21a34fd2e7668c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:52:19.109937+00:00"
+  },
+  "9efbcad33b7e08b7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:17.472977+00:00"
+  },
+  "9fc8bb80242644ac": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:42.279275+00:00"
+  },
+  "9fff8356e1a360bb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:21.108721+00:00"
+  },
+  "a00641fb137285f5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:35.826711+00:00"
+  },
+  "a00fe6f9fbd3aebd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:51.684843+00:00"
+  },
+  "a035a36f93755439": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:48.275893+00:00"
+  },
+  "a0c8e81b9cbae494": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:21.229334+00:00"
+  },
+  "a123ba0184abb914": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:54:50.454984+00:00"
+  },
+  "a13e8e1141a904b2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:30.412374+00:00"
+  },
+  "a18cb8382f2352e6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:51:19.670054+00:00"
+  },
+  "a195ed91034ae6e6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:16.519294+00:00"
+  },
+  "a19d22dcc3ba3a89": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:52.990030+00:00"
+  },
+  "a1d7dc5147be5b9d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:15.227164+00:00"
+  },
+  "a1f0e097478290a0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:53.955492+00:00"
+  },
+  "a2c431a73b8c4408": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:40.106190+00:00"
+  },
+  "a2faab985037021b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:53.130949+00:00"
+  },
+  "a312b0dba0a1f9b4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:30.874462+00:00"
   },
   "a34d6ff3b0a211f8": {
     "cheap_score": 0,
@@ -35,16 +3035,1714 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:26:16.501030+00:00"
   },
+  "a37ade975fb0d747": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:22.859779+00:00"
+  },
+  "a37be7332af348a9": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:47:32.936569+00:00"
+  },
+  "a3c9b385a1e8cc99": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:46.964654+00:00"
+  },
+  "a48b38c2412ccbc0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:54.495645+00:00"
+  },
+  "a4a272e1fe40fd6c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:55:01.520239+00:00"
+  },
+  "a4a7851b32ea12cf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:52.693683+00:00"
+  },
+  "a4b3614cd93b640b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:35.666255+00:00"
+  },
+  "a4e0481ccc7607e6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:54.641074+00:00"
+  },
+  "a5133f5ba30af5ff": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:38:51.919865+00:00"
+  },
+  "a66381e88a683b4c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:35.562540+00:00"
+  },
+  "a778e0e48162a2ce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:17.707234+00:00"
+  },
+  "a78669b3a61a0e5d": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:45.949355+00:00"
+  },
+  "a7a45abf91281ca2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:25.878899+00:00"
+  },
+  "a7d28bf6780bb5ab": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:39.305398+00:00"
+  },
+  "a90012888f2365b2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:11.475721+00:00"
+  },
+  "a9352f86d84972c4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:49.904302+00:00"
+  },
+  "a943b765d9ee0188": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:08.069734+00:00"
+  },
+  "a958ac835505f493": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:02.632580+00:00"
+  },
+  "a9a37c5213220830": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:54.464155+00:00"
+  },
+  "aa51513197a4b776": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:56.514138+00:00"
+  },
+  "aa560027029cbd85": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:18.254546+00:00"
+  },
+  "aa95a1fbded5392c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:39.097013+00:00"
+  },
+  "aaf12f97c68f78dd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:07.909503+00:00"
+  },
+  "ab6645f81837bd69": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:25:01.874621+00:00"
+  },
+  "ac9c0a9c73ca9640": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:15.577013+00:00"
+  },
+  "ace4247f9a8ebb6e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:05.810642+00:00"
+  },
+  "ad1c3e6db5db0aa1": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:02.953631+00:00"
+  },
+  "ad532d668e6880a5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:05:52.918489+00:00"
+  },
+  "adda619a0ba21050": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:35:46.960409+00:00"
+  },
+  "ae53f2bbd2269e31": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:46:43.434572+00:00"
+  },
   "ae8bf725172172bc": {
     "cheap_score": 0,
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:23:45.850894+00:00"
   },
+  "aebf26de52929368": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:14.377464+00:00"
+  },
+  "af2ae7a0fc833814": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:13.406853+00:00"
+  },
+  "afa9440f00598f06": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:40.271792+00:00"
+  },
+  "afd28af781e31696": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:42:43.346768+00:00"
+  },
+  "b03256e5ed52e968": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.942517+00:00"
+  },
+  "b053aa1a66894046": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:41.016816+00:00"
+  },
+  "b07d4495abb7ee4d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:51.863952+00:00"
+  },
+  "b0fb8626b6bb1e4b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:42.392725+00:00"
+  },
+  "b12c400c332ffd85": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:05.378991+00:00"
+  },
+  "b1323e5a39cf72d7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:59.821282+00:00"
+  },
+  "b19e8567ecf3f5aa": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:28.273808+00:00"
+  },
+  "b1e8f2ce752deda4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:23.152325+00:00"
+  },
+  "b27abfa572ba97a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:59.622618+00:00"
+  },
+  "b362c3c2ee34c034": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:01.922499+00:00"
+  },
+  "b42d33f15b78a486": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:49.672660+00:00"
+  },
+  "b4734edbbf64c22b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:10.542850+00:00"
+  },
+  "b4c298d7aa5deaa8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:14.962799+00:00"
+  },
+  "b50c18596c0ea502": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:23.890138+00:00"
+  },
+  "b533ad3a0d25fcf6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:01.108950+00:00"
+  },
+  "b53f679c6beb28a6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:58.487834+00:00"
+  },
+  "b58d8ac6135316c1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:26:01.670133+00:00"
+  },
+  "b5b6d3dddc15025a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:19:48.259512+00:00"
+  },
+  "b5b74f86e51df37c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:19:00.752154+00:00"
+  },
+  "b5f94569bf3f77a3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:07.408381+00:00"
+  },
+  "b68ececa25321b57": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:08:23.610309+00:00"
+  },
+  "b6e44619c025b85a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:18.557036+00:00"
+  },
+  "b70ce2e840673ea5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:58.990247+00:00"
+  },
+  "b718cbe88f80df4f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:51.464173+00:00"
+  },
+  "b7eb3a688b233da3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:32.072444+00:00"
+  },
+  "b7ecbf120fb10f43": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:48.030042+00:00"
+  },
+  "b8ea3e119b53ff4e": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:29:28.467104+00:00"
+  },
+  "b8f9083588ffcd0b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:06.273292+00:00"
+  },
+  "b9380bdc78499335": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:05:58.948365+00:00"
+  },
+  "b9c34fa3544acfdb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:11.363238+00:00"
+  },
+  "ba17351c93662293": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:46.887009+00:00"
+  },
+  "ba2618e59128f39b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:51.276757+00:00"
+  },
+  "ba42a363a49f9995": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:35.388364+00:00"
+  },
+  "ba7fd7a3de85baac": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:23.255990+00:00"
+  },
+  "ba890a83f7426974": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:43.553751+00:00"
+  },
+  "bae3a1f4dcfe968a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:01.619908+00:00"
+  },
+  "baec04b5817bc35d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:32:08.452445+00:00"
+  },
+  "bb5d42340dedd6f0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:29.137046+00:00"
+  },
+  "bb609ea72be0c9e3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:25.055571+00:00"
+  },
+  "bbc56193885d924d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:03.177304+00:00"
+  },
+  "bbd22de460d13b5a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:32.813008+00:00"
+  },
+  "bc2887379d7901c7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:15.225267+00:00"
+  },
+  "bc4a80f343eca551": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:41:05.891887+00:00"
+  },
+  "bc4f9467d6fe7439": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:38.929157+00:00"
+  },
+  "bc75c0632a9ebc7f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:42.190362+00:00"
+  },
+  "bce2931733eaf889": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:00.170656+00:00"
+  },
+  "bd2c25f6df420ae6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:23.344331+00:00"
+  },
+  "beaeecf906ad6479": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:31:23.767857+00:00"
+  },
+  "bed3c62372d6290b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:24.023792+00:00"
+  },
+  "bedbfe9c991d784e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:45.130558+00:00"
+  },
+  "bedc9d4b6476138d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:42.011010+00:00"
+  },
+  "bfc205ca7d2060a5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:53.628271+00:00"
+  },
+  "c04b1c6eed5c0748": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:11:40.047434+00:00"
+  },
+  "c1029dfbebfa9c37": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:10.961940+00:00"
+  },
+  "c1d1f8fe390a8195": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:49:02.283155+00:00"
+  },
+  "c299400170a0eb78": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:51.216439+00:00"
+  },
+  "c32938ae3e356870": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:23.092980+00:00"
+  },
+  "c3e7667418a1ffbd": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:23.341853+00:00"
+  },
+  "c40901114ddecf17": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:52:20.469349+00:00"
+  },
+  "c418088442532fa8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:12:17.862144+00:00"
+  },
+  "c42b01a925fcaf7a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:39.717069+00:00"
+  },
+  "c4613167d368c664": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:23.935015+00:00"
+  },
+  "c4a0fd199cfcb31c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:46.658650+00:00"
+  },
+  "c4d33fa116e66163": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:23:17.504913+00:00"
+  },
+  "c544c19f083d8689": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:36.189884+00:00"
+  },
+  "c58dce4dfc36bd86": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:51.266139+00:00"
+  },
+  "c5d662e6d260fa9b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:11.966988+00:00"
+  },
+  "c6103fc6ebf82f5e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:19.023799+00:00"
+  },
+  "c63ff83a8936a7c4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:28.304832+00:00"
+  },
+  "c67b2372ce1d6667": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:26.181455+00:00"
+  },
+  "c7cf4764b2e109cf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:50.469363+00:00"
+  },
+  "c89a537de5acd0f4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:50.721170+00:00"
+  },
+  "c8c3de27dd9ee68f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:06.842746+00:00"
+  },
+  "c8e9facd0d41bc1b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:28.508419+00:00"
+  },
+  "c8f9b48789b23223": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:17.553910+00:00"
+  },
+  "ca95d1abfa028579": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:10.420014+00:00"
+  },
+  "cac47c7553ce6411": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:20.232595+00:00"
+  },
+  "cb07f0ad1486b04e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:16.285265+00:00"
+  },
+  "cb0c0e7c46f37c76": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:50.419593+00:00"
+  },
+  "cb199d41a1af65ae": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:51.646476+00:00"
+  },
+  "cb3dcc834860fab5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:06:52.049917+00:00"
+  },
+  "cb634f8289a2df9e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:29.121775+00:00"
+  },
+  "cb89ae2f3e799cf2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:13.509845+00:00"
+  },
+  "cbd6bbdae1439c68": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:37.222611+00:00"
+  },
+  "cc0e9a58ff7305ef": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:53.831489+00:00"
+  },
+  "cc3ebe4ab93d4da7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:08.773213+00:00"
+  },
+  "cc3ee670fc915610": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:35.281198+00:00"
+  },
+  "cc609d7a0de58dce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:05.227763+00:00"
+  },
+  "ccb701a163c6fa2c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:21.929054+00:00"
+  },
+  "cd72d1286312d1ec": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:43:24.781590+00:00"
+  },
+  "ce2f25dfd5841d95": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:21:58.409000+00:00"
+  },
+  "cee664ca19c7d034": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:46.327747+00:00"
+  },
+  "cf0998376600d759": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:44:40.064178+00:00"
+  },
+  "cf0aa5380d385326": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:29.341670+00:00"
+  },
+  "cf70e4aad01e2d98": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:38.945751+00:00"
+  },
+  "cf80faa49684ee64": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:08.852536+00:00"
+  },
+  "cfd1597a44f4ebaa": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:30:46.614115+00:00"
+  },
+  "d0032b521ce6e7ad": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:03.458211+00:00"
+  },
+  "d0075789692d81d5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:06.309248+00:00"
+  },
+  "d07330f737861b57": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:37:00.544098+00:00"
+  },
+  "d159240b54f3c944": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:28.858761+00:00"
+  },
+  "d20cf04ea6ea6840": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:31:14.337224+00:00"
+  },
+  "d250fd991dafd65a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:48.477880+00:00"
+  },
+  "d284c56ae443896f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:43:03.165883+00:00"
+  },
+  "d29232a347cb372c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:32.788543+00:00"
+  },
+  "d2a65280f4907866": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:30.322109+00:00"
+  },
+  "d2b49ca370f4ccf3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:55.689443+00:00"
+  },
+  "d338371cdccf08a9": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:46:41.836697+00:00"
+  },
+  "d36c516d5ce2f2d4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:34.312490+00:00"
+  },
+  "d3e79154b885b6d1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:11.628150+00:00"
+  },
+  "d42a5af0b43f1f3c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:41.654889+00:00"
+  },
+  "d4407a1ea13d999b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:21:58.157445+00:00"
+  },
+  "d460bf426dada44a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:46.749555+00:00"
+  },
+  "d4ad6962050b0a9d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:34.610313+00:00"
+  },
   "d4b58eda2831296e": {
     "cheap_score": 0,
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T09:26:17.284825+00:00"
+  },
+  "d4fdc7063a0bda9c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:41:05.566253+00:00"
+  },
+  "d522c3fb7071a3d1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:07.030635+00:00"
+  },
+  "d55c5bdff604d0fe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:46.023607+00:00"
+  },
+  "d5a5fd259e53c19c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:24.336422+00:00"
+  },
+  "d5aca3d15e6680c3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:16.072497+00:00"
+  },
+  "d5b06d47efad50a7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.053210+00:00"
+  },
+  "d5f8cecb2162eae7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:11.108316+00:00"
+  },
+  "d6a87c713c469542": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:03:36.915840+00:00"
+  },
+  "d6b0dcffe31fa965": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:41:06.179219+00:00"
+  },
+  "d6e77ec084a06e68": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:31.602775+00:00"
+  },
+  "d7a7f54709bc2996": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:25:24.641328+00:00"
+  },
+  "d7fe2c26c18440f7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:26:50.008652+00:00"
+  },
+  "d8b2ab38583bc891": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:56.752662+00:00"
+  },
+  "d8cc744bdb292f6a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:41.291241+00:00"
+  },
+  "d908a30bf900c266": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:58:24.935113+00:00"
+  },
+  "d9536c87bfe39318": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:30.915911+00:00"
+  },
+  "d95d4f190d726f52": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:59.475853+00:00"
+  },
+  "d96921d2045b4b6e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:43:11.674797+00:00"
+  },
+  "d9753415cd21a1f3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:16.841015+00:00"
+  },
+  "d9b99df2996c829f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:40.271174+00:00"
+  },
+  "dac2c4150ed47cf1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:34:08.169127+00:00"
+  },
+  "db3171913adfde82": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:00.795544+00:00"
+  },
+  "dbb9c8fa31b3fc62": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:24:11.319341+00:00"
+  },
+  "dbcab4aa0b488a4b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:21.181024+00:00"
+  },
+  "dbe82b571d863efe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:59.446362+00:00"
+  },
+  "dc21b3160c0fdf07": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:18.960741+00:00"
+  },
+  "dc388781c46206b6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:57:10.772644+00:00"
+  },
+  "dc81c16d4ff135cf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:26.633826+00:00"
+  },
+  "dc92a30a2759bd6a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:35.787687+00:00"
+  },
+  "dd52835b47a0ecfe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:58.887141+00:00"
+  },
+  "dd9d265f74233090": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:14:37.909285+00:00"
+  },
+  "dde493e4dbe60ef4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:45:01.122258+00:00"
+  },
+  "deb173a2cca8fbb1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:47:16.118612+00:00"
+  },
+  "df04ccc68a396a00": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:47:02.966459+00:00"
+  },
+  "df1e87a0a271e452": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:17.006021+00:00"
+  },
+  "df72db4942688101": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:30.711917+00:00"
+  },
+  "df7a7e7072595e93": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:18.129047+00:00"
+  },
+  "df7ab5f0a657dcbe": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:14:42.256520+00:00"
+  },
+  "df9df1f5406ee497": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:48.783982+00:00"
+  },
+  "dffab78b38705af3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:17:13.285571+00:00"
+  },
+  "e01c5222fa4fbe5f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:37.915078+00:00"
+  },
+  "e07a1abb465c5e85": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:50.717963+00:00"
+  },
+  "e08d6c5e41be8ef0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:50.237710+00:00"
+  },
+  "e0bddb63b93e71cb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:14.043328+00:00"
+  },
+  "e0d653fdcb807a68": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:11.494732+00:00"
+  },
+  "e1c8ba59de166274": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:18.215885+00:00"
+  },
+  "e327a964cf8d3d7b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:33.443613+00:00"
+  },
+  "e3529498b999b50d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:33:04.877239+00:00"
+  },
+  "e3fd9ae0f705b4b6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:15.050952+00:00"
+  },
+  "e4265a967bb50f8a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:01:30.901205+00:00"
+  },
+  "e4860ac9b3b4c1b0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:35.845982+00:00"
+  },
+  "e504299818f2e0de": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:23:30.512177+00:00"
+  },
+  "e5c39eec784e3485": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:22:33.887719+00:00"
+  },
+  "e5d2607f1d754dec": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:51.738040+00:00"
+  },
+  "e64f4054be06e9f1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:25.802589+00:00"
+  },
+  "e68dc09268bf6bcf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:58:32.843175+00:00"
+  },
+  "e6b5c6f79493dd5f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:01.934473+00:00"
+  },
+  "e76b4c273540704b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:16:20.484454+00:00"
+  },
+  "e7e7d1e7485ca326": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:05.989235+00:00"
+  },
+  "e7fc47f2ddce5517": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:52.476619+00:00"
+  },
+  "e82d9eac9b08f1ca": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:53.980561+00:00"
+  },
+  "e87b9fc117257087": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:24.826575+00:00"
+  },
+  "e8d7cba23e2dab5c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:20:02.543886+00:00"
+  },
+  "e8fe616f597fc1b7": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:38.762250+00:00"
+  },
+  "e996376341d7d4ca": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:22:33.168326+00:00"
+  },
+  "e9b49bb2d781e2b5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:24.049305+00:00"
+  },
+  "e9f8bd40b22c8244": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:19:00.166099+00:00"
+  },
+  "ea2f839b794521ca": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:18:03.073096+00:00"
+  },
+  "ea2ff8d652333c32": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:34.686409+00:00"
+  },
+  "ea4cf299f88cbde1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:26.688437+00:00"
+  },
+  "ea944e7f3aa88f17": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:39:35.062171+00:00"
+  },
+  "ead01609fa532741": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:53.619460+00:00"
+  },
+  "eb0b5becdcf0d573": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:19.416474+00:00"
+  },
+  "eb5bd44d3d6aebdc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:26:50.852604+00:00"
+  },
+  "ebb137d62da5a018": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:16:54.327065+00:00"
+  },
+  "ebcf7b55da2d459b": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:07:36.567055+00:00"
+  },
+  "ebdb73dbe8239e6e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:30.328285+00:00"
+  },
+  "ebeb3de970e931cf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:17.675246+00:00"
+  },
+  "ec2caa9f8347d4ce": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:41:17.866914+00:00"
+  },
+  "ecf1bb0965d0a02d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:57.023240+00:00"
+  },
+  "ed987158250453c6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:38.930893+00:00"
+  },
+  "edce1ebafb5b6f01": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:36.158428+00:00"
+  },
+  "edd353f840bdadb2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:50.594188+00:00"
+  },
+  "ee54ead00b0a1705": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:55.357366+00:00"
+  },
+  "ee5a0bdb866061d4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:37.470013+00:00"
+  },
+  "eeb3ce5c2ee94800": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:47.550746+00:00"
+  },
+  "eecf0ec8841de6b4": {
+    "cheap_score": 30,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:36:22.845352+00:00"
+  },
+  "ef161048efdda10b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:19.733969+00:00"
+  },
+  "ef9999399061ed39": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:30:47.184114+00:00"
+  },
+  "f020fd71bfc9ea7b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:05.848576+00:00"
+  },
+  "f021e6c7b9326922": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:36:51.748668+00:00"
+  },
+  "f02869d26c33da5d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:53:20.609682+00:00"
+  },
+  "f0fe79073ae1d4f5": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:18:39.273807+00:00"
+  },
+  "f1339e5b9f6c3eae": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:07:51.501922+00:00"
+  },
+  "f144dc87693b56bf": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:50:43.257577+00:00"
+  },
+  "f29bf8daeb531834": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:11:29.367175+00:00"
+  },
+  "f2a688e9141f5e7e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:52:16.010194+00:00"
+  },
+  "f2e1d40404f22755": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:00:37.855263+00:00"
+  },
+  "f30810aadc78e043": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:08.202672+00:00"
+  },
+  "f390c60084280a14": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:31:18.975306+00:00"
+  },
+  "f3d44d45637a760d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:13.836862+00:00"
+  },
+  "f42ed235530c1d2a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:46.451920+00:00"
+  },
+  "f44458219f4b18c1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:04:09.547144+00:00"
+  },
+  "f4492355c2b2ce17": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:15.915754+00:00"
+  },
+  "f47fc6cf25dad52d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:13:08.561546+00:00"
+  },
+  "f4930ea4744e99a0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:10:00.937794+00:00"
+  },
+  "f53f67cb9aad08b0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:29.841243+00:00"
+  },
+  "f56dd79e09e3fa74": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:28:40.440494+00:00"
+  },
+  "f576f494a9861528": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:24.341399+00:00"
+  },
+  "f5bee67ca022e9f0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:49:27.994998+00:00"
+  },
+  "f6c2d0d7f945fd02": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:31.430670+00:00"
+  },
+  "f6f90cc3caf4388c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:42:36.382223+00:00"
+  },
+  "f6fafa362c45ad1e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:48:16.631616+00:00"
+  },
+  "f782b26d389763fb": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:27:17.644574+00:00"
+  },
+  "f925145891e9b12c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:37:05.294292+00:00"
+  },
+  "f95ed54c000e16de": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:17:37.341341+00:00"
+  },
+  "f9bdbbbc196d518b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:08:23.943718+00:00"
+  },
+  "f9d10b31cfb7303d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:14:18.482429+00:00"
+  },
+  "fb3d329c19d0812c": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:44:37.682555+00:00"
+  },
+  "fb9d3de9bc806810": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:45:38.282521+00:00"
+  },
+  "fbb3163ad8032f43": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:57:47.893426+00:00"
+  },
+  "fbe6c47e25d4a121": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:56:19.314149+00:00"
+  },
+  "fbf01d6157ab147a": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:13.167757+00:00"
+  },
+  "fc392062dad2a2b6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:27:37.147921+00:00"
+  },
+  "fcfb5a647cadab77": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:10:31.116135+00:00"
+  },
+  "fd5e2ece0bcfc759": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:42.398026+00:00"
+  },
+  "fdd7368ef182a1a2": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:21:20.382656+00:00"
+  },
+  "fdd8314d9894f2f3": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:46:14.705595+00:00"
+  },
+  "fe14f680c3540419": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:19:11.121731+00:00"
+  },
+  "fe8af99adcf587e0": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:29:50.647456+00:00"
+  },
+  "ff066f7921a7f62b": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:35:39.118952+00:00"
+  },
+  "ff0aca86691da141": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:28:31.328126+00:00"
+  },
+  "ff0d9857db4a5e99": {
+    "cheap_score": 20,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T12:13:52.815901+00:00"
+  },
+  "ff854772b7c5a1dc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:39:03.682507+00:00"
+  },
+  "ffcbba14edb78d9d": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T13:56:15.452184+00:00"
   }
 }

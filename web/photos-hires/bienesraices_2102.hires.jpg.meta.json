@@ -1,0 +1,26 @@
+{
+  "width": 2560,
+  "height": 1917,
+  "aspect_ratio": 1.335,
+  "file_size_kb": 823.1,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:04:27.458308+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/QW4O1TNUCR/mjynqZVqMg/La-Union-5-scaled.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/QW4O1TNUCR/mjynqZVqMg/La-Union-5-scaled.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:04:28.703711+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 2560,
+  "resdet_detected_height": 1917,
+  "resdet_upscaled": false,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.3,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.234 color_entropy=0.606"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "width": 1080,
+  "height": 1208,
+  "aspect_ratio": 1.119,
+  "file_size_kb": 216.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T13:57:52.509901+00:00",
+  "source_url": "https://assets.easybroker.com/property_images/4998369/85409286/EB-SE8369.jpg?rasterize=true&version=1738255174",
+  "original_url": "https://assets.easybroker.com/property_images/4998369/85409286/EB-SE8369.jpg?rasterize=true&version=1738255174",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T13:57:52.989102+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 810,
+  "resdet_detected_height": 23,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.4,
+    "issues": [
+      "low_quality"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.221 color_entropy=0.363"
+  }
+}

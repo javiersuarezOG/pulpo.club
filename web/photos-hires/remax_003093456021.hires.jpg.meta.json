@@ -1,0 +1,28 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 5763.5,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:03:10.390370+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093456021/v3/HDPhotos/delimitaciones de terreno.png",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093456021/v3/HDPhotos/delimitaciones de terreno.png",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:03:10.548157+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 4.9,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.029 color_entropy=0.512"
+  }
+}

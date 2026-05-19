@@ -1,0 +1,26 @@
+{
+  "width": 6000,
+  "height": 4000,
+  "aspect_ratio": 1.5,
+  "file_size_kb": 1595.3,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:05:35.919834+00:00",
+  "source_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/costa-del-sol-house-for-sale-14.jpg",
+  "original_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/costa-del-sol-house-for-sale-14-1024x683.jpg",
+  "transform_used": "goodlife-strip-wp-size-suffix",
+  "fetched_at": "2026-05-19T14:05:38.003467+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 3750,
+  "resdet_detected_height": 3500,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.7,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.174 color_entropy=0.641"
+  }
+}

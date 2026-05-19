@@ -1,0 +1,16 @@
+{
+  "width": 960,
+  "height": 720,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 128.6,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:03:50.317997+00:00",
+  "hero_photo_quality_score": 60,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/5035241/86155604/EB-SI5241.jpeg?rasterize=true&version=1739727331",
+  "candidate_count": 3,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-19T13:03:50.318143+00:00"
+}

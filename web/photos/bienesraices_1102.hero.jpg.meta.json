@@ -1,0 +1,16 @@
+{
+  "width": 818,
+  "height": 1080,
+  "aspect_ratio": 1.32,
+  "file_size_kb": 220.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:22:16.729951+00:00",
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/5558922/96629002/EB-UI8922.jpg?rasterize=true&version=1759537036",
+  "candidate_count": 3,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-19T13:22:16.730113+00:00"
+}
