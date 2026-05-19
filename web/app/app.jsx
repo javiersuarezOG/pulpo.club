@@ -417,7 +417,23 @@ function App() {
   // <WelcomeModal> picks its variant from `user` state (anon vs
   // signed-in). Fires once on mount, then strips the param so a
   // refresh doesn't re-open the modal.
-  const [welcomeModalState, setWelcomeModalState] = useState(null);
+  // welcomeModalState is initialized SYNCHRONOUSLY from the URL via
+  // useState's initializer so the route-gate effect (which runs later
+  // in the same render-commit pass — see [./lib/route-gates.ts]) can
+  // see this state on first render. Prior implementation set it from
+  // a useEffect, by which point the URL strip below had already
+  // happened AND the gate effect had read the now-stripped URL → the
+  // ?welcome=1 bypass evaporated → the SignupModal opened on top of
+  // the WelcomeModal on every post-Stripe landing. The render-commit-
+  // pass ordering matters here; the test for it is in
+  // tests/e2e/preview-smoke.spec.ts ("welcome modal: gate-bypass
+  // prevents SignupModal flash").
+  const [welcomeModalState, setWelcomeModalState] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") !== "1") return null;
+    return { sessionId: params.get("session_id") || null };
+  });
   const welcomeParamHandledRef = useRef(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -425,7 +441,6 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("welcome") !== "1") return;
     welcomeParamHandledRef.current = true;
-    const sessionId = params.get("session_id") || null;
     params.delete("welcome");
     params.delete("session_id");
     const newSearch = params.toString();
@@ -440,9 +455,9 @@ function App() {
       surface: "account_welcome",
       result: "success",
     });
-    setWelcomeModalState({ sessionId });
-    // Welcome modal also fires welcome_modal.shown from inside the
-    // component on mount with `variant` reflecting auth state at render.
+    // welcomeModalState was already populated synchronously by the
+    // useState initializer above — no setState needed here. (See the
+    // race comment on the useState declaration.)
   }, []);
   const closeWelcomeModal = useCallback(() => setWelcomeModalState(null), []);
 
@@ -888,11 +903,16 @@ function App() {
   //
   // The gate doesn't render anything itself — this effect just opens
   // the modal. The page components show a placeholder behind it.
+  //
+  // /account?welcome=1 bypass: when the user is post-Stripe and
+  // doesn't have a Clerk session yet, welcomeModalState carries the
+  // signal (populated synchronously from URL via useState initializer
+  // higher up). The route-gates.ts searchParams check is kept as
+  // defense in depth, but the welcomeModalState short-circuit below
+  // is the load-bearing guard since the URL strip happens in the
+  // welcome effect.
   useEffect(() => {
-    // Pass current URL search params so route-gates.ts can honour the
-    // `?welcome=1` bypass for /account (post-Stripe / post-magic-link
-    // landing where the user has paid but doesn't have a Clerk session
-    // yet — PR-B.4b).
+    if (welcomeModalState) return;
     const searchParams = typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : undefined;
@@ -913,9 +933,23 @@ function App() {
       track("signup_modal.shown", { trigger: "manual", mode: "login" });
     }
     // Intentionally not depending on signupModal — that would re-fire
-    // every time the modal closes. We only care about route + user.
+    // every time the modal closes. We only care about route + user
+    // + welcomeModalState (for the post-Stripe bypass).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, user]);
+  }, [route, user, welcomeModalState]);
+
+  // Defensive close: if the gate already opened a SignupModal before
+  // welcomeModalState became truthy (e.g. a popstate that flipped
+  // route to /account with `?welcome=1` arriving on a later render),
+  // close that gate-triggered modal as soon as welcomeModalState
+  // resolves. Without this the user sees a stale SignupModal hanging
+  // around even after the WelcomeModal mounts.
+  useEffect(() => {
+    if (!welcomeModalState) return;
+    if (signupModal && signupModal.gateReason === "auth_required") {
+      setSignupModal(null);
+    }
+  }, [welcomeModalState, signupModal]);
 
   // PR-B.5 — home-page Pulpo Pro upsell modal. Triggered by HomePage's
   // mount-time effect when the URL carries a campaign signal (see
