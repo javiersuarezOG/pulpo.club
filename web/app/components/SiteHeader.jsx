@@ -19,6 +19,7 @@ import { t, LOCALES } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { Icon, PulpoLogo } from "../components.jsx";
 import { LiveStats } from "./LiveStats.jsx";
+import { isPaid } from "../lib/gating";
 
 // Compact EN/ES toggle. Only used by SiteHeader so it lives here.
 function LocaleToggle({ app }) {
@@ -45,11 +46,20 @@ function LocaleToggle({ app }) {
 
 export function SiteHeader({ app }) {
   const lc = app.locale;
+  // Pro identity: signed-in paid users see a "Pro" mark next to the
+  // wordmark + a gold ring on the avatar. The check goes through the
+  // gating helper so a future plan rename (e.g. "founder") only needs
+  // updating in one place.
+  const proMember = isPaid(app.user);
   return (
     <header className="topnav" data-testid="site-header">
       <div className="topnav-inner">
-        <button className="logo-btn" onClick={() => app.go("home")} aria-label={t("nav.home", lc)}>
-          <PulpoLogo />
+        <button
+          className={`logo-btn${proMember ? " logo-btn-pro" : ""}`}
+          onClick={() => app.go("home")}
+          aria-label={proMember ? t("nav.home_pro", lc) : t("nav.home", lc)}
+        >
+          <PulpoLogo pro={proMember} />
         </button>
         <nav className="topnav-links" aria-label={t("nav.home", lc)}>
           <button
@@ -78,13 +88,19 @@ export function SiteHeader({ app }) {
           <LiveStats locale={lc} />
           <LocaleToggle app={app} />
           {app.user ? (
-            <div className="profile-chip">
+            <div className={`profile-chip${proMember ? " profile-chip-pro" : ""}`}>
               <button
-                className="avatar avatar-btn"
+                className={`avatar avatar-btn${proMember ? " avatar-pro" : ""}`}
                 onClick={() => app.go("account")}
-                title={t("nav.account", lc)}
-                aria-label={t("nav.account", lc)}
-              >{app.user.email[0].toUpperCase()}</button>
+                title={proMember ? t("nav.account_pro", lc) : t("nav.account", lc)}
+                aria-label={proMember ? t("nav.account_pro", lc) : t("nav.account", lc)}
+                data-testid={proMember ? "avatar-pro" : "avatar"}
+              >
+                {app.user.email[0].toUpperCase()}
+                {proMember && (
+                  <span className="avatar-pro-badge" aria-hidden="true">★</span>
+                )}
+              </button>
               <button
                 className="link-btn"
                 onClick={() => app.signout()}

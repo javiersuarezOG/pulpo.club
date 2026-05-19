@@ -63,6 +63,13 @@
   --accent-2: oklch(0.62 0.20 25);      /* heart red */
   --moss: oklch(0.55 0.08 145);
   --gold: oklch(0.72 0.13 80);
+  /* Pulpo Pro identity — gold-on-cream pill + avatar ring used by the
+     global header to make active membership visible everywhere. Deeper
+     than --gold for legible ink on cream; the ring is lighter for a
+     subtle glow rather than a stamp. */
+  --pro-ink: oklch(0.55 0.13 70);
+  --pro-line: oklch(0.72 0.13 80);
+  --pro-ring: oklch(0.80 0.11 80);
   /* Homepage rewrite — section accents for the category grid.
      Beach reuses the brand green; Lake gets its own blue so the
      two sections read distinct without overpowering. */
