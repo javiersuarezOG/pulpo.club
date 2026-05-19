@@ -479,13 +479,34 @@ def detect_text_overlay(
         return None
 
     try:
+        # `lang='eng+spa'` to recognise Spanish broker stamps
+        # ("REBAJA", "VENDIDO", "OFERTA"). Both language packs are
+        # installed by ci.yml + pulpo-nightly.yml + repick-heroes.yml.
+        # When the spa pack is missing, fall back to eng so the OCR
+        # still runs on the (more common) English stamps.
         data = pytesseract.image_to_data(
             img,
             output_type=pytesseract.Output.DICT,
+            lang="eng+spa",
         )
     except pytesseract.TesseractNotFoundError:
         _detector_unavailable("tesseract binary not on PATH")
         return None
+    except pytesseract.pytesseract.TesseractError as e:
+        # spa language pack not installed → retry with eng only.
+        if "spa" in str(e).lower():
+            try:
+                data = pytesseract.image_to_data(
+                    img,
+                    output_type=pytesseract.Output.DICT,
+                    lang="eng",
+                )
+            except Exception as e2:
+                _detector_unavailable(f"tesseract eng-only retry failed: {e2!r}")
+                return None
+        else:
+            _detector_unavailable(f"tesseract error: {e!r}")
+            return None
     except Exception as e:
         _detector_unavailable(f"tesseract error: {e!r}")
         return None
