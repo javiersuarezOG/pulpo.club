@@ -75,19 +75,48 @@ def main() -> int:
         print("Usage: check_tests_added.py <diff_file>", file=sys.stderr)
         return 2
 
+    import os
     added = Path(sys.argv[1]).read_text().splitlines()
     added = [f.strip() for f in added if f.strip()]
 
     missing = check(added)
-    if missing:
-        print("❌  Missing test files for newly added agents:")
-        for m in missing:
-            print(m)
-        print("\nAdd a test file or label the PR 'no-test-required' to skip.")
-        return 1
+    bypass_active = os.environ.get("PULPO_TESTS_BYPASS_ACTIVE") == "1"
 
-    print(f"✅  {len(added)} added files checked — all agents have tests.")
-    return 0
+    if not missing:
+        print(f"✅  {len(added)} added files checked — all agents have tests.")
+        if bypass_active:
+            # Operator labelled the PR for bypass but the script would
+            # have passed anyway — flag the dead label so it can be
+            # removed (it's misleading on a clean PR).
+            print(
+                "::notice::PR has the 'no-test-required' label but all "
+                "added agents already have matching tests — the bypass "
+                "is unnecessary and can be removed.",
+            )
+        return 0
+
+    print("❌  Missing test files for newly added agents:")
+    for m in missing:
+        print(m)
+    if bypass_active:
+        # Honor the bypass but make it LOUD. GitHub Actions renders
+        # ::warning:: as a yellow banner on the check run and as a
+        # PR annotation; the reviewer sees exactly which files were
+        # waved through. Audit-fix from PR-7 of the reliability plan —
+        # the legacy `if:` gate skipped the whole job and left no trail.
+        print(
+            "::warning::TEST COVERAGE BYPASS ACTIVE — the "
+            "'no-test-required' label is letting this PR ship without "
+            f"the {len(missing)} test file(s) listed above. Confirm "
+            "this is genuinely a docs / data / config PR before merging.",
+        )
+        # Exit 0 so the bypass still unblocks the merge (matches the
+        # legacy behavior the operator expects), but the warning above
+        # is permanent in both the run log + the PR's checks tab.
+        return 0
+
+    print("\nAdd a test file or label the PR 'no-test-required' to skip.")
+    return 1
 
 
 if __name__ == "__main__":

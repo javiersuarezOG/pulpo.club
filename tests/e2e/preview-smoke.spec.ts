@@ -496,6 +496,13 @@ test.describe("New app boots cleanly on key routes", () => {
       "Weekly 10 picks",                              // free_month_modal.bullet.1
       "Direct seller links",                          // free_month_modal.bullet.3
       "Maybe later",                                  // free_month_modal.cta_dismiss
+      // ListingDetail in-panel upgrade CTA (broker outbound + locked
+      // thumb + locked USP row). Anon + free see this CTA on ES as
+      // "Contrata Pulpo Pro — 1 mes gratis"; if EN leaks the canary
+      // catches it. Renders only for non-paid tiers — the detail-panel
+      // scan below runs anon so the CTA is in the body text.
+      "Start Pulpo Pro",                              // detail.unlock_pro_free_month (brand+plan half)
+      "first month free",                             // detail.unlock_pro_free_month (offer half)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
@@ -533,14 +540,12 @@ test.describe("New app boots cleanly on key routes", () => {
 
     // Navigate to /browse and click into the first card to mount the
     // detail panel. The road_access "Paved" bug was on detail; we must
-    // check it.
-    //
-    // Post-#262: anon clicks on /browse listing-cards open FreeMonthModal
-    // (not the detail panel) because the routing matrix sends
-    // shelf_card → free_month_modal for anon + free. Seed a pro user
-    // here so the click passthrough opens the detail panel. The home
-    // scan above already exercised the ES anon surface.
-    await seedProUser(page);
+    // check it. Post-listing-funnel: anon clicks on /browse listing-cards
+    // now passthrough to the detail panel (matrix `shelf_card` row is
+    // passthrough for all tiers), so we don't need to seed a paid user
+    // here — the panel renders for anon. That also lets the canary
+    // scan exercise the in-panel upgrade CTA ("Contrata Pulpo Pro —
+    // 1 mes gratis"), which renders only for non-paid tiers.
 
     await page.goto("/browse", { waitUntil: "networkidle" });
     await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });

@@ -56,9 +56,11 @@ const matrix: Array<[CtaId, User, Branch, string]> = [
   ["newsletter_activation", pro,    "passthrough",  "pro clicks newsletter upgrade (UI not shown)"],
   ["newsletter_activation", agency, "passthrough",  "agency clicks newsletter upgrade"],
 
-  // shelf_card: anon + free → modal; paid → passthrough (opens listing if real).
-  ["shelf_card",     anon,   "free_month_modal", "anon clicks shelf card"],
-  ["shelf_card",     free,   "free_month_modal", "free clicks shelf card"],
+  // shelf_card: all tiers → passthrough. Listing-card clicks now always
+  // open ListingDetail (which carries its own tier-aware soft-gating);
+  // the conversion gate moved to the in-panel upgrade CTAs.
+  ["shelf_card",     anon,   "passthrough",      "anon clicks shelf card → opens detail panel"],
+  ["shelf_card",     free,   "passthrough",      "free clicks shelf card → opens detail panel"],
   ["shelf_card",     pro,    "passthrough",      "pro clicks shelf card"],
   ["shelf_card",     agency, "passthrough",      "agency clicks shelf card"],
 
