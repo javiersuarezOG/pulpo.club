@@ -1,0 +1,16 @@
+{
+  "width": 1200,
+  "height": 900,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 324.5,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:12:15.843302+00:00",
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/4511821/75597035/EB-QI1821.jpeg?rasterize=true&version=1716908096",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T13:12:15.843490+00:00"
+}

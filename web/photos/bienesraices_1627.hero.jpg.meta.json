@@ -1,0 +1,16 @@
+{
+  "width": 960,
+  "height": 720,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 213.6,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:56:38.231129+00:00",
+  "hero_photo_quality_score": 70,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/4705632/79475739/EB-RB5632.jpg?rasterize=true&version=1725030566",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T13:56:38.231320+00:00"
+}

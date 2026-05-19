@@ -1,0 +1,16 @@
+{
+  "width": 1200,
+  "height": 900,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 230.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T13:47:02.483034+00:00",
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/5162054/88671541/EB-SV2054.jpeg?rasterize=true&version=1744230379",
+  "candidate_count": 4,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-19T13:47:02.483198+00:00"
+}

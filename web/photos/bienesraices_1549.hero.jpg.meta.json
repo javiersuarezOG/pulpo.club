@@ -1,0 +1,16 @@
+{
+  "width": 1080,
+  "height": 1080,
+  "aspect_ratio": 1.0,
+  "file_size_kb": 154.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T12:46:58.572002+00:00",
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/2236744/96401022/EB-HO6744.png?rasterize=true&version=1762202667",
+  "candidate_count": 5,
+  "picker_excluded_count": 2,
+  "repicked_at": "2026-05-19T12:46:58.572185+00:00"
+}

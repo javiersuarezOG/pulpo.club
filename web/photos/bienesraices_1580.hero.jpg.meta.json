@@ -1,0 +1,16 @@
+{
+  "width": 745,
+  "height": 1080,
+  "aspect_ratio": 1.45,
+  "file_size_kb": 262.1,
+  "hero_eligible": false,
+  "card_eligible": false,
+  "hires_eligible": false,
+  "computed_at": "2026-05-19T12:42:44.982476+00:00",
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "winning_url": "https://assets.easybroker.com/property_images/4815921/81639166/EB-RM5921.jpg?rasterize=true&version=1729733141",
+  "candidate_count": 5,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-19T12:42:44.982671+00:00"
+}
