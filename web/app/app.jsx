@@ -388,9 +388,17 @@ function App() {
     if (!status) return;
     if (status === "success") {
       track("upgrade.checkout_returned", { result: "success" });
+      track("stripe.return_landed", {
+        surface: "preview_upgrade_success",
+        result: "success",
+      });
       setToast({ id: Date.now(), message: t("upgrade.success_toast", locale) });
     } else if (status === "cancelled") {
       track("upgrade.checkout_returned", { result: "cancelled" });
+      track("stripe.return_landed", {
+        surface: "preview_upgrade_cancelled",
+        result: "cancelled",
+      });
       setToast({ id: Date.now(), message: t("upgrade.cancelled_toast", locale) });
     }
     params.delete("upgrade");
@@ -423,10 +431,18 @@ function App() {
     const newSearch = params.toString();
     const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
     window.history.replaceState({}, "", newUrl);
+    // Immediate-fire anchor for the post-Stripe activation funnel.
+    // welcome_modal.shown waits on Clerk hydration (up to 5s) and so is
+    // unreliable as a "did they return from Stripe?" signal. This event
+    // fires the moment the URL is detected — pair it with the later
+    // signin.completed to measure activation drop-off cleanly.
+    track("stripe.return_landed", {
+      surface: "account_welcome",
+      result: "success",
+    });
     setWelcomeModalState({ sessionId });
-    // Telemetry fires from inside the WelcomeModal component on mount
-    // (so the `variant` field reflects the auth state at render time,
-    // not the moment of the URL detection).
+    // Welcome modal also fires welcome_modal.shown from inside the
+    // component on mount with `variant` reflecting auth state at render.
   }, []);
   const closeWelcomeModal = useCallback(() => setWelcomeModalState(null), []);
 

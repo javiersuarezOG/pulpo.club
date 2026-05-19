@@ -1626,7 +1626,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
                     track("paywall.bypassed", {
                       kind: "detail_view", action: "upgrade", listing_id: listing.id,
                     });
-                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                    track("detail.upgrade_cta_clicked", {
+                      cta_location: i === 4 ? "more_photos_overlay" : "locked_thumb",
+                      listing_id: listing.id,
+                      listing_state: isOffMarket ? "off_market" : "active",
+                    });
+                    const branch = routeCtaForState("detail_upgrade", app?.user);
+                    trackCtaRouted("detail_upgrade", app?.user, branch, true);
+                    dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
                   } else {
                     openLightbox(i);
                   }
@@ -1708,7 +1715,14 @@ function ListingDetail({ listing, app, asPanel = true }) {
                     track("paywall.bypassed", {
                       kind: "detail_view", action: "upgrade", listing_id: listing.id,
                     });
-                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                    track("detail.upgrade_cta_clicked", {
+                      cta_location: "locked_usp",
+                      listing_id: listing.id,
+                      listing_state: isOffMarket ? "off_market" : "active",
+                    });
+                    const branch = routeCtaForState("detail_upgrade", app?.user);
+                    trackCtaRouted("detail_upgrade", app?.user, branch, true);
+                    dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
                   }}
                 >
                   {t("detail.unlock_pro_free_month", lc)}
@@ -1806,12 +1820,17 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 track("paywall.bypassed", {
                   kind: "detail_view", action: "upgrade", listing_id: listing.id,
                 });
-                // Branch label reflects what the matrix would route
-                // broker_outbound to for non-paid tiers; the actual
-                // dispatch goes straight to FreeMonthModal because the
-                // upgrade button IS the per-CTA paywall here.
-                trackCtaRouted("broker_outbound", app.user, "free_month_modal", true);
-                app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                track("detail.upgrade_cta_clicked", {
+                  cta_location: "broker_outbound",
+                  listing_id: listing.id,
+                  listing_state: isOffMarket ? "off_market" : "active",
+                });
+                // Uniform routing dispatch — the in-panel upgrade CTA is
+                // the per-CTA paywall here. detail_upgrade matrix row
+                // resolves to free_month_modal for anon/free.
+                const branch = routeCtaForState("detail_upgrade", app.user);
+                trackCtaRouted("detail_upgrade", app.user, branch, true);
+                dispatchCentralBranch(branch, app, { trigger: "detail_upgrade" });
               }}
             >
               <Icon name="lock" size={16}/> {t("detail.unlock_pro_free_month", lc)}
