@@ -65,8 +65,14 @@ async function findPendingInvitationsForEmail(clerk, email) {
       .filter((inv) => (inv.emailAddress || "").toLowerCase() === email.toLowerCase())
       .map((inv) => ({
         id: inv.id,
+        // Clerk's invitation `status` field — typically "pending" here
+        // since we filter by it, but exposing it is cheap and future-proof.
+        status: inv.status || "pending",
         created_at: inv.createdAt
           ? new Date(inv.createdAt).toISOString()
+          : null,
+        expires_at: inv.expiresAt
+          ? new Date(inv.expiresAt).toISOString()
           : null,
       }));
   } catch {
@@ -204,7 +210,16 @@ module.exports = async (req, res) => {
     expected_webhook_path: expectedPath,
     // Operator hint — which branches emit an activation email.
     sends_email: expectedPath === "anonymous_invitation_created",
-    // Pointers for follow-up triage.
-    posthog_hint: `Search PostHog for event "webhook.checkout_completed" where session_id="${sessionId}" — the historical record of what actually ran.`,
+    // Pointers for follow-up triage. Once `/api/clerk/webhook` is
+    // configured and `CLERK_WEBHOOK_SECRET` is set in Vercel, the
+    // historical email-send signal also lives in PostHog as
+    // `clerk.email_attempted` keyed on `email:<hash>` — the same
+    // identity scheme this endpoint hashes against.
+    posthog_hints: {
+      checkout_path: `Search PostHog for event "webhook.checkout_completed" where session_id="${sessionId}" — historical record of which webhook branch ran.`,
+      email_attempt: validEmail
+        ? `Search PostHog for event "clerk.email_attempted" where email_hash="${crypto.createHash("sha256").update(email.trim().toLowerCase()).digest("hex").slice(0, 16)}" — confirms Clerk actually attempted to send the activation email (or didn't).`
+        : "n/a — session has no email",
+    },
   });
 };
