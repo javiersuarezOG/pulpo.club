@@ -1623,7 +1623,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 aria-label={locked ? t("detail.gallery.locked_aria", lc) : t("detail.gallery.open_n", lc, { n: i + 1 })}
                 onClick={() => {
                   if (locked) {
-                    app.openSignup({ mode: "signup", pendingListing: listing.id });
+                    track("paywall.bypassed", {
+                      kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                    });
+                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
                   } else {
                     openLightbox(i);
                   }
@@ -1637,7 +1640,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   <div className="more-photos">{t("detail.more_photos", lc, { n: listing.photos.length - 5 })}</div>
                 )}
                 {locked && i === 4 && (
-                  <div className="more-photos">{t("detail.signup_more_photos", lc, { n: listing.photos.length - 2 })}</div>
+                  <div className="more-photos">{t("detail.unlock_pro_free_month", lc)}</div>
                 )}
               </button>
               );
@@ -1692,43 +1695,24 @@ function ListingDetail({ listing, app, asPanel = true }) {
             {listing.usps.slice(0, uspCap).map((u, i) => (
               <li key={i}><Icon name="check" size={16} strokeWidth={2.4}/> {tr(u, app.locale)}</li>
             ))}
-            {/* Anonymous → "Sign up free to see N more" (chains to
-                signup modal, then the detail page re-renders with
-                free-tier USPs unlocked). Free → "Upgrade to Pro to
-                see N more" (chains to Stripe checkout). Paid users
-                hide both — they see every USP. */}
+            {/* Anon + free hit the same in-panel conversion CTA: opens
+                FreeMonthModal with `detail_upgrade` trigger, which
+                pre-applies PULPOFREEMONTH at /api/stripe/start-checkout.
+                Paid users see every USP and skip this row. */}
             {!isPaid && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
-                {needsSignup ? (
-                  <button className="link-btn" onClick={() => app.openSignup({ mode: "signup", pendingListing: listing.id })}>
-                    {listing.usps.length - uspCap === 1
-                      ? t("detail.signup_more_reasons_one", lc)
-                      : t("detail.signup_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
-                  </button>
-                ) : (
-                  <button
-                    className="link-btn"
-                    onClick={() => {
-                      track("paywall.bypassed", {
-                        kind: "detail_view", action: "upgrade", listing_id: listing.id,
-                      });
-                      startStripeCheckout({
-                        onError: (code) => {
-                          if (code === "sign_in_required") {
-                            app.showToast(t("plans.checkout_auth_mismatch", lc));
-                          } else {
-                            app.go("plans");
-                          }
-                        },
-                      });
-                    }}
-                  >
-                    {listing.usps.length - uspCap === 1
-                      ? t("detail.upgrade_more_reasons_one", lc)
-                      : t("detail.upgrade_more_reasons_other", lc, { n: listing.usps.length - uspCap })}
-                  </button>
-                )}
+                <button
+                  className="link-btn"
+                  onClick={() => {
+                    track("paywall.bypassed", {
+                      kind: "detail_view", action: "upgrade", listing_id: listing.id,
+                    });
+                    app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
+                  }}
+                >
+                  {t("detail.unlock_pro_free_month", lc)}
+                </button>
               </li>
             )}
           </ul>
@@ -1808,12 +1792,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
       </div>
 
       {/* Sticky bottom CTA. Source-listing link is Pro-only — the
-          vendor-URL outbound is a paid feature. Anonymous and free
-          users see Pro-upgrade prompts that chain to Stripe checkout
-          (anonymous chains via SignupModal pendingAction:checkout;
-          free goes direct). Renders for both on-market and off-market
-          listings; sold listings opt out (no point upselling on a
-          finished sale). */}
+          vendor-URL outbound is a paid feature. Anon + free both land
+          on FreeMonthModal (single conversion surface, pre-applies
+          PULPOFREEMONTH on /api/stripe/start-checkout). Renders for
+          both on-market and off-market listings; sold listings opt out
+          (no point upselling on a finished sale). */}
       {!isSold && (
         <div className="detail-cta-bar">
           {!isPaid ? (
@@ -1823,39 +1806,15 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 track("paywall.bypassed", {
                   kind: "detail_view", action: "upgrade", listing_id: listing.id,
                 });
-                // Wave-1 funnel-debug event. Branch reflects the
-                // dispatch this CTA bar performs (the upgrade button
-                // IS the per-CTA paywall when the user can't see the
-                // broker URL). Dispatch logic unchanged below.
-                trackCtaRouted("broker_outbound", app.user, "paywall", true);
-                if (needsSignup) {
-                  // Anonymous: signup then chained checkout. The
-                  // post-signin effect in app.jsx fires
-                  // startStripeCheckout when pendingAction is set,
-                  // so a single click covers the whole funnel.
-                  app.openSignup({
-                    mode: "signup",
-                    pendingListing: listing.id,
-                    pendingAction: "checkout",
-                  });
-                } else {
-                  // Free signed-in: straight to Stripe checkout.
-                  startStripeCheckout({
-                    onError: (code) => {
-                      if (code === "sign_in_required") {
-                        app.showToast(t("plans.checkout_auth_mismatch", lc));
-                      } else {
-                        app.go("plans");
-                      }
-                    },
-                  });
-                }
+                // Branch label reflects what the matrix would route
+                // broker_outbound to for non-paid tiers; the actual
+                // dispatch goes straight to FreeMonthModal because the
+                // upgrade button IS the per-CTA paywall here.
+                trackCtaRouted("broker_outbound", app.user, "free_month_modal", true);
+                app.openFreeMonthModal?.({ trigger: "detail_upgrade" });
               }}
             >
-              <Icon name="lock" size={16}/> {t(
-                needsSignup ? "detail.signup_upgrade_to_view_source" : "detail.upgrade_to_view_source",
-                lc,
-              )}
+              <Icon name="lock" size={16}/> {t("detail.unlock_pro_free_month", lc)}
             </button>
           ) : listing.original_url ? (
             <a

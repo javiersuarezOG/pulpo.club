@@ -114,12 +114,14 @@ const MATRIX: Record<CtaId, Record<Tier, Branch>> = {
     agency:    "passthrough",
   },
   shelf_card: {
-    // Anon + free: card click opens the conversion modal. Paid:
-    // passthrough → caller opens the listing (or no-op for placeholder
-    // editorial cards). The matrix's defensive paid passthrough is
-    // unchanged from Wave-1.
-    anonymous: "free_month_modal",
-    free:      "free_month_modal",
+    // Listing-card clicks always passthrough — the caller opens
+    // ListingDetail (which carries its own tier-aware soft-gating via
+    // lib/gating.ts). Anon + free no longer hit FreeMonthModal at the
+    // card boundary; the gate moves to the in-panel upgrade CTAs
+    // (broker outbound, locked thumbs/USPs) which dispatch through the
+    // matrix as `detail_upgrade` trigger on FreeMonthModal.
+    anonymous: "passthrough",
+    free:      "passthrough",
     pro:       "passthrough",
     agency:    "passthrough",
   },
@@ -203,7 +205,8 @@ export type FreeMonthModalTrigger =
   | "featured_deal"
   | "hero_just_in"
   | "favorites_action"
-  | "browse_card";
+  | "browse_card"
+  | "detail_upgrade";
 
 export type AppLike = {
   user?: GatingUser;

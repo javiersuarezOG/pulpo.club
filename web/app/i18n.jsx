@@ -607,26 +607,16 @@ const UI_STRINGS = {
                                es: "Off-market — consulta los planes" },
   "detail.save":             { en: "Save",                          es: "Guardar" },
   "detail.saved":            { en: "Saved",                         es: "Guardado" },
-  "detail.signup_more_reasons_one": { en: "Sign up to see 1 more reason we picked this listing",
-                               es: "Crea cuenta para ver 1 razón más por la que elegimos esta propiedad" },
-  "detail.signup_more_reasons_other": { en: "Sign up to see {n} more reasons we picked this listing",
-                               es: "Crea cuenta para ver {n} razones más por las que elegimos esta propiedad" },
-  // Free signed-in users: same gated row, but the CTA goes to
-  // Stripe checkout instead of the signup modal. Pro users hide
-  // the row entirely.
-  "detail.upgrade_more_reasons_one":   { en: "Upgrade to Pro to see 1 more reason we picked this listing",
-                                          es: "Contrata Pro para ver 1 razón más por la que elegimos esta propiedad" },
-  "detail.upgrade_more_reasons_other": { en: "Upgrade to Pro to see {n} more reasons we picked this listing",
-                                          es: "Contrata Pro para ver {n} razones más por las que elegimos esta propiedad" },
-  // Source-listing link is Pro-only (PR after this one).
-  // Anonymous → signup + chained checkout. Free signed-in → direct
-  // checkout. Pro → outbound link (no prompt).
-  "detail.signup_upgrade_to_view_source": { en: "Sign up + upgrade to Pro to view source listing",
-                                             es: "Crea cuenta y contrata Pro para ver el anuncio original" },
-  "detail.upgrade_to_view_source":         { en: "Upgrade to Pro to view source listing",
-                                              es: "Contrata Pro para ver el anuncio original" },
-  "detail.signup_more_photos": { en: "Sign up for {n}+ photos",
-                               es: "Crea cuenta para ver {n}+ fotos" },
+  // Single shared CTA for every gated upgrade point inside ListingDetail
+  // (bottom CTA bar, locked gallery thumb, locked USP row). Names the
+  // free-month offer because that's the actual offer at the other end:
+  // the click opens FreeMonthModal which pre-applies PULPOFREEMONTH at
+  // /api/stripe/start-checkout. Per-site copy variants ("see N more
+  // reasons", "N+ photos") were dropped — the panel's lock-icon
+  // affordances + this single CTA convey enough; reintroduce per-site
+  // keys later if A/B tests show a lift.
+  "detail.unlock_pro_free_month": { en: "Start Pulpo Pro — first month free",
+                                     es: "Contrata Pulpo Pro — 1 mes gratis" },
   "detail.more_photos":      { en: "+{n} photos",                   es: "+{n} fotos" },
   "detail.signup_for_pin":   { en: "Sign up for precise pin",       es: "Crea cuenta para ver el pin exacto" },
   "detail.sold_banner.title": { en: "This listing has been sold or removed.",
