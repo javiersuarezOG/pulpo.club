@@ -116,13 +116,42 @@ def _is_global_error(exc: BaseException) -> bool:
 
 
 def _load_sidecar(path: Path) -> dict:
+    """Load the enrichment sidecar; return an empty dict and LOG LOUDLY
+    on corruption.
+
+    The sidecar is the cache that prevents the LLM enrichment leg from
+    re-spending DeepSeek credit on already-enriched listings. The legacy
+    `except Exception: return {}` swallowed corruption silently — a
+    half-written sidecar (e.g. from a crash before PR-1's atomic-write
+    landed) would cause the next nightly to re-enrich every entry
+    (~$1-$3 wasted) with zero operator signal.
+
+    Now: missing file → empty dict (the normal first-run case, quiet).
+    Bad JSON / wrong root type → empty dict but with a `[llm_enrich]`
+    stderr line so the operator sees it in the nightly log + can
+    follow up. Behavior is unchanged from the caller's POV — only the
+    silence is broken.
+    """
     if not path.exists():
         return {}
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else {}
-    except Exception:
+    except Exception as e:
+        print(
+            f"[llm_enrich] sidecar corrupt at {path} ({type(e).__name__}: "
+            f"{e}); proceeding with empty cache — next run will re-enrich "
+            "every listing. Inspect the file and restore from git if needed.",
+            file=sys.stderr,
+        )
         return {}
+    if not isinstance(data, dict):
+        print(
+            f"[llm_enrich] sidecar at {path} has unexpected root type "
+            f"{type(data).__name__} (expected dict); ignoring.",
+            file=sys.stderr,
+        )
+        return {}
+    return data
 
 
 def _save_sidecar(path: Path, sidecar: dict) -> None:
