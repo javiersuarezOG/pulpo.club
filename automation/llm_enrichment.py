@@ -40,11 +40,12 @@ from __future__ import annotations
 import concurrent.futures
 import json
 import os
+import random
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 # Bounded-concurrency default for the LLM enrichment fan-out. DeepSeek's
 # documented chat-completions rate is comfortable above 8 concurrent
@@ -125,11 +126,11 @@ def _load_sidecar(path: Path) -> dict:
 
 
 def _save_sidecar(path: Path, sidecar: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(sidecar, indent=2, ensure_ascii=False, default=str),
-        encoding="utf-8",
-    )
+    # Atomic write: the sidecar is the source of truth for "this listing
+    # was already enriched"; a crash mid-write corrupts it and the next
+    # run re-spends DeepSeek credit on every entry.
+    from automation._atomic import atomic_write_json
+    atomic_write_json(path, sidecar, indent=2, default=str)
 
 
 def _append_log(path: Path, event: dict) -> None:
@@ -242,6 +243,55 @@ def _build_client(schema: EnrichmentSchema):
         base_url=schema.base_url,
         api_key=os.environ[schema.api_key_env],
     ), None)
+
+
+# Bounded retry around the HTTP call. Network blips against DeepSeek
+# happen ~1% of the time in nightly logs; without retry, that's a
+# permanently-skipped listing that the next run re-spends $0.001-$0.003
+# of credit on. Retry only on raised exceptions — validation/JSON/length
+# failures are already returned as a structured ("failed", …) triple
+# from _enrich_one, and retrying them would be deterministic-loss.
+# Global errors (auth, quota, billing) skip retry and fail fast: every
+# attempt would identically fail.
+_RETRY_MAX_ATTEMPTS = max(1, int(
+    os.environ.get("PULPO_LLM_RETRY_MAX_ATTEMPTS") or "3"))
+_RETRY_BASE_DELAYS = (0.5, 1.5)  # seconds before attempt 2, 3
+_RETRY_JITTER_RATIO = 0.4         # ±20% around the base
+
+
+def _retry_delay(attempt: int, *, rand: Callable[[], float] = random.random) -> float:
+    """Delay before retry `attempt` (1-indexed; attempt=1 is the FIRST retry
+    after the initial failure). Returns 0 if no retry is scheduled."""
+    if attempt < 1 or attempt > len(_RETRY_BASE_DELAYS):
+        return 0.0
+    base = _RETRY_BASE_DELAYS[attempt - 1]
+    return base * (1.0 - _RETRY_JITTER_RATIO / 2 + _RETRY_JITTER_RATIO * rand())
+
+
+def _call_with_retry(
+    fn: Callable[[], Any],
+    *,
+    sleep: Callable[[float], None] = time.sleep,
+    rand: Callable[[], float] = random.random,
+) -> Any:
+    """Run `fn` with bounded retry on raised exceptions. Re-raises the
+    final exception after exhaustion. Caller decides what to do (today:
+    convert to a structured failure event)."""
+    last_exc: BaseException | None = None
+    for attempt in range(_RETRY_MAX_ATTEMPTS):
+        try:
+            return fn()
+        except Exception as e:
+            last_exc = e
+            if _is_global_error(e):
+                raise
+            remaining = _RETRY_MAX_ATTEMPTS - 1 - attempt
+            if remaining <= 0:
+                raise
+            sleep(_retry_delay(attempt + 1, rand=rand))
+    # Unreachable — loop body either returns or raises. Keeps type checkers happy.
+    assert last_exc is not None
+    raise last_exc
 
 
 def _enrich_one(client, li: Any, schema: EnrichmentSchema
@@ -512,11 +562,12 @@ def enrich_listings(listings: list[Any],
             print(f"[llm_enrich] key={key} decision=failed reason={reason}")
 
     def _safe_call(li: Any, key: str) -> tuple[str, dict | None, dict]:
-        """_enrich_one wrapped in the same try/except the legacy loop
-        used so HTTP / network errors become a structured 'failed' event
-        rather than a crashing exception."""
+        """_enrich_one wrapped with bounded retry + a final try/except so
+        HTTP / network errors become a structured 'failed' event rather
+        than crashing the run. Global errors (auth/quota) fail fast — see
+        _call_with_retry."""
         try:
-            return _enrich_one(api_client, li, schema)
+            return _call_with_retry(lambda: _enrich_one(api_client, li, schema))
         except Exception as e:
             event = {
                 "ts":       _now_iso(),

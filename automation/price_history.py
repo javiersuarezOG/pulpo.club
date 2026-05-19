@@ -109,8 +109,7 @@ def track_prices(listings: list[Any], sidecar_path: Path,
                 _set(li, "is_repriced", False)
         # else: first scrape ever — leave per-scraper value untouched
 
-    sidecar_path.parent.mkdir(parents=True, exist_ok=True)
-    with sidecar_path.open("w", encoding="utf-8") as f:
-        json.dump(history_dict, f, ensure_ascii=False)
+    from automation._atomic import atomic_write_json
+    atomic_write_json(sidecar_path, history_dict)
 
     return {"tracked": len(history_dict), "repriced_this_run": repriced_count}
