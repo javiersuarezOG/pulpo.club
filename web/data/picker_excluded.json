@@ -1,1 +1,50 @@
-{}
+{
+  "0dec1426d9ca770f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:26:17.107095+00:00"
+  },
+  "151261e5d8f6e6b4": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:26:16.746317+00:00"
+  },
+  "1deadc1464804db6": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:26:16.923666+00:00"
+  },
+  "53593fac260e7565": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:23:46.042865+00:00"
+  },
+  "77d7d00b89f2b5ef": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:23:46.246079+00:00"
+  },
+  "a34d6ff3b0a211f8": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:26:16.501030+00:00"
+  },
+  "ae8bf725172172bc": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:23:45.850894+00:00"
+  },
+  "d4b58eda2831296e": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-19T09:26:17.284825+00:00"
+  }
+}

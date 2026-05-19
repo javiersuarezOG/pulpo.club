@@ -1,0 +1,254 @@
+{
+  "20900bdaaab36374": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:31.102094+00:00"
+  },
+  "19c744a3fc9fbd0e": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:34.777004+00:00"
+  },
+  "9a4d38b0dead2e3d": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:38.434919+00:00"
+  },
+  "26909cd87f2a656d": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:42.114759+00:00"
+  },
+  "a020eeaaa7b1ca9e": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:45.571092+00:00"
+  },
+  "bfb6e4e254e3b733": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:50.180024+00:00"
+  },
+  "95d430471b6cf7c2": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:54.250187+00:00"
+  },
+  "8e7c91a77626a270": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:23:58.830621+00:00"
+  },
+  "cc13ff932c4fbab4": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:02.524832+00:00"
+  },
+  "d249b5b5eef1a208": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:06.897965+00:00"
+  },
+  "5df2ef9e5b8e1ddc": {
+    "score": 4.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:10.407621+00:00"
+  },
+  "267cd75e01ee9222": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:14.473996+00:00"
+  },
+  "81a695893b72cafa": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:19.247880+00:00"
+  },
+  "a9f741672a2ad464": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:22.883841+00:00"
+  },
+  "aa9e2acb1c1727b4": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:26.333155+00:00"
+  },
+  "e434af029a732e8b": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:30.116465+00:00"
+  },
+  "ecc6d6a12ef5b6d4": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:34.003010+00:00"
+  },
+  "bc0d06bdc54c43dc": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:39.116740+00:00"
+  },
+  "e0e49132539add0e": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:42.199653+00:00"
+  },
+  "32fddab8983c2ef4": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:45.657485+00:00"
+  },
+  "c7b3e7c752054188": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:49.255686+00:00"
+  },
+  "880924e06a152945": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:52.993424+00:00"
+  },
+  "146f86af69cf2190": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:24:57.537959+00:00"
+  },
+  "79216f5df18944e2": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:01.382108+00:00"
+  },
+  "99bbaf62bc05c131": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:04.652879+00:00"
+  },
+  "32a22139deeb7718": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:07.934340+00:00"
+  },
+  "46168c6ff74a909f": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:11.411813+00:00"
+  },
+  "0daf4efd5dc3fcea": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:15.933275+00:00"
+  },
+  "a6dd16bb7d42ba6f": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:19.279234+00:00"
+  },
+  "653072e8fb550b88": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:23.376831+00:00"
+  },
+  "6ba454019c8759ae": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:26.788737+00:00"
+  },
+  "a7e6c8443b5c6625": {
+    "score": 6.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:30.578507+00:00"
+  },
+  "55166f08d3dc3618": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:37.067787+00:00"
+  },
+  "38df62110fb83daf": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:41.855627+00:00"
+  },
+  "c8a5c0ee67ab7a9a": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:45.875111+00:00"
+  },
+  "cc54b13fe6ebbd03": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:50.398003+00:00"
+  },
+  "519cc22f24b452bf": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:25:54.986353+00:00"
+  },
+  "0b1842fd1d79d4b0": {
+    "score": 5.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:26:00.072737+00:00"
+  },
+  "1a124b53aab6b606": {
+    "score": 7.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:26:03.536861+00:00"
+  },
+  "da745d555076933f": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:26:07.617224+00:00"
+  },
+  "89c52104d0102ce6": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:26:11.290967+00:00"
+  },
+  "b5fce8444e5afcc3": {
+    "score": 8.0,
+    "provider": "segmind",
+    "model": "qwen3-vl-flash",
+    "ts": "2026-05-19T09:26:16.203232+00:00"
+  }
+}
