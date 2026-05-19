@@ -204,6 +204,7 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
             className="hp-shelf-card-img"
             eager={eager}
             source="home_shelf"
+            thumbnail
           />
           {rank != null && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>

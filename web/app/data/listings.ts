@@ -137,16 +137,16 @@ function deriveRoadAccess(
 }
 
 function buildPhotos(raw: any): string[] {
-  // Prefer hero_photo_path (locally cached, served by Vercel) for slot
-  // 0; supplement with photo_urls for the gallery. hero_photo_path is
-  // a path like "/photos/<source>_<id>.jpg".
-  const out: string[] = [];
-  const hero = raw.hero_photo_path;
-  if (typeof hero === "string" && hero.length > 0) out.push(hero);
+  // Gallery is broker URLs only. The local /photos/<id>.jpg derivative
+  // is a 600×400 thumbnail (drives card paint via `thumbnail_url`); when
+  // we used to prepend it here the carousel rendered slot 0 as that
+  // upscaled thumb right next to the same image at broker-native
+  // resolution — the visible "low+high quality dupe."
   const urls = Array.isArray(raw.photo_urls) ? raw.photo_urls : [];
+  const out: string[] = [];
   for (const u of urls) {
     if (typeof u !== "string") continue;
-    if (out.length === 0 || u !== out[0]) out.push(u);
+    if (out.length === 0 || u !== out[out.length - 1]) out.push(u);
   }
   return out;
 }
@@ -253,6 +253,10 @@ export function adaptListing(raw: any): Listing {
     previous_price: typeof raw.previous_price === "number" ? raw.previous_price : null,
     price_per_m2: typeof raw.price_per_m2 === "number" ? raw.price_per_m2 : null,
     photos,
+    thumbnail_url:
+      typeof raw.hero_photo_path === "string" && raw.hero_photo_path.length > 0
+        ? raw.hero_photo_path
+        : null,
     photos_count: typeof raw.photos_count === "number" ? raw.photos_count : photos.length,
     hero_photo_quality_score:
       typeof raw.hero_photo_quality_score === "number" ? raw.hero_photo_quality_score : null,
