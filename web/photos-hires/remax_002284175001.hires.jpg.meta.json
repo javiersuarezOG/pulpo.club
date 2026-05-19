@@ -1,0 +1,26 @@
+{
+  "width": 4032,
+  "height": 3024,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 2178.6,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:03:44.688028+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002284175001/v3/HDPhotos/entrada golden lake.jpg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002284175001/v3/HDPhotos/entrada golden lake.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:03:45.290966+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.8,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.342 color_entropy=0.484"
+  }
+}

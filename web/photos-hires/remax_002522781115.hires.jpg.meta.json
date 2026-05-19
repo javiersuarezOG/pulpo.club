@@ -1,0 +1,26 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 197.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T14:00:14.978563+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781115/v3/HDPhotos/1753843364757.jpg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781115/v3/HDPhotos/1753843364757.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-05-19T14:00:15.212994+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1680,
+  "resdet_detected_height": 945,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.5,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.192 color_entropy=0.499"
+  }
+}

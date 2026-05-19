@@ -36,7 +36,7 @@ const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
   // block          anon    free    pro     agency
   hero:          { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
   featured:      { anonymous: true,  free: true,  pro: false, agency: false },
-  usps:          { anonymous: true,  free: true,  pro: false, agency: false },
+  usps:          { anonymous: true,  free: false, pro: false, agency: false }, // signed-in users (free OR paid) skip the marketing band
   shoreline:     { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
   top_10:        { anonymous: true,  free: true,  pro: true,  agency: true  },
   price_drops:   { anonymous: true,  free: true,  pro: true,  agency: true  },
