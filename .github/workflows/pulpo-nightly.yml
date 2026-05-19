@@ -97,7 +97,7 @@ jobs:
           # Disabled sources (re-add when the blocker is resolved):
           #   kazu              — Nuxt SPA, panel API denylisted; needs headless browser
           #
-          # realtyelsalvador  — trial re-enabled 2026-05-20 (PR #345). It was
+          # realtyelsalvador  — trial re-enabled 2026-05-20 (PR #346). It was
           #   disabled 2026-05-06 after 3 consecutive 403s from Azure runner
           #   IPs (PR #67's header workaround stopped working). Two weeks later
           #   the WP REST endpoint still serves ~179 listings from a local IP,
