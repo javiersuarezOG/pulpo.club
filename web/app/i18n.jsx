@@ -727,12 +727,39 @@ const UI_STRINGS = {
   // Browse — Load more pagination
   "browse.load_more":        { en: "Load more ({n} remaining)",     es: "Ver más ({n} restantes)" },
 
-  // Consent banner (GDPR)
+  // Consent banner (GDPR / ePrivacy / LGPD)
+  //
+  // Implements the 9-point ConsentBanner contract from
+  // legal_documents/03-cookie-policy.md. EN + ES coverage from day one;
+  // a Spanish-counsel review pass will follow before incorporation.
   "consent.aria":            { en: "Cookie consent",                es: "Consentimiento de cookies" },
-  "consent.body":            { en: "Pulpo uses analytics cookies to improve the site. No third-party ads.",
-                               es: "Pulpo usa cookies analíticas para mejorar el sitio. Sin anuncios de terceros." },
+  "consent.body":            { en: "Pulpo uses cookies to deliver the site, remember your preferences, and (with your permission) measure how the site is used. Strictly-necessary cookies are always on; everything else is off until you decide.",
+                               es: "Pulpo usa cookies para que el sitio funcione, recordar tus preferencias y (con tu permiso) entender cómo se usa el sitio. Las estrictamente necesarias siempre están activas; el resto se queda desactivado hasta que tú decidas." },
+  // Pre-rebuild keys kept for back-compat — no current call site after PR-E.
   "consent.decline":         { en: "Decline",                       es: "Rechazar" },
   "consent.accept":          { en: "Accept",                        es: "Aceptar" },
+  // PR-E new keys.
+  "consent.accept_all":      { en: "Accept all",                    es: "Aceptar todas" },
+  "consent.decline_all":     { en: "Decline all",                   es: "Rechazar todas" },
+  "consent.manage":          { en: "Manage preferences",            es: "Gestionar preferencias" },
+  "consent.save":            { en: "Save preferences",              es: "Guardar preferencias" },
+  "consent.prefs.title":     { en: "Cookie preferences",            es: "Preferencias de cookies" },
+  "consent.prefs.lede":      { en: "Strictly-necessary cookies are always on — the site can't function without them. The rest you can switch on or off.",
+                               es: "Las cookies estrictamente necesarias siempre están activas — el sitio no funciona sin ellas. El resto puedes activarlas o desactivarlas." },
+  "consent.category.always_active":               { en: "Always active",
+                                                    es: "Siempre activas" },
+  "consent.category.strictly_necessary.label":    { en: "Strictly necessary",
+                                                    es: "Estrictamente necesarias" },
+  "consent.category.strictly_necessary.desc":     { en: "Authentication, checkout session continuity, your stored preferences. These cannot be switched off.",
+                                                    es: "Autenticación, continuidad del pago en Stripe, tus preferencias guardadas. No se pueden desactivar." },
+  "consent.category.analytics.label":             { en: "Analytics",
+                                                    es: "Analíticas" },
+  "consent.category.analytics.desc":              { en: "PostHog product analytics + 10% session replay sample (input-masked, EU-hosted in Frankfurt). Helps us see what works.",
+                                                    es: "Analíticas de producto con PostHog + grabación de sesiones al 10% (con los campos enmascarados, alojado en Frankfurt). Nos ayuda a entender qué funciona." },
+  "consent.category.functional.label":            { en: "Functional",
+                                                    es: "Funcionales" },
+  "consent.category.functional.desc":             { en: "Mapbox map-tile caching and Resend newsletter open/click tracking. Improves the experience but not required.",
+                                                    es: "Caché de mosaicos de Mapbox y seguimiento de aperturas/clics del newsletter por Resend. Mejora la experiencia pero no es necesario." },
 
   // Saved page CTA
   "saved.browse_cta":        { en: "Browse listings →",             es: "Ver propiedades →" },
