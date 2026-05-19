@@ -137,6 +137,15 @@ def check_public_deploy(url: str = "https://pulpo.club/data/ranked.json") -> tup
 # How many consecutive red runs trigger a per-source alert.
 SOURCE_CONSECUTIVE_RED_THRESHOLD = 2
 
+# How fresh the most-recent health row must be for a source to be considered
+# "actively attempted" by the consecutive-red check. A source that hasn't
+# emitted a row in this long is either intentionally disabled from PULPO_SOURCES
+# (see the comment in pulpo-nightly.yml) or its module is failing to import —
+# both different problems from "the scraper ran twice and went red", and the
+# top-level freshness check already covers a stopped pipeline. Set to ~2× the
+# nightly cadence so a single missed run doesn't trip it.
+SOURCE_STALENESS_HOURS = 48
+
 # Latency regression ratio: today's duration_s vs 7-day median.
 # 3.0 = "today's run took 3× longer than the recent median" — almost always
 # a DOM change, anti-bot kicking in, or proxy slowness. Anything below 2× is
@@ -164,16 +173,28 @@ def _read_source_history(data_dir: Path) -> list[dict]:
     return rows
 
 
-def check_source_consecutive_red(data_dir: Path) -> tuple[bool, str]:
+def check_source_consecutive_red(
+    data_dir: Path, *, now: datetime | None = None
+) -> tuple[bool, str]:
     """Alert if any source has been red for SOURCE_CONSECUTIVE_RED_THRESHOLD+ runs.
 
     'Red' is the status string the run.py telemetry writes — set when a
     source either errored or returned zero listings. A single red run is
     noise; two in a row is a signal worth chasing.
+
+    Sources whose most-recent row predates ``SOURCE_STALENESS_HOURS`` are
+    excluded — those scrapers aren't being attempted right now, so frozen
+    red rows from weeks ago aren't actionable signal.
+
+    ``now`` is injectable for tests; defaults to wall-clock UTC.
     """
     rows = _read_source_history(data_dir)
     if not rows:
         return True, "OK   source_health: no history yet (skipping consecutive-red check)"
+
+    if now is None:
+        now = datetime.now(timezone.utc)
+    staleness_cutoff = now - timedelta(hours=SOURCE_STALENESS_HOURS)
 
     # Group rows by source, sorted by ts descending.
     by_source: dict[str, list[dict]] = {}
@@ -183,19 +204,38 @@ def check_source_consecutive_red(data_dir: Path) -> tuple[bool, str]:
         by_source[src].sort(key=lambda r: r.get("ts") or "", reverse=True)
 
     streaks: list[str] = []
+    stale: list[str] = []
     for src, entries in sorted(by_source.items()):
         recent = entries[:SOURCE_CONSECUTIVE_RED_THRESHOLD]
         if len(recent) < SOURCE_CONSECUTIVE_RED_THRESHOLD:
+            continue
+        # Staleness guard: skip sources whose most-recent row is older than
+        # SOURCE_STALENESS_HOURS. Repeating the same alert daily on frozen
+        # history is noise — the source isn't even being attempted.
+        latest_ts: datetime | None = None
+        try:
+            latest_ts = datetime.fromisoformat(
+                (recent[0].get("ts") or "").replace("Z", "+00:00")
+            )
+        except ValueError:
+            pass
+        if latest_ts is not None and latest_ts < staleness_cutoff:
+            age_h = (now - latest_ts).total_seconds() / 3600
+            stale.append(f"{src} ({age_h:.0f}h stale)")
             continue
         if all(r.get("status") == "red" for r in recent):
             err_classes = sorted({(r.get("error_class") or "ZeroRecords") for r in recent})
             streaks.append(f"{src} ({SOURCE_CONSECUTIVE_RED_THRESHOLD}× red, "
                            f"errors={','.join(err_classes)})")
 
+    stale_suffix = f" (skipped stale: {', '.join(stale)})" if stale else ""
     if streaks:
         return False, ("FAIL source_health: consecutive-red streaks detected — "
-                       + "; ".join(streaks))
-    return True, f"OK   source_health: no source red ≥{SOURCE_CONSECUTIVE_RED_THRESHOLD}× in a row"
+                       + "; ".join(streaks) + stale_suffix)
+    return True, (
+        f"OK   source_health: no source red ≥{SOURCE_CONSECUTIVE_RED_THRESHOLD}× in a row"
+        + stale_suffix
+    )
 
 
 def check_source_latency_regression(data_dir: Path) -> tuple[bool, str]:
