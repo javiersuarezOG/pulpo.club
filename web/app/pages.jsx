@@ -11,7 +11,7 @@ import { clerkEnabled } from "./auth/clerk-shell.jsx";
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
-import { SHELVES, PILLS, ZONES } from "./data.jsx";
+import { SHELVES, PILLS, PILL_GROUPS, ZONES } from "./data.jsx";
 import { getCategoryImage } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
@@ -76,27 +76,139 @@ const PRO_PRICE_EUR_PER_MONTH = 10;
 // needed.
 
 // ====== Pill rail ======
-function PillRail({ app, active }) {
+// Three labeled groups (WHERE / RANKING / FILTERS), each chip toggles a
+// specific URL param so chips compose instead of swap:
+//   WHERE   — master = beach | lake | (null = All)         single-select
+//   RANKING — rmax=10  OR  status=price_drop  OR  status=new   single-select
+//   FILTERS — tag=waterfront (toggle) + pmax=100000|250000 (mutex pair)
+//
+// Click logic reads the current URL, computes the next URL, and navigates
+// to /browse. When the user is already on /browse, app.goBrowse keeps the
+// same route but updates routeParams; the BrowsePage mount-time effect
+// re-reads the URL and applies the new filter set.
+function readPillState() {
+  if (typeof window === "undefined") return new URLSearchParams();
+  return new URLSearchParams(window.location.search);
+}
+
+function isPillActive(pill, params) {
+  if (pill.param === "master") {
+    const cur = params.get("master") || null;
+    return cur === pill.value;
+  }
+  if (pill.param === "rmax") {
+    return params.get("rmax") === pill.value;
+  }
+  if (pill.param === "status") {
+    const cur = (params.get("status") || "").split(",").filter(Boolean);
+    return cur.includes(pill.value);
+  }
+  if (pill.param === "tag") {
+    const cur = (params.get("tag") || "").split(",").filter(Boolean);
+    return cur.includes(pill.value);
+  }
+  if (pill.param === "pmax") {
+    return params.get("pmax") === pill.value;
+  }
+  return false;
+}
+
+// Compute the next URLSearchParams after clicking `pill` within `group`.
+// Single-select groups: clicking active = clear; clicking inactive = set
+// (and clear sibling selections in the same group). Toggle: add/remove
+// from the tag set. price_mutex: set pmax to this value (overrides the
+// sibling chip in the same group).
+function nextParamsForPill(group, pill, params) {
+  const next = new URLSearchParams(params);
+  const isActive = isPillActive(pill, params);
+
+  if (group === "where") {
+    // master is mutex; clicking active value clears it; clicking "All"
+    // (value === null) always clears.
+    if (pill.value == null || isActive) next.delete("master");
+    else next.set("master", pill.value);
+    return next;
+  }
+
+  if (group === "ranking") {
+    // RANKING is mutex across three different URL params. Clear all three
+    // first, then set the clicked one (unless it was already active → clear-only).
+    next.delete("rmax");
+    next.delete("status");
+    if (!isActive) {
+      if (pill.param === "rmax") next.set("rmax", pill.value);
+      else if (pill.param === "status") next.set("status", pill.value);
+    }
+    return next;
+  }
+
+  // FILTERS group: mixed behavior
+  if (pill.behavior === "toggle") {
+    // tag set: add/remove pill.value
+    const cur = new Set((next.get("tag") || "").split(",").filter(Boolean));
+    if (isActive) cur.delete(pill.value);
+    else cur.add(pill.value);
+    if (cur.size === 0) next.delete("tag");
+    else next.set("tag", [...cur].join(","));
+    return next;
+  }
+  if (pill.behavior === "price_mutex") {
+    if (isActive) next.delete("pmax");
+    else next.set("pmax", pill.value);
+    return next;
+  }
+  return next;
+}
+
+function PillRail({ app }) {
+  // Re-read URL on every render so the rail reflects external filter changes
+  // (FilterPanel toggles, back-button, deep links). Keyed by app.routeParams
+  // so clicks trigger a re-render even when the URL string itself is mutated
+  // via replaceState by writeFilterToURL.
+  const params = readPillState();
+  const lc = app.locale;
+
+  const handleClick = (groupKey, pill) => {
+    const next = nextParamsForPill(groupKey, pill, params);
+    // Preserve dev/debug/utm params that aren't filter-related.
+    // (They're already in `params` by virtue of starting from window.search.)
+    const qs = next.toString();
+    if (typeof window !== "undefined") {
+      const url = `/browse${qs ? `?${qs}` : ""}`;
+      // Push to history so back-button works for chip navigation.
+      window.history.pushState({}, "", url);
+    }
+    // Route to /browse without a `category` slug — the filter state is
+    // already encoded in the URL params we just wrote.
+    app.goBrowse({ category: null });
+  };
+
   return (
-    <div className="pill-rail-wrap">
-      <div className="pill-rail">
-        <button
-          className={`pill-chip ${!active ? "is-active" : ""}`}
-          onClick={() => app.goBrowse({ category: null })}
-        >
-          <span className="pill-icon" aria-hidden="true"><Icon name="cat_all" size={15} strokeWidth={1.6}/></span> {t("pill.all", app.locale)}
-        </button>
-        {PILLS.map(p => (
-          <button
-            key={p.key}
-            className={`pill-chip ${active === p.key ? "is-active" : ""}`}
-            onClick={() => app.goBrowse({ category: p.key })}
-          >
-            <span className="pill-icon" aria-hidden="true"><Icon name={p.icon} size={15} strokeWidth={1.6}/></span>{tr(p.label, app.locale)}
-          </button>
-        ))}
-      </div>
-      <div className="pill-rail-fade" />
+    <div className="pill-rail-wrap" role="region" aria-label={t("pill.rail.aria", lc)}>
+      {Object.entries(PILL_GROUPS).map(([groupKey, group]) => (
+        <div key={groupKey} className={`pill-tier pill-tier-${groupKey}`}>
+          <span className="pill-tier-label">{t(group.headerKey, lc)}</span>
+          <div className="pill-rail">
+            {group.pills.map(p => {
+              const active = isPillActive(p, params);
+              return (
+                <button
+                  key={p.key}
+                  className={`pill-chip ${active ? "is-active" : ""}`}
+                  onClick={() => handleClick(groupKey, p)}
+                  aria-pressed={active}
+                >
+                  <span className="pill-icon" aria-hidden="true">
+                    <Icon name={p.icon} size={15} strokeWidth={1.6}/>
+                  </span>
+                  {tr(p.label, lc)}
+                </button>
+              );
+            })}
+          </div>
+          <div className="pill-rail-fade" />
+        </div>
+      ))}
     </div>
   );
 }
@@ -851,6 +963,7 @@ function makeDefaultFilters() {
     master_category: null,                    // "beach" | "lake" | null
     subcategory: null,                        // "homes" | "condos" | "land" | null
     discovery_tags: new Set(),                // subset of {top_rated, under_250k, gated, waterfront}
+    rank_max: null,                           // position-rank cap; e.g. 10 for "Top 10" chip
     // Inverse-semantic toggle. Defaults to false → listings where the
     // broker hasn't shared price or size are hidden. Toggling on
     // surfaces them at the bottom of the result set (ranker already
@@ -930,6 +1043,9 @@ function applyFilters(listings, f) {
         if (!tags.includes(required)) return false;
       }
     }
+    if (f.rank_max != null && f.rank_max > 0) {
+      if (typeof l.rank !== "number" || l.rank > f.rank_max) return false;
+    }
     return true;
   });
 }
@@ -971,6 +1087,7 @@ function buildFiltersForCategory(category) {
     under_250k:   () => { f.discovery_tags.add("under_250k"); },
     gated:        () => { f.discovery_tags.add("gated"); },
     waterfront:   () => { f.discovery_tags.add("waterfront"); },
+    top_10:       () => { f.rank_max = 10; },
   };
   map[category]?.();
   return f;
@@ -1151,7 +1268,7 @@ function BrowsePage({ app }) {
 
   return (
     <div className="page page-browse">
-      <PillRail app={app} active={app.routeParams.category} />
+      <PillRail app={app} />
       <div className="browse-layout">
         <div className="filter-desktop">
           <FilterPanel filters={filters} setFilters={setFilters} count={results.length} app={app} />

@@ -42,6 +42,9 @@ export type FilterShape = {
   readiness: number;
   score_min?: number;
   weights?: { value: number; location: number; momentum: number };
+  // Position-rank cap. When set, only listings with `rank <= rank_max`
+  // pass. Used by the "Top 10" pill rail chip.
+  rank_max: number | null;
   // Rewrite Phase 5B — new IA filter axes. null = "all" for the
   // single-selects. discovery_tags is multi-select.
   master_category: MasterCategory | null;
@@ -112,6 +115,7 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     master_category: masterFromUrl ?? baseDefaults.master_category,
     subcategory:     subFromUrl    ?? baseDefaults.subcategory,
     discovery_tags:  tagsFromUrl.size > 0 ? tagsFromUrl : baseDefaults.discovery_tags,
+    rank_max: p.get("rmax") != null ? parseInt0(p.get("rmax"), 0) : baseDefaults.rank_max,
     include_incomplete: p.get("inc") === "1" ? true : baseDefaults.include_incomplete,
   };
   const sm = p.get("score_min");
@@ -175,6 +179,7 @@ export function writeFilterToURL(
   setOrRemove("master", filters.master_category ?? "");
   setOrRemove("sub",    filters.subcategory ?? "");
   setOrRemove("tag",    [...filters.discovery_tags].join(","));
+  setOrRemove("rmax",   filters.rank_max != null && filters.rank_max > 0 ? String(filters.rank_max) : "");
   setOrRemove("inc",    filters.include_incomplete ? "1" : "");
   const qs = p.toString();
   const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;

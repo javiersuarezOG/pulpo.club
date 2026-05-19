@@ -282,6 +282,7 @@ export function HomeShelf({
   shelfKey,
   domId,
   headingKey,
+  subcopyKey,      // Optional one-line subtitle under the h2 (objective shelf description).
   countPill,
   cards,
   listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
@@ -367,6 +368,9 @@ export function HomeShelf({
             <h2 id={`${domId}-h2`} className="hp-shelf-h2">
               {t(headingKey, locale)}
             </h2>
+            {subcopyKey ? (
+              <p className="hp-shelf-sub">{t(subcopyKey, locale)}</p>
+            ) : null}
           </div>
           <div className="hp-shelf-head-right">
             {useReal && (
@@ -459,10 +463,11 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
       shelfKey="top_10"
       domId="hp-shelf-top10"
       headingKey="home.shelf.top10.h2"
+      subcopyKey="home.shelf.top10.sub"
       cards={TOP_10_CARDS}
       listings={listings}
       heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({})}
+      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "top_10" })}
     />
   );
 }
@@ -479,6 +484,7 @@ export function PriceDropsShelf({ app, locale, heroV4 = false }) {
       shelfKey="price_drops"
       domId="hp-shelf-drops"
       headingKey="home.shelf.dropsHeading"
+      subcopyKey="home.shelf.dropsSub"
       countPill={{ text: typeof pill === "string" ? pill.replace("{n}", "47") : "", tone: "burgundy" }}
       cards={PRICE_DROPS_CARDS}
       listings={listings}
@@ -500,6 +506,7 @@ export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
       shelfKey="new_this_week"
       domId="hp-shelf-new"
       headingKey="home.shelf.newHeading"
+      subcopyKey="home.shelf.newSub"
       countPill={{ text: typeof pill === "string" ? pill.replace("{n}", "1,247") : "", tone: "sage" }}
       cards={NEW_THIS_WEEK_CARDS}
       listings={listings}
