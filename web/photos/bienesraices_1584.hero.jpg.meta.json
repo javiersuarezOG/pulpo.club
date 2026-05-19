@@ -1,16 +1,18 @@
 {
-  "width": 498,
-  "height": 1080,
-  "aspect_ratio": 2.169,
-  "file_size_kb": 76.2,
+  "width": 1080,
+  "height": 2340,
+  "aspect_ratio": 2.167,
+  "file_size_kb": 180.1,
   "hero_eligible": false,
-  "card_eligible": false,
-  "hires_eligible": false,
-  "computed_at": "2026-05-19T13:40:26.075820+00:00",
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-19T21:53:38.266204+00:00",
+  "derivative_width": 498,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4808234/81489425/EB-RL8234.jpg?rasterize=true&version=1729452379",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:40:26.075996+00:00"
+  "repicked_at": "2026-05-19T21:53:38.272526+00:00"
 }

@@ -1,16 +1,18 @@
 {
-  "width": 1080,
-  "height": 1080,
+  "width": 1200,
+  "height": 1200,
   "aspect_ratio": 1.0,
-  "file_size_kb": 464.5,
+  "file_size_kb": 483.8,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T13:08:23.431010+00:00",
+  "computed_at": "2026-05-19T21:47:19.094802+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/2923552/46442333/EB-KF3552.jpg?rasterize=true&version=1650648936",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:08:23.431192+00:00"
+  "repicked_at": "2026-05-19T21:47:19.102455+00:00"
 }

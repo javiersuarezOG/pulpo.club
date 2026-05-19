@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 251.0,
+  "file_size_kb": 237.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:08:55.508554+00:00",
+  "computed_at": "2026-05-19T21:34:45.773105+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3750206/61404156/EB-NK0206.jpg?rasterize=true&version=1684361182",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T12:08:55.508737+00:00"
+  "repicked_at": "2026-05-19T21:34:45.777508+00:00"
 }

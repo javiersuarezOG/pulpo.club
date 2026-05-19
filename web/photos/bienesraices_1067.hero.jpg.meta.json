@@ -2,15 +2,17 @@
   "width": 829,
   "height": 647,
   "aspect_ratio": 1.281,
-  "file_size_kb": 103.3,
+  "file_size_kb": 97.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:49:26.512302+00:00",
+  "computed_at": "2026-05-19T21:55:36.742235+00:00",
+  "derivative_width": 829,
+  "derivative_height": 647,
   "hero_photo_quality_score": 40,
-  "has_text_overlay": false,
+  "has_text_overlay": true,
   "winning_url": "https://assets.easybroker.com/property_images/5326729/97618731/EB-TL6729.jpeg?rasterize=true&version=1761424365",
   "candidate_count": 2,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T13:49:26.512499+00:00"
+  "repicked_at": "2026-05-19T21:55:36.744245+00:00"
 }

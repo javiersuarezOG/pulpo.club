@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 768,
   "aspect_ratio": 1.333,
-  "file_size_kb": 142.9,
+  "file_size_kb": 137.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:57:10.408297+00:00",
+  "computed_at": "2026-05-19T21:56:54.564581+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 768,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5594920/97345758/EB-UM4920.jpg?rasterize=true&version=1760991626",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:57:10.408478+00:00"
+  "repicked_at": "2026-05-19T21:56:54.567941+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 164.0,
+  "file_size_kb": 154.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T12:36:51.039565+00:00",
+  "computed_at": "2026-05-19T21:41:15.541061+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/2736922/43205169/EB-JM6922.jpg?rasterize=true&version=1643642387",
   "candidate_count": 5,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T12:36:51.039718+00:00"
+  "repicked_at": "2026-05-19T21:41:15.544657+00:00"
 }

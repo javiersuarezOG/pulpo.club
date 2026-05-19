@@ -1,16 +1,18 @@
 {
-  "width": 810,
-  "height": 1080,
+  "width": 960,
+  "height": 1280,
   "aspect_ratio": 1.333,
-  "file_size_kb": 351.3,
+  "file_size_kb": 3062.3,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:33:02.050724+00:00",
+  "computed_at": "2026-05-19T21:52:14.173843+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003114271001/v3/HDPhotos/Diseno sin titulo (4).png",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:33:02.050928+00:00"
+  "repicked_at": "2026-05-19T21:52:14.194315+00:00"
 }

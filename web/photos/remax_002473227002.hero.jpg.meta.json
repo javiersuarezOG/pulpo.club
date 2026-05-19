@@ -2,15 +2,17 @@
   "width": 940,
   "height": 776,
   "aspect_ratio": 1.211,
-  "file_size_kb": 120.7,
+  "file_size_kb": 112.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:05:57.308617+00:00",
+  "computed_at": "2026-05-19T21:46:55.614258+00:00",
+  "derivative_width": 940,
+  "derivative_height": 776,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002473227002/v3/HDPhotos/Sierra SE 1.jpeg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:05:57.308767+00:00"
+  "repicked_at": "2026-05-19T21:46:55.617128+00:00"
 }

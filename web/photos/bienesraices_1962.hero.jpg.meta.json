@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 384.3,
+  "file_size_kb": 362.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:21:37.787204+00:00",
+  "computed_at": "2026-05-19T21:49:36.273700+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3093501/49299109/EB-KW3501.jpg?rasterize=true&version=1657040842",
   "candidate_count": 5,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T13:21:37.787361+00:00"
+  "repicked_at": "2026-05-19T21:49:36.279061+00:00"
 }

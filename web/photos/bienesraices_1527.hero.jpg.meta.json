@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 124.4,
+  "file_size_kb": 114.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:43:06.968331+00:00",
+  "computed_at": "2026-05-19T21:54:13.821282+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4923773/83895673/EB-RX3773.jpeg?rasterize=true&version=1734712404",
   "candidate_count": 3,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T13:43:06.968496+00:00"
+  "repicked_at": "2026-05-19T21:54:13.823831+00:00"
 }

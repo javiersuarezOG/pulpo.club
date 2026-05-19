@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 675,
   "aspect_ratio": 1.778,
-  "file_size_kb": 153.6,
+  "file_size_kb": 143.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:50:29.804094+00:00",
+  "computed_at": "2026-05-19T21:55:45.267248+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5684969/99304672/EB-UV4969.jpg?rasterize=true&version=1764973510",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:50:29.804269+00:00"
+  "repicked_at": "2026-05-19T21:55:45.270182+00:00"
 }

@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 348.1,
+  "file_size_kb": 329.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T13:51:28.422444+00:00",
+  "computed_at": "2026-05-19T21:55:51.736193+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3528160/57321265/EB-MN8160.jpg?rasterize=true&version=1675344977",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T13:51:28.422627+00:00"
+  "repicked_at": "2026-05-19T21:55:51.741767+00:00"
 }
