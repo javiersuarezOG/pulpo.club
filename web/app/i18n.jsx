@@ -1059,6 +1059,26 @@ const UI_STRINGS = {
   // generic resend_done copy lies — there's no new inbox to check.
   "welcome_modal.anon.resend_user_exists": { en: "Looks like you're already signed up. Try refreshing this page.",
                                           es: "Parece que ya tienes cuenta. Refresca la página para continuar." },
+  // Status-branch copy — driven by /api/clerk/invitation-status on
+  // modal mount. The default anon variant ("invitation_pending"
+  // branch) keeps the existing body+resend wiring; these keys cover
+  // the three OTHER discriminated outcomes from the webhook. Before
+  // these existed the modal lied to users on any non-invitation
+  // path (e.g. existing-user / no-email / webhook-not-yet-fired).
+  "welcome_modal.anon.status.user_exists.headline": { en: "You already have a Pulpo account",
+                                          es: "Ya tienes una cuenta de Pulpo" },
+  "welcome_modal.anon.status.user_exists.body": { en: "Your subscription is active and linked to {email_domain}. Sign in with your existing password — no new email was sent.",
+                                          es: "Tu suscripción está activa y vinculada a {email_domain}. Inicia sesión con tu contraseña — no enviamos un correo nuevo." },
+  "welcome_modal.anon.status.user_exists.cta": { en: "Sign in →",
+                                          es: "Iniciar sesión →" },
+  "welcome_modal.anon.status.no_email.headline": { en: "We couldn't read your email",
+                                          es: "No pudimos leer tu correo" },
+  "welcome_modal.anon.status.no_email.body": { en: "Your subscription is active but your Stripe receipt didn't include an email we could match. Please email hello@pulpo.club so we can attach your subscription.",
+                                          es: "Tu suscripción está activa pero el recibo de Stripe no incluía un correo que pudiéramos vincular. Escríbenos a hello@pulpo.club para conectar tu suscripción." },
+  "welcome_modal.anon.status.no_email.cta": { en: "Email hello@pulpo.club →",
+                                          es: "Escribir a hello@pulpo.club →" },
+  "welcome_modal.anon.status.webhook_pending.body": { en: "Your subscription is active. We're finishing your account setup — your activation email should arrive in a moment. If it doesn't show up in 5 minutes, email hello@pulpo.club.",
+                                          es: "Tu suscripción está activa. Estamos terminando de configurar tu cuenta — tu correo de activación debería llegar en un momento. Si no aparece en 5 minutos, escríbenos a hello@pulpo.club." },
   "welcome_modal.signedin.headline":    { en: "You're all set",
                                           es: "Todo listo" },
   "welcome_modal.signedin.body":        { en: "Welcome to Pulpo Pro. Your account is active — start exploring the marketplace.",
