@@ -2476,30 +2476,66 @@ function ConsentBanner({ locale = "en" }) {
 }
 
 // ────────────────────────────────────────────────────────────────────
-// WelcomeModal — post-payment / post-magic-link landing overlay.
+// WelcomeModal — post-payment / post-Clerk-invitation landing overlay.
 //
 // Mounted by app.jsx when ?welcome=1 is detected in the URL. Two
 // variants based on `app.user` state:
 //   - anon: user just completed Stripe Checkout but hasn't accepted
-//           the Clerk magic-link yet. Modal says "check your inbox"
-//           with a primary CTA to open Gmail and a secondary "resend"
-//           button that hits /api/clerk/resend-invitation.
-//   - signed_in: user accepted the magic-link and is now signed in.
-//           Modal says "you're all set" with a single "start exploring"
-//           CTA that dismisses + auto-dismisses after ~3s.
+//           the Clerk invitation yet. Modal says "check your inbox"
+//           with a primary CTA to open Gmail and a secondary "resend
+//           my invitation" button that hits /api/clerk/resend-invitation.
+//   - signed_in: user accepted the invitation, set a password, and
+//           is now signed in. Modal says "you're all set" with a
+//           single "start exploring" CTA that auto-dismisses after ~3s.
+//
+// Hydration gate (2026-05-19): the same URL handles both moments,
+// and Clerk hydration is async. To prevent the anon-variant copy
+// from flashing during the post-invitation round trip while Clerk
+// is still booting, the modal returns null until `app.authLoaded`
+// flips true. A 5s safety-net timer renders the modal even if Clerk
+// never hydrates (SDK boot failure, ad-blocker, CSP regression) so
+// the modal can't hang forever — `welcome_modal.auth_load_timeout`
+// telemetry fires in that case so we can spot it in PostHog.
 //
 // Tokens-only CSS in web/app/styles/index.css's .welcome-modal block.
 // Mobile-first; ESC + backdrop click dismiss.
 function WelcomeModal({ app, state, onClose }) {
   const lc = app.locale;
+  // Gate rendering on Clerk hydration. If authLoaded is true (Clerk
+  // off OR Clerk on and isLoaded resolved) we can trust `app.user`.
+  // While false, render nothing — but only up to AUTH_LOAD_TIMEOUT_MS.
+  const AUTH_LOAD_TIMEOUT_MS = 5000;
+  const [authTimedOut, setAuthTimedOut] = pUseState(false);
+  const authLoaded = app.authLoaded !== false; // treat undefined as ready
+  const renderReady = authLoaded || authTimedOut;
   const isSignedIn = !!app.user;
   const variant = isSignedIn ? "signed_in" : "anon";
   const [resending, setResending] = pUseState(false);
   const [resendResult, setResendResult] = pUseState(null);
   const dialogRef = React.useRef(null);
 
-  // Fire `welcome_modal.shown` once per mount with the resolved variant.
+  // Safety-net timeout: if Clerk never finishes hydrating we still
+  // surface the modal (in whatever auth state we have) so the user
+  // isn't stuck on a blank backdrop. Telemetry tags whether `user`
+  // had populated by the time the timer fired — true = late
+  // hydration, false = SDK boot likely failed.
   React.useEffect(() => {
+    if (authLoaded) return undefined;
+    const id = setTimeout(() => {
+      setAuthTimedOut(true);
+      track("welcome_modal.auth_load_timeout", { resolved_user: !!app.user });
+    }, AUTH_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, [authLoaded, app.user]);
+
+  // Fire `welcome_modal.shown` once the variant is resolvable (auth
+  // gate cleared). Re-fires if the variant flips after the gate
+  // (e.g. late-hydration moves user from null → signed-in object
+  // while the modal is mounted). The hydration gate above ensures
+  // we don't double-fire as anon→signed_in during the normal boot
+  // race; this guard handles the post-timeout late-hydration case.
+  React.useEffect(() => {
+    if (!renderReady) return undefined;
     track("welcome_modal.shown", { variant, surface: "account" });
     // Auto-dismiss the signed-in variant after a brief acknowledgement
     // so the user lands on the real signed-in /account page.
@@ -2511,10 +2547,11 @@ function WelcomeModal({ app, state, onClose }) {
       return () => clearTimeout(id);
     }
     return undefined;
-  }, [variant, onClose]);
+  }, [renderReady, variant, onClose]);
 
   // ESC dismiss + focus trap entry — modeled on the SignupModal pattern.
   React.useEffect(() => {
+    if (!renderReady) return undefined;
     const onKey = (e) => {
       if (e.key === "Escape") {
         track("welcome_modal.dismissed", { variant, action: "esc" });
@@ -2524,7 +2561,11 @@ function WelcomeModal({ app, state, onClose }) {
     document.addEventListener("keydown", onKey);
     if (dialogRef.current) dialogRef.current.focus();
     return () => document.removeEventListener("keydown", onKey);
-  }, [variant, onClose]);
+  }, [renderReady, variant, onClose]);
+
+  // While Clerk is mid-hydration and the safety-net hasn't fired,
+  // render nothing — no backdrop, no flash of stale anon copy.
+  if (!renderReady) return null;
 
   const onBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -2535,6 +2576,7 @@ function WelcomeModal({ app, state, onClose }) {
 
   const onResend = async () => {
     if (resending || !state || !state.sessionId) {
+      track("welcome_modal.resend_failed", {});
       setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
       return;
     }
@@ -2548,11 +2590,23 @@ function WelcomeModal({ app, state, onClose }) {
         body: JSON.stringify({ session_id: state.sessionId }),
       });
       if (!res.ok) {
+        track("welcome_modal.resend_failed", {});
         setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
       } else {
-        setResendResult({ ok: true, msg: t("welcome_modal.anon.resend_done", lc) });
+        const data = await res.json().catch(() => ({}));
+        if (data && data.status === "user_exists") {
+          // Clerk already has a user for this email — there's no new
+          // invitation to re-send. Tell the user to refresh instead
+          // of lying with "check your inbox".
+          track("welcome_modal.resend_user_exists", {});
+          setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_user_exists", lc) });
+        } else {
+          track("welcome_modal.resend_done", {});
+          setResendResult({ ok: true, msg: t("welcome_modal.anon.resend_done", lc) });
+        }
       }
     } catch {
+      track("welcome_modal.resend_failed", {});
       setResendResult({ ok: false, msg: t("welcome_modal.anon.resend_failed", lc) });
     }
     setResending(false);

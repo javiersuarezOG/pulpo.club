@@ -30,8 +30,18 @@ function planFromMetadata(metadata) {
   return v === "pro" ? "pro" : "free";
 }
 
-function ClerkUserSync({ setUser }) {
+function ClerkUserSync({ setUser, setAuthLoaded }) {
   const { isSignedIn, user, isLoaded } = useUser();
+  // Surface Clerk's `isLoaded` to App as soon as it flips, independent
+  // of `setUser`. WelcomeModal gates its mount on this so the anon
+  // variant doesn't flash during the post-invitation hydration race.
+  // Wired separately because `setUser(null)` for an anon user is a
+  // *valid* end-state — App can't distinguish "Clerk hasn't hydrated"
+  // from "Clerk hydrated and confirmed no session" by looking at
+  // `app.user` alone.
+  useEffect(() => {
+    if (typeof setAuthLoaded === "function") setAuthLoaded(!!isLoaded);
+  }, [isLoaded, setAuthLoaded]);
   useEffect(() => {
     // Wait for Clerk to hydrate before touching state — otherwise we
     // briefly clear the localStorage-restored user on first paint.
@@ -120,11 +130,11 @@ function ClerkActionsBinder({ onActions }) {
   return null;
 }
 
-export default function ClerkProviderWrapper({ setUser, onClerkActions, children }) {
+export default function ClerkProviderWrapper({ setUser, setAuthLoaded, onClerkActions, children }) {
   // <ClerkProvider> reads VITE_CLERK_PUBLISHABLE_KEY from import.meta.env.
   return (
     <ClerkProvider afterSignOutUrl="/">
-      {typeof setUser === "function" ? <ClerkUserSync setUser={setUser} /> : null}
+      {typeof setUser === "function" ? <ClerkUserSync setUser={setUser} setAuthLoaded={setAuthLoaded} /> : null}
       {typeof onClerkActions === "function" ? <ClerkActionsBinder onActions={onClerkActions} /> : null}
       {children}
     </ClerkProvider>

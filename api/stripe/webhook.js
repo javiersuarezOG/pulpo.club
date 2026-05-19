@@ -49,6 +49,21 @@ function pickUtms(metadata) {
   return out;
 }
 
+// Normalize the locale Pulpo stamps onto Stripe session metadata into
+// the BCP-47 root Clerk's invitation API expects. Stripe carries
+// "es-419" (the Latin-American Spanish flavor that Stripe's hosted UI
+// uses) but Clerk's locale templates key off "es". "en" is identical
+// on both sides. Empty/missing returns undefined so we don't override
+// Clerk's default with a bogus value.
+function clerkLocaleFromStripe(stripeLocale) {
+  if (!stripeLocale || typeof stripeLocale !== "string") return undefined;
+  const lc = stripeLocale.trim().toLowerCase();
+  if (!lc) return undefined;
+  if (lc === "es" || lc.startsWith("es-")) return "es";
+  if (lc === "en" || lc.startsWith("en-")) return "en";
+  return undefined;
+}
+
 async function setPlanForClerkUser(clerk, userId, plan, extraPrivate) {
   if (!userId) return;
   await clerk.users.updateUser(userId, {
@@ -135,9 +150,13 @@ module.exports = async (req, res) => {
         const amountTotal = typeof session.amount_total === "number" ? session.amount_total : 0;
         const hasDiscount = Array.isArray(session.discounts) && session.discounts.length > 0;
         const utms = pickUtms(session.metadata);
+        // start-checkout.js stamps this so the activation email matches
+        // the language the user was browsing in.
+        const stripeLocale = session.metadata && session.metadata.locale ? String(session.metadata.locale) : "";
+        const clerkLocale = clerkLocaleFromStripe(stripeLocale);
 
         // Shared props for every webhook.checkout_completed event. PostHog
-        // funnels can break down by path / source / utm_* / country.
+        // funnels can break down by path / source / utm_* / country / locale.
         const baseProps = {
           event_id: event.id,
           session_id: session.id,
@@ -146,6 +165,7 @@ module.exports = async (req, res) => {
           currency,
           amount_total: amountTotal,
           has_discount: hasDiscount,
+          locale: stripeLocale,
           utm_source: utms.utm_source || "",
           utm_medium: utms.utm_medium || "",
           utm_campaign: utms.utm_campaign || "",
@@ -219,6 +239,7 @@ module.exports = async (req, res) => {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_existing_user", clerk_user_id: existing.id,
+            locale: stripeLocale,
           });
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_existing_user",
@@ -232,6 +253,7 @@ module.exports = async (req, res) => {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_dupe_invitation_skipped", session_id: session.id,
+            locale: stripeLocale,
           });
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_dupe_invitation_skipped",
@@ -250,12 +272,16 @@ module.exports = async (req, res) => {
         try {
           const invitation = await clerk.invitations.createInvitation({
             emailAddress: email,
-            // After accepting the Clerk magic-link, land back on
+            // After accepting the Clerk invitation, land back on
             // /account?welcome=1 — same surface as the post-Stripe
             // redirect. The WelcomeModal re-renders in its signed-in
             // variant for a brief acknowledgement, then auto-dismisses
             // leaving the user on a fully signed-in /account page.
             redirectUrl:  `${origin}/account?welcome=1`,
+            // Picks the locale-specific Clerk invitation email template
+            // (Dashboard → Customization → Emails → Localizations).
+            // Omitted when unknown so Clerk falls back to its default.
+            ...(clerkLocale ? { locale: clerkLocale } : {}),
             publicMetadata: { plan: "pro" },
             privateMetadata: {
               stripeCustomerId: customerId || undefined,
@@ -268,6 +294,7 @@ module.exports = async (req, res) => {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_invitation_created", session_id: session.id,
             invitation_id: (invitation && invitation.id) || "",
+            locale: stripeLocale,
           });
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_invitation_created",
@@ -291,6 +318,7 @@ module.exports = async (req, res) => {
               logApi("stripe.webhook", {
                 status: 200, ms: Date.now() - t0, type: event.type,
                 path: "anonymous_race_recovered", clerk_user_id: racedUser.id,
+                locale: stripeLocale,
               });
               posthog.capture(distinctId, "webhook.checkout_completed", {
                 ...baseProps, path: "anonymous_race_recovered",

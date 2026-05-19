@@ -26,6 +26,19 @@ const posthog = require("../_posthog");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Normalize Pulpo's Stripe-flavored locale ("es-419"/"en") to the
+// BCP-47 root Clerk's invitation API expects. Mirrored from webhook.js
+// — duplicated rather than shared because the api/clerk module
+// shouldn't reach into api/stripe internals.
+function clerkLocaleFromStripe(stripeLocale) {
+  if (!stripeLocale || typeof stripeLocale !== "string") return undefined;
+  const lc = stripeLocale.trim().toLowerCase();
+  if (!lc) return undefined;
+  if (lc === "es" || lc.startsWith("es-")) return "es";
+  if (lc === "en" || lc.startsWith("en-")) return "en";
+  return undefined;
+}
+
 async function readJsonBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
   const chunks = [];
@@ -105,23 +118,32 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "no_email_on_session" });
   }
 
+  // Pulpo stamps the user's UI locale onto session.metadata in
+  // start-checkout.js; re-read it here so the resent email matches
+  // the original language even if Clerk Dashboard has multi-locale
+  // templates configured.
+  const stripeLocale = (session.metadata && session.metadata.locale)
+    ? String(session.metadata.locale) : "";
+  const clerkLocale = clerkLocaleFromStripe(stripeLocale);
+
   const distinctId = posthog.emailDistinctId(email);
 
   // If the user already exists in Clerk (e.g. they signed in
   // separately or this is the auth-gated flow), there's nothing to
-  // resend — surface a 200 with a hint so the frontend can show
-  // "you're already in" copy if it wants. (Today the modal just
-  // shows the generic resend-failed message; we'll iterate.)
+  // resend — surface a 200 with status: "user_exists" so the
+  // WelcomeModal can show the "refresh this page" copy instead of
+  // lying with "check your inbox".
   const clerk = clerkClient();
   const existing = await findClerkUserByEmail(clerk, email);
   if (existing) {
     logApi("clerk.resend_invitation", {
       status: 200, ms: Date.now() - t0, path: "user_exists",
       clerk_user_id: existing.id, session_id: sessionId,
+      locale: stripeLocale,
     });
     posthog.capture(distinctId, "clerk.invitation_resent", {
       session_id: sessionId, path: "user_exists",
-      reason: "noop", ms: Date.now() - t0,
+      reason: "noop", locale: stripeLocale, ms: Date.now() - t0,
     });
     await posthog.flush();
     return res.status(200).json({ status: "user_exists" });
@@ -136,6 +158,7 @@ module.exports = async (req, res) => {
       logApi("clerk.resend_invitation", {
         status: 500, ms: Date.now() - t0, reason: "revoke_failed",
         invitation_id: pending.id, error: err && err.message,
+        locale: stripeLocale,
       });
       // Fall through — Clerk may have already revoked / expired it.
     }
@@ -150,6 +173,10 @@ module.exports = async (req, res) => {
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       redirectUrl:  `${origin}/account?welcome=1`,
+      // Same locale plumbing as the initial webhook-issued invitation
+      // so the resent email respects the original language. Omitted
+      // when unknown so Clerk falls back to its default template.
+      ...(clerkLocale ? { locale: clerkLocale } : {}),
       publicMetadata: { plan: "pro" },
       privateMetadata: {
         stripeSessionId: sessionId,
@@ -165,11 +192,11 @@ module.exports = async (req, res) => {
     logApi("clerk.resend_invitation", {
       status: 200, ms: Date.now() - t0, path: "resent",
       session_id: sessionId, invitation_id: invitation && invitation.id,
-      was_dupe: !!pending,
+      was_dupe: !!pending, locale: stripeLocale,
     });
     posthog.capture(distinctId, "clerk.invitation_resent", {
       session_id: sessionId, path: "resent",
-      was_dupe: !!pending, ms: Date.now() - t0,
+      was_dupe: !!pending, locale: stripeLocale, ms: Date.now() - t0,
     });
     await posthog.flush();
     return res.status(200).json({ status: "resent" });
@@ -177,10 +204,11 @@ module.exports = async (req, res) => {
     logApi("clerk.resend_invitation", {
       status: 500, ms: Date.now() - t0, reason: "create_failed",
       session_id: sessionId, error: err && err.message,
+      locale: stripeLocale,
     });
     posthog.capture(distinctId, "clerk.invitation_resent", {
       session_id: sessionId, path: "create_failed",
-      error_message: err && err.message, ms: Date.now() - t0,
+      error_message: err && err.message, locale: stripeLocale, ms: Date.now() - t0,
     });
     await posthog.flush();
     return res.status(500).json({ error: "create_failed" });
