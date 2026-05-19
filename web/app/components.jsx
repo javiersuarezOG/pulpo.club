@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VARA2 } from "./i18n.jsx";
 import { track } from "./telemetry/hook";
 import { uspsVisibleFor } from "./lib/gating.ts";
+import { categoryImageForListing } from "./assets/categories";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -341,16 +342,19 @@ function Photo({
   }, [url, eager, source, listing.id, idx]);
 
   if (!url || errored) {
+    // Visual fallback — always an image, never a text card. Picks a
+    // bundled category WebP that matches the listing's master_category
+    // / land_type. See assets/categories/index.js#categoryImageForListing.
+    const fallbackUrl = categoryImageForListing(listing);
     return (
-      <div className={`photo-placeholder ${className}`} style={{ aspectRatio: ratio }}>
-        <div className="photo-placeholder-inner">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <path d="M3 20l5-9 4 6 3-4 6 7z"/>
-            <circle cx="17" cy="7" r="2"/>
-          </svg>
-          <div className="photo-placeholder-zone">{listing.zone_name}</div>
-          <div className="photo-placeholder-type">{landTypeLabel(listing.land_type)}</div>
-        </div>
+      <div className={`photo-wrap photo-fallback ${className}`} style={{ aspectRatio: ratio }}>
+        <img
+          src={fallbackUrl}
+          alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={eager ? "high" : "auto"}
+        />
       </div>
     );
   }
