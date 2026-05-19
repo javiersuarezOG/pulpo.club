@@ -2531,6 +2531,15 @@ function WelcomeModal({ app, state, onClose }) {
   const variant = isSignedIn ? "signed_in" : "anon";
   const [resending, setResending] = pUseState(false);
   const [resendResult, setResendResult] = pUseState(null);
+  // Discriminated status from /api/clerk/invitation-status — fetched
+  // once on anon-variant mount (signed_in skips it; nothing to verify).
+  // Drives which copy the anon branch renders. Null = still fetching;
+  // see the four `welcome_modal.anon.status.*` i18n keys for the
+  // resolved-status copy. Pre-PR the anon body lied uniformly
+  // ("we just sent an invitation") regardless of which Path-B webhook
+  // outcome the user actually hit — see the postmortem in
+  // ~/.claude/plans/bug-report-post-stripe-bright-flurry.md.
+  const [statusInfo, setStatusInfo] = pUseState(null);
   const dialogRef = React.useRef(null);
 
   // Safety-net timeout: if Clerk never finishes hydrating we still
@@ -2567,6 +2576,59 @@ function WelcomeModal({ app, state, onClose }) {
     }
     return undefined;
   }, [renderReady, variant, onClose]);
+
+  // Invitation-status fetch — only meaningful for the anon variant.
+  // Mounts once when the modal is render-ready AND the user isn't
+  // signed in yet AND we have a session_id to verify against. The
+  // endpoint is read-only + idempotent so polling is safe; we poll
+  // ONCE on mount and re-poll after a 5s delay if the first response
+  // was `webhook_pending` (the only transient state — others are
+  // terminal). Pre-PR this whole flow was missing — the modal had no
+  // idea whether an invitation was actually created.
+  React.useEffect(() => {
+    if (!renderReady || isSignedIn) return undefined;
+    if (!state || !state.sessionId) return undefined;
+    let cancelled = false;
+    let retryTimer = null;
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch(
+          `/api/clerk/invitation-status?session_id=${encodeURIComponent(state.sessionId)}`,
+          { headers: { "Accept": "application/json" } },
+        );
+        if (cancelled) return;
+        if (!res.ok) {
+          setStatusInfo({ status: "fetch_failed" });
+          track("welcome_modal.invitation_status_resolved", { status: "fetch_failed" });
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        const status = (data && data.status) || "fetch_failed";
+        setStatusInfo({
+          status,
+          emailDomain: (data && data.email_domain) || "",
+        });
+        track("welcome_modal.invitation_status_resolved", { status });
+        // webhook_pending is transient — Stripe hasn't fired the
+        // webhook yet OR it's still inflight. Retry once after 5s
+        // to see if the server caught up. If still pending after
+        // the retry we leave the user on the pending copy with a
+        // "if it doesn't show up in 5 minutes, email us" escalation.
+        if (status === "webhook_pending") {
+          retryTimer = setTimeout(fetchStatus, 5000);
+        }
+      } catch {
+        if (cancelled) return;
+        setStatusInfo({ status: "fetch_failed" });
+        track("welcome_modal.invitation_status_resolved", { status: "fetch_failed" });
+      }
+    };
+    fetchStatus();
+    return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+  }, [renderReady, isSignedIn, state]);
 
   // ESC dismiss + focus trap entry — modeled on the SignupModal pattern.
   React.useEffect(() => {
@@ -2658,32 +2720,98 @@ function WelcomeModal({ app, state, onClose }) {
         </button>
         <div className="welcome-modal-eyebrow">{t("welcome_modal.eyebrow", lc)}</div>
         {variant === "anon" ? (
-          <>
-            <h2 className="welcome-modal-headline">{t("welcome_modal.anon.headline", lc)}</h2>
-            <p className="welcome-modal-body">{t("welcome_modal.anon.body", lc)}</p>
-            <a
-              className="welcome-modal-cta-primary"
-              href="https://mail.google.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
-            >
-              {t("welcome_modal.anon.cta_inbox", lc)}
-            </a>
-            <button
-              type="button"
-              className="welcome-modal-cta-secondary"
-              onClick={onResend}
-              disabled={resending}
-            >
-              {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
-            </button>
-            {resendResult && (
-              <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
-                {resendResult.msg}
-              </p>
-            )}
-          </>
+          (() => {
+            // Status-branched anon rendering — see the
+            // welcome_modal.anon.status.* i18n keys + the comment on
+            // statusInfo above. The default (statusInfo still null
+            // OR status === "invitation_pending") is the canonical
+            // "check inbox" copy. The three other branches surface
+            // outcomes the modal pre-PR rendered identically + wrong.
+            const status = statusInfo && statusInfo.status;
+            if (status === "user_exists") {
+              return (
+                <>
+                  <h2 className="welcome-modal-headline">{t("welcome_modal.anon.status.user_exists.headline", lc)}</h2>
+                  <p className="welcome-modal-body">
+                    {t("welcome_modal.anon.status.user_exists.body", lc, {
+                      email_domain: (statusInfo && statusInfo.emailDomain) || "your email",
+                    })}
+                  </p>
+                  <button
+                    type="button"
+                    className="welcome-modal-cta-primary"
+                    onClick={() => {
+                      track("welcome_modal.signin_existing_clicked", {});
+                      if (app.clerkActions && typeof app.clerkActions.openSignIn === "function") {
+                        app.clerkActions.openSignIn();
+                      } else if (typeof app.openSignup === "function") {
+                        app.openSignup({ mode: "login" });
+                      }
+                    }}
+                  >
+                    {t("welcome_modal.anon.status.user_exists.cta", lc)}
+                  </button>
+                </>
+              );
+            }
+            if (status === "no_email") {
+              return (
+                <>
+                  <h2 className="welcome-modal-headline">{t("welcome_modal.anon.status.no_email.headline", lc)}</h2>
+                  <p className="welcome-modal-body">{t("welcome_modal.anon.status.no_email.body", lc)}</p>
+                  <a
+                    className="welcome-modal-cta-primary"
+                    href="mailto:hello@pulpo.club?subject=Pulpo%20Pro%20activation%20help"
+                    onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
+                  >
+                    {t("welcome_modal.anon.status.no_email.cta", lc)}
+                  </a>
+                </>
+              );
+            }
+            // Default branch — covers invitation_pending (happy path,
+            // expected case), webhook_pending (still polling),
+            // session_not_found, session_not_complete, fetch_failed,
+            // AND the null-status pre-resolution window. Body switches
+            // to the webhook_pending wording when that's the resolved
+            // status so we don't lie about "we sent an invitation"
+            // while we're waiting for Stripe to actually fire the
+            // webhook. Resend CTA is always available — it's the
+            // user-facing escape hatch for any of the failure modes.
+            const isWebhookPending = status === "webhook_pending";
+            return (
+              <>
+                <h2 className="welcome-modal-headline">{t("welcome_modal.anon.headline", lc)}</h2>
+                <p className="welcome-modal-body">
+                  {isWebhookPending
+                    ? t("welcome_modal.anon.status.webhook_pending.body", lc)
+                    : t("welcome_modal.anon.body", lc)}
+                </p>
+                <a
+                  className="welcome-modal-cta-primary"
+                  href="https://mail.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track("welcome_modal.cta_inbox_clicked", {})}
+                >
+                  {t("welcome_modal.anon.cta_inbox", lc)}
+                </a>
+                <button
+                  type="button"
+                  className="welcome-modal-cta-secondary"
+                  onClick={onResend}
+                  disabled={resending}
+                >
+                  {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
+                </button>
+                {resendResult && (
+                  <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
+                    {resendResult.msg}
+                  </p>
+                )}
+              </>
+            );
+          })()
         ) : (
           <>
             <h2 className="welcome-modal-headline">{t("welcome_modal.signedin.headline", lc)}</h2>
