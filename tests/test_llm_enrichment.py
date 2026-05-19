@@ -703,3 +703,44 @@ def test_call_with_retry_invokes_sleep_between_attempts():
     assert result == "ok"
     assert calls["n"] == 2
     assert len(sleeps) == 1  # exactly one back-off pause
+
+
+# ── Sidecar corruption surfaces (PR-7 audit item #14) ──────────────────
+
+def test_load_sidecar_missing_file_is_silent(tmp_path, capsys):
+    """Normal first-run case: the sidecar doesn't exist yet. Empty dict,
+    no log noise. (If we yelled on this we'd be wrong every fresh clone.)"""
+    from automation.llm_enrichment import _load_sidecar
+    result = _load_sidecar(tmp_path / "nonexistent.json")
+    assert result == {}
+    captured = capsys.readouterr()
+    assert "corrupt" not in captured.err
+    assert "unexpected root type" not in captured.err
+
+
+def test_load_sidecar_bad_json_logs_warning(tmp_path, capsys):
+    """The bug class this fix targets — a half-written sidecar would
+    return {} silently and the next run would re-spend DeepSeek credit
+    on every entry. Now: empty dict + a stderr line so the operator
+    sees it in the nightly log."""
+    from automation.llm_enrichment import _load_sidecar
+    bad = tmp_path / "side.json"
+    bad.write_text("{this is not valid json", encoding="utf-8")
+    result = _load_sidecar(bad)
+    assert result == {}
+    captured = capsys.readouterr()
+    assert "corrupt" in captured.err
+    assert "side.json" in captured.err
+
+
+def test_load_sidecar_wrong_root_type_logs_warning(tmp_path, capsys):
+    """A sidecar that parses but isn't a dict (someone hand-edited it
+    into a list) — same blast radius as a JSON error. Surface it."""
+    from automation.llm_enrichment import _load_sidecar
+    weird = tmp_path / "side.json"
+    weird.write_text('["unexpected", "list", "shape"]', encoding="utf-8")
+    result = _load_sidecar(weird)
+    assert result == {}
+    captured = capsys.readouterr()
+    assert "unexpected root type" in captured.err
+    assert "list" in captured.err
