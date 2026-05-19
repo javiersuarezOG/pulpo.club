@@ -145,6 +145,7 @@ export function FeaturedDeal({ app, locale }) {
                   className="hp-featured-art-img"
                   eager
                   source="featured_deal"
+                  thumbnail
                 />
               ) : (
                 <>

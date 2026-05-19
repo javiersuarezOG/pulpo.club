@@ -1,12 +1,13 @@
 // Wave-4 paid-home variant — end-to-end smoke for the block registry.
 //
 // Three scenarios:
-//   1. Pro user + flag on → upsell blocks (hero, featured, usps) NOT
-//      in the DOM. Carousels still present.
+//   1. Pro user + flag on → upsell blocks (featured, usps, shoreline)
+//      NOT in the DOM. Carousels still present.
 //   2. Pro user + flag off → all 7 blocks visible (rollback path
-//      preserves today's behavior byte-for-byte).
-//   3. Free user + flag on → all 7 blocks visible (filter targets
-//      paid only; free users see the same homepage).
+//      preserves pre-Wave-4 behavior byte-for-byte).
+//   3. Free user + flag on → USPs hidden (PR #323 — anonymous-only
+//      marketing band), every other block visible. Free users still
+//      see featured + shoreline since those carry conversion intent.
 //
 // Mechanism: `?ff_paid_home_variant_v1=1/0` forces the flag locally,
 // same URL-override pattern Wave 1 uses for cta_routing_v2.
@@ -85,7 +86,7 @@ test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
     expect(errors).toEqual([]);
   });
 
-  test("free user + flag on: filter is paid-only, free sees everything", async ({ page }) => {
+  test("free user + flag on: USPs anonymous-only, everything else visible", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedUser(page, "free");
 
@@ -94,14 +95,21 @@ test.describe("Paid-home variant (Wave 4) — block registry filtering", () => {
       { waitUntil: "networkidle" },
     );
 
+    // Post-PR-323: the marketing USP band is anonymous-only — signed-in
+    // free users skip it (intentional, to avoid pitching the product to
+    // someone already inside). Hero + Featured + Shoreline still render
+    // for the free tier, plus the three shelves.
     await expect(page.locator(".hp-hero")).toBeVisible();
     await expect(page.locator(".hp-featured")).toBeVisible();
-    await expect(page.locator(".hp-usp")).toBeVisible();
+    await expect(page.locator(".hp-usp")).toHaveCount(0);
+    await expect(page.locator(".hp-shoreline")).toBeVisible();
 
     const ev = (await getEvents(page)).find((e) => e.name === "paid_home_rendered");
     expect(ev).toBeTruthy();
     expect(ev!.props.user_state).toBe("free");
-    expect((ev!.props.blocks_visible as string[]).length).toBe(7);
+    expect(ev!.props.blocks_visible).toEqual([
+      "hero", "featured", "shoreline", "top_10", "price_drops", "new_this_week",
+    ]);
 
     expect(errors).toEqual([]);
   });

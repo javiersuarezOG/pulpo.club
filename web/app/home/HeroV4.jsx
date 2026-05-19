@@ -38,12 +38,20 @@ import {
   LISTING_COUNT_FALLBACK,
 } from "./heroConfig";
 import { useListings } from "../data/use-listings.tsx";
-import { loadFeaturedJson, featuredIdToListingId } from "../data/featured";
+import { pickTopRanked } from "./HomeShelf.jsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { tierFor } from "../lib/gating";
 import { readFeatureFlag } from "../lib/feature-flag";
-import { pickHeroPhoto } from "../lib/hero-photos";
 import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
+
+// Deterministic UTC-day index — same epoch + math as lib/hero-photos.ts
+// `daily` mode so the hero rotates once per UTC day worldwide.
+function dailyIndex(modulo) {
+  if (!modulo || modulo <= 0) return 0;
+  const epoch = Date.UTC(2026, 0, 1);
+  const days = Math.floor((Date.now() - epoch) / 86_400_000);
+  return ((days % modulo) + modulo) % modulo;
+}
 
 function fmtCount(n, locale) {
   try {
@@ -54,26 +62,18 @@ function fmtCount(n, locale) {
 }
 
 export function HeroV4({ app, locale }) {
-  // ── Featured listing resolution (same pattern as Wave-5b FeaturedDeal) ─
+  // ── Featured listing resolution ────────────────────────────────────
+  // Pick from the same top-10-by-rank_score set the "Top 10 deals right
+  // now" shelf renders, rotated once per UTC day. This replaces the old
+  // /data/featured.json fetch + stock-image-while-waiting flow, which
+  // produced a visible flash from a curated category WebP to the real
+  // listing photo on every cold load.
   const listings = useListings();
-  const [resolved, setResolved] = useState(null);
-  // Fallback hero photo from the curated pool when the featured pipeline
-  // hasn't resolved (cold load, fetch failure, listing absent from
-  // cache). Picked once per mount.
-  const fallbackPhoto = useMemo(() => pickHeroPhoto("random"), []);
-
-  useEffect(() => {
-    if (!listings || listings.length === 0) return;
-    let cancelled = false;
-    loadFeaturedJson().then((featured) => {
-      if (cancelled || !featured) return;
-      for (const entry of featured.pool) {
-        const id = featuredIdToListingId(entry.listing_id);
-        const match = listings.find((l) => l.id === id);
-        if (match) { setResolved(match); return; }
-      }
-    }).catch(() => { /* fallback photo already in place */ });
-    return () => { cancelled = true; };
+  const resolved = useMemo(() => {
+    if (!listings || listings.length === 0) return null;
+    const top = pickTopRanked(listings, 10);
+    if (top.length === 0) return null;
+    return top[dailyIndex(top.length)];
   }, [listings]);
 
   // ── Live counter (real /data/last_updated.json fetch + sessionStorage cache) ─
@@ -235,12 +235,13 @@ export function HeroV4({ app, locale }) {
               source="hero_v4"
             />
           ) : (
-            <img
-              src={fallbackPhoto.url}
-              alt=""
+            // Listings still loading — render an aspect-ratio-preserving
+            // empty box so layout is stable and no stock image is ever
+            // flashed before the real top-10 photo arrives.
+            <div
               className="hp-hero-v4-photo-img"
-              loading="eager"
-              decoding="async"
+              style={{ aspectRatio: "4/3", width: "100%" }}
+              aria-hidden="true"
             />
           )}
           {resolved && (

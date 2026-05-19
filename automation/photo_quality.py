@@ -403,6 +403,24 @@ TEXT_MIN_CONF = 60          # Tesseract confidence threshold per word
 TEXT_MIN_WORDS = 8          # >= this many qualifying words → flag
 TEXT_MIN_AREA_PCT = 5.0     # >= this % of image covered by text → flag
 
+# Marketing-banner keyword denylist. The TEXT_MIN_WORDS=8 threshold is
+# tuned for brochure-style overlays — it misses short marketing banners
+# like "Price Reduction" (2 words), "SOLD", "VENDIDO", "OFERTA". When
+# Tesseract finds ANY of these at confidence ≥ TEXT_MIN_CONF, the image
+# is flagged immediately regardless of word count or area coverage.
+# Triggered by the 2026-05-19 IG post that auto-published a Costa del
+# Sol oceanside listing with a visible "Price Reduction" overlay
+# (id=oceanside__12451; has_text_overlay was False because of the
+# 8-word floor). EN + ES coverage — extend per real failure modes.
+MARKETING_OVERLAY_WORDS = frozenset({
+    # English marketing copy frequently stamped on listing photos
+    "reduction", "reduced", "sold", "sale", "discount", "discounted",
+    "available", "new",
+    # Spanish equivalents (most Latam brokers stamp in Spanish)
+    "rebaja", "rebajado", "rebajada", "vendido", "vendida",
+    "oferta", "descuento", "disponible", "nuevo", "nueva", "venta",
+})
+
 _TESSERACT_WARNED = False   # one-shot warning gate per process
 
 
@@ -461,13 +479,34 @@ def detect_text_overlay(
         return None
 
     try:
+        # `lang='eng+spa'` to recognise Spanish broker stamps
+        # ("REBAJA", "VENDIDO", "OFERTA"). Both language packs are
+        # installed by ci.yml + pulpo-nightly.yml + repick-heroes.yml.
+        # When the spa pack is missing, fall back to eng so the OCR
+        # still runs on the (more common) English stamps.
         data = pytesseract.image_to_data(
             img,
             output_type=pytesseract.Output.DICT,
+            lang="eng+spa",
         )
     except pytesseract.TesseractNotFoundError:
         _detector_unavailable("tesseract binary not on PATH")
         return None
+    except pytesseract.pytesseract.TesseractError as e:
+        # spa language pack not installed → retry with eng only.
+        if "spa" in str(e).lower():
+            try:
+                data = pytesseract.image_to_data(
+                    img,
+                    output_type=pytesseract.Output.DICT,
+                    lang="eng",
+                )
+            except Exception as e2:
+                _detector_unavailable(f"tesseract eng-only retry failed: {e2!r}")
+                return None
+        else:
+            _detector_unavailable(f"tesseract error: {e!r}")
+            return None
     except Exception as e:
         _detector_unavailable(f"tesseract error: {e!r}")
         return None
@@ -492,6 +531,14 @@ def detect_text_overlay(
             continue
         if not txt or not txt.strip():
             continue
+        # Marketing-banner short-circuit: any confidence-passing word
+        # that matches the denylist flags the image immediately, so we
+        # catch 1-2 word banners that the count/area thresholds miss.
+        # Case-insensitive; punctuation stripped (handles "SOLD!",
+        # "REBAJA:", etc.).
+        normalized = txt.strip().lower().strip(".,!?:;-")
+        if normalized in MARKETING_OVERLAY_WORDS:
+            return True
         qualifying_words += 1
         try:
             text_area += int(w) * int(h)

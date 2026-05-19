@@ -59,10 +59,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   backdrop-filter: saturate(140%) blur(10px);
   border-bottom: 1px solid var(--line);
 }
+/* Base = mobile. The 320px viewport budget is tight for Pro members:
+   Pulpo Pro pill, avatar ring, Logout text, LocaleToggle, and the
+   LiveStats toggle all share topnav-inner. Pre-PR-323 the Pro pill
+   didn't exist, so the original 24px/32px desktop values fit; after
+   #323 a Pro user blew past 320 by 42px. Desktop spacing is restored
+   at ≥768px below. */
 .topnav-inner {
   max-width: 1400px; margin: 0 auto;
-  display: flex; align-items: center; gap: 32px;
-  padding: 14px 24px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 14px 8px;
+}
+@media (min-width: 768px) {
+  .topnav-inner { gap: 32px; padding: 14px 24px; }
 }
 .logo-btn { display: flex; align-items: center; }
 .pulpo-logo { color: var(--accent); }
@@ -129,13 +138,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--ink-3);
 }
 
-.profile-chip { display: flex; align-items: center; gap: 10px; }
+.profile-chip { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); color: white;
   display: grid; place-items: center;
   font-weight: 600; font-size: 13px;
   position: relative;
+  flex-shrink: 0;
 }
 
 /* ── Pulpo Pro identity ────────────────────────────────────────────────
@@ -173,6 +183,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 700;
   border: 1.5px solid var(--paper);
   box-sizing: content-box;
+}
+
+/* Mobile: tighten the topnav gap so the wordmark + Pro pill + right-side
+   chrome fit at the common phone widths (375–414px). Below 360px (the
+   smoke-test 320px viewport included) the pill drops out — the gold
+   avatar ring + ★ badge still carry Pro identity, and the wordmark +
+   chrome keep their space. */
+@media (max-width: 767px) {
+  .topnav-inner { gap: 16px; }
+  .pulpo-logo-pro { font-size: 12px; padding: 2px 6px 3px; }
+}
+@media (max-width: 360px) {
+  .pulpo-logo-pro { display: none; }
 }
 
 /* Single auth icon — replaces the dual "Log in" + "Sign up — free" pair.
@@ -678,29 +701,6 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-.photo-placeholder {
-  position: relative;
-  width: 100%;
-  background: linear-gradient(135deg, oklch(32% 0.04 60) 0%, oklch(22% 0.03 70) 100%);
-  border-radius: inherit;
-}
-.photo-placeholder-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  color: oklch(85% 0.04 60);
-  gap: 4px;
-}
-.photo-placeholder-zone {
-  font-family: var(--font-display);
-  font-size: 18px;
-  margin-top: 4px;
-}
-.photo-placeholder-type {
-  font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0.7;
-}
 
 .card-badge-row {
   position: absolute; top: 12px; left: 12px;

@@ -96,7 +96,7 @@ function isShelfEligible(l) {
 }
 
 // Top 10: rank_score-sorted, must have at least one photo.
-function pickTopRanked(listings, n) {
+export function pickTopRanked(listings, n) {
   return [...listings]
     .filter((l) => l.rank_score != null && isShelfEligible(l))
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
@@ -204,6 +204,7 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
             className="hp-shelf-card-img"
             eager={eager}
             source="home_shelf"
+            thumbnail
           />
           {rank != null && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>

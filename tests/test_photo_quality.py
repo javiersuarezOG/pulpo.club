@@ -231,3 +231,45 @@ def test_detect_text_overlay_text_heavy_image_returns_true():
     behavior-pinned rather than threshold-fragile."""
     raw = _make_text_overlay_image()
     assert detect_text_overlay(raw) is True
+
+
+def _make_short_banner_image(text: str, size=(900, 700)) -> bytes:
+    """Synthesize a marketing-banner photo: large coloured background +
+    a single short banner phrase (1-3 words). Used to pin down the
+    marketing-keyword shortcut: short banners that don't trip the
+    8-word floor must still flag via the denylist."""
+    from PIL import Image, ImageDraw, ImageFont
+    img = Image.new("RGB", size, color=(200, 60, 60))   # warm red banner bg
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
+    # Repeated 4× so Tesseract's per-word detector lands on it
+    # reliably across binary versions / dpi settings.
+    for ry in range(4):
+        for rx in range(2):
+            draw.text(
+                (60 + rx * 360, 100 + ry * 80),
+                text,
+                fill=(255, 255, 255),
+                font=font,
+            )
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_marketing_keyword_flags_short_banner_en():
+    """A 2-word English marketing banner ("Price Reduction") must flag
+    via the MARKETING_OVERLAY_WORDS denylist — the 8-word floor alone
+    misses it (see oceanside__12451 incident, 2026-05-19)."""
+    raw = _make_short_banner_image("Price Reduction")
+    assert detect_text_overlay(raw) is True
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_marketing_keyword_flags_spanish_banner():
+    """Spanish marketing banner ("REBAJADO", "VENDIDO") — most Latam
+    brokers stamp in Spanish, so the denylist must cover both
+    languages."""
+    raw = _make_short_banner_image("VENDIDO")
+    assert detect_text_overlay(raw) is True
