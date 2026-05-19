@@ -2137,29 +2137,8 @@ function PlansPage({ app }) {
 }
 
 // ====== Sign-up modal ======
-const CLERK_INTRO_SEEN_KEY = "pulpo-clerk-intro-seen";
-
 function SignupModal({ app }) {
   const m = app.signupModal;
-  const lc = app.locale;
-
-  // Pulpo intro shown before handing off to Clerk's hosted modal.
-  // Without this, users went from clicking "Sign in" → seeing a
-  // Clerk-branded prompt asking them to share info with no context
-  // for who Clerk is or why. The intro shows once per device; after
-  // confirm we set localStorage so subsequent sign-ins skip straight
-  // through. `null` = un-decided yet (still loading from storage),
-  // `true` = user has seen + acknowledged, `false` = needs intro.
-  const [introAcknowledged, setIntroAcknowledged] = pUseState(() => {
-    try { return localStorage.getItem(CLERK_INTRO_SEEN_KEY) === "1"; }
-    catch { return false; }
-  });
-  const acknowledgeIntro = (persist) => {
-    if (persist) {
-      try { localStorage.setItem(CLERK_INTRO_SEEN_KEY, "1"); } catch {}
-    }
-    setIntroAcknowledged(true);
-  };
 
   // Flag-on hand-off to Clerk. Trigger the hosted modal imperatively
   // via app.clerkActions (wired by ClerkActionsBinder once the SDK
@@ -2167,17 +2146,12 @@ function SignupModal({ app }) {
   // fire. If clerkActions isn't ready yet (cold first paint), we wait;
   // the effect re-runs when it lands.
   //
-  // The handoff is gated on `introAcknowledged` so first-time users
-  // see the Pulpo intro before Clerk's modal opens. Returning users
-  // (with the localStorage flag set) skip straight through.
-  //
   // Hook is at the top so order is stable across renders, regardless
   // of whether `m` or `clerkEnabled()` flip the early returns below.
   pUseEffect(() => {
     if (!m) return;
     if (!clerkEnabled()) return;
     if (!app.clerkActions) return;
-    if (!introAcknowledged) return;
     // Defensive: Clerk's hosted SignIn/SignUp throws
     // `cannot_render_single_session_enabled` when the user is already
     // signed in — and we have a race where consumers (e.g. the topnav
@@ -2208,58 +2182,11 @@ function SignupModal({ app }) {
       }
     }
     app.closeSignup();
-  }, [m, app.clerkActions, app.user, introAcknowledged]);
+  }, [m, app.clerkActions, app.user]);
 
   if (!m) return null;
-  if (clerkEnabled()) {
-    // First-time on this device: show the Pulpo-branded intro before
-    // Clerk's hosted modal opens. Subsequent sign-ins skip this and
-    // hand off immediately (the effect above fires).
-    if (introAcknowledged) return null;
-    return <ClerkIntroModal app={app} lc={lc} onContinue={acknowledgeIntro} />;
-  }
+  if (clerkEnabled()) return null;
   return <LegacySignupModal app={app} m={m} />;
-}
-
-// Brief Pulpo-branded intro shown the first time a user signs in.
-// Names Clerk explicitly so the user has context when they see Clerk's
-// hosted UI. Default-checked "don't show again" toggle keeps return
-// visits friction-free.
-function ClerkIntroModal({ app, lc, onContinue }) {
-  const [persist, setPersist] = pUseState(true);
-  return (
-    <div className="modal-backdrop" onClick={() => app.closeSignup()}>
-      <div
-        className="modal modal-clerk-intro"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="clerk-intro-title"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <PulpoLogo />
-        <h2 id="clerk-intro-title" className="confirm-title">
-          {t("auth.clerk_intro.title", lc)}
-        </h2>
-        <p className="confirm-body">{t("auth.clerk_intro.body", lc)}</p>
-        <label className="clerk-intro-skip">
-          <input
-            type="checkbox"
-            checked={persist}
-            onChange={(e) => setPersist(e.target.checked)}
-          />
-          <span>{t("auth.clerk_intro.dont_show", lc)}</span>
-        </label>
-        <div className="confirm-actions">
-          <button className="btn-ghost" onClick={() => app.closeSignup()}>
-            {t("auth.clerk_intro.cancel", lc)}
-          </button>
-          <button className="btn-primary" onClick={() => onContinue(persist)}>
-            {t("auth.clerk_intro.cta", lc)}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 // Legacy email/password sign-in form. Only renders when VITE_USE_CLERK
