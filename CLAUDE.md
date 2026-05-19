@@ -63,6 +63,30 @@ If a local-merge attempt to `main` fails with `protected branch hook declined`, 
 
 4. **Skipping these guardrails is worse than missing the deadline.** The user sees crashes, not commits.
 
+## NEVER ship a broken auth/billing flow again — live preview verification (post-2026-05-19)
+
+**PR #307 shipped a "fix" for the post-Stripe modal that left two real bugs in production** — a gate-bypass race that opened Clerk's SignIn modal on top of the WelcomeModal, AND a modal that lied about whether an invitation email was actually sent (the webhook can take three different no-email paths). Both manifested only with Clerk ON, both were invisible to CI (which runs Clerk OFF), and both shipped because the PR was merged with the manual Stripe-sandbox checklist `[ ]` unchecked.
+
+**Mandatory rules for any PR that touches `api/stripe/**`, `api/clerk/**`, `web/app/app.jsx`'s welcome/login URL effects, `WelcomeModal` / `SignupModal`, `web/app/lib/route-gates.ts`, or the Stripe success URL:**
+
+1. **Walk the full Stripe-sandbox flow on the Vercel preview URL** (NOT just dev w/ Clerk off):
+   - Open the preview URL in a **fresh incognito window**.
+   - Hit `/start` → run a Stripe-sandbox checkout (4242 4242 4242 4242).
+   - Confirm the modal sequence on the success URL: **no SignupModal flash, only WelcomeModal**.
+   - Confirm the Clerk invitation email arrives in **inbox** (not spam, not promotions tab) on a **brand-new email address that has never been used in any prior Pulpo test**. Existing-email tests hit the silent-no-email path on the webhook and are misleading.
+   - Click the email CTA → complete Clerk sign-up → confirm you land on `/account` signed in, in Pro state.
+
+2. **Attach evidence to the PR body** before requesting merge:
+   - Screenshot of the WelcomeModal on the success URL (signed-out, then signed-in after the email round trip).
+   - PostHog event snippet showing `webhook.received` → `webhook.checkout_completed` → `welcome_modal.shown variant=anon` → `welcome_modal.shown variant=signed_in` for the test session.
+   - Confirmation that `welcome_modal.invitation_status_resolved status=invitation_pending` fired (once PR #2 of the activation-flow series lands).
+
+3. **The `[x] Manual sandbox dry-run` checkbox is mandatory.** CI green is necessary but **not sufficient** to merge. If the box is unchecked, the merge does not happen — even on `--auto`.
+
+4. **The Vercel preview URL is the testing surface.** Production deploys carry real Stripe webhooks, real Clerk live keys, and real user money. The preview environment is the safest place to catch what CI can't see — use it.
+
+5. **Skipping these guardrails is how a broken funnel hits paying users.** The user sees a Clerk modal they don't recognize and an inbox with no email, not a green CI badge.
+
 ## Frontend conventions (post-PR-1.5)
 
 The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.

@@ -79,6 +79,16 @@ function AccountPage({ app }) {
   aUseEffect(() => {
     if (clerkBooting) return;
     if (app.user) return;
+    // /account?welcome=1 bypass — symmetric with the page-render
+    // branch below. Without this, an anonymous post-Stripe landing
+    // would trigger the SignupModal on top of the WelcomeModal,
+    // which is the Sebas-2026-05-19 bug. The App-level route-gate
+    // also bypasses on welcome=1 (see app.jsx welcomeModalState
+    // short-circuit); this check is the AccountPage-local belt that
+    // covers the Clerk-boot edge case.
+    const isWelcomeLanding = typeof window !== "undefined"
+      && new URLSearchParams(window.location.search).get("welcome") === "1";
+    if (isWelcomeLanding) return;
     app.openSignup({ mode: "login" });
   }, [clerkBooting, app.user]);
 

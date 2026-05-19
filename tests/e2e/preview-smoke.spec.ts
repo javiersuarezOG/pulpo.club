@@ -679,6 +679,58 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(modalText).not.toContain("Resend the link");
   });
 
+  // 2026-05-19 regression — Sebas hit a post-Stripe flow where Clerk's
+  // hosted SignIn modal opened on top of the WelcomeModal because of an
+  // effect-order race: the welcome effect synchronously stripped
+  // ?welcome=1 from the URL, then the route-gate effect re-read the
+  // (now stripped) URL and decided /account needed auth → opened the
+  // SignupModal in login mode → which (under Clerk-on) trampolined to
+  // clerk.openSignIn(). Fix: welcomeModalState is now initialized
+  // synchronously from URL via useState initializer so the gate effect
+  // sees it on first render. This test catches the regression.
+  test("welcome modal: gate-bypass prevents SignupModal flash for anonymous post-Stripe landing", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await page.goto(
+      "/account?welcome=1&session_id=cs_test_assert_no_flash",
+      { waitUntil: "networkidle" },
+    );
+
+    // Welcome modal must render. If the fix worked, the SignupModal
+    // (login mode, gateReason=auth_required) must NOT mount alongside
+    // it. Pre-fix this test would catch the gate race because the
+    // SignupModal would race the welcome modal into the DOM.
+    await page.locator(".welcome-modal").waitFor({ state: "visible", timeout: 10_000 });
+
+    // Give React a settle tick — if the gate were going to mount a
+    // SignupModal, this is the window where it would happen.
+    await page.waitForTimeout(500);
+
+    // Diagnostic: dump both modal classes + URL so failure messages
+    // show exactly what's in the DOM.
+    const dom = await page.evaluate(() => ({
+      url: window.location.href,
+      welcome: document.querySelectorAll(".welcome-modal").length,
+      signup: document.querySelectorAll(".modal-signup").length,
+      welcomeText: (document.querySelector(".welcome-modal")?.textContent || "").slice(0, 120),
+    }));
+    // The legacy SignupModal renders as .modal-signup. In CI
+    // (Clerk-off), the bug manifests as both .welcome-modal AND
+    // .modal-signup present in the DOM. Pre-fix: the gate effect
+    // re-read the URL after the welcome-effect strip → ?welcome=1
+    // bypass evaporated → SignupModal opened on top of WelcomeModal.
+    // The AccountPage-local gate at account.jsx:79 was an additional
+    // setSignupModal call site that also needed the welcome bypass.
+    expect(
+      dom.signup,
+      `SignupModal opened on /account?welcome=1 — the gate-bypass race is back. ` +
+        `See app.jsx welcomeModalState initializer + gate effect short-circuit + ` +
+        `account.jsx welcome=1 bypass on the auth-gate effect. DOM: ${JSON.stringify(dom)}`,
+    ).toBe(0);
+  });
+
   test("welcome modal anon variant: 'invitación' copy renders in ES (no English canaries)", async ({ page }) => {
     await page.addInitScript(() => {
       try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }

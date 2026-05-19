@@ -74,6 +74,15 @@ export function evaluateGate(
   // (or post-Clerk-magic-link) `?welcome=1` flag is present. The page
   // renders in logged-out-preview mode; the WelcomeModal handles the
   // sign-in nudge. This is the ONLY route that opts into this bypass.
+  //
+  // Defense in depth: the load-bearing bypass is now a
+  // `welcomeModalState` short-circuit in app.jsx's gate effect — the
+  // searchParams check here would otherwise lose the race against the
+  // welcome-effect URL strip (the gate effect runs after the strip
+  // in the same render-commit pass). Keeping this check covers the
+  // legacy CI path where Clerk is off and the same-tick effect
+  // ordering still applies, plus any future caller that doesn't go
+  // through app.jsx.
   if (route === "account" && searchParams && searchParams.get("welcome") === "1") {
     return { kind: "allow" };
   }
