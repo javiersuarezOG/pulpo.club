@@ -425,6 +425,10 @@ const UI_STRINGS = {
   "filter.tag.under_250k":       { en: "Under $250K",     es: "Menos de $250K" },
   "filter.tag.gated":            { en: "Gated",           es: "Privado / cerrado" },
   "filter.tag.waterfront":       { en: "Waterfront",      es: "Frente al agua" },
+  // Inverse-semantic chip: OFF by default hides listings where the
+  // broker hasn't shared price or size; ON brings them in at the
+  // bottom of the ranking.
+  "filter.show_incomplete":      { en: "Show missing details", es: "Ver con datos faltantes" },
 
   // Sort dropdown — rewrite-canonical labels (existing sort keys
   // stay; only the visible label changes so saved URLs still work).
@@ -498,6 +502,17 @@ const UI_STRINGS = {
   "detail.price":            { en: "Price",               es: "Precio" },
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
+  // Used on cards + detail keystats wherever price or size is null.
+  // Surfaces the "broker hasn't shared" semantic instead of a bare
+  // em-dash. The tooltip explains the next step.
+  "value.notshared.short":   { en: "Not shared",          es: "No compartido" },
+  "value.notshared.tooltip": { en: "The broker hasn't shared this. Contact them for details.",
+                               es: "El broker no ha compartido este dato. Contáctalo para más información." },
+  // Inline note rendered above the detail-page description for any
+  // listing where price OR size is missing. Pairs with the per-field
+  // "Not shared" copy.
+  "detail.broker_note":      { en: "The broker hasn't shared full details for this listing. Contact them to confirm price and size.",
+                               es: "El broker no ha compartido todos los datos de esta propiedad. Contáctalo para confirmar precio y tamaño." },
 
   // Saved — page title matches the nav-bar label ("Favorites"). The
   // URL is still /saved (Wave 3b renames it). Past-tense "saved"

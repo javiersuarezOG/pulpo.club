@@ -201,3 +201,25 @@ def test_ranker_stable_with_none_price():
     assert cheap_rank < no_price_rank, (
         f"Cheap listing (rank {cheap_rank}) should beat no-price (rank {no_price_rank})"
     )
+
+
+def test_ranker_demotes_incomplete_below_every_complete():
+    """is_incomplete listings sort below every complete listing,
+    regardless of their composite rank_score. The pipeline sets
+    `is_incomplete` before rank() runs, so the sort key honors it."""
+    listings = [
+        _listing(source_id="cheap",      price_usd=50_000.0,   price_per_m2=50.0,  area_m2=1_000.0),
+        _listing(source_id="mid",        price_usd=200_000.0,  price_per_m2=200.0, area_m2=1_000.0),
+        _listing(source_id="pricey",     price_usd=800_000.0,  price_per_m2=800.0, area_m2=1_000.0),
+        _listing(source_id="incomplete", price_usd=100_000.0,  price_per_m2=100.0, area_m2=1_000.0),
+    ]
+    # Mark "incomplete" as missing data — even though it has price/size
+    # here in the fixture, the flag governs ranker order.
+    for li in listings:
+        if li.source_id == "incomplete":
+            li.is_incomplete = True
+    ranked = rank(listings)
+    last = ranked[-1]
+    assert last.source_id == "incomplete", (
+        f"Expected incomplete listing at the bottom; got {last.source_id} at rank {last.rank}"
+    )
