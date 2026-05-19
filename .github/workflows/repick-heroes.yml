@@ -1,0 +1,177 @@
+name: repick heroes + hi-res backfill (one-off retroactive)
+
+# Manual-trigger workflow that runs two picture-only stages in sequence:
+#
+#   Stage A — automation/repick_heroes.py  (existing 1920×1080 hero path)
+#   Stage B — automation/backfill_hires.py (parallel native-resolution
+#             web/photos-hires/ derivative — plan v2)
+#
+# No scrape, no DeepSeek enrichment, no ranker. Both stages share a
+# single data-PR commit + single Vercel deploy at the end.
+#
+# Trigger:
+#   gh workflow run repick-heroes.yml -f floor=40 -f daily_budget_usd=5
+#
+# Picture-flow-only invariants:
+#   - Stage A writes web/photos/<id>.jpg + .hero.jpg + ranked.json hero_* fields.
+#   - Stage B writes web/photos-hires/<id>.hires.jpg + ranked.json hires_* fields.
+#   - The two field namespaces are disjoint; neither stage clobbers the other.
+#   - Text enrichment / geocoding / ranker / normalize output stays frozen.
+
+on:
+  workflow_dispatch:
+    inputs:
+      floor:
+        description: "Quality floor (0-100). Empty = default 40."
+        required: false
+        default: ""
+      limit:
+        description: "Operate on first N listings (empty = all)."
+        required: false
+        default: ""
+      source:
+        description: "Comma-separated source codes (empty = all sources)."
+        required: false
+        default: ""
+      daily_budget_usd:
+        description: "Override LLM_VISION_DAILY_BUDGET_USD (default 1.00)."
+        required: false
+        default: ""
+      booster_only_cached:
+        description: "Skip VLM calls. $0 spend."
+        type: boolean
+        required: false
+        default: false
+      skip_hires_backfill:
+        description: "Stage B opt-out — only re-pick existing heroes, no native-res backfill."
+        type: boolean
+        required: false
+        default: false
+      hires_budget_s:
+        description: "Stage B wall budget in seconds. Default 10800 (3h, cold full-fleet)."
+        required: false
+        default: ""
+
+concurrency:
+  group: pulpo-nightly
+  cancel-in-progress: true
+
+jobs:
+  repick:
+    runs-on: ubuntu-latest
+    # Stage A repick ~85-140 min cold; Stage B hires ~60-90 min cold.
+    # Warm re-runs are ~10 + ~5 min thanks to URL-hash + aesthetic caches.
+    timeout-minutes: 240
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Tesseract OCR
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run repick_heroes CLI
+        env:
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED || 'true' }}
+          LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
+          LLM_VISION_DAILY_BUDGET_USD: ${{ github.event.inputs.daily_budget_usd || secrets.LLM_VISION_DAILY_BUDGET_USD }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+          HERO_PICKER_MIN_CHEAP_SCORE: ${{ github.event.inputs.floor }}
+        run: |
+          set -e
+          ARGS=(--execute)
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ github.event.inputs.limit }}")
+          fi
+          if [ -n "${{ github.event.inputs.source }}" ]; then
+            ARGS+=(--source "${{ github.event.inputs.source }}")
+          fi
+          if [ -n "${{ github.event.inputs.floor }}" ]; then
+            ARGS+=(--floor "${{ github.event.inputs.floor }}")
+          fi
+          if [ "${{ github.event.inputs.booster_only_cached }}" = "true" ]; then
+            ARGS+=(--booster-only-cached)
+          fi
+          python automation/repick_heroes.py "${ARGS[@]}"
+
+      # Stage B — parallel hi-res backfill (plan v2). Disjoint from Stage A:
+      # writes web/photos-hires/<id>.hires.jpg + ranked.json hires_* fields.
+      # The two stages don't share filenames or fields, so a failure here
+      # doesn't roll back Stage A's output.
+      - name: Run backfill_hires CLI
+        if: ${{ github.event.inputs.skip_hires_backfill != 'true' }}
+        env:
+          PULPO_HIRES_ENABLED: "1"
+          PULPO_HIRES_SOURCES: ${{ github.event.inputs.source || 'bienesraices,century21,encuentra24,goodlife,nexo,oceanside,remax' }}
+          PULPO_HIRES_BUDGET_S: ${{ github.event.inputs.hires_budget_s || '10800' }}
+          PULPO_HIRES_LIMIT: ${{ github.event.inputs.limit || '0' }}
+          PULPO_HIRES_SHADOW: "0"
+          PULPO_HIRES_SERVE: "1"
+        run: |
+          set -e
+          ARGS=(--execute)
+          if [ -n "${{ github.event.inputs.limit }}" ]; then
+            ARGS+=(--limit "${{ github.event.inputs.limit }}")
+          fi
+          if [ -n "${{ github.event.inputs.source }}" ]; then
+            ARGS+=(--source "${{ github.event.inputs.source }}")
+          fi
+          python automation/backfill_hires.py "${ARGS[@]}"
+
+      - name: Commit refreshed data via PR
+        id: commit
+        env:
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "bot@pulpo.club"
+          git add web/data/ranked.json \
+                  web/data/picker_excluded.json \
+                  web/data/llm_vision_cache.json \
+                  web/data/llm_vision_budget.jsonl 2>/dev/null || true
+          git add web/data/repick_summary.jsonl 2>/dev/null || true
+          git add "web/photos/" 2>/dev/null || true
+          # Stage B outputs — hires derivatives + per-run metrics row.
+          git add "web/photos-hires/" 2>/dev/null || true
+          git add web/data/hires_pipeline_metrics.jsonl 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No data changes."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          BRANCH="chore/repick-heroes-$(date -u +%Y-%m-%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(data): repick heroes + hi-res backfill $(date -u +%Y-%m-%d)"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore(data): repick heroes + hi-res backfill $(date -u +%Y-%m-%d)" \
+            --body "Automated retroactive picker run + parallel hi-res backfill."
+          gh workflow run ci.yml --ref "$BRANCH" || true
+          gh workflow run tests-required.yml --ref "$BRANCH" || true
+          gh pr merge "$BRANCH" --squash --delete-branch --auto
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Vercel
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm install -g vercel@latest
+          vercel deploy --prod --yes

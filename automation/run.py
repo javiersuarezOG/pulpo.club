@@ -408,6 +408,39 @@ def _read_sidecar(image_path: Path) -> Optional[dict]:
         return None
 
 
+def _populate_hires_fields_from_sidecar(li, sidecar: dict, *, quarantined: bool) -> None:
+    """Copy hires sidecar values onto the Listing object.
+
+    Called from both the fresh-write path and the cache-hit skip path
+    inside ``_download_hires_photos``. Mutates ``li`` in place. The
+    sidecar dict is the one written to ``<file>.hires.jpg.meta.json``
+    (i.e. the merged result of ``compute_image_metadata`` + the hires
+    QC additions: hires_photo_quality_score, resdet_*, quarantined,
+    aesthetic). ``quarantined`` is passed separately so the cache-hit
+    path can compute it from the marker file even on older sidecars
+    that pre-date the ``quarantined`` key.
+    """
+    if not isinstance(sidecar, dict):
+        return
+    if sidecar.get("width") is not None:
+        li.hires_width = int(sidecar["width"])
+    if sidecar.get("height") is not None:
+        li.hires_height = int(sidecar["height"])
+    # hires_eligible comes from compute_image_metadata which gates on the
+    # source bytes' dimensions — exactly the contract pulpo-social needs.
+    if "hires_eligible" in sidecar:
+        li.hires_eligible = bool(sidecar.get("hires_eligible"))
+    if sidecar.get("hires_photo_quality_score") is not None:
+        li.hires_photo_quality_score = int(sidecar["hires_photo_quality_score"])
+    if "resdet_upscaled" in sidecar:
+        v = sidecar.get("resdet_upscaled")
+        li.hires_resdet_upscaled = bool(v) if v is not None else None
+    li.hires_quarantined = bool(quarantined)
+    # hires_available = file present AND not quarantined. The caller has
+    # already verified file presence before invoking this helper.
+    li.hires_available = not bool(quarantined)
+
+
 def _download_hero_photos(listings, repo: Path) -> dict:
     """Download the first photo_url for each listing with photos, then write
     two derivatives:
@@ -870,6 +903,18 @@ def _download_hires_photos(listings, repo: Path) -> dict:
                     skipped_cache += 1
                     print(f"[hires] skip   {li.source}__{li.source_id} reason=cache_hit", file=sys.stderr)
                     by_source[li.source]["with_hires"] += 1
+                    # Repopulate hires_* fields on the Listing from the
+                    # cached sidecar so downstream consumers
+                    # (api/social/listings projection, contract test)
+                    # see the same values they would on a fresh run.
+                    cached_sidecar = _read_sidecar(hires_path)
+                    if cached_sidecar is not None:
+                        cached_quarantined = bool(cached_sidecar.get("quarantined")) or (
+                            photos_hires_dir / (hires_path.name + ".quarantine")
+                        ).exists()
+                        _populate_hires_fields_from_sidecar(
+                            li, cached_sidecar, quarantined=cached_quarantined
+                        )
                     continue
             except OSError:
                 pass
@@ -967,6 +1012,11 @@ def _download_hires_photos(listings, repo: Path) -> dict:
             print(f"[hires] error  {li.source}__{li.source_id} reason=sidecar_write_failed {e}",
                   file=sys.stderr)
             continue
+
+        # Populate hires_* fields on the Listing object. Source of truth is
+        # the sidecar dict we just persisted, so the in-memory state matches
+        # what the cached-skip path reads on subsequent runs.
+        _populate_hires_fields_from_sidecar(li, sidecar, quarantined=quarantined)
 
         if quarantined:
             rejected_upscaled += 1
