@@ -1,14 +1,19 @@
-name: pulpo newsletter (dry-run)
+name: pulpo newsletter
 
-# Weekly Monday cadence — fortnight gating lands in PR-NL-4 once the actual
-# send pipeline (PR-NL-1) is verified. For now this runs every Monday at
-# 14:00 UTC, builds the per-cohort dry-run HTML against the latest
-# committed ranked.json, uploads the bundle as a CI artifact, and fires the
-# matching PostHog telemetry. Nothing in this workflow talks to Resend.
+# Weekly Monday cadence. Two modes:
+#   • Cron / default dispatch: dry-run. Builds the per-cohort cohort HTMLs
+#     against committed ranked.json, runs the full enumerate-and-send
+#     pipeline with PULPO_NEWSLETTER_DRY_RUN=1 (no Resend API hits), and
+#     uploads everything as artifacts. Use this to QA before flipping
+#     send_mode=yes.
+#   • Manual dispatch with send_mode=yes: LIVE send. Builds the recipient
+#     queue from the Resend audience × Clerk users, calls Resend for real,
+#     fires newsletter.send_succeeded/failed events into PostHog. Pair with
+#     only_email=javier@suarez.ventures for the first live smoke test.
 #
-# Manual trigger via workflow_dispatch — useful when you've just changed
-# the renderer or commentary copy and want to eyeball the output without
-# waiting for the schedule.
+# Fortnight gating (every other Monday) lands in PR-NL-4 once we've
+# verified end-to-end sending. For now: weekly cron in dry-run, send_mode
+# is operator-driven.
 
 on:
   schedule:
@@ -23,6 +28,16 @@ on:
         description: "Toggle the DeepSeek commentary path (1 = on, 0 = deterministic)"
         required: false
         default: "0"
+      send_mode:
+        description: "Switch from dry-run to LIVE Resend send"
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+      only_email:
+        description: "Smoke-test address — limit the send to this one email. Blank = whole audience."
+        required: false
+        default: ""
 
 concurrency:
   group: pulpo-newsletter
@@ -31,20 +46,32 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
-      # Deterministic dry-run by default. The LLM toggle is OFF unless the
-      # workflow_dispatch input sets it explicitly — never burn DeepSeek
-      # credits from a cron run while the send pipeline is still gated.
+      # Deterministic dry-run by default. LLM toggle OFF unless the
+      # dispatch input flips it — never burn DeepSeek credits from cron.
       PULPO_NEWSLETTER_USE_LLM: "${{ github.event.inputs.use_llm || '0' }}"
-      # Telemetry — newsletter.issue_built / commentary_generated events
-      # land in PostHog when the project token is wired. Same secrets the
-      # nightly run uses; missing-token = silent no-op (per posthog_client.py).
+
+      # Send gate. Default OFF — weekly cron stays in dry-run. Setting
+      # send_mode=yes via workflow_dispatch flips DRY_RUN=0 and the send
+      # pipeline talks to Resend for real.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ github.event.inputs.send_mode == 'yes' && '0' || '1' }}"
+
+      # Telemetry — silent no-op when secret is missing (per
+      # automation/posthog_client.py + api/_posthog.js).
       POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
       POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
-      # Only consumed when use_llm is flipped on by a manual trigger; the
-      # weekly cron leaves the deterministic fallback in charge.
       DEEPSEEK_API_TOKEN: "${{ secrets.DEEPSEEK_API_TOKEN }}"
+
+      # Send pipeline secrets. Missing-key paths return SendResult.error
+      # — the script logs + PostHogs them, never crashes.
+      RESEND_API_KEY: "${{ secrets.RESEND_API_KEY }}"
+      RESEND_FROM_EMAIL: "${{ vars.RESEND_FROM_EMAIL }}"
+      RESEND_AUDIENCE_ID: "${{ secrets.RESEND_AUDIENCE_ID }}"
+      RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
+      PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
+      CLERK_SECRET_KEY: "${{ secrets.CLERK_SECRET_KEY }}"
 
     steps:
       - uses: actions/checkout@v4
@@ -58,8 +85,6 @@ jobs:
           cache-dependency-path: requirements.txt
 
       # PostHog SDK + (optional) openai SDK for the LLM toggle path.
-      # The module degrades gracefully when these aren't importable, so the
-      # build still succeeds in a stripped-down environment.
       - name: install runtime deps
         run: pip install -q posthog openai
 
@@ -73,10 +98,35 @@ jobs:
           python3 scripts/build_newsletter_dryrun.py \
             --issue-number "${{ github.event.inputs.issue_number || '1' }}"
 
-      - name: upload HTML artifact
+      - name: upload cohort fixture artifact
         uses: actions/upload-artifact@v4
         with:
-          name: newsletter-dryrun-${{ github.run_id }}
+          name: newsletter-cohort-${{ github.run_id }}
           path: newsletter-drafts/dryrun-*.html
           retention-days: 30
           if-no-files-found: error
+
+      - name: send issues
+        # In dry-run mode this enumerates the audience + builds + renders
+        # + fires telemetry with fake message_ids; no HTTP to Resend.
+        # In live mode this makes real Resend calls. only_email scopes
+        # the recipient set when set.
+        run: |
+          ONLY_EMAIL="${{ github.event.inputs.only_email || '' }}"
+          ARGS=(--issue-number "${{ github.event.inputs.issue_number || '1' }}" \
+                --write-html-to newsletter-drafts/sent)
+          if [ -n "$ONLY_EMAIL" ]; then
+            ARGS+=(--only-email "$ONLY_EMAIL")
+          fi
+          python3 scripts/send_newsletter.py "${ARGS[@]}"
+
+      - name: upload sent artifact
+        # The per-recipient rendered HTMLs (one file per send, named by the
+        # recipient hash). Lets us audit any specific issue post-hoc.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsletter-sent-${{ github.run_id }}
+          path: newsletter-drafts/sent/*.html
+          retention-days: 30
+          if-no-files-found: ignore
