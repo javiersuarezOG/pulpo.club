@@ -341,15 +341,17 @@ test.describe("New app boots cleanly on key routes", () => {
   test("back/forward across sections + listing detail keeps state correct", async ({ page }) => {
     // Post-#262: anon listing-card clicks open FreeMonthModal, not the
     // detail panel. Seed pro user so the matrix routes to passthrough.
-    // Pro user with no flag set also still sees the shoreline block
-    // (paid_home_variant_v1 is off by default — the rollback path
-    // exposes all blocks to all tiers).
+    //
+    // Post-PR-323: `paid_home_variant_v1` defaults to true and the
+    // block registry hides `shoreline` from pro users. Force the flag
+    // off via the URL override so the Pick-Your-Shoreline card is
+    // still rendered — we need it to drive the / → /browse hop.
     await seedProUser(page);
 
     // Homepage v2 hides the shared TopNav on /. Use the Pick Your
     // Shoreline card to navigate from / → /browse, then open a
     // listing for the back/forward chain.
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/?ff_paid_home_variant_v1=0", { waitUntil: "networkidle" });
 
     // Click the Beach shoreline card to navigate to /browse.
     await page.locator(".hp-shoreline-card-beach").click();
