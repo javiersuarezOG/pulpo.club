@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
-import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon } from "../components.jsx";
+import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon, RankTrophy } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
@@ -210,7 +210,7 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
           {showRank && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
               <span className="pulpo-rank-star" aria-hidden="true">
-                <Icon name="cat_top10" size={12} strokeWidth={2} />
+                <RankTrophy />
               </span>
               <span className="pulpo-rank-num">{rank}</span>
             </span>
