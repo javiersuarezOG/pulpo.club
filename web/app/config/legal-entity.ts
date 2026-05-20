@@ -16,7 +16,7 @@
 // Stripe Checkout session." The banner suppresses itself once
 // `ENTITY.incorporated === true`.
 
-export type Jurisdiction = "NL" | "ES";
+export type Jurisdiction = "NL" | "ES" | "SV";
 
 // Vite exposes only VITE_*-prefixed env vars to the client. Server-side
 // code that needs the same value reads process.env.VITE_LEGAL_JURISDICTION
@@ -25,7 +25,8 @@ export type Jurisdiction = "NL" | "ES";
 export const JURISDICTION: Jurisdiction = (() => {
   const raw = import.meta.env.VITE_LEGAL_JURISDICTION as string | undefined;
   if (raw === "ES") return "ES";
-  return "NL"; // default until ES is incorporated
+  if (raw === "NL") return "NL";
+  return "SV"; // default — the platform's first live market is El Salvador
 })();
 
 export interface EntityConfig {
@@ -116,6 +117,36 @@ const ENTITIES: Record<Jurisdiction, EntityConfig> = {
     requires_impressum: true,
     edpb_member: true,
     outbound_from: "noreply@pulpo.club",
+  },
+  SV: {
+    trade_name: "Pulpo",
+    legal_name: "[NOMBRE REGISTRADO COMPLETO] S.A. de C.V.",
+    legal_form: "Sociedad Anónima de Capital Variable (S.A. de C.V.)",
+    incorporated: false,
+    chamber_of_commerce: {
+      authority: "Centro Nacional de Registros (CNR) — Registro de Comercio",
+      number: "[NÚMERO DE REGISTRO]",
+    },
+    tax_id: { label: "NIT", value: "[NIT]" },
+    address: {
+      street: "[CALLE Y NÚMERO]",
+      postcode: "[CÓDIGO POSTAL]",
+      city: "San Salvador",
+      country: "El Salvador",
+      country_code: "SV",
+    },
+    director: { name: "[NOMBRE LEGAL COMPLETO]", role: "Representante Legal" },
+    phone: "+503 [NÚMERO]",
+    governing_law: "leyes de la República de El Salvador",
+    courts: "Juzgados de lo Civil y Mercantil de San Salvador, El Salvador",
+    supervisory_authority: {
+      name: "Defensoría del Consumidor",
+      url: "defensoria.gob.sv",
+      phone: "910",
+    },
+    requires_impressum: false,
+    edpb_member: false,
+    outbound_from: "hello@pulpo.club",
   },
 };
 
