@@ -148,24 +148,60 @@ h1,h2,h3,h4,h5 { margin: 0; }
   flex-shrink: 0;
 }
 
-/* ── Pulpo Pro identity ────────────────────────────────────────────────
-   The "Pro" mark next to the wordmark + gold ring + star badge on the
-   avatar are the global-header signals that membership is active. Tone:
-   editorial, not SaaS. Hairline border, serif italic, gold tokens.
-   See tokens.css → --pro-ink / --pro-line / --pro-ring. */
-.pulpo-logo-pro {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 14px;
+/* ── Pulpo wordmark + Pro identity ─────────────────────────────────────
+   The mark (spiral tentacle gripping a gold catch) is rendered by the
+   PulpoLogo component; the wordmark is Inter 700 lowercase with a tiny
+   gold dot inside the `o` — the same "catch" motif the mark uses, so
+   wordmark + mark belong to one visual family. The Pro pill leads with
+   a gold dot + Inter caps so it reads as "the premium catch," not as a
+   separate font glued on.
+   See tokens.css → --gold / --pro-ink / --pro-line / --pro-ring. */
+.pulpo-logo-wm {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.035em;
   line-height: 1;
-  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.pulpo-logo-o {
+  position: relative;
+  display: inline-block;
+}
+.pulpo-logo-o::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 56%;
+  transform: translate(-50%, -50%);
+  width: 0.18em; height: 0.18em;
+  border-radius: 50%;
+  background: var(--gold);
+  pointer-events: none;
+}
+.pulpo-logo-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
   color: var(--pro-ink);
   border: 1px solid var(--pro-line);
-  border-radius: 999px;
-  padding: 3px 8px 4px;
+  border-radius: 6px;
+  padding: 4px 8px 3px;
   margin-left: 2px;
   background: transparent;
   white-space: nowrap;
+}
+.pulpo-logo-pro::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
 }
 .avatar-pro {
   box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--pro-ring);
@@ -192,7 +228,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
    chrome keep their space. */
 @media (max-width: 767px) {
   .topnav-inner { gap: 16px; }
-  .pulpo-logo-pro { font-size: 12px; padding: 2px 6px 3px; }
+  .pulpo-logo-wm { font-size: 20px; }
+  .pulpo-logo-pro { font-size: 10px; padding: 3px 6px 2px; letter-spacing: 0.16em; }
+  .pulpo-logo-pro::before { width: 5px; height: 5px; }
 }
 @media (max-width: 360px) {
   .pulpo-logo-pro { display: none; }
@@ -5816,22 +5854,59 @@ h1,h2,h3,h4,h5 { margin: 0; }
   outline: 2px solid var(--color-forest-deep);
   outline-offset: 3px;
 }
-.homepage-v2.hero-v4 .hp-hero-v4-photo-pill {
+/* Rank chip — same `.pulpo-rank` mark used on the Top 10 shelf cards
+   so the hero pick reads as "today's #N" rather than generic "Featured."
+   Positioning matches the shelf card chip (top-left, breathing room). */
+.homepage-v2.hero-v4 .hp-hero-v4-rank.pulpo-rank {
   position: absolute;
   top: 16px;
   left: 16px;
+  z-index: 3;
+  padding: 6px 12px;
+}
+.homepage-v2.hero-v4 .hp-hero-v4-rank .pulpo-rank-num {
+  font-size: 14px;
+}
+
+/* "Why #N" caption — explains the ranking with the listing's top two
+   sub-scores (Value/Location/Momentum). Bottom-left of the photo,
+   same white-pill language as the rank chip above. */
+.homepage-v2.hero-v4 .hp-hero-v4-why {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  margin: 0;
+  max-width: calc(100% - 32px);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   background: var(--color-bg-white);
-  color: var(--color-ink-primary);
-  padding: 8px 14px;
+  color: var(--color-ink-secondary);
+  padding: 6px 12px;
   border-radius: 999px;
+  border: 0.5px solid var(--color-line-soft);
+  box-shadow: var(--shadow-1);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: -0.005em;
-  box-shadow: var(--shadow-1);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 480px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-why {
+    bottom: 12px;
+    left: 12px;
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .homepage-v2.hero-v4 .hp-hero-v4-rank.pulpo-rank {
+    top: 12px;
+    left: 12px;
+    padding: 5px 10px;
+  }
 }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
