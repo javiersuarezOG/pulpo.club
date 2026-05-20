@@ -301,7 +301,7 @@ def test_pick_best_photo_picks_highest_scoring(tmp_repo):
         return r
 
     with mock.patch("httpx.get", side_effect=fake_get):
-        url, content, score, has_text = _pick_best_photo_url(list(responses.keys()))
+        url, content, score, has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
     # The full-HD image should win — it's the only one in tier 100.
     # We assert the URL rather than an absolute score because PR-7.6
@@ -341,7 +341,7 @@ def test_pick_best_photo_deprioritizes_text_overlay(tmp_repo):
     with mock.patch("httpx.get", side_effect=fake_get), \
          mock.patch("automation.photo_quality.detect_text_overlay",
                     side_effect=fake_text_overlay):
-        url, _content, _score, has_text = _pick_best_photo_url(list(responses.keys()))
+        url, _content, _score, has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
     assert url == "https://example.com/clean.jpg"
     assert has_text is False
@@ -370,21 +370,21 @@ def test_pick_best_photo_falls_back_when_all_flagged(tmp_repo):
     with mock.patch("httpx.get", side_effect=fake_get), \
          mock.patch("automation.photo_quality.detect_text_overlay",
                     return_value=True):
-        url, _content, _score, has_text = _pick_best_photo_url(list(responses.keys()))
+        url, _content, _score, has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
     assert url == "https://example.com/big.jpg"
     assert has_text is True
 
 
 def test_pick_best_photo_returns_none_when_all_fail(tmp_repo):
-    """All downloads fail → returns (None, None, None, None) and the
-    caller increments the failure counter."""
+    """All downloads fail → returns all-None 5-tuple and the caller
+    increments the failure counter."""
     from automation.run import _pick_best_photo_url
 
     with mock.patch("httpx.get", side_effect=Exception("connection_refused")):
         result = _pick_best_photo_url(["https://example.com/a.jpg",
                                        "https://example.com/b.jpg"])
-    assert result == (None, None, None, None)
+    assert result == (None, None, None, None, None)
 
 
 def test_pick_best_photo_respects_candidates_cap(tmp_repo, monkeypatch):

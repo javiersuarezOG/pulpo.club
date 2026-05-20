@@ -99,6 +99,14 @@ class Listing:
     # from the elite featured-listing pool. None = no signal (Tesseract
     # not installed, image undecodable, or scoring skipped).
     has_text_overlay: Optional[bool] = None
+    # VLM-based marketing-overlay detector for hero photos. True = the
+    # image carries a marketing banner / watermark / agency logo / price
+    # stamp that Tesseract may have missed (stylized fonts,
+    # semi-transparent overlays). Picker hard-rejects when True; the
+    # social-listings endpoint also gates on it as defense in depth.
+    # None = no signal (LLM Vision disabled, budget exhausted, response
+    # omitted the field, or legacy cache row predates the field).
+    has_marketing_overlay: Optional[bool] = None
     # Image-enrichment protocol eligibility flags (hero rewrite Phase 2).
     # Populated by automation/run.py:_download_hero_photos when new
     # photos are fetched (or by `python -m pulpo.cli enrich-photos` when

@@ -93,7 +93,7 @@ def test_pick_best_photo_url_unchanged_when_llm_off():
                     side_effect=fake_compute_score), \
          mock.patch("automation.photo_quality.detect_text_overlay",
                     return_value=False):
-        url, content, score, has_text = _pick_best_photo_url(list(responses.keys()))
+        url, content, score, has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
     assert url == "https://example.com/big.png"
     assert content == big
@@ -137,7 +137,7 @@ def test_aesthetic_off_means_pure_technical_ranking():
                     side_effect=fake_compute_score), \
          mock.patch("automation.photo_quality.detect_text_overlay",
                     return_value=False):
-        url, _content, score, _has_text = _pick_best_photo_url(list(responses.keys()))
+        url, _content, score, _has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
     assert url == "https://example.com/b.png"
     assert score == 80
@@ -183,7 +183,7 @@ def test_provider_failure_still_picks_a_hero():
                         side_effect=fake_compute_score), \
              mock.patch("automation.photo_quality.detect_text_overlay",
                         return_value=False):
-            url, _content, _score, _has_text = _pick_best_photo_url(list(responses.keys()))
+            url, _content, _score, _has_text, _has_marketing = _pick_best_photo_url(list(responses.keys()))
 
         # Despite provider failures, the picker still produces a hero —
         # the one with the higher technical score.
