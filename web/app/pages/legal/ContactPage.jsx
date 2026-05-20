@@ -49,10 +49,11 @@ const PAGE_STYLES = `
 }
 .page-contact__back:hover { color: var(--ink); }
 .page-contact__title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 36px;
   line-height: 44px;
-  font-weight: 400;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ink);
   margin: 0 0 8px;
 }
