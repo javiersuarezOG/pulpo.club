@@ -19,11 +19,25 @@ This module is the SINGLE place to add per-source URL rewriting. Adding
 a new source = add a new ``if source == "<name>"`` branch + a unit test
 in ``tests/test_hires_url_transform.py``.
 
-Day-1 source allowlist (per plan v2) = bienesraices, remax, century21,
-oceanside, nexo. All five expose hi-res URLs already, so this module is
-a no-op for them today. goodlife + encuentra24 transforms are
-implemented but not enabled until Phase 4 of the plan (after the 5
-clean sources prove out).
+Source-by-source upgrade ceilings, verified 2026-05-20 by probing each
+CDN with parameter variants:
+
+- bienesraices — EasyBroker CDN (assets.easybroker.com). URL pattern is
+  ``?rasterize=true&version=<ts>`` and the CDN rejects (HTTP 400) every
+  other rasterize / width / size variant. Native-res IS the rasterized
+  1200×N image. No URL transform possible; the broker's CDN is the
+  hard ceiling.
+- remax — Two franchises:
+    * remax-central.com.sv: ``-large.png`` filename suffix variant
+      (not yet investigated; site times out from us-east).
+    * remaxcaribbeanandcentralamerica.azureedge.net: already serves
+      native-res ``HDPhotos/<file>.png`` (1192×2048+ verified). No
+      transform needed.
+- oceanside, century21, encuentra24, nexo — small-fleet sources, mostly
+  no native-res URLs available from broker.
+
+goodlife + encuentra24 transforms (WordPress size-suffix strip,
+Cloudinary t_full) are implemented and active.
 """
 from __future__ import annotations
 
