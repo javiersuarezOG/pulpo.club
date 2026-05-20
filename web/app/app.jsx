@@ -36,6 +36,19 @@ import { AdminPage } from "./admin/AdminShell.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
+import { deriveSubscriptionState } from "./lib/subscription";
+
+// Resolves the hydrated user object's `plan` field to the effective
+// plan (honoring the 14-day grace window after a failed payment) and
+// then applies the founder-email override. Used at every user state
+// transition — initial localStorage seed, legacy email signin — so
+// every downstream `app.user.plan` reader sees the same value the
+// Clerk hydration path (clerk-bundle.jsx) produces.
+function hydrateUser(raw) {
+  if (!raw) return raw;
+  const effective = deriveSubscriptionState(raw).effective;
+  return applyFounderPlan({ ...raw, plan: effective });
+}
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
 // inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
 // extracted out for the same reason — single chrome component per role.
@@ -162,7 +175,7 @@ function App() {
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
-    try { return applyFounderPlan(JSON.parse(localStorage.getItem("pulpo-user"))) || null; } catch { return null; }
+    try { return hydrateUser(JSON.parse(localStorage.getItem("pulpo-user"))) || null; } catch { return null; }
   });
   // Tracks whether Clerk has finished hydrating. When Clerk is OFF
   // (legacy CI / no publishable key) this defaults to true so the
@@ -972,7 +985,7 @@ function App() {
     // Just flip user state. The post-signin effect above closes the
     // modal AND chains any pending action — keeping the wiring in one
     // place so Clerk and legacy paths behave identically.
-    setUser(applyFounderPlan({ email, provider: provider || "email", joined: Date.now() }));
+    setUser(hydrateUser({ email, provider: provider || "email", joined: Date.now() }));
     showToast(t("toast.welcome", locale));
   }, [showToast, locale]);
 

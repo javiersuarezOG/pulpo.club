@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import { ClerkProvider, useUser, useClerk } from "@clerk/react";
 import { esMX, enUS } from "@clerk/localizations";
 import { applyFounderPlan } from "../lib/founder-emails";
+import { deriveSubscriptionState } from "../lib/subscription";
 
 function planFromMetadata(metadata) {
   // Clerk Dashboard test users carry plan in publicMetadata.plan.
@@ -32,6 +33,23 @@ function planFromMetadata(metadata) {
   // override travels with the hydrated user object.
   const v = metadata && metadata.plan;
   return v === "pro" ? "pro" : "free";
+}
+
+// Subscription lifecycle fields written by api/stripe/webhook.js
+// (see api/_plan.js for the canonical schema + grace logic). Surfaced
+// onto app.user so the Account page can render the past_due grace
+// banner without an extra fetch. Defaults to "active" + no grace for
+// users who pre-date this field set.
+function subscriptionFromMetadata(metadata) {
+  const m = metadata || {};
+  return {
+    subscription_status:
+      m.subscription_status === "past_due" || m.subscription_status === "canceled"
+        ? m.subscription_status
+        : "active",
+    payment_failed_at: typeof m.payment_failed_at === "number" ? m.payment_failed_at : null,
+    grace_period_ends_at: typeof m.grace_period_ends_at === "number" ? m.grace_period_ends_at : null,
+  };
 }
 
 function ClerkUserSync({ setUser, setAuthLoaded }) {
@@ -54,13 +72,26 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
       setUser(null);
       return;
     }
+    const rawPlan = planFromMetadata(user.publicMetadata);
+    const subFields = subscriptionFromMetadata(user.publicMetadata);
+    // Effective plan honors the 14-day grace window: a past_due user
+    // with an expired grace_period_ends_at reads as "free" everywhere
+    // downstream (isPaid, SiteHeader Pro pill, BottomNav star, Plans
+    // page Pro state). The Account page reads subscription_status +
+    // grace_period_ends_at off the same hydrated user to render the
+    // grace banner with raw lifecycle context.
+    const effective = deriveSubscriptionState({ plan: rawPlan, ...subFields }).effective;
     setUser(applyFounderPlan({
       email:    user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "",
       name:     user.firstName || user.username || "",
-      plan:     planFromMetadata(user.publicMetadata),
+      plan:     effective,
       joined:   user.createdAt ? +new Date(user.createdAt) : Date.now(),
       provider: "clerk",
       clerkId:  user.id,
+      // Subscription lifecycle (status / grace bookkeeping). Spread
+      // here so deriveSubscriptionState() can read everything off
+      // app.user without an extra `user.subscription.` namespace.
+      ...subFields,
       // Open profile dict (see web/app/lib/user-profile.ts). Read-only
       // hydration today — PR-C wires the write path so Clerk becomes
       // the cross-device source of truth.

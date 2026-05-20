@@ -2867,6 +2867,50 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .status-paused        { background: oklch(95% 0.03 80);  color: oklch(50% 0.12 80); }
 .status-payment_issue { background: oklch(94% 0.05 25);  color: oklch(50% 0.18 25); }
 
+/* Grace-period banner — shows above the subscription card when the
+   user is in the 14-day window after a failed payment, or after the
+   window closed (expired variant). Uses the same warm-warning palette
+   as the payment_issue status pill so the two read as related signals
+   rather than competing UI. Stacks vertically on mobile (CTA below
+   copy); side-by-side on tablet+. */
+.sub-grace-banner {
+  border: 1px solid oklch(85% 0.10 60);
+  background: oklch(98% 0.03 80);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sub-grace-banner-body {
+  flex: 1 1 220px;
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sub-grace-banner-head {
+  font-weight: 600;
+  font-size: 15px;
+  color: oklch(40% 0.15 35);
+}
+.sub-grace-banner-copy {
+  font-size: 14px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.sub-grace-banner-cta { flex-shrink: 0; }
+
+/* Expired variant — colder, slightly muted so the user reads it as
+   "this already happened" rather than "act now". */
+.sub-grace-banner-expired {
+  border-color: var(--line);
+  background: var(--paper-2);
+}
+.sub-grace-banner-expired .sub-grace-banner-head {
+  color: var(--ink);
+}
+
 .sub-divider {
   border-top: 1px solid var(--line);
   margin: 8px 0;
