@@ -2850,6 +2850,18 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-size: 24px; font-weight: 400;
   color: var(--ink);
 }
+/* Pro-identity treatment on the active-plan card. Inline-flex keeps
+   the gold pill baseline-aligned with the larger display-font "Pulpo"
+   word; the pill itself inherits the canonical .pulpo-logo-pro
+   styling so the chrome and the subscription block use exactly the
+   same brand mark. The pill's own font-size is set on .pulpo-logo-pro
+   (14px in tokens), which reads correctly nested against the 24px
+   wordmark. */
+.sub-plan-name-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
 .sub-plan-meta { font-size: 13px; color: var(--ink-3); margin-top: 4px; overflow-wrap: anywhere; }
 .sub-plan-status-copy { font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
 .sub-plan-actions { display: flex; gap: 12px; flex-wrap: wrap; }

@@ -20,6 +20,7 @@ import {
   attachErrorRecorder,
   seedPastDueUser,
   seedProUser,
+  seedUser,
 } from "./_helpers";
 
 async function gotoAccountSubscription(page: Page) {
@@ -89,6 +90,43 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
 
     await expect(page.getByTestId("sub-grace-banner")).toHaveCount(0);
     await expect(page.getByTestId("sub-grace-banner-expired")).toHaveCount(0);
+
+    expect(errors).toEqual([]);
+  });
+
+  test("Pro user: subscription card shows 'Pulpo Pro' label + gold pill (parity with header)", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedProUser(page);
+    await gotoAccountSubscription(page);
+
+    // The plan-name container renders the brand mark — "Pulpo" + the
+    // canonical .pulpo-logo-pro span — when the user is on Pro.
+    const planName = page.locator(".sub-plan-name");
+    await expect(planName).toBeVisible();
+    await expect(planName).toContainText("Pulpo");
+    // The exact same gold pill the SiteHeader uses, nested inside the
+    // subscription card. We assert presence + correct text rather than
+    // a positional locator so a future copy tweak in EN/ES doesn't
+    // break the test (the brand mark "Pro" itself is locale-neutral).
+    const proPill = planName.locator(".pulpo-logo-pro");
+    await expect(proPill).toBeVisible();
+    await expect(proPill).toHaveText(/^Pro$/);
+    // Regression guard against the prior "Pulpo Monthly" copy — make
+    // sure that legacy string doesn't sneak back in here.
+    await expect(planName).not.toContainText(/Pulpo Monthly/);
+
+    expect(errors).toEqual([]);
+  });
+
+  test("Free user: subscription card shows 'Free' label, no Pro pill", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedUser(page, "free");
+    await gotoAccountSubscription(page);
+
+    const planName = page.locator(".sub-plan-name");
+    await expect(planName).toBeVisible();
+    await expect(planName).toContainText("Free");
+    await expect(planName.locator(".pulpo-logo-pro")).toHaveCount(0);
 
     expect(errors).toEqual([]);
   });
