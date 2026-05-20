@@ -295,7 +295,7 @@ export const PRIVACY: LegalDocument = {
       heading: { en: "Retention periods", es: "Períodos de retención" },
       body: {
         en:
-          "• Account data: Duration of account + 30 days after deletion request.\n" +
+          "• Account data: Duration of account + 90 days after deletion request.\n" +
           "• Payment / billing records: 7 years (Dutch belastingdienst / VAT obligation).\n" +
           "• Transactional email logs: 90 days.\n" +
           "• Newsletter subscription: Until opt-out + 30 days.\n" +
