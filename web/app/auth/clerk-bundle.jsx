@@ -102,6 +102,41 @@ function ClerkActionsBinder({ onActions }) {
           missingFields: Array.isArray(s.missingFields) ? s.missingFields : [],
         };
       },
+      // Explicit two-step ticket consume — handover §7b. Clerk's SDK
+      // implicit consumption from URL (just calling openSignUp with
+      // __clerk_ticket in URL) didn't reliably bind the SignUp resource
+      // to the ticket — Clerk's modal rendered "This ticket is invalid"
+      // even on fresh tickets in some sessions. Calling signUp.create
+      // with strategy="ticket" first guarantees the SignUp resource is
+      // attached to the ticket BEFORE openSignUp mounts the modal, so
+      // the modal renders the password step directly.
+      //
+      // Returns { ok: true, status, emailAddress } on success, or
+      // { ok: false, code, message } on failure. Failure does NOT throw
+      // — caller fires telemetry and falls through to openSignUp; Clerk's
+      // hosted modal renders its own ticket-invalid alert with a "sign in
+      // instead" footer, which is the right recovery UX for already-spent
+      // tickets.
+      consumeTicket: async (ticket) => {
+        const s = clerk.signUp;
+        if (!s) return { ok: false, code: "sdk_not_ready", message: "Clerk SDK not ready" };
+        try {
+          const result = await s.create({ strategy: "ticket", ticket });
+          return {
+            ok: true,
+            status: result.status || s.status || null,
+            emailAddress: result.emailAddress || s.emailAddress || null,
+          };
+        } catch (err) {
+          const errors = err && err.errors;
+          const first = Array.isArray(errors) && errors.length ? errors[0] : null;
+          return {
+            ok: false,
+            code: (first && first.code) || (err && err.code) || "unknown",
+            message: (first && first.longMessage) || (first && first.message) || (err && err.message) || "",
+          };
+        }
+      },
       // Synchronous "does Clerk think a user is signed in right now?"
       // SignupModal uses this to short-circuit the open call during the
       // boot race where Clerk's session is hydrated from cookies *before*
