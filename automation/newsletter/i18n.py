@@ -36,7 +36,7 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "glance.subhead.with_skip":    {"en": "{kept} to consider. One to skip.",             "es": "{kept} para considerar. Una para saltar."},
     "glance.subhead.no_skip":      {"en": "{kept} to consider.",                          "es": "{kept} para considerar."},
     # ── Pick / shortlist labels ──
-    "pick.top_label":              {"en": "Top pick · {rank:02d}",                        "es": "Selección · {rank:02d}"},
+    "pick.top_label":              {"en": "🏆 Top pick · {rank:02d}",                     "es": "🏆 Selección · {rank:02d}"},
     "pick.new_pill":               {"en": "New this fortnight",                           "es": "Nueva esta quincena"},
     "pick.repriced_pill":          {"en": "Price moved",                                  "es": "Precio movido"},
     "pick.cta_open":               {"en": "Open the file →",                              "es": "Abrir la ficha →"},
