@@ -35,6 +35,15 @@ function loadRanked() {
   return null;
 }
 
+// Newsletter cohorts — Node mirror of the Cohort literal in
+// automation/newsletter/types.py. Imported by preview.js + send.js so
+// validation has a single source on the Node side. The TS counterpart
+// at web/app/admin/widgets/newsletter/constants.ts is asserted to
+// match this list by tests/api/admin_newsletter_filter.test.js, and
+// types.py vs constants.ts is asserted by
+// tests/test_newsletter_constants_sync.py. Both directions guarded.
+const NEWSLETTER_COHORTS = ["pro_prefs", "free_prefs", "logged_no_prefs", "anonymous"];
+
 // Mirror of CATEGORY_PREDICATES in automation/newsletter/segments.py.
 const CATEGORY_PREDICATES = {
   beachfront:        (l) => !!l.is_beachfront || !!l.is_walk_to_beach,
@@ -124,4 +133,5 @@ module.exports = {
   paywallForCohort,
   pickLocale,
   CATEGORY_PREDICATES,
+  NEWSLETTER_COHORTS,
 };
