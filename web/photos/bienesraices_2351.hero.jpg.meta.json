@@ -1,16 +1,18 @@
 {
-  "width": 1599,
-  "height": 1200,
-  "aspect_ratio": 1.333,
-  "file_size_kb": 411.9,
+  "width": 1279,
+  "height": 960,
+  "aspect_ratio": 1.332,
+  "file_size_kb": 306.0,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": true,
-  "computed_at": "2026-05-20T07:31:19.504076+00:00",
-  "derivative_width": 1439,
-  "derivative_height": 1080,
+  "hires_eligible": false,
+  "computed_at": "2026-05-20T12:52:19.912229+00:00",
+  "derivative_width": 1279,
+  "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/SLHKKFII84/WiwrQg4Amx/Venta_de_Terreno_con_Nacimientos_de_Agua_en_Ahuachap%C3%A1n__Finca_El_Cashal_Cant%C3%B3n_Suntecumat.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvMU43Slk3T0VRRC9mRVg0UXJCVFhRL1ZlbnRhX2RlX1RlcnJlbm9fY29uX05hY2ltaWVudG9zX2RlX0FndWFfZW5fQWh1YWNoYXBcdTAwZTFuX19GaW5jYV9FbF9DYXNoYWxfQ2FudFx1MDBmM25fU3VudGVjdW1hdF82LmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:52:19.918704+00:00"
 }

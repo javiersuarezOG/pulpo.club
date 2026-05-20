@@ -1,16 +1,18 @@
 {
-  "width": 1600,
-  "height": 1200,
+  "width": 1280,
+  "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 391.9,
+  "file_size_kb": 212.7,
   "hero_eligible": false,
   "card_eligible": true,
-  "hires_eligible": true,
-  "computed_at": "2026-05-20T07:31:14.239360+00:00",
-  "derivative_width": 1440,
-  "derivative_height": 1080,
+  "hires_eligible": false,
+  "computed_at": "2026-05-20T12:46:47.160348+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/XKHQKB8M1Z/yNYcbKmXBu/En_Venta_Terreno_Rustico_de_11.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvWE5TVk01WkNWNS9pUU4zcEU4em0yL0VuX1ZlbnRhX1RlcnJlbm9fUnVzdGljb19kZV8xMS5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:46:47.165562+00:00"
 }

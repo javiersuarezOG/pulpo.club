@@ -1,10 +1,10 @@
 {
-  "width": 600,
+  "width": 533,
   "height": 400,
-  "aspect_ratio": 1.5,
-  "file_size_kb": 60.2,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 49.8,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:26.574307+00:00"
+  "computed_at": "2026-05-20T12:59:21.839921+00:00"
 }

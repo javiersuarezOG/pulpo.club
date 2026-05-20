@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 303.9,
+  "file_size_kb": 130.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:15.528676+00:00",
+  "computed_at": "2026-05-20T12:48:24.046113+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
-  "hero_photo_quality_score": 100,
+  "hero_photo_quality_score": 90,
   "has_text_overlay": false,
-  "winning_url": "https://assets.easybroker.com/property_images/3640410/59434668/EB-MZ0410.jpg?rasterize=true&version=1679964412",
-  "candidate_count": 5
+  "winning_url": "https://assets.easybroker.com/property_images/3640410/59434666/EB-MZ0410.jpg?rasterize=true&version=1679964412",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:48:24.050371+00:00"
 }

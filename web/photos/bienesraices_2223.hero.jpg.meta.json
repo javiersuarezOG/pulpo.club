@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:19.631195+00:00",
+  "computed_at": "2026-05-20T12:52:22.435966+00:00",
   "derivative_width": 1600,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/VQ3D8T6PO3/TqpkdRZeuS/Terreno_Estrat%C3%A9gico_en_Venta__Ciudad_Delgado__4982_m%C2%B2__Ideal_para_Desarrollo_o_Log%C3%ADstica_1.jpeg",
-  "candidate_count": 2
+  "candidate_count": 2,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:52:22.443715+00:00"
 }
