@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:33.786472+00:00",
+  "computed_at": "2026-05-20T13:05:36.082517+00:00",
   "derivative_width": 1600,
   "derivative_height": 739,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZGT44WJRMY/bLeyxuPdZg/Alquiler_de_Terreno_Industrial_en_Nuevo_Cuscatl%C3%A1n__13500_v%C2%B2__Ubicaci%C3%B3n_Estrat%C3%A9gica.jpeg",
-  "candidate_count": 2
+  "candidate_count": 2,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-20T13:05:36.087435+00:00"
 }

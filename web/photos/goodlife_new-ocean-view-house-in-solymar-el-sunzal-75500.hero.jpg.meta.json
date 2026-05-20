@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:22.471264+00:00",
+  "computed_at": "2026-05-20T12:54:39.677934+00:00",
   "derivative_width": 1024,
   "derivative_height": 680,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/solymar-house-for-sale-6-1024x680.jpg",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-20T12:54:39.686488+00:00"
 }

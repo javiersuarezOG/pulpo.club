@@ -2,15 +2,17 @@
   "width": 800,
   "height": 800,
   "aspect_ratio": 1.0,
-  "file_size_kb": 1486.5,
+  "file_size_kb": 1321.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:26.883659+00:00",
+  "computed_at": "2026-05-20T12:59:46.588772+00:00",
   "derivative_width": 800,
   "derivative_height": 800,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
-  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2023/08/Untitled-design-8.png",
-  "candidate_count": 3
+  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2023/08/2-9.png",
+  "candidate_count": 3,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:59:46.605718+00:00"
 }

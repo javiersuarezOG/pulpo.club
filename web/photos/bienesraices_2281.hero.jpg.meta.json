@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:33.017272+00:00",
+  "computed_at": "2026-05-20T13:05:11.188265+00:00",
   "derivative_width": 1376,
   "derivative_height": 752,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/NJ9N7DT3AG/3kBY7njGzF/Venta_de_Terreno_de_5.jpeg",
-  "candidate_count": 2
+  "candidate_count": 2,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-20T13:05:11.191854+00:00"
 }

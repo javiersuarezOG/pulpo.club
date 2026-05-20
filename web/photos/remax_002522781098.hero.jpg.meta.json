@@ -3,10 +3,10 @@
   "height": 3996,
   "aspect_ratio": 1.335,
   "file_size_kb": 2640.0,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T21:41:08.833598+00:00",
+  "computed_at": "2026-05-20T12:50:55.590297+00:00",
   "derivative_width": 1442,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
@@ -14,5 +14,5 @@
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781069/v3/HDPhotos/Vector terrenos-02.png",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:41:08.904915+00:00"
+  "repicked_at": "2026-05-20T12:50:55.673918+00:00"
 }

@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:21.357479+00:00",
+  "computed_at": "2026-05-20T12:53:37.722605+00:00",
   "derivative_width": 1280,
   "derivative_height": 576,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/00VWNKO2EU/qeJGQw4zGR/Terreno_en_Venta_Zacatecoluca__180_Manzanas__Con_Regad%C3%ADo_y_R%C3%ADo__Ideal_para_Ca%C3%B1a_o_Lotificaci%C3%B3n.jpeg",
-  "candidate_count": 3
+  "candidate_count": 3,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-20T12:53:37.726521+00:00"
 }

@@ -893,4 +893,72 @@ test.describe("New app boots cleanly on key routes", () => {
     // substring that won't match the user_exists / no_email branches.
     expect(txt).not.toContain("set up your password");
   });
+
+  // 2026-05-20 — Clerk activation-landing regression guards.
+  //
+  // PR #364/365 (call it whichever): Clerk's /v1/tickets/accept
+  // redirects the user to /account?__clerk_status=sign_up&__clerk_ticket=<JWT>
+  // after they click the activation email. Two effects in app.jsx
+  // were racing to call clerkActions.openSignUp({}) on this URL,
+  // each consuming the same single-use ticket → first call rendered
+  // the password form, second hung on an already-consumed ticket
+  // (infinite spinner + stacked modals). The fix:
+  //   - One dedicated effect (clerkTicketHandledRef) owns the
+  //     activation landing, detected by `__clerk_ticket` URL param.
+  //   - The pendingSignUp effect short-circuits when hasClerkTicket
+  //     is true.
+  //   - welcomeModalState init suppresses on __clerk_ticket so the
+  //     anon WelcomeModal can't flash on top during the boot race.
+  //
+  // CI runs Clerk-off so clerkActions stays null; these tests assert
+  // the URL-level guards (no crash, no WelcomeModal on __clerk_ticket
+  // URLs). The full openSignUp → password form behavior requires the
+  // live Clerk SDK and is verified manually on Vercel preview.
+  test("activation landing: /account?__clerk_ticket=… does not render WelcomeModal", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (err) => { errors.push(`pageerror:${err.message}`); });
+    page.on("console", (msg) => {
+      if (msg.type() === "error") errors.push(`console:${msg.text()}`);
+    });
+
+    // Synthetic ticket — Clerk's SDK isn't loaded in CI so the param
+    // never gets consumed; this exercises the URL-detection guards.
+    await page.goto(
+      "/account?__clerk_status=sign_up&__clerk_ticket=eyJfake.test.jwt&lang=es",
+      { waitUntil: "domcontentloaded" },
+    );
+    await page.waitForTimeout(800);
+
+    const dom = await page.evaluate(() => ({
+      url: window.location.href,
+      welcome: document.querySelectorAll(".welcome-modal").length,
+      signup: document.querySelectorAll(".modal-signup").length,
+    }));
+    expect(dom.welcome, `WelcomeModal must not render on activation landing. DOM: ${JSON.stringify(dom)}`).toBe(0);
+    expect(errors.filter((e) => !/Clerk|clerk/.test(e)), `unexpected page errors: ${errors.join(" | ")}`).toEqual([]);
+  });
+
+  test("activation landing: /account?welcome=1&__clerk_ticket=… belt-and-suspenders suppresses WelcomeModal", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    // Defensive: if a future redirect ever lands us on both flags,
+    // the __clerk_ticket guard in the welcomeModalState initializer
+    // must still suppress the modal (Clerk owns the flow).
+    await page.goto(
+      "/account?welcome=1&__clerk_ticket=eyJfake.test.jwt&lang=es",
+      { waitUntil: "domcontentloaded" },
+    );
+    await page.waitForTimeout(800);
+    const welcome = await page.locator(".welcome-modal").count();
+    expect(
+      welcome,
+      "WelcomeModal must not render when both welcome=1 AND __clerk_ticket are present.",
+    ).toBe(0);
+  });
 });

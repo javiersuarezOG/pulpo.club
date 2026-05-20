@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 683,
   "aspect_ratio": 1.499,
-  "file_size_kb": 251.5,
+  "file_size_kb": 71.7,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:15.957474+00:00",
+  "computed_at": "2026-05-20T12:48:43.526930+00:00",
   "derivative_width": 1024,
   "derivative_height": 683,
-  "hero_photo_quality_score": 70,
+  "hero_photo_quality_score": 50,
   "has_text_overlay": false,
-  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/10/taquillo-land-for-sale-7-1024x683.jpg",
-  "candidate_count": 5
+  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/10/taquillo-land-for-sale-9-1024x683.jpg",
+  "candidate_count": 5,
+  "picker_excluded_count": 2,
+  "repicked_at": "2026-05-20T12:48:43.532557+00:00"
 }
