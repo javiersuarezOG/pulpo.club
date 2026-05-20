@@ -190,7 +190,13 @@ def compute_score(raw_bytes: bytes, byte_size: Optional[int] = None) -> int:
 
 HERO_MIN_WIDTH_PX   = 1600
 HERO_MIN_HEIGHT_PX  = 1200
-HERO_MIN_ASPECT     = 1.4
+# 1.0 = no aspect-based exclusion. 4:3 (1.333) is the most common
+# real-estate camera ratio and reads fine cropped to 1:1 / 4:5 / 9:16
+# at the social-image endpoint. Consumers that need landscape-only (e.g.
+# desktop featured pool) should filter on `hires_width > hires_height`,
+# not raise this floor — the aspect metric is long/short, so any
+# floor > 1.0 also rejects portrait sources at the same ratio.
+HERO_MIN_ASPECT     = 1.0
 HERO_MAX_ASPECT     = 1.85
 HERO_MAX_SIZE_KB    = 5120
 
