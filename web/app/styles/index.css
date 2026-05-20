@@ -442,6 +442,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
     height: auto;
   }
 }
+/* On desktop, push pill-tier content into the centered 1400px column used
+   by .topnav-inner and .browse-layout so the WHERE/RANKING/FILTER rows
+   line up with the page frame instead of running edge-to-edge. The
+   max() floor preserves the existing 24px gutter on narrower viewports.
+   The full-width border-bottom on .pill-rail-wrap is unaffected. */
+@media (min-width: 1024px) {
+  .pill-tier {
+    padding-left: max(24px, calc((100% - 1400px) / 2 + 24px));
+    padding-right: max(24px, calc((100% - 1400px) / 2 + 24px));
+  }
+  .pill-rail-fade {
+    right: max(24px, calc((100% - 1400px) / 2 + 24px));
+  }
+}
 .pill-chip {
   display: inline-flex; align-items: center; gap: 6px;
   flex-shrink: 0;

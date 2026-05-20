@@ -9,6 +9,7 @@
 import React, { useEffect, useState } from "react";
 import { t } from "../i18n.jsx";
 import { Icon } from "../components.jsx";
+import { useListings } from "../data/use-listings.tsx";
 
 function fmtRelative(iso, locale) {
   if (!iso) return null;
@@ -29,6 +30,13 @@ function fmtRelative(iso, locale) {
 function LiveStats({ locale }) {
   const [data, setData] = useState(null);
   const [open, setOpen] = useState(false); // mobile popover
+  // Source the listings count from the same loaded array Browse renders
+  // so the header chip can't drift from the in-page "{N} listings" count.
+  // last_updated.json#total_listings is the raw pipeline total (includes
+  // is_incomplete rows that applyFilters() hides by default), so reading
+  // it directly produced a visible mismatch (923 in header vs 873 on
+  // /browse).
+  const listings = useListings();
 
   useEffect(() => {
     let cancelled = false;
@@ -46,7 +54,15 @@ function LiveStats({ locale }) {
   const statuses = data.source_status || {};
   const sourcesOnline = Object.values(statuses).filter(s => s === "green" || s === "yellow").length;
   const sourcesTotal = Object.keys(statuses).length;
-  const listingsCount = typeof data.total_listings === "number" ? data.total_listings : null;
+  // Mirror the default-filter exclusions in pages.jsx applyFilters() so the
+  // header chip matches what /browse shows with no user filters applied.
+  // Fall back to the pipeline total while listings are still loading; if
+  // it's missing too, omit the chip.
+  const browsableCount = listings.length
+    ? listings.filter(l => !l.is_sold && !l.is_incomplete).length
+    : null;
+  const listingsCount = browsableCount
+    ?? (typeof data.total_listings === "number" ? data.total_listings : null);
   const updatedRel = fmtRelative(data.last_updated, locale);
 
   if (sourcesTotal === 0 && listingsCount == null && !updatedRel) return null;
