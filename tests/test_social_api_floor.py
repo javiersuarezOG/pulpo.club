@@ -127,25 +127,33 @@ if __name__ == "__main__":  # pragma: no cover — manual diagnostic
     qualifying = 0
     for li in data:
         if not li.get("hero_photo_path"):
-            reasons["no_hero_photo_path"] += 1; continue
+            reasons["no_hero_photo_path"] += 1
+            continue
         if li.get("price_usd") is None:
-            reasons["no_price"] += 1; continue
+            reasons["no_price"] += 1
+            continue
         if (li.get("data_quality_score") or 0) < 0.5:
-            reasons["low_data_quality"] += 1; continue
+            reasons["low_data_quality"] += 1
+            continue
         if li.get("has_text_overlay") is True:
-            reasons["has_text_overlay"] += 1; continue
+            reasons["has_text_overlay"] += 1
+            continue
         if li.get("has_marketing_overlay") is True:
-            reasons["has_marketing_overlay"] += 1; continue
+            reasons["has_marketing_overlay"] += 1
+            continue
         qs = li.get("hero_photo_quality_score")
         if qs is not None and qs < 50:
-            reasons["low_hero_quality"] += 1; continue
+            reasons["low_hero_quality"] += 1
+            continue
         if li.get("hero_eligible") is not True:
-            reasons["hero_ineligible"] += 1; continue
+            reasons["hero_ineligible"] += 1
+            continue
         if (li.get("source_width") or 0) < 1080 or (li.get("source_height") or 0) < 1080:
-            reasons["source_below_1080"] += 1; continue
+            reasons["source_below_1080"] += 1
+            continue
         qualifying += 1
     print(f"total: {len(data)}")
     print(f"qualifying: {qualifying} (floor={PULPO_SOCIAL_PANIC_FLOOR})")
-    print(f"rejected by:")
+    print("rejected by:")
     for r, n in sorted(reasons.items(), key=lambda kv: -kv[1]):
         print(f"  {r:30s} {n:>4}")
