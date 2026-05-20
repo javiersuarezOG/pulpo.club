@@ -1047,6 +1047,12 @@ function App() {
     const pending = clerkActions.pendingSignUp();
     if (!pending) return;
     pendingSignUpHandledRef.current = true;
+    // Close any open WelcomeModal — Clerk's SignUp modal takes priority.
+    // Without this, the welcomeModalState (set synchronously from URL
+    // via useState initializer above) leaves the anon WelcomeModal
+    // stacked on top of Clerk's password UI. PR #361 stopped the
+    // SignupModal from racing in but missed the welcomeModalState itself.
+    setWelcomeModalState(null);
     track("invitation.password_creation_opened", {
       missing_fields: pending.missingFields.join(","),
     });
@@ -1190,7 +1196,7 @@ function App() {
     // ClerkUserSync inside the provider that maps Clerk's user to
     // App's `setUser` so every downstream `app.user` reader works
     // unchanged. Lives inside App so `setUser` is in scope.
-    <ClerkShell setUser={setUser} setAuthLoaded={setAuthLoaded} onClerkActions={setClerkActions}>
+    <ClerkShell setUser={setUser} setAuthLoaded={setAuthLoaded} onClerkActions={setClerkActions} locale={locale}>
     <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", true) ? " hero-v4" : ""}`}>
       {/* SVG sprite — symbols defined once, referenced via <use href> in
           high-frequency render paths (rank chips on shelf + listing cards

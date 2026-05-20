@@ -22,6 +22,7 @@
 
 import { useEffect } from "react";
 import { ClerkProvider, useUser, useClerk } from "@clerk/react";
+import { esMX, enUS } from "@clerk/localizations";
 import { applyFounderPlan } from "../lib/founder-emails";
 
 function planFromMetadata(metadata) {
@@ -155,10 +156,19 @@ function ClerkActionsBinder({ onActions }) {
   return null;
 }
 
-export default function ClerkProviderWrapper({ setUser, setAuthLoaded, onClerkActions, children }) {
+export default function ClerkProviderWrapper({ setUser, setAuthLoaded, onClerkActions, locale, children }) {
   // <ClerkProvider> reads VITE_CLERK_PUBLISHABLE_KEY from import.meta.env.
+  //
+  // localization matches the app's pulpo-locale so Clerk's hosted modals
+  // (SignIn / SignUp / UserProfile) render in the same language as the
+  // surrounding app. Without this, Clerk defaults to enUS regardless of
+  // user locale — a user navigating in Spanish would get the activation
+  // email in Spanish, click through, and see Clerk's password modal in
+  // English. esMX picked over esES because Pulpo's Spanish copy is
+  // Salvadoran/Central American (closer to LATAM Spanish than Castilian).
+  const localization = locale === "es" ? esMX : enUS;
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" localization={localization}>
       {typeof setUser === "function" ? <ClerkUserSync setUser={setUser} setAuthLoaded={setAuthLoaded} /> : null}
       {typeof onClerkActions === "function" ? <ClerkActionsBinder onActions={onClerkActions} /> : null}
       {children}

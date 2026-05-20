@@ -848,7 +848,10 @@ test.describe("New app boots cleanly on key routes", () => {
     // Resend CTA must NOT render here. Pre-PR-2 the modal showed both
     // unconditionally and users had no recovery path.
     expect(txt).not.toContain("Resend my invitation");
-    expect(txt).not.toContain("We just sent an invitation");
+    // Post-2026-05-20 short copy: "We've sent an email to set up your
+    // password. Open it to activate your account." We use a stable
+    // substring that won't match the user_exists / no_email branches.
+    expect(txt).not.toContain("set up your password");
   });
 
   test("welcome modal status: no_email shows support escalation", async ({ page }) => {
@@ -885,6 +888,9 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(txt).toContain("Resend my invitation");
     // We must NOT show the canonical 'we just sent an invitation'
     // body here — the webhook hasn't fired yet so that would lie.
-    expect(txt).not.toContain("We just sent an invitation");
+    // Post-2026-05-20 short copy: "We've sent an email to set up your
+    // password. Open it to activate your account." We use a stable
+    // substring that won't match the user_exists / no_email branches.
+    expect(txt).not.toContain("set up your password");
   });
 });
