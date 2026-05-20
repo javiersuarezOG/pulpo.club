@@ -67,22 +67,51 @@ h1,h2,h3,h4,h5 { margin: 0; }
    at ≥768px below. */
 .topnav-inner {
   max-width: 1400px; margin: 0 auto;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: baseline; gap: 4px;
   padding: 14px 8px;
 }
+/* The right-rail is a cluster of mixed elements (avatar circle, mono
+   pills, text links) — center it as a block so the avatar doesn't drop
+   to the baseline. Inside the cluster, its own align-items:center keeps
+   the children vertically aligned with each other. */
+.topnav-right { align-self: center; }
+/* logo-btn baseline = wordmark text baseline (currentColor inherits up
+   through PulpoLogo's inner flex); that's what nav text aligns to. */
 @media (min-width: 768px) {
   .topnav-inner { gap: 32px; padding: 14px 24px; }
 }
 .logo-btn { display: flex; align-items: center; }
 .pulpo-logo { color: var(--accent); }
-.topnav-links { display: flex; gap: 4px; flex: 1; }
+/* Header brand lockup — bigger than the default PulpoLogo (which is
+   tuned for modals + footer). The header is the brand's most repeated
+   surface, so the mark + wordmark are sized to anchor the page. CSS
+   width/height overrides the React `size` prop's inline attributes
+   (CSS wins over presentation attributes per spec). */
+.logo-btn .pulpo-logo { gap: 12px; }
+.logo-btn .pulpo-logo > svg { width: 32px; height: 32px; }
+.logo-btn .pulpo-logo-wm { font-size: 28px; letter-spacing: -0.045em; }
+.topnav-links { display: flex; gap: 6px; flex: 1; }
+/* Nav copy size — proportional to the 28px wordmark + 32px mark above.
+   Strong-brand headers (Airbnb, Spotify, Strava) all run their primary
+   nav between 15–17px; 16px reads as deliberate at this scale. Smaller
+   feels apologetic next to the bigger logo. */
 .topnav-links button {
-  padding: 8px 14px; font-size: 14px; font-weight: 500;
+  padding: 10px 16px; font-size: 16px; font-weight: 500;
   color: var(--ink-2); border-radius: 999px;
   transition: background 160ms;
+  letter-spacing: -0.005em;
 }
 .topnav-links button:hover { background: var(--paper-2); color: var(--ink); }
 .topnav-links button.active { color: var(--ink); background: var(--paper-2); }
+/* Right-rail copy — one homogenous size across LiveStats, Locale toggle,
+   and Logout so they read as a single utility group. Smaller than the
+   16 px nav (which is the primary action), unified at 13 px so the rail
+   feels like supporting chrome, not three competing voices. Scoped to
+   .topnav so non-header consumers keep their default size. */
+.topnav .locale-toggle button { font-size: 13px; padding: 5px 11px; letter-spacing: 0.04em; }
+.topnav .link-btn { font-size: 13px; font-weight: 500; }
+.topnav .live-stats { font-size: 13px; }
+.topnav .count-badge { font-size: 12px; padding: 2px 8px; }
 /* margin-left: auto keeps the topnav-right block (LiveStats + locale +
    auth icon) pinned to the corner regardless of viewport. On desktop
    the .topnav-links spacer (flex: 1) does this; on mobile that spacer
@@ -229,8 +258,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 767px) {
   .topnav-inner { gap: 16px; }
   .pulpo-logo-wm { font-size: 20px; }
+  .logo-btn .pulpo-logo { gap: 10px; }
+  .logo-btn .pulpo-logo > svg { width: 28px; height: 28px; }
+  .logo-btn .pulpo-logo-wm { font-size: 24px; }
   .pulpo-logo-pro { font-size: 10px; padding: 3px 6px 2px; letter-spacing: 0.16em; }
   .pulpo-logo-pro::before { width: 5px; height: 5px; }
+}
+@media (max-width: 360px) {
+  .logo-btn .pulpo-logo > svg { width: 26px; height: 26px; }
+  .logo-btn .pulpo-logo-wm { font-size: 22px; }
 }
 @media (max-width: 360px) {
   .pulpo-logo-pro { display: none; }
@@ -5866,30 +5902,8 @@ h1,h2,h3,h4,h5 { margin: 0; }
   outline: 2px solid var(--color-forest-deep);
   outline-offset: 3px;
 }
-/* Photo column wraps photo + brief details. Becomes the right-hand
-   flex child of `.hp-hero-v4-inner` on desktop, the top item on mobile.
-   Inner photo's existing `order` rules are inert once wrapped. */
-.homepage-v2.hero-v4 .hp-hero-v4-photo-col {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  order: 1;
-  width: 100%;
-}
-@media (min-width: 1024px) {
-  .homepage-v2.hero-v4 .hp-hero-v4-photo-col {
-    order: 2;
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-}
-/* Wrapped photo no longer carries its own flex-order — the column does. */
-.homepage-v2.hero-v4 .hp-hero-v4-photo-col .hp-hero-v4-photo { order: 0; }
-
 /* "Featured today" pill — trophy + label, no rank numeral. White pill
-   with clay trophy + ink-primary label, mirroring `.pulpo-rank` styling
-   so it reads in the same visual family as the Top 10 shelf chips
-   without claiming a numeric rank. */
+   with clay trophy + ink-primary label. Top-left of the photo. */
 .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
   position: absolute;
   top: 16px;
@@ -5914,42 +5928,65 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--color-clay-primary);
 }
 
-/* Listing details brief — zone_name (title) + price · size · land_type.
-   Sits below the photo, clickable, opens the same listing detail as the
-   photo. Quiet typography so the photo stays the hero's center of mass. */
+/* Bottom scrim — bottom-up gradient ensuring the brief text stays
+   legible on any photo (bright skies, busy foliage). Pure visual,
+   never receives pointer events. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 45%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.32) 35%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Listing details brief overlaid on the photo (bottom-left, inside
+   the scrim band). Inherits the photo's click handler via event
+   bubble — clicking the title/meta opens the listing detail. */
 .homepage-v2.hero-v4 .hp-hero-v4-brief {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background var(--dur-mid) var(--ease-out);
-}
-.homepage-v2.hero-v4 .hp-hero-v4-brief:hover {
-  background: var(--color-bg-cream-soft);
-}
-.homepage-v2.hero-v4 .hp-hero-v4-brief:focus-visible {
-  outline: 2px solid var(--color-forest-deep);
-  outline-offset: 2px;
+  pointer-events: none;
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
-  color: var(--color-ink-primary);
+  color: var(--color-bg-white);
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-meta {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-ink-secondary);
+  color: rgba(255, 255, 255, 0.92);
   letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@media (min-width: 1024px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-brief {
+    left: 28px;
+    right: 28px;
+    bottom: 24px;
+  }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 24px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 15px; }
 }
 @media (max-width: 480px) {
   .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
@@ -5958,7 +5995,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
     padding: 5px 10px;
     font-size: 12px;
   }
-  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 15px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief {
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+  }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 18px; }
   .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 13px; }
 }
 
