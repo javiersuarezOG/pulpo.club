@@ -2063,6 +2063,18 @@ h1,h2,h3,h4,h5 { margin: 0; }
   transition: background 120ms;
 }
 .modal-close:hover { background: var(--paper-2); }
+/* Centered brand mark for modals (Welcome / ProUpsell / FreeMonth, etc).
+   Sits above the eyebrow / headline so the modal opens with a quiet
+   brand signal — same role as a letterhead. Always centered regardless
+   of the modal's text-align (pro-upsell is left-aligned). */
+.modal-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  color: var(--accent);
+  line-height: 0;
+}
 .modal-head { margin-bottom: 20px; text-align: center; }
 .modal-head .pulpo-logo { justify-content: center; margin-bottom: 12px; }
 .modal-head h2 {
@@ -5854,59 +5866,100 @@ h1,h2,h3,h4,h5 { margin: 0; }
   outline: 2px solid var(--color-forest-deep);
   outline-offset: 3px;
 }
-/* Rank chip — same `.pulpo-rank` mark used on the Top 10 shelf cards
-   so the hero pick reads as "today's #N" rather than generic "Featured."
-   Positioning matches the shelf card chip (top-left, breathing room). */
-.homepage-v2.hero-v4 .hp-hero-v4-rank.pulpo-rank {
+/* Photo column wraps photo + brief details. Becomes the right-hand
+   flex child of `.hp-hero-v4-inner` on desktop, the top item on mobile.
+   Inner photo's existing `order` rules are inert once wrapped. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  order: 1;
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-photo-col {
+    order: 2;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+/* Wrapped photo no longer carries its own flex-order — the column does. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-col .hp-hero-v4-photo { order: 0; }
+
+/* "Featured today" pill — trophy + label, no rank numeral. White pill
+   with clay trophy + ink-primary label, mirroring `.pulpo-rank` styling
+   so it reads in the same visual family as the Top 10 shelf chips
+   without claiming a numeric rank. */
+.homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
   position: absolute;
   top: 16px;
   left: 16px;
   z-index: 3;
-  padding: 6px 12px;
-}
-.homepage-v2.hero-v4 .hp-hero-v4-rank .pulpo-rank-num {
-  font-size: 14px;
-}
-
-/* "Why #N" caption — explains the ranking with the listing's top two
-   sub-scores (Value/Location/Momentum). Bottom-left of the photo,
-   same white-pill language as the rank chip above. */
-.homepage-v2.hero-v4 .hp-hero-v4-why {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  margin: 0;
-  max-width: calc(100% - 32px);
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   background: var(--color-bg-white);
-  color: var(--color-ink-secondary);
+  color: var(--color-ink-primary);
   padding: 6px 12px;
   border-radius: 999px;
   border: 0.5px solid var(--color-line-soft);
   box-shadow: var(--shadow-1);
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: -0.005em;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1;
+}
+.homepage-v2.hero-v4 .hp-hero-v4-featured-pill svg {
+  color: var(--color-clay-primary);
+}
+
+/* Listing details brief — zone_name (title) + price · size · land_type.
+   Sits below the photo, clickable, opens the same listing detail as the
+   photo. Quiet typography so the photo stays the hero's center of mass. */
+.homepage-v2.hero-v4 .hp-hero-v4-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--dur-mid) var(--ease-out);
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief:hover {
+  background: var(--color-bg-cream-soft);
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief:focus-visible {
+  outline: 2px solid var(--color-forest-deep);
+  outline-offset: 2px;
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief-meta {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 480px) {
-  .homepage-v2.hero-v4 .hp-hero-v4-why {
-    bottom: 12px;
-    left: 12px;
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-  .homepage-v2.hero-v4 .hp-hero-v4-rank.pulpo-rank {
+  .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
     top: 12px;
     left: 12px;
     padding: 5px 10px;
+    font-size: 12px;
   }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 15px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 13px; }
 }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
