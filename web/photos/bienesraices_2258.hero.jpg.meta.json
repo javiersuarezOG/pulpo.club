@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T07:31:12.494290+00:00",
+  "computed_at": "2026-05-20T12:45:26.202555+00:00",
   "derivative_width": 1920,
   "derivative_height": 887,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/9OMPQEKPTJ/sgstFn5tDH/76453.jpeg",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-20T12:45:26.237242+00:00"
 }

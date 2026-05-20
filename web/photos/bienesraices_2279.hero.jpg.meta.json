@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:11.731995+00:00",
+  "computed_at": "2026-05-20T12:45:00.114740+00:00",
   "derivative_width": 354,
   "derivative_height": 473,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/NOMRLD36DN/RAuFFumwy5/TERRENO_40mz_ZAPOTITAN_ZONA_CLAUDIA_LARS.jpeg",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 4,
+  "repicked_at": "2026-05-20T12:45:00.115832+00:00"
 }

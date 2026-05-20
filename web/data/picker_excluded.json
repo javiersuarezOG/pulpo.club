@@ -1355,6 +1355,12 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T13:51:34.935909+00:00"
   },
+  "446ba82b7eb478db": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-20T13:05:39.108429+00:00"
+  },
   "446e1b3145686c21": {
     "cheap_score": 0,
     "floor": 40,
@@ -2147,6 +2153,12 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T12:07:24.138117+00:00"
   },
+  "70fb00e727c06bff": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-20T13:05:39.175639+00:00"
+  },
   "71574ce455af931b": {
     "cheap_score": 20,
     "floor": 40,
@@ -2296,6 +2308,12 @@
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T13:27:52.376351+00:00"
+  },
+  "7ac2c92320aea7ea": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-20T13:05:39.039565+00:00"
   },
   "7adc025a700ccc14": {
     "cheap_score": 0,
@@ -3413,6 +3431,12 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T12:34:48.030042+00:00"
   },
+  "b7ef4b5f39e1448f": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-20T12:45:42.189152+00:00"
+  },
   "b8ea3e119b53ff4e": {
     "cheap_score": 20,
     "floor": 40,
@@ -4006,6 +4030,12 @@
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T13:01:31.602775+00:00"
+  },
+  "d738d90ca1a3d267": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-05-20T13:05:38.895021+00:00"
   },
   "d7a7f54709bc2996": {
     "cheap_score": 0,

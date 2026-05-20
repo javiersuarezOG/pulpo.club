@@ -3,14 +3,16 @@
   "height": 1200,
   "aspect_ratio": 1.333,
   "file_size_kb": 568.6,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T07:31:11.511580+00:00",
+  "computed_at": "2026-05-20T12:44:50.158019+00:00",
   "derivative_width": 1440,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZRJFBSF68X/FxK6Dzwjqy/Terreno_en_venta_en_Playa_San_Diego_La_Libertad.jpeg",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:44:50.167794+00:00"
 }

@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:17.814157+00:00",
+  "computed_at": "2026-05-20T12:49:56.959068+00:00",
   "derivative_width": 1280,
   "derivative_height": 576,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/BST9RX6KZR/eJo6uFQYoV/Venta_de_Terreno_Agr%C3%ADcola_en_Usulut%C3%A1n__400_Manzanas_100_Planas__Ideal_Ganader%C3%ADa_y_Cultivo.jpeg",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 5,
+  "repicked_at": "2026-05-20T12:49:56.962007+00:00"
 }

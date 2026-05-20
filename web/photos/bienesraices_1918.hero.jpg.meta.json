@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:32.629334+00:00",
+  "computed_at": "2026-05-20T13:04:41.876308+00:00",
   "derivative_width": 1200,
   "derivative_height": 675,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3531251/57379962/EB-MO1251.jpg?rasterize=true&version=1675441958",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T13:04:41.880336+00:00"
 }
