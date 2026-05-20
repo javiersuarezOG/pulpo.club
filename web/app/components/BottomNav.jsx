@@ -5,9 +5,15 @@
 import React from "react";
 import { t } from "../i18n.jsx";
 import { Icon } from "../components.jsx";
+import { isPaid } from "../lib/gating";
 
 export function BottomNav({ app }) {
   const lc = app.locale;
+  // Mobile parity with SiteHeader's avatar-pro-badge: when the signed-in
+  // user is on Pulpo Pro, mark the Profile tab with a ★ so Pro identity
+  // is visible in the mobile chrome too (the header's wordmark pill is
+  // hidden below 360px — the star is the durable signal).
+  const proMember = isPaid(app.user);
   const tabs = [
     { key: "home",    labelKey: "nav.home",      icon: "home" },
     { key: "browse",  labelKey: "nav.discover",  icon: "search" },
@@ -26,10 +32,14 @@ export function BottomNav({ app }) {
               else app.go("account");
             } else app.go(tab.key);
           }}
+          data-testid={tab.key === "profile" && proMember ? "bottomnav-profile-pro" : undefined}
         >
           <Icon name={tab.icon} size={20} />
           <span>{t(tab.labelKey, lc)}</span>
           {tab.key === "saved" && app.savedIds.size > 0 && <span className="tab-count">{app.savedIds.size}</span>}
+          {tab.key === "profile" && proMember && (
+            <span className="tab-pro-badge" aria-hidden="true">★</span>
+          )}
         </button>
       ))}
     </nav>

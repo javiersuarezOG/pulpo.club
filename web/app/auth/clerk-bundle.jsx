@@ -22,10 +22,13 @@
 
 import { useEffect } from "react";
 import { ClerkProvider, useUser, useClerk } from "@clerk/react";
+import { applyFounderPlan } from "../lib/founder-emails";
 
 function planFromMetadata(metadata) {
   // Clerk Dashboard test users carry plan in publicMetadata.plan.
-  // Default to "free" — pro is opt-in per user.
+  // Default to "free" — pro is opt-in per user. The founder-email
+  // allowlist is applied downstream in applyFounderPlan so the
+  // override travels with the hydrated user object.
   const v = metadata && metadata.plan;
   return v === "pro" ? "pro" : "free";
 }
@@ -50,7 +53,7 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
       setUser(null);
       return;
     }
-    setUser({
+    setUser(applyFounderPlan({
       email:    user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "",
       name:     user.firstName || user.username || "",
       plan:     planFromMetadata(user.publicMetadata),
@@ -63,7 +66,7 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
       profile:  (user.publicMetadata && user.publicMetadata.profile && typeof user.publicMetadata.profile === "object")
         ? user.publicMetadata.profile
         : {},
-    });
+    }));
   }, [isLoaded, isSignedIn, user, setUser]);
   return null;
 }

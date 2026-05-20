@@ -736,6 +736,10 @@ const UI_STRINGS = {
   // three canonical USPs (alerts covers newsletter + price_alerts; browse
   // covers unlimited_details; links covers off_market access).
   "plans.pro.feat.everything_in_free": { en: "Everything in Free",        es: "Todo lo que incluye el plan Gratis" },
+  // Pro-user state on the Pro card — replaces the upgrade CTA so a paying
+  // member doesn't see a re-checkout button on their own plan.
+  "plans.pro.cta_current":   { en: "Your plan",                es: "Tu plan" },
+  "plans.pro.current_ribbon": { en: "Your current plan",       es: "Tu plan actual" },
   // Agency tier (hidden by default — see SHOW_AGENCY_PLAN in pages.jsx).
   "plans.agency.name":       { en: "Agency",                   es: "Agencia" },
   "plans.agency.tag":        { en: "For investor groups & brokers",

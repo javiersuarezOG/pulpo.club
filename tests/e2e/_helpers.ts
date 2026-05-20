@@ -58,3 +58,23 @@ export async function seedUser(
 export async function seedProUser(page: Page): Promise<void> {
   await seedUser(page, "pro");
 }
+
+// Seeds a localStorage user with plan="free" but email matching the
+// VITE_FOUNDER_EMAILS allowlist set in playwright.config.ts. Used to
+// assert that the founder-override path (web/app/lib/founder-emails.ts)
+// promotes the user to Pro on hydration so all downstream gates honor
+// Pro state even though the underlying plan is free.
+export async function seedFounderUser(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: "founder-tester@pulpo.club",
+        name: "Founder Tester",
+        plan: "free",
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  });
+}

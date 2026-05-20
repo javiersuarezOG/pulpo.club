@@ -18,6 +18,7 @@
 // `authenticateClerkRequest`. No session → 401.
 
 const { clerkClient, authenticateClerkRequest } = require("./_clerk");
+const { effectivePlan } = require("./_plan");
 const { makeRateLimiter, send429 } = require("./_rate_limit");
 
 const FREE_SAVE_CAP = 10;
@@ -33,10 +34,6 @@ const savesLimiter = makeRateLimiter({
   name: "saves",
 });
 
-function planFromMetadata(publicMetadata) {
-  return publicMetadata && publicMetadata.plan === "pro" ? "pro" : "free";
-}
-
 function logApi(name, fields) {
   const parts = [`[api]`, name];
   for (const [k, v] of Object.entries(fields)) parts.push(`${k}=${v}`);
@@ -49,7 +46,7 @@ async function readUser(userId) {
   const saves = Array.isArray(user.privateMetadata && user.privateMetadata.saves)
     ? user.privateMetadata.saves
     : [];
-  const plan = planFromMetadata(user.publicMetadata);
+  const plan = effectivePlan(user);
   return { user, saves, plan };
 }
 

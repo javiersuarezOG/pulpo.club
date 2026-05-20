@@ -2206,6 +2206,11 @@ function SavedPage({ app }) {
 // ====== Plans page ======
 function PlansPage({ app }) {
   const lc = app.locale;
+  // Pro users (real or founder-override) shouldn't see the upgrade CTA —
+  // clicking it kicks off a second checkout. Mirrors SiteHeader's
+  // `proMember = isPaid(app.user)` check so the page is consistent with
+  // the global chrome.
+  const isPaid = gateIsPaid(app.user);
   // Telemetry — plans.viewed fires once per PlansPage mount. The event
   // type has existed in events.ts since the catalog landed but had no
   // consumer; Phase 7 wires it. `source` differentiates entry points
@@ -2277,12 +2282,18 @@ function PlansPage({ app }) {
             {featMuted("pro.usp.browse.short")}
             {featMuted("pro.usp.links.short")}
           </ul>
-          <button className="btn-ghost block" disabled={!app.user}>
-            {app.user ? t("plans.free.cta_current", lc) : t("plans.free.cta_signup", lc)}
+          <button className="btn-ghost block" disabled={!app.user || isPaid}>
+            {!app.user
+              ? t("plans.free.cta_signup", lc)
+              : isPaid
+                ? t("plans.free.name", lc)
+                : t("plans.free.cta_current", lc)}
           </button>
         </div>
-        <div className="plan-card featured">
-          <div className="plan-ribbon">{t("plans.pro.ribbon", lc)}</div>
+        <div className={`plan-card featured${isPaid ? " plan-card-current" : ""}`} data-testid="plan-card-pro">
+          {isPaid
+            ? <div className="plan-ribbon plan-ribbon-current">{t("plans.pro.current_ribbon", lc)}</div>
+            : <div className="plan-ribbon">{t("plans.pro.ribbon", lc)}</div>}
           <div className="plan-name">{t("plans.pro.name", lc)}</div>
           <div className="plan-price">
             <span>€{PRO_PRICE_EUR_PER_MONTH}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
@@ -2294,9 +2305,15 @@ function PlansPage({ app }) {
             {feat("pro.usp.links.headline")}
             {feat("plans.pro.feat.everything_in_free")}
           </ul>
-          <button className="btn-primary block lg" onClick={onUpgrade}>
-            {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
-          </button>
+          {isPaid ? (
+            <button className="btn-ghost block lg" disabled data-testid="plan-pro-current-cta">
+              {t("plans.pro.cta_current", lc)}
+            </button>
+          ) : (
+            <button className="btn-primary block lg" onClick={onUpgrade}>
+              {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
+            </button>
+          )}
           <p className="plan-currency-note">{t("plans.pro.currency_note", lc)}</p>
         </div>
         {SHOW_AGENCY_PLAN && (
