@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:19.568032+00:00",
+  "computed_at": "2026-05-20T12:52:21.043995+00:00",
   "derivative_width": 810,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5632801/98154599/EB-UQ2801.jpeg?rasterize=true&version=1762527568",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-20T12:52:21.048669+00:00"
 }

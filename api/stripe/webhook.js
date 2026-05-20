@@ -390,15 +390,18 @@ module.exports = async (req, res) => {
           const invitation = await clerk.invitations.createInvitation({
             emailAddress: email,
             notify: false,
-            // After accepting the Clerk invitation, land back on
-            // /account with BOTH `welcome=1` (existing route-gate
-            // bypass) AND `activation=1` (explicit "post-activation-
-            // click" marker so the frontend can open Clerk's password
-            // modal directly and suppress the WelcomeModal). The
-            // SDK-state detection in PR #361/362 was unreliable for
-            // some Clerk flows; the URL marker is deterministic.
-            // ?lang=<locale> locks the landing language.
-            redirectUrl: `${origin}/account?welcome=1&activation=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
+            // After Clerk completes the invitation sign-up (password
+            // set), the user lands on /account?welcome=1[&lang=…] so
+            // the signed-in WelcomeModal renders and auto-dismisses.
+            //
+            // We do NOT append our own activation=1 marker — Clerk's
+            // /v1/tickets/accept redirect strips invitation redirectUrl
+            // query params and substitutes its own (__clerk_status +
+            // __clerk_ticket). PR #363 tried activation=1; it never
+            // reached the browser (Sebas 2026-05-20). Frontend detects
+            // the activation landing on __clerk_ticket directly
+            // (web/app/app.jsx hasClerkTicket).
+            redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
             // locale kept for downstream parity even though Clerk's
             // own template no longer renders — our Resend templates
             // also branch on it.

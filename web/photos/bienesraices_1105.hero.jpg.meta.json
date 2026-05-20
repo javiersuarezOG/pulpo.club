@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:23.270297+00:00",
+  "computed_at": "2026-05-20T12:55:17.951480+00:00",
   "derivative_width": 962,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5550658/96854980/EB-UI0658.jpg?rasterize=true&version=1760008500",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-20T12:55:17.956286+00:00"
 }

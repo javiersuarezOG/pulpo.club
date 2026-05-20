@@ -2,15 +2,17 @@
   "width": 1024,
   "height": 683,
   "aspect_ratio": 1.499,
-  "file_size_kb": 229.4,
+  "file_size_kb": 80.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:26.675450+00:00",
+  "computed_at": "2026-05-20T12:59:31.476696+00:00",
   "derivative_width": 1024,
   "derivative_height": 683,
-  "hero_photo_quality_score": 70,
+  "hero_photo_quality_score": 50,
   "has_text_overlay": false,
-  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/08/lot-for-sale-in-surf-city-1-1024x683.jpg",
-  "candidate_count": 5
+  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/08/lot-for-sale-in-surf-city-4-1024x683.jpg",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:59:31.483141+00:00"
 }

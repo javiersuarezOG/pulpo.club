@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T07:31:12.857010+00:00",
+  "computed_at": "2026-05-20T12:45:39.546428+00:00",
   "derivative_width": 810,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/W40B91U5OK/sXNZ2aGTFJ/Venta_de_Terreno_de_1000_v%C2%B2_en_Condominio_Canarias__Zona_Surf_City_La_Libertad.jpeg",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 3,
+  "repicked_at": "2026-05-20T12:45:39.554115+00:00"
 }
