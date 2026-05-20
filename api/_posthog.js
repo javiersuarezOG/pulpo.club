@@ -35,7 +35,20 @@ function _init() {
   if (_initAttempted) return _client;
   _initAttempted = true;
   const token = (process.env.POSTHOG_PROJECT_TOKEN || "").trim();
-  if (!token) return null;
+  if (!token) {
+    // Loud warning on first cold start. Without it the missing env var
+    // is invisible — capture() becomes a silent no-op forever, which
+    // we hit during the 2026-05-20 post-Stripe activation incident
+    // (no server events in PostHog for the whole post-Stripe flow).
+    // Fires exactly once per process because _initAttempted guards
+    // re-entry.
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[posthog] POSTHOG_PROJECT_TOKEN not set — server-side telemetry is disabled. " +
+      "All capture() calls are silent no-ops. Set the env var in Vercel to fix.",
+    );
+    return null;
+  }
   const host = (process.env.POSTHOG_HOST || "https://eu.i.posthog.com").trim();
   try {
     const { PostHog } = require("posthog-node");
