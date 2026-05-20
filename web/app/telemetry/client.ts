@@ -280,6 +280,49 @@ export function resetIdentity() {
   try { posthog?.reset(); } catch { /* ignore */ }
 }
 
+// Stable, non-reversible identity for an email. Mirrors the server-side
+// algorithm in api/_posthog.js#emailDistinctId — same hash, same prefix,
+// same length — so a client identify() and a server alias() converge on
+// the same PostHog Person.
+//
+// Returns null when SubtleCrypto is unavailable (very old browsers or
+// non-secure contexts). The caller treats null as "skip identify" rather
+// than fall back to the raw email (which would land PII in PostHog).
+export async function emailDistinctId(email: string | null | undefined): Promise<string | null> {
+  if (!email || typeof email !== "string") return null;
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return null;
+  const subtle = typeof crypto !== "undefined" && crypto.subtle ? crypto.subtle : null;
+  if (!subtle) return null;
+  try {
+    const data = new TextEncoder().encode(normalized);
+    const buffer = await subtle.digest("SHA-256", data);
+    // 16 hex chars = 64 bits, enough entropy without inflating Person IDs.
+    // Matches api/_posthog.js#emailDistinctId — keep the two in lockstep.
+    const hex = Array.from(new Uint8Array(buffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, 16);
+    return `email:${hex}`;
+  } catch {
+    return null;
+  }
+}
+
+// Convenience helper for the app-level signin effect. Computes the
+// canonical distinct_id from an email and calls identify() with the
+// supplied Person properties. Failures are silent — telemetry should
+// never block an auth flow.
+export async function identifyByEmail(
+  email: string | null | undefined,
+  props?: Record<string, unknown>,
+): Promise<void> {
+  if (!SHOULD_TELEMETER) return;
+  const id = await emailDistinctId(email);
+  if (!id) return;
+  identify(id, props);
+}
+
 // Returns the current anonymous PostHog distinct_id, or null if the SDK
 // hasn't loaded yet (which is normal during the deferred-init window).
 // Used by the Stripe checkout helpers to propagate the anon session ID
