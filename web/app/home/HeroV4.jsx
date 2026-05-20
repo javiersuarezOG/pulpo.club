@@ -223,64 +223,54 @@ export function HeroV4({ app, locale }) {
             <span>{counterLine}</span>
           </div>
         </div>
-        <div className="hp-hero-v4-photo-col">
-          <div
-            className={`hp-hero-v4-photo${resolved ? " hp-hero-v4-photo-clickable" : ""}`}
-            onClick={resolved ? onPhotoClick : undefined}
-            role={resolved ? "button" : undefined}
-            tabIndex={resolved ? 0 : undefined}
-            onKeyDown={resolved ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onPhotoClick();
-              }
-            } : undefined}
-            aria-label={resolved ? t("home.hero.v4.photo_aria", locale, {
-              name: resolved.zone_name || t("home.featured.zone", locale),
-            }) : undefined}
-          >
-            {resolved ? (
-              <Photo
-                listing={resolved}
-                idx={0}
-                ratio="4/3"
-                className="hp-hero-v4-photo-img"
-                eager
-                source="hero_v4"
-              />
-            ) : (
-              // Listings still loading — render an aspect-ratio-preserving
-              // empty box so layout is stable and no stock image is ever
-              // flashed before the real top-10 photo arrives.
-              <div
-                className="hp-hero-v4-photo-img"
-                style={{ aspectRatio: "4/3", width: "100%" }}
-                aria-hidden="true"
-              />
-            )}
-            {resolved && (
-              <span className="hp-hero-v4-featured-pill">
-                <RankTrophy />
-                <span>{t("home.hero.v4.featured_today", locale)}</span>
-              </span>
-            )}
-          </div>
-          {resolved && (
+        <div
+          className={`hp-hero-v4-photo${resolved ? " hp-hero-v4-photo-clickable" : ""}`}
+          onClick={resolved ? onPhotoClick : undefined}
+          role={resolved ? "button" : undefined}
+          tabIndex={resolved ? 0 : undefined}
+          onKeyDown={resolved ? (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onPhotoClick();
+            }
+          } : undefined}
+          aria-label={resolved ? t("home.hero.v4.photo_aria", locale, {
+            name: resolved.zone_name || t("home.featured.zone", locale),
+          }) : undefined}
+        >
+          {resolved ? (
+            <Photo
+              listing={resolved}
+              idx={0}
+              ratio="4/3"
+              className="hp-hero-v4-photo-img"
+              eager
+              source="hero_v4"
+            />
+          ) : (
+            // Listings still loading — render an aspect-ratio-preserving
+            // empty box so layout is stable and no stock image is ever
+            // flashed before the real top-10 photo arrives.
             <div
-              className="hp-hero-v4-brief"
-              role="button"
-              tabIndex={0}
-              onClick={onPhotoClick}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onPhotoClick();
-                }
-              }}
-            >
-              <h3 className="hp-hero-v4-brief-title">{resolved.zone_name}</h3>
-              {briefMeta && <p className="hp-hero-v4-brief-meta">{briefMeta}</p>}
-            </div>
+              className="hp-hero-v4-photo-img"
+              style={{ aspectRatio: "4/3", width: "100%" }}
+              aria-hidden="true"
+            />
+          )}
+          {resolved && (
+            <span className="hp-hero-v4-featured-pill">
+              <RankTrophy />
+              <span>{t("home.hero.v4.featured_today", locale)}</span>
+            </span>
+          )}
+          {resolved && (
+            <>
+              <span className="hp-hero-v4-photo-scrim" aria-hidden="true" />
+              <div className="hp-hero-v4-brief">
+                <h3 className="hp-hero-v4-brief-title">{resolved.zone_name}</h3>
+                {briefMeta && <p className="hp-hero-v4-brief-meta">{briefMeta}</p>}
+              </div>
+            </>
           )}
         </div>
       </div>
