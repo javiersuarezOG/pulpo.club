@@ -25,6 +25,7 @@ import {
 } from "./lib/user-profile";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
+import { deriveSubscriptionState, graceDaysLeft } from "./lib/subscription";
 
 function AccountPage({ app }) {
   // Source of truth for the active tab is `app.routeParams.section` — set
@@ -758,11 +759,32 @@ function Toggle({ checked, onChange, ariaLabel }) {
 
 // ============== A.3.3 — Manage Subscription ==============
 function SubscriptionSection({ app }) {
-  // Mock subscription state — in prod this comes from Stripe / billing service.
-  const plan = app.user.plan || "free";
-  const status = "active"; // 'active' | 'paused' | 'payment_issue'
+  const lc = app.locale;
+  // Live subscription view (real publicMetadata via clerk-bundle's
+  // hydration). The "status" pill below + the grace banner both source
+  // from this single derivation so they can't disagree.
+  const subState = deriveSubscriptionState(app.user);
+  const plan = subState.effective;
+  const status = subState.status === "past_due"
+    ? "payment_issue"
+    : subState.status === "canceled"
+      ? "paused"
+      : "active";
 
   const isPaid = plan !== "free";
+  const inGrace = subState.in_grace;
+  const graceDays = graceDaysLeft(app.user);
+  const graceDate = subState.grace_period_ends_at
+    ? new Date(subState.grace_period_ends_at)
+    : null;
+  // Format the grace date in the user's locale — accepts the Date
+  // object directly; Intl.DateTimeFormat is locale-aware and matches
+  // the rest of Pulpo's date rendering (account.sub.intro, footer).
+  const graceDateStr = graceDate
+    ? graceDate.toLocaleDateString(lc === "es" ? "es-SV" : "en-US", {
+        day: "numeric", month: "long", year: "numeric",
+      })
+    : "";
 
   // Open the Stripe Customer Portal — Stripe owns the invoice list,
   // so we hand off rather than render fabricated rows that drift out
@@ -784,6 +806,62 @@ function SubscriptionSection({ app }) {
   return (
     <div className="account-section">
       <p className="section-intro">{t("account.sub.intro", app.locale)}</p>
+
+      {/* Grace-period warning banner — rendered only when the user is
+         currently in the 14-day window after a failed payment. Goes
+         above the plan card so it's the first thing the user sees on
+         this page. Linking to the Stripe Customer Portal is the one
+         action that actually resolves it. */}
+      {inGrace && (
+        <div className="sub-grace-banner" role="alert" data-testid="sub-grace-banner">
+          <div className="sub-grace-banner-body">
+            <div className="sub-grace-banner-head">
+              {t("account.sub.grace.head", lc)}
+            </div>
+            <div className="sub-grace-banner-copy">
+              {t("account.sub.grace.copy", lc, {
+                days: graceDays,
+                date: graceDateStr,
+              })}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-primary sub-grace-banner-cta"
+            onClick={onOpenInvoices}
+            data-testid="sub-grace-banner-cta"
+          >
+            {t("account.sub.grace.cta_update_card", lc)}
+          </button>
+        </div>
+      )}
+
+      {/* Reactivate notice — past_due but grace has expired. We key
+         off subscription_status (raw lifecycle field) rather than the
+         derived plan because hydration overwrites plan with the
+         effective value, so a grace-expired user reads as plan="free"
+         everywhere downstream. status="past_due" + !in_grace is the
+         exact "Pro was active, payment failed, grace closed" window. */}
+      {subState.status === "past_due" && !inGrace && (
+        <div className="sub-grace-banner sub-grace-banner-expired" role="alert" data-testid="sub-grace-banner-expired">
+          <div className="sub-grace-banner-body">
+            <div className="sub-grace-banner-head">
+              {t("account.sub.grace_expired.head", lc)}
+            </div>
+            <div className="sub-grace-banner-copy">
+              {t("account.sub.grace_expired.copy", lc)}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-primary sub-grace-banner-cta"
+            onClick={onOpenInvoices}
+            data-testid="sub-grace-banner-reactivate-cta"
+          >
+            {t("account.sub.grace_expired.cta_reactivate", lc)}
+          </button>
+        </div>
+      )}
 
       {/* Block 1 — Active plan */}
       <div className="sub-block">

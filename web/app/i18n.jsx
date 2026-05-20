@@ -1009,6 +1009,22 @@ const UI_STRINGS = {
                                es: "Ver facturas en el portal de Stripe →" },
   "account.sub.invoices_empty":   { en: "No invoices yet — your billing history will appear in the Stripe portal once your first payment is processed.",
                                es: "Aún no hay facturas — tu historial aparecerá en el portal de Stripe tras tu primer pago." },
+  // ── Grace-period banner (14-day window after a failed payment) ───
+  // Renders above the plan card on /account?section=subscription when
+  // publicMetadata.subscription_status === "past_due" and the grace
+  // window hasn't closed yet. CTA bounces to Stripe Customer Portal.
+  "account.sub.grace.head":         { en: "Your card couldn't be charged",
+                                      es: "No pudimos cobrar tu tarjeta" },
+  "account.sub.grace.copy":         { en: "Pulpo Pro stays active for {days} more days — until {date}. Update your card to keep it.",
+                                      es: "Pulpo Pro sigue activo por {days} días más — hasta el {date}. Actualiza tu tarjeta para mantenerlo." },
+  "account.sub.grace.cta_update_card": { en: "Update card", es: "Actualizar tarjeta" },
+  // Grace expired — user is back on Free, but we say "reactivate"
+  // rather than "upgrade" because their subscription history is intact.
+  "account.sub.grace_expired.head": { en: "Pulpo Pro paused — payment overdue",
+                                      es: "Pulpo Pro en pausa — pago vencido" },
+  "account.sub.grace_expired.copy": { en: "Your 14-day grace period has ended. Reactivate to get Pro back.",
+                                      es: "Tu periodo de gracia de 14 días terminó. Reactiva para recuperar Pulpo Pro." },
+  "account.sub.grace_expired.cta_reactivate": { en: "Reactivate", es: "Reactivar" },
 
   // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
   // Public marketing surfaces that funnel cold visitors into Stripe
