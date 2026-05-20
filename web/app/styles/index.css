@@ -5302,6 +5302,13 @@ h1,h2,h3,h4,h5 { margin: 0; }
   letter-spacing: -0.015em;
   font-weight: 500;
   color: var(--color-ink-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.homepage-v2 .hp-shelf-h2-icon {
+  color: var(--color-clay-primary);
+  flex-shrink: 0;
 }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-shelf-h2 { font-size: 22px; }
@@ -6378,8 +6385,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 .pulpo-rank-star {
   color: var(--color-clay-primary);
-  font-size: 10px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .pulpo-rank-num {
@@ -6425,8 +6433,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
     padding: 3px 9px;
     gap: 3px;
   }
-  .pulpo-rank-star {
-    font-size: 9px;
+  .pulpo-rank-star svg {
+    width: 11px;
+    height: 11px;
   }
   .pulpo-rank-num {
     font-size: 12px;
