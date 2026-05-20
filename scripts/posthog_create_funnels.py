@@ -9,19 +9,24 @@ Funnel C: Detail-panel upgrade -> Paid (replaces post-#266 "Card intent"
 Funnel D: Activation -> Account engagement (post-Stripe loop)
 Funnel E: Activation -> Continued browsing (post-Stripe loop)
 Funnel F: Activation email delivery — proves the Stripe → us →
-          Clerk → user chain is intact end-to-end. Starts at
-          webhook.received (signature verified) so Stripe-delivery
-          failures show up as step 0→1 drops. Step 2 is the new
-          welcome_modal.invitation_status_resolved client-side
-          confirmation that the invitation actually exists. Pairs
-          with the invitation_sent boolean on
-          webhook.checkout_completed to expose deliverability,
-          existing-user, and webhook-not-fired regressions.
+          Resend → Clerk → user chain is intact end-to-end. Six
+          steps; starts at webhook.received so Stripe-delivery
+          failures show up as 0→1 drops. Filters step 1 on
+          invitation_sent=true (post-#360 Resend path) to exclude
+          existing_user / auth_gated / no_email branches that
+          legitimately don't send an email. Includes the new
+          invitation.password_creation_opened and ticket_consumed
+          events from PR #361/#363/#368/#374 so deliverability,
+          ticket-race, and password-modal-bail drops are each
+          distinguishable.
 
-Funnels D + E share steps 0-2 (webhook.checkout_completed ->
-stripe.return_landed -> signin.completed[provider=clerk]) and diverge
-at step 3 to capture the two end-states the user asked about: "updated
-account anyhow" vs "kept browsing the website".
+Funnels D + E share steps 0-3 (webhook.checkout_completed →
+stripe.return_landed → invitation.password_creation_opened →
+signin.completed[provider=clerk]) and diverge at step 4 to capture
+the two end-states the user asked about: "updated account anyhow"
+vs "kept browsing the website". Identity stitching post-#367:
+posthog.identify() fires on signin.completed so anon distinct_id
+resolves to the signed-in Person automatically.
 
 Why a script: the funnel definitions are versioned with the codebase so
 when an event name moves we update the script and re-run it. The PostHog
@@ -259,58 +264,60 @@ def build_detail_panel_upgrade_funnel(date_from: str) -> dict:
 
 
 def build_activation_account_funnel(date_from: str) -> dict:
-    # Post-Stripe activation loop. Steps 0-2 are the activation backbone;
-    # step 3 measures the "updated account anyhow" terminal state — the
-    # user actively visited an /account/<section> after activating.
-    # Step 1 anchors on stripe.return_landed rather than welcome_modal.shown
-    # so the funnel isn't gated on Clerk SDK hydration (which can delay
-    # welcome_modal.shown up to 5s and miss it entirely if Clerk fails).
-    # Identity stitching: webhook step is keyed on emailDistinctId via
-    # posthog.alias(), so the same person resolves across all four steps.
+    # Post-Stripe activation loop. Five-step funnel — the
+    # canonical happy path after PRs #360 (Resend-sent activation
+    # emails), #361/#363/#368/#374 (?__clerk_ticket=… URL marker
+    # drives password creation directly), and #367 (PostHog
+    # identify() on sign-in stitches anon → signed-in cleanly):
+    #
+    #   0. webhook.checkout_completed  — user paid; Stripe webhook
+    #      handler created the Clerk invitation server-side.
+    #   1. stripe.return_landed (account_welcome) — user hit
+    #      /account?welcome=1 from Stripe's success_url (anon
+    #      variant, anchors the funnel without Clerk-hydration
+    #      latency).
+    #   2. invitation.password_creation_opened (source=
+    #      clerk_ticket_url) — user clicked the activation email;
+    #      arrived at /?__clerk_ticket=…; Pulpo opened Clerk's
+    #      hosted password modal.
+    #   3. signin.completed (provider=clerk) — password created,
+    #      Clerk signed the user in. #367 now fires posthog.identify()
+    #      on this transition so anon distinct_id resolves to the
+    #      Person.
+    #   4. account.section_viewed — terminal "updated account"
+    #      state.
+    #
+    # Drop-offs by step are diagnostic:
+    #   0→1: paid but never returned to /account?welcome=1 (rare;
+    #        Stripe redirect fail or instant tab-close).
+    #   1→2: email delivered? clicked? Slice by
+    #        webhook.activation_email_failed and
+    #        welcome_modal.invitation_status_resolved status to
+    #        attribute deliverability vs UX vs spam folder.
+    #   2→3: ticket consumed? slice by
+    #        invitation.ticket_consumed vs ticket_rejected to
+    #        attribute Clerk SDK issues.
+    #   3→4: signed in but didn't visit /account — measured by
+    #        sibling 'Continued browsing' funnel terminating on
+    #        route.changed instead.
     steps = [
         step(0, "webhook.checkout_completed"),
         step(1, "stripe.return_landed",
               [prop("surface", "account_welcome")]),
-        step(2, "signin.completed", [prop("provider", "clerk")]),
-        step(3, "account.section_viewed"),
+        step(2, "invitation.password_creation_opened",
+              [prop("source", "clerk_ticket_url")]),
+        step(3, "signin.completed", [prop("provider", "clerk")]),
+        step(4, "account.section_viewed"),
     ]
     return funnel_payload(
         name="Funnel — Activation → Account engagement (auto)",
         description=(
             "webhook.checkout_completed → stripe.return_landed "
-            "(account_welcome) → signin.completed (provider=clerk; Clerk "
-            "invitation accepted = password created) → account.section_viewed. "
-            "Terminal state: 'updated account'. Anchor on stripe.return_landed "
-            "(immediate, not Clerk-hydration-gated). Owner: "
-            "scripts/posthog_create_funnels.py."
-        ),
-        steps=steps,
-        date_from=date_from,
-    )
-
-
-def build_activation_browsing_funnel(date_from: str) -> dict:
-    # Sibling of build_activation_account_funnel. Steps 0-2 are
-    # identical; step 3 measures the "kept browsing" terminal state —
-    # the user navigated away from /account/* after activating. Uses
-    # `not_icontains` because PostHog's exact-match operator can't
-    # express "any path not starting with /account".
-    steps = [
-        step(0, "webhook.checkout_completed"),
-        step(1, "stripe.return_landed",
-              [prop("surface", "account_welcome")]),
-        step(2, "signin.completed", [prop("provider", "clerk")]),
-        step(3, "route.changed",
-              [prop("to_path", "/account", operator="not_icontains")]),
-    ]
-    return funnel_payload(
-        name="Funnel — Activation → Continued browsing (auto)",
-        description=(
-            "webhook.checkout_completed → stripe.return_landed "
-            "(account_welcome) → signin.completed (provider=clerk; Clerk "
-            "invitation accepted = password created) → route.changed "
-            "(to_path not_icontains '/account'). Terminal state: 'kept "
-            "browsing'. Pairs with Activation → Account engagement. "
+            "(account_welcome) → invitation.password_creation_opened "
+            "(clerk_ticket_url; user clicked the activation email) → "
+            "signin.completed (clerk) → account.section_viewed. Terminal: "
+            "'updated account'. 1→2 drop = email deliverability / "
+            "click-through. 2→3 = ticket consume / Clerk SDK. "
             "Owner: scripts/posthog_create_funnels.py."
         ),
         steps=steps,
@@ -318,58 +325,108 @@ def build_activation_browsing_funnel(date_from: str) -> dict:
     )
 
 
+def build_activation_browsing_funnel(date_from: str) -> dict:
+    # Sibling of build_activation_account_funnel. Steps 0-3 are
+    # identical; step 4 measures the "kept browsing" terminal state —
+    # the user navigated away from /account/* after activating. Uses
+    # `not_icontains` because PostHog's exact-match operator can't
+    # express "any path not starting with /account".
+    steps = [
+        step(0, "webhook.checkout_completed"),
+        step(1, "stripe.return_landed",
+              [prop("surface", "account_welcome")]),
+        step(2, "invitation.password_creation_opened",
+              [prop("source", "clerk_ticket_url")]),
+        step(3, "signin.completed", [prop("provider", "clerk")]),
+        step(4, "route.changed",
+              [prop("to_path", "/account", operator="not_icontains")]),
+    ]
+    return funnel_payload(
+        name="Funnel — Activation → Continued browsing (auto)",
+        description=(
+            "webhook.checkout_completed → stripe.return_landed "
+            "(account_welcome) → invitation.password_creation_opened "
+            "(clerk_ticket_url; user clicked the activation email) → "
+            "signin.completed (clerk) → route.changed (to_path not_icontains "
+            "'/account'). Terminal: 'kept browsing'. Pairs with Activation → "
+            "Account engagement. Owner: scripts/posthog_create_funnels.py."
+        ),
+        steps=steps,
+        date_from=date_from,
+    )
+
+
 def build_activation_email_delivery_funnel(date_from: str) -> dict:
-    # Funnel F (PR #2 of the post-Stripe activation flow): proves
-    # that Stripe → us → Clerk → user-acted is intact end-to-end,
-    # and pinpoints WHICH step drops users off when it isn't.
-    # Unlike Funnels D + E (which start at webhook.checkout_completed
-    # — already inside the server), this funnel starts at
-    # webhook.received so a Stripe-delivery failure is also visible
-    # as a step-0-to-step-1 drop. Steps:
+    # Funnel F: proves the Stripe → us → Resend → Clerk → user-acted
+    # chain is intact end-to-end, and pinpoints WHICH step drops users
+    # when it isn't. Six steps after PR #360 (Resend takes over the
+    # activation email from Clerk's queue) + PR #361/#363/#368/#374
+    # (?__clerk_ticket=… URL marker drives password creation):
     #
     #   0. webhook.received — Stripe delivered, signature verified.
-    #   1. webhook.checkout_completed (path=anonymous_invitation_created)
-    #      — the only Path-B branch that actually creates an
-    #      invitation. invitation_sent=true property is set here.
-    #   2. welcome_modal.invitation_status_resolved (status=invitation_pending)
-    #      — the client confirmed via GET /api/clerk/invitation-status
-    #      that the invitation exists. Drop-off between 1 and 2 means
-    #      the user never returned to /account?welcome=1 (closed tab,
-    #      redirect failed, etc.).
-    #   3. signin.completed (provider=clerk) — Clerk invitation
-    #      accepted, password created.
+    #   1. webhook.checkout_completed
+    #      (path=anonymous_invitation_created, invitation_sent=true)
+    #      — the only Path-B branch that creates AND sends an
+    #      invitation via Resend. Both filters together exclude the
+    #      auth_gated / existing_user / no_email / dupe / race
+    #      paths that legitimately set invitation_sent=false.
+    #   2. welcome_modal.invitation_status_resolved
+    #      (status=invitation_pending) — the client confirmed via
+    #      GET /api/clerk/invitation-status that the pending
+    #      invitation exists. Only fires on the initial
+    #      /account?welcome=1 anon landing.
+    #   3. invitation.password_creation_opened
+    #      (source=clerk_ticket_url) — user clicked the Resend
+    #      email; landed at /?__clerk_ticket=…; Pulpo opened the
+    #      Clerk hosted password modal.
+    #   4. invitation.ticket_consumed — Clerk validated the ticket
+    #      (fresh, not already spent) and the SignUp resource is
+    #      bound to it.
+    #   5. signin.completed (provider=clerk) — password created,
+    #      sign-in transition fired posthog.identify() to stitch
+    #      anon → signed-in identity (#367).
     #
     # Drop-off semantics:
-    #   0→1: webhook handler errored or took a non-invitation Path-B
-    #        branch (existing_user / no_email / dupe). Slice by
-    #        invitation_sent in PostHog to confirm.
-    #   1→2: client never landed on the welcome modal. Often a
-    #        Stripe→app redirect issue OR the user closed the tab
-    #        between paying and the redirect.
-    #   2→3: email deliverability or copy / UX dropped them. This is
-    #        the step that surfaces the Clerk-Dashboard items (B in
-    #        the plan: custom sending domain + DKIM/SPF/DMARC).
+    #   0→1: webhook handler errored OR took a non-invitation Path-B
+    #        branch OR Resend send failed (webhook.activation_email_failed
+    #        is the sibling signal — slice on it to attribute).
+    #   1→2: user never returned to /account?welcome=1 in an anon
+    #        state — usually Stripe redirect race or close-on-Stripe.
+    #   2→3: email deliverability / spam folder / copy not
+    #        compelling enough — the step that surfaces SPF/DKIM/
+    #        DMARC gaps.
+    #   3→4: ticket already consumed (resent-link race) or invalid
+    #        — slice by invitation.ticket_rejected for the
+    #        complementary count.
+    #   4→5: user opened the password modal but bailed before
+    #        submitting; Clerk SDK error mid-flow.
     steps = [
         step(0, "webhook.received",
               [prop("type", "checkout.session.completed")]),
-        step(1, "webhook.checkout_completed",
-              [prop("path", "anonymous_invitation_created")]),
+        step(1, "webhook.checkout_completed", [
+            prop("path", "anonymous_invitation_created"),
+            # PostHog stores invitation_sent as boolean (webhook.js
+            # passes Python-true / Node-true); filter with the
+            # native bool so the operator="exact" match resolves.
+            prop("invitation_sent", True),
+        ]),
         step(2, "welcome_modal.invitation_status_resolved",
               [prop("status", "invitation_pending")]),
-        step(3, "signin.completed", [prop("provider", "clerk")]),
+        step(3, "invitation.password_creation_opened",
+              [prop("source", "clerk_ticket_url")]),
+        step(4, "invitation.ticket_consumed"),
+        step(5, "signin.completed", [prop("provider", "clerk")]),
     ]
     return funnel_payload(
         name="Funnel — Activation email delivery (auto)",
         description=(
             "webhook.received → webhook.checkout_completed "
-            "(anonymous_invitation_created) → "
-            "welcome_modal.invitation_status_resolved "
-            "(invitation_pending) → signin.completed (provider=clerk). "
-            "Owner: scripts/posthog_create_funnels.py. "
-            "Drop-offs: 0→1 webhook error or non-invitation path "
-            "(slice by invitation_sent); 1→2 client never returned to "
-            "welcome modal; 2→3 email deliverability or copy/UX "
-            "regression."
+            "(anonymous_invitation_created, invitation_sent=true) → "
+            "welcome_modal.invitation_status_resolved (invitation_pending) "
+            "→ invitation.password_creation_opened (clerk_ticket_url) → "
+            "invitation.ticket_consumed → signin.completed (clerk). "
+            "Drops: 0→1 webhook/Resend fail; 1→2 Stripe-close; 2→3 email "
+            "deliverability; 3→4 ticket race; 4→5 password bail."
         ),
         steps=steps,
         date_from=date_from,
