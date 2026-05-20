@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:54:53.932060+00:00",
+  "computed_at": "2026-05-20T14:10:41.525802+00:00",
   "derivative_width": 498,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4968135/84811319/EB-SB8135.jpg?rasterize=true&version=1737121466",
   "candidate_count": 2,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-20T12:54:53.941254+00:00"
+  "repicked_at": "2026-05-20T14:10:41.533955+00:00"
 }

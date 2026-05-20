@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:46:34.329970+00:00",
+  "computed_at": "2026-05-20T14:02:12.625492+00:00",
   "derivative_width": 1280,
   "derivative_height": 720,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/H3X2UT3Y66/Pwt7VSjHP4/Terreno_en_Venta_San_Nicol%C3%A1s_Lempa__60_Manzanas_100_Planas__Abundante_Agua_2_R%C3%ADos.jpeg",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:46:34.334271+00:00"
+  "repicked_at": "2026-05-20T14:02:12.629133+00:00"
 }

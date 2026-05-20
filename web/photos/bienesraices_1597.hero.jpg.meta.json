@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:51:41.034140+00:00",
+  "computed_at": "2026-05-20T14:07:18.222071+00:00",
   "derivative_width": 1200,
   "derivative_height": 554,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4783219/81003038/EB-RJ3219.jpg?rasterize=true&version=1728411918",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-20T12:51:41.039071+00:00"
+  "repicked_at": "2026-05-20T14:07:18.226591+00:00"
 }

@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:02:49.222530+00:00",
+  "computed_at": "2026-05-20T14:19:07.325563+00:00",
   "derivative_width": 1080,
   "derivative_height": 694,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4461915/78865865/EB-QD1915.jpg?rasterize=true&version=1723735364",
   "candidate_count": 4,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-20T13:02:49.225198+00:00"
+  "repicked_at": "2026-05-20T14:19:07.328217+00:00"
 }

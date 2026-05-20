@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:51:59.545960+00:00",
+  "computed_at": "2026-05-20T14:07:38.187206+00:00",
   "derivative_width": 864,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4201397/69763389/EB-PD1397.jpeg?rasterize=true&version=1704312156",
   "candidate_count": 2,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-20T12:51:59.551462+00:00"
+  "repicked_at": "2026-05-20T14:07:38.191773+00:00"
 }

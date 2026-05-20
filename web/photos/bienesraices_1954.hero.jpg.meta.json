@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:03:49.910111+00:00",
+  "computed_at": "2026-05-20T14:20:12.194590+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/2318503/35910368/EB-HW8503.jpg?rasterize=true&version=1625232147",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:03:49.914381+00:00"
+  "repicked_at": "2026-05-20T14:20:12.198882+00:00"
 }

@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:06:34.810676+00:00",
+  "computed_at": "2026-05-20T14:22:51.290922+00:00",
   "derivative_width": 499,
   "derivative_height": 1080,
   "hero_photo_quality_score": 0,
   "has_text_overlay": true,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5595815/97371235/EB-UM5815.jpg?rasterize=true&version=1761010556",
   "candidate_count": 2,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-20T13:06:34.814136+00:00"
+  "repicked_at": "2026-05-20T14:22:51.294545+00:00"
 }

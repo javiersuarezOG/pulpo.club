@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:55:11.755676+00:00",
+  "computed_at": "2026-05-20T14:11:02.270885+00:00",
   "derivative_width": 1080,
   "derivative_height": 788,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5213459/89682440/EB-TA3459.jpg?rasterize=true&version=1746277421",
   "candidate_count": 3,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:55:11.759594+00:00"
+  "repicked_at": "2026-05-20T14:11:02.273767+00:00"
 }

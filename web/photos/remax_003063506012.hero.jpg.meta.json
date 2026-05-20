@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:58:49.194711+00:00",
+  "computed_at": "2026-05-20T14:14:46.845193+00:00",
   "derivative_width": 1668,
   "derivative_height": 1052,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003063506012/v3/HDPhotos/mervatinnova1.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:58:49.207455+00:00"
+  "repicked_at": "2026-05-20T14:14:46.857006+00:00"
 }

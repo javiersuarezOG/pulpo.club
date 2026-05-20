@@ -3,16 +3,17 @@
   "height": 1080,
   "aspect_ratio": 1.0,
   "file_size_kb": 1708.8,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:52:45.135917+00:00",
+  "computed_at": "2026-05-20T14:08:30.548770+00:00",
   "derivative_width": 1080,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/2236744/96401022/EB-HO6744.png?rasterize=true&version=1762202667",
   "candidate_count": 5,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-20T12:52:45.153290+00:00"
+  "repicked_at": "2026-05-20T14:08:30.564692+00:00"
 }

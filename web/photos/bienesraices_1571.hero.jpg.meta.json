@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:03:00.281844+00:00",
+  "computed_at": "2026-05-20T14:19:19.876178+00:00",
   "derivative_width": 1200,
   "derivative_height": 554,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4828640/81889788/EB-RN8640.jpg?rasterize=true&version=1730328662",
   "candidate_count": 5,
   "picker_excluded_count": 5,
-  "repicked_at": "2026-05-20T13:03:00.284787+00:00"
+  "repicked_at": "2026-05-20T14:19:19.878702+00:00"
 }

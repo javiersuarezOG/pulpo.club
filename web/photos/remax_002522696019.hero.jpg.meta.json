@@ -3,16 +3,17 @@
   "height": 1198,
   "aspect_ratio": 1.336,
   "file_size_kb": 459.9,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:53:52.369941+00:00",
+  "computed_at": "2026-05-20T14:09:36.122160+00:00",
   "derivative_width": 1442,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522696019/v3/HDPhotos/El Espino 1.4.jpeg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:53:52.379416+00:00"
+  "repicked_at": "2026-05-20T14:09:36.130563+00:00"
 }
