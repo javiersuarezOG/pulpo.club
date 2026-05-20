@@ -39,8 +39,18 @@ describe("AccountPage post-Stripe welcome bypass", () => {
     // boot transition (clerkBooting true→false) re-evaluates against
     // the synchronous state, not a URL that the welcome effect has
     // already stripped.
-    expect(accountSrc).toMatch(/if \(app\.welcomeModalState\) return;\s*\n\s*app\.openSignup/);
-    expect(accountSrc).toMatch(/\[clerkBooting,\s*app\.user,\s*app\.welcomeModalState\]/);
+    expect(accountSrc).toMatch(/if \(app\.welcomeModalState\) return;/);
+    expect(accountSrc).toMatch(/\[clerkBooting,\s*app\.user,\s*app\.welcomeModalState,\s*app\.clerkActions\]/);
+  });
+
+  it("auth-gate effect short-circuits on pending Clerk invitation sign-up", () => {
+    // When Clerk has a pending sign-up (post-invitation-ticket but
+    // password not set), the dedicated app.jsx effect opens
+    // clerk.openSignUp({}) for password creation. The local auth-gate
+    // here must not race + stack a SignupModal on top. See 2026-05-20
+    // post-activation-flow bug.
+    expect(accountSrc).toMatch(/app\.clerkActions[\s\S]{0,150}pendingSignUp/);
+    expect(accountSrc).toMatch(/pendingSignUp\(\)\)?\) return;\s*\n\s*app\.openSignup/);
   });
 
   it("no URL re-read for welcome-bypass anywhere in AccountPage", () => {

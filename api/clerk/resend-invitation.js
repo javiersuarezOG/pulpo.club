@@ -175,11 +175,12 @@ module.exports = async (req, res) => {
     // own email send. We send via Resend below — Pulpo's verified
     // mail.pulpo.club sender — because Clerk's pipeline holds at
     // status=queued indefinitely on this account. Same rationale as
-    // api/stripe/webhook.js.
+    // api/stripe/webhook.js. ?lang=<locale> locks the post-click
+    // landing to the email's language; see webhook.js for context.
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       notify: false,
-      redirectUrl:  `${origin}/account?welcome=1`,
+      redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
       ...(clerkLocale ? { locale: clerkLocale } : {}),
       publicMetadata: { plan: "pro" },
       privateMetadata: {
