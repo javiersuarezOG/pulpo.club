@@ -314,11 +314,14 @@ def test_pick_best_photo_picks_highest_scoring(tmp_repo):
     assert score > 0
 
 
-def test_pick_best_photo_deprioritizes_text_overlay(tmp_repo):
+def test_pick_best_photo_deprioritizes_text_overlay(tmp_repo, monkeypatch):
     """When one candidate is flagged has_text_overlay=True and others
     are not, the picker prefers a non-flagged candidate even if it scores
-    lower."""
+    lower. The picker_excluded floor is disabled here so both candidates
+    enter the has_text_overlay filter — the floor is exercised in
+    test_picker_excluded_floor.py and isn't this test's contract."""
     pytest.importorskip("PIL")
+    monkeypatch.setenv("HERO_PICKER_MIN_CHEAP_SCORE", "0")
     from automation.run import _pick_best_photo_url
 
     flagged = _make_jpeg(size=(1920, 1080))   # high-res but flagged

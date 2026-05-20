@@ -188,8 +188,16 @@ def compute_score(raw_bytes: bytes, byte_size: Optional[int] = None) -> int:
 # <file>.hero.jpg.meta.json record the per-file dimensions so re-
 # computation is fast on subsequent runs.
 
-HERO_MIN_WIDTH_PX   = 1600
-HERO_MIN_HEIGHT_PX  = 1200
+# 1080×1080 = aligned with pulpo-social's downstream gate (the IG 1:1
+# cover-crop output is 1080² so the source must be ≥1080 on both axes).
+# Was 1600×1200, which left pulpo.club calling listings hero_eligible
+# that pulpo-social later rejected with `source_too_small_*`. Aligning
+# the two gates means every hero_eligible listing is actually postable.
+# Broker source bytes are the binding constraint above this — bumping
+# the floor any higher rejects most of bienesraices (CDN hard-capped at
+# 1200×N) and most of remax's smaller-franchise URLs.
+HERO_MIN_WIDTH_PX   = 1080
+HERO_MIN_HEIGHT_PX  = 1080
 # 1.0 = no aspect-based exclusion. 4:3 (1.333) is the most common
 # real-estate camera ratio and reads fine cropped to 1:1 / 4:5 / 9:16
 # at the social-image endpoint. Consumers that need landscape-only (e.g.
