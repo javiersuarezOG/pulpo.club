@@ -81,21 +81,34 @@ _SYSTEM_PROMPT = (
     "  1-3 = poor — bad composition, awkward angle, no focal point, "
     "cluttered\n"
     "  0 = unusable — heavily watermarked, dominated by text, broken\n\n"
+    "Also detect whether the image carries ANY marketing overlay — text "
+    "banners, watermarks, agency logos, price stamps, 'SOLD' / 'FOR SALE' "
+    "/ 'PRICE REDUCTION' badges — even small, even partially transparent. "
+    "If you see ANY non-photographic text or logo overlay, set "
+    "has_marketing_overlay=true. A clean property photo with no stamps "
+    "or banners is has_marketing_overlay=false.\n\n"
     "Return STRICT JSON only (no prose) matching:\n"
-    '{"visual_appeal": <0-10 number>, "issues": [<string>...], '
+    '{"visual_appeal": <0-10 number>, '
+    '"has_marketing_overlay": <true|false>, '
     '"rationale": "<one sentence>"}'
 )
 
 _USER_PROMPT_TEXT = "Score this hero photo for the listing."
 
 
-def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
-    """Return a 0-10 visual-appeal score for the image, or None when the
-    booster is disabled / no key configured / daily budget exhausted /
-    the provider call fails.
+def score_aesthetic(raw_bytes: bytes) -> Optional[dict]:
+    """Return ``{"score": 0-10, "has_marketing_overlay": bool|None}`` for the
+    image, or None when the booster is disabled / no key configured /
+    daily budget exhausted / the provider call fails.
 
     Never raises. Callers in automation/run.py treat None as "no
     aesthetic signal available, use technical score alone".
+
+    Cache rows written before the marketing-overlay field existed return
+    ``has_marketing_overlay=None`` — the picker treats that as "no
+    signal" (same null-tolerance as ``has_text_overlay``), so legacy
+    cache rows don't false-reject. Rescore via repick-heroes.yml to
+    repopulate.
     """
     if not _is_enabled():
         return None
@@ -110,35 +123,41 @@ def score_aesthetic(raw_bytes: bytes) -> Optional[float]:
     if hit is not None:
         cached_score = hit.get("score")
         if isinstance(cached_score, (int, float)):
-            return float(cached_score)
+            cached_overlay = hit.get("has_marketing_overlay")
+            overlay = bool(cached_overlay) if isinstance(cached_overlay, bool) else None
+            return {"score": float(cached_score), "has_marketing_overlay": overlay}
 
     if _budget_exhausted(provider=provider):
         _log_budget_event("llm_vision_budget_exceeded", provider=provider)
         return None
 
-    score = None
+    result: Optional[tuple[Optional[float], Optional[bool]]] = None
     try:
         if provider == "qwen":
-            score = _call_qwen(raw_bytes)
+            result = _call_qwen(raw_bytes)
         elif provider == "segmind":
-            score = _call_segmind(raw_bytes)
+            result = _call_segmind(raw_bytes)
         elif provider == "openai":
-            score = _call_openai(raw_bytes)
+            result = _call_openai(raw_bytes)
         elif provider == "anthropic":
-            score = _call_anthropic(raw_bytes)
+            result = _call_anthropic(raw_bytes)
     except Exception as exc:  # noqa: BLE001 — booster is fail-soft
         _log_budget_event("llm_vision_call_failed", provider=provider,
                           error=str(exc)[:200])
         return None
 
+    if result is None:
+        return None
+    score, has_overlay = result
     if score is None:
         return None
 
     # Record the spend even when the score parsing succeeds — keeps the
     # budget honest in the face of a 200 response we couldn't parse.
     _record_spend(provider=provider, score=score)
-    _write_cache(cache, key, provider=provider, score=score)
-    return score
+    _write_cache(cache, key, provider=provider, score=score,
+                 has_marketing_overlay=has_overlay)
+    return {"score": score, "has_marketing_overlay": has_overlay}
 
 
 def _is_enabled() -> bool:
@@ -179,7 +198,7 @@ def _resolve_provider() -> Optional[str]:
 
 # ── Provider calls ────────────────────────────────────────────────────────
 
-def _call_qwen(raw_bytes: bytes) -> Optional[float]:
+def _call_qwen(raw_bytes: bytes) -> Optional[tuple[Optional[float], Optional[bool]]]:
     """Qwen3-VL Flash via DashScope's OpenAI-compatible endpoint."""
     try:
         from openai import OpenAI
@@ -208,10 +227,10 @@ def _call_qwen(raw_bytes: bytes) -> Optional[float]:
         ],
     )
     content = resp.choices[0].message.content or ""
-    return _parse_score(content)
+    return _parse_response(content)
 
 
-def _call_segmind(raw_bytes: bytes) -> Optional[float]:
+def _call_segmind(raw_bytes: bytes) -> Optional[tuple[Optional[float], Optional[bool]]]:
     """Qwen3-VL Flash via Segmind's model-specific endpoint.
 
     Segmind is NOT a standard OpenAI-compatible chat-completions
@@ -251,10 +270,10 @@ def _call_segmind(raw_bytes: bytes) -> Optional[float]:
         content = body["choices"][0]["message"]["content"] or ""
     except (KeyError, IndexError, TypeError):
         return None
-    return _parse_score(content)
+    return _parse_response(content)
 
 
-def _call_openai(raw_bytes: bytes) -> Optional[float]:
+def _call_openai(raw_bytes: bytes) -> Optional[tuple[Optional[float], Optional[bool]]]:
     try:
         from openai import OpenAI
     except ImportError:
@@ -279,10 +298,10 @@ def _call_openai(raw_bytes: bytes) -> Optional[float]:
         ],
     )
     content = resp.choices[0].message.content or ""
-    return _parse_score(content)
+    return _parse_response(content)
 
 
-def _call_anthropic(raw_bytes: bytes) -> Optional[float]:
+def _call_anthropic(raw_bytes: bytes) -> Optional[tuple[Optional[float], Optional[bool]]]:
     # Optional dependency — only imported when explicitly chosen. Keeps
     # `anthropic` out of the base requirements.txt while the booster
     # ships as off-by-default.
@@ -319,16 +338,19 @@ def _call_anthropic(raw_bytes: bytes) -> Optional[float]:
     for b in msg.content:
         if getattr(b, "type", None) == "text":
             text_parts.append(getattr(b, "text", "") or "")
-    return _parse_score("\n".join(text_parts))
+    return _parse_response("\n".join(text_parts))
 
 
 def _data_url(raw_bytes: bytes) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(raw_bytes).decode("ascii")
 
 
-def _parse_score(content: str) -> Optional[float]:
-    """Extract the visual_appeal number from the LLM's JSON response.
-    Tolerates ```json fences and surrounding prose."""
+def _parse_response(content: str) -> tuple[Optional[float], Optional[bool]]:
+    """Extract (visual_appeal, has_marketing_overlay) from the LLM's JSON
+    response. Tolerates ```json fences and surrounding prose. Either
+    field can be None when the model omits it or the response is
+    unparseable — callers treat None on either axis as "no signal."
+    """
     cleaned = content.replace("```json", "").replace("```", "").strip()
     # Some providers wrap the JSON inside a prose envelope; pull out the
     # first {...} block.
@@ -338,11 +360,13 @@ def _parse_score(content: str) -> Optional[float]:
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError:
-        return None
-    raw = data.get("visual_appeal")
-    if isinstance(raw, (int, float)):
-        return max(0.0, min(10.0, float(raw)))
-    return None
+        return (None, None)
+    raw_score = data.get("visual_appeal")
+    score = (max(0.0, min(10.0, float(raw_score)))
+             if isinstance(raw_score, (int, float)) else None)
+    raw_overlay = data.get("has_marketing_overlay")
+    overlay = bool(raw_overlay) if isinstance(raw_overlay, bool) else None
+    return (score, overlay)
 
 
 # ── Budget tracking ────────────────────────────────────────────────────────
@@ -464,13 +488,15 @@ def _load_cache() -> dict:
         return {}
 
 
-def _write_cache(cache: dict, key: str, *, provider: str, score: float) -> None:
-    """Insert (key → {score, provider, model, ts}) and persist. Evicts
-    the oldest rows when the cache grows past _CACHE_MAX_ROWS. Write is
-    atomic (tmp file + rename) so a crash mid-write can't corrupt the
-    cache."""
+def _write_cache(cache: dict, key: str, *, provider: str, score: float,
+                 has_marketing_overlay: Optional[bool] = None) -> None:
+    """Insert (key → {score, has_marketing_overlay, provider, model, ts}) and
+    persist. Evicts the oldest rows when the cache grows past
+    _CACHE_MAX_ROWS. Write is atomic (tmp file + rename) so a crash
+    mid-write can't corrupt the cache."""
     cache[key] = {
         "score": round(float(score), 2),
+        "has_marketing_overlay": has_marketing_overlay,
         "provider": provider,
         "model": _model_for_provider(provider),
         "ts": datetime.now(timezone.utc).isoformat(),
