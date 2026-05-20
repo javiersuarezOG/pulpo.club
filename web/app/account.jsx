@@ -886,11 +886,20 @@ function SubscriptionSection({ app }) {
         </div>
       )}
 
-      {/* Block 1 — Active plan */}
+      {/* Block 1 — Active plan. Pro identity here uses the same gold
+         "Pro" pill the SiteHeader renders next to the wordmark, so a
+         signed-in Pro user sees the same brand mark on the chrome and
+         in the subscription block. */}
       <div className="sub-block">
         <div className="sub-plan-head">
           <div>
-            <div className="sub-plan-name">{isPaid ? "Pulpo Monthly" : "Free"}</div>
+            <div className="sub-plan-name">
+              {isPaid ? (
+                <span className="sub-plan-name-pro">
+                  Pulpo <span className="pulpo-logo-pro">Pro</span>
+                </span>
+              ) : "Free"}
+            </div>
             <div className="sub-plan-meta">
               {isPaid ? "Renews on 5 Jun 2026" : "Browse the catalogue, no card required."}
             </div>
