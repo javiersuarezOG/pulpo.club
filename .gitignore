@@ -56,6 +56,13 @@ mobile-discover.png
 # web/app/config/legal-content.ts. See legal_documents/README.md.
 legal_documents/
 
+# DSR (Data Subject Request) execution artefacts. Personal-data dumps
+# and deletion manifests written by scripts/dsr/*. Never commit — they
+# contain the full data of a specific real user. Retain locally per
+# the Privacy Policy retention period, then secure-delete.
+dsr-exports/
+dsr-deletions/
+
 # Local Pulpo Legal Document Suite PDF — Sebastian-supplied template.
 Pulpo Legal Document Suite.pdf
 

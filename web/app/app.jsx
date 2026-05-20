@@ -1069,6 +1069,16 @@ function App() {
   // welcome effect.
   useEffect(() => {
     if (welcomeModalState) return;
+    // Activation-ticket landing: the clerkTicketHandledRef effect above
+    // opens Clerk's hosted SignUp modal directly. Don't double-open via
+    // setSignupModal → SignupModal → clerk.openSignIn — that stacks a
+    // second Clerk portal on top, producing the 2026-05-20 double-modal
+    // / infinite-spinner bug. evaluateGate also returns `allow` on this
+    // URL (see route-gates.ts), but this short-circuit is load-bearing
+    // defense in depth: it runs BEFORE the pendingSignUp check (which
+    // depends on Clerk being hydrated, so it can't fire on first render
+    // when the race actually happens).
+    if (hasClerkTicket) return;
     // Pending Clerk invitation sign-up takes priority — the dedicated
     // effect below opens clerk.openSignUp() so the user can finish
     // setting their password. Don't stack our own SignupModal on top;
@@ -1098,9 +1108,9 @@ function App() {
     // every time the modal closes. We only care about route + user
     // + welcomeModalState (for the post-Stripe bypass) + clerkActions
     // (so we re-evaluate when Clerk hydrates and pendingSignUp becomes
-    // queryable).
+    // queryable) + hasClerkTicket (activation-landing bypass).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, user, welcomeModalState, clerkActions]);
+  }, [route, user, welcomeModalState, clerkActions, hasClerkTicket]);
 
   // Post-activation sign-up flow: after the user clicks the activation
   // email link, Clerk's /v1/tickets/accept endpoint validates the

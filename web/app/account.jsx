@@ -96,6 +96,18 @@ function AccountPage({ app }) {
     // SignupModal on top of WelcomeModal. welcomeModalState survives
     // the strip and is the correct source of truth.
     if (app.welcomeModalState) return;
+    // Activation-ticket landing — app.jsx's clerkTicketHandledRef
+    // effect opens Clerk's hosted SignUp modal directly. Don't open
+    // our SignupModal in parallel; SignupModal calls clerk.openSignIn
+    // when mode==="login", which stacks a second Clerk portal on top
+    // of the SignUp one — the 2026-05-20 double-modal / infinite-
+    // spinner bug. Symmetric with the welcomeModalState bypass above.
+    // Re-read URL here because hasClerkTicket lives on App, not the
+    // page; same pattern as the route-gates.ts welcome=1 bypass.
+    if (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("__clerk_ticket")) {
+      return;
+    }
     // Pending invitation sign-up takes priority — app.jsx's dedicated
     // effect opens clerk.openSignUp() for password creation. Don't
     // stack our SignupModal on top; see 2026-05-20 post-activation
@@ -119,6 +131,17 @@ function AccountPage({ app }) {
     // in production (Clerk-ON), leaving the WelcomeModal floating over
     // a `return null` empty page instead of the loading shell.
     if (app.welcomeModalState) {
+      return <div className="page page-account account-welcome-preview" aria-busy="true" />;
+    }
+    // Activation-ticket landing — Clerk's hosted SignUp modal is
+    // opening on top of this page. Render a neutral placeholder rather
+    // than null so closing the Clerk modal doesn't leave the user
+    // staring at a blank viewport. Symmetric with the welcome-preview
+    // branch above. URL re-read is safe here — the auth-gate effect
+    // above also re-reads, and __clerk_ticket survives until Clerk's
+    // SDK consumes it (no app-side URL strip).
+    if (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("__clerk_ticket")) {
       return <div className="page page-account account-welcome-preview" aria-busy="true" />;
     }
     return null;
