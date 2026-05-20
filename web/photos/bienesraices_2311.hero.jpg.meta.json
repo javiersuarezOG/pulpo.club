@@ -1,16 +1,18 @@
 {
-  "width": 1600,
-  "height": 917,
-  "aspect_ratio": 1.745,
-  "file_size_kb": 218.2,
+  "width": 1280,
+  "height": 732,
+  "aspect_ratio": 1.749,
+  "file_size_kb": 151.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:29.277020+00:00",
-  "derivative_width": 1600,
-  "derivative_height": 917,
-  "hero_photo_quality_score": 100,
+  "computed_at": "2026-05-20T13:01:44.796220+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 732,
+  "hero_photo_quality_score": 90,
   "has_text_overlay": false,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/JSSSQWYE9E/9K22SEZ5W9/VENTA_DE_PROPIEDAD_EN_SAN_SALVADOR_A_2_MINS_DEL_BOULEVARD_DEL_EJERCITO.jpeg",
-  "candidate_count": 4
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvTVZWUUxaWkhaWS90NExVUkxSWko4L1ZFTlRBX0RFX1BST1BJRURBRF9FTl9TQU5fU0FMVkFET1JfQV8yX01JTlNfREVMX0JPVUxFVkFSRF9ERUxfRUpFUkNJVE9fMS5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
+  "candidate_count": 4,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T13:01:44.799761+00:00"
 }

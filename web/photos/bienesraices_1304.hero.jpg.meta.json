@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:27.522319+00:00",
+  "computed_at": "2026-05-20T13:00:22.959630+00:00",
   "derivative_width": 1024,
   "derivative_height": 473,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/YRE2NLZYII/Yqvm7mvQcj/Terreno_en_venta_en_El_Majahual.jpeg",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 5,
+  "repicked_at": "2026-05-20T13:00:22.962720+00:00"
 }

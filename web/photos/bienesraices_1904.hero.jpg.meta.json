@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:30.537906+00:00",
+  "computed_at": "2026-05-20T13:02:34.425364+00:00",
   "derivative_width": 1200,
   "derivative_height": 630,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3586462/58385913/EB-MT6462.jpg?rasterize=true&version=1677683854",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-20T13:02:34.429048+00:00"
 }
