@@ -103,5 +103,15 @@ export function evaluateGate(
   if (route === "account" && searchParams && searchParams.get("welcome") === "1") {
     return { kind: "allow" };
   }
+  // Activation-ticket bypass — symmetric with welcome=1 above. When
+  // Clerk's /v1/tickets/accept redirects the user to /account with
+  // __clerk_ticket in the URL, app.jsx's dedicated clerkTicketHandledRef
+  // effect opens Clerk's hosted SignUp modal directly. Letting the gate
+  // also open a SignupModal (which then calls clerk.openSignIn) stacks
+  // a second Clerk portal — the 2026-05-20 double-modal / infinite-
+  // spinner bug. PR #368 missed this path; PR #371 closes it.
+  if (route === "account" && searchParams && searchParams.has("__clerk_ticket")) {
+    return { kind: "allow" };
+  }
   return { kind: "modal", minTier: gate.minTier, postLoginRoute: route };
 }

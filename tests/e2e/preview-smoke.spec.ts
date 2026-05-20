@@ -961,4 +961,51 @@ test.describe("New app boots cleanly on key routes", () => {
       "WelcomeModal must not render when both welcome=1 AND __clerk_ticket are present.",
     ).toBe(0);
   });
+
+  // PR #371 — the real fix for the 2026-05-20 double-modal / infinite-
+  // spinner bug. PR #368 only gated WelcomeModal + the pendingSignUp
+  // effect; it missed THREE independent code paths that each opened a
+  // modal on /account?__clerk_ticket=…:
+  //   1. app.jsx route-gate effect (evaluateGate → setSignupModal)
+  //   2. account.jsx AccountPage auth-gate (app.openSignup)
+  //   3. app.jsx clerkTicketHandledRef (clerk.openSignUp — the intended one)
+  // Paths 1+2 both triggered SignupModal → SignupModal called
+  // clerk.openSignIn (mode="login"). In production this rendered a
+  // SECOND Clerk portal (`cl-cardBox` spinner) stacked beneath path 3's
+  // openSignUp portal. Two modals, top one spinning forever.
+  //
+  // CI runs Clerk-OFF so clerk.open* are no-ops; the React-side
+  // SignupModal (`.modal-signup` / LegacySignupModal) is the upstream
+  // signal we CAN observe. Its absence on this URL proves paths 1+2
+  // are gated. Sebas walks the Vercel-live flow to confirm path 3 is
+  // also working correctly (one SignUp portal, no spinner).
+  test("activation landing: no SignupModal mounts (gate suppression prevents double Clerk portal)", async ({ page }) => {
+    await page.addInitScript(() => {
+      try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
+      localStorage.setItem("pulpo-locale", "en");
+    });
+    await page.goto(
+      "/account?__clerk_status=sign_up&__clerk_ticket=eyJfake.test.jwt&lang=es",
+      { waitUntil: "domcontentloaded" },
+    );
+    await page.waitForTimeout(1200);
+
+    const signupModals = await page.locator(".modal-signup").count();
+    expect(
+      signupModals,
+      "SignupModal must not mount on activation landing — its clerk.openSignIn " +
+        "call stacks a second Clerk portal on top of clerk.openSignUp. The route-gate " +
+        "+ AccountPage gate must short-circuit on __clerk_ticket.",
+    ).toBe(0);
+
+    // AccountPage placeholder must render so the activation modal sits
+    // on something rather than a blank `return null` page.
+    const placeholder = await page
+      .locator(".account-welcome-preview, .account-loading")
+      .count();
+    expect(
+      placeholder,
+      "AccountPage should render a neutral placeholder on activation landings, not return null.",
+    ).toBeGreaterThanOrEqual(1);
+  });
 });
