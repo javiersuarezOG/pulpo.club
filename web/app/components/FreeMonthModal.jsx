@@ -16,7 +16,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
-import { Icon } from "../components.jsx";
+import { Icon, PulpoMark } from "../components.jsx";
 import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 import { useCampaignParams } from "../lib/campaign";
 import { startCheckoutFromModal } from "../lib/stripe-modal-checkout";
@@ -162,6 +162,9 @@ export function FreeMonthModal({ app, trigger, onClose }) {
           <Icon name="close" size={18} />
         </button>
 
+        <div className="modal-brand-mark" style={{ color: "var(--accent)" }}>
+          <PulpoMark size={36} />
+        </div>
         <h2 className="free-month-modal-headline">{t("free_month_modal.headline", lc)}</h2>
         <p className="free-month-modal-body">{t("free_month_modal.body", lc)}</p>
 

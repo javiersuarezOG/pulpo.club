@@ -30,6 +30,7 @@ import {
   Icon,
   RankTrophy,
   PulpoLogo,
+  PulpoMark,
   Badge,
   Photo,
   HeartButton,
@@ -3222,6 +3223,9 @@ function WelcomeModal({ app, state, onClose }) {
         >
           ×
         </button>
+        <div className="modal-brand-mark" style={{ color: "var(--accent)" }}>
+          <PulpoMark size={36} />
+        </div>
         <div className="welcome-modal-eyebrow">{t("welcome_modal.eyebrow", lc)}</div>
         {variant === "anon" ? (
           (() => {
@@ -3451,6 +3455,9 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
         >
           ×
         </button>
+        <div className="modal-brand-mark" style={{ color: "var(--accent)" }}>
+          <PulpoMark size={36} />
+        </div>
         <div className="pro-upsell-eyebrow">{t("pro_upsell.eyebrow", lc)}</div>
         <h2 className="pro-upsell-headline">{t("pro_upsell.headline", lc)}</h2>
         <ul className="pro-upsell-usps">

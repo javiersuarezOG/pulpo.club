@@ -55,12 +55,37 @@ function pickLocale(stripeLocale) {
 // (already drafted, just lifted into code). HTML keeps Clerk-compatible
 // inline styles so the email renders identically across Gmail/Outlook/
 // Apple Mail clients regardless of CSS support.
+//
+// Brand header (inline SVG + wordmark) renders the new Pulpo mark at
+// the top of every activation email. Hex literals only — most email
+// clients strip CSS vars. Outlook desktop is the weak link for inline
+// SVG; it gracefully falls back to nothing, leaving the wordmark
+// to carry brand identity.
+const BRAND_HEADER_HTML = `
+<div style="text-align:center;padding:8px 0 20px;border-bottom:1px solid #e6e6e6;margin-bottom:24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;border-collapse:collapse;">
+    <tr>
+      <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+        <svg width="26" height="26" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+          <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+          <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+        </svg>
+      </td>
+      <td style="vertical-align:middle;">
+        <span style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.035em;color:#1F3D31;line-height:1;">pulpo</span>
+      </td>
+    </tr>
+  </table>
+</div>`;
+
 const TEMPLATES = {
   en: {
     subject: "Your Pulpo Pro subscription is active — set up your account",
     preheader: "One step left: set your password and start exploring.",
     html: (actionUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+${BRAND_HEADER_HTML}
 <p>Hi there,</p>
 <p>Thanks for joining Pulpo Pro — your subscription is active.</p>
 <p>One step left to access your account: set a password so you can sign in from any device.</p>
@@ -91,6 +116,7 @@ Questions? Reply to this email or write to hello@pulpo.club.
     preheader: "Solo falta un paso: elige tu contraseña y empieza a explorar.",
     html: (actionUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+${BRAND_HEADER_HTML}
 <p>Hola,</p>
 <p>Gracias por sumarte a Pulpo Pro — tu suscripción está activa.</p>
 <p>Solo queda un paso para acceder a tu cuenta: elige una contraseña para iniciar sesión desde cualquier dispositivo.</p>
