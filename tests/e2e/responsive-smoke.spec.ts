@@ -80,6 +80,12 @@ const SECTIONS = [
   { path: "/imprint",      surface: ".page-legal",   gated: false },
   { path: "/impressum",    surface: ".page-legal",   gated: false },
   { path: "/contact",      surface: ".page-contact", gated: false },
+  // Internal admin hub — page is open (robots-blocked), needs to fit
+  // every viewport same as any other public route. The widget grid is
+  // a single-column stack at <640px, two columns above; the newsletter
+  // widget form stays full-width below 900px and side-by-side above.
+  { path: "/admin",            surface: ".page-admin", gated: false },
+  { path: "/admin/newsletter", surface: ".nl-widget",  gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.

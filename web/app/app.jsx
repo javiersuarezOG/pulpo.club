@@ -30,6 +30,9 @@ import { AccountPage } from "./account.jsx";
 // land in a follow-up PR.
 import { LegalPage } from "./pages/legal/LegalPage.jsx";
 import { ContactPage } from "./pages/legal/ContactPage.jsx";
+// Internal admin hub — no nav link, robots-blocked, see AdminShell.jsx
+// for the safety-belt rationale.
+import { AdminPage } from "./admin/AdminShell.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
@@ -139,12 +142,17 @@ function App() {
     return parseLocation(window.location.pathname);
   }, []);
   const [route, setRoute] = useState(_initialParsed.route);
-  // Seed `section` from the cold-load URL so `/account/notifications`
-  // mounts straight on the Notifications tab — without this, AccountPage
-  // would render Profile for one frame and then resync.
-  const [routeParams, setRouteParams] = useState(() => (
-    _initialParsed.section ? { section: _initialParsed.section } : {}
-  ));
+  // Seed `section` / `adminWidget` from the cold-load URL so a deep-link
+  // like `/account/notifications` or `/admin/newsletter` mounts straight
+  // on the right tab/widget. Without this seed there's a one-frame flash
+  // of the default landing tab before the URL resyncs.
+  const [routeParams, setRouteParams] = useState(() => {
+    if (_initialParsed.section) return { section: _initialParsed.section };
+    if (_initialParsed.route === "admin") {
+      return { adminWidget: _initialParsed.adminWidget };
+    }
+    return {};
+  });
   // Tracks whether the current detail view was entered cold (no source
   // section underneath). Reset to false whenever the user navigates to a
   // section in-app; set true on cold-load entry.
@@ -337,7 +345,11 @@ function App() {
       setRouteParams(
         parsed.section
           ? { section: parsed.section, _entry: "popstate" }
-          : (parsed.route === "account" ? { _entry: "popstate" } : {})
+          : parsed.route === "account"
+          ? { _entry: "popstate" }
+          : parsed.route === "admin"
+          ? { adminWidget: parsed.adminWidget, _entry: "popstate" }
+          : {}
       );
       // popstate landing on /listing/:id with no app-pushed state means
       // the user navigated forward from history into a detail entry.
@@ -701,11 +713,14 @@ function App() {
     // Account sub-sections round-trip through the URL — `/account/notifications`
     // is shareable. For every other route, `section` is ignored by urlFor.
     const section = r === "account" ? (params.section || null) : null;
-    const target = urlFor({ route: r, section }, "");
+    // Admin widget slugs round-trip the same way — `/admin/newsletter`
+    // is a real URL state the browser back button must honour.
+    const adminWidget = r === "admin" ? (params.adminWidget || null) : null;
+    const target = urlFor({ route: r, section, adminWidget }, "");
     // Same-route, same-URL → no-op so the back button doesn't accumulate
     // duplicate entries.
     const same = typeof window !== "undefined"
-      && isSameLocation({ route: r, section }, window.location.pathname, "");
+      && isSameLocation({ route: r, section, adminWidget }, window.location.pathname, "");
     setRoute(r);
     // `_entry` is consumed by AccountPage's section-viewed telemetry so
     // in-app clicks are distinguishable from cold-load / popstate. Marked
@@ -1142,6 +1157,7 @@ function App() {
         {route === "subscription" && <LegalPage app={app} slug="subscription" />}
         {route === "imprint" && <LegalPage app={app} slug="imprint" />}
         {route === "contact" && <ContactPage app={app} />}
+        {route === "admin" && <AdminPage app={app} />}
       </main>
 
       <SiteFooter app={app} locale={locale} tweaks={tweaks} />

@@ -37,6 +37,8 @@
     { "source": "/plans",                   "destination": "/web/dist/index.html" },
     { "source": "/account",                 "destination": "/web/dist/index.html" },
     { "source": "/account/:section",        "destination": "/web/dist/index.html" },
+    { "source": "/admin",                   "destination": "/web/dist/index.html" },
+    { "source": "/admin/:widget",           "destination": "/web/dist/index.html" },
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/web/dist/index.html" }

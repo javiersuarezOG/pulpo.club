@@ -16,6 +16,8 @@ Disallow: /legacy/
 
 # Internal admin / dev paths.
 Disallow: /dashboard
+Disallow: /admin
+Disallow: /admin/
 Disallow: /api/
 
 Sitemap: https://pulpo.club/sitemap.xml
