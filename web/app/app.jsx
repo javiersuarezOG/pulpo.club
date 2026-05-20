@@ -557,11 +557,17 @@ function App() {
 
   // Dedicated effect for the activation landing: open Clerk's hosted
   // SignUp modal so the user can set their password. Fires as soon as
-  // Clerk hydrates (clerkActions becomes truthy). Clerk's SDK consumes
-  // the __clerk_ticket from the URL implicitly when openSignUp() fires.
-  // Once the user completes sign-up, Clerk redirects per the
-  // invitation's rurl to /account?welcome=1[&lang=…] signed in — the
-  // signed-in WelcomeModal then renders and auto-dismisses.
+  // Clerk hydrates (clerkActions becomes truthy). We then explicitly
+  // consume the __clerk_ticket via signUp.create({strategy:"ticket"})
+  // BEFORE opening Clerk's hosted modal — handover §7b. Clerk's
+  // implicit URL-consumption from openSignUp({}) was unreliable for
+  // Pulpo's instance (Clerk's modal rendered "This ticket is invalid"
+  // even on fresh tickets in some sessions). Explicit consume binds
+  // the SignUp resource to the ticket synchronously; the modal then
+  // renders the password step directly. Once the user completes
+  // sign-up, Clerk redirects per the invitation's rurl to
+  // /account?welcome=1[&lang=…] signed in — the signed-in WelcomeModal
+  // then renders and auto-dismisses.
   //
   // This effect MUST be the only caller of openSignUp on the activation
   // landing. The pendingSignUp effect below explicitly skips when
@@ -576,11 +582,41 @@ function App() {
     if (clerkTicketHandledRef.current) return;
     clerkTicketHandledRef.current = true;
     track("invitation.password_creation_opened", { source: "clerk_ticket_url" });
-    try {
-      clerkActions.openSignUp({});
-    } catch {
-      clerkTicketHandledRef.current = false;
-    }
+
+    const ticket = (typeof window !== "undefined")
+      ? (new URLSearchParams(window.location.search).get("__clerk_ticket") || "")
+      : "";
+
+    (async () => {
+      // Step 1: explicit consume. Fires PostHog telemetry on both paths
+      // so we can distinguish fresh-ticket-rejected from spent-ticket
+      // from sdk-not-ready in production.
+      if (ticket && clerkActions.consumeTicket) {
+        const consume = await clerkActions.consumeTicket(ticket);
+        if (consume && consume.ok) {
+          track("invitation.ticket_consumed", {
+            status: consume.status || "unknown",
+            had_email: !!consume.emailAddress,
+          });
+        } else {
+          track("invitation.ticket_rejected", {
+            code: (consume && consume.code) || "unknown",
+            message: ((consume && consume.message) || "").slice(0, 200),
+          });
+          // Don't bail — fall through to openSignUp so Clerk's hosted
+          // modal renders its own ticket-invalid UI (with a "sign in
+          // instead" footer that's the right recovery for spent tickets).
+        }
+      }
+      // Step 2: open the modal. Whether step 1 succeeded or not, the
+      // hosted modal renders the appropriate state (password form on
+      // success, ticket-invalid alert on failure).
+      try {
+        clerkActions.openSignUp({});
+      } catch {
+        clerkTicketHandledRef.current = false;
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasClerkTicket, clerkActions, user]);
 
