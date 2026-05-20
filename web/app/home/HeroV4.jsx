@@ -30,7 +30,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
-import { Photo, RankTrophy } from "../components.jsx";
+import { Photo, RankTrophy, formatPrice, formatSize, landTypeLabel } from "../components.jsx";
 import { IconArrowRight } from "./icons.jsx";
 import { readLiveCounterCache, writeLiveCounterCache } from "../lib/live-counter-cache";
 import {
@@ -69,34 +69,25 @@ export function HeroV4({ app, locale }) {
   // produced a visible flash from a curated category WebP to the real
   // listing photo on every cold load.
   const listings = useListings();
-  const { resolved, rank } = useMemo(() => {
-    if (!listings || listings.length === 0) return { resolved: null, rank: null };
+  const resolved = useMemo(() => {
+    if (!listings || listings.length === 0) return null;
     const top = pickTopRanked(listings, 10);
-    if (top.length === 0) return { resolved: null, rank: null };
-    const idx = dailyIndex(top.length);
-    return { resolved: top[idx], rank: idx + 1 };
+    if (top.length === 0) return null;
+    return top[dailyIndex(top.length)];
   }, [listings]);
 
-  // Top 2 sub-scores (Value/Location/Momentum), in fixed order, used for
-  // the "Why #N" caption under the photo. Null sub-scores are skipped;
-  // if fewer than one is available the caption is suppressed entirely.
-  const whyParts = useMemo(() => {
-    if (!resolved) return [];
-    const candidates = [
-      { key: "value",    score: resolved.value_score },
-      { key: "location", score: resolved.location_score },
-      { key: "momentum", score: resolved.momentum_score },
-    ].filter((c) => typeof c.score === "number");
-    return candidates
-      .slice()
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 2)
-      .sort((a, b) => {
-        const order = { value: 0, location: 1, momentum: 2 };
-        return order[a.key] - order[b.key];
-      })
-      .map((c) => t(`home.hero.v4.score.${c.key}`, locale, { n: Math.round(c.score) }));
-  }, [resolved, locale]);
+  // Brief details under the photo — price · size · land_type. Joined
+  // with " · " and any null piece is dropped so a listing missing
+  // land_type still renders price + size cleanly.
+  const briefMeta = useMemo(() => {
+    if (!resolved) return null;
+    const parts = [
+      resolved.price != null ? formatPrice(resolved.price) : null,
+      resolved.size_m2 != null ? formatSize(resolved.size_m2) : null,
+      resolved.land_type ? landTypeLabel(resolved.land_type) : null,
+    ].filter(Boolean);
+    return parts.length > 0 ? parts.join(" · ") : null;
+  }, [resolved]);
 
   // ── Live counter (real /data/last_updated.json fetch + sessionStorage cache) ─
   const initialCounter = useMemo(() => {
@@ -232,59 +223,64 @@ export function HeroV4({ app, locale }) {
             <span>{counterLine}</span>
           </div>
         </div>
-        <div
-          className={`hp-hero-v4-photo${resolved ? " hp-hero-v4-photo-clickable" : ""}`}
-          onClick={resolved ? onPhotoClick : undefined}
-          role={resolved ? "button" : undefined}
-          tabIndex={resolved ? 0 : undefined}
-          onKeyDown={resolved ? (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              onPhotoClick();
-            }
-          } : undefined}
-          aria-label={resolved ? t("home.hero.v4.photo_aria", locale, {
-            rank: rank ?? 1,
-            name: resolved.zone_name || t("home.featured.zone", locale),
-          }) : undefined}
-        >
-          {resolved ? (
-            <Photo
-              listing={resolved}
-              idx={0}
-              ratio="4/3"
-              className="hp-hero-v4-photo-img"
-              eager
-              source="hero_v4"
-            />
-          ) : (
-            // Listings still loading — render an aspect-ratio-preserving
-            // empty box so layout is stable and no stock image is ever
-            // flashed before the real top-10 photo arrives.
-            <div
-              className="hp-hero-v4-photo-img"
-              style={{ aspectRatio: "4/3", width: "100%" }}
-              aria-hidden="true"
-            />
-          )}
-          {resolved && rank != null && (
-            <span
-              className="pulpo-rank hp-hero-v4-rank"
-              aria-label={t("home.hero.v4.rank_aria", locale, { rank })}
-            >
-              <span className="pulpo-rank-star" aria-hidden="true">
+        <div className="hp-hero-v4-photo-col">
+          <div
+            className={`hp-hero-v4-photo${resolved ? " hp-hero-v4-photo-clickable" : ""}`}
+            onClick={resolved ? onPhotoClick : undefined}
+            role={resolved ? "button" : undefined}
+            tabIndex={resolved ? 0 : undefined}
+            onKeyDown={resolved ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onPhotoClick();
+              }
+            } : undefined}
+            aria-label={resolved ? t("home.hero.v4.photo_aria", locale, {
+              name: resolved.zone_name || t("home.featured.zone", locale),
+            }) : undefined}
+          >
+            {resolved ? (
+              <Photo
+                listing={resolved}
+                idx={0}
+                ratio="4/3"
+                className="hp-hero-v4-photo-img"
+                eager
+                source="hero_v4"
+              />
+            ) : (
+              // Listings still loading — render an aspect-ratio-preserving
+              // empty box so layout is stable and no stock image is ever
+              // flashed before the real top-10 photo arrives.
+              <div
+                className="hp-hero-v4-photo-img"
+                style={{ aspectRatio: "4/3", width: "100%" }}
+                aria-hidden="true"
+              />
+            )}
+            {resolved && (
+              <span className="hp-hero-v4-featured-pill">
                 <RankTrophy />
+                <span>{t("home.hero.v4.featured_today", locale)}</span>
               </span>
-              <span className="pulpo-rank-num">{rank}</span>
-            </span>
-          )}
-          {resolved && rank != null && whyParts.length > 0 && (
-            <p className="hp-hero-v4-why">
-              {t("home.hero.v4.why_template", locale, {
-                rank,
-                parts: whyParts.join(" · "),
-              })}
-            </p>
+            )}
+          </div>
+          {resolved && (
+            <div
+              className="hp-hero-v4-brief"
+              role="button"
+              tabIndex={0}
+              onClick={onPhotoClick}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onPhotoClick();
+                }
+              }}
+            >
+              <h3 className="hp-hero-v4-brief-title">{resolved.zone_name}</h3>
+              {briefMeta && <p className="hp-hero-v4-brief-meta">{briefMeta}</p>}
+            </div>
           )}
         </div>
       </div>
