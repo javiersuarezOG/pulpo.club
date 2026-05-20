@@ -197,7 +197,7 @@ export function AdminPage({ app }) {
         <p className="admin-eyebrow">Pulpo · internal tools</p>
         {widget ? (
           <>
-            <button type="button" className="widget-back" onClick={goToGrid} aria-label="Back to admin home">
+            <button type="button" className="widget-back" onClick={goToGrid} aria-label="Back to admin home"> {/* i18n-allow: admin-only, internal tools, EN-only */}
               ← Back to admin home
             </button>
             <h1 id="admin-title" className="admin-title">{widget.label}</h1>

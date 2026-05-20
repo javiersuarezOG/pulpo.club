@@ -449,7 +449,7 @@ export function NewsletterWidget() {
                 value={issueNumber}
                 min={1}
                 onChange={(e) => setIssueNumber(e.target.value)}
-                aria-label="Issue number"
+                aria-label="Issue number" // i18n-allow: admin-only widget, EN-only
               />
             </div>
             <span className="hint">Issue number stamps the email header; pick something high (e.g. 99) for tests.</span>
@@ -519,7 +519,7 @@ export function NewsletterWidget() {
                 value={minPrice}
                 placeholder="min"
                 onChange={(e) => setMinPrice(e.target.value)}
-                aria-label="Minimum price"
+                aria-label="Minimum price" // i18n-allow: admin-only widget, EN-only
                 min={0}
               />
               <input
@@ -527,7 +527,7 @@ export function NewsletterWidget() {
                 value={maxPrice}
                 placeholder="max"
                 onChange={(e) => setMaxPrice(e.target.value)}
-                aria-label="Maximum price"
+                aria-label="Maximum price" // i18n-allow: admin-only widget, EN-only
                 min={0}
               />
             </div>
@@ -571,7 +571,7 @@ export function NewsletterWidget() {
           </div>
           {previewHtml ? (
             <iframe
-              title="Newsletter preview"
+              title="Newsletter preview" // i18n-allow: admin-only widget, EN-only
               srcDoc={previewHtml}
               sandbox="allow-same-origin"
             />
