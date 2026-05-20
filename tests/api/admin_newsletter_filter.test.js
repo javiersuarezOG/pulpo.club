@@ -7,12 +7,32 @@
 // and add a regression row below.
 
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 // CJS module under api/ — destructure off the default export so the
 // vitest ESM→CJS interop is unambiguous (matches the pattern in
 // tests/api/nightly_health.test.js).
 import filterModule from "../../api/admin/newsletter/_filter.js";
-const { normalizePreference, applyPreference, selectPicks, CATEGORY_PREDICATES } = filterModule;
+const {
+  normalizePreference, applyPreference, selectPicks,
+  CATEGORY_PREDICATES, NEWSLETTER_COHORTS,
+} = filterModule;
+
+// ── Drift guard: Node port vs Python source of truth ─────────────────
+// Reads automation/newsletter/segments.py as text and asserts every key
+// declared in the Python CATEGORY_PREDICATES dict has a matching key in
+// the JS port. The Python file is the canonical pipeline; if these
+// diverge the admin widget will silently filter wrong vs production.
+function pythonCategoryKeys() {
+  const path = resolve(__dirname, "../../automation/newsletter/segments.py");
+  const src = readFileSync(path, "utf8");
+  // Locate the CATEGORY_PREDICATES = {...} block, then grep keys from it.
+  const m = src.match(/CATEGORY_PREDICATES\s*=\s*\{([\s\S]*?)\n\}/);
+  if (!m) throw new Error("Could not locate CATEGORY_PREDICATES in segments.py");
+  // Each entry is `    "key": lambda …` — grab the string keys.
+  return Array.from(m[1].matchAll(/"([a-z_0-9]+)"\s*:/g)).map((row) => row[1]).sort();
+}
 
 // Compact builder: produce a listing with sensible defaults so each test
 // can override only the fields it cares about.
@@ -88,6 +108,31 @@ describe("applyPreference — axis semantics", () => {
       departments: ["La Libertad"], property_types: ["land", "condo"],
     }));
     expect(out.map((l) => l.source_id).sort()).toEqual(["1", "4"]);
+  });
+});
+
+describe("CATEGORY_PREDICATES — drift guard", () => {
+  it("Node port has the same keys as Python segments.py", () => {
+    const nodeKeys = Object.keys(CATEGORY_PREDICATES).sort();
+    expect(nodeKeys).toEqual(pythonCategoryKeys());
+  });
+});
+
+describe("NEWSLETTER_COHORTS — drift guard", () => {
+  // Read the TS constants file as text and assert the JS-side list in
+  // _filter.js matches it. The pytest counterpart asserts the TS file
+  // matches the Python Cohort literal — transitively, all three sides
+  // (Python types.py → TS constants.ts → JS _filter.js) stay in lockstep.
+  function tsCohortKeys() {
+    const path = resolve(__dirname, "../../web/app/admin/widgets/newsletter/constants.ts");
+    const src = readFileSync(path, "utf8");
+    const m = src.match(/const\s+NEWSLETTER_COHORTS\s*=\s*\[([\s\S]*?)\]\s*as\s+const/);
+    if (!m) throw new Error("Could not locate NEWSLETTER_COHORTS in constants.ts");
+    return Array.from(m[1].matchAll(/"([a-z_]+)"/g)).map((row) => row[1]).sort();
+  }
+
+  it("Node _filter.js NEWSLETTER_COHORTS matches TS constants.ts", () => {
+    expect([...NEWSLETTER_COHORTS].sort()).toEqual(tsCohortKeys());
   });
 });
 

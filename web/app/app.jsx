@@ -1143,6 +1143,23 @@ function App() {
     // unchanged. Lives inside App so `setUser` is in scope.
     <ClerkShell setUser={setUser} setAuthLoaded={setAuthLoaded} onClerkActions={setClerkActions}>
     <div className={`app density-${tweaks.density} ${route === "home" ? "app-route-home" : ""}${readFeatureFlag("hero_v4", true) ? " hero-v4" : ""}`}>
+      {/* SVG sprite — symbols defined once, referenced via <use href> in
+          high-frequency render paths (rank chips on shelf + listing cards
+          + results table). Lets the compositor cache one rasterization of
+          the shape instead of repainting 6 bezier paths per chip on every
+          scroll frame. Sprite ID prefix: `sprite-`. */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
+        <defs>
+          <symbol id="sprite-cat-top10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </symbol>
+        </defs>
+      </svg>
       {/* Wave-3a: single SiteHeader on every route. The homepage's hero
           still owns its conversion CTAs; the header is pure navigation. */}
       <SiteHeader app={app} />

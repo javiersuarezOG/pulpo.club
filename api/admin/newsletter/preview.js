@@ -14,10 +14,10 @@
 //
 // Response: { html, picks_total, total_listings, cohort, filter_trace }
 
-const { loadRanked, normalizePreference, applyPreference, selectPicks } = require("./_filter");
+const { loadRanked, normalizePreference, applyPreference, selectPicks, NEWSLETTER_COHORTS } = require("./_filter");
 const { renderAdminIssue } = require("./_render");
 
-const COHORTS = new Set(["pro_prefs", "free_prefs", "logged_no_prefs", "anonymous"]);
+const COHORTS = new Set(NEWSLETTER_COHORTS);
 const LOCALES = new Set(["en", "es"]);
 
 async function readJsonBody(req) {

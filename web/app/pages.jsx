@@ -28,6 +28,7 @@ import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
 import {
   Icon,
+  RankTrophy,
   PulpoLogo,
   Badge,
   Photo,
@@ -1519,7 +1520,7 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
                 {topRankMap && topRankMap.get(l.id) != null && (
                   <span className="pulpo-rank pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
                     <span className="pulpo-rank-star" aria-hidden="true">
-                      <Icon name="cat_top10" size={12} strokeWidth={2} />
+                      <RankTrophy />
                     </span>
                     <span className="pulpo-rank-num">{topRankMap.get(l.id)}</span>
                   </span>

@@ -166,6 +166,20 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
   );
 };
 
+// Sprite-backed trophy used by the rank chip across three hot scroll
+// paths (home-shelf cards, listing cards, results table). Renders a
+// <use href> reference to the symbol mounted at the app root, so the
+// browser caches one rasterization of the shape instead of repainting
+// 6 bezier paths per chip on every scroll frame. Color cascades via
+// currentColor on the parent `.pulpo-rank-star`.
+const RankTrophy = React.memo(function RankTrophy({ size = 12 }) {
+  return (
+    <svg width={size} height={size} aria-hidden="true" focusable="false">
+      <use href="#sprite-cat-top10" />
+    </svg>
+  );
+});
+
 // ===== Pulpo wordmark =====
 // `pro` prop appends a small serif-italic "Pro" mark next to the wordmark
 // so subscribed users see their membership reinforced on every page in the
@@ -594,7 +608,7 @@ function ListingCard({
         {topRank != null && (
           <span className="pulpo-rank listing-card-rank" aria-label={`Pulpo ranked ${topRank}`}>
             <span className="pulpo-rank-star" aria-hidden="true">
-              <Icon name="cat_top10" size={12} strokeWidth={2} />
+              <RankTrophy />
             </span>
             <span className="pulpo-rank-num">{topRank}</span>
           </span>
@@ -711,7 +725,7 @@ function Toast({ toast }) {
 }
 
 export {
-  Icon, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
+  Icon, RankTrophy, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
 };
