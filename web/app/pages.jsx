@@ -2897,12 +2897,13 @@ const CONSENT_BANNER_STYLES = `
   overflow-y: auto;
 }
 .consent-prefs__title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 22px;
   line-height: 28px;
   margin: 0 0 4px;
   color: var(--paper);
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .consent-prefs__lede {
   font-size: 13px;

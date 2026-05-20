@@ -34,9 +34,11 @@ const SHELL_STYLES = `
   margin: 0 0 8px;
 }
 .page-admin h1.admin-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 36px;
   line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0 0 12px;
   color: var(--ink);
 }
