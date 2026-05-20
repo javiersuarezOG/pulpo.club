@@ -20,8 +20,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { attachErrorRecorder, seedFounderUser, seedUser } from "./_helpers";
 
-const FOUNDER_EMAIL = "founder-tester@pulpo.club";
-
 async function assertProHeader(page: Page): Promise<void> {
   // Pro pill on the wordmark (hidden below 360px — caller picks the
   // viewport before calling).
@@ -35,7 +33,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
   test("home: free-plan user with founder email hydrates as Pro", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedFounderUser(page);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await assertProHeader(page);
     // Wordmark pill present at desktop viewport (default 1280×720).
     await expect(page.locator(".pulpo-logo-pro")).toBeVisible();
@@ -47,7 +45,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
     const errors = attachErrorRecorder(page);
     await seedFounderUser(page);
     for (const path of ["/", "/browse", "/saved", "/plans", "/account"]) {
-      await page.goto(path, { waitUntil: "networkidle" });
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.getByTestId("avatar-pro"), `avatar-pro on ${path}`).toBeVisible();
       await expect(page.locator(".avatar-pro-badge"), `badge on ${path}`).toBeVisible();
     }
@@ -58,7 +56,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
     const errors = attachErrorRecorder(page);
     await page.setViewportSize({ width: 375, height: 812 });
     await seedFounderUser(page);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     // Avatar ring + star still present in the top-nav (mobile keeps
     // both — only the wordmark pill drops below 360px).
     await expect(page.getByTestId("avatar-pro")).toBeVisible();
@@ -73,7 +71,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
     const errors = attachErrorRecorder(page);
     await page.setViewportSize({ width: 320, height: 568 });
     await seedFounderUser(page);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     // Pill is display:none below 360px — assert it's hidden, not absent.
     // Locating + isVisible() is the right idiom: the DOM node exists but
     // the bounding box is 0×0.
@@ -89,7 +87,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
   test("plans page: Pro user sees 'Your plan' (disabled), not re-checkout CTA", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedFounderUser(page);
-    await page.goto("/plans", { waitUntil: "networkidle" });
+    await page.goto("/plans", { waitUntil: "domcontentloaded" });
     // The Pro card swaps the upgrade CTA for a disabled "Your plan"
     // button — tagged with data-testid for stable lookup.
     const currentCta = page.getByTestId("plan-pro-current-cta");
@@ -106,13 +104,13 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
   test("non-founder free user does NOT get promoted (regression guard)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedUser(page, "free");
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     // Free user: no Pro identity anywhere.
     await expect(page.getByTestId("avatar-pro")).toHaveCount(0);
     await expect(page.locator(".pulpo-logo-pro")).toHaveCount(0);
     await expect(page.locator(".avatar-pro-badge")).toHaveCount(0);
     // Plans page still shows the upgrade CTA.
-    await page.goto("/plans", { waitUntil: "networkidle" });
+    await page.goto("/plans", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("button", { name: /Upgrade — €/ })).toBeVisible();
     expect(errors).toEqual([]);
   });
