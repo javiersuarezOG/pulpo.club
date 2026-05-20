@@ -82,105 +82,90 @@ const PRO_PRICE_EUR_PER_MONTH = 10;
 //   RANKING — rmax=10  OR  status=price_drop  OR  status=new   single-select
 //   FILTERS — tag=waterfront (toggle) + pmax=100000|250000 (mutex pair)
 //
-// Click logic reads the current URL, computes the next URL, and navigates
-// to /browse. When the user is already on /browse, app.goBrowse keeps the
-// same route but updates routeParams; the BrowsePage mount-time effect
-// re-reads the URL and applies the new filter set.
-function readPillState() {
-  if (typeof window === "undefined") return new URLSearchParams();
-  return new URLSearchParams(window.location.search);
-}
-
-function isPillActive(pill, params) {
+// Pill chips are visually driven by the React filter state — that's the
+// same source of truth FilterPanel writes to and applyFilters reads from.
+// Routing the chip through URL params and back through the category
+// effect (the original design) didn't work because back-to-back clicks
+// kept `routeParams.category` at null both times, so the effect that
+// re-seeded filters from URL only fired on the first click.
+function isPillActive(pill, filters) {
   if (pill.param === "master") {
-    const cur = params.get("master") || null;
-    return cur === pill.value;
+    return (filters.master_category ?? null) === pill.value;
   }
   if (pill.param === "rmax") {
-    return params.get("rmax") === pill.value;
+    return filters.rank_max != null && String(filters.rank_max) === pill.value;
   }
   if (pill.param === "status") {
-    const cur = (params.get("status") || "").split(",").filter(Boolean);
-    return cur.includes(pill.value);
+    return filters.status.has(pill.value);
   }
   if (pill.param === "tag") {
-    const cur = (params.get("tag") || "").split(",").filter(Boolean);
-    return cur.includes(pill.value);
+    return filters.discovery_tags.has(pill.value);
   }
   if (pill.param === "pmax") {
-    return params.get("pmax") === pill.value;
+    return filters.price_max != null && String(filters.price_max) === pill.value;
   }
   return false;
 }
 
-// Compute the next URLSearchParams after clicking `pill` within `group`.
-// Single-select groups: clicking active = clear; clicking inactive = set
-// (and clear sibling selections in the same group). Toggle: add/remove
-// from the tag set. price_mutex: set pmax to this value (overrides the
-// sibling chip in the same group).
-function nextParamsForPill(group, pill, params) {
-  const next = new URLSearchParams(params);
-  const isActive = isPillActive(pill, params);
+// Compute the next FilterShape after clicking `pill` within `group`. Each
+// tier has a distinct interaction model; this function is the one place
+// that knows them. Sets are cloned so React detects the state change.
+function nextFiltersForPill(group, pill, filters) {
+  const next = { ...filters };
+  const wasActive = isPillActive(pill, filters);
 
   if (group === "where") {
-    // master is mutex; clicking active value clears it; clicking "All"
-    // (value === null) always clears.
-    if (pill.value == null || isActive) next.delete("master");
-    else next.set("master", pill.value);
+    // master is single-select; clicking the active value (or "All") clears it.
+    next.master_category = (pill.value == null || wasActive) ? null : pill.value;
     return next;
   }
 
   if (group === "ranking") {
-    // RANKING is mutex across three different URL params. Clear all three
-    // first, then set the clicked one (unless it was already active → clear-only).
-    next.delete("rmax");
-    next.delete("status");
-    if (!isActive) {
-      if (pill.param === "rmax") next.set("rmax", pill.value);
-      else if (pill.param === "status") next.set("status", pill.value);
+    // RANKING is mutex across rmax + two status values. Clear all three first,
+    // then set the clicked one (unless it was already active → clear-only).
+    next.rank_max = null;
+    const status = new Set(filters.status);
+    status.delete("price_drop");
+    status.delete("new");
+    if (!wasActive) {
+      if (pill.param === "rmax") next.rank_max = parseInt(pill.value, 10);
+      else if (pill.param === "status") status.add(pill.value);
     }
+    next.status = status;
     return next;
   }
 
-  // FILTERS group: mixed behavior
   if (pill.behavior === "toggle") {
     // tag set: add/remove pill.value
-    const cur = new Set((next.get("tag") || "").split(",").filter(Boolean));
-    if (isActive) cur.delete(pill.value);
-    else cur.add(pill.value);
-    if (cur.size === 0) next.delete("tag");
-    else next.set("tag", [...cur].join(","));
+    const tags = new Set(filters.discovery_tags);
+    if (wasActive) tags.delete(pill.value);
+    else tags.add(pill.value);
+    next.discovery_tags = tags;
     return next;
   }
   if (pill.behavior === "price_mutex") {
-    if (isActive) next.delete("pmax");
-    else next.set("pmax", pill.value);
+    // pmax is single-value; clicking the active price clears it. Sibling
+    // chip (the other Under $… price) overrides automatically because
+    // both write to the same field.
+    next.price_max = wasActive ? null : parseInt(pill.value, 10);
     return next;
   }
   return next;
 }
 
-function PillRail({ app }) {
-  // Re-read URL on every render so the rail reflects external filter changes
-  // (FilterPanel toggles, back-button, deep links). Keyed by app.routeParams
-  // so clicks trigger a re-render even when the URL string itself is mutated
-  // via replaceState by writeFilterToURL.
-  const params = readPillState();
+function PillRail({ app, filters, setFilters }) {
   const lc = app.locale;
 
   const handleClick = (groupKey, pill) => {
-    const next = nextParamsForPill(groupKey, pill, params);
-    // Preserve dev/debug/utm params that aren't filter-related.
-    // (They're already in `params` by virtue of starting from window.search.)
-    const qs = next.toString();
+    const nextFilters = nextFiltersForPill(groupKey, pill, filters);
+    // Push a fresh history entry so the back button undoes the chip
+    // click. The URL value here is a placeholder — BrowsePage's
+    // writeFilterToURL effect replaceState's it with the canonical
+    // encoding on the next tick.
     if (typeof window !== "undefined") {
-      const url = `/browse${qs ? `?${qs}` : ""}`;
-      // Push to history so back-button works for chip navigation.
-      window.history.pushState({}, "", url);
+      window.history.pushState({}, "", window.location.pathname + window.location.search);
     }
-    // Route to /browse without a `category` slug — the filter state is
-    // already encoded in the URL params we just wrote.
-    app.goBrowse({ category: null });
+    setFilters(nextFilters);
   };
 
   return (
@@ -190,7 +175,7 @@ function PillRail({ app }) {
           <span className="pill-tier-label">{t(group.headerKey, lc)}</span>
           <div className="pill-rail">
             {group.pills.map(p => {
-              const active = isPillActive(p, params);
+              const active = isPillActive(p, filters);
               return (
                 <button
                   key={p.key}
@@ -1043,11 +1028,25 @@ function applyFilters(listings, f) {
         if (!tags.includes(required)) return false;
       }
     }
-    if (f.rank_max != null && f.rank_max > 0) {
-      if (typeof l.rank !== "number" || l.rank > f.rank_max) return false;
-    }
+    // rank_max is intentionally NOT applied here — it operates on a
+    // position rank that only makes sense AFTER every other predicate
+    // has narrowed the set. Callers compute the cap via applyRankCap.
     return true;
   });
+}
+
+// Take the post-applyFilters list and, if rank_max is set, keep only the
+// top N by rank_score (descending). The N best listings *within the
+// current filter scope* — so "Lake + Top 10" means "10 best lake
+// listings", not "the global top 10 intersected with lake" (which is
+// almost always 0). Listings without a rank_score are dropped from the
+// cap to keep the badge consistent with the global Top-10 semantics.
+function applyRankCap(listings, rank_max) {
+  if (rank_max == null || rank_max <= 0) return listings;
+  return [...listings]
+    .filter((l) => l.rank_score != null)
+    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
+    .slice(0, rank_max);
 }
 
 // ====== Browse Page ======
@@ -1187,7 +1186,15 @@ function BrowsePage({ app }) {
     // recurring computation on Browse (873 listings × 15 predicates).
     // Telemetry surfaces P95 in PostHog so a regression is visible.
     const _perf_t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
-    const r = applyFilters(LISTINGS, debouncedFilters);
+    const filtered = applyFilters(LISTINGS, debouncedFilters);
+    // Top-N cap runs AFTER applyFilters so "Lake + Top 10" means
+    // the 10 best lake listings, not the global top 10 narrowed to
+    // lake (which is usually empty). When rank_max is active we
+    // also force-sort by rank_score desc so the chip's intent
+    // ("show me the best") survives whatever the sort dropdown was
+    // last set to.
+    const r = applyRankCap(filtered, debouncedFilters.rank_max);
+    const rankActive = debouncedFilters.rank_max != null && debouncedFilters.rank_max > 0;
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
       price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
@@ -1208,7 +1215,7 @@ function BrowsePage({ app }) {
         recomputeComposite(b, debouncedFilters.weights) -
         recomputeComposite(a, debouncedFilters.weights),
     };
-    const sorted = [...r].sort(sorters[sort] || sorters.recent);
+    const sorted = [...r].sort(rankActive ? sorters.stars_desc : (sorters[sort] || sorters.recent));
     // Emit perf telemetry for the full filter+sort cycle.
     if (_perf_t0 > 0 && typeof performance !== "undefined" && performance.now) {
       const ms = Math.round(performance.now() - _perf_t0);
@@ -1268,7 +1275,7 @@ function BrowsePage({ app }) {
 
   return (
     <div className="page page-browse">
-      <PillRail app={app} />
+      <PillRail app={app} filters={filters} setFilters={setFilters} />
       <div className="browse-layout">
         <div className="filter-desktop">
           <FilterPanel filters={filters} setFilters={setFilters} count={results.length} app={app} />
@@ -1511,7 +1518,9 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
                   <span className="pulpo-rank pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
-                    <span className="pulpo-rank-star" aria-hidden="true">★</span>
+                    <span className="pulpo-rank-star" aria-hidden="true">
+                      <Icon name="cat_top10" size={12} strokeWidth={2} />
+                    </span>
                     <span className="pulpo-rank-num">{topRankMap.get(l.id)}</span>
                   </span>
                 )}
