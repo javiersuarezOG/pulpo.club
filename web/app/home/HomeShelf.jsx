@@ -188,12 +188,13 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
 
   // Real-listing rendering path
   if (isReal && heroV4) {
-    // Rank chip subsumes the grade-letter "A+ / A / B+ deal" badge on
-    // the top_10 shelf — the explicit #1..#10 number is a stronger,
-    // less duplicative signal than the grade. Other shelves keep their
-    // contextual badge alongside the rank chip (rank top-left, kind
-    // badge stacked beneath via CSS).
-    const badge = shelfKey === "top_10" ? null : badgeForListing(listing, shelfKey);
+    // One tag per shelf: Top 10 shows the rank chip (#1..#10) as its
+    // single overlay; Price Drops shows the −$Xk badge; New Listings
+    // shows the recency badge. Stacking both reads as crowded, so each
+    // shelf gets exactly one identity element.
+    const isTopTen = shelfKey === "top_10";
+    const badge = isTopTen ? null : badgeForListing(listing, shelfKey);
+    const showRank = isTopTen && rank != null;
     return (
       <article className="hp-shelf-card hp-shelf-card-real" onClick={onClick}>
         <div className="hp-shelf-card-art">
@@ -206,9 +207,11 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
             source="home_shelf"
             thumbnail
           />
-          {rank != null && (
+          {showRank && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
-              <span className="pulpo-rank-star" aria-hidden="true">★</span>
+              <span className="pulpo-rank-star" aria-hidden="true">
+                <Icon name="cat_top10" size={12} strokeWidth={2} />
+              </span>
               <span className="pulpo-rank-num">{rank}</span>
             </span>
           )}
@@ -284,6 +287,7 @@ export function HomeShelf({
   headingKey,
   subcopyKey,      // Optional one-line subtitle under the h2 (objective shelf description).
   countPill,
+  iconName,        // Optional icon (e.g. "cat_top10") rendered inline before the h2 text.
   cards,
   listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
   heroV4 = false,  // gates the new card markup
@@ -366,6 +370,9 @@ export function HomeShelf({
               </span>
             ) : null}
             <h2 id={`${domId}-h2`} className="hp-shelf-h2">
+              {iconName ? (
+                <Icon name={iconName} size={22} strokeWidth={1.5} className="hp-shelf-h2-icon" />
+              ) : null}
               {t(headingKey, locale)}
             </h2>
             {subcopyKey ? (
@@ -464,6 +471,7 @@ export function TopTenShelf({ app, locale, heroV4 = false }) {
       domId="hp-shelf-top10"
       headingKey="home.shelf.top10.h2"
       subcopyKey="home.shelf.top10.sub"
+      iconName="cat_top10"
       cards={TOP_10_CARDS}
       listings={listings}
       heroV4={heroV4}
