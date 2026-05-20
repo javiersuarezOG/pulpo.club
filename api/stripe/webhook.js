@@ -101,6 +101,55 @@ async function findPendingInvitation(clerk, email) {
   }
 }
 
+// Stripe retries webhook delivery on any non-2xx response and on missed
+// ACKs (network blip between Stripe and Vercel). A retry carries the
+// SAME event.id as the original. Most paths in this handler are already
+// idempotent — setPlanForClerkUser writes plan="pro" the same way on the
+// nth call — but the anonymous_invitation_created path is not:
+// createInvitation produces a new row each time, and sendActivationEmail
+// sends another email. The user sees duplicate "set up your Pulpo Pro
+// account" inboxes, which is a real production-visible failure.
+//
+// Dedup strategy: use Stripe's own subscription.metadata as the dedup
+// store. We retrieve the subscription, check whether
+// metadata.pulpo_last_event_id matches the current event.id, and skip
+// the side-effecting path if so. After successful processing we write
+// the new event.id into the same metadata field.
+//
+// Why subscription metadata and not a separate store:
+//   - No new infrastructure (no Vercel KV / Upstash / Postgres).
+//   - Stripe is already the source of truth for the subscription.
+//   - Cross-instance retries are covered: any warm or cold function
+//     invocation reads the same subscription state.
+// Trade-off: 1 extra Stripe API call per webhook on the anonymous path
+// (~50ms). Acceptable at our event volume.
+async function isStripeEventAlreadyProcessed(stripe, subscriptionId, eventId) {
+  if (!subscriptionId || !eventId) return false;
+  try {
+    const sub = await stripe.subscriptions.retrieve(subscriptionId);
+    const lastId = sub && sub.metadata && sub.metadata.pulpo_last_event_id;
+    return lastId === eventId;
+  } catch {
+    // Read failure: fall through and process. Worst case is a duplicate
+    // email; better than silently skipping a legitimate first delivery
+    // because Stripe was momentarily unreachable.
+    return false;
+  }
+}
+
+async function markStripeEventProcessed(stripe, subscriptionId, eventId) {
+  if (!subscriptionId || !eventId) return;
+  try {
+    await stripe.subscriptions.update(subscriptionId, {
+      metadata: { pulpo_last_event_id: eventId },
+    });
+  } catch {
+    // Non-fatal: the event was processed correctly; we just couldn't
+    // store the dedup marker. On retry we'd reprocess (duplicate email),
+    // which is the tolerated failure mode of this safety net.
+  }
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
   if (req.method !== "POST") {
@@ -276,6 +325,28 @@ module.exports = async (req, res) => {
           break;
         }
 
+        // Idempotency gate: if Stripe is retrying this exact event.id
+        // (transient 5xx or missed-ACK on a prior attempt), the previous
+        // attempt may have already created the invitation and sent the
+        // email. Re-running the side effects produces a duplicate inbox
+        // for the user. Skip with a 200 if subscription.metadata says
+        // we've already processed this event.id. See helpers above for
+        // the design rationale.
+        const stripe = stripeClient();
+        if (await isStripeEventAlreadyProcessed(stripe, subscriptionId, event.id)) {
+          logApi("stripe.webhook", {
+            status: 200, ms: Date.now() - t0, type: event.type,
+            path: "anonymous_duplicate_skip",
+            session_id: session.id, subscription_id: subscriptionId,
+            event_id: event.id,
+          });
+          posthog.capture(distinctId, "webhook.checkout_completed", {
+            ...baseProps, path: "anonymous_duplicate_skip",
+            invitation_sent: false, ms: Date.now() - t0,
+          });
+          break;
+        }
+
         // If a pending invitation already exists for this email, revoke
         // it before creating a fresh one. This guarantees a fresh
         // activation email goes out on every checkout (as long as the
@@ -355,6 +426,13 @@ module.exports = async (req, res) => {
             actionUrl,
             sessionId: session.id,
           });
+
+          // Mark the event as processed BEFORE telemetry so a Stripe
+          // retry hits the dedup branch above even if the function gets
+          // killed mid-handler. Failures are swallowed inside the
+          // helper (see comment there) — a missed write means the next
+          // retry redoes the work, which is the tolerated failure mode.
+          await markStripeEventProcessed(stripe, subscriptionId, event.id);
 
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
@@ -485,3 +563,8 @@ module.exports = async (req, res) => {
 // Disable Vercel's default JSON body parser — signature verification
 // requires the raw bytes off the wire.
 module.exports.config = { api: { bodyParser: false } };
+
+// Test seam — pure helpers exported for unit tests. Vercel doesn't
+// import these in prod; the bundler tree-shakes them out.
+module.exports.isStripeEventAlreadyProcessed = isStripeEventAlreadyProcessed;
+module.exports.markStripeEventProcessed = markStripeEventProcessed;
