@@ -28,8 +28,18 @@ function pickShorelineHero(listings, shoreline) {
     }
     return false;
   };
+  // Require a local thumbnail_url. Broker URLs (Encuentra24, Bienesonline,
+  // etc.) can stall silently — no onerror, no onload — leaving the shimmer
+  // skeleton visible forever. The local /photos/<id>.jpg derivative is
+  // repo-served and reliable. ~91% of listings have one; falling back to
+  // the category WebP is fine for the rare shoreline with zero candidates.
   return [...listings]
-    .filter((l) => matches(l) && l.photos && l.photos.length > 0 && l.rank_score != null)
+    .filter((l) =>
+      matches(l) &&
+      l.photos && l.photos.length > 0 &&
+      typeof l.thumbnail_url === "string" && l.thumbnail_url.length > 0 &&
+      l.rank_score != null
+    )
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))[0] || null;
 }
 
@@ -81,6 +91,7 @@ function ShorelineCard({ shoreline, locale, app, heroListing }) {
           ratio="auto"
           className="hp-shoreline-photo"
           eager
+          thumbnail
           source="home_shoreline"
         />
       ) : fallbackSrc ? (
