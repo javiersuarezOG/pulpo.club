@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:47:16.417727+00:00",
+  "computed_at": "2026-05-20T07:31:24.434580+00:00",
   "derivative_width": 1080,
   "derivative_height": 616,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4729979/79952521/EB-RD9979.jpg?rasterize=true&version=1726068702",
-  "candidate_count": 3,
-  "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T21:47:16.420405+00:00"
+  "candidate_count": 3
 }

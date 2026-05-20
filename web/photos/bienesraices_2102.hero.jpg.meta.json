@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T21:51:59.875898+00:00",
+  "computed_at": "2026-05-20T07:31:28.231434+00:00",
   "derivative_width": 1442,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/QW4O1TNUCR/mjynqZVqMg/La-Union-5-scaled.jpeg",
-  "candidate_count": 3,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:51:59.893847+00:00"
+  "candidate_count": 3
 }

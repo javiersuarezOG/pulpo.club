@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:39:40.944436+00:00",
+  "computed_at": "2026-05-20T07:31:17.001094+00:00",
   "derivative_width": 1000,
   "derivative_height": 601,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://remax-central.com.sv/storage/properties/J3tqq21RKrlWOXUxdtek-large.jpg",
-  "candidate_count": 1,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:39:40.948838+00:00"
+  "candidate_count": 1
 }

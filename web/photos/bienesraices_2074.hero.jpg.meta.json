@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T21:38:36.944980+00:00",
+  "computed_at": "2026-05-20T07:31:15.708557+00:00",
   "derivative_width": 810,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/TNMPSSAQLV/Atk5bF7xWL/WhatsApp_Image_2025-12-14_at_9.jpeg",
-  "candidate_count": 5,
-  "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T21:38:36.952395+00:00"
+  "candidate_count": 5
 }

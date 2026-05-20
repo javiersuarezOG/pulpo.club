@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:36:37.833485+00:00",
+  "computed_at": "2026-05-20T07:31:13.584587+00:00",
   "derivative_width": 800,
   "derivative_height": 800,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2023/08/8-1.png",
-  "candidate_count": 5,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:36:37.854227+00:00"
+  "candidate_count": 5
 }

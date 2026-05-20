@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:56:54.232416+00:00",
+  "computed_at": "2026-05-20T07:31:32.854298+00:00",
   "derivative_width": 736,
   "derivative_height": 419,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093245048/v3/HDPhotos/BOULEVARD CONSTITUCION.jpg",
-  "candidate_count": 1,
-  "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T21:56:54.234423+00:00"
+  "candidate_count": 1
 }

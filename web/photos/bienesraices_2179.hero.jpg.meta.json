@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:48:46.418760+00:00",
+  "computed_at": "2026-05-20T07:31:25.663986+00:00",
   "derivative_width": 1600,
   "derivative_height": 720,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/HG8MJOSYDM/82Dc3pDPVK/Venta_de_Terreno_en_Ahuachap%C3%A1n_23_Manzanas_a_Orilla_de_Carretera_Las_Chinamas.jpeg",
-  "candidate_count": 5,
-  "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T21:48:46.423235+00:00"
+  "candidate_count": 5
 }

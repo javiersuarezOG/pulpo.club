@@ -1,18 +1,16 @@
 {
-  "width": 1280,
-  "height": 935,
-  "aspect_ratio": 1.369,
-  "file_size_kb": 267.5,
+  "width": 1279,
+  "height": 960,
+  "aspect_ratio": 1.332,
+  "file_size_kb": 334.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:37:00.414369+00:00",
-  "derivative_width": 1280,
-  "derivative_height": 935,
+  "computed_at": "2026-05-20T07:31:14.368102+00:00",
+  "derivative_width": 1279,
+  "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvUklJTFI1SFE4My9VR1E5QnBBUENzL1RlcnJlbm9fZGVfMTA5NV92XHUwMGIyX2VuX0h1aXpcdTAwZmFjYXJfTGFfTGliZXJ0YWRfRXN0ZV9fT3BvcnR1bmlkYWRfY29uX0N1bHRpdm9fZGVfQ2FmXHUwMGU5XzUuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5NjAsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
-  "candidate_count": 4,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:37:00.418886+00:00"
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvOFIyTTlDMDgzMi9KOGQ0RlhzVFZiL1RlcnJlbm9fZGVfMTA5NV92XHUwMGIyX2VuX0h1aXpcdTAwZmFjYXJfTGFfTGliZXJ0YWRfRXN0ZV9fT3BvcnR1bmlkYWRfY29uX0N1bHRpdm9fZGVfQ2FmXHUwMGU5XzQuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5NjAsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
+  "candidate_count": 4
 }

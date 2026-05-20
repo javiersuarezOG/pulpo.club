@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:35:00.212379+00:00",
+  "computed_at": "2026-05-20T07:31:11.276499+00:00",
   "derivative_width": 1600,
   "derivative_height": 901,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/OYG5OFF78D/ifSauUHXSB/VENTA_DE_88_MANZANAS_EN_QUEZALTEPEQUE_DPTO_DE_LA_LIBERTAD.jpeg",
-  "candidate_count": 4,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:35:00.218609+00:00"
+  "candidate_count": 4
 }

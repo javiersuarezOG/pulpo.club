@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:44:48.554550+00:00",
+  "computed_at": "2026-05-20T07:31:21.955736+00:00",
   "derivative_width": 517,
   "derivative_height": 304,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/3287450/52900383/EB-LP7450.jpg?rasterize=true&version=1664733054",
-  "candidate_count": 5,
-  "picker_excluded_count": 5,
-  "repicked_at": "2026-05-19T21:44:48.555151+00:00"
+  "candidate_count": 5
 }

@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:36:52.061411+00:00",
+  "computed_at": "2026-05-20T07:31:13.983522+00:00",
   "derivative_width": 1152,
   "derivative_height": 648,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/2786203/44044790/EB-JR6203.jpg?rasterize=true&version=1645549723",
-  "candidate_count": 5,
-  "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T21:36:52.065136+00:00"
+  "candidate_count": 5
 }

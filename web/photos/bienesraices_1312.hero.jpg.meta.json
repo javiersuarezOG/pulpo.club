@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:42:41.411470+00:00",
+  "computed_at": "2026-05-20T07:31:19.720937+00:00",
   "derivative_width": 1200,
   "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/5241675/90200906/EB-TD1675.jpeg?rasterize=true&version=1747324586",
-  "candidate_count": 2,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:42:41.414716+00:00"
+  "candidate_count": 2
 }

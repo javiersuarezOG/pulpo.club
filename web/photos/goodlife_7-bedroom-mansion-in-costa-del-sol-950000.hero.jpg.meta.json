@@ -2,17 +2,15 @@
   "width": 1024,
   "height": 683,
   "aspect_ratio": 1.499,
-  "file_size_kb": 81.8,
+  "file_size_kb": 107.0,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:55:28.772731+00:00",
+  "computed_at": "2026-05-20T07:31:31.549736+00:00",
   "derivative_width": 1024,
   "derivative_height": 683,
-  "hero_photo_quality_score": 50,
+  "hero_photo_quality_score": 60,
   "has_text_overlay": false,
-  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/costa-del-sol-house-for-sale-14-1024x683.jpg",
-  "candidate_count": 5,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:55:28.778488+00:00"
+  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/costa-del-sol-house-for-sale-2-1024x683.jpg",
+  "candidate_count": 5
 }

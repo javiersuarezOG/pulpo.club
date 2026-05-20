@@ -42998,5 +42998,235 @@
     "cost_usd": 0.00125544,
     "finish_reason": "stop",
     "latency_ms": 8143
+  },
+  "remax|003063705009": {
+    "ts": "2026-05-20T07:08:20.090706+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Building Lot in Planes de Renderos, San Salvador",
+      "es": "Terreno en Planes de Renderos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Excellent investment opportunity in Lotificación El Pinar, Polígono G, Lot 3, located in the peaceful and growing area of Planes de Renderos, San Salvador. This 136 m² flat lot is elevated above street level, ideal for building your dream home or as a long-term investment. The property features a perimeter wall, razor wire fencing, and a private access gate already in place, offering security and privacy. Situated in a progressively developing rural-residential area, it combines tranquility with accessibility. Priced at $78,750 negotiable. Contact us today for more information or to schedule a visit!",
+      "es": "Excelente oportunidad de inversión en Lotificación El Pinar, Polígono G, Lote 3, ubicado en la tranquila y creciente zona de Planes de Renderos, San Salvador. Este terreno plano de 136 m² está elevado sobre el nivel de la calle, ideal para construir su hogar soñado o como inversión a largo plazo. La propiedad cuenta con muro perimetral, cerca de púas y portón de acceso privado ya instalados, ofreciendo seguridad y privacidad. Situado en un área rural-residencial en desarrollo progresivo, combina tranquilidad y accesibilidad. Precio: $78,750 negociable. ¡Contáctenos hoy para más información o para agendar una visita!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "136 m² flat lot with elevated topography",
+        "es": "Terreno plano de 136 m² con topografía elevada"
+      },
+      {
+        "en": "Perimeter wall, razor wire, and private gate included",
+        "es": "Muro perimetral, cerca de púas y portón privado incluidos"
+      },
+      {
+        "en": "Peaceful rural-residential area with growth potential",
+        "es": "Zona rural-residencial tranquila con potencial de crecimiento"
+      },
+      {
+        "en": "Negotiable price at $78,750",
+        "es": "Precio negociable de $78,750"
+      },
+      {
+        "en": "Ideal for building a home or investment",
+        "es": "Ideal para construir casa o inversión"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Planes de Renderos, Panchimalco, San Salvador",
+    "url_language": "en",
+    "tokens_in": 2497,
+    "tokens_out": 614,
+    "cost_usd": 0.00134959,
+    "finish_reason": "stop",
+    "latency_ms": 7062
+  },
+  "remax|001462845091": {
+    "ts": "2026-05-20T07:08:20.806589+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "3 Flat Plots for Sale in Cangrejera, La Libertad",
+      "es": "3 Terrenos Planos en Venta en Cangrejera, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover three exceptional flat plots of land, each 10 x 35 meters, located at kilometer 46.5 on El Litoral Road in the sought-after Cangrejera area of La Libertad Coast. These urbanized lots come with water and electricity access, plus a main road and a lateral road for easy construction. Situated within the peaceful Lotificación Estancias Vistas del Mar, they are ready for building in a safe, quiet neighborhood close to beautiful beaches and the charming village of Cangrejera. Ideal for a farmhouse, hostel, or investment property. Don't miss this opportunity!",
+      "es": "Descubre tres excepcionales terrenos planos de 10 x 35 metros cada uno, ubicados en el kilómetro 46.5 de la Carretera El Litoral, en la codiciada zona de Cangrejera, Costa de La Libertad. Estos lotes urbanizados cuentan con acceso a agua y electricidad, además de una calle principal y una lateral para facilitar la construcción. Situados dentro de la tranquila Lotificación Estancias Vistas del Mar, están listos para edificar en un vecindario seguro y apacible, cerca de hermosas playas y el encantador pueblo de Cangrejera. Ideales para casa de campo, hostal o inversión. ¡No pierdas esta oportunidad!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Three flat plots of 10x35 m each, sold separately or together",
+        "es": "Tres terrenos planos de 10x35 m cada uno, se venden separados o juntos"
+      },
+      {
+        "en": "Prime location at km 46.5 on El Litoral Road, near beaches",
+        "es": "Ubicación privilegiada en el km 46.5 de la Carretera El Litoral, cerca de playas"
+      },
+      {
+        "en": "Urbanized with water, electricity, and road access",
+        "es": "Urbanizados con agua, electricidad y acceso vial"
+      },
+      {
+        "en": "Quiet and safe neighborhood in Lotificación Estancias Vistas del Mar",
+        "es": "Vecindario tranquilo y seguro en Lotificación Estancias Vistas del Mar"
+      },
+      {
+        "en": "Ideal for farmhouse, hostel, or investment",
+        "es": "Ideal para casa de campo, hostal o inversión"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa K59 / San Diego (nearest beach in table)",
+    "url_language": "mixed",
+    "tokens_in": 2500,
+    "tokens_out": 679,
+    "cost_usd": 0.0014219,
+    "finish_reason": "stop",
+    "latency_ms": 7777
+  },
+  "remax|002684004014": {
+    "ts": "2026-05-20T07:08:21.146878+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "40-Acre Macro-Lot in Altos de Santa Lucía",
+      "es": "Macrolote de 40 Acres en Altos de Santa Lucía"
+    },
+    "short_description_canonical": {
+      "en": "Seize a rare turnkey investment opportunity: a 40-acre macro-lot in the exclusive Altos de Santa Lucía Residential Community, Southwest Zone. This fully subdivided property comprises 247 individual lots (144,208.06 m² total), each with its own title deed. Environmental impact studies and urbanization permits are already approved, eliminating development risk. Located at the foot of Santa Lucía Hill, the site combines urban appreciation potential with a pristine natural setting. Priced at $3,000,000 USD, this is not just land—it's a ready-to-launch residential project. Contact us for a private showing and technical review.",
+      "es": "Aproveche una oportunidad de inversión llave en mano: un macrolote de 40 acres en la exclusiva Comunidad Residencial Altos de Santa Lucía, Zona Suroeste. Esta propiedad totalmente subdividida comprende 247 lotes individuales (144,208.06 m² en total), cada uno con su título de propiedad independiente. Los estudios de impacto ambiental y los permisos de urbanización ya están aprobados, eliminando el riesgo de desarrollo. Ubicado al pie del Cerro Santa Lucía, el sitio combina potencial de plusvalía urbana con un entorno natural privilegiado. Precio: $3,000,000 USD. No es solo terreno, es un proyecto residencial listo para lanzar. Contáctenos para una visita privada y revisión técnica."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "247 individual lots with separate title deeds",
+        "es": "247 lotes individuales con escrituras independientes"
+      },
+      {
+        "en": "Approved environmental and urbanization permits",
+        "es": "Permisos ambientales y de urbanización aprobados"
+      },
+      {
+        "en": "Prime southwest location at Santa Lucía Hill",
+        "es": "Ubicación privilegiada al suroeste, al pie del Cerro Santa Lucía"
+      },
+      {
+        "en": "Turnkey project ready for pre-sales",
+        "es": "Proyecto llave en mano listo para preventas"
+      },
+      {
+        "en": "Attractive price of $3,000,000 USD",
+        "es": "Precio atractivo de $3,000,000 USD"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2333,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Lucía Hill, Southwest Zone, San Salvador",
+    "url_language": "en",
+    "tokens_in": 2575,
+    "tokens_out": 633,
+    "cost_usd": 0.00139155,
+    "finish_reason": "stop",
+    "latency_ms": 8117
+  },
+  "remax|002282623033": {
+    "ts": "2026-05-20T07:08:21.898981+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Land in Playa Dorada, Sonsonate – High Appreciation",
+      "es": "Terreno Premium en Playa Dorada, Sonsonate – Alta Plusvalía"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare investment opportunity in Playa Dorada, Sonsonate, one of the fastest-growing coastal areas in western El Salvador. This 1,910 m² (2,734 sq. varas) flat parcel offers 24 meters of frontage and a depth of up to 90 meters, making it ideal for residential, tourism, or mixed-use projects. Located just off the Litoral Highway, it is only 1 hour from Puerto de La Libertad and 30 minutes from Puerto de Acajutla. The property sits on the second row from the beach, with a direct road leading to the shore, and is surrounded by restaurants and tourist amenities. A recent appraisal confirms its market value, ensuring a solid investment in a rapidly appreciating area. Don't miss this chance to develop a beachfront project in one of El Salvador's most promising coastal regions.",
+      "es": "Descubra una oportunidad de inversión única en Playa Dorada, Sonsonate, una de las zonas costeras de más rápido crecimiento en el occidente de El Salvador. Este terreno plano de 1,910 m² (2,734 vrs²) cuenta con 24 metros de frente y hasta 90 metros de fondo, ideal para proyectos residenciales, turísticos o de uso mixto. Ubicado a pocos pasos de la Carretera Litoral, está a solo 1 hora de Puerto de La Libertad y 30 minutos de Puerto de Acajutla. La propiedad se encuentra en segunda fila de la playa, con un camino directo a la orilla, y rodeada de restaurantes y servicios turísticos. Una tasación reciente respalda su valor de mercado, garantizando una inversión sólida en una zona de alta plusvalía. No pierda esta oportunidad de desarrollar un proyecto frente al mar en una de las regiones costeras más prometedoras de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,910 m² flat parcel with 24m frontage",
+        "es": "Parcela plana de 1,910 m² con 24 m de frente"
+      },
+      {
+        "en": "Second row from beach with direct road access",
+        "es": "Segunda fila de la playa con acceso directo por carretera"
+      },
+      {
+        "en": "Close to Mizata and Litoral Highway",
+        "es": "Cerca de Mizata y la Carretera Litoral"
+      },
+      {
+        "en": "High appreciation potential in growing area",
+        "es": "Alta plusvalía en zona en crecimiento"
+      },
+      {
+        "en": "Recent appraisal supports market value",
+        "es": "Tasación reciente respalda el valor de mercado"
+      }
+    ],
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, near Mizata, Sonsonate",
+    "url_language": "en",
+    "tokens_in": 2599,
+    "tokens_out": 729,
+    "cost_usd": 0.00150363,
+    "finish_reason": "stop",
+    "latency_ms": 8870
+  },
+  "remax|003133331010": {
+    "ts": "2026-05-20T07:08:21.912645+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Scenic Lot in Juayúa – Volcano Views, Ideal for Airbnb",
+      "es": "Lote Escénico en Juayúa – Vistas a Volcanes, Ideal para Airbnb"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity to own a semi-flat 3,099 v² (approx. 2,166 m²) lot in Juayúa, one of El Salvador's most charming regions. Located on the San José de La Majada highway, this parcel offers easy access via well-maintained roads, electricity ready for connection, and beautiful paved internal streets of natural stone. The secure, peaceful neighborhood is Airbnb-friendly, perfect for generating rental income. Enjoy breathtaking panoramic views of the Ilamatepec Mountain Range, Santa Ana Volcano, Izalco Volcano, Cerro Verde, and more. Whether for a dream vacation home, retirement retreat, or investment property, this land promises fresh mountain climate and stunning surroundings. Priced at $159,000. Contact us to schedule a visit.",
+      "es": "Descubra una oportunidad única de poseer un lote semiplano de 3,099 v² (aproximadamente 2,166 m²) en Juayúa, una de las regiones más encantadoras de El Salvador. Ubicado en la carretera a San José de La Majada, este terreno ofrece fácil acceso por caminos en buen estado, electricidad lista para conexión y hermosas calles internas empedradas de laja. El vecindario seguro y tranquilo es apto para Airbnb, perfecto para generar ingresos por alquiler. Disfrute de impresionantes vistas panorámicas de la cordillera Ilamatepec, el volcán Santa Ana, el volcán Izalco, Cerro Verde y más. Ya sea para una casa de vacaciones soñada, retiro o inversión, este terreno promete clima fresco de montaña y entorno natural. Precio: $159,000. Contáctenos para agendar una visita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Semi-flat 3,099 v² lot with panoramic volcano views",
+        "es": "Lote semiplano de 3,099 v² con vistas panorámicas a volcanes"
+      },
+      {
+        "en": "Easy access via paved roads and natural stone streets",
+        "es": "Fácil acceso por calles pavimentadas y empedradas de laja"
+      },
+      {
+        "en": "Electricity ready for connection, Airbnb-friendly zoning",
+        "es": "Electricidad lista para conexión, zonificación apta para Airbnb"
+      },
+      {
+        "en": "Secure, peaceful neighborhood in Juayúa, Sonsonate",
+        "es": "Vecindario seguro y tranquilo en Juayúa, Sonsonate"
+      },
+      {
+        "en": "Ideal for countryside home, retirement, or investment",
+        "es": "Ideal para casa de campo, retiro o inversión"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.8114,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa municipal centroid",
+    "url_language": "en",
+    "tokens_in": 2631,
+    "tokens_out": 730,
+    "cost_usd": 0.00151337,
+    "finish_reason": "stop",
+    "latency_ms": 8883
   }
 }
