@@ -320,13 +320,14 @@ module.exports = async (req, res) => {
             emailAddress: email,
             notify: false,
             // After accepting the Clerk invitation, land back on
-            // /account?welcome=1 — same surface as the post-Stripe
-            // redirect. ?lang=<locale> locks the landing page to the
-            // same language as the activation email (i18n.jsx reads
-            // ?lang= as the highest-priority locale source). Without
-            // this the user lands on browser-default locale, which
-            // mismatches the email language.
-            redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
+            // /account with BOTH `welcome=1` (existing route-gate
+            // bypass) AND `activation=1` (explicit "post-activation-
+            // click" marker so the frontend can open Clerk's password
+            // modal directly and suppress the WelcomeModal). The
+            // SDK-state detection in PR #361/362 was unreliable for
+            // some Clerk flows; the URL marker is deterministic.
+            // ?lang=<locale> locks the landing language.
+            redirectUrl: `${origin}/account?welcome=1&activation=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
             // locale kept for downstream parity even though Clerk's
             // own template no longer renders — our Resend templates
             // also branch on it.

@@ -491,10 +491,29 @@ function App() {
   // pass ordering matters here; the test for it is in
   // tests/e2e/preview-smoke.spec.ts ("welcome modal: gate-bypass
   // prevents SignupModal flash").
+  // activation=1 is set by the Clerk invitation's redirect_url
+  // (api/stripe/webhook.js + api/clerk/resend-invitation.js). When this
+  // param is present, the user just clicked the activation email and
+  // Clerk has a pending sign-up cookie ready — we open Clerk's password
+  // modal directly and DO NOT render our own WelcomeModal. The flag is
+  // synchronous (same init pattern as welcomeModalState) so the boot
+  // race doesn't matter; WelcomeModal can check this before its first
+  // render. Locked deterministically by URL — does not rely on
+  // clerk.signUp state which was unreliable in production (PR #361/362
+  // detection failed for Sebas's real Clerk session).
+  const [isActivationLanding, setIsActivationLanding] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get("activation") === "1";
+  });
+
   const [welcomeModalState, setWelcomeModalState] = useState(() => {
     if (typeof window === "undefined") return null;
     const params = new URLSearchParams(window.location.search);
     if (params.get("welcome") !== "1") return null;
+    // Suppress the post-Stripe WelcomeModal during the activation
+    // landing — Clerk's password modal takes the whole flow.
+    if (params.get("activation") === "1") return null;
     return { sessionId: params.get("session_id") || null };
   });
   const welcomeParamHandledRef = useRef(false);
@@ -506,6 +525,7 @@ function App() {
     welcomeParamHandledRef.current = true;
     params.delete("welcome");
     params.delete("session_id");
+    params.delete("activation");
     const newSearch = params.toString();
     const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "") + window.location.hash;
     window.history.replaceState({}, "", newUrl);
@@ -523,6 +543,33 @@ function App() {
     // race comment on the useState declaration.)
   }, []);
   const closeWelcomeModal = useCallback(() => setWelcomeModalState(null), []);
+
+  // Dedicated effect for the activation landing: open Clerk's hosted
+  // SignUp modal so the user can set their password. Fires as soon as
+  // Clerk hydrates (clerkActions becomes truthy). Once the user
+  // completes sign-up, Clerk redirects per the invitation's rurl back
+  // to /account?welcome=1&activation=1&lang=… signed in — the
+  // welcomeModalState init above sees activation=1 and skips rendering
+  // (the user is fully signed in by then anyway).
+  const activationHandledRef = useRef(false);
+  useEffect(() => {
+    if (!isActivationLanding) return;
+    if (!clerkActions) return;
+    if (user) return; // Already signed in — nothing to finish.
+    if (activationHandledRef.current) return;
+    activationHandledRef.current = true;
+    track("invitation.password_creation_opened", { source: "activation_landing" });
+    try {
+      clerkActions.openSignUp({});
+    } catch {
+      activationHandledRef.current = false;
+    }
+    // After Clerk completes sign-up + the redirect lands us back, the
+    // user is signed in. Clear the activation flag so any future
+    // route changes don't re-trigger this effect.
+    setIsActivationLanding(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActivationLanding, clerkActions, user]);
 
   // Handle `?login=1` — set by /start's "Log in" link so anonymous
   // visitors who already have an account land on `/` and immediately
