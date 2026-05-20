@@ -180,9 +180,12 @@ module.exports = async (req, res) => {
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       notify: false,
-      // welcome=1 + activation=1 marker — see api/stripe/webhook.js
-      // for the rationale (deterministic URL signal, not SDK state).
-      redirectUrl: `${origin}/account?welcome=1&activation=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
+      // welcome=1 only — Clerk strips our redirectUrl query params on
+      // /v1/tickets/accept and substitutes __clerk_status + __clerk_ticket
+      // (the actual landing URL the browser sees during activation).
+      // Frontend detects the activation landing on __clerk_ticket — see
+      // web/app/app.jsx hasClerkTicket + api/stripe/webhook.js comment.
+      redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
       ...(clerkLocale ? { locale: clerkLocale } : {}),
       publicMetadata: { plan: "pro" },
       privateMetadata: {
