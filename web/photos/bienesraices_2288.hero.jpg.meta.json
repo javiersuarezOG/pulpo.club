@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:18.656364+00:00",
+  "computed_at": "2026-05-20T12:51:40.701518+00:00",
   "derivative_width": 1280,
   "derivative_height": 960,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/F57W2ZHD5Y/rQQPB62Ets/Venta_de_Lotes_para_Desarrollo_Tur%C3%ADstico_en_Huiz%C3%BAcar__Zona_Cadejo_Monta%C3%B1a.jpeg",
-  "candidate_count": 2
+  "candidate_count": 2,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:51:40.705881+00:00"
 }

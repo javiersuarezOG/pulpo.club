@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:19.343357+00:00",
+  "computed_at": "2026-05-20T12:52:10.162198+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/2377353/36938134/EB-IC7353.jpg?rasterize=true&version=1627838998",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 1,
+  "repicked_at": "2026-05-20T12:52:10.168025+00:00"
 }

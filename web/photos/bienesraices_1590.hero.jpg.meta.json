@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:14.812537+00:00",
+  "computed_at": "2026-05-20T12:47:44.790574+00:00",
   "derivative_width": 1152,
   "derivative_height": 864,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4798015/81324969/EB-RK8015.jpg?rasterize=true&version=1729096591",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "picker_excluded_count": 2,
+  "repicked_at": "2026-05-20T12:47:44.794479+00:00"
 }

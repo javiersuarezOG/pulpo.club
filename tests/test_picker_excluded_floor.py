@@ -125,7 +125,7 @@ def test_pick_winner_prefers_non_excluded():
         _stub_candidate("https://x/a.jpg", cheap=95, excluded=True, technical=95),  # best by score
         _stub_candidate("https://x/b.jpg", cheap=60, excluded=False, technical=60),
     ]
-    url, _content, _score, _has_text = _pick_winner_from_scored(candidates)
+    url, _content, _score, _has_text, _has_marketing = _pick_winner_from_scored(candidates)
     assert url == "https://x/b.jpg"  # excluded one loses despite higher score
 
 
@@ -135,7 +135,81 @@ def test_pick_winner_falls_back_to_all_excluded_pool():
         _stub_candidate("https://x/a.jpg", cheap=15, excluded=True, technical=15),
         _stub_candidate("https://x/b.jpg", cheap=30, excluded=True, technical=30),
     ]
-    url, _content, _score, _has_text = _pick_winner_from_scored(candidates)
+    url, _content, _score, _has_text, _has_marketing = _pick_winner_from_scored(candidates)
     # All excluded → graceful degrade, listing still gets a hero (the
     # least-bad of the dregs).
     assert url == "https://x/b.jpg"
+
+
+# ── _pick_winner_from_scored drops has_marketing_overlay candidates ─────
+
+def _stub_candidate_with_overlays(url: str, *, technical: int,
+                                  has_text: bool, has_marketing: bool):
+    return {
+        "url": url,
+        "content": url.encode("utf-8"),
+        "score": technical,
+        "has_text_overlay": has_text,
+        "has_marketing_overlay": has_marketing,
+        "hero_eligible": True,
+        "cheap_score": technical,
+        "picker_excluded": False,
+    }
+
+
+def test_pick_winner_prefers_non_marketing_overlay():
+    """LLM-flagged marketing-banner candidate must lose to a clean peer
+    even when its technical score is higher — mirrors the
+    has_text_overlay filter for OCR-flagged candidates."""
+    from automation.run import _pick_winner_from_scored
+    candidates = [
+        _stub_candidate_with_overlays("https://x/banner.jpg",
+                                       technical=95,
+                                       has_text=False,
+                                       has_marketing=True),  # high-res banner
+        _stub_candidate_with_overlays("https://x/clean.jpg",
+                                       technical=60,
+                                       has_text=False,
+                                       has_marketing=False),
+    ]
+    url, _content, _score, _has_text, has_marketing = _pick_winner_from_scored(candidates)
+    assert url == "https://x/clean.jpg"
+    assert has_marketing is False
+
+
+def test_pick_winner_falls_back_when_all_marketing_overlay():
+    """If every candidate carries a marketing overlay, the picker still
+    selects one (graceful degrade) — same contract as has_text_overlay."""
+    from automation.run import _pick_winner_from_scored
+    candidates = [
+        _stub_candidate_with_overlays("https://x/a.jpg",
+                                       technical=40,
+                                       has_text=False,
+                                       has_marketing=True),
+        _stub_candidate_with_overlays("https://x/b.jpg",
+                                       technical=80,
+                                       has_text=False,
+                                       has_marketing=True),
+    ]
+    url, _content, _score, _has_text, has_marketing = _pick_winner_from_scored(candidates)
+    # All flagged → least-bad of the dregs (higher technical wins).
+    assert url == "https://x/b.jpg"
+    assert has_marketing is True
+
+
+def test_pick_winner_treats_none_marketing_overlay_as_unflagged():
+    """None on has_marketing_overlay means 'no signal' (legacy cache rows
+    predating the field). Picker must not false-reject — mirrors the
+    has_text_overlay null-tolerance contract."""
+    from automation.run import _pick_winner_from_scored
+    candidates = [
+        _stub_candidate_with_overlays("https://x/legacy.jpg",
+                                       technical=90,
+                                       has_text=False,
+                                       has_marketing=False),
+    ]
+    # Overwrite to simulate "no signal" — None instead of False
+    candidates[0]["has_marketing_overlay"] = None
+    url, _content, _score, _has_text, has_marketing = _pick_winner_from_scored(candidates)
+    assert url == "https://x/legacy.jpg"
+    assert has_marketing is None

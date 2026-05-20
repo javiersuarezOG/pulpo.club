@@ -1,16 +1,18 @@
 {
-  "width": 1600,
-  "height": 900,
+  "width": 1280,
+  "height": 720,
   "aspect_ratio": 1.778,
-  "file_size_kb": 309.2,
+  "file_size_kb": 247.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:14.468539+00:00",
-  "derivative_width": 1600,
-  "derivative_height": 900,
+  "computed_at": "2026-05-20T12:46:55.857001+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 720,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZO9JPIKMYC/SkkknfAc9m/Terreno_de_165_Manzanas_en_Cant%C3%B3n_R%C3%ADo_Fr%C3%ADo_Ahuachap%C3%A1n.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQThLUTlSSE5KVS9WQUtyWGppNllwL1RlcnJlbm9fZGVfMTY1X01hbnphbmFzX2VuX0NhbnRcdTAwZjNuX1JcdTAwZWRvX0ZyXHUwMGVkb19BaHVhY2hhcFx1MDBlMW5fMi5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
+  "candidate_count": 5,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T12:46:55.861468+00:00"
 }

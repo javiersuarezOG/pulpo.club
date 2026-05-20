@@ -2,15 +2,17 @@
   "width": 1200,
   "height": 900,
   "aspect_ratio": 1.333,
-  "file_size_kb": 132.4,
+  "file_size_kb": 117.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:37.772361+00:00",
+  "computed_at": "2026-05-20T13:06:33.861657+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
-  "winning_url": "https://assets.easybroker.com/property_images/5442683/94214505/EB-TX2683.jpeg?rasterize=true&version=1754945426",
-  "candidate_count": 3
+  "winning_url": "https://assets.easybroker.com/property_images/5442683/94214506/EB-TX2683.jpeg?rasterize=true&version=1754945426",
+  "candidate_count": 3,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T13:06:33.865739+00:00"
 }
