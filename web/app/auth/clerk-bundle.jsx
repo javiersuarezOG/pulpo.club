@@ -233,8 +233,16 @@ export default function ClerkProviderWrapper({ setUser, setAuthLoaded, onClerkAc
   // English. esMX picked over esES because Pulpo's Spanish copy is
   // Salvadoran/Central American (closer to LATAM Spanish than Castilian).
   const localization = locale === "es" ? esMX : enUS;
+  // Pin Clerk's hosted modals (SignIn / SignUp / UserProfile) to the app's
+  // Inter sans stack so the auth surfaces match the rest of the product
+  // instead of inheriting Clerk's default UI font.
+  const appearance = {
+    variables: {
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif",
+    },
+  };
   return (
-    <ClerkProvider afterSignOutUrl="/" localization={localization}>
+    <ClerkProvider afterSignOutUrl="/" localization={localization} appearance={appearance}>
       {typeof setUser === "function" ? <ClerkUserSync setUser={setUser} setAuthLoaded={setAuthLoaded} /> : null}
       {typeof onClerkActions === "function" ? <ClerkActionsBinder onActions={onClerkActions} /> : null}
       {children}

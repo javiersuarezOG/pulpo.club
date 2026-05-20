@@ -94,13 +94,13 @@
 }
 
 .start-hero-h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 38px;
   line-height: 1.08;
   margin: 0 0 var(--space-5);
   color: var(--ink);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .start-hero-sub {
@@ -226,12 +226,13 @@
   gap: var(--space-6);
 }
 .start-value-label {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 24px;
   line-height: 1.15;
   margin: 0 0 var(--space-5);
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 .start-value-body {
   margin: 0;
@@ -261,13 +262,14 @@
   margin: 0 auto;
 }
 .start-join-heading {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 32px;
   line-height: 1.1;
   text-align: center;
   margin: 0 0 var(--space-8);
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 .start-join-card {
   background: var(--paper);
@@ -289,9 +291,11 @@
   color: var(--ink-3);
 }
 .start-card-price {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 32px;
   line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 .start-card-features {

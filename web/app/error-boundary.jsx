@@ -77,7 +77,7 @@ const compactStyle = {
   textAlign: "center",
   color: "#5A5650",
   fontSize: 13,
-  fontFamily: "Inter, system-ui, sans-serif",
+  fontFamily: "var(--font-sans)",
   background: "#F8F4EC",
   borderRadius: 8,
   margin: "16px auto",
@@ -93,7 +93,7 @@ const fallbackStyle = {
   minHeight: "60vh",
   padding: 24,
   textAlign: "center",
-  fontFamily: "Inter, system-ui, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 const btnStyle = {
