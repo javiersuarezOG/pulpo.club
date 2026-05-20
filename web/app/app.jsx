@@ -61,6 +61,7 @@ import { ErrorBoundary } from "./error-boundary.jsx";
 import { ClerkShell, clerkEnabled } from "./auth/clerk-shell.jsx";
 import { fetchSaves, postSaveAction } from "./auth/saves-client.js";
 import { track } from "./telemetry/hook";
+import { identifyByEmail, resetIdentity } from "./telemetry/client";
 import { bootWebVitals } from "./telemetry/web-vitals";
 import {
   parseLocation,
@@ -688,6 +689,15 @@ function App() {
   // (ClerkUserSync drives setUser) and legacy (signin/signout
   // callbacks). Identity-keyed on user.email so tab visibility
   // re-renders don't double-fire.
+  //
+  // Also bridges the anonymous PostHog session into a stable
+  // email-derived Person on sign-in (and resets it on sign-out).
+  // Server-side, the Stripe webhook already aliases anon → email-hash
+  // for paying users, but post-signin events from non-paying users
+  // (free upgrade page views, save-cap modal exposure) still attributed
+  // to the anonymous distinct_id without this. identifyByEmail uses the
+  // SAME sha256→16-hex prefix as api/_posthog.js#emailDistinctId so the
+  // two converge on a single PostHog Person.
   const prevAuthEmailRef = useRef(user ? user.email : null);
   useEffect(() => {
     const prev = prevAuthEmailRef.current;
@@ -699,10 +709,23 @@ function App() {
         provider: (user && user.provider) || "legacy",
         plan:     (user && user.plan)     || "free",
       });
+      // Bind the PostHog session to a stable email-derived Person.
+      // Person properties land on the user record so cohort breakdowns
+      // ("retention by plan", "LTV by provider") can slice without
+      // joining to a session-property table.
+      identifyByEmail(next, {
+        plan:     (user && user.plan)     || "free",
+        provider: (user && user.provider) || "legacy",
+        locale:   locale,
+      });
     } else if (!next && prev) {
       track("signout.completed", {});
+      // Break the binding so subsequent anonymous events don't keep
+      // attributing to the just-signed-out Person. PostHog generates a
+      // fresh anonymous distinct_id on the next event.
+      resetIdentity();
     }
-  }, [user]);
+  }, [user, locale]);
 
   // PR-9c — Clerk-on path takes the saves list from the server.
   // Hydrates on user transition; clears on sign-out so we don't
