@@ -77,7 +77,7 @@ export const COUNTRIES = [
   { code: "DO", name: "Dominican Republic" },
   { code: "EC", name: "Ecuador" },
   { code: "EG", name: "Egypt" },
-  { code: "SV", name: "El Salvador" },
+  { code: "SV", name: "El Salvador" },
   { code: "GQ", name: "Equatorial Guinea" },
   { code: "ER", name: "Eritrea" },
   { code: "EE", name: "Estonia" },

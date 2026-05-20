@@ -173,8 +173,8 @@ const UI_STRINGS = {
   // Eyebrow + headline + tagline + CTA + sub-text per the brief.
   "new_hero.eyebrow":        { en: "★ Ranked by value",
                                es: "★ Rankeado por valor" },
-  "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
-                               es: "Todas las casas de playa y lago de El Salvador, rankeadas por valor." },
+  "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
+                               es: "Todas las casas de playa y lago de El Salvador, rankeadas por valor." },
   "new_hero.tagline":        { en: "No more scrolling through 50 listing sites. We rank every beach and lake listing by value and deliver the 10 best to your inbox every two weeks.",
                                es: "Olvídate de buscar en 50 sitios. Rankeamos cada propiedad de playa y lago por valor y te enviamos las 10 mejores al correo cada quince días." },
   "new_hero.email_placeholder": { en: "you@example.com",
@@ -276,7 +276,7 @@ const UI_STRINGS = {
   "home.hero.eyebrow_after":     { en: " EVERY 90 SECONDS",
                                    es: " CADA 90 SEGUNDOS" },
   "home.hero.h1.before":         { en: "Every beach and lake property in El Salvador,",
-                                   es: "Todas las propiedades de playa y lago de El Salvador," },
+                                   es: "Todas las propiedades de playa y lago de El Salvador," },
   "home.hero.h1.italic":         { en: "ranked.",
                                    es: "rankeadas." },
   "home.hero.subhead":           { en: "We scan every site, rank every beach and lake listing by value, and deliver the 10 best to your inbox every two weeks.",
@@ -388,8 +388,8 @@ const UI_STRINGS = {
 
   "home.shelf.top10.h2":         { en: "Top 10 deals right now",
                                    es: "Las 10 mejores ofertas ahora mismo" },
-  "home.shelf.top10.sub":        { en: "The 10 best price-for-location lots in El Salvador. Ranked daily.",
-                                   es: "Los 10 mejores lotes por precio-ubicación en El Salvador. Ranqueados a diario." },
+  "home.shelf.top10.sub":        { en: "The 10 best price-for-location lots in El Salvador. Ranked daily.",
+                                   es: "Los 10 mejores lotes por precio-ubicación en El Salvador. Ranqueados a diario." },
   "home.shelf.dropsHeading":     { en: "Price drops",
                                    es: "Rebajas de precio" },
   "home.shelf.dropsSub":         { en: "Listings with a price cut this month.",
@@ -465,7 +465,7 @@ const UI_STRINGS = {
   "card.listings_count":     { en: "listings",            es: "propiedades" },
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
-  "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
+  "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /
@@ -551,10 +551,10 @@ const UI_STRINGS = {
   "toast.logged_out":        { en: "Logged out",           es: "Sesión cerrada" },
 
   // Footer
-  "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
-                               es: "Las propiedades que valen la pena en El Salvador." },
-  "footer.country_badge":    { en: "Listings in El Salvador",
-                               es: "Propiedades en El Salvador" },
+  "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
+                               es: "Las propiedades que valen la pena en El Salvador." },
+  "footer.country_badge":    { en: "Listings in El Salvador",
+                               es: "Propiedades en El Salvador" },
 
   // Find Your Style carousel — deleted in the rewrite cutover (Phase 9)
   // with the legacy StyleCarousel component. Keys removed.
@@ -1034,12 +1034,12 @@ const UI_STRINGS = {
   // Login link → opens Clerk hosted sign-in modal (PR-B.4). Keep wording
   // identical to the in-app TopNav so the user sees a consistent "Log in"
   // across surfaces.
-  "start.hero.eyebrow":       { en: "Real estate in El Salvador",
-                                es: "Bienes raíces en El Salvador" },
-  "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
-  "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
-                                es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas y locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
+  "start.hero.eyebrow":       { en: "Real estate in El Salvador",
+                                es: "Bienes raíces en El Salvador" },
+  "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
+  "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas y locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
   "start.hero.cta_primary":   { en: "Get access — {price}/month",
                                 es: "Quiero acceso — {price}/mes" },
   "start.hero.trust_micro":   { en: "Cancel anytime. No commitment.",
@@ -1070,8 +1070,8 @@ const UI_STRINGS = {
                                 es: "Con el plan gratis ves la foto. Con Pro recibes el enlace directo al vendedor." },
   "start.value.a.label":      { en: "Before the portals",
                                 es: "Antes que los portales" },
-  "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
-                                es: "La mayoría de las propiedades en El Salvador nunca llegan a Encuentra24 ni a Facebook. Los vendedores se mueven rápido, las ofertas se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al correo." },
+  "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
+                                es: "La mayoría de las propiedades en El Salvador nunca llegan a Encuentra24 ni a Facebook. Los vendedores se mueven rápido, las ofertas se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al correo." },
   "start.value.b.label":      { en: "Land, homes, commercial",
                                 es: "Terrenos, casas y locales" },
   "start.value.b.body":       { en: "Residential plots, beachfront land, homes, and commercial properties — all in one place, with the data you actually need.",
@@ -1080,8 +1080,8 @@ const UI_STRINGS = {
                                 es: "Datos de inversionista" },
   "start.value.c.body":       { en: "Price history, days on market, road access, utilities — the data points serious buyers need, in plain language.",
                                 es: "Historial de precios, días en el mercado, acceso vial, servicios — los datos que un comprador serio necesita, en lenguaje claro." },
-  "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
-                                es: "MÃ¡s de {n} propiedades revisadas en todo El Salvador" },
+  "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
+                                es: "MÃ¡s de {n} propiedades revisadas en todo El Salvador" },
   "start.join.heading":       { en: "Join Pulpo",
                                 es: "Únete a Pulpo" },
   "start.join.paid.label":    { en: "Full access",
@@ -1225,10 +1225,10 @@ const UI_STRINGS = {
   // and listing-card clicks for anon + free users (paid users skip).
   // Replaces the previous "redirect to /start?intent=upgrade" page
   // jump with an in-page modal that POSTs to /api/stripe/start-checkout.
-  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
-  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
-                                          es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
+  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
+  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                          es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
   "free_month_modal.bullet.1":         { en: "Weekly 10 picks in your inbox",
                                           es: "10 propiedades cada semana, en tu correo" },
   "free_month_modal.bullet.2":         { en: "Filters + smart sorting",
