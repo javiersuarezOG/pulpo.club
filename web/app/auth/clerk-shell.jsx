@@ -41,7 +41,7 @@ export function clerkEnabled() {
   );
 }
 
-export function ClerkShell({ setUser, setAuthLoaded, onClerkActions, children }) {
+export function ClerkShell({ setUser, setAuthLoaded, onClerkActions, locale, children }) {
   if (!clerkEnabled()) return children;
   // Suspense fallback renders the children directly while Clerk loads,
   // so the app is interactive immediately — Clerk just hydrates auth
@@ -53,12 +53,17 @@ export function ClerkShell({ setUser, setAuthLoaded, onClerkActions, children })
   // App can know when Clerk has finished hydrating (isLoaded === true)
   // and the modal-gate in WelcomeModal can stop showing the anon
   // variant during the hydration race.
+  //
+  // locale is threaded through so ClerkProvider's localization prop
+  // matches the app's current language. Without this, Clerk's hosted
+  // modals always render in English regardless of pulpo-locale.
   return (
     <Suspense fallback={children}>
       <ClerkProviderLazy
         setUser={setUser}
         setAuthLoaded={setAuthLoaded}
         onClerkActions={onClerkActions}
+        locale={locale}
       >
         {children}
       </ClerkProviderLazy>

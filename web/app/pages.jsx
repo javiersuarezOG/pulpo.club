@@ -3140,6 +3140,17 @@ function WelcomeModal({ app, state, onClose }) {
   // render nothing — no backdrop, no flash of stale anon copy.
   if (!renderReady) return null;
 
+  // If Clerk has a pending invitation sign-up, app.jsx's dedicated
+  // effect is opening Clerk's password-creation modal. Skip our
+  // welcome modal entirely — the user is mid-password-creation, not
+  // looking at a "check your inbox" reminder. Without this gate the
+  // anon WelcomeModal flashes on top of Clerk's password UI during
+  // the boot race (Sebas 2026-05-20: "i could only see the create
+  // your password once i closed that box").
+  if (app.clerkActions && typeof app.clerkActions.pendingSignUp === "function" && app.clerkActions.pendingSignUp()) {
+    return null;
+  }
+
   const onBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       track("welcome_modal.dismissed", { variant, action: "backdrop" });
