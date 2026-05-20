@@ -5902,8 +5902,30 @@ h1,h2,h3,h4,h5 { margin: 0; }
   outline: 2px solid var(--color-forest-deep);
   outline-offset: 3px;
 }
+/* Photo column wraps photo + brief details. Becomes the right-hand
+   flex child of `.hp-hero-v4-inner` on desktop, the top item on mobile.
+   Inner photo's existing `order` rules are inert once wrapped. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  order: 1;
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-photo-col {
+    order: 2;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+/* Wrapped photo no longer carries its own flex-order — the column does. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-col .hp-hero-v4-photo { order: 0; }
+
 /* "Featured today" pill — trophy + label, no rank numeral. White pill
-   with clay trophy + ink-primary label. Top-left of the photo. */
+   with clay trophy + ink-primary label, mirroring `.pulpo-rank` styling
+   so it reads in the same visual family as the Top 10 shelf chips
+   without claiming a numeric rank. */
 .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
   position: absolute;
   top: 16px;
@@ -5928,53 +5950,40 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--color-clay-primary);
 }
 
-/* Bottom scrim — bottom-up gradient ensuring the brief text stays
-   legible on any photo (bright skies, busy foliage). Pure visual,
-   never receives pointer events. */
-.homepage-v2.hero-v4 .hp-hero-v4-photo-scrim {
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 45%;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.32) 35%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Listing details brief overlaid on the photo (bottom-left, inside
-   the scrim band). Inherits the photo's click handler via event
-   bubble — clicking the title/meta opens the listing detail. */
+/* Listing details brief — zone_name (title) + price · size · land_type.
+   Sits below the photo, clickable, opens the same listing detail as the
+   photo. Quiet typography so the photo stays the hero's center of mass. */
 .homepage-v2.hero-v4 .hp-hero-v4-brief {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 18px;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  pointer-events: none;
+  padding: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background var(--dur-mid) var(--ease-out);
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief:hover {
+  background: var(--color-bg-cream-soft);
+}
+.homepage-v2.hero-v4 .hp-hero-v4-brief:focus-visible {
+  outline: 2px solid var(--color-forest-deep);
+  outline-offset: 2px;
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--color-bg-white);
+  color: var(--color-ink-primary);
   letter-spacing: -0.01em;
-  line-height: 1.2;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  line-height: 1.25;
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-meta {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--color-ink-secondary);
   letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -5995,12 +6004,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
     padding: 5px 10px;
     font-size: 12px;
   }
-  .homepage-v2.hero-v4 .hp-hero-v4-brief {
-    left: 16px;
-    right: 16px;
-    bottom: 14px;
-  }
-  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 18px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 15px; }
   .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 13px; }
 }
 
