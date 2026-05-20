@@ -169,6 +169,36 @@ To force-retrofit existing listings after a prompt or table change:
 `python3 scripts/retrofit_geocoding.py` (dry-run with `--dry-run`,
 cap with `--limit N`).
 
+## Persistence & backups (read before claiming "we need a DB backup")
+
+**Pulpo has no database.** The 2026-05-20 pre-prod audit was confused
+by a stale `DATABASE_URL` stub in `.env.example` and flagged "no
+backup story documented." `DATABASE_URL` is never referenced in any
+`.py` / `.js` / `.ts` / `.yml` — it's a leftover from an early PR and
+has been removed.
+
+All Pulpo persistence lives in one of two places:
+
+1. **Listings data** — `web/data/*.json` (`ranked.json`, `featured.json`,
+   `llm_enrichment.json`, etc.) is regenerated nightly by the pipeline
+   and committed to `main` by `pulpo-bot`. Recovery RPO = last successful
+   nightly run (≤ 24h); RTO = re-run the nightly. Git history is the
+   backup — `git log -- web/data/ranked.json` walks every prior state.
+
+2. **User data** — every byte of user-identifying state is owned by a
+   third-party SaaS, and each provider is responsible for its own
+   backups:
+     - **Clerk** — accounts, sessions, invitations, plan metadata.
+       (Clerk backup SLA: per their DPA.)
+     - **Stripe** — customers, subscriptions, invoices, payment intents.
+       (Stripe's own retention.)
+     - **PostHog** — events, sessions, Person properties.
+     - **Resend** — newsletter audience, email lifecycle telemetry.
+
+There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
+Upstash instance. If a future feature genuinely needs one, the PR that
+adds it must also add the backup posture to this section.
+
 ## Commit Message Format
 - `feat:` new feature
 - `fix:` bug fix
