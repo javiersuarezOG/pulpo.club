@@ -30,7 +30,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
-import { Icon, Photo } from "../components.jsx";
+import { Photo, RankTrophy } from "../components.jsx";
 import { IconArrowRight } from "./icons.jsx";
 import { readLiveCounterCache, writeLiveCounterCache } from "../lib/live-counter-cache";
 import {
@@ -69,12 +69,34 @@ export function HeroV4({ app, locale }) {
   // produced a visible flash from a curated category WebP to the real
   // listing photo on every cold load.
   const listings = useListings();
-  const resolved = useMemo(() => {
-    if (!listings || listings.length === 0) return null;
+  const { resolved, rank } = useMemo(() => {
+    if (!listings || listings.length === 0) return { resolved: null, rank: null };
     const top = pickTopRanked(listings, 10);
-    if (top.length === 0) return null;
-    return top[dailyIndex(top.length)];
+    if (top.length === 0) return { resolved: null, rank: null };
+    const idx = dailyIndex(top.length);
+    return { resolved: top[idx], rank: idx + 1 };
   }, [listings]);
+
+  // Top 2 sub-scores (Value/Location/Momentum), in fixed order, used for
+  // the "Why #N" caption under the photo. Null sub-scores are skipped;
+  // if fewer than one is available the caption is suppressed entirely.
+  const whyParts = useMemo(() => {
+    if (!resolved) return [];
+    const candidates = [
+      { key: "value",    score: resolved.value_score },
+      { key: "location", score: resolved.location_score },
+      { key: "momentum", score: resolved.momentum_score },
+    ].filter((c) => typeof c.score === "number");
+    return candidates
+      .slice()
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
+      .sort((a, b) => {
+        const order = { value: 0, location: 1, momentum: 2 };
+        return order[a.key] - order[b.key];
+      })
+      .map((c) => t(`home.hero.v4.score.${c.key}`, locale, { n: Math.round(c.score) }));
+  }, [resolved, locale]);
 
   // ── Live counter (real /data/last_updated.json fetch + sessionStorage cache) ─
   const initialCounter = useMemo(() => {
@@ -222,6 +244,7 @@ export function HeroV4({ app, locale }) {
             }
           } : undefined}
           aria-label={resolved ? t("home.hero.v4.photo_aria", locale, {
+            rank: rank ?? 1,
             name: resolved.zone_name || t("home.featured.zone", locale),
           }) : undefined}
         >
@@ -244,11 +267,24 @@ export function HeroV4({ app, locale }) {
               aria-hidden="true"
             />
           )}
-          {resolved && (
-            <span className="hp-hero-v4-photo-pill">
-              <Icon name="star" size={12} strokeWidth={1.6} />
-              {t("home.hero.v4.featured_pill", locale)}
+          {resolved && rank != null && (
+            <span
+              className="pulpo-rank hp-hero-v4-rank"
+              aria-label={t("home.hero.v4.rank_aria", locale, { rank })}
+            >
+              <span className="pulpo-rank-star" aria-hidden="true">
+                <RankTrophy />
+              </span>
+              <span className="pulpo-rank-num">{rank}</span>
             </span>
+          )}
+          {resolved && rank != null && whyParts.length > 0 && (
+            <p className="hp-hero-v4-why">
+              {t("home.hero.v4.why_template", locale, {
+                rank,
+                parts: whyParts.join(" · "),
+              })}
+            </p>
           )}
         </div>
       </div>
