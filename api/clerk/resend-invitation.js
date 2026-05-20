@@ -180,7 +180,9 @@ module.exports = async (req, res) => {
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       notify: false,
-      redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
+      // welcome=1 + activation=1 marker — see api/stripe/webhook.js
+      // for the rationale (deterministic URL signal, not SDK state).
+      redirectUrl: `${origin}/account?welcome=1&activation=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
       ...(clerkLocale ? { locale: clerkLocale } : {}),
       publicMetadata: { plan: "pro" },
       privateMetadata: {
