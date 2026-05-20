@@ -33,6 +33,7 @@ const {
   logApi,
 } = require("./_stripe");
 const posthog = require("../_posthog");
+const { sendActivationEmail } = require("../_activation_email");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 
@@ -82,19 +83,21 @@ async function findClerkUserByEmail(clerk, email) {
   return list[0] || null;
 }
 
-// Check whether a pending Clerk invitation for this email already exists,
-// so the same Stripe event being retried doesn't create duplicates.
-async function hasPendingInvitation(clerk, email) {
-  if (!email) return false;
+// Find a pending Clerk invitation for this email, if one exists. Used by
+// the anonymous_invitation_created branch to revoke-and-recreate, so a
+// repeat checkout on the same email (e.g. user paid twice before
+// activating) always produces a fresh outbound email rather than
+// silently skipping. List-API failures return null (caller treats as
+// "no pending" and proceeds to create) — the old "pessimistic skip" was
+// itself a silent-no-send failure mode.
+async function findPendingInvitation(clerk, email) {
+  if (!email) return null;
   try {
     const result = await clerk.invitations.getInvitationList({ status: "pending" });
     const list = Array.isArray(result) ? result : (result && result.data) || [];
-    return list.some((inv) => (inv.emailAddress || "").toLowerCase() === email.toLowerCase());
-  } catch (err) {
-    // Pessimistic: if the list call fails, prefer to NOT create a possible
-    // duplicate. The user will not be silently locked out — the next
-    // webhook retry (or a manual replay) will go through.
-    return true;
+    return list.find((inv) => (inv.emailAddress || "").toLowerCase() === email.toLowerCase()) || null;
+  } catch {
+    return null;
   }
 }
 
@@ -273,22 +276,27 @@ module.exports = async (req, res) => {
           break;
         }
 
-        const dupe = await hasPendingInvitation(clerk, email);
-        if (dupe) {
-          logApi("stripe.webhook", {
-            status: 200, ms: Date.now() - t0, type: event.type,
-            path: "anonymous_dupe_invitation_skipped", session_id: session.id,
-            locale: stripeLocale,
-          });
-          // invitation_sent: false on dupe — a pending invitation
-          // already exists from a prior webhook delivery. Counts as
-          // "no NEW email" for the activation funnel; the existing
-          // pending invitation may or may not have been delivered.
-          posthog.capture(distinctId, "webhook.checkout_completed", {
-            ...baseProps, path: "anonymous_dupe_invitation_skipped",
-            invitation_sent: false, ms: Date.now() - t0,
-          });
-          break;
+        // If a pending invitation already exists for this email, revoke
+        // it before creating a fresh one. This guarantees a fresh
+        // activation email goes out on every checkout (as long as the
+        // user hasn't activated yet — the `existing` lookup above
+        // already caught that case). The pre-PR behavior was to skip
+        // entirely, which was a silent-no-send when the user paid twice.
+        const pendingPrev = await findPendingInvitation(clerk, email);
+        if (pendingPrev) {
+          try {
+            await clerk.invitations.revokeInvitation(pendingPrev.id);
+          } catch (err) {
+            // Non-fatal: maybe Clerk already revoked / expired it. Log
+            // + continue; createInvitation below will tell us if the
+            // revoke didn't actually clear the row.
+            logApi("stripe.webhook", {
+              status: 200, ms: Date.now() - t0, type: event.type,
+              path: "anonymous_prev_revoke_failed",
+              prev_invitation_id: pendingPrev.id,
+              error: err && err.message,
+            });
+          }
         }
 
         // Build the redirect URL from the request's host header so dev /
@@ -299,17 +307,27 @@ module.exports = async (req, res) => {
         const origin = `${proto}://${host}`;
 
         try {
+          // notify: false → Clerk creates the invitation row but does
+          // NOT trigger its own email send. We send the email
+          // ourselves via Resend below (sendActivationEmail) because
+          // Clerk's pipeline holds activation emails at status=queued
+          // indefinitely on this account — confirmed via Svix
+          // telemetry (PR #341). DNS is fully verified Clerk-side;
+          // the gate is somewhere in Clerk's account/billing config
+          // and is outside our control. The Resend path uses Pulpo's
+          // already-verified mail.pulpo.club sending domain.
           const invitation = await clerk.invitations.createInvitation({
             emailAddress: email,
+            notify: false,
             // After accepting the Clerk invitation, land back on
             // /account?welcome=1 — same surface as the post-Stripe
             // redirect. The WelcomeModal re-renders in its signed-in
             // variant for a brief acknowledgement, then auto-dismisses
             // leaving the user on a fully signed-in /account page.
             redirectUrl:  `${origin}/account?welcome=1`,
-            // Picks the locale-specific Clerk invitation email template
-            // (Dashboard → Customization → Emails → Localizations).
-            // Omitted when unknown so Clerk falls back to its default.
+            // locale kept for downstream parity even though Clerk's
+            // own template no longer renders — our Resend templates
+            // also branch on it.
             ...(clerkLocale ? { locale: clerkLocale } : {}),
             publicMetadata: { plan: "pro" },
             privateMetadata: {
@@ -319,22 +337,50 @@ module.exports = async (req, res) => {
               acquisitionUtms: Object.keys(utms).length ? utms : undefined,
             },
           });
+          const invitationId = (invitation && invitation.id) || "";
+          const actionUrl = (invitation && invitation.url) || `${origin}/account?welcome=1`;
+
+          // Send the activation email via Resend. Failures are logged
+          // + reported via PostHog but do NOT throw — the invitation
+          // row exists, so the user can retry via the WelcomeModal's
+          // "Resend my invitation" button. Throwing here would make
+          // Stripe retry the whole webhook, which would create yet
+          // another invitation row in a loop.
+          const sendResult = await sendActivationEmail({
+            email,
+            locale: stripeLocale || clerkLocale,
+            actionUrl,
+            sessionId: session.id,
+          });
+
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_invitation_created", session_id: session.id,
-            invitation_id: (invitation && invitation.id) || "",
+            invitation_id: invitationId,
             locale: stripeLocale,
+            resend_ok: sendResult.ok,
+            resend_message_id: sendResult.message_id || "",
+            resend_error: sendResult.error || "",
           });
-          // invitation_sent: true — this is the ONLY webhook path
-          // that actually fires Clerk's email. Slicing
-          // webhook.checkout_completed by invitation_sent gives us
-          // the "% of paying users who actually get an activation
-          // email" KPI directly.
+          // invitation_sent: true means we ASKED Resend to send. The
+          // truer delivered/bounced signal comes from api/resend-webhook
+          // events (newsletter.sent / .delivered / .bounced) keyed on
+          // the same recipient_hash as this event's distinctId.
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_invitation_created",
-            invitation_id: (invitation && invitation.id) || "",
-            invitation_sent: true, ms: Date.now() - t0,
+            invitation_id: invitationId,
+            invitation_sent: sendResult.ok,
+            resend_status_code: sendResult.status_code || 0,
+            ms: Date.now() - t0,
           });
+          if (!sendResult.ok) {
+            posthog.capture(distinctId, "webhook.activation_email_failed", {
+              ...baseProps, invitation_id: invitationId,
+              error: sendResult.error || "unknown",
+              status_code: sendResult.status_code || 0,
+              ms: Date.now() - t0,
+            });
+          }
         } catch (err) {
           // Race recovery: if a Clerk user was created in parallel (e.g.
           // the user signed up via /signin while the webhook was inflight),

@@ -23,6 +23,7 @@ const {
   logApi,
 } = require("../stripe/_stripe");
 const posthog = require("../_posthog");
+const { sendActivationEmail } = require("../_activation_email");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -170,12 +171,15 @@ module.exports = async (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host || "pulpo.club";
   const origin = `${proto}://${host}`;
   try {
+    // notify: false so Clerk creates the invitation row but skips its
+    // own email send. We send via Resend below — Pulpo's verified
+    // mail.pulpo.club sender — because Clerk's pipeline holds at
+    // status=queued indefinitely on this account. Same rationale as
+    // api/stripe/webhook.js.
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
+      notify: false,
       redirectUrl:  `${origin}/account?welcome=1`,
-      // Same locale plumbing as the initial webhook-issued invitation
-      // so the resent email respects the original language. Omitted
-      // when unknown so Clerk falls back to its default template.
       ...(clerkLocale ? { locale: clerkLocale } : {}),
       publicMetadata: { plan: "pro" },
       privateMetadata: {
@@ -189,16 +193,43 @@ module.exports = async (req, res) => {
         resentAt: new Date().toISOString(),
       },
     });
+    const invitationId = invitation && invitation.id;
+    const actionUrl = (invitation && invitation.url) || `${origin}/account?welcome=1`;
+
+    // Fire the Resend send. Same shape as webhook.js — keeps the
+    // "Resend my invitation" button using the same successful pipeline.
+    const sendResult = await sendActivationEmail({
+      email,
+      locale: stripeLocale || clerkLocale,
+      actionUrl,
+      sessionId,
+    });
+
     logApi("clerk.resend_invitation", {
-      status: 200, ms: Date.now() - t0, path: "resent",
-      session_id: sessionId, invitation_id: invitation && invitation.id,
+      status: sendResult.ok ? 200 : 502, ms: Date.now() - t0,
+      path: sendResult.ok ? "resent" : "resend_send_failed",
+      session_id: sessionId, invitation_id: invitationId,
       was_dupe: !!pending, locale: stripeLocale,
+      resend_message_id: sendResult.message_id || "",
+      resend_error: sendResult.error || "",
     });
     posthog.capture(distinctId, "clerk.invitation_resent", {
-      session_id: sessionId, path: "resent",
-      was_dupe: !!pending, locale: stripeLocale, ms: Date.now() - t0,
+      session_id: sessionId,
+      path: sendResult.ok ? "resent" : "resend_send_failed",
+      was_dupe: !!pending, locale: stripeLocale,
+      resend_status_code: sendResult.status_code || 0,
+      resend_error: sendResult.error || "",
+      ms: Date.now() - t0,
     });
     await posthog.flush();
+    if (!sendResult.ok) {
+      // Surface Resend failure to the client so the modal can show a
+      // useful error rather than the lying "we just sent" copy.
+      return res.status(502).json({
+        status: "resend_send_failed",
+        error: sendResult.error || "resend_failed",
+      });
+    }
     return res.status(200).json({ status: "resent" });
   } catch (err) {
     logApi("clerk.resend_invitation", {
