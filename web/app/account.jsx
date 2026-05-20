@@ -95,8 +95,13 @@ function AccountPage({ app }) {
     // SignupModal on top of WelcomeModal. welcomeModalState survives
     // the strip and is the correct source of truth.
     if (app.welcomeModalState) return;
+    // Pending invitation sign-up takes priority — app.jsx's dedicated
+    // effect opens clerk.openSignUp() for password creation. Don't
+    // stack our SignupModal on top; see 2026-05-20 post-activation
+    // flow bug.
+    if (app.clerkActions && typeof app.clerkActions.pendingSignUp === "function" && app.clerkActions.pendingSignUp()) return;
     app.openSignup({ mode: "login" });
-  }, [clerkBooting, app.user, app.welcomeModalState]);
+  }, [clerkBooting, app.user, app.welcomeModalState, app.clerkActions]);
 
   if (clerkBooting) {
     return <div className="page page-account account-loading" aria-busy="true" />;

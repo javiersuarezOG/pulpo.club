@@ -987,6 +987,12 @@ function App() {
   // welcome effect.
   useEffect(() => {
     if (welcomeModalState) return;
+    // Pending Clerk invitation sign-up takes priority — the dedicated
+    // effect below opens clerk.openSignUp() so the user can finish
+    // setting their password. Don't stack our own SignupModal on top;
+    // it'd race + render the wrong copy ("Sign in to continue" rather
+    // than "Set your password"). See post-activation-flow bug, 2026-05-20.
+    if (clerkActions && typeof clerkActions.pendingSignUp === "function" && clerkActions.pendingSignUp()) return;
     const searchParams = typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : undefined;
@@ -1008,9 +1014,52 @@ function App() {
     }
     // Intentionally not depending on signupModal — that would re-fire
     // every time the modal closes. We only care about route + user
-    // + welcomeModalState (for the post-Stripe bypass).
+    // + welcomeModalState (for the post-Stripe bypass) + clerkActions
+    // (so we re-evaluate when Clerk hydrates and pendingSignUp becomes
+    // queryable).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, user, welcomeModalState]);
+  }, [route, user, welcomeModalState, clerkActions]);
+
+  // Post-activation sign-up flow: after the user clicks the activation
+  // email link, Clerk's /v1/tickets/accept endpoint validates the
+  // invitation ticket, sets a session cookie holding the pending
+  // sign-up state (email pre-filled), and redirects to /account?welcome=1.
+  // At that point clerk.signUp.status === "missing_requirements" with
+  // missingFields including "password" — the user needs to finish
+  // sign-up by setting a password.
+  //
+  // Without this effect, the app would just see "anonymous user on
+  // /account?welcome=1", render the post-Stripe WelcomeModal ("we
+  // sent an invitation"), and the user would loop back here clicking
+  // "Resend my invitation". See 2026-05-20 post-activation-flow bug.
+  //
+  // This effect runs after Clerk hydrates (clerkActions truthy). On
+  // detecting a pending sign-up, it opens Clerk's hosted SignUp modal
+  // with the email pre-filled, prompting for the password. After
+  // completion, Clerk redirects per the invitation's rurl back to
+  // /account?welcome=1 signed in — WelcomeModal then renders its
+  // signed_in variant ("You're all set!") and auto-dismisses.
+  const pendingSignUpHandledRef = useRef(false);
+  useEffect(() => {
+    if (!clerkActions || typeof clerkActions.pendingSignUp !== "function") return;
+    if (user) return; // Already signed in — nothing to finish.
+    if (pendingSignUpHandledRef.current) return; // Don't re-open if closed.
+    const pending = clerkActions.pendingSignUp();
+    if (!pending) return;
+    pendingSignUpHandledRef.current = true;
+    track("invitation.password_creation_opened", {
+      missing_fields: pending.missingFields.join(","),
+    });
+    try {
+      clerkActions.openSignUp({});
+    } catch {
+      // Non-fatal — Clerk SDK errors on openSignUp would leave the user
+      // on the page but with no path forward. Let the WelcomeModal flow
+      // continue as the fallback (resend invitation, contact support).
+      pendingSignUpHandledRef.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerkActions, user]);
 
   // Defensive close: if the gate already opened a SignupModal before
   // welcomeModalState became truthy (e.g. a popstate that flipped

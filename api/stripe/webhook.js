@@ -321,10 +321,12 @@ module.exports = async (req, res) => {
             notify: false,
             // After accepting the Clerk invitation, land back on
             // /account?welcome=1 — same surface as the post-Stripe
-            // redirect. The WelcomeModal re-renders in its signed-in
-            // variant for a brief acknowledgement, then auto-dismisses
-            // leaving the user on a fully signed-in /account page.
-            redirectUrl:  `${origin}/account?welcome=1`,
+            // redirect. ?lang=<locale> locks the landing page to the
+            // same language as the activation email (i18n.jsx reads
+            // ?lang= as the highest-priority locale source). Without
+            // this the user lands on browser-default locale, which
+            // mismatches the email language.
+            redirectUrl: `${origin}/account?welcome=1${clerkLocale ? `&lang=${clerkLocale}` : ""}`,
             // locale kept for downstream parity even though Clerk's
             // own template no longer renders — our Resend templates
             // also branch on it.

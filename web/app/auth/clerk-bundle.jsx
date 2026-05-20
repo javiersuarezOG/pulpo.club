@@ -79,6 +79,28 @@ function ClerkActionsBinder({ onActions }) {
       openSignIn: (opts) => clerk.openSignIn(opts || {}),
       openSignUp: (opts) => clerk.openSignUp(opts || {}),
       signOut:    (opts) => clerk.signOut(opts || {}),
+      // Reads Clerk's signUp resource state — populated when the user
+      // has accepted an invitation ticket but hasn't completed sign-up
+      // (e.g. password not set). The `/v1/tickets/accept` redirect from
+      // the activation email leaves Clerk in this in-between state:
+      // not anon, not fully signed in. Returns a small descriptor so
+      // app.jsx can route the user into the password-creation modal
+      // without poking at Clerk's internal resource shape.
+      //
+      // status === "missing_requirements" + missingFields containing
+      // "password" is the canonical "needs to finish sign-up" signal.
+      // Returns null when there's no pending sign-up (anonymous OR
+      // fully signed in).
+      pendingSignUp: () => {
+        const s = clerk.signUp;
+        if (!s) return null;
+        if (s.status !== "missing_requirements") return null;
+        return {
+          status: s.status,
+          emailAddress: s.emailAddress || null,
+          missingFields: Array.isArray(s.missingFields) ? s.missingFields : [],
+        };
+      },
       // Synchronous "does Clerk think a user is signed in right now?"
       // SignupModal uses this to short-circuit the open call during the
       // boot race where Clerk's session is hydrated from cookies *before*
