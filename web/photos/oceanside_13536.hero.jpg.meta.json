@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:51:02.609594+00:00",
+  "computed_at": "2026-05-20T14:06:41.006576+00:00",
   "derivative_width": 1060,
   "derivative_height": 596,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/03/cerromar-lands-feb-26-13-marc-3.jpg?fit=1060%2C596&ssl=1",
   "candidate_count": 1,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-20T12:51:02.626979+00:00"
+  "repicked_at": "2026-05-20T14:06:41.021868+00:00"
 }

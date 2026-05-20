@@ -6,13 +6,14 @@
   "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:47:23.793793+00:00",
+  "computed_at": "2026-05-20T14:03:03.154129+00:00",
   "derivative_width": 1440,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472129056/v3/HDPhotos/Plano Parcelacion.png",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:47:23.824359+00:00"
+  "repicked_at": "2026-05-20T14:03:03.182533+00:00"
 }

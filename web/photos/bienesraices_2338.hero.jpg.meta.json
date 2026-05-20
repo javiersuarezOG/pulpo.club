@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:02:11.519051+00:00",
+  "computed_at": "2026-05-20T14:18:27.096870+00:00",
   "derivative_width": 1600,
   "derivative_height": 895,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/5P1BE0Q7OH/kMmy7pw478/Venta_de_Terreno_con_Casa_en_Troncal_del_Norte_Chalatenango__Ideal_para_Comercio_o_Vivienda.jpeg",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:02:11.525979+00:00"
+  "repicked_at": "2026-05-20T14:18:27.103044+00:00"
 }

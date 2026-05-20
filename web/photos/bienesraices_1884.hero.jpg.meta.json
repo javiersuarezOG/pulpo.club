@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:46:47.802067+00:00",
+  "computed_at": "2026-05-20T14:02:26.315455+00:00",
   "derivative_width": 943,
   "derivative_height": 809,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/3669133/59903702/EB-NB9133.jpg?rasterize=true&version=1681214466",
   "candidate_count": 2,
   "picker_excluded_count": 1,
-  "repicked_at": "2026-05-20T12:46:47.805610+00:00"
+  "repicked_at": "2026-05-20T14:02:26.318957+00:00"
 }

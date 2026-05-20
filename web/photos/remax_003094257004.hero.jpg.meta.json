@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:44:03.496589+00:00",
+  "computed_at": "2026-05-20T14:00:05.176179+00:00",
   "derivative_width": 607,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003094257004/v3/HDPhotos/415217.png",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:44:03.551285+00:00"
+  "repicked_at": "2026-05-20T14:00:05.227061+00:00"
 }

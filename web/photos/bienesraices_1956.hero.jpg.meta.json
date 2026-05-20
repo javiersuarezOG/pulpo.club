@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:52:16.282328+00:00",
+  "computed_at": "2026-05-20T14:07:55.978080+00:00",
   "derivative_width": 1180,
   "derivative_height": 885,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/3217928/51596797/EB-LI7928.jpg?rasterize=true&version=1661879184",
   "candidate_count": 5,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-20T12:52:16.286834+00:00"
+  "repicked_at": "2026-05-20T14:07:55.982457+00:00"
 }

@@ -6,13 +6,14 @@
   "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:53:34.064383+00:00",
+  "computed_at": "2026-05-20T14:09:19.404680+00:00",
   "derivative_width": 1920,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/2523089030/v3/HDPhotos/dji_mimo_20260428_144630_20260428144630_1777500395412_photo.jpeg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:53:34.119139+00:00"
+  "repicked_at": "2026-05-20T14:09:19.453542+00:00"
 }

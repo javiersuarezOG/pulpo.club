@@ -3,16 +3,17 @@
   "height": 1158,
   "aspect_ratio": 1.072,
   "file_size_kb": 203.3,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T13:01:08.931075+00:00",
+  "computed_at": "2026-05-20T14:17:16.490704+00:00",
   "derivative_width": 1007,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5330875/91998584/EB-TM0875.jpg?rasterize=true&version=1759536751",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:01:08.936631+00:00"
+  "repicked_at": "2026-05-20T14:17:16.494962+00:00"
 }

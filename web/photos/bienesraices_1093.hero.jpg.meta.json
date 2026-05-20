@@ -3,16 +3,17 @@
   "height": 1200,
   "aspect_ratio": 1.0,
   "file_size_kb": 299.3,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:53:55.673846+00:00",
+  "computed_at": "2026-05-20T14:09:40.271349+00:00",
   "derivative_width": 1080,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5580760/97057005/EB-UL0760.jpeg?rasterize=true&version=1760389314",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:53:55.680021+00:00"
+  "repicked_at": "2026-05-20T14:09:40.277021+00:00"
 }

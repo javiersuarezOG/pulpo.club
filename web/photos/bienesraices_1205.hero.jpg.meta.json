@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:54:27.369690+00:00",
+  "computed_at": "2026-05-20T14:10:12.437674+00:00",
   "derivative_width": 1200,
   "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5341758/92202707/EB-TN1758.jpeg?rasterize=true&version=1750968415",
   "candidate_count": 4,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:54:27.372646+00:00"
+  "repicked_at": "2026-05-20T14:10:12.440377+00:00"
 }

@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:03:55.038161+00:00",
+  "computed_at": "2026-05-20T14:20:17.506187+00:00",
   "derivative_width": 960,
   "derivative_height": 720,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/3766955/80206785/EB-NL6955.jpg?rasterize=true&version=1726667835",
   "candidate_count": 3,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:03:55.041247+00:00"
+  "repicked_at": "2026-05-20T14:20:17.508735+00:00"
 }
