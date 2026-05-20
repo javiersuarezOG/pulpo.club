@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:02:40.852504+00:00",
+  "computed_at": "2026-05-20T14:18:57.950183+00:00",
   "derivative_width": 1360,
   "derivative_height": 768,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/VEUUE04D69/CCBdjaxfe7/Venta_de_Terreno_Industrial_en_Nejapa__11.jpeg",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:02:40.855952+00:00"
+  "repicked_at": "2026-05-20T14:18:57.953822+00:00"
 }

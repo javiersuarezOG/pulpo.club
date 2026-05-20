@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:52:24.236617+00:00",
+  "computed_at": "2026-05-20T14:08:02.729573+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4804998/81426329/EB-RL4998.jpeg?rasterize=true&version=1729263509",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:52:24.242542+00:00"
+  "repicked_at": "2026-05-20T14:08:02.734660+00:00"
 }

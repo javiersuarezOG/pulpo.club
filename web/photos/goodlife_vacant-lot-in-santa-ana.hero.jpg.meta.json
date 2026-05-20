@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:54:32.155577+00:00",
+  "computed_at": "2026-05-20T14:10:17.426663+00:00",
   "derivative_width": 1024,
   "derivative_height": 768,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2024/08/vacant-lot-el-salvador-santa-ana-1-1024x768.jpeg",
   "candidate_count": 4,
   "picker_excluded_count": 2,
-  "repicked_at": "2026-05-20T12:54:32.164934+00:00"
+  "repicked_at": "2026-05-20T14:10:17.435198+00:00"
 }

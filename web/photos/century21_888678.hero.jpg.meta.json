@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:04:07.490247+00:00",
+  "computed_at": "2026-05-20T14:20:29.794941+00:00",
   "derivative_width": 399,
   "derivative_height": 299,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://cdn.21online.lat/centroam/cache/awsTest1/rc/SWqJrM8G/uploads/41/propiedades/29774/67ba8c9530893.jpg",
   "candidate_count": 5,
   "picker_excluded_count": 5,
-  "repicked_at": "2026-05-20T13:04:07.491073+00:00"
+  "repicked_at": "2026-05-20T14:20:29.795758+00:00"
 }

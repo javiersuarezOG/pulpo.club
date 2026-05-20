@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:43:58.707095+00:00",
+  "computed_at": "2026-05-20T13:59:59.377939+00:00",
   "derivative_width": 1600,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/05/41.jpg?fit=1600%2C900&ssl=1",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:43:58.721949+00:00"
+  "repicked_at": "2026-05-20T13:59:59.390834+00:00"
 }

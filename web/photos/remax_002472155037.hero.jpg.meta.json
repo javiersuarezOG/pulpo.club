@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:47:40.029625+00:00",
+  "computed_at": "2026-05-20T14:03:21.293183+00:00",
   "derivative_width": 1600,
   "derivative_height": 738,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155037/v3/HDPhotos/Terreno R de Mora 1.jpeg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:47:40.035705+00:00"
+  "repicked_at": "2026-05-20T14:03:21.299263+00:00"
 }

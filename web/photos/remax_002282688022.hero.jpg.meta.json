@@ -6,13 +6,14 @@
   "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:59:51.938965+00:00",
+  "computed_at": "2026-05-20T14:15:57.514558+00:00",
   "derivative_width": 1920,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002282688022/v3/HDPhotos/dji_fly_20220923_153524_314_1664201181230_photo_optimized.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:59:51.980390+00:00"
+  "repicked_at": "2026-05-20T14:15:57.551595+00:00"
 }

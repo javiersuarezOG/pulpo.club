@@ -3,16 +3,17 @@
   "height": 1342,
   "aspect_ratio": 1.243,
   "file_size_kb": 295.7,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-20T12:51:43.435042+00:00",
+  "computed_at": "2026-05-20T14:07:21.032259+00:00",
   "derivative_width": 869,
   "derivative_height": 1080,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/4942202/84289616/EB-RZ2202.jpg?rasterize=true&version=1736275169",
   "candidate_count": 2,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:51:43.441634+00:00"
+  "repicked_at": "2026-05-20T14:07:21.037769+00:00"
 }

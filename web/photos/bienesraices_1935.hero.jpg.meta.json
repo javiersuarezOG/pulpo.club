@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T12:56:51.179202+00:00",
+  "computed_at": "2026-05-20T14:12:48.760514+00:00",
   "derivative_width": 1200,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/3415630/55284395/EB-MC5630.jpg?rasterize=true&version=1670260485",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T12:56:51.186419+00:00"
+  "repicked_at": "2026-05-20T14:12:48.767135+00:00"
 }

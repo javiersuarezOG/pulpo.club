@@ -6,13 +6,14 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T13:05:20.922991+00:00",
+  "computed_at": "2026-05-20T14:21:40.477126+00:00",
   "derivative_width": 1024,
   "derivative_height": 683,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
+  "has_marketing_overlay": null,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/04/el-zonte-hills-view-1024x683.jpg",
   "candidate_count": 5,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-20T13:05:20.932504+00:00"
+  "repicked_at": "2026-05-20T14:21:40.485460+00:00"
 }
