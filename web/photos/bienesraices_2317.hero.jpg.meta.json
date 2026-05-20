@@ -6,11 +6,13 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-20T07:31:30.944964+00:00",
+  "computed_at": "2026-05-20T13:02:48.136090+00:00",
   "derivative_width": 1280,
   "derivative_height": 720,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/1907EQJ7IN/aXHKZQpSkJ/VENTA_DE_TERRENO_DE_PLAYA_EN_BARRA_DE_SANTIAGO_SEGUNDA_FILA.jpeg",
-  "candidate_count": 4
+  "candidate_count": 4,
+  "picker_excluded_count": 0,
+  "repicked_at": "2026-05-20T13:02:48.141249+00:00"
 }

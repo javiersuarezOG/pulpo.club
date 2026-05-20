@@ -63,6 +63,7 @@
       "hero_photo_path",
       "hero_photo_quality_score",
       "has_text_overlay",
+      "has_marketing_overlay",
       "hero_eligible",
       "card_eligible",
       "source_width",
@@ -402,6 +403,12 @@
         ]
       },
       "has_text_overlay": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "has_marketing_overlay": {
         "type": [
           "boolean",
           "null"

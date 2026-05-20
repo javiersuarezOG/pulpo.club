@@ -3,10 +3,10 @@
   "height": 3116,
   "aspect_ratio": 1.335,
   "file_size_kb": 2419.8,
-  "hero_eligible": false,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T21:37:27.404523+00:00",
+  "computed_at": "2026-05-20T12:47:12.555578+00:00",
   "derivative_width": 1442,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
@@ -14,5 +14,5 @@
   "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002523316006/v3/HDPhotos/Casco de la finca.jpg",
   "candidate_count": 1,
   "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:37:27.453545+00:00"
+  "repicked_at": "2026-05-20T12:47:12.613649+00:00"
 }

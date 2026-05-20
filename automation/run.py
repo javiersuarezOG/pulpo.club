@@ -275,37 +275,48 @@ def _apply_aesthetic_to_eligible(scored_candidates, eligible_urls=None):
     for c in scored_candidates:
         if _score_aesthetic is None:
             c["aesthetic"] = None
+            c["has_marketing_overlay"] = None
             continue
         if eligible_urls is not None and c["url"] not in eligible_urls:
             c["aesthetic"] = None
+            c["has_marketing_overlay"] = None
             continue
         try:
-            c["aesthetic"] = _score_aesthetic(c["content"])
+            result = _score_aesthetic(c["content"])
         except Exception:
+            result = None
+        if result is None:
             c["aesthetic"] = None
+            c["has_marketing_overlay"] = None
+        else:
+            c["aesthetic"] = result.get("score")
+            c["has_marketing_overlay"] = result.get("has_marketing_overlay")
 
 
 def _pick_winner_from_scored(
     scored_candidates,
-) -> "tuple[Optional[str], Optional[bytes], Optional[int], Optional[bool]]":
+) -> "tuple[Optional[str], Optional[bytes], Optional[int], Optional[bool], Optional[bool]]":
     """Phase 4 cost-gating winner-selection — same composite ranking as
-    pre-refactor ``_pick_best_photo_url``: prefer non-text-overlay
-    candidates; rank by 70% aesthetic + 30% technical when at least one
-    aesthetic score is present, else by technical alone. Returns the
-    legacy ``(url, content, score, has_text_overlay)`` tuple."""
+    pre-refactor ``_pick_best_photo_url``: prefer non-text-overlay and
+    non-marketing-overlay candidates; rank by 70% aesthetic + 30%
+    technical when at least one aesthetic score is present, else by
+    technical alone. Returns ``(url, content, score, has_text_overlay,
+    has_marketing_overlay)``."""
     if not scored_candidates:
-        return (None, None, None, None)
+        return (None, None, None, None, None)
 
-    # Prefer photos that are NOT flagged as text overlay AND NOT flagged
-    # picker_excluded (below quality floor). Same filter pattern: drop
-    # excluded ONLY when at least one non-excluded candidate exists so a
-    # listing with all-bad photos still gets a hero (graceful degrade —
-    # technical ranking decides among the dregs). Treat None for either
-    # flag as "not flagged" so missing signals don't disqualify everyone.
+    # Filter cascade: drop picker_excluded → drop has_text_overlay=True →
+    # drop has_marketing_overlay=True. Each filter degrades gracefully:
+    # only drops the flag's matches when at least one clean alternative
+    # survives, so a listing with all-flagged photos still gets a hero
+    # (technical ranking decides among the dregs). None on any flag means
+    # "no signal," not "flagged" — missing signals don't disqualify.
     non_excluded = [c for c in scored_candidates if not c.get("picker_excluded")]
     base = non_excluded if non_excluded else list(scored_candidates)
     non_text = [c for c in base if c.get("has_text_overlay") is not True]
-    pool = non_text if non_text else base
+    after_text = non_text if non_text else base
+    non_marketing = [c for c in after_text if c.get("has_marketing_overlay") is not True]
+    pool = non_marketing if non_marketing else after_text
 
     any_aesthetic = any(c.get("aesthetic") is not None for c in pool)
     if any_aesthetic:
@@ -323,7 +334,13 @@ def _pick_winner_from_scored(
     else:
         pool.sort(key=lambda c: c["score"], reverse=True)
     w = pool[0]
-    return (w["url"], w["content"], w["score"], w.get("has_text_overlay"))
+    return (
+        w["url"],
+        w["content"],
+        w["score"],
+        w.get("has_text_overlay"),
+        w.get("has_marketing_overlay"),
+    )
 
 
 def _pick_best_photo_url(photo_urls, on_url_error=None):
@@ -333,8 +350,8 @@ def _pick_best_photo_url(photo_urls, on_url_error=None):
     uses the underlying primitives so it can compute the global top-X%
     gate across all listings.
 
-    Returns ``(url, content, score, has_text_overlay)`` for the winning
-    candidate, or ``(None, None, None, None)`` if every download failed.
+    Returns ``(url, content, score, has_text_overlay, has_marketing_overlay)``
+    for the winning candidate, or all-None if every download failed.
     """
     candidates = _score_candidates_cheap(photo_urls, on_url_error=on_url_error)
     # No global gate at this entry point — preserve today's per-listing
@@ -558,6 +575,9 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 ho = hero_meta.get("has_text_overlay")
                 if ho is not None:
                     li.has_text_overlay = ho
+                mo = hero_meta.get("has_marketing_overlay")
+                if mo is not None:
+                    li.has_marketing_overlay = mo
                 qs = hero_meta.get("hero_photo_quality_score")
                 if qs is not None:
                     li.hero_photo_quality_score = qs
@@ -664,9 +684,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             else:
                 _apply_aesthetic_to_eligible(scored, eligible_urls=set())
 
-            winning_url, winning_content, winning_score, winning_has_text = (
-                _pick_winner_from_scored(scored)
-            )
+            (winning_url, winning_content, winning_score,
+             winning_has_text, winning_has_marketing) = _pick_winner_from_scored(scored)
             if winning_url is None or winning_content is None:
                 raise RuntimeError(
                     f"winner_pick_failed_from_{len(candidate_urls)}_urls"
@@ -674,6 +693,7 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
             li.hero_photo_quality_score = winning_score if winning_score else None
             li.has_text_overlay = winning_has_text
+            li.has_marketing_overlay = winning_has_marketing
 
             from PIL import Image
 
@@ -738,6 +758,7 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                     hero_meta["hires_eligible"] = source_meta.get("hires_eligible")
                 hero_meta["hero_photo_quality_score"] = winning_score
                 hero_meta["has_text_overlay"] = winning_has_text
+                hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",

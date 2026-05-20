@@ -76,6 +76,9 @@ function passesQualityGate(l) {
   if ((l.data_quality_score ?? 0) < 0.5) return false;
   // Soft signals — only reject when explicitly flagged.
   if (l.has_text_overlay === true) return false;
+  // VLM-based overlay catches stylized banners Tesseract misses. Same
+  // null-tolerance: only reject when explicitly true.
+  if (l.has_marketing_overlay === true) return false;
   if (l.hero_photo_quality_score != null && l.hero_photo_quality_score < 50) return false;
   return true;
 }
@@ -99,6 +102,10 @@ function projectListing(l, locale) {
     quality: {
       hero_photo_quality_score: l.hero_photo_quality_score ?? null,
       has_text_overlay: l.has_text_overlay ?? null,
+      // VLM marketing-overlay flag (defense-in-depth for downstream
+      // consumers like pulpo-social, even though passesQualityGate above
+      // already rejects when this is true).
+      has_marketing_overlay: l.has_marketing_overlay ?? null,
       data_quality_score: l.data_quality_score ?? null,
       // Source-side dimensions (px) — set from the hero derivative's
       // sidecar by automation/run.py. Equal to the original source
