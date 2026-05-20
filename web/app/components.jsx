@@ -180,27 +180,42 @@ const RankTrophy = React.memo(function RankTrophy({ size = 12 }) {
   );
 });
 
+// ===== Pulpo brand mark =====
+// The spiral tentacle gripping a gold catch — pulpo wrapping itself around
+// the deal it found. Standalone (no wordmark) so it can be reused across
+// modals, empty states, splash screens, etc. for brand continuity.
+const PulpoMark = ({ size = 22, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="-50 -50 100 100"
+    fill="none"
+    aria-hidden="true"
+    className={className}
+  >
+    <path
+      d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4"
+      stroke="currentColor"
+      strokeWidth="8.5"
+      strokeLinecap="round"
+      fill="none"
+    />
+    {/* gripper bulb at the spiral's terminus */}
+    <circle cx="18" cy="-4" r="9.5" fill="currentColor" />
+    {/* gold catch held inside the gripper */}
+    <circle cx="18" cy="-4" r="5.5" fill="var(--gold)" />
+  </svg>
+);
+
 // ===== Pulpo wordmark =====
-// `pro` prop appends a small serif-italic "Pro" mark next to the wordmark
-// so subscribed users see their membership reinforced on every page in the
-// global header chrome. Styling lives in index.css (`.pulpo-logo-pro`) so
-// it can reference the gold-hairline tokens without inline literals.
+// Mark + Inter 700 lowercase wordmark with a small gold dot inside the
+// `o` — wordmark carries the same "catch" motif as the mark. `pro`
+// appends the membership pill (styling in index.css → .pulpo-logo-pro).
 const PulpoLogo = ({ size = 22, pro = false }) => (
-  <div className="pulpo-logo" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      {/* simple octopus mark */}
-      <ellipse cx="16" cy="11" rx="9" ry="7.5" fill="currentColor"/>
-      <circle cx="12.5" cy="10" r="1.3" fill="var(--paper)"/>
-      <circle cx="19.5" cy="10" r="1.3" fill="var(--paper)"/>
-      <path d="M8 17c-.5 3-2.5 4-3 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M11 18c-.5 3.5-1 5-1 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M14 18.5c-.3 4-.5 5.5 0 8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M18 18.5c.3 4 .5 5.5 0 8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M21 18c.5 3.5 1 5 1 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M24 17c.5 3 2.5 4 3 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-    <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 500, letterSpacing: "-0.02em", lineHeight: 1 }}>
-      pulpo
+  <div className="pulpo-logo" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <PulpoMark size={size} />
+    <span className="pulpo-logo-wm">
+      pulp<span className="pulpo-logo-o">o</span>
     </span>
     {pro && (
       // "Pro" is a shared EN/ES brand mark. The parent button already
@@ -727,7 +742,7 @@ function Toast({ toast }) {
 }
 
 export {
-  Icon, RankTrophy, PulpoLogo, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
+  Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
 };

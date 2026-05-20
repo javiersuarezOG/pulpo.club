@@ -500,11 +500,25 @@ def render_html(issue: Issue) -> str:
     </td></tr>
     """
 
+    # Brand mark: a tentacle coiled around the gold catch. Inline SVG so
+    # email clients render it without external assets. Hex colors only —
+    # most clients strip CSS vars from inline styles.
     header_strip = f"""
     <tr><td class="pad-sm" style="border-bottom: 1px solid var(--line);">
       <table width="100%" role="presentation"><tr>
         <td style="vertical-align: middle;">
-          <span class="display" style="font-size: 24px; font-weight: 500; letter-spacing: -0.02em; color: #1F3D31; line-height: 1;">pulpo</span>
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+            <td style="vertical-align: middle; padding-right: 10px; line-height: 0;">
+              <svg width="26" height="26" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+                <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+                <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+              </svg>
+            </td>
+            <td style="vertical-align: middle;">
+              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span>
+            </td>
+          </tr></table>
         </td>
         <td align="right" style="vertical-align: middle;">
           <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em;">{_e(issue_strip)}</span>

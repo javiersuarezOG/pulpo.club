@@ -67,22 +67,51 @@ h1,h2,h3,h4,h5 { margin: 0; }
    at ≥768px below. */
 .topnav-inner {
   max-width: 1400px; margin: 0 auto;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: baseline; gap: 4px;
   padding: 14px 8px;
 }
+/* The right-rail is a cluster of mixed elements (avatar circle, mono
+   pills, text links) — center it as a block so the avatar doesn't drop
+   to the baseline. Inside the cluster, its own align-items:center keeps
+   the children vertically aligned with each other. */
+.topnav-right { align-self: center; }
+/* logo-btn baseline = wordmark text baseline (currentColor inherits up
+   through PulpoLogo's inner flex); that's what nav text aligns to. */
 @media (min-width: 768px) {
   .topnav-inner { gap: 32px; padding: 14px 24px; }
 }
 .logo-btn { display: flex; align-items: center; }
 .pulpo-logo { color: var(--accent); }
-.topnav-links { display: flex; gap: 4px; flex: 1; }
+/* Header brand lockup — bigger than the default PulpoLogo (which is
+   tuned for modals + footer). The header is the brand's most repeated
+   surface, so the mark + wordmark are sized to anchor the page. CSS
+   width/height overrides the React `size` prop's inline attributes
+   (CSS wins over presentation attributes per spec). */
+.logo-btn .pulpo-logo { gap: 12px; }
+.logo-btn .pulpo-logo > svg { width: 32px; height: 32px; }
+.logo-btn .pulpo-logo-wm { font-size: 28px; letter-spacing: -0.045em; }
+.topnav-links { display: flex; gap: 6px; flex: 1; }
+/* Nav copy size — proportional to the 28px wordmark + 32px mark above.
+   Strong-brand headers (Airbnb, Spotify, Strava) all run their primary
+   nav between 15–17px; 16px reads as deliberate at this scale. Smaller
+   feels apologetic next to the bigger logo. */
 .topnav-links button {
-  padding: 8px 14px; font-size: 14px; font-weight: 500;
+  padding: 10px 16px; font-size: 16px; font-weight: 500;
   color: var(--ink-2); border-radius: 999px;
   transition: background 160ms;
+  letter-spacing: -0.005em;
 }
 .topnav-links button:hover { background: var(--paper-2); color: var(--ink); }
 .topnav-links button.active { color: var(--ink); background: var(--paper-2); }
+/* Right-rail copy — one homogenous size across LiveStats, Locale toggle,
+   and Logout so they read as a single utility group. Smaller than the
+   16 px nav (which is the primary action), unified at 13 px so the rail
+   feels like supporting chrome, not three competing voices. Scoped to
+   .topnav so non-header consumers keep their default size. */
+.topnav .locale-toggle button { font-size: 13px; padding: 5px 11px; letter-spacing: 0.04em; }
+.topnav .link-btn { font-size: 13px; font-weight: 500; }
+.topnav .live-stats { font-size: 13px; }
+.topnav .count-badge { font-size: 12px; padding: 2px 8px; }
 /* margin-left: auto keeps the topnav-right block (LiveStats + locale +
    auth icon) pinned to the corner regardless of viewport. On desktop
    the .topnav-links spacer (flex: 1) does this; on mobile that spacer
@@ -229,8 +258,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 767px) {
   .topnav-inner { gap: 16px; }
   .pulpo-logo-wm { font-size: 20px; }
+  .logo-btn .pulpo-logo { gap: 10px; }
+  .logo-btn .pulpo-logo > svg { width: 28px; height: 28px; }
+  .logo-btn .pulpo-logo-wm { font-size: 24px; }
   .pulpo-logo-pro { font-size: 10px; padding: 3px 6px 2px; letter-spacing: 0.16em; }
   .pulpo-logo-pro::before { width: 5px; height: 5px; }
+}
+@media (max-width: 360px) {
+  .logo-btn .pulpo-logo > svg { width: 26px; height: 26px; }
+  .logo-btn .pulpo-logo-wm { font-size: 22px; }
 }
 @media (max-width: 360px) {
   .pulpo-logo-pro { display: none; }
@@ -5950,6 +5986,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--color-ink-secondary);
   letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@media (min-width: 1024px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-brief {
+    left: 28px;
+    right: 28px;
+    bottom: 24px;
+  }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 24px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 15px; }
 }
 @media (max-width: 480px) {
   .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
