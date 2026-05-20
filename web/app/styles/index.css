@@ -5902,46 +5902,42 @@ h1,h2,h3,h4,h5 { margin: 0; }
   outline: 2px solid var(--color-forest-deep);
   outline-offset: 3px;
 }
-/* Photo column wraps photo + brief details. Becomes the right-hand
-   flex child of `.hp-hero-v4-inner` on desktop, the top item on mobile.
-   Inner photo's existing `order` rules are inert once wrapped. */
-.homepage-v2.hero-v4 .hp-hero-v4-photo-col {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  order: 1;
-  width: 100%;
+/* Bottom scrim — bottom-up gradient ensuring the brief text overlay
+   stays legible on any photo (bright skies, busy foliage, beach sand).
+   Pure visual, never receives pointer events. */
+.homepage-v2.hero-v4 .hp-hero-v4-photo-scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 45%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.32) 35%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
-@media (min-width: 1024px) {
-  .homepage-v2.hero-v4 .hp-hero-v4-photo-col {
-    order: 2;
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-}
-/* Wrapped photo no longer carries its own flex-order — the column does. */
-.homepage-v2.hero-v4 .hp-hero-v4-photo-col .hp-hero-v4-photo { order: 0; }
 
-/* "Featured today" pill — trophy + label, no rank numeral. White pill
-   with clay trophy + ink-primary label, mirroring `.pulpo-rank` styling
-   so it reads in the same visual family as the Top 10 shelf chips
-   without claiming a numeric rank. */
+/* "Featured today" pill — trophy + label, anchored top-left of the
+   photo. Mobile-first sizing: base = smallest viewport, `min-width`
+   queries enlarge upward (CLAUDE.md mobile-first rule). */
 .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   z-index: 3;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: var(--color-bg-white);
   color: var(--color-ink-primary);
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
   border: 0.5px solid var(--color-line-soft);
   box-shadow: var(--shadow-1);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.005em;
   line-height: 1;
@@ -5949,44 +5945,58 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .homepage-v2.hero-v4 .hp-hero-v4-featured-pill svg {
   color: var(--color-clay-primary);
 }
+@media (min-width: 481px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
+    top: 16px;
+    left: 16px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
 
-/* Listing details brief — zone_name (title) + price · size · land_type.
-   Sits below the photo, clickable, opens the same listing detail as the
-   photo. Quiet typography so the photo stays the hero's center of mass. */
+/* Listing-details brief overlaid on the photo, bottom-left of the
+   scrim band. Inherits the photo's click handler via event bubble —
+   `pointer-events: none` keeps the parent button as the only click
+   target. Mobile-first sizing. */
 .homepage-v2.hero-v4 .hp-hero-v4-brief {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background var(--dur-mid) var(--ease-out);
-}
-.homepage-v2.hero-v4 .hp-hero-v4-brief:hover {
-  background: var(--color-bg-cream-soft);
-}
-.homepage-v2.hero-v4 .hp-hero-v4-brief:focus-visible {
-  outline: 2px solid var(--color-forest-deep);
-  outline-offset: 2px;
+  pointer-events: none;
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: var(--color-ink-primary);
+  color: var(--color-bg-white);
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-meta {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--color-ink-secondary);
+  color: rgba(255, 255, 255, 0.92);
   letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@media (min-width: 481px) {
+  .homepage-v2.hero-v4 .hp-hero-v4-brief {
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+  }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 20px; }
+  .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 14px; }
 }
 @media (min-width: 1024px) {
   .homepage-v2.hero-v4 .hp-hero-v4-brief {
@@ -5996,16 +6006,6 @@ h1,h2,h3,h4,h5 { margin: 0; }
   }
   .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 24px; }
   .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 15px; }
-}
-@media (max-width: 480px) {
-  .homepage-v2.hero-v4 .hp-hero-v4-featured-pill {
-    top: 12px;
-    left: 12px;
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .homepage-v2.hero-v4 .hp-hero-v4-brief-title { font-size: 15px; }
-  .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 13px; }
 }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
