@@ -10,6 +10,20 @@
 //   POST /api/admin/newsletter/preview  — filter + render HTML
 //   POST /api/admin/newsletter/send     — same + Resend a test email
 //
+// Sources of truth (anti-drift). The widget DOES NOT hardcode these:
+//   - Categories (chip set + labels)  → web/app/lib/categories.ts
+//                                       (PREFERENCE_CATEGORY_KEYS +
+//                                        PREFERENCE_CATEGORY_LABEL_KEY)
+//   - Cohorts                         → ./constants.ts (NEWSLETTER_COHORTS),
+//                                       guarded against Python drift by
+//                                       tests/test_newsletter_constants_sync.py
+//   - Locales                         → web/app/i18n.jsx (LOCALES)
+//   - Departments / zones / property
+//     types                           → fetched live from /api/admin/
+//                                       newsletter/options (reads
+//                                       web/data/ranked.json at request
+//                                       time)
+//
 // Send guardrails (enforced server-side, restated here for the operator):
 //   - hard cap of 5 recipients per call. No `confirm_broadcast` escape.
 //   - subject is tagged `[PULPO ADMIN TEST]` so a misdelivered email is
@@ -18,39 +32,40 @@
 //     path (`pulpo-newsletter` workflow with `send_mode=yes`).
 
 import React, { useEffect, useMemo, useState } from "react";
+import { t, LOCALES } from "../../../i18n.jsx";
+import {
+  PREFERENCE_CATEGORY_KEYS,
+  PREFERENCE_CATEGORY_LABEL_KEY,
+} from "../../../lib/categories.ts";
+import {
+  NEWSLETTER_COHORTS,
+  NEWSLETTER_COHORT_LABEL,
+  NEWSLETTER_PROPERTY_TYPES,
+} from "./constants.ts";
+
+// Admin tool is EN-only by design (see `// i18n-allow:` markers in this
+// tree). Category labels come through `t()` for parity with what users
+// see on /account/notifications, locked to "en" so the operator sees the
+// same chip text regardless of their browser locale.
+const ADMIN_UI_LOCALE = "en";
 
 // Default recipient is Javier's address (the admin owner). The form lets
 // the user replace or add — but the page never broadcasts.
 const DEFAULT_RECIPIENT = "javier@suarez.ventures";
 const MAX_RECIPIENTS = 5;
 
-// Mirror of `CATEGORY_PREDICATES` in automation/newsletter/segments.py.
-// Kept inline so the UI doesn't have to round-trip to the server for the
-// list of available categories — the server still enforces the canonical
-// set (mismatches degrade silently to "no opinion" on that axis).
-const CATEGORY_OPTIONS = [
-  ["beachfront",         "Beachfront or walk-to-beach"],
-  ["water_features",     "Has water features (river / lake / sea)"],
-  ["ocean_view",         "Ocean view"],
-  ["mountain_view",      "Mountain view"],
-  ["flat_buildable",     "Flat + buildable"],
-  ["build_ready",        "Build-ready (power + water)"],
-  ["commercial",         "Commercial use"],
-  ["agricultural",       "Agricultural"],
-  ["under_50k",          "Under $50k"],
-  ["under_100k",         "Under $100k"],
-  ["price_drops",        "Repriced this cycle"],
-  ["motivated_sellers",  "Motivated seller"],
-];
+// Category options come from PREFERENCE_CATEGORY_KEYS — the same list
+// /account/notifications uses. When that list shrinks (or grows) this
+// widget tracks it automatically. Labels go through `t()` so the chip
+// copy matches what users see on the live UI.
+const CATEGORY_OPTIONS = PREFERENCE_CATEGORY_KEYS.map((k) => [
+  k,
+  t(PREFERENCE_CATEGORY_LABEL_KEY[k], ADMIN_UI_LOCALE),
+]);
 
-const COHORT_OPTIONS = [
-  ["pro_prefs",        "Pro + prefs (full picks, no paywall)"],
-  ["free_prefs",       "Free + prefs (paywalled below pick #1)"],
-  ["logged_no_prefs",  "Logged in, no prefs (fallback)"],
-  ["anonymous",        "Anonymous email (welcome edition)"],
-];
+const COHORT_OPTIONS = NEWSLETTER_COHORTS.map((k) => [k, NEWSLETTER_COHORT_LABEL[k]]);
 
-const PROPERTY_TYPES = ["land", "house", "condo"];
+const PROPERTY_TYPES = NEWSLETTER_PROPERTY_TYPES;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -441,8 +456,11 @@ export function NewsletterWidget() {
             <label>Locale & issue</label>
             <div className="row inline">
               <select value={locale} onChange={(e) => setLocale(e.target.value)} style={{ flex: "0 0 90px" }}>
-                <option value="en">English</option>
-                <option value="es">Español</option>
+                {LOCALES.map((lc) => (
+                  <option key={lc} value={lc}>
+                    {lc === "en" ? "English" : lc === "es" ? "Español" : lc.toUpperCase()}
+                  </option>
+                ))}
               </select>
               <input
                 type="number"
