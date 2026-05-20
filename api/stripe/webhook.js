@@ -19,8 +19,19 @@
 //                                              Look up by email; create
 //                                              a Clerk invitation if no
 //                                              user exists.
-//   customer.subscription.updated      — renewals, plan changes, paused
-//                                        / past_due → re-derive plan
+//   invoice.payment_failed             — first failed retry. Stamp
+//                                        payment_failed_at + a 14-day
+//                                        grace_period_ends_at. plan
+//                                        stays "pro" so the UI can show
+//                                        "still Pro — update your card".
+//   invoice.payment_succeeded          — successful charge, including
+//                                        a recovery after a failure.
+//                                        Clears the grace fields.
+//   customer.subscription.updated      — status transitions. active /
+//                                        trialing → plan=pro & clear
+//                                        grace; past_due → keep plan=pro
+//                                        and ensure grace is stamped;
+//                                        canceled / unpaid → plan=free.
 //   customer.subscription.deleted      — fully cancelled, plan=free
 //
 // The webhook needs the *raw* request body for signature verification
@@ -34,8 +45,12 @@ const {
 } = require("./_stripe");
 const posthog = require("../_posthog");
 const { sendActivationEmail } = require("../_activation_email");
+const { GRACE_MS } = require("../_plan");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
+// Statuses that mean "subscription is finished, not paused": fully
+// cancel the user. past_due / unpaid keep the user in grace.
+const TERMINAL_STATUSES = new Set(["canceled", "incomplete_expired"]);
 
 // UTM keys we propagate from Stripe metadata onto the Clerk user — used
 // downstream by PostHog Person properties for per-channel LTV slicing.
@@ -71,6 +86,25 @@ async function setPlanForClerkUser(clerk, userId, plan, extraPrivate) {
     publicMetadata:  { plan },
     ...(extraPrivate ? { privateMetadata: extraPrivate } : {}),
   });
+}
+
+// Partial publicMetadata patch — Clerk's updateUserMetadata REPLACES
+// publicMetadata wholesale, so we have to read the current value,
+// shallow-merge the patch, and write it back. Same pattern as
+// api/clerk/update-profile.js (which documents the gotcha at length).
+// Used by the subscription-lifecycle paths below so a grace-period
+// stamp doesn't wipe the user's `profile` blob.
+async function patchPublicMetadata(clerk, userId, patch) {
+  if (!userId) return;
+  const user = await clerk.users.getUser(userId);
+  const current = (user && user.publicMetadata) || {};
+  const next = { ...current, ...patch };
+  // Convert undefined-valued patch keys into explicit deletes; null
+  // sticks (we use null to mean "explicitly cleared").
+  for (const k of Object.keys(patch)) {
+    if (patch[k] === undefined) delete next[k];
+  }
+  await clerk.users.updateUserMetadata(userId, { publicMetadata: next });
 }
 
 // Look up an existing Clerk user by email. Returns the user object or
@@ -520,20 +554,186 @@ module.exports = async (req, res) => {
           const user = await findClerkUserByEmail(clerk, subEmail);
           if (user) userId = user.id;
         }
-        const isActive = event.type === "customer.subscription.deleted"
-          ? false
-          : ACTIVE_STATUSES.has(sub.status);
-        await setPlanForClerkUser(clerk, userId, isActive ? "pro" : "free");
+
+        // Three buckets of Stripe status → Pulpo metadata patch:
+        //   active / trialing → plan="pro", status="active", clear
+        //                        grace fields (a successful recovery
+        //                        after past_due routes through here).
+        //   past_due / unpaid → plan="pro" (still!), status="past_due",
+        //                        stamp grace fields if not already set
+        //                        so the 14-day countdown is anchored
+        //                        on the first failure, not on every
+        //                        subscription.updated retry that fires
+        //                        while we're still past_due.
+        //   canceled / expired / deleted → plan="free", status="canceled",
+        //                                  clear grace fields.
+        const status = sub.status;
+        const isDeleted = event.type === "customer.subscription.deleted";
+        const isActive = !isDeleted && ACTIVE_STATUSES.has(status);
+        const isTerminal = isDeleted || TERMINAL_STATUSES.has(status);
+        const isPastDue = !isTerminal && (status === "past_due" || status === "unpaid");
+
+        let patch = null;
+        if (isActive) {
+          patch = {
+            plan: "pro",
+            subscription_status: "active",
+            payment_failed_at: undefined,
+            grace_period_ends_at: undefined,
+          };
+        } else if (isPastDue) {
+          // Read current metadata so we don't reset the grace clock on
+          // every retry — past_due fires repeatedly while Stripe is
+          // attempting Smart Retries.
+          let existingGrace = null;
+          let existingFailedAt = null;
+          if (userId) {
+            try {
+              const u = await clerk.users.getUser(userId);
+              const meta = (u && u.publicMetadata) || {};
+              if (typeof meta.grace_period_ends_at === "number") existingGrace = meta.grace_period_ends_at;
+              if (typeof meta.payment_failed_at === "number") existingFailedAt = meta.payment_failed_at;
+            } catch { /* fall through — we'll stamp fresh */ }
+          }
+          const failedAt = existingFailedAt || ((event.created || Math.floor(Date.now() / 1000)) * 1000);
+          const graceEndsAt = existingGrace || (failedAt + GRACE_MS);
+          patch = {
+            plan: "pro",
+            subscription_status: "past_due",
+            payment_failed_at: failedAt,
+            grace_period_ends_at: graceEndsAt,
+          };
+        } else {
+          // Terminal (canceled / expired / deleted): drop the user to
+          // free and clear grace bookkeeping.
+          patch = {
+            plan: "free",
+            subscription_status: "canceled",
+            payment_failed_at: undefined,
+            grace_period_ends_at: undefined,
+          };
+        }
+
+        if (userId) {
+          await patchPublicMetadata(clerk, userId, patch);
+        }
         posthog.capture(posthog.emailDistinctId(subEmail), "webhook.subscription_changed", {
           event_id: event.id,
           subscription_id: sub.id,
           type: event.type,
-          status: sub.status,
+          status: status || "",
           is_active: isActive,
+          is_past_due: isPastDue,
+          is_terminal: isTerminal,
           clerk_user_id: userId || "",
+          grace_period_ends_at: patch.grace_period_ends_at || 0,
           source: (sub.metadata && sub.metadata.source) ? String(sub.metadata.source) : "",
           ms: Date.now() - t0,
         });
+        break;
+      }
+      case "invoice.payment_failed": {
+        // Fires on each failed charge attempt. We anchor the 14-day
+        // grace clock on the FIRST failure of the current dunning cycle
+        // — subsequent retries don't reset it. customer.subscription.updated
+        // (status=past_due) usually fires alongside this and would
+        // also stamp the same fields; we leave both wired so a missed
+        // subscription.updated still produces a grace stamp.
+        const inv = event.data.object;
+        const subId = typeof inv.subscription === "string"
+          ? inv.subscription
+          : (inv.subscription && inv.subscription.id);
+        const invEmail = (inv.customer_email)
+          || (inv.customer_address && inv.customer_address.email)
+          || null;
+        let userId = null;
+        let subMeta = {};
+        if (subId) {
+          try {
+            const sub = await stripeClient().subscriptions.retrieve(subId);
+            subMeta = (sub && sub.metadata) || {};
+            userId = subMeta.clerkUserId || null;
+          } catch { /* fall back to email lookup */ }
+        }
+        const fallbackEmail = invEmail || subMeta.email || null;
+        if (!userId && fallbackEmail) {
+          const user = await findClerkUserByEmail(clerk, fallbackEmail);
+          if (user) userId = user.id;
+        }
+        if (userId) {
+          // Read first so we don't reset the clock on retries.
+          let existingGrace = null;
+          let existingFailedAt = null;
+          try {
+            const u = await clerk.users.getUser(userId);
+            const meta = (u && u.publicMetadata) || {};
+            if (typeof meta.grace_period_ends_at === "number") existingGrace = meta.grace_period_ends_at;
+            if (typeof meta.payment_failed_at === "number") existingFailedAt = meta.payment_failed_at;
+          } catch { /* stamp fresh */ }
+          const failedAt = existingFailedAt || ((event.created || Math.floor(Date.now() / 1000)) * 1000);
+          const graceEndsAt = existingGrace || (failedAt + GRACE_MS);
+          await patchPublicMetadata(clerk, userId, {
+            plan: "pro",
+            subscription_status: "past_due",
+            payment_failed_at: failedAt,
+            grace_period_ends_at: graceEndsAt,
+          });
+          posthog.capture(posthog.emailDistinctId(fallbackEmail), "webhook.invoice_payment_failed", {
+            event_id: event.id,
+            invoice_id: inv.id,
+            subscription_id: subId || "",
+            clerk_user_id: userId,
+            grace_period_ends_at: graceEndsAt,
+            attempt_count: typeof inv.attempt_count === "number" ? inv.attempt_count : 0,
+            ms: Date.now() - t0,
+          });
+        }
+        break;
+      }
+      case "invoice.payment_succeeded": {
+        // Successful charge — including recovery from a past_due state.
+        // Always clear the grace fields so a recovered customer goes
+        // back to a clean "active" view.
+        const inv = event.data.object;
+        const subId = typeof inv.subscription === "string"
+          ? inv.subscription
+          : (inv.subscription && inv.subscription.id);
+        const invEmail = (inv.customer_email)
+          || (inv.customer_address && inv.customer_address.email)
+          || null;
+        let userId = null;
+        let subMeta = {};
+        if (subId) {
+          try {
+            const sub = await stripeClient().subscriptions.retrieve(subId);
+            subMeta = (sub && sub.metadata) || {};
+            userId = subMeta.clerkUserId || null;
+          } catch { /* fall back */ }
+        }
+        const fallbackEmail = invEmail || subMeta.email || null;
+        if (!userId && fallbackEmail) {
+          const user = await findClerkUserByEmail(clerk, fallbackEmail);
+          if (user) userId = user.id;
+        }
+        if (userId) {
+          await patchPublicMetadata(clerk, userId, {
+            plan: "pro",
+            subscription_status: "active",
+            payment_failed_at: undefined,
+            grace_period_ends_at: undefined,
+          });
+          posthog.capture(posthog.emailDistinctId(fallbackEmail), "webhook.invoice_payment_succeeded", {
+            event_id: event.id,
+            invoice_id: inv.id,
+            subscription_id: subId || "",
+            clerk_user_id: userId,
+            // Distinguish first invoice (initial purchase already handled
+            // by checkout.session.completed) from a recovery — useful
+            // for funnel attribution.
+            billing_reason: typeof inv.billing_reason === "string" ? inv.billing_reason : "",
+            ms: Date.now() - t0,
+          });
+        }
         break;
       }
       default:

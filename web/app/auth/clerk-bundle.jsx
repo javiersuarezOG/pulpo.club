@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import { ClerkProvider, useUser, useClerk } from "@clerk/react";
 import { esMX, enUS } from "@clerk/localizations";
 import { applyFounderPlan } from "../lib/founder-emails";
+import { deriveSubscriptionState } from "../lib/subscription";
 
 function planFromMetadata(metadata) {
   // Clerk Dashboard test users carry plan in publicMetadata.plan.
@@ -32,6 +33,23 @@ function planFromMetadata(metadata) {
   // override travels with the hydrated user object.
   const v = metadata && metadata.plan;
   return v === "pro" ? "pro" : "free";
+}
+
+// Subscription lifecycle fields written by api/stripe/webhook.js
+// (see api/_plan.js for the canonical schema + grace logic). Surfaced
+// onto app.user so the Account page can render the past_due grace
+// banner without an extra fetch. Defaults to "active" + no grace for
+// users who pre-date this field set.
+function subscriptionFromMetadata(metadata) {
+  const m = metadata || {};
+  return {
+    subscription_status:
+      m.subscription_status === "past_due" || m.subscription_status === "canceled"
+        ? m.subscription_status
+        : "active",
+    payment_failed_at: typeof m.payment_failed_at === "number" ? m.payment_failed_at : null,
+    grace_period_ends_at: typeof m.grace_period_ends_at === "number" ? m.grace_period_ends_at : null,
+  };
 }
 
 function ClerkUserSync({ setUser, setAuthLoaded }) {
@@ -54,13 +72,26 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
       setUser(null);
       return;
     }
+    const rawPlan = planFromMetadata(user.publicMetadata);
+    const subFields = subscriptionFromMetadata(user.publicMetadata);
+    // Effective plan honors the 14-day grace window: a past_due user
+    // with an expired grace_period_ends_at reads as "free" everywhere
+    // downstream (isPaid, SiteHeader Pro pill, BottomNav star, Plans
+    // page Pro state). The Account page reads subscription_status +
+    // grace_period_ends_at off the same hydrated user to render the
+    // grace banner with raw lifecycle context.
+    const effective = deriveSubscriptionState({ plan: rawPlan, ...subFields }).effective;
     setUser(applyFounderPlan({
       email:    user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "",
       name:     user.firstName || user.username || "",
-      plan:     planFromMetadata(user.publicMetadata),
+      plan:     effective,
       joined:   user.createdAt ? +new Date(user.createdAt) : Date.now(),
       provider: "clerk",
       clerkId:  user.id,
+      // Subscription lifecycle (status / grace bookkeeping). Spread
+      // here so deriveSubscriptionState() can read everything off
+      // app.user without an extra `user.subscription.` namespace.
+      ...subFields,
       // Open profile dict (see web/app/lib/user-profile.ts). Read-only
       // hydration today — PR-C wires the write path so Clerk becomes
       // the cross-device source of truth.
@@ -101,6 +132,41 @@ function ClerkActionsBinder({ onActions }) {
           emailAddress: s.emailAddress || null,
           missingFields: Array.isArray(s.missingFields) ? s.missingFields : [],
         };
+      },
+      // Explicit two-step ticket consume — handover §7b. Clerk's SDK
+      // implicit consumption from URL (just calling openSignUp with
+      // __clerk_ticket in URL) didn't reliably bind the SignUp resource
+      // to the ticket — Clerk's modal rendered "This ticket is invalid"
+      // even on fresh tickets in some sessions. Calling signUp.create
+      // with strategy="ticket" first guarantees the SignUp resource is
+      // attached to the ticket BEFORE openSignUp mounts the modal, so
+      // the modal renders the password step directly.
+      //
+      // Returns { ok: true, status, emailAddress } on success, or
+      // { ok: false, code, message } on failure. Failure does NOT throw
+      // — caller fires telemetry and falls through to openSignUp; Clerk's
+      // hosted modal renders its own ticket-invalid alert with a "sign in
+      // instead" footer, which is the right recovery UX for already-spent
+      // tickets.
+      consumeTicket: async (ticket) => {
+        const s = clerk.signUp;
+        if (!s) return { ok: false, code: "sdk_not_ready", message: "Clerk SDK not ready" };
+        try {
+          const result = await s.create({ strategy: "ticket", ticket });
+          return {
+            ok: true,
+            status: result.status || s.status || null,
+            emailAddress: result.emailAddress || s.emailAddress || null,
+          };
+        } catch (err) {
+          const errors = err && err.errors;
+          const first = Array.isArray(errors) && errors.length ? errors[0] : null;
+          return {
+            ok: false,
+            code: (first && first.code) || (err && err.code) || "unknown",
+            message: (first && first.longMessage) || (first && first.message) || (err && err.message) || "",
+          };
+        }
       },
       // Synchronous "does Clerk think a user is signed in right now?"
       // SignupModal uses this to short-circuit the open call during the

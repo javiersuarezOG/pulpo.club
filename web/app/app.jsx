@@ -36,6 +36,19 @@ import { AdminPage } from "./admin/AdminShell.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
+import { deriveSubscriptionState } from "./lib/subscription";
+
+// Resolves the hydrated user object's `plan` field to the effective
+// plan (honoring the 14-day grace window after a failed payment) and
+// then applies the founder-email override. Used at every user state
+// transition — initial localStorage seed, legacy email signin — so
+// every downstream `app.user.plan` reader sees the same value the
+// Clerk hydration path (clerk-bundle.jsx) produces.
+function hydrateUser(raw) {
+  if (!raw) return raw;
+  const effective = deriveSubscriptionState(raw).effective;
+  return applyFounderPlan({ ...raw, plan: effective });
+}
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
 // inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
 // extracted out for the same reason — single chrome component per role.
@@ -162,7 +175,7 @@ function App() {
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
-    try { return applyFounderPlan(JSON.parse(localStorage.getItem("pulpo-user"))) || null; } catch { return null; }
+    try { return hydrateUser(JSON.parse(localStorage.getItem("pulpo-user"))) || null; } catch { return null; }
   });
   // Tracks whether Clerk has finished hydrating. When Clerk is OFF
   // (legacy CI / no publishable key) this defaults to true so the
@@ -544,11 +557,17 @@ function App() {
 
   // Dedicated effect for the activation landing: open Clerk's hosted
   // SignUp modal so the user can set their password. Fires as soon as
-  // Clerk hydrates (clerkActions becomes truthy). Clerk's SDK consumes
-  // the __clerk_ticket from the URL implicitly when openSignUp() fires.
-  // Once the user completes sign-up, Clerk redirects per the
-  // invitation's rurl to /account?welcome=1[&lang=…] signed in — the
-  // signed-in WelcomeModal then renders and auto-dismisses.
+  // Clerk hydrates (clerkActions becomes truthy). We then explicitly
+  // consume the __clerk_ticket via signUp.create({strategy:"ticket"})
+  // BEFORE opening Clerk's hosted modal — handover §7b. Clerk's
+  // implicit URL-consumption from openSignUp({}) was unreliable for
+  // Pulpo's instance (Clerk's modal rendered "This ticket is invalid"
+  // even on fresh tickets in some sessions). Explicit consume binds
+  // the SignUp resource to the ticket synchronously; the modal then
+  // renders the password step directly. Once the user completes
+  // sign-up, Clerk redirects per the invitation's rurl to
+  // /account?welcome=1[&lang=…] signed in — the signed-in WelcomeModal
+  // then renders and auto-dismisses.
   //
   // This effect MUST be the only caller of openSignUp on the activation
   // landing. The pendingSignUp effect below explicitly skips when
@@ -563,11 +582,41 @@ function App() {
     if (clerkTicketHandledRef.current) return;
     clerkTicketHandledRef.current = true;
     track("invitation.password_creation_opened", { source: "clerk_ticket_url" });
-    try {
-      clerkActions.openSignUp({});
-    } catch {
-      clerkTicketHandledRef.current = false;
-    }
+
+    const ticket = (typeof window !== "undefined")
+      ? (new URLSearchParams(window.location.search).get("__clerk_ticket") || "")
+      : "";
+
+    (async () => {
+      // Step 1: explicit consume. Fires PostHog telemetry on both paths
+      // so we can distinguish fresh-ticket-rejected from spent-ticket
+      // from sdk-not-ready in production.
+      if (ticket && clerkActions.consumeTicket) {
+        const consume = await clerkActions.consumeTicket(ticket);
+        if (consume && consume.ok) {
+          track("invitation.ticket_consumed", {
+            status: consume.status || "unknown",
+            had_email: !!consume.emailAddress,
+          });
+        } else {
+          track("invitation.ticket_rejected", {
+            code: (consume && consume.code) || "unknown",
+            message: ((consume && consume.message) || "").slice(0, 200),
+          });
+          // Don't bail — fall through to openSignUp so Clerk's hosted
+          // modal renders its own ticket-invalid UI (with a "sign in
+          // instead" footer that's the right recovery for spent tickets).
+        }
+      }
+      // Step 2: open the modal. Whether step 1 succeeded or not, the
+      // hosted modal renders the appropriate state (password form on
+      // success, ticket-invalid alert on failure).
+      try {
+        clerkActions.openSignUp({});
+      } catch {
+        clerkTicketHandledRef.current = false;
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasClerkTicket, clerkActions, user]);
 
@@ -972,7 +1021,7 @@ function App() {
     // Just flip user state. The post-signin effect above closes the
     // modal AND chains any pending action — keeping the wiring in one
     // place so Clerk and legacy paths behave identically.
-    setUser(applyFounderPlan({ email, provider: provider || "email", joined: Date.now() }));
+    setUser(hydrateUser({ email, provider: provider || "email", joined: Date.now() }));
     showToast(t("toast.welcome", locale));
   }, [showToast, locale]);
 

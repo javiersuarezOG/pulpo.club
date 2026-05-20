@@ -78,3 +78,31 @@ export async function seedFounderUser(page: Page): Promise<void> {
     );
   });
 }
+
+// Pro user whose latest invoice failed — anchors the 14-day grace
+// window at `failedDaysAgo` days before now. Used by the grace-banner
+// e2e to assert the past_due UX surfaces without needing a real Stripe
+// webhook event to fire.
+export async function seedPastDueUser(
+  page: Page,
+  opts: { failedDaysAgo: number } = { failedDaysAgo: 3 },
+): Promise<void> {
+  await page.addInitScript((arg) => {
+    const DAY = 24 * 60 * 60 * 1000;
+    const GRACE_MS = 14 * DAY;
+    const failedAt = Date.now() - arg.failedDaysAgo * DAY;
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: "past-due-tester@pulpo.club",
+        name: "Past Due Tester",
+        plan: "pro",
+        subscription_status: "past_due",
+        payment_failed_at: failedAt,
+        grace_period_ends_at: failedAt + GRACE_MS,
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  }, opts);
+}
