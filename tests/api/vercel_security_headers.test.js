@@ -74,4 +74,59 @@ describe("vercel.json security headers", () => {
     expect(v).toMatch(/microphone=\(\)/);
     expect(v).toMatch(/geolocation=\(\)/);
   });
+
+  // CSP runs in report-only mode initially so violations surface in the
+  // browser DevTools console without breaking real users. The next step
+  // (after a week of clean previews + the Stripe-sandbox walk) is to
+  // rename the header to "Content-Security-Policy" to enforce it. Don't
+  // delete the report-only header until the enforced one has been live
+  // through at least one full Stripe-sandbox + Clerk-on flow with no
+  // console violations.
+  describe("Content-Security-Policy-Report-Only", () => {
+    const csp = headerValue(catchAll, "Content-Security-Policy-Report-Only");
+
+    it("is present (report-only mode for incremental rollout)", () => {
+      expect(csp).toBeTruthy();
+    });
+
+    it("declares default-src 'self' (baseline lockdown)", () => {
+      expect(csp).toMatch(/default-src 'self'/);
+    });
+
+    it("allows Stripe Checkout iframes (js.stripe.com + hooks.stripe.com)", () => {
+      // Without these, Stripe Elements would be CSP-blocked the moment
+      // a user hits /start. Failure here = paywall is broken on enforce.
+      expect(csp).toMatch(/frame-src[^;]*js\.stripe\.com/);
+      expect(csp).toMatch(/frame-src[^;]*hooks\.stripe\.com/);
+    });
+
+    it("allows Clerk hosted modal embeds (*.clerk.com + *.clerk.accounts.dev)", () => {
+      expect(csp).toMatch(/frame-src[^;]*\*\.clerk\.com/);
+      expect(csp).toMatch(/script-src[^;]*\*\.clerk\.com/);
+    });
+
+    it("allows PostHog ingestion (eu.i.posthog.com)", () => {
+      expect(csp).toMatch(/connect-src[^;]*eu\.i\.posthog\.com/);
+      expect(csp).toMatch(/script-src[^;]*eu\.i\.posthog\.com/);
+    });
+
+    it("allows Google Fonts (fonts.googleapis.com + fonts.gstatic.com)", () => {
+      // Loaded from web/index.html on every page; without these the
+      // body font falls back to system sans-serif on first paint.
+      expect(csp).toMatch(/style-src[^;]*fonts\.googleapis\.com/);
+      expect(csp).toMatch(/font-src[^;]*fonts\.gstatic\.com/);
+    });
+
+    it("bans object/embed (no Flash-style plugins)", () => {
+      expect(csp).toMatch(/object-src 'none'/);
+    });
+
+    it("locks base-uri to 'self' (mitigates <base href=...> injection)", () => {
+      expect(csp).toMatch(/base-uri 'self'/);
+    });
+
+    it("requires upgrade-insecure-requests (no mixed-content fallback)", () => {
+      expect(csp).toMatch(/upgrade-insecure-requests/);
+    });
+  });
 });
