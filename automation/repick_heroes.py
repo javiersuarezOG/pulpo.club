@@ -300,6 +300,34 @@ def main() -> int:
         print("ERROR: ranked.json is empty or not a list", file=sys.stderr)
         return 1
 
+    # Backfill missing Listing fields on every dict so the schema-required
+    # set is satisfied even for listings the picker skips (no_photo_urls).
+    # The repick only mutates dicts when it picks a winner — skipped ones
+    # pass through unchanged. If the prior ranked.json predates a field
+    # added to pulpo.models.Listing, those skipped dicts ship with a stale
+    # shape and tests/test_ranked_schema.py fails the data PR. This loop
+    # normalizes load-time so adding a new Listing field never requires a
+    # one-off data-patch PR again.
+    from dataclasses import MISSING, fields as _dataclass_fields
+    from pulpo.models import Listing as _Listing
+    _listing_field_defaults: dict = {}
+    for _f in _dataclass_fields(_Listing):
+        if _f.default is not MISSING:
+            _listing_field_defaults[_f.name] = _f.default
+        elif _f.default_factory is not MISSING:  # type: ignore[misc]
+            _listing_field_defaults[_f.name] = _f.default_factory()
+        # fields without any default stay absent — they must be explicitly
+        # set by the caller, so we don't invent values for them.
+    _backfilled = 0
+    for _li in data:
+        for _name, _default in _listing_field_defaults.items():
+            if _name not in _li:
+                _li[_name] = _default
+                _backfilled += 1
+    if _backfilled:
+        print(f"[repick] backfilled {_backfilled} missing Listing-field "
+              f"defaults across {len(data)} listings")
+
     sources = None
     if args.source:
         sources = {s.strip() for s in args.source.split(",") if s.strip()}
