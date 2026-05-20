@@ -112,6 +112,7 @@ def _repick_one_listing(
             "winner_url": None,
             "technical_score": None,
             "has_text_overlay": None,
+            "has_marketing_overlay": None,
             "action": "no_photo_urls",
         }
 
@@ -128,9 +129,8 @@ def _repick_one_listing(
         }
     _apply_aesthetic_to_eligible(candidates, eligible_urls=eligible_urls)
 
-    winning_url, winning_content, winning_score, winning_has_text = (
-        _pick_winner_from_scored(candidates)
-    )
+    (winning_url, winning_content, winning_score,
+     winning_has_text, winning_has_marketing) = _pick_winner_from_scored(candidates)
 
     if winning_url is None or winning_content is None:
         return {
@@ -142,6 +142,7 @@ def _repick_one_listing(
             "winner_url": None,
             "technical_score": None,
             "has_text_overlay": None,
+            "has_marketing_overlay": None,
             "action": "no_winner",
         }
 
@@ -201,6 +202,7 @@ def _repick_one_listing(
                 hero_meta["hires_eligible"] = source_meta.get("hires_eligible")
             hero_meta["hero_photo_quality_score"] = winning_score
             hero_meta["has_text_overlay"] = winning_has_text
+            hero_meta["has_marketing_overlay"] = winning_has_marketing
             hero_meta["winning_url"] = winning_url
             hero_meta["candidate_count"] = len(candidates)
             hero_meta["picker_excluded_count"] = n_excluded
@@ -220,6 +222,7 @@ def _repick_one_listing(
             "winner_url": winning_url,
             "technical_score": winning_score,
             "has_text_overlay": winning_has_text,
+            "has_marketing_overlay": winning_has_marketing,
             "action": "no_winner",
         }
 
@@ -231,6 +234,7 @@ def _repick_one_listing(
     listing["hero_photo_path"] = f"/photos/{fname}"
     listing["hero_photo_quality_score"] = winning_score
     listing["has_text_overlay"] = winning_has_text
+    listing["has_marketing_overlay"] = winning_has_marketing
     if hero_meta is not None:
         if "hero_eligible" in hero_meta:
             listing["hero_eligible"] = bool(hero_meta["hero_eligible"])
@@ -250,6 +254,7 @@ def _repick_one_listing(
         "winner_url": winning_url,
         "technical_score": winning_score,
         "has_text_overlay": winning_has_text,
+        "has_marketing_overlay": winning_has_marketing,
         "action": "winner_picked",
     }
 

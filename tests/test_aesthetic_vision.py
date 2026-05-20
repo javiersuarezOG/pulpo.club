@@ -119,7 +119,8 @@ def test_qwen_call_returns_score_and_records_spend(tmp_path, monkeypatch):
         from automation.aesthetic_vision import score_aesthetic
         score = score_aesthetic(b"fake_jpeg")
 
-    assert score == 7.5
+    assert score is not None and score["score"] == 7.5
+    assert score["has_marketing_overlay"] is None  # legacy fixture omits the field
     # Provider invoked with the DashScope-compat base URL by default.
     fake_openai_cls.assert_called_once()
     call_kwargs = fake_openai_cls.call_args.kwargs
@@ -296,7 +297,7 @@ def test_segmind_call_returns_score_and_records_spend(tmp_path, monkeypatch):
         from automation.aesthetic_vision import score_aesthetic
         score = score_aesthetic(b"fake_jpeg_segmind")
 
-    assert score == 6.0
+    assert score is not None and score["score"] == 6.0
     fake_post.assert_called_once()
     call_kwargs = fake_post.call_args.kwargs
     assert call_kwargs["headers"]["x-api-key"] == "sk-test-segmind"
@@ -395,7 +396,7 @@ def test_cache_hit_skips_provider_and_spend(tmp_path, monkeypatch):
         from automation.aesthetic_vision import score_aesthetic
         score = score_aesthetic(raw)
 
-    assert score == 8.5
+    assert score is not None and score["score"] == 8.5
     assert _budget_rows(tmp_path) == []  # no spend recorded
 
 
@@ -417,7 +418,7 @@ def test_cache_miss_records_score_and_persists(monkeypatch):
         from automation.aesthetic_vision import score_aesthetic, _cache_key, _cache_path
         score = score_aesthetic(raw)
 
-    assert score == 4.5
+    assert score is not None and score["score"] == 4.5
     cache = json.loads(_cache_path().read_text(encoding="utf-8"))
     assert _cache_key(raw) in cache
     entry = cache[_cache_key(raw)]
@@ -449,7 +450,103 @@ def test_cache_corruption_falls_through_to_provider(monkeypatch):
         from automation.aesthetic_vision import score_aesthetic
         score = score_aesthetic(b"fresh_bytes")
 
-    assert score == 3.0
+    assert score is not None and score["score"] == 3.0
     # The cache file is now valid JSON (overwritten by the successful call).
     cache = json.loads(cache_path.read_text(encoding="utf-8"))
     assert isinstance(cache, dict) and len(cache) == 1
+
+
+# ── _parse_response tuple coverage ────────────────────────────────────────
+
+
+def test_parse_response_extracts_score_and_overlay_true():
+    from automation.aesthetic_vision import _parse_response
+    score, overlay = _parse_response(
+        '{"visual_appeal": 6, "has_marketing_overlay": true, "rationale": "banner"}'
+    )
+    assert score == 6.0
+    assert overlay is True
+
+
+def test_parse_response_extracts_score_and_overlay_false():
+    from automation.aesthetic_vision import _parse_response
+    score, overlay = _parse_response(
+        '{"visual_appeal": 8, "has_marketing_overlay": false, "rationale": "clean"}'
+    )
+    assert score == 8.0
+    assert overlay is False
+
+
+def test_parse_response_legacy_response_returns_none_overlay():
+    """Older cached responses lack the overlay field; parser returns
+    None for it so the picker treats it as 'no signal' rather than
+    false-rejecting."""
+    from automation.aesthetic_vision import _parse_response
+    score, overlay = _parse_response(
+        '{"visual_appeal": 7.5, "issues": [], "rationale": "ok"}'
+    )
+    assert score == 7.5
+    assert overlay is None
+
+
+def test_parse_response_malformed_returns_none_pair():
+    from automation.aesthetic_vision import _parse_response
+    assert _parse_response("not json at all") == (None, None)
+    assert _parse_response("{partial json") == (None, None)
+
+
+# ── score_aesthetic surfaces overlay field end-to-end ─────────────────────
+
+
+def test_score_aesthetic_returns_overlay_flagged_response(monkeypatch):
+    """A live response with has_marketing_overlay=true must propagate to
+    the returned dict so the picker can hard-reject the candidate."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+
+    fake_response = mock.MagicMock()
+    fake_response.raise_for_status.return_value = None
+    fake_response.json.return_value = {
+        "choices": [{"message": {"content":
+            '{"visual_appeal": 6.0, "has_marketing_overlay": true, "rationale": "price banner"}'
+        }}]
+    }
+    with mock.patch("httpx.post", return_value=fake_response):
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(b"banner_image_bytes")
+
+    assert score is not None
+    assert score["score"] == 6.0
+    assert score["has_marketing_overlay"] is True
+
+
+def test_score_aesthetic_cache_row_with_overlay_propagates(monkeypatch):
+    """A cache entry written with has_marketing_overlay=true must
+    populate the returned dict so a cached banner-stamped photo doesn't
+    bypass the picker filter on subsequent runs."""
+    monkeypatch.setenv("LLM_VISION_ENABLED", "true")
+    monkeypatch.setenv("LLM_VISION_PROVIDER", "segmind")
+    monkeypatch.setenv("SEGMIND_API_KEY", "sk-test-segmind")
+    from automation.aesthetic_vision import _cache_key, _cache_path
+
+    raw = b"cached_banner_image"
+    cache_path = _cache_path()
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(json.dumps({
+        _cache_key(raw): {
+            "score": 5.0,
+            "has_marketing_overlay": True,
+            "provider": "segmind",
+            "model": "qwen3-vl-flash",
+            "ts": "2026-05-20T00:00:00+00:00",
+        }
+    }))
+
+    with mock.patch("httpx.post", side_effect=AssertionError("must hit cache")):
+        from automation.aesthetic_vision import score_aesthetic
+        score = score_aesthetic(raw)
+
+    assert score is not None
+    assert score["score"] == 5.0
+    assert score["has_marketing_overlay"] is True
