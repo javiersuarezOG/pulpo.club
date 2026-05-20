@@ -301,11 +301,12 @@ function Photo({
     });
   }, [url]);
 
-  // Stuck-image telemetry — fire if the image neither loaded nor
-  // errored after 8 s. Pre-fix the opacity-stuck bug was invisible to
-  // PostHog (image failures bypass JS exceptions + we never wired the
-  // onerror handler). Post-fix this should baseline near zero; a
-  // non-zero rate is a regression signal we want to see.
+  // Stuck-image handling — if the image neither loaded nor errored
+  // after 8 s, treat it as failed and engage the category fallback.
+  // Broker URLs (Encuentra24, Bienesonline) sometimes stall without
+  // firing onerror/onload (slow CDN, ad-blocker, 503-without-headers),
+  // which left the shimmer skeleton visible forever. Promoting stuck →
+  // errored guarantees the surface always lands on a real image.
   useEffect(() => {
     if (!url) return;
     let cancelled = false;
@@ -324,6 +325,7 @@ function Photo({
           was_cached_likely: wasCachedLikely,
         });
       } catch { /* never let telemetry break the render */ }
+      setErrored(true);
     }, 8000);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [url, loaded, errored, listing.id, idx, source]);
