@@ -137,6 +137,13 @@ export interface Listing {
      *  (text/banner/agency overlays). Excludes listing from the elite featured pool.
      *  null = no OCR signal (Tesseract absent or undecodable image). */
     has_text_overlay: boolean | null;
+    /** VLM-based marketing-overlay flag for hero photos. True = the image carries
+     *  a marketing banner / watermark / agency logo / price stamp that OCR may
+     *  have missed (stylized fonts, semi-transparent overlays). Picker hard-
+     *  rejects when true; /api/social/listings also gates on it as defense in
+     *  depth. null = no signal (LLM Vision disabled, budget exhausted, response
+     *  omitted the field, or legacy cache row predates the field). */
+    has_marketing_overlay: boolean | null;
     first_seen_at: string | null;       // ISO8601 UTC
 
     // ── Broker ──────────────────────────────────────────────────────
