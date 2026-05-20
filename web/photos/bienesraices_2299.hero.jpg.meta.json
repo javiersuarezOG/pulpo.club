@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:35:24.177410+00:00",
+  "computed_at": "2026-05-20T07:31:11.810034+00:00",
   "derivative_width": 1081,
   "derivative_height": 687,
   "hero_photo_quality_score": 60,
   "has_text_overlay": true,
   "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/G1FS1ND2IA/CFcUZAsXky/Terreno_en_venta_en_Complejo_Privado_Atami_1.jpeg",
-  "candidate_count": 2,
-  "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T21:35:24.180113+00:00"
+  "candidate_count": 2
 }

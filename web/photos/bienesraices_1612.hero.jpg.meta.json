@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:42:18.862410+00:00",
+  "computed_at": "2026-05-20T07:31:19.255163+00:00",
   "derivative_width": 1080,
   "derivative_height": 611,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4744478/80212971/EB-RF4478.jpeg?rasterize=true&version=1726678805",
-  "candidate_count": 2,
-  "picker_excluded_count": 1,
-  "repicked_at": "2026-05-19T21:42:18.865782+00:00"
+  "candidate_count": 2
 }

@@ -1,18 +1,16 @@
 {
-  "width": 1280,
-  "height": 720,
-  "aspect_ratio": 1.778,
-  "file_size_kb": 338.3,
+  "width": 1599,
+  "height": 899,
+  "aspect_ratio": 1.779,
+  "file_size_kb": 362.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:38:06.883860+00:00",
-  "derivative_width": 1280,
-  "derivative_height": 720,
+  "computed_at": "2026-05-20T07:31:14.911746+00:00",
+  "derivative_width": 1599,
+  "derivative_height": 899,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvTThOQk9POFpaWC81RVVhRGRDZGJ0L1ZlbnRhX2RlX1RlcnJlbm9fZGVfM19NYW56YW5hc19lbl9TYW5fSm9zXHUwMGU5X1ZpbGxhbnVldmFfX0lkZWFsX3BhcmFfRGVzYXJyb2xsb19VcmJhblx1MDBlZHN0aWNvXzEuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5NjAsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
-  "candidate_count": 3,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:38:06.888770+00:00"
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/7OJJYH0Z4E/WA9htSedTJ/Venta_de_Terreno_de_3_Manzanas_en_San_Jos%C3%A9_Villanueva__Ideal_para_Desarrollo_Urban%C3%ADstico_2.jpeg",
+  "candidate_count": 3
 }

@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:51:24.559027+00:00",
+  "computed_at": "2026-05-20T07:31:27.390549+00:00",
   "derivative_width": 607,
   "derivative_height": 1080,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4042897/66799227/EB-ON2897.jpg?rasterize=true&version=1696336162",
-  "candidate_count": 4,
-  "picker_excluded_count": 4,
-  "repicked_at": "2026-05-19T21:51:24.563218+00:00"
+  "candidate_count": 4
 }

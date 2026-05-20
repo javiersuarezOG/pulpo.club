@@ -1,129 +1,129 @@
 {
-  "generated_at": "2026-05-19T07:22:01.384445+00:00",
-  "total_listings": 917,
+  "generated_at": "2026-05-20T07:35:27.252423+00:00",
+  "total_listings": 923,
   "ui_gate_pct": 15,
   "existing": [
     {
       "field": "url",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "title",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "description>20",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "first_seen_at",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "scraped_at",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "days_listed",
-      "hits": 917,
+      "hits": 923,
       "pct": 100.0
     },
     {
       "field": "lat",
-      "hits": 915,
+      "hits": 921,
       "pct": 99.8
     },
     {
       "field": "lng",
-      "hits": 915,
+      "hits": 921,
       "pct": 99.8
     },
     {
       "field": "department",
-      "hits": 895,
-      "pct": 97.6
+      "hits": 900,
+      "pct": 97.5
     },
     {
       "field": "price_usd",
-      "hits": 893,
-      "pct": 97.4
+      "hits": 898,
+      "pct": 97.3
     },
     {
       "field": "area_m2",
-      "hits": 892,
+      "hits": 898,
       "pct": 97.3
     },
     {
       "field": "price_per_m2",
-      "hits": 868,
-      "pct": 94.7
+      "hits": 873,
+      "pct": 94.6
     },
     {
       "field": "zone",
-      "hits": 866,
+      "hits": 871,
       "pct": 94.4
     },
     {
       "field": "photo_urls>0",
-      "hits": 839,
+      "hits": 845,
       "pct": 91.5
     },
     {
       "field": "photos_count>0",
-      "hits": 839,
+      "hits": 845,
       "pct": 91.5
     },
     {
       "field": "zone_specific",
-      "hits": 586,
-      "pct": 63.9
+      "hits": 591,
+      "pct": 64.0
     },
     {
       "field": "broker_name",
       "hits": 515,
-      "pct": 56.2
+      "pct": 55.8
     },
     {
       "field": "broker_phone",
       "hits": 512,
-      "pct": 55.8
+      "pct": 55.5
     },
     {
       "field": "broker_email",
       "hits": 512,
-      "pct": 55.8
+      "pct": 55.5
     },
     {
       "field": "is_in_development",
-      "hits": 375,
-      "pct": 40.9
+      "hits": 377,
+      "pct": 40.8
     },
     {
       "field": "is_beachfront",
-      "hits": 119,
-      "pct": 13.0
+      "hits": 121,
+      "pct": 13.1
     },
     {
       "field": "property_type!=land",
       "hits": 86,
-      "pct": 9.4
+      "pct": 9.3
     },
     {
       "field": "is_repriced",
-      "hits": 7,
-      "pct": 0.8
+      "hits": 8,
+      "pct": 0.9
     }
   ],
   "nlp": [
     {
       "field": "has_mountain_view",
-      "hits": 15,
-      "pct": 1.6,
+      "hits": 16,
+      "pct": 1.7,
       "prd_target": 0,
       "verdict": "RED",
       "verdict_label": "🔴 below 5% — needs scraper depth"
@@ -138,8 +138,8 @@
     },
     {
       "field": "has_paved_access",
-      "hits": 203,
-      "pct": 22.1,
+      "hits": 207,
+      "pct": 22.4,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 above 15% gate, below PRD target"
@@ -147,15 +147,15 @@
     {
       "field": "has_power",
       "hits": 276,
-      "pct": 30.1,
+      "pct": 29.9,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 above 15% gate, below PRD target"
     },
     {
       "field": "has_water",
-      "hits": 305,
-      "pct": 33.3,
+      "hits": 308,
+      "pct": 33.4,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 above 15% gate, below PRD target"
@@ -163,63 +163,71 @@
     {
       "field": "has_water_body",
       "hits": 144,
-      "pct": 15.7,
+      "pct": 15.6,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_agricultural",
-      "hits": 197,
-      "pct": 21.5,
+      "hits": 199,
+      "pct": 21.6,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_beachfront",
-      "hits": 117,
-      "pct": 12.8,
+      "hits": 119,
+      "pct": 12.9,
       "prd_target": 15,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_commercial",
-      "hits": 89,
-      "pct": 9.7,
+      "hits": 88,
+      "pct": 9.5,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_flat",
-      "hits": 239,
-      "pct": 26.1,
+      "hits": 243,
+      "pct": 26.3,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_motivated",
-      "hits": 181,
-      "pct": 19.7,
+      "hits": 183,
+      "pct": 19.8,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_on_beach",
-      "hits": 106,
-      "pct": 11.6,
+      "hits": 108,
+      "pct": 11.7,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
+      "field": "is_on_lake",
+      "hits": 6,
+      "pct": 0.7,
+      "prd_target": 0,
+      "verdict": "RED",
+      "verdict_label": "🔴 below 5% — needs scraper depth"
+    },
+    {
       "field": "is_tourist",
-      "hits": 111,
-      "pct": 12.1,
+      "hits": 115,
+      "pct": 12.5,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -242,16 +250,16 @@
     },
     {
       "field": "is_repriced_text",
-      "hits": 1,
-      "pct": 0.1,
+      "hits": 2,
+      "pct": 0.2,
       "prd_target": 0,
       "verdict": "RED",
       "verdict_label": "🔴 below 5% — needs scraper depth"
     },
     {
       "field": "zoning_residential",
-      "hits": 339,
-      "pct": 37.0,
+      "hits": 341,
+      "pct": 36.9,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -259,7 +267,7 @@
     {
       "field": "zoning_tourist",
       "hits": 41,
-      "pct": 4.5,
+      "pct": 4.4,
       "prd_target": 0,
       "verdict": "RED",
       "verdict_label": "🔴 below 5% — needs scraper depth"
@@ -267,7 +275,7 @@
     {
       "field": "land_agricultural",
       "hits": 120,
-      "pct": 13.1,
+      "pct": 13.0,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -275,15 +283,15 @@
     {
       "field": "land_commercial",
       "hits": 135,
-      "pct": 14.7,
+      "pct": 14.6,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "land_recreational",
-      "hits": 69,
-      "pct": 7.5,
+      "hits": 71,
+      "pct": 7.7,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -308,12 +316,12 @@
       },
       {
         "bucket": "200-500",
-        "count": 157,
+        "count": 158,
         "pct": 17.1
       },
       {
         "bucket": ">=500",
-        "count": 736,
+        "count": 741,
         "pct": 80.3
       }
     ],
@@ -333,7 +341,7 @@
       {
         "source": "encuentra24",
         "n": 3,
-        "avg_chars": 1135,
+        "avg_chars": 1020,
         "pct_short_lt50": 0.0
       },
       {
@@ -350,25 +358,25 @@
       },
       {
         "source": "oceanside",
-        "n": 21,
-        "avg_chars": 1459,
+        "n": 23,
+        "avg_chars": 1463,
         "pct_short_lt50": 0.0
       },
       {
         "source": "remax",
-        "n": 332,
-        "avg_chars": 964,
+        "n": 336,
+        "avg_chars": 965,
         "pct_short_lt50": 0.0
       }
     ]
   },
   "us01_cohort": {
     "any_one_signal": {
-      "hits": 466,
+      "hits": 469,
       "pct": 50.8
     },
     "all_three_signals": {
-      "hits": 75,
+      "hits": 76,
       "pct": 8.2
     }
   }

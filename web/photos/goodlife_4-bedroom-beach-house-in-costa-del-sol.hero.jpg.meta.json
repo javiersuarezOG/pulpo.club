@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:45:34.728603+00:00",
+  "computed_at": "2026-05-20T07:31:22.164146+00:00",
   "derivative_width": 1023,
   "derivative_height": 682,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2025/05/costa-del-sol-6-1024x682.jpg",
-  "candidate_count": 5,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:45:34.737911+00:00"
+  "candidate_count": 5
 }

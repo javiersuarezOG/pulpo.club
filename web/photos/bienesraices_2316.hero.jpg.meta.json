@@ -1,18 +1,16 @@
 {
   "width": 1280,
-  "height": 720,
-  "aspect_ratio": 1.778,
-  "file_size_kb": 194.1,
+  "height": 853,
+  "aspect_ratio": 1.501,
+  "file_size_kb": 279.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:47:13.306047+00:00",
+  "computed_at": "2026-05-20T07:31:24.368767+00:00",
   "derivative_width": 1280,
-  "derivative_height": 720,
-  "hero_photo_quality_score": 90,
+  "derivative_height": 853,
+  "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/5G464IO1TB/428VHyV4er/VENTA_DE_TERRENO_A_UN_COSTADO_DE_LAS_RAMBLAS_SANTA_ANA.jpeg",
-  "candidate_count": 5,
-  "picker_excluded_count": 0,
-  "repicked_at": "2026-05-19T21:47:13.309641+00:00"
+  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQUdJTzJDM0YxWi9MY0hwdHg0b0tUL1ZFTlRBX0RFX1RFUlJFTk9fQV9VTl9DT1NUQURPX0RFX0xBU19SQU1CTEFTX1NBTlRBX0FOQV8xLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
+  "candidate_count": 5
 }

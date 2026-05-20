@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:47:07.193996+00:00",
+  "computed_at": "2026-05-20T07:31:23.917636+00:00",
   "derivative_width": 900,
   "derivative_height": 506,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/1752430/59867068/EB-FS2430.jpg?rasterize=true&version=1681144253",
-  "candidate_count": 5,
-  "picker_excluded_count": 5,
-  "repicked_at": "2026-05-19T21:47:07.195957+00:00"
+  "candidate_count": 5
 }

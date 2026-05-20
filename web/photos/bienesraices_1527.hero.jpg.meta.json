@@ -6,13 +6,11 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-05-19T21:54:13.821282+00:00",
+  "computed_at": "2026-05-20T07:31:30.452600+00:00",
   "derivative_width": 1200,
   "derivative_height": 675,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "winning_url": "https://assets.easybroker.com/property_images/4923773/83895673/EB-RX3773.jpeg?rasterize=true&version=1734712404",
-  "candidate_count": 3,
-  "picker_excluded_count": 2,
-  "repicked_at": "2026-05-19T21:54:13.823831+00:00"
+  "candidate_count": 3
 }
