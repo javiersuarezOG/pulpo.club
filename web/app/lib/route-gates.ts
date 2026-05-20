@@ -48,6 +48,13 @@ const ROUTE_GATES: Record<Route, RouteGate> = {
   subscription: { minTier: "anonymous", onDenied: "modal" },
   imprint:      { minTier: "anonymous", onDenied: "modal" },
   contact:      { minTier: "anonymous", onDenied: "modal" },
+
+  // Internal admin hub — intentionally `anonymous` here even though the
+  // page is operator-only. The page itself is open by design (no auth,
+  // no nav link, robots-blocked). Per-widget blast-radius guards live
+  // in the API endpoints (e.g. 5-recipient cap on newsletter send).
+  // The route gate is just declaring "no Clerk modal" here.
+  admin:        { minTier: "anonymous", onDenied: "modal" },
 };
 
 const TIER_RANK: Record<Tier, number> = {
