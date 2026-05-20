@@ -35,6 +35,7 @@ import { ContactPage } from "./pages/legal/ContactPage.jsx";
 import { AdminPage } from "./admin/AdminShell.jsx";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
+import { applyFounderPlan } from "./lib/founder-emails";
 // Wave-3a: SiteHeader replaces both HomepageHeader (home-only) and the
 // inline TopNav that used to live in pages.jsx. SiteFooter + BottomNav
 // extracted out for the same reason — single chrome component per role.
@@ -160,7 +161,7 @@ function App() {
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
+    try { return applyFounderPlan(JSON.parse(localStorage.getItem("pulpo-user"))) || null; } catch { return null; }
   });
   // Tracks whether Clerk has finished hydrating. When Clerk is OFF
   // (legacy CI / no publishable key) this defaults to true so the
@@ -902,7 +903,7 @@ function App() {
     // Just flip user state. The post-signin effect above closes the
     // modal AND chains any pending action — keeping the wiring in one
     // place so Clerk and legacy paths behave identically.
-    setUser({ email, provider: provider || "email", joined: Date.now() });
+    setUser(applyFounderPlan({ email, provider: provider || "email", joined: Date.now() }));
     showToast(t("toast.welcome", locale));
   }, [showToast, locale]);
 

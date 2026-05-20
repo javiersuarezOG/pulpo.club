@@ -35,5 +35,14 @@ export default defineConfig({
     timeout: 60_000,
     stdout: "ignore",
     stderr: "pipe",
+    env: {
+      // Seed the founder-email override list so the founder-override
+      // e2e can assert that a free user with this email is promoted to
+      // Pro across all surfaces. CI always spins a fresh dev server;
+      // a stale local dev server (reuseExistingServer=true) without
+      // this env will fail the founder-override test only — the other
+      // specs are unaffected.
+      VITE_FOUNDER_EMAILS: "founder-tester@pulpo.club",
+    },
   },
 });

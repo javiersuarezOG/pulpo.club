@@ -1923,12 +1923,24 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border-color: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
+/* Pro user viewing their own plan — swap the accent treatment for the
+   Pro-identity gold so the page echoes the header's pill/ring/star
+   tokens (see .pulpo-logo-pro / .avatar-pro). Same shape as featured
+   so layout doesn't shift between Free and Pro viewers. */
+.plan-card.featured.plan-card-current {
+  border-color: var(--pro-line);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--pro-line) 18%, transparent);
+}
 .plan-ribbon {
   position: absolute; top: -10px; left: 24px;
   background: var(--accent); color: white;
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.04em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 999px;
+}
+.plan-ribbon-current {
+  background: var(--pro-line);
+  color: var(--paper);
 }
 .plan-name {
   font-family: var(--font-display);
@@ -2420,6 +2432,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--accent); color: white;
   font-size: 9px; font-weight: 600;
   padding: 1px 5px; border-radius: 999px;
+}
+/* Pro identity on the Profile tab — mirrors SiteHeader's
+   .avatar-pro-badge so a mobile user sees the same ★ signal the
+   header gives desktop users. Tucked into the upper-right of the
+   icon so it doesn't fight the label below. */
+.bottomnav .tab-pro-badge {
+  position: absolute; top: 2px; right: 30%;
+  width: 12px; height: 12px;
+  background: var(--pro-line); color: var(--paper);
+  font-size: 8px; line-height: 12px; text-align: center; font-weight: 700;
+  border-radius: 50%;
+  border: 1.5px solid var(--paper);
+  box-sizing: content-box;
 }
 
 /* ============== Toast ============== */
