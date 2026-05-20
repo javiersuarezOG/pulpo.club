@@ -33,7 +33,7 @@ const ZONES = [
 ];
 
 const COUNTRY_NAMES = {
-  SV: { en: "El Salvador", es: "El Salvador" },
+  SV: { en: "El Salvador", es: "El Salvador" },
 };
 
 // Curated Unsplash photos (land/ocean/jungle/farm) — direct CDN URLs
