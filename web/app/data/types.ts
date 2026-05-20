@@ -94,6 +94,10 @@ export type Listing = {
   geocoding_confidence: "high" | "medium" | "low" | null;
   is_sold: boolean;
   original_url: string | null;
+  // Position-rank from pulpo/ranker.py (1 = best opportunity). Distinct
+  // from rank_score (the 0-100 composite). The Top 10 pill chip in
+  // applyFilters reads this to slice the catalog to `rank <= 10`.
+  rank: number | null;
   // Carried for the legacy Browse "Advanced ranking" group + sort:
   rank_score: number | null;
   value_score: number | null;

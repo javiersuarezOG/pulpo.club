@@ -302,6 +302,7 @@ export function adaptListing(raw: any): Listing {
         : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
+    rank: typeof raw.rank === "number" ? raw.rank : null,
     rank_score: typeof raw.rank_score === "number" ? raw.rank_score : null,
     value_score: typeof raw.value_score === "number" ? raw.value_score : null,
     location_score: typeof raw.location_score === "number" ? raw.location_score : null,
