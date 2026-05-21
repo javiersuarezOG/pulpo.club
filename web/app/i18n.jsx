@@ -702,8 +702,10 @@ const UI_STRINGS = {
   // legacy NewsletterCTA component. The new homepage's hero email
   // form (Hero.jsx) reads the new_hero.* keys higher up in this file.
 
-  // Plans page — full string set. PRO_PRICE_USD_PER_MONTH lives in
-  // pages.jsx and mirrors automation/stripe_setup.mjs.
+  // Plans page — full string set. The displayed Pro price comes from
+  // web/app/lib/pricing.ts (geo-aware: EUR or USD). The {price}
+  // placeholder used below already includes the currency glyph, so
+  // these templates must NOT hard-code € or $.
   "plans.head.title":        { en: "Pick a plan that fits how you invest.",
                                es: "Escoge el plan que mejor se ajuste a cómo inviertes." },
   "plans.head.subtitle":     { en: "Pulpo is free to browse. Upgrade for unlimited details, off-market access, and weekly alerts.",
@@ -724,11 +726,13 @@ const UI_STRINGS = {
   "plans.pro.name":          { en: "Pulpo Pro",                es: "Pulpo Pro" },
   "plans.pro.per_month":     { en: "/month",                   es: "/mes" },
   "plans.pro.tag":           { en: "Billed monthly",           es: "Facturación mensual" },
-  // Listings remain in USD (El Salvador's currency); the Pro
-  // subscription is billed in EUR via the European Stripe entity.
-  // This footnote prevents "why is my plan in euros?" confusion.
-  "plans.pro.currency_note": { en: "Listings are priced in USD; Pulpo Pro is billed in EUR.",
-                               es: "Los precios de las propiedades aparecen en USD; la suscripciÃ³n de Pulpo Pro se cobra en EUR." },
+  // Listings remain in USD (El Salvador's currency); the Pulpo Pro
+  // subscription is geo-billed — EUR for EU diaspora, USD for
+  // everyone else (mirrors api/stripe/_geo.js + web/app/lib/pricing.ts).
+  // This footnote keeps the listing-vs-subscription currency story
+  // explicit for both audiences.
+  "plans.pro.currency_note": { en: "Listings are priced in USD. Pulpo Pro is billed in your local currency (EUR or USD).",
+                               es: "Los precios de las propiedades aparecen en USD. Pulpo Pro se factura en tu moneda local (EUR o USD)." },
   // Pro feature list — PlansPage now uses the three canonical `pro.usp.*.headline`
   // keys above, plus this single "Everything in Free" caboose. The five legacy
   // bullets (unlimited_details, off_market, newsletter, unlimited_saves,
@@ -752,8 +756,8 @@ const UI_STRINGS = {
                                              es: "Conexiones off-market prioritarias" },
   "plans.agency.cta_contact": { en: "Contact sales",           es: "Contactar ventas" },
   // Stripe-wired Pro CTA + error toast.
-  "plans.upgrade_pro_cta":   { en: "Upgrade — €{price}/month",
-                               es: "Hazte Pro — €{price}/mes" },
+  "plans.upgrade_pro_cta":   { en: "Upgrade — {price}/month",
+                               es: "Hazte Pro — {price}/mes" },
   "plans.checkout_error_toast": { en: "Couldn't start checkout — please try again.",
                                   es: "No pudimos iniciar el pago — inténtalo de nuevo." },
   "plans.checkout_auth_mismatch": { en: "Couldn't verify your session. Please log out and back in, then try again.",
