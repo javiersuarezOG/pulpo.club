@@ -43,7 +43,7 @@ export function perfStart() {
  *  with the elapsed ms, payload size (bytes), and cache hint when the
  *  Server-Timing header surfaces it. */
 export async function timedFetch(
-  file: "ranked.json" | "last_updated.json" | "featured.json",
+  file: "ranked.json" | "ranked.list.json" | "last_updated.json" | "featured.json",
   url: string,
   init?: RequestInit,
 ): Promise<Response> {

@@ -59,3 +59,32 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
         assert prod_data != data or len(prod_data) >= len(data), (
             "Smoke test must not overwrite production ranked.json"
         )
+
+    # PR-perf-3b — the slim list-view projection MUST be emitted alongside
+    # the full ranked.json on every pipeline run. Browse + Discover + Saved
+    # fetch /data/ranked.list.json on cold-load; if the pipeline regresses
+    # on emitting this, every visitor falls back to the full ranked.json
+    # and the perf win is silently lost.
+    slim_path = tmp_path / "web" / "data" / "ranked.list.json"
+    assert slim_path.exists(), "ranked.list.json was not emitted by phase_write_outputs"
+    slim_data = json.loads(slim_path.read_text())
+    assert isinstance(slim_data, list), "ranked.list.json must be a JSON array"
+    assert len(slim_data) == len(data), (
+        f"ranked.list.json record count ({len(slim_data)}) "
+        f"diverges from ranked.json ({len(data)}) — slim/full must stay in lockstep"
+    )
+    # Sample the first record — must-have set is intentionally narrow so a
+    # future whitelist trim doesn't break the test. These are the fields
+    # the FE adapter reads with no graceful fallback.
+    must_have = {"source", "source_id", "title", "rank", "rank_score"}
+    for k in must_have:
+        assert k in slim_data[0], (
+            f"ranked.list.json record missing required field {k!r} — "
+            f"check _RANKED_LIST_FIELDS in automation/pipeline_steps.py"
+        )
+    # Sanity-check: a representative dropped field stays out of the slim.
+    # If this fires after a legit whitelist expansion, swap to another
+    # field still excluded.
+    assert "broker_phone" not in slim_data[0], (
+        "ranked.list.json must NOT carry broker contact info — PII leak risk"
+    )
