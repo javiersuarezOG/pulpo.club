@@ -47,7 +47,16 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     setState({ status: "loading" });
     loadListings()
       .then((listings) => {
-        if (!cancelled) setState({ status: "ready", listings });
+        if (cancelled) return;
+        // Agricultural-purge runtime defense. The pipeline filter in
+        // automation/run.py ("[purge]") drops agricultural listings
+        // before ranked.json, but this guards against stale cached
+        // data shipping an agricultural listing through. Agricultural
+        // is out-of-scope for Pulpo's beach + lake marketplace.
+        const filtered = listings.filter(
+          (l) => (l as { is_agricultural?: boolean }).is_agricultural !== true,
+        );
+        setState({ status: "ready", listings: filtered });
       })
       .catch((err: Error) => {
         if (cancelled) return;

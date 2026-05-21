@@ -136,8 +136,9 @@ def test_title_caps_at_80_chars():
 
 
 def test_title_uses_correct_land_type_label():
-    title = fallback_title(_li(property_type="agricultural", area_m2=120_000))
-    assert title.startswith("Farm / Agricultural Land")
+    """Commercial property_type renders its commercial-land prefix."""
+    title = fallback_title(_li(property_type="commercial", area_m2=120_000))
+    assert title.startswith("Commercial Land")
 
 
 # ── fallback_reasons_to_buy — PRD §8.3 trigger table ──────────────────
@@ -243,13 +244,14 @@ def test_type_label_land_unchanged():
     assert _type_label("land") == "Raw Land"
 
 
-def test_type_label_legacy_finca_still_resolves():
+def test_type_label_legacy_lot_still_resolves():
     """Pre-PR-#64 normalize.detect_property_type emitted strings like
-    'finca', 'lot', 'agricultural'. Old fixtures + already-shipped data
-    may still carry these. Backwards compat must hold."""
-    assert _type_label("finca") == "Farm / Agricultural Land"
+    'lot' for residential plots. Old fixtures + already-shipped data
+    may still carry these. Backwards compat for non-agricultural
+    legacy values must hold. ('finca' + 'agricultural' were removed
+    alongside the agricultural-listing purge — those listings are
+    now dropped at the pipeline level before this code runs.)"""
     assert _type_label("lot") == "Residential Lot"
-    assert _type_label("agricultural") == "Farm / Agricultural Land"
 
 
 def test_type_label_unknown_falls_back_to_raw_land():

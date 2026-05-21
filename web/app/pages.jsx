@@ -367,7 +367,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
 
       <FilterGroup title={t("filter.land_type", lc)}>
         <div className="chip-grid">
-          {["residential","agricultural","commercial","tourist","mixed","raw"].map(typeKey => (
+          {["residential","commercial","tourist","mixed","raw"].map(typeKey => (
             <button key={typeKey}
               className={`chip ${filters.land_types.has(typeKey) ? "is-active" : ""}`}
               onClick={() => toggleSet("land_types", typeKey)}>{landTypeLabel(typeKey)}</button>
@@ -1069,7 +1069,6 @@ function buildFiltersForCategory(category) {
     off_market: () => f.status.add("off_market"),
     motivated_sellers: () => f.status.add("motivated"),
     commercial: () => f.land_types.add("commercial"),
-    agricultural: () => f.land_types.add("agricultural"),
     under_100k: () => { f.price_max = 100000; },
     under_50k: () => { f.price_max = 50000; },
     build_ready: () => { f.readiness = 3; },

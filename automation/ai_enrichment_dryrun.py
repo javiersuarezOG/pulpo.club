@@ -95,14 +95,12 @@ SYSTEM_USPS = (
 # Land-type labels per PRD §8.1
 LAND_TYPE_LABELS = {
     "residential":  "Residential Lot",
-    "agricultural": "Farm / Agricultural Land",
     "commercial":   "Commercial Land",
     "recreational": "Recreational Land",
     "mixed":        "Mixed-Use Land",
     "raw":          "Raw Land",
     "land":         "Raw Land",   # current default property_type
     "lot":          "Residential Lot",
-    "finca":        "Farm / Agricultural Land",
 }
 
 # Fields scored for data_quality_score per PRD §FR-7.4

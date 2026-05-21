@@ -83,7 +83,7 @@ class Listing:
     # and derive_land_type() in pulpo/derived_rules.py after the NLP
     # extractor runs. None = no signal yet.
     beachfront_tier: Optional[str] = None  # 'on_beach'|'walk_to_beach'|'near_beach'|None
-    land_type: Optional[str] = None         # 'agricultural'|'commercial'|'tourist'|'residential'|None
+    land_type: Optional[str] = None         # 'commercial'|'tourist'|'residential'|None (agricultural purged at pipeline)
 
     # Activity
     days_listed: Optional[int] = None

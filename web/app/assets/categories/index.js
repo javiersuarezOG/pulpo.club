@@ -7,7 +7,6 @@
 //     magick "$f" -resize '1200x>' -strip -quality 72 -define webp:method=6 \
 //       "web/app/assets/categories/$(basename "${f%.png}").webp"; \
 //   done
-import agricultural from "./agricultural.webp";
 import beachfront from "./beachfront.webp";
 import best_documented from "./best_documented.webp";
 import build_ready from "./build_ready.webp";
@@ -24,7 +23,6 @@ import under_50k from "./under_50k.webp";
 import water_features from "./water_features.webp";
 
 export const CATEGORY_IMAGES = {
-  agricultural,
   beachfront,
   best_documented,
   build_ready,
@@ -55,7 +53,6 @@ export function categoryImageForListing(listing) {
   if (!listing) return CATEGORY_IMAGES.flat_buildable;
   if (listing.master_category === "beach") return CATEGORY_IMAGES.beachfront;
   if (listing.master_category === "lake")  return CATEGORY_IMAGES.water_features;
-  if (listing.land_type === "agricultural") return CATEGORY_IMAGES.agricultural;
   if (listing.land_type === "commercial")   return CATEGORY_IMAGES.commercial;
   if (listing.beachfront_tier) return CATEGORY_IMAGES.beachfront;
   if (listing.has_ocean_view)  return CATEGORY_IMAGES.ocean_view;
