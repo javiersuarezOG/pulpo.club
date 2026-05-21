@@ -449,7 +449,7 @@ export const SUBSCRIPTION: LegalDocument = {
     es: "Precios, meses promocionales, renovación, cancelación y reembolsos de Pulpo Pro.",
   },
   review_complete: false,
-  last_updated: "2026-05-19",
+  last_updated: "2026-05-21",
   sections: [
     {
       id: "plans",
@@ -459,8 +459,9 @@ export const SUBSCRIPTION: LegalDocument = {
           "Free Plan — Unlimited browse of listing cards; limited full listing detail views per " +
           "session; newsletter opt-in available.\n\n" +
           "Paid Plan (Pulpo Pro) — Full access: unlimited detail views, saved listings, weekly " +
-          "deal digest, advanced filters. Price: €10.00 per month (or USD equivalent at the " +
-          "rate displayed at checkout; geo-determined).",
+          "deal digest, advanced filters. Price: €9.99 per month for EU subscribers, or $9.99 USD " +
+          "per month for subscribers outside the EUR region. The currency shown at checkout is " +
+          "determined by your location.",
         es: PLACEHOLDER_BODY.es,
       },
     },
@@ -495,9 +496,10 @@ export const SUBSCRIPTION: LegalDocument = {
           "promotional free period applies, the first paid charge is deferred by the number " +
           "of free months in that promotion; otherwise, the first charge runs at checkout.\n\n" +
           "Your subscription renews automatically each month on the anniversary of the first " +
-          "paid charge. You will be charged €10.00 + applicable VAT per month. A receipt is " +
-          "sent by email after each charge. After any initial fixed term, your subscription " +
-          "continues on a month-to-month basis (Dutch consumer-law requirement).",
+          "paid charge. You will be charged €9.99 + applicable VAT per month (or $9.99 USD for " +
+          "subscribers outside the EUR region). A receipt is sent by email after each charge. " +
+          "After any initial fixed term, your subscription continues on a month-to-month basis " +
+          "(Dutch consumer-law requirement).",
         es: PLACEHOLDER_BODY.es,
       },
     },
