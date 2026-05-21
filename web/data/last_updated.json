@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-05-20T07:35:26.974366+00:00",
-  "started_at": "2026-05-20T06:08:54.538512+00:00",
-  "duration_seconds": 5192.44,
-  "total_listings": 923,
+  "last_updated": "2026-05-21T07:13:24.853971+00:00",
+  "started_at": "2026-05-21T06:11:43.064140+00:00",
+  "duration_seconds": 3701.79,
+  "total_listings": 920,
   "dropped": 149,
   "per_source_raw": {
     "goodlife": 72,
     "oceanside": 50,
-    "century21": 15,
+    "century21": 14,
     "bienesraices": 568,
-    "remax": 355,
+    "remax": 353,
     "nexo": 9,
     "encuentra24": 3,
     "realtyelsalvador": 0
@@ -37,7 +37,7 @@
     },
     "century21": {
       "supplier": null,
-      "pulled": 15,
+      "pulled": 14,
       "max_pages_hit": false
     },
     "bienesraices": {
@@ -47,7 +47,7 @@
     },
     "remax": {
       "supplier": null,
-      "pulled": 355,
+      "pulled": 353,
       "max_pages_hit": false
     },
     "nexo": {
@@ -69,15 +69,15 @@
   "derived_field_population": {
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
-    "previous_price": 0.0087,
-    "beachfront_tier_on_beach": 0.117,
+    "previous_price": 0.0098,
+    "beachfront_tier_on_beach": 0.1174,
     "beachfront_tier_walk_to_beach": 0.0163,
     "beachfront_tier_near_beach": 0.013,
-    "land_type_agricultural": 0.2156,
-    "land_type_commercial": 0.0802,
-    "land_type_tourist": 0.0899,
-    "land_type_residential": 0.6143,
-    "is_motivated": 0.1983
+    "land_type_agricultural": 0.2152,
+    "land_type_commercial": 0.0804,
+    "land_type_tourist": 0.0891,
+    "land_type_residential": 0.6152,
+    "is_motivated": 0.1989
   },
   "field_completeness": {
     "bienesraices": {
@@ -106,7 +106,7 @@
       }
     },
     "century21": {
-      "n_listings": 15,
+      "n_listings": 14,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -117,9 +117,9 @@
         "lat": 1.0,
         "lng": 1.0,
         "is_beachfront": 0.07,
-        "has_paved_access": 0.33,
-        "has_water": 0.73,
-        "has_power": 0.67,
+        "has_paved_access": 0.36,
+        "has_water": 0.71,
+        "has_power": 0.64,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -231,7 +231,7 @@
       }
     },
     "remax": {
-      "n_listings": 336,
+      "n_listings": 334,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -245,7 +245,7 @@
         "has_paved_access": 0.15,
         "has_water": 0.31,
         "has_power": 0.36,
-        "is_repriced": 0.02,
+        "is_repriced": 0.03,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 0.0,
@@ -257,7 +257,7 @@
     }
   },
   "property_type_counts": {
-    "land": 837,
+    "land": 834,
     "house": 74,
     "condo": 12
   },
@@ -268,7 +268,7 @@
       "drop": 3
     },
     "land": {
-      "pass": 780,
+      "pass": 777,
       "flag": 57,
       "drop": 24
     },
