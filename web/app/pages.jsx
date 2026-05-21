@@ -2142,10 +2142,20 @@ function SavedPage({ app }) {
     return (
       <div className="page page-saved">
         <div className="empty-state lg">
-          <div className="empty-illus">
+          <div className="empty-illus" aria-hidden="true">
             <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-              <path d="M20 80c0-25 20-45 45-45s45 20 45 45" stroke="var(--ink-3)" strokeWidth="2" fill="none"/>
-              <path d="M60 50l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6-4.5-4 6-1z" fill="var(--accent-2)"/>
+              <circle cx="60" cy="60" r="52" fill="var(--color-bg-cream-soft)" />
+              <g transform="translate(30, 30) scale(2.5)">
+                <path
+                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"
+                  stroke="var(--color-forest-deep)"
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+              <circle cx="60" cy="65" r="3.5" fill="var(--gold)" />
             </svg>
           </div>
           <h2>{t("saved.empty.title", app.locale)}</h2>
