@@ -1478,7 +1478,6 @@ h1,h2,h3,h4,h5 { margin: 0; }
   font-weight: 500;
 }
 .type-pill.type-commercial { background: oklch(92% 0.04 240); color: oklch(40% 0.1 240); }
-.type-pill.type-agricultural { background: oklch(92% 0.04 145); color: oklch(38% 0.08 145); }
 .type-pill.type-tourist { background: oklch(92% 0.04 40); color: oklch(40% 0.12 40); }
 
 @media (max-width: 767px) {

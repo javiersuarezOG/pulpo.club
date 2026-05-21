@@ -22,7 +22,6 @@ const HERO_KEYS = [
   "water_features",
   "flat_buildable",
   "build_ready",
-  "agricultural",
 ] as const;
 
 type HeroKey = (typeof HERO_KEYS)[number];

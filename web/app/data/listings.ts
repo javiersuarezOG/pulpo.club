@@ -103,7 +103,7 @@ function deriveLandType(
   propertyType: string | null,
 ): Listing["land_type"] {
   const v = raw?.land_type;
-  if (v === "agricultural" || v === "commercial" || v === "tourist" || v === "residential") {
+  if (v === "commercial" || v === "tourist" || v === "residential") {
     return v;
   }
   if (propertyType === "land" || propertyType === "house" ||

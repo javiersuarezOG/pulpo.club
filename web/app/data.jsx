@@ -148,7 +148,7 @@ const USPS = [
   { en: "Mature secondary forest — eco credits eligible" },
 ];
 
-const LAND_TYPES = ["residential", "agricultural", "commercial", "tourist", "mixed", "raw"];
+const LAND_TYPES = ["residential", "commercial", "tourist", "mixed", "raw"];
 
 function pick(arr, i) { return arr[i % arr.length]; }
 function pickN(arr, seed, n) {
@@ -185,7 +185,6 @@ const LISTINGS = Array.from({ length: 48 }, (_, i) => {
   const isFlat = pool === "flat" || pool === "farm" || rand(seed * 2) > 0.6;
   const hasWaterBody = pool === "jungle" || rand(seed * 3) > 0.7;
   const landType = isBeachfront ? "tourist"
-    : pool === "farm" ? "agricultural"
     : i % 11 === 0 ? "commercial"
     : pick(LAND_TYPES, i);
 
@@ -243,7 +242,7 @@ const LISTINGS = Array.from({ length: 48 }, (_, i) => {
     has_sewage: rand(seed * 37) > 0.6,
     road_access_type: roadAccessType,
     readiness_score: readinessScore,
-    zoning_use: landType === "commercial" ? "commercial" : landType === "agricultural" ? "agricultural" : "residential",
+    zoning_use: landType === "commercial" ? "commercial" : "residential",
     dist_beach_km: isBeachfront ? 0 : Math.round(rand(seed * 41) * 30 * 10) / 10,
     dist_airport_km: Math.round(rand(seed * 43) * 80),
     dist_nearest_town_km: Math.round(rand(seed * 47) * 15 * 10) / 10,
@@ -272,7 +271,6 @@ const SHELVES = [
   { key: "flat_buildable",   label: { en: "Ready When You Are",           es: "Listo cuando tú lo estés" },    subline: { en: "Flat, clear, and waiting for your plans.",              es: "Plano, limpio y esperando tus planes." },                 icon: "cat_flat_land",    filter: (l) => l.is_flat },
   { key: "build_ready",      label: { en: "Plug In and Build",            es: "Conecta y construye" },         subline: { en: "Water, power, road — the hard part is done.",           es: "Agua, luz y carretera — lo difícil ya está." },           icon: "cat_build_ready",  filter: (l) => l.readiness_score >= 3 },
   { key: "commercial",       label: { en: "Think Bigger",                 es: "Piensa en grande" },            subline: { en: "Land zoned for what you have in mind.",                 es: "Propiedades zonificadas para lo que tienes en mente." },       icon: "cat_commercial",   filter: (l) => l.land_type === "commercial" },
-  { key: "agricultural",     label: { en: "Back to the Land",             es: "Vuelta a la tierra" },          subline: { en: "Productive soil. Real long-term value.",                es: "Suelo productivo. Valor real a largo plazo." },           icon: "cat_agricultural", filter: (l) => l.land_type === "agricultural" },
   { key: "under_50k",        label: { en: "Under $50K — Seriously",       es: "Menos de $50K — en serio" },    subline: { en: "Entry-point land that doesn't feel like a compromise.", es: "Propiedades de entrada que no se sienten como sacrificio." },  icon: "cat_under_100k",   filter: (l) => l.price <= 50000 },
   { key: "under_100k",       label: { en: "Big Opportunity, Mid Budget",  es: "Gran oportunidad, presupuesto medio" }, subline: { en: "The $50K–$100K range is where the deals live.", es: "Entre $50K y $100K es donde viven las ofertas." },        icon: "cat_under_100k",   filter: (l) => l.price <= 100000 && l.price > 50000 },
   { key: "motivated_sellers",label: { en: "The Owner Is Ready to Talk",   es: "El dueño está listo para conversar" }, subline: { en: "Listed over 90 days — room to negotiate.",      es: "Más de 90 días publicado — espacio para negociar." },     icon: "cat_motivated",    filter: (l) => l.days_listed >= 90 },

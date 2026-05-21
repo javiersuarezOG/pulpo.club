@@ -55,7 +55,6 @@ This is **the source of truth for category intent**, not for implementation. If 
 | `off_market`      | `source_type = "off_market"` | `recency` |
 | `under_50k`       | `price ≤ 50_000` | `price asc` |
 | `under_100k`      | `price` between `50_001` and `100_000` (avoid overlap with under_50k) | `price asc` |
-| `agricultural`    | `land_type = "agricultural"` | `recency` |
 | `commercial`      | `land_type = "commercial"` | `recency` |
 | `motivated_sellers` | `days_listed ≥ 90` AND (`is_repriced = true` OR seller flagged) | `days_listed desc` |
 
@@ -84,7 +83,7 @@ For each flag, prefer **keyword + regex** first, then **LLM classification with 
 | `has_power` | "power on site", "luz", "electricidad", "transformer at boundary", "poste a 50m" | Keyword. "At boundary" vs "on site" matters → bucket. |
 | `has_water` | "water on site", "agua potable", "well", "pozo", "ANDA", "municipal water" | Keyword. In El Salvador, "ANDA" (national water utility) is a strong positive signal. |
 | `has_title_clean` | "titled", "escriturado", "título de propiedad", "Registro Inmobiliario", "free of liens", "libre de gravamen" | Keyword. Inverse signals: "in process", "en trámite", "remedición pendiente" → flag as `title_pending`. |
-| `land_type` | "agricultural", "agrícola", "finca", "cafetal", "commercial", "comercial", "residential", "tourism zone", "zona turística" | Keyword. Default to `residential` if ambiguous. Cross-check with zoning municipal data when available. |
+| `land_type` | "commercial", "comercial", "residential", "tourism zone", "zona turística" | Keyword. Default to `residential` if ambiguous. Cross-check with zoning municipal data when available. Agricultural inventory is purged at the pipeline level — see `automation/run.py` `[purge]` step. |
 | `is_repriced` | Compare current price vs scrape history. If no history, look for "reduced", "rebajado", "price reduced from $X to $Y", "negociable" | Diff-based. Keyword as fallback for first-scrape signals. |
 | `motivated` | "must sell", "urgent", "se vende urgente", "remate", "bajada de precio", "owner relocating", "estate sale" | Keyword. Combined with `days_listed ≥ 90` for higher precision. |
 | `usps[]` | The 2–3 most distinctive features per listing | LLM summarizer with prompt: *"Given this listing description, return up to 3 short bullets that would make this parcel stand out. Output JSON: `{ usps: [{ en, es }] }`."* |

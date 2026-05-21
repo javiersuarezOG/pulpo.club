@@ -156,7 +156,6 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     cat_top10:      <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
     cat_mountain:   <><path d="M2 20l6-11 4 7"/><path d="M10 20l5-9 7 9z"/><circle cx="7" cy="5" r="1.5"/></>,
     cat_under_100k: <><circle cx="12" cy="12" r="9"/><path d="M15 9c-1-1-2-1.5-3-1.5-2 0-3 1-3 2.5 0 3 6 1.5 6 4.5 0 1.5-1 2.5-3 2.5-1.5 0-2.5-.5-3.5-1.5"/><path d="M12 6v12"/></>,
-    cat_agricultural:<><path d="M12 21V9"/><path d="M12 9c0-3 2-5 5-5-1 4-3 5-5 5z"/><path d="M12 13c0-3-2-5-5-5 1 4 3 5 5 5z"/><path d="M5 21h14"/></>,
     cat_commercial: <><path d="M3 21V8l6-4 6 4v13"/><path d="M15 21V12h6v9"/><path d="M3 21h18"/><path d="M7 11h.01M7 14h.01M7 17h.01M11 11h.01M11 14h.01M11 17h.01"/></>,
     cat_motivated:  <><circle cx="12" cy="13" r="8"/><path d="M12 8v5l3 2"/><path d="M9 2h6"/></>,
   };

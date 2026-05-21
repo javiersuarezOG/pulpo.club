@@ -46,7 +46,6 @@ const shelves = {
   flat_buildable: (l) => l.is_flat,
   build_ready: (l) => (l.readiness_score ?? 0) >= 3,
   commercial: (l) => l.land_type === "commercial",
-  agricultural: (l) => l.land_type === "agricultural",
   under_50k: (l) => (l.price_usd ?? Infinity) <= 50_000,
   under_100k: (l) =>
     (l.price_usd ?? Infinity) <= 100_000 && (l.price_usd ?? 0) > 50_000,

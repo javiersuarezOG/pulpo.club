@@ -304,11 +304,10 @@ def derive_beachfront_tier(li: Any) -> Optional[str]:
 
 
 def derive_land_type(li: Any) -> Optional[str]:
-    """Collapse land-use booleans into a 4-tier enum.
+    """Collapse land-use booleans into a 3-tier enum.
 
     Priority (each NLP signal is well-disambiguated, so the order is
     informational rather than exclusive):
-        is_agricultural=True   → "agricultural"
         is_commercial=True     → "commercial"
         is_tourist=True        → "tourist"
         property_type='land'   → "residential"   (default for land)
@@ -316,17 +315,17 @@ def derive_land_type(li: Any) -> Optional[str]:
         property_type='condo'  → "residential"
         else                   → None
 
-    `is_agricultural` runs first because Salvadoran "finca cafetalera"
-    descriptions sometimes also mention "ideal para hotel" (tourist
-    secondary use); the agricultural classification is the *current*
-    use, which is what the buyer is paying for.
+    Agricultural listings are dropped at the pipeline level (see the
+    "[purge]" step in automation/run.py) since fincas / cafetales are
+    out-of-scope for Pulpo's beach + lake recreational marketplace.
+    The `is_agricultural` boolean is still computed by NLP enrichment
+    so the purge filter can detect them; this function never sees
+    those listings.
 
     Risk note (per plan): is_commercial in Salvadoran broker copy
     overlaps with "precio comercial" (negotiable) — the keyword
     dictionary's negative patterns suppress the most common confusions.
     """
-    if _g(li, "is_agricultural") is True:
-        return "agricultural"
     if _g(li, "is_commercial") is True:
         return "commercial"
     if _g(li, "is_tourist") is True:

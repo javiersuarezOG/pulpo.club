@@ -86,10 +86,12 @@ def test_build_input_keeps_land_type_label_even_when_input_missing():
 
 
 def test_land_type_label_lookup():
-    """Map land_type → user-facing label per PRD §8.1."""
+    """Map land_type → user-facing label per PRD §8.1.
+    'agricultural' was removed alongside the agricultural-listing purge."""
     assert LAND_TYPE_LABELS["residential"]  == "Residential Lot"
-    assert LAND_TYPE_LABELS["agricultural"] == "Farm / Agricultural Land"
+    assert LAND_TYPE_LABELS["commercial"]   == "Commercial Land"
     assert LAND_TYPE_LABELS["raw"]          == "Raw Land"
+    assert "agricultural" not in LAND_TYPE_LABELS
 
 
 # ── Prompts — system messages from PRD §8 ─────────────────────────────

@@ -478,9 +478,9 @@ const UI_STRINGS = {
   "card.listed_1_month":     { en: "Listed 1 month ago",  es: "Publicado hace 1 mes" },
   "card.listed_n_months":    { en: "Listed {n} months ago", es: "Publicado hace {n} meses" },
 
-  // Land types
+  // Land types — agricultural removed (out-of-scope for Pulpo's
+  // beach + lake recreational marketplace; dropped at the pipeline).
   "type.residential":        { en: "Residential",         es: "Residencial" },
-  "type.agricultural":       { en: "Agricultural",        es: "Agrícola" },
   "type.commercial":         { en: "Commercial",          es: "Comercial" },
   "type.tourist":            { en: "Tourist",             es: "Turístico" },
   "type.mixed":              { en: "Mixed Use",           es: "Uso Mixto" },
@@ -500,9 +500,10 @@ const UI_STRINGS = {
   "filter.clear":            { en: "Clear all",           es: "Limpiar todo" },
   "filter.zone":             { en: "Zone",                es: "Zona" },
   "filter.price":            { en: "Price",               es: "Precio" },
-  // Filter values cover residential / agricultural / commercial /
-  // tourist / mixed / raw — broad use categories, not strictly
-  // plots-of-land. Renamed to "Property type" / "Tipo de propiedad"
+  // Filter values cover residential / commercial / tourist / mixed /
+  // raw — broad use categories, not strictly plots-of-land
+  // (agricultural was removed alongside the agricultural-listing
+  // purge). Renamed to "Property type" / "Tipo de propiedad"
   // to match Pulpo's broadened scope (houses + lots, not just land).
   // The i18n key keeps `land_type` for back-compat with the filter
   // state shape — only the user-visible label changes.
@@ -1276,8 +1277,6 @@ const UI_STRINGS = {
                                           es: "Listo para construir" },
   "footer.col.discover.off_market":    { en: "Off-market",
                                           es: "Off-market" },
-  "footer.col.discover.agricultural":  { en: "Agricultural",
-                                          es: "Agrícola" },
   "footer.col.pulpo.heading":          { en: "Pulpo",
                                           es: "Pulpo" },
   "footer.col.pulpo.plans":            { en: "Plans",
