@@ -322,15 +322,28 @@ def upsert_dashboard(
     else:
         url = f"{host}/api/projects/{project_id}/dashboards/"
         dash = http("POST", url, key, payload)
-    # Wire insights to the dashboard. Re-attaching an already-attached
-    # insight is a no-op; PostHog dedupes on (dashboard, insight).
+    # Wire insights to the dashboard. PostHog's REST API removed the
+    # POST /dashboards/<id>/add_insight/ endpoint in favor of carrying
+    # `dashboards: [<id>, ...]` directly on the insight resource. PATCH
+    # each insight with the target dashboard id; the request is
+    # idempotent (PostHog dedupes on (insight, dashboard) at the
+    # database level) and re-runs with no-op effect.
     for insight_id in insight_ids:
         try:
-            http(
-                "POST",
-                f"{host}/api/projects/{project_id}/dashboards/{dash['id']}/add_insight/",
+            current = http(
+                "GET",
+                f"{host}/api/projects/{project_id}/insights/{insight_id}/",
                 key,
-                {"insight_id": insight_id},
+            )
+            current_dashes = current.get("dashboards") or []
+            if dash["id"] in current_dashes:
+                continue
+            merged = list({*current_dashes, dash["id"]})
+            http(
+                "PATCH",
+                f"{host}/api/projects/{project_id}/insights/{insight_id}/",
+                key,
+                {"dashboards": merged},
             )
         except urllib.error.HTTPError as e:
             # 400 typically means "already on this dashboard" — fine.
