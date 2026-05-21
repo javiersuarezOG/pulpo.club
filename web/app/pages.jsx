@@ -63,13 +63,6 @@ import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/c
 // no env var) restores the third card.
 const SHOW_AGENCY_PLAN = false;
 
-// Source-of-truth price for Pulpo Pro. Mirrors automation/stripe_setup.mjs
-// (PRICE_AMOUNT = 1000 cents = €10/mo). The Stripe Price is denominated
-// in EUR. When the Stripe price changes, update both. The annual toggle
-// was removed because there is no annual price in Stripe today —
-// re-introduce both when a yearly price ships.
-const PRO_PRICE_EUR_PER_MONTH = 10;
-
 // TopNav, BottomNav, and LocaleToggle were extracted in Wave-3a:
 //   web/app/components/SiteHeader.jsx  — replaces TopNav + LocaleToggle
 //   web/app/components/BottomNav.jsx   — same logic, own file
@@ -2223,6 +2216,17 @@ function PlansPage({ app }) {
   // `proMember = isPaid(app.user)` check so the page is consistent with
   // the global chrome.
   const isPaid = gateIsPaid(app.user);
+  // Geo-aware price. Synchronous default (USD) renders on first paint;
+  // fetchPriceForCurrentGeo() resolves the real currency from /api/geo
+  // and the cached result is shared with every other paid-CTA surface
+  // (HeroV4, USPBand, /start, FreeMonthModal, UspPopup) — see
+  // web/app/lib/pricing.ts.
+  const [price, setPrice] = pUseState(() => priceForCountry(null));
+  pUseEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
   // Telemetry — plans.viewed fires once per PlansPage mount. The event
   // type has existed in events.ts since the catalog landed but had no
   // consumer; Phase 7 wires it. `source` differentiates entry points
@@ -2308,7 +2312,7 @@ function PlansPage({ app }) {
             : <div className="plan-ribbon">{t("plans.pro.ribbon", lc)}</div>}
           <div className="plan-name">{t("plans.pro.name", lc)}</div>
           <div className="plan-price">
-            <span>€{PRO_PRICE_EUR_PER_MONTH}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
+            <span>{price.displayString}</span><span className="per">{t("plans.pro.per_month", lc)}</span>
           </div>
           <div className="plan-tag">{t("plans.pro.tag", lc)}</div>
           <ul className="plan-features">
@@ -2323,7 +2327,7 @@ function PlansPage({ app }) {
             </button>
           ) : (
             <button className="btn-primary block lg" onClick={onUpgrade}>
-              {t("plans.upgrade_pro_cta", lc, { price: PRO_PRICE_EUR_PER_MONTH })}
+              {t("plans.upgrade_pro_cta", lc, { price: price.displayString })}
             </button>
           )}
           <p className="plan-currency-note">{t("plans.pro.currency_note", lc)}</p>
