@@ -813,7 +813,18 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      // PR-perf-2: granular surfaces. Previously bare <img>s, now
+      // inline-augmented with priority hints + this telemetry.
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
   };
   /** Fires when an image neither loaded nor errored within 8 s of the
@@ -828,7 +839,16 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
     was_cached_likely: boolean;
   };
