@@ -763,7 +763,7 @@ export type EventMap = {
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */
   "perf.data_fetch": {
-    file: "ranked.json" | "last_updated.json" | "featured.json";
+    file: "ranked.json" | "ranked.list.json" | "last_updated.json" | "featured.json";
     ms: number;
     bytes: number | null;
     cache: "hit" | "miss" | "unknown";
@@ -796,7 +796,18 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      // PR-perf-2: granular surfaces. Previously bare <img>s, now
+      // inline-augmented with priority hints + this telemetry.
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
   };
   /** Fires when an image neither loaded nor errored within 8 s of the
@@ -811,7 +822,16 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
     was_cached_likely: boolean;
   };
