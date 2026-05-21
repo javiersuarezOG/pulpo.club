@@ -41,9 +41,12 @@ const { makeRateLimiter, send429, ipFromRequest } = require("./_rate_limit");
 const posthog = require("./_posthog");
 const withTiming = require("./_perf");
 
+// Default inbox for every topic until the topical Resend inboxes are
+// provisioned via PULPO_INBOX_<TOPIC> env vars. Sebastian's runbook
+// Task 3 sets up the topical inboxes; until then, every submission lands
+// in the shared inbox.
 const FOUNDER_FAN_OUT = [
-  "sebastian.honores@gmail.com",
-  "javier@suarez.ventures",
+  "hello@pulpo.club",
 ];
 
 const TOPIC_INBOX_ENV = {

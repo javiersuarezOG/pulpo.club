@@ -197,6 +197,55 @@ ORDER BY path, n DESC
 """.strip()
 
 
+def q_hero_broker_url_regression(days: int) -> str:
+    """Regression alarm for the home-hero LCP fix (PR-perf-hero, 2026-05-21).
+
+    Before the fix, the LCP element on `/` was a broker-CDN <img> with
+    a URL like `assets.easybroker.com/property_images/…` for ~half of
+    sessions. After the fix it should be `/api/img?…`. This insight
+    counts LCP attribution events on `/` whose `properties.url` matches
+    a known broker host. **Post-merge expectation: every row's n drops
+    to ~0 within 24–48 h** (residual rows are pre-merge LCPs aging out
+    of the window).
+
+    Non-zero `n` in steady state means someone reverted the hero
+    routing OR a code path produces a non-/api/img hero URL. Pair with
+    the Playwright `hero-v4.spec.ts` "LCP guard" test that fails the
+    PR before it ships.
+    """
+    return f"""
+SELECT
+  splitByChar('?', coalesce(properties.$current_url, ''))[1] AS path,
+  multiIf(
+    position(toString(properties.url), 'easybroker.com') > 0, 'assets.easybroker.com',
+    position(toString(properties.url), 'remax-central.com.sv') > 0, 'remax-central.com.sv',
+    position(toString(properties.url), 'remaxcaribbeanandcentralamerica.azureedge.net') > 0, 'remax-caribbean (azureedge)',
+    position(toString(properties.url), 'i0.wp.com') > 0, 'i0.wp.com',
+    position(toString(properties.url), 'oceansideelsalvador.com') > 0, 'oceansideelsalvador.com',
+    position(toString(properties.url), 'goodlifeelsalvador.com') > 0, 'goodlifeelsalvador.com',
+    'OTHER'
+  ) AS broker_host,
+  round(quantile(0.75)(toFloat(properties.ms))) AS p75_ms,
+  count() AS n
+FROM events
+WHERE event = 'web_vitals.lcp.attribution'
+  AND properties.element_tag = 'img'
+  AND splitByChar('?', coalesce(properties.$current_url, ''))[1] LIKE '%pulpo.club/'
+  AND multiIf(
+    position(toString(properties.url), 'easybroker.com') > 0, 1,
+    position(toString(properties.url), 'remax-central.com.sv') > 0, 1,
+    position(toString(properties.url), 'remaxcaribbeanandcentralamerica.azureedge.net') > 0, 1,
+    position(toString(properties.url), 'i0.wp.com') > 0, 1,
+    position(toString(properties.url), 'oceansideelsalvador.com') > 0, 1,
+    position(toString(properties.url), 'goodlifeelsalvador.com') > 0, 1,
+    0
+  ) = 1
+  AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY path, broker_host
+ORDER BY n DESC
+""".strip()
+
+
 # Stubs for events PR-perf-5c will ship — included so the dashboards are
 # complete the day 5c lands. Until then they just say "no data yet".
 
@@ -515,6 +564,12 @@ INSIGHT_PLAN = [
         "LCP element breakdown by route",
         "Which DOM element wins LCP per page. On /listing/:id this should be 'img' (gallery-main); on / it should be the hero photo.",
         q_lcp_element_breakdown,
+    ),
+    (
+        "Performance — Image Health",
+        "Hero broker-URL regression (LCP on /)",
+        "Count of LCP attribution events on / where the LCP <img>'s URL is a broker host (easybroker.com, remax-central.com.sv, i0.wp.com, oceansideelsalvador.com, goodlifeelsalvador.com, remaxcaribbeanandcentralamerica.azureedge.net). Post PR-perf-hero this should be ~0. Non-zero in steady state means someone reverted the hero routing — check the Playwright LCP guard.",
+        q_hero_broker_url_regression,
     ),
     (
         "Performance — External Services",

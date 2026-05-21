@@ -785,6 +785,32 @@ export type EventMap = {
     server_ms: number | null;
     vercel_region: string | null;
   };
+  /** PR-perf-5c — Clerk SDK chunk load latency.
+   *  Wraps the React.lazy() import in clerk-shell.jsx. `cache="hit"` is
+   *  a heuristic (chunk arrives in <100ms → browser cache); `miss` is
+   *  the cold-load case. Lets PostHog tell apart returning visitors
+   *  from first-time signup-modal opens. */
+  "perf.clerk_chunk_load": {
+    ms: number;
+    cache: "hit" | "miss" | "unknown";
+  };
+  /** PR-perf-5c — Clerk hosted modal click → first paint.
+   *  Stamps at openSignIn / openSignUp / openUserProfile call and again
+   *  on the next requestAnimationFrame after Clerk mounts the modal.
+   *  The delta is the user-perceived "I clicked, why isn't anything
+   *  happening" gap. */
+  "perf.clerk_modal_opened": {
+    intent: "sign_in" | "sign_up" | "user_profile";
+    ms_from_click: number;
+  };
+  /** PR-perf-5c — Upgrade button click → Stripe redirect navigation.
+   *  Includes the /api/stripe/create-checkout-session round-trip + any
+   *  campaign-params resolution. Anything > 1500 ms feels janky and
+   *  the user may double-click; the dashboard alert fires above that. */
+  "perf.stripe_redirect": {
+    ms_from_click_to_redirect: number;
+    has_promo: boolean;
+  };
   /** Wall-clock time for filter recompute on Browse. High values =
    *  the filter pipeline got expensive (Sets/Arrays growing, debounce
    *  not landing). */

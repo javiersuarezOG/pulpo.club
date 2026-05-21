@@ -19,6 +19,14 @@ import { captureCampaignParams } from "../lib/campaign";
 import { readFeatureFlag } from "../lib/feature-flag";
 
 export async function startStripeCheckout({ onError } = {}) {
+  // PR-perf-5c — stamp click time so we can emit perf.stripe_redirect
+  // right before window.location.assign. PostHog's sendBeacon path
+  // flushes pending events on `beforeunload`, so the event survives the
+  // imminent page navigation.
+  const _stripeClickT0 =
+    typeof performance !== "undefined" && performance.now
+      ? performance.now()
+      : Date.now();
   // Wave-2: build the POST body from same-session campaign params.
   // Empty body when the flag is off (rollback path).
   let body = "{}";
@@ -78,6 +86,16 @@ export async function startStripeCheckout({ onError } = {}) {
     if (onError) onError("no_url");
     return false;
   }
+  try {
+    const now =
+      typeof performance !== "undefined" && performance.now
+        ? performance.now()
+        : Date.now();
+    track("perf.stripe_redirect", {
+      ms_from_click_to_redirect: Math.max(0, Math.round(now - _stripeClickT0)),
+      has_promo: hasPromo,
+    });
+  } catch { /* never block redirect on telemetry */ }
   window.location.assign(url);
   return true;
 }

@@ -22,11 +22,42 @@
 // existing state. Every downstream `app.user` reader keeps working
 // unchanged.
 import React, { Suspense, lazy } from "react";
+import { track } from "../telemetry/hook";
 
 // Module-level lazy: Vite/Rollup splits clerk-bundle.jsx (and its
 // transitive @clerk/react import) into its own chunk that only loads
 // when this lazy component is actually rendered.
-const ClerkProviderLazy = lazy(() => import("./clerk-bundle.jsx"));
+//
+// PR-perf-5c — wrap the dynamic-import with a perf.clerk_chunk_load
+// telemetry stamp. The asset-load PerformanceObserver already catches
+// the byte size; this captures the round-trip duration explicitly so
+// the External Services dashboard can show "Clerk SDK loads slowly
+// from Europe" before users complain. `cache="hit"` is a heuristic
+// (chunk arrives in <100 ms → browser cache); above that, treat it
+// as a cold load. We don't have a more precise signal because the
+// fetch is inside the bundler-emitted glue code, not our fetch().
+const ClerkProviderLazy = lazy(() => {
+  const t0 =
+    typeof performance !== "undefined" && performance.now
+      ? performance.now()
+      : Date.now();
+  return import("./clerk-bundle.jsx").then((mod) => {
+    try {
+      const now =
+        typeof performance !== "undefined" && performance.now
+          ? performance.now()
+          : Date.now();
+      const ms = Math.max(0, Math.round(now - t0));
+      track("perf.clerk_chunk_load", {
+        ms,
+        cache: ms < 100 ? "hit" : ms < 1500 ? "miss" : "unknown",
+      });
+    } catch {
+      // Telemetry must never block the chunk load.
+    }
+    return mod;
+  });
+});
 
 export function clerkEnabled() {
   // Opt-out: VITE_USE_CLERK="0" keeps the legacy auth path. Any other

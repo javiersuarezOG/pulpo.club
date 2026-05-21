@@ -272,22 +272,29 @@ function Badge({ listing }) {
 function Photo({
   listing, idx = 0, ratio = "16/9", className = "",
   lazy = true, eager = false, onLoad, source,
-  thumbnail = false,
+  thumbnail = false, heroSrc = null,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
   // Reset loaded state when the URL changes (carousel arrow click).
   // Without this, the skeleton stays hidden while the new image streams
   // in, and the user sees the OLD photo with stale "loaded" state.
+  // `heroSrc` callers (the home hero) pass an explicit local /photos/*
+  // .hero.jpg path — sourced from the pipeline's 1080² hero variant,
+  // routed through /api/img for WebP at the right viewport size. This
+  // bypasses photos[0] (a broker URL) and the LCP long-tail it produces
+  // (PostHog: hero_v4 P95=14.5s, mostly broker-CDN flakes).
   // `thumbnail` callers (cards) read the local 600×400 derivative at
   // `thumbnail_url` — fast CDN paint, no broker dependency. Gallery
   // callers (carousels) read `photos[idx]` — broker URLs at native
   // resolution. The two were combined before, which surfaced the same
   // image twice in the carousel (the thumb at slot 0 alongside the
   // broker-native version a click away).
-  const url = thumbnail
-    ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
-    : listing.photos[idx];
+  const url = heroSrc
+    ? heroSrc
+    : thumbnail
+      ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
+      : listing.photos[idx];
 
   // PR-perf-4 — image optimization v2 (feature-flag-gated). When the
   // `image_optimization_v2` PostHog flag is on AND the photo lives at
@@ -303,7 +310,13 @@ function Photo({
   // The default `sizes` value covers both card surfaces (~400-800px
   // wide) and the listing-detail gallery-main (~800-1600px). For more
   // precision, future call sites can pass an explicit `sizes` prop.
-  const optimizationOn = readFeatureFlag("image_optimization_v2", false);
+  // `heroSrc` callers force the optimization on regardless of the
+  // image_optimization_v2 flag rollout — the home hero's broker-URL
+  // fallback (photos[0]) is the LCP long-tail we're closing, so this
+  // call site is opted in unconditionally. buildSrcSet still returns
+  // null for broker URLs (img-url.ts), so non-local heroSrc values
+  // degrade safely to the raw <img src>.
+  const optimizationOn = !!heroSrc || readFeatureFlag("image_optimization_v2", false);
   const optimized = useMemo(() => {
     if (!optimizationOn || !url) return null;
     const webp = buildSrcSet(url);
