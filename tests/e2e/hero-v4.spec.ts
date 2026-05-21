@@ -165,6 +165,89 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     expect(errors).toEqual([]);
   });
 
+  // Regression guard for the hero-LCP fix (PR-perf-hero, 2026-05-21).
+  // Before the fix, the hero photo on / was rendered from listing.photos[0]
+  // — a broker-CDN URL (assets.easybroker.com, remax-central.com.sv,
+  // i0.wp.com, goodlifeelsalvador.com, oceansideelsalvador.com,
+  // remaxcaribbeanandcentralamerica.azureedge.net). PostHog showed those
+  // URLs as the LCP element on / with P75=2.26s, P95=14.5s on
+  // perf.card_image_load, and 20 image.stuck events in 14 days.
+  //
+  // After the fix, HeroV4 derives a local .hero.jpg from thumbnail_url
+  // and routes it through /api/img with a srcset, so the actual
+  // currentSrc is "/api/img?src=<id>.hero.jpg&root=photos&w=<400|800|1600>".
+  //
+  // This test fails if:
+  //   - someone reverts heroSrc handling in HeroV4 or Photo
+  //   - someone changes buildPhotos to put a broker URL into thumbnail_url
+  //   - the pipeline stops producing .hero.jpg variants and /api/img 404s
+  //     (Photo would degrade to photos[0] = broker URL)
+  test("LCP guard: hero <img> currentSrc must be /api/img, never a broker URL", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+
+    // Stub /api/img so the dev server returns 200 (the production
+    // Vercel function doesn't exist in Vite dev). Without this, the
+    // <picture><source> 404s, onError fires, and Photo falls through
+    // to the category placeholder — masking the real assertion. We
+    // proxy to the underlying /photos/* file so the browser actually
+    // decodes an image and onLoad fires.
+    await page.route("**/api/img**", async (route) => {
+      const url = new URL(route.request().url());
+      const src = url.searchParams.get("src");
+      const root = url.searchParams.get("root") || "photos";
+      if (!src) return route.abort();
+      const target = `${url.origin}/${root}/${src}`;
+      const upstream = await page.request.get(target);
+      if (!upstream.ok()) return route.abort();
+      await route.fulfill({
+        status: 200,
+        contentType: upstream.headers()["content-type"] || "image/jpeg",
+        body: await upstream.body(),
+        headers: { "X-Pulpo-Image-Format": "test-stub" },
+      });
+    });
+
+    await page.goto("/?ff_hero_v4=1", { waitUntil: "networkidle" });
+
+    // Wait for the hero photo wrapper, then for an <img> inside it whose
+    // currentSrc is non-empty (loaded or in-flight with a resolved URL).
+    const heroImg = page.locator(".hp-hero-v4-photo img").first();
+    await expect(heroImg).toBeVisible({ timeout: 5_000 });
+    await page.waitForFunction(() => {
+      const img = document.querySelector(".hp-hero-v4-photo img") as HTMLImageElement | null;
+      return img != null && typeof img.currentSrc === "string" && img.currentSrc.length > 0;
+    }, { timeout: 10_000 });
+
+    const currentSrc = await heroImg.evaluate(
+      (el) => (el as HTMLImageElement).currentSrc,
+    );
+
+    // Positive assertion — must route through our optimizer.
+    expect(currentSrc, "hero image must be served via /api/img").toMatch(
+      /\/api\/img\?/,
+    );
+
+    // Negative assertion — explicit broker hosts that telemetry caught
+    // showing up as the LCP element. Keep this list in sync with the
+    // sources buildPhotos sees (web/app/data/listings.ts:139).
+    const BROKER_HOSTS = [
+      "assets.easybroker.com",
+      "remax-central.com.sv",
+      "remaxcaribbeanandcentralamerica.azureedge.net",
+      "i0.wp.com",
+      "oceansideelsalvador.com",
+      "goodlifeelsalvador.com",
+    ];
+    for (const host of BROKER_HOSTS) {
+      expect(
+        currentSrc.includes(host),
+        `hero image must not be a broker URL (saw ${host})`,
+      ).toBe(false);
+    }
+
+    expect(errors).toEqual([]);
+  });
+
   test("paid user with paid_home_variant_v1 + hero_v4: hero image visible, no CTA, no upsell blocks", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);
