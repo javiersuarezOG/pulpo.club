@@ -84,11 +84,11 @@
     },
     {
       "source": "/photos/:file",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=604800" }]
     },
     {
       "source": "/photos-hires/:file",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=604800" }]
     },
     {
       "source": "/build/:file",
