@@ -480,7 +480,7 @@ test.describe("New app boots cleanly on key routes", () => {
       // heading visible to a cold ES visitor on /. Trips when hardcoded
       // EN strings sneak in instead of t() lookups.
       "Try a free month",                             // hero primary + header CTA
-      "Curated weekly",                               // hero_v4 subhead opener
+      "We're local",                                  // hero_v4 subhead opener
       "See this week's top 10",                       // hero secondary CTA
       "Scanning",                                     // hero pre-label "SCANNING N SOURCES"
       "Just in",                                      // hero Just In pill
