@@ -87,13 +87,13 @@ export const TERMS: LegalDocument = {
       heading: { en: "Who we are", es: "Quiénes somos" },
       body: {
         en:
-          `Pulpo is operated by ${ENTITY.legal_name} ("Pulpo", "we", "us"), a ${ENTITY.legal_form} ` +
-          `with registered offices at ${formatAddress()} (${formatRegistration()}). ` +
-          `You can reach us any time at ${SUPPORT_EMAIL}.`,
+          `Pulpo ("we", "us", "our") is an online land-investment platform based in ${formatAddress()}. ` +
+          `The platform is operated under ${ENTITY.governing_law}, and our consumer-protection obligations are governed by the Ley de Protección al Consumidor (D.L. 776/2005) and the Ley de Comercio Electrónico (D.L. 947/2020). ` +
+          `For any matter — questions, complaints, claims, takedowns, or data-protection requests — you can reach us at ${SUPPORT_EMAIL}.`,
         es:
-          `Pulpo es operado por ${ENTITY.legal_name} ("Pulpo", "nosotros"), una ${ENTITY.legal_form} ` +
-          `con domicilio en ${formatAddress()} (${formatRegistration()}). ` +
-          `Puedes contactarnos en cualquier momento escribiendo a ${SUPPORT_EMAIL}.`,
+          `Pulpo ("nosotros") es una plataforma en línea de inversión en suelo, con sede en ${formatAddress()}. ` +
+          `La plataforma se opera bajo las ${ENTITY.governing_law}, y nuestras obligaciones de protección al consumidor están regidas por la Ley de Protección al Consumidor (D.L. 776/2005) y la Ley de Comercio Electrónico (D.L. 947/2020). ` +
+          `Para cualquier asunto — consultas, reclamos, denuncias, eliminación de contenido, o solicitudes sobre protección de datos — puedes contactarnos en ${SUPPORT_EMAIL}.`,
       },
     },
     {
@@ -253,11 +253,11 @@ export const TERMS: LegalDocument = {
       heading: { en: "Contact", es: "Contacto" },
       body: {
         en:
-          `${ENTITY.legal_name}\n${formatAddress()}\n${formatRegistration()}\n\n` +
+          `Pulpo\n${formatAddress()}\n\n` +
           `For anything — questions, complaints, takedowns, data requests: ${SUPPORT_EMAIL}\n` +
           `Or use the contact form at pulpo.club/contact.`,
         es:
-          `${ENTITY.legal_name}\n${formatAddress()}\n${formatRegistration()}\n\n` +
+          `Pulpo\n${formatAddress()}\n\n` +
           `Para cualquier cosa — preguntas, reclamos, eliminación de contenido, solicitudes de datos: ${SUPPORT_EMAIL}\n` +
           `O usa el formulario en pulpo.club/contact.`,
       },
@@ -297,9 +297,9 @@ export const PRIVACY: LegalDocument = {
       heading: { en: "Who is responsible for your data", es: "Quién es responsable de tus datos" },
       body: {
         en:
-          `${ENTITY.legal_name} ("Pulpo", "we") is the party responsible for the personal data we collect through pulpo.club. Our registered office is at ${formatAddress()}. ${formatRegistration()}. Contact: ${SUPPORT_EMAIL}.`,
+          `Pulpo ("we", "us", "our") is the party responsible for the personal data we collect through pulpo.club. We operate from ${formatAddress()}, under ${ENTITY.governing_law}. For privacy questions, data-access requests, corrections, or deletion: ${SUPPORT_EMAIL}.`,
         es:
-          `${ENTITY.legal_name} ("Pulpo", "nosotros") es el responsable de los datos personales que recopilamos a través de pulpo.club. Nuestro domicilio es ${formatAddress()}. ${formatRegistration()}. Contacto: ${SUPPORT_EMAIL}.`,
+          `Pulpo ("nosotros") es el responsable de los datos personales que recopilamos a través de pulpo.club. Operamos desde ${formatAddress()}, bajo las ${ENTITY.governing_law}. Para preguntas de privacidad, acceso, rectificación o eliminación de datos: ${SUPPORT_EMAIL}.`,
       },
     },
     {
@@ -710,47 +710,43 @@ export const IMPRINT: LegalDocument = {
       heading: { en: "Provider information (Art. 6 LCE)", es: "Información del proveedor (Art. 6 LCE)" },
       body: {
         en:
-          `Legal entity: ${ENTITY.legal_name}\n` +
           `Trade name: ${ENTITY.trade_name}\n` +
-          `Legal form: ${ENTITY.legal_form}\n` +
-          `${ENTITY.chamber_of_commerce.authority}: ${ENTITY.chamber_of_commerce.number}\n` +
-          `${ENTITY.tax_id.label}: ${ENTITY.tax_id.value}\n` +
-          `Registered address: ${formatAddress()}\n` +
-          `Legal representative: ${ENTITY.director.name} (${ENTITY.director.role})\n` +
+          `Operating address: ${formatAddress()}\n` +
+          `Governing law: ${ENTITY.governing_law}\n` +
           `Email: ${SUPPORT_EMAIL}\n` +
-          `Phone: ${ENTITY.phone}\n` +
           `Website: https://pulpo.club\n\n` +
           `Service providers used to operate the platform:\n` +
           `• Hosting and CDN: Vercel, Inc. (United States / EU)\n` +
           `• Authentication: Clerk, Inc. (United States)\n` +
-          `• Payments: Stripe Payments Europe Ltd. (Dublin, Ireland)\n\n` +
-          `Consumer-protection authority:\n` +
+          `• Payments: Stripe Payments Europe Ltd. (Dublin, Ireland)\n` +
+          `• Transactional email: Resend, Inc. (United States)\n` +
+          `• Product analytics: PostHog, Inc. (United States / EU)\n` +
+          `• Maps: Mapbox, Inc. (United States)\n\n` +
+          `Consumer-protection authority (claims under the Ley de Protección al Consumidor, D.L. 776/2005):\n` +
           `${ENTITY.supervisory_authority.name}\n` +
-          `${ENTITY.supervisory_authority.url}\n` +
+          `Website: ${ENTITY.supervisory_authority.url}\n` +
           `Phone: ${ENTITY.supervisory_authority.phone}\n\n` +
           `Civil and commercial disputes:\n` +
-          `${ENTITY.courts}`,
+          `${ENTITY.courts}.`,
         es:
-          `Razón social: ${ENTITY.legal_name}\n` +
           `Nombre comercial: ${ENTITY.trade_name}\n` +
-          `Forma jurídica: ${ENTITY.legal_form}\n` +
-          `${ENTITY.chamber_of_commerce.authority}: ${ENTITY.chamber_of_commerce.number}\n` +
-          `${ENTITY.tax_id.label}: ${ENTITY.tax_id.value}\n` +
-          `Domicilio: ${formatAddress()}\n` +
-          `Representante legal: ${ENTITY.director.name} (${ENTITY.director.role})\n` +
+          `Domicilio de operación: ${formatAddress()}\n` +
+          `Ley aplicable: ${ENTITY.governing_law}\n` +
           `Correo: ${SUPPORT_EMAIL}\n` +
-          `Teléfono: ${ENTITY.phone}\n` +
           `Sitio web: https://pulpo.club\n\n` +
           `Proveedores de servicios para operar la plataforma:\n` +
           `• Hosting y CDN: Vercel, Inc. (Estados Unidos / UE)\n` +
           `• Autenticación: Clerk, Inc. (Estados Unidos)\n` +
-          `• Pagos: Stripe Payments Europe Ltd. (Dublín, Irlanda)\n\n` +
-          `Autoridad de protección al consumidor:\n` +
+          `• Pagos: Stripe Payments Europe Ltd. (Dublín, Irlanda)\n` +
+          `• Correo transaccional: Resend, Inc. (Estados Unidos)\n` +
+          `• Analítica de producto: PostHog, Inc. (Estados Unidos / UE)\n` +
+          `• Mapas: Mapbox, Inc. (Estados Unidos)\n\n` +
+          `Autoridad de protección al consumidor (reclamos al amparo de la Ley de Protección al Consumidor, D.L. 776/2005):\n` +
           `${ENTITY.supervisory_authority.name}\n` +
-          `${ENTITY.supervisory_authority.url}\n` +
+          `Sitio web: ${ENTITY.supervisory_authority.url}\n` +
           `Teléfono: ${ENTITY.supervisory_authority.phone}\n\n` +
           `Disputas civiles y mercantiles:\n` +
-          `${ENTITY.courts}`,
+          `${ENTITY.courts}.`,
       },
     },
   ],
