@@ -763,10 +763,53 @@ export type EventMap = {
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */
   "perf.data_fetch": {
-    file: "ranked.json" | "last_updated.json" | "featured.json";
+    file: "ranked.json" | "ranked.list.json" | "last_updated.json" | "featured.json";
     ms: number;
     bytes: number | null;
     cache: "hit" | "miss" | "unknown";
+  };
+  /** PR-perf-5a — wall-clock time for a /api/* round-trip, split by
+   *  endpoint + region + status. `server_ms` is read from the
+   *  Server-Timing header (set by api/_perf.js#withTiming); the
+   *  difference between `ms` and `server_ms` is network + queue +
+   *  TLS — the latency budget the region pin / preconnects target.
+   *  `vercel_region` is the function's runtime region (iad1, gru1,
+   *  lhr1 once Pro). PostHog auto-tags the user's country, so the
+   *  Geo Latency dashboard can do a server-side-vs-network split
+   *  per (user country, function region) pair — the key question
+   *  for the "should we go multi-region" decision. */
+  "perf.api_call": {
+    endpoint: string;
+    status: number;
+    ms: number;
+    server_ms: number | null;
+    vercel_region: string | null;
+  };
+  /** PR-perf-5c — Clerk SDK chunk load latency.
+   *  Wraps the React.lazy() import in clerk-shell.jsx. `cache="hit"` is
+   *  a heuristic (chunk arrives in <100ms → browser cache); `miss` is
+   *  the cold-load case. Lets PostHog tell apart returning visitors
+   *  from first-time signup-modal opens. */
+  "perf.clerk_chunk_load": {
+    ms: number;
+    cache: "hit" | "miss" | "unknown";
+  };
+  /** PR-perf-5c — Clerk hosted modal click → first paint.
+   *  Stamps at openSignIn / openSignUp / openUserProfile call and again
+   *  on the next requestAnimationFrame after Clerk mounts the modal.
+   *  The delta is the user-perceived "I clicked, why isn't anything
+   *  happening" gap. */
+  "perf.clerk_modal_opened": {
+    intent: "sign_in" | "sign_up" | "user_profile";
+    ms_from_click: number;
+  };
+  /** PR-perf-5c — Upgrade button click → Stripe redirect navigation.
+   *  Includes the /api/stripe/create-checkout-session round-trip + any
+   *  campaign-params resolution. Anything > 1500 ms feels janky and
+   *  the user may double-click; the dashboard alert fires above that. */
+  "perf.stripe_redirect": {
+    ms_from_click_to_redirect: number;
+    has_promo: boolean;
   };
   /** Wall-clock time for filter recompute on Browse. High values =
    *  the filter pipeline got expensive (Sets/Arrays growing, debounce
@@ -796,7 +839,18 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      // PR-perf-2: granular surfaces. Previously bare <img>s, now
+      // inline-augmented with priority hints + this telemetry.
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
   };
   /** Fires when an image neither loaded nor errored within 8 s of the
@@ -811,7 +865,16 @@ export type EventMap = {
     url: string;
     listing_id: string;
     idx: number;
-    source: "discover" | "browse" | "saved" | "detail" | "unknown";
+    source:
+      | "discover"
+      | "browse"
+      | "saved"
+      | "detail"
+      | "unknown"
+      | "browse_table"
+      | "detail_main"
+      | "detail_thumb"
+      | "lightbox";
     is_local: boolean;
     was_cached_likely: boolean;
   };

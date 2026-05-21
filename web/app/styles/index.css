@@ -168,6 +168,15 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 .profile-chip { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+/* Mobile: the topnav-right rail (avatar + Logout + LocaleToggle + LiveStats)
+   blows past a 320 px viewport when a user is signed in (responsive-smoke
+   on /account at 320×568 and 375×812 saw the chip's right edge at
+   x=361 — 41 px past). Hiding the redundant Logout link-btn here keeps
+   the avatar (which navigates to /account, where the SecuritySection
+   has its own Sign Out CTA) without sacrificing identity affordance. */
+@media (max-width: 767px) {
+  .topnav .profile-chip .link-btn { display: none; }
+}
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); color: white;
@@ -2672,7 +2681,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .account-nav ul { list-style: none; display: flex; flex-direction: column; gap: 2px; padding: 0; margin: 0; }
 
 @media (max-width: 767px) {
-  .account-nav ul { flex-direction: row; overflow-x: auto; gap: 8px; padding-bottom: 8px; }
+  /* Horizontal chip rail. `max-width: 100%` + `min-width: 0` constrain
+     the flex container to the parent grid track so the in-flow row of
+     nowrap chips clips via overflow-x: auto instead of pushing the
+     document wider than the viewport (fixes responsive-smoke at 320px
+     and 375px, where the four-chip row's intrinsic width is ~551px). */
+  .account-nav ul {
+    flex-direction: row; overflow-x: auto;
+    gap: 8px; padding-bottom: 8px;
+    width: 100%; max-width: 100%; min-width: 0;
+  }
 }
 .account-nav li button {
   width: 100%;

@@ -23,7 +23,15 @@ import {
 } from "./pages.jsx";
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { NewHomePage } from "./home";
-import { AccountPage } from "./account.jsx";
+// PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
+// + its child widgets only render for users on /account or /admin, which
+// is a minority of sessions. Wrapping the imports in React.lazy moves
+// them into per-route chunks that fetch on first navigation, trimming
+// the initial entry bundle by ~70-100KB gz. Vite + Rollup auto-split
+// any module imported via `import(...)` — no manualChunks hint needed.
+const AccountPage = React.lazy(() =>
+  import("./account.jsx").then((m) => ({ default: m.AccountPage })),
+);
 // Legal-suite public routes (/terms, /privacy, /cookies, /subscription,
 // /imprint, /contact). LegalPage reads from web/app/config/legal-content.ts;
 // ContactPage is currently a shell — the actual form + api/contact.js
@@ -31,8 +39,12 @@ import { AccountPage } from "./account.jsx";
 import { LegalPage } from "./pages/legal/LegalPage.jsx";
 import { ContactPage } from "./pages/legal/ContactPage.jsx";
 // Internal admin hub — no nav link, robots-blocked, see AdminShell.jsx
-// for the safety-belt rationale.
-import { AdminPage } from "./admin/AdminShell.jsx";
+// for the safety-belt rationale. Route-level lazy (PR-perf-3a) so the
+// admin chunk (with its newsletter + sources widgets) only loads for
+// the operator on /admin — not on every public page load.
+const AdminPage = React.lazy(() =>
+  import("./admin/AdminShell.jsx").then((m) => ({ default: m.AdminPage })),
+);
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
@@ -1357,14 +1369,28 @@ function App() {
         {route === "browse" && <BrowsePage app={app} />}
         {route === "saved" && <SavedPage app={app} />}
         {route === "plans" && <PlansPage app={app} />}
-        {route === "account" && <AccountPage app={app} />}
+        {/* PR-perf-3a — wrap lazy routes in Suspense. Fallback={null} is
+            intentional: the SiteHeader + BottomNav stay mounted around
+            <main>, so the user sees a brief blank-main flicker during
+            chunk load (sub-second on cable, ~1-2s on 3G) rather than a
+            spinner that would imply something is broken. The same
+            pattern is used by ClerkShell for the auth SDK chunk. */}
+        {route === "account" && (
+          <React.Suspense fallback={null}>
+            <AccountPage app={app} />
+          </React.Suspense>
+        )}
         {route === "terms" && <LegalPage app={app} slug="terms" />}
         {route === "privacy" && <LegalPage app={app} slug="privacy" />}
         {route === "cookies" && <LegalPage app={app} slug="cookies" />}
         {route === "subscription" && <LegalPage app={app} slug="subscription" />}
         {route === "imprint" && <LegalPage app={app} slug="imprint" />}
         {route === "contact" && <ContactPage app={app} />}
-        {route === "admin" && <AdminPage app={app} />}
+        {route === "admin" && (
+          <React.Suspense fallback={null}>
+            <AdminPage app={app} />
+          </React.Suspense>
+        )}
       </main>
 
       <SiteFooter app={app} locale={locale} tweaks={tweaks} />

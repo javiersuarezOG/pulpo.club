@@ -1511,11 +1511,31 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
           {results.map(l => (
             <tr key={l.id} onClick={() => app.openListing(l.id)}>
               <td className="thumb-cell">
-                {(l.thumbnail_url ?? l.photos[0]) ? (
-                  <img src={l.thumbnail_url ?? l.photos[0]} alt=""/>
-                ) : (
-                  <div className="thumb-placeholder"/>
-                )}
+                {(() => {
+                  const _thumbUrl = l.thumbnail_url ?? l.photos[0];
+                  if (!_thumbUrl) return <div className="thumb-placeholder"/>;
+                  return (
+                    <img
+                      src={_thumbUrl}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={56}
+                      height={56}
+                      onError={() => {
+                        try {
+                          track("image.error", {
+                            url: String(_thumbUrl).slice(0, 200),
+                            listing_id: l.id,
+                            idx: 0,
+                            source: "browse_table",
+                            is_local: String(_thumbUrl).startsWith("/photos/"),
+                          });
+                        } catch { /* never let telemetry break the render */ }
+                      }}
+                    />
+                  );
+                })()}
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
@@ -1633,6 +1653,28 @@ function ListingDetail({ listing, app, asPanel = true }) {
     });
     if (app.user && !isSold) app.recordDetailView();
   }, [listing.id]);
+
+  // PR-perf-2 — preload the gallery-main image (the LCP element on
+  // /listing/:id). Injects a <link rel="preload" as="image"> into the
+  // document head so the fetch starts during HTML parse instead of
+  // waiting for the <img> below to mount. Removes the link on unmount /
+  // listing change so the head doesn't grow unboundedly across
+  // navigations. fetchpriority="high" matches the <img> hint so the
+  // browser doesn't downgrade the preload mid-stream.
+  pUseEffect(() => {
+    if (typeof document === "undefined") return;
+    const lcp = listing.photos && listing.photos[0];
+    if (!lcp) return;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = lcp;
+    try { link.setAttribute("fetchpriority", "high"); } catch { /* ignore */ }
+    document.head.appendChild(link);
+    return () => {
+      try { document.head.removeChild(link); } catch { /* already gone — fine */ }
+    };
+  }, [listing.id, listing.photos && listing.photos[0]]);
 
   // Paywall telemetry. Fires once per listing+lock transition when the
   // off-market hard paywall renders. Bypass events fire on the buttons
@@ -1791,7 +1833,24 @@ function ListingDetail({ listing, app, asPanel = true }) {
             aria-label={listing.photos.length ? t("detail.gallery.open", lc) : undefined}
           >
             {listing.photos[0] ? (
-              <img src={listing.photos[0]} alt={tr(listing.title, app.locale)}/>
+              <img
+                src={listing.photos[0]}
+                alt={tr(listing.title, app.locale)}
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                onError={() => {
+                  try {
+                    track("image.error", {
+                      url: String(listing.photos[0] ?? "").slice(0, 200),
+                      listing_id: listing.id,
+                      idx: 0,
+                      source: "detail_main",
+                      is_local: String(listing.photos[0] ?? "").startsWith("/photos/"),
+                    });
+                  } catch { /* never let telemetry break the render */ }
+                }}
+              />
             ) : (
               <div className="gallery-placeholder">
                 <Icon name="mountain" size={48} />
@@ -1827,7 +1886,23 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   }
                 }}
               >
-                <img src={listing.photos[i]} alt=""/>
+                <img
+                  src={listing.photos[i]}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onError={() => {
+                    try {
+                      track("image.error", {
+                        url: String(listing.photos[i] ?? "").slice(0, 200),
+                        listing_id: listing.id,
+                        idx: i,
+                        source: "detail_thumb",
+                        is_local: String(listing.photos[i] ?? "").startsWith("/photos/"),
+                      });
+                    } catch { /* never let telemetry break the render */ }
+                  }}
+                />
                 {locked && (
                   <div className="thumb-lock"><Icon name="lock" size={16}/></div>
                 )}
@@ -2088,7 +2163,23 @@ function ListingDetail({ listing, app, asPanel = true }) {
           >
             <Icon name="close" size={22}/>
           </button>
-          <img src={listing.photos[galleryIdx]} alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}/>
+          <img
+            src={listing.photos[galleryIdx]}
+            alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}
+            decoding="async"
+            fetchpriority="high"
+            onError={() => {
+              try {
+                track("image.error", {
+                  url: String(listing.photos[galleryIdx] ?? "").slice(0, 200),
+                  listing_id: listing.id,
+                  idx: galleryIdx,
+                  source: "lightbox",
+                  is_local: String(listing.photos[galleryIdx] ?? "").startsWith("/photos/"),
+                });
+              } catch { /* never let telemetry break the render */ }
+            }}
+          />
           <div className="lightbox-controls" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setGalleryIdx((galleryIdx - 1 + listing.photos.length) % listing.photos.length)}
@@ -2142,10 +2233,20 @@ function SavedPage({ app }) {
     return (
       <div className="page page-saved">
         <div className="empty-state lg">
-          <div className="empty-illus">
+          <div className="empty-illus" aria-hidden="true">
             <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-              <path d="M20 80c0-25 20-45 45-45s45 20 45 45" stroke="var(--ink-3)" strokeWidth="2" fill="none"/>
-              <path d="M60 50l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6-4.5-4 6-1z" fill="var(--accent-2)"/>
+              <circle cx="60" cy="60" r="52" fill="var(--color-bg-cream-soft)" />
+              <g transform="translate(30, 30) scale(2.5)">
+                <path
+                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"
+                  stroke="var(--color-forest-deep)"
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+              <circle cx="60" cy="65" r="3.5" fill="var(--gold)" />
             </svg>
           </div>
           <h2>{t("saved.empty.title", app.locale)}</h2>

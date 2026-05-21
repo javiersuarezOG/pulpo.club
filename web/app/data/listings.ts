@@ -343,16 +343,33 @@ export async function loadListings(): Promise<Listing[]> {
 
   // PR-photo-nav-perf — instrumented fetch surfaces the data-load
   // latency + cache-hit-rate in PostHog.
+  // PR-perf-3b — fetch the slim list-view projection first (~40-60%
+  // smaller payload, drops broker contact + validation + raw scraper
+  // text + hires sidecar fields that the adapter never reads). Fall
+  // back to the full ranked.json on 404 so the client survives the
+  // window between this PR landing and the first nightly that emits
+  // ranked.list.json. Once the nightly has run, the fallback becomes
+  // dead code (file always present); we keep it as a safety net in
+  // case the pipeline ever regresses on the slim emit.
   const { timedFetch } = await import("../telemetry/perf");
-  const res = await timedFetch("ranked.json", "/data/ranked.json", {
-    headers: { Accept: "application/json" },
-  });
-  if (!res.ok) {
-    throw new Error(`ranked.json HTTP ${res.status}`);
+  const accept = { headers: { Accept: "application/json" } };
+  let res: Response | null = null;
+  try {
+    res = await timedFetch("ranked.list.json", "/data/ranked.list.json", accept);
+    if (res.status === 404) res = null;
+  } catch {
+    // network error / fetch threw → fall through to ranked.json
+    res = null;
+  }
+  if (!res || !res.ok) {
+    res = await timedFetch("ranked.json", "/data/ranked.json", accept);
+    if (!res.ok) {
+      throw new Error(`ranked HTTP ${res.status}`);
+    }
   }
   const raw = await res.json();
   if (!Array.isArray(raw)) {
-    throw new Error("ranked.json is not an array");
+    throw new Error("ranked payload is not an array");
   }
   const listings = raw.map(adaptListing);
   cache = { ts: Date.now(), listings };
