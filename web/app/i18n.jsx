@@ -561,10 +561,7 @@ const UI_STRINGS = {
   // with the legacy StyleCarousel component. Keys removed.
 
   // Live header stats (PR-4c)
-  "stats.sources":           { en: "sources",  es: "fuentes" },
   "stats.listings":          { en: "listings", es: "propiedades" },
-  "stats.updated":           { en: "updated",  es: "actualizado" },
-  "stats.info_label":        { en: "Pulpo data freshness", es: "Última actualización de los datos de Pulpo" },
 
   // Units toggle (PR-4c) — vrs² is the Salvadoran traditional area unit.
   "units.label":             { en: "Show areas in", es: "Mostrar áreas en" },
