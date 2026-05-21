@@ -8,6 +8,9 @@
   "functions": {
     "api/social/image.js": {
       "excludeFiles": "web/photos/**,web/photos-hires/**"
+    },
+    "api/img.js": {
+      "excludeFiles": "web/photos/**,web/photos-hires/**"
     }
   },
   "rewrites": [
