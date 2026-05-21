@@ -197,6 +197,55 @@ ORDER BY path, n DESC
 """.strip()
 
 
+def q_hero_broker_url_regression(days: int) -> str:
+    """Regression alarm for the home-hero LCP fix (PR-perf-hero, 2026-05-21).
+
+    Before the fix, the LCP element on `/` was a broker-CDN <img> with
+    a URL like `assets.easybroker.com/property_images/…` for ~half of
+    sessions. After the fix it should be `/api/img?…`. This insight
+    counts LCP attribution events on `/` whose `properties.url` matches
+    a known broker host. **Post-merge expectation: every row's n drops
+    to ~0 within 24–48 h** (residual rows are pre-merge LCPs aging out
+    of the window).
+
+    Non-zero `n` in steady state means someone reverted the hero
+    routing OR a code path produces a non-/api/img hero URL. Pair with
+    the Playwright `hero-v4.spec.ts` "LCP guard" test that fails the
+    PR before it ships.
+    """
+    return f"""
+SELECT
+  splitByChar('?', coalesce(properties.$current_url, ''))[1] AS path,
+  multiIf(
+    position(toString(properties.url), 'easybroker.com') > 0, 'assets.easybroker.com',
+    position(toString(properties.url), 'remax-central.com.sv') > 0, 'remax-central.com.sv',
+    position(toString(properties.url), 'remaxcaribbeanandcentralamerica.azureedge.net') > 0, 'remax-caribbean (azureedge)',
+    position(toString(properties.url), 'i0.wp.com') > 0, 'i0.wp.com',
+    position(toString(properties.url), 'oceansideelsalvador.com') > 0, 'oceansideelsalvador.com',
+    position(toString(properties.url), 'goodlifeelsalvador.com') > 0, 'goodlifeelsalvador.com',
+    'OTHER'
+  ) AS broker_host,
+  round(quantile(0.75)(toFloat(properties.ms))) AS p75_ms,
+  count() AS n
+FROM events
+WHERE event = 'web_vitals.lcp.attribution'
+  AND properties.element_tag = 'img'
+  AND splitByChar('?', coalesce(properties.$current_url, ''))[1] LIKE '%pulpo.club/'
+  AND multiIf(
+    position(toString(properties.url), 'easybroker.com') > 0, 1,
+    position(toString(properties.url), 'remax-central.com.sv') > 0, 1,
+    position(toString(properties.url), 'remaxcaribbeanandcentralamerica.azureedge.net') > 0, 1,
+    position(toString(properties.url), 'i0.wp.com') > 0, 1,
+    position(toString(properties.url), 'oceansideelsalvador.com') > 0, 1,
+    position(toString(properties.url), 'goodlifeelsalvador.com') > 0, 1,
+    0
+  ) = 1
+  AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY path, broker_host
+ORDER BY n DESC
+""".strip()
+
+
 # Stubs for events PR-perf-5c will ship — included so the dashboards are
 # complete the day 5c lands. Until then they just say "no data yet".
 
@@ -241,6 +290,118 @@ FROM events
 WHERE event = 'perf.stripe_redirect' AND timestamp >= now() - INTERVAL {days} DAY
 GROUP BY geo
 ORDER BY p95_ms DESC
+""".strip()
+
+
+# ── "Performance — At a Glance" queries (the executive-summary board) ──
+# Each query is compact: 1-5 rows, just the headline number per cohort.
+# Designed so the board fits on one screen + tells you "is everything
+# OK?" without drilling into the per-route breakdowns on the other
+# three dashboards.
+
+def q_glance_lcp_p75_by_geo(days: int) -> str:
+    return f"""
+SELECT
+  {geo_case()} AS geo,
+  round(quantile(0.75)(toFloat(properties.value))) AS lcp_p75_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'web_vitals.lcp' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY geo
+ORDER BY lcp_p75_ms DESC
+""".strip()
+
+
+def q_glance_image_health(days: int) -> str:
+    # One row, three columns. Per-100-session normalization handles
+    # traffic growth so the number stays comparable week-over-week.
+    return f"""
+WITH sessions AS (
+  SELECT count(DISTINCT $session_id) AS s
+  FROM events WHERE timestamp >= now() - INTERVAL {days} DAY
+)
+SELECT
+  round(100.0 * countIf(event = 'image.error') / (SELECT s FROM sessions), 3) AS errors_per_100_sessions,
+  round(100.0 * countIf(event = 'image.stuck') / (SELECT s FROM sessions), 3) AS stuck_per_100_sessions,
+  countIf(event = 'image.error') + countIf(event = 'image.stuck') AS total_failures
+FROM events
+WHERE event IN ('image.error','image.stuck')
+  AND timestamp >= now() - INTERVAL {days} DAY
+""".strip()
+
+
+def q_glance_slowest_endpoints(days: int) -> str:
+    return f"""
+SELECT
+  properties.endpoint AS endpoint,
+  properties.vercel_region AS region,
+  round(quantile(0.95)(toFloat(properties.ms))) AS p95_total_ms,
+  round(quantile(0.95)(toFloat(properties.server_ms))) AS p95_server_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'perf.api_call' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY endpoint, region
+ORDER BY p95_total_ms DESC
+LIMIT 5
+""".strip()
+
+
+def q_glance_web_vitals_overall(days: int) -> str:
+    # One row, four columns — the SLO-style "% of sessions hitting good
+    # for each web vital." Combined into a single row so the dashboard
+    # card shows all four at once instead of forcing the user to scan
+    # a longer table.
+    return f"""
+SELECT
+  round(100.0 * countIf(event = 'web_vitals.lcp' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.lcp'), 0), 1) AS lcp_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.inp' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.inp'), 0), 1) AS inp_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.cls' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.cls'), 0), 1) AS cls_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.ttfb' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.ttfb'), 0), 1) AS ttfb_good_pct
+FROM events
+WHERE event IN ('web_vitals.lcp','web_vitals.inp','web_vitals.cls','web_vitals.ttfb')
+  AND timestamp >= now() - INTERVAL {days} DAY
+""".strip()
+
+
+def q_glance_external_services(days: int) -> str:
+    # Clerk modal P95 and Stripe redirect P95 collapsed into a single
+    # per-geo row. quantileIf gates the aggregate to the matching event
+    # so we don't mix the two ms fields. Populates once PR-perf-5c #402
+    # lands and a few clicks flow through.
+    return f"""
+SELECT
+  {geo_case()} AS geo,
+  round(quantileIf(0.95)(toFloat(properties.ms_from_click),
+        event = 'perf.clerk_modal_opened')) AS clerk_modal_p95_ms,
+  round(quantileIf(0.95)(toFloat(properties.ms_from_click_to_redirect),
+        event = 'perf.stripe_redirect')) AS stripe_redirect_p95_ms,
+  countIf(event = 'perf.clerk_modal_opened') AS clerk_n,
+  countIf(event = 'perf.stripe_redirect') AS stripe_n
+FROM events
+WHERE event IN ('perf.clerk_modal_opened','perf.stripe_redirect')
+  AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY geo
+ORDER BY geo
+""".strip()
+
+
+def q_glance_data_payload(days: int) -> str:
+    # One row per data file — the "are we shipping too many bytes?"
+    # question in one glance. Median kB and median ms.
+    return f"""
+SELECT
+  properties.file AS file,
+  round(quantile(0.5)(toFloat(properties.bytes)) / 1024) AS median_kb,
+  round(quantile(0.5)(toFloat(properties.ms))) AS median_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'perf.data_fetch' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY file
+ORDER BY median_kb DESC
 """.strip()
 
 
@@ -322,15 +483,28 @@ def upsert_dashboard(
     else:
         url = f"{host}/api/projects/{project_id}/dashboards/"
         dash = http("POST", url, key, payload)
-    # Wire insights to the dashboard. Re-attaching an already-attached
-    # insight is a no-op; PostHog dedupes on (dashboard, insight).
+    # Wire insights to the dashboard. PostHog's REST API removed the
+    # POST /dashboards/<id>/add_insight/ endpoint in favor of carrying
+    # `dashboards: [<id>, ...]` directly on the insight resource. PATCH
+    # each insight with the target dashboard id; the request is
+    # idempotent (PostHog dedupes on (insight, dashboard) at the
+    # database level) and re-runs with no-op effect.
     for insight_id in insight_ids:
         try:
-            http(
-                "POST",
-                f"{host}/api/projects/{project_id}/dashboards/{dash['id']}/add_insight/",
+            current = http(
+                "GET",
+                f"{host}/api/projects/{project_id}/insights/{insight_id}/",
                 key,
-                {"insight_id": insight_id},
+            )
+            current_dashes = current.get("dashboards") or []
+            if dash["id"] in current_dashes:
+                continue
+            merged = list({*current_dashes, dash["id"]})
+            http(
+                "PATCH",
+                f"{host}/api/projects/{project_id}/insights/{insight_id}/",
+                key,
+                {"dashboards": merged},
             )
         except urllib.error.HTTPError as e:
             # 400 typically means "already on this dashboard" — fine.
@@ -392,6 +566,12 @@ INSIGHT_PLAN = [
         q_lcp_element_breakdown,
     ),
     (
+        "Performance — Image Health",
+        "Hero broker-URL regression (LCP on /)",
+        "Count of LCP attribution events on / where the LCP <img>'s URL is a broker host (easybroker.com, remax-central.com.sv, i0.wp.com, oceansideelsalvador.com, goodlifeelsalvador.com, remaxcaribbeanandcentralamerica.azureedge.net). Post PR-perf-hero this should be ~0. Non-zero in steady state means someone reverted the hero routing — check the Playwright LCP guard.",
+        q_hero_broker_url_regression,
+    ),
+    (
         "Performance — External Services",
         "Clerk hosted modal open latency by geo (PR-perf-5c)",
         "perf.clerk_modal_opened — click → first interactive. Empty until PR-perf-5c lands the event.",
@@ -409,10 +589,60 @@ INSIGHT_PLAN = [
         "perf.stripe_redirect — Upgrade click → window.location.assign. Empty until PR-perf-5c lands the event.",
         q_stripe_redirect,
     ),
+    # ── Performance — At a Glance ───────────────────────────────────────
+    # The executive-summary board. Each insight returns 1-5 rows with
+    # just the headline number per cohort/endpoint/file. Designed to fit
+    # on one screen and answer "is everything OK?" without having to
+    # open the per-route drill-downs on the other three boards.
+    (
+        "Performance — At a Glance",
+        "Glance: LCP P75 by geo",
+        "The single headline number per geo cohort. Anything above 2500 ms is 'poor' per web.dev/vitals — and the user feels it.",
+        q_glance_lcp_p75_by_geo,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Image health (errors + stuck per 100 sessions)",
+        "Per-100-session rates so the number stays comparable as traffic grows. Anything above 0.5 either column is a regression signal.",
+        q_glance_image_health,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Top 5 slowest API endpoints",
+        "P95 round-trip and P95 server-side ms, by endpoint and region. If total_ms ≈ server_ms the function is the bottleneck; if total >> server the network is.",
+        q_glance_slowest_endpoints,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Web Vitals 'good' rate (all metrics)",
+        "Single-row SLO view: % of sessions hitting 'good' for LCP / INP / CLS / TTFB. The numbers users feel rolled into a one-line health score.",
+        q_glance_web_vitals_overall,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: External services pulse (Clerk + Stripe)",
+        "Clerk modal P95 and Stripe redirect P95 per geo, side by side. Populates once PR-perf-5c #402 lands and a few flows complete.",
+        q_glance_external_services,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Data payload by file",
+        "Median kB and median ms for each data file. Confirms ranked.list.json (PR-perf-3b) is dominating cold-loads vs ranked.json.",
+        q_glance_data_payload,
+    ),
 ]
 
 
 DASHBOARDS = {
+    # Order matters — PostHog renders dashboards in creation order. List
+    # "At a Glance" first so it's the top entry in Sebas's Performance
+    # tag filter (and the obvious starting point).
+    "Performance — At a Glance": (
+        "Executive-summary board: 6 compact insights covering LCP, image "
+        "health, slowest endpoints, web-vitals good rate, external services, "
+        "and data payload sizes. Open this one first; the three drill-down "
+        "boards exist for when an At-a-Glance card flags something."
+    ),
     "Performance — Geo Latency": (
         "Real-user perf metrics sliced by Central America / North America / "
         "Europe / Other. Built by scripts/posthog_setup_perf_dashboards.py — "
@@ -430,6 +660,46 @@ DASHBOARDS = {
 }
 
 
+def _load_env_file() -> None:
+    """Best-effort `.env` loader. Reads `<repo-root>/.env` if present and
+    sets any KEY=VALUE pairs into os.environ unless already set. Lets
+    `python3 scripts/posthog_setup_perf_dashboards.py` read POSTHOG_*
+    values from the same `.env` Vite + Vercel-dev already use, without
+    adding python-dotenv as a dependency.
+
+    Format: `KEY=value` per line, `#` comments allowed, surrounding
+    single/double quotes stripped. Anything else is ignored silently
+    (existing values in os.environ always win — so `export FOO=bar` on
+    the shell still beats `.env`).
+    """
+    import pathlib
+    repo_root = pathlib.Path(__file__).resolve().parent.parent
+    env_path = repo_root / ".env"
+    if not env_path.is_file():
+        return
+    try:
+        for raw in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip()
+            # Strip matching surrounding quotes (single or double).
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                value = value[1:-1]
+            if key and key not in os.environ:
+                os.environ[key] = value
+    except OSError:
+        # Permissions / encoding hiccups — silently fall through; the
+        # main() function will fail fast on missing env vars with a
+        # clear message that doesn't mention `.env` so the user still
+        # has the option of `export` if their file is unreadable.
+        pass
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Stand up PostHog perf dashboards.")
     p.add_argument("--days", type=int, default=7,
@@ -437,6 +707,11 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true",
                    help="Print the HogQL bodies without hitting the PostHog API.")
     args = p.parse_args()
+
+    # Load .env BEFORE reading env vars so `.env` works seamlessly
+    # alongside the existing `export FOO=bar` shell pattern. Shell
+    # exports always win — see _load_env_file().
+    _load_env_file()
 
     key_raw = os.getenv("POSTHOG_PERSONAL_API_KEY")
     project_raw = os.getenv("POSTHOG_PROJECT_ID")

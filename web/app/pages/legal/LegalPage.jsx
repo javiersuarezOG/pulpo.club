@@ -9,14 +9,12 @@
 //   - Responsive: single content column, max-width capped, padding via
 //     design tokens. No horizontal scroll at 320px.
 //   - i18n: locale-aware. Each LegalDocument carries `body.en` + `body.es`;
-//     the component picks based on `app.locale`. ES copy currently shows
-//     the "draft pending counsel review" placeholder text.
+//     the component picks based on `app.locale`.
 //   - Telemetry: fires `legal.page_viewed` on mount with the page slug.
 //   - Design tokens: every spacing/color value reads from tokens.css.
 
 import React, { useEffect } from "react";
 import { findDocument } from "../../config/legal-content";
-import { ENTITY } from "../../config/legal-entity";
 import { useDocumentMeta } from "../../lib/use-document-meta";
 import { t } from "../../i18n.jsx";
 import { track } from "../../telemetry/client";
@@ -59,27 +57,6 @@ const PAGE_STYLES = `
   font-size: var(--type-card-meta-size);
   color: var(--ink-3);
   margin: 0 0 32px;
-}
-.page-legal__draft-banner {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--accent);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin: 0 0 32px;
-  font-size: var(--type-card-meta-size);
-  line-height: 1.6;
-  color: var(--ink-2);
-}
-.page-legal__incorporation-banner {
-  background: var(--paper-2);
-  border: 1px solid var(--line-2);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin: 0 0 24px;
-  font-size: var(--type-card-meta-size);
-  line-height: 1.6;
-  color: var(--ink-2);
 }
 .page-legal__section { margin: 0 0 32px; }
 .page-legal__section-heading {
@@ -145,18 +122,6 @@ export function LegalPage({ app, slug }) {
       <p className="page-legal__updated">
         {t("legal.last_updated", locale)}: {doc.last_updated}
       </p>
-
-      {!doc.review_complete && (
-        <div className="page-legal__draft-banner" role="status">
-          {t("legal.draft_banner", locale)}
-        </div>
-      )}
-
-      {!ENTITY.incorporated && (
-        <div className="page-legal__incorporation-banner" role="status">
-          {t("legal.incorporation_banner", locale)}
-        </div>
-      )}
 
       {doc.sections
         .filter((section) => (section.if ? section.if() : true))

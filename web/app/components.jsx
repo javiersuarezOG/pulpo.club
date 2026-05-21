@@ -272,22 +272,29 @@ function Badge({ listing }) {
 function Photo({
   listing, idx = 0, ratio = "16/9", className = "",
   lazy = true, eager = false, onLoad, source,
-  thumbnail = false,
+  thumbnail = false, heroSrc = null,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
   // Reset loaded state when the URL changes (carousel arrow click).
   // Without this, the skeleton stays hidden while the new image streams
   // in, and the user sees the OLD photo with stale "loaded" state.
+  // `heroSrc` callers (the home hero) pass an explicit local /photos/*
+  // .hero.jpg path — sourced from the pipeline's 1080² hero variant,
+  // routed through /api/img for WebP at the right viewport size. This
+  // bypasses photos[0] (a broker URL) and the LCP long-tail it produces
+  // (PostHog: hero_v4 P95=14.5s, mostly broker-CDN flakes).
   // `thumbnail` callers (cards) read the local 600×400 derivative at
   // `thumbnail_url` — fast CDN paint, no broker dependency. Gallery
   // callers (carousels) read `photos[idx]` — broker URLs at native
   // resolution. The two were combined before, which surfaced the same
   // image twice in the carousel (the thumb at slot 0 alongside the
   // broker-native version a click away).
-  const url = thumbnail
-    ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
-    : listing.photos[idx];
+  const url = heroSrc
+    ? heroSrc
+    : thumbnail
+      ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
+      : listing.photos[idx];
 
   // PR-perf-4 — image optimization v2 (feature-flag-gated). When the
   // `image_optimization_v2` PostHog flag is on AND the photo lives at
@@ -303,7 +310,13 @@ function Photo({
   // The default `sizes` value covers both card surfaces (~400-800px
   // wide) and the listing-detail gallery-main (~800-1600px). For more
   // precision, future call sites can pass an explicit `sizes` prop.
-  const optimizationOn = readFeatureFlag("image_optimization_v2", false);
+  // `heroSrc` callers force the optimization on regardless of the
+  // image_optimization_v2 flag rollout — the home hero's broker-URL
+  // fallback (photos[0]) is the LCP long-tail we're closing, so this
+  // call site is opted in unconditionally. buildSrcSet still returns
+  // null for broker URLs (img-url.ts), so non-local heroSrc values
+  // degrade safely to the raw <img src>.
+  const optimizationOn = !!heroSrc || readFeatureFlag("image_optimization_v2", false);
   const optimized = useMemo(() => {
     if (!optimizationOn || !url) return null;
     const webp = buildSrcSet(url);
@@ -347,11 +360,23 @@ function Photo({
   }, [url]);
 
   // Stuck-image handling — if the image neither loaded nor errored
-  // after 8 s, treat it as failed and engage the category fallback.
+  // after 12 s, treat it as failed and engage the category fallback.
   // Broker URLs (Encuentra24, Bienesonline) sometimes stall without
   // firing onerror/onload (slow CDN, ad-blocker, 503-without-headers),
   // which left the shimmer skeleton visible forever. Promoting stuck →
   // errored guarantees the surface always lands on a real image.
+  //
+  // Threshold bumped from 8 s to 12 s after the first week of telemetry
+  // showed 8.27 stuck events per session on the home + browse surfaces,
+  // 83% of them on LOCAL /photos/* paths. Combined with the browser's
+  // 6-connections-per-origin cap, that points at queueing on slow LATAM
+  // mobile connections — images that DO load between 8-15 s were
+  // mis-counted as failures. 12 s preserves the genuine-broken-image
+  // signal (those fail in <1 s via onerror) while giving slow-network
+  // users headroom. The image_optimization_v2 flag (#399) ships WebP
+  // at a smaller wire size which will further drop the stuck rate;
+  // this threshold change is the safety margin in case the flag is
+  // off or the user's browser refuses WebP.
   useEffect(() => {
     if (!url) return;
     let cancelled = false;
@@ -371,7 +396,7 @@ function Photo({
         });
       } catch { /* never let telemetry break the render */ }
       setErrored(true);
-    }, 8000);
+    }, 12000);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [url, loaded, errored, listing.id, idx, source]);
 
