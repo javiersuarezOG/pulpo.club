@@ -430,6 +430,46 @@ DASHBOARDS = {
 }
 
 
+def _load_env_file() -> None:
+    """Best-effort `.env` loader. Reads `<repo-root>/.env` if present and
+    sets any KEY=VALUE pairs into os.environ unless already set. Lets
+    `python3 scripts/posthog_setup_perf_dashboards.py` read POSTHOG_*
+    values from the same `.env` Vite + Vercel-dev already use, without
+    adding python-dotenv as a dependency.
+
+    Format: `KEY=value` per line, `#` comments allowed, surrounding
+    single/double quotes stripped. Anything else is ignored silently
+    (existing values in os.environ always win — so `export FOO=bar` on
+    the shell still beats `.env`).
+    """
+    import pathlib
+    repo_root = pathlib.Path(__file__).resolve().parent.parent
+    env_path = repo_root / ".env"
+    if not env_path.is_file():
+        return
+    try:
+        for raw in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip()
+            # Strip matching surrounding quotes (single or double).
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                value = value[1:-1]
+            if key and key not in os.environ:
+                os.environ[key] = value
+    except OSError:
+        # Permissions / encoding hiccups — silently fall through; the
+        # main() function will fail fast on missing env vars with a
+        # clear message that doesn't mention `.env` so the user still
+        # has the option of `export` if their file is unreadable.
+        pass
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Stand up PostHog perf dashboards.")
     p.add_argument("--days", type=int, default=7,
@@ -437,6 +477,11 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true",
                    help="Print the HogQL bodies without hitting the PostHog API.")
     args = p.parse_args()
+
+    # Load .env BEFORE reading env vars so `.env` works seamlessly
+    # alongside the existing `export FOO=bar` shell pattern. Shell
+    # exports always win — see _load_env_file().
+    _load_env_file()
 
     key_raw = os.getenv("POSTHOG_PERSONAL_API_KEY")
     project_raw = os.getenv("POSTHOG_PROJECT_ID")
