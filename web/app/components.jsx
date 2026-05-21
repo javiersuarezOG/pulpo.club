@@ -347,11 +347,23 @@ function Photo({
   }, [url]);
 
   // Stuck-image handling — if the image neither loaded nor errored
-  // after 8 s, treat it as failed and engage the category fallback.
+  // after 12 s, treat it as failed and engage the category fallback.
   // Broker URLs (Encuentra24, Bienesonline) sometimes stall without
   // firing onerror/onload (slow CDN, ad-blocker, 503-without-headers),
   // which left the shimmer skeleton visible forever. Promoting stuck →
   // errored guarantees the surface always lands on a real image.
+  //
+  // Threshold bumped from 8 s to 12 s after the first week of telemetry
+  // showed 8.27 stuck events per session on the home + browse surfaces,
+  // 83% of them on LOCAL /photos/* paths. Combined with the browser's
+  // 6-connections-per-origin cap, that points at queueing on slow LATAM
+  // mobile connections — images that DO load between 8-15 s were
+  // mis-counted as failures. 12 s preserves the genuine-broken-image
+  // signal (those fail in <1 s via onerror) while giving slow-network
+  // users headroom. The image_optimization_v2 flag (#399) ships WebP
+  // at a smaller wire size which will further drop the stuck rate;
+  // this threshold change is the safety margin in case the flag is
+  // off or the user's browser refuses WebP.
   useEffect(() => {
     if (!url) return;
     let cancelled = false;
@@ -371,7 +383,7 @@ function Photo({
         });
       } catch { /* never let telemetry break the render */ }
       setErrored(true);
-    }, 8000);
+    }, 12000);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [url, loaded, errored, listing.id, idx, source]);
 
