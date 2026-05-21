@@ -371,16 +371,8 @@ export function ContactPage({ app }) {
 
       <ul className="page-contact__inbox-list" aria-label={t("contact.page.inbox_list_label", locale)}>
         <li className="page-contact__inbox-row">
-          <p className="page-contact__inbox-label">{t("contact.topic.general", locale)}</p>
-          <p className="page-contact__inbox-address">contact@pulpo.club</p>
-        </li>
-        <li className="page-contact__inbox-row">
-          <p className="page-contact__inbox-label">{t("contact.topic.privacy", locale)}</p>
-          <p className="page-contact__inbox-address">privacy@pulpo.club</p>
-        </li>
-        <li className="page-contact__inbox-row">
-          <p className="page-contact__inbox-label">{t("contact.topic.legal", locale)}</p>
-          <p className="page-contact__inbox-address">legal@pulpo.club</p>
+          <p className="page-contact__inbox-label">{t("contact.page.inbox_single_label", locale)}</p>
+          <p className="page-contact__inbox-address">hello@pulpo.club</p>
         </li>
       </ul>
     </div>
