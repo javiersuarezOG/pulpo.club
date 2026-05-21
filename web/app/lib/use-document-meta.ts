@@ -27,8 +27,8 @@ const SITE_NAME = "Pulpo";
 // while remaining accurate for the legacy homepage during the rollout
 // window. Both versions surface beach + lake properties + a value
 // ranking; the copy works regardless of which UI a SERP click lands on.
-const SITE_DESCRIPTION_EN = "Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every two weeks.";
-const SITE_DESCRIPTION_ES = "Cada casa de playa y lago en El Salvador, ordenada por valor. Explora cientos de propiedades verificadas de playa y lago — y recibe las 10 mejores en tu correo cada dos semanas.";
+const SITE_DESCRIPTION_EN = "Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week.";
+const SITE_DESCRIPTION_ES = "Cada casa de playa y lago en El Salvador, ordenada por valor. Explora cientos de propiedades verificadas de playa y lago — y recibe las 10 mejores en tu correo cada semana.";
 
 // One brand image for sections; listing detail uses the listing's first
 // photo. The brand image lives next to the legacy assets and is also
