@@ -244,6 +244,118 @@ ORDER BY p95_ms DESC
 """.strip()
 
 
+# ── "Performance — At a Glance" queries (the executive-summary board) ──
+# Each query is compact: 1-5 rows, just the headline number per cohort.
+# Designed so the board fits on one screen + tells you "is everything
+# OK?" without drilling into the per-route breakdowns on the other
+# three dashboards.
+
+def q_glance_lcp_p75_by_geo(days: int) -> str:
+    return f"""
+SELECT
+  {geo_case()} AS geo,
+  round(quantile(0.75)(toFloat(properties.value))) AS lcp_p75_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'web_vitals.lcp' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY geo
+ORDER BY lcp_p75_ms DESC
+""".strip()
+
+
+def q_glance_image_health(days: int) -> str:
+    # One row, three columns. Per-100-session normalization handles
+    # traffic growth so the number stays comparable week-over-week.
+    return f"""
+WITH sessions AS (
+  SELECT count(DISTINCT $session_id) AS s
+  FROM events WHERE timestamp >= now() - INTERVAL {days} DAY
+)
+SELECT
+  round(100.0 * countIf(event = 'image.error') / (SELECT s FROM sessions), 3) AS errors_per_100_sessions,
+  round(100.0 * countIf(event = 'image.stuck') / (SELECT s FROM sessions), 3) AS stuck_per_100_sessions,
+  countIf(event = 'image.error') + countIf(event = 'image.stuck') AS total_failures
+FROM events
+WHERE event IN ('image.error','image.stuck')
+  AND timestamp >= now() - INTERVAL {days} DAY
+""".strip()
+
+
+def q_glance_slowest_endpoints(days: int) -> str:
+    return f"""
+SELECT
+  properties.endpoint AS endpoint,
+  properties.vercel_region AS region,
+  round(quantile(0.95)(toFloat(properties.ms))) AS p95_total_ms,
+  round(quantile(0.95)(toFloat(properties.server_ms))) AS p95_server_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'perf.api_call' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY endpoint, region
+ORDER BY p95_total_ms DESC
+LIMIT 5
+""".strip()
+
+
+def q_glance_web_vitals_overall(days: int) -> str:
+    # One row, four columns — the SLO-style "% of sessions hitting good
+    # for each web vital." Combined into a single row so the dashboard
+    # card shows all four at once instead of forcing the user to scan
+    # a longer table.
+    return f"""
+SELECT
+  round(100.0 * countIf(event = 'web_vitals.lcp' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.lcp'), 0), 1) AS lcp_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.inp' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.inp'), 0), 1) AS inp_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.cls' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.cls'), 0), 1) AS cls_good_pct,
+  round(100.0 * countIf(event = 'web_vitals.ttfb' AND properties.rating = 'good') /
+        nullif(countIf(event = 'web_vitals.ttfb'), 0), 1) AS ttfb_good_pct
+FROM events
+WHERE event IN ('web_vitals.lcp','web_vitals.inp','web_vitals.cls','web_vitals.ttfb')
+  AND timestamp >= now() - INTERVAL {days} DAY
+""".strip()
+
+
+def q_glance_external_services(days: int) -> str:
+    # Clerk modal P95 and Stripe redirect P95 collapsed into a single
+    # per-geo row. quantileIf gates the aggregate to the matching event
+    # so we don't mix the two ms fields. Populates once PR-perf-5c #402
+    # lands and a few clicks flow through.
+    return f"""
+SELECT
+  {geo_case()} AS geo,
+  round(quantileIf(0.95)(toFloat(properties.ms_from_click),
+        event = 'perf.clerk_modal_opened')) AS clerk_modal_p95_ms,
+  round(quantileIf(0.95)(toFloat(properties.ms_from_click_to_redirect),
+        event = 'perf.stripe_redirect')) AS stripe_redirect_p95_ms,
+  countIf(event = 'perf.clerk_modal_opened') AS clerk_n,
+  countIf(event = 'perf.stripe_redirect') AS stripe_n
+FROM events
+WHERE event IN ('perf.clerk_modal_opened','perf.stripe_redirect')
+  AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY geo
+ORDER BY geo
+""".strip()
+
+
+def q_glance_data_payload(days: int) -> str:
+    # One row per data file — the "are we shipping too many bytes?"
+    # question in one glance. Median kB and median ms.
+    return f"""
+SELECT
+  properties.file AS file,
+  round(quantile(0.5)(toFloat(properties.bytes)) / 1024) AS median_kb,
+  round(quantile(0.5)(toFloat(properties.ms))) AS median_ms,
+  count() AS sample_size
+FROM events
+WHERE event = 'perf.data_fetch' AND timestamp >= now() - INTERVAL {days} DAY
+GROUP BY file
+ORDER BY median_kb DESC
+""".strip()
+
+
 # ── PostHog API client (cribbed from posthog_create_funnels.py) ─────────
 
 def api_host() -> str:
@@ -422,10 +534,60 @@ INSIGHT_PLAN = [
         "perf.stripe_redirect — Upgrade click → window.location.assign. Empty until PR-perf-5c lands the event.",
         q_stripe_redirect,
     ),
+    # ── Performance — At a Glance ───────────────────────────────────────
+    # The executive-summary board. Each insight returns 1-5 rows with
+    # just the headline number per cohort/endpoint/file. Designed to fit
+    # on one screen and answer "is everything OK?" without having to
+    # open the per-route drill-downs on the other three boards.
+    (
+        "Performance — At a Glance",
+        "Glance: LCP P75 by geo",
+        "The single headline number per geo cohort. Anything above 2500 ms is 'poor' per web.dev/vitals — and the user feels it.",
+        q_glance_lcp_p75_by_geo,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Image health (errors + stuck per 100 sessions)",
+        "Per-100-session rates so the number stays comparable as traffic grows. Anything above 0.5 either column is a regression signal.",
+        q_glance_image_health,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Top 5 slowest API endpoints",
+        "P95 round-trip and P95 server-side ms, by endpoint and region. If total_ms ≈ server_ms the function is the bottleneck; if total >> server the network is.",
+        q_glance_slowest_endpoints,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Web Vitals 'good' rate (all metrics)",
+        "Single-row SLO view: % of sessions hitting 'good' for LCP / INP / CLS / TTFB. The numbers users feel rolled into a one-line health score.",
+        q_glance_web_vitals_overall,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: External services pulse (Clerk + Stripe)",
+        "Clerk modal P95 and Stripe redirect P95 per geo, side by side. Populates once PR-perf-5c #402 lands and a few flows complete.",
+        q_glance_external_services,
+    ),
+    (
+        "Performance — At a Glance",
+        "Glance: Data payload by file",
+        "Median kB and median ms for each data file. Confirms ranked.list.json (PR-perf-3b) is dominating cold-loads vs ranked.json.",
+        q_glance_data_payload,
+    ),
 ]
 
 
 DASHBOARDS = {
+    # Order matters — PostHog renders dashboards in creation order. List
+    # "At a Glance" first so it's the top entry in Sebas's Performance
+    # tag filter (and the obvious starting point).
+    "Performance — At a Glance": (
+        "Executive-summary board: 6 compact insights covering LCP, image "
+        "health, slowest endpoints, web-vitals good rate, external services, "
+        "and data payload sizes. Open this one first; the three drill-down "
+        "boards exist for when an At-a-Glance card flags something."
+    ),
     "Performance — Geo Latency": (
         "Real-user perf metrics sliced by Central America / North America / "
         "Europe / Other. Built by scripts/posthog_setup_perf_dashboards.py — "
