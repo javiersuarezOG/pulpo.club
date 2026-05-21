@@ -3568,9 +3568,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 /* ============== PR-4c — Live header stats ============== */
-/* Three-metric compact chip in TopNav: sources online, listings,
-   updated. Inline on desktop; collapses behind an info-toggle popover
-   on mobile to keep the header height stable. */
+/* Single "Listings" count in TopNav with a pulsing live dot. Previous
+   iterations also surfaced Sources online + Updated; both were dropped
+   because the pulsing dot next to the count carries the "this is live
+   data" signal on its own. */
 .live-stats {
   position: relative;
   display: flex;
@@ -3612,63 +3613,29 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .ls-dot[data-state="ok"]   { background: var(--badge-new); }
 .ls-dot[data-state="warn"] { background: var(--tone-amber); }
 
-/* Mobile-only info toggle. Hidden on desktop; replaces inline rail on mobile. */
-.live-stats-toggle {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-3);
-  cursor: pointer;
-  transition: color 160ms, border-color 160ms;
+/* Live-pulse variant: soft scale + opacity loop so the count reads as
+   real-time without being attention-grabbing. The pulse uses an
+   ::after halo so the dot itself stays a crisp 6px circle. */
+.ls-dot--live {
+  position: relative;
 }
-.live-stats-toggle:hover { color: var(--ink); border-color: var(--line-2); }
-
-.live-stats-popover {
+.ls-dot--live::after {
+  content: "";
   position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 60;
-  min-width: 200px;
-  padding: 12px 14px;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-2);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-2);
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: ls-dot-pulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
-.live-stats-popover .ls-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 0;
+@keyframes ls-dot-pulse {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  70%  { transform: scale(2.6); opacity: 0;   }
+  100% { transform: scale(2.6); opacity: 0;   }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ls-dot--live::after { animation: none; }
 }
 
-@media (max-width: 1023px) {
-  /* On tablet/mobile, collapse to the icon. */
-  .live-stats-inline { display: none; }
-  .live-stats-toggle { display: inline-flex; }
-}
-@media (max-width: 600px) {
-  /* The toggle sits in the middle of .topnav-right, so anchoring the
-     popover with `right: 0` ran it off-screen left at 375px. Pin to the
-     viewport edge with a small inset and cap the width so it always
-     fits — independent of where the toggle button lives in the header. */
-  .live-stats-popover {
-    position: fixed;
-    top: 64px;
-    right: 12px;
-    left: auto;
-    max-width: calc(100vw - 24px);
-    min-width: 200px;
-  }
-}
 @media (max-width: 480px) {
   /* Free up topnav-right gap on tiny screens. */
   .live-stats { margin-right: -4px; }
