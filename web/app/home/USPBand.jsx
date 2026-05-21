@@ -3,7 +3,7 @@
 // works" link.
 //
 // Card titles include an intentional \n line-break per the design
-// spec (e.g. "10 best deals,\nevery 2 weeks"). The CSS preserves the
+// spec (e.g. "10 best deals,\nevery week"). The CSS preserves the
 // break with white-space: pre-line on the title element.
 //
 // Post-Wave-5: the section is clickable for anon + free users, opening
