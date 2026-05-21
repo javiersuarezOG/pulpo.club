@@ -68,17 +68,17 @@ export const TERMS: LegalDocument = {
     es: "Las reglas claras para usar Pulpo — qué hacemos, qué puedes esperar de nosotros, y qué te pedimos a ti.",
   },
   review_complete: true,
-  last_updated: "2026-05-20",
+  last_updated: "2026-05-21",
   sections: [
     {
       id: "intro",
       heading: { en: "In short", es: "En pocas palabras" },
       body: {
         en:
-          "Pulpo helps you find land for sale in El Salvador. We collect listings from public sources, organise them, and let you save, filter, and read enriched summaries. We are not a real-estate agent — we are an information platform.\n\n" +
+          "Pulpo helps you find properties for sale in El Salvador — terrenos, houses, condos and other real estate. We aggregate listings from third-party real-estate portals, normalise them, rank them, and let you save, filter, and read enriched summaries. We are not a real-estate agent, broker, or seller — we are an information platform.\n\n" +
           "Using Pulpo means you accept these Terms. They are written to be readable, not lawyerly. If anything is unclear, write to " + SUPPORT_EMAIL + " and we will explain.",
         es:
-          "Pulpo te ayuda a encontrar terrenos a la venta en El Salvador. Reunimos anuncios de fuentes públicas, los organizamos, y te dejamos guardarlos, filtrarlos y leer resúmenes enriquecidos. No somos una agencia inmobiliaria — somos una plataforma de información.\n\n" +
+          "Pulpo te ayuda a encontrar propiedades a la venta en El Salvador — terrenos, casas, apartamentos y otros inmuebles. Reunimos anuncios de portales inmobiliarios de terceros, los normalizamos, los rankeamos, y te dejamos guardarlos, filtrarlos y leer resúmenes enriquecidos. No somos corredores ni agencia inmobiliaria, ni vendedores — somos una plataforma de información.\n\n" +
           "Usar Pulpo significa que aceptas estos Términos. Están escritos para que se entiendan, no para parecer un contrato pesado. Si algo no queda claro, escríbenos a " + SUPPORT_EMAIL + " y te lo explicamos.",
       },
     },
@@ -87,11 +87,11 @@ export const TERMS: LegalDocument = {
       heading: { en: "Who we are", es: "Quiénes somos" },
       body: {
         en:
-          `Pulpo ("we", "us", "our") is an online land-investment platform based in ${formatAddress()}. ` +
+          `Pulpo ("we", "us", "our") is an online real-estate information platform based in ${formatAddress()}. We aggregate property listings (terrenos, houses, condos, and other real estate) from third-party portals and rank them to help users compare. ` +
           `The platform is operated under ${ENTITY.governing_law}, and our consumer-protection obligations are governed by the Ley de Protección al Consumidor (D.L. 776/2005) and the Ley de Comercio Electrónico (D.L. 947/2020). ` +
           `For any matter — questions, complaints, claims, takedowns, or data-protection requests — you can reach us at ${SUPPORT_EMAIL}.`,
         es:
-          `Pulpo ("nosotros") es una plataforma en línea de inversión en suelo, con sede en ${formatAddress()}. ` +
+          `Pulpo ("nosotros") es una plataforma de información inmobiliaria en línea, con sede en ${formatAddress()}. Reunimos anuncios de propiedades (terrenos, casas, apartamentos y otros inmuebles) publicados en portales de terceros y los rankeamos para que los usuarios puedan compararlos. ` +
           `La plataforma se opera bajo las ${ENTITY.governing_law}, y nuestras obligaciones de protección al consumidor están regidas por la Ley de Protección al Consumidor (D.L. 776/2005) y la Ley de Comercio Electrónico (D.L. 947/2020). ` +
           `Para cualquier asunto — consultas, reclamos, denuncias, eliminación de contenido, o solicitudes sobre protección de datos — puedes contactarnos en ${SUPPORT_EMAIL}.`,
       },
@@ -101,27 +101,61 @@ export const TERMS: LegalDocument = {
       heading: { en: "What Pulpo does", es: "Qué hace Pulpo" },
       body: {
         en:
-          "Pulpo is an information marketplace for land investments in El Salvador. We aggregate listings published on public real-estate portals, normalise them into a consistent format, and use AI to write short summaries and infer features (e.g. \"build-ready\", \"beachfront\", distance to the nearest beach).\n\n" +
+          "Pulpo is an information platform for real estate in El Salvador. We aggregate property listings — terrenos, houses, condos, and other real estate — published on third-party real-estate portals, normalise them into a consistent format, rank them using our own algorithm, and use AI to write short summaries and infer features (e.g. \"build-ready\", \"beachfront\", distance to the nearest beach, walk-to-amenities).\n\n" +
           "What Pulpo IS:\n" +
-          "• A discovery tool to compare listings.\n" +
-          "• A way to save listings and get filtered views.\n" +
+          "• A discovery tool to compare listings across multiple portals in one place.\n" +
+          "• A ranking and filtering service over public listings.\n" +
+          "• A way to save listings and get personalised views.\n" +
           "• A source of plain-language summaries.\n\n" +
           "What Pulpo IS NOT:\n" +
           "• A real-estate broker, agent, or seller.\n" +
           "• A guarantee that a listing is current, accurate, or available.\n" +
           "• A substitute for visiting the property, hiring a notario, or doing a title search at the Centro Nacional de Registros (CNR).\n\n" +
-          "Before you put any money on the table, do your own due diligence — visit the lot, verify the title in the CNR, talk to a notario.",
+          "Before you put any money on the table, do your own due diligence — visit the property, verify the title in the CNR, talk to a notario.",
         es:
-          "Pulpo es un marketplace de información sobre inversión en suelo en El Salvador. Reunimos anuncios publicados en portales inmobiliarios públicos, los normalizamos a un formato consistente, y usamos IA para escribir resúmenes cortos y deducir características (por ejemplo, \"listo para construir\", \"frente de playa\", o distancia a la playa más cercana).\n\n" +
+          "Pulpo es una plataforma de información inmobiliaria para El Salvador. Reunimos anuncios de propiedades — terrenos, casas, apartamentos y otros inmuebles — publicados en portales inmobiliarios de terceros, los normalizamos a un formato consistente, los rankeamos con nuestro propio algoritmo, y usamos IA para escribir resúmenes cortos y deducir características (por ejemplo, \"listo para construir\", \"frente de playa\", distancia a la playa más cercana, o cercanía a comercios).\n\n" +
           "Lo que Pulpo SÍ es:\n" +
-          "• Una herramienta para descubrir y comparar terrenos.\n" +
-          "• Una forma de guardar anuncios y filtrarlos.\n" +
+          "• Una herramienta para descubrir y comparar anuncios de varios portales en un solo lugar.\n" +
+          "• Un servicio de ranking y filtrado sobre anuncios públicos.\n" +
+          "• Una forma de guardar anuncios y tener vistas personalizadas.\n" +
           "• Una fuente de resúmenes en lenguaje claro.\n\n" +
           "Lo que Pulpo NO es:\n" +
           "• Una corredora ni agencia inmobiliaria, ni vendedor.\n" +
           "• Una garantía de que un anuncio esté vigente, sea exacto, o esté disponible.\n" +
-          "• Un sustituto de visitar el terreno, contratar a un notario, o hacer una búsqueda de título en el Centro Nacional de Registros (CNR).\n\n" +
-          "Antes de poner dinero, haz tu propia investigación — visita el terreno, verifica el título en el CNR, y consulta con un notario.",
+          "• Un sustituto de visitar la propiedad, contratar a un notario, o hacer una búsqueda de título en el Centro Nacional de Registros (CNR).\n\n" +
+          "Antes de poner dinero, haz tu propia investigación — visita la propiedad, verifica el título en el CNR, y consulta con un notario.",
+      },
+    },
+    {
+      id: "ranking",
+      heading: { en: "How we rank listings", es: "Cómo rankeamos los anuncios" },
+      body: {
+        en:
+          "Pulpo orders listings using our own ranking algorithm. We do not show every property in the order the original portal listed it — listings are scored and re-ordered to surface what we believe are the strongest options first. We want you to understand what goes into that score, even though the exact formula and the weights we assign are ours.\n\n" +
+          "Factors that typically improve a listing's ranking include:\n" +
+          "• Price competitiveness against comparable nearby properties.\n" +
+          "• Completeness of listing data (good photos, clear title information, dimensions, location pinned on a map).\n" +
+          "• Recency — newer or recently-updated listings rank higher than stale ones.\n" +
+          "• AI-inferred quality signals (e.g. \"build-ready\", paved road access, water and electricity availability, distance to beach, walk-to-amenities).\n" +
+          "• Source reliability — listings from portals where data has historically been more accurate are favoured.\n\n" +
+          "What we DO NOT do:\n" +
+          "• We do not take payment from sellers, brokers, or portals in exchange for higher ranking. Ranking is editorial, not commercial.\n" +
+          "• We do not let advertisers influence ranking.\n" +
+          "• We do not guarantee the ranking. Two reasonable people can rank the same listings differently, and the score is a tool to help you compare — not a verdict.\n\n" +
+          "Ranking is best-effort and may change at any time as we tune the algorithm. If you think a listing is mis-ranked, write to " + SUPPORT_EMAIL + " — we read every report.",
+        es:
+          "Pulpo ordena los anuncios usando nuestro propio algoritmo de ranking. No mostramos cada propiedad en el orden en que la publicó el portal original — los anuncios se puntúan y se reordenan para mostrar primero las que consideramos las mejores opciones. Queremos que entiendas qué entra en esa puntuación, aunque la fórmula exacta y los pesos que asignamos son nuestros.\n\n" +
+          "Factores que normalmente mejoran el ranking de un anuncio:\n" +
+          "• Precio competitivo frente a propiedades comparables cercanas.\n" +
+          "• Información completa del anuncio (buenas fotos, datos claros de título, dimensiones, ubicación en mapa).\n" +
+          "• Actualidad — los anuncios nuevos o actualizados recientemente rankean más arriba que los desactualizados.\n" +
+          "• Señales de calidad deducidas por IA (por ejemplo, \"listo para construir\", acceso por calle pavimentada, disponibilidad de agua y electricidad, distancia a la playa, cercanía a comercios).\n" +
+          "• Fiabilidad de la fuente — favorecemos anuncios de portales cuyos datos históricamente han sido más exactos.\n\n" +
+          "Lo que NO hacemos:\n" +
+          "• No aceptamos pagos de vendedores, corredores ni portales a cambio de un mejor ranking. El ranking es editorial, no comercial.\n" +
+          "• No dejamos que anunciantes influyan en el ranking.\n" +
+          "• No garantizamos el ranking. Dos personas razonables pueden ordenar los mismos anuncios de forma distinta, y la puntuación es una herramienta para comparar — no un veredicto.\n\n" +
+          "El ranking es de mejor esfuerzo y puede cambiar en cualquier momento conforme ajustamos el algoritmo. Si crees que un anuncio está mal rankeado, escríbenos a " + SUPPORT_EMAIL + " — leemos cada reporte.",
       },
     },
     {
@@ -151,14 +185,14 @@ export const TERMS: LegalDocument = {
       heading: { en: "How you can use Pulpo", es: "Cómo puedes usar Pulpo" },
       body: {
         en:
-          "Use Pulpo for personal, non-commercial decisions about land investments. Please don't:\n" +
+          "Use Pulpo for personal, non-commercial real-estate research and decisions. Please don't:\n" +
           "• Scrape, copy, or re-publish listing content elsewhere.\n" +
-          "• Reverse-engineer our ranking model, AI summaries, or other internals.\n" +
+          "• Reverse-engineer our ranking algorithm, AI summaries, or other internals.\n" +
           "• Try to break, overload, or get unauthorised access to any part of the platform.\n" +
           "• Use Pulpo to do anything illegal under Salvadoran law, including any conduct covered by the Ley Especial Contra los Delitos Informáticos y Conexos.\n\n" +
           "If you break these rules, we may suspend or close your account.",
         es:
-          "Usa Pulpo para tus decisiones personales — no comerciales — sobre inversión en suelo. Por favor, no:\n" +
+          "Usa Pulpo para investigación y decisiones inmobiliarias personales — no comerciales. Por favor, no:\n" +
           "• Hagas scraping, copies o republiques los anuncios en otros sitios.\n" +
           "• Intentes hacer ingeniería inversa de nuestro algoritmo de ranking, los resúmenes de IA, u otras partes internas.\n" +
           "• Intentes romper, sobrecargar, o acceder sin permiso a ninguna parte de la plataforma.\n" +
@@ -171,11 +205,11 @@ export const TERMS: LegalDocument = {
       heading: { en: "Intellectual property", es: "Propiedad intelectual" },
       body: {
         en:
-          `Everything that makes Pulpo "Pulpo" — software, design, ranking algorithm, AI-generated summaries, and the database of standardised listings — is owned by or licensed to ${ENTITY.legal_name}. It is protected by Salvadoran copyright law (Ley de Propiedad Intelectual, D.L. 604/1993) and any other applicable intellectual-property protections.\n\n` +
-          "You get a personal, non-transferable, revocable right to use Pulpo. You do not get any right to copy, redistribute, or build derivative products on top of our content.",
+          `Everything that makes Pulpo "Pulpo" — software, design, ranking algorithm and the specific weights it applies, AI-generated summaries, and the database of normalised listings — is owned by or licensed to ${ENTITY.legal_name}. It is protected by Salvadoran copyright law (Ley de Propiedad Intelectual, D.L. 604/1993), trade-secret protections, and any other applicable intellectual-property protections. The ranking formula itself is a trade secret: we explain the factors that go into it (see "How we rank listings" above), but we do not disclose the exact formula or weights, and we reserve the right to change them at any time.\n\n` +
+          "You get a personal, non-transferable, revocable right to use Pulpo. You do not get any right to copy, redistribute, scrape, or build derivative products on top of our content, ranking output, or the AI-enriched listing data.",
         es:
-          `Todo lo que hace que Pulpo sea "Pulpo" — software, diseño, algoritmo de ranking, resúmenes generados por IA, y la base de datos de anuncios estandarizados — pertenece o está licenciado a ${ENTITY.legal_name}. Está protegido por la legislación salvadoreña de derecho de autor (Ley de Propiedad Intelectual, D.L. 604/1993) y cualquier otra protección de propiedad intelectual aplicable.\n\n` +
-          "Te damos un derecho personal, no transferible y revocable de usar Pulpo. No te damos derecho a copiar, redistribuir, ni construir productos derivados sobre nuestro contenido.",
+          `Todo lo que hace que Pulpo sea "Pulpo" — software, diseño, algoritmo de ranking y los pesos específicos que aplica, resúmenes generados por IA, y la base de datos de anuncios normalizados — pertenece o está licenciado a ${ENTITY.legal_name}. Está protegido por la legislación salvadoreña de derecho de autor (Ley de Propiedad Intelectual, D.L. 604/1993), por protecciones de secreto industrial, y por cualquier otra protección de propiedad intelectual aplicable. La fórmula de ranking en sí es un secreto industrial: explicamos qué factores entran en ella (ver "Cómo rankeamos los anuncios" más arriba), pero no revelamos la fórmula exacta ni los pesos, y nos reservamos el derecho a cambiarlos en cualquier momento.\n\n` +
+          "Te damos un derecho personal, no transferible y revocable de usar Pulpo. No te damos derecho a copiar, redistribuir, hacer scraping, ni construir productos derivados sobre nuestro contenido, el resultado del ranking, ni los datos enriquecidos por IA.",
       },
     },
     {
@@ -187,7 +221,7 @@ export const TERMS: LegalDocument = {
           "Always verify a listing directly with the seller, a real-estate broker, or a notario before taking any action.\n\n" +
           "If you are a broker, photographer, or rights-holder and want a listing or photo removed from Pulpo, write to " + SUPPORT_EMAIL + " with the subject \"Takedown\". We will acknowledge your request within 48 hours and act on a valid request within 7 working days.",
         es:
-          "Los anuncios en Pulpo vienen de portales inmobiliarios de terceros. La fuente original se muestra en cada tarjeta de anuncio. No garantizamos que un anuncio esté vigente, sea exacto, esté completo, o siga disponible. Precios, situación de propiedad y detalles del terreno pueden cambiar sin aviso.\n\n" +
+          "Los anuncios en Pulpo vienen de portales inmobiliarios de terceros. La fuente original se muestra en cada tarjeta de anuncio. No garantizamos que un anuncio esté vigente, sea exacto, esté completo, o siga disponible. Precios, situación de propiedad y detalles de la propiedad pueden cambiar sin aviso.\n\n" +
           "Verifica siempre un anuncio directamente con el vendedor, un corredor inmobiliario, o un notario antes de tomar cualquier acción.\n\n" +
           "Si eres corredor, fotógrafo o titular de derechos y quieres que se elimine un anuncio o foto de Pulpo, escríbenos a " + SUPPORT_EMAIL + " con el asunto \"Eliminación\". Acusaremos recibo dentro de 48 horas y atenderemos una solicitud válida en un máximo de 7 días hábiles.",
       },
