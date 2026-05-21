@@ -39,6 +39,7 @@
 const { Resend } = require("resend");
 const { makeRateLimiter, send429, ipFromRequest } = require("./_rate_limit");
 const posthog = require("./_posthog");
+const withTiming = require("./_perf");
 
 const FOUNDER_FAN_OUT = [
   "sebastian.honores@gmail.com",
@@ -150,7 +151,10 @@ function buildEmail({ name, email, topic, subject, message }) {
   return { subject: subj, html, text };
 }
 
-module.exports = async (req, res) => {
+// PR-perf-5a — withTiming wraps every response with Server-Timing +
+// X-Vercel-Region so the Geo Latency dashboard can split server vs
+// network ms by region.
+module.exports = withTiming(async (req, res) => {
   const t0 = Date.now();
 
   if (req.method !== "POST") {
@@ -263,4 +267,4 @@ module.exports = async (req, res) => {
   await posthog.flush();
 
   return res.status(200).json({ ok: true });
-};
+});

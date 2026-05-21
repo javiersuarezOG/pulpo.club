@@ -768,6 +768,23 @@ export type EventMap = {
     bytes: number | null;
     cache: "hit" | "miss" | "unknown";
   };
+  /** PR-perf-5a — wall-clock time for a /api/* round-trip, split by
+   *  endpoint + region + status. `server_ms` is read from the
+   *  Server-Timing header (set by api/_perf.js#withTiming); the
+   *  difference between `ms` and `server_ms` is network + queue +
+   *  TLS — the latency budget the region pin / preconnects target.
+   *  `vercel_region` is the function's runtime region (iad1, gru1,
+   *  lhr1 once Pro). PostHog auto-tags the user's country, so the
+   *  Geo Latency dashboard can do a server-side-vs-network split
+   *  per (user country, function region) pair — the key question
+   *  for the "should we go multi-region" decision. */
+  "perf.api_call": {
+    endpoint: string;
+    status: number;
+    ms: number;
+    server_ms: number | null;
+    vercel_region: string | null;
+  };
   /** Wall-clock time for filter recompute on Browse. High values =
    *  the filter pipeline got expensive (Sets/Arrays growing, debounce
    *  not landing). */

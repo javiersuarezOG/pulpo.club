@@ -68,3 +68,63 @@ export async function timedFetch(
   stop("perf.data_fetch", { file, bytes, cache });
   return res;
 }
+
+/** PR-perf-5a — instrumented wrapper for /api/* calls.
+ *
+ *  Reads `Server-Timing: total;dur=<ms>, geo;desc=<region>` from the
+ *  response (api/_perf.js#withTiming sets it on every wrapped handler)
+ *  and X-Vercel-Region as a backup. Emits perf.api_call with the
+ *  endpoint + status + total round-trip ms + server-side ms + region.
+ *  Subtracting server_ms from ms gives the network+queue cost — the
+ *  budget that the region pin (when we go Pro) closes.
+ *
+ *  Same contract as fetch(): returns Response. Caller's body-read
+ *  flow stays identical (the wrapper doesn't peek the body to avoid
+ *  doubling the bandwidth budget for /api/*).
+ */
+export async function timedApiFetch(
+  endpoint: string,
+  url: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const t0 = _now();
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } catch (err) {
+    const ms = Math.round(_now() - t0);
+    track("perf.api_call", {
+      endpoint, status: 0, ms,
+      server_ms: null, vercel_region: null,
+    });
+    throw err;
+  }
+  const ms = Math.round(_now() - t0);
+  const serverTiming = res.headers.get("server-timing") || "";
+  const region =
+    res.headers.get("x-vercel-region") ||
+    extractRegion(serverTiming) ||
+    null;
+  const server_ms = extractServerMs(serverTiming);
+  track("perf.api_call", {
+    endpoint,
+    status: res.status,
+    ms,
+    server_ms,
+    vercel_region: region,
+  });
+  return res;
+}
+
+function extractServerMs(serverTiming: string): number | null {
+  // Format: "total;dur=42, geo;desc=iad1[, ...]" — pick out total's dur.
+  const m = serverTiming.match(/total;dur=([0-9.]+)/i);
+  if (!m) return null;
+  const n = Number.parseFloat(m[1]);
+  return Number.isFinite(n) ? Math.round(n) : null;
+}
+
+function extractRegion(serverTiming: string): string | null {
+  const m = serverTiming.match(/geo;desc=([a-z0-9_-]+)/i);
+  return m ? m[1] : null;
+}
