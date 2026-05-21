@@ -4,6 +4,8 @@ import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VA
 import { track } from "./telemetry/hook";
 import { uspsVisibleFor } from "./lib/gating.ts";
 import { categoryImageForListing } from "./assets/categories";
+import { readFeatureFlag } from "./lib/feature-flag";
+import { buildSrcSet } from "./lib/img-url";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -286,6 +288,34 @@ function Photo({
   const url = thumbnail
     ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
     : listing.photos[idx];
+
+  // PR-perf-4 — image optimization v2 (feature-flag-gated). When the
+  // `image_optimization_v2` PostHog flag is on AND the photo lives at
+  // /photos/* or /photos-hires/* on our CDN (broker URLs from
+  // photo_urls[] are excluded — those are served by the broker's own
+  // CDN and we don't proxy them), generate a srcset that points at
+  // /api/img with WebP + multi-size variants. Browser content-
+  // negotiates: gets WebP at the right pixel density per viewport.
+  // Falls back to the raw `url` via the <img src={url}> child when
+  // the srcset can't be built (broker URL, flag off, or unsupported
+  // browser — <picture> degrades gracefully to <img>).
+  //
+  // The default `sizes` value covers both card surfaces (~400-800px
+  // wide) and the listing-detail gallery-main (~800-1600px). For more
+  // precision, future call sites can pass an explicit `sizes` prop.
+  const optimizationOn = readFeatureFlag("image_optimization_v2", false);
+  const optimized = useMemo(() => {
+    if (!optimizationOn || !url) return null;
+    const webp = buildSrcSet(url);
+    if (!webp) return null;
+    // Both <source> tags use the same /api/img endpoint — content
+    // negotiation on the server (Accept: image/webp) picks the
+    // format. We still declare type="image/webp" on the first source
+    // so a browser that doesn't accept WebP falls through to the
+    // <img> child cleanly.
+    return { webpSrcSet: webp };
+  }, [url, optimizationOn]);
+  const optimizedSizes = "(min-width: 768px) 800px, 100vw";
   // Stamp start-of-perceived-load on every URL change. useMemo runs
   // during render, before the browser commits the <img src>, so the
   // elapsed value covers React commit + network fetch + decode —
@@ -409,19 +439,17 @@ function Photo({
       </div>
     );
   }
-  return (
-    <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
-      {!loaded && <div className="photo-skeleton" />}
-      <img
-        ref={imgRef}
-        src={url}
-        alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
-        loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
-        decoding="async"
-        // fetchpriority is a recent (2023+) hint; browsers without
-        // support fall through to the default queue order.
-        fetchpriority={eager ? "high" : "auto"}
-        onLoad={() => {
+  const imgElement = (
+    <img
+      ref={imgRef}
+      src={url}
+      alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
+      loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
+      decoding="async"
+      // fetchpriority is a recent (2023+) hint; browsers without
+      // support fall through to the default queue order.
+      fetchpriority={eager ? "high" : "auto"}
+      onLoad={() => {
           setLoaded(true);
           if (onLoad) onLoad();
           if (typeof performance === "undefined") return;
@@ -467,6 +495,25 @@ function Photo({
         }}
         style={{ opacity: loaded ? 1 : 0 }}
       />
+  );
+  return (
+    <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
+      {!loaded && <div className="photo-skeleton" />}
+      {optimized ? (
+        <picture>
+          {/* WebP variants. Modern browsers pick the smallest candidate
+              that satisfies the sizes hint; <img src> below is the
+              fallback for browsers that ignore <source> entirely. */}
+          <source
+            type="image/webp"
+            srcSet={optimized.webpSrcSet}
+            sizes={optimizedSizes}
+          />
+          {imgElement}
+        </picture>
+      ) : (
+        imgElement
+      )}
     </div>
   );
 }

@@ -8,6 +8,9 @@
   "functions": {
     "api/social/image.js": {
       "excludeFiles": "web/photos/**,web/photos-hires/**"
+    },
+    "api/img.js": {
+      "excludeFiles": "web/photos/**,web/photos-hires/**"
     }
   },
   "rewrites": [
@@ -16,6 +19,7 @@
     { "source": "/legacy/",                 "destination": "/web/legacy.html" },
     { "source": "/dashboard",               "destination": "/web/dashboard.html" },
     { "source": "/data/ranked.json",        "destination": "/web/data/ranked.json" },
+    { "source": "/data/ranked.list.json",   "destination": "/web/data/ranked.list.json" },
     { "source": "/data/last_updated.json",  "destination": "/web/data/last_updated.json" },
     { "source": "/data/run_history.json",   "destination": "/web/data/run_history.json" },
     { "source": "/data/featured.json",      "destination": "/web/data/featured.json" },
@@ -61,6 +65,10 @@
     {
       "source": "/data/ranked.json",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=600" }]
+    },
+    {
+      "source": "/data/ranked.list.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, s-maxage=3600" }]
     },
     {
       "source": "/data/last_updated.json",
