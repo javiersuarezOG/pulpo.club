@@ -763,7 +763,7 @@ export type EventMap = {
   /** Wall-clock time to fetch + parse a JSON data file. Network-bound;
    *  high values flag CDN cache misses or large payloads. */
   "perf.data_fetch": {
-    file: "ranked.json" | "last_updated.json" | "featured.json";
+    file: "ranked.json" | "ranked.list.json" | "last_updated.json" | "featured.json";
     ms: number;
     bytes: number | null;
     cache: "hit" | "miss" | "unknown";

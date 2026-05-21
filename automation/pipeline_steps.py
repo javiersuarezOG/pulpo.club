@@ -140,6 +140,18 @@ def phase_write_outputs(
 
     _write_csv(ranked, samples_path)
     _write_ranked_json(ranked_dicts, web_data_dir / "ranked.json")
+    # PR-perf-3b — emit a slim projection of ranked.json with ONLY the
+    # fields the web/app/data/listings.ts adapter consumes. Drops broker
+    # contact, validation metadata, hires sidecar fields, raw scraper
+    # text, geocoding metadata, and the granular `is_*` booleans that
+    # are redundant with the backend-derived enums. Browse + Discover
+    # + Saved fetch this file instead of the full 6.7 MB ranked.json,
+    # cutting first-paint payload ~40-60%. The detail view still needs
+    # the full record (description, USPs); the next PR adds a lazy
+    # detail-fetch path. Until then, the client's adapter handles the
+    # slim shape — heavy fields it reads (description, reasons_to_buy)
+    # stay in the slim file.
+    _write_ranked_list_json(ranked_dicts, web_data_dir / "ranked.list.json")
 
     source_status = _compute_source_status(sources, per_source_count, source_errors)
     meta = _build_meta(
@@ -176,6 +188,65 @@ def _write_ranked_json(ranked_dicts: list, path: Path) -> None:
     directly so the public version was dropped (saved ~1.1 MB per commit).
     """
     atomic_write_json(path, ranked_dicts, indent=2, default=str)
+
+
+# PR-perf-3b — slim projection of ranked.json. Listed fields are the
+# strict union of what `web/app/data/listings.ts#adaptListing` reads
+# from each raw record. Adding a new field-read in the adapter MUST
+# also add the field name here, otherwise the live app will silently
+# treat that field as missing for slim-file loads.
+_RANKED_LIST_FIELDS: frozenset[str] = frozenset({
+    # Identity
+    "source", "source_id", "url",
+    # Title + description + USPs (kept — adapter & detail page read these)
+    "title", "title_canonical",
+    "description", "short_description_canonical",
+    "reasons_to_buy", "url_language",
+    # Location
+    "zone", "department", "country",
+    # Land type / property
+    "land_type", "property_type", "bedrooms",
+    # Price + size
+    "area_m2", "price_usd", "previous_price", "price_per_m2",
+    # Photos
+    "photo_urls", "hero_photo_path", "photos_count",
+    "hero_photo_quality_score", "has_text_overlay",
+    "hero_eligible", "card_eligible",
+    # Timing
+    "first_seen_at", "days_listed", "is_repriced",
+    # Source classification
+    "source_type",
+    # Features
+    "beachfront_tier", "is_beachfront",
+    "has_ocean_view", "has_mountain_view", "has_water_body", "is_flat",
+    "has_water", "has_power", "has_sewage",
+    "has_paved_access", "road_access_type",
+    "readiness_score", "zoning_use",
+    # Distance + geo (lat/lng → only the truthy-test reaches the FE)
+    "dist_beach_km", "dist_airport_km", "dist_nearest_town_km",
+    "lat", "lng", "geocoding_confidence",
+    # State
+    "is_sold",
+    # Ranking
+    "rank", "rank_score",
+    "value_score", "location_score", "momentum_score",
+    # IA-axis derivatives
+    "master_category", "subcategory",
+    "discovery_tags", "star_rating", "is_incomplete",
+})
+
+
+def _write_ranked_list_json(ranked_dicts: list, path: Path) -> None:
+    """Emit a slim projection of ranked.json for the list-view fetch
+    path. Whitelist-based, see _RANKED_LIST_FIELDS for the rule.
+    The full ranked.json stays in place for the detail-view fetch.
+    """
+    slim: list[dict] = []
+    for record in ranked_dicts:
+        if not isinstance(record, dict):
+            continue
+        slim.append({k: v for k, v in record.items() if k in _RANKED_LIST_FIELDS})
+    atomic_write_json(path, slim, indent=2, default=str)
 
 
 def _compute_source_status(sources: list[str], per_source_count: dict[str, int], source_errors: dict[str, str]) -> dict[str, str]:
