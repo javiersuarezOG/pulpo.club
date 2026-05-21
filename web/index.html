@@ -19,9 +19,26 @@
          (PR-186 recoloured to deep green but users still saw the old
          icon for this reason; the spiral-mark refresh bumped to v=3). -->
     <link rel="icon" href="/assets/logo_mark_only.svg?v=3" type="image/svg+xml" />
+    <!-- Third-party hints (PR-perf-1). preconnect pre-warms TLS for hosts
+         on the critical path (Google Fonts + Stripe Checkout redirect).
+         dns-prefetch is the cheaper fallback for hosts hit later in the
+         session (Clerk on signup click). PostHog stays dns-prefetch-only
+         to respect the pre-consent hard gate — no network beyond DNS
+         until the user grants analytics consent. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://checkout.stripe.com" crossorigin />
+    <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+    <link rel="dns-prefetch" href="https://clerk.com" />
+    <link rel="dns-prefetch" href="https://clerk.accounts.dev" />
+    <link rel="dns-prefetch" href="https://api.stripe.com" />
+    <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
+    <link rel="dns-prefetch" href="https://eu-assets.i.posthog.com" />
+    <!-- Font diet (PR-perf-1). Trimmed from 7 families to 3 — only Inter,
+         Instrument Serif, and JetBrains Mono are referenced anywhere in
+         web/app/ (grep-verified). The dropped families were carry-over:
+         Space Grotesk, Newsreader, Manrope, IBM Plex Sans. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>
