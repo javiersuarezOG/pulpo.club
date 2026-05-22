@@ -280,49 +280,10 @@ const SHELVES = [
 // from .pill-icon (CSS), which ties them to --accent — so changing the
 // accent recolors every category icon site-wide automatically.
 //
-// PR — Filter rail restructure. The flat PILLS array is replaced by three
-// labeled groups (WHERE / RANKING / FILTERS) so chips compose instead of
-// swap. Each group's chips read their "active" state from URL params, not
-// from a single `category` slug. PILL_GROUPS is the source of truth; PILLS
-// is kept flat below for the few legacy lookups in pages.jsx (category
-// title labels, etc.) but no longer drives the rail render.
-const PILL_GROUPS = {
-  where: {
-    headerKey: "pill.group.where",
-    mode: "single",          // exactly one active; "all" = none-of-the-others
-    pills: [
-      { key: "all",   label: { en: "All",   es: "Todos" },         icon: "cat_all",        param: "master", value: null },
-      { key: "beach", label: { en: "Beach", es: "Playa" },         icon: "cat_beachfront", param: "master", value: "beach" },
-      { key: "lake",  label: { en: "Lake",  es: "Lago" },          icon: "cat_lake",       param: "master", value: "lake" },
-    ],
-  },
-  ranking: {
-    headerKey: "pill.group.ranking",
-    mode: "single",          // mutex among Top 10 / Drops / New (none active = default order)
-    pills: [
-      { key: "top_10",      label: { en: "Top 10",      es: "Top 10" },         icon: "cat_top10",      param: "rmax",   value: "10" },
-      { key: "price_drops", label: { en: "Price Drops", es: "Bajó de precio" }, icon: "cat_price_drop", param: "status", value: "price_drop" },
-      { key: "new",         label: { en: "New",         es: "Nuevos" },         icon: "cat_new",        param: "status", value: "new" },
-    ],
-  },
-  filters: {
-    headerKey: "pill.group.filters",
-    mode: "mixed",           // Waterfront = independent toggle; price chips = mutex pair
-    pills: [
-      { key: "waterfront", label: { en: "Waterfront",  es: "Frente al agua" }, icon: "cat_waterfront", param: "tag",  value: "waterfront", behavior: "toggle" },
-      { key: "under_100k", label: { en: "Under $100K", es: "Menos de $100K" }, icon: "cat_under_100k", param: "pmax", value: "100000",     behavior: "price_mutex" },
-      { key: "under_250k", label: { en: "Under $250K", es: "Menos de $250K" }, icon: "cat_under_100k", param: "pmax", value: "250000",     behavior: "price_mutex" },
-    ],
-  },
-};
+// Phase 4 (May 2026) deleted the PillRail. PILL_GROUPS + PILLS were
+// the rail's source-of-truth and the label-lookup table; both are
+// gone. The chips they defined now live in the FilterPanel's Primary
+// tier (Where / Type / Ranking) inside pages.jsx. SHELVES below is
+// the only remaining home-shelf metadata exported from this module.
 
-// Flat list kept for `PILLS.find(p => p.key === category)` lookups in
-// pages.jsx (e.g., results-cat-title resolution). New code should read
-// PILL_GROUPS instead.
-const PILLS = [
-  ...PILL_GROUPS.where.pills,
-  ...PILL_GROUPS.ranking.pills,
-  ...PILL_GROUPS.filters.pills,
-];
-
-export { LISTINGS, SHELVES, PILLS, PILL_GROUPS, ZONES, COUNTRY_NAMES };
+export { LISTINGS, SHELVES, ZONES, COUNTRY_NAMES };

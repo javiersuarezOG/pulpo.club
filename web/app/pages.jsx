@@ -11,7 +11,7 @@ import { clerkEnabled } from "./auth/clerk-shell.jsx";
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
-import { SHELVES, PILLS, PILL_GROUPS, ZONES } from "./data.jsx";
+import { SHELVES, ZONES } from "./data.jsx";
 import { getCategoryImage } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
@@ -70,130 +70,15 @@ const SHOW_AGENCY_PLAN = false;
 // pages.jsx surface stable during the rewrite phase and are no longer
 // needed.
 
-// ====== Pill rail ======
-// Three labeled groups (WHERE / RANKING / FILTERS), each chip toggles a
-// specific URL param so chips compose instead of swap:
-//   WHERE   — master = beach | lake | (null = All)         single-select
-//   RANKING — rmax=10  OR  status=price_drop  OR  status=new   single-select
-//   FILTERS — tag=waterfront (toggle) + pmax=100000|250000 (mutex pair)
-//
-// Pill chips are visually driven by the React filter state — that's the
-// same source of truth FilterPanel writes to and applyFilters reads from.
-// Routing the chip through URL params and back through the category
-// effect (the original design) didn't work because back-to-back clicks
-// kept `routeParams.category` at null both times, so the effect that
-// re-seeded filters from URL only fired on the first click.
-function isPillActive(pill, filters) {
-  if (pill.param === "master") {
-    return (filters.master_category ?? null) === pill.value;
-  }
-  if (pill.param === "rmax") {
-    return filters.rank_max != null && String(filters.rank_max) === pill.value;
-  }
-  if (pill.param === "status") {
-    return filters.status.has(pill.value);
-  }
-  if (pill.param === "tag") {
-    return filters.discovery_tags.has(pill.value);
-  }
-  if (pill.param === "pmax") {
-    return filters.price_max != null && String(filters.price_max) === pill.value;
-  }
-  return false;
-}
-
-// Compute the next FilterShape after clicking `pill` within `group`. Each
-// tier has a distinct interaction model; this function is the one place
-// that knows them. Sets are cloned so React detects the state change.
-function nextFiltersForPill(group, pill, filters) {
-  const next = { ...filters };
-  const wasActive = isPillActive(pill, filters);
-
-  if (group === "where") {
-    // master is single-select; clicking the active value (or "All") clears it.
-    next.master_category = (pill.value == null || wasActive) ? null : pill.value;
-    return next;
-  }
-
-  if (group === "ranking") {
-    // RANKING is mutex across rmax + two status values. Clear all three first,
-    // then set the clicked one (unless it was already active → clear-only).
-    next.rank_max = null;
-    const status = new Set(filters.status);
-    status.delete("price_drop");
-    status.delete("new");
-    if (!wasActive) {
-      if (pill.param === "rmax") next.rank_max = parseInt(pill.value, 10);
-      else if (pill.param === "status") status.add(pill.value);
-    }
-    next.status = status;
-    return next;
-  }
-
-  if (pill.behavior === "toggle") {
-    // tag set: add/remove pill.value
-    const tags = new Set(filters.discovery_tags);
-    if (wasActive) tags.delete(pill.value);
-    else tags.add(pill.value);
-    next.discovery_tags = tags;
-    return next;
-  }
-  if (pill.behavior === "price_mutex") {
-    // pmax is single-value; clicking the active price clears it. Sibling
-    // chip (the other Under $… price) overrides automatically because
-    // both write to the same field.
-    next.price_max = wasActive ? null : parseInt(pill.value, 10);
-    return next;
-  }
-  return next;
-}
-
-function PillRail({ app, filters, setFilters }) {
-  const lc = app.locale;
-
-  const handleClick = (groupKey, pill) => {
-    const nextFilters = nextFiltersForPill(groupKey, pill, filters);
-    // Push a fresh history entry so the back button undoes the chip
-    // click. The URL value here is a placeholder — BrowsePage's
-    // writeFilterToURL effect replaceState's it with the canonical
-    // encoding on the next tick.
-    if (typeof window !== "undefined") {
-      window.history.pushState({}, "", window.location.pathname + window.location.search);
-    }
-    setFilters(nextFilters);
-  };
-
-  return (
-    <div className="pill-rail-wrap" role="region" aria-label={t("pill.rail.aria", lc)}>
-      {Object.entries(PILL_GROUPS).map(([groupKey, group]) => (
-        <div key={groupKey} className={`pill-tier pill-tier-${groupKey}`}>
-          <span className="pill-tier-label">{t(group.headerKey, lc)}</span>
-          <div className="pill-rail">
-            {group.pills.map(p => {
-              const active = isPillActive(p, filters);
-              return (
-                <button
-                  key={p.key}
-                  className={`pill-chip ${active ? "is-active" : ""}`}
-                  onClick={() => handleClick(groupKey, p)}
-                  aria-pressed={active}
-                >
-                  <span className="pill-icon" aria-hidden="true">
-                    <Icon name={p.icon} size={15} strokeWidth={1.6}/>
-                  </span>
-                  {tr(p.label, lc)}
-                </button>
-              );
-            })}
-          </div>
-          <div className="pill-rail-fade" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ====== Browse — filter sidebar ======
+//
+// Phase 4 (May 2026) deleted the PillRail entirely. The chips that
+// used to live above the result grid are now absorbed by the
+// FilterPanel's Primary tier (Where / Type / Ranking) — one filter
+// surface, no duplicate state. The PillRail's three groups
+// (WHERE, RANKING, FILTERS) mapped directly to the new Primary
+// tier + the existing Refine "Discovery tags" group. See
+// `filter-primary` styling in styles/index.css.
 function FilterPanel({ filters, setFilters, count, onClose, app }) {
   // Helper to count active filters from a CANDIDATE filter shape — used
   // by the telemetry below to compute active_count POST-toggle without
@@ -292,36 +177,129 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       )}
 
-      {/* ── Rewrite Phase 5B — new IA axes (master/sub/tags) ────── */}
-      <FilterGroup title={t("filter.master_category", lc)}>
-        <div className="chip-grid">
-          {["beach", "lake"].map((m) => (
+      {/* ──────────────────────────────────────────────────────────
+         Phase 4 — Primary tier. Always visible. The three axes a
+         buyer thinks in (Where / Type / Ranking). PillRail was deleted
+         alongside this rebuild — these chips are now the single source
+         of truth for those decisions. */}
+      <div className="filter-primary">
+        <FilterGroup title={t("filter.primary.where", lc)}>
+          <div className="chip-grid">
+            {["beach", "lake"].map((m) => (
+              <button
+                key={m}
+                className={`chip ${filters.master_category === m ? "is-active" : ""}`}
+                onClick={() => toggleSingle("master_category", m)}
+              >
+                <Icon name={m === "beach" ? "cat_beachfront" : "cat_lake"} size={14} strokeWidth={1.6} />
+                {t(`filter.master.${m}`, lc)}
+              </button>
+            ))}
+          </div>
+        </FilterGroup>
+
+        <FilterGroup title={t("filter.primary.type", lc)}>
+          <div className="chip-grid">
+            {["homes", "condos", "land"].map((s) => (
+              <button
+                key={s}
+                className={`chip ${filters.subcategory === s ? "is-active" : ""}`}
+                onClick={() => toggleSingle("subcategory", s)}
+              >
+                <Icon
+                  name={s === "homes" ? "type_home" : s === "condos" ? "type_condo" : "type_terreno"}
+                  size={14} strokeWidth={1.6}
+                />
+                {t(`filter.sub.${s}`, lc)}
+              </button>
+            ))}
+          </div>
+        </FilterGroup>
+
+        <FilterGroup title={t("filter.primary.ranking", lc)}>
+          <div className="chip-grid">
             <button
-              key={m}
-              className={`chip ${filters.master_category === m ? "is-active" : ""}`}
-              onClick={() => toggleSingle("master_category", m)}
+              className={`chip ${filters.rank_max === 10 ? "is-active" : ""}`}
+              onClick={() => update({ rank_max: filters.rank_max === 10 ? null : 10 })}
             >
-              {t(`filter.master.${m}`, lc)}
+              <Icon name="cat_top10" size={14} strokeWidth={1.6} />
+              {t("filter.ranking.top10", lc)}
             </button>
+            <button
+              className={`chip ${filters.status.has("price_drop") ? "is-active" : ""}`}
+              onClick={() => toggleSet("status", "price_drop")}
+            >
+              <Icon name="cat_price_drop" size={14} strokeWidth={1.6} />
+              {t("filter.ranking.price_drops", lc)}
+            </button>
+            <button
+              className={`chip ${filters.status.has("new") ? "is-active" : ""}`}
+              onClick={() => toggleSet("status", "new")}
+            >
+              <Icon name="cat_new" size={14} strokeWidth={1.6} />
+              {t("filter.ranking.new", lc)}
+            </button>
+          </div>
+        </FilterGroup>
+      </div>
+
+      {/* ──────────────────────────────────────────────────────────
+         Refine tier. Collapsed accordions — open the ones you care
+         about. Order matches the mockup: Use → Price → Size → Zones
+         → Features → Infrastructure → Discovery → Photos → Advanced. */}
+      <FilterGroup title={t("filter.use", lc)} collapsible defaultOpen={filters.land_types.size > 0}>
+        <div className="chip-grid">
+          {["residential","commercial","tourist"].map(typeKey => (
+            <button key={typeKey}
+              className={`chip ${filters.land_types.has(typeKey) ? "is-active" : ""}`}
+              onClick={() => toggleSet("land_types", typeKey)}>{landTypeLabel(typeKey)}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.subcategory", lc)}>
+      <FilterGroup title={t("filter.price", lc)} collapsible defaultOpen={filters.price_max != null || filters.price_min > 0}>
+        <PriceHistogram filters={filters} setFilters={update} />
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.size", lc)} collapsible defaultOpen={filters.size_min > 0}>
+        <div className="range-row">
+          <label>{t("filter.size_min", lc, { n: (filters.size_min/10000).toFixed(1) })}</label>
+          <input type="range" min="0" max="200000" step="500"
+            value={filters.size_min} onChange={(e) => update({ size_min: +e.target.value })}/>
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.zone", lc)} collapsible defaultOpen={filters.zones.size > 0}>
         <div className="chip-grid">
-          {["homes", "condos", "land"].map((s) => (
-            <button
-              key={s}
-              className={`chip ${filters.subcategory === s ? "is-active" : ""}`}
-              onClick={() => toggleSingle("subcategory", s)}
-            >
-              {t(`filter.sub.${s}`, lc)}
-            </button>
+          {zoneList.map(z => (
+            <button key={z}
+              className={`chip ${filters.zones.has(z) ? "is-active" : ""}`}
+              onClick={() => toggleSet("zones", z)}>{z}</button>
           ))}
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.discovery_tags", lc)}>
+      <FilterGroup title={t("filter.features", lc)} collapsible defaultOpen={filters.features.size > 0}>
+        <div className="chip-grid">
+          {["beachfront","ocean_view","mountain_view","flat","water_body"].map(k => (
+            <button key={k}
+              className={`chip ${filters.features.has(k) ? "is-active" : ""}`}
+              onClick={() => toggleSet("features", k)}>{t(`filter.feature.${k}`, lc)}</button>
+          ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.infrastructure", lc)} collapsible defaultOpen={filters.infra.size > 0}>
+        <div className="chip-grid">
+          {["water","power","paved","sewage"].map(k => (
+            <button key={k}
+              className={`chip ${filters.infra.has(k) ? "is-active" : ""}`}
+              onClick={() => toggleSet("infra", k)}>{t(`filter.infra.${k}`, lc)}</button>
+          ))}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title={t("filter.discovery_tags", lc)} collapsible defaultOpen={filters.discovery_tags?.size > 0 || filters.include_incomplete}>
         <div className="chip-grid">
           {["top_rated", "under_250k", "gated", "waterfront"].map((tag) => (
             <button
@@ -344,69 +322,8 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.zone", lc)}>
-        <div className="chip-grid">
-          {zoneList.map(z => (
-            <button key={z}
-              className={`chip ${filters.zones.has(z) ? "is-active" : ""}`}
-              onClick={() => toggleSet("zones", z)}>{z}</button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.price", lc)}>
-        <PriceHistogram filters={filters} setFilters={update} />
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.land_type", lc)}>
-        <div className="chip-grid">
-          {["residential","commercial","tourist"].map(typeKey => (
-            <button key={typeKey}
-              className={`chip ${filters.land_types.has(typeKey) ? "is-active" : ""}`}
-              onClick={() => toggleSet("land_types", typeKey)}>{landTypeLabel(typeKey)}</button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.size", lc)}>
-        <div className="range-row">
-          <label>{t("filter.size_min", lc, { n: (filters.size_min/10000).toFixed(1) })}</label>
-          <input type="range" min="0" max="200000" step="500"
-            value={filters.size_min} onChange={(e) => update({ size_min: +e.target.value })}/>
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.features", lc)}>
-        <div className="chip-grid">
-          {["beachfront","ocean_view","mountain_view","flat","water_body"].map(k => (
-            <button key={k}
-              className={`chip ${filters.features.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("features", k)}>{t(`filter.feature.${k}`, lc)}</button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.infrastructure", lc)}>
-        <div className="chip-grid">
-          {["water","power","paved","sewage"].map(k => (
-            <button key={k}
-              className={`chip ${filters.infra.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("infra", k)}>{t(`filter.infra.${k}`, lc)}</button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      {/* Status section + Readiness slider removed in Phase 1 of the
-          filter rewrite. "New" / "Price drop" are now reached via the
-          PillRail's Ranking group (and per-card NEW/Price-drop badges);
-          Off-market + Motivated were ambiguous signals that the user
-          decided to retire entirely. Readiness was a confusing 0-100
-          slider with no clear mental model. The underlying `status` Set
-          + `readiness` number stay in filter state because the PillRail
-          + buildFiltersForCategory routing still write to them. */}
-
       {/* PR-4b — photos chip (legacy parity). */}
-      <FilterGroup title={t("filter.photos", lc)}>
+      <FilterGroup title={t("filter.photos", lc)} collapsible defaultOpen={filters.photos !== "all"}>
         <div className="chip-grid">
           {["all","with","none"].map(k => (
             <button key={k}
@@ -573,11 +490,28 @@ function MethodologyModal({ open, onClose }) {
   );
 }
 
-function FilterGroup({ title, children }) {
+function FilterGroup({ title, children, collapsible = false, defaultOpen = true }) {
+  const [open, setOpen] = pUseState(defaultOpen);
+  if (!collapsible) {
+    return (
+      <div className="filter-group">
+        <div className="filter-group-title">{title}</div>
+        {children}
+      </div>
+    );
+  }
   return (
-    <div className="filter-group">
-      <div className="filter-group-title">{title}</div>
-      {children}
+    <div className={`filter-group filter-group-collapsible ${open ? "is-open" : "is-collapsed"}`}>
+      <button
+        type="button"
+        className="filter-group-title filter-group-toggle"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        <span>{title}</span>
+        <Icon name={open ? "chevron_up" : "chevron_down"} size={14} strokeWidth={2} />
+      </button>
+      {open ? children : null}
     </div>
   );
 }
@@ -1269,7 +1203,6 @@ function BrowsePage({ app }) {
 
   return (
     <div className="page page-browse">
-      <PillRail app={app} filters={filters} setFilters={setFilters} />
       <div className="browse-layout">
         <div className="filter-desktop">
           <FilterPanel filters={filters} setFilters={setFilters} count={results.length} app={app} />
@@ -1311,8 +1244,11 @@ function BrowsePage({ app }) {
                   </span>
                 </>
               ) : app.routeParams.category ? (() => {
-                const cat = PILLS.find(p => p.key === app.routeParams.category)
-                          || SHELVES.find(s => s.key === app.routeParams.category);
+                // Phase 4 removed the PILLS lookup (PillRail is gone). Routes
+                // arriving via deep-link still display a header derived from
+                // the SHELVES dict if it knows the slug; otherwise the raw
+                // category string is the fallback label.
+                const cat = SHELVES.find(s => s.key === app.routeParams.category);
                 const label = cat ? tr(cat.label, app.locale) : app.routeParams.category;
                 return (
                   <>
@@ -3613,7 +3549,7 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
 }
 
 export {
-  PillRail, BrowsePage, ListingDetail,
+  BrowsePage, ListingDetail,
   SavedPage, PlansPage, SignupModal, WelcomeModal, ProUpsellModal, ToastHost,
   makeDefaultFilters, applyFilters,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
