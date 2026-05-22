@@ -971,6 +971,25 @@ h1,h2,h3,h4,h5 { margin: 0; }
   display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
   margin-top: 4px;
 }
+
+/* Phase 5 — editorial deal-grade chip on the listing card. Lands
+   directly below the price-row when rank_score qualifies (≥65).
+   Inline-flex pill with a trophy icon prefix; accent-soft bg +
+   accent-strong text says "Pulpo editorial" without competing with
+   the price for the buyer's eye. Most cards render nothing here. */
+.deal-grade-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.02em;
+  width: fit-content;
+}
+.deal-grade-chip svg { color: var(--gold); }
+.deal-grade-chip.deal-grade-a_plus { /* highest grade — keep the accent palette uniform so the chip reads as a system, not a stoplight */ }
 .price-main {
   font-weight: 600; font-size: 15px; color: var(--ink);
 }

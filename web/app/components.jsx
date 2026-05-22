@@ -282,6 +282,46 @@ function signalForListing(listing) {
   return null;
 }
 
+// ===== dealGradeForListing — shared by DealGradeChip + tests =====
+// Derives an editorial deal grade from the rank_score (0-100). Mirrors
+// the thresholds the home-shelf badge system used pre-Phase-3
+// (`badgeForListing` in HomeShelf.jsx) so the visual language stays
+// consistent across surfaces:
+//   ≥85 → "a_plus"     (top-tier deal)
+//   ≥75 → "a"          (solid deal)
+//   ≥65 → "b_plus"     (good deal — bottom of the editorial set)
+//   else null          (no chip — listing isn't deal-worthy editorial)
+// The rank_score itself is a 0..100 composite from pulpo/ranker.py;
+// 85+ is the editorial top decile across the catalog.
+function dealGradeForListing(listing) {
+  const score = listing?.rank_score;
+  if (typeof score !== "number") return null;
+  if (score >= 85) return "a_plus";
+  if (score >= 75) return "a";
+  if (score >= 65) return "b_plus";
+  return null;
+}
+
+// ===== DealGradeChip — Phase 5 editorial chip on the listing card =====
+// Renders the Pulpo deal grade (A+/A/B+) for high-ranked listings.
+// Lands in the ListingCard body below the price so the buyer reads
+// "this is the price" then "Pulpo says it's an A+ deal." Color leans
+// on the brand green (accent-soft background + accent-strong text)
+// with a trophy icon prefix — same vocabulary as the shelf headers
+// upstairs. Returns null when the listing isn't deal-grade material;
+// most cards render no chip at all.
+function DealGradeChip({ listing }) {
+  const lc = currentLocale();
+  const grade = dealGradeForListing(listing);
+  if (!grade) return null;
+  return (
+    <span className={`deal-grade-chip deal-grade-${grade}`}>
+      <Icon name="cat_top10" size={11} strokeWidth={1.8} />
+      <span>{t(`deal_grade.${grade}`, lc)}</span>
+    </span>
+  );
+}
+
 // ===== CardSignalChip — photo overlay variant =====
 // Icon-led pill, anchored to the bottom-left corner of the photo
 // area. Used by ShelfCard (home) + ListingCard (Browse, Saved).
@@ -793,6 +833,12 @@ function ListingCard({
             );
           })()}
         </div>
+        {/* Phase 5 — editorial deal-grade chip. Lands directly below the
+            price-row so the buyer reads "this is what it costs" then
+            "Pulpo says this is an A+ deal." Renders null when the listing
+            isn't deal-grade material (rank_score < 65), which is most
+            listings — chip is the exception, not the norm. */}
+        {!isMag && <DealGradeChip listing={listing} />}
         {!compact && !isMag && listing.usps[0] && (() => {
           // Same gate the detail panel uses — keep card and detail in
           // lockstep via lib/gating.ts. Anonymous + Free see 1, paid
@@ -854,7 +900,7 @@ function Toast({ toast }) {
 }
 
 export {
-  Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, signalForListing, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
+  Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, DealGradeChip, dealGradeForListing, signalForListing, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
 };

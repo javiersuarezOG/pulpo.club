@@ -104,26 +104,17 @@ export function pickTopRanked(listings, n) {
 }
 
 // Shelf-specific badge derived from the listing data. Returns
-// `{ text, kind, side }` or null. `kind` mirrors the existing
-// hp-shelf-card-badge-{kind} classes; `side` is "left" or "right".
-function badgeForListing(listing, shelfKey) {
-  if (shelfKey === "top_10") {
-    const rank = listing.rank_score ?? 0;
-    if (rank >= 85) return { text: "A+ deal", kind: "dark", side: "left" };
-    if (rank >= 75) return { text: "A deal", kind: "dark", side: "left" };
-    if (rank >= 65) return { text: "B+ deal", kind: "dark", side: "left" };
-    return null;
-  }
-  if (shelfKey === "price_drops" && listing.previous_price && listing.price) {
-    const dollarsOff = Math.round((listing.previous_price - listing.price) / 1000);
-    if (dollarsOff <= 0) return null;
-    return { text: `−$${dollarsOff}k`, kind: "burgundy", side: "left" };
-  }
-  if (shelfKey === "new_this_week") {
-    const d = listing.days_listed ?? listing.first_seen_date ?? 0;
-    if (d === 0) return { text: "today", kind: "forest-cream", side: "right" };
-    return { text: `${d} day${d === 1 ? "" : "s"} ago`, kind: "forest-cream", side: "right" };
-  }
+// `{ text, kind, side }` or null.
+//
+// Phase 3 + Phase 5 retired every branch this function used to handle.
+// The legacy shelfKeys (top_10 / price_drops / new_this_week) were
+// replaced by six type-specific shelves whose deal grade now surfaces
+// via the universal DealGradeChip in the card body (PR #425, Phase 5);
+// price-drop + new signals live on the CardSignalChip overlay (#421).
+// Kept as a stub so existing callers don't have to thread a removal
+// through their render paths — any new shelfKey simply gets no extra
+// badge from this module. */
+function badgeForListing(_listing, _shelfKey) {
   return null;
 }
 
