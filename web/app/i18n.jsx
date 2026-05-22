@@ -432,7 +432,17 @@ const UI_STRINGS = {
   "home.badge.days_ago":         { en: "{n} days ago",
                                    es: "hace {n} días" },
 
-  // ── Browse filters — Phase 5B (new IA axes on the FilterPanel) ─────
+  // ── Browse filters — Phase 4 rebuild ───────────────────────────────
+  // Primary tier: Where / Type / Ranking. Always visible at the top of
+  // the FilterPanel — these are the three axes a buyer thinks in.
+  "filter.primary.where":        { en: "Where",           es: "Dónde" },
+  "filter.primary.type":         { en: "Type",            es: "Tipo" },
+  "filter.primary.ranking":      { en: "Ranking",         es: "Ranking" },
+  "filter.ranking.top10":        { en: "Top 10",          es: "Top 10" },
+  "filter.ranking.price_drops":  { en: "Price drops",     es: "Bajó de precio" },
+  "filter.ranking.new":          { en: "New this week",   es: "Nuevos esta semana" },
+  // Master/sub chip labels — single source of truth for both the
+  // Primary tier and the active-filter chips above the result grid.
   "filter.master_category":      { en: "Beach or lake",   es: "Playa o lago" },
   "filter.master.beach":         { en: "Beach",           es: "Playa" },
   "filter.master.lake":          { en: "Lake",            es: "Lago" },
@@ -523,7 +533,11 @@ const UI_STRINGS = {
   // to match Pulpo's broadened scope (houses + lots, not just land).
   // The i18n key keeps `land_type` for back-compat with the filter
   // state shape — only the user-visible label changes.
-  "filter.land_type":        { en: "Property type",       es: "Tipo de propiedad" },
+  // filter.land_type → filter.use (Phase 4 rename). "Tipo de propiedad"
+  // is now the Type primary tier (Homes/Condos/Land); the Use accordion
+  // surfaces Residencial/Uso comercial/Uso turístico.
+  "filter.use":              { en: "Use",                 es: "Uso" },
+  "filter.land_type":        { en: "Use",                 es: "Uso" },
   "filter.size":             { en: "Size",                es: "Tamaño" },
   "filter.features":         { en: "Key features",        es: "Características" },
   "filter.infrastructure":   { en: "Infrastructure",      es: "Infraestructura" },

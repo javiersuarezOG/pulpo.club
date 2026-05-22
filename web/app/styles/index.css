@@ -1229,6 +1229,45 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--ink-3);
   margin-bottom: 12px;
 }
+
+/* Phase 4 — Primary tier wrapper. The three Always-Visible groups
+   (Where / Type / Ranking) sit inside a tinted container at the top
+   of the FilterPanel so a buyer's eye lands there first. Refine
+   accordions live below, on the regular paper background, collapsed
+   by default. */
+.filter-panel .filter-primary {
+  margin: 0 -8px 12px;
+  padding: 4px 12px 8px;
+  background: var(--accent-soft);
+  border-radius: 12px;
+}
+.filter-panel .filter-primary .filter-group {
+  border-bottom: 1px solid oklch(0.86 0.03 165);
+  padding: 10px 0;
+}
+.filter-panel .filter-primary .filter-group:last-child { border-bottom: none; }
+.filter-panel .filter-primary .filter-group-title { color: var(--accent-strong); }
+
+/* Phase 4 — Collapsible accordion for Refine tier groups. Toggle is
+   the entire title row; chevron flips between down (collapsed) + up
+   (open). Body renders only when open so the panel stays compact. */
+.filter-group-collapsible .filter-group-toggle {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+.filter-group-collapsible.is-open .filter-group-toggle { margin-bottom: 12px; }
+.filter-group-collapsible .filter-group-toggle:hover { color: var(--ink); }
+.filter-group-collapsible .filter-group-toggle svg { color: var(--ink-3); flex-shrink: 0; }
 .chip-grid {
   display: flex; gap: 6px; flex-wrap: wrap;
 }
