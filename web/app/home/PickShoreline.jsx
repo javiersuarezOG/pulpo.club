@@ -62,7 +62,12 @@ function ShorelineCard({ shoreline, locale, app, heroListing }) {
   const onClick = useCallback(() => {
     try { track("shoreline_card_clicked", { shoreline }); } catch { /* ignore */ }
     if (app && typeof app.goBrowse === "function") {
-      app.goBrowse({ master_category: shoreline });
+      // Pass the category slug so BrowsePage.buildFiltersForCategory()
+      // maps it to master_category. Previously this passed
+      // { master_category: shoreline } directly, but BrowsePage reads
+      // routeParams.category — the mismatch made the page open with
+      // every filter set (instead of just Beach or Lake).
+      app.goBrowse({ category: shoreline });
     }
   }, [shoreline, app]);
 
