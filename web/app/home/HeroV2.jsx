@@ -48,6 +48,7 @@ import {
   slugifyListing,
 } from "./heroLeaderboard";
 import { readLiveCounterCache, writeLiveCounterCache } from "../lib/live-counter-cache";
+import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { tierFor } from "../lib/gating";
 import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
@@ -100,6 +101,18 @@ export function HeroV2({ app, locale }) {
     };
   }, []);
   const [counter, setCounter] = useState(initialCounter);
+
+  // Browsable count: filter to match LiveStats (header chip) + /browse's
+  // applyFilters() so the hero number never drifts from the in-page
+  // count. last_updated.json#total_listings is the RAW pipeline total
+  // (includes is_sold + is_incomplete rows browse hides by default).
+  // Falls back to the cached/fallback total while listings are loading.
+  const listings = useListings();
+  const browsableTotal = useMemo(() => {
+    if (!listings || listings.length === 0) return null;
+    return listings.filter((l) => !l.is_sold && !l.is_incomplete).length;
+  }, [listings]);
+  const displayedTotal = browsableTotal ?? counter.total_listings;
 
   // Reduced-motion is the kill switch. Both the React render path
   // (hide Just In, no pop animation) and the interval (never starts)
@@ -418,7 +431,7 @@ export function HeroV2({ app, locale }) {
 
   const counterTemplate = fillTemplate(
     t("home.hero.counter_template", locale),
-    { count: fmtCount(counter.total_listings, locale), sources: counter.source_count },
+    { count: fmtCount(displayedTotal, locale), sources: counter.source_count },
   );
 
   // Subhead, microcopy, etc. — straight t() lookups.
