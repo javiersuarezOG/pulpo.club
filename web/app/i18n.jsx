@@ -461,7 +461,7 @@ const UI_STRINGS = {
   // land. Spanish copy uses "propiedades" (inclusive) rather than
   // "terrenos" (which would translate "listing" → "plot of land").
   // Keep "terreno" only where the string is genuinely about parcels
-  // of land specifically — see `type.raw`, `filter.feature.flat`.
+  // of land specifically — see `filter.feature.flat`.
   "card.listings_count":     { en: "listings",            es: "propiedades" },
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
@@ -478,13 +478,15 @@ const UI_STRINGS = {
   "card.listed_1_month":     { en: "Listed 1 month ago",  es: "Publicado hace 1 mes" },
   "card.listed_n_months":    { en: "Listed {n} months ago", es: "Publicado hace {n} meses" },
 
-  // Land types — agricultural removed (out-of-scope for Pulpo's
-  // beach + lake recreational marketplace; dropped at the pipeline).
+  // Property-type filter chips. Three values for the Salvadoran market:
+  // Residencial (homes for living), Uso comercial (zoned for business),
+  // Uso turístico (zoned for hospitality / short-let / Airbnb).
+  // 'mixed' + 'raw' removed alongside the chip reduction — they were
+  // mock-data-only values that the backend's land_type field never
+  // emits. 'agricultural' removed earlier (purged at the pipeline).
   "type.residential":        { en: "Residential",         es: "Residencial" },
-  "type.commercial":         { en: "Commercial",          es: "Comercial" },
-  "type.tourist":            { en: "Tourist",             es: "Turístico" },
-  "type.mixed":              { en: "Mixed Use",           es: "Uso Mixto" },
-  "type.raw":                { en: "Raw Land",            es: "Terreno bruto" },
+  "type.commercial":         { en: "Commercial use",      es: "Uso comercial" },
+  "type.tourist":            { en: "Tourism use",         es: "Uso turístico" },
 
   // Badges
   "badge.price_drop":        { en: "Price drop",          es: "Bajó de precio" },
