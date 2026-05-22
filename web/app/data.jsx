@@ -148,7 +148,7 @@ const USPS = [
   { en: "Mature secondary forest — eco credits eligible" },
 ];
 
-const LAND_TYPES = ["residential", "commercial", "tourist", "mixed", "raw"];
+const LAND_TYPES = ["residential", "commercial", "tourist"];
 
 function pick(arr, i) { return arr[i % arr.length]; }
 function pickN(arr, seed, n) {

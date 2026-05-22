@@ -367,7 +367,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
 
       <FilterGroup title={t("filter.land_type", lc)}>
         <div className="chip-grid">
-          {["residential","commercial","tourist","mixed","raw"].map(typeKey => (
+          {["residential","commercial","tourist"].map(typeKey => (
             <button key={typeKey}
               className={`chip ${filters.land_types.has(typeKey) ? "is-active" : ""}`}
               onClick={() => toggleSet("land_types", typeKey)}>{landTypeLabel(typeKey)}</button>
