@@ -521,6 +521,14 @@ const UI_STRINGS = {
   "badge.ocean_view":        { en: "Ocean view",          es: "Vista al mar" },
   "badge.flat":              { en: "Flat",                es: "Plano" },
 
+  // Phase 5 — editorial deal-grade chip on ListingCard. Derived from
+  // rank_score thresholds (≥85 / ≥75 / ≥65 / else hidden) and shown
+  // below the price as Pulpo's editorial signal: "we say this is an
+  // A+ deal." Kept short — the chip is a one-glance read.
+  "deal_grade.a_plus":       { en: "A+ deal",             es: "Oferta A+" },
+  "deal_grade.a":            { en: "A deal",              es: "Oferta A" },
+  "deal_grade.b_plus":       { en: "B+ deal",             es: "Oferta B+" },
+
   // Filter / browse
   "filter.title":            { en: "Filters",             es: "Filtros" },
   "filter.clear":            { en: "Clear all",           es: "Limpiar todo" },
