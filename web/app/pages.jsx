@@ -396,23 +396,14 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.status", lc)}>
-        <div className="chip-grid">
-          {["new","price_drop","off_market","motivated"].map(k => (
-            <button key={k}
-              className={`chip ${filters.status.has(k) ? "is-active" : ""}`}
-              onClick={() => toggleSet("status", k)}>{t(`filter.status.${k}`, lc)}</button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title={t("filter.readiness", lc)}>
-        <div className="range-row">
-          <label>{t(`filter.readiness.${filters.readiness ?? 0}`, lc)}</label>
-          <input type="range" min="0" max="4" step="1"
-            value={filters.readiness} onChange={(e) => update({ readiness: +e.target.value })}/>
-        </div>
-      </FilterGroup>
+      {/* Status section + Readiness slider removed in Phase 1 of the
+          filter rewrite. "New" / "Price drop" are now reached via the
+          PillRail's Ranking group (and per-card NEW/Price-drop badges);
+          Off-market + Motivated were ambiguous signals that the user
+          decided to retire entirely. Readiness was a confusing 0-100
+          slider with no clear mental model. The underlying `status` Set
+          + `readiness` number stay in filter state because the PillRail
+          + buildFiltersForCategory routing still write to them. */}
 
       {/* PR-4b — photos chip (legacy parity). */}
       <FilterGroup title={t("filter.photos", lc)}>
