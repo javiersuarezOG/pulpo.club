@@ -198,9 +198,16 @@ def _write_ranked_json(ranked_dicts: list, path: Path) -> None:
 _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     # Identity
     "source", "source_id", "url",
-    # Title + description + USPs (kept — adapter & detail page read these)
+    # Title + canonical short description + USPs.
+    # `description` is the legacy pre-DeepSeek field — 99.8% of records now
+    # have `short_description_canonical` populated, and the FE adapter
+    # (web/app/data/listings.ts) only reads `description` as a fallback.
+    # Dropping it saves ~28% of the slim-file payload (the single biggest
+    # field by bytes). The full `description` remains in ranked.json for
+    # the rare records where DeepSeek hasn't run yet; the FE detail panel
+    # falls back to no-description for those — recoverable on next nightly.
     "title", "title_canonical",
-    "description", "short_description_canonical",
+    "short_description_canonical",
     "reasons_to_buy", "url_language",
     # Location
     "zone", "department", "country",
@@ -240,13 +247,18 @@ def _write_ranked_list_json(ranked_dicts: list, path: Path) -> None:
     """Emit a slim projection of ranked.json for the list-view fetch
     path. Whitelist-based, see _RANKED_LIST_FIELDS for the rule.
     The full ranked.json stays in place for the detail-view fetch.
+
+    Written compact (no indent). gzip absorbs whitespace on the wire so
+    indent didn't cost much there, but the indented form added ~500 KB
+    of pure whitespace to the raw body — that's parse-time CPU on slow
+    LATAM mobile devices for no reason.
     """
     slim: list[dict] = []
     for record in ranked_dicts:
         if not isinstance(record, dict):
             continue
         slim.append({k: v for k, v in record.items() if k in _RANKED_LIST_FIELDS})
-    atomic_write_json(path, slim, indent=2, default=str)
+    atomic_write_json(path, slim, separators=(",", ":"), default=str)
 
 
 def _compute_source_status(sources: list[str], per_source_count: dict[str, int], source_errors: dict[str, str]) -> dict[str, str]:

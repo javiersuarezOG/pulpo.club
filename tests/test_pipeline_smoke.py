@@ -88,3 +88,12 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
     assert "broker_phone" not in slim_data[0], (
         "ranked.list.json must NOT carry broker contact info — PII leak risk"
     )
+    # `description` is the pre-DeepSeek legacy text field — was the single
+    # largest contributor to slim-file bytes (~23%). FE adapter only reads
+    # it as a fallback when `short_description_canonical` is missing, which
+    # is now 99.8%+ of records. Re-adding it here silently reverses the
+    # PR-perf-yest-1 wire-size win.
+    assert "description" not in slim_data[0], (
+        "ranked.list.json must NOT carry the legacy `description` field — "
+        "use `short_description_canonical` (see PR-perf-yest-1)"
+    )
