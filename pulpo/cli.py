@@ -74,7 +74,7 @@ def _row(li: Listing) -> dict:
 # slug and dispatches there before argparse ever runs. Anything else
 # falls through to the original rank-pipeline flow unchanged.
 
-_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "backfill-listing-photo-meta"}
+_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "check-hero-variants", "backfill-listing-photo-meta"}
 
 
 def _run_enrich_photos(argv: list[str]) -> int:
@@ -259,6 +259,122 @@ def _run_check_hero_pool(argv: list[str]) -> int:
     return 0
 
 
+def _run_check_hero_variants(argv: list[str]) -> int:
+    """Verify every ranked.json listing's `.hero.jpg` variant is present.
+
+    Frontend regression guard for the home-hero LCP fix (PR-perf-hero,
+    2026-05-21). HeroV4 derives a local `/photos/<id>.hero.jpg` path
+    from `hero_photo_path` (`/photos/<id>.jpg`) and routes it through
+    /api/img for WebP optimization. If the pipeline ever stops producing
+    `.hero.jpg`, /api/img 404s and the hero quietly falls back to the
+    broker URL — re-introducing the 14.5s P95 LCP regression we just
+    closed.
+
+    The check is cheap (O(N) filesystem stats) and fails loudly. Wire
+    into CI / nightly alongside `check-hero-pool`.
+
+    Exit code:
+        0 — every listing with a `hero_photo_path` has the sibling
+            `.hero.jpg` on disk, and every filename satisfies
+            /api/img's path-traversal guard (^[a-z0-9_.-]+$).
+        1 — at least one listing is missing the variant OR carries an
+            unsafe filename. Stdout summarises; stderr lists offenders.
+
+    Usage:
+        python3 -m pulpo.cli check-hero-variants
+        python3 -m pulpo.cli check-hero-variants --top-only 50
+    """
+    import re
+
+    sp = argparse.ArgumentParser(
+        prog="pulpo check-hero-variants",
+        description="Verify .hero.jpg variants exist for every ranked listing.",
+    )
+    sp.add_argument(
+        "--ranked-path", type=str, default=None,
+        help="Override ranked.json path (default: <repo>/web/data/ranked.json).",
+    )
+    sp.add_argument(
+        "--top-only", type=int, default=0,
+        help="Restrict the check to the N highest-rank_score listings (default: 0 = all).",
+    )
+    args = sp.parse_args(argv)
+
+    repo_root = Path(__file__).resolve().parents[1]
+    ranked_path = Path(args.ranked_path) if args.ranked_path else repo_root / "web" / "data" / "ranked.json"
+    if not ranked_path.exists():
+        print(f"check-hero-variants: ranked.json not found: {ranked_path}", file=sys.stderr)
+        return 1
+
+    try:
+        data = json.loads(ranked_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"check-hero-variants: malformed ranked.json: {e}", file=sys.stderr)
+        return 1
+    if not isinstance(data, list):
+        print("check-hero-variants: ranked.json is not a list", file=sys.stderr)
+        return 1
+
+    records = [r for r in data if isinstance(r, dict)]
+    if args.top_only > 0:
+        records = sorted(records, key=lambda r: r.get("rank_score") or 0, reverse=True)[: args.top_only]
+
+    # /api/img path-traversal guard (api/img.js:70). Anything outside this
+    # regex returns 400; the FE then falls back to the raw broker URL —
+    # which is exactly the regression this check exists to catch.
+    SAFE_FILENAME = re.compile(r"^[a-z0-9_.-]+$", re.IGNORECASE)
+
+    missing: list[tuple[float, str]] = []
+    unsafe: list[str] = []
+    skipped_no_path = 0
+    checked = 0
+
+    for rec in records:
+        hp = rec.get("hero_photo_path")
+        if not isinstance(hp, str) or not hp.startswith("/photos/") or not hp.endswith(".jpg"):
+            skipped_no_path += 1
+            continue
+        checked += 1
+        hero_rel = hp[:-4] + ".hero.jpg"
+        hero_fs = repo_root / "web" / hero_rel.lstrip("/")
+        if not hero_fs.exists():
+            missing.append((rec.get("rank_score") or 0.0, hp))
+        # Filename safety
+        filename = hero_rel.rsplit("/", 1)[-1]
+        if not SAFE_FILENAME.match(filename):
+            unsafe.append(filename)
+
+    print(f"\n[check-hero-variants] {ranked_path}")
+    print(f"  total records:        {len(records)}")
+    print(f"  checked (have path):  {checked}")
+    print(f"  skipped (no path):    {skipped_no_path}")
+    print(f"  missing .hero.jpg:    {len(missing)}")
+    print(f"  unsafe filenames:     {len(unsafe)}")
+    sys.stdout.flush()
+
+    if missing or unsafe:
+        if missing:
+            print(
+                f"\n[check-hero-variants] FAIL: {len(missing)} listing(s) missing .hero.jpg",
+                file=sys.stderr,
+            )
+            for rs, hp in missing[:20]:
+                print(f"  rank={rs} hero_photo_path={hp}", file=sys.stderr)
+            if len(missing) > 20:
+                print(f"  ... and {len(missing) - 20} more", file=sys.stderr)
+        if unsafe:
+            print(
+                f"\n[check-hero-variants] FAIL: {len(unsafe)} unsafe filename(s) (would 400 at /api/img)",
+                file=sys.stderr,
+            )
+            for fn in unsafe[:20]:
+                print(f"  {fn}", file=sys.stderr)
+        return 1
+
+    print("\n[check-hero-variants] PASS: every checked listing has a safe .hero.jpg variant")
+    return 0
+
+
 def _run_backfill_listing_photo_meta(argv: list[str]) -> int:
     """Propagate per-photo sidecar metadata onto existing ranked.json rows.
 
@@ -385,6 +501,8 @@ def _dispatch_subcommand(name: str, argv: list[str]) -> int:
         return _run_enrich_photos(argv)
     if name == "check-hero-pool":
         return _run_check_hero_pool(argv)
+    if name == "check-hero-variants":
+        return _run_check_hero_variants(argv)
     if name == "backfill-listing-photo-meta":
         return _run_backfill_listing_photo_meta(argv)
     print(f"pulpo: unknown subcommand '{name}'", file=sys.stderr)

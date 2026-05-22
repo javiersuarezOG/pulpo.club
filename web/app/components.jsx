@@ -4,6 +4,8 @@ import { t, tr, formatPriceI18n, formatSizeI18n, formatDaysListedI18n, M2_PER_VA
 import { track } from "./telemetry/hook";
 import { uspsVisibleFor } from "./lib/gating.ts";
 import { categoryImageForListing } from "./assets/categories";
+import { readFeatureFlag } from "./lib/feature-flag";
+import { buildSrcSet } from "./lib/img-url";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -154,7 +156,6 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     cat_top10:      <><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></>,
     cat_mountain:   <><path d="M2 20l6-11 4 7"/><path d="M10 20l5-9 7 9z"/><circle cx="7" cy="5" r="1.5"/></>,
     cat_under_100k: <><circle cx="12" cy="12" r="9"/><path d="M15 9c-1-1-2-1.5-3-1.5-2 0-3 1-3 2.5 0 3 6 1.5 6 4.5 0 1.5-1 2.5-3 2.5-1.5 0-2.5-.5-3.5-1.5"/><path d="M12 6v12"/></>,
-    cat_agricultural:<><path d="M12 21V9"/><path d="M12 9c0-3 2-5 5-5-1 4-3 5-5 5z"/><path d="M12 13c0-3-2-5-5-5 1 4 3 5 5 5z"/><path d="M5 21h14"/></>,
     cat_commercial: <><path d="M3 21V8l6-4 6 4v13"/><path d="M15 21V12h6v9"/><path d="M3 21h18"/><path d="M7 11h.01M7 14h.01M7 17h.01M11 11h.01M11 14h.01M11 17h.01"/></>,
     cat_motivated:  <><circle cx="12" cy="13" r="8"/><path d="M12 8v5l3 2"/><path d="M9 2h6"/></>,
   };
@@ -270,22 +271,63 @@ function Badge({ listing }) {
 function Photo({
   listing, idx = 0, ratio = "16/9", className = "",
   lazy = true, eager = false, onLoad, source,
-  thumbnail = false,
+  thumbnail = false, heroSrc = null,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
   // Reset loaded state when the URL changes (carousel arrow click).
   // Without this, the skeleton stays hidden while the new image streams
   // in, and the user sees the OLD photo with stale "loaded" state.
+  // `heroSrc` callers (the home hero) pass an explicit local /photos/*
+  // .hero.jpg path — sourced from the pipeline's 1080² hero variant,
+  // routed through /api/img for WebP at the right viewport size. This
+  // bypasses photos[0] (a broker URL) and the LCP long-tail it produces
+  // (PostHog: hero_v4 P95=14.5s, mostly broker-CDN flakes).
   // `thumbnail` callers (cards) read the local 600×400 derivative at
   // `thumbnail_url` — fast CDN paint, no broker dependency. Gallery
   // callers (carousels) read `photos[idx]` — broker URLs at native
   // resolution. The two were combined before, which surfaced the same
   // image twice in the carousel (the thumb at slot 0 alongside the
   // broker-native version a click away).
-  const url = thumbnail
-    ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
-    : listing.photos[idx];
+  const url = heroSrc
+    ? heroSrc
+    : thumbnail
+      ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
+      : listing.photos[idx];
+
+  // PR-perf-4 — image optimization v2 (feature-flag-gated). When the
+  // `image_optimization_v2` PostHog flag is on AND the photo lives at
+  // /photos/* or /photos-hires/* on our CDN (broker URLs from
+  // photo_urls[] are excluded — those are served by the broker's own
+  // CDN and we don't proxy them), generate a srcset that points at
+  // /api/img with WebP + multi-size variants. Browser content-
+  // negotiates: gets WebP at the right pixel density per viewport.
+  // Falls back to the raw `url` via the <img src={url}> child when
+  // the srcset can't be built (broker URL, flag off, or unsupported
+  // browser — <picture> degrades gracefully to <img>).
+  //
+  // The default `sizes` value covers both card surfaces (~400-800px
+  // wide) and the listing-detail gallery-main (~800-1600px). For more
+  // precision, future call sites can pass an explicit `sizes` prop.
+  // `heroSrc` callers force the optimization on regardless of the
+  // image_optimization_v2 flag rollout — the home hero's broker-URL
+  // fallback (photos[0]) is the LCP long-tail we're closing, so this
+  // call site is opted in unconditionally. buildSrcSet still returns
+  // null for broker URLs (img-url.ts), so non-local heroSrc values
+  // degrade safely to the raw <img src>.
+  const optimizationOn = !!heroSrc || readFeatureFlag("image_optimization_v2", false);
+  const optimized = useMemo(() => {
+    if (!optimizationOn || !url) return null;
+    const webp = buildSrcSet(url);
+    if (!webp) return null;
+    // Both <source> tags use the same /api/img endpoint — content
+    // negotiation on the server (Accept: image/webp) picks the
+    // format. We still declare type="image/webp" on the first source
+    // so a browser that doesn't accept WebP falls through to the
+    // <img> child cleanly.
+    return { webpSrcSet: webp };
+  }, [url, optimizationOn]);
+  const optimizedSizes = "(min-width: 768px) 800px, 100vw";
   // Stamp start-of-perceived-load on every URL change. useMemo runs
   // during render, before the browser commits the <img src>, so the
   // elapsed value covers React commit + network fetch + decode —
@@ -317,11 +359,23 @@ function Photo({
   }, [url]);
 
   // Stuck-image handling — if the image neither loaded nor errored
-  // after 8 s, treat it as failed and engage the category fallback.
+  // after 12 s, treat it as failed and engage the category fallback.
   // Broker URLs (Encuentra24, Bienesonline) sometimes stall without
   // firing onerror/onload (slow CDN, ad-blocker, 503-without-headers),
   // which left the shimmer skeleton visible forever. Promoting stuck →
   // errored guarantees the surface always lands on a real image.
+  //
+  // Threshold bumped from 8 s to 12 s after the first week of telemetry
+  // showed 8.27 stuck events per session on the home + browse surfaces,
+  // 83% of them on LOCAL /photos/* paths. Combined with the browser's
+  // 6-connections-per-origin cap, that points at queueing on slow LATAM
+  // mobile connections — images that DO load between 8-15 s were
+  // mis-counted as failures. 12 s preserves the genuine-broken-image
+  // signal (those fail in <1 s via onerror) while giving slow-network
+  // users headroom. The image_optimization_v2 flag (#399) ships WebP
+  // at a smaller wire size which will further drop the stuck rate;
+  // this threshold change is the safety margin in case the flag is
+  // off or the user's browser refuses WebP.
   useEffect(() => {
     if (!url) return;
     let cancelled = false;
@@ -341,7 +395,7 @@ function Photo({
         });
       } catch { /* never let telemetry break the render */ }
       setErrored(true);
-    }, 8000);
+    }, 12000);
     return () => { cancelled = true; clearTimeout(handle); };
   }, [url, loaded, errored, listing.id, idx, source]);
 
@@ -409,19 +463,17 @@ function Photo({
       </div>
     );
   }
-  return (
-    <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
-      {!loaded && <div className="photo-skeleton" />}
-      <img
-        ref={imgRef}
-        src={url}
-        alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
-        loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
-        decoding="async"
-        // fetchpriority is a recent (2023+) hint; browsers without
-        // support fall through to the default queue order.
-        fetchpriority={eager ? "high" : "auto"}
-        onLoad={() => {
+  const imgElement = (
+    <img
+      ref={imgRef}
+      src={url}
+      alt={`${tr(listing.title, currentLocale())} — ${listing.zone_name}`}
+      loading={eager ? "eager" : (lazy ? "lazy" : "eager")}
+      decoding="async"
+      // fetchpriority is a recent (2023+) hint; browsers without
+      // support fall through to the default queue order.
+      fetchpriority={eager ? "high" : "auto"}
+      onLoad={() => {
           setLoaded(true);
           if (onLoad) onLoad();
           if (typeof performance === "undefined") return;
@@ -467,6 +519,25 @@ function Photo({
         }}
         style={{ opacity: loaded ? 1 : 0 }}
       />
+  );
+  return (
+    <div ref={wrapRef} className={`photo-wrap ${className}`} style={{ aspectRatio: ratio }}>
+      {!loaded && <div className="photo-skeleton" />}
+      {optimized ? (
+        <picture>
+          {/* WebP variants. Modern browsers pick the smallest candidate
+              that satisfies the sizes hint; <img src> below is the
+              fallback for browsers that ignore <source> entirely. */}
+          <source
+            type="image/webp"
+            srcSet={optimized.webpSrcSet}
+            sizes={optimizedSizes}
+          />
+          {imgElement}
+        </picture>
+      ) : (
+        imgElement
+      )}
     </div>
   );
 }

@@ -93,18 +93,6 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
         canonicalPath: "/browse?cat=off_market",
       };
     }
-    if (cat === "agricultural") {
-      return {
-        title: isEs
-          ? "Terrenos agrícolas en El Salvador — Pulpo"
-          : "Agricultural land for sale in El Salvador — Pulpo",
-        description: isEs
-          ? "Fincas y parcelas agrícolas en El Salvador. Curado por Pulpo."
-          : "Farms and agricultural parcels in El Salvador. Curated by Pulpo.",
-        image: BRAND_OG_IMAGE,
-        canonicalPath: "/browse?cat=agricultural",
-      };
-    }
     return {
       title: isEs
         ? "Explorar terrenos frente al mar y off-market — Pulpo"

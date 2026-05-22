@@ -432,7 +432,7 @@ def test_regression_guard_skips_new_fields():
     It becomes baseline for next run."""
     from automation.pipeline_steps import check_population_regression
     prev = {"derived_field_population": {"is_beachfront": 0.30}}
-    new = {"is_beachfront": 0.30, "land_type_agricultural": 0.0}  # newly added, 0%
+    new = {"is_beachfront": 0.30, "derived_test_new_field": 0.0}  # newly added, 0%
     assert check_population_regression(prev, new) == []
 
 
@@ -462,16 +462,22 @@ def test_beachfront_tier_none_when_no_signal():
 
 # ── PR-8: derive_land_type ────────────────────────────────────────────
 
-def test_land_type_agricultural_when_flag_set():
-    li = _li(is_agricultural=True)
-    assert derive_land_type(li) == "agricultural"
+def test_land_type_ignores_is_agricultural_after_purge():
+    """Agricultural inventory is dropped at the pipeline level (see
+    automation/run.py [purge]). If is_agricultural slips through and
+    nothing else matches, derive_land_type returns None — never
+    'agricultural', because that value was removed from the enum."""
+    li = _li(is_agricultural=True, property_type="unknown")
+    li["property_type"] = "unknown"
+    assert derive_land_type(li) is None
 
 
-def test_land_type_agricultural_priority_over_other_uses():
-    """Salvadoran 'finca' descriptions sometimes also mention 'ideal
-    para hotel'. Current use (agricultural) wins."""
-    li = _li(is_agricultural=True, is_tourist=True, is_commercial=True)
-    assert derive_land_type(li) == "agricultural"
+def test_land_type_commercial_wins_over_agricultural_flag():
+    """If is_commercial=True alongside a stray is_agricultural flag,
+    commercial classification still applies (agricultural is no longer
+    a recognised land_type value)."""
+    li = _li(is_agricultural=True, is_commercial=True)
+    assert derive_land_type(li) == "commercial"
 
 
 def test_land_type_commercial_when_flag_set():

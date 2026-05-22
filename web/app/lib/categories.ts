@@ -35,7 +35,6 @@ export const CATEGORY_KEYS = [
   "flat_buildable",
   "build_ready",
   "commercial",
-  "agricultural",
   "under_50k",
   "under_100k",
   "motivated_sellers",

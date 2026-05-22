@@ -444,7 +444,7 @@ export function HomeShelf({
 const TOP_10_CARDS = [
   { image: "water_features", gradient: "forest", badgeLeft: "A+ deal", badgeLeftKind: "dark", badgeRight: "−31%", badgeRightKind: "forest", price: "$324,000", meta: "Lago de Coatepeque · 2bd" },
   { image: "beachfront",     gradient: "clay",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−28%", badgeRightKind: "forest", price: "$615,000", meta: "El Tunco · 3bd beach" },
-  { image: "agricultural",   gradient: "navy",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−26%", badgeRightKind: "forest", price: "$198,500", meta: "Lago de Suchitlán · land" },
+  { image: "ocean_view",     gradient: "navy",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−26%", badgeRightKind: "forest", price: "$485,000", meta: "El Cuco · 4bd home" },
 ];
 
 const PRICE_DROPS_CARDS = [

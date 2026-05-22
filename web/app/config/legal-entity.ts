@@ -4,19 +4,22 @@
 // public legal page (/terms, /privacy, /cookies, /subscription, /imprint),
 // the imprint footer, and the contact-form responses.
 //
-// Edit THIS FILE (and re-deploy) to flip jurisdiction between NL and ES
-// once incorporation is complete. The legal-doc body copy lives in
-// `legal-content.ts` and reads from this module's `ENTITY` export.
+// Active jurisdiction is "SV" (El Salvador). NL/ES blocks are kept for
+// reference in case the platform later expands. The body copy in
+// `legal-content.ts` reads from this module's `ENTITY` export, with the
+// `formatAddress` / `formatRegistration` helpers gracefully omitting
+// fields whose values are empty strings.
 //
-// IMPORTANT: most fields are still placeholders. Real values land when
-// Sebastian completes incorporation (either NL/Amsterdam or ES/Barcelona).
-// Until then, the public legal routes render with placeholder strings
-// AND a banner that reads "Pulpo is currently being incorporated — the
-// entity details on this page will be finalised before the first live
-// Stripe Checkout session." The banner suppresses itself once
-// `ENTITY.incorporated === true`.
+// Pre-incorporation soft-launch: the public legal copy uses "Pulpo" as
+// the operator name and the operator-facing fields (`legal_name`,
+// `chamber_of_commerce.number`, `tax_id.value`, the street address,
+// `director.name`, `phone`) are empty strings. Sentences in
+// `legal-content.ts` that would otherwise read awkwardly without these
+// fields are written to stand on their own. When incorporation closes,
+// populate those fields (and bump `last_updated` on each doc) — no
+// other code changes required.
 
-export type Jurisdiction = "NL" | "ES";
+export type Jurisdiction = "NL" | "ES" | "SV";
 
 // Vite exposes only VITE_*-prefixed env vars to the client. Server-side
 // code that needs the same value reads process.env.VITE_LEGAL_JURISDICTION
@@ -25,7 +28,8 @@ export type Jurisdiction = "NL" | "ES";
 export const JURISDICTION: Jurisdiction = (() => {
   const raw = import.meta.env.VITE_LEGAL_JURISDICTION as string | undefined;
   if (raw === "ES") return "ES";
-  return "NL"; // default until ES is incorporated
+  if (raw === "NL") return "NL";
+  return "SV"; // default — the platform's first live market is El Salvador
 })();
 
 export interface EntityConfig {
@@ -117,19 +121,55 @@ const ENTITIES: Record<Jurisdiction, EntityConfig> = {
     edpb_member: true,
     outbound_from: "noreply@pulpo.club",
   },
+  SV: {
+    trade_name: "Pulpo",
+    legal_name: "Pulpo",
+    legal_form: "",
+    incorporated: false,
+    chamber_of_commerce: { authority: "", number: "" },
+    tax_id: { label: "", value: "" },
+    address: {
+      street: "",
+      postcode: "",
+      city: "San Salvador",
+      country: "El Salvador",
+      country_code: "SV",
+    },
+    director: { name: "", role: "" },
+    phone: "",
+    governing_law: "leyes de la República de El Salvador",
+    courts: "Juzgados de lo Civil y Mercantil de San Salvador, El Salvador",
+    supervisory_authority: {
+      name: "Defensoría del Consumidor",
+      url: "defensoria.gob.sv",
+      phone: "910",
+    },
+    requires_impressum: false,
+    edpb_member: false,
+    outbound_from: "hello@pulpo.club",
+  },
 };
 
 export const ENTITY: EntityConfig = ENTITIES[JURISDICTION];
 
 // Convenience: a formatted single-line address suitable for legal copy.
+// Empty fields are skipped so a pre-incorporation entity (city + country
+// only) renders as "San Salvador, El Salvador" rather than ", ,  …".
 export function formatAddress(entity: EntityConfig = ENTITY): string {
   const a = entity.address;
-  return `${a.street}, ${a.postcode} ${a.city}, ${a.country}`;
+  const streetLine = [a.street, a.postcode].filter(Boolean).join(" ").trim();
+  return [streetLine, a.city, a.country].filter(Boolean).join(", ");
 }
 
 // Convenience: "KvK 12345678 | BTW NL123456789B01" or local equivalent.
+// Returns an empty string if no registration identifiers are configured,
+// so legal-content.ts can omit the line entirely when needed.
 export function formatRegistration(entity: EntityConfig = ENTITY): string {
-  return `${entity.chamber_of_commerce.authority} ${entity.chamber_of_commerce.number} | ${entity.tax_id.label} ${entity.tax_id.value}`;
+  const coc = [entity.chamber_of_commerce.authority, entity.chamber_of_commerce.number]
+    .filter(Boolean)
+    .join(" ");
+  const tax = [entity.tax_id.label, entity.tax_id.value].filter(Boolean).join(" ");
+  return [coc, tax].filter(Boolean).join(" | ");
 }
 
 // EU ODR platform URL — required for EU B2C e-commerce per Regulation (EU)

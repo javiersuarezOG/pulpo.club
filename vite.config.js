@@ -51,6 +51,23 @@ export default defineConfig(() => ({
         entryFileNames: "build/[name]-[hash].js",
         chunkFileNames: "build/[name]-[hash].js",
         assetFileNames: "build/[name]-[hash][extname]",
+        // PR-perf-3a manual chunk hints. React + React-DOM are heavy
+        // (~140KB unminified) and change once a year; splitting them
+        // out means a Pulpo app-code change doesn't bust the React
+        // cache on returning visitors. The /admin and /account splits
+        // happen automatically from the React.lazy(() => import(...))
+        // calls in app.jsx — Rollup detects the dynamic-import boundary
+        // and emits a chunk per route. No manual hint needed for those.
+        manualChunks(id) {
+          if (
+            id.includes("/node_modules/react/") ||
+            id.includes("/node_modules/react-dom/") ||
+            id.includes("/node_modules/scheduler/")
+          ) {
+            return "vendor-react";
+          }
+          return undefined;
+        },
       },
     },
   },

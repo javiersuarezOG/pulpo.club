@@ -360,3 +360,34 @@ pipeline change. Last-write-wins per UTC day, so a manual snapshot
 followed by the nightly run will overwrite — date-named, not append.
 If you need to keep an off-schedule snapshot distinct, just rename
 the resulting blob via the Vercel dashboard afterwards.
+
+## Vercel Pro upgrade — region pin
+
+The day we move from Hobby to Pro, add multi-region functions so users
+in LATAM and Europe stop paying the full RTT to `iad1`. Hobby plan
+ignores multi-region (functions always run in the project's primary
+region); Pro routes each request to the closest healthy region. The
+static CDN is already global on both plans, so this change only
+affects `/api/**` latency.
+
+Edit `vercel.json`: add `"regions"` at the top level, alongside
+`"version"` and `"functions"`:
+
+```json
+"regions": ["iad1", "gru1", "lhr1"],
+```
+
+Region codes: `iad1` = US East (Virginia), `gru1` = São Paulo
+(covers Central America + LATAM from the closest peering point),
+`lhr1` = London (covers Europe). Vercel routes each request to the
+nearest healthy region automatically.
+
+Verify after deploy: `curl -I https://pulpo.club/api/clerk/invitation-status`
+from a São Paulo / London egress IP — the response should carry
+`x-vercel-id: gru1::…` or `lhr1::…` instead of `iad1::…`.
+
+Once regions are pinned, also enable the synthetic perf probe (cron
+job that hits the prod URL every 15 minutes from each region) — see
+PR-perf-1 in `~/.claude/plans/make-a-full-audit-cheerful-sketch.md`
+for the design. The probe was deliberately deferred until Pro
+because per-region cron requires Pro.

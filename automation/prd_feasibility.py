@@ -54,8 +54,6 @@ KEYWORDS: dict[str, list[str]] = {
                            r"zona residencial", r"residential"],
     "zoning_tourist":     [r"zona tur[ií]stica", r"uso tur[ií]stico", r"\bturismo\b",
                            r"tourist zone"],
-    "land_agricultural":  [r"agr[ií]cola", r"agricultural", r"\bfinca\b",
-                           r"\bcafetal\b", r"\bcacao\b", r"\bfarm\b"],
     "land_commercial":    [r"\bcomercial\b", r"\bcommercial\b"],
     "land_recreational":  [r"recreacional", r"recreational", r"vacation"],
 }

@@ -43,6 +43,7 @@ const {
   logApi,
 } = require("../stripe/_stripe");
 const posthog = require("../_posthog");
+const withTiming = require("../_perf");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -70,7 +71,11 @@ function emailDomain(email) {
   return at < 0 ? "" : email.slice(at + 1).toLowerCase();
 }
 
-module.exports = async (req, res) => {
+// PR-perf-5a — withTiming wraps every response with Server-Timing.
+// This endpoint is polled by WelcomeModal on the post-Stripe-return
+// flow, so its latency directly impacts the user-perceived gap
+// between Stripe redirect-back and the "you're all set" modal.
+module.exports = withTiming(async (req, res) => {
   const t0 = Date.now();
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
@@ -191,4 +196,4 @@ module.exports = async (req, res) => {
     status: "webhook_pending",
     email_domain: domain,
   });
-};
+});

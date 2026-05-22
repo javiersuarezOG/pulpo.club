@@ -35,13 +35,11 @@ from automation.property_types import PROPERTY_TYPES
 # in sync with property_types.py's title_canonical_template.
 _LEGACY_TYPE_LABELS = {
     "residential":  "Residential Lot",
-    "agricultural": "Farm / Agricultural Land",
     "commercial":   "Commercial Land",
     "recreational": "Recreational Land",
     "mixed":        "Mixed-Use Land",
     "raw":          "Raw Land",
     "lot":          "Residential Lot",
-    "finca":        "Farm / Agricultural Land",
 }
 
 # Backwards-compat alias for any external test/import that still uses the

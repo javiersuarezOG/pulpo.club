@@ -32,12 +32,20 @@ Why a script: the funnel definitions are versioned with the codebase so
 when an event name moves we update the script and re-run it. The PostHog
 UI is for ad-hoc exploration, not the load-bearing conversion funnels.
 
+Umbrella dashboard: every funnel above is auto-attached to one PostHog
+dashboard — "Pulpo — Conversion + Activation funnels (auto)" — so the
+operator has a single URL to bookmark instead of six insight links. The
+dashboard is upserted by name on every script run; tiles attach
+idempotently and any manual additions you make in the UI are preserved
+(we only ever append to the insight's `dashboards` list, never replace).
+
 The legacy "Funnel — Card intent → Paid (auto)" insight (pre-#305) is
 intentionally orphaned in the PostHog UI — historical data is preserved
 but no longer maintained by this script. Delete in the UI when ready.
 
 Env:
-  POSTHOG_PERSONAL_API_KEY   phx_... with scopes insight:write + project:read
+  POSTHOG_PERSONAL_API_KEY   phx_... with scopes insight:write +
+                             dashboard:write + project:read
   POSTHOG_PROJECT_ID         numeric, from the eu.posthog.com URL
   POSTHOG_HOST               defaults to https://eu.posthog.com
                              (ingestion host eu.i.posthog.com auto-swapped)
@@ -47,7 +55,7 @@ Usage:
   python3 scripts/posthog_create_funnels.py --date-from=-90d   # use = (leading - confuses argparse)
   python3 scripts/posthog_create_funnels.py --dry-run
 
-Re-running re-uses the existing insight by name (PATCH).
+Re-running re-uses the existing insight + dashboard by name (PATCH).
 """
 from __future__ import annotations
 
@@ -102,6 +110,51 @@ def upsert(host: str, project_id: str, key: str, payload: dict) -> dict:
         return request("PATCH", url, key, payload)
     url = f"{host}/api/projects/{project_id}/insights/"
     return request("POST", url, key, payload)
+
+
+def find_existing_dashboard(host: str, project_id: str, key: str, name: str) -> dict | None:
+    # PostHog's /dashboards/ list endpoint doesn't accept ?search= in
+    # the way /insights/ does — paginate manually until match or end.
+    next_url: str | None = f"{host}/api/projects/{project_id}/dashboards/?limit=100"
+    while next_url:
+        result = request("GET", next_url, key)
+        for hit in result.get("results", []):
+            if hit.get("name") == name:
+                return hit
+        next_url = result.get("next")
+    return None
+
+
+def upsert_dashboard(host: str, project_id: str, key: str,
+                     name: str, description: str) -> dict:
+    """Create the dashboard by name or PATCH the existing one. Returns
+    the dashboard dict including its `id` for tile attachment."""
+    existing = find_existing_dashboard(host, project_id, key, name)
+    payload = {
+        "name": name,
+        "description": description,
+        "tags": ["conversion", "auto-created"],
+    }
+    if existing:
+        url = f"{host}/api/projects/{project_id}/dashboards/{existing['id']}/"
+        return request("PATCH", url, key, payload)
+    url = f"{host}/api/projects/{project_id}/dashboards/"
+    return request("POST", url, key, payload)
+
+
+def attach_insight_to_dashboard(host: str, project_id: str, key: str,
+                                insight_id: int, dashboard_id: int) -> None:
+    """Idempotently add the dashboard to the insight's dashboards list.
+    PostHog's insights API accepts `dashboards: [id, …]` on POST/PATCH;
+    we GET the current list first so we don't clobber any manual
+    attachments the user made in the UI."""
+    url = f"{host}/api/projects/{project_id}/insights/{insight_id}/"
+    insight = request("GET", url, key)
+    current = insight.get("dashboards") or []
+    if dashboard_id in current:
+        return
+    current.append(dashboard_id)
+    request("PATCH", url, key, {"dashboards": current})
 
 
 def funnel_payload(name: str, description: str, steps: list[dict], date_from: str) -> dict:
@@ -459,11 +512,47 @@ def main() -> int:
         print(json.dumps(payloads, indent=2))
         return 0
 
+    # Upsert the umbrella dashboard FIRST so every insight can be
+    # attached on the same pass. Description kept under PostHog's
+    # 400-char cap (same limit as insights — discovered empirically
+    # 2026-05-19).
+    dashboard = upsert_dashboard(
+        host, project_id, key,
+        name="Pulpo — Conversion + Activation funnels (auto)",
+        description=(
+            "Single-glance view of every funnel managed by "
+            "scripts/posthog_create_funnels.py: A Home→Paid, "
+            "B Listing→Paid, C Detail-panel→Paid, D Activation→"
+            "Account engagement, E Activation→Continued browsing, "
+            "F Activation email delivery. Tiles auto-attach on every "
+            "script run; manual additions in the PostHog UI are "
+            "preserved."
+        ),
+    )
+    dashboard_numeric_id = dashboard.get("id")
+    dashboard_short_id = dashboard.get("short_id")
+    dashboard_url = (
+        f"{host}/project/{project_id}/dashboard/{dashboard_numeric_id}"
+        if dashboard_numeric_id else None
+    )
+
     for payload in payloads:
         result = upsert(host, project_id, key, payload)
-        insight_id = result.get("short_id") or result.get("id")
-        url = f"{host}/project/{project_id}/insights/{insight_id}"
+        insight_numeric_id = result.get("id")
+        insight_short_id = result.get("short_id") or insight_numeric_id
+        url = f"{host}/project/{project_id}/insights/{insight_short_id}"
+        if dashboard_numeric_id and insight_numeric_id:
+            attach_insight_to_dashboard(
+                host, project_id, key,
+                insight_numeric_id, dashboard_numeric_id,
+            )
         print(f"OK  {payload['name']}\n    {url}\n")
+
+    if dashboard_url:
+        print(f"\nDashboard:  {dashboard['name']}\n    {dashboard_url}")
+    # Silence linter — dashboard_short_id is informational only; keep
+    # for future use if PostHog exposes a /dashboard/s/<short_id> path.
+    del dashboard_short_id
     return 0
 
 

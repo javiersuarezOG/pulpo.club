@@ -1855,6 +1855,19 @@ def main() -> int:
           f"tags={dict(sorted(ia_tag_counts.items()))} "
           f"stars={dict(sorted(ia_star_counts.items()))}")
 
+    # Agricultural-purge filter. Pulpo's scope is beach + lake
+    # recreational real estate; agricultural inventory (fincas,
+    # cafetales, ganaderas) is out-of-scope. NLP enrichment still
+    # computes `is_agricultural` so the filter can detect them, but the
+    # listings are dropped here, before regression-guard + write, so
+    # they never reach ranked.json or any downstream consumer
+    # (frontend, newsletter, sitemap, schema).
+    pre_purge = len(ranked)
+    ranked = [li for li in ranked if getattr(li, "is_agricultural", False) is not True]
+    agri_dropped = pre_purge - len(ranked)
+    if agri_dropped:
+        print(f"[purge] dropped {agri_dropped} agricultural listings (out-of-scope) — {len(ranked)} remain")
+
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
     # population rates against the new ones, and fail the run if any

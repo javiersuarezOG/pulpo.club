@@ -170,15 +170,6 @@ function SiteFooterFull({ app, locale }) {
             >
               {t("footer.col.discover.off_market", locale)}
             </button>
-            <button
-              className="link-btn"
-              onClick={() => {
-                track("footer.link_clicked", { link: "discover.agricultural", surface: "full" });
-                app.goBrowse({ category: "agricultural" });
-              }}
-            >
-              {t("footer.col.discover.agricultural", locale)}
-            </button>
           </div>
           <div>
             <h5>{t("footer.col.pulpo.heading", locale)}</h5>

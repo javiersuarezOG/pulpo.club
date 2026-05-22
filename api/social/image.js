@@ -130,6 +130,12 @@ module.exports = async (req, res) => {
   }
   const resolved = await resolveImage(id);
   if (!resolved) {
+    // no-store on 404s so a transient miss (asset still propagating from
+    // the nightly run) never gets pinned by a CDN — the next request must
+    // re-resolve. Without this, Meta's #9004 / #324 errors compound: by
+    // the time pulpo-social asks again, the edge could still be serving
+    // a stale 404 even though the asset is now present.
+    res.setHeader("Cache-Control", "private, no-store");
     return res.status(404).json({ error: "not_found" });
   }
   try {
@@ -141,6 +147,7 @@ module.exports = async (req, res) => {
     // source_width/source_height check) skip these listings before request.
     const meta = await sharp(resolved.buffer).metadata();
     if ((meta.width ?? 0) < size.width || (meta.height ?? 0) < size.height) {
+      res.setHeader("Cache-Control", "private, no-store");
       return res.status(404).json({
         error: "source_too_small",
         detail: `source ${meta.width}x${meta.height} is below target ${size.width}x${size.height}; refuse to upscale`,

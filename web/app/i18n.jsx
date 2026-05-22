@@ -461,7 +461,7 @@ const UI_STRINGS = {
   // land. Spanish copy uses "propiedades" (inclusive) rather than
   // "terrenos" (which would translate "listing" → "plot of land").
   // Keep "terreno" only where the string is genuinely about parcels
-  // of land specifically — see `type.raw`, `filter.feature.flat`.
+  // of land specifically — see `filter.feature.flat`.
   "card.listings_count":     { en: "listings",            es: "propiedades" },
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
@@ -478,13 +478,15 @@ const UI_STRINGS = {
   "card.listed_1_month":     { en: "Listed 1 month ago",  es: "Publicado hace 1 mes" },
   "card.listed_n_months":    { en: "Listed {n} months ago", es: "Publicado hace {n} meses" },
 
-  // Land types
+  // Property-type filter chips. Three values for the Salvadoran market:
+  // Residencial (homes for living), Uso comercial (zoned for business),
+  // Uso turístico (zoned for hospitality / short-let / Airbnb).
+  // 'mixed' + 'raw' removed alongside the chip reduction — they were
+  // mock-data-only values that the backend's land_type field never
+  // emits. 'agricultural' removed earlier (purged at the pipeline).
   "type.residential":        { en: "Residential",         es: "Residencial" },
-  "type.agricultural":       { en: "Agricultural",        es: "Agrícola" },
-  "type.commercial":         { en: "Commercial",          es: "Comercial" },
-  "type.tourist":            { en: "Tourist",             es: "Turístico" },
-  "type.mixed":              { en: "Mixed Use",           es: "Uso Mixto" },
-  "type.raw":                { en: "Raw Land",            es: "Terreno bruto" },
+  "type.commercial":         { en: "Commercial use",      es: "Uso comercial" },
+  "type.tourist":            { en: "Tourism use",         es: "Uso turístico" },
 
   // Badges
   "badge.price_drop":        { en: "Price drop",          es: "Bajó de precio" },
@@ -500,9 +502,10 @@ const UI_STRINGS = {
   "filter.clear":            { en: "Clear all",           es: "Limpiar todo" },
   "filter.zone":             { en: "Zone",                es: "Zona" },
   "filter.price":            { en: "Price",               es: "Precio" },
-  // Filter values cover residential / agricultural / commercial /
-  // tourist / mixed / raw — broad use categories, not strictly
-  // plots-of-land. Renamed to "Property type" / "Tipo de propiedad"
+  // Filter values cover residential / commercial / tourist / mixed /
+  // raw — broad use categories, not strictly plots-of-land
+  // (agricultural was removed alongside the agricultural-listing
+  // purge). Renamed to "Property type" / "Tipo de propiedad"
   // to match Pulpo's broadened scope (houses + lots, not just land).
   // The i18n key keeps `land_type` for back-compat with the filter
   // state shape — only the user-visible label changes.
@@ -560,10 +563,7 @@ const UI_STRINGS = {
   // with the legacy StyleCarousel component. Keys removed.
 
   // Live header stats (PR-4c)
-  "stats.sources":           { en: "sources",  es: "fuentes" },
   "stats.listings":          { en: "listings", es: "propiedades" },
-  "stats.updated":           { en: "updated",  es: "actualizado" },
-  "stats.info_label":        { en: "Pulpo data freshness", es: "Última actualización de los datos de Pulpo" },
 
   // Units toggle (PR-4c) — vrs² is the Salvadoran traditional area unit.
   "units.label":             { en: "Show areas in", es: "Mostrar áreas en" },
@@ -1283,8 +1283,6 @@ const UI_STRINGS = {
                                           es: "Listo para construir" },
   "footer.col.discover.off_market":    { en: "Off-market",
                                           es: "Off-market" },
-  "footer.col.discover.agricultural":  { en: "Agricultural",
-                                          es: "Agrícola" },
   "footer.col.pulpo.heading":          { en: "Pulpo",
                                           es: "Pulpo" },
   "footer.col.pulpo.plans":            { en: "Plans",
@@ -1309,12 +1307,14 @@ const UI_STRINGS = {
                                           es: "Contactar con Pulpo" },
   "contact.page.description":          { en: "Get in touch with the Pulpo team — general enquiries, billing, privacy requests, takedowns.",
                                           es: "Ponte en contacto con el equipo de Pulpo — consultas generales, facturación, privacidad o eliminación de contenido." },
-  "contact.page.lede":                 { en: "We'd love to hear from you. Pick the right inbox below to reach the right person fast.",
-                                          es: "Nos encantaría saber de ti. Escoge la bandeja correcta para llegar más rápido a la persona indicada." },
+  "contact.page.lede":                 { en: "We'd love to hear from you. Send a message below or write to us at hello@pulpo.club.",
+                                          es: "Nos encantaría saber de ti. Envíanos un mensaje abajo o escríbenos a hello@pulpo.club." },
   "contact.page.form_coming_soon":     { en: "A web form for contacting us is being added shortly. In the meantime, please email the inbox that best matches your enquiry.",
                                           es: "Pronto vamos a tener un formulario de contacto. Mientras tanto, escríbenos al correo que mejor coincida con tu consulta." },
   "contact.page.inbox_list_label":     { en: "Or email us directly",
                                           es: "O escríbenos directamente" },
+  "contact.page.inbox_single_label":   { en: "Email us",
+                                          es: "Escríbenos" },
   "contact.page.success":              { en: "Message sent. We'll get back to you shortly.",
                                           es: "Mensaje enviado. Te respondemos pronto." },
   "contact.page.error":                { en: "We couldn't send your message just now. Please try again, or email the inbox that best matches your enquiry directly.",

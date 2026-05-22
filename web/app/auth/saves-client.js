@@ -11,6 +11,7 @@
 // having to ask Sebastian to dig through Vercel runtime logs.
 
 import { track } from "../telemetry/hook";
+import { timedApiFetch } from "../telemetry/perf";
 
 async function parseJsonOrNull(res) {
   try { return await res.json(); } catch { return null; }
@@ -30,7 +31,7 @@ function reportApiError(endpoint, status, detail) {
 }
 
 export async function fetchSaves() {
-  const res = await fetch("/api/saves", {
+  const res = await timedApiFetch("/api/saves[GET]", "/api/saves", {
     method: "GET",
     credentials: "same-origin",
   });
@@ -44,7 +45,7 @@ export async function fetchSaves() {
 }
 
 export async function postSaveAction(listingId, action) {
-  const res = await fetch("/api/saves", {
+  const res = await timedApiFetch("/api/saves[POST]", "/api/saves", {
     method: "POST",
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },

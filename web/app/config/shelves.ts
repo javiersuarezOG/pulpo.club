@@ -92,7 +92,6 @@ export const RETIRED_SHELF_KEYS: readonly string[] = [
   "flat_buildable",
   "build_ready",
   "commercial",
-  "agricultural",
   "under_50k",
   "under_100k",
   "motivated_sellers",

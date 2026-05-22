@@ -14,7 +14,7 @@
 // actually wires it up — not the function in isolation.
 
 import { test, expect } from "@playwright/test";
-import { attachErrorRecorder, seedProUser } from "./_helpers";
+import { attachErrorRecorder, seedConsent, seedProUser } from "./_helpers";
 
 const MODAL = ".pro-upsell-modal";
 
@@ -24,6 +24,14 @@ const MODAL = ".pro-upsell-modal";
 // test below RELIES on the suppression key being set by markUpsellDismissed
 // and surviving across the reload, so a global addInitScript that wipes
 // the key would defeat that assertion.
+//
+// Pre-seed cookie consent on EVERY test in this file. Without it, the
+// ConsentBanner mounts as a fixed-position role="dialog" that intercepts
+// pointer events on top of the upsell modal, and `Maybe later` clicks
+// time out (CI failure mode pre-2026-05-21).
+test.beforeEach(async ({ page }) => {
+  await seedConsent(page);
+});
 
 test.describe("Home page Pro upsell modal — trigger logic", () => {
   test("Direct traffic (/ no params) → no modal", async ({ page }) => {

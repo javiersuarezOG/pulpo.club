@@ -29,7 +29,6 @@ CATEGORY_PREDICATES = {
     "flat_buildable": lambda listing: bool(listing.get("is_flat")) and bool(listing.get("has_paved_access")),
     "build_ready":    lambda listing: bool(listing.get("has_power")) and bool(listing.get("has_water")),
     "commercial":     lambda listing: bool(listing.get("is_commercial")),
-    "agricultural":   lambda listing: bool(listing.get("is_agricultural")),
     "under_50k":      lambda listing: (listing.get("price_usd") or 1e12) < 50_000,
     "under_100k":     lambda listing: (listing.get("price_usd") or 1e12) < 100_000,
     "price_drops":    lambda listing: bool(listing.get("is_repriced")),

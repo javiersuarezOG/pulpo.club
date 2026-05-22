@@ -366,7 +366,6 @@
           "null"
         ],
         "enum": [
-          "agricultural",
           "commercial",
           "tourist",
           "residential",

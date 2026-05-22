@@ -53,7 +53,6 @@ const CATEGORY_PREDICATES = {
   flat_buildable:    (l) => !!l.is_flat && !!l.has_paved_access,
   build_ready:       (l) => !!l.has_power && !!l.has_water,
   commercial:        (l) => !!l.is_commercial,
-  agricultural:      (l) => !!l.is_agricultural,
   under_50k:         (l) => (l.price_usd ?? 1e12) < 50_000,
   under_100k:        (l) => (l.price_usd ?? 1e12) < 100_000,
   price_drops:       (l) => !!l.is_repriced,

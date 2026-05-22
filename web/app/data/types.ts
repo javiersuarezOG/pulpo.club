@@ -28,7 +28,6 @@ export type Listing = {
   // any land/house/condo property_type).
   land_type:
     | "residential"
-    | "agricultural"
     | "commercial"
     | "tourist"
     | null;

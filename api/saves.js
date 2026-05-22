@@ -20,6 +20,7 @@
 const { clerkClient, authenticateClerkRequest } = require("./_clerk");
 const { effectivePlan } = require("./_plan");
 const { makeRateLimiter, send429 } = require("./_rate_limit");
+const withTiming = require("./_perf");
 
 const FREE_SAVE_CAP = 10;
 
@@ -56,7 +57,13 @@ async function writeSaves(userId, saves) {
   });
 }
 
-module.exports = async (req, res) => {
+// PR-perf-5a — wrap with withTiming so every response carries
+// Server-Timing + X-Vercel-Region. The client's timedApiFetch reads
+// both and tags `perf.api_call` events with the region — lets the
+// Geo Latency dashboard tell apart "saves endpoint is slow from
+// Europe because it lives in iad1" from "saves endpoint is slow
+// everywhere".
+module.exports = withTiming(async (req, res) => {
   const t0 = Date.now();
 
   let userId;
@@ -156,4 +163,4 @@ module.exports = async (req, res) => {
   res.setHeader("Allow", "GET, POST");
   logApi("saves", { status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
   return res.status(405).json({ error: "method_not_allowed" });
-};
+});

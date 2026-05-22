@@ -25,6 +25,43 @@ import { ClerkProvider, useUser, useClerk } from "@clerk/react";
 import { esMX, enUS } from "@clerk/localizations";
 import { applyFounderPlan } from "../lib/founder-emails";
 import { deriveSubscriptionState } from "../lib/subscription";
+import { track } from "../telemetry/hook";
+
+// PR-perf-5c — time the click → modal-paint gap for Clerk hosted
+// modals. `requestAnimationFrame` after the imperative open call fires
+// on the next browser paint, which is roughly when the modal first
+// becomes visible to the user. The delta isn't pixel-perfect (Clerk
+// may paint over multiple frames as fonts/icons hydrate) but it's the
+// best client-side approximation without instrumenting Clerk's
+// internals — good enough to spot a 2x slowdown by geo. Try/catch
+// wraps every call so a telemetry hiccup never breaks the modal open.
+function timedClerkOpen(intent, fn) {
+  const t0 =
+    typeof performance !== "undefined" && performance.now
+      ? performance.now()
+      : Date.now();
+  try { fn(); } finally {
+    try {
+      const stamp = () => {
+        const now =
+          typeof performance !== "undefined" && performance.now
+            ? performance.now()
+            : Date.now();
+        track("perf.clerk_modal_opened", {
+          intent,
+          ms_from_click: Math.max(0, Math.round(now - t0)),
+        });
+      };
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(stamp);
+      } else {
+        // Tests / SSR / very old browsers — emit synchronously with
+        // ms=0. PostHog can still see the event count.
+        stamp();
+      }
+    } catch { /* ignore */ }
+  }
+}
 
 function planFromMetadata(metadata) {
   // Clerk Dashboard test users carry plan in publicMetadata.plan.
@@ -108,8 +145,8 @@ function ClerkActionsBinder({ onActions }) {
   useEffect(() => {
     if (typeof onActions !== "function") return;
     onActions({
-      openSignIn: (opts) => clerk.openSignIn(opts || {}),
-      openSignUp: (opts) => clerk.openSignUp(opts || {}),
+      openSignIn: (opts) => timedClerkOpen("sign_in", () => clerk.openSignIn(opts || {})),
+      openSignUp: (opts) => timedClerkOpen("sign_up", () => clerk.openSignUp(opts || {})),
       signOut:    (opts) => clerk.signOut(opts || {}),
       // Reads Clerk's signUp resource state — populated when the user
       // has accepted an invitation ticket but hasn't completed sign-up
@@ -182,7 +219,8 @@ function ClerkActionsBinder({ onActions }) {
       // sessions, connected OAuth accounts, and account deletion.
       // Account → Security calls this when Clerk is enabled instead
       // of mounting the dead local password form.
-      openUserProfile: (opts) => clerk.openUserProfile(opts || {}),
+      openUserProfile: (opts) =>
+        timedClerkOpen("user_profile", () => clerk.openUserProfile(opts || {})),
       // Persists a profile patch through the backend. Frontend SDK
       // can't write `publicMetadata` directly (Clerk blocks it — the
       // user can't be trusted to set their own plan / preferences),

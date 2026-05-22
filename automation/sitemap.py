@@ -28,7 +28,6 @@ SECTION_ENTRIES: list[tuple[str, str, str]] = [
     ("/browse?cat=beachfront",     "daily",   "0.9"),
     ("/browse?cat=build_ready",    "daily",   "0.8"),
     ("/browse?cat=off_market",     "weekly",  "0.6"),
-    ("/browse?cat=agricultural",   "weekly",  "0.7"),
     ("/plans",                     "monthly", "0.5"),
 ]
 

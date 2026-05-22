@@ -43,6 +43,7 @@ import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/
 import { tierFor } from "../lib/gating";
 import { readFeatureFlag } from "../lib/feature-flag";
 import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
+import { buildSrcSet } from "../lib/img-url";
 
 // Deterministic UTC-day index — same epoch + math as lib/hero-photos.ts
 // `daily` mode so the hero rotates once per UTC day worldwide.
@@ -75,6 +76,30 @@ export function HeroV4({ app, locale }) {
     if (top.length === 0) return null;
     return top[dailyIndex(top.length)];
   }, [listings]);
+
+  // Hero photo source. We DON'T use the listing's photos[0] (which is
+  // a broker-CDN URL — easybroker.com, remax-central, i0.wp.com, etc.
+  // PostHog telemetry showed those URLs as the LCP element on / for
+  // ~half of sessions at P75=2.26s, with a 14.5s P95 on
+  // perf.card_image_load and 20 image.stuck events in 14 days, all on
+  // is_local=False broker URLs).
+  //
+  // Instead we derive the LOCAL .hero.jpg variant from `thumbnail_url`
+  // (which is `/photos/<id>.jpg`, the 600×400 derivative). The .hero.jpg
+  // sibling is the 1080² hi-res variant the pipeline generates for every
+  // hero-eligible listing. Routing it through /api/img (Photo component
+  // does this when heroSrc is set) serves WebP at q=78 from the Vercel
+  // edge with 1-year immutable cache — 30–80KB instead of 500KB–2MB.
+  //
+  // Falls back to null if thumbnail_url isn't a /photos/* path; <Photo>
+  // then renders the broker URL via photos[0] (pre-fix behaviour),
+  // preserving the surface for any future listing source whose pipeline
+  // doesn't write a local hero variant.
+  const heroSrc = useMemo(() => {
+    const tn = resolved?.thumbnail_url;
+    if (typeof tn !== "string" || !tn.startsWith("/photos/")) return null;
+    return tn.replace(/\.jpg$/i, ".hero.jpg");
+  }, [resolved]);
 
   // Brief details under the photo — price · size · land_type. Joined
   // with " · " and any null piece is dropped so a listing missing
@@ -129,6 +154,29 @@ export function HeroV4({ app, locale }) {
   useEffect(() => {
     try { track("hero_v4_viewed", {}); } catch { /* ignore */ }
   }, []);
+
+  // ── LCP preload ────────────────────────────────────────────────────
+  // Inject <link rel="preload" as="image"> as soon as we know the hero's
+  // local .hero.jpg path. The browser starts the fetch immediately —
+  // earlier than the React commit, earlier than the <picture>+<img>
+  // discovery — shaving ~50–150ms off LCP on cold loads. The srcset
+  // mirrors what <Photo> renders so the preload + the actual <img>
+  // resolve to the same URL (no double-fetch).
+  useEffect(() => {
+    if (!heroSrc) return;
+    const srcset = buildSrcSet(heroSrc);
+    if (!srcset) return;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    try { link.fetchPriority = "high"; } catch { /* older browsers */ }
+    link.setAttribute("imagesrcset", srcset);
+    link.setAttribute("imagesizes", "(min-width:1024px) 800px, 100vw");
+    document.head.appendChild(link);
+    return () => {
+      try { document.head.removeChild(link); } catch { /* already gone */ }
+    };
+  }, [heroSrc]);
 
   // ── Paid-tier detection (hides CTA + microcopy for pro/agency) ─────
   const tier = tierFor(app?.user);
@@ -246,6 +294,7 @@ export function HeroV4({ app, locale }) {
               className="hp-hero-v4-photo-img"
               eager
               source="hero_v4"
+              heroSrc={heroSrc}
             />
           ) : (
             // Listings still loading — render an aspect-ratio-preserving

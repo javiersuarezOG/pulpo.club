@@ -59,6 +59,31 @@ export async function seedProUser(page: Page): Promise<void> {
   await seedUser(page, "pro");
 }
 
+// Pre-accept the cookie-consent banner so it doesn't render over
+// modal/CTA targets in the test (it's a fixed-position role="dialog"
+// that intercepts pointer events until the user clicks Accept / Reject).
+// Mirrors the production "Accept all" path: writes a versioned
+// `consent_v` record granting every category. Must run via addInitScript
+// BEFORE the first navigation so the banner never mounts.
+//
+// Keep the policy version in sync with CONSENT_POLICY_VERSION in
+// web/app/lib/consent.ts — if that constant bumps, this seed becomes
+// stale and the banner re-renders, defeating the helper.
+export async function seedConsent(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem(
+        "consent_v",
+        JSON.stringify({
+          v: 1,
+          ts: Date.now(),
+          accepted: ["strictly_necessary", "functional", "analytics"],
+        }),
+      );
+    } catch { /* private mode / quota — banner will render and tests fail loudly */ }
+  });
+}
+
 // Seeds a localStorage user with plan="free" but email matching the
 // VITE_FOUNDER_EMAILS allowlist set in playwright.config.ts. Used to
 // assert that the founder-override path (web/app/lib/founder-emails.ts)

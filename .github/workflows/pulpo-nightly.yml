@@ -488,6 +488,24 @@ jobs:
           print(f"Hires pipeline canary OK: attempted={attempted} ok={results.get('ok',0)} error={errored}")
           EOF
 
+      - name: Hero variant canary (LCP-fix dependency)
+        # Regression guard for the home-hero LCP fix (PR-perf-hero,
+        # 2026-05-21). HeroV4 routes the home hero through /api/img,
+        # which fetches `/photos/<id>.hero.jpg` (the pipeline-generated
+        # 1080² variant). If the pipeline ever stops writing
+        # `.hero.jpg` next to `<id>.jpg`, /api/img 404s and the hero
+        # falls back to the broker URL (photos[0]) — the exact 14.5 s
+        # P95 LCP regression we just closed.
+        #
+        # Soft fail: warn-only on first miss so a single off-market
+        # listing without a hero variant doesn't block the nightly. The
+        # canary is gated to the top 200 by rank_score — those are the
+        # listings the hero rotator can actually pick. A miss in the
+        # tail is harmless; a miss in the top is a real regression.
+        run: |
+          python3 -m pulpo.cli check-hero-variants --top-only 200 \
+            || { echo "::error::hero variant canary FAILED — see logs above"; exit 1; }
+
       - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)
         # PR-8 of the reliability plan — durable backup of every nightly's
         # canary-validated ranked.json. Lives AFTER the canaries pass but
