@@ -103,24 +103,6 @@ export function pickTopRanked(listings, n) {
     .slice(0, n);
 }
 
-// Price drops: previous_price > price, sorted by % drop desc.
-function pickPriceDrops(listings, n) {
-  return [...listings]
-    .filter((l) => l.previous_price && l.price && l.previous_price > l.price && isShelfEligible(l))
-    .map((l) => ({ l, dropPct: 1 - l.price / l.previous_price }))
-    .sort((a, b) => b.dropPct - a.dropPct)
-    .slice(0, n)
-    .map((x) => x.l);
-}
-
-// New this week: days_listed ≤ 7, sorted by first_seen_date asc (most recent).
-function pickNewThisWeek(listings, n) {
-  return [...listings]
-    .filter((l) => (l.days_listed ?? l.first_seen_date) <= 7 && isShelfEligible(l))
-    .sort((a, b) => (a.first_seen_date ?? 999) - (b.first_seen_date ?? 999))
-    .slice(0, n);
-}
-
 // Shelf-specific badge derived from the listing data. Returns
 // `{ text, kind, side }` or null. `kind` mirrors the existing
 // hp-shelf-card-badge-{kind} classes; `side` is "left" or "right".
@@ -288,7 +270,11 @@ export function HomeShelf({
   headingKey,
   subcopyKey,      // Optional one-line subtitle under the h2 (objective shelf description).
   countPill,
-  iconName,        // Optional icon (e.g. "cat_top10") rendered inline before the h2 text.
+  iconName,        // Single icon (e.g. "cat_top10") rendered inline before the h2 text.
+  iconStack,       // Phase 3: array of icons rendered as a 2- or 3-glyph stack before the h2.
+                   //   e.g. ["cat_top10", "cat_beachfront", "type_terreno"] for a Top 10
+                   //   beach terrenos shelf. Each entry can be {name, tone?} for color
+                   //   override (trophy=gold, lake=blue, beach=green, type=ink).
   cards,
   listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
   heroV4 = false,  // gates the new card markup
@@ -371,7 +357,23 @@ export function HomeShelf({
               </span>
             ) : null}
             <h2 id={`${domId}-h2`} className="hp-shelf-h2">
-              {iconName ? (
+              {iconStack && iconStack.length > 0 ? (
+                <span className="hp-shelf-h2-iconstack" aria-hidden="true">
+                  {iconStack.map((g, i) => {
+                    const name = typeof g === "string" ? g : g.name;
+                    const tone = typeof g === "string" ? null : g.tone;
+                    return (
+                      <Icon
+                        key={`${name}-${i}`}
+                        name={name}
+                        size={20}
+                        strokeWidth={1.6}
+                        className={`hp-shelf-h2-icon hp-shelf-h2-icon-${tone || "ink"}`}
+                      />
+                    );
+                  })}
+                </span>
+              ) : iconName ? (
                 <Icon name={iconName} size={22} strokeWidth={1.5} className="hp-shelf-h2-icon" />
               ) : null}
               {t(headingKey, locale)}
@@ -439,88 +441,154 @@ export function HomeShelf({
 }
 
 // ────────────────────────────────────────────────────────────────────
-// Three pre-configured instances. Hardcoded editorial cards remain as
-// the flag-off / small-dataset fallback so the homepage never empties.
+// Phase 3 — Six type-specific Top 10 shelves replacing the single
+// Top 10 / Price Drops / New This Week trio. Each shelf is the
+// best-ranked listings within one (master_category, subcategory)
+// pair. A shelf only renders when ≥ MIN_REAL_LISTINGS qualify;
+// otherwise the section is silently hidden (the hero_v4 hideShelf
+// branch). NEW + PRICE-DROP signals migrated to per-card chips in
+// PR #421 — no more dedicated shelves for those.
 
-const TOP_10_CARDS = [
-  { image: "water_features", gradient: "forest", badgeLeft: "A+ deal", badgeLeftKind: "dark", badgeRight: "−31%", badgeRightKind: "forest", price: "$324,000", meta: "Lago de Coatepeque · 2bd" },
-  { image: "beachfront",     gradient: "clay",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−28%", badgeRightKind: "forest", price: "$615,000", meta: "El Tunco · 3bd beach" },
-  { image: "ocean_view",     gradient: "navy",   badgeLeft: "A deal",  badgeLeftKind: "dark", badgeRight: "−26%", badgeRightKind: "forest", price: "$485,000", meta: "El Cuco · 4bd home" },
-];
+// Pick the best-ranked listings for a (master, sub) cohort.
+function pickTopByMasterAndSub(listings, master, sub, n) {
+  return [...listings]
+    .filter(
+      (l) =>
+        l.master_category === master &&
+        l.subcategory === sub &&
+        l.rank_score != null &&
+        isShelfEligible(l),
+    )
+    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
+    .slice(0, n);
+}
 
-const PRICE_DROPS_CARDS = [
-  { image: "water_features", gradient: "forest", badgeLeft: "−$45k", badgeLeftKind: "burgundy", price: "$425,000", priceWas: "$470k", meta: "Lago de Ilopango · 4bd" },
-  { image: "ocean_view",     gradient: "clay",   badgeLeft: "−$30k", badgeLeftKind: "burgundy", price: "$720,000", priceWas: "$750k", meta: "Costa del Sol · 3bd condo" },
-  { image: "mountain_view",  gradient: "gray",   badgeLeft: "−$22k", badgeLeftKind: "burgundy", price: "$268,000", priceWas: "$290k", meta: "El Sunzal · 2bd cottage" },
-];
+// Map subcategory → its icon name. Trophy is universal; the
+// master-category glyph (cat_beachfront / cat_lake) carries the
+// shoreline; this carries the property type. Triple icon-stack
+// renders as `trophy → master → sub`.
+const SUB_ICON = {
+  homes:  "type_home",
+  condos: "type_condo",
+  land:   "type_terreno",
+};
+const MASTER_ICON = {
+  beach: "cat_beachfront",
+  lake:  "cat_lake",
+};
 
-const NEW_THIS_WEEK_CARDS = [
-  { image: "beachfront",     gradient: "clay",   badgeRight: "today",      badgeRightKind: "forest-cream", price: "$845,000", meta: "Las Flores · oceanfront" },
-  { image: "water_features", gradient: "forest", badgeRight: "2 days ago", badgeRightKind: "forest-cream", price: "$389,000", meta: "Lago de Güija · 3bd" },
-  { image: "flat_buildable", gradient: "navy",   badgeRight: "5 days ago", badgeRightKind: "forest-cream", price: "$152,000", meta: "Lago de Coatepeque · lot" },
-];
-
-export function TopTenShelf({ app, locale, heroV4 = false }) {
+function ShelfTopBySubcategory({
+  app,
+  locale,
+  heroV4,
+  master,    // "beach" | "lake"
+  sub,       // "homes" | "condos" | "land"
+  shelfKey,  // unique slug for telemetry
+  headingKey,
+  subcopyKey,
+  category,  // routing slug for "View all →" (e.g. "top_beach_terrenos")
+}) {
   const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickTopRanked(all, REAL_LIMITS.top_10) : []), [all, heroV4]);
+  const listings = useMemo(
+    () => (heroV4 ? pickTopByMasterAndSub(all, master, sub, 10) : []),
+    [all, heroV4, master, sub],
+  );
   return (
     <HomeShelf
       app={app}
       locale={locale}
-      sectionKey="top_10"
-      shelfKey="top_10"
-      domId="hp-shelf-top10"
-      headingKey="home.shelf.top10.h2"
-      subcopyKey="home.shelf.top10.sub"
-      iconName="cat_top10"
-      cards={TOP_10_CARDS}
+      sectionKey={shelfKey}
+      shelfKey={shelfKey}
+      domId={`hp-shelf-${shelfKey}`}
+      headingKey={headingKey}
+      subcopyKey={subcopyKey}
+      iconStack={[
+        { name: "cat_top10",     tone: "trophy" },
+        { name: MASTER_ICON[master], tone: master },
+        { name: SUB_ICON[sub],   tone: "ink" },
+      ]}
+      cards={[]}
       listings={listings}
       heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "top_10" })}
+      onViewAll={() => app && app.goBrowse && app.goBrowse({ category })}
     />
   );
 }
 
-export function PriceDropsShelf({ app, locale, heroV4 = false }) {
-  const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickPriceDrops(all, REAL_LIMITS.price_drops) : []), [all, heroV4]);
-  const pill = t("home.shelf.dropsCount", locale);
+export function TopBeachTerrenosShelf({ app, locale, heroV4 = false }) {
   return (
-    <HomeShelf
-      app={app}
-      locale={locale}
-      sectionKey="price_drops"
-      shelfKey="price_drops"
-      domId="hp-shelf-drops"
-      headingKey="home.shelf.dropsHeading"
-      subcopyKey="home.shelf.dropsSub"
-      countPill={{ text: typeof pill === "string" ? pill.replace("{n}", "47") : "", tone: "burgundy" }}
-      cards={PRICE_DROPS_CARDS}
-      listings={listings}
-      heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "price_drop" })}
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="beach" sub="land"
+      shelfKey="top_beach_terrenos"
+      headingKey="home.shelf.top_beach_terrenos.h2"
+      subcopyKey="home.shelf.top_beach_terrenos.sub"
+      category="top_beach_terrenos"
     />
   );
 }
 
-export function NewThisWeekShelf({ app, locale, heroV4 = false }) {
-  const all = useListings();
-  const listings = useMemo(() => (heroV4 ? pickNewThisWeek(all, REAL_LIMITS.new_this_week) : []), [all, heroV4]);
-  const pill = t("home.shelf.newCount", locale);
+export function TopBeachCondosShelf({ app, locale, heroV4 = false }) {
   return (
-    <HomeShelf
-      app={app}
-      locale={locale}
-      sectionKey="new_this_week"
-      shelfKey="new_this_week"
-      domId="hp-shelf-new"
-      headingKey="home.shelf.newHeading"
-      subcopyKey="home.shelf.newSub"
-      countPill={{ text: typeof pill === "string" ? pill.replace("{n}", "1,247") : "", tone: "sage" }}
-      cards={NEW_THIS_WEEK_CARDS}
-      listings={listings}
-      heroV4={heroV4}
-      onViewAll={() => app && app.goBrowse && app.goBrowse({ category: "new" })}
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="beach" sub="condos"
+      shelfKey="top_beach_condos"
+      headingKey="home.shelf.top_beach_condos.h2"
+      subcopyKey="home.shelf.top_beach_condos.sub"
+      category="top_beach_condos"
+    />
+  );
+}
+
+export function TopBeachHomesShelf({ app, locale, heroV4 = false }) {
+  return (
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="beach" sub="homes"
+      shelfKey="top_beach_homes"
+      headingKey="home.shelf.top_beach_homes.h2"
+      subcopyKey="home.shelf.top_beach_homes.sub"
+      category="top_beach_homes"
+    />
+  );
+}
+
+export function TopLakeTerrenosShelf({ app, locale, heroV4 = false }) {
+  return (
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="lake" sub="land"
+      shelfKey="top_lake_terrenos"
+      headingKey="home.shelf.top_lake_terrenos.h2"
+      subcopyKey="home.shelf.top_lake_terrenos.sub"
+      category="top_lake_terrenos"
+    />
+  );
+}
+
+export function TopLakeCondosShelf({ app, locale, heroV4 = false }) {
+  return (
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="lake" sub="condos"
+      shelfKey="top_lake_condos"
+      headingKey="home.shelf.top_lake_condos.h2"
+      subcopyKey="home.shelf.top_lake_condos.sub"
+      category="top_lake_condos"
+    />
+  );
+}
+
+export function TopLakeHomesShelf({ app, locale, heroV4 = false }) {
+  return (
+    <ShelfTopBySubcategory
+      app={app} locale={locale} heroV4={heroV4}
+      master="lake" sub="homes"
+      shelfKey="top_lake_homes"
+      headingKey="home.shelf.top_lake_homes.h2"
+      subcopyKey="home.shelf.top_lake_homes.sub"
+      category="top_lake_homes"
     />
   );
 }

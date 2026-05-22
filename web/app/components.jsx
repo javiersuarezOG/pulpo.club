@@ -158,6 +158,13 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     cat_under_100k: <><circle cx="12" cy="12" r="9"/><path d="M15 9c-1-1-2-1.5-3-1.5-2 0-3 1-3 2.5 0 3 6 1.5 6 4.5 0 1.5-1 2.5-3 2.5-1.5 0-2.5-.5-3.5-1.5"/><path d="M12 6v12"/></>,
     cat_commercial: <><path d="M3 21V8l6-4 6 4v13"/><path d="M15 21V12h6v9"/><path d="M3 21h18"/><path d="M7 11h.01M7 14h.01M7 17h.01M11 11h.01M11 14h.01M11 17h.01"/></>,
     cat_motivated:  <><circle cx="12" cy="13" r="8"/><path d="M12 8v5l3 2"/><path d="M9 2h6"/></>,
+    /* Subcategory icons — pair with master_category (cat_beachfront /
+       cat_lake) in shelf headers to communicate "Beach × Homes" etc.
+       at a glance. Mono-line, geometric, same hairline as the other
+       cat_* set. */
+    type_home:      <><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></>,
+    type_condo:     <><path d="M5 21V5l7-2v18"/><path d="M12 21V9l7 2v10"/><path d="M7 8h2M7 12h2M7 16h2M14 13h2M14 17h2"/></>,
+    type_terreno:   <><path d="M3 18l4-4 5 5 4-4 5 5"/><path d="M3 20h18"/><path d="M6 6l2 2M11 5l2 2M16 7l2 2"/></>,
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
