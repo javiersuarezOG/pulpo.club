@@ -119,7 +119,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
    wedged next to the logo on the left. */
 .topnav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .topnav-links { display: none; }
 }
 
@@ -168,13 +168,16 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 
 .profile-chip { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-/* Mobile: the topnav-right rail (avatar + Logout + LocaleToggle + LiveStats)
-   blows past a 320 px viewport when a user is signed in (responsive-smoke
-   on /account at 320×568 and 375×812 saw the chip's right edge at
-   x=361 — 41 px past). Hiding the redundant Logout link-btn here keeps
-   the avatar (which navigates to /account, where the SecuritySection
-   has its own Sign Out CTA) without sacrificing identity affordance. */
-@media (max-width: 767px) {
+/* Mobile + tablet portrait: the topnav-right rail (avatar + Logout +
+   LocaleToggle + LiveStats) blows past viewport when a Pro user is
+   signed in. Original fix targeted 320–414 (responsive-smoke saw the
+   chip's right edge at x=361 — 41 px past 320). Pro user /account at
+   768×1024 iPad portrait still failed with 75 px overflow because the
+   ≥768 breakpoint shows the Logout link AND the full desktop nav AND
+   desktop padding (24px × 2). Extending the collapse to ≤768 makes
+   iPad portrait fit cleanly; the avatar still navigates to /account
+   where the SecuritySection has its own Sign Out CTA. */
+@media (max-width: 768px) {
   .topnav .profile-chip .link-btn { display: none; }
 }
 .avatar {
@@ -3656,6 +3659,14 @@ h1,h2,h3,h4,h5 { margin: 0; }
 @media (max-width: 480px) {
   /* Free up topnav-right gap on tiny screens. */
   .live-stats { margin-right: -4px; }
+  /* iPhone-SE-class viewports (320px wide). The full chip — dot + count
+     + "listings" label — plus the rest of the header (logo, locale
+     switcher, sign-in CTA) overflows by ~39px because every flex child
+     has `white-space: nowrap`. Drop the textual label here; the
+     pulsing dot + bolded count still carry the "live" signal that
+     PR #417 introduced. Regression caught by tests/e2e/responsive-smoke
+     at 320×568 iPhone SE. */
+  .live-stats .ls-label { display: none; }
 }
 
 /* ============================================================
