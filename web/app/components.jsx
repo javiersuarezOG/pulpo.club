@@ -229,29 +229,65 @@ const PulpoLogo = ({ size = 22, pro = false }) => (
 );
 
 // ===== Badge =====
+// Text-only pill for non-photo contexts (results table, detail page).
+// Reduced to NEW + PRICE DROP only — off-market / motivated / build-ready
+// retired in Phase 1 of the filter rewrite. For photo-overlay surfaces
+// (shelf cards, browse/saved cards), use <CardSignalChip> instead.
 function Badge({ listing }) {
   const lc = currentLocale();
-  // Effective listing age in days. Source-of-truth is `days_listed`
-  // (parsed from the original posting's mod_dt by the scraper). When
-  // that's null (source date unparseable), fall back to
-  // `first_seen_date` (days since Pulpo first scraped it) — but
-  // that's a weaker signal: a listing scraped today could have been
-  // posted on the source 10 months ago. Prior bug shipped "Nuevo"
-  // badges on listings whose footer simultaneously read "Publicado
-  // hace 10 meses" because we trusted first_seen_date directly.
-  const effectiveAgeDays = (typeof listing.days_listed === "number")
+  const signal = signalForListing(listing);
+  if (!signal) return null;
+  return (
+    <span className="pulpo-badge" style={{ background: `var(--badge-${signal.kind})` }}>
+      {t(signal.labelKey, lc)}
+    </span>
+  );
+}
+
+// ===== signalForListing — shared by Badge + CardSignalChip =====
+// Returns {kind, labelKey, icon} for the highest-priority signal, or
+// null when nothing fires. Single source of truth so the photo chip,
+// the table row, and the detail header always agree on which signal
+// (if any) applies to a listing.
+//
+// Priority: PRICE DROP wins over NEW. Commercial-value signal beats
+// freshness because a $50k drop is more decision-shaping than a
+// listing being 6 days vs 8 days old. Most listings return null;
+// at most one signal renders per card.
+//
+// Effective age uses `days_listed` (parsed from the broker's mod_dt)
+// when available, falling back to `first_seen_date` (days since
+// Pulpo first scraped it). The fallback is weaker — a today-scraped
+// listing could have been posted 10 months ago on the source — but
+// it's all we have when the broker's date is unparseable. Threshold
+// is 7 days, matching the home shelf's "new this week" definition.
+function signalForListing(listing) {
+  if (!listing) return null;
+  if (listing.is_repriced) {
+    return { kind: "drop", labelKey: "badge.price_drop", icon: "cat_price_drop" };
+  }
+  const ageDays = (typeof listing.days_listed === "number")
     ? listing.days_listed
     : listing.first_seen_date;
-  let kind = null;
-  if (listing.is_repriced) kind = { key: "drop", label: t("badge.price_drop", lc), color: "var(--badge-drop)" };
-  else if (listing.source_type === "off_market") kind = { key: "off", label: t("badge.off_market", lc), color: "var(--badge-off)" };
-  else if (effectiveAgeDays <= 3) kind = { key: "new", label: t("badge.new", lc), color: "var(--badge-new)" };
-  else if (listing.readiness_score >= 3) kind = { key: "ready", label: t("badge.build_ready", lc), color: "var(--badge-ready)" };
-  else if (typeof listing.days_listed === "number" && listing.days_listed >= 90) kind = { key: "motivated", label: t("badge.motivated", lc), color: "var(--badge-motivated)" };
-  if (!kind) return null;
+  if (typeof ageDays === "number" && ageDays <= 7) {
+    return { kind: "new", labelKey: "badge.new", icon: "cat_new" };
+  }
+  return null;
+}
+
+// ===== CardSignalChip — photo overlay variant =====
+// Icon-led pill, anchored to the bottom-left corner of the photo
+// area. Used by ShelfCard (home) + ListingCard (Browse, Saved).
+// White background with the icon + label tinted by the signal's
+// brand color, so the chip pops cleanly against any photo.
+function CardSignalChip({ listing }) {
+  const lc = currentLocale();
+  const signal = signalForListing(listing);
+  if (!signal) return null;
   return (
-    <span className="pulpo-badge" style={{ background: kind.color }}>
-      {kind.label}
+    <span className={`card-signal-chip card-signal-chip-${signal.kind}`}>
+      <Icon name={signal.icon} size={12} strokeWidth={2} />
+      <span>{t(signal.labelKey, lc)}</span>
     </span>
   );
 }
@@ -701,9 +737,7 @@ function ListingCard({
             <span className="pulpo-rank-num">{topRank}</span>
           </span>
         )}
-        <div className="card-badge-row">
-          <Badge listing={listing} />
-        </div>
+        <CardSignalChip listing={listing} />
         <HeartButton listingId={listing.id} app={app} variant="overlay" size={18} />
         {hovered && listing.photos.length > 1 && (
           <>
@@ -813,7 +847,7 @@ function Toast({ toast }) {
 }
 
 export {
-  Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
+  Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, signalForListing, Photo, HeartButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
 };

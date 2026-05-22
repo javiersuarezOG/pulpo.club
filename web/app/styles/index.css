@@ -850,6 +850,29 @@ h1,h2,h3,h4,h5 { margin: 0; }
   position: absolute; top: 12px; left: 12px;
   display: flex; gap: 6px; z-index: 2;
 }
+
+/* Photo-overlay chip for the NEW / PRICE DROP signals. Bottom-left
+   so it doesn't collide with the rank chip (top-left) or heart
+   (top-right). White pill + colored icon+text reads cleanly on any
+   photo. Used by ListingCard (Browse + Saved) and ShelfCard (Home).
+   Priority: drop wins over new — at most one chip per card. */
+.card-signal-chip {
+  position: absolute; bottom: 10px; left: 10px;
+  z-index: 2;
+  display: inline-flex; align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 4px oklch(0 0 0 / 0.18);
+  pointer-events: none;
+}
+.card-signal-chip svg { width: 12px; height: 12px; }
+.card-signal-chip-drop { color: var(--badge-drop); }
+.card-signal-chip-new  { color: var(--badge-new); }
+
 .pulpo-badge {
   display: inline-flex; align-items: center;
   padding: 5px 10px;

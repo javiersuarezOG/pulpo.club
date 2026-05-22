@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
-import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon, RankTrophy } from "../components.jsx";
+import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon, RankTrophy, CardSignalChip } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
 import { readFeatureFlag } from "../lib/feature-flag";
@@ -220,6 +220,7 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
               {badge.text}
             </span>
           )}
+          <CardSignalChip listing={listing} />
           <HeartButton listingId={listing.id} app={app} variant="overlay" size={16} />
         </div>
         <div className="hp-shelf-card-body">
