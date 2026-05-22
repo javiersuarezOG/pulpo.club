@@ -392,7 +392,7 @@ const UI_STRINGS = {
   // when ≥5 listings qualify; otherwise the section is hidden. NEW
   // and PRICE-DROP signals now ride on per-card chips (PR #421) so
   // no dedicated shelves for those any more.
-  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 beach terrenos",
+  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 beach land",
                                           es: "Top 10 terrenos de playa" },
   "home.shelf.top_beach_terrenos.sub": { en: "Best-priced land along the Pacific coast.",
                                           es: "Los mejores terrenos en la costa del Pacífico." },
@@ -404,7 +404,7 @@ const UI_STRINGS = {
                                           es: "Top 10 casas de playa" },
   "home.shelf.top_beach_homes.sub":    { en: "Single-family beachfront and beach-walk residences.",
                                           es: "Casas frente al mar y a pasos de la playa." },
-  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lake terrenos",
+  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lake land",
                                           es: "Top 10 terrenos de lago" },
   "home.shelf.top_lake_terrenos.sub":  { en: "Best-ranked lakefront land, El Salvador-wide.",
                                           es: "Los mejores terrenos frente al lago en El Salvador." },

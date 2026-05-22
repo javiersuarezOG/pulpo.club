@@ -583,6 +583,89 @@ test.describe("New app boots cleanly on key routes", () => {
     }
   });
 
+  // Mirror of the EN-into-ES canary above: English-locale users must not
+  // see Spanish words on the page. We've already shipped at least two
+  // such regressions — most recently the "Top 10 beach terrenos" /
+  // "Top 10 lake terrenos" home-shelf headings (i18n.jsx) where the EN
+  // copy literally contained the Spanish plural "terrenos" instead of
+  // "land". This test locks the fix in and catches the next one.
+  //
+  // Listing titles + descriptions come from Spanish-language broker
+  // sources (e.g. "TERRENOS PLAYA EL ZONTE") — translating those is a
+  // separate ingest-pipeline workstream. We scope the sweep to surfaces
+  // we own (the homepage shell + the Browse results header & shelves);
+  // the detail panel is intentionally NOT swept.
+  test("English locale: no Spanish canary words leak into rendered UI", async ({ page }) => {
+    // Spanish words/phrases that should NOT appear in the EN UI. Each
+    // entry is a word we've shipped at least once in EN copy and had
+    // to fix; adding to this list locks the fix in.
+    const SPANISH_CANARIES = [
+      // Home-shelf headings (i18n.jsx home.shelf.top_*_terrenos.h2) —
+      // the literal "terrenos" plural was hardcoded into EN copy.
+      "terrenos",
+      // Broader vocabulary the canary should reject if it ever leaks
+      // into a Pulpo-owned EN surface. None of these are valid English
+      // and none appear in any current EN entry of i18n.jsx (verified
+      // via grep at test-write time).
+      "casas", "departamentos", "condominios", "propiedades",
+      "frente al mar", "frente al lago",
+      "vista al mar", "vista al lago",
+      // Common ES verbs/connectors that would betray a stray ES string.
+      "sin tope",                                  // price-input placeholder fallback
+      // Sort labels (Spanish-side of sort.*) — pure ES, no false-positives.
+      "Mejor valor", "Menor precio", "Más recientes", "Lote más grande",
+      // Status / discovery
+      "Bajó de precio", "Recién aparecidos",
+    ];
+
+    // Tokens that legitimately exist in both EN and ES copy and would
+    // false-positive a naive sweep. Add with a justification.
+    const SHARED_TOKENS = [
+      "Pulpo",                                     // brand name
+      "Pulpo Pro",                                 // brand + plan name
+      "Top 10",                                    // numeric/brand label
+      "El Salvador",                               // country name
+    ];
+    void SHARED_TOKENS;
+
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "en"));
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page.locator(".homepage-v2").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(500);
+
+    const homeText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of SPANISH_CANARIES) {
+      expect(
+        homeText,
+        `English locale leaked Spanish text on home: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+
+    // Browse — sweep the page header + filter panel + shelves. The
+    // detail panel is intentionally NOT opened: listing titles +
+    // descriptions are Spanish-source broker data, out of scope.
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.locator(".page-browse").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(400);
+
+    // Scope to the page chrome (results header + filter sidebar +
+    // controls) so broker-supplied card titles don't trip the canary.
+    const browseChromeText: string = await page.evaluate(() => {
+      const parts = [
+        document.querySelector(".results-header")?.textContent ?? "",
+        document.querySelector(".filter-desktop")?.textContent ?? "",
+        document.querySelector(".active-filter-row")?.textContent ?? "",
+      ];
+      return parts.join(" ");
+    });
+    for (const word of SPANISH_CANARIES) {
+      expect(
+        browseChromeText,
+        `English locale leaked Spanish text on /browse chrome: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
+  });
+
   // PR-C — /start ES canary. Same guardrail as the home-page canary
   // above but for the public marketing surface. Every t()-able string
   // on /start must render in Spanish when localStorage says ES.

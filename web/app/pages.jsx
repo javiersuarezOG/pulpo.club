@@ -11,7 +11,12 @@ import { clerkEnabled } from "./auth/clerk-shell.jsx";
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
-import { SHELVES, ZONES } from "./data.jsx";
+import { ZONES } from "./data.jsx";
+import {
+  MASTER_CATEGORY_LABELS,
+  SUBCATEGORY_LABELS,
+  DISCOVERY_PILL_LABELS,
+} from "./config/ia.ts";
 import { getCategoryImage } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
@@ -1020,6 +1025,68 @@ function buildFiltersForCategory(category) {
   return f;
 }
 
+// Derive the `results-cat-title` header from the live `filters` state so
+// it always matches what the user is actually looking at. Previously the
+// header read `app.routeParams.category` (the URL `cat=` slug set at
+// entry), which never re-synced as the user toggled filter chips — so
+// landing via "Lake" and then switching to Beach kept showing "Lake".
+//
+// Returns `{ title, meta?, clear } | null`. `clear` mutates filters
+// to remove the dimension(s) that produced the title; `meta` is the
+// optional secondary line (used only for Top 10's "N of 10" semantic).
+// Returns null when no flagship filter is set → caller falls back to
+// the plain count.
+//
+// Multi-dimension cases (e.g. Beach + Waterfront, or two discovery
+// tags) intentionally return null — the active-filter chip row below
+// the header already shows each dimension, and a synthesized title
+// would just duplicate it.
+function resolveResultsHeader(filters, locale, resultCount) {
+  if (filters.rank_max === 10) {
+    return {
+      title: t("browse.top10.title", locale),
+      meta: `${resultCount} ${t("browse.top10.of_ten", locale)}`,
+      clearAria: t("browse.top10.clear", locale),
+      clear: (f) => ({ ...f, rank_max: null }),
+    };
+  }
+  const { master_category: m, subcategory: s, discovery_tags: tags } = filters;
+  if (m && s) {
+    return {
+      title: `${tr(MASTER_CATEGORY_LABELS[m], locale)} · ${tr(SUBCATEGORY_LABELS[s], locale)}`,
+      clearAria: t("browse.clear_category", locale),
+      clear: (f) => ({ ...f, master_category: null, subcategory: null }),
+    };
+  }
+  if (m) {
+    return {
+      title: tr(MASTER_CATEGORY_LABELS[m], locale),
+      clearAria: t("browse.clear_category", locale),
+      clear: (f) => ({ ...f, master_category: null }),
+    };
+  }
+  if (s) {
+    return {
+      title: tr(SUBCATEGORY_LABELS[s], locale),
+      clearAria: t("browse.clear_category", locale),
+      clear: (f) => ({ ...f, subcategory: null }),
+    };
+  }
+  if (tags && tags.size === 1) {
+    const [tag] = tags;
+    return {
+      title: tr(DISCOVERY_PILL_LABELS[tag], locale),
+      clearAria: t("browse.clear_category", locale),
+      clear: (f) => {
+        const next = new Set(f.discovery_tags);
+        next.delete(tag);
+        return { ...f, discovery_tags: next };
+      },
+    };
+  }
+  return null;
+}
+
 function BrowsePage({ app }) {
   const LISTINGS = useListings();
   const listingsState = useListingsState();
@@ -1210,67 +1277,52 @@ function BrowsePage({ app }) {
         <div className="results-col">
           <div className="results-header">
             <div className="results-count">
-              {filters.rank_max === 10 ? (
-                // Top 10 chip is active. The Top 10 list is GLOBAL — chips
-                // like Beach / Waterfront slice it, they don't re-rank it.
-                // The "N of 10" meta makes the slice transparent: if Beach
-                // is also active and 6 of the global Top 10 are beach
-                // listings, the user sees "6 of 10" and understands they're
-                // looking at the intersection, not a re-ranked "Top 10 in
-                // beach."
-                <>
-                  <span className="results-cat-title">{t("browse.top10.title", app.locale)}</span>
-                  <span className="results-cat-meta">
-                    <span className="num">{results.length}</span> {t("browse.top10.of_ten", app.locale)}
-                    <button
-                      className="cat-clear"
-                      onClick={() => {
-                        // Clear rmax from URL so the user drops back to the
-                        // full ranked list. Other chips (master, tag, pmax)
-                        // stay applied — they're independent dimensions.
-                        if (typeof window !== "undefined") {
-                          const next = new URLSearchParams(window.location.search);
-                          next.delete("rmax");
-                          const qs = next.toString();
-                          window.history.pushState({}, "", `/browse${qs ? `?${qs}` : ""}`);
-                        }
-                        app.goBrowse({ category: null });
-                      }}
-                      aria-label={t("browse.top10.clear", app.locale)}
-                      title={t("browse.top10.clear", app.locale)}
-                    >
-                      <Icon name="close" size={14} strokeWidth={2}/>
-                    </button>
-                  </span>
-                </>
-              ) : app.routeParams.category ? (() => {
-                // Phase 4 removed the PILLS lookup (PillRail is gone). Routes
-                // arriving via deep-link still display a header derived from
-                // the SHELVES dict if it knows the slug; otherwise the raw
-                // category string is the fallback label.
-                const cat = SHELVES.find(s => s.key === app.routeParams.category);
-                const label = cat ? tr(cat.label, app.locale) : app.routeParams.category;
+              {(() => {
+                // Derive the header from the live filter state, not the
+                // URL `cat=` slug. See resolveResultsHeader's docblock —
+                // without this, switching from Lake to Beach (etc.) left
+                // the original slug pinned at the top of the page.
+                const header = resolveResultsHeader(filters, app.locale, results.length);
+                if (!header) {
+                  return (
+                    <>
+                      <span className="num">{results.length}</span> {t("card.listings_count", app.locale)}
+                    </>
+                  );
+                }
                 return (
                   <>
-                    <span className="results-cat-title">{label}</span>
+                    <span className="results-cat-title">{header.title}</span>
                     <span className="results-cat-meta">
-                      <span className="num">{results.length}</span> {t("browse.in_country", app.locale)}
+                      {header.meta ? (
+                        <>
+                          <span className="num">{results.length}</span> {t("browse.top10.of_ten", app.locale)}
+                        </>
+                      ) : (
+                        <>
+                          <span className="num">{results.length}</span> {t("browse.in_country", app.locale)}
+                        </>
+                      )}
                       <button
                         className="cat-clear"
-                        onClick={() => app.goBrowse({ category: null })}
-                        aria-label={t("browse.clear_category", app.locale)}
-                        title={t("browse.clear_category", app.locale)}
+                        onClick={() => {
+                          // Mutate filters directly so the header, chip
+                          // row, URL writer, and `browse.filter_changed`
+                          // telemetry stay in sync. goBrowse() is a
+                          // navigation primitive; using it for a filter
+                          // mutation would skip the writer effect and
+                          // leave a stale URL.
+                          setFilters((prev) => header.clear(prev));
+                        }}
+                        aria-label={header.clearAria}
+                        title={header.clearAria}
                       >
                         <Icon name="close" size={14} strokeWidth={2}/>
                       </button>
                     </span>
                   </>
                 );
-              })() : (
-                <>
-                  <span className="num">{results.length}</span> {t("card.listings_count", app.locale)}
-                </>
-              )}
+              })()}
             </div>
             <div className="results-controls">
               <button className="filter-mobile-btn" onClick={() => setFilterDrawerOpen(true)}>
