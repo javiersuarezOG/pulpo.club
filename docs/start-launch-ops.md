@@ -15,8 +15,8 @@ El Salvador's legal tender). Every other geo falls back to USD.
 
 1. Stripe Dashboard → **Products → Pulpo Pro → Pulpo Pro Price**.
 2. Click "Add a price by currency". Add:
-   - `USD` — $10.00 (round marketing price — *do not* let Stripe pre-fill an FX-converted value like $12)
-3. `EUR` stays as the base — €10.00.
+   - `USD` — $9.99 (round marketing price — *do not* let Stripe pre-fill an FX-converted value like $11.83)
+3. `EUR` stays as the base — €9.99.
 4. **Do NOT** enable Adaptive Pricing. It conflicts with explicit
    `currency_options`. If Stripe surfaces an "Adaptive Pricing is on"
    banner, switch it off.
@@ -28,9 +28,42 @@ currency-selector with EUR + USD.
 
 **Adding MXN / ARS later** (when the regional channels start producing
 traffic in PostHog): add the row to the Stripe Price *and* add the matching
-country → currency line in `api/stripe/_geo.js` in the same PR. The geo
-map only returns currencies that exist on the Stripe Price — adding to
-one without the other 500s the checkout for that geo.
+country → currency line in `api/stripe/_geo.js` AND in
+`web/app/lib/pricing.ts` (both files hold parallel maps — see the
+header comment in pricing.ts for the full recipe). The geo map only
+returns currencies that exist on the Stripe Price — adding to one
+without the others 500s the checkout for that geo.
+
+### Price-rotation playbook (changing the displayed amount)
+
+To change the Pulpo Pro displayed price (e.g. running a price
+experiment):
+
+1. **Code**: edit `web/app/lib/pricing.ts` — update `amount` and
+   `displayString` for each currency in the `PRICES` map. That single
+   file drives every paid-CTA surface (hero microcopy, USP band,
+   /start, FreeMonthModal, UspPopup, /plans).
+2. **Stripe**: in the Dashboard → **Products → Pulpo Pro → "Add another
+   price"**, create a new monthly recurring Price with `currency_options`
+   for both EUR and USD at the new amount. Same `recurring.interval =
+   month`, same `tax_code = txcd_10103100`. Stripe blocks editing
+   `unit_amount` on a Price that has been used in any Checkout — that's
+   why we add a new Price instead of editing the existing one.
+3. **Archive the old Price** (Dashboard → old Price → "Archive"). Any
+   existing subscriptions stay attached to the archived Price unless you
+   explicitly migrate them via a Subscription Schedule — separate
+   decision, separate playbook.
+4. **Rotate `STRIPE_PRICE_ID_PRO`** in Vercel (production scope — the
+   only scope we use) with the new `price_…` ID. Redeploy.
+5. **Verify on the Vercel preview** per `CLAUDE.md`'s live-preview
+   verification mandate before merging the code PR. The Checkout
+   summary screen must show the new amount and, if testing a promo,
+   the coupon must still resolve ("3 months free → then €X.XX/mo").
+6. **Coupons keep working untouched.** Self-applied promo codes
+   (REDDIT01, AMIGOS, IG01, WHATSAPP01, TEST, …) attach to the **Coupon**
+   object, not to a Price. Swapping the underlying Price changes
+   nothing about how they resolve — Stripe applies the same discount
+   to whatever line item the Checkout Session has.
 
 ### "3 months free" coupon + promo codes (required for PR-A)
 
@@ -69,21 +102,19 @@ Confirm `https://pulpo.club/api/stripe/webhook` is registered in:
 If you rotate the signing secret in Stripe, also update the Vercel env
 var or every event will fail signature verification.
 
-### Test-mode vs live-mode keys (operational note)
+### Promo codes live alongside the Stripe keys
 
-Test-mode promo codes (`TEST`) and live-mode promo codes (`REDDIT01`) live
-in **separate ledgers**. After flipping to live keys in Vercel:
+Promo codes and the "3 months free" coupon live in whichever Stripe
+workspace is referenced by `STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID_PRO`
+in Vercel. If you rotate those keys to a different Stripe environment,
+the promo codes from the old environment won't resolve — re-create
+them in the new workspace and re-attach to the "3 months free"
+coupon there.
 
-- Re-create every promo code in live mode (test-mode codes won't resolve).
-- Re-attach them to the live-mode "3 months free" coupon.
-- `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID_PRO` in Vercel env must both
-  switch in lockstep — test price IDs won't resolve against live keys
-  and vice versa.
-
-When triaging a "no code found" report, check the Vercel function log for
-the `key_prefix=sk_test_` vs `key_prefix=sk_live_` token emitted by
-`start-checkout.js:113` — that's the fastest way to confirm a test/live
-mismatch.
+When triaging a "no code found" report, check the Vercel function log
+for the `key_prefix=` token emitted by `start-checkout.js:113` — that
+identifies which Stripe key the function actually loaded, which is
+the fastest way to confirm a wrong/stale key is in play.
 
 ## Clerk Dashboard
 

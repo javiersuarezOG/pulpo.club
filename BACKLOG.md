@@ -41,7 +41,7 @@ These shipped in [PR-150](https://github.com/javiersuarezOG/pulpo.club/pull/150)
 
 - [ ] **Real Stripe end-to-end (Checkout + Customer Portal)** with a Stripe test card (4242 4242 4242 4242, any future date, any CVC). Steps:
   1. Sign in as a Free user on a Vercel preview with `STRIPE_SECRET_KEY` + Clerk wired.
-  2. Click "Upgrade — $10/month" on the Plans page → redirect to `https://checkout.stripe.com/...` lands.
+  2. Click "Upgrade — $9.99/month" on the Plans page → redirect to `https://checkout.stripe.com/...` lands.
   3. Pay with the test card → return to `/preview/?upgrade=success` and the success toast fires.
   4. Watch the Clerk Dashboard: `publicMetadata.plan = "pro"` set by webhook; `privateMetadata.stripeCustomerId` set.
   5. Reload the app — UI reflects Pro tier (no upgrade prompts, full gallery, off-market unlocked).

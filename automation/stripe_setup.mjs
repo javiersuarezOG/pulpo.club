@@ -17,7 +17,7 @@ import Stripe from "stripe";
 
 const PRODUCT_NAME      = "Pulpo Pro";
 const PRODUCT_DESC      = "Pulpo Pro — off-market access, broker contacts, unlimited views, unlimited saves.";
-const PRICE_AMOUNT      = 1000;          // €10.00 / month (1000 cents)
+const PRICE_AMOUNT      = 999;           // €9.99 / month (999 cents) — mirror web/app/lib/pricing.ts
 const PRICE_CURRENCY    = "eur";
 const PRICE_INTERVAL    = "month";
 const TAX_CODE          = "txcd_10103100"; // digital service / SaaS

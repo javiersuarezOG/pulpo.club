@@ -10,7 +10,7 @@
 //      tab carries the ★ Pro badge. At 320px the wordmark pill is
 //      hidden by design but the avatar ring + star remain.
 //   4. The Plans page renders "Your plan" (disabled) for Pro users
-//      instead of the "Upgrade — €10/month" re-checkout CTA.
+//      instead of the "Upgrade — $9.99/month" re-checkout CTA.
 //
 // Driven by the legacy auth path (localStorage seed) since Playwright
 // CI runs with Clerk off. The same hydration helper applies the
@@ -96,8 +96,9 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
     // The card itself carries the .plan-card-current marker so future
     // visual diffs catch a theming regression.
     await expect(page.getByTestId("plan-card-pro")).toHaveClass(/plan-card-current/);
-    // No "Upgrade — €" button anywhere on the page for a Pro viewer.
-    await expect(page.getByRole("button", { name: /Upgrade — €/ })).toHaveCount(0);
+    // No upgrade CTA anywhere on the page for a Pro viewer (matches
+    // either currency glyph since the page picks one based on geo).
+    await expect(page.getByRole("button", { name: /Upgrade — [€$]/ })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
@@ -111,7 +112,7 @@ test.describe("Founder-email Pro override — full Pro identity across the app",
     await expect(page.locator(".avatar-pro-badge")).toHaveCount(0);
     // Plans page still shows the upgrade CTA.
     await page.goto("/plans", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("button", { name: /Upgrade — €/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Upgrade — [€$]/ })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });

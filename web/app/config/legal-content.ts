@@ -602,7 +602,7 @@ export const SUBSCRIPTION: LegalDocument = {
     es: "Precios, meses promocionales, renovación automática, cancelación, y el derecho de retracto de 5 días hábiles de Pulpo Pro.",
   },
   review_complete: true,
-  last_updated: "2026-05-20",
+  last_updated: "2026-05-22",
   sections: [
     {
       id: "plans",
@@ -610,10 +610,10 @@ export const SUBSCRIPTION: LegalDocument = {
       body: {
         en:
           "Free Plan — Unlimited browsing of listing cards, limited full detail views per session, and the option to receive the newsletter.\n\n" +
-          "Pulpo Pro (paid plan) — Unlimited detail views, saved listings, weekly deal digest, and advanced filters. Price: USD 10.00 per month. The price you see at checkout is the price you pay.",
+          "Pulpo Pro (paid plan) — Unlimited detail views, saved listings, weekly deal digest, and advanced filters. Price: €9.99 per month for EU subscribers, or $9.99 USD per month for subscribers outside the EUR region. The currency shown at checkout is determined by your location.",
         es:
           "Plan gratuito — Navegación ilimitada de tarjetas de anuncios, vistas de detalle limitadas por sesión, y la opción de recibir el boletín.\n\n" +
-          "Pulpo Pro (plan de pago) — Vistas de detalle ilimitadas, anuncios guardados, resumen semanal de oportunidades, y filtros avanzados. Precio: USD 10.00 al mes. El precio que ves en el checkout es el que pagas.",
+          "Pulpo Pro (plan de pago) — Vistas de detalle ilimitadas, anuncios guardados, resumen semanal de oportunidades, y filtros avanzados. Precio: €9,99 al mes para suscriptores de la UE, o $9.99 USD al mes para suscriptores fuera de la zona euro. La moneda mostrada en el checkout depende de tu ubicación.",
       },
     },
     {
@@ -640,11 +640,11 @@ export const SUBSCRIPTION: LegalDocument = {
       body: {
         en:
           "Your subscription starts the day Stripe confirms your payment. If a free promotional period applies, the first paid charge is deferred by the number of free months in that promotion.\n\n" +
-          "After that, your subscription renews automatically every month. You will be charged USD 10.00 per month (plus any taxes that apply where you live). We send a receipt by email after each charge.\n\n" +
+          "After that, your subscription renews automatically every month. You will be charged €9.99 per month for EU subscribers, or $9.99 USD per month for subscribers outside the EUR region (plus any taxes that apply where you live). We send a receipt by email after each charge.\n\n" +
           "Auto-renewal is required by Stripe's flow, but you can cancel any time and avoid future charges — see below.",
         es:
           "Tu suscripción comienza el día en que Stripe confirma tu pago. Si aplica un período gratuito promocional, el primer cobro se difiere por la cantidad de meses gratuitos de esa promoción.\n\n" +
-          "Después, tu suscripción se renueva automáticamente cada mes. Se te cobrará USD 10.00 al mes (más los impuestos que correspondan donde vives). Enviamos un recibo por correo tras cada cobro.\n\n" +
+          "Después, tu suscripción se renueva automáticamente cada mes. Se te cobrará €9,99 al mes para suscriptores de la UE, o $9.99 USD al mes para suscriptores fuera de la zona euro (más los impuestos que correspondan donde vives). Enviamos un recibo por correo tras cada cobro.\n\n" +
           "La renovación automática es parte del flujo de Stripe, pero puedes cancelar en cualquier momento y evitar cobros futuros — ver abajo.",
       },
     },
