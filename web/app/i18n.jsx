@@ -513,8 +513,10 @@ const UI_STRINGS = {
   "filter.size":             { en: "Size",                es: "Tamaño" },
   "filter.features":         { en: "Key features",        es: "Características" },
   "filter.infrastructure":   { en: "Infrastructure",      es: "Infraestructura" },
-  "filter.status":           { en: "Listing status",      es: "Estado" },
-  "filter.readiness":        { en: "Build readiness",     es: "Listo para construir" },
+  // filter.status + filter.readiness section labels removed alongside
+  // their FilterGroups (Phase 1 of the rewrite). New + Price-drop now
+  // surface via the PillRail Ranking group + per-card badges;
+  // Off-market + Motivated retired as ambiguous; Readiness was opaque.
 
   // Detail
   "detail.back":             { en: "Back to results",     es: "Volver a resultados" },
@@ -819,15 +821,9 @@ const UI_STRINGS = {
   "filter.infra.power":      { en: "Electricity",                   es: "Electricidad" },
   "filter.infra.paved":      { en: "Paved Road",                    es: "Camino pavimentado" },
   "filter.infra.sewage":     { en: "Sewage",                        es: "Drenaje" },
-  "filter.status.new":       { en: "New",                           es: "Nuevo" },
-  "filter.status.price_drop": { en: "Price drop",                   es: "Bajó de precio" },
-  "filter.status.off_market": { en: "Off-market",                   es: "Off-market" },
-  "filter.status.motivated":  { en: "Motivated seller",             es: "Vendedor motivado" },
-  "filter.readiness.0":      { en: "Any",                           es: "Cualquiera" },
-  "filter.readiness.1":      { en: "Basic",                         es: "Básico" },
-  "filter.readiness.2":      { en: "Some",                          es: "Algo" },
-  "filter.readiness.3":      { en: "Most",                          es: "Mayoría" },
-  "filter.readiness.4":      { en: "Fully ready",                   es: "Totalmente listo" },
+  // filter.status.* + filter.readiness.* removed alongside their UI
+  // (Phase 1 of the rewrite). State + predicate stay so URL routing
+  // and PillRail still work.
   "filter.photos_all":       { en: "All listings",                  es: "Todas las propiedades" },
   "filter.photos_with":      { en: "With photos",                   es: "Con fotos" },
   "filter.photos_none":      { en: "No photos",                     es: "Sin fotos" },
