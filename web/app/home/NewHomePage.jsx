@@ -5,9 +5,11 @@
 //   2. FeaturedDeal     — single editorial card between hero and USPs
 //   3. USPBand          — "For subscribers only" + 3 cards on white
 //   4. PickShoreline    — Lake / Beach nav cards with editorial mockups
-//   5. TopTenShelf      — Top 10 deals right now
-//   6. PriceDropsShelf  — Price drops + ↘ N cuts pill
-//   7. NewThisWeekShelf — New this week + ✦ N added pill
+//   5–10. Six Top-10 shelves (Phase 3): Beach × terrenos / condos /
+//        homes, then Lake × terrenos / condos / homes. Each renders
+//        only when ≥5 listings qualify; otherwise it's hidden. The
+//        NEW + PRICE-DROP signals that used to drive their own shelves
+//        now ride as per-card chips (PR #421).
 //
 // Wave-3a: HomepageHeader removed — SiteHeader (mounted at the app
 // level) is the single header for every route. The hero still owns the
@@ -28,7 +30,14 @@ import { HeroV4 } from "./HeroV4.jsx";
 import { FeaturedDeal } from "./FeaturedDeal.jsx";
 import { USPBand } from "./USPBand.jsx";
 import { PickShoreline } from "./PickShoreline.jsx";
-import { TopTenShelf, PriceDropsShelf, NewThisWeekShelf } from "./HomeShelf.jsx";
+import {
+  TopBeachTerrenosShelf,
+  TopBeachCondosShelf,
+  TopBeachHomesShelf,
+  TopLakeTerrenosShelf,
+  TopLakeCondosShelf,
+  TopLakeHomesShelf,
+} from "./HomeShelf.jsx";
 import { visibleBlocksFor } from "./blockRegistry";
 import { readFeatureFlag } from "../lib/feature-flag";
 import { tierFor } from "../lib/gating";
@@ -56,9 +65,12 @@ const BLOCK_COMPONENTS = {
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
   usps:          ({ app, locale }) => <USPBand app={app} locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
-  top_10:        ({ app, locale, heroV4 }) => <TopTenShelf app={app} locale={locale} heroV4={heroV4} />,
-  price_drops:   ({ app, locale, heroV4 }) => <PriceDropsShelf app={app} locale={locale} heroV4={heroV4} />,
-  new_this_week: ({ app, locale, heroV4 }) => <NewThisWeekShelf app={app} locale={locale} heroV4={heroV4} />,
+  top_beach_terrenos: ({ app, locale, heroV4 }) => <TopBeachTerrenosShelf app={app} locale={locale} heroV4={heroV4} />,
+  top_beach_condos:   ({ app, locale, heroV4 }) => <TopBeachCondosShelf   app={app} locale={locale} heroV4={heroV4} />,
+  top_beach_homes:    ({ app, locale, heroV4 }) => <TopBeachHomesShelf    app={app} locale={locale} heroV4={heroV4} />,
+  top_lake_terrenos:  ({ app, locale, heroV4 }) => <TopLakeTerrenosShelf  app={app} locale={locale} heroV4={heroV4} />,
+  top_lake_condos:    ({ app, locale, heroV4 }) => <TopLakeCondosShelf    app={app} locale={locale} heroV4={heroV4} />,
+  top_lake_homes:     ({ app, locale, heroV4 }) => <TopLakeHomesShelf     app={app} locale={locale} heroV4={heroV4} />,
 };
 
 export function NewHomePage({ app }) {

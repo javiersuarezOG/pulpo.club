@@ -171,19 +171,37 @@ export type EventMap = {
     cta_text: string;
   };
   "homepage.featured_deal_clicked": Record<string, never>;
+  // Phase 3 — homepage block IDs were six type-specific Top 10 shelves
+  // replacing the single top_10 / price_drops / new_this_week trio.
+  // Section + shelf enums updated accordingly. Keep the old IDs in the
+  // union so historical PostHog events still match the schema (they're
+  // never emitted by current code but live forever in the warehouse).
   "homepage.section_viewed": {
-    section: "hero" | "featured" | "usps" | "shoreline" | "top_10" | "price_drops" | "new_this_week";
+    section:
+      | "hero" | "featured" | "usps" | "shoreline"
+      | "top_beach_terrenos" | "top_beach_condos" | "top_beach_homes"
+      | "top_lake_terrenos"  | "top_lake_condos"  | "top_lake_homes"
+      | "top_10" | "price_drops" | "new_this_week";   // legacy, retained for historical event compatibility
   };
   "homepage.shelf_view_all_clicked": {
-    shelf: "top_10" | "price_drops" | "new_this_week";
+    shelf:
+      | "top_beach_terrenos" | "top_beach_condos" | "top_beach_homes"
+      | "top_lake_terrenos"  | "top_lake_condos"  | "top_lake_homes"
+      | "top_10" | "price_drops" | "new_this_week";   // legacy
   };
   "homepage.shelf_card_clicked": {
-    shelf: "top_10" | "price_drops" | "new_this_week";
+    shelf:
+      | "top_beach_terrenos" | "top_beach_condos" | "top_beach_homes"
+      | "top_lake_terrenos"  | "top_lake_condos"  | "top_lake_homes"
+      | "top_10" | "price_drops" | "new_this_week";   // legacy
     position: number;
     listing_id: string;
   };
   "homepage.shelf_scrolled": {
-    shelf: "top_10" | "price_drops" | "new_this_week";
+    shelf:
+      | "top_beach_terrenos" | "top_beach_condos" | "top_beach_homes"
+      | "top_lake_terrenos"  | "top_lake_condos"  | "top_lake_homes"
+      | "top_10" | "price_drops" | "new_this_week";   // legacy
     max_position_reached: number;
   };
   "shoreline_card_clicked": {

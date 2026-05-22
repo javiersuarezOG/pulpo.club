@@ -22,18 +22,25 @@ const BOTH_ON       = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v
 const HERO_V4_ON    = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: true  };
 const ALL_FLAGS_ON  = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: true  };
 
+// Phase 3 — the catalogue shelves are now six (Beach × Land/Condos/
+// Homes, then Lake × Land/Condos/Homes) instead of the legacy three
+// (top_10, price_drops, new_this_week).
+const SIX_TOP_SHELVES: readonly BlockId[] = [
+  "top_beach_terrenos", "top_beach_condos", "top_beach_homes",
+  "top_lake_terrenos",  "top_lake_condos",  "top_lake_homes",
+];
 const ALL_BLOCKS: readonly BlockId[] = [
   "hero", "featured", "usps",
-  "shoreline", "top_10", "price_drops", "new_this_week",
+  "shoreline", ...SIX_TOP_SHELVES,
 ];
 // Post-Wave-5 paid trim: hero stays (image-only — CTA gated in
 // component), featured/usps/shoreline drop. Catalogue shelves stay.
 const PAID_BLOCKS: readonly BlockId[] = [
-  "hero", "top_10", "price_drops", "new_this_week",
+  "hero", ...SIX_TOP_SHELVES,
 ];
 const ALL_BLOCKS_NO_USPS: readonly BlockId[] = [
   "hero", "featured",
-  "shoreline", "top_10", "price_drops", "new_this_week",
+  "shoreline", ...SIX_TOP_SHELVES,
 ];
 
 // localStorage stub — visibleBlocksFor reads window.localStorage for
@@ -150,7 +157,7 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
 
   it("composes with all flags on for paid: only hero + shelves remain", () => {
     const out = visibleBlocksFor(pro as never, ALL_FLAGS_ON);
-    expect(out).toEqual(["hero", "top_10", "price_drops", "new_this_week"]);
+    expect(out).toEqual(["hero", ...SIX_TOP_SHELVES]);
   });
 });
 

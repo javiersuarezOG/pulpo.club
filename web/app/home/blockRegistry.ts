@@ -20,9 +20,16 @@ export type BlockId =
   | "featured"
   | "usps"
   | "shoreline"
-  | "top_10"
-  | "price_drops"
-  | "new_this_week";
+  // Phase 3 — six type-specific Top 10 shelves replacing the single
+  // top_10 / price_drops / new_this_week trio. NEW + PRICE-DROP signals
+  // now ride on per-card chips (PR #421). Beach-first, by type
+  // ascending (terrenos → condos → homes).
+  | "top_beach_terrenos"
+  | "top_beach_condos"
+  | "top_beach_homes"
+  | "top_lake_terrenos"
+  | "top_lake_condos"
+  | "top_lake_homes";
 
 // ╭───────────────────────────────────────────────────────────────────╮
 // │ HOME PAGE BLOCK VISIBILITY MATRIX                                  │
@@ -33,26 +40,36 @@ export type BlockId =
 // │ Authoring order = render order — drag a row to reorder visually.   │
 // ╰───────────────────────────────────────────────────────────────────╯
 const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
-  // block          anon    free    pro     agency
-  hero:          { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
-  featured:      { anonymous: true,  free: true,  pro: false, agency: false },
-  usps:          { anonymous: true,  free: false, pro: false, agency: false }, // signed-in users (free OR paid) skip the marketing band
-  shoreline:     { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
-  top_10:        { anonymous: true,  free: true,  pro: true,  agency: true  },
-  price_drops:   { anonymous: true,  free: true,  pro: true,  agency: true  },
-  new_this_week: { anonymous: true,  free: true,  pro: true,  agency: true  },
+  // block               anon    free    pro     agency
+  hero:               { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
+  featured:           { anonymous: true,  free: true,  pro: false, agency: false },
+  usps:               { anonymous: true,  free: false, pro: false, agency: false }, // signed-in users (free OR paid) skip the marketing band
+  shoreline:          { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
+  // Phase 3: each shelf renders only when ≥5 listings qualify (the
+  // hero_v4 hideShelf gate inside HomeShelf). Visible to every tier.
+  top_beach_terrenos: { anonymous: true,  free: true,  pro: true,  agency: true  },
+  top_beach_condos:   { anonymous: true,  free: true,  pro: true,  agency: true  },
+  top_beach_homes:    { anonymous: true,  free: true,  pro: true,  agency: true  },
+  top_lake_terrenos:  { anonymous: true,  free: true,  pro: true,  agency: true  },
+  top_lake_condos:    { anonymous: true,  free: true,  pro: true,  agency: true  },
+  top_lake_homes:     { anonymous: true,  free: true,  pro: true,  agency: true  },
 };
 
 // Render order — authoring order in the matrix is the rendered order.
-// Keep this in sync with VISIBILITY's key order.
+// Keep this in sync with VISIBILITY's key order. Phase 3 puts the
+// Beach × types first (Beach is the volume category — terrenos/condos/
+// homes ascending by entry price), then Lake.
 const BLOCK_ORDER: readonly BlockId[] = [
   "hero",
   "featured",
   "usps",
   "shoreline",
-  "top_10",
-  "price_drops",
-  "new_this_week",
+  "top_beach_terrenos",
+  "top_beach_condos",
+  "top_beach_homes",
+  "top_lake_terrenos",
+  "top_lake_condos",
+  "top_lake_homes",
 ];
 
 // Flag map controlling the registry's filter behavior. Each wave adds

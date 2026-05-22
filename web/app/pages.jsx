@@ -1067,6 +1067,15 @@ function buildFiltersForCategory(category) {
     lake_homes:   () => { f.master_category = "lake";  f.subcategory = "homes"; },
     lake_condos:  () => { f.master_category = "lake";  f.subcategory = "condos"; },
     lake_land:    () => { f.master_category = "lake";  f.subcategory = "land"; },
+    // Phase 3 — View-all from the six type-specific home shelves
+    // routes here. Same master+sub as the bare variants above, plus
+    // rank_max=10 so the landing view matches the shelf's editorial promise.
+    top_beach_terrenos: () => { f.master_category = "beach"; f.subcategory = "land";   f.rank_max = 10; },
+    top_beach_condos:   () => { f.master_category = "beach"; f.subcategory = "condos"; f.rank_max = 10; },
+    top_beach_homes:    () => { f.master_category = "beach"; f.subcategory = "homes";  f.rank_max = 10; },
+    top_lake_terrenos:  () => { f.master_category = "lake";  f.subcategory = "land";   f.rank_max = 10; },
+    top_lake_condos:    () => { f.master_category = "lake";  f.subcategory = "condos"; f.rank_max = 10; },
+    top_lake_homes:     () => { f.master_category = "lake";  f.subcategory = "homes";  f.rank_max = 10; },
     top_rated:    () => { f.discovery_tags.add("top_rated"); },
     under_250k:   () => { f.discovery_tags.add("under_250k"); },
     gated:        () => { f.discovery_tags.add("gated"); },

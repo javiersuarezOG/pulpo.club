@@ -5519,6 +5519,22 @@ h1,h2,h3,h4,h5 { margin: 0; }
   color: var(--color-clay-primary);
   flex-shrink: 0;
 }
+
+/* Phase 3 — three-glyph icon stack in shelf headers
+   (trophy → master-category → subcategory). Each glyph picks up its
+   own tone so a Top 10 lake condos shelf reads: gold trophy, blue
+   ripple, ink condo at a glance. */
+.homepage-v2 .hp-shelf-h2-iconstack {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.homepage-v2 .hp-shelf-h2-iconstack .hp-shelf-h2-icon { color: inherit; }
+.homepage-v2 .hp-shelf-h2-icon-trophy { color: var(--gold); }
+.homepage-v2 .hp-shelf-h2-icon-beach  { color: var(--accent); }
+.homepage-v2 .hp-shelf-h2-icon-lake   { color: var(--accent-lake); }
+.homepage-v2 .hp-shelf-h2-icon-ink    { color: var(--ink); }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-shelf-h2 { font-size: 22px; }
 }
