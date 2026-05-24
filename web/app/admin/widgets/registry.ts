@@ -12,6 +12,7 @@
 
 import type { ComponentType } from "react";
 import { NewsletterWidget } from "./newsletter/NewsletterWidget.jsx";
+import { SourcesHealthWidget } from "./sources/SourcesHealthWidget.jsx";
 
 // Widget-author contract. Components take no props — they own their own
 // state. AdminShell renders them inside a consistent card layout (title
@@ -35,6 +36,14 @@ export const ADMIN_WIDGETS: readonly AdminWidget[] = [
       "Compose a one-off newsletter from current listings — pick any filter combination, preview the cut, and send a test email to yourself.",
     category: "comms",
     Component: NewsletterWidget,
+  },
+  {
+    slug: "sources",
+    label: "Source health",
+    description:
+      "Per-scraper status, latest count, 14-day trend, and a link to the diagnostic snapshot when a source is red.",
+    category: "ops",
+    Component: SourcesHealthWidget,
   },
 ] as const;
 
