@@ -23,6 +23,7 @@
     { "source": "/data/last_updated.json",  "destination": "/web/data/last_updated.json" },
     { "source": "/data/run_history.json",   "destination": "/web/data/run_history.json" },
     { "source": "/data/featured.json",      "destination": "/web/data/featured.json" },
+    { "source": "/data/source_health_history.jsonl", "destination": "/web/data/source_health_history.jsonl" },
     { "source": "/photos/:file",            "destination": "/web/photos/:file" },
     { "source": "/photos-hires/:file",      "destination": "/web/photos-hires/:file" },
     { "source": "/assets/:file",            "destination": "/web/assets/:file" },

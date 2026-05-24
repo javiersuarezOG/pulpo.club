@@ -41,7 +41,7 @@ export const ADMIN_WIDGETS: readonly AdminWidget[] = [
     slug: "sources",
     label: "Source health",
     description:
-      "Per-scraper status, latest count, 14-day trend, and a link to the diagnostic snapshot when a source is red.",
+      "Per-scraper card with status, listing count, supply-mix pies, and a live fix-state banner (recently fixed / open PR / auto-repair running / shadow suggestion / needs human) for red sources.",
     category: "ops",
     Component: SourcesHealthWidget,
   },
