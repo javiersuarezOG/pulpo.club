@@ -27,12 +27,19 @@
 // error. Don't leak which axis was wrong — that helps token-guessing.
 
 const crypto = require("crypto");
+const { Resend } = require("resend");
 const { capture, flush } = require("./_posthog");
 
 const UNSUB_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET";
 const RESEND_API_KEY_ENV = "RESEND_API_KEY";
 const RESEND_AUDIENCE_ID_ENV = "RESEND_AUDIENCE_ID";
-const RESEND_API_BASE = "https://api.resend.com";
+
+function hashEmail(email) {
+  return crypto.createHash("sha256")
+    .update(String(email || "").trim().toLowerCase())
+    .digest("hex")
+    .slice(0, 16);
+}
 
 function logApi(fields) {
   const parts = ["[api]", "unsubscribe"];
@@ -71,32 +78,83 @@ function readParams(req) {
   return { r, issueNumber, t };
 }
 
-// Flip the contact's unsubscribed flag in Resend. Best-effort. We don't
-// have the contact id — Resend's PATCH /contacts requires either the id
-// or the email. We have neither (the recipient hash isn't an id). Two
-// options: (1) PUT by email after lookup, (2) accept that we can't
-// directly mutate the audience and just record the event. For now we
-// take option 2 — the next cron run filters by `unsubscribed=true` in
-// Resend after the user clicks the footer's "Unsubscribe via Resend"
-// link inside their Gmail header; the one-click path Gmail POSTs to
-// already updates Resend on their side. The recipient hash → email
-// mapping lives in Clerk + Resend and we don't have it here.
+// Map the URL's recipient_hash back to an email by scanning the Resend
+// audience and matching hash(email) for each contact. Resend's audience
+// is the source of truth for who's subscribed; we own that list, so
+// scanning it is honest (vs storing a parallel hash→email PII index in
+// our repo). Cost: one `contacts.list` call per unsub, ~200ms.
 //
-// What this endpoint DOES is the authoritative gate Pulpo's cron checks
-// before queueing the next issue: a row in newsletter_history.jsonl
-// flagged `unsubscribed=true` is excluded forever. The Resend audience
-// update is a defence in depth — if it fails, we still don't send.
+// Returns { email, contactId } on hit, null on miss. Network / API
+// failures bubble up as exceptions — caller treats them as soft and
+// still fires the PostHog event so the cron's PostHog-based filter
+// catches the unsub even if Resend hiccupped.
+async function lookupContactByHash(client, audienceId, recipientHash) {
+  const resp = await client.contacts.list({ audienceId });
+  // Resend SDK shape variance across versions — tolerate { data: { data: [] } }
+  // and { data: [] } and bare arrays.
+  const contacts = (resp && resp.data && Array.isArray(resp.data.data) ? resp.data.data
+                  : resp && Array.isArray(resp.data) ? resp.data
+                  : []);
+  for (const c of contacts) {
+    const email = c && c.email;
+    if (!email) continue;
+    if (hashEmail(email) === recipientHash) {
+      return { email, contactId: c.id || null };
+    }
+  }
+  return null;
+}
+
+// Two side effects per unsubscribe:
+//   1. PostHog event — the durable signal the next-issue cron filters on.
+//      Fires unconditionally so a Resend hiccup never silently re-includes
+//      the user in the next blast.
+//   2. Resend audience update — the user's expectation when they click
+//      "unsubscribe." Without this, our confirmation page lies. Best
+//      effort: if Resend can't be reached or the contact isn't in the
+//      audience (already-unsubscribed, deleted, etc.), we still 200 the
+//      user with the confirmation copy and the PostHog event covers it.
+//
+// Returns the resolution shape so the response can be honest about
+// whether the Resend mutation actually happened.
 async function recordUnsubscribe(recipientHash, issueNumber) {
-  // History append happens in the cron worker, not here (this endpoint
-  // is on Vercel — no shared filesystem with the worker). The cron
-  // reads a Vercel KV / API endpoint to learn about new unsubscribes.
-  // For PR-NL-1 we just fire the PostHog event; the next iteration of
-  // the cron picks the unsub flag up via the PostHog query helper.
   capture(`user:${recipientHash}`, "newsletter.unsubscribed", {
     recipient_hash: recipientHash,
     issue_number: issueNumber,
     source: "one_click",
   });
+
+  const apiKey     = process.env[RESEND_API_KEY_ENV];
+  const audienceId = process.env[RESEND_AUDIENCE_ID_ENV];
+  if (!apiKey || !audienceId) {
+    return { resend_status: "not_configured" };
+  }
+
+  const client = new Resend(apiKey);
+  let contact;
+  try {
+    contact = await lookupContactByHash(client, audienceId, recipientHash);
+  } catch (err) {
+    return { resend_status: "lookup_failed", error: err && err.message };
+  }
+  if (!contact) {
+    return { resend_status: "not_in_audience" };
+  }
+
+  try {
+    await client.contacts.update({
+      audienceId,
+      email: contact.email,
+      unsubscribed: true,
+    });
+    return { resend_status: "updated", contact_id: contact.contactId };
+  } catch (err) {
+    return {
+      resend_status: "update_failed",
+      contact_id: contact.contactId,
+      error: err && err.message,
+    };
+  }
 }
 
 function renderConfirmationHtml() {
@@ -160,8 +218,9 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "invalid_link" });
   }
 
+  let resendResult = { resend_status: "skipped" };
   try {
-    await recordUnsubscribe(r, issueNumber);
+    resendResult = await recordUnsubscribe(r, issueNumber);
     await flush();
   } catch (err) {
     logApi({
@@ -170,12 +229,14 @@ module.exports = async (req, res) => {
       error_class: err && err.constructor ? err.constructor.name : "Error",
     });
     // Don't surface the failure to the user — the unsub intent was
-    // captured; the audit trail catches the followup.
+    // captured (or attempted); the audit trail catches the followup.
   }
 
   logApi({
     status: 200, ms: Date.now() - t0,
     recipient_hash: r, issue_number: issueNumber, method: req.method,
+    resend_status: resendResult.resend_status,
+    resend_contact_id: resendResult.contact_id || "",
   });
 
   if (req.method === "POST") {
@@ -190,3 +251,5 @@ module.exports = async (req, res) => {
 // Exposed for unit tests — Vercel won't import these in production.
 module.exports.expectedToken = expectedToken;
 module.exports.verifyToken = verifyToken;
+module.exports.hashEmail = hashEmail;
+module.exports.lookupContactByHash = lookupContactByHash;

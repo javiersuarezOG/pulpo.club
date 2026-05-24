@@ -7,7 +7,7 @@
   "scripts": {
     "stripe:setup": "node automation/stripe_setup.mjs",
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/build_sitemap.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

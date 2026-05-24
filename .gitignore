@@ -14,6 +14,12 @@ node_modules/
 # Vite build output — Vercel rebuilds on deploy; locals don't track it
 web/dist/
 
+# Build-time sitemap — regenerated on every Vercel deploy via the
+# `build` script. Committing it would churn the diff every build
+# (lastmod dates roll daily) without adding value — Vercel always
+# serves a fresh copy.
+web/sitemap.xml
+
 # Vercel build cache
 .vercel/
 

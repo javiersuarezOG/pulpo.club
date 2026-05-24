@@ -10,12 +10,14 @@
 // template (see _render.js) — not byte-identical to the production
 // newsletter renderer.
 //
-// No auth (the /admin page is open by design). No emails are sent.
+// Auth: `Authorization: Bearer <PULPO_ADMIN_DEBUG_TOKEN>` via the
+// shared `_admin_auth` helper. No emails are sent.
 //
 // Response: { html, picks_total, total_listings, cohort, filter_trace }
 
 const { loadRanked, normalizePreference, applyPreference, selectPicks, NEWSLETTER_COHORTS } = require("./_filter");
 const { renderAdminIssue } = require("./_render");
+const { requireAdminAuth } = require("../../_admin_auth");
 
 const COHORTS = new Set(NEWSLETTER_COHORTS);
 const LOCALES = new Set(["en", "es"]);
@@ -38,6 +40,7 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  if (!requireAdminAuth(req, res)) return;
   const body = await readJsonBody(req);
 
   const cohort = COHORTS.has(body.cohort) ? body.cohort : "pro_prefs";

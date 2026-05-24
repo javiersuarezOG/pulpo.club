@@ -24,30 +24,15 @@
 // is calling this and from where. Does NOT call any Clerk mutation
 // or Stripe mutation API.
 
-const crypto = require("crypto");
 const {
   stripeClient,
   clerkClient,
   logApi,
 } = require("../stripe/_stripe");
 const posthog = require("../_posthog");
+const { requireAdminAuth } = require("../_admin_auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function readToken(req) {
-  const header = req.headers && (req.headers.authorization || req.headers.Authorization);
-  if (!header || typeof header !== "string") return "";
-  if (!header.startsWith("Bearer ")) return "";
-  return header.slice(7).trim();
-}
-
-function tokensMatch(given, expected) {
-  if (!given || !expected) return false;
-  const a = Buffer.from(given);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
 
 async function findClerkUserByEmail(clerk, email) {
   if (!email) return null;
@@ -104,19 +89,11 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
-  const expected = (process.env.PULPO_ADMIN_DEBUG_TOKEN || "").trim();
-  if (!expected) {
+  if (!requireAdminAuth(req, res)) {
     logApi("admin.stripe_session_debug", {
-      status: 503, reason: "token_not_configured", ms: Date.now() - t0,
+      status: "auth_failed", ms: Date.now() - t0,
     });
-    return res.status(503).json({ error: "debug_token_not_configured" });
-  }
-  const given = readToken(req);
-  if (!tokensMatch(given, expected)) {
-    logApi("admin.stripe_session_debug", {
-      status: 401, reason: "bad_token", ms: Date.now() - t0,
-    });
-    return res.status(401).end();
+    return;
   }
 
   const sessionId = typeof req.query.session_id === "string"

@@ -7,9 +7,11 @@
 // hard-coded with a `[PULPO ADMIN TEST]` prefix so a misdelivered email
 // is unambiguously not the production newsletter.
 //
-// No auth (the /admin page is open by design — see AdminShell.jsx). The
-// 5-recipient cap is the load-bearing blast-radius guard; audience-wide
-// sends remain in the `pulpo-newsletter` GitHub Actions workflow.
+// Auth: `Authorization: Bearer <PULPO_ADMIN_DEBUG_TOKEN>` via the
+// shared `_admin_auth` helper. The 5-recipient cap + rate-limit are
+// kept as defense-in-depth (so a stolen token can't blast through
+// Resend credits unbounded). Audience-wide sends remain in the
+// `pulpo-newsletter` GitHub Actions workflow.
 //
 // Rate limit: 10 sends per IP per hour (reuses api/_rate_limit.js).
 // PostHog: fires `admin.newsletter.test_sent` with recipient hashes
@@ -18,6 +20,7 @@
 const crypto = require("crypto");
 const { Resend } = require("resend");
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
+const { requireAdminAuth } = require("../../_admin_auth");
 const posthog = require("../../_posthog");
 const { loadRanked, normalizePreference, applyPreference, selectPicks, NEWSLETTER_COHORTS } = require("./_filter");
 const { renderAdminIssue } = require("./_render");
@@ -70,6 +73,8 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+
+  if (!requireAdminAuth(req, res)) return;
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
