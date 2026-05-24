@@ -63,20 +63,22 @@ def test_per_type_canary_inline_default_matches_yaml_env():
 
 
 def test_per_type_canary_floors_set_to_realistic_thresholds():
-    """Floors must be 80% of current observed counts (house=50, condo=8)
-    so the very next nightly doesn't immediately fail. Spec defaults
-    (HOUSE_FLOOR=80) would flunk against today's 50."""
+    """Floors must sit BELOW current observed counts so the very next
+    nightly doesn't immediately fail. Post-#418 (agricultural purge,
+    merged 2026-05-22) house equilibrium is ~34; condo equilibrium ~12.
+    Spec defaults (HOUSE_FLOOR=80) would flunk against current data —
+    the workflow value must stay calibrated to actual nightly output."""
     yaml = _yaml_text()
     canary_section = yaml.split("Per-type canaries")[1].split("- name:")[0]
-    # House floor — must be ≤ current production count of 50
+    # House floor — must be ≤ post-#418 equilibrium of ~34
     assert 'HOUSE_FLOOR:' in canary_section
     house_floor_line = [
         ln for ln in canary_section.split('\n') if 'HOUSE_FLOOR:' in ln
     ][0]
     house_floor = int(house_floor_line.split('"')[1])
-    assert 0 < house_floor <= 50, (
+    assert 0 < house_floor <= 34, (
         f"HOUSE_FLOOR={house_floor} would fail next nightly "
-        f"(current production has 50 houses)"
+        f"(post-#418 equilibrium is ~34 houses)"
     )
     # Condo floor — must be ≤ current 8
     condo_floor_line = [

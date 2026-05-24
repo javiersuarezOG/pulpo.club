@@ -245,14 +245,17 @@ jobs:
         # ENFORCING (PR-5 of the reliability plan). The 7-day soak window from
         # the PRD calibration period (2026-05-06 → 2026-05-13) is over and
         # observed counts have been stable, so violations now fail the
-        # workflow instead of logging. Floors are at ~80% of current production
-        # data (house=50, condo=8); ceiling on uncertain rate at 15% per the
-        # original PRD spec. Set LOG_ONLY="true" to temporarily downgrade to
-        # log-only while recalibrating thresholds — mirrors the data-quality
-        # canary's escape hatch.
+        # workflow instead of logging. Floors are calibrated to ~85% of the
+        # post-#418 equilibrium (the agricultural-purge scope-tightening,
+        # merged 2026-05-22, dropped ~35 houses that were ALSO flagged as
+        # `is_agricultural`, taking the post-purge house count to ~34).
+        # Ceiling on uncertain rate stays at 15% per the original PRD spec.
+        # Set LOG_ONLY="true" to temporarily downgrade to log-only while
+        # recalibrating thresholds — mirrors the data-quality canary's escape
+        # hatch.
         env:
           LOG_ONLY:        "false"
-          HOUSE_FLOOR:     "40"   # ~80% of 50 — catches broadening collapse
+          HOUSE_FLOOR:     "30"   # ~85% of post-#418 equilibrium (~34)
           CONDO_FLOOR:     "5"    # ~60% of 8 (small N — looser tolerance)
           UNCERTAIN_PCT_CEILING: "15"
         run: |
@@ -262,7 +265,7 @@ jobs:
 
           log_only = os.environ.get("LOG_ONLY", "false").lower() == "true"
           floors = {
-              "house": int(os.environ.get("HOUSE_FLOOR",  "40")),
+              "house": int(os.environ.get("HOUSE_FLOOR",  "30")),
               "condo": int(os.environ.get("CONDO_FLOOR",  "5")),
           }
           uncertain_ceiling = float(os.environ.get("UNCERTAIN_PCT_CEILING", "15"))
