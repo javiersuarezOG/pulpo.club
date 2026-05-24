@@ -303,6 +303,53 @@ def test_scraper_category_urls_well_formed():
         assert _category_from_url(synthetic) is not None
 
 
+def test_scraper_category_urls_phase3_expansion():
+    """Phase 3 (2026-05-24) widened CATEGORY_URLS from 3 national pages
+    to per-department subpaths. The 2026-05-24 live probe established
+    which department × category combinations return real inventory;
+    those subpaths must all be present and use the slash format
+    (`/casas/la-libertad`), not the hyphenated form
+    (`/casas-la-libertad`) — the latter returned an empty SPA shell
+    in the probe."""
+    assert len(CATEGORY_URLS) >= 18, (
+        f"Phase 3 widened to 18+ URLs; got {len(CATEGORY_URLS)}"
+    )
+    # Confirmed-populated department subpaths from the live probe.
+    must_have_casas = [
+        "/bienes-raices-venta-de-propiedades-casas/la-libertad",
+        "/bienes-raices-venta-de-propiedades-casas/la-paz",
+        "/bienes-raices-venta-de-propiedades-casas/sonsonate",
+        "/bienes-raices-venta-de-propiedades-casas/usulutan",
+        "/bienes-raices-venta-de-propiedades-casas/san-salvador",
+    ]
+    must_have_apartamentos = [
+        "/bienes-raices-venta-de-propiedades-apartamentos/la-libertad",
+        "/bienes-raices-venta-de-propiedades-apartamentos/san-salvador",
+    ]
+    joined = "\n".join(CATEGORY_URLS)
+    for required in must_have_casas + must_have_apartamentos:
+        assert required in joined, f"missing required department subpath: {required}"
+    # Hyphenated form is the wrong shape — the live probe showed it
+    # returns ~96KB empty pages. Catch a future "consolidate URLs"
+    # refactor that flattens them.
+    for url in CATEGORY_URLS:
+        assert "casas-la-libertad" not in url, (
+            f"hyphenated department form is wrong (got empty page in probe): {url}"
+        )
+        assert "apartamentos-la-libertad" not in url, url
+
+
+def test_scraper_uses_polite_layer_imports():
+    """Sanity check: Phase 3 migrated the live crawl to the polite
+    runtime. If a refactor accidentally rips out the import the
+    rate-limit + jitter will silently disappear and we'll get
+    encuent24-banned. Test asserts the symbols are at least imported."""
+    import pulpo.scrapers.encuentra24 as e24
+    assert hasattr(e24, "polite_playwright_goto")
+    assert hasattr(e24, "pick_user_agent")
+    assert hasattr(e24, "get_policy")
+
+
 def test_crawl_with_meta_returns_expected_shape():
     """Pipeline expects {records, max_pages_hit, limit_hit} from this
     method (parity with other sources)."""

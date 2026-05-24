@@ -84,6 +84,41 @@ def test_vacation_zones_includes_lake_zones():
     assert "lago-ilopango" in VACATION_ZONES
 
 
+def test_vacation_zones_includes_tier1_phase3_additions():
+    """Phase 3 (2026-05-24) widened the vacation set with nine micro-
+    beach / surfer slang / port-city slugs that the original set
+    missed. Each entry covers a real coastal gap surfaced during the
+    El Salvador-coast audit in the PR description. Pin them so a
+    later refactor doesn't silently revert the widening."""
+    tier1 = {
+        "los-cobanos", "palmarcito", "k59", "k61",
+        "puerto-de-la-libertad", "surf-city", "el-icacal",
+        "las-tunas", "esteron",
+    }
+    missing = tier1 - VACATION_ZONES
+    assert not missing, f"Tier-1 zones missing from VACATION_ZONES: {missing}"
+
+
+def test_vacation_zones_no_unintentional_metro_match():
+    """The vacation-zone filter does substring matching against
+    location_text after replacing spaces with hyphens. If we ever
+    added a slug that's a substring of a common metro location
+    string, every San Salvador apartment would suddenly pass the
+    filter. Guards against that class of regression."""
+    metro_locations = [
+        "san-salvador,-san-salvador,-el-salvador",
+        "colonia-escalon,-san-salvador",
+        "antiguo-cuscatlan,-la-libertad,-el-salvador",
+        "santa-tecla,-la-libertad,-el-salvador",
+    ]
+    for loc in metro_locations:
+        leaked = [z for z in VACATION_ZONES if z in loc]
+        assert not leaked, (
+            f"Metro location {loc!r} unintentionally substring-matches "
+            f"vacation zones: {leaked}"
+        )
+
+
 # ── Place-name exclusion ────────────────────────────────────────────────
 
 def test_strip_exclusions_removes_villa_bosque():

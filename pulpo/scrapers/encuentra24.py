@@ -44,7 +44,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -52,6 +51,11 @@ from pulpo.agents.html_crawler import SELECTOLAX_OK, is_offline, load_fixtures
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
+from pulpo.scrapers._policy import get_policy
+from pulpo.scrapers._runtime import (
+    polite_playwright_goto,
+    pick_user_agent,
+)
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
@@ -64,18 +68,44 @@ if SELECTOLAX_OK:
 BASE = "https://www.encuentra24.com"
 INDEX_URL = f"{BASE}/el-salvador-es/bienes-raices"
 
-# Sub-category landing URLs. encuentra24's sale section is split by
-# property type (apartments/houses/lots), each at a stable URL. No
-# pagination has been found at the category-URL level (infinite scroll
-# is disabled, no `?page=N` query, no "next page" link); inventory size
-# per render appears to cap at ~20 listings per category. Geographic
-# sub-paths (`/apartamentos/la-libertad`, `/apartamentos/colonia-escalon`)
-# could multiply coverage — left for v2 once we have a baseline of how
-# many unique listings v1 actually surfaces.
+# Sub-category landing URLs. Phase 3 (2026-05-24) widened this from
+# three national pages to per-department subpaths after a live probe
+# established:
+#   • encuent24 supports `/<category>/<department>` URL routing.
+#   • Department subpaths each return their own ~20-listing batch.
+#   • Three categories × 6+ populated departments = ~18 URLs, a 6× funnel
+#     expansion over the original 3 national pages.
+#   • Per-department `/terrenos/<dept>` returns empty for the
+#     departments probed — national /terrenos remains the right page
+#     for land.
+# Each URL renders ~7s in Playwright; the polite layer keeps the
+# per-request cadence on the slow side so encuent24 ingests politely
+# in spite of the higher URL count.
 CATEGORY_URLS: list[str] = [
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas",
+    # Terrenos (land): per-department subpaths returned empty during
+    # the 2026-05-24 probe, so we use the national page only.
     f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-terrenos",
+    # Casas: nine departments returned real inventory in the probe.
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/la-libertad",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/la-paz",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/sonsonate",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/usulutan",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/san-salvador",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/ahuachapan",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/cuscatlan",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/santa-ana",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/chalatenango",
+    # Apartamentos: six departments had real inventory; the rural
+    # departments (ahuachapan, cuscatlan, chalatenango, morazan) were
+    # empty for condos.
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/la-libertad",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/la-paz",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/sonsonate",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/san-salvador",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/santa-ana",
+    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/usulutan",
 ]
 
 FIXTURE_FILE = "sample_listings.json"
@@ -443,6 +473,16 @@ class Encuentra24Scraper:
     def _crawl_live(self, limit: int) -> list[dict]:
         """Render category landings → harvest URLs → render each detail.
         Lazy-imports playwright so the offline test path doesn't need it.
+
+        Phase 3 (2026-05-24) migrated this to the polite-request runtime:
+          - polite_playwright_goto wraps page.goto with per-source rate
+            limit + jitter + Retry-After-aware retries.
+          - User-Agent rotation from the safari_macos pool (set on the
+            BrowserContext; the polite layer rotates the value at run
+            start — Playwright contexts hold a fixed UA for the session,
+            so we rotate per crawl rather than per request).
+          - REQUEST_DELAY removed from the inner loops — the rate limiter
+            in polite_playwright_goto enforces the cadence.
         """
         try:
             from playwright.sync_api import sync_playwright   # type: ignore
@@ -450,10 +490,12 @@ class Encuentra24Scraper:
             print("[encuentra24] playwright not installed — skipping live crawl")
             return []
 
-        UA = (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 "
-            "(KHTML, like Gecko) Version/17.0 Safari/605.1.15"
-        )
+        policy = get_policy(self.slug)
+        # Rotate UA per crawl run. Playwright contexts hold a fixed UA;
+        # rotating mid-session is detectable (and rotating the context
+        # adds noticeable overhead). Per-crawl rotation gives us a
+        # different fingerprint each nightly without per-request churn.
+        ua = pick_user_agent(policy.user_agent_pool)
         out: list[dict] = []
         seen_urls: set[str] = set()
 
@@ -463,7 +505,7 @@ class Encuentra24Scraper:
                 args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
             )
             context = browser.new_context(
-                user_agent=UA,
+                user_agent=ua,
                 viewport={"width": 1280, "height": 800},
                 locale="es-SV",
             )
@@ -482,23 +524,30 @@ class Encuentra24Scraper:
                 for cat_url in CATEGORY_URLS:
                     if len(listing_urls) >= limit:
                         break
-                    time.sleep(self.REQUEST_DELAY)
                     try:
-                        page.goto(cat_url, wait_until="networkidle",
-                                  timeout=self.PAGE_TIMEOUT_MS)
+                        polite_playwright_goto(
+                            page, cat_url,
+                            source=self.slug, policy=policy,
+                            wait_until="networkidle",
+                            timeout_ms=self.PAGE_TIMEOUT_MS,
+                        )
                         page.wait_for_timeout(2500)
                     except Exception as e:
                         print(f"[encuentra24] category fetch failed "
                               f"{cat_url}: {type(e).__name__}: {e}")
                         continue
                     cat_html = page.content()
+                    new_in_cat = 0
                     for url in parse_index_html(cat_html):
                         if url in seen_urls:
                             continue
                         seen_urls.add(url)
                         listing_urls.append(url)
+                        new_in_cat += 1
                         if len(listing_urls) >= limit:
                             break
+                    print(f"[encuentra24] {cat_url.rsplit('/', 1)[-1]}: "
+                          f"+{new_in_cat} unique URLs")
 
                 print(f"[encuentra24] harvested {len(listing_urls)} "
                       f"listing URLs across {len(CATEGORY_URLS)} categories")
@@ -507,10 +556,13 @@ class Encuentra24Scraper:
                 for url in listing_urls:
                     if len(out) >= limit:
                         break
-                    time.sleep(self.REQUEST_DELAY)
                     try:
-                        page.goto(url, wait_until="networkidle",
-                                  timeout=self.PAGE_TIMEOUT_MS)
+                        polite_playwright_goto(
+                            page, url,
+                            source=self.slug, policy=policy,
+                            wait_until="networkidle",
+                            timeout_ms=self.PAGE_TIMEOUT_MS,
+                        )
                         page.wait_for_timeout(1500)
                     except Exception as e:
                         print(f"[encuentra24] detail fetch failed "
