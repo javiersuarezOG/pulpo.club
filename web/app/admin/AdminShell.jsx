@@ -197,8 +197,8 @@ function AdminGate({ onUnlock }) {
         <input
           type="password"
           autoComplete="off"
-          aria-label="Admin token"
-          placeholder="Bearer token"
+          aria-label="Admin token" // i18n-allow: admin-only, internal tools, EN-only
+          placeholder="Bearer token" // i18n-allow: admin-only, internal tools, EN-only
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
