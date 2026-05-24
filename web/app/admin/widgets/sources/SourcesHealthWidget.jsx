@@ -163,85 +163,82 @@ const STYLES = `
 .sw-legend .key { color: var(--ink); font-weight: 500; min-width: 56px; }
 .sw-legend .pct { color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
 
-/* ── Section 3: per-source rows ──────────────────────────────── */
-.sw-list { display: grid; gap: 10px; }
+/* ── Section 3: per-source rows ────────────────────────────────
+   Single line per source on desktop. Columns:
+     [status dot] [name] [count or PR-status] [pies] [last update]
+   On mobile they wrap, but the same single-line semantics hold —
+   each row remains one logical unit, not a card with internal
+   structure. */
+.sw-list { display: grid; gap: 6px; }
 .sw-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px 14px;
-  background: var(--paper);
-}
-@media (min-width: 640px) {
-  .sw-row {
-    grid-template-columns: 1.4fr 0.9fr 1.3fr 0.9fr;
-    align-items: center;
-    gap: 14px;
-  }
-}
-
-.sw-source-line {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 15px;
-  min-width: 0;
-}
-.sw-source-line code {
-  font-family: var(--font-mono);
-  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 4px;
+  font-size: 14px;
   color: var(--ink-2);
-  font-weight: 500;
 }
-.sw-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-.sw-pill[data-status="green"]   { background: color-mix(in oklch, var(--badge-new) 18%, transparent); color: var(--badge-new); }
-.sw-pill[data-status="red"]     { background: color-mix(in oklch, var(--badge-drop) 18%, transparent); color: var(--badge-drop); }
-.sw-pill[data-status="unknown"] { background: var(--paper-2); color: var(--ink-3); }
-.sw-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.sw-row:last-child { border-bottom: none; }
 
-.sw-count {
+.sw-row .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.sw-row[data-status="green"] .dot { background: var(--badge-new); }
+.sw-row[data-status="red"]   .dot { background: var(--badge-drop); }
+.sw-row[data-status="unknown"] .dot { background: var(--ink-3); }
+
+.sw-row .name {
+  font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--ink-3);
-}
-.sw-count .big { font-size: 18px; line-height: 22px; color: var(--ink); font-weight: 600; }
-.sw-count .sub { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
-
-.sw-mini { display: flex; gap: 10px; align-items: center; }
-.sw-mini .pielbl {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink);
+  font-weight: 500;
+  min-width: 140px;
 }
 
-.sw-tail { font-size: 12px; color: var(--ink-3); line-height: 16px; min-width: 0; }
-.sw-tail a {
+.sw-row .signal {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
+  min-width: 130px;
+}
+.sw-row .signal .sub {
+  color: var(--ink-3);
+  font-weight: 400;
+  font-size: 13px;
+}
+.sw-row .signal a {
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   text-decoration: none;
+  font-weight: 500;
 }
-.sw-tail a:hover { text-decoration: underline; }
-.sw-tail .err {
-  display: block;
-  margin-top: 2px;
+.sw-row .signal a:hover { text-decoration: underline; }
+.sw-row .signal .needs {
   color: var(--badge-drop);
-  word-break: break-word;
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.sw-row .pies {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+.sw-row .pies .gap { width: 6px; }
+
+.sw-row .when {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .sw-empty, .sw-error {
@@ -254,17 +251,6 @@ const STYLES = `
 }
 .sw-error { color: var(--badge-drop); border-color: var(--badge-drop); }
 .sw-loading { font-size: 13px; color: var(--ink-3); padding: 8px 0; }
-
-/* Mobile inline labels — visible only in the stacked layout. */
-.sw-row .col-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-right: 8px;
-}
-@media (min-width: 640px) { .sw-row .col-label { display: none; } }
 `;
 
 // ── palette ──────────────────────────────────────────────────────────
@@ -384,12 +370,42 @@ function formatDuration(s) {
   return `${m}m${r.toString().padStart(2, "0")}s`;
 }
 
+// GitHub identity — derived once at module load so the row component
+// doesn't recompute it. Hardcoded to the public Pulpo repo since the
+// admin tool is internal and not deployed anywhere else.
+const GH_OWNER = "javiersuarezOG";
+const GH_REPO  = "pulpo.club";
+
 function issueSearchUrl(source) {
-  // Land in the GitHub issues list filtered to open issues mentioning
-  // the source — the watchdog issue is always the top result, and
-  // the Phase-4 shadow-mode comments live there.
   const q = encodeURIComponent(`is:issue is:open ${source}`);
-  return `https://github.com/javiersuarezOG/pulpo.club/issues?q=${q}`;
+  return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=${q}`;
+}
+
+// Find open PRs that mention the source slug in title or body. Uses
+// GitHub's public Search API — unauthenticated CORS works, rate limit
+// 60/hr per IP (plenty for an admin tool refreshed by 1-2 humans).
+// Returns the first matching PR or null. On rate-limit / network
+// failure, returns null and the row falls back to "needs human".
+async function fetchOpenPrForSource(source) {
+  const q = encodeURIComponent(
+    `is:pr is:open repo:${GH_OWNER}/${GH_REPO} ${source} in:title,body`
+  );
+  const url = `https://api.github.com/search/issues?q=${q}&per_page=1`;
+  try {
+    const r = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+    if (!r.ok) return null;
+    const body = await r.json();
+    const item = (body && body.items && body.items[0]) || null;
+    if (!item) return null;
+    return {
+      number: item.number,
+      title:  item.title,
+      url:    item.html_url,
+      draft:  Boolean(item.draft),
+    };
+  } catch (_) {
+    return null;
+  }
 }
 
 // ── component ────────────────────────────────────────────────────────
@@ -403,6 +419,13 @@ export function SourcesHealthWidget() {
     fetchedAt: null,
     error: null,
   });
+
+  // PR lookup per source slug. Populated lazily when a source goes red
+  // — green sources never need this. Keyed by source slug; value is the
+  // PR object (number/title/url) or `null` (no PR found / rate-limited).
+  // ``undefined`` means "not fetched yet" so the UI can render a
+  // "checking…" placeholder.
+  const [prs, setPrs] = useState({});
 
   const load = useCallback(async () => {
     setState((s) => ({ ...s, status: "loading", error: null }));
@@ -447,6 +470,32 @@ export function SourcesHealthWidget() {
     for (const [src, rows] of bySrc) out.set(src, aggregate(rows));
     return out;
   }, [state.listings]);
+
+  // After health data lands, fan out one PR-search per red source.
+  // Effects can't be async directly — kick off the fetches and write
+  // results back into `prs` state. The empty-deps + manual guard keeps
+  // this from re-firing on every render.
+  useEffect(() => {
+    if (state.status !== "ready") return;
+    const reds = state.healthRows.reduce((acc, r) => {
+      // Latest row per source — newest ts wins.
+      if (!r || !r.source) return acc;
+      const prev = acc[r.source];
+      if (!prev || prev.ts < r.ts) acc[r.source] = r;
+      return acc;
+    }, {});
+    const redSlugs = Object.values(reds)
+      .filter((row) => row.status === "red")
+      .map((row) => row.source);
+    for (const slug of redSlugs) {
+      if (prs[slug] !== undefined) continue; // already fetched / in-flight
+      // Mark in-flight so a re-render doesn't refire the request.
+      setPrs((p) => ({ ...p, [slug]: null }));
+      void fetchOpenPrForSource(slug).then((result) => {
+        setPrs((p) => ({ ...p, [slug]: result }));
+      });
+    }
+  }, [state.status, state.healthRows]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Source ordering — reds first (oldest red on top), then healthy
   // sources by descending count.
@@ -542,6 +591,7 @@ export function SourcesHealthWidget() {
               key={entry.source}
               entry={entry}
               mix={perSourceMix.get(entry.source)}
+              pr={prs[entry.source]}
             />
           ))}
         </div>
@@ -578,7 +628,7 @@ function SupplyBlock({ label, order, counts, labels, total, size }) {
   );
 }
 
-function SourceRow({ entry, mix }) {
+function SourceRow({ entry, mix, pr }) {
   const { source, latest, isRed, lastGreen } = entry;
   const status = latest.status || "unknown";
   const count = latest.count ?? 0;
@@ -591,63 +641,69 @@ function SourceRow({ entry, mix }) {
   }));
   const hasMix = mix && mix.total > 0;
 
+  // Tail timestamp — for green sources it's the latest run; for red
+  // sources it's the last successful run (often more interesting than
+  // the latest failure timestamp because it tells you how stale the
+  // ingestion is).
+  const whenIso = isRed ? lastGreen : latest.ts;
+  const whenLabel = isRed
+    ? (lastGreen ? `last good ${formatRelative(lastGreen)}` : "never green")
+    : formatRelative(latest.ts);
+
   return (
-    <div className="sw-row" role="listitem" aria-label={`${source} ${status}`}>
-      {/* col 1 — name + status */}
-      <div className="sw-source-line">
-        <code>{source}</code>
-        <span className="sw-pill" data-status={status}>
-          <span className="dot" /> {status}
-        </span>
-      </div>
+    <div className="sw-row" data-status={status} role="listitem" aria-label={`${source} ${status}`}>
+      <span className="dot" />
+      <span className="name">{source}</span>
 
-      {/* col 2 — count + last update */}
-      <div className="sw-count">
-        <span className="col-label">Last run</span>
-        <div className="big">{count}</div>
-        <div className="sub">{formatRelative(latest.ts)}</div>
-      </div>
+      {/* Signal column: number of listings (green) OR PR status (red) */}
+      <span className="signal">
+        {isRed ? (
+          // pr === undefined: still fetching the lookup
+          // pr === null:      lookup done, no open PR found
+          // pr === object:    open PR exists, show its number
+          pr === undefined ? (
+            <span className="sub">checking for fix…</span>
+          ) : pr ? (
+            <a href={pr.url} target="_blank" rel="noreferrer" title={pr.title}>
+              fix in progress · PR #{pr.number} ↗
+            </a>
+          ) : (
+            <>
+              <span className="needs">needs human</span>{" "}
+              <a href={issueSearchUrl(source)} target="_blank" rel="noreferrer">
+                issue ↗
+              </a>
+            </>
+          )
+        ) : (
+          <>
+            <strong>{count.toLocaleString()}</strong>{" "}
+            <span className="sub">listing{count === 1 ? "" : "s"}</span>
+          </>
+        )}
+      </span>
 
-      {/* col 3 — tiny pies (or "no data" placeholder for red sources) */}
-      <div className="sw-mini">
+      {/* Per-source supply-mix pies — present even when red (shows the
+          historical mix this source contributed; signals what we LOSE
+          when it goes red). When the source has no data in ranked.json,
+          render empty-state placeholders that align with the column. */}
+      <span className="pies" title={hasMix ? "geography · type" : "no listings in dataset"}>
         {hasMix ? (
           <>
-            <span className="pielbl">geo</span>
-            <Pie segments={geoSegments} size={28} />
-            <span className="pielbl">type</span>
-            <Pie segments={typeSegments} size={28} />
+            <Pie segments={geoSegments} size={22} />
+            <span className="gap" />
+            <Pie segments={typeSegments} size={22} />
           </>
         ) : (
-          <span className="sub" style={{ color: "var(--ink-3)", fontSize: 12 }}>
-            no listings in dataset
-          </span>
-        )}
-      </div>
-
-      {/* col 4 — tail (last good + issue link for reds, healthy status otherwise) */}
-      <div className="sw-tail">
-        {isRed ? (
           <>
-            <span className="col-label">Last good</span>
-            <span>{lastGreen ? formatRelative(lastGreen) : "—"}</span>
-            <br />
-            <a href={issueSearchUrl(source)} target="_blank" rel="noreferrer">
-              fix → see issue ↗
-            </a>
-            {(latest.error_class || latest.error_msg) && (
-              <span className="err">
-                {latest.error_class && <strong>{latest.error_class}</strong>}
-                {latest.error_class && latest.error_msg ? " — " : ""}
-                {latest.error_msg && (latest.error_msg.length > 80
-                  ? latest.error_msg.slice(0, 80) + "…"
-                  : latest.error_msg)}
-              </span>
-            )}
+            <Pie segments={[{ count: 0, color: "var(--line-2)" }]} size={22} />
+            <span className="gap" />
+            <Pie segments={[{ count: 0, color: "var(--line-2)" }]} size={22} />
           </>
-        ) : (
-          <span style={{ color: "var(--ink-3)" }}>healthy</span>
         )}
-      </div>
+      </span>
+
+      <span className="when" title={whenIso || ""}>{whenLabel}</span>
     </div>
   );
 }
