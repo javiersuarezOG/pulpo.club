@@ -236,7 +236,9 @@ export function AdminPage({ app }) {
                   >
                     <p className="wc-category">{w.category}</p>
                     <p className="wc-label">{w.label}</p>
-                    <p className="wc-desc">{w.description}</p>
+                    {w.Preview
+                      ? <w.Preview />
+                      : <p className="wc-desc">{w.description}</p>}
                   </button>
                 ))}
                 {adminWidget && !widget && (

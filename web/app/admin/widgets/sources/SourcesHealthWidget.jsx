@@ -946,6 +946,128 @@ function SourceCard({ entry, mix, fixState }) {
   );
 }
 
+// ── grid-card preview ────────────────────────────────────────────────
+//
+// Rendered by AdminShell on the /admin grid card *instead of* the
+// static description. Shows the at-a-glance signal: how many sources
+// are active vs broken, when the last nightly ran, and the total
+// listings produced. Keep the surface narrow — the card is ~280px
+// wide.
+
+const PREVIEW_STYLES = `
+.sw-prev {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+.sw-prev .line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--ink-2);
+  flex-wrap: wrap;
+}
+.sw-prev .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.sw-prev .chip[data-tone="green"] { background: color-mix(in oklch, var(--badge-new)  18%, transparent); color: var(--badge-new); }
+.sw-prev .chip[data-tone="red"]   { background: color-mix(in oklch, var(--badge-drop) 18%, transparent); color: var(--badge-drop); }
+.sw-prev .chip .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.sw-prev .meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.sw-prev .placeholder {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+`;
+
+export function SourcesHealthPreview() {
+  // Mini-fetch — only the two files needed for the grid summary.
+  // The full widget at /admin/sources fetches ranked.list.json too;
+  // we intentionally skip it here to keep the /admin page light.
+  const [data, setData] = useState({ status: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const cb = `?t=${Date.now()}`;
+        const [healthText, lastUpdated] = await Promise.all([
+          fetch(HEALTH_HISTORY_PATH + cb).then((r) => r.ok ? r.text() : ""),
+          fetch(LAST_UPDATED_PATH + cb).then((r) => r.ok ? r.json() : null).catch(() => null),
+        ]);
+        if (cancelled) return;
+        const rows = parseJsonl(healthText);
+        const latestByncSource = new Map();
+        for (const r of rows) {
+          if (!r || !r.source) continue;
+          const prev = latestByncSource.get(r.source);
+          if (!prev || prev.ts < r.ts) latestByncSource.set(r.source, r);
+        }
+        const latest = Array.from(latestByncSource.values());
+        const active = latest.filter((r) => r.status === "green").length;
+        const broken = latest.filter((r) => r.status === "red").length;
+        setData({
+          status: "ready",
+          active,
+          broken,
+          total:    lastUpdated && lastUpdated.total_listings != null ? lastUpdated.total_listings : null,
+          startedAt: lastUpdated && lastUpdated.started_at ? lastUpdated.started_at : null,
+        });
+      } catch (_) {
+        if (!cancelled) setData({ status: "error" });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <>
+      <style>{PREVIEW_STYLES}</style>
+      <div className="sw-prev">
+        {data.status === "loading" && (
+          <p className="placeholder">Checking nightly status…</p>
+        )}
+        {data.status === "error" && (
+          <p className="placeholder">Couldn’t reach status data.</p>
+        )}
+        {data.status === "ready" && (
+          <>
+            <div className="line">
+              <span className="chip" data-tone="green">
+                <span className="dot" /> {data.active} active
+              </span>
+              <span className="chip" data-tone={data.broken > 0 ? "red" : "green"}>
+                <span className="dot" /> {data.broken} broken
+              </span>
+            </div>
+            <div className="line meta">
+              {data.startedAt ? (
+                <>last nightly {formatRelative(data.startedAt)}</>
+              ) : "no nightly yet"}
+              {data.total != null && <> · {data.total.toLocaleString()} listings</>}
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
 function MiniMix({ label, order, counts, labels, total, segments }) {
   return (
     <div className="block">
