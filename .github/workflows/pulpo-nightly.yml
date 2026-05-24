@@ -111,15 +111,18 @@ jobs:
           #   no longer spams the issue tracker.
           #
           # encuentra24 added 2026-05-08 (PR-E2 follow-up to PR #187). First
-          # run capped at 200 via PULPO_E24_LIMIT below — at ~7s/detail-page
-          # in Playwright that's ~25 min; lift the cap once we've validated
-          # one full nightly's data lands cleanly in ranked.json.
+          # capped at 200; Phase 3 (2026-05-24) widened the funnel from 3 to
+          # 18 category URLs (per-department subpaths for casas + apartamentos)
+          # and lifted the operational cap to 2000 (runaway-bug ceiling, not
+          # a throttle). Real yield after the vacation-zone filter still
+          # depends on inventory in pulpo's beach zones — expect 20-40
+          # surviving records, up from 3 today.
           PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,encuentra24,realtyelsalvador"
           # encuentra24-specific cap. Tightens against PULPO_LIMIT (the
-          # global cap) but never raises it. Set to 200 for the first
-          # validated runs; raise to e.g. 1000 once we've measured runtime
-          # impact on a real nightly.
-          PULPO_E24_LIMIT: "200"
+          # global cap) but never raises it. Set high enough that real
+          # nightly yield is bounded by inventory + vacation-zone filter
+          # rather than by this ceiling.
+          PULPO_E24_LIMIT: "2000"
           # Hero-photo wall budget (Phase A download + Phase C derivative
           # write inside automation/run.py::_download_hero_photos). The
           # default 600s was too small for the post-encuentra24 baseline:
