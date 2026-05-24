@@ -75,18 +75,21 @@ describe("vercel.json security headers", () => {
     expect(v).toMatch(/geolocation=\(\)/);
   });
 
-  // CSP runs in report-only mode initially so violations surface in the
-  // browser DevTools console without breaking real users. The next step
-  // (after a week of clean previews + the Stripe-sandbox walk) is to
-  // rename the header to "Content-Security-Policy" to enforce it. Don't
-  // delete the report-only header until the enforced one has been live
-  // through at least one full Stripe-sandbox + Clerk-on flow with no
-  // console violations.
-  describe("Content-Security-Policy-Report-Only", () => {
-    const csp = headerValue(catchAll, "Content-Security-Policy-Report-Only");
+  // CSP is enforced (flipped from Report-Only at launch hardening). The
+  // policy baked in Report-Only mode for several weeks with no console
+  // violations observed across Stripe-sandbox + Clerk-on flows. If a
+  // future allowlist addition needs to soak first, add a parallel
+  // Content-Security-Policy-Report-Only with the candidate value; don't
+  // downgrade this header back to report-only without a strong reason.
+  describe("Content-Security-Policy", () => {
+    const csp = headerValue(catchAll, "Content-Security-Policy");
 
-    it("is present (report-only mode for incremental rollout)", () => {
+    it("is present and enforced (not report-only)", () => {
       expect(csp).toBeTruthy();
+      // Belt-and-braces: ensure we didn't ALSO leave a Report-Only
+      // header hanging around, which would mean two CSPs in flight and
+      // double-reporting in browser DevTools.
+      expect(headerValue(catchAll, "Content-Security-Policy-Report-Only")).toBeNull();
     });
 
     it("declares default-src 'self' (baseline lockdown)", () => {

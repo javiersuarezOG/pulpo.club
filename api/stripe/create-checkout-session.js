@@ -21,8 +21,21 @@ const {
 } = require("./_stripe");
 const { toWebRequest } = require("../_clerk");
 const posthog = require("../_posthog");
+const { makeRateLimiter, send429 } = require("../_rate_limit");
 
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+
+// Per-Clerk-user rate limit. The endpoint is auth-gated, so abuse is
+// bounded to an authenticated account, but each call mints a fresh
+// Stripe Checkout Session + optionally a promotionCodes.list — both
+// real third-party API spend. 10 sessions per 5 min covers a
+// human-scale "click upgrade, back out, click again" pattern; caps
+// a scripted loop on a single account.
+const checkoutLimiter = makeRateLimiter({
+  windowMs: 5 * 60 * 1000,
+  maxAttempts: 10,
+  name: "stripe_create_checkout_session",
+});
 
 function safeStr(v) {
   return typeof v === "string" ? v : "";
@@ -89,6 +102,17 @@ module.exports = async (req, res) => {
       detail: err && err.message,
       class: err && err.constructor ? err.constructor.name : undefined,
     });
+  }
+
+  // Rate-limit keyed by userId (not IP) — a household behind one NAT
+  // shouldn't punish each other; one account abusing the endpoint
+  // should rate-limit itself.
+  const rl = checkoutLimiter.hit(userId);
+  if (!rl.allowed) {
+    logApi("stripe.create_checkout_session", {
+      status: 429, ms: Date.now() - t0, reason: "rate_limited", user_id: userId,
+    });
+    return send429(res, rl, "stripe_create_checkout_session");
   }
 
   const proto = (req.headers["x-forwarded-proto"] || "https").split(",")[0].trim();

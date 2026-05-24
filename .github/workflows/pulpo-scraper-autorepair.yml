@@ -48,13 +48,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      # Comment on the watchdog issue.
+      # Shadow mode only needs to comment on the watchdog issue.
+      # contents:write + pull-requests:write get added in the
+      # graduation PR alongside the active-mode script changes —
+      # principle of least privilege over upfront convenience.
       issues: write
-      # contents:write + pull-requests:write are needed for ACTIVE mode
-      # (future). Granting them now so the graduation PR doesn't need
-      # workflow file changes — only a script flag flip.
-      contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v6.0.2
 

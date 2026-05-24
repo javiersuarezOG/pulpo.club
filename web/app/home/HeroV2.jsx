@@ -621,7 +621,7 @@ export function HeroV2({ app, locale }) {
                   <span className="hp-hero-justin-name">{pill.listing.name}</span>
                   <span className="hp-hero-justin-row">
                     <span className="hp-hero-justin-price">{fmtShortPrice(pill.listing.price)}</span>
-                    <span className={`hp-hero-justin-grade hp-hero-justin-grade-${pill.grade[0].toLowerCase()}`}>
+                    <span className={`hp-hero-justin-grade hp-hero-justin-grade-${pill.grade ? pill.grade[0].toLowerCase() : "unknown"}`}>
                       {pill.grade}
                     </span>
                   </span>
