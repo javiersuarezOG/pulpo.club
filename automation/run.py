@@ -1237,7 +1237,16 @@ def main() -> int:
     # the other doesn't. Migrate both in lock-step if/when needed.
     offline = os.environ.get("PULPO_OFFLINE") == "1"
     limit = _env_int("PULPO_LIMIT", 30)
-    sources = _env_str("PULPO_SOURCES", ",".join(REGISTRY.keys())).split(",")
+    # PULPO_SOURCES is an explicit-override env var. When unset OR
+    # empty-string we fall back to the autodiscovered REGISTRY — so
+    # dropping a new scraper at pulpo/scrapers/<slug>.py is enough to
+    # get it crawled on the next nightly without a workflow-YAML edit.
+    # See pulpo/scrapers/__init__.py for the autodiscovery loop.
+    _PULPO_SOURCES_RAW = (os.environ.get("PULPO_SOURCES") or "").strip()
+    if _PULPO_SOURCES_RAW:
+        sources = [s for s in _PULPO_SOURCES_RAW.split(",") if s.strip()]
+    else:
+        sources = sorted(REGISTRY.keys())
 
     started = datetime.now(timezone.utc)
     # PostHog: tag every subsequent capture() in this process with a

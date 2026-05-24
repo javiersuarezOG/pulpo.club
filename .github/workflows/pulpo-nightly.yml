@@ -110,14 +110,24 @@ jobs:
           #   With PR #344's staleness guard landed, a single failed nightly
           #   no longer spams the issue tracker.
           #
-          # encuentra24 added 2026-05-08 (PR-E2 follow-up to PR #187). First
-          # capped at 200; Phase 3 (2026-05-24) widened the funnel from 3 to
-          # 18 category URLs (per-department subpaths for casas + apartamentos)
-          # and lifted the operational cap to 2000 (runaway-bug ceiling, not
-          # a throttle). Real yield after the vacation-zone filter still
-          # depends on inventory in pulpo's beach zones — expect 20-40
-          # surviving records, up from 3 today.
-          PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,encuentra24,realtyelsalvador"
+          # PULPO_SOURCES is an OPTIONAL explicit-override. When unset
+          # the nightly autodiscovers every scraper in pulpo/scrapers/
+          # via the package's __init__ side effect — drop a new file,
+          # next nightly crawls it, no workflow edit needed. See
+          # automation/run.py around the PULPO_SOURCES read for the
+          # fallback logic, and pulpo/scrapers/__init__.py for the
+          # autodiscovery loop. Set this env var only when you need to
+          # crawl a *subset* (debugging a single source, or temporarily
+          # disabling a noisy one) — leaving it unset is the normal path.
+          #
+          # Example temporary disable while investigating a red source:
+          #   PULPO_SOURCES: "goodlife,oceanside,century21,bienesraices,remax,nexo,encuentra24"
+          # (omits realtyelsalvador for one nightly)
+          #
+          # encuentra24 added 2026-05-08 (PR-E2 follow-up to PR #187).
+          # Phase 3 (2026-05-24) widened the funnel from 3 to 18 category
+          # URLs (per-department subpaths) and lifted PULPO_E24_LIMIT
+          # from 200 to 2000 — see comment on PULPO_E24_LIMIT below.
           # encuentra24-specific cap. Tightens against PULPO_LIMIT (the
           # global cap) but never raises it. Set high enough that real
           # nightly yield is bounded by inventory + vacation-zone filter
