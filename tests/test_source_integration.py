@@ -51,7 +51,7 @@ TESTS_DIR    = REPO / "tests" / "scrapers"
 # explicit allow-list — non-underscore additions get caught by the
 # scraper-file glob below.
 KNOWN_HELPERS = {
-    "_policy", "_runtime", "_type_classifier", "_photo_url_upgrade",
+    "_base", "_policy", "_runtime", "_type_classifier", "_photo_url_upgrade",
     "__init__",
 }
 

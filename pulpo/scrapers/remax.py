@@ -23,13 +23,11 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from pulpo.agents.html_crawler import (
-    HTTPX_OK, SELECTOLAX_OK, is_offline, load_fixtures, make_client,
+    HTTPX_OK, SELECTOLAX_OK, make_client,
     DEFAULT_REQUEST_DELAY as REQUEST_DELAY,
 )
 from pulpo.agents import SOURCES, register
-from pulpo.scrapers._type_classifier import classify_property_type
-from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
-from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
+from pulpo.scrapers._base import OfflineFixtureMixin, finalize_record
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -58,10 +56,6 @@ PROP_TYPE_IDS_TO_FETCH: list[tuple[str, str]] = [
 # Backwards-compat alias — the existing offline tests + calibration scripts
 # still import PROP_TYPE expecting the land ID.
 PROP_TYPE = "3"
-
-# Compiled waterfront-keyword fallback for the vacation-zone filter on
-# house/condo. "Waterfront" covers ocean coast + lake (PR #161, 2026-05-08).
-_WATERFRONT_RE = re.compile("|".join(WATERFRONT_KEYWORDS), re.IGNORECASE)
 
 _TOKEN_FIELDS = ("__RequestVerificationToken", "ax", "bx", "cx", "dx")
 
@@ -251,7 +245,8 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         desc_el = tree.css_first("section p")
         description = desc_el.text(strip=True)[:1500] if desc_el else ""
 
-    # Photos — RE/MAX typically uses an image gallery with data-src lazy loading
+    # Photos — RE/MAX typically uses an image gallery with data-src lazy loading.
+    # finalize_record() handles the upgrade_photo_urls call below.
     photo_urls: list[str] = []
     seen: set[str] = set()
     for img in tree.css(
@@ -269,7 +264,6 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
             u = og.attributes.get("content") or ""
             if u.startswith("http"):
                 photo_urls.append(u)
-    photo_urls = upgrade_photo_urls("remax", photo_urls)
 
     if not title:
         return None
@@ -343,39 +337,19 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
             # 1 v² = 0.6987 m² (standard El Salvador conversion).
             rec["built_area_m2"] = round(bv * 0.6987, 2) if bu == "v2" else bv
 
-    # Vacation-zone filter — house/condo dropped unless its location string
-    # matches VACATION_ZONES (ocean coast OR lake) OR title/description
-    # carries a waterfront keyword. Land is exempt (inland lots stay).
-    if broker_type in ("house", "condo"):
-        loc_blob = (rec.get("location_text") or "").lower().replace(" ", "-")
-        zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
-        text_blob = f"{title}\n{description}"
-        has_waterfront_kw = bool(_WATERFRONT_RE.search(text_blob))
-        if not zone_is_vacation and not has_waterfront_kw:
-            return None
-
-    # Multi-signal classifier — confirms broker_type, surfaces signals for
-    # the shadow log, FLAGS the listing if classifier disagrees with the
-    # broker's structured type field.
-    ptype, signals, confidence, total = classify_property_type({
-        "broker_type_field": dets.get("Tipo de Propiedad", ""),
-        "url":               partial["url"],
-        "photo_urls":        photo_urls,
-        "title":             title,
-        "description":       description,
-    }, fallback_type=broker_type)
-    rec["_type_signals"]    = [s.to_dict() for s in signals]
-    rec["_type_confidence"] = confidence
-    rec["_type_total"]      = total
-    if ptype != broker_type:
-        rec["validation_status"] = "flagged"
-        rec.setdefault("validation_warnings", []).append("type_classifier_disagree")
-
-    return rec
+    # Shared finalize: upgrade_photo_urls + vacation-zone gate (house/condo
+    # only) + multi-signal classifier + disagreement flag. Returns None if
+    # the vacation gate dropped it. See pulpo/scrapers/_base.py.
+    return finalize_record(
+        rec, slug="remax",
+        broker_type=broker_type,
+        broker_type_field=dets.get("Tipo de Propiedad", ""),
+    )
 
 
-class RemaxScraper:
+class RemaxScraper(OfflineFixtureMixin):
     slug = "remax"
+    FIXTURE_FILE = FIXTURE_FILE  # module-level constant; kept for clarity
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline
@@ -392,8 +366,15 @@ class RemaxScraper:
             return None
 
     def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
-        if is_offline(offline if offline is not None else self.offline):
-            return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        # NOTE on HTTP layer: RE/MAX issues CSRF tokens that are bound to the
+        # session's User-Agent. polite_get's per-request UA rotation would
+        # invalidate the token mid-crawl, so the listing POST + detail GET
+        # paths stay on the legacy client. Only the offline guard moves to
+        # the shared mixin in this PoC. Non-session sources (HTML/REST/JSON)
+        # should switch their HTTP layer to polite_get_for(slug) as well.
+        fix = self._offline_or_fixtures(limit, override_offline=offline)
+        if fix is not None:
+            return fix
         client = make_client()
         try:
             # One GET to establish session and get CSRF tokens
