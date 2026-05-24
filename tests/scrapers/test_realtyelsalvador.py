@@ -1,8 +1,15 @@
 """
-Tests for the Realty El Salvador scraper (pulpo/scrapers/realtyelsalvador.py).
+Tests for the Realty El Salvador HTML scraper (pulpo/scrapers/realtyelsalvador.py).
 
-Runs in offline mode against the fixture in
-samples/calibration/realtyelsalvador/sample_listings.json.
+Two layers:
+1. Offline-fixture crawl — same contract as the other scrapers
+   (load from ``fixtures/sample_listings.json``).
+2. Calibration-HTML parsers — exercise ``parse_archive_urls`` and
+   ``parse_detail`` against real captured HTML in
+   ``samples/calibration/realtyelsalvador/``. This protects against
+   selector / JSON-LD shape drift even when the offline-fixture path
+   passes (the fixture has no HTML, so a parser regression would
+   otherwise ship silently).
 """
 from __future__ import annotations
 import sys
@@ -15,14 +22,25 @@ sys.path.insert(0, str(REPO))
 
 from pulpo.scrapers.realtyelsalvador import (  # noqa: E402
     RealtyElSalvadorScraper,
-    _map,
-    _is_land,
-    _extract_photo_urls,
-    _API_HEADERS,
+    parse_archive_urls,
+    parse_detail,
+    _extract_jsonld,
+    _extract_postid,
+    _extract_photos,
+    _parse_price_usd,
+    _parse_size_text,
+    _parse_location,
+    _PHOTO_URL_RE,
 )
 
 
-# ── Offline fixture crawl ──────────────────────────────────────────────
+CALIBRATION_DIR = REPO / "samples" / "calibration" / "realtyelsalvador"
+ARCHIVE_HTML    = CALIBRATION_DIR / "archive_page_1.html"
+DETAIL_HTML     = CALIBRATION_DIR / "detail_terreno_chinameca.html"
+
+
+# ── Offline fixture crawl (unchanged contract) ─────────────────────────
+
 
 @pytest.fixture(scope="module")
 def offline_records():
@@ -63,143 +81,173 @@ def test_empty_photo_urls_is_list_not_none(offline_records):
         assert r["photo_urls"] == [], f"photo_urls must be [] not {r['photo_urls']!r}"
 
 
-# ── _is_land unit tests ───────────────────────────────────────────────
+# ── Archive-page parser ────────────────────────────────────────────────
 
-def _fake_rec(term_slug: str, link: str = "") -> dict:
-    return {
-        "status": "publish",
-        "link": link,
-        "_embedded": {
-            "wp:term": [[{"taxonomy": "tipo-de-propiedad", "slug": term_slug, "name": term_slug}]],
-            "wp:featuredmedia": [],
-        },
-        "tipo-de-propiedad": [],
+
+def test_parse_archive_urls_returns_unique_detail_urls():
+    pytest.importorskip("selectolax")
+    if not ARCHIVE_HTML.exists():
+        pytest.skip("calibration archive HTML not present")
+    html = ARCHIVE_HTML.read_text(encoding="utf-8")
+    urls = parse_archive_urls(html)
+    assert len(urls) >= 1, "no listing URLs found in archive HTML"
+    # No duplicates.
+    assert len(urls) == len(set(urls))
+    # All match the expected detail-URL pattern.
+    for u in urls:
+        assert u.startswith("https://realtyelsalvador.com/propiedades/"), u
+        assert u.endswith("/"), u
+
+
+def test_parse_archive_urls_skips_non_listing_links():
+    """Hits to /tipo-de-propiedad/, /lista-de-propiedades/, social links,
+    etc. must not be returned. Easy regression to ship if someone widens
+    the regex without thinking."""
+    html = (
+        '<a href="https://realtyelsalvador.com/tipo-de-propiedad/terrenos/">Land</a>'
+        '<a href="https://realtyelsalvador.com/propiedades/test-listing/">Listing</a>'
+        '<a href="https://facebook.com/ventadecasas">FB</a>'
+    )
+    urls = parse_archive_urls(html)
+    assert urls == ["https://realtyelsalvador.com/propiedades/test-listing/"]
+
+
+# ── Detail-page parser ─────────────────────────────────────────────────
+
+
+def test_parse_detail_against_calibration_html():
+    if not DETAIL_HTML.exists():
+        pytest.skip("calibration detail HTML not present")
+    html = DETAIL_HTML.read_text(encoding="utf-8")
+    url = "https://realtyelsalvador.com/propiedades/terreno-de-montana-con-arboles-frutales-en-valle-el-boqueron-a-6-min-de-chinameca/"
+    rec = parse_detail(html, url)
+    assert rec is not None
+    assert rec["source_id"] == "14194"
+    assert rec["url"] == url
+    assert "Boquerón" in rec["title"] or "Boqueron" in rec["title"]
+    assert rec["property_type"] == "land"
+    assert rec["price_usd"] == 40000.0
+    assert "$40000" in rec["raw_price_text"]
+    assert "3,444" in rec["raw_size_text"] or "3444" in rec["raw_size_text"]
+    assert "metros" in rec["raw_size_text"].lower()
+    assert "El Salvador" in rec["location_text"]
+    # Chinameca is the locality.
+    assert "Chinameca" in rec["location_text"]
+
+
+def test_parse_detail_returns_none_without_jsonld():
+    html = "<html><body>no structured data</body></html>"
+    assert parse_detail(html, "https://realtyelsalvador.com/propiedades/x/") is None
+
+
+def test_parse_detail_returns_none_without_title():
+    html = '<script type="application/ld+json">{"@type":"RealEstateListing","name":""}</script>'
+    assert parse_detail(html, "https://realtyelsalvador.com/propiedades/x/") is None
+
+
+def test_extract_jsonld_picks_realestate_listing_from_array():
+    """Some WP pages emit a JSON-LD list — Organization first, then
+    RealEstateListing. We must pick the latter."""
+    html = '''
+    <script type="application/ld+json">
+    [{"@type":"Organization","name":"Realty"},
+     {"@type":"RealEstateListing","name":"X","offers":{"price":"1"}}]
+    </script>
+    '''
+    blob = _extract_jsonld(html)
+    assert blob is not None
+    assert blob["@type"] == "RealEstateListing"
+    assert blob["name"] == "X"
+
+
+def test_extract_postid_from_body_class():
+    html = '<body class="post-template-default single single-propiedades postid-12345 ">'
+    assert _extract_postid(html) == "12345"
+
+
+def test_extract_postid_falls_back_to_slug_when_missing():
+    """When no postid is in the body class, parse_detail must still
+    produce a stable source_id — it builds one from the URL slug."""
+    html = '<script type="application/ld+json">{"@type":"RealEstateListing","name":"X"}</script>'
+    url = "https://realtyelsalvador.com/propiedades/cool-terreno-12345/"
+    rec = parse_detail(html, url)
+    assert rec is not None
+    assert rec["source_id"] == "slug:cool-terreno-12345"
+
+
+# ── Photo extraction ──────────────────────────────────────────────────
+
+
+def test_photo_url_regex_only_matches_file_prefix():
+    """Theme assets (agent headshots ``img-wendy-de-velis-*``, favicons
+    ``cropped-img-*``) must NOT bleed into our gallery."""
+    assert _PHOTO_URL_RE.match(
+        "https://realtyelsalvador.com/wp-content/uploads/file-1773964123.jpeg"
+    )
+    assert not _PHOTO_URL_RE.match(
+        "https://realtyelsalvador.com/wp-content/uploads/img-wendy-de-velis-1717986023.jpg"
+    )
+    assert not _PHOTO_URL_RE.match(
+        "https://realtyelsalvador.com/wp-content/uploads/cropped-img-1717986358.png"
+    )
+
+
+def test_extract_photos_strips_size_suffix():
+    """Wordpress generates -WIDTHxHEIGHT thumbnails for the same source
+    photo. We dedupe to the canonical filename so the photo upgrader
+    sees one entry per real photo, not 8."""
+    html = (
+        '<meta property="og:image" content="https://realtyelsalvador.com/wp-content/uploads/file-12345.jpg">'
+        '<img src="https://realtyelsalvador.com/wp-content/uploads/file-12345-150x150.jpg">'
+        '<img src="https://realtyelsalvador.com/wp-content/uploads/file-12345-300x300.jpg">'
+    )
+    photos = _extract_photos(html)
+    assert photos == ["https://realtyelsalvador.com/wp-content/uploads/file-12345.jpg"]
+
+
+def test_extract_photos_against_calibration_html():
+    if not DETAIL_HTML.exists():
+        pytest.skip("calibration detail HTML not present")
+    html = DETAIL_HTML.read_text(encoding="utf-8")
+    photos = _extract_photos(html)
+    assert len(photos) >= 1, "expected at least one listing photo"
+    # Hero (og:image) must come first.
+    assert "file-1773964123" in photos[0]
+    # No theme-asset leakage.
+    for p in photos:
+        assert "wendy-de-velis" not in p, f"agent headshot leaked into gallery: {p}"
+        assert "cropped-img" not in p, f"favicon leaked into gallery: {p}"
+
+
+# ── JSON-LD field parsers ──────────────────────────────────────────────
+
+
+def test_parse_price_usd_handles_string_and_dict():
+    assert _parse_price_usd({"offers": {"price": "50000"}})        == (50000.0, "$50000")
+    assert _parse_price_usd({"offers": {"price": "50,000"}})       == (50000.0, "$50000")
+    assert _parse_price_usd({"offers": {"price": ""}})             == (None, "")
+    assert _parse_price_usd({"offers": {"price": "not-a-number"}}) == (None, "")
+    assert _parse_price_usd({"offers": {}})                        == (None, "")
+
+
+def test_parse_size_text_handles_metros_cuadrados():
+    jsonld = {
+        "additionalProperty": [
+            {"@type": "PropertyValue", "name": "Area Size", "value": "3,444", "unitText": "metros cuadrados"}
+        ]
     }
+    assert "3,444" in _parse_size_text(jsonld)
+    assert "metros cuadrados" in _parse_size_text(jsonld)
 
 
-def test_is_land_terreno():
-    assert _is_land(_fake_rec("terrenos"))
+def test_parse_size_text_returns_empty_when_no_area():
+    assert _parse_size_text({}) == ""
+    assert _parse_size_text({"additionalProperty": [{"name": "Other", "value": "1"}]}) == ""
 
 
-def test_is_land_lote():
-    assert _is_land(_fake_rec("lotes"))
-
-
-def test_is_land_false_for_casa():
-    rec = _fake_rec("casas")
-    rec["link"] = "https://realtyelsalvador.com/propiedades/casa-en-venta"
-    assert not _is_land(rec)
-
-
-def test_is_land_fallback_url():
-    """If taxonomy is ambiguous, URL containing 'terreno' should pass."""
-    rec = _fake_rec("uncategorized", link="https://realtyelsalvador.com/propiedades/terreno-san-miguel")
-    assert _is_land(rec)
-
-
-# ── _map unit tests ───────────────────────────────────────────────────
-
-def _minimal_record(property_meta: dict | None = None) -> dict:
-    return {
-        "id": 99999,
-        "status": "publish",
-        "link": "https://realtyelsalvador.com/propiedades/test-terreno/",
-        "title": {"rendered": "Test Terreno"},
-        "excerpt": {"rendered": "<p>Test description.</p>"},
-        "content": {"rendered": ""},
-        "modified_gmt": "2026-01-01T12:00:00",
-        "property_meta": property_meta or {
-            "REAL_HOMES_property_price": "50000",
-            "REAL_HOMES_property_size": "500",
-            "REAL_HOMES_property_size_postfix": "metros cuadrados",
-            "REAL_HOMES_property_images": [],
-        },
-        "_embedded": {
-            "wp:term": [[{"taxonomy": "tipo-de-propiedad", "slug": "terrenos", "name": "Terrenos"}]],
-            "wp:featuredmedia": [],
-        },
-    }
-
-
-def test_map_returns_dict_for_land():
-    rec = _minimal_record()
-    result = _map(rec)
-    assert result is not None
-    assert result["source_id"] == "99999"
-    assert result["price_usd"] == 50000.0
-
-
-def test_map_returns_none_for_house():
-    rec = _minimal_record()
-    rec["_embedded"]["wp:term"] = [[{"taxonomy": "tipo-de-propiedad", "slug": "casas", "name": "Casas"}]]
-    rec["link"] = "https://realtyelsalvador.com/propiedades/casa-en-la-libertad/"
-    result = _map(rec)
-    assert result is None
-
-
-def test_map_returns_none_for_draft():
-    rec = _minimal_record()
-    rec["status"] = "draft"
-    assert _map(rec) is None
-
-
-def test_map_price_none_when_missing():
-    rec = _minimal_record({"REAL_HOMES_property_price": "", "REAL_HOMES_property_images": []})
-    result = _map(rec)
-    assert result is not None
-    assert result["price_usd"] is None
-
-
-def test_map_photo_urls_is_list_always():
-    rec = _minimal_record()
-    result = _map(rec)
-    assert isinstance(result["photo_urls"], list)
-
-
-def test_extract_photo_urls_from_featured_media():
-    rec = {
-        "_embedded": {
-            "wp:featuredmedia": [{"source_url": "https://realtyelsalvador.com/wp-content/uploads/hero.jpg"}],
-        },
-        "property_meta": {"REAL_HOMES_property_images": []},
-    }
-    urls = _extract_photo_urls(rec)
-    assert "https://realtyelsalvador.com/wp-content/uploads/hero.jpg" in urls
-
-
-def test_extract_photo_urls_deduplicates():
-    same_url = "https://realtyelsalvador.com/wp-content/uploads/photo.jpg"
-    rec = {
-        "_embedded": {
-            "wp:featuredmedia": [{"source_url": same_url}],
-        },
-        "property_meta": {
-            "REAL_HOMES_property_images": [{"source_url": same_url, "file": "photo.jpg", "sizes": {}}],
-        },
-    }
-    urls = _extract_photo_urls(rec)
-    assert urls.count(same_url) == 1
-
-
-# ── Anti-403 headers ────────────────────────────────────────────────────
-# The two prior nightlies returned 0 listings due to HTTP 403 from
-# realtyelsalvador.com when the API is hit from GitHub Actions runner IPs.
-# These tests pin the headers we send so a future cleanup doesn't silently
-# strip them and reintroduce the regression.
-
-def test_api_headers_include_browser_realistic_ua():
-    """Pulpo's default UA returned 403 from runner IPs. The Safari UA in
-    _API_HEADERS is the workaround. If this assertion fails the request
-    will go out with whatever fallback the client supplies, very likely
-    triggering the WAF block again."""
-    assert "Mozilla/5.0" in _API_HEADERS["User-Agent"]
-    assert "Safari" in _API_HEADERS["User-Agent"]
-
-
-def test_api_headers_include_referer_and_sec_fetch():
-    """Referer + Sec-Fetch-* headers are commonly weighted by WordPress /
-    Cloudflare bot scoring. Pin them so a refactor doesn't drop them."""
-    assert _API_HEADERS["Referer"].startswith("https://realtyelsalvador.com")
-    assert _API_HEADERS["Sec-Fetch-Mode"] == "cors"
-    assert _API_HEADERS["Sec-Fetch-Site"] == "same-origin"
-    assert _API_HEADERS["Accept"].startswith("application/json")
+def test_parse_location_appends_el_salvador():
+    assert _parse_location({"address": {"addressLocality": "Chinameca"}}) == "Chinameca, El Salvador"
+    assert _parse_location({"address": {"addressLocality": "Chinameca", "addressRegion": "San Miguel"}}) == "Chinameca, San Miguel, El Salvador"
+    assert _parse_location({}) == "El Salvador"
+    # Already includes El Salvador — don't double-suffix.
+    assert _parse_location({"address": {"addressLocality": "El Salvador"}}).count("El Salvador") == 1
