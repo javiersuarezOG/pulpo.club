@@ -74,6 +74,16 @@ POLICIES: dict[str, Policy] = {
     "century21":        Policy(transport="httpx", rate_limit_rps=0.5),
     "nexo":             Policy(transport="httpx", rate_limit_rps=0.5),
 
+    # --- New sources (PR-C ... PR-F) ---
+    # CityMax: SSR-parse the Next.js Flight payload, 12 listings per page.
+    # Public site so the safari_macos UA pool matches the typical visitor
+    # fingerprint and avoids the bot-pool path.
+    "citymax":          Policy(
+        transport="httpx",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+    ),
+
     # --- encuent24: Playwright source, polite by default. Phase 3 will
     # widen its category set ~6x; the polite layer keeps that respectful.
     "encuentra24": Policy(

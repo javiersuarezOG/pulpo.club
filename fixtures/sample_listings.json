@@ -370,5 +370,70 @@
     "broker_phone": "+50312345678",
     "broker_email": "test@test.com",
     "scraped_at": "2026-05-04T00:00:00Z"
+  },
+  {
+    "source": "citymax",
+    "source_id": "160147",
+    "url": "https://www.citymax-sv.com/inmuebles/terreno-en-venta-en-apulo-ilopango",
+    "title": "Terreno en venta en Apulo Ilopango a 3 minutos del lago",
+    "price_usd": 98500.0,
+    "raw_price_text": "USD 98500",
+    "raw_size_text": "500 m2",
+    "location_text": "Ilopango, San Salvador, El Salvador",
+    "description": "Terreno residencial cerca del lago Ilopango.",
+    "property_type": "land",
+    "photo_urls": [
+      "https://d3owphs4fllasc.cloudfront.net/fotos-destacados/9ffbc735a8673a5e4e15d912e5bd33da.jpeg"
+    ],
+    "broker_name": "Gabriel Oliva",
+    "lat": 13.6998,
+    "lng": -89.0784,
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "citymax",
+    "source_id": "158017",
+    "url": "https://www.citymax-sv.com/inmuebles/casa-de-playa-en-residencial-lomas-de-san-blas",
+    "title": "Casa de Playa en Residencial Lomas de San Blas en venta",
+    "price_usd": 285000.0,
+    "raw_price_text": "USD 285000",
+    "raw_size_text": "320 m2",
+    "location_text": "San Blas, La Libertad, El Salvador",
+    "description": "Casa frente al mar en San Blas con vista al ocenao Pacifico.",
+    "property_type": "house",
+    "photo_urls": [
+      "https://d3owphs4fllasc.cloudfront.net/fotos-destacados/sample-sanblas.jpg"
+    ],
+    "broker_name": "Maria Lopez",
+    "built_area_m2": 220.0,
+    "bedrooms": 3,
+    "bathrooms": 2.5,
+    "parking_spaces": 2,
+    "lat": 13.4895,
+    "lng": -89.376,
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "citymax",
+    "source_id": "155872",
+    "url": "https://www.citymax-sv.com/inmuebles/apartamento-frente-al-mar-costa-del-sol",
+    "title": "Apartamento frente al mar en Costa del Sol",
+    "price_usd": 175000.0,
+    "raw_price_text": "USD 175000",
+    "raw_size_text": "85 m2",
+    "location_text": "Costa del Sol, La Paz, El Salvador",
+    "description": "Apartamento de playa con vista al ocenao en Costa del Sol.",
+    "property_type": "condo",
+    "photo_urls": [
+      "https://d3owphs4fllasc.cloudfront.net/fotos-destacados/sample-costa.jpg"
+    ],
+    "broker_name": "Sofia Portillo",
+    "built_area_m2": 85.0,
+    "bedrooms": 2,
+    "bathrooms": 2.0,
+    "parking_spaces": 1,
+    "lat": 13.3399,
+    "lng": -88.9,
+    "scraped_at": "2026-05-25T00:00:00Z"
   }
 ]
