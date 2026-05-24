@@ -2,195 +2,273 @@
 Realty El Salvador scraper — realtyelsalvador.com
 
 El Salvador-focused English-language real estate broker.
-Stack: WordPress + RealHomes theme. All listing data is accessible via
-the WP REST API at /wp-json/wp/v2/propiedades with _embed for media.
+Stack: WordPress + RealHomes theme.
 
-Strategy:
-  1. Fetch pages of /wp-json/wp/v2/propiedades?per_page=100&_embed
-  2. Filter to land / lot property types via the tipo-de-propiedad taxonomy
-  3. Extract price, area, location from property_meta (REAL_HOMES_* fields)
-  4. Hero photo from _embedded.wp:featuredmedia; gallery from
-     property_meta.REAL_HOMES_property_images (list of image dicts)
+Why HTML, not the WP REST API
+-----------------------------
+Until 2026-05-06 we used ``/wp-json/wp/v2/propiedades?_embed`` and the
+output schema was clean (~140 land listings). Then Cloudflare started
+returning HTTP 403 to that endpoint from GitHub Actions runner IPs
+(Azure datacenter ranges). Browser-realistic headers were attempted
+(PR #297, see git history) and didn't help — the gate is IP-based on
+the API surface. From an end-user IP both the API and the HTML site
+work; from runner IPs only the HTML site works. So the scraper hits
+the HTML site exclusively now.
 
-Photo CDN: realtyelsalvador.com/wp-content/uploads/
+Strategy
+--------
+1. Paginate ``/tipo-de-propiedad/terrenos/page/N/`` — the WordPress
+   archive view filtered to the ``terrenos`` (land) taxonomy.
+2. Extract listing detail URLs from each archive page.
+3. For each detail page: read JSON-LD (``@type: RealEstateListing``)
+   for the canonical fields (name, description, price, locality,
+   area). Fall through to HTML for fields JSON-LD doesn't carry
+   (photo gallery URLs, post id).
+4. Use the polite-request layer (``pulpo.scrapers._runtime.polite_get``)
+   for UA rotation, jitter, rate-limit, and Retry-After honoring.
 
-Note: there is no /wp-json/wp/v2/property CPT — the registered type is
-`propiedades` (non-standard slug). The namespaces include crm/v1 and
-elementor/v1 but no real-estate plugin namespace; all structured data
-lives in property_meta.
+Resilience
+----------
+- Offline mode loads from ``fixtures/sample_listings.json`` filtered
+  by source — same contract as the rest of the scrapers.
+- On any HTTP failure during the live crawl, the scraper attaches the
+  failing request URL + last response to ``self.last_*`` attributes so
+  the Phase-1 diagnostic-capture in ``automation/run.py`` can record a
+  proper snapshot. Without those breadcrumbs the run.py snapshot is
+  exception-only and misses the response body.
+- Pagination is capped at ``MAX_PAGES`` (well above the current ~21
+  page count of the terrenos archive) to bound runtime.
+- Listing cap at ``MAX_LISTINGS`` keeps the request budget bounded
+  even if the site adds inventory faster than we can crawl politely.
 """
 from __future__ import annotations
+import json
 import re
-import time
 from datetime import datetime, timezone
 from typing import Optional
+from urllib.parse import urljoin
 
-from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_client, with_retries
-from pulpo.agents.html_crawler import DEFAULT_REQUEST_DELAY as REQUEST_DELAY
+from pulpo.agents.html_crawler import (
+    HTTPX_OK,
+    SELECTOLAX_OK,
+    is_offline,
+    load_fixtures,
+    make_client,
+)
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._policy import get_policy
+from pulpo.scrapers._runtime import polite_get
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 
 BASE         = "https://realtyelsalvador.com"
-API_BASE     = f"{BASE}/wp-json/wp/v2/propiedades"
-PER_PAGE     = 100
-MAX_PAGES    = 20
+ARCHIVE_URL  = f"{BASE}/tipo-de-propiedad/terrenos/page/{{page}}/"
+ARCHIVE_FIRST = f"{BASE}/tipo-de-propiedad/terrenos/"
 FIXTURE_FILE = "sample_listings.json"
 
-# Browser-realistic headers — the WP REST endpoint returns HTTP 403 to
-# requests from GitHub Actions runner IPs (Azure datacenter ranges) when
-# only the default pulpo-club UA is sent. The two prior nightlies hit
-# this and shipped 0 listings. From a developer machine the same code
-# works regardless of UA, so the gate is some combination of IP + missing
-# bot-evasion headers. These match what Safari/Chrome sends for an XHR to
-# the same endpoint and have defeated similar WordPress / Cloudflare
-# bot-scoring rules elsewhere. If 403s persist on the next nightly we
-# know it's pure IP-based and need a proxy.
-_API_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 "
-        "(KHTML, like Gecko) Version/17.0 Safari/605.1.15"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "es-SV,es;q=0.9,en;q=0.8",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Referer": f"{BASE}/",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-    "Cache-Control": "no-cache",
-}
+# Bounds — kept conservative on purpose. The archive serves 6 listings/
+# page and currently spans ~21 pages (~126 land listings total). We cap
+# at 100 to be a polite citizen and to keep the request budget bounded
+# if the site grows fast. Pagination cap is its own ceiling — protects
+# against the WP archive looping infinitely when our page indexer
+# overflows the real last page.
+MAX_LISTINGS = 100
+MAX_PAGES    = 25
 
-# tipo-de-propiedad taxonomy: terms we treat as land
-# Discovered by inspecting live records — expand as new terms appear.
-_LAND_KEYWORDS = {"terreno", "terrenos", "lote", "lotes", "land", "lot", "finca", "parcela"}
+# Detail-page URL pattern. The archive links every listing as
+#   https://realtyelsalvador.com/propiedades/<slug>/
+_DETAIL_URL_RE = re.compile(
+    r'href="(https://realtyelsalvador\.com/propiedades/[^"#?]+/)"'
+)
 
+# Body class includes ``postid-NNNNN`` which is the WP post id — same id
+# the deprecated WP REST API exposed as ``rec["id"]``. Keeping the same
+# source_id keeps downstream first-seen / repeat-listing tracking stable
+# across the WP-REST → HTML migration.
+_POSTID_RE = re.compile(r'<body[^>]*class="[^"]*postid-(\d+)')
 
-def _is_land(rec: dict) -> bool:
-    """Return True if the listing type is land / lot / finca."""
-    # Check taxonomy term names from embedded wp:term
-    for term_group in (rec.get("_embedded") or {}).get("wp:term", []):
-        for term in term_group:
-            slug = (term.get("slug") or "").lower()
-            name = (term.get("name") or "").lower()
-            if any(k in slug or k in name for k in _LAND_KEYWORDS):
-                return True
-    # Fallback: check the URL slug
-    link = rec.get("link", "").lower()
-    return any(k in link for k in _LAND_KEYWORDS)
+# JSON-LD blob — RealHomes embeds exactly one Product/RealEstateListing
+# block per detail page. We take the first match (DOTALL crosses line
+# boundaries because the payload is pretty-printed multi-line JSON).
+_JSONLD_RE = re.compile(
+    r'<script[^>]+type="application/ld\+json"[^>]*>(.*?)</script>',
+    re.DOTALL,
+)
 
+# Listing photo URL pattern. The site stores user-uploaded listing
+# photos as wp-content/uploads/file-<unix-timestamp>.<ext>. Brand /
+# theme assets (agent headshots, favicons, cropped-img variants) use a
+# different prefix and must NOT bleed into our gallery. The check is
+# strict: prefix must be exactly ``file-`` to qualify.
+_PHOTO_URL_RE = re.compile(
+    r'https://realtyelsalvador\.com/wp-content/uploads/file-\d+(?:-\d+x\d+)?\.(?:jpe?g|png|webp)',
+    re.IGNORECASE,
+)
 
-def _extract_photo_urls(rec: dict) -> list[str]:
-    """Collect hero + gallery photo URLs from the WP REST record."""
-    urls: list[str] = []
-    seen: set[str] = set()
+# og:image — the canonical hero photo. Listed first in our output.
+_OG_IMAGE_RE = re.compile(
+    r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"'
+)
 
-    def _add(u: str) -> None:
-        u = u.strip()
-        if u.startswith("http") and u not in seen:
-            seen.add(u)
-            urls.append(u)
-
-    # Hero from embedded featured media
-    emb = (rec.get("_embedded") or {})
-    for fm in emb.get("wp:featuredmedia", []):
-        src = fm.get("source_url", "")
-        if src:
-            _add(src)
-
-    # Gallery from property_meta.REAL_HOMES_property_images
-    meta = rec.get("property_meta") or {}
-    for img in meta.get("REAL_HOMES_property_images") or []:
-        if isinstance(img, dict):
-            # Prefer the highest-res size available
-            sizes = img.get("sizes") or {}
-            best = (
-                sizes.get("large", {}).get("source_url")
-                or sizes.get("medium_large", {}).get("source_url")
-                or sizes.get("medium", {}).get("source_url")
-            )
-            src = best or img.get("source_url") or ""
-            if not src and img.get("file"):
-                src = f"{BASE}/wp-content/uploads/{img['file']}"
-            if src:
-                _add(src)
-
-    return upgrade_photo_urls("realtyelsalvador", urls, payload=rec)
+# Strip WP-thumbnail size suffix ``-WIDTHxHEIGHT`` so the photo upgrade
+# step (``_photo_url_upgrade``) sees the canonical filename.
+_SIZE_SUFFIX_RE = re.compile(r"-\d+x\d+(\.[a-z]+)$", re.IGNORECASE)
 
 
-def _map(rec: dict) -> Optional[dict]:
-    """Map one WP REST record to our raw dict schema."""
-    if rec.get("status") != "publish":
+# ── parsing helpers ───────────────────────────────────────────────────
+
+
+def _strip_size_suffix(url: str) -> str:
+    return _SIZE_SUFFIX_RE.sub(r"\1", url)
+
+
+def parse_archive_urls(html: str) -> list[str]:
+    """Return unique detail-page URLs found in an archive-page HTML."""
+    urls = list(dict.fromkeys(_DETAIL_URL_RE.findall(html)))
+    return urls
+
+
+def _extract_jsonld(html: str) -> Optional[dict]:
+    """Return the first RealEstateListing/Product JSON-LD block as a dict."""
+    for raw in _JSONLD_RE.findall(html):
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            blob = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(blob, list):
+            for entry in blob:
+                if isinstance(entry, dict) and entry.get("@type") in {
+                    "RealEstateListing", "Product"
+                }:
+                    return entry
+        elif isinstance(blob, dict):
+            if blob.get("@type") in {"RealEstateListing", "Product"}:
+                return blob
+    return None
+
+
+def _extract_postid(html: str) -> Optional[str]:
+    m = _POSTID_RE.search(html)
+    return m.group(1) if m else None
+
+
+def _extract_photos(html: str) -> list[str]:
+    """Return de-duplicated photo URLs for the listing.
+
+    Order: og:image first (if it matches the listing-photo pattern),
+    then any other ``file-<ts>.<ext>`` URLs in DOM order. Size suffixes
+    are stripped so the upgrader sees the canonical filename.
+    """
+    seen: dict[str, None] = {}
+    og_match = _OG_IMAGE_RE.search(html)
+    if og_match:
+        candidate = _strip_size_suffix(og_match.group(1))
+        if _PHOTO_URL_RE.match(candidate):
+            seen[candidate] = None
+    for raw_url in _PHOTO_URL_RE.findall(html):
+        canonical = _strip_size_suffix(raw_url)
+        seen.setdefault(canonical, None)
+    return list(seen.keys())
+
+
+def _parse_price_usd(jsonld: dict) -> tuple[Optional[float], str]:
+    offers = jsonld.get("offers") or {}
+    raw = offers.get("price") or offers.get("priceSpecification") or ""
+    if isinstance(raw, dict):
+        raw = raw.get("price") or ""
+    raw_str = str(raw).strip().replace(",", "")
+    if not raw_str:
+        return None, ""
+    try:
+        return float(raw_str), f"${raw_str}"
+    except (ValueError, TypeError):
+        return None, ""
+
+
+def _parse_size_text(jsonld: dict) -> str:
+    """Return ``"<value> <unit>"`` from JSON-LD additionalProperty[Area Size].
+
+    The site reports area in m² (Spanish: ``metros cuadrados``) and
+    occasionally in manzanas. Pulpo's normalizer accepts either; we pass
+    the raw string through so the normalizer's existing unit-handling
+    code runs unchanged.
+    """
+    for prop in (jsonld.get("additionalProperty") or []):
+        if not isinstance(prop, dict):
+            continue
+        name = (prop.get("name") or "").lower()
+        if "area" in name or "size" in name or "tama" in name:
+            value = str(prop.get("value") or "").strip()
+            unit  = str(prop.get("unitText") or "").strip()
+            if value:
+                return f"{value} {unit}".strip()
+    return ""
+
+
+def _parse_location(jsonld: dict) -> str:
+    addr = jsonld.get("address") or {}
+    if isinstance(addr, dict):
+        parts = [
+            addr.get("addressLocality") or "",
+            addr.get("addressRegion")   or "",
+        ]
+        loc = ", ".join(p for p in parts if p).strip(", ")
+    else:
+        loc = ""
+    if not loc:
+        loc = "El Salvador"
+    elif "El Salvador" not in loc:
+        loc = f"{loc}, El Salvador"
+    return loc
+
+
+def parse_detail(html: str, url: str) -> Optional[dict]:
+    """Parse a detail-page HTML into our raw record schema. Returns None
+    if the page is missing the essentials (title or post-id)."""
+    jsonld = _extract_jsonld(html)
+    if not jsonld:
         return None
-    if not _is_land(rec):
-        return None
 
-    title = rec.get("title", {}).get("rendered", "").strip()
+    title = (jsonld.get("name") or "").strip()
     if not title:
         return None
-    # Strip HTML entities
-    title = re.sub(r"<[^>]+>", "", title).strip()
+    title = re.sub(r"\s+", " ", title)
 
-    meta = rec.get("property_meta") or {}
+    postid = _extract_postid(html)
+    if not postid:
+        # Fall back to the URL slug hash — rare path, but better than
+        # dropping the listing entirely. Normalize as a stable ID.
+        slug = url.rstrip("/").rsplit("/", 1)[-1]
+        postid = f"slug:{slug}"
 
-    # Price
-    raw_price = meta.get("REAL_HOMES_property_price", "")
-    price_usd: Optional[float] = None
-    if raw_price:
-        try:
-            price_usd = float(str(raw_price).replace(",", ""))
-        except (ValueError, TypeError):
-            pass
+    description = (jsonld.get("description") or "").strip()[:1500]
 
-    # Area (prefer size in m², fall back to lot_size)
-    raw_size_str = meta.get("REAL_HOMES_property_size", "") or ""
-    size_unit = meta.get("REAL_HOMES_property_size_postfix", "") or ""
-    lot_str   = meta.get("REAL_HOMES_property_lot_size", "") or ""
-    lot_unit  = meta.get("REAL_HOMES_property_lot_size_postfix", "") or ""
-    raw_size_text = ""
-    if raw_size_str:
-        raw_size_text = f"{raw_size_str} {size_unit}".strip()
-    elif lot_str:
-        raw_size_text = f"{lot_str} {lot_unit}".strip()
+    price_usd, raw_price_text = _parse_price_usd(jsonld)
+    raw_size_text = _parse_size_text(jsonld)
+    location_text = _parse_location(jsonld)
 
-    # Location from taxonomy terms
-    location_parts: list[str] = []
-    for term_group in (rec.get("_embedded") or {}).get("wp:term", []):
-        for term in term_group:
-            taxonomy = term.get("taxonomy", "")
-            if taxonomy == "ubicacion-de-propiedad":
-                location_parts.append(term.get("name", "").strip())
-    location_text = ", ".join(location_parts) if location_parts else "El Salvador"
-    if "El Salvador" not in location_text:
-        location_text += ", El Salvador"
-
-    # Description from excerpt (cleaned) or content snippet
-    desc_html = rec.get("excerpt", {}).get("rendered", "") or rec.get("content", {}).get("rendered", "")
-    description = re.sub(r"<[^>]+>", " ", desc_html).strip()[:1500]
-
-    # Days listed from modified date
-    days_listed: Optional[int] = None
-    modified = rec.get("modified_gmt") or rec.get("modified") or ""
-    if modified:
-        try:
-            mod_dt = datetime.fromisoformat(modified.rstrip("Z")).replace(tzinfo=timezone.utc)
-            days_listed = (datetime.now(timezone.utc) - mod_dt).days
-        except Exception:
-            pass
+    photo_urls = _extract_photos(html)
+    photo_urls = upgrade_photo_urls("realtyelsalvador", photo_urls)
 
     return {
-        "source_id":      str(rec["id"]),
-        "url":            rec.get("link", ""),
+        "source_id":      str(postid),
+        "url":            url,
         "title":          title,
         "description":    description,
         "location_text":  location_text,
         "price_usd":      price_usd,
-        "raw_price_text": f"${raw_price}" if raw_price else "",
+        "raw_price_text": raw_price_text,
         "raw_size_text":  raw_size_text,
         "property_type":  "land",
-        "photo_urls":     _extract_photo_urls(rec),
-        "days_listed":    days_listed,
-        "is_repriced":    bool(meta.get("REAL_HOMES_property_old_price")),
+        "photo_urls":     photo_urls,
+        "days_listed":    None,
+        "is_repriced":    False,
     }
+
+
+# ── crawler ───────────────────────────────────────────────────────────
 
 
 class RealtyElSalvadorScraper:
@@ -198,67 +276,99 @@ class RealtyElSalvadorScraper:
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline
+        # Breadcrumbs for Phase-1 diagnostic capture. ``automation/run.py``
+        # reads these via getattr after an exception to enrich the snapshot.
+        self.last_request_url: Optional[str] = None
+        self.last_request_headers: Optional[dict] = None
+        self.last_response = None
 
-    def report_total(self, client) -> Optional[int]:
-        try:
-            r = client.get(f"{API_BASE}?per_page=1", headers=_API_HEADERS)
-            r.raise_for_status()
-            return int(r.headers.get("X-WP-Total", 0)) or None
-        except Exception:
-            return None
-
-    def crawl(self, limit: int = 30, offline: bool | None = None) -> list[dict]:
+    def crawl(self, limit: int = MAX_LISTINGS, offline: bool | None = None) -> list[dict]:
         if is_offline(offline if offline is not None else self.offline):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
-        if not HTTPX_OK:
+        if not (HTTPX_OK and SELECTOLAX_OK):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
+        effective_limit = min(limit, MAX_LISTINGS)
+        policy = get_policy(self.slug)
+
         client = make_client()
         try:
-            out: list[dict] = []
-            for page in range(1, MAX_PAGES + 1):
-                time.sleep(REQUEST_DELAY)
-                try:
-                    r = with_retries(lambda: client.get(API_BASE, params={
-                        "per_page": PER_PAGE,
-                        "page":     page,
-                        "_embed":   "wp:featuredmedia,wp:term",
-                    }, headers=_API_HEADERS))
-                    r.raise_for_status()
-                except Exception as e:
-                    print(f"[realtyelsalvador] page {page} failed: {e}")
-                    break
-
-                recs = r.json()
-                if not recs:
-                    break
-                total_pages = int(r.headers.get("X-WP-TotalPages", 1))
-
-                for rec in recs:
-                    if len(out) >= limit:
-                        break
-                    mapped = _map(rec)
-                    if mapped:
-                        mapped["source"] = self.slug
-                        mapped["scraped_at"] = datetime.now(timezone.utc).isoformat()
-                        out.append(mapped)
-
-                if len(out) >= limit or page >= total_pages:
-                    break
-
-            return out
+            return self._crawl_live(client, policy, effective_limit)
         finally:
             client.close()
 
+    def _crawl_live(self, client, policy, limit: int) -> list[dict]:
+        out: list[dict] = []
+        seen_urls: set[str] = set()
+        last_had_results = False
+
+        for page in range(1, MAX_PAGES + 1):
+            archive_url = ARCHIVE_FIRST if page == 1 else ARCHIVE_URL.format(page=page)
+            self.last_request_url = archive_url
+            resp = polite_get(client, archive_url, source=self.slug, policy=policy)
+            self.last_response = resp
+
+            if resp.status_code != 200:
+                print(f"[realtyelsalvador] archive page {page} HTTP {resp.status_code}")
+                break
+
+            page_urls = parse_archive_urls(resp.text)
+            if not page_urls:
+                # Walked past the last real page — WP archives wrap and
+                # show a generic landing once N exceeds the count. Stop.
+                break
+
+            new_this_page = False
+            for durl in page_urls:
+                if len(out) >= limit:
+                    break
+                durl = urljoin(BASE, durl) if not durl.startswith("http") else durl
+                if durl in seen_urls:
+                    continue
+                seen_urls.add(durl)
+                new_this_page = True
+
+                self.last_request_url = durl
+                d_resp = polite_get(client, durl, source=self.slug, policy=policy)
+                self.last_response = d_resp
+                if d_resp.status_code != 200:
+                    print(f"[realtyelsalvador] detail {durl} HTTP {d_resp.status_code}")
+                    continue
+
+                rec = parse_detail(d_resp.text, durl)
+                if rec is None:
+                    continue
+                rec["source"]     = self.slug
+                rec["scraped_at"] = datetime.now(timezone.utc).isoformat()
+                out.append(rec)
+
+            last_had_results = new_this_page
+            if len(out) >= limit:
+                break
+            if not new_this_page:
+                break
+
+        # Honest about pagination — caller knows if there might be more.
+        self._last_max_pages_hit = (page >= MAX_PAGES) and last_had_results
+        self._last_limit_hit     = len(out) >= limit
+        return out
+
     def crawl_with_meta(
-        self, limit: int = 30, offline: bool | None = None, max_pages: int | None = None  # noqa: ARG002
+        self,
+        limit: int = MAX_LISTINGS,
+        offline: bool | None = None,
+        max_pages: Optional[int] = None,  # noqa: ARG002  # accepted for parity
     ) -> dict:
         records = self.crawl(limit, offline)
-        return {"records": records, "max_pages_hit": False, "limit_hit": len(records) >= limit}
+        return {
+            "records":       records,
+            "max_pages_hit": getattr(self, "_last_max_pages_hit", False),
+            "limit_hit":     getattr(self, "_last_limit_hit", False),
+        }
 
 
 _scraper = RealtyElSalvadorScraper()
 register(SOURCES, "realtyelsalvador", _scraper)
 
 
-def crawl(limit: int = 30, offline: bool | None = None) -> list[dict]:
+def crawl(limit: int = MAX_LISTINGS, offline: bool | None = None) -> list[dict]:
     return RealtyElSalvadorScraper(offline=offline).crawl(limit)
