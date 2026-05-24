@@ -85,20 +85,28 @@ def polite_get_for(slug: str) -> Callable:
 
 
 def passes_vacation_gate(
-    *, property_type: str, location_text: str, title: str, description: str,
+    *,
+    property_type: str,
+    location_text: str,
+    title: str,
+    description: str,
+    force: bool = False,
 ) -> bool:
-    """Vacation-zone + waterfront-keyword filter for house/condo.
+    """Vacation-zone + waterfront-keyword filter.
 
-    Returns True for land (no gate — inland lots are valid inventory).
-    For house/condo, returns True iff:
-      - the location string contains a known VACATION_ZONE slug, OR
-      - the title or description contains a WATERFRONT_KEYWORDS match.
+    Default behavior (matches the existing 8 scrapers): land is exempt
+    — inland lots are valid inventory across most sources. House/condo
+    must match either a known VACATION_ZONE slug in location_text OR a
+    WATERFRONT_KEYWORDS match in title/description.
 
-    The check is the same shape applied in every existing scraper's
-    type-specific branch — moved here so a single edit (e.g. adding
-    a new lake zone) updates every consumer.
+    Set ``force=True`` to apply the gate to ALL property types,
+    including land. Used by inland-dominant scrapers (e.g. citymax)
+    where the brief explicitly narrows scope to the Pacific coast +
+    Lake Coatepeque + Lake Ilopango. Without ``force`` such scrapers
+    would flood ranked.json with San Salvador / Cojutepeque terrenos
+    that don't belong in Pulpo.
     """
-    if property_type not in ("house", "condo"):
+    if not force and property_type not in ("house", "condo"):
         return True
     loc_blob = (location_text or "").lower().replace(" ", "-")
     zone_is_vacation = any(z in loc_blob for z in VACATION_ZONES)
@@ -115,14 +123,15 @@ def finalize_record(
     broker_type: str,
     broker_type_field: str = "",
     photo_payload: Optional[dict] = None,
+    force_vacation_gate: bool = False,
 ) -> Optional[dict]:
     """Run the standard cross-cutting steps on a near-final record dict.
 
     Steps, in order:
       1. Upgrade `photo_urls` via `upgrade_photo_urls(slug, urls, payload=...)`.
          (Mutates record["photo_urls"] in place.)
-      2. Apply the vacation-zone gate for house/condo (drops inland
-         built listings unless title/desc has a waterfront keyword).
+      2. Apply the vacation-zone gate (house/condo by default; all
+         property types when ``force_vacation_gate=True``).
       3. Run the multi-signal `classify_property_type`, attach
          `_type_signals`, `_type_confidence`, `_type_total`.
       4. If the classifier disagrees with `broker_type`, set
@@ -141,6 +150,7 @@ def finalize_record(
         location_text=record.get("location_text", ""),
         title=record.get("title", ""),
         description=record.get("description", ""),
+        force=force_vacation_gate,
     ):
         return None
 

@@ -66,6 +66,56 @@ def test_vacation_gate_condo_at_lake_passes():
     ) is True
 
 
+def test_vacation_gate_force_drops_inland_land():
+    """force=True applies the gate to land too — used by inland-dominant
+    scrapers (e.g. citymax) where the brief explicitly narrows scope."""
+    assert passes_vacation_gate(
+        property_type="land",
+        location_text="San Salvador",
+        title="Terreno residencial",
+        description="Lote plano cerca del centro.",
+        force=True,
+    ) is False
+
+
+def test_vacation_gate_force_keeps_coastal_land():
+    """force=True still passes coastal land via the vacation-zone slug."""
+    assert passes_vacation_gate(
+        property_type="land",
+        location_text="El Tunco, La Libertad",
+        title="Terreno",
+        description="",
+        force=True,
+    ) is True
+
+
+def test_vacation_gate_force_keeps_lake_land_via_keyword():
+    """force=True still passes lake land via the waterfront keyword."""
+    assert passes_vacation_gate(
+        property_type="land",
+        location_text="San Salvador",
+        title="Terreno con vista al lago",
+        description="Vista al lago Ilopango.",
+        force=True,
+    ) is True
+
+
+def test_finalize_force_gate_drops_inland_land():
+    """force_vacation_gate=True drops inland land in finalize_record too."""
+    inland_land = {
+        "title":         "Terreno residencial",
+        "description":   "Lote en San Salvador.",
+        "location_text": "San Salvador",
+        "url":           "https://example.com/terreno-1",
+        "photo_urls":    [],
+    }
+    out = finalize_record(
+        inland_land, slug="test", broker_type="land",
+        broker_type_field="Terreno", force_vacation_gate=True,
+    )
+    assert out is None
+
+
 # ── finalize_record ───────────────────────────────────────────────────
 
 
