@@ -3,7 +3,7 @@ Pipeline watchdog — validates that the nightly run produced sane output.
 
 Checks (all must pass):
   1. Freshness     — last_updated.json timestamp within 36 hours
-  2. Volume        — ranked.json count within ±20% of 7-day rolling median
+  2. Volume        — ranked.json count within ±VOLUME_TOLERANCE of 7-day rolling median
   3. Parser errors — parser_errors.log has no non-comment content if recently written
   4. Public deploy — https://pulpo.club/data/ranked.json returns 200 + valid JSON
 
@@ -20,7 +20,21 @@ REPO = Path(__file__).resolve().parents[1]
 
 # Thresholds
 FRESHNESS_HOURS   = 36
-VOLUME_TOLERANCE  = 0.20   # ±20% from 7-day rolling median
+# ±30% from the 7-day rolling median.
+#
+# Temporarily widened from 0.20 to 0.30 after PR #418 (2026-05-22) added
+# the agricultural-purge filter that took ranked.json from 920 → 722
+# (-21.5%). For the next ~7 nightlies the rolling median straddles
+# pre- and post-purge runs, so a 0.20 band would fire false-positive
+# volume failures every night until the median fully rebased. The
+# wider band absorbs the rebase without losing the genuine-anomaly
+# signal (a real scraper failure would still drop hundreds, not 200).
+#
+# **Revert to 0.20 on or after 2026-06-08** (14 days post-purge — by
+# then the 7-day window contains only post-purge runs and the median
+# stabilises at ~720). If we add another large scope filter, bump
+# this comment to the new sunset date rather than leaving 0.30 forever.
+VOLUME_TOLERANCE  = 0.30
 VOLUME_FLOOR      = 50     # absolute minimum if history is unavailable
 MIN_HISTORY_RUNS  = 3      # need at least 3 full runs to compute a median
 FULL_RUN_FLOOR    = 200    # runs with total < this are test runs, excluded from median
