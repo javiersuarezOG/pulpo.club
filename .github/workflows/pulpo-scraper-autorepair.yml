@@ -72,8 +72,19 @@ jobs:
 
       - name: Run auto-repair (shadow mode)
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+          # Anthropic key. Tries both names because the repo secret was
+          # named PULPO_CLUB_SCRAPER_AUTOREPAIR during initial provisioning;
+          # ANTHROPIC_API_KEY is the canonical name a future maintainer
+          # would expect. Either works.
+          ANTHROPIC_API_KEY: ${{ secrets.PULPO_CLUB_SCRAPER_AUTOREPAIR || secrets.ANTHROPIC_API_KEY }}
+          # gh CLI auth for the `gh issue comment` post step. Must be
+          # the auto-provisioned github.token — the workflow's
+          # `permissions: { issues: write }` block applies to that token
+          # specifically. PULPO_BOT_TOKEN is a fine-grained PAT scoped
+          # for the nightly's git-push flow and lacks `issues: write`,
+          # which surfaced as `gh issue comment ... non-zero exit status 1`
+          # in run 26368507241.
+          GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           AUTOREPAIR_MODE: "shadow"
           AUTOREPAIR_MODEL: ${{ vars.AUTOREPAIR_MODEL || 'claude-opus-4-7' }}
