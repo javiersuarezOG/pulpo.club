@@ -435,5 +435,64 @@
     "lat": 13.3399,
     "lng": -88.9,
     "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "essurf",
+    "source_id": "5268",
+    "url": "https://elsalvadorsurfrealestate.com/atami-home-for-sale-270000/",
+    "title": "Atami Home 270000",
+    "price_usd": 270000.0,
+    "raw_price_text": "$270,000.00",
+    "raw_size_text": "701.39 m2",
+    "location_text": "Atami, Tamanique, La Libertad, El Salvador",
+    "description": "",
+    "property_type": "house",
+    "photo_urls": [
+      "https://assets.thesparksite.com/uploads/sites/1521/2026/01/IMG-8200-1200x800.fit.jpg"
+    ],
+    "lat": 13.5,
+    "lng": -89.4192,
+    "bedrooms": 4,
+    "bathrooms": 3.0,
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "essurf",
+    "source_id": "4900",
+    "url": "https://elsalvadorsurfrealestate.com/el-zonte-lot-for-sale-180000/",
+    "title": "El Zonte Lot 180000",
+    "price_usd": 180000.0,
+    "raw_price_text": "$180,000",
+    "raw_size_text": "1200 m2",
+    "location_text": "El Zonte, La Libertad, El Salvador",
+    "description": "",
+    "property_type": "land",
+    "photo_urls": [
+      "https://assets.thesparksite.com/uploads/sites/1521/sample-zonte.jpg"
+    ],
+    "lat": 13.4965,
+    "lng": -89.4364,
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "essurf",
+    "source_id": "5012",
+    "url": "https://elsalvadorsurfrealestate.com/punta-mango-condo-for-sale-350000/",
+    "title": "Punta Mango Condo 350000",
+    "price_usd": 350000.0,
+    "raw_price_text": "$350,000",
+    "raw_size_text": "95 m2",
+    "location_text": "Punta Mango, La Union, El Salvador",
+    "description": "",
+    "property_type": "condo",
+    "photo_urls": [
+      "https://assets.thesparksite.com/uploads/sites/1521/sample-mango.jpg"
+    ],
+    "lat": 13.1735,
+    "lng": -88.093,
+    "bedrooms": 2,
+    "bathrooms": 2.0,
+    "built_area_m2": 95.0,
+    "scraped_at": "2026-05-25T00:00:00Z"
   }
 ]
