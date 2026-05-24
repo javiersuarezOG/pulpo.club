@@ -12,18 +12,26 @@
 
 import type { ComponentType } from "react";
 import { NewsletterWidget } from "./newsletter/NewsletterWidget.jsx";
-import { SourcesHealthWidget } from "./sources/SourcesHealthWidget.jsx";
+import { SourcesHealthWidget, SourcesHealthPreview } from "./sources/SourcesHealthWidget.jsx";
 
 // Widget-author contract. Components take no props — they own their own
 // state. AdminShell renders them inside a consistent card layout (title
 // bar, back-to-grid link, body). Keep the surface narrow on purpose so
 // each widget can iterate without touching the shell.
+//
+// `Preview` is optional. When provided, AdminShell renders it on the
+// /admin grid card *instead of* the static `description` — giving the
+// widget a live at-a-glance summary (counts, recency, status) before
+// the user clicks in. Widgets without a Preview still work; they keep
+// the description fallback. Keep Preview output narrow — it shows
+// inside a card that's roughly 280px wide.
 export type AdminWidget = {
   slug: string;                 // URL segment: `/admin/<slug>`
   label: string;                // grid card title + page title
-  description: string;          // grid card subhead (one sentence)
+  description: string;          // grid card subhead (one sentence) — fallback when no Preview
   category: AdminWidgetCategory;
   Component: ComponentType<{}>;
+  Preview?: ComponentType<{}>;
 };
 
 export type AdminWidgetCategory = "comms" | "data" | "ops";
@@ -41,9 +49,10 @@ export const ADMIN_WIDGETS: readonly AdminWidget[] = [
     slug: "sources",
     label: "Source health",
     description:
-      "Per-scraper status, latest count, 14-day trend, and a link to the diagnostic snapshot when a source is red.",
+      "Per-scraper card with status, listing count, supply-mix pies, and a live fix-state banner (recently fixed / open PR / auto-repair running / shadow suggestion / needs human) for red sources.",
     category: "ops",
     Component: SourcesHealthWidget,
+    Preview: SourcesHealthPreview,
   },
 ] as const;
 
