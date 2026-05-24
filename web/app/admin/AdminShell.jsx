@@ -126,8 +126,14 @@ const SHELL_STYLES = `
   background: var(--paper);
   border: 1px solid var(--border-soft);
   border-radius: 12px;
-  padding: 32px;
+  /* Tighter horizontal padding at narrow viewports (iPhone SE 320px) so
+     the input + button row fits without horizontal overflow. responsive-
+     smoke spec catches 320×568 — keep this in step. */
+  padding: 24px 16px;
   margin: 32px 0;
+}
+@media (min-width: 480px) {
+  .page-admin .admin-gate { padding: 32px; }
 }
 .page-admin .admin-gate h2 {
   font-size: 18px;
@@ -138,12 +144,17 @@ const SHELL_STYLES = `
   font-size: 14px;
   color: var(--ink-3);
   margin: 0 0 16px;
+  word-wrap: break-word;
 }
 .page-admin .admin-gate .gate-row {
-  display: flex; gap: 8px; align-items: stretch;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-wrap: wrap;     /* stack the button under the input below 360px */
 }
 .page-admin .admin-gate input[type="password"] {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;        /* allow shrink below the placeholder's intrinsic width */
   font: inherit; font-size: 14px;
   padding: 10px 12px;
   border: 1px solid var(--border-soft);
@@ -159,6 +170,7 @@ const SHELL_STYLES = `
   color: var(--paper);
   font: inherit; font-size: 14px; font-weight: 600;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .page-admin .admin-gate .gate-error {
   color: var(--accent-strong, #b00);
