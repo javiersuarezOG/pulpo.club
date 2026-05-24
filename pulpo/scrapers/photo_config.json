@@ -7,6 +7,11 @@
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
+    "citymax": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
     "century21": {
       "full_res": { "strategy": "noop" },
       "min_source_long_side_px": 1080,
