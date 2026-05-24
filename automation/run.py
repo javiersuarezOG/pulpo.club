@@ -1280,6 +1280,13 @@ def main() -> int:
     source_meta: dict[str, dict] = {}      # src -> {max_pages_hit, limit_hit}
     source_durations: dict[str, float] = {}  # src -> seconds in mod.crawl
     source_error_class: dict[str, str] = {}  # src -> short error category
+    source_failure_id: dict[str, str] = {}   # src -> id of diagnostic snapshot, if any
+
+    # Lazy-imported so the offline test path doesn't pull the helper at import.
+    from automation.scraper_failures import (
+        write_failure_snapshot as _write_failure_snapshot,
+        is_enabled as _failure_capture_enabled,
+    )
 
     for src in sources:
         src = src.strip()
@@ -1289,6 +1296,14 @@ def main() -> int:
             errors.append(err)
             source_errors[src] = err
             source_error_class[src] = "UnknownSource"
+            if _failure_capture_enabled():
+                fid = _write_failure_snapshot(
+                    src,
+                    kind="unknown_source",
+                    context={"registry_keys": sorted(REGISTRY.keys())},
+                )
+                if fid:
+                    source_failure_id[src] = fid
             continue
         crawl_started = _time.monotonic()
         try:
@@ -1308,12 +1323,49 @@ def main() -> int:
             source_errors[src] = err
             source_error_class[src] = _classify_error(e)
             source_durations[src] = round(_time.monotonic() - crawl_started, 2)
+            if _failure_capture_enabled():
+                # The scraper may attach .last_response / .last_request_url
+                # on failure (Phase-0 polite_get does this once realtyelsalvador
+                # is migrated). We duck-type access — None is fine.
+                fid = _write_failure_snapshot(
+                    src,
+                    kind="exception",
+                    exception=e,
+                    response=getattr(mod, "last_response", None),
+                    request_url=getattr(mod, "last_request_url", None),
+                    request_headers=getattr(mod, "last_request_headers", None),
+                    context={
+                        "duration_s": source_durations[src],
+                        "offline":    bool(offline),
+                    },
+                )
+                if fid:
+                    source_failure_id[src] = fid
             continue
         source_durations[src] = round(_time.monotonic() - crawl_started, 2)
         per_source_count[src] = len(recs)
         for r in recs:
             r.setdefault("source", src)
             raw.append(r)
+
+        # Capture an "empty_yield" snapshot when the scraper completed
+        # without exception but returned zero records. This is the silent-
+        # failure mode that bit realtyelsalvador (Cloudflare 403 swallowed
+        # by the `break` in its pagination loop) — no traceback, just a
+        # quiet count=0. The snapshot gives the watchdog + auto-repair
+        # agent something concrete to look at.
+        if not recs and _failure_capture_enabled() and not offline:
+            fid = _write_failure_snapshot(
+                src,
+                kind="empty_yield",
+                context={
+                    "duration_s":    source_durations[src],
+                    "max_pages_hit": source_meta[src].get("max_pages_hit"),
+                    "limit_hit":     source_meta[src].get("limit_hit"),
+                },
+            )
+            if fid:
+                source_failure_id[src] = fid
 
     # ── PostHog: per-source crawl results ────────────────────────────
     # Emit one event per source after the loop completes (success or
@@ -1411,6 +1463,10 @@ def main() -> int:
                 "error_msg":   (source_errors.get(src) or "")[:300],
                 "max_pages_hit": source_meta.get(src, {}).get("max_pages_hit", False),
                 "limit_hit":     source_meta.get(src, {}).get("limit_hit", False),
+                # Phase-1 diagnostic-snapshot pointer. ``failure_id`` resolves to
+                # ``web/data/scraper_failures/<source>_*_<failure_id>.json``,
+                # consumed by the watchdog + Phase-4 auto-repair agent.
+                "failure_id":   source_failure_id.get(src),
             }, ensure_ascii=False) + "\n")
 
     # Normalize
