@@ -1,31 +1,44 @@
 // SourcesHealthWidget — at-a-glance per-scraper health for the /admin hub.
 //
-// Three sections, all from data the nightly already commits:
+// Three sections, single page, all from data the nightly already commits:
 //
 //   1. Nightly status strip — last-run timestamp, duration, total
 //      listings, overall green/red. Reads /data/last_updated.json.
 //
 //   2. Supply mix card — two side-by-side pies (geography + type)
-//      computed across every listing in /data/ranked.list.json. This is
-//      the "where are the gaps?" view: a tiny condo slice means thin
-//      condo inventory, a tiny lake slice means lake under-supply,
-//      and so on.
+//      computed across every listing in /data/ranked.list.json. This
+//      is the "where are the gaps?" view: a tiny condo slice means
+//      thin condo inventory, a tiny lake slice means lake supply
+//      under-served, and so on.
 //
-//   3. Per-source rows — name, status pill, listing count, two TINY
-//      versions of the same pies scoped to that source. Spots
-//      single-source dependencies ("if remax goes red we lose X% of
-//      our condos"). For red sources, the per-source pies are
-//      replaced with a "fix → see issue ↗" link that opens the
-//      watchdog issue for the source (where the Phase-4 shadow-mode
-//      auto-repair comments live).
+//   3. Per-source cards — one bordered card per scraper.
+//
+//      Green sources show: count of listings + per-source supply mix
+//      (two pies with a legend so you can read "bienesraices is mostly
+//      inland land" without hovering).
+//
+//      Red sources show: a five-state fix banner pulled live from
+//      GitHub, in priority order (best → worst):
+//        1. `recently fixed`        — PR mentioning the source was
+//                                     merged in the last 7 days; the
+//                                     next nightly will verify green.
+//        2. `fix open`              — open PR mentions the source
+//                                     (auto-repair active mode, or
+//                                     hand-written).
+//        3. `auto-repair running`   — pulpo-scraper-autorepair
+//                                     workflow currently in progress.
+//        4. `shadow suggestion`     — Phase-4 shadow comment exists on
+//                                     the watchdog issue.
+//        5. `needs human`           — nothing in flight.
 //
 // Auto-integration of new sources
 // -------------------------------
 // New scraper onboarding is one step: drop pulpo/scrapers/<slug>.py.
 // The package autodiscovers the new module, the nightly crawls it on
-// next run, and this widget displays it after its first row lands in
-// source_health_history.jsonl. The /admin/sources widget needs zero
-// changes for a new source — same fetch + group-by-source code path.
+// next run, and this widget displays its card after its first row
+// lands in source_health_history.jsonl. The widget needs zero changes
+// for a new source — the card list is generated from whatever rows
+// the JSONL carries.
 //
 // tests/test_source_integration.py guards the chain — fails CI if any
 // scraper module errors on import, fails to register, or lacks a test
@@ -37,6 +50,20 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 const HEALTH_HISTORY_PATH = "/data/source_health_history.jsonl";
 const LAST_UPDATED_PATH   = "/data/last_updated.json";
 const RANKED_LIST_PATH    = "/data/ranked.list.json";
+
+// GitHub identity — derived once at module load so the row component
+// doesn't recompute it. Hardcoded to the public Pulpo repo since the
+// admin tool is internal and not deployed anywhere else.
+const GH_OWNER  = "javiersuarezOG";
+const GH_REPO   = "pulpo.club";
+const GH_API    = "https://api.github.com";
+const AUTOREPAIR_WORKFLOW_FILE = "pulpo-scraper-autorepair.yml";
+
+// "Recently fixed" window — a PR merged in the last N days counts as
+// "fixed, awaiting next nightly verification." After the window
+// expires we fall back to "needs human" because the source is still
+// red despite a supposed fix.
+const RECENTLY_FIXED_WINDOW_DAYS = 7;
 
 // Ocean-coast slugs from automation/property_types.py VACATION_ZONES.
 // Duplicated here on purpose — the JS side has no other reason to know
@@ -163,82 +190,172 @@ const STYLES = `
 .sw-legend .key { color: var(--ink); font-weight: 500; min-width: 56px; }
 .sw-legend .pct { color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
 
-/* ── Section 3: per-source rows ────────────────────────────────
-   Single line per source on desktop. Columns:
-     [status dot] [name] [count or PR-status] [pies] [last update]
-   On mobile they wrap, but the same single-line semantics hold —
-   each row remains one logical unit, not a card with internal
-   structure. */
-.sw-list { display: grid; gap: 6px; }
-.sw-row {
+/* ── Section 3: per-source cards ──────────────────────────────── */
+.sw-srclist {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 800px) {
+  .sw-srclist { grid-template-columns: 1fr 1fr; }
+}
+
+.sw-srccard {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sw-srccard[data-status="red"] {
+  border-color: color-mix(in oklch, var(--badge-drop) 40%, var(--line) 60%);
+}
+
+.sw-srccard .head {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px 14px;
-  border-bottom: 1px solid var(--line);
-  padding: 10px 4px;
-  font-size: 14px;
-  color: var(--ink-2);
+  justify-content: space-between;
+  gap: 10px;
 }
-.sw-row:last-child { border-bottom: none; }
-
-.sw-row .dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  flex-shrink: 0;
-}
-.sw-row[data-status="green"] .dot { background: var(--badge-new); }
-.sw-row[data-status="red"]   .dot { background: var(--badge-drop); }
-.sw-row[data-status="unknown"] .dot { background: var(--ink-3); }
-
-.sw-row .name {
+.sw-srccard .name {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--ink);
-  font-weight: 500;
-  min-width: 140px;
+  word-break: break-word;
 }
+.sw-srccard .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.sw-srccard .pill[data-status="green"] { background: color-mix(in oklch, var(--badge-new) 18%, transparent); color: var(--badge-new); }
+.sw-srccard .pill[data-status="red"]   { background: color-mix(in oklch, var(--badge-drop) 18%, transparent); color: var(--badge-drop); }
+.sw-srccard .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-.sw-row .signal {
-  font-size: 14px;
-  color: var(--ink);
-  font-weight: 500;
-  min-width: 130px;
+.sw-srccard .signalrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.sw-row .signal .sub {
+.sw-srccard .signal {
+  font-size: 16px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.sw-srccard .signal .sub {
   color: var(--ink-3);
   font-weight: 400;
   font-size: 13px;
+  margin-left: 6px;
 }
-.sw-row .signal a {
-  color: var(--accent);
+.sw-srccard .when {
   font-family: var(--font-mono);
-  font-size: 13px;
-  text-decoration: none;
-  font-weight: 500;
-}
-.sw-row .signal a:hover { text-decoration: underline; }
-.sw-row .signal .needs {
-  color: var(--badge-drop);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
 }
 
-.sw-row .pies {
+.sw-srccard .fixbanner {
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex: 1 1 auto;
-  min-width: 80px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  background: var(--paper-2);
 }
-.sw-row .pies .gap { width: 6px; }
-
-.sw-row .when {
+.sw-srccard .fixbanner .icon {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.sw-srccard .fixbanner.fixed   { background: color-mix(in oklch, var(--badge-new) 14%, transparent); }
+.sw-srccard .fixbanner.open    { background: color-mix(in oklch, var(--accent) 14%, transparent); }
+.sw-srccard .fixbanner.running { background: color-mix(in oklch, var(--badge-motivated) 18%, transparent); }
+.sw-srccard .fixbanner.shadow  { background: color-mix(in oklch, var(--ink-3) 12%, transparent); }
+.sw-srccard .fixbanner.human   { background: color-mix(in oklch, var(--badge-drop) 12%, transparent); }
+.sw-srccard .fixbanner .label { font-weight: 600; color: var(--ink); }
+.sw-srccard .fixbanner .meta {
+  color: var(--ink-2);
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+.sw-srccard .fixbanner a {
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--ink-3);
-  margin-left: auto;
+  text-decoration: none;
   white-space: nowrap;
+}
+.sw-srccard .fixbanner a:hover { text-decoration: underline; }
+
+.sw-srccard .mixwrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding-top: 4px;
+}
+@media (min-width: 480px) {
+  .sw-srccard .mixwrap { grid-template-columns: 1fr 1fr; }
+}
+.sw-srccard .mixwrap .block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.sw-srccard .mixwrap .lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.sw-srccard .mixwrap .leg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--ink-2);
+  min-width: 0;
+}
+.sw-srccard .mixwrap .leg .row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.sw-srccard .mixwrap .leg .sw {
+  width: 8px; height: 8px; border-radius: 2px;
+}
+.sw-srccard .mixwrap .leg .key { color: var(--ink); font-weight: 500; min-width: 42px; }
+.sw-srccard .mixwrap .leg .pct { color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
+
+.sw-srccard .nomix {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.sw-srccard .error {
+  font-size: 12px;
+  color: var(--badge-drop);
+  line-height: 16px;
+  word-break: break-word;
+  margin-top: -4px;
 }
 
 .sw-empty, .sw-error {
@@ -254,14 +371,10 @@ const STYLES = `
 `;
 
 // ── palette ──────────────────────────────────────────────────────────
-//
-// Three tokens used twice each so the geography and type pies share a
-// visual language: position-1 = primary (most common), position-2 =
-// secondary, position-3 = niche.
 const COLORS = {
-  beach:  "var(--badge-new)",       // moss
-  inland: "var(--accent)",          // brand accent
-  lake:   "var(--badge-motivated)", // gold
+  beach:  "var(--badge-new)",
+  inland: "var(--accent)",
+  lake:   "var(--badge-motivated)",
   land:   "var(--badge-new)",
   house:  "var(--accent)",
   condo:  "var(--badge-motivated)",
@@ -272,10 +385,6 @@ const GEO_LABEL  = { beach: "Beach", inland: "Inland", lake: "Lake" };
 const TYPE_LABEL = { land: "Land",  house: "House",  condo: "Condo" };
 
 // ── small SVG donut/pie ──────────────────────────────────────────────
-//
-// One circle per segment, drawn with stroke-dasharray to give a donut
-// look. Cheap to render (no JSX gymnastics, no chart lib) and degrades
-// to a single solid colour when one segment is 100%.
 function Pie({ segments, size = 56 }) {
   const total = segments.reduce((sum, s) => sum + (s.count || 0), 0);
   if (total === 0) {
@@ -370,42 +479,131 @@ function formatDuration(s) {
   return `${m}m${r.toString().padStart(2, "0")}s`;
 }
 
-// GitHub identity — derived once at module load so the row component
-// doesn't recompute it. Hardcoded to the public Pulpo repo since the
-// admin tool is internal and not deployed anywhere else.
-const GH_OWNER = "javiersuarezOG";
-const GH_REPO  = "pulpo.club";
-
 function issueSearchUrl(source) {
   const q = encodeURIComponent(`is:issue is:open ${source}`);
   return `https://github.com/${GH_OWNER}/${GH_REPO}/issues?q=${q}`;
 }
 
-// Find open PRs that mention the source slug in title or body. Uses
-// GitHub's public Search API — unauthenticated CORS works, rate limit
-// 60/hr per IP (plenty for an admin tool refreshed by 1-2 humans).
-// Returns the first matching PR or null. On rate-limit / network
-// failure, returns null and the row falls back to "needs human".
-async function fetchOpenPrForSource(source) {
-  const q = encodeURIComponent(
-    `is:pr is:open repo:${GH_OWNER}/${GH_REPO} ${source} in:title,body`
-  );
-  const url = `https://api.github.com/search/issues?q=${q}&per_page=1`;
+// ── GitHub API helpers ───────────────────────────────────────────────
+//
+// GitHub's unauthenticated REST API is rate-limited to 60 req/hr per
+// IP for the core API and 10 req/min for the Search API. We hit four
+// endpoints per red source on every load(); typical red-source count
+// is 0-2 so the budget is comfortable. Failures (network, rate-limit)
+// return null, and the fix-state detector falls back gracefully.
+
+async function ghJson(path) {
   try {
-    const r = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+    const r = await fetch(`${GH_API}${path}`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
     if (!r.ok) return null;
-    const body = await r.json();
-    const item = (body && body.items && body.items[0]) || null;
-    if (!item) return null;
-    return {
-      number: item.number,
-      title:  item.title,
-      url:    item.html_url,
-      draft:  Boolean(item.draft),
-    };
+    return await r.json();
   } catch (_) {
     return null;
   }
+}
+
+async function findOpenPrForSource(source) {
+  const q = encodeURIComponent(
+    `is:pr is:open repo:${GH_OWNER}/${GH_REPO} ${source} in:title,body`
+  );
+  const body = await ghJson(`/search/issues?q=${q}&per_page=1`);
+  const it = body && body.items && body.items[0];
+  if (!it) return null;
+  return {
+    number: it.number,
+    title:  it.title,
+    url:    it.html_url,
+    draft:  Boolean(it.draft),
+  };
+}
+
+async function findRecentlyMergedPrForSource(source) {
+  const since = new Date(Date.now() - RECENTLY_FIXED_WINDOW_DAYS * 86400_000)
+    .toISOString().slice(0, 10);
+  const q = encodeURIComponent(
+    `is:pr is:merged repo:${GH_OWNER}/${GH_REPO} ${source} in:title,body merged:>=${since}`
+  );
+  const body = await ghJson(`/search/issues?q=${q}&per_page=1&sort=updated&order=desc`);
+  const it = body && body.items && body.items[0];
+  if (!it) return null;
+  return {
+    number:    it.number,
+    title:     it.title,
+    url:       it.html_url,
+    mergedAt:  it.closed_at || it.updated_at,
+  };
+}
+
+async function findRunningAutoRepairForSource(source) {
+  const body = await ghJson(
+    `/repos/${GH_OWNER}/${GH_REPO}/actions/workflows/${AUTOREPAIR_WORKFLOW_FILE}/runs?status=in_progress&per_page=10`
+  );
+  if (!body || !Array.isArray(body.workflow_runs)) return null;
+  // The workflow_dispatch payload doesn't expose `inputs` on the run
+  // listing; match by display title (`autorepair · <source>`) when it
+  // exists, otherwise treat any in-progress run as a possible match
+  // and let the user click through to confirm.
+  for (const run of body.workflow_runs) {
+    const title = (run.display_title || run.name || "").toLowerCase();
+    if (title.includes(source.toLowerCase()) || body.workflow_runs.length === 1) {
+      return {
+        id:    run.id,
+        url:   run.html_url,
+        title: run.display_title || run.name,
+        startedAt: run.run_started_at,
+      };
+    }
+  }
+  return null;
+}
+
+async function findShadowSuggestionForSource(source) {
+  // The orchestrator posts shadow comments on the watchdog issue. Find
+  // the watchdog issue first (open issue mentioning source), then
+  // search its comments for the marker line emitted by
+  // scripts/scraper_autorepair.py.
+  const issuesQ = encodeURIComponent(`is:issue is:open repo:${GH_OWNER}/${GH_REPO} ${source}`);
+  const issuesBody = await ghJson(`/search/issues?q=${issuesQ}&per_page=3`);
+  const issues = (issuesBody && issuesBody.items) || [];
+  for (const issue of issues) {
+    const commentsBody = await ghJson(
+      `/repos/${GH_OWNER}/${GH_REPO}/issues/${issue.number}/comments?per_page=20&sort=created&direction=desc`
+    );
+    if (!Array.isArray(commentsBody)) continue;
+    for (const c of commentsBody) {
+      if ((c.body || "").includes(`Auto-repair shadow suggestion — \`${source}\``)) {
+        return {
+          issueNumber: issue.number,
+          commentUrl: c.html_url,
+          postedAt:   c.created_at,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+// Run all four detection probes for one source in parallel, then pick
+// the highest-priority signal. Returns a fix-state record consumed by
+// FixBanner. Priority order matches the user-facing UX: a freshly-
+// merged PR ("you're done, just wait for nightly") beats an open PR
+// ("close to landing") beats a running auto-repair workflow ("in
+// progress") beats a shadow suggestion ("proposal exists") beats
+// nothing.
+async function detectFixState(source) {
+  const [merged, open, running, shadow] = await Promise.all([
+    findRecentlyMergedPrForSource(source),
+    findOpenPrForSource(source),
+    findRunningAutoRepairForSource(source),
+    findShadowSuggestionForSource(source),
+  ]);
+  if (merged)  return { kind: "fixed",   detail: merged  };
+  if (open)    return { kind: "open",    detail: open    };
+  if (running) return { kind: "running", detail: running };
+  if (shadow)  return { kind: "shadow",  detail: shadow  };
+  return { kind: "human", detail: null };
 }
 
 // ── component ────────────────────────────────────────────────────────
@@ -420,15 +618,14 @@ export function SourcesHealthWidget() {
     error: null,
   });
 
-  // PR lookup per source slug. Populated lazily when a source goes red
-  // — green sources never need this. Keyed by source slug; value is the
-  // PR object (number/title/url) or `null` (no PR found / rate-limited).
-  // ``undefined`` means "not fetched yet" so the UI can render a
-  // "checking…" placeholder.
-  const [prs, setPrs] = useState({});
+  // Fix-state lookup per source slug. Populated lazily after the
+  // health data lands. Undefined = not started; null = checking;
+  // object = result.
+  const [fixStates, setFixStates] = useState({});
 
   const load = useCallback(async () => {
     setState((s) => ({ ...s, status: "loading", error: null }));
+    setFixStates({}); // re-detect from scratch on manual refresh
     try {
       const cb = `?t=${Date.now()}`;
       const [healthText, lastUpdatedRes, listingsRes] = await Promise.all([
@@ -455,7 +652,6 @@ export function SourcesHealthWidget() {
 
   useEffect(() => { void load(); }, [load]);
 
-  // Pre-compute everything derivable from the fetched data.
   const grouped = useMemo(() => groupHealthBySource(state.healthRows), [state.healthRows]);
   const totals  = useMemo(() => aggregate(state.listings), [state.listings]);
   const perSourceMix = useMemo(() => {
@@ -471,34 +667,28 @@ export function SourcesHealthWidget() {
     return out;
   }, [state.listings]);
 
-  // After health data lands, fan out one PR-search per red source.
-  // Effects can't be async directly — kick off the fetches and write
-  // results back into `prs` state. The empty-deps + manual guard keeps
-  // this from re-firing on every render.
+  // After health data lands, kick off fix-state detection for every
+  // red source in parallel. Results land in `fixStates` as each
+  // probe completes.
   useEffect(() => {
     if (state.status !== "ready") return;
-    const reds = state.healthRows.reduce((acc, r) => {
-      // Latest row per source — newest ts wins.
-      if (!r || !r.source) return acc;
-      const prev = acc[r.source];
-      if (!prev || prev.ts < r.ts) acc[r.source] = r;
-      return acc;
-    }, {});
-    const redSlugs = Object.values(reds)
-      .filter((row) => row.status === "red")
-      .map((row) => row.source);
-    for (const slug of redSlugs) {
-      if (prs[slug] !== undefined) continue; // already fetched / in-flight
-      // Mark in-flight so a re-render doesn't refire the request.
-      setPrs((p) => ({ ...p, [slug]: null }));
-      void fetchOpenPrForSource(slug).then((result) => {
-        setPrs((p) => ({ ...p, [slug]: result }));
+    const latestByncSource = new Map();
+    for (const r of state.healthRows) {
+      if (!r || !r.source) continue;
+      const prev = latestByncSource.get(r.source);
+      if (!prev || prev.ts < r.ts) latestByncSource.set(r.source, r);
+    }
+    const reds = Array.from(latestByncSource.values()).filter((r) => r.status === "red");
+    for (const r of reds) {
+      const slug = r.source;
+      if (fixStates[slug] !== undefined) continue;
+      setFixStates((s) => ({ ...s, [slug]: null })); // mark "checking"
+      void detectFixState(slug).then((result) => {
+        setFixStates((s) => ({ ...s, [slug]: result }));
       });
     }
   }, [state.status, state.healthRows]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Source ordering — reds first (oldest red on top), then healthy
-  // sources by descending count.
   const sources = useMemo(() => {
     const entries = Array.from(grouped.entries()).map(([source, rows]) => {
       const latest = rows[0] || {};
@@ -575,7 +765,7 @@ export function SourcesHealthWidget() {
         </div>
       )}
 
-      {/* Section 3 — per-source rows */}
+      {/* Section 3 — per-source cards */}
       {state.status === "loading" && sources.length === 0 && (
         <div className="sw-loading">Loading…</div>
       )}
@@ -585,13 +775,13 @@ export function SourcesHealthWidget() {
       )}
 
       {sources.length > 0 && (
-        <div className="sw-list" role="list">
+        <div className="sw-srclist">
           {sources.map((entry) => (
-            <SourceRow
+            <SourceCard
               key={entry.source}
               entry={entry}
               mix={perSourceMix.get(entry.source)}
-              pr={prs[entry.source]}
+              fixState={fixStates[entry.source]}
             />
           ))}
         </div>
@@ -602,9 +792,7 @@ export function SourcesHealthWidget() {
 
 function SupplyBlock({ label, order, counts, labels, total, size }) {
   const segments = order.map((key) => ({
-    key,
-    color: COLORS[key],
-    count: counts[key] || 0,
+    key, color: COLORS[key], count: counts[key] || 0,
   }));
   return (
     <div className="sw-mix-block">
@@ -628,82 +816,155 @@ function SupplyBlock({ label, order, counts, labels, total, size }) {
   );
 }
 
-function SourceRow({ entry, mix, pr }) {
+function FixBanner({ source, fixState }) {
+  // Five-state banner — see module docstring for the priority order.
+  if (fixState === undefined || fixState === null) {
+    return (
+      <div className="fixbanner shadow">
+        <span className="icon">⟳</span>
+        <span className="meta">checking GitHub for fix in progress…</span>
+      </div>
+    );
+  }
+  const { kind, detail } = fixState;
+  if (kind === "fixed") {
+    return (
+      <div className="fixbanner fixed">
+        <span className="icon">✓</span>
+        <span className="meta">
+          <span className="label">recently fixed</span> — PR #{detail.number} merged{" "}
+          {formatRelative(detail.mergedAt)}. Awaiting next nightly to verify green.
+        </span>
+        <a href={detail.url} target="_blank" rel="noreferrer">PR #{detail.number} ↗</a>
+      </div>
+    );
+  }
+  if (kind === "open") {
+    return (
+      <div className="fixbanner open">
+        <span className="icon">→</span>
+        <span className="meta">
+          <span className="label">fix open</span> — PR #{detail.number}{" "}
+          {detail.draft ? "(draft)" : "(ready for review)"}
+        </span>
+        <a href={detail.url} target="_blank" rel="noreferrer">PR #{detail.number} ↗</a>
+      </div>
+    );
+  }
+  if (kind === "running") {
+    return (
+      <div className="fixbanner running">
+        <span className="icon">⟳</span>
+        <span className="meta">
+          <span className="label">auto-repair running</span> — started{" "}
+          {formatRelative(detail.startedAt)}.
+        </span>
+        <a href={detail.url} target="_blank" rel="noreferrer">run ↗</a>
+      </div>
+    );
+  }
+  if (kind === "shadow") {
+    return (
+      <div className="fixbanner shadow">
+        <span className="icon">💬</span>
+        <span className="meta">
+          <span className="label">shadow suggestion ready</span> — fix proposal posted{" "}
+          {formatRelative(detail.postedAt)} on issue #{detail.issueNumber}. Needs human to apply.
+        </span>
+        <a href={detail.commentUrl} target="_blank" rel="noreferrer">comment ↗</a>
+      </div>
+    );
+  }
+  return (
+    <div className="fixbanner human">
+      <span className="icon">⚠</span>
+      <span className="meta">
+        <span className="label">needs human</span> — no fix in flight.
+      </span>
+      <a href={issueSearchUrl(source)} target="_blank" rel="noreferrer">open issue ↗</a>
+    </div>
+  );
+}
+
+function SourceCard({ entry, mix, fixState }) {
   const { source, latest, isRed, lastGreen } = entry;
   const status = latest.status || "unknown";
   const count = latest.count ?? 0;
 
+  const whenIso = isRed ? lastGreen : latest.ts;
+  const whenLabel = isRed
+    ? (lastGreen ? `last good ${formatRelative(lastGreen)}` : "never green")
+    : `${formatRelative(latest.ts)}`;
+
+  const hasMix = mix && mix.total > 0;
   const geoSegments = GEO_ORDER.map((key) => ({
     key, color: COLORS[key], count: (mix && mix.geo[key]) || 0,
   }));
   const typeSegments = TYPE_ORDER.map((key) => ({
     key, color: COLORS[key], count: (mix && mix.type[key]) || 0,
   }));
-  const hasMix = mix && mix.total > 0;
-
-  // Tail timestamp — for green sources it's the latest run; for red
-  // sources it's the last successful run (often more interesting than
-  // the latest failure timestamp because it tells you how stale the
-  // ingestion is).
-  const whenIso = isRed ? lastGreen : latest.ts;
-  const whenLabel = isRed
-    ? (lastGreen ? `last good ${formatRelative(lastGreen)}` : "never green")
-    : formatRelative(latest.ts);
 
   return (
-    <div className="sw-row" data-status={status} role="listitem" aria-label={`${source} ${status}`}>
-      <span className="dot" />
-      <span className="name">{source}</span>
+    <div className="sw-srccard" data-status={status} aria-label={`${source} ${status}`}>
+      <div className="head">
+        <span className="name">{source}</span>
+        <span className="pill" data-status={status}>
+          <span className="dot" /> {status}
+        </span>
+      </div>
 
-      {/* Signal column: number of listings (green) OR PR status (red) */}
-      <span className="signal">
-        {isRed ? (
-          // pr === undefined: still fetching the lookup
-          // pr === null:      lookup done, no open PR found
-          // pr === object:    open PR exists, show its number
-          pr === undefined ? (
-            <span className="sub">checking for fix…</span>
-          ) : pr ? (
-            <a href={pr.url} target="_blank" rel="noreferrer" title={pr.title}>
-              fix in progress · PR #{pr.number} ↗
-            </a>
-          ) : (
-            <>
-              <span className="needs">needs human</span>{" "}
-              <a href={issueSearchUrl(source)} target="_blank" rel="noreferrer">
-                issue ↗
-              </a>
-            </>
-          )
-        ) : (
-          <>
-            <strong>{count.toLocaleString()}</strong>{" "}
-            <span className="sub">listing{count === 1 ? "" : "s"}</span>
-          </>
-        )}
-      </span>
+      <div className="signalrow">
+        <div className="signal">
+          {isRed
+            ? <>{count.toLocaleString()} <span className="sub">listings · scraper red</span></>
+            : <>{count.toLocaleString()} <span className="sub">listings</span></>}
+        </div>
+        <div className="when" title={whenIso || ""}>{whenLabel}</div>
+      </div>
 
-      {/* Per-source supply-mix pies — present even when red (shows the
-          historical mix this source contributed; signals what we LOSE
-          when it goes red). When the source has no data in ranked.json,
-          render empty-state placeholders that align with the column. */}
-      <span className="pies" title={hasMix ? "geography · type" : "no listings in dataset"}>
-        {hasMix ? (
-          <>
-            <Pie segments={geoSegments} size={22} />
-            <span className="gap" />
-            <Pie segments={typeSegments} size={22} />
-          </>
-        ) : (
-          <>
-            <Pie segments={[{ count: 0, color: "var(--line-2)" }]} size={22} />
-            <span className="gap" />
-            <Pie segments={[{ count: 0, color: "var(--line-2)" }]} size={22} />
-          </>
-        )}
-      </span>
+      {isRed && <FixBanner source={source} fixState={fixState} />}
 
-      <span className="when" title={whenIso || ""}>{whenLabel}</span>
+      {isRed && (latest.error_class || latest.error_msg) && (
+        <div className="error">
+          {latest.error_class && <strong>{latest.error_class}</strong>}
+          {latest.error_class && latest.error_msg ? " — " : ""}
+          {latest.error_msg && (latest.error_msg.length > 200
+            ? latest.error_msg.slice(0, 200) + "…"
+            : latest.error_msg)}
+        </div>
+      )}
+
+      {hasMix ? (
+        <div className="mixwrap">
+          <MiniMix label="Geography" order={GEO_ORDER}  counts={mix.geo}  labels={GEO_LABEL}  total={mix.total} segments={geoSegments} />
+          <MiniMix label="Type"      order={TYPE_ORDER} counts={mix.type} labels={TYPE_LABEL} total={mix.total} segments={typeSegments} />
+        </div>
+      ) : (
+        <div className="nomix">no listings in current ranked dataset</div>
+      )}
+    </div>
+  );
+}
+
+function MiniMix({ label, order, counts, labels, total, segments }) {
+  return (
+    <div className="block">
+      <Pie segments={segments} size={40} />
+      <div className="leg">
+        <div className="lbl">{label}</div>
+        {order.map((key) => {
+          const c = counts[key] || 0;
+          const pct = total > 0 ? Math.round((c / total) * 100) : 0;
+          return (
+            <div className="row" key={key}>
+              <span className="sw" style={{ background: COLORS[key] }} />
+              <span className="key">{labels[key]}</span>
+              <span>{c}</span>
+              <span className="pct">({pct}%)</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
