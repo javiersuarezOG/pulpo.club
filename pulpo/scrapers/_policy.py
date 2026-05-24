@@ -83,6 +83,14 @@ POLICIES: dict[str, Policy] = {
         rate_limit_rps=0.5,
         user_agent_pool="safari_macos",
     ),
+    # essurf (El Salvador Surf Real Estate): WordPress AgentFire v3 IDX,
+    # POST to /wp-json/agentfire/v2/listing3/listings, 9 listings per
+    # page across 24 pages. Light traffic so a higher rps is fine.
+    "essurf":           Policy(
+        transport="httpx",
+        rate_limit_rps=1.0,
+        user_agent_pool="safari_macos",
+    ),
 
     # --- encuent24: Playwright source, polite by default. Phase 3 will
     # widen its category set ~6x; the polite layer keeps that respectful.
