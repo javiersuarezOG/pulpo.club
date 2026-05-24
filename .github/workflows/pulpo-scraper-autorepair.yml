@@ -1,0 +1,83 @@
+name: pulpo scraper auto-repair (shadow)
+
+# Phase 4 — auto-repair workflow, v1 (shadow mode only).
+#
+# Triggered after a Pulpo nightly OR on manual dispatch. Reads the
+# latest source_health_history.jsonl to find sources in red status,
+# loads the matching diagnostic snapshot from web/data/scraper_failures/,
+# asks Claude to propose a patch via scripts/scraper_autorepair.py,
+# and (in SHADOW mode) posts the suggestion as a comment on the
+# existing watchdog issue for that source.
+#
+# Shadow mode is deliberate. The cost of a wrong auto-merged scraper
+# patch is bigger than the cost of waiting for a human review. After
+# ~4 weeks of useful shadow suggestions we'll graduate to ACTIVE mode
+# (apply patch, run offline test, open PR if validated) — that lives
+# in a separate follow-up PR with stricter safety rails.
+#
+# Why workflow_run.completed (not workflow_run.failed)?
+# A nightly that "succeeds" can still have a red source (the canary
+# gates are best-effort, not perfect). Reading source_health_history
+# inside the script is more authoritative than the workflow's
+# conclusion field.
+
+on:
+  workflow_run:
+    workflows: ["pulpo nightly run"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Comma-separated source slugs (empty = auto-detect red sources)"
+        required: false
+        default: ""
+        type: string
+      dry_run:
+        description: "Skip Anthropic call, print prompt only"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+concurrency:
+  group: pulpo-scraper-autorepair
+  cancel-in-progress: false   # don't kill in-flight repair if a new nightly fires
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      # Comment on the watchdog issue.
+      issues: write
+      # contents:write + pull-requests:write are needed for ACTIVE mode
+      # (future). Granting them now so the graduation PR doesn't need
+      # workflow file changes — only a script flag flip.
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          # Anthropic SDK — pinned to a tested major. Pulpo doesn't use
+          # this elsewhere yet, so we install it in this workflow only.
+          pip install 'anthropic>=0.40,<1.0'
+
+      - name: Run auto-repair (shadow mode)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          AUTOREPAIR_MODE: "shadow"
+          AUTOREPAIR_MODEL: ${{ vars.AUTOREPAIR_MODEL || 'claude-opus-4-7' }}
+          AUTOREPAIR_TARGETS: ${{ github.event.inputs.targets || '' }}
+          AUTOREPAIR_DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+        run: |
+          python3 scripts/scraper_autorepair.py
