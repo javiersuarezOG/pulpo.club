@@ -388,49 +388,47 @@ function AdvancedRanking({ filters, update }) {
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
       >
-        <span>{lc === "es" ? "Ajusta el ranking" : "Tune the ranking"}</span>
+        <span>{t("filter.ranking.tune", lc)}</span>
         <Icon name={open ? "chevron_up" : "chevron_down"} size={14} />
       </button>
       {open && (
         <div className="advanced-ranking">
           <div className="advanced-ranking-help">
             <button className="link-btn" onClick={() => setMethOpen(true)}>
-              {lc === "es" ? "¿Cómo calculamos esto?" : "How we rank"}
+              {t("filter.ranking.how", lc)}
             </button>
           </div>
           <div className="range-row">
             <label>
-              {lc === "es" ? "Puntaje mínimo" : "Investment score"}: <strong>{filters.score_min ?? 0}</strong>
+              {t("filter.ranking.min_score", lc)}: <strong>{filters.score_min ?? 0}</strong>
             </label>
             <input type="range" min="0" max="100" step="5"
               value={filters.score_min ?? 0}
               onChange={(e) => update({ score_min: +e.target.value })}/>
           </div>
           <div className="range-row">
-            <label>{lc === "es" ? "Precio vs. comparables" : "Price vs. comps"}: <strong>{w.value}%</strong></label>
+            <label>{t("filter.ranking.weight_value", lc)}: <strong>{w.value}%</strong></label>
             <input type="range" min="0" max="100" step="5"
               value={w.value}
               onChange={(e) => setWeight("value", +e.target.value)}/>
           </div>
           <div className="range-row">
-            <label>{lc === "es" ? "Ubicación" : "Location"}: <strong>{w.location}%</strong></label>
+            <label>{t("filter.ranking.weight_loc", lc)}: <strong>{w.location}%</strong></label>
             <input type="range" min="0" max="100" step="5"
               value={w.location}
               onChange={(e) => setWeight("location", +e.target.value)}/>
           </div>
           <div className="range-row">
-            <label>{lc === "es" ? "Momentum del área" : "Area momentum"}: <strong>{w.momentum}%</strong></label>
+            <label>{t("filter.ranking.weight_mom", lc)}: <strong>{w.momentum}%</strong></label>
             <input type="range" min="0" max="100" step="5"
               value={w.momentum}
               onChange={(e) => setWeight("momentum", +e.target.value)}/>
           </div>
           <button className="link-btn" onClick={reset}>
-            {lc === "es" ? "Restablecer" : "Reset to defaults"}
+            {t("filter.ranking.reset", lc)}
           </button>
           <p className="advanced-ranking-hint">
-            {lc === "es"
-              ? `Elige "Mejor coincidencia (tus pesos)" en el orden para usar tus pesos.`
-              : `Pick "Best match (your weights)" in the sort dropdown to use your weights.`}
+            {t("filter.ranking.hint", lc)}
           </p>
         </div>
       )}
@@ -455,41 +453,17 @@ function MethodologyModal({ open, onClose }) {
         <button className="modal-close" onClick={onClose} aria-label={t("common.close", lc)}>
           <Icon name="close" size={18} />
         </button>
-        <h2 id="meth-title">{lc === "es" ? "Cómo clasificamos" : "How we rank"}</h2>
-        <p className="meth-tagline">
-          {lc === "es"
-            ? "Cada propiedad recibe un puntaje compuesto de 0–100 basado en tres dimensiones simples."
-            : "Every listing gets a 0–100 composite score from three plain-English dimensions."}
-        </p>
-        <h3>{lc === "es" ? "Precio vs. comparables" : "Price vs. comparable lots"}</h3>
-        <p>
-          {lc === "es"
-            ? "Qué tan barato es por m² comparado con lotes similares en la misma zona. 100 = el más barato; 0 = el más caro."
-            : "How cheap this listing is per square meter compared to similar lots in the same area. 100 = cheapest comparable; 0 = most expensive."}
-        </p>
-        <h3>{lc === "es" ? "Ubicación y accesibilidad" : "Location & accessibility"}</h3>
-        <p>
-          {lc === "es"
-            ? "Posición y acceso del lote — beneficio de zona, frente al mar, acceso pavimentado, agua y luz, cercanía al aeropuerto."
-            : "Zone tier, beachfront, paved access, water/power on the lot, and proximity to the nearest international airport."}
-        </p>
-        <h3>{lc === "es" ? "Momentum del área" : "Area momentum"}</h3>
-        <p>
-          {lc === "es"
-            ? "Qué tan caliente está la zona — re-precios indican vendedores motivados; nuevo inventario indica demanda creciente."
-            : "How often listings get repriced down (motivated sellers) and how quickly new inventory appears in each zone."}
-        </p>
-        <h3>{lc === "es" ? "El compuesto" : "The composite"}</h3>
-        <div className="meth-formula">
-          {lc === "es"
-            ? "compuesto = 0.40 × Precio + 0.35 × Ubicación + 0.25 × Momentum"
-            : "composite = 0.40 × Price vs Comps + 0.35 × Location + 0.25 × Momentum"}
-        </div>
-        <p>
-          {lc === "es"
-            ? "Mueve los pesos en \"Ajusta el ranking\" para ver tu propio compuesto."
-            : `Move the weights under "Tune the ranking" to see your own composite.`}
-        </p>
+        <h2 id="meth-title">{t("rank.method.title", lc)}</h2>
+        <p className="meth-tagline">{t("rank.method.tagline", lc)}</p>
+        <h3>{t("rank.method.value_h", lc)}</h3>
+        <p>{t("rank.method.value_p", lc)}</p>
+        <h3>{t("rank.method.loc_h", lc)}</h3>
+        <p>{t("rank.method.loc_p", lc)}</p>
+        <h3>{t("rank.method.mom_h", lc)}</h3>
+        <p>{t("rank.method.mom_p", lc)}</p>
+        <h3>{t("rank.method.composite_h", lc)}</h3>
+        <div className="meth-formula">{t("rank.method.composite_f", lc)}</div>
+        <p>{t("rank.method.footer", lc)}</p>
       </div>
     </div>
   );

@@ -554,6 +554,50 @@ const UI_STRINGS = {
   // surface via the PillRail Ranking group + per-card badges;
   // Off-market + Motivated retired as ambiguous; Readiness was opaque.
 
+  // "Tune the ranking" advanced panel — the collapsible block below
+  // the primary filters that lets power users move the composite-score
+  // weights. Paired with the methodology modal below (rank.method.*).
+  "filter.ranking.tune":          { en: "Tune the ranking",         es: "Ajusta el ranking" },
+  "filter.ranking.how":           { en: "How we rank",              es: "¿Cómo calculamos esto?" },
+  "filter.ranking.min_score":     { en: "Investment score",         es: "Puntaje mínimo" },
+  "filter.ranking.weight_value":  { en: "Price vs. comps",          es: "Precio vs. comparables" },
+  "filter.ranking.weight_loc":    { en: "Location",                 es: "Ubicación" },
+  "filter.ranking.weight_mom":    { en: "Area momentum",            es: "Momentum del área" },
+  "filter.ranking.reset":         { en: "Reset to defaults",        es: "Restablecer" },
+  "filter.ranking.hint":          {
+    en: `Pick "Best match (your weights)" in the sort dropdown to use your weights.`,
+    es: `Elige "Mejor coincidencia (tus pesos)" en el orden para usar tus pesos.`,
+  },
+
+  // "How we rank" methodology modal — explains the composite the
+  // ranker.py weights produce.
+  "rank.method.title":            { en: "How we rank",                                                                          es: "Cómo clasificamos" },
+  "rank.method.tagline":          { en: "Every listing gets a 0–100 composite score from three plain-English dimensions.",      es: "Cada propiedad recibe un puntaje compuesto de 0–100 basado en tres dimensiones simples." },
+  "rank.method.value_h":          { en: "Price vs. comparable lots",                                                            es: "Precio vs. comparables" },
+  "rank.method.value_p":          {
+    en: "How cheap this listing is per square meter compared to similar lots in the same area. 100 = cheapest comparable; 0 = most expensive.",
+    es: "Qué tan barato es por m² comparado con lotes similares en la misma zona. 100 = el más barato; 0 = el más caro.",
+  },
+  "rank.method.loc_h":            { en: "Location & accessibility",                                                             es: "Ubicación y accesibilidad" },
+  "rank.method.loc_p":            {
+    en: "Zone tier, beachfront, paved access, water/power on the lot, and proximity to the nearest international airport.",
+    es: "Posición y acceso del lote — beneficio de zona, frente al mar, acceso pavimentado, agua y luz, cercanía al aeropuerto.",
+  },
+  "rank.method.mom_h":            { en: "Area momentum",                                                                        es: "Momentum del área" },
+  "rank.method.mom_p":            {
+    en: "How often listings get repriced down (motivated sellers) and how quickly new inventory appears in each zone.",
+    es: "Qué tan caliente está la zona — re-precios indican vendedores motivados; nuevo inventario indica demanda creciente.",
+  },
+  "rank.method.composite_h":      { en: "The composite",                                                                        es: "El compuesto" },
+  "rank.method.composite_f":      {
+    en: "composite = 0.40 × Price vs Comps + 0.35 × Location + 0.25 × Momentum",
+    es: "compuesto = 0.40 × Precio + 0.35 × Ubicación + 0.25 × Momentum",
+  },
+  "rank.method.footer":           {
+    en: `Move the weights under "Tune the ranking" to see your own composite.`,
+    es: `Mueve los pesos en "Ajusta el ranking" para ver tu propio compuesto.`,
+  },
+
   // Detail
   "detail.back":             { en: "Back to results",     es: "Volver a resultados" },
   "detail.reasons":          { en: "Reasons to buy",      es: "Razones para comprar" },
