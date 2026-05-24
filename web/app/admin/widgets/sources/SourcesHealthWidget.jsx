@@ -6,6 +6,23 @@
 //   { ts, source, status: "green"|"red", count, duration_s,
 //     error_class, error_msg, failure_id, max_pages_hit, limit_hit }
 //
+// Auto-integration of new sources
+// -------------------------------
+// This widget groups rows by the ``source`` field — any slug that
+// appears in the JSONL renders automatically with no widget code
+// changes. The chain that makes that work:
+//
+//   1. New scraper at ``pulpo/scrapers/<slug>.py`` (calls register()).
+//   2. Slug appended to ``PULPO_SOURCES`` in the nightly workflow.
+//   3. Nightly writes a row for the new source to the JSONL.
+//   4. This widget picks it up on next refresh.
+//
+// The chain has a load-bearing assumption — that the new slug is wired
+// end-to-end. ``tests/test_source_integration.py`` is the deployment
+// guard: it parses PULPO_SOURCES and fails CI if any declared source is
+// missing the scraper module, test file, or runtime registration. So
+// "shipping a new source" can't accidentally leave the dashboard blind.
+//
 // The widget surfaces:
 //   - current status pill (green / red) per source
 //   - latest nightly count + duration
