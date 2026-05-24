@@ -1,21 +1,23 @@
 // AdminShell — the `/admin` hub layout.
 //
-// Renders one of two things:
-//   - `/admin`             → widget grid (one card per ADMIN_WIDGETS entry)
-//   - `/admin/<slug>`      → the matching widget's Component, wrapped in a
-//                            consistent header with back-to-grid link
+// Renders one of three things:
+//   - no admin token        → token-entry gate (no widgets render)
+//   - `/admin`              → widget grid (one card per ADMIN_WIDGETS entry)
+//   - `/admin/<slug>`       → the matching widget's Component, wrapped in a
+//                             consistent header with back-to-grid link
 //
-// Auth: NONE. Page is publicly reachable; discoverability is the only
-// gate (robots-blocked, no nav link, no marketing surface). Widget
-// backends carry their own guardrails (e.g. 5-recipient cap on the
-// newsletter send endpoint) so the blast radius is bounded even if the
-// URL leaks.
+// Auth: shared bearer token (`PULPO_ADMIN_DEBUG_TOKEN` server-side).
+// Sebas enters it once on /admin; it's stashed in localStorage and
+// threaded on every /api/admin/* call via the `adminFetch` helper.
+// Backend endpoints reject with 401 if the token is missing/wrong,
+// which clears the local token and re-renders this gate.
 //
 // Widgets that need state/coordination across pages can use sessionStorage
 // or React context — this shell intentionally passes nothing in.
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ADMIN_WIDGETS, findWidget } from "./widgets/registry.ts";
+import { hasAdminToken, setAdminToken, clearAdminToken } from "./lib/admin-token.ts";
 
 const SHELL_STYLES = `
 .page-admin {
@@ -120,6 +122,48 @@ const SHELL_STYLES = `
 }
 .page-admin .widget-back:hover { color: var(--accent); }
 
+.page-admin .admin-gate {
+  background: var(--paper);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px 0;
+}
+.page-admin .admin-gate h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.page-admin .admin-gate p {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin: 0 0 16px;
+}
+.page-admin .admin-gate .gate-row {
+  display: flex; gap: 8px; align-items: stretch;
+}
+.page-admin .admin-gate input[type="password"] {
+  flex: 1;
+  font: inherit; font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.page-admin .admin-gate button {
+  padding: 10px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+.page-admin .admin-gate .gate-error {
+  color: var(--accent-strong, #b00);
+  font-size: 13px; margin-top: 12px;
+}
 .page-admin .widget-empty {
   border: 1px dashed var(--line-2);
   border-radius: 12px;
@@ -130,9 +174,54 @@ const SHELL_STYLES = `
 }
 `;
 
+function AdminGate({ onUnlock }) {
+  const [value, setValue] = useState("");
+  const [err, setErr] = useState("");
+  const submit = (e) => {
+    e.preventDefault();
+    const t = (value || "").trim();
+    if (!t) { setErr("Token is empty."); return; }
+    setAdminToken(t);
+    setErr("");
+    onUnlock();
+  };
+  return (
+    <div className="admin-gate">
+      <h2>Admin token required</h2>
+      <p>
+        Paste the <code>PULPO_ADMIN_DEBUG_TOKEN</code> value from Vercel env.
+        Stored in this browser's localStorage; cleared automatically if the
+        server rejects it.
+      </p>
+      <form onSubmit={submit} className="gate-row">
+        <input
+          type="password"
+          autoComplete="off"
+          aria-label="Admin token" // i18n-allow: admin-only, internal tools, EN-only
+          placeholder="Bearer token" // i18n-allow: admin-only, internal tools, EN-only
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <button type="submit">Unlock</button>
+      </form>
+      {err ? <p className="gate-error">{err}</p> : null}
+    </div>
+  );
+}
+
 export function AdminPage({ app }) {
   const adminWidget = app?.routeParams?.adminWidget ?? null;
   const widget = findWidget(adminWidget);
+  const [tokenOk, setTokenOk] = useState(() => hasAdminToken());
+
+  // The adminFetch helper dispatches `pulpo:admin-token-invalid` on a
+  // server 401 (after clearing the stale token). Re-check here so the
+  // gate re-renders the moment a widget call surfaces auth failure.
+  useEffect(() => {
+    const onInvalid = () => setTokenOk(false);
+    window.addEventListener("pulpo:admin-token-invalid", onInvalid);
+    return () => window.removeEventListener("pulpo:admin-token-invalid", onInvalid);
+  }, []);
 
   // Belt-and-braces noindex — `robots.txt` already disallows /admin
   // for compliant crawlers; this meta tag covers anyone who skips it.
@@ -192,6 +281,19 @@ export function AdminPage({ app }) {
     // popstate dispatch above triggers the app's existing listener.
   }, []);
 
+  if (!tokenOk) {
+    return (
+      <>
+        <style>{SHELL_STYLES}</style>
+        <main className="page-admin" aria-labelledby="admin-title">
+          <p className="admin-eyebrow">Pulpo · internal tools</p>
+          <h1 id="admin-title" className="admin-title">Admin</h1>
+          <AdminGate onUnlock={() => setTokenOk(true)} />
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <style>{SHELL_STYLES}</style>
@@ -205,10 +307,10 @@ export function AdminPage({ app }) {
             <h1 id="admin-title" className="admin-title">{widget.label}</h1>
             <p className="admin-subhead">{widget.description}</p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> this page is open at <code>/admin</code> with no
-              login. Actions taken here send real emails and write to production telemetry.
-              The send pipeline is capped at 5 recipients per call; audience-wide sending
-              stays in the GitHub Actions workflow.
+              <strong>Heads up —</strong> token-gated, but actions here still send
+              real emails and write to production telemetry. The send pipeline is
+              capped at 5 recipients per call; audience-wide sending stays in the
+              GitHub Actions workflow.
             </div>
             <widget.Component />
           </>
@@ -219,9 +321,9 @@ export function AdminPage({ app }) {
               Internal Pulpo tools. Pick a widget below to get started.
             </p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> this page is open at <code>/admin</code> with no
-              login. Each widget guards its own blast radius (e.g. the newsletter widget
-              caps at 5 test recipients per send).
+              <strong>Heads up —</strong> token-gated, but each widget guards its
+              own blast radius too (e.g. the newsletter widget caps at 5 test
+              recipients per send).
             </div>
             {ADMIN_WIDGETS.length === 0 ? (
               <div className="widget-empty">No widgets registered yet.</div>

@@ -2,18 +2,22 @@
 //
 // Returns the filter dimensions present in the current ranked.json so the
 // admin newsletter widget can populate its chip pickers from live data
-// (instead of hardcoded constants that drift). No auth: the /admin page
-// is open by design — see web/app/admin/AdminShell.jsx for the rationale.
+// (instead of hardcoded constants that drift).
+//
+// Auth: `Authorization: Bearer <PULPO_ADMIN_DEBUG_TOKEN>` via the
+// shared `_admin_auth` helper.
 //
 // Response: { departments, zones, property_types, total_listings }
 
 const { loadRanked } = require("./_filter");
+const { requireAdminAuth } = require("../../_admin_auth");
 
 module.exports = async (req, res) => {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  if (!requireAdminAuth(req, res)) return;
 
   const data = loadRanked();
   if (!data || !Array.isArray(data)) {

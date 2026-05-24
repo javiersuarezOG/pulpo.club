@@ -42,6 +42,7 @@ import {
   NEWSLETTER_COHORT_LABEL,
   NEWSLETTER_PROPERTY_TYPES,
 } from "./constants.ts";
+import { adminFetch } from "../../lib/admin-token.ts";
 
 // Admin tool is EN-only by design (see `// i18n-allow:` markers in this
 // tree). Category labels come through `t()` for parity with what users
@@ -309,7 +310,7 @@ export function NewsletterWidget() {
   // ── Load options on mount ────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/admin/newsletter/options")
+    adminFetch("/api/admin/newsletter/options")
       .then((r) => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then((data) => {
         if (cancelled) return;
@@ -349,7 +350,7 @@ export function NewsletterWidget() {
     setBusy("preview");
     setStatus({ kind: null, message: "" });
     try {
-      const r = await fetch("/api/admin/newsletter/preview", {
+      const r = await adminFetch("/api/admin/newsletter/preview", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(filterSpec),
@@ -400,7 +401,7 @@ export function NewsletterWidget() {
     setBusy("send");
     setStatus({ kind: null, message: "Sending…" });
     try {
-      const r = await fetch("/api/admin/newsletter/send", {
+      const r = await adminFetch("/api/admin/newsletter/send", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...filterSpec, recipients: cleaned }),
