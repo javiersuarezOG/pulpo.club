@@ -96,7 +96,7 @@ export function SiteHeader({ app }) {
                 aria-label={proMember ? t("nav.account_pro", lc) : t("nav.account", lc)}
                 data-testid={proMember ? "avatar-pro" : "avatar"}
               >
-                {app.user.email[0].toUpperCase()}
+                {app.user.email ? app.user.email[0].toUpperCase() : "?"}
                 {proMember && (
                   <span className="avatar-pro-badge" aria-hidden="true">★</span>
                 )}

@@ -44,8 +44,20 @@ const {
 } = require("../stripe/_stripe");
 const posthog = require("../_posthog");
 const withTiming = require("../_perf");
+const { makeRateLimiter, send429, ipFromRequest } = require("../_rate_limit");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Per-IP rate limit. Each call hits Stripe (1 retrieve) + Clerk
+// (1 list-users + 1 list-invites). The WelcomeModal polls this on
+// the post-Stripe return flow, so the limit is generous enough for
+// a normal poll cadence (every 2-3s for ~30s while the webhook
+// settles) but caps a runaway polling loop or scripted abuse.
+const statusLimiter = makeRateLimiter({
+  windowMs: 60 * 1000,
+  maxAttempts: 30,
+  name: "clerk_invitation_status",
+});
 
 async function findClerkUserByEmail(clerk, email) {
   if (!email) return null;
@@ -80,6 +92,14 @@ module.exports = withTiming(async (req, res) => {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "method_not_allowed" });
+  }
+
+  const rl = statusLimiter.hit(ipFromRequest(req));
+  if (!rl.allowed) {
+    logApi("clerk.invitation_status", {
+      status: 429, ms: Date.now() - t0, reason: "rate_limited",
+    });
+    return send429(res, rl, "clerk_invitation_status");
   }
 
   const sessionId = typeof req.query.session_id === "string"

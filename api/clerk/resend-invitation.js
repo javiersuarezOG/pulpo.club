@@ -24,8 +24,22 @@ const {
 } = require("../stripe/_stripe");
 const posthog = require("../_posthog");
 const { sendActivationEmail } = require("../_activation_email");
+const { makeRateLimiter, send429, ipFromRequest } = require("../_rate_limit");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Per-IP rate limit. Each request fans out to ~5 third-party calls
+// (Stripe retrieve, Clerk list-users + list-invites + revoke +
+// createInvitation, Resend send), so the limit is the load-bearing
+// blast-radius guard against an attacker holding a valid session_id
+// who tries to flood the paying customer's inbox + burn our quota.
+// 5/hr/IP is generous for legit "I lost the email, click the button
+// again" usage and punishing for abusers.
+const resendLimiter = makeRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxAttempts: 5,
+  name: "clerk_resend_invitation",
+});
 
 // Normalize Pulpo's Stripe-flavored locale ("es-419"/"en") to the
 // BCP-47 root Clerk's invitation API expects. Mirrored from webhook.js
@@ -74,6 +88,14 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
+  }
+
+  const rl = resendLimiter.hit(ipFromRequest(req));
+  if (!rl.allowed) {
+    logApi("clerk.resend_invitation", {
+      status: 429, ms: Date.now() - t0, reason: "rate_limited",
+    });
+    return send429(res, rl, "clerk_resend_invitation");
   }
 
   const body = await readJsonBody(req);
