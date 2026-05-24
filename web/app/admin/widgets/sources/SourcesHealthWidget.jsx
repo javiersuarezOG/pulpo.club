@@ -10,18 +10,22 @@
 // -------------------------------
 // This widget groups rows by the ``source`` field — any slug that
 // appears in the JSONL renders automatically with no widget code
-// changes. The chain that makes that work:
+// changes. New scraper onboarding is now one step:
 //
-//   1. New scraper at ``pulpo/scrapers/<slug>.py`` (calls register()).
-//   2. Slug appended to ``PULPO_SOURCES`` in the nightly workflow.
-//   3. Nightly writes a row for the new source to the JSONL.
-//   4. This widget picks it up on next refresh.
+//   1. Drop ``pulpo/scrapers/<slug>.py`` (with the standard
+//      register(SOURCES, "<slug>", _scraper) call).
 //
-// The chain has a load-bearing assumption — that the new slug is wired
-// end-to-end. ``tests/test_source_integration.py`` is the deployment
-// guard: it parses PULPO_SOURCES and fails CI if any declared source is
-// missing the scraper module, test file, or runtime registration. So
-// "shipping a new source" can't accidentally leave the dashboard blind.
+// That's it. The package's ``__init__.py`` autodiscovers every
+// non-underscore sibling module, so the scraper auto-imports and
+// auto-registers. ``automation/run.py`` falls back to
+// REGISTRY.keys() when PULPO_SOURCES is unset, so the nightly picks
+// it up on its next run. The first nightly writes a row to
+// source_health_history.jsonl and this widget displays the new
+// source on its next refresh.
+//
+// ``tests/test_source_integration.py`` guards the chain — fails CI
+// if any scraper module errors on import, fails to register, or
+// lacks a test file.
 //
 // The widget surfaces:
 //   - current status pill (green / red) per source
