@@ -6,7 +6,7 @@
 // in lockstep.
 
 import { describe, expect, it, vi } from "vitest";
-import { encodeShareToken, decodeShareToken, shareUrlFor } from "./share";
+import { encodeShareToken, decodeShareToken, shareUrlFor, resolvePinFromParam } from "./share";
 
 describe("share token", () => {
   it("encodes a remax id without revealing the source name in the token", () => {
@@ -52,13 +52,13 @@ describe("share token", () => {
 });
 
 describe("shareUrlFor", () => {
-  it("uses pulpo.club as the canonical origin in SSR contexts", () => {
+  it("uses pulpo.club/browse?pin=<token> as the canonical share format in SSR contexts", () => {
     // No window — simulates the build-time / Node fallback path.
     // vi.stubGlobal cleanly clears between tests.
     vi.stubGlobal("window", undefined);
     try {
       const url = shareUrlFor("remax__001461165132");
-      expect(url.startsWith("https://pulpo.club/l/")).toBe(true);
+      expect(url.startsWith("https://pulpo.club/browse?pin=")).toBe(true);
     } finally {
       vi.unstubAllGlobals();
     }
@@ -68,13 +68,16 @@ describe("shareUrlFor", () => {
     vi.stubGlobal("window", { location: { origin: "http://localhost:5173" } });
     try {
       const url = shareUrlFor("remax__001461165132");
-      expect(url.startsWith("http://localhost:5173/l/")).toBe(true);
+      expect(url.startsWith("http://localhost:5173/browse?pin=")).toBe(true);
     } finally {
       vi.unstubAllGlobals();
     }
   });
 
   it("share URL contains no broker name regardless of the listing source", () => {
+    // Source-opacity (hard rule from #457). The pin value is the
+    // base64url token of the id, never the raw id — so "remax" /
+    // "oceanside" / "idealista" can't be read out of the URL.
     vi.stubGlobal("window", { location: { origin: "https://pulpo.club" } });
     try {
       for (const id of ["remax__001461165132", "oceanside__15463", "idealista.es_678901"]) {
@@ -85,5 +88,42 @@ describe("shareUrlFor", () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  it("the pin in the URL round-trips back to the original listing id", () => {
+    vi.stubGlobal("window", { location: { origin: "https://pulpo.club" } });
+    try {
+      for (const id of ["remax__001461165132", "oceanside__15463", "essurf__5247"]) {
+        const url = shareUrlFor(id);
+        const param = new URL(url).searchParams.get("pin");
+        expect(resolvePinFromParam(param)).toBe(id);
+      }
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe("resolvePinFromParam", () => {
+  it("decodes a canonical base64url token back to the original id", () => {
+    const id = "remax__001461165132";
+    expect(resolvePinFromParam(encodeShareToken(id))).toBe(id);
+  });
+
+  it("falls through to raw-id interpretation for hand-typed /browse?pin=<id> URLs", () => {
+    // Backward compat: a user pasting in `?pin=essurf__5247` directly
+    // gets the same result as the canonical token. Lowers the cliff
+    // for in-team debugging and external links accidentally written
+    // in raw form.
+    const id = "essurf__5247";
+    expect(resolvePinFromParam(id)).toBe(id);
+  });
+
+  it("rejects garbage (path-traversal, slashes, empty, null)", () => {
+    expect(resolvePinFromParam(null)).toBeNull();
+    expect(resolvePinFromParam("")).toBeNull();
+    expect(resolvePinFromParam("../../etc/passwd")).toBeNull();
+    expect(resolvePinFromParam("foo bar")).toBeNull();
+    expect(resolvePinFromParam("foo/bar")).toBeNull();
   });
 });

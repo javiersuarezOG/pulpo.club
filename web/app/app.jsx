@@ -95,6 +95,7 @@ import {
   urlFor,
   isSameLocation,
 } from "./lib/url-routing";
+import { resolvePinFromParam, encodeShareToken } from "./lib/share";
 import { evaluateGate } from "./lib/route-gates";
 import { useDocumentMeta } from "./lib/use-document-meta";
 import { bootAssetTelemetry } from "./telemetry/asset-load";
@@ -185,20 +186,38 @@ function App() {
   // section in-app; set true on cold-load entry.
   const coldEnteredDetailRef = useRef(_initialParsed.isListingPath);
   // Share-pin landing — the recipient hit either:
-  //   - /l/<token>     (parseLocation surfaces pinListingId)
-  //   - /browse?pin=X  (URL search param, used after the /l/ rewrite and
-  //                     also as a direct deep-link surface)
-  // In both cases closeListing should drop the user on /browse (the
+  //   - /l/<token>           (parseLocation surfaces pinListingId)
+  //   - /browse?pin=<token>  (canonical PRD share format, opaque token)
+  //   - /browse?pin=<rawid>  (hand-typed / back-compat deep link)
+  // In all cases closeListing should drop the user on /browse (the
   // whole point of the pin feature) — NOT on / (the cold-detail
   // fallback) and NOT history.back (would exit the site). One-shot:
   // cleared on the first closeListing.
   const _initialPinFromSearch = useMemo(() => {
     if (typeof window === "undefined") return null;
-    try { return new URLSearchParams(window.location.search).get("pin"); }
-    catch { return null; }
+    try {
+      const raw = new URLSearchParams(window.location.search).get("pin");
+      return resolvePinFromParam(raw);
+    } catch { return null; }
   }, []);
   const _initialPinId = _initialParsed.pinListingId || _initialPinFromSearch;
   const pinLandedRef = useRef(_initialPinId != null);
+  // Mobile auto-open is destructive — the detail-overlay is a fullscreen
+  // modal at this viewport, covering 100% of the screen and HIDING the
+  // pinned card + catalogue that the share-pin feature exists to
+  // surface. Per the PRD: "If mobile detail is a full-page navigation:
+  // do not auto-navigate. The user would lose browse context. Instead,
+  // rely on the pinned card being the first and most prominent item in
+  // the grid as the invitation to tap." Width threshold matches the
+  // tablet breakpoint in .card-grid CSS — single-column at <=600px,
+  // 2-column at 601-1023px, 3+ above. Below 1024 the panel is a fixed
+  // overlay; at 1024+ the layout has room for a side-panel.
+  const _initialIsMobileShareLanding = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    if (!_initialPinId) return false;
+    return window.innerWidth < 1024;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
@@ -233,14 +252,24 @@ function App() {
   const [clerkActions, setClerkActions] = useState(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [toast, setToast] = useState(null);
-  // openListingId seeds from /listing/<id> path OR /l/<token> decode
-  // (parseLocation handles both) OR a direct /browse?pin=<id> deep
-  // link. The last case is what makes a refresh-after-pin-rewrite work
-  // and what auto-opens the detail panel when a pin URL is shared
-  // verbatim without going through /l/.
-  const [openListingId, setOpenListingId] = useState(
-    _initialParsed.openListingId || _initialPinId,
-  );
+  // openListingId seeds from:
+  //   - /listing/<id>           — always auto-open (direct deep-link)
+  //   - /l/<token>              — auto-open ONLY on desktop; mobile would
+  //                                cover the catalogue with a fullscreen
+  //                                overlay and defeat the pin feature.
+  //   - /browse?pin=<token/id>  — same: desktop yes, mobile no.
+  // Mobile share-pin recipients see the catalogue with the pinned card
+  // at the top as the invitation to tap (per PRD).
+  const [openListingId, setOpenListingId] = useState(() => {
+    // Direct /listing/:id is a single-intent navigation — always honor.
+    if (_initialParsed.openListingId && !_initialParsed.pinListingId) {
+      return _initialParsed.openListingId;
+    }
+    // Share-pin landing on mobile → don't auto-open. The "Shared with
+    // you" tagged card at index 0 is the surface the user lands on.
+    if (_initialIsMobileShareLanding) return null;
+    return _initialParsed.openListingId || _initialPinId;
+  });
   // Guard against re-entry on rapid backdrop taps / Esc-then-click.
   // history.back() is async — popstate fires next tick — so a second
   // call mid-flight would close more than one history entry.
@@ -357,7 +386,10 @@ function App() {
   useMemo(() => {
     if (typeof window === "undefined") return;
     if (!_initialParsed.pinListingId) return;
-    const target = `/browse?pin=${encodeURIComponent(_initialParsed.pinListingId)}`;
+    // Canonical share URL is /browse?pin=<token> — keep the token shape
+    // (source-opacity) when rewriting from /l/<token> so the URL bar
+    // matches what shareUrlFor() would have produced.
+    const target = `/browse?pin=${encodeShareToken(_initialParsed.pinListingId)}`;
     if (window.location.pathname + window.location.search === target) return;
     window.history.replaceState(
       { pulpo: true, listing: _initialParsed.pinListingId },

@@ -58,6 +58,7 @@ import {
 import { LiveStats } from "./components/LiveStats.jsx";
 import { useUnits } from "./i18n.jsx";
 import { startStripeCheckout } from "./auth/stripe-checkout.js";
+import { resolvePinFromParam } from "./lib/share";
 import {
   uspsVisibleFor,
   galleryThumbsUnlockedFor,
@@ -1083,14 +1084,15 @@ function BrowsePage({ app }) {
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
 
-  // Share-pin state — recipient landed via /l/<token>, the app shell
-  // already rewrote the URL to /browse?pin=<id> + auto-opened the detail
-  // panel. We seed from ?pin so the pinned card renders at the top of
-  // the grid with a "Shared with you" tag. Clears the moment the user
-  // changes filters / sort / closes the panel.
+  // Share-pin state — recipient landed via /l/<token> OR the canonical
+  // /browse?pin=<token> share URL. We seed from ?pin so the pinned card
+  // renders at the top of the grid with a "Shared with you" tag.
+  // resolvePinFromParam decodes the base64url token to the raw listing
+  // id (and tolerates a raw id form for back-compat). Clears the moment
+  // the user changes filters / sort / closes the panel.
   const [pinnedListingId, setPinnedListingId] = pUseState(() => {
     if (typeof window === "undefined") return null;
-    return new URLSearchParams(window.location.search).get("pin");
+    return resolvePinFromParam(new URLSearchParams(window.location.search).get("pin"));
   });
 
   // Strips ?pin from the URL via replaceState (NEVER pushState — we
@@ -1136,7 +1138,7 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
-      setPinnedListingId(params.get("pin"));
+      setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
