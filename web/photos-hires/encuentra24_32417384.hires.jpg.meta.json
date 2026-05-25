@@ -1,0 +1,26 @@
+{
+  "width": 1621,
+  "height": 1081,
+  "aspect_ratio": 1.5,
+  "file_size_kb": 335.2,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-05-25T01:45:44.083063+00:00",
+  "source_url": "https://photos.encuentra24.com/t_full/f_auto/v1/sv/32/41/73/84/32417384_609f5fff976f11b7441dd07a89b94e52-6ca72bc",
+  "original_url": "https://photos.encuentra24.com/t_or_fh_m/f_auto/v1/sv/32/41/73/84/32417384_609f5fff976f11b7441dd07a89b94e52-6ca72bc",
+  "transform_used": "encuentra24-cloudinary-t-full",
+  "fetched_at": "2026-05-25T01:45:44.209975+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.7,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.270 color_entropy=0.617"
+  }
+}
