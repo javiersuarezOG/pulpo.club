@@ -9,6 +9,14 @@
     <meta property="og:description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every two weeks." />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="es_SV" />
+    <!-- Per-listing OG overrides for /l/<token> share URLs. api/l/[token].js
+         replaces this exact comment (preserved through Vite build) with
+         listing-specific og:title / og:description / og:image / og:url
+         so WhatsApp/iMessage/FB crawlers see a rich, source-opaque card.
+         Browsers ignore the duplicate-tag prepend; latest tag wins per
+         the OG spec. Keep the comment exact — string-replace targets it
+         literally. -->
+    <!--OG_TAGS-->
     <!-- Mobile browser chrome (Android Chrome address bar, iOS Safari
          status bar tint via apple-mobile-web-app-status-bar-style). Set
          to deep brand green so the chrome blends with the header. -->
