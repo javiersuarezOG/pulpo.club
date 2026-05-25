@@ -1920,18 +1920,36 @@ def main() -> int:
           f"tags={dict(sorted(ia_tag_counts.items()))} "
           f"stars={dict(sorted(ia_star_counts.items()))}")
 
-    # Agricultural-purge filter. Pulpo's scope is beach + lake
-    # recreational real estate; agricultural inventory (fincas,
-    # cafetales, ganaderas) is out-of-scope. NLP enrichment still
-    # computes `is_agricultural` so the filter can detect them, but the
-    # listings are dropped here, before regression-guard + write, so
-    # they never reach ranked.json or any downstream consumer
-    # (frontend, newsletter, sitemap, schema).
+    # Agricultural-purge filter — narrowed 2026-05-25 to land-only.
+    #
+    # Pulpo's scope is beach + lake recreational real estate;
+    # agricultural LAND (raw cattle pastures, sugarcane fields, pure
+    # finca lots) is out-of-scope. But a "casa en un cafetal" or
+    # "rancho de playa con cafetal anexo" is a BUILT vacation property
+    # that still serves Pulpo's audience — the rural-lifestyle buyer
+    # looking for a coastal or lakeside second home with grounds.
+    #
+    # The original PR #418 implementation purged on `is_agricultural`
+    # alone, which dropped ~140 houses/condos along with the raw farms.
+    # See the 2026-05-25 ranked-totals investigation: bienesraices
+    # -83, remax -54 listings vs the pre-purge baseline, mostly built
+    # structures on agricultural-coded land.
+    #
+    # The narrower filter (property_type == "land" AND is_agricultural)
+    # keeps every built structure regardless of how the NLP tags its
+    # land, while still purging pure agricultural-land inventory.
     pre_purge = len(ranked)
-    ranked = [li for li in ranked if getattr(li, "is_agricultural", False) is not True]
+    ranked = [
+        li for li in ranked
+        if not (
+            getattr(li, "property_type", None) == "land"
+            and getattr(li, "is_agricultural", False)
+        )
+    ]
     agri_dropped = pre_purge - len(ranked)
     if agri_dropped:
-        print(f"[purge] dropped {agri_dropped} agricultural listings (out-of-scope) — {len(ranked)} remain")
+        print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
+              f"(built structures retained) — {len(ranked)} remain")
 
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
