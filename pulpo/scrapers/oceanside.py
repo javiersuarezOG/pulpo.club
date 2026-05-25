@@ -334,6 +334,7 @@ def _map(rec: dict, land_term_id: Optional[int], broker_type: str = "land") -> O
 
 class OceansideScraper:
     slug = "oceanside"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

@@ -349,6 +349,7 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
 
 class RemaxScraper(OfflineFixtureMixin):
     slug = "remax"
+    country = "SV"
     FIXTURE_FILE = FIXTURE_FILE  # module-level constant; kept for clarity
 
     def __init__(self, offline: bool | None = None):

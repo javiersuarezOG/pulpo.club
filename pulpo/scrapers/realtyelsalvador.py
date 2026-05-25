@@ -273,6 +273,7 @@ def parse_detail(html: str, url: str) -> Optional[dict]:
 
 class RealtyElSalvadorScraper:
     slug = "realtyelsalvador"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

@@ -143,6 +143,7 @@ def _parse_detail_page(html: str, partial: dict) -> Optional[dict]:
 
 class NexoScraper:
     slug = "nexo"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline
