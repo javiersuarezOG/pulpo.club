@@ -263,3 +263,33 @@ def active() -> CountryManifest:
     """
     cc = os.environ.get("PULPO_ACTIVE_COUNTRY", "SV")
     return load(cc)
+
+
+def data_filename(filename: str, cc: str | None) -> str:
+    """Return the per-country variant of a data filename.
+
+    Examples:
+        data_filename("ranked.json", "SV")          → "ranked.SV.json"
+        data_filename("ranked.list.json", "SV")     → "ranked.list.SV.json"
+        data_filename("last_updated.json", "GT")    → "last_updated.GT.json"
+        data_filename("ranked.json", None)          → "ranked.json"  (legacy)
+        data_filename("ranked.json", "")            → "ranked.json"  (legacy)
+
+    The country code is inserted before the LAST '.', so multi-dot
+    filenames like ``ranked.list.json`` keep their compound stem and
+    only the extension shifts. The code is upper-cased so on-disk
+    sorting groups by country regardless of how the caller spelled the
+    argument.
+
+    Used by ``automation/pipeline_steps.phase_write_outputs`` (PR-MC-3)
+    to dual-write per-country files alongside the legacy unified files.
+    When PR-MC-4 switches the frontend to read the per-country files,
+    the unified ones become deprecated; until then they coexist.
+    """
+    if not cc:
+        return filename
+    stem, dot, ext = filename.rpartition(".")
+    if not dot:
+        # No extension — append the country code as a suffix.
+        return f"{filename}.{cc.upper()}"
+    return f"{stem}.{cc.upper()}.{ext}"
