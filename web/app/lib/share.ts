@@ -45,7 +45,21 @@ export function decodeShareToken(token: string): string | null {
   return fromBase64Url(token);
 }
 
-// Build the full https://pulpo.club/l/<token> URL for a listing.
+// Build the full https://pulpo.club/browse?pin=<token> share URL for a
+// listing. This is the canonical share format per the share-pin PRD:
+// recipients land on /browse with the listing pinned as the first card
+// + (on desktop) the detail panel auto-opened, instead of dead-ending
+// on /listing/<id>.
+//
+// Source-opacity (the hard rule from #457): the pin value is the
+// base64url token, NOT the raw id — so the URL contains no broker name.
+// Decoded client-side in BrowsePage via resolvePinFromParam.
+//
+// Backward compat: `/l/<token>` URLs already in the wild still work —
+// parseLocation decodes the token, the app shell rewrites to
+// /browse?pin=<token> at mount. resolvePinFromParam also accepts raw
+// ids so hand-typed /browse?pin=remax__123 URLs degrade gracefully.
+//
 // Falls back to window.location.origin when window is defined (browser)
 // so dev/preview environments produce links that point to themselves.
 export function shareUrlFor(listingId: string): string {
@@ -53,5 +67,24 @@ export function shareUrlFor(listingId: string): string {
   const origin = typeof window !== "undefined" && window.location?.origin
     ? window.location.origin
     : "https://pulpo.club";
-  return `${origin}/l/${token}`;
+  return `${origin}/browse?pin=${token}`;
+}
+
+// Listing IDs in the catalog: alphanumerics, dashes, underscores, dots.
+// Mirrors SAFE_LISTING_ID_RE in url-routing.ts. Reject anything that
+// smells like a path traversal or has slashes before letting it become
+// a key in BrowsePage / app shell state.
+const SAFE_LISTING_ID_RE = /^[A-Za-z0-9._\-]+$/;
+
+// Resolve a raw ?pin URL param into a listing id. Tries the
+// base64url-token decode first (the canonical share format). Falls
+// through to "raw id" interpretation so any URL of the form
+// /browse?pin=<rawid> the user might paste in by hand still works.
+// Returns null on garbage so the caller can silently no-op.
+export function resolvePinFromParam(pinParam: string | null): string | null {
+  if (!pinParam) return null;
+  const decoded = decodeShareToken(pinParam);
+  if (decoded && SAFE_LISTING_ID_RE.test(decoded)) return decoded;
+  if (SAFE_LISTING_ID_RE.test(pinParam)) return pinParam;
+  return null;
 }

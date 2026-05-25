@@ -57,6 +57,12 @@ export type ParsedLocation = {
   // which slugs are valid; unknown slugs render a "widget not found"
   // card on the admin shell side.
   adminWidget: string | null;
+  // Set only when the user landed via a share URL (`/l/<token>`). The
+  // app shell uses this to: (a) rewrite the URL to /browse?pin=<id> on
+  // cold-load so the catalogue, not /home, sits underneath the detail
+  // panel; (b) branch closeListing so closing the panel returns to
+  // /browse instead of /. Null on every non-share parse path.
+  pinListingId: string | null;
 };
 
 const SECTION_PATHS: Record<string, Route> = {
@@ -102,7 +108,7 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
     : pathname;
 
   if (normalized in SECTION_PATHS) {
-    return { route: SECTION_PATHS[normalized], openListingId: null, isListingPath: false, section: null, adminWidget: null };
+    return { route: SECTION_PATHS[normalized], openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
   }
 
   // `/account/<section>` — single-segment sub-paths only. Unknown sections
@@ -115,9 +121,9 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
     // sections are valid. The router doesn't model anything deeper.
     if (rest && !rest.includes("/")) {
       const section = ACCOUNT_SECTION_SET.has(rest) ? (rest as AccountSection) : null;
-      return { route: "account", openListingId: null, isListingPath: false, section, adminWidget: null };
+      return { route: "account", openListingId: null, isListingPath: false, section, adminWidget: null, pinListingId: null };
     }
-    return { route: "account", openListingId: null, isListingPath: false, section: null, adminWidget: null };
+    return { route: "account", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
   }
 
   // `/admin/<widget>` — single-segment widget slugs. Validation happens on
@@ -128,9 +134,9 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
   if (normalized.startsWith(ADMIN_PREFIX)) {
     const rest = normalized.slice(ADMIN_PREFIX.length);
     if (rest && !rest.includes("/") && /^[a-z0-9-]+$/.test(rest)) {
-      return { route: "admin", openListingId: null, isListingPath: false, section: null, adminWidget: rest };
+      return { route: "admin", openListingId: null, isListingPath: false, section: null, adminWidget: rest, pinListingId: null };
     }
-    return { route: "admin", openListingId: null, isListingPath: false, section: null, adminWidget: null };
+    return { route: "admin", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
   }
 
   if (normalized.startsWith(LISTING_PREFIX)) {
@@ -142,13 +148,15 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
     } catch {
       // Malformed encoding — treat as no listing.
     }
-    return { route: fallbackRoute, openListingId: id, isListingPath: true, section: null, adminWidget: null };
+    return { route: fallbackRoute, openListingId: id, isListingPath: true, section: null, adminWidget: null, pinListingId: null };
   }
 
   // `/l/<token>` — source-opaque share link. Decode the token (base64url
-  // of the internal id) and open the listing as if the user had gone
-  // through /listing/<id>. Malformed tokens degrade to home — the SPA
-  // never surfaces broker info from a bad share URL.
+  // of the internal id), force the underlying route to `browse` so the
+  // catalogue (not /home) sits behind the auto-opened detail panel, and
+  // populate `pinListingId` so the app shell can rewrite the URL bar
+  // to /browse?pin=<id> on cold-load. Malformed tokens degrade to home —
+  // the SPA never surfaces broker info from a bad share URL.
   if (normalized.startsWith(SHARE_PREFIX)) {
     const token = normalized.slice(SHARE_PREFIX.length);
     if (SAFE_SHARE_TOKEN_RE.test(token)) {
@@ -156,19 +164,19 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
         const padded = token.replace(/-/g, "+").replace(/_/g, "/");
         const decoded = atob(padded);
         if (SAFE_LISTING_ID_RE.test(decoded)) {
-          return { route: fallbackRoute, openListingId: decoded, isListingPath: true, section: null, adminWidget: null };
+          return { route: "browse", openListingId: decoded, isListingPath: true, section: null, adminWidget: null, pinListingId: decoded };
         }
       } catch {
         // Malformed base64 — fall through to home.
       }
     }
-    return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null };
+    return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
   }
 
   // Unknown path — Vercel rewrites everything to the SPA, so we just
   // fall back to home. (This also covers `/preview` once the rewrites
   // are dropped — Vercel's 404 fires before the SPA boots.)
-  return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null };
+  return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
 }
 
 export function pathForRoute(route: Route, section?: AccountSection | null, adminWidget?: string | null): string {

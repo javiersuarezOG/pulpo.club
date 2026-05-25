@@ -95,6 +95,14 @@ export type EventMap = {
   // a page-2 load apart from page-N.
   "browse.load_more_clicked": { from: number; to: number; total: number };
 
+  // Share-pin landing — fires once per /browse?pin=<id> mount when the
+  // pin resolves to a non-incomplete listing. Closes the funnel
+  // share.opened → share.channel_clicked → browse.pin_consumed so we
+  // can measure how many shared links actually convert to a browse
+  // session. Invalid/incomplete pins clear ?pin silently and do NOT
+  // fire this event.
+  "browse.pin_consumed": { listing_id: string };
+
   // ───── New homepage (rewrite Phase 4) ─────
   // Email form on the rewritten hero. Phase 6 wires the actual
   // /api/newsletter endpoint; the event fires regardless so we can
