@@ -43228,5 +43228,1465 @@
     "cost_usd": 0.00151337,
     "finish_reason": "stop",
     "latency_ms": 8883
+  },
+  "encuentra24|28765642": {
+    "ts": "2026-05-25T01:40:04.354177+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Home for Sale in Costa del Sol",
+      "es": "Casa frente al mar en venta en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning beachfront property in the exclusive Costa del Sol area, San Luis La Herradura. This 1,341 m² home offers 4 bedrooms, 3 bathrooms, and parking for 5 vehicles. Enjoy an open-air living room, fully equipped kitchen, laundry area, and a 5x5 meter pool. The lot measures 1,920 varas² (1,341 m²) with ample green spaces and gardens. Perfect for family gatherings and entertaining guests with beautiful ocean views. Amenities include pool, garden, outdoor areas, and green zones. Schedule a free visit and make an offer directly to the owner. ID #2364.",
+      "es": "Descubre esta impresionante propiedad frente al mar en la exclusiva zona de Costa del Sol, San Luis La Herradura. Esta casa de 1,341 m² ofrece 4 habitaciones, 3 baños y estacionamiento para 5 vehículos. Disfruta de una sala al aire libre, cocina totalmente equipada, área de lavado y una piscina de 5x5 metros. El terreno mide 1,920 varas² (1,341 m²) con amplias áreas verdes y jardines. Perfecta para reuniones familiares y entretenimiento con hermosas vistas al océano. Amenidades incluyen piscina, jardín, áreas al aire libre y zonas verdes. Agenda una visita gratis y haz una oferta directa al propietario. ID #2364."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location on Costa del Sol",
+        "es": "Ubicación frente al mar en Costa del Sol"
+      },
+      {
+        "en": "4 bedrooms, 3 bathrooms, 1,341 m² lot",
+        "es": "4 habitaciones, 3 baños, terreno de 1,341 m²"
+      },
+      {
+        "en": "Private 5x5 meter pool",
+        "es": "Piscina privada de 5x5 metros"
+      },
+      {
+        "en": "Open-air living and dining areas",
+        "es": "Áreas de estar y comedor al aire libre"
+      },
+      {
+        "en": "Parking for 5 cars",
+        "es": "Estacionamiento para 5 autos"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2523,
+    "tokens_out": 624,
+    "cost_usd": 0.00136761,
+    "finish_reason": "stop",
+    "latency_ms": 5368
+  },
+  "encuentra24|32416675": {
+    "ts": "2026-05-25T01:40:04.516779+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beach House in Cabo del Sol, Costa del Sol",
+      "es": "Casa de Playa en Cabo del Sol, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning beach house in the exclusive Residencial Cabo del Sol, Costa del Sol. Designed for spacious living and ultimate privacy, this property offers a generous 1,600-square-vara lot (approx. 1,117 m²) with 280 m² of construction. The home features 4 bedrooms, 5 bathrooms, an integrated living and dining room, a large kitchen, terrace, service area, air conditioning, a private pool, and a lush garden. Located just minutes from the beach in one of El Salvador's most sought-after coastal areas, this residence is perfect as a family retreat or a high-potential vacation rental investment. Priced at $475,000 with a monthly maintenance fee of $125.",
+      "es": "Descubre esta impresionante casa de playa en el exclusivo Residencial Cabo del Sol, Costa del Sol. Diseñada para disfrutar de amplitud y privacidad total, esta propiedad ofrece un terreno de 1,600 varas cuadradas (aprox. 1,117 m²) con 280 m² de construcción. La casa cuenta con 4 habitaciones, 5 baños, sala y comedor integrados, cocina amplia, terraza, área de servicio, aire acondicionado, piscina privada y un amplio jardín. Ubicada a pocos minutos de la playa en una de las zonas costeras más exclusivas y demandadas de El Salvador, esta residencia es ideal como refugio familiar o como inversión con alto potencial de valorización y renta vacacional. Precio de venta: $475,000. Mantenimiento mensual: $125."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive gated community: Residencial Cabo del Sol",
+        "es": "Comunidad cerrada exclusiva: Residencial Cabo del Sol"
+      },
+      {
+        "en": "Private pool and lush garden",
+        "es": "Piscina privada y jardín amplio"
+      },
+      {
+        "en": "Minutes from the beach in Costa del Sol",
+        "es": "A minutos de la playa en Costa del Sol"
+      },
+      {
+        "en": "4 bedrooms, 5 bathrooms, spacious layout",
+        "es": "4 habitaciones, 5 baños, distribución amplia"
+      },
+      {
+        "en": "High potential for vacation rental income",
+        "es": "Alto potencial de renta vacacional"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2541,
+    "tokens_out": 660,
+    "cost_usd": 0.00141207,
+    "finish_reason": "stop",
+    "latency_ms": 5531
+  },
+  "encuentra24|32417847": {
+    "ts": "2026-05-25T01:40:04.569806+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Modern Beachfront Home in Costa del Sol",
+      "es": "Moderna Casa Frente al Mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Designed for those seeking a waterfront lifestyle surrounded by nature, privacy, and unique experiences, this modern residence combines contemporary architecture with outdoor spaces crafted for enjoyment and access to nautical activities in one of El Salvador's most attractive beach destinations. The property features a 260 m² lot with 225 m² of construction, parking for three vehicles, a private pool, garden, controlled access, and exclusive community amenities. Ideal for activities such as boat rides, kayaking, paddle boarding, recreational fishing, sunset watching, and bird and wildlife observation. Located in Costa del Sol, it offers a high-end residential experience focused on relaxation, nature, and recreational living, perfect for family use or vacation investment. Contact us for availability and pricing.",
+      "es": "Diseñada para quienes buscan un estilo de vida frente al agua, rodeado de naturaleza, privacidad y experiencias únicas, esta residencia moderna combina arquitectura contemporánea con espacios exteriores pensados para el disfrute y acceso a actividades náuticas en uno de los destinos de playa más atractivos de El Salvador. La propiedad cuenta con un terreno de 260 m² y 225 m² de construcción, estacionamiento para tres vehículos, piscina privada, jardín, acceso controlado y áreas sociales exclusivas. Ideal para paseos en lancha, kayak, paddle board, pesca recreativa, atardeceres y observación de aves y fauna local. Ubicada en Costa del Sol, ofrece una experiencia residencial de alto nivel enfocada en descanso, naturaleza y vida recreativa, perfecta para uso familiar o inversión vacacional. Contáctenos para disponibilidad y precios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront living in Costa del Sol",
+        "es": "Vida frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Private pool and garden",
+        "es": "Piscina privada y jardín"
+      },
+      {
+        "en": "Access to nautical activities",
+        "es": "Acceso a actividades náuticas"
+      },
+      {
+        "en": "Controlled access and exclusive community",
+        "es": "Acceso controlado y comunidad exclusiva"
+      },
+      {
+        "en": "Ideal for family or vacation investment",
+        "es": "Ideal para uso familiar o inversión vacacional"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol, La Paz",
+    "url_language": "es",
+    "tokens_in": 2580,
+    "tokens_out": 633,
+    "cost_usd": 0.0013929,
+    "finish_reason": "stop",
+    "latency_ms": 5584
+  },
+  "century21|888677": {
+    "ts": "2026-05-25T01:40:04.616713+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Luxury Nature Retreat in La Libertad",
+      "es": "Retiro de Lujo en La Libertad Rodeado de Naturaleza"
+    },
+    "short_description_canonical": {
+      "en": "Discover a new home designed to delight all your senses. Terrazas del Encanto is part of the exclusive El Encanto project, a unique luxury community nestled in nature. Enjoy the tranquility of the natural surroundings and take advantage of the club's amenities, including sports and recreation areas. Each property features 3 bedrooms with private bathrooms, living and dining rooms, a kitchen, terrace, and covered parking for 2-3 vehicles. Located on the Carretera Al Puerto de La Libertad in Zaragoza, La Libertad, this is your chance to live in harmony with nature. Contact us at +503 7346-1111 for more details or to schedule a tour.",
+      "es": "Descubre un nuevo hogar diseñado para deleitar todos tus sentidos. Terrazas del Encanto es parte del exclusivo proyecto El Encanto, una comunidad única de lujo inmersa en la naturaleza. Disfruta de la tranquilidad del entorno natural y aprovecha las amenidades del club, que incluyen áreas deportivas y de recreación. Cada propiedad cuenta con 3 habitaciones con baño privado, sala, comedor, cocina, terraza y parqueo techado para 2 o 3 vehículos. Ubicado en la Carretera Al Puerto de La Libertad, Zaragoza, La Libertad, esta es tu oportunidad de vivir en armonía con la naturaleza. Contáctanos al +503 7346-1111 para más detalles o para agendar un recorrido."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive luxury community surrounded by nature",
+        "es": "Comunidad exclusiva de lujo rodeada de naturaleza"
+      },
+      {
+        "en": "Club with sports and recreation amenities",
+        "es": "Club con amenidades deportivas y recreativas"
+      },
+      {
+        "en": "3 bedrooms each with private bathroom",
+        "es": "3 habitaciones cada una con baño privado"
+      },
+      {
+        "en": "Covered parking for 2-3 vehicles",
+        "es": "Parqueo techado para 2 o 3 vehículos"
+      },
+      {
+        "en": "Located on the scenic La Libertad highway",
+        "es": "Ubicado en la pintoresca carretera a La Libertad"
+      }
+    ],
+    "lat": 13.5892,
+    "lng": -89.3222,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2465,
+    "tokens_out": 630,
+    "cost_usd": 0.00135855,
+    "finish_reason": "stop",
+    "latency_ms": 5632
+  },
+  "encuentra24|29223430": {
+    "ts": "2026-05-25T01:40:05.480541+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Luxury Beach House in Costa del Sol",
+      "es": "Casa de Lujo en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning vacation home in Costa Azul Lux Bay, Costa del Sol, San Luis La Herradura. Priced at $900,000, this 524 m² property offers 5 bedrooms and 5.5 bathrooms, perfect for family getaways or retreats. The outdoor area features a charming hammock gazebo, a private dock, and a serene fountain. The main 3-level house includes ample parking, a bright living room, cozy dining area, well-equipped kitchen, and service area. With 4 bedrooms and 4 bathrooms, plus a balcony and rooftop with spectacular views, comfort and privacy are paramount. A separate 1-level loft with 2 bedrooms, 1 bathroom, kitchen, and living area, along with a refreshing pool, provides ideal guest accommodation. Amenities include pool, terrace, outdoor spaces, and security booth. Schedule a free visit and send your offer directly to the owner: ID #2798.",
+      "es": "Descubre esta impresionante casa vacacional en Costa Azul Lux Bay, Costa del Sol, San Luis La Herradura. Con un precio de $900,000, esta propiedad de 524 m² ofrece 5 habitaciones y 5.5 baños, perfecta para escapadas familiares o retiros. El área exterior cuenta con una hermosa glorieta de hamacas, un muelle privado y una fuente serena. La casa principal de 3 niveles incluye amplio parqueo, sala luminosa, comedor acogedor, cocina equipada y área de servicio. Con 4 dormitorios y 4 baños, además de balcón y azotea con vistas espectaculares, el confort y la privacidad están garantizados. Un loft exterior independiente de 1 nivel con 2 dormitorios, 1 baño, cocina y sala de estar, junto con una refrescante piscina, ofrece alojamiento ideal para invitados. Amenidades: piscina, terraza, áreas al aire libre y caseta de vigilancia. ¡Agenda una visita gratis y envía tu oferta directa al propietario: ID #2798."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Costa del Sol",
+        "es": "Ubicación frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Private dock and hammock gazebo",
+        "es": "Muelle privado y glorieta de hamacas"
+      },
+      {
+        "en": "Main house plus separate guest loft with pool",
+        "es": "Casa principal más loft para invitados con piscina"
+      },
+      {
+        "en": "Rooftop with spectacular views",
+        "es": "Azotea con vistas espectaculares"
+      },
+      {
+        "en": "5 bedrooms, 5.5 bathrooms, 524 m²",
+        "es": "5 habitaciones, 5.5 baños, 524 m²"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2681,
+    "tokens_out": 757,
+    "cost_usd": 0.00155657,
+    "finish_reason": "stop",
+    "latency_ms": 6495
+  },
+  "encuentra24|32474181": {
+    "ts": "2026-05-25T01:40:06.091825+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "The Jaguar House – Luxury Villa in Escalón",
+      "es": "The Jaguar House – Villa de Lujo en Escalón"
+    },
+    "short_description_canonical": {
+      "en": "The Jaguar House is a unique investment opportunity in one of San Salvador's most exclusive, safe, and sought-after neighborhoods: Escalón. Designed as a spacious and elegant villa with 9 bedrooms and 9 bathrooms, this property offers an exceptional combination of lifestyle, security, income potential, and long-term appreciation. It can function as a private family residence, an Airbnb villa, a boutique hotel, a coliving space, a retreat house, corporate lodging, or a hybrid model for living and renting simultaneously. The property is located in a prestigious area with 24-hour security directly in front, surrounded by embassies, major hotels, shopping centers, restaurants, business districts, and views of the city and the volcano. It is also approximately 45 minutes from the beach or Lake Ilopango, making it highly attractive for both local and international guests. A turnkey villa with multiple income opportunities: the property can generate a stable long-term rental income of approximately $3,500 USD per month, offering a simple and secure way to preserve capital in a premium location. We have also tested the short-term rental model, and the property demonstrated strong demand, especially from large families, groups, international visitors, entrepreneurs, and Bitcoin-related investors. With proper operation, the property has shown potential for significant returns.",
+      "es": "The Jaguar House es una oportunidad única de inversión en una de las zonas más exclusivas, seguras y deseadas de San Salvador: Escalón. Diseñada como una villa amplia y elegante, con 9 habitaciones y 9 baños, esta propiedad ofrece una combinación excepcional de estilo de vida, seguridad, potencial de ingresos y valorización a largo plazo. Puede funcionar como residencia familiar privada, villa para Airbnb, hotel boutique, coliving, casa de retiros, alojamiento corporativo o un modelo híbrido para vivir y rentar al mismo tiempo. La propiedad se encuentra en una zona prestigiosa con seguridad 24 horas directamente al frente, rodeada de embajadas, hoteles importantes, centros comerciales, restaurantes, zonas de negocios y vistas hacia la ciudad y el volcán. También está aproximadamente a 45 minutos de la playa o del Lago de Ilopango, lo que la hace muy atractiva tanto para huéspedes locales como internacionales. Una villa llave en mano con múltiples oportunidades de ingreso: la propiedad tiene la capacidad de generar un ingreso estable de renta a largo plazo de aproximadamente $3,500 USD mensuales, ofreciendo una forma simple y segura de preservar capital en una ubicación premium. También hemos probado el modelo de renta a corto plazo y la propiedad demostró una fuerte demanda, especialmente por parte de familias grandes, grupos, visitantes internacionales, emprendedores e inversionistas relacionados con Bitcoin. Con una operación adecuada, la propiedad ha mostrado potencial para retornos significativos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location in Escalón, San Salvador's most exclusive neighborhood",
+        "es": "Ubicación privilegiada en Escalón, el barrio más exclusivo de San Salvador"
+      },
+      {
+        "en": "9 bedrooms and 9 bathrooms, spacious and elegant design",
+        "es": "9 habitaciones y 9 baños, diseño amplio y elegante"
+      },
+      {
+        "en": "Multiple income models: long-term rental, Airbnb, boutique hotel, coliving",
+        "es": "Múltiples modelos de ingreso: renta a largo plazo, Airbnb, hotel boutique, coliving"
+      },
+      {
+        "en": "24-hour security, surrounded by embassies, hotels, and shopping centers",
+        "es": "Seguridad 24 horas, rodeado de embajadas, hoteles y centros comerciales"
+      },
+      {
+        "en": "45 minutes from the beach and Lake Ilopango",
+        "es": "A 45 minutos de la playa y del Lago de Ilopango"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colonia Escalón, San Salvador",
+    "url_language": "es",
+    "tokens_in": 2646,
+    "tokens_out": 985,
+    "cost_usd": 0.00179792,
+    "finish_reason": "stop",
+    "latency_ms": 7107
+  },
+  "encuentra24|29319737": {
+    "ts": "2026-05-25T01:40:09.784998+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beach House in Jiquilisco Bay, 4BR Pool",
+      "es": "Casa en Bahía de Jiquilisco, 4 habs con piscina"
+    },
+    "short_description_canonical": {
+      "en": "Discover this charming vacation home in Jiquilisco, set in a privileged location just minutes by boat from Puerto Barillas. The property features a spacious kitchen and a bright dining area, perfect for family meals. The cozy living room is designed for relaxation and special moments. This house offers three bedrooms, all with air conditioning for your comfort on hot days. The exterior is equally impressive, with a refreshing pool where you can unwind and enjoy the sun. The surrounding garden is adorned with tropical vegetation, creating an ideal setting for outdoor living. With easy access to water activities and beautiful beaches, this property is the perfect getaway for those seeking comfort and adventure. Don't miss the opportunity to make this your new vacation retreat!",
+      "es": "Descubre esta encantadora casa vacacional en Jiquilisco, situada en una ubicación privilegiada a solo minutos en lancha de Puerto Barillas. La propiedad cuenta con una amplia cocina y un comedor luminoso, perfectos para disfrutar de comidas en familia. La sala familiar es acogedora y está diseñada para proporcionar un ambiente relajante, ideal para compartir momentos especiales. Esta casa ofrece tres dormitorios, todos equipados con aire acondicionado para garantizar tu comodidad durante los días calurosos. El exterior es igual de impresionante, con una refrescante piscina donde podrás relajarte y disfrutar del sol. Además, el jardín que rodea la casa está adornado con vegetación tropical, creando un ambiente perfecto para disfrutar del aire libre. Con acceso cercano a actividades acuáticas y playas hermosas, esta propiedad es la escapada ideal para quienes buscan combinar confort y aventura. ¡No pierdas la oportunidad de hacer de este lugar tu nuevo refugio vacacional!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Minutes by boat from Puerto Barillas",
+        "es": "Minutos en lancha desde Puerto Barillas"
+      },
+      {
+        "en": "Private pool and tropical garden",
+        "es": "Piscina privada y jardín tropical"
+      },
+      {
+        "en": "3 bedrooms with air conditioning",
+        "es": "3 dormitorios con aire acondicionado"
+      },
+      {
+        "en": "Spacious kitchen and bright dining area",
+        "es": "Amplia cocina y comedor luminoso"
+      },
+      {
+        "en": "Close to water activities and beaches",
+        "es": "Cerca de actividades acuáticas y playas"
+      }
+    ],
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bahía de Jiquilisco",
+    "url_language": "es",
+    "tokens_in": 2670,
+    "tokens_out": 682,
+    "cost_usd": 0.0014711,
+    "finish_reason": "stop",
+    "latency_ms": 5168
+  },
+  "encuentra24|32123935": {
+    "ts": "2026-05-25T01:40:09.785997+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Cozy Family Cabin in Quintas Esperanza, Apaneca",
+      "es": "Acogedora Cabaña Familiar en Quintas Esperanza, Apaneca"
+    },
+    "short_description_canonical": {
+      "en": "Discover this charming 2-bedroom cabin nestled in Quintas Esperanza, a private residential community in Apaneca. Enjoy the cool mountain climate from your terrace, perfect for outdoor breakfasts and sunset coffee. The property features a spacious private patio and garden, ideal for family gatherings or quiet relaxation. Located along the famous Ruta de las Flores, this cabin offers excellent potential for personal use or as an Airbnb investment, thanks to the area's high tourist demand. Priced at $145,000 (negotiable). Contact Morena Rivera for details.",
+      "es": "Descubre esta encantadora cabaña de 2 habitaciones en Quintas Esperanza, una comunidad residencial privada en Apaneca. Disfruta del clima fresco de la montaña desde tu terraza, perfecta para desayunos al aire libre y café al atardecer. La propiedad cuenta con un amplio patio y jardín privado, ideal para reuniones familiares o descanso tranquilo. Ubicada sobre la Ruta de las Flores, esta cabaña ofrece un excelente potencial para uso personal o como inversión en Airbnb, gracias a la alta demanda turística de la zona. Precio: $145,000 (negociable). Contacta a Morena Rivera para más información."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private residential community with security",
+        "es": "Comunidad residencial privada con seguridad"
+      },
+      {
+        "en": "Terrace with mountain views",
+        "es": "Terraza con vistas a la montaña"
+      },
+      {
+        "en": "Located on the Ruta de las Flores",
+        "es": "Ubicada sobre la Ruta de las Flores"
+      },
+      {
+        "en": "Ideal for Airbnb investment",
+        "es": "Ideal para inversión en Airbnb"
+      },
+      {
+        "en": "Spacious private patio and garden",
+        "es": "Amplio patio y jardín privado"
+      }
+    ],
+    "lat": 13.86,
+    "lng": -89.8,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Apaneca, Ahuachapán",
+    "url_language": "es",
+    "tokens_in": 2561,
+    "tokens_out": 562,
+    "cost_usd": 0.00130967,
+    "finish_reason": "stop",
+    "latency_ms": 4873
+  },
+  "encuentra24|28843470": {
+    "ts": "2026-05-25T01:40:10.120001+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Lakefront Private Estate with Two Houses",
+      "es": "Espectacular Propiedad Frente al Lago con Dos Casas"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique lakeside retreat on the shores of Lake Coatepeque. This private property features two separate houses, each with multiple bedrooms, full kitchens, and bathrooms. Enjoy spacious terraces and docks overlooking the lake, surrounded by lush gardens. Perfect for a family compound or investment in one of El Salvador's most beautiful natural settings.",
+      "es": "Descubra un exclusivo refugio a orillas del Lago de Coatepeque. Esta propiedad privada cuenta con dos casas independientes, cada una con múltiples habitaciones, cocinas completas y baños. Disfrute de amplias terrazas y muelles con vista al lago, rodeados de frondosos jardines. Ideal para un complejo familiar o inversión en uno de los entornos naturales más bellos de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two separate houses with private entrances",
+        "es": "Dos casas independientes con entrada privada"
+      },
+      {
+        "en": "Direct lakefront access with private docks",
+        "es": "Acceso directo al lago con muelles privados"
+      },
+      {
+        "en": "Expansive gardens and terraces",
+        "es": "Amplios jardines y terrazas"
+      },
+      {
+        "en": "Located on the pristine Lake Coatepeque",
+        "es": "Ubicado en el prístino Lago de Coatepeque"
+      }
+    ],
+    "lat": 13.9333,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lake Coatepeque, El Congo, Santa Ana",
+    "url_language": "es",
+    "tokens_in": 2344,
+    "tokens_out": 440,
+    "cost_usd": 0.00111688,
+    "finish_reason": "stop",
+    "latency_ms": 4278
+  },
+  "encuentra24|32250988": {
+    "ts": "2026-05-25T01:40:10.677965+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Spacious Corner House Near Miramar Beach, Sonsonate",
+      "es": "Amplia Casa Esquinera Cerca de Playa Miramar, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional corner property in Cantón Metalío, Parcelación la Isla, Acajutla. Set on a generous 420 m² lot (10 x 42 m), this brick home with ceramic floors offers 2 bedrooms, living-dining room, kitchen, and garage for 3 vehicles. Enjoy fruit trees and ample space to expand, add a pool, or subdivide. Located just 10 minutes from exclusive Miramar Beach and 400 meters from the Litoral Highway, with electricity, potable water, and a well. Priced at $57,900 with flexible financing (50% down, balance in monthly installments or full payment within a year). A peaceful, orderly neighborhood with high housing demand—perfect for family living or investment in a growing area.",
+      "es": "Descubra esta excepcional propiedad esquinera en Cantón Metalío, Parcelación la Isla, Acajutla. Ubicada en un amplio terreno de 420 m² (10 x 42 m), esta casa de ladrillo con pisos cerámicos ofrece 2 habitaciones, sala-comedor, cocina y garaje para 3 vehículos. Disfrute de árboles frutales y amplio espacio para expandir, agregar piscina o subdividir. A solo 10 minutos de la exclusiva Playa Miramar y a 400 metros de la Carretera Litoral, con electricidad, agua potable y pozo. Precio: $57,900 con financiamiento flexible (50% de prima, saldo en cuotas mensuales o pago total en un año). Entorno tranquilo y ordenado con alta demanda de vivienda, ideal para vida familiar o inversión en una zona en desarrollo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "420 m² corner lot with fruit trees and expansion potential",
+        "es": "Terreno esquinero de 420 m² con árboles frutales y potencial de expansión"
+      },
+      {
+        "en": "10 minutes from exclusive Miramar Beach",
+        "es": "A 10 minutos de la exclusiva Playa Miramar"
+      },
+      {
+        "en": "Flexible financing: 50% down, balance in installments or one year",
+        "es": "Financiamiento flexible: 50% de prima, saldo en cuotas o un año"
+      },
+      {
+        "en": "Close to Litoral Highway and basic utilities",
+        "es": "Cerca de la Carretera Litoral y servicios básicos"
+      },
+      {
+        "en": "Quiet, orderly neighborhood with high housing demand",
+        "es": "Vecindario tranquilo y ordenado con alta demanda de vivienda"
+      }
+    ],
+    "lat": 13.58,
+    "lng": -89.77,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Metalío beach area, near Acajutla",
+    "url_language": "es",
+    "tokens_in": 2576,
+    "tokens_out": 729,
+    "cost_usd": 0.00149742,
+    "finish_reason": "stop",
+    "latency_ms": 6161
+  },
+  "encuentra24|30454827": {
+    "ts": "2026-05-25T01:40:10.924662+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oasis Beachfront: Exclusive Luxury Residences in Barra de Santiago",
+      "es": "Oasis Frente al Mar: Residencias de Lujo Exclusivas en Barra de Santiago"
+    },
+    "short_description_canonical": {
+      "en": "Discover Oasis, an exclusive beachfront development in Barra de Santiago, El Salvador. Designed for those seeking luxury, comfort, and a harmonious connection with nature, this project offers only 11 beachfront residences with cutting-edge, sustainable design. Each home is crafted to provide a relaxed and enriching lifestyle on one of the country's most paradisiacal beaches. Lots start at 508 v² (approx. 425 m²) with 266 m² of construction. Choose from three- or four-bedroom models with spacious, functional, and elegant layouts. Modern designs integrate the natural surroundings, offering spectacular views and privileged beach access. Ideal as an investment or vacation home, Oasis represents a unique opportunity for exclusivity and comfort in an incomparable setting. Prices from $499,000. Schedule a visit and discover how you can be part of this unique beachfront experience.",
+      "es": "Descubre Oasis, un exclusivo desarrollo frente al mar en Barra de Santiago, El Salvador. Diseñado para quienes buscan lujo, confort y una conexión armoniosa con la naturaleza, este proyecto ofrece solo 11 residencias de playa con diseño vanguardista y sostenible. Cada hogar está pensado para brindar un estilo de vida relajado y enriquecedor en una de las playas más paradisíacas del país. Los terrenos van desde 508 v² (aproximadamente 425 m²) con 266 m² de construcción. Elige entre modelos de tres o cuatro habitaciones con espacios amplios, funcionales y elegantes. Los diseños modernos integran el entorno natural, ofreciendo vistas espectaculares y acceso privilegiado a la playa. Ideal como inversión o casa de vacaciones, Oasis representa una oportunidad única de exclusividad y confort en un entorno incomparable. Precios desde $499,000. Agenda una cita y descubre cómo puedes ser parte de esta experiencia única frente al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Barra de Santiago",
+        "es": "Ubicación frente al mar en Barra de Santiago"
+      },
+      {
+        "en": "Only 11 exclusive residences",
+        "es": "Solo 11 residencias exclusivas"
+      },
+      {
+        "en": "Sustainable, cutting-edge design",
+        "es": "Diseño sostenible y vanguardista"
+      },
+      {
+        "en": "Lots from 508 v² with 266 m² construction",
+        "es": "Terrenos desde 508 v² con 266 m² de construcción"
+      },
+      {
+        "en": "Prices starting at $499,000",
+        "es": "Precios desde $499,000"
+      }
+    ],
+    "lat": 13.706,
+    "lng": -89.974,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Barra de Santiago beach",
+    "url_language": "es",
+    "tokens_in": 2582,
+    "tokens_out": 722,
+    "cost_usd": 0.00149134,
+    "finish_reason": "stop",
+    "latency_ms": 5444
+  },
+  "encuentra24|31315517": {
+    "ts": "2026-05-25T01:40:11.140261+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Rustic Elegance Hacienda for Sale in Sonsonate",
+      "es": "Hacienda de Elegancia Rústica en Venta en Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Discover this beautiful property for sale that combines rustic character and elegance in a privileged setting, perfect for those seeking a peaceful retreat with ample spaces. This hacienda, ideal for investment or family living, offers a unique atmosphere inviting you to enjoy nature and comfort in one place. Key features: Hacienda-style property designed for a cozy and authentic ambiance. Price: USD 590,000, an excellent investment in a prime location. Strategically situated in an easily accessible area with stunning views. Expansive land with green areas and spaces ideal for outdoor activities. Space for a pool and recreational zones, perfect for relaxation and entertainment. Land prepared for agricultural or livestock activities as needed. Spacious and well-distributed interiors, ideal for comfortable living. 5 bedrooms, perfect for enjoying with family and friends. Possibility to adapt for various uses, from private residence to tourist business. This property is the perfect option for those wanting to enjoy a natural environment without sacrificing modern comforts. Don't miss the opportunity to acquire a space that combines tradition and functionality in one of the most sought-after locations. Contact us and schedule a visit to discover everything it offers.",
+      "es": "Descubre esta hermosa propiedad en venta que combina el carácter rústico y la elegancia en un entorno privilegiado, perfecta para quienes buscan un refugio tranquilo con amplios espacios. Esta hacienda, ideal para inversión o vida familiar, ofrece una atmósfera única que invita a disfrutar de la naturaleza y la comodidad en un solo lugar. Características destacadas: Tipo de inmueble: Hacienda, diseñada para ofrecer un ambiente acogedor y auténtico. Precio: USD 590,000, una excelente inversión en un entorno privilegiado. Ubicación estratégica en una zona de fácil acceso, con vistas impresionantes. Amplios terrenos con áreas verdes y espacios ideales para actividades al aire libre. Espacio para piscina y zonas recreativas, perfectas para el descanso y el entretenimiento. Terreno preparado para actividades agrícolas o de ganadería, según tus necesidades. Interiores espaciosos y bien distribuidos, ideales para vivir con comodidad. Posee 5 habitaciones, ideales para disfrutar con familia y amigos. Posibilidad de adaptarla para diferentes usos, desde residencia privada hasta negocio turístico. Esta propiedad se presenta como la opción perfecta para quienes desean disfrutar de un entorno natural sin renunciar a las comodidades modernas. No pierdas la oportunidad de adquirir un espacio que combina tradición y funcionalidad en una de las ubicaciones más codiciadas. Contáctanos y agenda una visita para descubrir todo lo que ofrece."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Rustic elegance hacienda with 5 bedrooms",
+        "es": "Hacienda de elegancia rústica con 5 habitaciones"
+      },
+      {
+        "en": "Prime location in Sonsonate with easy access",
+        "es": "Ubicación privilegiada en Sonsonate con fácil acceso"
+      },
+      {
+        "en": "Land ready for agricultural or livestock use",
+        "es": "Terreno preparado para uso agrícola o ganadero"
+      },
+      {
+        "en": "Space for pool and recreational areas",
+        "es": "Espacio para piscina y zonas recreativas"
+      },
+      {
+        "en": "Versatile property ideal for residence or tourism business",
+        "es": "Propiedad versátil ideal para residencia o negocio turístico"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.7333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "es",
+    "tokens_in": 2671,
+    "tokens_out": 902,
+    "cost_usd": 0.00171337,
+    "finish_reason": "stop",
+    "latency_ms": 6570
+  },
+  "encuentra24|31908923": {
+    "ts": "2026-05-25T01:40:11.418118+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Exclusive Property in Bahía Dorada – La Libertad",
+      "es": "Propiedad Exclusiva en Bahía Dorada – La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover this impressive residential property located within the prestigious Bahía Dorada complex, a private environment that combines comfort, security, and contact with nature. Ideal for family living, vacation home, or investment. The land measures 1,371.07 m² (1,961.73 v²) with ample spaces, excellent distribution, and total privacy. It features two fully functional houses: House 1 (90 m²) with 3 bedrooms, master suite, and modern finishes; House 2 (110 m²) also with 3 bedrooms, master suite, and a multipurpose room. Enjoy a private pool, gardens, barbecue area, and ample parking. Located at Km 73.5 on the Litoral Highway, just minutes from beautiful beaches and local amenities.",
+      "es": "Descubre esta impresionante propiedad residencial ubicada dentro del prestigioso Complejo Bahía Dorada, un entorno privado que combina comodidad, seguridad y contacto con la naturaleza. Ideal para vivienda familiar, casa de descanso o inversión. El terreno mide 1,371.07 m² (1,961.73 v²) con amplios espacios, excelente distribución y privacidad total. Cuenta con dos casas totalmente funcionales: Casa 1 (90 m²) con 3 dormitorios, suite principal y acabados modernos; Casa 2 (110 m²) también con 3 dormitorios, suite principal y cuarto multiusos. Disfruta de piscina privada, jardines, área de barbacoa y amplio estacionamiento. Ubicada en el Km 73.5 de la Carretera del Litoral, a minutos de hermosas playas y servicios locales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two fully equipped houses on one lot",
+        "es": "Dos casas completamente equipadas en un solo terreno"
+      },
+      {
+        "en": "Private pool and recreational area",
+        "es": "Piscina privada y área recreativa"
+      },
+      {
+        "en": "Prime location on Litoral Highway, near beaches",
+        "es": "Ubicación privilegiada en Carretera del Litoral, cerca de playas"
+      },
+      {
+        "en": "Gated community with security and privacy",
+        "es": "Comunidad cerrada con seguridad y privacidad"
+      },
+      {
+        "en": "Ideal for family or investment",
+        "es": "Ideal para familia o inversión"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach (nearest named beach from Bahía Dorada area)",
+    "url_language": "es",
+    "tokens_in": 2711,
+    "tokens_out": 683,
+    "cost_usd": 0.00148327,
+    "finish_reason": "stop",
+    "latency_ms": 5326
+  },
+  "encuentra24|30661994": {
+    "ts": "2026-05-25T01:40:11.634418+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Luxury Beach Villa – Costa del Sol, El Salvador",
+      "es": "Villa de Lujo – Costa del Sol, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Discover luxury and tranquility on the Costa del Sol! This spectacular villa features three independent houses, fully furnished and equipped, located in one of the most exclusive areas of La Paz. Each house has a unique theme: Oasis, Mediterranean, and Bali. This is an exclusive opportunity to acquire a villa of three single-story houses designed and built to be your family beach escape while generating income through Airbnb, with capacity for up to 12 guests per house. The project is located in San Luis La Herradura, Playa El Zapote, Costa del Sol, just 45 minutes from El Salvador International Airport and 1 hour from San Salvador. Discover a home where you can enjoy and relax, combining pleasure with investment. The houses have beach access 200 meters away (only a 4-minute walk). Land area: 3,000 v2 (approx. 2,097 m²). Each property: 1,000 v2 (approx. 699 m²). Construction area: 735 m² total, each house 245 m². General features per house: access gate, open-concept living-dining-kitchen, decorated living room, dining room, fully equipped kitchen, 1 master bedroom with full bath, 3 junior bedrooms, tanning deck with reclining chairs, hammock area, outdoor shower, large garden, private pool. Extras include a designated photo spot.",
+      "es": "¡Descubre el lujo y la tranquilidad en la Costa del Sol! Esta espectacular villa ofrece tres casas independientes, completamente amuebladas y equipadas, ubicadas en una de las zonas más exclusivas de La Paz. Cada casa tiene una temática única: Oasis, Mediterránea y Bali. Es una oportunidad exclusiva para adquirir una villa de tres casas de una planta diseñadas y construidas para ser tu escape familiar a la playa y a la vez generar ingresos por Airbnb, con capacidad de hasta 12 huéspedes por casa. El proyecto está ubicado en San Luis La Herradura, Playa El Zapote, Costa del Sol, a solo 45 minutos del Aeropuerto Internacional de El Salvador y a 1 hora de San Salvador. Descubre una casa donde disfrutar y relajarte combinando el placer con la inversión. Las casas cuentan con acceso a la playa a 200 metros (a solo 4 minutos caminando). Área de terreno: 3,000 v2 (aprox. 2,097 m²). Cada propiedad: 1,000 v2 (aprox. 699 m²). Área de construcción: 735 m² total, cada casa 245 m². Características generales por casa: portón de acceso, concepto open space de sala-comedor-cocina, sala decorada, comedor, cocina full equipada, 1 habitación principal con baño completo, 3 habitaciones Jr., deck de bronceado con sillas reclinables, hamaquero, regadera externa, amplio jardín, piscina independiente. Extras incluyen espacio diseñado para fotos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Three independent themed villas (Oasis, Mediterranean, Bali)",
+        "es": "Tres villas independientes temáticas (Oasis, Mediterránea, Bali)"
+      },
+      {
+        "en": "Beach access just 200 meters away (4-minute walk)",
+        "es": "Acceso a la playa a solo 200 metros (4 minutos caminando)"
+      },
+      {
+        "en": "Ideal for Airbnb investment, up to 12 guests per house",
+        "es": "Ideal para inversión Airbnb, hasta 12 huéspedes por casa"
+      },
+      {
+        "en": "Private pool and large garden in each house",
+        "es": "Piscina privada y amplio jardín en cada casa"
+      },
+      {
+        "en": "45 minutes from the airport, 1 hour from San Salvador",
+        "es": "45 minutos del aeropuerto, 1 hora de San Salvador"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol, Playa El Zapote",
+    "url_language": "es",
+    "tokens_in": 2711,
+    "tokens_out": 1003,
+    "cost_usd": 0.00183527,
+    "finish_reason": "stop",
+    "latency_ms": 7280
+  },
+  "encuentra24|32416837": {
+    "ts": "2026-05-25T01:40:15.318832+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Apartment with Panoramic Ocean Views in Costa del Sol",
+      "es": "Apartamento frente al mar con vistas panorámicas en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning beachfront apartment offering privileged ocean views and a relaxed lifestyle in one of El Salvador's most exclusive coastal areas. Located in Costa del Sol, this 162 m² property features an integrated living, dining, and kitchen area, a terrace with panoramic sea views, three bedrooms with closets (master with private bath, one junior with private bath, and one junior sharing a social bath), a complete service area, and laundry space. Enjoy resort-style amenities including a swimming pool, bar & lounge, volleyball court, and fun spot. Perfect for family living or as a vacation rental investment. Priced at $457,000, this is a rare opportunity to own a piece of paradise.",
+      "es": "Descubra este impresionante apartamento frente al mar con vistas privilegiadas al océano y un estilo de vida relajado en una de las zonas costeras más exclusivas de El Salvador. Ubicado en Costa del Sol, esta propiedad de 162 m² cuenta con sala, comedor y cocina integrados, terraza con vista panorámica al mar, tres habitaciones con clóset (principal con baño privado, una junior con baño privado y una junior que comparte baño social), área de servicio completa y lavandería. Disfrute de amenidades como piscina, bar & lounge, cancha de voleibol y fun spot. Ideal para uso familiar o como inversión vacacional. Precio de venta: $457,000. Una oportunidad única para poseer un pedazo de paraíso."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location with direct ocean views",
+        "es": "Ubicación frente al mar con vistas directas al océano"
+      },
+      {
+        "en": "162 m² of well-designed living space",
+        "es": "162 m² de espacio habitable bien diseñado"
+      },
+      {
+        "en": "Three bedrooms with closets and private baths",
+        "es": "Tres habitaciones con clóset y baños privados"
+      },
+      {
+        "en": "Resort amenities: pool, bar, volleyball court",
+        "es": "Amenidades de resort: piscina, bar, cancha de voleibol"
+      },
+      {
+        "en": "Ideal for family or vacation rental investment",
+        "es": "Ideal para familia o inversión en alquiler vacacional"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2552,
+    "tokens_out": 648,
+    "cost_usd": 0.00140184,
+    "finish_reason": "stop",
+    "latency_ms": 5531
+  },
+  "encuentra24|30595921": {
+    "ts": "2026-05-25T01:40:15.874081+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Penthouse at Costa Real Resort",
+      "es": "Penthouse frente al mar en Costa Real Resort"
+    },
+    "short_description_canonical": {
+      "en": "Experience luxury living in this exclusive oceanfront penthouse at Condominios Costa Real Resort y Villas. Located on the 7th floor of Tower D, this 237.82 m² residence features five bedrooms, four bathrooms, and private terraces with panoramic ocean views. Completely remodeled with high-end finishes, it includes VRF air conditioning, pool, parking, all basic services, and 24/7 security. Perfect for those seeking a stylish and comfortable lifestyle or vacation retreat.",
+      "es": "Vive la experiencia del lujo en este exclusivo penthouse frente al mar en Condominios Costa Real Resort y Villas. Ubicado en el séptimo piso de la Torre D, este espacio de 237.82 m² ofrece cinco habitaciones, cuatro baños y terrazas privadas con vistas panorámicas al océano. Totalmente remodelado con acabados de alta gama, incluye aire acondicionado VRF, piscina, estacionamiento, todos los servicios básicos y seguridad 24/7. Ideal para quienes buscan un estilo de vida elegante y confortable o un refugio vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Oceanfront penthouse with panoramic views",
+        "es": "Penthouse frente al mar con vistas panorámicas"
+      },
+      {
+        "en": "237.82 m² with 5 bedrooms and 4 bathrooms",
+        "es": "237.82 m² con 5 habitaciones y 4 baños"
+      },
+      {
+        "en": "Completely remodeled with high-end finishes",
+        "es": "Totalmente remodelado con acabados de lujo"
+      },
+      {
+        "en": "Resort amenities: pool, parking, 24/7 security",
+        "es": "Amenidades resort: piscina, estacionamiento, seguridad 24/7"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol, La Paz",
+    "url_language": "es",
+    "tokens_in": 2433,
+    "tokens_out": 525,
+    "cost_usd": 0.00123441,
+    "finish_reason": "stop",
+    "latency_ms": 4239
+  },
+  "encuentra24|32059471": {
+    "ts": "2026-05-25T01:40:16.036072+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Lakefront Home at Lake Coatepeque – Breathtaking Views",
+      "es": "Casa Frente al Lago de Coatepeque – Vistas Impresionantes"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional lakefront property on the shores of Lake Coatepeque, one of El Salvador's most stunning volcanic crater lakes. Located in the most privileged area of the lake, this home offers tranquility, security, and unforgettable sunsets. The main house features 5 bedrooms, 5 bathrooms, living room, dining room, kitchen, breakfast nook, game area, terrace, and service area. A separate guest house includes 5 bedrooms, 3 bathrooms, living room, dining room, kitchen, terrace, and service area. The property sits on a 2,682-square-varas lot (approx. 1,874 m²) with 678 m² of construction. Enjoy a private dock, wooden deck, lush garden, and a caretaker's house. Parking for 10+ vehicles. Priced at $1,100,000. Contact us for a showing.",
+      "es": "Descubra esta excepcional propiedad frente al lago en las orillas del Lago de Coatepeque, uno de los lagos de cráter volcánico más impresionantes de El Salvador. Ubicada en la zona más privilegiada del lago, esta casa ofrece tranquilidad, seguridad y atardeceres inolvidables. La casa principal cuenta con 5 habitaciones, 5 baños, sala, comedor, cocina, desayunador, área de juegos, terraza y área de servicio. Una casa de huéspedes independiente incluye 5 habitaciones, 3 baños, sala, comedor, cocina, terraza y área de servicio. El terreno es de 2,682 varas cuadradas (aproximadamente 1,874 m²) con 678 m² de construcción. Disfrute de un muelle privado, deck de madera, jardín frondoso y casa de guardián. Estacionamiento para más de 10 vehículos. Precio: $1,100,000. Contáctenos para una cita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront property with private dock",
+        "es": "Propiedad frente al lago con muelle privado"
+      },
+      {
+        "en": "Two independent houses: main + guest house",
+        "es": "Dos casas independientes: principal + casa de huéspedes"
+      },
+      {
+        "en": "10+ vehicle parking and large lot",
+        "es": "Estacionamiento para más de 10 vehículos y amplio terreno"
+      },
+      {
+        "en": "Breathtaking sunset views over volcanic crater lake",
+        "es": "Vistas impresionantes de atardeceres sobre lago de cráter volcánico"
+      },
+      {
+        "en": "Prime location in the most privileged area of Lake Coatepeque",
+        "es": "Ubicación privilegiada en la zona más exclusiva del Lago de Coatepeque"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lago de Coatepeque, Santa Ana, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2744,
+    "tokens_out": 773,
+    "cost_usd": 0.00159118,
+    "finish_reason": "stop",
+    "latency_ms": 6250
+  },
+  "encuentra24|32291646": {
+    "ts": "2026-05-25T01:40:16.306867+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Puerta del Alma: Urban Core Apartments in Antiguo Cuscatlán",
+      "es": "Puerta del Alma: Apartamentos Urban Core en Antiguo Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "Puerta del Alma redefines urban living with its innovative Urban Core Apartments concept. Live in the heart of the country's economic activity, surrounded by exclusive amenities and a strategic location that guarantees high property value. Features: 2 bedrooms, all with air conditioning. Master bedroom with walk-in closet, private bathroom with double vanity and air conditioning. Junior bedroom with air conditioning, closet, and shares a full social bathroom. Spacious fully equipped kitchen. Parking for 2 vehicles. Hot water system. Tower security with controlled access. Includes: washer, dryer, dishwasher, stove, refrigerator; air conditioners, blackout curtains. Tower amenities: Lobby, Sky Lounge, Pool, Gym, Cinema, Reading and meeting rooms, Social area and event hall, Billiards, Barbecue area, Children's play area.",
+      "es": "Puerta del Alma redefine el estilo de vida urbano con su innovador concepto de Urban Core Apartments. Vive en el corazón de la actividad económica del país, rodeado de amenidades exclusivas y con una ubicación estratégica que garantiza alta plusvalía. Características: 2 habitaciones, todas con aire acondicionado. Habitación principal con walk-in clóset, baño privado con doble lavamanos y aire acondicionado. Habitación Jr. con aire acondicionado, clóset y comparte baño social completo. Amplia cocina totalmente equipada. Parqueo propio para 2 vehículos. Sistema de agua caliente. Seguridad en la torre con accesos controlados. Incluye: lavadora, secadora, lavaplatos, cocina, refrigeradora; aires acondicionados, cortinas blackout. Amenidades de la torre: Lobby, Sky Lounge, Piscina, Gimnasio, Cine, Salas de lectura y reuniones, Área social y salón de eventos, Billar, Área de barbacoa, Juegos para niños."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location in Antiguo Cuscatlán, heart of economic activity",
+        "es": "Ubicación privilegiada en Antiguo Cuscatlán, corazón de la actividad económica"
+      },
+      {
+        "en": "Fully equipped with appliances and blackout curtains",
+        "es": "Totalmente equipado con electrodomésticos y cortinas blackout"
+      },
+      {
+        "en": "Exclusive tower amenities: Sky Lounge, pool, gym, cinema",
+        "es": "Amenidades exclusivas de la torre: Sky Lounge, piscina, gimnasio, cine"
+      },
+      {
+        "en": "2 parking spaces and hot water system",
+        "es": "2 parqueos y sistema de agua caliente"
+      },
+      {
+        "en": "High property value appreciation potential",
+        "es": "Alta plusvalía garantizada"
+      }
+    ],
+    "lat": 13.6733,
+    "lng": -89.2467,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Antiguo Cuscatlán, La Libertad",
+    "url_language": "es",
+    "tokens_in": 2607,
+    "tokens_out": 767,
+    "cost_usd": 0.00154759,
+    "finish_reason": "stop",
+    "latency_ms": 5628
+  },
+  "encuentra24|31052892": {
+    "ts": "2026-05-25T01:40:16.332672+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Escape on Costa del Sol",
+      "es": "Escape frente al mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished apartment for sale on Costa del Sol, La Paz. Your beachfront getaway with the longest pool in El Salvador as your horizon. Featuring fine designer furniture and decor, 132 sqm of construction plus parking spaces. 3 bedrooms, master with en-suite bath and closet, plus washer/dryer area (other two share a bath). Spacious living-dining room, air conditioning throughout. Kitchen with pantry, fully equipped with toaster oven, microwave, coffee maker, stove, refrigerator. Sold fully equipped with pots, plates, cutlery, etc. Condominium pool is 101 meters long, the longest in the country. Note: no ocean view. Covered parking for two vehicles. Monthly maintenance $300. Sale price $315,000 fixed.",
+      "es": "Apartamento completamente amueblado en venta en La Costa del Sol, La Paz. Tu escape frente al mar, con la piscina más larga de El Salvador como horizonte. Con finos muebles y decoración de diseñador, 132 mts de construcción más espacios de parqueo. 3 habitaciones, la principal con baño y closet, área de lavadora y secadora (las otras dos comparten baño). Sala-comedor amplio y decorado, aires acondicionados en todas las estancias. Cocina con pantry y completamente equipada: horno tostador, microondas, cafetera, cocina y refrigerador. Se vende con todo: sartenes, platos, cubiertos, etc. Piscina del condominio de 101 mts de largo, la más larga del país. Nota: no cuenta con vista al mar. Cochera techada para dos vehículos. Mantenimiento $300 mensuales. Precio de venta $315 mil fijos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location on Costa del Sol",
+        "es": "Ubicación frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Longest pool in El Salvador (101 m)",
+        "es": "Piscina más larga de El Salvador (101 m)"
+      },
+      {
+        "en": "Fully furnished with designer decor",
+        "es": "Totalmente amueblado con decoración de diseñador"
+      },
+      {
+        "en": "3 bedrooms, master en-suite",
+        "es": "3 habitaciones, principal con baño"
+      },
+      {
+        "en": "Covered parking for 2 vehicles",
+        "es": "Cochera techada para 2 vehículos"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2531,
+    "tokens_out": 680,
+    "cost_usd": 0.00143137,
+    "finish_reason": "stop",
+    "latency_ms": 5408
+  },
+  "encuentra24|32014708": {
+    "ts": "2026-05-25T01:40:16.412447+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Apartment in Costa del Sol, 94m²",
+      "es": "Apartamento frente al mar en Costa del Sol, 94m²"
+    },
+    "short_description_canonical": {
+      "en": "Exclusive beachfront apartment in the prestigious Suites de Jaltepeque complex on Costa del Sol, El Salvador. This 94 m² unit offers stunning ocean views and direct access to white sand beaches. The property features three bedrooms (one with king bed and sofa bed, one with two queen beds, and one small with bunk beds), two full bathrooms, an integrated living-dining-kitchen area, and a terrace. Enjoy full air conditioning, two private parking spaces, expansive gardens, two swimming pools, and a beachfront rancho with pool. Beach umbrellas, palapas, and beach equipment are included. Additional amenities: WiFi and plasma TV. Price: $295,000.",
+      "es": "Exclusivo apartamento frente al mar en el prestigioso complejo Suites de Jaltepeque en Costa del Sol, El Salvador. Esta unidad de 94 m² ofrece impresionantes vistas al océano y acceso directo a playas de arena blanca. Cuenta con tres dormitorios (uno con cama king y sofá cama, uno con dos camas queen, y uno pequeño con camarote), dos baños completos, sala-comedor-cocina integrada y terraza. Disfrute de aire acondicionado completo, dos estacionamientos privados, amplios jardines, dos piscinas y un rancho frente al mar con piscina. Se incluyen sombrillas playeras, palapas y equipo de playa. Amenidades adicionales: WiFi y TV plasma. Precio: $295,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with direct ocean views",
+        "es": "Frente al mar con vistas directas al océano"
+      },
+      {
+        "en": "Three bedrooms with capacity for 8+ guests",
+        "es": "Tres dormitorios con capacidad para 8+ huéspedes"
+      },
+      {
+        "en": "Two swimming pools and beachfront rancho",
+        "es": "Dos piscinas y rancho frente al mar"
+      },
+      {
+        "en": "Two private parking spaces included",
+        "es": "Dos estacionamientos privados incluidos"
+      },
+      {
+        "en": "Fully furnished with beach equipment",
+        "es": "Totalmente amueblado con equipo de playa"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2492,
+    "tokens_out": 638,
+    "cost_usd": 0.00137464,
+    "finish_reason": "stop",
+    "latency_ms": 5272
+  },
+  "encuentra24|31305818": {
+    "ts": "2026-05-25T01:40:17.041512+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Modern Ocean-View Apartment in AtLoft Tuscania",
+      "es": "Moderno Apartamento con Vista al Mar en AtLoft Tuscania"
+    },
+    "short_description_canonical": {
+      "en": "Discover this beautiful, modern, and bright apartment in AtLoft Tuscania, perfect for enjoying natural surroundings and stunning ocean views with your loved ones. With a usable area of 102 m² plus 25 m² of parking, this unit features a covered parking for two vehicles, an open-concept living room with terrace, dining room, kitchen with pantry and breakfast bar, a study or auxiliary room with A/C, a master bedroom with A/C, walk-in closet, and full bathroom, and a junior bedroom with A/C sharing a bathroom with the study. Extras include high false ceilings for excellent natural light, modern solar-powered A/C, and an attic or storage space within the apartment. Tower amenities: gym, yoga deck, BBQ area, covered children's play area, coworking room, walking trails, and green areas. Located minutes from prestigious schools, shopping centers, and restaurants; just 20 minutes from Surf City and 15 minutes from the capital. Sale price: $290,000. We assist with bank financing at the best market conditions. Contact us by call or WhatsApp.",
+      "es": "Descubra este hermoso, moderno e iluminado apartamento en AtLoft Tuscania, ideal para disfrutar de un entorno natural y una impresionante vista al mar junto a sus seres queridos. Con un área útil de 102 m² más 25 m² de estacionamiento, cuenta con estacionamiento techado para dos vehículos, concepto abierto de sala con terraza, comedor, cocina con pantry y barra desayunadora, estudio o habitación auxiliar con A/C, habitación principal con A/C, walk-in closet y baño completo, y una habitación junior con A/C que comparte baño con el estudio. Extras: cielos falsos altos que garantizan excelente luz natural, aire acondicionado moderno alimentado con energía solar, y ático o bodega dentro del apartamento. Amenidades de la torre: gimnasio, yoga deck, área de BBQ, área de juegos techada para niños, sala de cowork, senderos y áreas verdes para caminata. Ubicado a minutos de prestigiosos colegios, centros comerciales y restaurantes; a solo 20 minutos de Surf City y 15 minutos de la capital. Precio de venta: $290,000. Brindamos asistencia para obtener financiamiento bancario con las mejores condiciones del mercado. Contáctenos por llamada o WhatsApp."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Stunning ocean views from a modern apartment",
+        "es": "Impresionantes vistas al mar desde un moderno apartamento"
+      },
+      {
+        "en": "Solar-powered air conditioning for energy efficiency",
+        "es": "Aire acondicionado con energía solar para eficiencia energética"
+      },
+      {
+        "en": "Prime location near schools, malls, and Surf City",
+        "es": "Ubicación privilegiada cerca de colegios, centros comerciales y Surf City"
+      },
+      {
+        "en": "Full tower amenities: gym, yoga deck, coworking, and more",
+        "es": "Amenidades completas de la torre: gimnasio, yoga deck, coworking y más"
+      },
+      {
+        "en": "Attic storage and covered parking for two vehicles",
+        "es": "Ático o bodega y estacionamiento techado para dos vehículos"
+      }
+    ],
+    "lat": 13.5883,
+    "lng": -89.29,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2694,
+    "tokens_out": 880,
+    "cost_usd": 0.00169538,
+    "finish_reason": "stop",
+    "latency_ms": 6921
+  },
+  "encuentra24|31514556": {
+    "ts": "2026-05-25T01:40:17.074905+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Brand New Apartment at Costa del Sol Beach",
+      "es": "A Estrenar Apartamento en Playa Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this brand new apartment in the exclusive private complex at Costa del Sol Beach, one of El Salvador's finest beaches. With 117 m² of modern living space, this unit offers stunning panoramic views, 2 bedrooms, 3 bathrooms, an open-concept kitchen with breakfast bar, living and dining areas, terrace, laundry area, and 2 parking spaces. The complex features a rooftop, gym, children's play area, bar, event terrace, green zones, 24/7 security, controlled access, elevators, and is pet-friendly. Located just 50 minutes from the International Airport and 1 hour 45 minutes from San Salvador and Surf City, this property promises growing value and an exceptional coastal lifestyle.",
+      "es": "Descubre este apartamento a estrenar en el exclusivo complejo privado de Playa Costa del Sol, una de las mejores playas de El Salvador. Con 117 m² de espacio moderno, esta unidad ofrece impresionantes vistas panorámicas, 2 habitaciones, 3 baños, cocina abierta con barra de desayuno, sala, comedor, terraza, área de lavado y 2 parqueos. El complejo cuenta con rooftop, gimnasio, área de juegos infantiles, bar, terraza para eventos, zonas verdes, seguridad 24/7, acceso controlado, elevadores y es pet-friendly. Ubicado a solo 50 minutos del Aeropuerto Internacional y a 1 hora 45 minutos de San Salvador y Surf City, esta propiedad promete plusvalía creciente y un estilo de vida costero excepcional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand new apartment in a private beachfront complex",
+        "es": "Apartamento a estrenar en complejo privado frente a la playa"
+      },
+      {
+        "en": "117 m² with panoramic ocean views",
+        "es": "117 m² con vistas panorámicas al mar"
+      },
+      {
+        "en": "2 bedrooms, 3 bathrooms, and 2 parking spaces",
+        "es": "2 habitaciones, 3 baños y 2 parqueos"
+      },
+      {
+        "en": "World-class amenities: rooftop, gym, bar, event terrace",
+        "es": "Amenidades de primer nivel: rooftop, gimnasio, bar, terraza para eventos"
+      },
+      {
+        "en": "Prime location near airport and main cities",
+        "es": "Ubicación privilegiada cerca del aeropuerto y principales ciudades"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Costa del Sol",
+    "url_language": "es",
+    "tokens_in": 2717,
+    "tokens_out": 670,
+    "cost_usd": 0.00147059,
+    "finish_reason": "stop",
+    "latency_ms": 5656
+  },
+  "encuentra24|31794200": {
+    "ts": "2026-05-25T01:40:20.042611+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Exclusive Beachfront Condo at Costa del Sol",
+      "es": "Exclusivo Apartamento Frente al Mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exclusive apartment in the prestigious Residencial Del Mar condominium, located on the stunning Costa del Sol. Perfect for those seeking a beachfront lifestyle with all modern comforts. The property spans 132.63 m² and features a master bedroom with private bathroom, two junior bedrooms, a full guest bathroom, a fully equipped kitchen, and air conditioning. Enjoy direct beach access and a privileged, relaxed atmosphere. Includes two covered parking spaces for added convenience and security.",
+      "es": "Descubre este exclusivo apartamento en el prestigioso condominio Residencial Del Mar, ubicado en la impresionante Costa del Sol. Ideal para quienes buscan un estilo de vida frente al mar con todas las comodidades modernas. La propiedad cuenta con 132.63 m², habitación principal con baño privado, dos habitaciones junior, baño social completo, cocina equipada y aire acondicionado. Disfruta de acceso directo a la playa y un ambiente privilegiado y relajado. Incluye dos parqueos techados para mayor comodidad y seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access from the condominium",
+        "es": "Acceso directo a la playa desde el condominio"
+      },
+      {
+        "en": "132.63 m² of well-distributed living space",
+        "es": "132.63 m² de espacio habitable bien distribuido"
+      },
+      {
+        "en": "Master bedroom with private bathroom",
+        "es": "Habitación principal con baño privado"
+      },
+      {
+        "en": "Fully equipped kitchen and air conditioning",
+        "es": "Cocina equipada y aire acondicionado"
+      },
+      {
+        "en": "Two covered parking spaces included",
+        "es": "Dos parqueos techados incluidos"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol, La Paz, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2431,
+    "tokens_out": 536,
+    "cost_usd": 0.00124597,
+    "finish_reason": "stop",
+    "latency_ms": 4168
+  },
+  "encuentra24|32417384": {
+    "ts": "2026-05-25T01:40:20.764520+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Apartment in Costa del Sol",
+      "es": "Apartamento frente al mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning ocean-view apartment in Costa del Sol, one of El Salvador's most exclusive beach destinations. Perfect for family getaways or vacation rental investment, this 160 m² property offers a functional layout with 3 bedrooms, including a master with walk-in closet and en-suite bath, plus two junior bedrooms sharing a full bath. The integrated living, dining, and kitchen area flows seamlessly to terraces with breathtaking sea views. Additional features include a social bathroom, complete service area, and two parking spaces. Sold unfurnished, allowing you to personalize every corner. Embrace a lifestyle of comfort, privacy, and beachfront living in a high-demand location with strong appreciation potential. Priced at $475,000.",
+      "es": "Descubre este espectacular apartamento con vista al mar en Costa del Sol, uno de los destinos playeros más exclusivos de El Salvador. Ideal para escapadas familiares o inversión vacacional, esta propiedad de 160 m² ofrece una distribución funcional con 3 habitaciones, incluyendo principal con walk-in closet y baño privado, más dos habitaciones junior que comparten un baño completo. El área integrada de sala, comedor y cocina fluye hacia terrazas con impresionantes vistas al mar. Cuenta además con baño social, área de servicio completa y dos parqueos. Se vende sin muebles, permitiéndote personalizar cada espacio. Disfruta de un estilo de vida de confort, privacidad y vida frente a la playa en una ubicación de alta demanda y plusvalía. Precio: $475,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "160 m² of well-distributed living space",
+        "es": "160 m² de espacio bien distribuido"
+      },
+      {
+        "en": "3 bedrooms with master en-suite",
+        "es": "3 habitaciones con suite principal"
+      },
+      {
+        "en": "Terraces with direct ocean views",
+        "es": "Terrazas con vistas directas al mar"
+      },
+      {
+        "en": "Prime beachfront location in Costa del Sol",
+        "es": "Ubicación privilegiada frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Sold unfurnished for personal customization",
+        "es": "Se vende sin muebles para personalizar"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2545,
+    "tokens_out": 626,
+    "cost_usd": 0.00137575,
+    "finish_reason": "stop",
+    "latency_ms": 5445
+  },
+  "essurf|4888": {
+    "ts": "2026-05-25T01:40:21.283663+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Beachfront Lot in San Blas, La Libertad",
+      "es": "Terreno frente al mar en San Blas, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional beachfront lot in the sought-after San Blas area of La Libertad. With direct ocean access and breathtaking views, this property is perfect for building your dream coastal home or a lucrative vacation rental. Located just minutes from the vibrant surf town of El Tunco and the amenities of Puerto de La Libertad, you'll enjoy the best of El Salvador's Pacific coast. The lot offers a rare opportunity to own a piece of paradise in a rapidly developing region. Ideal for investors or families seeking a tranquil beach lifestyle with easy access to restaurants, shops, and surfing hotspots.",
+      "es": "Descubra este excepcional terreno frente al mar en la codiciada zona de San Blas, La Libertad. Con acceso directo al océano y vistas impresionantes, esta propiedad es perfecta para construir la casa costera de sus sueños o una lucrativa propiedad de alquiler vacacional. Ubicado a minutos del vibrante pueblo surfista de El Tunco y de los servicios de Puerto de La Libertad, disfrutará de lo mejor de la costa pacífica de El Salvador. El terreno ofrece una oportunidad única de poseer un pedazo de paraíso en una región en rápido desarrollo. Ideal para inversores o familias que buscan un estilo de vida playero tranquilo con fácil acceso a restaurantes, tiendas y puntos de surf."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beachfront access",
+        "es": "Acceso directo frente al mar"
+      },
+      {
+        "en": "Prime location near El Tunco and La Libertad",
+        "es": "Ubicación privilegiada cerca de El Tunco y La Libertad"
+      },
+      {
+        "en": "Perfect for custom home or investment",
+        "es": "Perfecto para casa personalizada o inversión"
+      },
+      {
+        "en": "Breathtaking ocean views",
+        "es": "Vistas impresionantes al océano"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2315,
+    "tokens_out": 553,
+    "cost_usd": 0.00123335,
+    "finish_reason": "stop",
+    "latency_ms": 4951
+  },
+  "remax|002284528002": {
+    "ts": "2026-05-25T01:40:21.745053+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Build Your Dream Home in Cumbres de Zaragoza",
+      "es": "Construye tu Hogar Soñado en Cumbres de Zaragoza"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional 700 m² (1,000 sq. yd.) residential lot in the exclusive gated community of Cumbres de Zaragoza. With 20 meters of frontage and 35 meters of depth, this gently sloping plot offers the perfect canvas for your dream home. Enjoy easy vehicular access, feasibility of basic services (water and electricity), and a pleasant climate year-round. The area is rapidly appreciating in value, with luxury homes already built nearby. Ideal for a primary residence or a weekend getaway. Priced at $60,000 negotiable.",
+      "es": "Descubra este excepcional lote residencial de 700 m² (1,000 yd²) en la exclusiva comunidad cerrada de Cumbres de Zaragoza. Con 20 metros de frente y 35 metros de fondo, este terreno de suave pendiente ofrece el lienzo perfecto para su hogar soñado. Disfrute de fácil acceso vehicular, factibilidad de servicios básicos (agua y electricidad) y un clima agradable durante todo el año. La zona está en rápida plusvalía, con casas de lujo ya construidas cerca. Ideal para residencia principal o casa de fin de semana. Precio: $60,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "700 m² lot in gated community",
+        "es": "Lote de 700 m² en comunidad cerrada"
+      },
+      {
+        "en": "20m frontage, 35m depth",
+        "es": "20 m de frente, 35 m de fondo"
+      },
+      {
+        "en": "Easy access and basic services available",
+        "es": "Fácil acceso y servicios básicos disponibles"
+      },
+      {
+        "en": "Growing area with luxury homes nearby",
+        "es": "Zona en crecimiento con casas de lujo cercanas"
+      },
+      {
+        "en": "Pleasant climate year-round",
+        "es": "Clima agradable todo el año"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2478,
+    "tokens_out": 574,
+    "cost_usd": 0.00130046,
+    "finish_reason": "stop",
+    "latency_ms": 4703
+  },
+  "encuentra24|30520708": {
+    "ts": "2026-05-25T01:40:21.989880+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Pre-Sale Apartment at Costa del Sol Beach",
+      "es": "Preventa de Apartamento en Playa Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning pre-sale apartment in the exclusive private complex at Costa del Sol Beach, one of El Salvador's finest beaches. With 104 m² of modern living space, this unit offers 2 bedrooms, 3 bathrooms, an open-plan kitchen with breakfast bar, living and dining areas, terrace, laundry area, and 2 parking spaces. Enjoy panoramic views and premium amenities including a rooftop, gym, children's play area, bar, event terrace, green zones, 24-hour security, controlled access, and pet-friendly policy. Located just 50 minutes from the International Airport and 1 hour 45 minutes from San Salvador, this property combines coastal living with growing investment potential. Ideal for water sports enthusiasts and those seeking a modern beachfront lifestyle.",
+      "es": "Descubre este increíble apartamento en preventa en el exclusivo complejo privado de Playa Costa del Sol, una de las mejores playas de El Salvador. Con 104 m² de espacio moderno, ofrece 2 habitaciones, 3 baños, cocina abierta con barra desayunadora, sala, comedor, terraza, área de lavado y 2 parqueos. Disfruta de vistas panorámicas y amenidades de primer nivel: rooftop, gimnasio, área de juegos infantiles, bar, terraza para eventos, zonas verdes, seguridad 24 horas, acceso controlado y pet friendly. Ubicado a solo 50 minutos del Aeropuerto Internacional y a 1 hora 45 minutos de San Salvador, esta propiedad combina vida costera con alto potencial de plusvalía. Ideal para deportes acuáticos y un estilo de vida moderno frente al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Costa del Sol",
+        "es": "Ubicación frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Modern amenities: rooftop, gym, bar, event terrace",
+        "es": "Amenidades modernas: rooftop, gimnasio, bar, terraza para eventos"
+      },
+      {
+        "en": "104 m² with panoramic views",
+        "es": "104 m² con vistas panorámicas"
+      },
+      {
+        "en": "50 minutes from International Airport",
+        "es": "50 minutos del Aeropuerto Internacional"
+      },
+      {
+        "en": "Growing investment value",
+        "es": "Plusvalía creciente"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Costa del Sol, La Paz, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2719,
+    "tokens_out": 652,
+    "cost_usd": 0.00145133,
+    "finish_reason": "stop",
+    "latency_ms": 5953
+  },
+  "remax|002522430084": {
+    "ts": "2026-05-25T01:40:22.291583+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Development Lot in Mejicanos, San Salvador",
+      "es": "Terreno Premium en Mejicanos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Discover a rare opportunity to own a 916 m² lot in a high-growth area of Mejicanos, San Salvador. This property offers the perfect blend of peaceful natural surroundings and convenient access to the city and essential services. Ideal for a residential project, vacation home, or long-term investment, the land sits in a strategic rural setting that ensures privacy and tranquility. The area is experiencing steady appreciation due to nearby residential and commercial development, making this an attractive option for future growth. The access road is currently unpaved, presenting a chance to customize the entrance and add value. Seize this investment potential today.",
+      "es": "Descubra una oportunidad única de poseer un lote de 916 m² en una zona de alto crecimiento en Mejicanos, San Salvador. Esta propiedad ofrece la combinación perfecta de entorno natural tranquilo y acceso conveniente a la ciudad y servicios esenciales. Ideal para un proyecto residencial, casa de vacaciones o inversión a largo plazo, el terreno se encuentra en un entorno rural estratégico que garantiza privacidad y tranquilidad. La zona experimenta una apreciación constante debido al desarrollo residencial y comercial cercano, lo que la convierte en una opción atractiva para el crecimiento futuro. El camino de acceso actualmente no está pavimentado, lo que brinda la oportunidad de personalizar la entrada y agregar valor. Aproveche este potencial de inversión hoy."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "916 m² lot in a high-growth area",
+        "es": "Lote de 916 m² en zona de alto crecimiento"
+      },
+      {
+        "en": "Peaceful natural surroundings with city proximity",
+        "es": "Entorno natural tranquilo con proximidad a la ciudad"
+      },
+      {
+        "en": "Strong appreciation potential due to nearby development",
+        "es": "Alto potencial de plusvalía por desarrollo cercano"
+      },
+      {
+        "en": "Ideal for residential project, vacation home, or investment",
+        "es": "Ideal para proyecto residencial, casa vacacional o inversión"
+      },
+      {
+        "en": "Opportunity to customize entrance and add value",
+        "es": "Oportunidad de personalizar la entrada y agregar valor"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "en",
+    "tokens_in": 2507,
+    "tokens_out": 609,
+    "cost_usd": 0.00134679,
+    "finish_reason": "stop",
+    "latency_ms": 5216
+  },
+  "remax|003093475009": {
+    "ts": "2026-05-25T01:40:22.413310+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Development Land in Santo Tomás, San Salvador",
+      "es": "Terreno Premium para Desarrollo en Santo Tomás, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique investment opportunity in the rapidly growing area of Santo Tomás, San Salvador. This 3,635 m² (5,200 v²) plot in Cantón El Carmen offers a perfect blend of flat and gently sloping terrain, ideal for residential lot development, a countryside home, or a recreational retreat. Enjoy fresh climate and natural surroundings with avocado, mango, and mamey trees, plus a seasonal creek that enhances the landscape without flood risk. Just 10 minutes from Plaza Santo Tomás and 8 minutes from local restaurants, churches, and schools. Utilities include electricity and potable water nearby, with paved road access within the subdivision. Priced at USD $40,000 with financing options for local buyers and Salvadorans abroad.",
+      "es": "Descubra una oportunidad de inversión única en la creciente zona de Santo Tomás, San Salvador. Este terreno de 3,635 m² (5,200 v²) en Cantón El Carmen ofrece una combinación perfecta de topografía plana y semi inclinada, ideal para desarrollo de lotes, casa campestre o retiro recreativo. Disfrute de clima fresco y entorno natural con árboles de aguacate, mango y mamey, además de un riachuelo estacional que realza el paisaje sin riesgo de inundación. A solo 10 minutos de Plaza Santo Tomás y 8 minutos de restaurantes, iglesias y escuelas. Cuenta con electricidad y agua potable cercanos, acceso pavimentado dentro de la urbanización. Precio de USD $40,000 con opciones de financiamiento para compradores locales y salvadoreños en el exterior."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,635 m² (5,200 v²) of versatile land with flat and semi-sloped topography",
+        "es": "3,635 m² (5,200 v²) de terreno versátil con topografía plana y semi inclinada"
+      },
+      {
+        "en": "Prime location: 10 min from Plaza Santo Tomás, 8 min from amenities",
+        "es": "Ubicación privilegiada: 10 min de Plaza Santo Tomás, 8 min de servicios"
+      },
+      {
+        "en": "Utilities ready: electricity and potable water nearby, paved access",
+        "es": "Servicios listos: electricidad y agua potable cercanos, acceso pavimentado"
+      },
+      {
+        "en": "Natural charm: fruit trees, seasonal creek, fresh climate",
+        "es": "Encanto natural: árboles frutales, riachuelo estacional, clima fresco"
+      },
+      {
+        "en": "Affordable at USD $40,000 with financing available",
+        "es": "Asequible a USD $40,000 con financiamiento disponible"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santo Tomás, San Salvador, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2634,
+    "tokens_out": 735,
+    "cost_usd": 0.00151968,
+    "finish_reason": "stop",
+    "latency_ms": 6000
+  },
+  "encuentra24|30735451": {
+    "ts": "2026-05-25T01:40:23.167830+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Wake Up to Lake Coatepeque Views – Exclusive Pre-Sale",
+      "es": "Despierta con vista al Lago de Coatepeque – Preventa Exclusiva"
+    },
+    "short_description_canonical": {
+      "en": "Imagine waking up every morning to the breathtaking turquoise waters of Lake Coatepeque, one of the most beautiful lakes in Latin America. Located just one hour from San Salvador, this paradise offers peace, nature, and a unique energy. This 16-tower, 17-story residential project features 1, 2, and 3-bedroom apartments with over 40 amenities, including the #1 amenity: Crystal Lagoon, an artificial crystal-clear lake spanning over 29,000 m² for water sports. Enjoy a clubhouse right on the lake with a dock. Exclusive pre-sale prices start at $170,000. Reserve with $5,000. Total down payment of 25% from reservation to delivery: 5% initial down payment upon purchase promise, and 20% payable in 18 monthly installments with no interest. Bank financing available. Estimated delivery of first towers: late 2026 to early 2027. Don't miss this opportunity to secure your spot on the most magical lake in El Salvador. Contact me for the full catalog!",
+      "es": "Imagina despertar cada mañana con las impresionantes aguas turquesas del Lago de Coatepeque, considerado uno de los lagos más bellos de América Latina. A solo una hora de San Salvador, este paraíso ofrece paz, naturaleza y una energía única. Este proyecto residencial de 16 torres de 17 niveles cuenta con apartamentos de 1, 2 y 3 habitaciones y más de 40 amenidades, incluyendo la amenidad #1: Crystal Lagoon, un lago artificial de agua cristalina de más de 29,000 m² para deportes acuáticos. Disfruta de una casa club frente al lago con muelle. ¡Preventa exclusiva desde $170,000! Reserva con $5,000. Prima total del 25% desde la reserva hasta la entrega: 5% de prima inicial en promesa de compra y 20% pagadero en 18 cuotas mensuales sin intereses. Crédito disponible con bancos. Entrega estimada de las primeras torres: finales de 2026 a principios de 2027. ¡No te pierdas esta oportunidad de asegurar tu lugar frente al lago más mágico de El Salvador! Contáctame para el catálogo completo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Crystal Lagoon: 29,000+ m² artificial lake for water sports",
+        "es": "Crystal Lagoon: lago artificial de más de 29,000 m² para deportes acuáticos"
+      },
+      {
+        "en": "Over 40 amenities including clubhouse and dock",
+        "es": "Más de 40 amenidades, incluyendo casa club y muelle"
+      },
+      {
+        "en": "1 hour from San Salvador",
+        "es": "A solo una hora de San Salvador"
+      },
+      {
+        "en": "Flexible payment: 18 interest-free monthly installments",
+        "es": "Pago flexible: 18 cuotas mensuales sin intereses"
+      },
+      {
+        "en": "Pre-sale from $170,000 with $5,000 reservation",
+        "es": "Preventa desde $170,000 con reserva de $5,000"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lago de Coatepeque, El Congo, Santa Ana",
+    "url_language": "es",
+    "tokens_in": 2683,
+    "tokens_out": 862,
+    "cost_usd": 0.00167261,
+    "finish_reason": "stop",
+    "latency_ms": 6861
+  },
+  "remax|00146162249": {
+    "ts": "2026-05-25T01:40:24.352122+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Flat Land in Sacacoyo, Near Pan-American Highway",
+      "es": "Terreno Plano en Sacacoyo, Cerca de la Carretera Panamericana"
+    },
+    "short_description_canonical": {
+      "en": "This expansive 8.5-hectare (85,000 m²) flat lot in Sacacoyo, El Tigre Canton, La Libertad, offers exceptional potential for industrial or recreational development. Currently used for corn and sugarcane cultivation, its prime location near the Pan-American Highway provides easy access to Sonsonate and Opico. The area is known for its safety and tranquility, making it an ideal canvas for your next project. We invite you to schedule a visit to fully appreciate the land's advantages, access points, and surroundings.",
+      "es": "Este amplio terreno plano de 8.5 hectáreas (85,000 m²) en Sacacoyo, Cantón El Tigre, La Libertad, ofrece un potencial excepcional para desarrollo industrial o recreativo. Actualmente utilizado para cultivo de maíz y caña de azúcar, su ubicación privilegiada cerca de la Carretera Panamericana brinda fácil acceso a Sonsonate y Opico. La zona es conocida por su seguridad y tranquilidad, lo que lo convierte en un lienzo ideal para su próximo proyecto. Lo invitamos a programar una visita para apreciar plenamente las ventajas del terreno, sus accesos y sus alrededores."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8.5 hectares of flat, ready-to-develop land",
+        "es": "8.5 hectáreas de terreno plano, listo para desarrollar"
+      },
+      {
+        "en": "Prime location near the Pan-American Highway",
+        "es": "Ubicación privilegiada cerca de la Carretera Panamericana"
+      },
+      {
+        "en": "Ideal for industrial or recreational projects",
+        "es": "Ideal para proyectos industriales o recreativos"
+      },
+      {
+        "en": "Safe and peaceful area",
+        "es": "Zona segura y tranquila"
+      },
+      {
+        "en": "Excellent access and visibility",
+        "es": "Excelente acceso y visibilidad"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sacacoyo, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2442,
+    "tokens_out": 561,
+    "cost_usd": 0.00127644,
+    "finish_reason": "stop",
+    "latency_ms": 4309
+  },
+  "remax|002284078029": {
+    "ts": "2026-05-25T01:40:26.736817+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Development Land in La Libertad Coastal Corridor",
+      "es": "Terreno de Desarrollo en Corredor Costero de La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Prime development land of 3,158.75 m² (4,519.63 varas²) located in Hacienda Santa Adela, within the rapidly consolidating coastal corridor of La Libertad. The irregular, sloped topography is ideal for stepped projects that maximize views, ventilation, and land use—perfect for mid-scale residential or tourism ventures. Direct access via two roads, including connectivity to Surf City highway and Calle El Calvario leading to downtown Puerto de La Libertad, ensures operational ease without heavy traffic exposure. This area is experiencing dynamic growth driven by Surf City development and coastal infrastructure investments, boosting land value and demand. Features include 32 meters of frontage, water and electricity access, and suitability for residential, tourism, or mixed-use projects. A strategic medium-term investment opportunity.",
+      "es": "Terreno prime de 3,158.75 m² (4,519.63 varas²) ubicado en Hacienda Santa Adela, dentro del corredor costero de La Libertad en rápida consolidación. La topografía irregular y inclinada es ideal para proyectos escalonados que maximizan vistas, ventilación y uso del suelo—perfecto para desarrollos residenciales o turísticos de mediana escala. Acceso directo por dos vías, incluyendo conectividad con la carretera Surf City y Calle El Calvario que lleva al centro de Puerto de La Libertad, garantiza funcionalidad operativa sin exposición directa al tráfico pesado. La zona experimenta un crecimiento dinámico impulsado por el desarrollo de Surf City y las inversiones en infraestructura costera, aumentando el valor del suelo y la demanda. Cuenta con 32 metros de frente, acceso a agua y electricidad, y aptitud para proyectos residenciales, turísticos o de uso mixto. Una oportunidad de inversión estratégica a mediano plazo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,158.75 m² (4,519.63 varas²) with 32 m frontage",
+        "es": "3,158.75 m² (4,519.63 varas²) con 32 m de frente"
+      },
+      {
+        "en": "Sloped topography ideal for terraced development",
+        "es": "Topografía inclinada ideal para desarrollo escalonado"
+      },
+      {
+        "en": "Direct access to Surf City highway and downtown La Libertad",
+        "es": "Acceso directo a carretera Surf City y centro de La Libertad"
+      },
+      {
+        "en": "Located in a high-growth coastal corridor",
+        "es": "Ubicado en un corredor costero de alto crecimiento"
+      },
+      {
+        "en": "Water and electricity available on site",
+        "es": "Agua y electricidad disponibles en el sitio"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "tokens_in": 2572,
+    "tokens_out": 738,
+    "cost_usd": 0.00150624,
+    "finish_reason": "stop",
+    "latency_ms": 5972
   }
 }
