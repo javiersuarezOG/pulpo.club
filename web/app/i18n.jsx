@@ -1,4 +1,5 @@
 import React from "react";
+import { ACTIVE_COUNTRY } from "./config/countries";
 
 // Pulpo — minimal i18n layer.
 //
@@ -221,8 +222,8 @@ const UI_STRINGS = {
                                    es: "Filtradas por lo que buscas. Directo a tu correo." },
   "usp.col_2_title":             { en: "Full catalogue, anytime",
                                    es: "Catálogo completo, cuando quieras" },
-  "usp.col_2_body":              { en: "Every property in El Salvador. Yours to filter, sort, and save.",
-                                   es: "Cada propiedad en El Salvador. Tuya para filtrar, ordenar y guardar." },
+  "usp.col_2_body":              { en: `Every property in ${ACTIVE_COUNTRY.name_en}. Yours to filter, sort, and save.`,
+                                   es: `Cada propiedad en ${ACTIVE_COUNTRY.name_es}. Tuya para filtrar, ordenar y guardar.` },
   "usp.col_3_title":             { en: "Built by locals",
                                    es: "Hecho por locales" },
   "usp.col_3_body":              { en: "We live on this coast. We know which listings are real and which are overpriced.",
@@ -368,8 +369,8 @@ const UI_STRINGS = {
                                    es: "Filtradas por lo que buscas. Directo a tu correo." },
   "home.usp.card2.title":        { en: "Full catalogue,\nanytime",
                                    es: "Catálogo completo,\ncuando quieras" },
-  "home.usp.card2.body":         { en: "Every property in El Salvador. Yours to filter, sort, and save.",
-                                   es: "Cada propiedad en El Salvador. Tuya para filtrar, ordenar y guardar." },
+  "home.usp.card2.body":         { en: `Every property in ${ACTIVE_COUNTRY.name_en}. Yours to filter, sort, and save.`,
+                                   es: `Cada propiedad en ${ACTIVE_COUNTRY.name_es}. Tuya para filtrar, ordenar y guardar.` },
   "home.usp.card3.title":        { en: "Built by locals",
                                    es: "Hecho por locales" },
   "home.usp.card3.body":         { en: "We live on this coast. We know which listings are real and which are overpriced.",
@@ -1485,8 +1486,14 @@ function t(key, locale, vars) {
   return s;
 }
 
-// Locale-aware number / currency / size formatters
-const localeMap = { en: "en-US", es: "es-SV" };
+// Locale-aware number / currency / size formatters.
+// PR-MC-i18n — locales come from the active country's manifest so a GT
+// deployment gets es-GT / en-US (or whatever the GT manifest specifies)
+// for free. The "currency: 'USD'" hardcode in formatPriceI18n below is
+// a follow-up — listings carry their price in their source-broker's
+// currency and the manifest's `currency` field is the deployment-wide
+// default; need a per-listing currency override before flipping.
+const localeMap = { en: ACTIVE_COUNTRY.locale_en, es: ACTIVE_COUNTRY.locale_es };
 function formatPriceI18n(n, locale) {
   if (n == null) return "—";
   return new Intl.NumberFormat(localeMap[locale] || "en-US", {
