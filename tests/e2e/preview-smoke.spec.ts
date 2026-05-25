@@ -535,6 +535,12 @@ test.describe("New app boots cleanly on key routes", () => {
       "above average for",                            // detail.price_context.above_avg (snippet)
       "Compared to",                                  // detail.price_context.caption (snippet)
       "Not enough listings",                          // detail.price_context.unavailable (snippet)
+      // Share-pin landing — BrowsePage tags the pinned card with this
+      // pill when a /l/<token> recipient arrives. Renders on / only if
+      // BrowsePage is mounted underneath a panel from a cold-load share,
+      // but always renders on /browse?pin= and is sweep-able on the
+      // detail-page step of this test (which navigates to /browse).
+      "Shared with you",                              // card.shared_pill
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
