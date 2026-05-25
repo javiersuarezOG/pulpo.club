@@ -46,6 +46,21 @@ If a local-merge attempt to `main` fails with `protected branch hook declined`, 
 - **Tests**: `PULPO_OFFLINE=1 pytest -q` — full suite must pass (or fail only in known-broken areas not touched by your change)
 - **Lint**: `ruff check .`
 
+### Local-only pytest failure: libjpeg ABI mismatch (post-2026-05-25)
+
+If `PULPO_OFFLINE=1 pytest -q` fails LOCALLY on `tests/test_photos.py` or `tests/test_repick_heroes.py` with `OSError: encoder error -2 when writing image file` plus a stderr line `Wrong JPEG library version: library is 90, caller expects 80`, that's a Pillow-vs-libjpeg ABI mismatch — Pillow was compiled against libjpeg 8 but the active environment serves libjpeg 9. CI on `ubuntu-latest` uses a consistent libjpeg + Pillow pair and is unaffected.
+
+Fix:
+```
+pip install --upgrade --force-reinstall --no-binary :all: Pillow
+```
+If that still leaves the mismatch, the cleanest path on macOS is to recreate the venv against the system libjpeg:
+```
+brew install libjpeg
+pip install --upgrade --force-reinstall Pillow
+```
+The failure is purely a local-env artifact; do NOT change the photo-pipeline code to "work around" it.
+
 ## NEVER ship a /preview crash again — null-safety + smoke test (post-2026-05-07)
 
 **Two crashes shipped in two PRs.** That's twice too many. The pattern was the same both times: a real listing's field was null where the prototype's mock was always populated. Components called `.toFixed()` / `.length` directly without a null guard, ErrorBoundary fired, page blanked.
