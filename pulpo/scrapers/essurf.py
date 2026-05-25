@@ -266,6 +266,7 @@ def _map(rec: dict) -> Optional[dict]:
 
 class ESSurfScraper(OfflineFixtureMixin):
     slug = "essurf"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

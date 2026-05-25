@@ -418,6 +418,7 @@ class Encuentra24Scraper:
     the per-page render is already slow, so 2s/page is fine.
     """
     slug = "encuentra24"
+    country = "SV"
     REQUEST_DELAY = 2.0
     PAGE_TIMEOUT_MS = 45_000   # 45s — encuentra24 detail pages take ~7s
                                 # plus JSON-LD must hydrate; 45s is safe

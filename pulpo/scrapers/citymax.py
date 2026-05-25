@@ -269,6 +269,7 @@ def _map(rec: dict) -> Optional[dict]:
 
 class CityMaxScraper(OfflineFixtureMixin):
     slug = "citymax"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

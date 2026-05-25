@@ -77,6 +77,7 @@ FIXTURE_FILE = "sample_listings.json"
 
 class BienesRaicesScraper:
     slug = "bienesraices"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

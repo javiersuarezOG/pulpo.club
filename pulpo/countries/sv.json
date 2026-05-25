@@ -1,0 +1,14 @@
+{
+  "code": "SV",
+  "name_en": "El Salvador",
+  "name_es": "El Salvador",
+  "locale_es": "es-SV",
+  "locale_en": "en-US",
+  "currency": "USD",
+  "centroid_lat": 13.7942,
+  "centroid_lng": -88.8965,
+  "listing_count_floor": 700,
+  "listing_count_ceiling": 1300,
+  "newsletter_audience_segment": "sv",
+  "_comment": "PR-MC-1a — minimal SV manifest establishing the contract. PR-MC-1b will move departments / zones / zone_tier / vacation_zones / named_beaches / airports / validation_bounds into this file from their current homes in pulpo/normalize.py, automation/localities.py, automation/distance_fields.py, automation/property_types.py, pulpo/airports.py, automation/validation_bounds.py, and pulpo/ranker_legs/location.py."
+}

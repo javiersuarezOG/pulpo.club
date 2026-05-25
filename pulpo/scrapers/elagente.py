@@ -376,6 +376,7 @@ def _parse_detail(html: str, url: str) -> Optional[dict]:
 
 class ElAgenteScraper(OfflineFixtureMixin):
     slug = "elagente"
+    country = "SV"
 
     def __init__(self, offline: bool | None = None):
         self.offline = offline

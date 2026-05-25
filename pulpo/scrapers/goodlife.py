@@ -57,6 +57,7 @@ FIXTURE_FILE = "sample_listings.json"
 
 class GoodLifeScraper:
     slug = "goodlife"
+    country = "SV"
 
     # ---- selectors (calibrated 2026-04-28, icon-box area updated 2026-05-02) ----
     INDEX_CARD_SEL = "div.mkdf-ips-item-content"

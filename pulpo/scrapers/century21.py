@@ -118,6 +118,7 @@ def _extract_results(html: str) -> list[dict]:
 
 class Century21Scraper:
     slug = "century21"
+    country = "SV"
     FIXTURE_FILE = "sample_listings.json"
 
     def __init__(self, offline: bool | None = None):
