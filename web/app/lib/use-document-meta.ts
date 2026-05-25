@@ -20,15 +20,30 @@
 import { useLayoutEffect } from "react";
 import type { Route } from "./url-routing";
 import type { Listing } from "../data/types";
+import { ACTIVE_COUNTRY } from "../config/countries";
 
 const SITE_NAME = "Pulpo";
+// PR-MC-4 — every "El Salvador" / "Salvadoran" string below is now a
+// read from ACTIVE_COUNTRY (the country selected at build time by
+// VITE_PULPO_ACTIVE_COUNTRY, default "SV"). The literal strings here
+// resolve to the SV deployment's copy when the active country is SV;
+// switching the deployment's env var to a new country produces the
+// matching localized copy automatically.
+const COUNTRY_EN = ACTIVE_COUNTRY.name_en;
+const COUNTRY_ES = ACTIVE_COUNTRY.name_es;
+const COUNTRY_ADJECTIVE_EN = ACTIVE_COUNTRY.name_adjective_en ?? ACTIVE_COUNTRY.name_en;
+// OG locale tag is `<lang>_<COUNTRY-CC>` — Open Graph spec uses
+// `es_SV` shape, not BCP-47's `es-SV` hyphen form.
+const OG_LOCALE_ES = `es_${ACTIVE_COUNTRY.code}`;
+const OG_LOCALE_EN = `en_${ACTIVE_COUNTRY.code === "SV" ? "US" : ACTIVE_COUNTRY.code}`;
+
 // Rewrite Phase 8 — homepage description now aligns with the new hero
-// copy ("Every beach and lake home in El Salvador, ranked by value")
+// copy ("Every beach and lake home in {country}, ranked by value")
 // while remaining accurate for the legacy homepage during the rollout
 // window. Both versions surface beach + lake properties + a value
 // ranking; the copy works regardless of which UI a SERP click lands on.
-const SITE_DESCRIPTION_EN = "Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week.";
-const SITE_DESCRIPTION_ES = "Cada casa de playa y lago en El Salvador, ordenada por valor. Explora cientos de propiedades verificadas de playa y lago — y recibe las 10 mejores en tu correo cada semana.";
+const SITE_DESCRIPTION_EN = `Every beach and lake home in ${COUNTRY_EN}, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week.`;
+const SITE_DESCRIPTION_ES = `Cada casa de playa y lago en ${COUNTRY_ES}, ordenada por valor. Explora cientos de propiedades verificadas de playa y lago — y recibe las 10 mejores en tu correo cada semana.`;
 
 // One brand image for sections; listing detail uses the listing's first
 // photo. The brand image lives next to the legacy assets and is also
@@ -60,11 +75,11 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
     if (cat === "beachfront") {
       return {
         title: isEs
-          ? "Terrenos frente al mar en El Salvador — Pulpo"
-          : "Beachfront land for sale in El Salvador — Pulpo",
+          ? `Terrenos frente al mar en ${COUNTRY_ES} — Pulpo`
+          : `Beachfront land for sale in ${COUNTRY_EN} — Pulpo`,
         description: isEs
-          ? "Explora terrenos frente al mar en El Salvador, titulados y off-market, en un solo lugar."
-          : "Browse Salvadoran beachfront land — titled and off-market — in one place.",
+          ? `Explora terrenos frente al mar en ${COUNTRY_ES}, titulados y off-market, en un solo lugar.`
+          : `Browse ${COUNTRY_ADJECTIVE_EN} beachfront land — titled and off-market — in one place.`,
         image: BRAND_OG_IMAGE,
         canonicalPath: "/browse?cat=beachfront",
       };
@@ -72,8 +87,8 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
     if (cat === "build_ready") {
       return {
         title: isEs
-          ? "Terrenos listos para construir en El Salvador — Pulpo"
-          : "Build-ready land for sale in El Salvador — Pulpo",
+          ? `Terrenos listos para construir en ${COUNTRY_ES} — Pulpo`
+          : `Build-ready land for sale in ${COUNTRY_EN} — Pulpo`,
         description: isEs
           ? "Terrenos con servicios y acceso vial, listos para construir. Curado por Pulpo."
           : "Plots with utilities and road access — build-ready. Curated by Pulpo.",
@@ -84,8 +99,8 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
     if (cat === "off_market") {
       return {
         title: isEs
-          ? "Ofertas off-market en El Salvador — Pulpo"
-          : "Off-market deals in El Salvador — Pulpo",
+          ? `Ofertas off-market en ${COUNTRY_ES} — Pulpo`
+          : `Off-market deals in ${COUNTRY_EN} — Pulpo`,
         description: isEs
           ? "Acceso a tratos off-market que no aparecen en otros portales. Pulpo Pro."
           : "Access off-market deals not listed publicly elsewhere. Pulpo Pro.",
@@ -96,7 +111,7 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
     return {
       title: isEs
         ? "Explorar terrenos frente al mar y off-market — Pulpo"
-        : "Browse Salvadoran beachfront, build-ready & off-market land — Pulpo",
+        : `Browse ${COUNTRY_ADJECTIVE_EN} beachfront, build-ready & off-market land — Pulpo`,
       description: isEs ? SITE_DESCRIPTION_ES : SITE_DESCRIPTION_EN,
       image: BRAND_OG_IMAGE,
       canonicalPath: "/browse",
@@ -135,8 +150,8 @@ function metaForSection(route: Route, locale: "en" | "es", search: string): Meta
   // home
   return {
     title: isEs
-      ? "Pulpo — Casas y terrenos de playa y lago en El Salvador, ordenados por valor"
-      : "Pulpo — Beach and lake homes in El Salvador, ranked by value",
+      ? `Pulpo — Casas y terrenos de playa y lago en ${COUNTRY_ES}, ordenados por valor`
+      : `Pulpo — Beach and lake homes in ${COUNTRY_EN}, ranked by value`,
     description: isEs ? SITE_DESCRIPTION_ES : SITE_DESCRIPTION_EN,
     image: BRAND_OG_IMAGE,
     canonicalPath: "/",
@@ -149,11 +164,12 @@ function metaForListing(listing: Listing, locale: "en" | "es"): Meta {
   const descField = listing.description?.[locale] ?? listing.description?.en ?? "";
   const zone = listing.zone_name || (listing.region ?? "");
 
+  const countryName = isEs ? COUNTRY_ES : COUNTRY_EN;
   const title = titleField
-    ? `${titleField} — ${zone ? zone + ", " : ""}El Salvador — Pulpo`
+    ? `${titleField} — ${zone ? zone + ", " : ""}${countryName} — Pulpo`
     : isEs
-      ? `Anuncio en ${zone || "El Salvador"} — Pulpo`
-      : `Listing in ${zone || "El Salvador"} — Pulpo`;
+      ? `Anuncio en ${zone || COUNTRY_ES} — Pulpo`
+      : `Listing in ${zone || COUNTRY_EN} — Pulpo`;
 
   const description = descField
     ? descField.length > 200 ? descField.slice(0, 197) + "…" : descField
@@ -215,7 +231,7 @@ function applyMeta(meta: Meta, locale: "en" | "es") {
   setMeta("property", "og:image", new URL(meta.image, ORIGIN).toString());
   setMeta("property", "og:type", "website");
   setMeta("property", "og:site_name", SITE_NAME);
-  setMeta("property", "og:locale", locale === "es" ? "es_SV" : "en_US");
+  setMeta("property", "og:locale", locale === "es" ? OG_LOCALE_ES : OG_LOCALE_EN);
 
   setMeta("name", "twitter:card", "summary_large_image");
   setMeta("name", "twitter:title", meta.title);

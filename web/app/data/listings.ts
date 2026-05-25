@@ -18,6 +18,7 @@
 
 import type { DiscoveryTag, Listing, MasterCategory, Subcategory } from "./types";
 import { decodeHtmlEntities } from "./decode-html";
+import { ACTIVE_COUNTRY } from "../config/countries";
 
 const VALID_MASTER_CATEGORIES: ReadonlySet<MasterCategory> = new Set(["beach", "lake"]);
 const VALID_SUBCATEGORIES:     ReadonlySet<Subcategory>    = new Set(["homes", "condos", "land"]);
@@ -245,8 +246,10 @@ export function adaptListing(raw: any): Listing {
     url_language: urlLanguage,
     zone_name: pretty(raw.zone, ZONE_NAMES),
     region: department,
-    country: typeof raw.country === "string" ? raw.country : "SV",
-    province_state: department ? `${department}, El Salvador` : "El Salvador",
+    country: typeof raw.country === "string" ? raw.country : ACTIVE_COUNTRY.code,
+    province_state: department
+      ? `${department}, ${ACTIVE_COUNTRY.name_en}`
+      : ACTIVE_COUNTRY.name_en,
     land_type: deriveLandType(raw, typeof raw.property_type === "string" ? raw.property_type : null),
     size_m2: typeof raw.area_m2 === "number" ? raw.area_m2 : null,
     price: typeof raw.price_usd === "number" ? raw.price_usd : null,

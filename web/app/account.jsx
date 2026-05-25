@@ -9,6 +9,7 @@ import { startStripeCheckout } from "./auth/stripe-checkout.js";
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 import { COUNTRIES } from "./lib/countries.js";
+import { ACTIVE_COUNTRY } from "./config/countries";
 import { track } from "./telemetry/hook";
 import {
   PREFERENCE_CATEGORY_KEYS,
@@ -193,7 +194,12 @@ function ProfileSection({ app }) {
   const initial = {
     name: app.user.name || "",
     email: app.user.email || "",
-    country: app.user.country || "SV",
+    // PR-MC-4 — the user-profile country default is the active
+    // deployment's country (was hardcoded "SV"). Users without a
+    // saved country are most likely from the country whose
+    // subdomain they're browsing; a multi-country traveler can
+    // override anytime via the picker.
+    country: app.user.country || ACTIVE_COUNTRY.code,
     language: app.locale,
   };
   const [values, setValues] = aUseState(initial);

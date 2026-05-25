@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { t, tr, LOCALES } from "./i18n.jsx";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
+import { ACTIVE_COUNTRY } from "./config/countries";
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
@@ -1550,7 +1551,7 @@ function ListingJsonLd({ listing, locale }) {
       image: photos.length ? photos : undefined,
       address: {
         "@type": "PostalAddress",
-        addressCountry: "SV",
+        addressCountry: listing.country || ACTIVE_COUNTRY.code,
         addressRegion: listing.region || undefined,
         addressLocality: listing.zone_name || undefined,
       },
@@ -1558,7 +1559,7 @@ function ListingJsonLd({ listing, locale }) {
         ? {
             "@type": "Offer",
             price: listing.price,
-            priceCurrency: "USD",
+            priceCurrency: ACTIVE_COUNTRY.currency,
             availability: "https://schema.org/InStock",
           }
         : undefined,
