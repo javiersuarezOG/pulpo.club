@@ -94,6 +94,20 @@ test.describe("New app boots cleanly on key routes", () => {
     // Detail overlay mounts with .detail-panel.
     await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
 
+    // PriceContextBlock smoke — appears whenever the listing has a
+    // price_per_m2 (Mode A or B). A real Pro-seeded listing from
+    // ranked.json effectively always has it. We don't pin the tone
+    // (A: success|neutral|amber) because that's data-dependent; just
+    // assert the block mounts and renders one of its two valid bodies.
+    const priceContext = page.locator(".price-context");
+    if (await priceContext.count() > 0) {
+      await priceContext.first().waitFor({ state: "visible", timeout: 3_000 });
+      const hasPill        = await priceContext.locator(".price-context__pill").count();
+      const hasUnavailable = await priceContext.locator(".price-context__unavailable").count();
+      expect(hasPill + hasUnavailable,
+        ".price-context mounted without either a pill or an unavailable note").toBeGreaterThan(0);
+    }
+
     // Try opening the lightbox via the first non-locked thumbnail
     // (anonymous users have the main photo + thumb 0/1 unlocked; thumbs
     // 2+ are sign-up gated). If no thumbnails render, skip the
@@ -512,6 +526,15 @@ test.describe("New app boots cleanly on key routes", () => {
       // "Show missing details" opt-in chip. Both must localize.
       "Not shared",                                   // value.notshared.short
       "Show missing details",                         // filter.show_incomplete
+      // PriceContextBlock — "How this price compares" zone-context block
+      // on the detail page. Renders for any listing with price_per_m2,
+      // so an anon visitor opening a card from /browse exercises it.
+      "How this price compares",                      // detail.price_context.header
+      "cheaper than typical",                         // detail.price_context.below_avg (snippet)
+      "About average for",                            // detail.price_context.near_avg (snippet)
+      "above average for",                            // detail.price_context.above_avg (snippet)
+      "Compared to",                                  // detail.price_context.caption (snippet)
+      "Not enough listings",                          // detail.price_context.unavailable (snippet)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
