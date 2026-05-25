@@ -21,6 +21,7 @@
     "@clerk/localizations": "^4.6.6",
     "@clerk/react": "^6.6.1",
     "@vercel/blob": "^2.4.0",
+    "@vercel/og": "^0.11.1",
     "posthog-js": "^1.372.9",
     "posthog-node": "^5.21.2",
     "react": "^18.3.1",
