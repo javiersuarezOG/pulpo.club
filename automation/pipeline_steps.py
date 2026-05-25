@@ -22,6 +22,7 @@ from pulpo.cli import _row, CSV_FIELDS
 from automation.validation import validate as _validate
 from automation.field_audit import build_completeness_block
 from automation._atomic import atomic_write_json
+from pulpo.countries import active as _active_country, data_filename as _data_filename
 
 
 # ── Phase: normalize ──────────────────────────────────────────────────
@@ -138,8 +139,21 @@ def phase_write_outputs(
     web_data_dir.mkdir(parents=True, exist_ok=True)
     ranked_dicts = [li.to_dict() for li in ranked]
 
+    # PR-MC-3 — dual-write each public-facing output: the legacy unified
+    # filename (e.g. ranked.json) AND the per-country variant
+    # (ranked.SV.json). The two files carry identical bytes today. When
+    # PR-MC-4 switches the frontend to read the per-country file, the
+    # unified one becomes deprecated; PR-MC-5's nightly matrix then
+    # produces per-country files for every PULPO_COUNTRIES entry and
+    # the legacy unified file goes away. Code below stays bit-stable
+    # for the single-country-per-deployment case (PULPO_ACTIVE_COUNTRY
+    # default = "SV"), so reviewers can confirm SV ranked.json matches
+    # the previous run by diffing the legacy file directly.
+    active_cc = _active_country().code
+
     _write_csv(ranked, samples_path)
     _write_ranked_json(ranked_dicts, web_data_dir / "ranked.json")
+    _write_ranked_json(ranked_dicts, web_data_dir / _data_filename("ranked.json", active_cc))
     # PR-perf-3b — emit a slim projection of ranked.json with ONLY the
     # fields the web/app/data/listings.ts adapter consumes. Drops broker
     # contact, validation metadata, hires sidecar fields, raw scraper
@@ -152,6 +166,7 @@ def phase_write_outputs(
     # slim shape — heavy fields it reads (description, reasons_to_buy)
     # stay in the slim file.
     _write_ranked_list_json(ranked_dicts, web_data_dir / "ranked.list.json")
+    _write_ranked_list_json(ranked_dicts, web_data_dir / _data_filename("ranked.list.json", active_cc))
 
     source_status = _compute_source_status(sources, per_source_count, source_errors)
     meta = _build_meta(
@@ -163,7 +178,12 @@ def phase_write_outputs(
         dropped=dropped, validation_by_type=validation_by_type,
     )
     atomic_write_json(web_data_dir / "last_updated.json", meta, indent=2)
+    atomic_write_json(web_data_dir / _data_filename("last_updated.json", active_cc), meta, indent=2)
 
+    # run_history.json stays single-file (audit log spans countries).
+    # When multiple countries run in the PR-MC-5 matrix, each shard
+    # appends its row to this same file with the country code in the
+    # row payload (a follow-up will add the field).
     _append_run_history(
         web_data_dir / "run_history.json",
         finished=finished, ranked_count=len(ranked), dropped=dropped,

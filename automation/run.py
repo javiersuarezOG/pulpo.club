@@ -2055,9 +2055,25 @@ def main() -> int:
     # Cron-stable Discover hero pool. Writes web/data/featured.json
     # with { tier, pool: [...], ... }. Non-fatal: a missing file just
     # lets the FE fall back to a client-side pick.
+    #
+    # PR-MC-3 — also writes featured.<cc>.json so PR-MC-4 can switch
+    # the frontend to the per-country file. Both files carry identical
+    # bytes today; the legacy unified file goes away in PR-MC-5.
     try:
         from pulpo.featured_listing import write_featured_json
+        from pulpo.countries import active as _active_country
+        from pulpo.countries import data_filename as _data_filename
+        active_cc = _active_country().code
         pool = write_featured_json(web_data_dir / "featured.json", ranked)
+        # Mirror the same content to the per-country file. We re-call
+        # write_featured_json because the function writes from scratch
+        # (idempotent, no in-memory pool to reuse); the small extra
+        # cost (sorting + serializing the catalog again) is dwarfed by
+        # the rest of the nightly.
+        write_featured_json(
+            web_data_dir / _data_filename("featured.json", active_cc),
+            ranked,
+        )
         if pool is not None:
             top = pool.entries[0]
             print(f"[featured] tier={pool.tier} pool_size={len(pool.entries)} "
