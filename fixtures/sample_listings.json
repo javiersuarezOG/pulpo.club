@@ -494,5 +494,55 @@
     "bathrooms": 2.0,
     "built_area_m2": 95.0,
     "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "elagente",
+    "source_id": "terreno-lago-de-coatepeque",
+    "url": "https://www.elagenteinmobiliario.com/propiedad/terreno-lago-de-coatepeque",
+    "title": "Terreno Lago de Coatepeque",
+    "price_usd": 295000.0,
+    "raw_price_text": "$295,000",
+    "raw_size_text": "8000 m2",
+    "location_text": "Lago de Coatepeque, El Salvador",
+    "description": "Espectacular terreno en venta para realizar caminatas, ciclismo de montana, lago de coatepeque.",
+    "property_type": "land",
+    "photo_urls": [
+      "https://www.elagenteinmobiliario.com/wp-content/uploads/2024/01/sample-coatepeque.jpeg"
+    ],
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "elagente",
+    "source_id": "complejo-bahia-dorada-la-libertad",
+    "url": "https://www.elagenteinmobiliario.com/propiedad/complejo-bahia-dorada-la-libertad",
+    "title": "Complejo Bahia Dorada La Libertad",
+    "price_usd": 480000.0,
+    "raw_price_text": "$480,000",
+    "raw_size_text": "1200 m2",
+    "location_text": "La Libertad, El Salvador",
+    "description": "Lote frente al mar en complejo Bahia Dorada La Libertad.",
+    "property_type": "land",
+    "photo_urls": [
+      "https://www.elagenteinmobiliario.com/wp-content/uploads/2024/06/sample-bahia.jpg"
+    ],
+    "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "elagente",
+    "source_id": "rancho-de-playa-frente-al-estero-jaltepeque",
+    "url": "https://www.elagenteinmobiliario.com/propiedad/rancho-de-playa-frente-al-estero-jaltepeque",
+    "title": "Rancho de playa frente al estero Jaltepeque",
+    "price_usd": 250000.0,
+    "raw_price_text": "$250,000",
+    "raw_size_text": "400 m2",
+    "location_text": "Jaltepeque, Costa del Sol, La Paz, El Salvador",
+    "description": "Casa frente al mar con acceso al estero Jaltepeque playa costa del sol.",
+    "property_type": "house",
+    "photo_urls": [
+      "https://www.elagenteinmobiliario.com/wp-content/uploads/2024/03/sample-jaltepeque.jpg"
+    ],
+    "bedrooms": 3,
+    "bathrooms": 2.0,
+    "scraped_at": "2026-05-25T00:00:00Z"
   }
 ]

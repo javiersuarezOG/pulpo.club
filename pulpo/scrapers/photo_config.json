@@ -17,6 +17,11 @@
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
+    "elagente": {
+      "full_res": { "strategy": "noop" },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
     "encuentra24": {
       "full_res": { "strategy": "noop" },
       "min_source_long_side_px": 1080,
