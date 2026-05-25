@@ -558,6 +558,7 @@ jobs:
           git config user.name "pulpo-bot"
           git config user.email "bot@pulpo.club"
           git add web/data/ranked.json \
+                  web/data/ranked.list.json \
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
                   samples/ranked.csv
