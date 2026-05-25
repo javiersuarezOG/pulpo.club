@@ -51,7 +51,7 @@
     { "source": "/admin",                   "destination": "/web/dist/index.html" },
     { "source": "/admin/:widget",           "destination": "/web/dist/index.html" },
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
-    { "source": "/l/:token",                "destination": "/api/l/[token]?token=:token" },
+    { "source": "/l/:token",                "destination": "/api/l/:token" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/web/dist/index.html" }
   ],

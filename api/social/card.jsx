@@ -21,8 +21,13 @@
 // is regenerated nightly and its CDN cache rolls over, so the next
 // crawler fetch picks up fresh data on stale-while-revalidate.
 
+import React from "react";
 import { ImageResponse } from "@vercel/og";
 
+// Vercel API functions use the classic JSX runtime by default (no
+// automatic-import). `import React` here is mandatory for esbuild to
+// resolve the JSX factory; without it the deploy build errors out with
+// "React is not defined" before the function ever boots.
 export const config = { runtime: "edge" };
 
 // Same alphabet check as web/app/lib/share.ts. Keep in sync.
