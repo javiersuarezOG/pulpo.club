@@ -818,6 +818,10 @@ const UI_STRINGS = {
   "card.heart.remove":       { en: "Remove from saved",             es: "Quitar de guardados" },
   "card.photo.prev":         { en: "Previous photo",                es: "Foto anterior" },
   "card.photo.next":         { en: "Next photo",                    es: "Foto siguiente" },
+  // Pinned-card tag for share-link landings (BrowsePage reads ?pin).
+  // Renders only on the one card the share recipient was sent to; the
+  // moment they filter/sort/close the panel the tag and ?pin both clear.
+  "card.shared_pill":        { en: "Shared with you",               es: "Compartido contigo" },
 
   // DataFetchFailed — hard error UI shown when /data/ranked.json
   // doesn't load. Was full English; same i18n sweep.
