@@ -99,20 +99,36 @@ def test_bucket_key_defaults_property_type_to_land():
 
 # ── compute_zone_medians ───────────────────────────────────────────────
 
+def _bucket(median: float, *, mn: float | None = None,
+            mx: float | None = None, n: int = MIN_LISTINGS_PER_ZONE) -> dict:
+    """Build a bucket-stats dict for apply_zone_metrics tests. Defaults keep
+    min/max equal to the median when callers only care about pct semantics."""
+    return {
+        "median": median,
+        "min":    median if mn is None else mn,
+        "max":    median if mx is None else mx,
+        "n":      n,
+    }
+
+
 def test_compute_below_min_returns_empty():
     """Bucket with fewer than MIN_LISTINGS_PER_ZONE peers is excluded."""
     listings = [_li(price_per_m2=p) for p in [100, 200, 300]]   # n=3 < 10
-    medians = compute_zone_medians(listings)
-    assert medians == {}
+    stats = compute_zone_medians(listings)
+    assert stats == {}
 
 
-def test_compute_at_min_returns_median():
+def test_compute_at_min_returns_stats():
     listings = [_li(price_per_m2=p) for p in range(100, 100 + MIN_LISTINGS_PER_ZONE * 10, 10)]
     assert len(listings) == MIN_LISTINGS_PER_ZONE
-    medians = compute_zone_medians(listings)
-    assert ("el-tunco", "land") in medians
+    stats = compute_zone_medians(listings)
+    assert ("el-tunco", "land") in stats
+    bucket = stats[("el-tunco", "land")]
     # Even spread 100, 110, 120, ..., 190 → median is between 140 and 150
-    assert 140 <= medians[("el-tunco", "land")] <= 150
+    assert 140 <= bucket["median"] <= 150
+    assert bucket["min"] == 100.0
+    assert bucket["max"] == 190.0
+    assert bucket["n"]   == MIN_LISTINGS_PER_ZONE
 
 
 def test_compute_segments_by_property_type():
@@ -120,62 +136,90 @@ def test_compute_segments_by_property_type():
     land_listings  = [_li(price_per_m2=200) for _ in range(MIN_LISTINGS_PER_ZONE)]
     house_listings = [_li(price_per_m2=1000, property_type="house")
                       for _ in range(MIN_LISTINGS_PER_ZONE)]
-    medians = compute_zone_medians(land_listings + house_listings)
-    assert medians[("el-tunco", "land")]  == 200.0
-    assert medians[("el-tunco", "house")] == 1000.0
+    stats = compute_zone_medians(land_listings + house_listings)
+    assert stats[("el-tunco", "land")]["median"]  == 200.0
+    assert stats[("el-tunco", "house")]["median"] == 1000.0
 
 
 def test_compute_excludes_sold_listings():
     listings  = [_li(price_per_m2=100) for _ in range(MIN_LISTINGS_PER_ZONE)]
     listings += [_li(price_per_m2=999, is_sold=True) for _ in range(20)]
-    medians = compute_zone_medians(listings)
-    # Sold listings excluded → median should be ~100
-    assert medians[("el-tunco", "land")] == 100.0
+    stats = compute_zone_medians(listings)
+    # Sold listings excluded → median + max should be ~100, not 999
+    bucket = stats[("el-tunco", "land")]
+    assert bucket["median"] == 100.0
+    assert bucket["max"]    == 100.0
 
 
 def test_compute_excludes_stale_listings():
     listings  = [_li(price_per_m2=100) for _ in range(MIN_LISTINGS_PER_ZONE)]
     listings += [_li(price_per_m2=999, days_listed=400) for _ in range(20)]
-    medians = compute_zone_medians(listings)
-    assert medians[("el-tunco", "land")] == 100.0
+    stats = compute_zone_medians(listings)
+    assert stats[("el-tunco", "land")]["median"] == 100.0
+
+
+def test_compute_min_max_and_n_populated():
+    """min/max/n surfaced alongside median for the detail-page context block."""
+    ppm_values = [50, 80, 100, 120, 150, 180, 200, 220, 250, 300, 350, 500]
+    listings = [_li(price_per_m2=p) for p in ppm_values]
+    stats = compute_zone_medians(listings)
+    bucket = stats[("el-tunco", "land")]
+    assert bucket["min"] == 50.0
+    assert bucket["max"] == 500.0
+    assert bucket["n"]   == 12
 
 
 # ── apply_zone_metrics ─────────────────────────────────────────────────
 
 def test_apply_signs_pct_correctly():
     """Positive pct = above median; negative = below."""
-    bucket_medians = {("el-tunco", "land"): 200.0}
+    stats = {("el-tunco", "land"): _bucket(200.0)}
     listings = [
         _li(price_per_m2=200),   # at median → 0%
         _li(price_per_m2=240),   # +20% above
         _li(price_per_m2=160),   # -20% below
     ]
-    apply_zone_metrics(listings, bucket_medians)
+    apply_zone_metrics(listings, stats)
     assert listings[0]["price_vs_zone_pct"] == 0.0
     assert listings[1]["price_vs_zone_pct"] == 20.0
     assert listings[2]["price_vs_zone_pct"] == -20.0
 
 
 def test_apply_sets_median_field_too():
-    bucket_medians = {("el-tunco", "land"): 175.5}
+    stats = {("el-tunco", "land"): _bucket(175.5)}
     li = _li(price_per_m2=200)
-    apply_zone_metrics([li], bucket_medians)
+    apply_zone_metrics([li], stats)
     assert li["price_vs_zone_median"] == 175.5
 
 
+def test_apply_sets_zone_distribution_fields():
+    """min/max/comp_count copied onto every eligible listing."""
+    stats = {("el-tunco", "land"): _bucket(150.0, mn=50.0, mx=500.0, n=14)}
+    listings = [_li(price_per_m2=200), _li(price_per_m2=120)]
+    apply_zone_metrics(listings, stats)
+    for li in listings:
+        assert li["zone_price_per_m2_min"] == 50.0
+        assert li["zone_price_per_m2_max"] == 500.0
+        assert li["zone_comp_count"]       == 14
+
+
 def test_apply_skips_listings_with_no_bucket_median():
-    """Bucket not in medians dict → both fields stay None."""
+    """Bucket not in stats dict → all fields stay None."""
     listings = [_li(zone="rare-zone", price_per_m2=100)]
     metrics = apply_zone_metrics(listings, {})
-    assert listings[0]["price_vs_zone_median"] is None
-    assert listings[0]["price_vs_zone_pct"] is None
+    li = listings[0]
+    assert li["price_vs_zone_median"]    is None
+    assert li["price_vs_zone_pct"]       is None
+    assert li.get("zone_price_per_m2_min") is None
+    assert li.get("zone_price_per_m2_max") is None
+    assert li.get("zone_comp_count")       is None
     assert metrics["listings_skipped_no_bucket_median"] == 1
 
 
 def test_apply_skips_inactive_listings():
     listings = [_li(price_per_m2=None), _li(is_sold=True),
                 _li(price_per_m2=100)]
-    metrics = apply_zone_metrics(listings, {("el-tunco", "land"): 100.0})
+    metrics = apply_zone_metrics(listings, {("el-tunco", "land"): _bucket(100.0)})
     assert metrics["listings_skipped_inactive"] == 2
     assert metrics["listings_scored"] == 1
 

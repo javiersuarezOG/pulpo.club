@@ -239,6 +239,14 @@ class Listing:
     price_vs_zone_median: Optional[float] = None  # USD/m² median of bucket peers
     price_vs_zone_pct: Optional[float] = None     # signed % vs. bucket median (negative=cheaper)
 
+    # Zone-distribution context for the detail-page "How this price compares"
+    # block. Same eligibility as price_vs_zone_median (bucket ≥ 10 active
+    # comps). min/max are computed but NOT displayed today — held back for a
+    # future visualization. zone_comp_count powers the "Based on N" caption.
+    zone_price_per_m2_min: Optional[float] = None  # lowest $/m² in bucket
+    zone_price_per_m2_max: Optional[float] = None  # highest $/m² in bucket
+    zone_comp_count: Optional[int] = None          # n peers in the bucket
+
     # PRD §FR-5.5 distance fields (Phase 3) — populated either via haversine
     # from lat/lng (preferred) or via the per-zone airport distance table
     # in pulpo/airports.py (fallback for listings without coords). The

@@ -35,6 +35,29 @@ export type Listing = {
   price: number | null;
   previous_price: number | null;
   price_per_m2: number | null;
+  /** Zone slug (e.g. "el-tunco"). Source of truth for the (zone,
+   *  property_type) comp-pool keying in automation/zone_medians.py.
+   *  Distinct from `zone_name`, which is the pretty display label. */
+  zone: string | null;
+  /** Cheapness percentile within the (zone, property_type) bucket, 0..100.
+   *  Lower = cheaper. Cascades zone → macro → global at MIN_COMPS=3, so
+   *  this is set more broadly than price_vs_zone_pct. */
+  zone_percentile: number | null;
+  /** Median $/m² of the (zone, property_type) bucket. null when the
+   *  bucket has < 10 active comparable peers (no cascade — see
+   *  automation/zone_medians.py:MIN_LISTINGS_PER_ZONE). */
+  price_vs_zone_median: number | null;
+  /** Signed % difference vs. price_vs_zone_median (negative = cheaper). */
+  price_vs_zone_pct: number | null;
+  /** Lowest $/m² in the same bucket — held for a future visualization;
+   *  not displayed in any UI today. */
+  zone_price_per_m2_min: number | null;
+  /** Highest $/m² in the same bucket — held for a future visualization;
+   *  not displayed in any UI today. */
+  zone_price_per_m2_max: number | null;
+  /** Number of peers in the bucket. Powers the "Based on N similar
+   *  listings in {zone}" caption on the PriceContextBlock. */
+  zone_comp_count: number | null;
   /** Gallery photos at the broker's native resolution. Excludes the
    *  local thumbnail (which lives at `thumbnail_url`, sized for cards) —
    *  putting both in the same array used to surface the same picture
