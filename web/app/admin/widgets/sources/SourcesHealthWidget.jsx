@@ -151,6 +151,14 @@ const STYLES = `
   color: var(--ink-3);
   margin: 0 0 12px;
 }
+/* Plain-text counts inside the upper-case mono title — explicitly lower-
+   case so the "(797 user-visible, 79 hidden)" reads as normal English
+   rather than mono-uppercase pseudo-code. */
+.sw-mix-subnote {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-sans);
+}
 .sw-mix {
   display: grid;
   grid-template-columns: 1fr;
@@ -453,12 +461,24 @@ function lastGreenTs(rows) {
 function aggregate(listings) {
   const geo  = { beach: 0, inland: 0, lake: 0 };
   const type = { land: 0, house: 0, condo: 0 };
+  let incomplete = 0;
   for (const r of listings) {
     geo[classifyGeo(r)] = (geo[classifyGeo(r)] || 0) + 1;
     const t = r.property_type;
     if (t && type[t] != null) type[t] += 1;
+    // is_incomplete = listings the homepage filter hides by default
+    // (web/app/pages.jsx::applyFilters). Tracking it here so the
+    // admin header can show both the ingested count (operator-facing,
+    // "how much inventory did we pull?") AND the user-visible count
+    // (audience-facing, "how many can a buyer actually browse?").
+    if (r.is_incomplete) incomplete += 1;
   }
-  return { geo, type, total: listings.length };
+  return {
+    geo, type,
+    total: listings.length,
+    incomplete,
+    visible: listings.length - incomplete,
+  };
 }
 
 function formatRelative(iso) {
@@ -728,9 +748,20 @@ export function SourcesHealthWidget() {
           <span className="dot" />
           <span className="big">
             {state.lastUpdated && state.lastUpdated.total_listings != null
-              ? `${state.lastUpdated.total_listings} listings`
+              ? `${state.lastUpdated.total_listings} ingested`
               : "no data yet"}
           </span>
+          {/* Inventory breakdown — ingested vs user-visible. Both numbers
+              are real: ingested = what the nightly pulled + ranked;
+              visible = what /browse and /discover show by default
+              (web/app/pages.jsx::applyFilters drops `is_incomplete=true`).
+              Showing both prevents the "why does the homepage show fewer
+              listings than the admin tool?" question. */}
+          {totals.total > 0 && totals.incomplete > 0 && (
+            <span className="meta">
+              <strong>{totals.visible}</strong> user-visible · <strong>{totals.incomplete}</strong> hidden as incomplete
+            </span>
+          )}
           <span className="meta">
             {state.lastUpdated && state.lastUpdated.started_at && (
               <>last nightly <strong>{formatRelative(state.lastUpdated.started_at)}</strong></>
@@ -757,7 +788,14 @@ export function SourcesHealthWidget() {
       {/* Section 2 — supply mix */}
       {totals.total > 0 && (
         <div className="sw-card">
-          <p className="sw-mix-title">Supply mix · {totals.total} listings</p>
+          <p className="sw-mix-title">
+            Supply mix · {totals.total} ingested
+            {totals.incomplete > 0 && (
+              <span className="sw-mix-subnote">
+                {" "}({totals.visible} user-visible, {totals.incomplete} hidden as incomplete)
+              </span>
+            )}
+          </p>
           <div className="sw-mix">
             <SupplyBlock label="Geography" order={GEO_ORDER}  counts={totals.geo}  labels={GEO_LABEL}  total={totals.total} size={64} />
             <SupplyBlock label="Type"      order={TYPE_ORDER} counts={totals.type} labels={TYPE_LABEL} total={totals.total} size={64} />
