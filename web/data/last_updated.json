@@ -1,16 +1,16 @@
 {
-  "last_updated": "2026-05-25T01:47:31.294966+00:00",
-  "started_at": "2026-05-25T00:21:28.530024+00:00",
-  "duration_seconds": 5162.76,
-  "total_listings": 875,
+  "last_updated": "2026-05-25T07:50:24.038278+00:00",
+  "started_at": "2026-05-25T06:28:56.491117+00:00",
+  "duration_seconds": 4887.55,
+  "total_listings": 876,
   "dropped": 156,
   "per_source_raw": {
     "bienesraices": 568,
     "century21": 15,
     "citymax": 32,
     "elagente": 0,
-    "encuentra24": 30,
-    "essurf": 40,
+    "encuentra24": 29,
+    "essurf": 41,
     "goodlife": 71,
     "nexo": 9,
     "oceanside": 50,
@@ -53,12 +53,12 @@
     },
     "encuentra24": {
       "supplier": null,
-      "pulled": 30,
+      "pulled": 29,
       "max_pages_hit": false
     },
     "essurf": {
       "supplier": null,
-      "pulled": 40,
+      "pulled": 41,
       "max_pages_hit": false
     },
     "goodlife": {
@@ -91,13 +91,13 @@
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
     "previous_price": 0.0114,
-    "beachfront_tier_on_beach": 0.1303,
+    "beachfront_tier_on_beach": 0.1301,
     "beachfront_tier_walk_to_beach": 0.016,
-    "beachfront_tier_near_beach": 0.0263,
-    "land_type_commercial": 0.0949,
-    "land_type_tourist": 0.1131,
-    "land_type_residential": 0.792,
-    "is_motivated": 0.1623
+    "beachfront_tier_near_beach": 0.0274,
+    "land_type_commercial": 0.0947,
+    "land_type_tourist": 0.113,
+    "land_type_residential": 0.7922,
+    "is_motivated": 0.1621
   },
   "field_completeness": {
     "bienesraices": {
@@ -187,9 +187,9 @@
         "lat": 1.0,
         "lng": 1.0,
         "is_beachfront": 0.3,
-        "has_paved_access": 0.04,
+        "has_paved_access": 0.0,
         "has_water": 0.19,
-        "has_power": 0.07,
+        "has_power": 0.11,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -201,7 +201,7 @@
       }
     },
     "essurf": {
-      "n_listings": 39,
+      "n_listings": 40,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.9,
@@ -211,7 +211,7 @@
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.28,
+        "is_beachfront": 0.3,
         "has_paved_access": 0.0,
         "has_water": 0.0,
         "has_power": 0.0,
@@ -328,18 +328,18 @@
   },
   "property_type_counts": {
     "house": 107,
-    "land": 742,
+    "land": 743,
     "condo": 26
   },
   "validation_by_type": {
     "land": {
-      "pass": 821,
+      "pass": 822,
       "flag": 58,
       "drop": 24
     },
     "house": {
       "pass": 100,
-      "flag": 11,
+      "flag": 10,
       "drop": 13
     },
     "condo": {

@@ -44688,5 +44688,97 @@
     "cost_usd": 0.00150624,
     "finish_reason": "stop",
     "latency_ms": 5972
+  },
+  "encuentra24|30979582": {
+    "ts": "2026-05-25T07:46:22.327551+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Luxury Beachfront Home in Bahía Dorada",
+      "es": "Casa de Lujo Frente al Mar en Bahía Dorada"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exclusive beachfront property in the private condominium of Bahía Dorada, offering an unparalleled residential experience with panoramic ocean views and direct access to the beach just steps away. Set in a tranquil and privileged environment, this 2,090 v² lot with 951 m² of construction boasts an impressive facade, beautiful gardens, and modern architecture that blends elegance and functionality. Ideal for those seeking privacy, comfort, and connection with nature without sacrificing city amenities. Featuring high ceilings, top-quality finishes, and perfectly distributed spaces, the residence includes five spacious bedrooms, four parking spaces, and social areas designed for entertainment and relaxation. Enjoy a stunning infinity pool overlooking the sea. Price: $2,500,000 USD.",
+      "es": "Descubra una propiedad exclusiva frente al mar en el condominio privado Bahía Dorada, que ofrece una experiencia residencial inigualable con vistas panorámicas al océano y acceso directo a la playa a solo pasos. En un entorno tranquilo y privilegiado, este terreno de 2,090 v² con 951 m² de construcción destaca por su imponente fachada, hermosos jardines y arquitectura moderna que combina elegancia y funcionalidad. Ideal para quienes buscan privacidad, confort y contacto con la naturaleza sin renunciar a las comodidades de la ciudad. Con techos altos, acabados de primera calidad y espacios perfectamente distribuidos, la residencia cuenta con cinco amplias habitaciones, cuatro estacionamientos y áreas sociales diseñadas para el entretenimiento y la relajación. Disfrute de una impresionante piscina de borde infinito con vista al mar. Precio: $2,500,000 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in private condominium",
+        "es": "Ubicación frente al mar en condominio privado"
+      },
+      {
+        "en": "Panoramic ocean views and infinity pool",
+        "es": "Vistas panorámicas al océano y piscina infinita"
+      },
+      {
+        "en": "5 bedrooms, 4 parking spaces, 951 m² construction",
+        "es": "5 habitaciones, 4 estacionamientos, 951 m² de construcción"
+      },
+      {
+        "en": "Modern architecture with high-end finishes",
+        "es": "Arquitectura moderna con acabados de lujo"
+      },
+      {
+        "en": "Steps from the beach in a tranquil setting",
+        "es": "A pasos de la playa en un entorno tranquilo"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach (nearest named beach to Bahía Dorada)",
+    "url_language": "es",
+    "tokens_in": 2543,
+    "tokens_out": 701,
+    "cost_usd": 0.00145771,
+    "finish_reason": "stop",
+    "latency_ms": 7203
+  },
+  "encuentra24|32474127": {
+    "ts": "2026-05-25T07:46:24.394497+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Vista Infinita – Luxury Infinity Pool Home Overlooking the Pacific",
+      "es": "Vista Infinita – Casa de lujo con Infinity Pool sobre el Pacífico"
+    },
+    "short_description_canonical": {
+      "en": "Wake up to breathtaking ocean views every morning at Vista Infinita, a stunning modern luxury home perched above the port of La Libertad in the heart of Surf City, El Salvador. This one-of-a-kind property features a spectacular 20-meter infinity pool with LED lighting, perfect for enjoying unforgettable sunsets over the Pacific. Just 300 meters from Playa El Obispo, the location is ideal for surfers, investors, or a high-end Airbnb project. The home includes 2 bedrooms, a spacious living room with open designer kitchen, separate TV/entertainment room, and an additional lower-level room with expansion or rental potential. Smart home system with Alexa and app control, high-speed Starlink internet, air conditioning, ceiling fans, Dolby Surround, security cameras, Ring Doorbell, 85-inch Smart TV with streaming services, fully equipped luxury kitchen with dishwasher, microwave, electric and induction oven, refrigerator with ice maker, automatic coffee machine, water filtration system, hot water with rain shower, and private washer. Experience the ultimate coastal lifestyle at Vista Infinita.",
+      "es": "Despierta cada mañana con impresionantes vistas al océano en Vista Infinita, una moderna casa de lujo ubicada sobre el puerto de La Libertad, en el corazón de Surf City, El Salvador. Esta propiedad única cuenta con una espectacular piscina infinita de aproximadamente 20 metros con iluminación LED, perfecta para disfrutar de atardeceres inolvidables sobre el Pacífico. A solo 300 metros de Playa El Obispo, la ubicación es ideal para surfistas, inversionistas o un proyecto Airbnb de lujo. La casa incluye 2 habitaciones, sala amplia con cocina abierta de diseño, sala de TV/entretenimiento separada, y una habitación adicional en el nivel inferior con potencial de expansión o renta. Sistema Smart Home con Alexa y control por app, Internet Starlink de alta velocidad, aire acondicionado, ventiladores de techo, sistema Dolby Surround, cámaras de seguridad, Ring Doorbell, Smart TV de 85 pulgadas con servicios de streaming, cocina de lujo totalmente equipada con lavaplatos, microondas, horno eléctrico e inducción, refrigeradora con Ice Maker, máquina de café automática, sistema de filtración de agua, agua caliente con ducha tipo lluvia y lavadora privada. Vive la experiencia costera definitiva en Vista Infinita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 meters from Playa El Obispo",
+        "es": "A 300 metros de Playa El Obispo"
+      },
+      {
+        "en": "20-meter infinity pool with LED lighting",
+        "es": "Piscina infinita de 20 metros con iluminación LED"
+      },
+      {
+        "en": "Panoramic ocean views to Punta Roca",
+        "es": "Vista panorámica al océano hasta Punta Roca"
+      },
+      {
+        "en": "Smart home with Alexa and app control",
+        "es": "Smart Home con Alexa y control por app"
+      },
+      {
+        "en": "High-speed Starlink internet",
+        "es": "Internet Starlink de alta velocidad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "tokens_in": 2689,
+    "tokens_out": 842,
+    "cost_usd": 0.00165223,
+    "finish_reason": "stop",
+    "latency_ms": 9270
   }
 }
