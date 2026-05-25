@@ -18,6 +18,7 @@ from automation.localities import (
     lookup_locality     as _lookup_locality,
     DEPT_LOOKUP, MUNI_LOOKUP, TOURIST_LOOKUP, _norm,
 )
+from pulpo.countries import active as _active_country
 
 # ---- Sold-listing detection ----
 # Goodlife (and other SV brokers) leave properties indexed indefinitely with
@@ -78,21 +79,16 @@ ZONE_PATTERNS: list[tuple[str, str, str, str]] = [
     (r"la\s*uni[oó]n",                          "la-union",          "La Unión",       "La Unión"),
 ]
 
-# Known El Salvador departments for structured-title validation
-_SV_DEPARTMENTS = {
-    "ahuachapán", "santa ana", "sonsonate", "chalatenango",
-    "la libertad", "san salvador", "cuscatlán", "la paz", "cabañas",
-    "san vicente", "usulután", "san miguel", "morazán", "la unión",
-}
-_DEPT_CANONICAL = {
-    "ahuachapán": "Ahuachapán", "santa ana": "Santa Ana",
-    "sonsonate": "Sonsonate",   "chalatenango": "Chalatenango",
-    "la libertad": "La Libertad", "san salvador": "San Salvador",
-    "cuscatlán": "Cuscatlán",   "la paz": "La Paz",
-    "cabañas": "Cabañas",       "san vicente": "San Vicente",
-    "usulután": "Usulután",     "san miguel": "San Miguel",
-    "morazán": "Morazán",       "la unión": "La Unión",
-}
+# Departments (or whatever the active country calls its first-level
+# admin subdivisions) for structured-title validation.
+#
+# PR-MC-1c — source of truth moved into pulpo/countries/<cc>.json
+# under the ``departments`` key (a normalized→canonical map).
+# _DEPT_CANONICAL is the full map; _SV_DEPARTMENTS is the
+# lowercase-key set (kept by legacy name for backward-compat with
+# existing imports). When the active country changes, both update.
+_DEPT_CANONICAL: dict[str, str] = _active_country().departments()
+_SV_DEPARTMENTS: set[str] = set(_DEPT_CANONICAL.keys())
 
 # Structured-title pattern: "Locality, Department, El Salvador"
 # Matches after a dash/preamble, not necessarily at string start.

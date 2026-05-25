@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from pulpo.agents import RANKER_LEGS, register
 from pulpo.airports import airport_bonus
+from pulpo.countries import active as _active_country
 
 if TYPE_CHECKING:
     from pulpo.models import Listing
@@ -10,24 +11,11 @@ if TYPE_CHECKING:
 # A: established, deep buyer pool, premium $/m², resilient through cycles.
 # B: secondary but proven; thicker discounts to A but real exit demand.
 # C: frontier; cheap but liquidity risk dominates for non-strategic buyers.
-ZONE_TIER = {
-    # A — Surf City core
-    "el-tunco":  "A",
-    "el-sunzal": "A",
-    "el-zonte":  "A",
-    # B — established secondary
-    "san-diego":          "B",
-    "la-libertad":        "B",
-    "puerto-la-libertad": "B",
-    "el-cuco":            "B",
-    "las-flores":         "B",
-    "mizata":             "B",
-    # C — frontier / interior / Gulf
-    "punta-mango": "C",
-    "el-espino":   "C",
-    "conchagua":   "C",
-    "la-union":    "C",
-}
+#
+# PR-MC-1c — source of truth moved into pulpo/countries/<cc>.json under
+# the ``zone_tier`` key. Read once at module import from the active
+# country's manifest.
+ZONE_TIER: dict[str, str] = _active_country().zone_tier()
 TIER_BASE = {"A": 85, "B": 65, "C": 45}
 UNKNOWN_TIER_BASE = 30
 

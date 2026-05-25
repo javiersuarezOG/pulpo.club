@@ -39,27 +39,18 @@ The location leg consumes this via airport_bonus(zone) below; it returns
 """
 from __future__ import annotations
 
+from pulpo.countries import active as _active_country
+
 # Distances per zone to each airport, in km.
-ZONE_AIRPORT_DISTANCES_KM: dict[str, dict[str, float]] = {
-    # Surf City core — within 60 km of SAL, far from AeP
-    "el-tunco":            {"SAL":  36.0, "AeP": 159.0},
-    "el-sunzal":           {"SAL":  37.0, "AeP": 160.0},
-    "el-zonte":            {"SAL":  43.0, "AeP": 165.0},
-    "san-diego":           {"SAL":  27.0, "AeP": 150.0},
-    "la-libertad":         {"SAL":  29.0, "AeP": 152.0},
-    "puerto-la-libertad":  {"SAL":  29.0, "AeP": 152.0},
-    # Next-wave west coast
-    "mizata":              {"SAL":  66.0, "AeP": 189.0},
-    # Eastern Pacific — Surf City Phase 2 corridor; AeP transforms these
-    "el-cuco":             {"SAL": 103.0, "AeP":  21.0},
-    "las-flores":          {"SAL": 100.0, "AeP":  27.0},
-    "punta-mango":         {"SAL": 105.0, "AeP":  23.0},
-    "el-espino":           {"SAL":  65.0, "AeP":  62.0},
-    "jiquilisco":          {"SAL":  61.0, "AeP":  62.0},
-    # Gulf of Fonseca — closest to AeP, far from SAL
-    "conchagua":           {"SAL": 130.0, "AeP":  15.0},
-    "la-union":            {"SAL": 132.0, "AeP":  19.0},
-}
+#
+# PR-MC-1c — source of truth moved into pulpo/countries/<cc>.json
+# under the ``airport_distances_km`` key. Read once at module import
+# from the active country's manifest (default: SV). Changing
+# PULPO_ACTIVE_COUNTRY between Python processes picks up the new
+# table; changing it mid-process won't propagate because Python
+# caches the import. Tests that need per-test active country use
+# monkeypatch + importlib.reload.
+ZONE_AIRPORT_DISTANCES_KM: dict[str, dict[str, float]] = _active_country().airport_distances_km()
 
 # Backward-compat shim: the old single-airport table. Some downstream
 # consumers (tests, audit scripts, prior commits in flight) may still
