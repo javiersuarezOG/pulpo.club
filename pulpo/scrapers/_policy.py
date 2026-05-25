@@ -83,6 +83,14 @@ POLICIES: dict[str, Policy] = {
         rate_limit_rps=0.5,
         user_agent_pool="safari_macos",
     ),
+    # elagente: WordPress Houzez archive + per-listing detail HTML
+    # parse. ~55 active listings = ~60 HTTP requests per nightly. Keep
+    # rps polite (0.5) so we don't trip the host's WAF.
+    "elagente":         Policy(
+        transport="httpx",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+    ),
 
     # --- encuent24: Playwright source, polite by default. Phase 3 will
     # widen its category set ~6x; the polite layer keeps that respectful.
