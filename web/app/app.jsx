@@ -184,12 +184,21 @@ function App() {
   // section underneath). Reset to false whenever the user navigates to a
   // section in-app; set true on cold-load entry.
   const coldEnteredDetailRef = useRef(_initialParsed.isListingPath);
-  // Set true when the user landed via a /l/<token> share URL. Distinct
-  // from coldEnteredDetailRef because closeListing should drop a share-
-  // landed user on /browse (catalogue, the whole point of the pin
-  // feature), NOT on / (the cold-detail fallback). One-shot: cleared
-  // on the first closeListing or on any in-app navigation.
-  const pinLandedRef = useRef(_initialParsed.pinListingId != null);
+  // Share-pin landing — the recipient hit either:
+  //   - /l/<token>     (parseLocation surfaces pinListingId)
+  //   - /browse?pin=X  (URL search param, used after the /l/ rewrite and
+  //                     also as a direct deep-link surface)
+  // In both cases closeListing should drop the user on /browse (the
+  // whole point of the pin feature) — NOT on / (the cold-detail
+  // fallback) and NOT history.back (would exit the site). One-shot:
+  // cleared on the first closeListing.
+  const _initialPinFromSearch = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    try { return new URLSearchParams(window.location.search).get("pin"); }
+    catch { return null; }
+  }, []);
+  const _initialPinId = _initialParsed.pinListingId || _initialPinFromSearch;
+  const pinLandedRef = useRef(_initialPinId != null);
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
@@ -224,7 +233,14 @@ function App() {
   const [clerkActions, setClerkActions] = useState(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [toast, setToast] = useState(null);
-  const [openListingId, setOpenListingId] = useState(_initialParsed.openListingId);
+  // openListingId seeds from /listing/<id> path OR /l/<token> decode
+  // (parseLocation handles both) OR a direct /browse?pin=<id> deep
+  // link. The last case is what makes a refresh-after-pin-rewrite work
+  // and what auto-opens the detail panel when a pin URL is shared
+  // verbatim without going through /l/.
+  const [openListingId, setOpenListingId] = useState(
+    _initialParsed.openListingId || _initialPinId,
+  );
   // Guard against re-entry on rapid backdrop taps / Esc-then-click.
   // history.back() is async — popstate fires next tick — so a second
   // call mid-flight would close more than one history entry.
@@ -333,10 +349,12 @@ function App() {
   // Share-pin landing — recipient hit /l/<token>. parseLocation already
   // returned route="browse" + openListingId set (so the catalogue mounts
   // behind the auto-opened detail panel), but the URL bar still shows
-  // /l/<token>. Rewrite to /browse?pin=<id> at mount so (a) the URL
-  // matches what the user sees, (b) BrowsePage's mount-time ?pin= read
-  // picks up the value, (c) a refresh keeps the same surface. One-shot.
-  useEffect(() => {
+  // /l/<token>. Rewrite to /browse?pin=<id> SYNCHRONOUSLY during the
+  // first render (via useMemo, not useEffect) so BrowsePage's
+  // mount-time `?pin` read sees the rewritten URL. A useEffect would
+  // fire AFTER BrowsePage's pUseState initializer, leaving its
+  // pinnedListingId state null and the pinned-card tag missing.
+  useMemo(() => {
     if (typeof window === "undefined") return;
     if (!_initialParsed.pinListingId) return;
     const target = `/browse?pin=${encodeURIComponent(_initialParsed.pinListingId)}`;
@@ -346,9 +364,24 @@ function App() {
       "",
       target,
     );
-    // Intentional one-shot — runs once at mount with the resolved
-    // _initialParsed. pinLandedRef stays true until closeListing clears it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // BrowsePage -> app shell: when BrowsePage's clearPin runs (invalid
+  // pin / user interaction), close the auto-opened detail panel. We
+  // also re-fire the listener when closeListing's own pinLandedRef
+  // branch dispatches the event — that's idempotent because
+  // setOpenListingId(null) is already null at that point. The ref clear
+  // ensures a fresh listing open later won't re-trigger the pin-close
+  // branch.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onCleared = () => {
+      pinLandedRef.current = false;
+      setOpenListingId(null);
+    };
+    window.addEventListener("pulpo:pin-cleared", onCleared);
+    return () => window.removeEventListener("pulpo:pin-cleared", onCleared);
   }, []);
 
   // Browser-default scrollRestoration is "auto" — it tries to restore a
@@ -967,13 +1000,16 @@ function App() {
       // pinLandedRef is one-shot and cleared here; coldEnteredDetailRef
       // is also true (parseLocation set isListingPath:true for /l/) so
       // we clear it too — otherwise the next listing open would think
-      // it's still a cold-entry.
+      // it's still a cold-entry. Dispatch pulpo:pin-cleared so
+      // BrowsePage drops the in-memory pin (its "Shared with you" tag
+      // disappears from the card).
       const fromPath = window.location.pathname + window.location.search;
       window.history.replaceState({ pulpo: true }, "", "/browse");
       pinLandedRef.current = false;
       coldEnteredDetailRef.current = false;
       setOpenListingId(null);
       setRoute("browse");
+      window.dispatchEvent(new CustomEvent("pulpo:pin-cleared"));
       track("route.changed", { from_path: fromPath, to_path: "/browse", trigger: "click" });
     } else if (coldEnteredDetailRef.current) {
       // User landed cold on /listing/:id — there's no source section
