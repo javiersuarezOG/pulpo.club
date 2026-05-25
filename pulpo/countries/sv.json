@@ -9,6 +9,18 @@
   "centroid_lat": 13.7942,
   "centroid_lng": -88.8965,
   "traditional_units": ["manzanas", "varas"],
+  "known_zones": [
+    { "name": "Surf City",          "region": "La Libertad" },
+    { "name": "El Tunco",           "region": "La Libertad" },
+    { "name": "El Zonte",           "region": "La Libertad" },
+    { "name": "Playa El Cuco",      "region": "San Miguel" },
+    { "name": "Punta Mango",        "region": "Usulután" },
+    { "name": "Conchagua",          "region": "La Unión" },
+    { "name": "Suchitoto",          "region": "Cuscatlán" },
+    { "name": "Ataco",              "region": "Ahuachapán" },
+    { "name": "Lago de Coatepeque", "region": "Santa Ana" },
+    { "name": "Juayúa",             "region": "Sonsonate" }
+  ],
   "listing_count_floor": 700,
   "listing_count_ceiling": 1300,
   "newsletter_audience_segment": "sv",

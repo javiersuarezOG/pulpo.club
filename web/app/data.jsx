@@ -16,24 +16,28 @@
 // gracefully via `tr()`'s default-locale handling — exactly what would happen
 // in a CMS where translators haven't filled in `es` yet.
 
-// All current inventory is in El Salvador. The schema keeps `country` as
-// ISO 3166 alpha-2 so adding a second country later is a data change, not a
-// refactor.
-const ZONES = [
-  { name: "Surf City",        region: "La Libertad",   country: "SV" },
-  { name: "El Tunco",         region: "La Libertad",   country: "SV" },
-  { name: "El Zonte",         region: "La Libertad",   country: "SV" },
-  { name: "Playa El Cuco",    region: "San Miguel",    country: "SV" },
-  { name: "Punta Mango",      region: "Usulután",      country: "SV" },
-  { name: "Conchagua",        region: "La Unión",      country: "SV" },
-  { name: "Suchitoto",        region: "Cuscatlán",     country: "SV" },
-  { name: "Ataco",            region: "Ahuachapán",    country: "SV" },
-  { name: "Lago de Coatepeque", region: "Santa Ana",   country: "SV" },
-  { name: "Juayúa",           region: "Sonsonate",     country: "SV" },
-];
+// PR-MC-zones — ZONES + COUNTRY_NAMES read from the active country's
+// manifest at module load. SV's manifest (web/app/config/countries/sv.json)
+// carries the same 10 known_zones the FE used to hardcode here, so the
+// rendered filter list is byte-identical on the SV deployment. A future
+// GT deployment supplies its own known_zones via gt.json and the filter
+// renders Guatemalan labels without touching this file.
+import { ACTIVE_COUNTRY } from "./config/countries";
 
+const ZONES = (ACTIVE_COUNTRY.known_zones || []).map((z) => ({
+  name: z.name,
+  region: z.region,
+  country: ACTIVE_COUNTRY.code,
+}));
+
+// Country-name map keyed by ISO code. In the single-country-per-
+// deployment model only the active country is populated; a future
+// multi-country UI extends this from a manifest registry.
 const COUNTRY_NAMES = {
-  SV: { en: "El Salvador", es: "El Salvador" },
+  [ACTIVE_COUNTRY.code]: {
+    en: ACTIVE_COUNTRY.name_en,
+    es: ACTIVE_COUNTRY.name_es,
+  },
 };
 
 // Curated Unsplash photos (land/ocean/jungle/farm) — direct CDN URLs
