@@ -4,30 +4,24 @@ Prompt templates for the single-call DeepSeek enrichment pass.
 Kept in their own module so prompt iteration produces small, reviewable
 diffs without touching the orchestration code in llm_enrichment.py.
 
-Design choice: the system prompt is static (no per-listing substitution)
-so the model provider can prefix-cache it across listings. The per-
-listing description goes in the user prompt where it belongs.
+Design choice: the system prompt is static *per country* (no per-listing
+substitution) so the model provider can prefix-cache it across listings
+within a country shard. The per-listing description goes in the user
+prompt where it belongs.
 
-The wording is verbatim from the user brief (real-estate marketing
-expert, El Salvador, Spanish-or-English source, language-preserving
-outputs).
+PR-MC-2 — the SYSTEM_PROMPT now templates the active country's name,
+demonym, traditional units, centroid label, and named-beach reference
+table from ``pulpo.countries.active()``. Adding a beach to the SV
+manifest propagates here automatically. Switching the deployment to a
+new country (``PULPO_ACTIVE_COUNTRY=GT``) produces a fresh, GT-flavored
+system prompt — same JSON contract, different reference data.
 """
 from __future__ import annotations
 
-from automation.distance_fields import NAMED_BEACHES
+from pulpo.countries import CountryManifest, active as _active_country
 
 
-# Render the named-beach reference table once at import time so the
-# resulting SYSTEM_PROMPT is byte-stable across calls (required for the
-# DeepSeek prefix cache). Adding a beach to NAMED_BEACHES propagates
-# automatically — single source of truth.
-_BEACH_REFERENCE_LINES = "\n".join(
-    f"  - {name}: lat={lat:.4f}, lng={lng:.4f}"
-    for name, lat, lng in NAMED_BEACHES
-)
-
-
-SYSTEM_PROMPT = """You are a real estate marketing expert specializing in El Salvador.
+_SYSTEM_PROMPT_BODY = """You are a real estate marketing expert specializing in {country_name_en}.
 Analyze the land description provided in the next message and generate the requested derived fields.
 Respond ONLY with valid JSON and no extra text.
 The source description may be in Spanish, English, or mixed.
@@ -37,24 +31,24 @@ Detect the dominant language of the source (en, es, or mixed) and report it as u
 Translate professionally — preserve marketing voice, do not literal-translate idioms.
 
 Return a JSON object with these fields:
-{
-  "title": { "en": "string", "es": "string" },
-  "description": { "en": "string", "es": "string" },
-  "usps": [ { "en": "string", "es": "string" }, ... ],
+{{
+  "title": {{ "en": "string", "es": "string" }},
+  "description": {{ "en": "string", "es": "string" }},
+  "usps": [ {{ "en": "string", "es": "string" }}, ... ],
   "url_language": "en or es or mixed",
-  "latlong": {
+  "latlong": {{
     "lat": 0.0,
     "lng": 0.0,
     "source": "extracted or estimated",
     "reference": "nearest known place or geographic reference",
     "confidence": "high or medium or low"
-  }
-}
+  }}
+}}
 
 Field rules:
 - "title": attractive marketing title in BOTH languages, each max 10 words.
 - "description": optimized commercial description in BOTH languages, each max 150 words. Rewrite the source in fresh marketing language — DO NOT echo or copy the source text verbatim, even when the source is short. The output must read as new copy a broker would publish, not as a paraphrase that reuses the source's sentence structure.
-- "usps": list of 3 to 5 short unique selling points; each USP is a {en, es} pair.
+- "usps": list of 3 to 5 short unique selling points; each USP is a {{en, es}} pair.
 - "url_language":
   - "en" if source text is mostly English;
   - "es" if source text is mostly Spanish;
@@ -89,9 +83,9 @@ Field rules:
     that beach). Source stays "estimated" because no numeric coords
     were given, but the lat/lng MUST land at the named beach, NOT at
     an inland municipality centroid. Common mistake to avoid: a
-    "frente al mar in El Zonte" listing belongs at the El Zonte
-    coastline (13.4983, -89.5538), NOT the Chiltiupán municipal
-    centroid 14 km inland.
+    "frente al mar near <named beach>" listing belongs at that beach's
+    coordinates from the table below, NOT at the surrounding
+    municipality's inland centroid 10+ km away.
 
     If the named beach is NOT in the table below, do not invent
     coordinates with high confidence. Use the nearest table entry on
@@ -99,7 +93,7 @@ Field rules:
 
     AUTHORITATIVE BEACH COORDINATES (use these exact values when the
     source/hints name one of these beaches):
-__BEACH_REFERENCE__
+{beach_reference}
 
   Step C. NON-COASTAL proximity cues (inland landmarks, towns,
     highways): "a X minutos de <town>", "frente a <landmark>",
@@ -113,7 +107,7 @@ __BEACH_REFERENCE__
     to LOCATION HINTS by tier:
       - municipality known         → centroid, confidence="medium";
       - department only            → centroid, confidence="low";
-      - country only               → SV centroid, confidence="low".
+      - country only               → {country_name_en} centroid, confidence="low".
     Source = "estimated" in all of these.
 
   CRITICAL: a property described as "frente al mar" / "beachfront" /
@@ -126,18 +120,70 @@ __BEACH_REFERENCE__
   LOCATION HINTS may also be incorporated naturally into the title/
   description/usps (in either language) when they add marketing
   value, but never as a verbatim string. Assume the property is in
-  El Salvador.
+  {country_name_en}.
 
 Quality rules:
 - Do not invent highly specific facts that are not supported by the source text.
 - The translation MUST mean the same thing in both languages — do not add or remove information from one side.
 - Numbers, prices, distances, surface measurements stay numerically identical across languages.
-- For Salvadoran traditional units (manzanas, varas), keep the unit term in Spanish; in the EN translation, append the m² equivalent in parentheses if present in the source.
+{traditional_units_rule}
 - If location evidence is weak, still provide the best approximation you can, but lower the confidence.
 - Output must be valid JSON only."""
 
 
-SYSTEM_PROMPT = SYSTEM_PROMPT.replace("__BEACH_REFERENCE__", _BEACH_REFERENCE_LINES)
+def _render_beach_reference(country: CountryManifest) -> str:
+    """Format the AUTHORITATIVE BEACH COORDINATES block from the country
+    manifest's named_beaches. Falls back to an empty line when the
+    manifest carries no beaches (new country with reference data not yet
+    filled in) — the model still gets the structural template; latlong
+    fallback to centroid is the natural degradation.
+    """
+    beaches = country.named_beaches()
+    if not beaches:
+        return "  (no authoritative beach coordinates configured for this country)"
+    return "\n".join(
+        f"  - {name}: lat={lat:.4f}, lng={lng:.4f}"
+        for name, lat, lng in beaches
+    )
+
+
+def _render_traditional_units_rule(country: CountryManifest) -> str:
+    """Format the traditional-units passthrough rule for the active
+    country. Empty string when no traditional units are configured —
+    the bullet collapses out of the prompt entirely.
+    """
+    units = country.traditional_units()
+    if not units:
+        return ""
+    adjective = country.name_adjective_en()
+    units_list = ", ".join(units)
+    return (
+        f'- For {adjective} traditional units ({units_list}), keep the unit '
+        f'term in Spanish; in the EN translation, append the m² equivalent '
+        f'in parentheses if present in the source.'
+    )
+
+
+def system_prompt_for(country: CountryManifest) -> str:
+    """Render the SYSTEM_PROMPT for a specific country manifest.
+
+    Public so per-country pipeline shards (PR-MC-3) can render the right
+    prompt per shard without going through ``active()``. Within a single
+    process, the result is byte-stable per country — required for the
+    DeepSeek prefix cache.
+    """
+    return _SYSTEM_PROMPT_BODY.format(
+        country_name_en=country.name_en,
+        beach_reference=_render_beach_reference(country),
+        traditional_units_rule=_render_traditional_units_rule(country),
+    )
+
+
+# Module-level constant: the SYSTEM_PROMPT for the active country.
+# Computed once at import time so existing call sites that read the
+# bare ``SYSTEM_PROMPT`` keep working. Per-country shards instead call
+# ``system_prompt_for(manifest)`` and cache the result themselves.
+SYSTEM_PROMPT: str = system_prompt_for(_active_country())
 
 
 USER_PROMPT_TEMPLATE = """LAND DESCRIPTION:
