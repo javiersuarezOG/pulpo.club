@@ -11,6 +11,8 @@ without coupling.
 """
 from __future__ import annotations
 
+from pulpo.countries import active as _active_country
+
 PROPERTY_TYPES: dict[str, dict] = {
     "land": {
         "label":     "Land",
@@ -62,40 +64,13 @@ PROPERTY_TYPES: dict[str, dict] = {
 # fraud-detection rule (very-large-parcel suspicion in supply-limited
 # beach zones). Lake parcels can legitimately be large, so that set
 # stays strictly ocean-coast.
-VACATION_ZONES: frozenset[str] = frozenset({
-    # Ocean coast — original set (2026-05-08)
-    "el-tunco", "el-sunzal", "el-zonte", "san-diego", "mizata",
-    "el-cuco", "las-flores", "punta-mango", "el-espino", "conchagua",
-    "jiquilisco", "tamanique", "costa-del-sol", "atami",
-    # Lake (added 2026-05-08; see live recon in commit message)
-    "lago-coatepeque", "lago-ilopango",
-    # Tier-1 widening (2026-05-24, Phase 3 of scraper auto-repair stack)
-    # Added after auditing El Salvador coastal geography against the
-    # existing list. Each entry covers either a named beach absent
-    # from the original set, or a micro-beach whose listings often
-    # don't reference the macro region as a substring.
-    #
-    # los-cobanos:           Sonsonate coast — whole-department gap in v1.
-    # palmarcito:            Between El Tunco / El Sunzal; listings often
-    #                        reference the micro-beach standalone.
-    # k59, k61:              West-coast surf km-markers; surfer slang used
-    #                        as primary location field in modern listings.
-    # puerto-de-la-libertad: Port city of La Libertad department. Using the
-    #                        port-specific slug avoids the over-match risk
-    #                        of bare "la-libertad" (whole department name).
-    # surf-city:             Government rebrand of La Libertad coast,
-    #                        increasingly used as the location field on
-    #                        newer listings.
-    # el-icacal:             Eastern coast (La Unión); not substring-matched
-    #                        by any existing slug.
-    # las-tunas:             Eastern coast (La Unión); listings drop the
-    #                        "playa" prefix and conchagua doesn't catch them.
-    # esteron:               Eastern coast (Bahía de Jiquilisco perimeter);
-    #                        same gap.
-    "los-cobanos", "palmarcito", "k59", "k61",
-    "puerto-de-la-libertad", "surf-city", "el-icacal",
-    "las-tunas", "esteron",
-})
+# PR-MC-1c — source of truth moved into pulpo/countries/<cc>.json
+# under the ``vacation_zones`` key. Adding a zone for SV = editing
+# sv.json; per-country slugs no longer collide because each country's
+# manifest is independent. Adding a country = adding a new JSON file
+# with its own vacation_zones list (typically the new country's
+# beach + lake zones).
+VACATION_ZONES: frozenset[str] = _active_country().vacation_zones()
 
 # Type keyword regex map — used by the multi-signal classifier.
 # Word-boundary matching only; never substring `in` checks. The patterns are
