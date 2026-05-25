@@ -391,3 +391,76 @@ job that hits the prod URL every 15 minutes from each region) — see
 PR-perf-1 in `~/.claude/plans/make-a-full-audit-cheerful-sketch.md`
 for the design. The probe was deliberately deferred until Pro
 because per-region cron requires Pro.
+
+## Adding a country (subdomain rollout)
+
+Pulpo is single-country per deployment by design. `pulpo.club` today
+serves SV exclusively. When a second country (e.g. Guatemala) ships,
+it lives on its own Vercel production domain (`gt.pulpo.club`)
+carrying its own `PULPO_ACTIVE_COUNTRY` env var. The codebase stays
+one; nothing on `pulpo.club` changes when GT goes live.
+
+### Prerequisites
+
+1. **Country manifest landed in both stacks.** Drop `<cc>.json` into:
+   - `pulpo/countries/<cc>.json` (Python pipeline)
+   - `web/app/config/countries/<cc>.json` (frontend bundle)
+
+   The two files must be byte-identical; a future CI parity check will
+   enforce that.
+
+2. **Scrapers tagged for the new country.** Any scraper module that
+   produces listings for the new country sets `country = "<CC>"` at
+   the class level. The `tests/test_country_manifest.py` contract
+   tests block CI if any scraper omits this.
+
+3. **Manifest carries enough reference data.** At minimum: `name_en`,
+   `name_es`, `locale_es`/`locale_en`, `currency`, `centroid_lat`/`lng`.
+   Adding `named_beaches`, `zone_tier`, `vacation_zones`,
+   `airport_distances_km`, `validation_bounds` enables the full
+   ranking pipeline; until then the new country's listings rank with
+   the unknown-zone fallback (`TIER_BASE=30`, no airport bonus).
+
+### Rollout steps
+
+1. **Register the subdomain in Vercel.** Settings → Domains → Add
+   Domain → `gt.pulpo.club`. Vercel auto-issues a TLS cert; DNS
+   needs `gt.pulpo.club CNAME cname.vercel-dns.com.`
+
+2. **Set per-domain env vars on the new domain.** Settings →
+   Environment Variables → scope to `Production` → `Domain:
+   gt.pulpo.club`:
+   - `PULPO_ACTIVE_COUNTRY=GT`
+   - `VITE_PULPO_ACTIVE_COUNTRY=GT`
+   - Keep every other secret identical to the SV deploy. Clerk,
+     Stripe, PostHog are country-agnostic.
+
+3. **Pipeline produces per-country output.** Set `PULPO_COUNTRIES=SV,GT`
+   on the nightly run (env section of `.github/workflows/pulpo-nightly.yml`).
+   Each shard writes `web/data/ranked.<cc>.json` +
+   `web/data/featured.<cc>.json` + `web/data/last_updated.<cc>.json`.
+   The Vercel deploy reads the active country's file at build time
+   (`web/app/config/countries.ts` does the import).
+
+4. **Clerk + Stripe.** Both work as-is — Clerk's allowed-domains list
+   needs `gt.pulpo.club` added (Dashboard → Settings → Domains).
+   Stripe's success URL on the checkout session is dynamic; no change.
+
+5. **Smoke test on the new domain.**
+   - `curl -I https://gt.pulpo.club/` → 200 OK.
+   - Inspect `<title>` + `<meta property="og:locale">` — must mention
+     Guatemala, not El Salvador.
+   - Open the detail page of a GT listing — JSON-LD `addressCountry`
+     reads `"GT"`, currency reads from the manifest.
+
+6. **SEO 301s (optional).** If GT is meant to absorb traffic from
+   `pulpo.club` (rare — usually each country lives on its own
+   subdomain independently), set up 301 redirects in `vercel.json` on
+   the source domain. Otherwise leave SV's domain alone.
+
+### Removing a country
+
+Reverse: drop the Vercel domain + delete the per-country env vars +
+optionally remove the manifest file. The codebase remains
+backward-compatible because every manifest accessor returns empty
+containers when its section is absent.
