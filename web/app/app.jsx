@@ -165,7 +165,7 @@ function App() {
   // whether the user entered on the detail (in which case "back" must
   // not exit the site — replaceState to "/" instead).
   const _initialParsed = useMemo(() => {
-    if (typeof window === "undefined") return { route: "home", openListingId: null, isListingPath: false, section: null };
+    if (typeof window === "undefined") return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: null };
     return parseLocation(window.location.pathname);
   }, []);
   const [route, setRoute] = useState(_initialParsed.route);
