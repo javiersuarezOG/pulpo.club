@@ -916,6 +916,25 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .heart-btn.heart-inline:hover { background: var(--paper-2); }
 .heart-btn.is-saved { color: var(--accent-2); }
 
+/* Share button — geometric twin of .heart-btn.heart-inline so the
+   Compartir + Guardar pair reads as one action group in
+   .detail-head-right. */
+.share-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: transparent;
+  color: var(--ink-2);
+  transition: background 120ms, color 120ms;
+  border: 0;
+  cursor: pointer;
+}
+.share-btn:hover { background: var(--paper-2); color: var(--ink); }
+.share-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* PR-4 — 44×44 touch targets. Visual 30px circle stays for design
    harmony, but a transparent ::before extends the hit-box on mobile so
    thumbs land reliably. Desktop hover-reveal preserved. */
@@ -1713,6 +1732,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   display: flex; justify-content: space-between; align-items: center;
   border-bottom: 1px solid var(--line);
 }
+.detail-head-right { display: flex; align-items: center; gap: var(--space-2); }
 
 .detail-gallery { padding: 0 24px; margin-top: 16px; }
 .gallery-mosaic {
@@ -2212,6 +2232,100 @@ h1,h2,h3,h4,h5 { margin: 0; }
   text-wrap: balance;
 }
 .modal-head p { color: var(--ink-3); margin-top: 6px; font-size: 14px; }
+
+/* ============== Share picker (Airbnb-style) ==============
+   Opened from the Compartir button in detail-head-right. Reuses the
+   shared .modal infrastructure (bottom-sheet on ≤600px, centered above)
+   and adds: Pulpo wordmark header, listing thumb + meta line, 6-option
+   2-column grid. Source-opacity contract: the modal never renders any
+   source/broker copy — only listing.title and derived hooks. */
+.share-picker {
+  max-width: 480px;
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  text-align: left;
+}
+.share-picker-brand {
+  display: flex; align-items: center; gap: var(--space-3);
+  color: var(--accent);
+  margin-bottom: var(--space-5);
+}
+.share-picker-wordmark {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.share-picker-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px; line-height: 1.15; letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 var(--space-5);
+}
+.share-picker-listing {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: 0 0 var(--space-5);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-5);
+}
+.share-picker-thumb {
+  width: 56px; height: 56px; border-radius: var(--radius);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.share-picker-meta { min-width: 0; flex: 1; }
+.share-picker-listing-title {
+  font-weight: 600; font-size: 14px; color: var(--ink);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.share-picker-listing-sub {
+  font-size: 13px; color: var(--ink-2);
+  margin-top: 2px;
+}
+.share-opts {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+.share-opt {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-4) var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: 14px; font-weight: 500;
+  color: var(--ink);
+  transition: background 120ms, border-color 120ms, transform 120ms;
+}
+.share-opt:hover { background: var(--paper-2); border-color: var(--ink-3); }
+.share-opt:active { transform: scale(0.98); }
+.share-opt.is-featured { border: 2px solid var(--accent); padding: 11px 11px; }
+.share-opt-ico {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: oklch(1 0 0);
+}
+/* Channel brand colors. These are external platform brand identifiers
+   (WhatsApp green, Facebook blue) and need to render at the published
+   hex/oklch — substituting Pulpo tokens would misrepresent the brand.
+   token-exception: external platform brand colors */
+.share-opt-wa    { background: oklch(0.73 0.20 145); } /* WhatsApp green */
+.share-opt-sms   { background: oklch(0.70 0.20 145); } /* iOS Messages green */
+.share-opt-copy  { background: var(--ink); }
+.share-opt-email { background: var(--ink-2); }
+.share-opt-fb    { background: oklch(0.50 0.20 260); } /* Facebook blue */
+.share-opt-tt    { background: oklch(0.20 0.02 280); } /* TikTok black */
+.share-opt-label { line-height: 1.2; }
 
 /* ============== Welcome modal (PR-B.4b) ==============
    Mounted on /account?welcome=1 — covers both the post-Stripe anon

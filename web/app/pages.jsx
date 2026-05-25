@@ -39,6 +39,7 @@ import {
   Badge,
   Photo,
   HeartButton,
+  ShareButton,
   ListingCard,
   SkeletonCard,
   Toast,
@@ -1765,6 +1766,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           <Icon name="arrow_left" size={16} strokeWidth={2}/> {t("detail.back", lc)}
         </button>
         <div className="detail-head-right">
+          <ShareButton listing={listing} app={app} variant="inline" size={20}/>
           <HeartButton listingId={listing.id} app={app} variant="inline" size={20}/>
         </div>
       </div>
