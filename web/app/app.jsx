@@ -184,6 +184,12 @@ function App() {
   // section underneath). Reset to false whenever the user navigates to a
   // section in-app; set true on cold-load entry.
   const coldEnteredDetailRef = useRef(_initialParsed.isListingPath);
+  // Set true when the user landed via a /l/<token> share URL. Distinct
+  // from coldEnteredDetailRef because closeListing should drop a share-
+  // landed user on /browse (catalogue, the whole point of the pin
+  // feature), NOT on / (the cold-detail fallback). One-shot: cleared
+  // on the first closeListing or on any in-app navigation.
+  const pinLandedRef = useRef(_initialParsed.pinListingId != null);
   const [locale, setLocale] = useLocale();
   const [units, setUnits] = useUnits();
   const [user, setUser] = useState(() => {
@@ -321,6 +327,27 @@ function App() {
     window.history.replaceState({}, "", "/" + window.location.search + window.location.hash);
     // Intentional one-shot, not reactive — runs at mount with the
     // resolved _initialParsed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Share-pin landing — recipient hit /l/<token>. parseLocation already
+  // returned route="browse" + openListingId set (so the catalogue mounts
+  // behind the auto-opened detail panel), but the URL bar still shows
+  // /l/<token>. Rewrite to /browse?pin=<id> at mount so (a) the URL
+  // matches what the user sees, (b) BrowsePage's mount-time ?pin= read
+  // picks up the value, (c) a refresh keeps the same surface. One-shot.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!_initialParsed.pinListingId) return;
+    const target = `/browse?pin=${encodeURIComponent(_initialParsed.pinListingId)}`;
+    if (window.location.pathname + window.location.search === target) return;
+    window.history.replaceState(
+      { pulpo: true, listing: _initialParsed.pinListingId },
+      "",
+      target,
+    );
+    // Intentional one-shot — runs once at mount with the resolved
+    // _initialParsed. pinLandedRef stays true until closeListing clears it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -931,7 +958,24 @@ function App() {
       setOpenListingId(null);
       return;
     }
-    if (coldEnteredDetailRef.current) {
+    if (pinLandedRef.current) {
+      // Share-pin landing — recipient hit /l/<token>, URL was rewritten
+      // to /browse?pin=<id>, detail panel auto-opened. Closing the panel
+      // should drop them on /browse (catalogue, no panel) — that's the
+      // whole point of the pin feature. Strip ?pin so the URL bar
+      // matches what they see, then settle into the browse route.
+      // pinLandedRef is one-shot and cleared here; coldEnteredDetailRef
+      // is also true (parseLocation set isListingPath:true for /l/) so
+      // we clear it too — otherwise the next listing open would think
+      // it's still a cold-entry.
+      const fromPath = window.location.pathname + window.location.search;
+      window.history.replaceState({ pulpo: true }, "", "/browse");
+      pinLandedRef.current = false;
+      coldEnteredDetailRef.current = false;
+      setOpenListingId(null);
+      setRoute("browse");
+      track("route.changed", { from_path: fromPath, to_path: "/browse", trigger: "click" });
+    } else if (coldEnteredDetailRef.current) {
       // User landed cold on /listing/:id — there's no source section
       // underneath. history.back() would exit the site. Instead replace
       // the current entry with /, so Browser Back exits cleanly with no
