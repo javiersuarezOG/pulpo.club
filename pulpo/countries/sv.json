@@ -10,5 +10,137 @@
   "listing_count_floor": 700,
   "listing_count_ceiling": 1300,
   "newsletter_audience_segment": "sv",
-  "_comment": "PR-MC-1a — minimal SV manifest establishing the contract. PR-MC-1b will move departments / zones / zone_tier / vacation_zones / named_beaches / airports / validation_bounds into this file from their current homes in pulpo/normalize.py, automation/localities.py, automation/distance_fields.py, automation/property_types.py, pulpo/airports.py, automation/validation_bounds.py, and pulpo/ranker_legs/location.py."
+  "_data_provenance": "PR-MC-1b — reference data lifted as-is from pulpo/normalize.py (_DEPT_CANONICAL), pulpo/ranker_legs/location.py (ZONE_TIER), automation/property_types.py (VACATION_ZONES), automation/distance_fields.py (NAMED_BEACHES, AIRPORTS_LAT_LNG), pulpo/airports.py (ZONE_AIRPORT_DISTANCES_KM), automation/validation_bounds.py (BOUNDS_BY_TYPE + COASTAL_ZONES). Parity tests in tests/test_country_manifest.py enforce no drift. PR-MC-1c will switch consumers to read from this manifest.",
+  "departments": {
+    "ahuachapán":   "Ahuachapán",
+    "santa ana":    "Santa Ana",
+    "sonsonate":    "Sonsonate",
+    "chalatenango": "Chalatenango",
+    "la libertad":  "La Libertad",
+    "san salvador": "San Salvador",
+    "cuscatlán":    "Cuscatlán",
+    "la paz":       "La Paz",
+    "cabañas":      "Cabañas",
+    "san vicente":  "San Vicente",
+    "usulután":     "Usulután",
+    "san miguel":   "San Miguel",
+    "morazán":      "Morazán",
+    "la unión":     "La Unión"
+  },
+  "zone_tier": {
+    "el-tunco":           "A",
+    "el-sunzal":          "A",
+    "el-zonte":           "A",
+    "san-diego":          "B",
+    "la-libertad":        "B",
+    "puerto-la-libertad": "B",
+    "el-cuco":            "B",
+    "las-flores":         "B",
+    "mizata":             "B",
+    "punta-mango":        "C",
+    "el-espino":          "C",
+    "conchagua":          "C",
+    "la-union":           "C"
+  },
+  "vacation_zones": [
+    "atami", "conchagua", "costa-del-sol", "el-cuco", "el-espino",
+    "el-icacal", "el-sunzal", "el-tunco", "el-zonte", "esteron",
+    "jiquilisco", "k59", "k61", "lago-coatepeque", "lago-ilopango",
+    "las-flores", "las-tunas", "los-cobanos", "mizata", "palmarcito",
+    "puerto-de-la-libertad", "punta-mango", "san-diego", "surf-city",
+    "tamanique"
+  ],
+  "coastal_zones": [
+    "el-tunco", "el-sunzal", "el-zonte", "san-diego", "mizata",
+    "el-cuco", "las-flores", "punta-mango", "el-espino", "conchagua",
+    "jiquilisco"
+  ],
+  "airports": {
+    "SAL": {
+      "name": "Monseñor Romero (Comalapa)",
+      "lat":  13.4408,
+      "lng": -89.0556,
+      "operational": true
+    },
+    "AeP": {
+      "name": "Aeropuerto del Pacífico",
+      "lat":  13.1970,
+      "lng": -87.9473,
+      "operational": false
+    }
+  },
+  "airport_distances_km": {
+    "el-tunco":           {"SAL":  36.0, "AeP": 159.0},
+    "el-sunzal":          {"SAL":  37.0, "AeP": 160.0},
+    "el-zonte":           {"SAL":  43.0, "AeP": 165.0},
+    "san-diego":          {"SAL":  27.0, "AeP": 150.0},
+    "la-libertad":        {"SAL":  29.0, "AeP": 152.0},
+    "puerto-la-libertad": {"SAL":  29.0, "AeP": 152.0},
+    "mizata":             {"SAL":  66.0, "AeP": 189.0},
+    "el-cuco":            {"SAL": 103.0, "AeP":  21.0},
+    "las-flores":         {"SAL": 100.0, "AeP":  27.0},
+    "punta-mango":        {"SAL": 105.0, "AeP":  23.0},
+    "el-espino":          {"SAL":  65.0, "AeP":  62.0},
+    "jiquilisco":         {"SAL":  61.0, "AeP":  62.0},
+    "conchagua":          {"SAL": 130.0, "AeP":  15.0},
+    "la-union":           {"SAL": 132.0, "AeP":  19.0}
+  },
+  "named_beaches": [
+    ["Barra de Santiago",      13.7060, -89.9740],
+    ["Metalío",                13.5800, -89.7700],
+    ["Los Cóbanos",            13.5410, -89.8050],
+    ["Acajutla",               13.5928, -89.8275],
+    ["Bocana San Diego",       13.4843, -89.7163],
+    ["El Majahual",            13.4900, -89.6594],
+    ["El Sunzal",              13.4844, -89.6322],
+    ["El Tunco",               13.4870, -89.6133],
+    ["El Sunza",               13.4983, -89.5856],
+    ["El Zonte",               13.4983, -89.5538],
+    ["San Blas",               13.4747, -89.4889],
+    ["Mizata",                 13.5300, -89.7000],
+    ["Playa La Perla",         13.4575, -89.3478],
+    ["Playa Taquillo",         13.4870, -89.5950],
+    ["Playa K59 / San Diego",  13.4843, -89.2500],
+    ["Puerto de La Libertad",  13.4869, -89.3217],
+    ["Punta Roca",             13.4882, -89.3211],
+    ["Costa del Sol",          13.3372, -88.9892],
+    ["Playa San Marcelino",    13.3170, -88.9450],
+    ["Bahía de Jiquilisco",    13.2000, -88.5950],
+    ["Playa El Espino",        13.1740, -88.5570],
+    ["Las Tunas",              13.1761, -88.4836],
+    ["Playa El Cuco",          13.1894, -88.3858],
+    ["Playa Las Flores",       13.1810, -88.3550],
+    ["Playa Negra",            13.1758, -88.2925],
+    ["Playa Esterón",          13.1822, -88.1839],
+    ["Playa El Icacal",        13.1750, -88.2250],
+    ["Playa El Tamarindo",     13.2050, -87.8420],
+    ["Playa Maculís",          13.2050, -87.8420],
+    ["Playa Las Playitas",     13.2700, -87.8000],
+    ["Playa El Jagüey",        13.1800, -87.7330],
+    ["Playa El Cocal",         13.3200, -87.8400],
+    ["Playa Torola",           13.2050, -87.8420],
+    ["Playa Cuevitas",         13.2150, -87.8500],
+    ["Conchagua",              13.1733, -87.9589],
+    ["La Unión bay",           13.3340, -87.8430]
+  ],
+  "validation_bounds": {
+    "land": {
+      "price_usd":      [1000.0,       100000000.0, 5000.0,    20000000.0],
+      "area_m2":        [50.0,         10000000.0,  100.0,     1000000.0],
+      "price_per_m2":   [0.5,          10000.0,     1.0,       5000.0]
+    },
+    "house": {
+      "price_usd":      [50000.0,      10000000.0,  100000.0,  5000000.0],
+      "built_area_m2":  [50.0,         2000.0,      80.0,      1000.0],
+      "area_m2":        [100.0,        50000.0,     200.0,     10000.0],
+      "bedrooms":       [1.0,          15.0,        1.0,       10.0],
+      "bathrooms":      [0.5,          15.0,        1.0,       10.0]
+    },
+    "condo": {
+      "price_usd":      [30000.0,      5000000.0,   70000.0,   2000000.0],
+      "built_area_m2":  [30.0,         1000.0,      50.0,      500.0],
+      "bedrooms":       [0.0,          10.0,        0.0,       6.0],
+      "hoa_fee_usd_monthly": [0.0,     5000.0,      0.0,       2000.0]
+    }
+  }
 }

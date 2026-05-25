@@ -184,3 +184,134 @@ def test_every_manifest_json_is_loadable():
                 json.load(f)
             except json.JSONDecodeError as e:
                 pytest.fail(f"{p.name}: invalid JSON: {e}")
+
+
+# ── PR-MC-1b — SV reference data parity ─────────────────────────────
+#
+# The SV manifest now mirrors the hardcoded reference constants in
+# pulpo/normalize.py, pulpo/ranker_legs/location.py,
+# automation/property_types.py, automation/distance_fields.py,
+# pulpo/airports.py, and automation/validation_bounds.py. The parity
+# tests below assert byte-for-byte equality between the manifest read
+# and the existing constants so that any future drift fails CI loudly.
+#
+# PR-MC-1c will switch each module to read from the manifest as the
+# primary source and these parity tests will collapse to simple
+# "manifest is non-empty" smoke tests.
+
+
+def test_sv_departments_match_normalize():
+    """SV manifest's departments map must equal pulpo.normalize._DEPT_CANONICAL."""
+    from pulpo.normalize import _DEPT_CANONICAL
+    sv = load("SV")
+    assert sv.departments() == _DEPT_CANONICAL
+
+
+def test_sv_zone_tier_matches_location_leg():
+    """SV manifest's zone_tier must equal pulpo.ranker_legs.location.ZONE_TIER."""
+    from pulpo.ranker_legs.location import ZONE_TIER
+    sv = load("SV")
+    assert sv.zone_tier() == ZONE_TIER
+
+
+def test_sv_vacation_zones_match_property_types():
+    """SV manifest's vacation_zones must equal automation.property_types.VACATION_ZONES."""
+    from automation.property_types import VACATION_ZONES
+    sv = load("SV")
+    assert sv.vacation_zones() == VACATION_ZONES
+
+
+def test_sv_coastal_zones_match_validation_bounds():
+    """SV manifest's coastal_zones must equal automation.validation_bounds.COASTAL_ZONES."""
+    from automation.validation_bounds import COASTAL_ZONES
+    sv = load("SV")
+    assert sv.coastal_zones() == COASTAL_ZONES
+
+
+def test_sv_named_beaches_match_distance_fields():
+    """SV manifest's named_beaches must equal automation.distance_fields.NAMED_BEACHES."""
+    from automation.distance_fields import NAMED_BEACHES
+    sv = load("SV")
+    assert sv.named_beaches() == NAMED_BEACHES
+
+
+def test_sv_airports_lat_lng_matches_distance_fields():
+    """SV manifest's airports must carry the same lat/lng as
+    automation.distance_fields.AIRPORTS_LAT_LNG.
+    """
+    from automation.distance_fields import AIRPORTS_LAT_LNG
+    sv = load("SV")
+    manifest = sv.airports()
+    assert set(manifest.keys()) == set(AIRPORTS_LAT_LNG.keys())
+    for code, (lat, lng) in AIRPORTS_LAT_LNG.items():
+        assert manifest[code]["lat"] == lat, (
+            f"airport {code} lat mismatch: manifest {manifest[code]['lat']} "
+            f"vs distance_fields {lat}"
+        )
+        assert manifest[code]["lng"] == lng, (
+            f"airport {code} lng mismatch: manifest {manifest[code]['lng']} "
+            f"vs distance_fields {lng}"
+        )
+
+
+def test_sv_airport_distances_km_matches_airports_module():
+    """SV manifest's airport_distances_km must equal
+    pulpo.airports.ZONE_AIRPORT_DISTANCES_KM.
+    """
+    from pulpo.airports import ZONE_AIRPORT_DISTANCES_KM
+    sv = load("SV")
+    assert sv.airport_distances_km() == ZONE_AIRPORT_DISTANCES_KM
+
+
+def test_sv_validation_bounds_match_validation_module():
+    """SV manifest's validation_bounds must equal
+    automation.validation_bounds.BOUNDS_BY_TYPE (with tuple-vs-list
+    equality already normalized inside the manifest accessor).
+    """
+    from automation.validation_bounds import BOUNDS_BY_TYPE
+    sv = load("SV")
+    manifest = sv.validation_bounds()
+    assert set(manifest.keys()) == set(BOUNDS_BY_TYPE.keys())
+    for ptype, fields in BOUNDS_BY_TYPE.items():
+        assert set(manifest[ptype].keys()) == set(fields.keys()), (
+            f"validation_bounds[{ptype}] field set mismatch: "
+            f"manifest {sorted(manifest[ptype].keys())} vs "
+            f"validation_bounds {sorted(fields.keys())}"
+        )
+        for field_name, expected in fields.items():
+            actual = manifest[ptype][field_name]
+            assert tuple(float(x) for x in actual) == tuple(float(x) for x in expected), (
+                f"validation_bounds[{ptype}][{field_name}] mismatch: "
+                f"manifest {actual} vs validation_bounds {expected}"
+            )
+
+
+# ── Defensive defaults on a partial manifest ─────────────────────────
+
+
+def _minimal_payload() -> dict:
+    return {
+        "code": "ZZ",
+        "name_en": "Test",
+        "name_es": "Test",
+        "locale_es": "es-ZZ",
+        "locale_en": "en-US",
+        "currency": "USD",
+        "centroid_lat": 0.0,
+        "centroid_lng": 0.0,
+    }
+
+
+def test_accessors_default_safely_on_partial_manifest():
+    """A new-country manifest with only required fields must not crash
+    on accessor calls — every typed accessor returns an empty container.
+    """
+    m = CountryManifest.from_dict(_minimal_payload())
+    assert m.departments() == {}
+    assert m.zone_tier() == {}
+    assert m.vacation_zones() == frozenset()
+    assert m.coastal_zones() == frozenset()
+    assert m.airports() == {}
+    assert m.airport_distances_km() == {}
+    assert m.named_beaches() == ()
+    assert m.validation_bounds() == {}
