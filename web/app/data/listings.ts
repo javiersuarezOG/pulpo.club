@@ -255,6 +255,16 @@ export function adaptListing(raw: any): Listing {
     price: typeof raw.price_usd === "number" ? raw.price_usd : null,
     previous_price: typeof raw.previous_price === "number" ? raw.previous_price : null,
     price_per_m2: typeof raw.price_per_m2 === "number" ? raw.price_per_m2 : null,
+    // Zone-relative price context — drives the detail-page PriceContextBlock.
+    // All seven fields are nullable; the block degrades gracefully when any
+    // are missing (sparse zones, fresh scrapes, incomplete listings).
+    zone:                   typeof raw.zone === "string"                    ? raw.zone                   : null,
+    zone_percentile:        typeof raw.zone_percentile === "number"         ? raw.zone_percentile        : null,
+    price_vs_zone_median:   typeof raw.price_vs_zone_median === "number"    ? raw.price_vs_zone_median   : null,
+    price_vs_zone_pct:      typeof raw.price_vs_zone_pct === "number"       ? raw.price_vs_zone_pct      : null,
+    zone_price_per_m2_min:  typeof raw.zone_price_per_m2_min === "number"   ? raw.zone_price_per_m2_min  : null,
+    zone_price_per_m2_max:  typeof raw.zone_price_per_m2_max === "number"   ? raw.zone_price_per_m2_max  : null,
+    zone_comp_count:        typeof raw.zone_comp_count === "number"         ? raw.zone_comp_count        : null,
     photos,
     thumbnail_url:
       typeof raw.hero_photo_path === "string" && raw.hero_photo_path.length > 0
