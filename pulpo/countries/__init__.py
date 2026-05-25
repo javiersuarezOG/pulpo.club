@@ -96,6 +96,27 @@ class CountryManifest:
     # without crashing the pipeline — they'll simply get zero zones,
     # zero beaches, etc., until the manifest is filled in.
 
+    def name_adjective_en(self) -> str:
+        """Demonym / adjective form of the country name in English
+        (e.g. 'Salvadoran', 'Guatemalan'). Used in the LLM enrichment
+        prompt to qualify country-specific concepts like traditional
+        units. Falls back to ``name_en`` when the manifest doesn't
+        carry an explicit demonym.
+        """
+        v = self.raw.get("name_adjective_en")
+        return v if isinstance(v, str) and v else self.name_en
+
+    def traditional_units(self) -> list[str]:
+        """Country-specific traditional units of land measurement
+        (e.g. ['manzanas', 'varas'] for SV; ['cuerdas'] for GT/HN;
+        ['caballerías', 'manzanas'] for NI). Used in the LLM
+        enrichment prompt's units-passthrough rule. Empty list when
+        the manifest doesn't carry any — the prompt then omits the
+        unit-specific instruction entirely.
+        """
+        v = self.raw.get("traditional_units") or []
+        return [u for u in v if isinstance(u, str)] if isinstance(v, list) else []
+
     def departments(self) -> dict[str, str]:
         """Normalized-name → canonical-name map for the country's
         first-level administrative subdivisions.
