@@ -14,8 +14,23 @@ from __future__ import annotations
 
 from typing import Literal
 
+from pulpo.countries import active as _active_country
+
 Locale = Literal["en", "es"]
 DEFAULT_LOCALE: Locale = "en"
+
+# PR-MC-newsletter — strings that mention the country / primary airport
+# read from the active country's manifest at module load. SV deployment
+# renders identically; a GT deployment swaps "El Salvador" → "Guatemala"
+# and "min to SAL" → "min to <GT primary airport>" in one shot.
+_country = _active_country()
+_country_en = _country.name_en
+_country_es = _country.name_es
+# Pick the first declared airport as the "minutes to <airport>" anchor.
+# SV's manifest lists SAL first (operational hub), so SV renders unchanged.
+# A new country adds its primary airport first in the airports dict.
+_airports = _country.airports()
+_primary_airport_code = next(iter(_airports.keys()), "")
 
 # Strings are grouped by surface (header / hero / glance / pick / shortlist /
 # skip / market / footer) — mirror the section comments in web/app/i18n.jsx.
@@ -27,8 +42,8 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "hero.eyebrow.unnamed":        {"en": "Hand-picked this fortnight",                   "es": "Selección de esta quincena"},
     "hero.eyebrow.anon":           {"en": "The 10 best, this fortnight",                  "es": "Las 10 mejores, esta quincena"},
     "hero.headline.default":       {"en": "The 10 best, this fortnight.",                 "es": "Las 10 mejores, esta quincena."},
-    "hero.lede.with_prefs":        {"en": "Pulpo scanned {n_scanned} active beach and lake properties across El Salvador this fortnight. These ten matched your filter closely enough to make the cut.",
-                                     "es": "Pulpo revisó {n_scanned} propiedades activas frente al mar y al lago en El Salvador esta quincena. Estas diez encajan con tu filtro lo suficiente para entrar."},
+    "hero.lede.with_prefs":        {"en": f"Pulpo scanned {{n_scanned}} active beach and lake properties across {_country_en} this fortnight. These ten matched your filter closely enough to make the cut.",
+                                     "es": f"Pulpo revisó {{n_scanned}} propiedades activas frente al mar y al lago en {_country_es} esta quincena. Estas diez encajan con tu filtro lo suficiente para entrar."},
     "hero.lede.no_prefs":          {"en": "Pulpo scanned {n_scanned} active properties this fortnight and ranked them by value, location and momentum. You'll get a sharper edition once you set a filter — link at the bottom.",
                                      "es": "Pulpo revisó {n_scanned} propiedades esta quincena y las clasificó por valor, ubicación y momentum. Recibirás una edición más afinada cuando configures un filtro — enlace al final."},
     # ── At a glance ──
@@ -66,8 +81,8 @@ STRINGS: dict[str, dict[Locale, str]] = {
                                      "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia quincenal, ocho veces la profundidad."},
     "paywall.cta":                 {"en": "Go Pro — $19/month",                           "es": "Hazte Pro — $19/mes"},
     # ── Footer ──
-    "footer.tagline":              {"en": "Every beach and lake home in El Salvador, ranked by value.",
-                                     "es": "Cada casa frente al mar y al lago en El Salvador, clasificada por valor."},
+    "footer.tagline":              {"en": f"Every beach and lake home in {_country_en}, ranked by value.",
+                                     "es": f"Cada casa frente al mar y al lago en {_country_es}, clasificada por valor."},
     "footer.you_get_this":         {"en": "You're getting this because your filter is set to {filter_summary}.",
                                      "es": "Recibes esto porque tu filtro está configurado en {filter_summary}."},
     "footer.you_get_this.no_prefs": {"en": "You're getting this because you signed up — we haven't captured your filter yet.",
@@ -77,13 +92,14 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "footer.unsubscribe":          {"en": "Unsubscribe",                                  "es": "Cancelar suscripción"},
     "footer.no_commission":        {"en": "Pulpo doesn't take commission and doesn't list its own properties. We pick from what's already on the market and tell you which ones are worth your time.",
                                      "es": "Pulpo no cobra comisión ni publica sus propias propiedades. Elegimos de lo que ya está en el mercado y te decimos cuáles merecen tu tiempo."},
-    "footer.copyright":            {"en": "© {year} Pulpo Club · La Libertad, El Salvador",
-                                     "es": "© {year} Pulpo Club · La Libertad, El Salvador"},
+    "footer.copyright":            {"en": "© {year} Pulpo Club",
+                                     "es": "© {year} Pulpo Club"},
     # ── Generic facts ──
     "facts.beach":                 {"en": "{km} km to beach",                             "es": "{km} km a la playa"},
     "facts.walk_to_beach":         {"en": "Walk to the beach",                            "es": "A pie de la playa"},
     "facts.beachfront":            {"en": "Beachfront",                                   "es": "Frente al mar"},
-    "facts.airport":               {"en": "{km} km · {min} min to SAL",                   "es": "{km} km · {min} min a SAL"},
+    "facts.airport":               {"en": f"{{km}} km · {{min}} min to {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min to airport",
+                                     "es": f"{{km}} km · {{min}} min a {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min al aeropuerto"},
     "facts.land":                  {"en": "Land",                                         "es": "Terreno"},
     "facts.house":                 {"en": "House",                                        "es": "Casa"},
     "facts.condo":                 {"en": "Condo",                                        "es": "Apartamento"},
