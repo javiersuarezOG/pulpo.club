@@ -89,6 +89,123 @@ class CountryManifest:
             raw=dict(d),
         )
 
+    # ── Typed accessors over `raw` (PR-MC-1b) ────────────────────────
+    # Each accessor returns an empty / safe-default container when the
+    # manifest doesn't carry that section. Consumers can therefore drop
+    # in a partial manifest for a new country (e.g. only `code` + names)
+    # without crashing the pipeline — they'll simply get zero zones,
+    # zero beaches, etc., until the manifest is filled in.
+
+    def departments(self) -> dict[str, str]:
+        """Normalized-name → canonical-name map for the country's
+        first-level administrative subdivisions.
+
+        SV uses 'departamentos' (e.g. 'la libertad' → 'La Libertad');
+        other countries use 'provincias', 'cantones', etc. — the
+        canonical-name string carries whatever casing/accent the country
+        is comfortable rendering in UI.
+        """
+        v = self.raw.get("departments") or {}
+        return dict(v) if isinstance(v, dict) else {}
+
+    def zone_tier(self) -> dict[str, str]:
+        """Canonical zone-slug → tier letter ('A'/'B'/'C').
+
+        Consumed by ``pulpo/ranker_legs/location.py`` to base-score a
+        listing's location. Unknown zones (slug absent here) fall
+        through to the leg's UNKNOWN_TIER_BASE.
+        """
+        v = self.raw.get("zone_tier") or {}
+        return dict(v) if isinstance(v, dict) else {}
+
+    def vacation_zones(self) -> frozenset[str]:
+        """Set of canonical zone slugs where house/condo listings are
+        considered in-scope.
+
+        Inland house/condo listings (zone slug absent here) are dropped
+        at scraper parse time unless the title/description carries a
+        WATERFRONT_KEYWORD. Land has no such gate — every land listing
+        is in-scope regardless of zone.
+        """
+        v = self.raw.get("vacation_zones") or []
+        return frozenset(v) if isinstance(v, (list, tuple, set, frozenset)) else frozenset()
+
+    def coastal_zones(self) -> frozenset[str]:
+        """Set of zone slugs on the actual ocean coast (strict subset
+        of vacation_zones — excludes lakes).
+
+        Used by the ``validation_bounds`` rule that flags
+        suspiciously-large parcels in supply-limited beach areas. Lakes
+        are excluded because lake parcels can legitimately be large
+        (frontage on a lake doesn't compress lot sizes the way a
+        beachfront strip does).
+        """
+        v = self.raw.get("coastal_zones") or []
+        return frozenset(v) if isinstance(v, (list, tuple, set, frozenset)) else frozenset()
+
+    def airports(self) -> dict[str, dict[str, Any]]:
+        """Airport code → {name, lat, lng, operational} dict.
+
+        Consumed by ``automation/distance_fields.py`` to compute the
+        nearest-airport haversine for listings with lat/lng populated,
+        and by ``pulpo/ranker_legs/location.py`` via the per-zone
+        lookup in ``airport_distances_km`` for listings without coords.
+        """
+        v = self.raw.get("airports") or {}
+        return dict(v) if isinstance(v, dict) else {}
+
+    def airport_distances_km(self) -> dict[str, dict[str, float]]:
+        """Zone slug → {airport_code → distance in km}.
+
+        The static lookup that powers the location-leg's "near airport"
+        bonus when the listing has no lat/lng. With coords, the live
+        haversine in ``distance_fields.py`` is preferred.
+        """
+        v = self.raw.get("airport_distances_km") or {}
+        return dict(v) if isinstance(v, dict) else {}
+
+    def named_beaches(self) -> tuple[tuple[str, float, float], ...]:
+        """Authoritative (name, lat, lng) triples for known beaches.
+
+        Single source of truth for both (a) the dist_beach_km haversine
+        reference set in ``automation/distance_fields.py``, and (b) the
+        AUTHORITATIVE BEACH COORDINATES table injected into the LLM
+        enrichment system prompt. Adding a beach here propagates to
+        both — no per-call cost (the prompt is byte-cached at module
+        import).
+        """
+        v = self.raw.get("named_beaches") or []
+        out: list[tuple[str, float, float]] = []
+        if isinstance(v, (list, tuple)):
+            for entry in v:
+                if (isinstance(entry, (list, tuple)) and len(entry) == 3
+                        and isinstance(entry[0], str)):
+                    out.append((entry[0], float(entry[1]), float(entry[2])))
+        return tuple(out)
+
+    def validation_bounds(self) -> dict[str, dict[str, tuple[float, float, float, float]]]:
+        """Per-property-type validation bounds.
+
+        Shape:  {ptype: {field: (drop_min, drop_max, flag_min, flag_max)}}
+
+        Drives the type-bounds rule in ``automation/validation.py``:
+        a record whose field falls outside the drop range is rejected;
+        a record outside the flag range is kept with
+        ``validation_status='flagged'``.
+        """
+        v = self.raw.get("validation_bounds") or {}
+        if not isinstance(v, dict):
+            return {}
+        out: dict[str, dict[str, tuple[float, float, float, float]]] = {}
+        for ptype, fields in v.items():
+            if not isinstance(fields, dict):
+                continue
+            out[ptype] = {}
+            for field_name, bounds in fields.items():
+                if (isinstance(bounds, (list, tuple)) and len(bounds) == 4):
+                    out[ptype][field_name] = tuple(float(x) for x in bounds)  # type: ignore[assignment]
+        return out
+
 
 def _manifest_path(cc: str) -> Path:
     return _MANIFEST_DIR / f"{cc.lower()}.json"
