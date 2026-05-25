@@ -278,6 +278,18 @@ export type EventMap = {
     listing_id: string;
     listing_state: "active" | "off_market";
   };
+  // PriceContextBlock impression — fires once per detail open. `mode`
+  // distinguishes the render path the user actually saw (A = pill +
+  // caption against zone median; B = sparse-zone fallback message).
+  // Mode C (block absent) intentionally does NOT fire — there's nothing
+  // to attribute. `pct`/`zone`/`comp_count` are null in mode B.
+  "detail.price_context_shown": {
+    listing_id: string;
+    mode: "A" | "B";
+    pct: number | null;
+    zone: string | null;
+    comp_count: number | null;
+  };
   "save.toggled": {
     listing_id: string;
     auth_state: AuthState;
