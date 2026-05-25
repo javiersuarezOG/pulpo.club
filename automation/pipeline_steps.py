@@ -235,6 +235,15 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "land_type", "property_type", "bedrooms",
     # Price + size
     "area_m2", "price_usd", "previous_price", "price_per_m2",
+    # Zone-relative price context (powers the detail-page PriceContextBlock).
+    # `zone_percentile` is computed in pulpo/ranker_legs/value.py (MIN_COMPS=3,
+    # cascades zone→macro→global). `price_vs_zone_*` and the new
+    # `zone_price_per_m2_min/max` + `zone_comp_count` come from
+    # automation/zone_medians.py (gate ≥ MIN_LISTINGS_PER_ZONE=10, no cascade).
+    "zone_percentile",
+    "price_vs_zone_median", "price_vs_zone_pct",
+    "zone_price_per_m2_min", "zone_price_per_m2_max",
+    "zone_comp_count",
     # Photos
     "photo_urls", "hero_photo_path", "photos_count",
     "hero_photo_quality_score", "has_text_overlay",

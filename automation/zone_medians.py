@@ -32,7 +32,8 @@ Public API:
 
     from automation.zone_medians import compute_and_apply
     metrics = compute_and_apply(listings)
-    # Each listing now has price_vs_zone_median and price_vs_zone_pct
+    # Each listing now has price_vs_zone_median, price_vs_zone_pct,
+    # zone_price_per_m2_min, zone_price_per_m2_max, and zone_comp_count
     # set when eligible.
 
 Idempotent: pure function of (current listings) → fields. No sidecar.
@@ -85,11 +86,19 @@ def _is_active(li: Any) -> bool:
     return True
 
 
-def compute_zone_medians(listings: list[Any]) -> dict[tuple[str, str], float]:
-    """Per-bucket median price_per_m2. Buckets below MIN_LISTINGS_PER_ZONE excluded.
+def compute_zone_medians(listings: list[Any]) -> dict[tuple[str, str], dict]:
+    """Per-bucket distribution stats over price_per_m2. Buckets below
+    MIN_LISTINGS_PER_ZONE are excluded.
 
     Returns:
-        {(zone, property_type): median_price_per_m2}
+        {(zone, property_type): {"median": float, "min": float,
+                                 "max": float, "n": int}}
+
+    `median` is the existing signal driving price_vs_zone_pct. `min`/`max`/`n`
+    feed the detail-page PriceContextBlock — `n` shows up in the "Based on N
+    listings" caption; `min`/`max` are kept for a future visualization that
+    isn't shipped in this PR (computed silently so the pipeline doesn't need
+    a second pass when the viz lands).
     """
     by_bucket: dict[tuple[str, str], list[float]] = {}
     for li in listings:
@@ -102,24 +111,34 @@ def compute_zone_medians(listings: list[Any]) -> dict[tuple[str, str], float]:
         by_bucket.setdefault(key, []).append(float(ppm))
 
     return {
-        key: round(statistics.median(values), 2)
+        key: {
+            "median": round(statistics.median(values), 2),
+            "min":    round(min(values), 2),
+            "max":    round(max(values), 2),
+            "n":      len(values),
+        }
         for key, values in by_bucket.items()
         if len(values) >= MIN_LISTINGS_PER_ZONE
     }
 
 
 def apply_zone_metrics(listings: list[Any],
-                       medians: dict[tuple[str, str], float]) -> dict:
-    """Set price_vs_zone_median + price_vs_zone_pct on each eligible listing.
+                       stats: dict[tuple[str, str], dict]) -> dict:
+    """Set zone-comparison fields on each eligible listing:
+        - price_vs_zone_median   (USD/m² median of bucket peers)
+        - price_vs_zone_pct      (signed % vs. median; negative = below)
+        - zone_price_per_m2_min  (lowest $/m² in bucket; not displayed yet)
+        - zone_price_per_m2_max  (highest $/m² in bucket; not displayed yet)
+        - zone_comp_count        (n peers; powers "Based on N" caption)
 
-    Eligibility: listing must be active AND its bucket must be in medians
+    Eligibility: listing must be active AND its bucket must be in `stats`
     (i.e. ≥ MIN_LISTINGS_PER_ZONE peers). Listings that don't qualify
-    leave both fields untouched (default None).
+    leave all fields untouched (default None).
 
     Returns metrics dict with bucket counts + how many listings were scored.
     """
     metrics: dict[str, Any] = {
-        "buckets_computed":      len(medians),
+        "buckets_computed":      len(stats),
         "buckets_below_min":     0,
         "listings_scored":       0,
         "listings_skipped_no_zone":  0,
@@ -134,17 +153,21 @@ def apply_zone_metrics(listings: list[Any],
         if key is None:
             metrics["listings_skipped_no_zone"] += 1
             continue
-        median = medians.get(key)
-        if median is None:
+        bucket = stats.get(key)
+        if bucket is None:
             metrics["listings_skipped_no_bucket_median"] += 1
             continue
 
         ppm = _g(li, "price_per_m2")
+        median = bucket["median"]
         # Signed % difference: negative = below median (cheaper), positive = above.
         # Rounded to 1 decimal — sufficient resolution for chip display.
         pct = round(((ppm - median) / median) * 100, 1)
         _set(li, "price_vs_zone_median", median)
         _set(li, "price_vs_zone_pct", pct)
+        _set(li, "zone_price_per_m2_min", bucket["min"])
+        _set(li, "zone_price_per_m2_max", bucket["max"])
+        _set(li, "zone_comp_count", bucket["n"])
         metrics["listings_scored"] += 1
 
     metrics["buckets_below_min"] = (
@@ -153,7 +176,7 @@ def apply_zone_metrics(listings: list[Any],
     return metrics
 
 
-def _write_history(medians: dict[tuple[str, str], float],
+def _write_history(stats: dict[tuple[str, str], dict],
                    bucket_sizes: dict[tuple[str, str], int],
                    history_path: Path) -> None:
     """Append one row per eligible (zone, type) bucket to the history JSONL."""
@@ -161,13 +184,13 @@ def _write_history(medians: dict[tuple[str, str], float],
     try:
         history_path.parent.mkdir(parents=True, exist_ok=True)
         with history_path.open("a", encoding="utf-8") as f:
-            for (zone, ptype), median in medians.items():
+            for (zone, ptype), bucket in stats.items():
                 f.write(json.dumps({
                     "ts":              ts,
                     "zone":            zone,
                     "property_type":   ptype,
                     "n_listings":      bucket_sizes.get((zone, ptype), 0),
-                    "median_ppm_usd":  median,
+                    "median_ppm_usd":  bucket["median"],
                 }, ensure_ascii=False) + "\n")
     except OSError:
         # Telemetry write failure should not break the pipeline.
@@ -175,7 +198,7 @@ def _write_history(medians: dict[tuple[str, str], float],
 
 
 def compute_and_apply(listings: list[Any], history_path: Path | None = None) -> dict:
-    """Top-level entry point — compute medians from `listings` and apply
+    """Top-level entry point — compute zone stats from `listings` and apply
     them in-place. Returns metrics dict.
 
     Common case: called once per nightly run after enrichment / derived
@@ -184,10 +207,10 @@ def compute_and_apply(listings: list[Any], history_path: Path | None = None) -> 
     Side effect: appends one row per eligible bucket to history_path
     (default web/data/zone_medians_history.jsonl) for trend tracking.
     """
-    medians = compute_zone_medians(listings)
-    metrics = apply_zone_metrics(listings, medians)
+    stats = compute_zone_medians(listings)
+    metrics = apply_zone_metrics(listings, stats)
 
-    # Compute per-bucket sizes for telemetry (separately from medians,
+    # Compute per-bucket sizes for telemetry (separately from stats,
     # which already filtered to only eligible buckets).
     bucket_sizes: dict[tuple[str, str], int] = {}
     for li in listings:
@@ -201,5 +224,5 @@ def compute_and_apply(listings: list[Any], history_path: Path | None = None) -> 
     if history_path is None:
         history_path = (Path(__file__).resolve().parents[1]
                         / "web" / "data" / "zone_medians_history.jsonl")
-    _write_history(medians, bucket_sizes, history_path)
+    _write_history(stats, bucket_sizes, history_path)
     return metrics

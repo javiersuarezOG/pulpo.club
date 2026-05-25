@@ -109,6 +109,9 @@
       "previous_price",
       "price_vs_zone_median",
       "price_vs_zone_pct",
+      "zone_price_per_m2_min",
+      "zone_price_per_m2_max",
+      "zone_comp_count",
       "dist_airport_km",
       "dist_beach_km",
       "dist_highway_km",
@@ -737,6 +740,24 @@
       "price_vs_zone_pct": {
         "type": [
           "number",
+          "null"
+        ]
+      },
+      "zone_price_per_m2_min": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "zone_price_per_m2_max": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "zone_comp_count": {
+        "type": [
+          "integer",
           "null"
         ]
       },

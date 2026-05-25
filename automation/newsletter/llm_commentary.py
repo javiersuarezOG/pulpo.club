@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from .types import Commentary, Locale, Preference
+from pulpo.countries import active as _active_country
 
 # ── Provider config ───────────────────────────────────────────────────────
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
@@ -55,9 +56,21 @@ def cost_usd(tokens_in: int, tokens_out: int) -> float:
 # Sebastian's editorial voice for the newsletter: opinionated, lives in
 # units (m², $/vara², minutes-to-beach), names trade-offs. The hand-authored
 # Issue 01 (newsletter-drafts/pulpo-issue-01-may-18-2026.html) is the tone
-# reference. Keep this prompt byte-stable — DeepSeek's prefix cache only
-# hits when the system prompt is identical across calls.
-SYSTEM_PROMPT = """You are the editorial voice of Pulpo's fortnightly newsletter for El Salvador beach + raw-land buyers.
+# reference. Keep this prompt byte-stable per country — DeepSeek's prefix
+# cache hits when the system prompt is identical across calls.
+#
+# PR-MC-newsletter — the prompt is country-templated from the active
+# country's manifest (same pattern as the listing-enrichment prompt in
+# automation/llm_enrichment_prompts.py, PR-MC-2). The "Salvadoran Spanish"
+# instruction degrades to the country's name when name_adjective_en is
+# unset (rare; falls back to name_en).
+_country = _active_country()
+_country_adjective = _country.name_adjective_en() or _country.name_en
+
+# Plain string + .replace() so the JSON-shape block's literal braces
+# below don't fight an f-string. The {locale} placeholder stays a
+# .format() substitution applied per-call in build_system_prompt().
+SYSTEM_PROMPT = """You are the editorial voice of Pulpo's fortnightly newsletter for __COUNTRY_NAME__ beach + raw-land buyers.
 
 Your role: take the FACTS the user provides and write the EDITORIAL CONNECTIVE TISSUE for one issue — the hero lede, the "at-a-glance" subhead, the market context paragraphs, the "skip this one" rationale, and the "one number worth knowing" block.
 
@@ -66,7 +79,7 @@ Voice:
 - Trade in numbers: $/m², $/vara², minutes to beach, days listed, % vs zone median. Never vague.
 - Surface trade-offs honestly — every pick has a catch.
 - No real-estate marketing clichés ("dream home", "tropical paradise", "must see"). No exclamation marks.
-- Match the locale: write everything in {locale} (`en` = English, `es` = Salvadoran Spanish). Never mix.
+- Match the locale: write everything in {locale} (`en` = English, `es` = __COUNTRY_ADJECTIVE__ Spanish). Never mix.
 
 Hard rules:
 - Reply ONLY with a single JSON object — no preamble, no markdown fence.
@@ -89,7 +102,7 @@ JSON shape:
   "one_number_title": "..." | null,   // ≤ 12 words
   "one_number_body": "..." | null     // ≤ 50 words
 }
-"""
+""".replace("__COUNTRY_NAME__", _country.name_en).replace("__COUNTRY_ADJECTIVE__", _country_adjective)
 
 
 def _build_client():
