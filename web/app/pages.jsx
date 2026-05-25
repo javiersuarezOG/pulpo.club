@@ -1582,6 +1582,96 @@ function ListingJsonLd({ listing, locale }) {
   );
 }
 
+// PriceContextBlock — "How this price compares" on /listing/:id.
+//
+// Sits between .detail-keystats (the absolute $/m² display) and the
+// description. Three render modes:
+//   A — full context: pill (green/neutral/amber) + caption. Requires
+//       price_vs_zone_pct != null AND zone_comp_count != null. Both
+//       fields are set together by automation/zone_medians.py for
+//       buckets with ≥ MIN_LISTINGS_PER_ZONE (=10) active comps.
+//   B — partial: muted "not enough listings" message when the listing
+//       has a $/m² but its zone bucket is below the threshold.
+//   C — nothing: when price_per_m2 itself is missing (the listing is
+//       already flagged is_incomplete and shows the broker note above).
+//
+// Currency-free by design — the block shows a relative %, never an
+// absolute $/m² number. The keystats strip above handles the absolute
+// number's locale formatting via formatPpm. Keeps the block
+// multi-country-safe ahead of PR-MC-4.
+function PriceContextBlock({ listing, locale }) {
+  // Stable telemetry on first render per listing — fires once when the
+  // detail panel opens, regardless of which mode the block lands in,
+  // so we can validate the production gating-rate ratio (Mode A ≈ 60%
+  // per the spec's 60.8% number) against PostHog.
+  pUseEffect(() => {
+    if (listing.price_per_m2 == null) return;     // Mode C — block absent, no event
+    const mode = listing.price_vs_zone_pct == null || listing.zone_comp_count == null ? "B" : "A";
+    track("detail.price_context_shown", {
+      listing_id:  listing.id,
+      mode,
+      pct:         listing.price_vs_zone_pct,
+      zone:        listing.zone,
+      comp_count:  listing.zone_comp_count,
+    });
+  }, [listing.id]);
+
+  if (listing.price_per_m2 == null) return null;
+
+  const zoneLabel = listing.zone_name || listing.zone || "";
+  const peerKindKey =
+    listing.subcategory === "homes"  ? "detail.price_context.peer_kind.homes"  :
+    listing.subcategory === "condos" ? "detail.price_context.peer_kind.condos" :
+    listing.subcategory === "land"   ? "detail.price_context.peer_kind.land"   :
+                                       "detail.price_context.peer_kind.listings";
+  const kind = t(peerKindKey, locale);
+
+  // Mode B — we have a $/m² but no zone comp data (bucket below the
+  // 10-listing gate). Render a muted note instead of the pill. Zone
+  // name may still be missing on rare records — fall back to a
+  // zone-agnostic copy so the section doesn't leak "{zone}" placeholder.
+  if (listing.price_vs_zone_pct == null || listing.zone_comp_count == null) {
+    const msgKey = zoneLabel
+      ? "detail.price_context.unavailable"
+      : "detail.price_context.unavailable_no_zone";
+    return (
+      <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
+        <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
+        <div className="price-context__unavailable">{t(msgKey, locale, { zone: zoneLabel })}</div>
+      </section>
+    );
+  }
+
+  // Mode A — pill + caption.
+  const pct = listing.price_vs_zone_pct;
+  const abs = Math.max(1, Math.round(Math.abs(pct)));  // never render "0% cheaper"
+  let tone, copyKey;
+  if (pct <= -15) {
+    tone    = "success";
+    copyKey = "detail.price_context.below_avg";
+  } else if (pct >= 15) {
+    tone    = "amber";
+    copyKey = "detail.price_context.above_avg";
+  } else {
+    tone    = "neutral";
+    copyKey = "detail.price_context.near_avg";
+  }
+
+  return (
+    <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
+      <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
+      <div className="price-context__row">
+        <span className="price-context__pill" data-tone={tone}>
+          {t(copyKey, locale, { pct: abs, kind, zone: zoneLabel })}
+        </span>
+      </div>
+      <div className="price-context__caption">
+        {t("detail.price_context.caption", locale, { n: listing.zone_comp_count, zone: zoneLabel })}
+      </div>
+    </section>
+  );
+}
+
 function ListingDetail({ listing, app, asPanel = true }) {
   const [galleryIdx, setGalleryIdx] = pUseState(0);
   const [lightbox, setLightbox] = pUseState(false);
@@ -1931,6 +2021,8 @@ function ListingDetail({ listing, app, asPanel = true }) {
             <div className={`kstat-value tone-${daysListedTone(listing.days_listed)}`}>{typeof listing.days_listed === "number" ? listing.days_listed : "—"}</div>
           </div>
         </div>
+
+        <PriceContextBlock listing={listing} locale={lc} />
 
         <div className="detail-section">
           <p className="detail-description">{tr(listing.description, app.locale)}</p>
