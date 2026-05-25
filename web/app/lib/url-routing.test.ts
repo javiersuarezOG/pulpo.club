@@ -17,6 +17,39 @@ describe("parseLocation — /l/<token>", () => {
     expect(parsed.isListingPath).toBe(true);
   });
 
+  // Share-pin landing — /l/<token> must surface route=browse and
+  // pinListingId so the app shell can (a) replaceState to /browse?pin=<id>
+  // on cold-load and (b) drop the user on /browse (not /) when the panel
+  // closes. Regression guard for the dead-end bug where a shared listing
+  // opened over /home with no catalogue underneath.
+  it("share link lands route=browse with pinListingId set", () => {
+    const id = "remax__001461165132";
+    const parsed = parseLocation(`/l/${encodeShareToken(id)}`);
+    expect(parsed.route).toBe("browse");
+    expect(parsed.pinListingId).toBe(id);
+    expect(parsed.openListingId).toBe(id);
+  });
+
+  // Non-share parse paths must NEVER populate pinListingId — pinListingId
+  // is the one-shot signal that "the user landed via a share URL." If a
+  // /listing/:id or /browse parse leaks pinListingId, the app shell will
+  // wrongly rewrite their URL and break the close-listing flow.
+  it("non-share paths never set pinListingId", () => {
+    const paths = [
+      "/",
+      "/browse",
+      "/saved",
+      "/plans",
+      "/account",
+      "/account/notifications",
+      "/listing/remax-12345",
+    ];
+    for (const path of paths) {
+      const parsed = parseLocation(path);
+      expect(parsed.pinListingId).toBeNull();
+    }
+  });
+
   it("decodes tokens for non-remax sources too", () => {
     const cases = [
       "oceanside__15463",

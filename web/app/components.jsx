@@ -723,7 +723,7 @@ const PHOTO_PRELOAD_MAX = 5;
 
 function ListingCard({
   listing, app, compact = false, onOpen, variant = "default",
-  priority = false, source, topRank,
+  priority = false, source, topRank, sharedPin = false,
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -831,6 +831,21 @@ function ListingCard({
           </span>
         )}
         <CardSignalChip listing={listing} />
+        {sharedPin && (
+          /* Share-pin tag. Reuses .card-signal-chip styling (same white
+             pill, same icon+label flow) with a -shared modifier that
+             repositions to top-left so it doesn't collide with the
+             new/drop signal chip at bottom-left. Renders only on the
+             pinned card in BrowsePage; cleared the moment the user
+             interacts with filters/sort/closes the panel. */
+          <span
+            className="card-signal-chip card-signal-chip-shared"
+            aria-label={t("card.shared_pill", currentLocale())}
+          >
+            <Icon name="share" size={12} strokeWidth={2} />
+            <span>{t("card.shared_pill", currentLocale())}</span>
+          </span>
+        )}
         <HeartButton listingId={listing.id} app={app} variant="overlay" size={18} />
         {hovered && listing.photos.length > 1 && (
           <>

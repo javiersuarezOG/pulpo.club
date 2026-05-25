@@ -1083,6 +1083,46 @@ function BrowsePage({ app }) {
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
 
+  // Share-pin state — recipient landed via /l/<token>, the app shell
+  // already rewrote the URL to /browse?pin=<id> + auto-opened the detail
+  // panel. We seed from ?pin so the pinned card renders at the top of
+  // the grid with a "Shared with you" tag. Clears the moment the user
+  // changes filters / sort / closes the panel.
+  const [pinnedListingId, setPinnedListingId] = pUseState(() => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get("pin");
+  });
+
+  // Strips ?pin from the URL via replaceState (NEVER pushState — we
+  // don't want each filter toggle adding a history entry). Also clears
+  // the in-memory pin state so the pinned card reverts to its natural
+  // sorted position, and dispatches `pulpo:pin-cleared` so the app
+  // shell can close the auto-opened detail panel (the panel is owned
+  // by the shell, not BrowsePage — see app.jsx's openListingId).
+  const clearPin = pUseCallback(() => {
+    setPinnedListingId(null);
+    if (typeof window === "undefined") return;
+    const next = new URLSearchParams(window.location.search);
+    const hadPin = next.has("pin");
+    if (hadPin) {
+      next.delete("pin");
+      const qs = next.toString();
+      window.history.replaceState({}, "", `/browse${qs ? `?${qs}` : ""}`);
+    }
+    window.dispatchEvent(new CustomEvent("pulpo:pin-cleared"));
+  }, []);
+
+  // App shell -> BrowsePage: when the user closes the auto-opened
+  // detail panel, app.closeListing's pinLandedRef branch dispatches
+  // pulpo:pin-cleared so BrowsePage drops the in-memory pin (and the
+  // "Shared with you" tag on the card).
+  pUseEffect(() => {
+    if (typeof window === "undefined") return;
+    const onCleared = () => setPinnedListingId(null);
+    window.addEventListener("pulpo:pin-cleared", onCleared);
+    return () => window.removeEventListener("pulpo:pin-cleared", onCleared);
+  }, []);
+
   // popstate filter resync — BrowsePage stays mounted when the user
   // goes Browse → Discover → back, or Browse → Listing → close → back.
   // Mount-time filter seed only runs once, so without this effect the
@@ -1092,11 +1132,11 @@ function BrowsePage({ app }) {
   pUseEffect(() => {
     if (typeof window === "undefined") return;
     const onPop = () => {
-      const seeded = buildFiltersForCategory(
-        new URLSearchParams(window.location.search).get("cat")
-      );
+      const params = new URLSearchParams(window.location.search);
+      const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
+      setPinnedListingId(params.get("pin"));
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
@@ -1229,14 +1269,47 @@ function BrowsePage({ app }) {
   // Wrap setSort / setView to fire telemetry on user-driven changes.
   // setFilters intentionally untracked — chip handlers wrap it themselves
   // when needed.
+  // Share-pin: sort changes are always user-driven, so clear the pin
+  // here. Filter changes are similar but split across many call sites —
+  // we wrap setFilters separately below so mount/popstate effects can
+  // still use the raw setter without nuking the pin.
   const setSortTelemeter = pUseCallback((next) => {
     setSort(next);
     track("browse.sort_changed", { sort: next });
-  }, []);
+    clearPin();
+  }, [clearPin]);
   const setViewTelemeter = pUseCallback((next) => {
     setView(next);
     track("browse.view_toggled", { view: next });
   }, []);
+
+  // setFilters wrapper that ALSO clears the share-pin. Use this
+  // everywhere a filter mutation is user-driven (FilterPanel, active
+  // chip toggles, EmptyResults clear, header cat-clear button). Do NOT
+  // use it inside the mount-time / popstate / category-sync effects —
+  // those need to seed filters from URL without consuming the pin.
+  const setFiltersWithPinClear = pUseCallback((next) => {
+    setFilters(next);
+    clearPin();
+  }, [clearPin]);
+
+  // Fire `browse.pin_consumed` once when the pinned listing resolves to
+  // a valid card. If the pin id doesn't match any listing OR the listing
+  // is_incomplete (excluded from the default Browse view, would render
+  // an empty/Not-shared card on top of the grid), silently strip ?pin
+  // so the page recovers without surfacing a broken share state.
+  const pinTelemetryFiredRef = pUseRef(false);
+  pUseEffect(() => {
+    if (!pinnedListingId || pinTelemetryFiredRef.current) return;
+    if (listingsState.state.status !== "ready") return;
+    const pinned = LISTINGS.find((l) => l.id === pinnedListingId);
+    if (!pinned || pinned.is_incomplete) {
+      clearPin();
+      return;
+    }
+    pinTelemetryFiredRef.current = true;
+    track("browse.pin_consumed", { listing_id: pinnedListingId });
+  }, [pinnedListingId, listingsState.state.status, LISTINGS, clearPin]);
 
   // === Hooks done — branch on load state. ===
   if (listingsState.state.status === "loading") return <BrowseSkeleton />;
@@ -1248,7 +1321,7 @@ function BrowsePage({ app }) {
     <div className="page page-browse">
       <div className="browse-layout">
         <div className="filter-desktop">
-          <FilterPanel filters={filters} setFilters={setFilters} count={results.length} app={app} />
+          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
         </div>
         <div className="results-col">
           <div className="results-header">
@@ -1288,7 +1361,7 @@ function BrowsePage({ app }) {
                           // navigation primitive; using it for a filter
                           // mutation would skip the writer effect and
                           // leave a stale URL.
-                          setFilters((prev) => header.clear(prev));
+                          setFiltersWithPinClear((prev) => header.clear(prev));
                         }}
                         aria-label={header.clearAria}
                         title={header.clearAria}
@@ -1346,21 +1419,21 @@ function BrowsePage({ app }) {
           {/* Active filter chips row */}
           {activeFilterCount > 0 && (
             <div className="active-filter-row">
-              {[...filters.zones].map(z => <span key={z} className="active-chip" onClick={() => { const s = new Set(filters.zones); s.delete(z); setFilters({...filters, zones: s});}}>{z} <Icon name="close" size={12}/></span>)}
-              {[...filters.land_types].map(t => <span key={t} className="active-chip" onClick={() => { const s = new Set(filters.land_types); s.delete(t); setFilters({...filters, land_types: s});}}>{landTypeLabel(t)} <Icon name="close" size={12}/></span>)}
-              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFilters({...filters, features: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
-              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFilters({...filters, infra: s});}}>{f} <Icon name="close" size={12}/></span>)}
-              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFilters({...filters, status: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
-              {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFilters({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
+              {[...filters.zones].map(z => <span key={z} className="active-chip" onClick={() => { const s = new Set(filters.zones); s.delete(z); setFiltersWithPinClear({...filters, zones: s});}}>{z} <Icon name="close" size={12}/></span>)}
+              {[...filters.land_types].map(t => <span key={t} className="active-chip" onClick={() => { const s = new Set(filters.land_types); s.delete(t); setFiltersWithPinClear({...filters, land_types: s});}}>{landTypeLabel(t)} <Icon name="close" size={12}/></span>)}
+              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
+              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{f} <Icon name="close" size={12}/></span>)}
+              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
+              {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
             </div>
           )}
 
           {results.length === 0 ? (
             <EmptyResults
-              onClear={() => setFilters(makeDefaultFilters())}
+              onClear={() => setFiltersWithPinClear(makeDefaultFilters())}
               filters={filters}
               listings={LISTINGS}
-              setFilters={setFilters}
+              setFilters={setFiltersWithPinClear}
             />
           ) : view === "cards" ? (
             <>
@@ -1371,32 +1444,49 @@ function BrowsePage({ app }) {
                     mount, and above-fold cards stall behind off-screen
                     fetches. 6 covers ~2 rows on a desktop auto-fill grid
                     and ~3 rows on a typical mobile portrait — anything
-                    below that falls through to native loading="lazy". */}
-                {results.slice(0, visibleCount).map((l, i) => (
-                  <ListingCard
-                    key={l.id}
-                    listing={l}
-                    app={app}
-                    priority={i < ABOVE_FOLD_COUNT}
-                    source="browse"
-                    topRank={topRankMap.get(l.id)}
-                    onOpen={() => {
-                      track("card.clicked", { listing_id: l.id, source_view: "browse" });
-                      // Route through the matrix so anon + free hit the
-                      // FreeMonthModal (paid users open the listing).
-                      const branch = routeCtaForState("shelf_card", app?.user);
-                      trackCtaRouted("shelf_card", app?.user, branch, true);
-                      if (branch === "passthrough") {
-                        app.openListing(l.id);
-                        return;
-                      }
-                      void dispatchCentralBranch(branch, app, {
-                        trigger: "browse_card",
-                        pendingListing: l.id,
-                      });
-                    }}
-                  />
-                ))}
+                    below that falls through to native loading="lazy".
+
+                    Share-pin: when a valid `?pin` is present, the pinned
+                    listing is prepended to displayResults so it renders
+                    as the first card with the "Shared with you" tag,
+                    while still appearing in its natural sorted position
+                    once the user clears the pin. is_incomplete pins are
+                    rejected upstream by the clearPin telemetry effect. */}
+                {(() => {
+                  const pinned = pinnedListingId
+                    ? results.find((l) => l.id === pinnedListingId)
+                      || LISTINGS.find((l) => l.id === pinnedListingId && !l.is_incomplete)
+                    : null;
+                  const displayResults = pinned
+                    ? [pinned, ...results.filter((l) => l.id !== pinned.id)]
+                    : results;
+                  return displayResults.slice(0, visibleCount).map((l, i) => (
+                    <ListingCard
+                      key={l.id}
+                      listing={l}
+                      app={app}
+                      priority={i < ABOVE_FOLD_COUNT}
+                      source="browse"
+                      topRank={topRankMap.get(l.id)}
+                      sharedPin={pinned != null && l.id === pinned.id}
+                      onOpen={() => {
+                        track("card.clicked", { listing_id: l.id, source_view: "browse" });
+                        // Route through the matrix so anon + free hit the
+                        // FreeMonthModal (paid users open the listing).
+                        const branch = routeCtaForState("shelf_card", app?.user);
+                        trackCtaRouted("shelf_card", app?.user, branch, true);
+                        if (branch === "passthrough") {
+                          app.openListing(l.id);
+                          return;
+                        }
+                        void dispatchCentralBranch(branch, app, {
+                          trigger: "browse_card",
+                          pendingListing: l.id,
+                        });
+                      }}
+                    />
+                  ));
+                })()}
               </div>
               {visibleCount < results.length && (
                 <div className="browse-load-more">
@@ -1427,7 +1517,7 @@ function BrowsePage({ app }) {
         <div className="filter-drawer-backdrop" onClick={() => setFilterDrawerOpen(false)}>
           <div className="filter-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-handle" />
-            <FilterPanel filters={filters} setFilters={setFilters} count={results.length} onClose={() => setFilterDrawerOpen(false)} app={app} />
+            <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} onClose={() => setFilterDrawerOpen(false)} app={app} />
           </div>
         </div>
       )}

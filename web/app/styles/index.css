@@ -875,6 +875,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .card-signal-chip svg { width: 12px; height: 12px; }
 .card-signal-chip-drop { color: var(--badge-drop); }
 .card-signal-chip-new  { color: var(--badge-new); }
+/* Share-pin tag — reuses the white-pill design system but anchors
+   top-left so it doesn't collide with the new/drop signal chip at
+   bottom-left and so the "this is the listing your friend shared"
+   context is the first thing a recipient reads on the pinned card.
+   Override pointer-events:none so the aria-label is announced to
+   screen readers on hover/focus. Stacks below the Pulpo-rank pill
+   (top-10 listings) via the ~ selector at the bottom of the file. */
+.card-signal-chip-shared {
+  top: 10px; left: 10px;
+  bottom: auto;
+  color: var(--ink-2);
+  pointer-events: auto;
+}
 
 .pulpo-badge {
   display: inline-flex; align-items: center;
@@ -6903,6 +6916,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
   top: 42px;
 }
 .pulpo-rank ~ .card-badge-row {
+  top: 46px;
+}
+/* Share-pin tag stacks below the rank pill the same way. */
+.pulpo-rank ~ .card-signal-chip-shared {
   top: 46px;
 }
 
