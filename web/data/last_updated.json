@@ -1,8 +1,8 @@
 {
-  "last_updated": "2026-05-25T07:50:24.038278+00:00",
-  "started_at": "2026-05-25T06:28:56.491117+00:00",
-  "duration_seconds": 4887.55,
-  "total_listings": 876,
+  "last_updated": "2026-05-25T09:29:57.989005+00:00",
+  "started_at": "2026-05-25T08:08:52.490242+00:00",
+  "duration_seconds": 4865.5,
+  "total_listings": 879,
   "dropped": 156,
   "per_source_raw": {
     "bienesraices": 568,
@@ -91,17 +91,17 @@
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
     "previous_price": 0.0114,
-    "beachfront_tier_on_beach": 0.1301,
-    "beachfront_tier_walk_to_beach": 0.016,
-    "beachfront_tier_near_beach": 0.0274,
-    "land_type_commercial": 0.0947,
-    "land_type_tourist": 0.113,
-    "land_type_residential": 0.7922,
-    "is_motivated": 0.1621
+    "beachfront_tier_on_beach": 0.1308,
+    "beachfront_tier_walk_to_beach": 0.0159,
+    "beachfront_tier_near_beach": 0.0273,
+    "land_type_commercial": 0.0944,
+    "land_type_tourist": 0.1138,
+    "land_type_residential": 0.7918,
+    "is_motivated": 0.1615
   },
   "field_completeness": {
     "bienesraices": {
-      "n_listings": 414,
+      "n_listings": 415,
       "fields": {
         "price_usd": 0.97,
         "area_m2": 0.97,
@@ -176,7 +176,7 @@
       }
     },
     "encuentra24": {
-      "n_listings": 27,
+      "n_listings": 28,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
@@ -186,9 +186,9 @@
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.3,
+        "is_beachfront": 0.32,
         "has_paved_access": 0.0,
-        "has_water": 0.19,
+        "has_water": 0.18,
         "has_power": 0.11,
         "is_repriced": 0.0,
         "days_listed": 1.0,
@@ -301,7 +301,7 @@
       }
     },
     "remax": {
-      "n_listings": 280,
+      "n_listings": 281,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -327,7 +327,7 @@
     }
   },
   "property_type_counts": {
-    "house": 107,
+    "house": 110,
     "land": 743,
     "condo": 26
   },
@@ -348,7 +348,7 @@
       "drop": 3
     }
   },
-  "v_fallback_no_price": 79,
+  "v_fallback_no_price": 80,
   "v_fallback_no_comps": 0,
   "sources": [
     "bienesraices",
