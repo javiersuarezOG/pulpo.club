@@ -106,10 +106,17 @@ function formatPpm(n) {
   return `$${Math.round(n)}/m²`;
 }
 
-// Render the OG card image. JSX-as-React-tree gets passed to Satori,
-// which lays out with a CSS subset and rasterizes to PNG via Resvg.
-// Constraints: flex layouts only, no `display: block` on text nodes,
-// no transforms beyond translate/rotate/scale.
+// Render the OG card image. React.createElement (not JSX) so the file
+// stays as plain .js — Vercel's serverless function classifier only
+// auto-detects .js / .ts / .mjs / .cjs in api/; .jsx/.tsx in this
+// directory layout fall through with "doesn't match any Serverless
+// Functions" at deploy time. Satori receives the createElement tree
+// directly, no transpilation needed.
+//
+// Constraints (Satori CSS subset): flex layouts only, no `display: block`
+// on text nodes, no transforms beyond translate/rotate/scale.
+const h = React.createElement;
+
 function renderCard({ listing, lang }) {
   const title = String(listing.title || "").trim();
   const price = formatPrice(listing.price_usd);
@@ -133,172 +140,201 @@ function renderCard({ listing, lang }) {
   const titleLine = area ? `${title} · ${area}` : title;
   const metaParts = [muni, dept, features.join(" · ")].filter(Boolean);
 
-  return (
-    <div
-      style={{
+  // Full-bleed hero photo. Satori fetches the URL server-side at
+  // render time; null on missing photo leaves the dark bg.
+  const photo = photoUrl
+    ? h("img", {
+        src: photoUrl,
+        width: 1200,
+        height: 630,
+        style: { position: "absolute", inset: 0, objectFit: "cover", width: 1200, height: 630 },
+      })
+    : null;
+
+  // Two-stop gradient — dark at top + dark at bottom for text legibility.
+  const gradient = h("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      background:
+        "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.82) 100%)",
+    },
+  });
+
+  // Pulpo brand pill, top-right — the only attribution on the card.
+  // Octopus mark path matches web/app/components.jsx PulpoMark.
+  const brandPill = h(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        top: 32,
+        right: 36,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "10px 22px 10px 12px",
+        backgroundColor: "rgba(255,255,255,0.96)",
+        borderRadius: 999,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+      },
+    },
+    h(
+      "svg",
+      { width: 36, height: 36, viewBox: "-50 -50 100 100" },
+      h("circle", { cx: 0, cy: 0, r: 18, fill: "#1F4A3E" }),
+      h("path", {
+        d: "M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4",
+        stroke: "#1F4A3E",
+        strokeWidth: 8.5,
+        strokeLinecap: "round",
+        fill: "none",
+      }),
+      h("circle", { cx: 18, cy: -4, r: 9.5, fill: "#1F4A3E" }),
+      h("circle", { cx: 18, cy: -4, r: 5.5, fill: "#B8814A" }),
+    ),
+    h(
+      "span",
+      { style: { fontFamily: "Instrument Serif", fontSize: 30, color: "#1A1916", lineHeight: 1 } },
+      "pulpo",
+    ),
+  );
+
+  // Beach / hook chip — translucent glass pill at top of bottom stack.
+  const chip = h(
+    "div",
+    {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        alignSelf: "flex-start",
+        gap: 10,
+        padding: "10px 18px 10px 14px",
+        marginBottom: 22,
+        backgroundColor: "rgba(255,255,255,0.18)",
+        border: "1px solid rgba(255,255,255,0.32)",
+        borderRadius: 999,
+        color: "#FFFFFF",
+        fontSize: 22,
+        fontWeight: 500,
+      },
+    },
+    h("div", {
+      style: {
+        width: 10,
+        height: 10,
+        borderRadius: 999,
+        backgroundColor: "#6BE38D",
+        boxShadow: "0 0 14px rgba(107,227,141,0.8)",
+      },
+    }),
+    zone ? `${hook} · ${zone}` : hook,
+  );
+
+  // Price — big serif with optional ppm badge alongside.
+  const priceBlock = h(
+    "div",
+    { style: { display: "flex", alignItems: "flex-end", gap: 22, marginBottom: 14 } },
+    h(
+      "span",
+      {
+        style: {
+          fontFamily: "Instrument Serif",
+          fontSize: 144,
+          lineHeight: 0.95,
+          letterSpacing: "-0.025em",
+          color: "#FFFFFF",
+        },
+      },
+      price,
+    ),
+    ppm
+      ? h(
+          "span",
+          {
+            style: {
+              fontSize: 26,
+              fontWeight: 500,
+              color: "rgba(255,255,255,0.88)",
+              marginBottom: 18,
+            },
+          },
+          ppm,
+        )
+      : null,
+  );
+
+  // Title + size line.
+  const titleBlock = h(
+    "div",
+    {
+      style: {
+        fontSize: 36,
+        fontWeight: 500,
+        lineHeight: 1.2,
+        color: "#FFFFFF",
+        marginBottom: 8,
+        maxWidth: 1000,
+        display: "flex",
+      },
+    },
+    titleLine,
+  );
+
+  // Meta line — municipality / department / features.
+  const metaBlock = metaParts.length > 0
+    ? h(
+        "div",
+        {
+          style: {
+            fontSize: 24,
+            lineHeight: 1.35,
+            color: "rgba(255,255,255,0.9)",
+            display: "flex",
+          },
+        },
+        metaParts.join(" · "),
+      )
+    : null;
+
+  // Bottom content stack — chip, price, title, meta.
+  const bottomStack = h(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        left: 56,
+        right: 56,
+        bottom: 44,
+        display: "flex",
+        flexDirection: "column",
+        color: "#FFFFFF",
+      },
+    },
+    chip,
+    priceBlock,
+    titleBlock,
+    metaBlock,
+  );
+
+  // Root card container.
+  return h(
+    "div",
+    {
+      style: {
         width: 1200,
         height: 630,
         display: "flex",
         position: "relative",
         backgroundColor: "#111",
         fontFamily: "Inter",
-      }}
-    >
-      {/* Full-bleed hero photo. Satori fetches the URL server-side at
-          render time; if it fails we fall through to the dark bg. */}
-      {photoUrl && (
-        <img
-          src={photoUrl}
-          width={1200}
-          height={630}
-          style={{ position: "absolute", inset: 0, objectFit: "cover", width: 1200, height: 630 }}
-        />
-      )}
-
-      {/* Two-stop gradient: dark band at top (brand pill legibility),
-          longer dark band at bottom (price + title legibility). */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.82) 100%)",
-        }}
-      />
-
-      {/* Pulpo brand pill, top-right. The only attribution on the card —
-          never the broker. Octopus mark + lowercase "pulpo" wordmark. */}
-      <div
-        style={{
-          position: "absolute",
-          top: 32,
-          right: 36,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "10px 22px 10px 12px",
-          backgroundColor: "rgba(255,255,255,0.96)",
-          borderRadius: 999,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-        }}
-      >
-        {/* Octopus mark — same path as components.jsx PulpoMark. */}
-        <svg width={36} height={36} viewBox="-50 -50 100 100">
-          <circle cx={0} cy={0} r={18} fill="#1F4A3E" />
-          <path
-            d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4"
-            stroke="#1F4A3E"
-            strokeWidth={8.5}
-            strokeLinecap="round"
-            fill="none"
-          />
-          <circle cx={18} cy={-4} r={9.5} fill="#1F4A3E" />
-          <circle cx={18} cy={-4} r={5.5} fill="#B8814A" />
-        </svg>
-        <span style={{ fontFamily: "Instrument Serif", fontSize: 30, color: "#1A1916", lineHeight: 1 }}>
-          pulpo
-        </span>
-      </div>
-
-      {/* Bottom content stack — chip, price, title, meta. */}
-      <div
-        style={{
-          position: "absolute",
-          left: 56,
-          right: 56,
-          bottom: 44,
-          display: "flex",
-          flexDirection: "column",
-          color: "#FFFFFF",
-        }}
-      >
-        {/* Beach / hook chip — translucent glass pill. */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            alignSelf: "flex-start",
-            gap: 10,
-            padding: "10px 18px 10px 14px",
-            marginBottom: 22,
-            backgroundColor: "rgba(255,255,255,0.18)",
-            border: "1px solid rgba(255,255,255,0.32)",
-            borderRadius: 999,
-            color: "#FFFFFF",
-            fontSize: 22,
-            fontWeight: 500,
-          }}
-        >
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: 999,
-              backgroundColor: "#6BE38D",
-              boxShadow: "0 0 14px rgba(107,227,141,0.8)",
-            }}
-          />
-          {zone ? `${hook} · ${zone}` : hook}
-        </div>
-
-        {/* Price — big serif. PPM rides as a small mono badge alongside. */}
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 22, marginBottom: 14 }}>
-          <span
-            style={{
-              fontFamily: "Instrument Serif",
-              fontSize: 144,
-              lineHeight: 0.95,
-              letterSpacing: "-0.025em",
-              color: "#FFFFFF",
-            }}
-          >
-            {price}
-          </span>
-          {ppm && (
-            <span
-              style={{
-                fontSize: 26,
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.88)",
-                marginBottom: 18,
-              }}
-            >
-              {ppm}
-            </span>
-          )}
-        </div>
-
-        {/* Title + size. */}
-        <div
-          style={{
-            fontSize: 36,
-            fontWeight: 500,
-            lineHeight: 1.2,
-            color: "#FFFFFF",
-            marginBottom: 8,
-            maxWidth: 1000,
-            display: "flex",
-          }}
-        >
-          {titleLine}
-        </div>
-
-        {/* Meta line — municipality, department, features. */}
-        {metaParts.length > 0 && (
-          <div
-            style={{
-              fontSize: 24,
-              lineHeight: 1.35,
-              color: "rgba(255,255,255,0.9)",
-              display: "flex",
-            }}
-          >
-            {metaParts.join(" · ")}
-          </div>
-        )}
-      </div>
-    </div>
+      },
+    },
+    photo,
+    gradient,
+    brandPill,
+    bottomStack,
   );
 }
 

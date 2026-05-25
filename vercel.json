@@ -15,7 +15,7 @@
     "api/l/[token].js": {
       "excludeFiles": "web/photos/**,web/photos-hires/**"
     },
-    "api/social/card.jsx": {
+    "api/social/card.js": {
       "excludeFiles": "web/photos/**,web/photos-hires/**,web/data/**"
     }
   },
