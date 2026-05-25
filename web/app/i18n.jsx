@@ -724,6 +724,30 @@ const UI_STRINGS = {
                                es: "Off-market — mira los planes para contactar" },
   "detail.save":             { en: "Save",                          es: "Guardar" },
   "detail.saved":            { en: "Saved",                         es: "Guardado" },
+  "detail.share":            { en: "Share",                         es: "Compartir" },
+  // Share picker (Airbnb-style modal opened from the Compartir button).
+  // Caption strings are kept short so they fit the WhatsApp pre-fill on
+  // one screen; the receiving client renders the rich OG card from the
+  // /l/<token> URL once PR #2 ships the card generator. Until then the
+  // text alone still travels through every channel.
+  "share.modal.title":       { en: "Share this listing",            es: "Comparte esta propiedad" },
+  "share.channel.whatsapp":  { en: "WhatsApp",                      es: "WhatsApp" },
+  "share.channel.sms":       { en: "Messages",                      es: "Mensajes" },
+  "share.channel.copy":      { en: "Copy link",                     es: "Copiar enlace" },
+  "share.channel.email":     { en: "Email",                         es: "Correo electrónico" },
+  "share.channel.facebook":  { en: "Facebook",                      es: "Facebook" },
+  "share.channel.tiktok":    { en: "TikTok",                        es: "TikTok" },
+  "share.toast.copied":      { en: "Link copied",                   es: "Enlace copiado" },
+  "share.toast.tiktok":      { en: "Link copied — paste in TikTok", es: "Enlace copiado — pega en TikTok" },
+  // Caption hook chosen from listing facts, in priority order. Pulpo
+  // brand never includes broker name — see the rule in CLAUDE.md.
+  "share.hook.beach_walk":   { en: "{minutes} min walk to beach 🌊", es: "{minutes} min a pie a la playa 🌊" },
+  "share.hook.beach_drive":  { en: "{km} km from the beach 🌊",      es: "a {km} km de la playa 🌊" },
+  "share.hook.lake":         { en: "On the lake",                   es: "Frente al lago" },
+  "share.hook.generic":      { en: "On Pulpo",                      es: "En Pulpo" },
+  "share.email.subject":     { en: "{title} on Pulpo",              es: "{title} en Pulpo" },
+  "share.aria.dialog":       { en: "Share this listing",            es: "Compartir esta propiedad" },
+  "share.aria.close":        { en: "Close share menu",              es: "Cerrar menú de compartir" },
   // Single shared CTA for every gated upgrade point inside ListingDetail
   // (bottom CTA bar, locked gallery thumb, locked USP row). Names the
   // free-month offer because that's the actual offer at the other end:

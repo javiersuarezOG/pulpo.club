@@ -79,7 +79,15 @@ const SECTION_PATHS: Record<string, Route> = {
 };
 
 const LISTING_PREFIX = "/listing/";
+// Source-opaque share URLs. `/l/<base64url-of-id>` keeps the broker
+// name out of pasted links (see web/app/lib/share.ts). The SPA decodes
+// the token client-side and opens the listing exactly like /listing/<id>.
+const SHARE_PREFIX = "/l/";
 const ACCOUNT_PREFIX = "/account/";
+
+// base64url alphabet for the share-token decode path. Anything outside
+// this set means a hand-mangled URL — bounce to home.
+const SAFE_SHARE_TOKEN_RE = /^[A-Za-z0-9_\-]+$/;
 
 // Listing IDs in the catalog look like `idealista-12345` — alphanumerics,
 // dashes, underscores, dots. Reject anything that smells like a path
@@ -135,6 +143,26 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
       // Malformed encoding — treat as no listing.
     }
     return { route: fallbackRoute, openListingId: id, isListingPath: true, section: null, adminWidget: null };
+  }
+
+  // `/l/<token>` — source-opaque share link. Decode the token (base64url
+  // of the internal id) and open the listing as if the user had gone
+  // through /listing/<id>. Malformed tokens degrade to home — the SPA
+  // never surfaces broker info from a bad share URL.
+  if (normalized.startsWith(SHARE_PREFIX)) {
+    const token = normalized.slice(SHARE_PREFIX.length);
+    if (SAFE_SHARE_TOKEN_RE.test(token)) {
+      try {
+        const padded = token.replace(/-/g, "+").replace(/_/g, "/");
+        const decoded = atob(padded);
+        if (SAFE_LISTING_ID_RE.test(decoded)) {
+          return { route: fallbackRoute, openListingId: decoded, isListingPath: true, section: null, adminWidget: null };
+        }
+      } catch {
+        // Malformed base64 — fall through to home.
+      }
+    }
+    return { route: "home", openListingId: null, isListingPath: false, section: null, adminWidget: null };
   }
 
   // Unknown path — Vercel rewrites everything to the SPA, so we just
