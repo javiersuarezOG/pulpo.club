@@ -94,10 +94,21 @@ POLICIES: dict[str, Policy] = {
     # elagente: WordPress Houzez archive + per-listing detail HTML
     # parse. ~55 active listings = ~60 HTTP requests per nightly. Keep
     # rps polite (0.5) so we don't trip the host's WAF.
+    #
+    # auto_repair=False: first nightly (2026-05-25) returned HTTP 403
+    # from the GitHub Actions runner IP — Wordfence / generic bot
+    # plugin block. Same failure class as realtyelsalvador's Cloudflare
+    # WAF: an LLM editing parser code can't bypass an IP-level reject.
+    # The scraper now sends full browser-realistic headers (see
+    # _BROWSER_HEADERS in elagente.py) as a best-effort header-class
+    # fix; if the host is also doing Azure-range IP filtering this
+    # won't help and the source stays red. Flip back to True if a
+    # future shadow suggestion is worth experimenting with.
     "elagente":         Policy(
         transport="httpx",
         rate_limit_rps=0.5,
         user_agent_pool="safari_macos",
+        auto_repair=False,
     ),
 
     # --- encuent24: Playwright source, polite by default. Phase 3 will

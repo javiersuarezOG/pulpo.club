@@ -54,6 +54,33 @@ INDEX_PATH  = "/estado/for-sale"   # the for-sale taxonomy archive
 MAX_PAGES   = 20                    # 20 × 11 = 220 listings worst-case
 FIXTURE_FILE = "sample_listings.json"
 
+# Browser-realistic headers — defense against Wordfence / generic
+# bot-detection plugins. First nightly (2026-05-25) returned HTTP 403
+# from the GitHub Actions runner with only a User-Agent header set.
+# Local curl with full Chrome headers returned 200, so the missing
+# piece is the Sec-Fetch-* / Accept-* fingerprint that real browsers
+# always send. If the host is also doing IP-class filtering on Azure
+# (GitHub Actions runners) these headers won't help — see
+# auto_repair=False in _policy.py, which documents the fallback.
+_BROWSER_HEADERS: dict[str, str] = {
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "image/avif,image/webp,image/apng,*/*;q=0.8"
+    ),
+    "Accept-Language": "es-SV,es;q=0.9,en;q=0.8",
+    # Brotli ("br") intentionally omitted — httpx doesn't decode it
+    # without the `brotli` package, so claiming br gets us a
+    # gibberish response body from any host that prefers it.
+    "Accept-Encoding": "gzip, deflate",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+}
+
 # Houzez "Tipo de propiedad" → Pulpo type. Unknown labels are dropped at
 # parse time (commercial / industrial taxonomies don't ship to Pulpo).
 _HOUZEZ_TYPE_TO_PULPO: dict[str, str] = {
@@ -381,13 +408,33 @@ class ElAgenteScraper(OfflineFixtureMixin):
         max_pages_hit = False
         limit_hit = False
         try:
+            # Warmup: hit the homepage first so any cookie-gated paths
+            # (Wordfence challenges, session establishers) get their
+            # cookies set on the shared httpx.Client before we start
+            # paginating. Failure of the warmup is not fatal — the
+            # paginated GETs below run regardless and will surface the
+            # real error if the site is blocking us at the IP layer.
+            try:
+                _ = get(client, f"{BASE_URL}/", extra_headers=_BROWSER_HEADERS)
+            except Exception as e:
+                print(f"[{self.slug}] warmup GET / failed (continuing): {e}")
+
             for page in range(1, page_cap + 1):
                 if len(out) >= limit:
                     limit_hit = True
                     break
                 index_url = f"{BASE_URL}{INDEX_PATH}/" if page == 1 else f"{BASE_URL}{INDEX_PATH}/page/{page}/"
                 try:
-                    resp = get(client, index_url)
+                    # Sec-Fetch-Site=same-origin once we have a referer
+                    referer = (
+                        f"{BASE_URL}/" if page == 1
+                        else f"{BASE_URL}{INDEX_PATH}/page/{page - 1}/"
+                    )
+                    resp = get(client, index_url, extra_headers={
+                        **_BROWSER_HEADERS,
+                        "Sec-Fetch-Site": "same-origin",
+                        "Referer": referer,
+                    })
                     resp.raise_for_status()
                 except Exception as e:
                     print(f"[{self.slug}] index page {page} failed: {e}")
@@ -407,7 +454,11 @@ class ElAgenteScraper(OfflineFixtureMixin):
                         continue
                     seen_urls.add(durl)
                     try:
-                        dresp = get(client, durl)
+                        dresp = get(client, durl, extra_headers={
+                            **_BROWSER_HEADERS,
+                            "Sec-Fetch-Site": "same-origin",
+                            "Referer": index_url,
+                        })
                         dresp.raise_for_status()
                     except Exception as e:
                         print(f"[{self.slug}] detail {durl} failed: {e}")
