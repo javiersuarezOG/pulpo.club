@@ -188,6 +188,12 @@ export interface Listing {
     // ── Zone medians (PRD §FR-7.5) ──────────────────────────────────
     price_vs_zone_median: number | null;  // USD/m² median of bucket peers
     price_vs_zone_pct: number | null;     // signed % vs bucket median
+    // Detail-page PriceContextBlock context. Same ≥10-comp gate as
+    // price_vs_zone_median; populated together by automation/zone_medians.py.
+    // min/max are computed but not displayed today — held for a future viz.
+    zone_price_per_m2_min: number | null;
+    zone_price_per_m2_max: number | null;
+    zone_comp_count: number | null;       // powers "Based on N" caption
 
     // ── Distance fields (PRD §FR-5.5) ───────────────────────────────
     dist_airport_km: number | null;
