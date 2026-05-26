@@ -295,8 +295,8 @@ const UI_STRINGS = {
   // simplified subhead, photo aria, and featured-pill.
   "home.hero.v4.kicker":         { en: "PULPO · BEACH + LAKE",
                                    es: "PULPO · PLAYA + LAGO" },
-  "home.hero.v4.subhead":        { en: "We're local. The best deals, every week.",
-                                   es: "Somos locales. Las mejores ofertas, cada semana." },
+  "home.hero.v4.subhead":        { en: "Your top deals — beach, lake, or both — in your inbox every Sunday.",
+                                   es: "Tus mejores ofertas — playa, lago o ambos — en tu correo cada domingo." },
   "home.hero.v4.featured_today": { en: "Featured today",
                                    es: "Destacado hoy" },
   "home.hero.v4.photo_aria":     { en: "Open today's featured listing in {name}",
