@@ -112,6 +112,7 @@
       "zone_price_per_m2_min",
       "zone_price_per_m2_max",
       "zone_comp_count",
+      "zone_comparison_scope",
       "dist_airport_km",
       "dist_beach_km",
       "dist_highway_km",
@@ -761,6 +762,12 @@
       "zone_comp_count": {
         "type": [
           "integer",
+          "null"
+        ]
+      },
+      "zone_comparison_scope": {
+        "type": [
+          "string",
           "null"
         ]
       },

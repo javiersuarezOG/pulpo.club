@@ -18,7 +18,6 @@
 //   - Honeypot field (`website`) catches bots — humans don't see it.
 
 import React, { useEffect, useState, useRef } from "react";
-import { useDocumentMeta } from "../../lib/use-document-meta";
 import { t } from "../../i18n.jsx";
 import { track } from "../../telemetry/client";
 import { CONTACT_TOPICS } from "../../config/contact-routing";
@@ -191,11 +190,6 @@ export function ContactPage({ app }) {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState(null); // null | "success" | "error"
   const formOpenedFired = useRef(false);
-
-  useDocumentMeta({
-    title: t("contact.page.title", locale),
-    description: t("contact.page.description", locale),
-  });
 
   useEffect(() => {
     track("legal.page_viewed", { page: "contact" });

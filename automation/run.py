@@ -1671,9 +1671,11 @@ def main() -> int:
     )
     print(f"[zone_medians] buckets={zm_metrics['buckets_computed']} "
           f"scored={zm_metrics['listings_scored']} "
-          f"skipped_no_zone={zm_metrics['listings_skipped_no_zone']} "
+          f"(zone={zm_metrics['listings_scored_zone']} "
+          f"macro={zm_metrics['listings_scored_macro']} "
+          f"country={zm_metrics['listings_scored_country']}) "
           f"skipped_inactive={zm_metrics['listings_skipped_inactive']} "
-          f"skipped_no_bucket_median={zm_metrics['listings_skipped_no_bucket_median']}")
+          f"skipped_no_pool={zm_metrics['listings_skipped_no_pool']}")
 
     # PRD §FR-5.5 — distance fields. dist_airport_km always populates from
     # the per-zone airport table when the zone is known; haversine from
@@ -2040,6 +2042,51 @@ def main() -> int:
         print("[run] prd_feasibility probe ok")
     except Exception as _e:
         print(f"[run] prd_feasibility probe failed (non-fatal): {_e!r}")
+
+    # IG batch 1: photo gate + trigger detector. Both read ranked, both
+    # write a JSON sidecar that the queue builder + publisher consume
+    # downstream. Non-fatal — a broken gate just leaves the previous
+    # ig_candidates.json intact for the next run to fix.
+    #
+    # Disable both with IG_SKIP_NIGHTLY=1 (e.g. for a one-off pipeline
+    # re-run when you don't want to bump the IG state). Triggers are
+    # observation-only in batch 1; the queue builder ignores them until
+    # IG_TRIGGERS_ENABLED=1 flips on in batch 2.
+    if not _env_bool("IG_SKIP_NIGHTLY", False):
+        try:
+            from automation import ig_photo_gate
+            gate_listings = ig_photo_gate.load_ranked(web_data_dir / "ranked.json")
+            gate_payload = ig_photo_gate.build_candidates(gate_listings)
+            ig_photo_gate.write_candidates(
+                web_data_dir / "ig_candidates.json", gate_payload,
+            )
+            gs = gate_payload["stats"]
+            print(
+                f"[ig_photo_gate] scanned={gs['scanned']} passed={gs['passed']} "
+                f"by_type={gs['by_property_type']}"
+            )
+        except Exception as _e:
+            print(f"[ig_photo_gate] failed (non-fatal): {_e!r}")
+
+        try:
+            from automation import ig_triggers
+            trig_listings = json.loads(
+                (web_data_dir / "ranked.json").read_text(encoding="utf-8")
+            )
+            trig_payload = ig_triggers.detect_all(trig_listings)
+            _atomic_write_json(
+                web_data_dir / "ig_triggers.json", trig_payload, indent=2,
+            )
+            ts = trig_payload["stats"]
+            print(
+                f"[ig_triggers] pre_cap={ts['candidates_per_trigger']} "
+                f"post_cap={ts['after_cap_per_trigger']} "
+                f"total={ts['total_after_cap']}"
+            )
+        except Exception as _e:
+            print(f"[ig_triggers] failed (non-fatal): {_e!r}")
+    else:
+        print("[ig] IG_SKIP_NIGHTLY=1 — gate + triggers skipped this run")
 
     # SEO sitemap. Sections + per-listing entries (excluding off-market
     # + sold). Non-fatal: a missing sitemap doesn't break the site,
