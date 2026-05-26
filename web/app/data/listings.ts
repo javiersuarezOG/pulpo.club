@@ -265,6 +265,12 @@ export function adaptListing(raw: any): Listing {
     zone_price_per_m2_min:  typeof raw.zone_price_per_m2_min === "number"   ? raw.zone_price_per_m2_min  : null,
     zone_price_per_m2_max:  typeof raw.zone_price_per_m2_max === "number"   ? raw.zone_price_per_m2_max  : null,
     zone_comp_count:        typeof raw.zone_comp_count === "number"         ? raw.zone_comp_count        : null,
+    zone_comparison_scope:
+      raw.zone_comparison_scope === "zone"
+      || raw.zone_comparison_scope === "macro"
+      || raw.zone_comparison_scope === "country"
+        ? raw.zone_comparison_scope
+        : null,
     photos,
     thumbnail_url:
       typeof raw.hero_photo_path === "string" && raw.hero_photo_path.length > 0

@@ -719,18 +719,22 @@ const UI_STRINGS = {
   "detail.fact.zoning":      { en: "Zoning",                        es: "Zonificación" },
   "detail.fact.photos":      { en: "Photos",                        es: "Fotos" },
   // PriceContextBlock — "How this price compares" section on the
-  // detail page. Pill copy + caption + Mode-B fallback. Peer-kind
-  // adapts to subcategory (homes / condos / lots / listings).
+  // detail page. Pill copy + caption. Peer-kind adapts to subcategory
+  // (homes / condos / lots / listings). Scope label adapts to the
+  // backend cascade tier — same zone / broader macro region / country
+  // (zone_comparison_scope on Listing). The unavailable_* keys below
+  // are kept for back-compat but are no longer read — the block now
+  // renders `null` when no comparison pool qualifies at any tier.
   "detail.price_context.header":             { en: "How this price compares",
                                                es: "Cómo se compara este precio" },
-  "detail.price_context.below_avg":          { en: "{pct}% cheaper than typical {kind} in {zone}",
-                                               es: "{pct}% más barato que {kind} similares en {zone}" },
-  "detail.price_context.near_avg":           { en: "About average for {kind} in {zone}",
-                                               es: "En el promedio para {kind} en {zone}" },
-  "detail.price_context.above_avg":          { en: "{pct}% above average for {kind} in {zone}",
-                                               es: "{pct}% sobre el promedio para {kind} en {zone}" },
-  "detail.price_context.caption":            { en: "Compared to {n} similar listings in {zone}.",
-                                               es: "Comparado con {n} propiedades similares en {zone}." },
+  "detail.price_context.below_avg":          { en: "{pct}% cheaper than typical {kind} in {scope}",
+                                               es: "{pct}% más barato que {kind} similares en {scope}" },
+  "detail.price_context.near_avg":           { en: "About average for {kind} in {scope}",
+                                               es: "En el promedio para {kind} en {scope}" },
+  "detail.price_context.above_avg":          { en: "{pct}% above average for {kind} in {scope}",
+                                               es: "{pct}% sobre el promedio para {kind} en {scope}" },
+  "detail.price_context.caption":            { en: "Average in {scope}: {median} · across {n} similar listings.",
+                                               es: "Promedio en {scope}: {median} · de {n} propiedades similares." },
   "detail.price_context.unavailable":        { en: "Not enough listings in {zone} yet to compare prices.",
                                                es: "Aún no hay suficientes propiedades en {zone} para comparar precios." },
   "detail.price_context.unavailable_no_zone": { en: "Not enough listings in this zone yet to compare prices.",
@@ -739,6 +743,18 @@ const UI_STRINGS = {
   "detail.price_context.peer_kind.condos":   { en: "condos",    es: "condominios" },
   "detail.price_context.peer_kind.land":     { en: "lots",      es: "lotes" },
   "detail.price_context.peer_kind.listings": { en: "listings",  es: "propiedades" },
+  // Scope labels — substituted into {scope} in the pill + caption when
+  // the backend cascade falls back from zone to macro or country tier.
+  // Currently only SV; add country.GT / country.PA / etc. as MC-N
+  // deployments come online.
+  "zone.macro.central-pacific":              { en: "the central Pacific region",
+                                               es: "la región del Pacífico central" },
+  "zone.macro.eastern-pacific":              { en: "the eastern Pacific region",
+                                               es: "la región del Pacífico oriental" },
+  "zone.macro.gulf-fonseca":                 { en: "the Gulf of Fonseca region",
+                                               es: "la región del Golfo de Fonseca" },
+  "country.SV":                              { en: "El Salvador",
+                                               es: "El Salvador" },
   "detail.signup_to_view_source": { en: "Sign up free to view source listing",
                                es: "Crea una cuenta gratis para ver el anuncio original" },
   "detail.view_on":          { en: "View on {source}",              es: "Ver en {source}" },
