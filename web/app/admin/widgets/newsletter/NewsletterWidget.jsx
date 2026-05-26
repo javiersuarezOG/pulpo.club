@@ -250,7 +250,7 @@ export function NewsletterWidget() {
                   if (e.key === "Enter") { e.preventDefault(); saveToken(); }
                 }}
                 onBlur={saveToken}
-                placeholder="PULPO_ADMIN_DEBUG_TOKEN value"
+                placeholder="PULPO_ADMIN_DEBUG_TOKEN value" // i18n-allow: admin-only widget, EN-only
                 autoComplete="off"
                 spellCheck={false}
               />
