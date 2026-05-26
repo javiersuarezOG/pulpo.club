@@ -472,45 +472,6 @@ function App() {
     routeRef.current = route;
   }, [route]);
 
-  // Marquee the document.title so the tab text scrolls like a
-  // marquesina. Pure-cosmetic — pauses entirely when the user has
-  // `prefers-reduced-motion: reduce` set (accessibility — animated
-  // tab titles can be disorienting).
-  //
-  // Only runs on the home route. On other sections (/browse, /listing/:id,
-  // …) the title is informational ("Listing X in Zone Y — Pulpo") and
-  // benefits from being readable, not scrolling. useDocumentMeta sets
-  // the route-specific title; this effect re-runs on every route change
-  // and either kicks the marquee off home or stays out of the way
-  // elsewhere.
-  useEffect(() => {
-    if (typeof window === "undefined" || !document) return;
-    if (route !== "home" || openListingId) return;
-    const reduce = typeof window.matchMedia === "function"
-      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-    // Snapshot the current title — useDocumentMeta wrote it before this
-    // effect ran (effect ordering: useDocumentMeta is mounted higher).
-    // If the title changes mid-marquee (e.g. locale flip while on home)
-    // the dep array re-runs this effect and the snapshot refreshes.
-    const original = document.title;
-    // The separator gives the eye a clear loop point + makes a one-
-    // word title readable as it scrolls back around. Three spaces
-    // either side of the bullet keep the words from running into
-    // each other on browsers that condense whitespace in the tab.
-    const text = original + "   •   ";
-    let offset = 0;
-    const tick = () => {
-      offset = (offset + 1) % text.length;
-      document.title = text.slice(offset) + text.slice(0, offset);
-    };
-    const id = setInterval(tick, 320);
-    return () => {
-      clearInterval(id);
-      document.title = original;
-    };
-  }, [route, openListingId, locale]);
-
   // Handle the Stripe Checkout return URL. The server's create-checkout-
   // session sends success → /preview/?upgrade=success&session_id=...
   // and cancel → /preview/?upgrade=cancelled. Without this, the user

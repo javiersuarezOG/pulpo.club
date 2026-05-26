@@ -889,36 +889,60 @@ h1,h2,h3,h4,h5 { margin: 0; }
   pointer-events: auto;
 }
 
-/* Pinned-listing highlight on the Browse card grid. The "Shared with
-   you" card needs to read as the visually anchored entrypoint of the
-   page — accent-colored border + soft halo + tiny lift on its photo.
-   `!important` on box-shadow is deliberate: this rule is by definition
-   an override of `.app.hero-v4 .listing-card { box-shadow: none }`
-   which wins on specificity (3 classes vs ours). No way around the
-   override without scope-coupling to .hero-v4, which would break
-   non-hero-v4 builds. */
+/* Pinned-listing highlight on the Browse card grid. Reads as "this is
+   the listing your friend shared" — calm + brand-coherent.
+   The base .app.hero-v4 .listing-card is a transparent shell with
+   border-radius:0 and overflow:visible — the photo carries its own
+   radius and the body is unframed. That works for the editorial grid
+   but breaks any attempt to draw a border: a rectangle around a
+   rounded photo + un-rounded body reads as broken. So we re-skin the
+   pinned card as a self-contained rounded container that bounds the
+   photo AND the body AND any chips inside both. */
 .listing-card.listing-card-shared-pinned {
-  outline: 2px solid var(--accent-2);
-  outline-offset: -2px;
-  border-radius: 14px;
+  /* All four structural overrides need !important — .app.hero-v4
+     .listing-card sets background:transparent, border-radius:0, and
+     overflow:visible with (0,3,0) specificity, which beats this
+     (0,2,0) rule. The whole point of the pinned-card visual is to
+     re-skin that transparent shell as a rounded paper container so
+     the border + halo + chips read as ONE bounded surface. */
+  background: var(--paper) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
   box-shadow:
-    0 0 0 4px oklch(from var(--accent-2) l c h / 0.18),
-    0 6px 18px oklch(from var(--accent-2) l c h / 0.22) !important;
+    inset 0 0 0 1.5px var(--accent),
+    0 0 0 4px oklch(from var(--accent) l c h / 0.10),
+    0 12px 28px oklch(from var(--accent) l c h / 0.18) !important;
   position: relative;
   z-index: 1;
 }
 .listing-card.listing-card-shared-pinned:hover {
   box-shadow:
-    0 0 0 5px oklch(from var(--accent-2) l c h / 0.24),
-    0 10px 24px oklch(from var(--accent-2) l c h / 0.28) !important;
+    inset 0 0 0 1.5px var(--accent),
+    0 0 0 5px oklch(from var(--accent) l c h / 0.14),
+    0 16px 32px oklch(from var(--accent) l c h / 0.22) !important;
 }
-/* The chip itself gets a tinted bg + accent border so it reads as
-   "context label", not "neutral pill" — pairs with the card halo. */
+/* Body padding bumped so the DealGradeChip + footer have breathing
+   room from the rounded corner — without this the chip sits at
+   left:4px bottom:0 and visually collides with our inset green
+   border. (0,3,0) specificity matches .app.hero-v4 .listing-card-body
+   but our rule comes EARLIER in the source than the hero-v4 block,
+   so without !important the hero-v4 rule wins source-order. */
+.listing-card.listing-card-shared-pinned .listing-card-body {
+  padding: 14px 14px 14px !important;
+}
+/* Flatten the photo's own 16px radius — the card now clips with
+   overflow:hidden + var(--radius-lg), so the photo's nested radius
+   would create a double-curve at the top corners (16px outer +
+   16px inner). Same !important reason as above. */
+.listing-card.listing-card-shared-pinned .listing-card-photo,
+.listing-card.listing-card-shared-pinned .listing-card-photo img {
+  border-radius: 0 !important;
+}
+/* "Shared with you" chip — accent bg, paper fg, base geometry from
+   .card-signal-chip so the chip never grows beyond the photo. */
 .listing-card-shared-pinned .card-signal-chip-shared {
-  background: oklch(from var(--accent-2) l c h / 0.95);
+  background: var(--accent);
   color: var(--paper);
-  font-weight: 700;
-  box-shadow: 0 2px 8px oklch(from var(--accent-2) l c h / 0.35);
 }
 .listing-card-shared-pinned .card-signal-chip-shared svg {
   color: var(--paper);

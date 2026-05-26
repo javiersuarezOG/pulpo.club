@@ -1308,8 +1308,33 @@ function BrowsePage({ app }) {
     return <DataFetchFailed onRetry={listingsState.reload} />;
   }
 
+  // Breadcrumb JSON-LD for the Browse route. Home › Browse, with an
+  // optional category leaf when the URL carries `?cat=…`. Read directly
+  // from the URL rather than the in-memory `filters` state so the trail
+  // matches the canonical we publish in useDocumentMeta + sitemap.xml.
+  const lcBc = app.locale === "es" ? "es" : "en";
+  const browseCat = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("cat")
+    : null;
+  const browseBreadcrumb = [
+    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
+    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+  ];
+  if (browseCat) {
+    // Title-case the cat slug for a readable breadcrumb leaf. Cheap and
+    // good enough — Google reads the trail as breadcrumb context, not
+    // marketing copy. Full localization lives in the page <title> +
+    // meta description set by useDocumentMeta.
+    const leaf = browseCat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    browseBreadcrumb.push({
+      name: leaf,
+      url: `/browse?cat=${browseCat}`,
+    });
+  }
+
   return (
     <div className="page page-browse">
+      <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">
           <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
@@ -1602,6 +1627,36 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
 }
 
 // ====== Listing Detail ======
+// schema.org BreadcrumbList JSON-LD. Surfaces breadcrumb trails in
+// Google SERPs (e.g. "pulpo.club › Browse › Beachfront › Listing"
+// under the result title). Cheap to ship: one extra script element per
+// page in the indexed routes. Items render in the document's current
+// locale so the SERP breadcrumb matches the page the user clicks into.
+function BreadcrumbListJsonLd({ items }) {
+  const json = pUseMemo(() => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://pulpo.club";
+    const list = items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      item: it.url ? new URL(it.url, origin).toString() : undefined,
+    }));
+    const data = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: JSON.parse(JSON.stringify(list)),
+    };
+    return JSON.stringify(data).replace(/</g, "\\u003c");
+  }, [items]);
+  return (
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: json }}
+    />
+  );
+}
+
 // schema.org RealEstateListing JSON-LD for /listing/:id. Embedded as a
 // <script type="application/ld+json"> so Google + Bing get rich-result
 // metadata (price, area, geo, photos, datePosted). Crawlers that
@@ -1666,41 +1721,88 @@ function ListingJsonLd({ listing, locale }) {
 
 // PriceContextBlock — "How this price compares" on /listing/:id.
 //
+// Zone slug → macro region slug. Mirrors automation/zone_medians.py's
+// `MACRO_ZONE` (imported from pulpo/ranker_legs/value.py on the backend
+// side). Kept in sync by hand for v2; MC-4 will move the SV reference
+// data into web/app/config/countries/sv.json and let this read from a
+// per-country manifest — same path the backend's MC-1c migration took.
+const ZONE_TO_MACRO_REGION = {
+  "el-tunco":           "central-pacific",
+  "el-sunzal":          "central-pacific",
+  "el-zonte":           "central-pacific",
+  "san-diego":          "central-pacific",
+  "mizata":             "central-pacific",
+  "puerto-la-libertad": "central-pacific",
+  "la-libertad":        "central-pacific",
+  "el-cuco":            "eastern-pacific",
+  "las-flores":         "eastern-pacific",
+  "punta-mango":        "eastern-pacific",
+  "el-espino":          "eastern-pacific",
+  "conchagua":          "gulf-fonseca",
+  "la-union":           "gulf-fonseca",
+};
+
 // Sits between .detail-keystats (the absolute $/m² display) and the
-// description. Three render modes:
-//   A — full context: pill (green/neutral/amber) + caption. Requires
-//       price_vs_zone_pct != null AND zone_comp_count != null. Both
-//       fields are set together by automation/zone_medians.py for
-//       buckets with ≥ MIN_LISTINGS_PER_ZONE (=10) active comps.
-//   B — partial: muted "not enough listings" message when the listing
-//       has a $/m² but its zone bucket is below the threshold.
-//   C — nothing: when price_per_m2 itself is missing (the listing is
-//       already flagged is_incomplete and shows the broker note above).
+// description. Two render outcomes:
+//   A — pill (green/neutral/amber) + caption with median $/m². Requires
+//       price_vs_zone_pct, zone_comp_count, price_vs_zone_median, AND
+//       zone_comparison_scope all populated. The backend cascade
+//       (zone → macro → country, see automation/zone_medians.py) sets
+//       all four together when any tier has ≥ MIN_LISTINGS_PER_ZONE peers.
+//   ∅ — block absent (returns null) when any of those four fields is
+//       missing. No fallback copy — silence is honest.
 //
-// Currency-free by design — the block shows a relative %, never an
-// absolute $/m² number. The keystats strip above handles the absolute
-// number's locale formatting via formatPpm. Keeps the block
-// multi-country-safe ahead of PR-MC-4.
+// Copy adapts to the comparison scope: "El Tunco" when the cascade
+// found a same-zone same-type pool, "the central Pacific region" when
+// it widened to the macro tier, "El Salvador" when it had to fall all
+// the way to country-wide.
 function PriceContextBlock({ listing, locale }) {
-  // Stable telemetry on first render per listing — fires once when the
-  // detail panel opens, regardless of which mode the block lands in,
-  // so we can validate the production gating-rate ratio (Mode A ≈ 60%
-  // per the spec's 60.8% number) against PostHog.
+  // Telemetry on first render per listing — only fires when the block
+  // actually renders. Lets us segment by scope in PostHog (what share
+  // of detail opens come from zone vs macro vs country tier?).
+  const willRender = listing.price_vs_zone_pct != null
+    && listing.zone_comp_count != null
+    && listing.price_vs_zone_median != null
+    && listing.zone_comparison_scope != null;
+
   pUseEffect(() => {
-    if (listing.price_per_m2 == null) return;     // Mode C — block absent, no event
-    const mode = listing.price_vs_zone_pct == null || listing.zone_comp_count == null ? "B" : "A";
+    if (!willRender) return;
     track("detail.price_context_shown", {
-      listing_id:  listing.id,
-      mode,
-      pct:         listing.price_vs_zone_pct,
-      zone:        listing.zone,
-      comp_count:  listing.zone_comp_count,
+      listing_id: listing.id,
+      mode:       "A",
+      pct:        listing.price_vs_zone_pct,
+      zone:       listing.zone,
+      comp_count: listing.zone_comp_count,
+      scope:      listing.zone_comparison_scope,
     });
   }, [listing.id]);
 
-  if (listing.price_per_m2 == null) return null;
+  if (!willRender) return null;
 
-  const zoneLabel = listing.zone_name || listing.zone || "";
+  // Resolve the {scope} substitution. Three branches per the backend's
+  // zone_comparison_scope: same-zone uses the pretty zone name (already
+  // localized for display, e.g. "Playa El Cuco"); macro uses an i18n
+  // key per macro slug; country uses an i18n key per ISO code.
+  let scope;
+  if (listing.zone_comparison_scope === "zone") {
+    scope = listing.zone_name || listing.zone || "";
+  } else if (listing.zone_comparison_scope === "macro" && listing.zone) {
+    const macro = ZONE_TO_MACRO_REGION[listing.zone];
+    // Defensive: a zone slug missing from ZONE_TO_MACRO_REGION on the FE
+    // shouldn't actually reach here (backend would've picked country
+    // instead because the macro pool wouldn't exist), but if data
+    // skew + a missing map entry ever ship together we degrade to the
+    // pretty zone name rather than rendering the raw i18n key.
+    if (macro) {
+      scope = t(`zone.macro.${macro}`, locale);
+    } else {
+      scope = listing.zone_name || listing.zone;
+    }
+  } else {
+    scope = t(`country.${listing.country || "SV"}`, locale);
+  }
+
+  // Peer-kind: "lots" / "homes" / "condos" / generic "listings".
   const peerKindKey =
     listing.subcategory === "homes"  ? "detail.price_context.peer_kind.homes"  :
     listing.subcategory === "condos" ? "detail.price_context.peer_kind.condos" :
@@ -1708,47 +1810,34 @@ function PriceContextBlock({ listing, locale }) {
                                        "detail.price_context.peer_kind.listings";
   const kind = t(peerKindKey, locale);
 
-  // Mode B — we have a $/m² but no zone comp data (bucket below the
-  // 10-listing gate). Render a muted note instead of the pill. Zone
-  // name may still be missing on rare records — fall back to a
-  // zone-agnostic copy so the section doesn't leak "{zone}" placeholder.
-  if (listing.price_vs_zone_pct == null || listing.zone_comp_count == null) {
-    const msgKey = zoneLabel
-      ? "detail.price_context.unavailable"
-      : "detail.price_context.unavailable_no_zone";
-    return (
-      <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
-        <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
-        <div className="price-context__unavailable">{t(msgKey, locale, { zone: zoneLabel })}</div>
-      </section>
-    );
-  }
-
-  // Mode A — pill + caption.
+  // Pill tone keyed on signed pct. abs floors at 1 so a -0.4 listing
+  // doesn't read "0% cheaper".
   const pct = listing.price_vs_zone_pct;
-  const abs = Math.max(1, Math.round(Math.abs(pct)));  // never render "0% cheaper"
+  const abs = Math.max(1, Math.round(Math.abs(pct)));
   let tone, copyKey;
   if (pct <= -15) {
-    tone    = "success";
-    copyKey = "detail.price_context.below_avg";
+    tone = "success"; copyKey = "detail.price_context.below_avg";
   } else if (pct >= 15) {
-    tone    = "amber";
-    copyKey = "detail.price_context.above_avg";
+    tone = "amber";   copyKey = "detail.price_context.above_avg";
   } else {
-    tone    = "neutral";
-    copyKey = "detail.price_context.near_avg";
+    tone = "neutral"; copyKey = "detail.price_context.near_avg";
   }
+
+  // Median formatted via the same helper as the keystats strip above —
+  // null-safe, locale-aware, rounds to integer, swaps to /vr² when the
+  // user picks Salvadoran varas. willRender guards median != null.
+  const median = `${formatPpm(listing.price_vs_zone_median)}${ppmSuffix()}`;
 
   return (
     <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
       <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
       <div className="price-context__row">
         <span className="price-context__pill" data-tone={tone}>
-          {t(copyKey, locale, { pct: abs, kind, zone: zoneLabel })}
+          {t(copyKey, locale, { pct: abs, kind, scope })}
         </span>
       </div>
       <div className="price-context__caption">
-        {t("detail.price_context.caption", locale, { n: listing.zone_comp_count, zone: zoneLabel })}
+        {t("detail.price_context.caption", locale, { scope, median, n: listing.zone_comp_count })}
       </div>
     </section>
   );
@@ -1930,9 +2019,20 @@ function ListingDetail({ listing, app, asPanel = true }) {
   }
   const showKeyFacts = facts.length >= 2;
 
+  const lcBc = app.locale === "es" ? "es" : "en";
+  const breadcrumbItems = [
+    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
+    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+    {
+      name: (listing.title?.[lcBc] ?? listing.title?.en ?? (lcBc === "es" ? "Anuncio" : "Listing")),
+      url: `/listing/${encodeURIComponent(listing.id)}`,
+    },
+  ];
+
   return (
     <div className={`detail ${asPanel ? "as-panel" : "as-page"}`}>
       <ListingJsonLd listing={listing} locale={app.locale} />
+      <BreadcrumbListJsonLd items={breadcrumbItems} />
       <div className="detail-head">
         <button className="link-btn" onClick={() => app.closeListing()}>
           <Icon name="arrow_left" size={16} strokeWidth={2}/> {t("detail.back", lc)}
