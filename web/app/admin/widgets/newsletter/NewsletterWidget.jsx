@@ -17,9 +17,22 @@
 // 30–60s lag for the workflow to spin up is acceptable for an
 // iteration-level QA loop — the iteration itself happens in code, not
 // in this widget.
+//
+// Auth: /admin is "open by design" (no entry-level gate) but every
+// /api/admin/* write endpoint requires `Authorization: Bearer <token>`
+// where token == `PULPO_ADMIN_DEBUG_TOKEN` server-side. This widget
+// hosts the only UI to set that token (lives in localStorage via
+// admin-token.ts). First-time setup: enter the token once per browser;
+// the trigger button stays disabled until a token is stored. If the
+// server rejects the token (401), adminFetch wipes it and we re-prompt.
 
-import React, { useState } from "react";
-import { adminFetch } from "../../lib/admin-token.ts";
+import React, { useEffect, useState } from "react";
+import {
+  adminFetch,
+  clearAdminToken,
+  hasAdminToken,
+  setAdminToken,
+} from "../../lib/admin-token.ts";
 
 const DEFAULT_EMAIL = "javier@suarez.ventures";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,7 +60,8 @@ const WIDGET_STYLES = `
   text-transform: uppercase;
   color: var(--ink-3);
 }
-.nl-preview-widget input[type=email] {
+.nl-preview-widget input[type=email],
+.nl-preview-widget input[type=password] {
   font: inherit;
   padding: 10px 12px;
   border: 1px solid var(--line-2);
@@ -56,10 +70,28 @@ const WIDGET_STYLES = `
   color: var(--ink);
   width: 100%;
 }
-.nl-preview-widget input[type=email]:focus {
+.nl-preview-widget input:focus {
   outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
+.nl-preview-widget .nl-token-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.nl-preview-widget .nl-token-row button {
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  align-self: auto;
+}
+.nl-preview-widget .nl-token-row button:hover { color: var(--accent); }
 .nl-preview-widget button {
   appearance: none;
   font: inherit;
@@ -107,11 +139,63 @@ export function NewsletterWidget() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState({ kind: null, message: "", url: null });
 
+  // Admin bearer token (PULPO_ADMIN_DEBUG_TOKEN on the server side).
+  // /admin is "open by design" — no entry-level gate — but every
+  // /api/admin/* write endpoint still requires the bearer. The token
+  // lives in localStorage; this widget hosts the only UI to set it.
+  // adminFetch fires `pulpo:admin-token-invalid` on a 401 (after wiping
+  // the stored value), so we re-prompt when that happens.
+  const [tokenSet, setTokenSet] = useState(() => hasAdminToken());
+  const [tokenDraft, setTokenDraft] = useState("");
+  const [editingToken, setEditingToken] = useState(false);
+
+  useEffect(() => {
+    const onInvalid = () => {
+      setTokenSet(false);
+      setEditingToken(true);
+      setStatus({
+        kind: "error",
+        message: "Admin token rejected — re-enter below.",
+        url: null,
+      });
+    };
+    window.addEventListener("pulpo:admin-token-invalid", onInvalid);
+    return () => window.removeEventListener("pulpo:admin-token-invalid", onInvalid);
+  }, []);
+
+  const saveToken = () => {
+    const v = tokenDraft.trim();
+    if (!v) return;
+    setAdminToken(v);
+    setTokenSet(true);
+    setEditingToken(false);
+    setTokenDraft("");
+    if (status.kind === "error" && /token/i.test(status.message)) {
+      setStatus({ kind: null, message: "", url: null });
+    }
+  };
+
+  const forgetToken = () => {
+    clearAdminToken();
+    setTokenSet(false);
+    setEditingToken(true);
+  };
+
   const trigger = async (e) => {
     e.preventDefault();
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
       setStatus({ kind: "error", message: "Enter a valid email address.", url: null });
+      return;
+    }
+    if (!hasAdminToken()) {
+      setTokenSet(false);
+      setEditingToken(true);
+      setStatus({
+        kind: "error",
+        message: "Set the admin token first.",
+        url: null,
+      });
       return;
     }
     setBusy(true);
@@ -147,11 +231,37 @@ export function NewsletterWidget() {
     }
   };
 
+  const showTokenInput = !tokenSet || editingToken;
+
   return (
     <>
       <style>{WIDGET_STYLES}</style>
       <div className="nl-preview-widget">
         <form className="nl-card" onSubmit={trigger}>
+          {showTokenInput ? (
+            <div>
+              <label htmlFor="nl-admin-token">Admin token</label>
+              <input
+                id="nl-admin-token"
+                type="password"
+                value={tokenDraft}
+                onChange={(e) => setTokenDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); saveToken(); }
+                }}
+                onBlur={saveToken}
+                placeholder="PULPO_ADMIN_DEBUG_TOKEN value"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </div>
+          ) : (
+            <div className="nl-token-row">
+              <span>Admin token set in this browser.</span>
+              <button type="button" onClick={forgetToken}>Forget token</button>
+            </div>
+          )}
+
           <div>
             <label htmlFor="nl-preview-email">Preview recipient</label>
             <input
