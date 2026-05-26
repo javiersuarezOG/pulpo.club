@@ -1667,40 +1667,63 @@ function ListingJsonLd({ listing, locale }) {
 // PriceContextBlock — "How this price compares" on /listing/:id.
 //
 // Sits between .detail-keystats (the absolute $/m² display) and the
-// description. Three render modes:
-//   A — full context: pill (green/neutral/amber) + caption. Requires
-//       price_vs_zone_pct != null AND zone_comp_count != null. Both
-//       fields are set together by automation/zone_medians.py for
-//       buckets with ≥ MIN_LISTINGS_PER_ZONE (=10) active comps.
-//   B — partial: muted "not enough listings" message when the listing
-//       has a $/m² but its zone bucket is below the threshold.
-//   C — nothing: when price_per_m2 itself is missing (the listing is
-//       already flagged is_incomplete and shows the broker note above).
+// description. Two render outcomes:
+//   A — pill (green/neutral/amber) + caption with median $/m². Requires
+//       price_vs_zone_pct, zone_comp_count, price_vs_zone_median, AND
+//       zone_comparison_scope all populated. The backend cascade
+//       (zone → macro → country, see automation/zone_medians.py) sets
+//       all four together when any tier has ≥ MIN_LISTINGS_PER_ZONE peers.
+//   ∅ — block absent (returns null) when any of those four fields is
+//       missing. No fallback copy — silence is honest.
 //
-// Currency-free by design — the block shows a relative %, never an
-// absolute $/m² number. The keystats strip above handles the absolute
-// number's locale formatting via formatPpm. Keeps the block
-// multi-country-safe ahead of PR-MC-4.
+// Copy adapts to the comparison scope: "El Tunco" when the cascade
+// found a same-zone same-type pool, "the central Pacific region" when
+// it widened to the macro tier, "El Salvador" when it had to fall all
+// the way to country-wide.
 function PriceContextBlock({ listing, locale }) {
-  // Stable telemetry on first render per listing — fires once when the
-  // detail panel opens, regardless of which mode the block lands in,
-  // so we can validate the production gating-rate ratio (Mode A ≈ 60%
-  // per the spec's 60.8% number) against PostHog.
+  // Telemetry on first render per listing — only fires when the block
+  // actually renders. Lets us segment by scope in PostHog (what share
+  // of detail opens come from zone vs macro vs country tier?).
+  const willRender = listing.price_vs_zone_pct != null
+    && listing.zone_comp_count != null
+    && listing.price_vs_zone_median != null
+    && listing.zone_comparison_scope != null;
+
   pUseEffect(() => {
-    if (listing.price_per_m2 == null) return;     // Mode C — block absent, no event
-    const mode = listing.price_vs_zone_pct == null || listing.zone_comp_count == null ? "B" : "A";
+    if (!willRender) return;
     track("detail.price_context_shown", {
-      listing_id:  listing.id,
-      mode,
-      pct:         listing.price_vs_zone_pct,
-      zone:        listing.zone,
-      comp_count:  listing.zone_comp_count,
+      listing_id: listing.id,
+      mode:       "A",
+      pct:        listing.price_vs_zone_pct,
+      zone:       listing.zone,
+      comp_count: listing.zone_comp_count,
+      scope:      listing.zone_comparison_scope,
     });
   }, [listing.id]);
 
-  if (listing.price_per_m2 == null) return null;
+  if (!willRender) return null;
 
-  const zoneLabel = listing.zone_name || listing.zone || "";
+  // Resolve the {scope} substitution. Three branches per the backend's
+  // zone_comparison_scope: same-zone uses the pretty zone name (already
+  // localized for display, e.g. "Playa El Cuco"); macro uses an i18n
+  // key per macro slug; country uses an i18n key per ISO code.
+  let scope;
+  if (listing.zone_comparison_scope === "zone") {
+    scope = listing.zone_name || listing.zone || "";
+  } else if (listing.zone_comparison_scope === "macro" && listing.zone) {
+    scope = t(`zone.macro.${listing.zone}`, locale);
+    // Defensive: a zone slug missing from MACRO_ZONE on the backend
+    // shouldn't actually reach here (backend would've picked country
+    // instead), but if it does the key lookup falls through to the
+    // key itself — guard by falling back to the pretty zone name.
+    if (scope === `zone.macro.${listing.zone}`) {
+      scope = listing.zone_name || listing.zone;
+    }
+  } else {
+    scope = t(`country.${listing.country || "SV"}`, locale);
+  }
+
+  // Peer-kind: "lots" / "homes" / "condos" / generic "listings".
   const peerKindKey =
     listing.subcategory === "homes"  ? "detail.price_context.peer_kind.homes"  :
     listing.subcategory === "condos" ? "detail.price_context.peer_kind.condos" :
@@ -1708,47 +1731,34 @@ function PriceContextBlock({ listing, locale }) {
                                        "detail.price_context.peer_kind.listings";
   const kind = t(peerKindKey, locale);
 
-  // Mode B — we have a $/m² but no zone comp data (bucket below the
-  // 10-listing gate). Render a muted note instead of the pill. Zone
-  // name may still be missing on rare records — fall back to a
-  // zone-agnostic copy so the section doesn't leak "{zone}" placeholder.
-  if (listing.price_vs_zone_pct == null || listing.zone_comp_count == null) {
-    const msgKey = zoneLabel
-      ? "detail.price_context.unavailable"
-      : "detail.price_context.unavailable_no_zone";
-    return (
-      <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
-        <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
-        <div className="price-context__unavailable">{t(msgKey, locale, { zone: zoneLabel })}</div>
-      </section>
-    );
-  }
-
-  // Mode A — pill + caption.
+  // Pill tone keyed on signed pct. abs floors at 1 so a -0.4 listing
+  // doesn't read "0% cheaper".
   const pct = listing.price_vs_zone_pct;
-  const abs = Math.max(1, Math.round(Math.abs(pct)));  // never render "0% cheaper"
+  const abs = Math.max(1, Math.round(Math.abs(pct)));
   let tone, copyKey;
   if (pct <= -15) {
-    tone    = "success";
-    copyKey = "detail.price_context.below_avg";
+    tone = "success"; copyKey = "detail.price_context.below_avg";
   } else if (pct >= 15) {
-    tone    = "amber";
-    copyKey = "detail.price_context.above_avg";
+    tone = "amber";   copyKey = "detail.price_context.above_avg";
   } else {
-    tone    = "neutral";
-    copyKey = "detail.price_context.near_avg";
+    tone = "neutral"; copyKey = "detail.price_context.near_avg";
   }
+
+  // Median formatted via the same helper as the keystats strip above —
+  // null-safe, locale-aware, rounds to integer, swaps to /vr² when the
+  // user picks Salvadoran varas. willRender guards median != null.
+  const median = `${formatPpm(listing.price_vs_zone_median)}${ppmSuffix()}`;
 
   return (
     <section className="price-context" aria-label={t("detail.price_context.header", locale)}>
       <div className="price-context__label">{t("detail.price_context.header", locale)}</div>
       <div className="price-context__row">
         <span className="price-context__pill" data-tone={tone}>
-          {t(copyKey, locale, { pct: abs, kind, zone: zoneLabel })}
+          {t(copyKey, locale, { pct: abs, kind, scope })}
         </span>
       </div>
       <div className="price-context__caption">
-        {t("detail.price_context.caption", locale, { n: listing.zone_comp_count, zone: zoneLabel })}
+        {t("detail.price_context.caption", locale, { scope, median, n: listing.zone_comp_count })}
       </div>
     </section>
   );

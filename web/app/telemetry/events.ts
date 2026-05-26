@@ -278,17 +278,19 @@ export type EventMap = {
     listing_id: string;
     listing_state: "active" | "off_market";
   };
-  // PriceContextBlock impression — fires once per detail open. `mode`
-  // distinguishes the render path the user actually saw (A = pill +
-  // caption against zone median; B = sparse-zone fallback message).
-  // Mode C (block absent) intentionally does NOT fire — there's nothing
-  // to attribute. `pct`/`zone`/`comp_count` are null in mode B.
+  // PriceContextBlock impression — fires once per detail open IF the
+  // block actually renders. Post-v2 (PR #481): mode is always "A"
+  // because Mode B is gone (the block hides when no comp pool qualifies
+  // at any cascade tier). `scope` tells which tier the backend cascade
+  // picked — lets us validate the cascade's coverage in PostHog
+  // (zone share / macro share / country share).
   "detail.price_context_shown": {
     listing_id: string;
-    mode: "A" | "B";
-    pct: number | null;
+    mode: "A";
+    pct: number;
     zone: string | null;
-    comp_count: number | null;
+    comp_count: number;
+    scope: "zone" | "macro" | "country";
   };
   "save.toggled": {
     listing_id: string;
