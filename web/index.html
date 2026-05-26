@@ -3,20 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      // Mirror the resolver in web/app/i18n.jsx synchronously so the
+      // <html lang> attribute is correct on first paint. Without this,
+      // a Spanish-speaker on ?lang=es (or with localStorage / browser
+      // locale) sees lang="en" until React boots — screen readers
+      // mis-announce, and Google's first-pass language detection sees
+      // English markup. Priority order matches i18n.jsx: ?lang= → stored
+      // → navigator → default(en).
+      (function () {
+        try {
+          var p = new URLSearchParams(window.location.search).get("lang");
+          if (p === "es" || p === "en") { document.documentElement.lang = p; return; }
+        } catch (e) {}
+        try {
+          var s = localStorage.getItem("pulpo-locale");
+          if (s === "es" || s === "en") { document.documentElement.lang = s; return; }
+        } catch (e) {}
+        try {
+          var n = (navigator.language || "").toLowerCase();
+          if (n.indexOf("es") === 0) document.documentElement.lang = "es";
+        } catch (e) {}
+      })();
+    </script>
     <title>Pulpo — Beach and lake homes in El Salvador, ranked by value</title>
-    <meta name="description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every two weeks." />
+    <meta name="description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://pulpo.club/" />
+    <link rel="alternate" hreflang="en" href="https://pulpo.club/" />
+    <link rel="alternate" hreflang="es" href="https://pulpo.club/?lang=es" />
+    <link rel="alternate" hreflang="x-default" href="https://pulpo.club/" />
     <meta property="og:title" content="Pulpo — Beach and lake homes in El Salvador, ranked by value" />
-    <meta property="og:description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every two weeks." />
+    <meta property="og:description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pulpo" />
+    <meta property="og:url" content="https://pulpo.club/" />
+    <meta property="og:image" content="https://pulpo.club/photos/goodlife_newly-built-condo-with-partial-ocean-view-at-zonset-el-zonte-340000.hero.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Newly-built condo with partial ocean view in El Zonte, El Salvador — featured on Pulpo." />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="es_SV" />
-    <!-- Per-listing OG overrides for /l/<token> share URLs. api/l/[token].js
-         replaces this exact comment (preserved through Vite build) with
-         listing-specific og:title / og:description / og:image / og:url
-         so WhatsApp/iMessage/FB crawlers see a rich, source-opaque card.
-         Browsers ignore the duplicate-tag prepend; latest tag wins per
-         the OG spec. Keep the comment exact — string-replace targets it
-         literally. -->
-    <!--OG_TAGS-->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pulpo — Beach and lake homes in El Salvador, ranked by value" />
+    <meta name="twitter:description" content="Every beach and lake home in El Salvador, ranked by value. Browse hundreds of vetted beach and lake properties — and get the 10 best delivered to your inbox every week." />
+    <meta name="twitter:image" content="https://pulpo.club/photos/goodlife_newly-built-condo-with-partial-ocean-view-at-zonset-el-zonte-340000.hero.jpg" />
+    <meta name="twitter:image:alt" content="Newly-built condo with partial ocean view in El Zonte, El Salvador — featured on Pulpo." />
     <!-- Mobile browser chrome (Android Chrome address bar, iOS Safari
          status bar tint via apple-mobile-web-app-status-bar-style). Set
          to deep brand green so the chrome blends with the header. -->
@@ -47,6 +80,35 @@
          web/app/ (grep-verified). The dropped families were carry-over:
          Space Grotesk, Newsreader, Manrope, IBM Plex Sans. -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- Site-wide structured data. Lives in the static shell so every URL
+         (incl. routes Googlebot reaches before JS executes) carries it.
+         Organization → knowledge-panel eligibility. WebSite → SERP
+         sitelinks-searchbox. Per-listing RealEstateListing JSON-LD is
+         injected dynamically by ListingJsonLd in web/app/pages.jsx, and
+         BreadcrumbList by BreadcrumbListJsonLd. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://pulpo.club/#org",
+            "name": "Pulpo",
+            "url": "https://pulpo.club/",
+            "logo": "https://pulpo.club/assets/logo_mark_only.svg",
+            "description": "Pulpo ranks beach and lake homes in El Salvador by value, surfacing vetted listings and off-market deals to international buyers."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://pulpo.club/#website",
+            "url": "https://pulpo.club/",
+            "name": "Pulpo",
+            "publisher": { "@id": "https://pulpo.club/#org" },
+            "inLanguage": ["en", "es"]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

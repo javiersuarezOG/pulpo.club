@@ -1308,8 +1308,33 @@ function BrowsePage({ app }) {
     return <DataFetchFailed onRetry={listingsState.reload} />;
   }
 
+  // Breadcrumb JSON-LD for the Browse route. Home › Browse, with an
+  // optional category leaf when the URL carries `?cat=…`. Read directly
+  // from the URL rather than the in-memory `filters` state so the trail
+  // matches the canonical we publish in useDocumentMeta + sitemap.xml.
+  const lcBc = app.locale === "es" ? "es" : "en";
+  const browseCat = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("cat")
+    : null;
+  const browseBreadcrumb = [
+    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
+    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+  ];
+  if (browseCat) {
+    // Title-case the cat slug for a readable breadcrumb leaf. Cheap and
+    // good enough — Google reads the trail as breadcrumb context, not
+    // marketing copy. Full localization lives in the page <title> +
+    // meta description set by useDocumentMeta.
+    const leaf = browseCat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    browseBreadcrumb.push({
+      name: leaf,
+      url: `/browse?cat=${browseCat}`,
+    });
+  }
+
   return (
     <div className="page page-browse">
+      <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">
           <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
@@ -1602,6 +1627,36 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
 }
 
 // ====== Listing Detail ======
+// schema.org BreadcrumbList JSON-LD. Surfaces breadcrumb trails in
+// Google SERPs (e.g. "pulpo.club › Browse › Beachfront › Listing"
+// under the result title). Cheap to ship: one extra script element per
+// page in the indexed routes. Items render in the document's current
+// locale so the SERP breadcrumb matches the page the user clicks into.
+function BreadcrumbListJsonLd({ items }) {
+  const json = pUseMemo(() => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://pulpo.club";
+    const list = items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      item: it.url ? new URL(it.url, origin).toString() : undefined,
+    }));
+    const data = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: JSON.parse(JSON.stringify(list)),
+    };
+    return JSON.stringify(data).replace(/</g, "\\u003c");
+  }, [items]);
+  return (
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: json }}
+    />
+  );
+}
+
 // schema.org RealEstateListing JSON-LD for /listing/:id. Embedded as a
 // <script type="application/ld+json"> so Google + Bing get rich-result
 // metadata (price, area, geo, photos, datePosted). Crawlers that
@@ -1964,9 +2019,20 @@ function ListingDetail({ listing, app, asPanel = true }) {
   }
   const showKeyFacts = facts.length >= 2;
 
+  const lcBc = app.locale === "es" ? "es" : "en";
+  const breadcrumbItems = [
+    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
+    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+    {
+      name: (listing.title?.[lcBc] ?? listing.title?.en ?? (lcBc === "es" ? "Anuncio" : "Listing")),
+      url: `/listing/${encodeURIComponent(listing.id)}`,
+    },
+  ];
+
   return (
     <div className={`detail ${asPanel ? "as-panel" : "as-page"}`}>
       <ListingJsonLd listing={listing} locale={app.locale} />
+      <BreadcrumbListJsonLd items={breadcrumbItems} />
       <div className="detail-head">
         <button className="link-btn" onClick={() => app.closeListing()}>
           <Icon name="arrow_left" size={16} strokeWidth={2}/> {t("detail.back", lc)}
