@@ -138,7 +138,10 @@
       },
       "country": {
         "type": "string",
-        "const": "SV"
+        "enum": [
+          "PA",
+          "SV"
+        ]
       },
       "department": {
         "type": [

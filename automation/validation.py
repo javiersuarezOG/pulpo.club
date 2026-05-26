@@ -31,6 +31,7 @@ from automation.validation_bounds import (
     STALE_PHOTOLESS_DAYS,
     BOUNDS_BY_TYPE,
 )
+from pulpo.countries import active as _active_country
 
 Disposition = Literal["PASS", "FLAG", "DROP"]
 RuleFn = Callable[[dict], tuple[Disposition, Optional[str]]]
@@ -43,35 +44,77 @@ class ValidationResult:
 
 
 # ── Country exclusion patterns ─────────────────────────────────────────
-# URL slug check: match country name as a word-segment in the URL path.
-# Handles slugs like /en-guatemala-, /costa-rica/, /panama/.
-_COUNTRY_SLUG_RE = re.compile(
-    r'(?:^|[-/])'
-    r'(guatemala|honduras|costa.?rica|nicaragua|panam[aá]|m[eé]xico|colombia)'
-    r'(?:[-/]|$)',
-    re.IGNORECASE,
-)
+#
+# The exclusion rules drop listings whose URL / title / description
+# names a country OTHER than the active deployment country. SV-only
+# pre-MC-PA-2 hardcoded the non-SV names; the regex is now built
+# dynamically from the active manifest so a PA deployment doesn't
+# self-exclude every PA listing.
+#
+# `_NON_ACTIVE_COUNTRY_NAMES` is a regex alternation of every known
+# Pulpo country except the active one. Adding a country to the
+# `_KNOWN_COUNTRY_NAMES` map below is the only change needed for a
+# 9th+ country to slot in.
+_KNOWN_COUNTRY_NAMES: dict[str, tuple[str, ...]] = {
+    "SV": ("el.salvador", "salvador"),
+    "GT": ("guatemala",),
+    "HN": ("honduras",),
+    "CR": ("costa.?rica",),
+    "NI": ("nicaragua",),
+    "PA": ("panam[aá]",),
+    "MX": ("m[eé]xico",),
+    "CO": ("colombia",),
+}
 
-# Title check: country name in first 5 words, OR after comma + en/in.
-# "Fincas en Venta en Guatemala" → drops (in first 5 words)
-# "Land for Sale, en Guatemala: ..." → drops (after comma + en)
-# "Land in El Salvador, similar quality to Guatemala fincas" → PASS
-_COUNTRY_IN_TITLE_RE = re.compile(
-    r'(?:'
-    r'^(?:\w+\s+){0,4}'           # in the first 5 words
-    r'|'
-    r',\s*(?:en|in)\s+'           # OR after comma + en/in
-    r')'
-    r'(guatemala|honduras|costa.?rica|nicaragua|panam[aá]|m[eé]xico|colombia)\b',
-    re.IGNORECASE,
-)
 
-# Description check (first 200 chars): "located in / in [country]" pattern.
-_COUNTRY_IN_DESC_RE = re.compile(
-    r'(?:located\s+in|ubicad[ao]\s+en|situated\s+in|(?<!\bEl\sSalvador,\s)\bin\s)'
-    r'(guatemala|honduras|costa.?rica|nicaragua|panam[aá]|m[eé]xico|colombia)\b',
-    re.IGNORECASE,
-)
+def _build_non_active_country_pattern(active_code: str) -> str:
+    parts: list[str] = []
+    for code, names in _KNOWN_COUNTRY_NAMES.items():
+        if code == active_code:
+            continue
+        parts.extend(names)
+    return "|".join(parts)
+
+
+# Three exclusion regexes — one per signal (URL / title / description).
+# Each is compiled lazily and cached per active-country code so a test
+# (or future hot-reload scenario) that flips PULPO_ACTIVE_COUNTRY gets
+# a fresh regex on the next validate() call without an `importlib.reload`
+# that would break class-identity for ValidationResult elsewhere.
+_REGEX_CACHE: dict[str, tuple[re.Pattern, re.Pattern, re.Pattern]] = {}
+
+
+def _exclusion_regexes() -> tuple[re.Pattern, re.Pattern, re.Pattern]:
+    active_code = _active_country().code
+    cached = _REGEX_CACHE.get(active_code)
+    if cached is not None:
+        return cached
+    pat = _build_non_active_country_pattern(active_code)
+    slug_re = re.compile(
+        rf'(?:^|[-/])({pat})(?:[-/]|$)',
+        re.IGNORECASE,
+    )
+    # Title check: country name in first 5 words, OR after comma + en/in.
+    # "Fincas en Venta en Guatemala" → drops (in first 5 words)
+    # "Land for Sale, en Guatemala: ..." → drops (after comma + en)
+    # "Land in El Salvador, similar quality to Guatemala fincas" → PASS
+    title_re = re.compile(
+        r'(?:'
+        r'^(?:\w+\s+){0,4}'           # in the first 5 words
+        r'|'
+        r',\s*(?:en|in)\s+'           # OR after comma + en/in
+        rf')({pat})\b',
+        re.IGNORECASE,
+    )
+    # Description check (first 200 chars): "located in / in [country]" pattern.
+    desc_re = re.compile(
+        rf'(?:located\s+in|ubicad[ao]\s+en|situated\s+in|(?<!\bEl\sSalvador,\s)\bin\s)'
+        rf'({pat})\b',
+        re.IGNORECASE,
+    )
+    out = (slug_re, title_re, desc_re)
+    _REGEX_CACHE[active_code] = out
+    return out
 
 # Manzana unit in title
 _MANZANA_RE = re.compile(r'\b(\d+(?:[.,]\d+)?)\s*(?:manzanas?|mz)\b', re.IGNORECASE)
@@ -92,7 +135,8 @@ def _rule_country_url(li: dict) -> tuple[Disposition, Optional[str]]:
         path = urlparse(url).path
     except Exception:
         path = url
-    m = _COUNTRY_SLUG_RE.search(path)
+    slug_re, _, _ = _exclusion_regexes()
+    m = slug_re.search(path)
     if m:
         return ("DROP", f"country_exclusion: url slug contains '{m.group(1).lower()}'")
     return ("PASS", None)
@@ -100,7 +144,8 @@ def _rule_country_url(li: dict) -> tuple[Disposition, Optional[str]]:
 
 def _rule_country_title(li: dict) -> tuple[Disposition, Optional[str]]:
     title = li.get("title") or ""
-    m = _COUNTRY_IN_TITLE_RE.search(title)
+    _, title_re, _ = _exclusion_regexes()
+    m = title_re.search(title)
     if m:
         return ("DROP", f"country_exclusion: title places listing in '{m.group(1).lower()}'")
     return ("PASS", None)
@@ -108,7 +153,8 @@ def _rule_country_title(li: dict) -> tuple[Disposition, Optional[str]]:
 
 def _rule_country_desc(li: dict) -> tuple[Disposition, Optional[str]]:
     desc = (li.get("description") or "")[:200]
-    m = _COUNTRY_IN_DESC_RE.search(desc)
+    _, _, desc_re = _exclusion_regexes()
+    m = desc_re.search(desc)
     if m:
         return ("DROP", f"country_exclusion: description places listing in '{m.group(1).lower()}'")
     return ("PASS", None)

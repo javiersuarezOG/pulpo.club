@@ -634,7 +634,7 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         scraped_at=raw.get("scraped_at") or datetime.now(timezone.utc).isoformat(),
         title=title or "(untitled)",
         description=description,
-        country="SV",
+        country=_active_country().code,
         department=raw.get("department") or dept,
         municipality=raw.get("municipality") or muni,
         zone=raw.get("zone") or zone,
