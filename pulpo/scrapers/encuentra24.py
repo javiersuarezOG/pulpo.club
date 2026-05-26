@@ -66,11 +66,25 @@ if SELECTOLAX_OK:
 
 
 BASE = "https://www.encuentra24.com"
-INDEX_URL = f"{BASE}/el-salvador-es/bienes-raices"
 
-# Sub-category landing URLs. Phase 3 (2026-05-24) widened this from
-# three national pages to per-department subpaths after a live probe
-# established:
+# PR-MC-PA-1 — encuentra24 is regional (SV + PA + CR + GT + HN + NI all
+# share the same Next.js DOM under /<country-slug>-es/...). Reading the
+# country slug + code from env vars at import time lets a single
+# deployment (or smoke-run env override) flip which country gets
+# scraped. Defaults preserve SV behavior bit-for-bit when no env is set.
+#
+# Trade-off: import-time capture means an in-process monkeypatch of
+# these env vars won't refresh the module-level constants. Tests that
+# need to flip country must set env BEFORE Python imports this module.
+_E24_COUNTRY_CODE = os.environ.get("PULPO_E24_COUNTRY", "SV").upper()
+_E24_COUNTRY_SLUG = os.environ.get("PULPO_E24_COUNTRY_SLUG", "el-salvador-es")
+
+INDEX_URL = f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices"
+
+# Sub-category landing URLs.
+#
+# For SV: Phase 3 (2026-05-24) widened this from three national pages
+# to per-department subpaths after a live probe established:
 #   • encuent24 supports `/<category>/<department>` URL routing.
 #   • Department subpaths each return their own ~20-listing batch.
 #   • Three categories × 6+ populated departments = ~18 URLs, a 6× funnel
@@ -81,32 +95,48 @@ INDEX_URL = f"{BASE}/el-salvador-es/bienes-raices"
 # Each URL renders ~7s in Playwright; the polite layer keeps the
 # per-request cadence on the slow side so encuent24 ingests politely
 # in spite of the higher URL count.
-CATEGORY_URLS: list[str] = [
-    # Terrenos (land): per-department subpaths returned empty during
-    # the 2026-05-24 probe, so we use the national page only.
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-terrenos",
-    # Casas: nine departments returned real inventory in the probe.
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/la-libertad",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/la-paz",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/sonsonate",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/usulutan",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/san-salvador",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/ahuachapan",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/cuscatlan",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/santa-ana",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-casas/chalatenango",
-    # Apartamentos: six departments had real inventory; the rural
-    # departments (ahuachapan, cuscatlan, chalatenango, morazan) were
-    # empty for condos.
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/la-libertad",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/la-paz",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/sonsonate",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/san-salvador",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/santa-ana",
-    f"{BASE}/el-salvador-es/bienes-raices-venta-de-propiedades-apartamentos/usulutan",
+#
+# For other countries (PA, etc.): use only the 3 national category URLs.
+# Per-country subpath slugs differ from SV's department names (PA uses
+# provincias like `panama`, `chiriqui`, `bocas-del-toro`). Adding those
+# requires a per-country live probe to confirm which subpaths actually
+# return inventory; deferred until each country graduates from smoke
+# scaffolding to production.
+_NATIONAL_CATEGORY_URLS: list[str] = [
+    f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-terrenos",
+    f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas",
+    f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos",
 ]
+
+if _E24_COUNTRY_CODE == "SV":
+    CATEGORY_URLS: list[str] = [
+        # Terrenos (land): per-department subpaths returned empty during
+        # the 2026-05-24 probe, so we use the national page only.
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-terrenos",
+        # Casas: nine departments returned real inventory in the probe.
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/la-libertad",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/la-paz",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/sonsonate",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/usulutan",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/san-salvador",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/ahuachapan",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/cuscatlan",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/santa-ana",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/chalatenango",
+        # Apartamentos: six departments had real inventory; the rural
+        # departments (ahuachapan, cuscatlan, chalatenango, morazan) were
+        # empty for condos.
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/la-libertad",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/la-paz",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/sonsonate",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/san-salvador",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/santa-ana",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/usulutan",
+    ]
+else:
+    CATEGORY_URLS = _NATIONAL_CATEGORY_URLS
 
 FIXTURE_FILE = "sample_listings.json"
 
@@ -418,7 +448,7 @@ class Encuentra24Scraper:
     the per-page render is already slow, so 2s/page is fine.
     """
     slug = "encuentra24"
-    country = "SV"
+    country = _E24_COUNTRY_CODE
     REQUEST_DELAY = 2.0
     PAGE_TIMEOUT_MS = 45_000   # 45s — encuentra24 detail pages take ~7s
                                 # plus JSON-LD must hydrate; 45s is safe
@@ -508,7 +538,7 @@ class Encuentra24Scraper:
             context = browser.new_context(
                 user_agent=ua,
                 viewport={"width": 1280, "height": 800},
-                locale="es-SV",
+                locale=f"es-{_E24_COUNTRY_CODE}",
             )
             # Cheap stealth — encuentra24 doesn't appear to do aggressive
             # bot detection, but `navigator.webdriver === true` is the
