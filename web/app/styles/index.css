@@ -892,23 +892,25 @@ h1,h2,h3,h4,h5 { margin: 0; }
 /* Pinned-listing highlight on the Browse card grid. The "Shared with
    you" card needs to read as the visually anchored entrypoint of the
    page — accent-colored border + soft halo + tiny lift on its photo.
-   The compound selector (.listing-card.listing-card-shared-pinned) is
-   needed to beat the `.app.hero-v4 .listing-card { box-shadow: none }`
-   rule that otherwise wins on specificity and nukes the halo. */
+   `!important` on box-shadow is deliberate: this rule is by definition
+   an override of `.app.hero-v4 .listing-card { box-shadow: none }`
+   which wins on specificity (3 classes vs ours). No way around the
+   override without scope-coupling to .hero-v4, which would break
+   non-hero-v4 builds. */
 .listing-card.listing-card-shared-pinned {
   outline: 2px solid var(--accent-2);
   outline-offset: -2px;
   border-radius: 14px;
   box-shadow:
     0 0 0 4px oklch(from var(--accent-2) l c h / 0.18),
-    0 6px 18px oklch(from var(--accent-2) l c h / 0.22);
+    0 6px 18px oklch(from var(--accent-2) l c h / 0.22) !important;
   position: relative;
   z-index: 1;
 }
 .listing-card.listing-card-shared-pinned:hover {
   box-shadow:
     0 0 0 5px oklch(from var(--accent-2) l c h / 0.24),
-    0 10px 24px oklch(from var(--accent-2) l c h / 0.28);
+    0 10px 24px oklch(from var(--accent-2) l c h / 0.28) !important;
 }
 /* The chip itself gets a tinted bg + accent border so it reads as
    "context label", not "neutral pill" — pairs with the card halo. */
