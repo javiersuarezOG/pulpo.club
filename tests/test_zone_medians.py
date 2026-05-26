@@ -299,16 +299,19 @@ def test_apply_sets_zone_distribution_fields():
 
 
 def test_apply_skips_listings_with_no_pool():
-    """No bucket at any tier → all fields stay None."""
+    """No bucket at any tier → all fields stay None (explicitly written)."""
     listings = [_li(zone="rare-zone", price_per_m2=100)]
     metrics = apply_zone_metrics(listings, {})
     li = listings[0]
     assert li["price_vs_zone_median"]    is None
     assert li["price_vs_zone_pct"]       is None
-    assert li.get("zone_price_per_m2_min") is None
-    assert li.get("zone_price_per_m2_max") is None
-    assert li.get("zone_comp_count")       is None
-    assert li.get("zone_comparison_scope") is None
+    # Use indexing (not .get) — these keys MUST exist so the dict path
+    # matches the dataclass path's None defaults. Required by the JSON
+    # schema that validates ranked.json on every nightly.
+    assert li["zone_price_per_m2_min"]   is None
+    assert li["zone_price_per_m2_max"]   is None
+    assert li["zone_comp_count"]         is None
+    assert li["zone_comparison_scope"]   is None
     assert metrics["listings_skipped_no_pool"] == 1
 
 
@@ -319,6 +322,22 @@ def test_apply_skips_inactive_listings():
         {("zone", "el-tunco", "land"): _bucket(100.0)})
     assert metrics["listings_skipped_inactive"] == 2
     assert metrics["listings_scored"] == 1
+
+
+def test_apply_writes_null_keys_on_inactive_listings():
+    """Inactive (sold / no $/m²) listings get explicit None on every owned
+    field — the dict code path must match the dataclass defaults so
+    ranked.json schema validation passes for nightly + backfill outputs."""
+    sold = _li(is_sold=True)
+    noprice = _li(price_per_m2=None)
+    apply_zone_metrics([sold, noprice],
+        {("zone", "el-tunco", "land"): _bucket(100.0)})
+    for li in (sold, noprice):
+        for k in ("price_vs_zone_median", "price_vs_zone_pct",
+                  "zone_price_per_m2_min", "zone_price_per_m2_max",
+                  "zone_comp_count", "zone_comparison_scope"):
+            assert k in li, f"{k} missing on inactive listing"
+            assert li[k] is None, f"{k} not None on inactive listing"
 
 
 # ── compute_and_apply (end-to-end) ─────────────────────────────────────
