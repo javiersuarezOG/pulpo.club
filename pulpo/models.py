@@ -16,7 +16,7 @@ class Listing:
     description: str = ""
 
     # Geography
-    country: str = "SV"
+    country: str = "SV"  # multi-country-exempt: dataclass default; normalize.py always overrides via active().code
     department: Optional[str] = None  # La Unión, San Miguel, La Libertad, ...
     municipality: Optional[str] = None
     zone: Optional[str] = None        # canonical zone slug: "el-cuco", "el-tunco", "el-zonte"

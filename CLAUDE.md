@@ -352,6 +352,79 @@ There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
 Upstash instance. If a future feature genuinely needs one, the PR that
 adds it must also add the backup posture to this section.
 
+## "Shipped" means the user-visible surface renders the change (post-2026-05-26)
+
+**PR-MC-PA-1 wrap-up overclaimed.** The smoke run exited 0, wrote
+`ranked.PA.json` (empty array, 2 bytes), and I declared "green for the
+parameterization scope." The user opened `pa.pulpo.club` and got a DNS
+error — no domain, no data, no usable surface. Two more PRs were needed
+to actually produce PA listings. "Pipeline ran" is upstream of done; it
+is not done.
+
+**The rule:** before claiming a change works, check the user-visible
+surface. If the change targets a URL, `curl -I` that URL and inspect a
+sample. If the change produces a file, open it and verify the content
+matches the claim, not just that the file exists. If the surface
+doesn't exist yet (DNS not configured, Vercel project not created,
+deploy not built), say **"code shipped; deploy pending: [explicit list
+of remaining manual steps]"** — never "works."
+
+Concrete checks per change-shape:
+
+- **API / route change** → `curl` the route, eyeball the response body.
+- **Frontend change** → load the page in a browser at the relevant
+  viewport (per the mobile-and-desktop rule above) and exercise the
+  feature.
+- **Pipeline / data change** → open the output file, count rows,
+  spot-check 2–3 records' content. "Row count > 0" is not enough; the
+  records must be correct for the change.
+- **New subdomain / Vercel project** → `dig +short <subdomain>` AND
+  `curl -I https://<subdomain>/` AND inspect rendered HTML. Three
+  separate failure modes; none subsumes the other.
+- **New CI guardrail** → run the guardrail against a known-bad input
+  to confirm it fails; then against current main to confirm it
+  passes. A guardrail that never triggers is decorative.
+
+**The smell test:** if the wrap-up reads "pipeline exited 0, file
+written, tests pass" without a sentence about what a user would
+actually see, it's incomplete. Add the user-visible verification or
+flag the deploy gap explicitly.
+
+## Country-hardcode guardrail (post-2026-05-26)
+
+Three SV-only string literals (`country="SV"`, an exclusion regex
+listing non-SV country names, and a schema `{"const": "SV"}`) silently
+dropped every PA listing in the MC-PA-1 smoke. PR #489 fixed them and
+[`scripts/check_country_hardcodes.py`](scripts/check_country_hardcodes.py)
+now runs in CI to prevent the regression class.
+
+**When the check fails:**
+
+1. Read the active country from the manifest:
+   ```python
+   from pulpo.countries import active as _active_country
+   country_name = _active_country().name_en
+   ```
+   or `loaded()` if you need a list of every registered country.
+2. If the hardcode is legitimately single-country (e.g. a scraper that
+   only serves one country's site, or the dataclass-default fallback),
+   add `# multi-country-exempt: <one-line reason>` on the offending
+   line. The reason makes the exemption auditable; "exempt" alone is
+   not enough.
+3. If the file is entirely country-specific by design (the SV manifest,
+   an SV-only scraper, the company-jurisdiction config), add its path
+   to `ALLOWED_FILES` in the script.
+
+**What NOT to do:**
+
+- Don't add `el.salvador|guatemala|panam[aá]|...` regex alternations
+  directly. Build them dynamically from `_KNOWN_COUNTRY_NAMES` minus
+  the active country (see `automation/validation.py` for the pattern).
+- Don't suppress the check with a blanket exempt marker on a long
+  list of code lines. If the change is broad enough that more than
+  2-3 lines need exemptions, you're probably hardcoding instead of
+  reading from the manifest.
+
 ## Commit Message Format
 - `feat:` new feature
 - `fix:` bug fix

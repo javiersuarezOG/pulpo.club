@@ -37,7 +37,7 @@ const COUNTRY_ADJECTIVE_EN = ACTIVE_COUNTRY.name_adjective_en ?? ACTIVE_COUNTRY.
 // OG locale tag is `<lang>_<COUNTRY-CC>` — Open Graph spec uses
 // `es_SV` shape, not BCP-47's `es-SV` hyphen form.
 const OG_LOCALE_ES = `es_${ACTIVE_COUNTRY.code}`;
-const OG_LOCALE_EN = `en_${ACTIVE_COUNTRY.code === "SV" ? "US" : ACTIVE_COUNTRY.code}`;
+const OG_LOCALE_EN = `en_${ACTIVE_COUNTRY.code === "SV" ? "US" : ACTIVE_COUNTRY.code}`;  // multi-country-exempt: SV→en_US (no en_SV in OG spec); FIXME — derive from manifest.locale_en when 3rd country lands
 
 // Rewrite Phase 8 — homepage description now aligns with the new hero
 // copy ("Every beach and lake home in {country}, ranked by value")
