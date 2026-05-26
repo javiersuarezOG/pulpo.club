@@ -39,9 +39,9 @@ export type AdminWidgetCategory = "comms" | "data" | "ops";
 export const ADMIN_WIDGETS: readonly AdminWidget[] = [
   {
     slug: "newsletter",
-    label: "Newsletter preview & send",
+    label: "Newsletter preview",
     description:
-      "Compose a one-off newsletter from current listings — pick any filter combination, preview the cut, and send a test email to yourself.",
+      "Trigger the production newsletter pipeline to send three cohort variants (anonymous, free, pro) of the next issue to any email. Routes through GitHub Actions — ~30–60s lag, real Resend send.",
     category: "comms",
     Component: NewsletterWidget,
   },
