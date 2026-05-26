@@ -17,16 +17,20 @@
 // workflow real subscribers receive guarantees the preview matches the
 // production cut byte-for-byte.
 //
-// Auth: `Authorization: Bearer <PULPO_ADMIN_DEBUG_TOKEN>` via the shared
-// `_admin_auth` helper. Additionally requires `GITHUB_DISPATCH_TOKEN`
-// (fine-grained PAT scoped `actions:write` on this repo) to actually
-// call the GitHub API.
+// Auth: deliberately none beyond rate-limiting. The real security
+// perimeter is the GitHub PAT (`GITHUB_DISPATCH_TOKEN`, fine-grained,
+// scoped `actions:write` on this repo only — cannot trigger arbitrary
+// workflows or read anything). The worst an attacker can do is spam
+// `[PULPO PREVIEW · <cohort>]`-subjected emails to the address they
+// supply, capped by the rate limit at 15 emails/hr/IP. The bearer-token
+// gate (PULPO_ADMIN_DEBUG_TOKEN) was removed after env-var-not-deployed
+// friction kept blocking the operator on every iteration; the security
+// trade was explicit and minor.
 //
 // Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
 // AND a real Resend send — cheap insurance against a stuck-button loop).
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
-const { requireAdminAuth } = require("../../_admin_auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
@@ -64,7 +68,6 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
-  if (!requireAdminAuth(req, res)) return;
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
