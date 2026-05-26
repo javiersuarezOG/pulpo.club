@@ -257,6 +257,39 @@ def join_recipients(
     return out
 
 
+def synthesize_preview_recipients(email: str) -> list[tuple[Recipient, str]]:
+    """Three fake recipients addressed to the same email — one per cohort
+    the production renderer can produce (anonymous, free_prefs, pro_prefs).
+
+    Used by `scripts/send_newsletter.py --preview-cohorts <email>` so the
+    operator can preview all three subscriber experiences in their own
+    inbox before flipping `send_mode=yes` on the real audience.
+
+    `logged_no_prefs` is intentionally omitted — its render diverges from
+    `anonymous` only by a settings-link path, and the cohort is rare in
+    the audience. Three variants is enough to vet the editorial cut.
+
+    Preference for the prefs cohorts: `departments=["La Libertad"]`. Wide
+    enough that the picker always finds picks, narrow enough that the
+    operator sees the "filter applied" branch render (not the broad
+    fallback). The renderer's filter-trace shows up in the rendered chips.
+    """
+    email = email.strip().lower()
+    if not email or "@" not in email:
+        raise ValueError(f"synthesize_preview_recipients: invalid email {email!r}")
+    eh = email_hash(email)
+    prefs = Preference(departments=["La Libertad"])
+    recipients = [
+        Recipient(email_hash=eh, display_name=None, locale="en",
+                  tier="free", has_account=False, preference=Preference()),
+        Recipient(email_hash=eh, display_name="Preview", locale="en",
+                  tier="free", has_account=True, preference=prefs),
+        Recipient(email_hash=eh, display_name="Preview", locale="en",
+                  tier="pro", has_account=True, preference=prefs),
+    ]
+    return [(r, email) for r in recipients]
+
+
 def build_recipient_queue(
     *,
     only_emails: Optional[set[str]] = None,
