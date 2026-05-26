@@ -889,6 +889,38 @@ h1,h2,h3,h4,h5 { margin: 0; }
   pointer-events: auto;
 }
 
+/* Pinned-listing highlight on the Browse card grid. The "Shared with
+   you" card needs to read as the visually anchored entrypoint of the
+   page — accent-colored border + soft halo + tiny lift on its photo.
+   Subtle on mobile (3px halo, no scale), more pronounced on desktop
+   (8px halo) since hover-states give us more headroom. */
+.listing-card-shared-pinned {
+  outline: 2px solid var(--accent-2);
+  outline-offset: -2px;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 4px oklch(from var(--accent-2) l c h / 0.18),
+    0 6px 18px oklch(from var(--accent-2) l c h / 0.22);
+  position: relative;
+  z-index: 1;
+}
+.listing-card-shared-pinned:hover {
+  box-shadow:
+    0 0 0 5px oklch(from var(--accent-2) l c h / 0.24),
+    0 10px 24px oklch(from var(--accent-2) l c h / 0.28);
+}
+/* The chip itself gets a tinted bg + accent border so it reads as
+   "context label", not "neutral pill" — pairs with the card halo. */
+.listing-card-shared-pinned .card-signal-chip-shared {
+  background: oklch(from var(--accent-2) l c h / 0.95);
+  color: var(--paper);
+  font-weight: 700;
+  box-shadow: 0 2px 8px oklch(from var(--accent-2) l c h / 0.35);
+}
+.listing-card-shared-pinned .card-signal-chip-shared svg {
+  color: var(--paper);
+}
+
 .pulpo-badge {
   display: inline-flex; align-items: center;
   padding: 5px 10px;
