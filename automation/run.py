@@ -1671,9 +1671,11 @@ def main() -> int:
     )
     print(f"[zone_medians] buckets={zm_metrics['buckets_computed']} "
           f"scored={zm_metrics['listings_scored']} "
-          f"skipped_no_zone={zm_metrics['listings_skipped_no_zone']} "
+          f"(zone={zm_metrics['listings_scored_zone']} "
+          f"macro={zm_metrics['listings_scored_macro']} "
+          f"country={zm_metrics['listings_scored_country']}) "
           f"skipped_inactive={zm_metrics['listings_skipped_inactive']} "
-          f"skipped_no_bucket_median={zm_metrics['listings_skipped_no_bucket_median']}")
+          f"skipped_no_pool={zm_metrics['listings_skipped_no_pool']}")
 
     # PRD §FR-5.5 — distance fields. dist_airport_km always populates from
     # the per-zone airport table when the zone is known; haversine from
