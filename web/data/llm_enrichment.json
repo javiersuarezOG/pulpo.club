@@ -44780,5 +44780,143 @@
     "cost_usd": 0.00165223,
     "finish_reason": "stop",
     "latency_ms": 9270
+  },
+  "remax|003113372030": {
+    "ts": "2026-05-26T07:24:36.533353+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "60,000 Sq. Vr2 Land Near El Espino Beach",
+      "es": "60,000 Vr2 de Terreno Cerca de Playa El Espino"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique investment opportunity in Usulután, Jucuarán. This 60,000 square-vara plot offers breathtaking mountain views and absolute tranquility. Located just 25 minutes from El Espino beach and 45 minutes from Plaza Mundo, the property also provides access to Puerto Viejo for boating. With an irregular shape, it is accessible by car and boat, currently used for agriculture but with immense potential for a tourist development. Ideal for investors seeking a peaceful yet strategically located land.",
+      "es": "Descubra una oportunidad de inversión única en Usulután, Jucuarán. Este terreno de 60,000 varas cuadradas ofrece impresionantes vistas a la montaña y absoluta tranquilidad. Ubicado a solo 25 minutos de la playa El Espino y a 45 minutos de Plaza Mundo, la propiedad también tiene acceso a Puerto Viejo para navegar. Con forma irregular, es accesible en auto y bote, actualmente de uso agrícola pero con enorme potencial para un proyecto turístico. Ideal para inversionistas que buscan un terreno pacífico y estratégicamente ubicado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "60,000 Sq. Vr2 of land with mountain views",
+        "es": "60,000 Vr2 de terreno con vistas a la montaña"
+      },
+      {
+        "en": "25 minutes from El Espino beach",
+        "es": "A 25 minutos de la playa El Espino"
+      },
+      {
+        "en": "Access to Puerto Viejo for boating",
+        "es": "Acceso a Puerto Viejo para navegar"
+      },
+      {
+        "en": "Potential for tourist development",
+        "es": "Potencial para desarrollo turístico"
+      },
+      {
+        "en": "Quiet and peaceful location",
+        "es": "Ubicación tranquila y pacífica"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino",
+    "url_language": "en",
+    "tokens_in": 2444,
+    "tokens_out": 540,
+    "cost_usd": 0.00125388,
+    "finish_reason": "stop",
+    "latency_ms": 6276
+  },
+  "remax|003093518030": {
+    "ts": "2026-05-26T07:24:37.008848+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Land with a View in Salcoatitán",
+      "es": "Terreno con Vista en Salcoatitán"
+    },
+    "short_description_canonical": {
+      "en": "Discover this exceptional land in the heart of Salcoatitán, just one block from the central park. Located in a small, exclusive residential community with only 9 plots, this property offers privacy and tranquility. Enjoy stunning views of the Ilamatepec mountain range and the surrounding coffee plantations. The community features underground electricity, water availability, and an electric access gate. The climate is excellent year-round. Owner financing available with a $15,000 down payment and zero interest over 2 years. Land area: 1369 v2.",
+      "es": "Descubra este terreno excepcional en el corazón de Salcoatitán, a solo una cuadra del parque central. Ubicado en una pequeña y exclusiva comunidad residencial de solo 9 lotes, esta propiedad ofrece privacidad y tranquilidad. Disfrute de impresionantes vistas de la cordillera de Ilamatepec y los cafetales circundantes. La comunidad cuenta con electricidad subterránea, disponibilidad de agua y portón eléctrico. El clima es excelente durante todo el año. Financiamiento directo con el dueño: prima de $15,000 y 2 años sin intereses. Área del terreno: 1369 v2."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location one block from Salcoatitán central park",
+        "es": "Ubicación privilegiada a una cuadra del parque central de Salcoatitán"
+      },
+      {
+        "en": "Exclusive community with only 9 plots",
+        "es": "Comunidad exclusiva de solo 9 lotes"
+      },
+      {
+        "en": "Panoramic views of Ilamatepec mountain range",
+        "es": "Vistas panorámicas de la cordillera de Ilamatepec"
+      },
+      {
+        "en": "Owner financing with zero interest for 2 years",
+        "es": "Financiamiento directo sin intereses por 2 años"
+      },
+      {
+        "en": "Underground electricity and water availability",
+        "es": "Electricidad subterránea y disponibilidad de agua"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.7833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Salcoatitán, Sonsonate, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2484,
+    "tokens_out": 584,
+    "cost_usd": 0.00131308,
+    "finish_reason": "stop",
+    "latency_ms": 6751
+  },
+  "remax|001463138091": {
+    "ts": "2026-05-26T07:24:38.169877+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Development Land on Ahuachapán Highway",
+      "es": "Terreno Premium en Carretera a Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Exceptional development opportunity on the busy Ahuachapán to Las Chinamas border highway. This 81,887.43 v2 (approx. 68,500 m²) flat parcel offers excellent visibility and direct road access, ideal for industrial, commercial, residential, or mixed-use projects. The property features three water wells and abundant water supply, plus access to electricity and potable water. Located in a high-growth area near the Guatemalan border, it attracts strong demand for commercial infrastructure and housing. Perfect for investors seeking a strategic location with high potential.",
+      "es": "Oportunidad excepcional de desarrollo en la transitada carretera de Ahuachapán a la frontera Las Chinamas. Este terreno plano de 81,887.43 v2 (aproximadamente 68,500 m²) ofrece excelente visibilidad y acceso directo a la carretera, ideal para proyectos industriales, comerciales, residenciales o de uso mixto. La propiedad cuenta con tres pozos de agua y abundante suministro, además de acceso a electricidad y agua potable. Ubicado en una zona de alto crecimiento cerca de la frontera con Guatemala, atrae una fuerte demanda de infraestructura comercial y vivienda. Perfecto para inversores que buscan una ubicación estratégica con alto potencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "81,887.43 v2 flat land with excellent road frontage",
+        "es": "81,887.43 v2 de terreno plano con excelente frente a la carretera"
+      },
+      {
+        "en": "Three water wells and abundant water supply",
+        "es": "Tres pozos de agua y abundante suministro hídrico"
+      },
+      {
+        "en": "Strategic location on Ahuachapán-Las Chinamas highway",
+        "es": "Ubicación estratégica en la carretera Ahuachapán-Las Chinamas"
+      },
+      {
+        "en": "Ideal for industrial, commercial, or residential development",
+        "es": "Ideal para desarrollo industrial, comercial o residencial"
+      },
+      {
+        "en": "High-growth area near Guatemalan border",
+        "es": "Zona de alto crecimiento cerca de la frontera guatemalteca"
+      }
+    ],
+    "lat": 13.853,
+    "lng": -89.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "tokens_in": 2549,
+    "tokens_out": 617,
+    "cost_usd": 0.00136693,
+    "finish_reason": "stop",
+    "latency_ms": 7913
   }
 }
