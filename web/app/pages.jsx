@@ -1666,6 +1666,27 @@ function ListingJsonLd({ listing, locale }) {
 
 // PriceContextBlock — "How this price compares" on /listing/:id.
 //
+// Zone slug → macro region slug. Mirrors automation/zone_medians.py's
+// `MACRO_ZONE` (imported from pulpo/ranker_legs/value.py on the backend
+// side). Kept in sync by hand for v2; MC-4 will move the SV reference
+// data into web/app/config/countries/sv.json and let this read from a
+// per-country manifest — same path the backend's MC-1c migration took.
+const ZONE_TO_MACRO_REGION = {
+  "el-tunco":           "central-pacific",
+  "el-sunzal":          "central-pacific",
+  "el-zonte":           "central-pacific",
+  "san-diego":          "central-pacific",
+  "mizata":             "central-pacific",
+  "puerto-la-libertad": "central-pacific",
+  "la-libertad":        "central-pacific",
+  "el-cuco":            "eastern-pacific",
+  "las-flores":         "eastern-pacific",
+  "punta-mango":        "eastern-pacific",
+  "el-espino":          "eastern-pacific",
+  "conchagua":          "gulf-fonseca",
+  "la-union":           "gulf-fonseca",
+};
+
 // Sits between .detail-keystats (the absolute $/m² display) and the
 // description. Two render outcomes:
 //   A — pill (green/neutral/amber) + caption with median $/m². Requires
@@ -1711,12 +1732,15 @@ function PriceContextBlock({ listing, locale }) {
   if (listing.zone_comparison_scope === "zone") {
     scope = listing.zone_name || listing.zone || "";
   } else if (listing.zone_comparison_scope === "macro" && listing.zone) {
-    scope = t(`zone.macro.${listing.zone}`, locale);
-    // Defensive: a zone slug missing from MACRO_ZONE on the backend
+    const macro = ZONE_TO_MACRO_REGION[listing.zone];
+    // Defensive: a zone slug missing from ZONE_TO_MACRO_REGION on the FE
     // shouldn't actually reach here (backend would've picked country
-    // instead), but if it does the key lookup falls through to the
-    // key itself — guard by falling back to the pretty zone name.
-    if (scope === `zone.macro.${listing.zone}`) {
+    // instead because the macro pool wouldn't exist), but if data
+    // skew + a missing map entry ever ship together we degrade to the
+    // pretty zone name rather than rendering the raw i18n key.
+    if (macro) {
+      scope = t(`zone.macro.${macro}`, locale);
+    } else {
       scope = listing.zone_name || listing.zone;
     }
   } else {
