@@ -77,6 +77,68 @@ def test_country_title_comparative_not_dropped():
     assert not country_drops, f"False-positive country drop: {country_drops}"
 
 
+# ── PR-MC-PA-2 — Country exclusion is active-country-aware ───────────
+
+
+def test_country_exclusion_pa_url_dropped_when_sv_active():
+    """SV is the default active country. A PA URL must still drop —
+    this is the pre-MC-PA-2 behavior and the production guard.
+    """
+    li = _listing(
+        url="https://www.encuentra24.com/panama-es/bienes-raices/venta/12345",
+        title="Casa en venta en Panamá",
+        description="located in Panama City",
+    )
+    result = validate(li)
+    assert result.disposition == "DROP"
+    assert any("country_exclusion" in r for r in result.reasons)
+
+
+def test_country_exclusion_pa_url_passes_when_pa_active(monkeypatch):
+    """PR-MC-PA-2: when PA is the active country, a PA URL must NOT
+    drop. This is the bug the previous smoke run surfaced (every PA
+    listing's URL contains "panama" → blanket drop).
+
+    The exclusion regex is built lazily and cached per active-country
+    code, so monkeypatching PULPO_ACTIVE_COUNTRY is enough — no module
+    reload needed.
+    """
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    li = _listing(
+        url="https://www.encuentra24.com/panama-es/bienes-raices/venta/12345",
+        title="Casa en venta Bijao Residences",
+        description="Beautiful beachfront home",
+        zone=None,
+        price_usd=695_000.0,
+        area_m2=400.0,
+        price_per_m2=1_737.5,
+    )
+    result = validate(li)
+    country_drops = [r for r in result.reasons if "country_exclusion" in r]
+    assert not country_drops, (
+        f"PA URL must not drop when PA is active: {country_drops}"
+    )
+
+
+def test_country_exclusion_gt_url_still_drops_when_pa_active(monkeypatch):
+    """Cross-protection: a GT URL must still drop when PA is the
+    active country (the exclusion rule still covers every non-active
+    Pulpo country).
+    """
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    li = _listing(
+        url=(
+            "https://bienesraicesenelsalvador.com/propiedad/"
+            "fincas-en-venta-en-guatemala-12345"
+        ),
+        title="Fincas en Venta en Guatemala",
+        description="located in Guatemala",
+    )
+    result = validate(li)
+    assert result.disposition == "DROP"
+    assert any("country_exclusion" in r for r in result.reasons)
+
+
 # ── Phase 7.3 — Zone extraction from structured title ─────────────────
 
 def test_jiquilisco_structured_title_zone():

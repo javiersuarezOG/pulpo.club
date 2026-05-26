@@ -40,6 +40,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from pulpo.models import Listing  # noqa: E402
+from pulpo.countries import loaded as _loaded_countries  # noqa: E402
 
 
 # Per-field overrides. The generator can derive type from the dataclass
@@ -47,7 +48,12 @@ from pulpo.models import Listing  # noqa: E402
 # explicitly. Keeping them in code means a drifting docstring won't
 # silently invalidate the schema.
 _OVERRIDES: dict[str, dict[str, Any]] = {
-    "country":              {"const": "SV"},
+    # Country: any code from a registered manifest. Was {"const": "SV"}
+    # pre-MC-PA-2 — relaxed to an enum so the same schema validates
+    # listings from any country a single deployment serves. The order
+    # is deterministic (sorted) so the generator output is stable
+    # across runs regardless of `loaded()`'s filesystem walk order.
+    "country":              {"enum": sorted(m.code for m in _loaded_countries())},
     "property_type":        {"enum": ["land", "house", "condo"]},
     "zone_confidence":      {"enum": ["specific", "municipality",
                                       "department", "unresolved", None]},

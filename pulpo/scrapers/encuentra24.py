@@ -57,6 +57,20 @@ from pulpo.scrapers._runtime import (
     pick_user_agent,
 )
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
+from pulpo.countries import active as _active_country
+
+
+def _country_fallback_name() -> str:
+    """Active country's English name — used when a listing's
+    PostalAddress is missing both street and locality. Resolved at call
+    time (not import) so a smoke run that flips PULPO_ACTIVE_COUNTRY in
+    between imports gets the right name."""
+    try:
+        return _active_country().name_en
+    except Exception:
+        # If the manifest can't load (misconfigured env), fall back to
+        # the scraper's own country code rather than crash the parse.
+        return _E24_COUNTRY_CODE
 
 if SELECTOLAX_OK:
     from selectolax.parser import HTMLParser  # noqa: F401
@@ -134,6 +148,36 @@ if _E24_COUNTRY_CODE == "SV":
         f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/san-salvador",
         f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/santa-ana",
         f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/usulutan",
+    ]
+elif _E24_COUNTRY_CODE == "PA":
+    # Panama provincias confirmed to return real inventory in the
+    # 2026-05-26 PR-MC-PA-2 probe (per-province subpaths each return
+    # the same 17-20 URL index batch as SV's department subpaths).
+    # /terrenos/<provincia> returns empty for every province probed —
+    # same pattern as SV, so we use the national /terrenos URL only.
+    CATEGORY_URLS = [
+        # Terrenos (national page; per-province subpaths empty).
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-terrenos",
+        # Casas: 9 provincias with real inventory.
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/cocle",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/bocas-del-toro",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/los-santos",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/veraguas",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/chiriqui",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/panama",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/colon",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/herrera",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-casas/panama-oeste",
+        # Apartamentos: 6 provincias with real inventory (the inland
+        # rural ones return 0 for condos — same shape as SV's pattern).
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/cocle",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/bocas-del-toro",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/chiriqui",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/panama",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/panama-oeste",
+        f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos/colon",
     ]
 else:
     CATEGORY_URLS = _NATIONAL_CATEGORY_URLS
@@ -320,23 +364,33 @@ def _build_raw_record(html: str, url: str) -> Optional[dict]:
         return None
     description = _strip_html(ld.get("description") or "")[:1500]
 
-    # Price — only USD listings count (encuentra24 lists in USD for SV)
+    # Price — accept currencies that are at-par with USD in the listing's
+    # country. SV lists in USD. PA lists in PAB ("Balboa") which is pegged
+    # 1:1 to USD and circulates as USD legal tender (Panama has no central
+    # bank; the Balboa is a name + coinage only — Panamanian banknotes are
+    # USD). Any future country that uses a different currency will need
+    # FX conversion before reaching this parser; until then this set is
+    # the exact list of currency labels that mean "USD amount, no
+    # conversion needed."
+    _AT_PAR_USD = {"USD", "PAB"}
     offers = ld.get("offers") or {}
     price_usd: Optional[float] = None
-    if (offers.get("priceCurrency") or "").upper() == "USD":
+    if (offers.get("priceCurrency") or "").upper() in _AT_PAR_USD:
         try:
             price_usd = float(offers.get("price") or 0) or None
         except (TypeError, ValueError):
             pass
 
-    # Location: street + locality from JSON-LD's PostalAddress
+    # Location: street + locality from JSON-LD's PostalAddress. Fallback
+    # to the active country's English name when both address parts are
+    # missing (was hardcoded to "El Salvador" pre-MC-PA-2).
     avail = (offers.get("availableAtOrFrom") or {})
     addr = avail.get("address") or {}
     location_parts = [
         p for p in (addr.get("streetAddress"), addr.get("addressLocality"))
         if p
     ]
-    location_text = ", ".join(location_parts) or "El Salvador"
+    location_text = ", ".join(location_parts) or _country_fallback_name()
 
     # Broker — encuentra24 carries a seller Organization; some listings
     # are owner-direct (no broker), in which case the field is absent
