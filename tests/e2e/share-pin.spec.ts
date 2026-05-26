@@ -33,73 +33,66 @@ async function firstListingIdFromBrowse(page: import("@playwright/test").Page): 
 test.describe("share-pin landing (desktop)", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test("/l/<token> rewrites URL to /browse?pin=<token> and opens detail over Browse", async ({ page }) => {
+  test("/l/<token> on desktop pins the card at top WITHOUT auto-opening the overlay", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     const id = await firstListingIdFromBrowse(page);
     const token = encodeShareToken(id);
 
     await page.goto(`/l/${token}`, { waitUntil: "domcontentloaded" });
 
-    // URL bar should rewrite away from /l/<token> to /browse?pin=<token>
-    // so a refresh keeps the same surface and the URL matches the
-    // canonical shareUrlFor() output.
-    await expect.poll(() => page.url(), {
-      timeout: 5_000,
-      message: "URL should rewrite from /l/<token> to /browse?pin=<token>",
-    }).toMatch(new RegExp(`\\/browse\\?(?:.*&)?pin=${token}`));
+    // URL rewrite to the canonical /browse?pin=<token> form.
+    await expect.poll(() => page.url(), { timeout: 5_000 }).toMatch(
+      new RegExp(`\\/browse\\?(?:.*&)?pin=${token}`),
+    );
 
-    // Detail panel auto-opens over Browse on desktop.
-    await expect(page.locator(".detail-overlay")).toBeVisible();
-    // The catalogue mounted underneath — the pinned card sits as the
-    // first card in the grid with the "Shared with you" tag.
-    await expect(
-      page.locator(".card-grid .listing-card").first().locator("text=Shared with you"),
-    ).toBeVisible();
-
-    expect(errors).toEqual([]);
-  });
-
-  test("closing the auto-opened panel drops user on /browse with pin cleared", async ({ page }) => {
-    const errors = attachErrorRecorder(page);
-    const id = await firstListingIdFromBrowse(page);
-
-    // Cold-load directly via /browse?pin= (faster than going through
-    // /l/<token> — the rewrite path is covered by the test above).
-    await page.goto(`/browse?pin=${encodeURIComponent(id)}`, { waitUntil: "domcontentloaded" });
-    await expect(page.locator(".detail-overlay")).toBeVisible();
-
-    // The detail panel's "Back to results" link calls app.closeListing.
-    await page.locator(".detail .link-btn").first().click();
-
-    // URL strips ?pin entirely (replaceState, not pushState — no extra
-    // history entry).
-    await expect.poll(() => page.url(), {
-      timeout: 5_000,
-      message: "Close should drop user on /browse with ?pin gone",
-    }).not.toMatch(/[?&]pin=/);
-
-    // Panel closed; grid still rendered.
+    // CRITICAL: even on desktop the detail-overlay's dim+blur backdrop
+    // hides the catalogue. Skip auto-open; the highlighted pinned card
+    // IS the surface the recipient lands on.
     await expect(page.locator(".detail-overlay")).toBeHidden();
-    await expect(page.locator(".card-grid .listing-card").first()).toBeVisible();
-    // The previously-pinned card no longer wears the "Shared with you"
-    // tag — it's reverted to its natural sorted position.
-    await expect(page.locator("text=Shared with you")).toHaveCount(0);
+
+    // The pinned card has the highlighted class + the "Shared with you" tag.
+    const firstCard = page.locator(".card-grid .listing-card").first();
+    await expect(firstCard).toHaveClass(/listing-card-shared-pinned/);
+    await expect(firstCard.locator("text=Shared with you")).toBeVisible();
 
     expect(errors).toEqual([]);
   });
 
-  test("filter interaction clears ?pin and the pinned-card tag", async ({ page }) => {
+  test("user taps pinned card → panel opens → close keeps ?pin AND the tag", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     const id = await firstListingIdFromBrowse(page);
 
     await page.goto(`/browse?pin=${encodeURIComponent(id)}`, { waitUntil: "domcontentloaded" });
+    const firstCard = page.locator(".card-grid .listing-card").first();
+    await expect(firstCard).toHaveClass(/listing-card-shared-pinned/);
+    await expect(page.locator(".detail-overlay")).toBeHidden();
+
+    // Tap the pinned card → standard openListing flow pushes /listing/:id.
+    await firstCard.click();
+    await expect(page.locator(".detail-overlay")).toBeVisible();
+
+    // Close the panel via "Back to results". history.back pops the
+    // pushed /listing/:id entry, restoring URL to /browse?pin=<id>.
+    // The pinned tag stays — closing the panel is not engagement with
+    // the catalogue, so the share context is kept.
+    await page.locator(".detail .link-btn").first().click();
+    await expect(page.locator(".detail-overlay")).toBeHidden();
+    await expect.poll(() => page.url(), { timeout: 5_000 }).toMatch(/[?&]pin=/);
+
+    await expect(page.locator(".card-grid .listing-card").first()).toHaveClass(/listing-card-shared-pinned/);
     await expect(page.locator(".card-grid .listing-card").first().locator("text=Shared with you")).toBeVisible();
 
-    // Close the detail panel first so the filter chips are pointer-
-    // reachable (the overlay covers the page underneath).
-    await page.locator(".detail .link-btn").first().click();
-    await expect(page.locator(".detail-overlay")).toBeHidden();
+    expect(errors).toEqual([]);
+  });
 
+  test("filter interaction clears ?pin AND the pinned-card tag (the only thing that clears it)", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    const id = await firstListingIdFromBrowse(page);
+
+    await page.goto(`/browse?pin=${encodeURIComponent(id)}`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator(".card-grid .listing-card").first()).toHaveClass(/listing-card-shared-pinned/);
+
+    // No close-the-panel step here — the panel doesn't auto-open.
     // Toggle the sort dropdown — every user-driven filter/sort path
     // funnels through clearPin(). Picking "Lowest price" guarantees a
     // real value change regardless of the current default.
@@ -110,6 +103,7 @@ test.describe("share-pin landing (desktop)", () => {
       message: "Sort change should strip ?pin from URL",
     }).not.toMatch(/[?&]pin=/);
     await expect(page.locator("text=Shared with you")).toHaveCount(0);
+    await expect(page.locator(".listing-card-shared-pinned")).toHaveCount(0);
 
     expect(errors).toEqual([]);
   });

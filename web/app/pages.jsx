@@ -1098,9 +1098,10 @@ function BrowsePage({ app }) {
   // Strips ?pin from the URL via replaceState (NEVER pushState — we
   // don't want each filter toggle adding a history entry). Also clears
   // the in-memory pin state so the pinned card reverts to its natural
-  // sorted position, and dispatches `pulpo:pin-cleared` so the app
-  // shell can close the auto-opened detail panel (the panel is owned
-  // by the shell, not BrowsePage — see app.jsx's openListingId).
+  // sorted position. NOTE: only the user's filter/sort interactions
+  // call this — closing the detail panel does NOT clear the pin (the
+  // pinned highlight is the share context, kept visible until the user
+  // explicitly engages the catalogue).
   const clearPin = pUseCallback(() => {
     setPinnedListingId(null);
     if (typeof window === "undefined") return;
@@ -1111,18 +1112,6 @@ function BrowsePage({ app }) {
       const qs = next.toString();
       window.history.replaceState({}, "", `/browse${qs ? `?${qs}` : ""}`);
     }
-    window.dispatchEvent(new CustomEvent("pulpo:pin-cleared"));
-  }, []);
-
-  // App shell -> BrowsePage: when the user closes the auto-opened
-  // detail panel, app.closeListing's pinLandedRef branch dispatches
-  // pulpo:pin-cleared so BrowsePage drops the in-memory pin (and the
-  // "Shared with you" tag on the card).
-  pUseEffect(() => {
-    if (typeof window === "undefined") return;
-    const onCleared = () => setPinnedListingId(null);
-    window.addEventListener("pulpo:pin-cleared", onCleared);
-    return () => window.removeEventListener("pulpo:pin-cleared", onCleared);
   }, []);
 
   // popstate filter resync — BrowsePage stays mounted when the user
