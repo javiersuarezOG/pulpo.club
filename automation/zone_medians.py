@@ -194,6 +194,33 @@ def _pick_bucket(
     return None, None
 
 
+# Every field this module owns on a Listing. Used by apply_zone_metrics
+# to null-fill non-qualifying listings so the dict code path matches
+# the dataclass code path (where fields default to None at construction).
+# Without this, backfill scripts that mutate raw dicts could leave the
+# keys missing entirely — and ranked.schema.json requires them present.
+_ZONE_FIELDS_OWNED: tuple[str, ...] = (
+    "price_vs_zone_median",
+    "price_vs_zone_pct",
+    "zone_price_per_m2_min",
+    "zone_price_per_m2_max",
+    "zone_comp_count",
+    "zone_comparison_scope",
+)
+
+
+def _null_zone_fields(li: Any) -> None:
+    """Write None to every zone field this module owns on `li`.
+
+    For dataclass listings this is a no-op (fields already default to
+    None). For dict listings (the backfill path), this guarantees the
+    keys exist with explicit None values — required by the JSON schema
+    that ranked.json validates against.
+    """
+    for k in _ZONE_FIELDS_OWNED:
+        _set(li, k, None)
+
+
 def apply_zone_metrics(
     listings: list[Any],
     stats: dict[tuple[str, str, str], dict],
@@ -208,7 +235,9 @@ def apply_zone_metrics(
 
     The cascade picks the most-specific tier whose bucket has ≥
     MIN_LISTINGS_PER_ZONE peers. Listings that don't qualify at any tier
-    leave all fields untouched (default None).
+    get all six fields explicitly nulled — dict callers (backfill
+    scripts) need the keys present for schema validation; dataclass
+    callers see a no-op since the fields already default to None.
 
     Returns metrics dict with tier-by-tier scoring counts.
     """
@@ -223,10 +252,12 @@ def apply_zone_metrics(
     }
     for li in listings:
         if not _is_active(li):
+            _null_zone_fields(li)
             metrics["listings_skipped_inactive"] += 1
             continue
         bucket, scope = _pick_bucket(li, stats)
         if bucket is None:
+            _null_zone_fields(li)
             metrics["listings_skipped_no_pool"] += 1
             continue
 
