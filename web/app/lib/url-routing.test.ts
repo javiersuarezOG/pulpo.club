@@ -9,25 +9,29 @@ import { parseLocation } from "./url-routing";
 import { encodeShareToken } from "./share";
 
 describe("parseLocation — /l/<token>", () => {
-  it("decodes a valid token and surfaces the listing id like /listing/<id>", () => {
+  it("decodes a valid token and surfaces it via pinListingId (NOT openListingId)", () => {
+    // Share-pin landing must NOT auto-open the detail panel. The panel
+    // covers the catalogue (mobile) or backdrop-blurs it (desktop),
+    // either way defeating the share-pin feature. Recipients land on
+    // /browse with the pinned card visually highlighted; they tap it
+    // to open the detail.
     const id = "remax__001461165132";
     const token = encodeShareToken(id);
     const parsed = parseLocation(`/l/${token}`);
-    expect(parsed.openListingId).toBe(id);
-    expect(parsed.isListingPath).toBe(true);
+    expect(parsed.openListingId).toBeNull();
+    expect(parsed.isListingPath).toBe(false);
+    expect(parsed.pinListingId).toBe(id);
   });
 
   // Share-pin landing — /l/<token> must surface route=browse and
-  // pinListingId so the app shell can (a) replaceState to /browse?pin=<id>
-  // on cold-load and (b) drop the user on /browse (not /) when the panel
-  // closes. Regression guard for the dead-end bug where a shared listing
-  // opened over /home with no catalogue underneath.
+  // pinListingId so the app shell can replaceState to /browse?pin=<token>
+  // on cold-load. Regression guard for the dead-end bug where a shared
+  // listing opened over /home with no catalogue underneath.
   it("share link lands route=browse with pinListingId set", () => {
     const id = "remax__001461165132";
     const parsed = parseLocation(`/l/${encodeShareToken(id)}`);
     expect(parsed.route).toBe("browse");
     expect(parsed.pinListingId).toBe(id);
-    expect(parsed.openListingId).toBe(id);
   });
 
   // Non-share parse paths must NEVER populate pinListingId — pinListingId
@@ -58,7 +62,7 @@ describe("parseLocation — /l/<token>", () => {
     ];
     for (const id of cases) {
       const parsed = parseLocation(`/l/${encodeShareToken(id)}`);
-      expect(parsed.openListingId).toBe(id);
+      expect(parsed.pinListingId).toBe(id);
     }
   });
 

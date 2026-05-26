@@ -152,11 +152,17 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
   }
 
   // `/l/<token>` — source-opaque share link. Decode the token (base64url
-  // of the internal id), force the underlying route to `browse` so the
-  // catalogue (not /home) sits behind the auto-opened detail panel, and
+  // of the internal id), force the underlying route to `browse`, and
   // populate `pinListingId` so the app shell can rewrite the URL bar
-  // to /browse?pin=<id> on cold-load. Malformed tokens degrade to home —
-  // the SPA never surfaces broker info from a bad share URL.
+  // to /browse?pin=<token> on cold-load. We deliberately do NOT set
+  // openListingId / isListingPath here: the share-pin landing renders
+  // the catalogue with the pinned listing as the visually highlighted
+  // first card — auto-opening the fullscreen panel covers that catalogue
+  // (mobile) or de-emphasizes it behind a darkened backdrop (desktop),
+  // either way defeating the "see what was shared AND the rest of the
+  // inventory" intent of the share-pin feature. Recipients tap the
+  // pinned card to drill into the detail. Malformed tokens degrade
+  // to home — the SPA never surfaces broker info from a bad share URL.
   if (normalized.startsWith(SHARE_PREFIX)) {
     const token = normalized.slice(SHARE_PREFIX.length);
     if (SAFE_SHARE_TOKEN_RE.test(token)) {
@@ -164,7 +170,7 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
         const padded = token.replace(/-/g, "+").replace(/_/g, "/");
         const decoded = atob(padded);
         if (SAFE_LISTING_ID_RE.test(decoded)) {
-          return { route: "browse", openListingId: decoded, isListingPath: true, section: null, adminWidget: null, pinListingId: decoded };
+          return { route: "browse", openListingId: null, isListingPath: false, section: null, adminWidget: null, pinListingId: decoded };
         }
       } catch {
         // Malformed base64 — fall through to home.

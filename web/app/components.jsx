@@ -795,7 +795,7 @@ function ListingCard({
 
   return (
     <article
-      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""}`}
+      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""}`}
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
