@@ -892,9 +892,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
 /* Pinned-listing highlight on the Browse card grid. The "Shared with
    you" card needs to read as the visually anchored entrypoint of the
    page — accent-colored border + soft halo + tiny lift on its photo.
-   Subtle on mobile (3px halo, no scale), more pronounced on desktop
-   (8px halo) since hover-states give us more headroom. */
-.listing-card-shared-pinned {
+   The compound selector (.listing-card.listing-card-shared-pinned) is
+   needed to beat the `.app.hero-v4 .listing-card { box-shadow: none }`
+   rule that otherwise wins on specificity and nukes the halo. */
+.listing-card.listing-card-shared-pinned {
   outline: 2px solid var(--accent-2);
   outline-offset: -2px;
   border-radius: 14px;
@@ -904,7 +905,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   position: relative;
   z-index: 1;
 }
-.listing-card-shared-pinned:hover {
+.listing-card.listing-card-shared-pinned:hover {
   box-shadow:
     0 0 0 5px oklch(from var(--accent-2) l c h / 0.24),
     0 10px 24px oklch(from var(--accent-2) l c h / 0.28);
