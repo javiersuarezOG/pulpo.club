@@ -494,9 +494,7 @@ test.describe("New app boots cleanly on key routes", () => {
       // heading visible to a cold ES visitor on /. Trips when hardcoded
       // EN strings sneak in instead of t() lookups.
       "Try a free month",                             // hero primary + header CTA
-      "Your top deals",                               // hero_v4 subhead opener
-      "in your inbox",                                // hero_v4 subhead — newsletter channel signature
-      "every Sunday",                                 // hero_v4 subhead — weekly cadence anchor
+      "We're local",                                  // hero_v4 subhead opener
       "See this week's top 10",                       // hero secondary CTA
       "Scanning",                                     // hero pre-label "SCANNING N SOURCES"
       "Just in",                                      // hero Just In pill
@@ -653,10 +651,6 @@ test.describe("New app boots cleanly on key routes", () => {
       "Mejor valor", "Menor precio", "Más recientes", "Lote más grande",
       // Status / discovery
       "Bajó de precio", "Recién aparecidos",
-      // hero_v4 subhead — newsletter clarity copy. Locks in that the EN
-      // locale never renders the ES words for "your best deals", "to your
-      // email", or "every Sunday".
-      "Tus mejores ofertas", "en tu correo", "cada domingo",
     ];
 
     // Tokens that legitimately exist in both EN and ES copy and would
