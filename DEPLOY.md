@@ -464,3 +464,75 @@ Reverse: drop the Vercel domain + delete the per-country env vars +
 optionally remove the manifest file. The codebase remains
 backward-compatible because every manifest accessor returns empty
 containers when its section is absent.
+
+### Current state — Panama (as of 2026-05-26)
+
+**Code + pipeline: complete.** PA can be deployed.
+**Vercel + DNS: not yet provisioned — those are the remaining manual
+steps before `pa.pulpo.club` resolves.**
+
+What's already shipped:
+
+- ✅ `pulpo/countries/pa.json` + `web/app/config/countries/pa.json`
+  (PR-MC-PA-1, #484)
+- ✅ `encuentra24` scrapes PA URLs via `PULPO_E24_COUNTRY=PA` +
+  `PULPO_E24_COUNTRY_SLUG=panama-es`, 18 category URLs covering
+  9 casas + 6 apartamentos provincias (PR-MC-PA-2)
+- ✅ PAB currency accepted as USD at par (PR-MC-PA-2)
+- ✅ `automation/validation.py` country-exclusion regex is now
+  active-country-aware — PA URLs no longer self-drop under PA
+  (PR-MC-PA-2)
+- ✅ `pulpo/normalize.py` stamps `country` from
+  `_active_country().code` (PR-MC-PA-2)
+- ✅ `ranked.schema.json` accepts `{"enum": ["PA", "SV"]}`
+  (PR-MC-PA-2)
+- ✅ Nightly workflow runs a PA pipeline pass and commits
+  `ranked.PA.json` + `featured.PA.json` + `last_updated.PA.json`
+  (PR-MC-PA-3). PA's run is `continue-on-error` so a PA failure does
+  not block the SV commit.
+
+What still needs to happen (operator-side, can't be scripted from CI):
+
+1. **DNS** — point `pa.pulpo.club` at Vercel:
+   ```
+   pa.pulpo.club CNAME cname.vercel-dns.com.
+   ```
+   (Apex `pulpo.club` and `www.pulpo.club` already resolve to Vercel.)
+
+2. **Vercel domain registration** — Settings → Domains → Add Domain →
+   `pa.pulpo.club`. Vercel auto-issues a TLS cert once DNS resolves.
+
+3. **Per-domain env vars** — Settings → Environment Variables, scope
+   `Production`, Domain `pa.pulpo.club`:
+   - `PULPO_ACTIVE_COUNTRY=PA`
+   - `VITE_PULPO_ACTIVE_COUNTRY=PA`
+   - All other secrets identical to the SV deploy. Clerk/Stripe/
+     PostHog are country-agnostic.
+
+4. **Clerk allowed-domains** — Dashboard → Settings → Domains →
+   add `pa.pulpo.club`. Otherwise sign-in modals fail on PA's domain.
+
+5. **First production smoke** (post-deploy):
+   - `curl -I https://pa.pulpo.club/` → 200 OK.
+   - `<title>` mentions "Panamá", not "El Salvador".
+   - Open a PA listing detail page; JSON-LD `addressCountry` reads
+     `"PA"`.
+   - One listing's price is rendered in USD (PAB is at par; the
+     PR-MC-PA-2 currency fix accepts both labels).
+
+Known PA-specific deltas vs SV:
+
+- **PA manifest is intentionally partial.** No `vacation_zones`,
+  `named_beaches`, `airport_distances_km`, or `validation_bounds`.
+  PA listings rank via the unknown-zone fallback and skip the
+  beach-distance + airport-distance bonuses. The vacation-zone
+  filter in `parse_detail` (drops inland house/condo listings)
+  falls back to waterfront keywords for PA — so PA inventory
+  skews heavily toward listings that explicitly mention "playa",
+  "beachfront", etc. in title/description.
+- **Inventory volume is much smaller than SV.** Smoke runs at
+  `PULPO_LIMIT=20` produce ~4 PA listings vs SV's ~900 nightly.
+  This will grow once PA reference data lands in PR-MC-PA-4+.
+- **Per-country canary** — PA's nightly count canary is a soft-warn
+  only (logs to stderr but doesn't fail the workflow). Tighten to
+  enforced once PA stabilises.

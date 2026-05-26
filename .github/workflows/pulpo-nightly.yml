@@ -226,6 +226,76 @@ jobs:
           SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
         run: python automation/run.py
 
+      # PR-MC-PA-3 — first non-SV nightly run. PA inventory is small
+      # (~4-30 listings/run today; SV is ~900), so a separate pipeline
+      # invocation rather than a matrix. The pipeline dual-writes the
+      # legacy `ranked.json` filename alongside the per-country one;
+      # because the apex (pulpo.club) reads `ranked.json` and serves
+      # SV, we back up SV's legacy files before the PA run and restore
+      # them after. PA outputs land at `ranked.PA.json` etc. and feed
+      # the future pa.pulpo.club deploy (deploy infra not yet wired —
+      # see DEPLOY.md "Adding a country (subdomain rollout)" section).
+      #
+      # `continue-on-error: true` because PA is brand-new — its
+      # population-rate baseline is non-existent and the scraper is
+      # still calibrating. A bad PA run must NOT block the SV commit.
+      - name: Run PA pipeline (multi-country scaffolding)
+        continue-on-error: true
+        env:
+          PULPO_OFFLINE: "0"
+          PULPO_ACTIVE_COUNTRY: "PA"
+          PULPO_E24_COUNTRY: "PA"
+          PULPO_E24_COUNTRY_SLUG: "panama-es"
+          PULPO_SOURCES: "encuentra24"
+          # PA cap below SV's (SV runs PULPO_LIMIT=1000 above) — PA
+          # inventory is much smaller and the cap stops a runaway from
+          # consuming the runner's time budget.
+          PULPO_LIMIT: "300"
+          PULPO_E24_LIMIT: "300"
+          # PA has no population-rate history yet. The regression guard
+          # would always fire (100% drop on every field) until PA has
+          # ~7 nightlies of baseline. Override for now; remove once
+          # PA stabilises.
+          PULPO_ALLOW_POPULATION_REGRESSION: "1"
+          DEEPSEEK_API_TOKEN: ${{ secrets.DEEPSEEK_API_TOKEN }}
+          LLM_VISION_ENABLED: ${{ secrets.LLM_VISION_ENABLED || 'true' }}
+          LLM_VISION_PROVIDER: ${{ secrets.LLM_VISION_PROVIDER }}
+          LLM_VISION_DAILY_BUDGET_USD: ${{ secrets.LLM_VISION_DAILY_BUDGET_USD }}
+          LLM_VISION_TOP_PCT: ${{ secrets.LLM_VISION_TOP_PCT }}
+          QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
+          SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
+        run: |
+          # Snapshot SV's legacy files; the PA run will dual-write them.
+          mkdir -p /tmp/sv-legacy
+          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+            [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
+          done
+
+          python automation/run.py || echo "PA pipeline exited non-zero (continue-on-error)"
+
+          # Restore SV's legacy files so the apex (pulpo.club) keeps
+          # serving SV data. PA-specific outputs (`ranked.PA.json` etc.)
+          # are untouched by this restore.
+          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+            [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
+          done
+
+      - name: PA count canary (soft — logs only, never fails)
+        continue-on-error: true
+        run: |
+          python3 - <<'EOF'
+          import json, sys
+          try:
+              data = json.load(open("web/data/ranked.PA.json"))
+              n = len(data)
+              print(f"PA canary: {n} listings (informational)")
+              if n == 0:
+                  print("WARN: PA scrape produced 0 listings", file=sys.stderr)
+          except FileNotFoundError:
+              print("WARN: ranked.PA.json not written; "
+                    "PA pipeline likely failed", file=sys.stderr)
+          EOF
+
       - name: Count canary (floor + ceiling)
         env:
           PULPO_ACTIVE_COUNTRY: ${{ env.PULPO_ACTIVE_COUNTRY }}
@@ -595,6 +665,15 @@ jobs:
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
                   samples/ranked.csv
+          # PR-MC-PA-3 — multi-country outputs from the PA pipeline
+          # run. Best-effort: PA file absence does not block the commit
+          # (continue-on-error on the PA pipeline step above means PA
+          # data may be missing some nights). When pa.pulpo.club is
+          # provisioned, these files become its source of truth.
+          for f in ranked.PA.json ranked.list.PA.json \
+                   last_updated.PA.json featured.PA.json; do
+            git add "web/data/$f" 2>/dev/null || true
+          done
           # Optional files — only add if they exist
           git add web/data/photo_fetch_log.jsonl 2>/dev/null || true
           git add web/data/photo_storage_size.jsonl 2>/dev/null || true
