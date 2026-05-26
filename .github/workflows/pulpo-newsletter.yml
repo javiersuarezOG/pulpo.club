@@ -38,6 +38,10 @@ on:
         description: "Smoke-test address — limit the send to this one email. Blank = whole audience."
         required: false
         default: ""
+      preview_cohorts:
+        description: "Admin preview: send the 3 cohort variants (anonymous, free, pro) of the current issue to this email. Bypasses the audience queue + forces LIVE send. Blank = disabled."
+        required: false
+        default: ""
 
 concurrency:
   group: pulpo-newsletter
@@ -54,8 +58,10 @@ jobs:
 
       # Send gate. Default OFF — weekly cron stays in dry-run. Setting
       # send_mode=yes via workflow_dispatch flips DRY_RUN=0 and the send
-      # pipeline talks to Resend for real.
-      PULPO_NEWSLETTER_DRY_RUN: "${{ github.event.inputs.send_mode == 'yes' && '0' || '1' }}"
+      # pipeline talks to Resend for real. preview_cohorts=<email> also
+      # forces LIVE — the admin preview button needs a real send to put
+      # the rendered email in the operator's inbox.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ (github.event.inputs.send_mode == 'yes' || github.event.inputs.preview_cohorts != '') && '0' || '1' }}"
 
       # Telemetry — silent no-op when secret is missing (per
       # automation/posthog_client.py + api/_posthog.js).
@@ -93,12 +99,16 @@ jobs:
           test -s web/data/ranked.json \
             || (echo "::error::web/data/ranked.json missing — run nightly first" && exit 1)
 
+      # Skipped in preview-cohorts mode — the fixture is for the weekly
+      # dry-run audit, not for the single-email operator preview.
       - name: build dry-run cohort fixtures
+        if: github.event.inputs.preview_cohorts == ''
         run: |
           python3 scripts/build_newsletter_dryrun.py \
             --issue-number "${{ github.event.inputs.issue_number || '1' }}"
 
       - name: upload cohort fixture artifact
+        if: github.event.inputs.preview_cohorts == ''
         uses: actions/upload-artifact@v4
         with:
           name: newsletter-cohort-${{ github.run_id }}
@@ -107,15 +117,21 @@ jobs:
           if-no-files-found: error
 
       - name: send issues
-        # In dry-run mode this enumerates the audience + builds + renders
-        # + fires telemetry with fake message_ids; no HTTP to Resend.
-        # In live mode this makes real Resend calls. only_email scopes
-        # the recipient set when set.
+        # Three modes:
+        #  • default cron — dry-run, audience-wide, fake message_ids;
+        #  • workflow_dispatch + send_mode=yes — LIVE to the audience
+        #    (optionally scoped by only_email);
+        #  • workflow_dispatch + preview_cohorts=<email> — LIVE to that
+        #    one address, three sends (anonymous, free_prefs, pro_prefs)
+        #    so the operator can vet what each subscriber type receives.
         run: |
           ONLY_EMAIL="${{ github.event.inputs.only_email || '' }}"
+          PREVIEW_EMAIL="${{ github.event.inputs.preview_cohorts || '' }}"
           ARGS=(--issue-number "${{ github.event.inputs.issue_number || '1' }}" \
                 --write-html-to newsletter-drafts/sent)
-          if [ -n "$ONLY_EMAIL" ]; then
+          if [ -n "$PREVIEW_EMAIL" ]; then
+            ARGS+=(--preview-cohorts "$PREVIEW_EMAIL")
+          elif [ -n "$ONLY_EMAIL" ]; then
             ARGS+=(--only-email "$ONLY_EMAIL")
           fi
           python3 scripts/send_newsletter.py "${ARGS[@]}"

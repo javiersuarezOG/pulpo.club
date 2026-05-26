@@ -174,3 +174,22 @@ def test_preference_from_missing_newsletter_block():
     assert p == Preference()
     p2 = subs._preference_from_profile({"newsletter": "not-a-dict"})
     assert p2 == Preference()
+
+
+def test_synthesize_preview_recipients_covers_three_cohorts():
+    from automation.newsletter.build_issue import detect_cohort
+
+    queue = subs.synthesize_preview_recipients("Preview@Pulpo.Club")
+    assert len(queue) == 3
+    emails = {email for _, email in queue}
+    assert emails == {"preview@pulpo.club"}        # normalized + same address everywhere
+    cohorts = [detect_cohort(r) for r, _ in queue]
+    assert cohorts == ["anonymous", "free_prefs", "pro_prefs"]
+
+
+def test_synthesize_preview_recipients_rejects_bad_email():
+    import pytest
+    with pytest.raises(ValueError):
+        subs.synthesize_preview_recipients("not-an-email")
+    with pytest.raises(ValueError):
+        subs.synthesize_preview_recipients("   ")

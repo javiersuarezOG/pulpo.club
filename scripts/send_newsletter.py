@@ -35,7 +35,10 @@ if str(ROOT) not in sys.path:
 
 from automation.newsletter import build_issue, render_html                 # noqa: E402
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
-from automation.newsletter.subscribers import build_recipient_queue        # noqa: E402
+from automation.newsletter.subscribers import (                            # noqa: E402
+    build_recipient_queue,
+    synthesize_preview_recipients,
+)
 
 
 def _capture(event: str, props: dict) -> None:
@@ -46,10 +49,14 @@ def _capture(event: str, props: dict) -> None:
         pass
 
 
-def _subject_for(issue, locale: str) -> str:
+def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
     # Editorial subject — variable substitution stays here so a future
     # A/B-test fixture can override per-recipient. The 14-day window is
     # the cadence reader expects ("this fortnight").
+    # In preview mode the cohort is stamped into the prefix so the
+    # operator can tell the three variants apart in their own inbox.
+    if preview:
+        return f"[PULPO PREVIEW · {issue.cohort}] Issue {issue.issue_number:02d}"
     if locale == "es":
         return f"Pulpo · Edición {issue.issue_number:02d} · 10 selecciones esta quincena"
     return f"Pulpo · Issue {issue.issue_number:02d} · 10 picks this fortnight"
@@ -66,6 +73,18 @@ def main() -> int:
         help=(
             "Restrict the send to these addresses (case-insensitive). "
             "Pass multiple times. Used for smoke-testing before broadcast."
+        ),
+    )
+    p.add_argument(
+        "--preview-cohorts",
+        default=None,
+        metavar="EMAIL",
+        help=(
+            "Admin preview mode. Skip the audience queue; instead send the "
+            "3 cohort variants (anonymous, free_prefs, pro_prefs) of the "
+            "current issue to this single email. Subjects are prefixed "
+            "'[PULPO PREVIEW · <cohort>]' so the operator can tell them "
+            "apart. Forces LIVE send (DRY_RUN must be off in the env)."
         ),
     )
     p.add_argument(
@@ -94,18 +113,43 @@ def main() -> int:
         ranked = json.load(fh)
     ranked = sorted(ranked, key=lambda x: x.get("rank") or 9_999)
 
-    only = set(args.only_email) if args.only_email else None
-    queue = build_recipient_queue(
-        only_emails=only,
-        include_unsubscribed=args.include_unsubscribed,
-    )
+    preview_mode = bool(args.preview_cohorts)
+    if preview_mode:
+        if args.only_email:
+            print(
+                "[send] --preview-cohorts and --only-email are mutually exclusive",
+                file=sys.stderr,
+            )
+            return 2
+        try:
+            queue = synthesize_preview_recipients(args.preview_cohorts)
+        except ValueError as e:
+            print(f"[send] {e}", file=sys.stderr)
+            return 2
+    else:
+        only = set(args.only_email) if args.only_email else None
+        queue = build_recipient_queue(
+            only_emails=only,
+            include_unsubscribed=args.include_unsubscribed,
+        )
     if args.limit:
         queue = queue[: args.limit]
 
     issue_date = datetime.now(timezone.utc)
     dry = is_dry_run()
+    if preview_mode and dry:
+        # Preview mode is explicit and goes to a single operator-chosen
+        # address — let it fail loud rather than silently no-op'ing the
+        # send the operator clicked to trigger.
+        print(
+            "[send] preview mode requires LIVE send "
+            "(set PULPO_NEWSLETTER_DRY_RUN=0 in the workflow / env)",
+            file=sys.stderr,
+        )
+        return 2
+    mode_label = "PREVIEW" if preview_mode else ("dry-run" if dry else "LIVE")
     print(
-        f"[send] mode={'dry-run' if dry else 'LIVE'} recipients={len(queue)} "
+        f"[send] mode={mode_label} recipients={len(queue)} "
         f"issue={args.issue_number} ranked={len(ranked)}"
     )
 
@@ -125,7 +169,7 @@ def main() -> int:
             history_rows=None,
         )
         html = render_html(issue)
-        subject = _subject_for(issue, recipient.locale)
+        subject = _subject_for(issue, recipient.locale, preview=preview_mode)
 
         if out_dir:
             stem = f"{issue.issue_id}-issue{args.issue_number:02d}-{recipient.email_hash[:8]}.html"
