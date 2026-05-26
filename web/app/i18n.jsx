@@ -295,15 +295,8 @@ const UI_STRINGS = {
   // simplified subhead, photo aria, and featured-pill.
   "home.hero.v4.kicker":         { en: "PULPO · BEACH + LAKE",
                                    es: "PULPO · PLAYA + LAGO" },
-  //   = non-breaking space. Locks four phrase atoms so the line
-  // never wraps mid-thought regardless of viewport / font / browser:
-  //   1. "deals —" / "ofertas —" — em-dash sticks to preceding word so it can't start a new line
-  //   2. "or both —" / "o ambos —" — the choice phrase ending stays glued to the dash
-  //   3. "in your inbox" / "en tu correo" — the channel signature reads as one unit
-  //   4. "every Sunday" / "cada domingo" — the cadence anchor stays atomic
-  // Natural break points remain: after each em-dash and at the commas inside "beach, lake," / "playa, lago".
-  "home.hero.v4.subhead":        { en: "Your top deals — beach, lake, or both — in your inbox every Sunday.",
-                                   es: "Tus mejores ofertas — playa, lago o ambos — en tu correo cada domingo." },
+  "home.hero.v4.subhead":        { en: "Your top deals — beach, lake, or both — in your inbox every Sunday.",
+                                   es: "Tus mejores ofertas — playa, lago o ambos — en tu correo cada domingo." },
   "home.hero.v4.featured_today": { en: "Featured today",
                                    es: "Destacado hoy" },
   "home.hero.v4.photo_aria":     { en: "Open today's featured listing in {name}",
