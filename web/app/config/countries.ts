@@ -15,6 +15,7 @@
 // extra weight in SV.
 
 import svManifest from "./countries/sv.json";
+import paManifest from "./countries/pa.json";
 
 export type CountryManifest = {
   code: string;             // ISO-3166-1 alpha-2 (uppercase)
@@ -47,6 +48,7 @@ export type CountryManifest = {
 // side, byte-identical mirror, JSON Schema validation in CI).
 const MANIFESTS: Record<string, CountryManifest> = {
   SV: svManifest as unknown as CountryManifest,
+  PA: paManifest as unknown as CountryManifest,
 };
 
 // Vite exposes env vars prefixed with VITE_ at build time. The fallback

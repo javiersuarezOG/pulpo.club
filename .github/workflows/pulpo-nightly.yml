@@ -33,6 +33,20 @@ env:
   # ceiling further when we lift the encuentra24 cap.
   LISTING_COUNT_FLOOR: "700"    # ~64% of ~1095 baseline post-encuentra24
   LISTING_COUNT_CEILING: "1300" # ~120% of ~1095, leaves headroom
+  # PR-MC-5 — multi-country prep. The pipeline today runs SV-only;
+  # PULPO_ACTIVE_COUNTRY tells the FE + the per-country reference data
+  # which country to render. PULPO_COUNTRIES is a comma-separated list
+  # for the (future) matrix nightly that will produce per-country
+  # outputs for multiple deployments from one cron run. Today both
+  # default to "SV" and the workflow behaves identically.
+  PULPO_ACTIVE_COUNTRY: "SV"
+  PULPO_COUNTRIES:      "SV"
+  # Per-country canary floor/ceiling override the global LISTING_COUNT_*
+  # values above when the active country has a tighter band in its
+  # manifest. PR-MC-1b put SV's bounds in pulpo/countries/sv.json under
+  # listing_count_floor / listing_count_ceiling; the canary-check step
+  # later in this workflow prefers those when set. Adding a country =
+  # set country_count_floor / country_count_ceiling in its <cc>.json.
 
 jobs:
   run:
@@ -213,26 +227,45 @@ jobs:
         run: python automation/run.py
 
       - name: Count canary (floor + ceiling)
+        env:
+          PULPO_ACTIVE_COUNTRY: ${{ env.PULPO_ACTIVE_COUNTRY }}
         run: |
           python3 - <<'EOF'
           import json, sys, os
-          floor   = int(os.environ.get("LISTING_COUNT_FLOOR",   "600"))
-          ceiling = int(os.environ.get("LISTING_COUNT_CEILING", "900"))
+          # PR-MC-5 — prefer the per-country floor/ceiling from the
+          # active country's manifest. Falls back to the workflow-level
+          # LISTING_COUNT_FLOOR / LISTING_COUNT_CEILING env vars when
+          # the manifest doesn't carry them (legacy default).
+          try:
+              from pulpo.countries import active as _active
+              m = _active().raw
+              manifest_floor   = m.get("listing_count_floor")
+              manifest_ceiling = m.get("listing_count_ceiling")
+          except Exception as e:
+              print(f"WARN: could not load country manifest, "
+                    f"using env-var defaults: {e}", file=sys.stderr)
+              manifest_floor = manifest_ceiling = None
+
+          floor   = int(manifest_floor   if manifest_floor   is not None
+                        else os.environ.get("LISTING_COUNT_FLOOR",   "600"))
+          ceiling = int(manifest_ceiling if manifest_ceiling is not None
+                        else os.environ.get("LISTING_COUNT_CEILING", "900"))
           try:
               data = json.load(open("web/data/ranked.json"))
           except Exception as e:
               print(f"ERROR: could not read ranked.json: {e}", file=sys.stderr)
               sys.exit(1)
           n = len(data)
+          cc = os.environ.get("PULPO_ACTIVE_COUNTRY", "SV")
           if n < floor:
-              print(f"CANARY FAIL: {n} listings < floor {floor}. "
+              print(f"CANARY FAIL [{cc}]: {n} listings < floor {floor}. "
                     "Not committing — stale data kept.", file=sys.stderr)
               sys.exit(1)
           if n > ceiling:
-              print(f"CANARY FAIL: {n} listings > ceiling {ceiling}. "
+              print(f"CANARY FAIL [{cc}]: {n} listings > ceiling {ceiling}. "
                     "Possible parser inflation — not committing.", file=sys.stderr)
               sys.exit(1)
-          print(f"CANARY OK: {n} listings in [{floor}, {ceiling}]")
+          print(f"CANARY OK [{cc}]: {n} listings in [{floor}, {ceiling}]")
           EOF
 
       - name: Per-type canaries (floor + classification confidence)

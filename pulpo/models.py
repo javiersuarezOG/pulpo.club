@@ -246,6 +246,12 @@ class Listing:
     zone_price_per_m2_min: Optional[float] = None  # lowest $/m² in bucket
     zone_price_per_m2_max: Optional[float] = None  # highest $/m² in bucket
     zone_comp_count: Optional[int] = None          # n peers in the bucket
+    # Which tier the cascade picked for this listing's comp pool:
+    # "zone" (same-zone same-type), "macro" (broader region), or "country"
+    # (all-SV same-type). Drives the FE's honest-labeling copy on the
+    # PriceContextBlock — "El Tunco" vs "the central Pacific region" vs
+    # "El Salvador". None when no tier qualified (block is hidden).
+    zone_comparison_scope: Optional[str] = None    # "zone" | "macro" | "country"
 
     # PRD §FR-5.5 distance fields (Phase 3) — populated either via haversine
     # from lat/lng (preferred) or via the per-zone airport distance table

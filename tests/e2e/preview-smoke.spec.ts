@@ -494,7 +494,9 @@ test.describe("New app boots cleanly on key routes", () => {
       // heading visible to a cold ES visitor on /. Trips when hardcoded
       // EN strings sneak in instead of t() lookups.
       "Try a free month",                             // hero primary + header CTA
-      "We're local",                                  // hero_v4 subhead opener
+      "Your top deals",                               // hero_v4 subhead opener
+      "in your inbox",                                // hero_v4 subhead — newsletter channel signature
+      "every Sunday",                                 // hero_v4 subhead — weekly cadence anchor
       "See this week's top 10",                       // hero secondary CTA
       "Scanning",                                     // hero pre-label "SCANNING N SOURCES"
       "Just in",                                      // hero Just In pill
@@ -527,14 +529,20 @@ test.describe("New app boots cleanly on key routes", () => {
       "Not shared",                                   // value.notshared.short
       "Show missing details",                         // filter.show_incomplete
       // PriceContextBlock — "How this price compares" zone-context block
-      // on the detail page. Renders for any listing with price_per_m2,
-      // so an anon visitor opening a card from /browse exercises it.
+      // on the detail page. Renders whenever the backend cascade
+      // (zone → macro → country) finds a qualifying comp pool. An anon
+      // visitor opening a /browse card exercises it.
       "How this price compares",                      // detail.price_context.header
       "cheaper than typical",                         // detail.price_context.below_avg (snippet)
       "About average for",                            // detail.price_context.near_avg (snippet)
       "above average for",                            // detail.price_context.above_avg (snippet)
-      "Compared to",                                  // detail.price_context.caption (snippet)
-      "Not enough listings",                          // detail.price_context.unavailable (snippet)
+      "Average in",                                   // detail.price_context.caption (snippet, post-v2)
+      "across",                                       // detail.price_context.caption (snippet, post-v2)
+      // Macro-tier scope labels — used when a sparse zone cascades to
+      // the broader region. Land any of these in ES copy = leak.
+      "the central Pacific region",                   // zone.macro.central-pacific
+      "the eastern Pacific region",                   // zone.macro.eastern-pacific
+      "the Gulf of Fonseca region",                   // zone.macro.gulf-fonseca
       // Share-pin landing — BrowsePage tags the pinned card with this
       // pill when a /l/<token> recipient arrives. Renders on / only if
       // BrowsePage is mounted underneath a panel from a cold-load share,
@@ -645,6 +653,10 @@ test.describe("New app boots cleanly on key routes", () => {
       "Mejor valor", "Menor precio", "Más recientes", "Lote más grande",
       // Status / discovery
       "Bajó de precio", "Recién aparecidos",
+      // hero_v4 subhead — newsletter clarity copy. Locks in that the EN
+      // locale never renders the ES words for "your best deals", "to your
+      // email", or "every Sunday".
+      "Tus mejores ofertas", "en tu correo", "cada domingo",
     ];
 
     // Tokens that legitimately exist in both EN and ES copy and would

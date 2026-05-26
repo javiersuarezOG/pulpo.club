@@ -243,7 +243,7 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "zone_percentile",
     "price_vs_zone_median", "price_vs_zone_pct",
     "zone_price_per_m2_min", "zone_price_per_m2_max",
-    "zone_comp_count",
+    "zone_comp_count", "zone_comparison_scope",
     # Photos
     "photo_urls", "hero_photo_path", "photos_count",
     "hero_photo_quality_score", "has_text_overlay",

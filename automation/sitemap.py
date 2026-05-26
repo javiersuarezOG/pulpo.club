@@ -21,14 +21,44 @@ SITE_ORIGIN = "https://pulpo.club"
 # Paths that are public + indexable. Saved + Account require auth, so
 # they're excluded — Google can crawl them but they have no useful
 # content for an anonymous bot. /plans is public.
+#
+# Browse-category entries mirror CATEGORY_KEYS in
+# web/app/lib/categories.ts (TS source of truth; Python can't import it
+# at runtime, so the list is duplicated here with this SAFETY note).
+# Each cat key must have matching localized title + description copy in
+# web/app/lib/use-document-meta.ts's BROWSE_CATEGORY_COPY map —
+# otherwise Google sees a sitemap URL that resolves to generic Browse
+# meta and treats it as duplicate content.
 SECTION_ENTRIES: list[tuple[str, str, str]] = [
     # (path, changefreq, priority)
-    ("/",                          "daily",   "1.0"),
-    ("/browse",                    "daily",   "0.9"),
-    ("/browse?cat=beachfront",     "daily",   "0.9"),
-    ("/browse?cat=build_ready",    "daily",   "0.8"),
-    ("/browse?cat=off_market",     "weekly",  "0.6"),
-    ("/plans",                     "monthly", "0.5"),
+    ("/",                                "daily",   "1.0"),
+    ("/browse",                          "daily",   "0.9"),
+    # High-intent category landing pages:
+    ("/browse?cat=beachfront",           "daily",   "0.9"),
+    ("/browse?cat=build_ready",          "daily",   "0.8"),
+    ("/browse?cat=ocean_view",           "daily",   "0.8"),
+    ("/browse?cat=water_features",       "weekly",  "0.7"),
+    ("/browse?cat=commercial",           "weekly",  "0.7"),
+    ("/browse?cat=under_50k",            "daily",   "0.7"),
+    ("/browse?cat=under_100k",           "daily",   "0.7"),
+    # Refinement filters representing a coherent search query:
+    ("/browse?cat=mountain_view",        "weekly",  "0.6"),
+    ("/browse?cat=flat_buildable",       "weekly",  "0.6"),
+    ("/browse?cat=best_documented",      "weekly",  "0.6"),
+    # Time-bounded shelves:
+    ("/browse?cat=new_this_week",        "daily",   "0.6"),
+    ("/browse?cat=price_drops",          "daily",   "0.6"),
+    ("/browse?cat=motivated_sellers",    "weekly",  "0.5"),
+    # Paywalled — crawlable but lower priority (anon users hit the
+    # soft paywall on results):
+    ("/browse?cat=off_market",           "weekly",  "0.6"),
+    ("/plans",                           "monthly", "0.5"),
+    ("/terms",                           "yearly",  "0.3"),
+    ("/privacy",                         "yearly",  "0.3"),
+    ("/cookies",                         "yearly",  "0.3"),
+    ("/subscription",                    "yearly",  "0.3"),
+    ("/imprint",                         "yearly",  "0.3"),
+    ("/contact",                         "monthly", "0.4"),
 ]
 
 
@@ -40,7 +70,7 @@ def _url_node(loc: str, lastmod: str, changefreq: str, priority: str) -> str:
     # Keep alternates simple — point ?lang=es / ?lang=en at the same
     # path; Google reads <xhtml:link rel="alternate" hreflang="...">
     # for language variants.
-    sep = "&amp;" if "?" in loc else "?"
+    sep = "&" if "?" in loc else "?"
     en_url = f"{SITE_ORIGIN}{loc}"
     es_url = f"{SITE_ORIGIN}{loc}{sep}lang=es"
     return (

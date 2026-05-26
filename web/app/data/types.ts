@@ -58,6 +58,11 @@ export type Listing = {
   /** Number of peers in the bucket. Powers the "Based on N similar
    *  listings in {zone}" caption on the PriceContextBlock. */
   zone_comp_count: number | null;
+  /** Which tier the backend cascade picked for this listing's comp pool.
+   *  Drives the PriceContextBlock copy variant — same-zone vs broader
+   *  macro region vs country-wide. null when no tier qualified (block
+   *  is hidden entirely). */
+  zone_comparison_scope: "zone" | "macro" | "country" | null;
   /** Gallery photos at the broker's native resolution. Excludes the
    *  local thumbnail (which lives at `thumbnail_url`, sized for cards) —
    *  putting both in the same array used to surface the same picture

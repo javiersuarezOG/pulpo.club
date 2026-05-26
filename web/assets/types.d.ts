@@ -194,6 +194,9 @@ export interface Listing {
     zone_price_per_m2_min: number | null;
     zone_price_per_m2_max: number | null;
     zone_comp_count: number | null;       // powers "Based on N" caption
+    // Which tier the cascade picked for this listing's comp pool.
+    // FE chooses copy variant from this: zone name / macro region / country.
+    zone_comparison_scope: "zone" | "macro" | "country" | null;
 
     // ── Distance fields (PRD §FR-5.5) ───────────────────────────────
     dist_airport_km: number | null;
