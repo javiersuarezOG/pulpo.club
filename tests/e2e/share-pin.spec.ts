@@ -55,6 +55,14 @@ test.describe("share-pin landing (desktop)", () => {
     await expect(firstCard).toHaveClass(/listing-card-shared-pinned/);
     await expect(firstCard.locator("text=Shared with you")).toBeVisible();
 
+    // Computed-style + geometry guards. The class being present in the
+    // DOM is not enough — the prior bug rounds shipped the class but
+    // the visual contract was broken (halo lost to specificity, red
+    // instead of green, card not actually rounded). These assertions
+    // lock the visual contract so a future refactor that nukes
+    // specificity or changes the wrong token fails CI loudly.
+    await assertPinnedCardVisualContract(firstCard);
+
     expect(errors).toEqual([]);
   });
 
@@ -154,9 +162,8 @@ test.describe("share-pin landing (mobile)", () => {
     await expect(page.locator(".detail-overlay")).toBeHidden();
 
     // The pinned card IS first in the grid with the "Shared with you" tag.
-    await expect(
-      page.locator(".card-grid .listing-card").first().locator("text=Shared with you"),
-    ).toBeVisible();
+    const firstCard = page.locator(".card-grid .listing-card").first();
+    await expect(firstCard.locator("text=Shared with you")).toBeVisible();
 
     // Defense-in-depth: assert there's no full-viewport overlay
     // hiding the grid. Catches "I opened the overlay but hid it
@@ -169,6 +176,61 @@ test.describe("share-pin landing (mobile)", () => {
     });
     expect(overlayCovers).toBe(false);
 
+    // Visual contract — same as the desktop spec. Mobile is the more
+    // common share-recipient surface so it gets this guard too.
+    await assertPinnedCardVisualContract(firstCard);
+
     expect(errors).toEqual([]);
   });
 });
+
+// Locks the visual contract of the pinned card. Each assertion guards
+// against a real bug that shipped in an earlier round:
+// - borderRadius !== 0   ↛ .app.hero-v4 transparent-shell leak (#491)
+// - overflow === hidden  ↛ card clips its photo + chips properly
+// - boxShadow has inset  ↛ accent border rendered, didn't lose to
+//                          specificity (#482, #483)
+// - boxShadow color is the brand green (oklch ~0.40 0.09 165), NOT
+//                          --accent-2 heart red (0.62 0.20 25) (#485)
+// - all chips inside card ≥ 8px from the rounded corner
+//                          ↛ DealGradeChip-on-border collision (#491)
+async function assertPinnedCardVisualContract(card: import("@playwright/test").Locator): Promise<void> {
+  const contract = await card.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    const cardR = el.getBoundingClientRect();
+    // Min distance from the card's bounding box to any visible
+    // descendant chip's edge. < 8 means the chip is on/near the border.
+    const minChipInset = [...el.querySelectorAll(".deal-grade-chip, .card-signal-chip")]
+      .map((c) => c.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0)
+      .map((r) => Math.min(r.left - cardR.left, cardR.right - r.right, r.top - cardR.top, cardR.bottom - r.bottom));
+    return {
+      borderRadius: cs.borderRadius,
+      overflow: cs.overflow,
+      boxShadow: cs.boxShadow,
+      minChipInset: minChipInset.length === 0 ? null : Math.min(...minChipInset),
+    };
+  });
+  // border-radius must be non-zero — the card needs to be a real
+  // rounded container, not the hero-v4 transparent shell.
+  expect(contract.borderRadius, "pinned card should have border-radius (was 0px on hero-v4 shell)").not.toBe("0px");
+  // overflow:hidden so chips/photo can't bleed past the rounded edge.
+  expect(contract.overflow, "pinned card should clip its contents").toBe("hidden");
+  // box-shadow must include the inset accent border + NOT be 'none'.
+  // 'none' means the !important didn't beat the .hero-v4 catch-all.
+  expect(contract.boxShadow, "pinned card halo + inset border should render").not.toBe("none");
+  expect(contract.boxShadow, "pinned card should have an inset border").toContain("inset");
+  // The brand accent (deep green) in oklch is `0.4 0.09 165`. The
+  // heart-red --accent-2 is `0.62 0.2 25`. If the shadow color is the
+  // wrong one we've regressed to using the heart token.
+  expect(contract.boxShadow, "pinned card should use --accent (brand green), not --accent-2 (heart red)")
+    .toMatch(/oklch\(0\.4 0\.09 165/);
+  // Every chip is at least 8px from the rounded corner. Catches the
+  // DealGradeChip-on-border collision (#491).
+  if (contract.minChipInset !== null) {
+    expect(
+      contract.minChipInset,
+      "every chip inside the pinned card should be ≥8px from the card edge (no chip-on-border collision)",
+    ).toBeGreaterThanOrEqual(8);
+  }
+}
