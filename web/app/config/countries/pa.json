@@ -1,0 +1,16 @@
+{
+  "code": "PA",
+  "name_en": "Panama",
+  "name_es": "Panamá",
+  "name_adjective_en": "Panamanian",
+  "locale_es": "es-PA",
+  "locale_en": "en-US",
+  "currency": "USD",
+  "centroid_lat": 8.5380,
+  "centroid_lng": -80.7821,
+  "traditional_units": [],
+  "listing_count_floor": 50,
+  "listing_count_ceiling": 5000,
+  "newsletter_audience_segment": "pa",
+  "_data_provenance": "PR-MC-PA-1 — minimum-viable scaffolding manifest. Required fields only; every optional reference-data section (zone_tier, vacation_zones, coastal_zones, named_beaches, airports, airport_distances_km, validation_bounds, departments) is intentionally absent. The typed accessors in pulpo.countries.CountryManifest default-safe to empty containers, so the pipeline runs end-to-end with this manifest but emits no PA-specific zone/beach/airport intelligence. Reference data lands in PR-MC-PA-2+."
+}

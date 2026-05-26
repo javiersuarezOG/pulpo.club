@@ -315,3 +315,33 @@ def test_accessors_default_safely_on_partial_manifest():
     assert m.airport_distances_km() == {}
     assert m.named_beaches() == ()
     assert m.validation_bounds() == {}
+
+
+# ── PR-MC-PA-1 — PA scaffolding manifest contract ────────────────────
+
+
+def test_pa_manifest_loads_with_required_only():
+    """PA is the first non-SV country and intentionally ships with a
+    required-only manifest (no zones, beaches, airports, validation
+    bounds). Pin that contract here so a future PR that backfills PA
+    reference data does so deliberately — and so the partial-manifest
+    code path stays exercised on a real on-disk manifest, not just a
+    synthetic in-test payload.
+    """
+    pa = load("PA")
+    assert pa.code == "PA"
+    assert pa.name_en == "Panama"
+    assert pa.name_es == "Panamá"
+    assert pa.locale_es == "es-PA"
+    assert pa.locale_en == "en-US"
+    assert pa.currency == "USD"
+    # Every optional reference-data section is intentionally absent.
+    # When PA reference data lands, update these assertions deliberately.
+    assert pa.named_beaches() == ()
+    assert pa.zone_tier() == {}
+    assert pa.vacation_zones() == frozenset()
+    assert pa.coastal_zones() == frozenset()
+    assert pa.airports() == {}
+    assert pa.airport_distances_km() == {}
+    assert pa.validation_bounds() == {}
+    assert pa.departments() == {}
