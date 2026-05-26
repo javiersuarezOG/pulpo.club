@@ -346,8 +346,19 @@ def _keytable(listing: dict, locale: Locale) -> list[tuple[str, str]]:
     return rows[:6]
 
 
+def _canonical_dict(value: Any) -> dict:
+    """Defensive coerce — `title_canonical` / `short_description_canonical`
+    are normally `{en, es}` dicts, but a stale listing may have left a
+    raw string in either field (the enrichment pipeline used to write
+    that shape). Treat anything non-dict as empty so the per-locale
+    `.get()` chain falls through to the legacy `listing.get("title")` /
+    `listing.get("description")` columns instead of crashing the entire
+    issue render."""
+    return value if isinstance(value, dict) else {}
+
+
 def _blurb(listing: dict, locale: Locale) -> str:
-    desc = listing.get("short_description_canonical") or {}
+    desc = _canonical_dict(listing.get("short_description_canonical"))
     text = desc.get(locale) or desc.get("en") or listing.get("description") or ""
     # First two sentences keep the email scannable. Heuristic split — good
     # enough for editorial copy from the LLM enrichment pipeline.
@@ -366,7 +377,7 @@ def _blurb(listing: dict, locale: Locale) -> str:
 
 
 def _to_pick(listing: dict, *, rank: int, locale: Locale, paywalled: bool, site_root: str) -> IssuePick:
-    tc = listing.get("title_canonical") or {}
+    tc = _canonical_dict(listing.get("title_canonical"))
     title = tc.get(locale) or tc.get("en") or listing.get("title") or "Listing"
     price_text, price_note = _format_price(listing, locale)
     callouts = commentary_mod.pick_callouts_for_listing(listing, locale)
@@ -467,7 +478,7 @@ def build_issue(
 
     glance_rows: list[dict] = []
     for i, listing in enumerate(kept_listings):
-        tc = listing.get("title_canonical") or {}
+        tc = _canonical_dict(listing.get("title_canonical"))
         glance_rows.append({
             "num": f"{i + 1:02d}",
             "title": tc.get(locale) or tc.get("en") or listing.get("title") or "—",
@@ -475,7 +486,7 @@ def build_issue(
             "price": (f"${int(listing['price_usd']):,}" if listing.get("price_usd") else "—"),
         })
     if skip_pick_listing:
-        tc = skip_pick_listing.get("title_canonical") or {}
+        tc = _canonical_dict(skip_pick_listing.get("title_canonical"))
         glance_rows.append({
             "num": "×",
             "title": tc.get(locale) or tc.get("en") or skip_pick_listing.get("title") or "—",
