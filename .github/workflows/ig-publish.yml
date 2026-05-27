@@ -1,0 +1,97 @@
+# Hourly publisher for the IG batch queue.
+#
+# Reads web/data/ig_queue.json on the default branch, picks the
+# earliest-scheduled item that is (approved, not posted, due now),
+# uploads its carousel slides to Instagram via the Graph API, publishes,
+# marks the item as posted, and commits the queue back via the bot.
+#
+# Safety:
+#   - IG_PAUSED secret set to "1" → publisher exits 0 without calling
+#     the API.  Used as a kill switch (set + push, takes effect on the
+#     next cron tick).
+#   - Cron runs hourly; publisher publishes AT MOST ONE item per run
+#     to bound the blast radius of a bad poster or a stuck container.
+#   - GITHUB_DISPATCH_TOKEN (separate from GITHUB_TOKEN) does the
+#     commit so the bot identity is consistent with the rest of the
+#     nightly tooling and main's branch protection still allows
+#     non-PR commits from this PAT only.
+#
+# Workflow can also be triggered manually (workflow_dispatch) for ad-hoc
+# publishing — useful when the operator wants to push an item now
+# without waiting for the next cron slot.
+
+name: pulpo-ig-publish
+
+on:
+  schedule:
+    # Hourly at :05 (offset by 5 min from typical cron stampedes).
+    - cron: '5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — log without publishing'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+concurrency:
+  # One publisher run at a time across cron + manual dispatch.  Stops
+  # back-to-back runs from double-publishing if a previous run is slow.
+  group: ig-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      IG_ACCESS_TOKEN:          ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID:               ${{ secrets.IG_USER_ID }}
+      IG_PAUSED:                ${{ secrets.IG_PAUSED }}
+      PULPO_PUBLIC_BASE_URL:    ${{ secrets.PULPO_PUBLIC_BASE_URL }}
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # Use the bot PAT so the post-publish commit pushes back to
+          # main even with branch protection on.
+          token: ${{ secrets.PULPO_BOT_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+
+      - name: Publish the next due item
+        id: publish
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python3 -m automation.ig_publish --dry-run
+          else
+            python3 -m automation.ig_publish
+          fi
+
+      - name: Commit queue mutation
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          if git diff --quiet web/data/ig_queue.json; then
+            echo "[ig-publish] queue unchanged — nothing to commit"
+            exit 0
+          fi
+          git add web/data/ig_queue.json
+          git commit -m "chore(ig): publisher marked next item as posted"
+          git push origin main
