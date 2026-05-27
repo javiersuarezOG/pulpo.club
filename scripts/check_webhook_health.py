@@ -17,8 +17,15 @@ import urllib.request
 
 
 DEFAULT_HOST = "https://eu.posthog.com"
-DEFAULT_RUNBOOK = "https://github.com/sehonores/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
+DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
 
+# `webhook.received` is captured exclusively by api/stripe/webhook.js. The
+# `provider: "stripe"` tag was added alongside this script in the same PR
+# for forward-compat (if/when a second webhook source is added we re-add
+# the filter), but filtering by it today would skip every existing event
+# that pre-dates the deploy — false-alarming on healthy systems until the
+# next Stripe webhook fires post-merge. Match all `webhook.received` rows
+# while it's still single-source.
 FAMILIES = {
     "resend": {
         "label": "Resend newsletter.*",
@@ -30,7 +37,7 @@ FAMILIES = {
     },
     "stripe": {
         "label": "Stripe webhook.received",
-        "where": "event = 'webhook.received' AND properties.provider = 'stripe'",
+        "where": "event = 'webhook.received'",
     },
 }
 

@@ -16,7 +16,7 @@ import urllib.request
 
 POSTHOG_HOST_DEFAULT = "https://eu.posthog.com"
 POSTHOG_INGEST_DEFAULT = "https://eu.i.posthog.com"
-RUNBOOK_DEFAULT = "https://github.com/sehonores/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
+RUNBOOK_DEFAULT = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
 
 
 def env(name: str, default: str = "") -> str:
