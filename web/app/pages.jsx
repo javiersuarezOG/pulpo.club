@@ -3443,6 +3443,7 @@ function WelcomeModal({ app, state, onClose }) {
         setStatusInfo({
           status,
           emailDomain: (data && data.email_domain) || "",
+          sentAt: (data && data.sent_at) || null,
         });
         track("welcome_modal.invitation_status_resolved", { status });
         // webhook_pending is transient — Stripe hasn't fired the
@@ -3540,6 +3541,22 @@ function WelcomeModal({ app, state, onClose }) {
     setResending(false);
   };
 
+  const formatSentAgo = (sentAt) => {
+    if (!sentAt) return "";
+    const then = Date.parse(sentAt);
+    if (!Number.isFinite(then)) return "";
+    const seconds = Math.max(0, Math.round((Date.now() - then) / 1000));
+    if (seconds < 60) return lc === "es" ? "hace un momento" : "just now";
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) {
+      if (lc === "es") return `hace ${minutes} min`;
+      return `${minutes} min ago`;
+    }
+    const hours = Math.round(minutes / 60);
+    if (lc === "es") return `hace ${hours} h`;
+    return `${hours} h ago`;
+  };
+
   return (
     <div
       className="modal-backdrop"
@@ -3601,6 +3618,20 @@ function WelcomeModal({ app, state, onClose }) {
                   >
                     {t("welcome_modal.anon.status.user_exists.cta", lc)}
                   </button>
+                  <button
+                    type="button"
+                    className="welcome-modal-cta-secondary welcome-modal-cta-tertiary"
+                    onClick={() => {
+                      track("welcome_modal.forgot_password_clicked", {});
+                      if (app.clerkActions && typeof app.clerkActions.openSignIn === "function") {
+                        app.clerkActions.openSignIn();
+                      } else if (typeof app.openSignup === "function") {
+                        app.openSignup({ mode: "login" });
+                      }
+                    }}
+                  >
+                    {t("welcome_modal.anon.status.user_exists.forgot_cta", lc)}
+                  </button>
                 </>
               );
             }
@@ -3637,6 +3668,15 @@ function WelcomeModal({ app, state, onClose }) {
                     ? t("welcome_modal.anon.status.webhook_pending.body", lc)
                     : t("welcome_modal.anon.body", lc)}
                 </p>
+                {statusInfo && statusInfo.sentAt && formatSentAgo(statusInfo.sentAt) && (
+                  <p className="welcome-modal-meta">
+                    <time dateTime={statusInfo.sentAt}>
+                      {t("welcome_modal.anon.sent_ago", lc, {
+                        time: formatSentAgo(statusInfo.sentAt),
+                      })}
+                    </time>
+                  </p>
+                )}
                 <a
                   className="welcome-modal-cta-primary"
                   href="https://mail.google.com/"
@@ -3654,6 +3694,9 @@ function WelcomeModal({ app, state, onClose }) {
                 >
                   {resending ? "…" : t("welcome_modal.anon.cta_resend", lc)}
                 </button>
+                <p className="welcome-modal-help">
+                  {t("welcome_modal.anon.body_postscript", lc)}
+                </p>
                 {resendResult && (
                   <p className={`welcome-modal-resend-${resendResult.ok ? "ok" : "err"}`} role="status">
                     {resendResult.msg}

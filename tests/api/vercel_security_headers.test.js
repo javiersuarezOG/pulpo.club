@@ -75,6 +75,11 @@ describe("vercel.json security headers", () => {
     expect(v).toMatch(/geolocation=\(\)/);
   });
 
+  it("declares a Reporting-Endpoints target for CSP reports", () => {
+    const v = headerValue(catchAll, "Reporting-Endpoints");
+    expect(v).toBe('csp-endpoint="/api/csp-report"');
+  });
+
   // CSP is enforced (flipped from Report-Only at launch hardening). The
   // policy baked in Report-Only mode for several weeks with no console
   // violations observed across Stripe-sandbox + Clerk-on flows. If a
@@ -108,6 +113,11 @@ describe("vercel.json security headers", () => {
       expect(csp).toMatch(/script-src[^;]*\*\.clerk\.com/);
     });
 
+    it("allows Clerk Turnstile CAPTCHA (challenges.cloudflare.com)", () => {
+      expect(csp).toMatch(/script-src[^;]*challenges\.cloudflare\.com/);
+      expect(csp).toMatch(/frame-src[^;]*challenges\.cloudflare\.com/);
+    });
+
     it("allows PostHog ingestion (eu.i.posthog.com)", () => {
       expect(csp).toMatch(/connect-src[^;]*eu\.i\.posthog\.com/);
       expect(csp).toMatch(/script-src[^;]*eu\.i\.posthog\.com/);
@@ -130,6 +140,11 @@ describe("vercel.json security headers", () => {
 
     it("requires upgrade-insecure-requests (no mixed-content fallback)", () => {
       expect(csp).toMatch(/upgrade-insecure-requests/);
+    });
+
+    it("reports CSP violations to /api/csp-report", () => {
+      expect(csp).toMatch(/report-to csp-endpoint/);
+      expect(csp).toMatch(/report-uri \/api\/csp-report/);
     });
   });
 });

@@ -27,7 +27,7 @@
 const crypto = require("crypto");
 
 const RESEND_API = "https://api.resend.com/emails";
-const DEFAULT_FROM = "Pulpo Club <noreply@mail.pulpo.club>";
+const DEFAULT_FROM = "Pulpo Club <hello@mail.pulpo.club>";
 
 // PII-safe recipient hash — same algorithm as api/_posthog.js's
 // emailDistinctId. Stamped on the outbound mail as a tag so Resend's
@@ -56,21 +56,15 @@ function pickLocale(stripeLocale) {
 // inline styles so the email renders identically across Gmail/Outlook/
 // Apple Mail clients regardless of CSS support.
 //
-// Brand header (inline SVG + wordmark) renders the new Pulpo mark at
-// the top of every activation email. Hex literals only — most email
-// clients strip CSS vars. Outlook desktop is the weak link for inline
-// SVG; it gracefully falls back to nothing, leaving the wordmark
-// to carry brand identity.
+// Brand header uses a hosted PNG mark rather than inline SVG. Several
+// email clients strip SVG entirely, and Resend surfaced that as a
+// deliverability warning during the 2026-05-27 activation incident.
 const BRAND_HEADER_HTML = `
 <div style="text-align:center;padding:8px 0 20px;border-bottom:1px solid #e6e6e6;margin-bottom:24px;">
   <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;border-collapse:collapse;">
     <tr>
       <td style="vertical-align:middle;padding-right:10px;line-height:0;">
-        <svg width="26" height="26" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
-          <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
-          <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
-        </svg>
+        <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="32" height="32" alt="" style="display:block;border:0;outline:none;text-decoration:none;border-radius:8px;" />
       </td>
       <td style="vertical-align:middle;">
         <span style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.035em;color:#1F3D31;line-height:1;">pulpo</span>
@@ -81,7 +75,7 @@ const BRAND_HEADER_HTML = `
 
 const TEMPLATES = {
   en: {
-    subject: "Your Pulpo Pro subscription is active — set up your account",
+    subject: "Set up your Pulpo Pro account — your subscription is active",
     preheader: "One step left: set your password and start exploring.",
     html: (actionUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
@@ -93,6 +87,7 @@ ${BRAND_HEADER_HTML}
   <a href="${actionUrl}" style="background:#1a1a1a;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Set up my Pulpo Pro account →</a>
 </p>
 <p>This link is unique to your account and expires in 24 hours. If it expires, request a new one from the activation modal on <a href="https://pulpo.club/account">pulpo.club/account</a>.</p>
+<p>If this lands in Promotions, drag it to Primary so the next Pulpo email finds you faster.</p>
 <p>Questions? Reply to this email or write to <a href="mailto:hello@pulpo.club">hello@pulpo.club</a>.</p>
 <p>— The Pulpo Club team</p>
 </body></html>`,
@@ -107,12 +102,14 @@ ${actionUrl}
 
 This link is unique to your account and expires in 24 hours.
 
+If this lands in Promotions, drag it to Primary so the next Pulpo email finds you faster.
+
 Questions? Reply to this email or write to hello@pulpo.club.
 
 — The Pulpo Club team`,
   },
   es: {
-    subject: "Tu suscripción de Pulpo Pro está activa — configura tu cuenta",
+    subject: "Configura tu cuenta Pulpo Pro — tu suscripción está activa",
     preheader: "Solo falta un paso: elige tu contraseña y empieza a explorar.",
     html: (actionUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
@@ -124,6 +121,7 @@ ${BRAND_HEADER_HTML}
   <a href="${actionUrl}" style="background:#1a1a1a;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Configurar mi cuenta Pulpo Pro →</a>
 </p>
 <p>Este enlace es único para tu cuenta y expira en 24 horas. Si expira, solicita uno nuevo desde la ventana de activación en <a href="https://pulpo.club/account">pulpo.club/account</a>.</p>
+<p>Si este correo llega a Promociones, muévelo a Principal para que el próximo email de Pulpo te encuentre más rápido.</p>
 <p>¿Dudas? Responde a este correo o escribe a <a href="mailto:hello@pulpo.club">hello@pulpo.club</a>.</p>
 <p>— El equipo de Pulpo Club</p>
 </body></html>`,
@@ -137,6 +135,8 @@ Configurar mi cuenta Pulpo Pro:
 ${actionUrl}
 
 Este enlace es único para tu cuenta y expira en 24 horas.
+
+Si este correo llega a Promociones, muévelo a Principal para que el próximo email de Pulpo te encuentre más rápido.
 
 ¿Dudas? Responde a este correo o escribe a hello@pulpo.club.
 

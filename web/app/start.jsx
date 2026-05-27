@@ -42,6 +42,7 @@ import "./styles/start.css";
 // Total catalog size — surfaced in the trust strip. Hardcoded for v1;
 // follow-up adds a /api/catalog-count endpoint or a build-time env var.
 const CATALOG_COUNT = 900;
+const DEFAULT_START_PROMO_CODE = "PULPOFREEMONTH";
 
 export default function StartPage() {
   const [locale] = useLocale();
@@ -52,6 +53,7 @@ export default function StartPage() {
   // exact same data. The hook also persists the UTMs to sessionStorage
   // so the values survive the Stripe redirect.
   const { urlCode, utms, isCancelled: initialCancelled } = useCampaignParams();
+  const checkoutPromoCode = urlCode || DEFAULT_START_PROMO_CODE;
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -64,8 +66,12 @@ export default function StartPage() {
   const heroPhoto = useMemo(() => pickHeroPhoto("random"), []);
 
   useEffect(() => {
-    track("start.viewed", { has_code: urlCode.length > 0 });
-  }, [urlCode]);
+    track("start.viewed", {
+      has_code: checkoutPromoCode.length > 0,
+      explicit_code: urlCode.length > 0,
+      default_promo_code: urlCode ? "" : DEFAULT_START_PROMO_CODE,
+    });
+  }, [urlCode, checkoutPromoCode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,7 +99,7 @@ export default function StartPage() {
     return () => io.disconnect();
   }, []);
 
-  // Internal — call once with the URL-supplied code, and again without
+  // Internal — call once with the URL-supplied/default code, and again without
   // it if the first call 400s on invalid_promo_code. Soft-fail: never
   // dead-end the user on a broken campaign URL.
   const postCheckout = useCallback(
@@ -102,7 +108,7 @@ export default function StartPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          promoCode: includeCode && urlCode ? urlCode : null,
+          promoCode: includeCode ? checkoutPromoCode : null,
           locale: lc,
           // Funnel-stitching: lets the webhook alias() the anon
           // session id to the email-derived id so PostHog joins them.
@@ -112,13 +118,16 @@ export default function StartPage() {
       });
       return res;
     },
-    [urlCode, lc, utms]
+    [checkoutPromoCode, lc, utms]
   );
 
   const handleSubmit = useCallback(
     async () => {
       setError(null);
-      track("start.cta_clicked", { has_code: urlCode.length > 0 });
+      track("start.cta_clicked", {
+        has_code: checkoutPromoCode.length > 0,
+        explicit_code: urlCode.length > 0,
+      });
 
       setSubmitting(true);
       try {
@@ -129,7 +138,7 @@ export default function StartPage() {
         if (!res.ok) {
           const detail = await res.json().catch(() => ({}));
           const reason = detail && detail.error;
-          if (reason === "invalid_promo_code" && urlCode) {
+          if (reason === "invalid_promo_code" && checkoutPromoCode) {
             track("start.code_error_shown", { reason: "invalid_promo_code" });
             res = await postCheckout(false);
           } else if (reason === "rate_limited") {
@@ -155,7 +164,10 @@ export default function StartPage() {
           setSubmitting(false);
           return;
         }
-        track("start.checkout_redirected", { had_promo_code: urlCode.length > 0 });
+        track("start.checkout_redirected", {
+          had_promo_code: checkoutPromoCode.length > 0,
+          explicit_code: urlCode.length > 0,
+        });
         window.location.assign(data.url);
       } catch (err) {
         track("api.error", {
@@ -168,7 +180,7 @@ export default function StartPage() {
         setSubmitting(false);
       }
     },
-    [lc, urlCode, postCheckout]
+    [lc, urlCode, checkoutPromoCode, postCheckout]
   );
 
   return (
@@ -208,7 +220,7 @@ export default function StartPage() {
                 : t("start.hero.cta_primary", lc, { price: price.displayString })}
             </button>
           </div>
-          {urlCode && (
+          {checkoutPromoCode && (
             <p className="start-hero-code-note" aria-live="polite">
               {t("start.code.applied_note", lc)}
             </p>
@@ -278,7 +290,7 @@ export default function StartPage() {
               ? t("start.join.paid.cta_submitting", lc)
               : t("start.join.paid.cta", lc)}
           </button>
-          {urlCode && (
+          {checkoutPromoCode && (
             <p className="start-code-applied-note" aria-live="polite">
               {t("start.code.applied_note", lc)}
             </p>

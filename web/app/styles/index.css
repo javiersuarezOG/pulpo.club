@@ -2435,6 +2435,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
   margin: 0 0 24px;
   text-wrap: pretty;
 }
+.welcome-modal-meta {
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 18px;
+  margin: -12px 0 20px;
+}
+.welcome-modal-help {
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 18px;
+  margin: 6px auto 0;
+  max-width: 320px;
+  text-wrap: pretty;
+}
 .welcome-modal-cta-primary {
   display: inline-flex;
   align-items: center;
@@ -2472,6 +2486,9 @@ h1,h2,h3,h4,h5 { margin: 0; }
   text-decoration: underline;
 }
 .welcome-modal-cta-secondary:hover { color: var(--ink); }
+.welcome-modal-cta-tertiary {
+  margin-top: -4px;
+}
 .welcome-modal-cta-secondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;

@@ -723,6 +723,8 @@ test.describe("New app boots cleanly on key routes", () => {
       // Join card
       "Full access",                     // start.join.paid.label
       "Get access",                      // CTA labels
+      "Try a free month",                // CTA labels
+      "First month free",                // default promo note
       "Log in",                          // start.nav.login_link
     ];
 

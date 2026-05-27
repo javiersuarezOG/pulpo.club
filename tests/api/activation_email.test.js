@@ -83,10 +83,18 @@ describe("TEMPLATES", () => {
 
   it("EN subject mentions Pulpo Pro and activation", () => {
     expect(TEMPLATES.en.subject.toLowerCase()).toContain("pulpo pro");
+    expect(TEMPLATES.en.subject).toMatch(/^Set up your Pulpo Pro account/);
   });
 
   it("ES subject is in Spanish (uses 'suscripción')", () => {
     expect(TEMPLATES.es.subject.toLowerCase()).toContain("suscripción");
+    expect(TEMPLATES.es.subject).toMatch(/^Configura tu cuenta Pulpo Pro/);
+  });
+
+  it("uses the hosted PNG logo instead of inline SVG", () => {
+    const html = TEMPLATES.en.html("https://pulpo.club/__test_action_url__");
+    expect(html).toContain("/assets/email-logo-32@2x.png");
+    expect(html).not.toContain("<svg");
   });
 });
 
@@ -143,6 +151,7 @@ describe("sendActivationEmail — happy path", () => {
       actionUrl: "https://x", sessionId: "cs_1",
     });
     expect(captured.from).toBe(DEFAULT_FROM);
+    expect(captured.from).toBe("Pulpo Club <hello@mail.pulpo.club>");
   });
 
   it("honors PULPO_ACTIVATION_FROM_EMAIL override", async () => {
@@ -169,9 +178,10 @@ describe("sendActivationEmail — happy path", () => {
       email: "u@example.com", locale: "es-419",
       actionUrl: "https://pulpo.club/__action__", sessionId: "cs_1",
     });
-    expect(captured.subject).toContain("suscripción");
+    expect(captured.subject).toMatch(/^Configura tu cuenta Pulpo Pro/);
     expect(captured.html).toContain("https://pulpo.club/__action__");
     expect(captured.text).toContain("https://pulpo.club/__action__");
+    expect(captured.html).toContain("Promociones");
   });
 
   it("EN locale picks English subject + body", async () => {
@@ -186,6 +196,7 @@ describe("sendActivationEmail — happy path", () => {
     });
     expect(captured.subject.toLowerCase()).toContain("pulpo pro");
     expect(captured.html).toContain("Set up my Pulpo Pro account");
+    expect(captured.text).toContain("Promotions");
   });
 
   it("unknown locale falls back to English", async () => {

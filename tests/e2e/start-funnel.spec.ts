@@ -5,7 +5,7 @@
 //   - "Log in" link routes to /?login=1
 //   - ?code=TEST shows the "✓ Discount applied at checkout" note
 //   - ?cancelled=1 shows the soft notice
-//   - Click "Get access" → POST /api/stripe/start-checkout (intercepted)
+//   - Click primary CTA → POST /api/stripe/start-checkout (intercepted)
 //     → window.location.assign() to the mocked Stripe URL
 //   - ES locale: no English canary words on /start (subset of the
 //     existing preview-smoke ES-canary test, expanded here)
@@ -107,7 +107,7 @@ test.describe("/start — URL behaviours", () => {
 });
 
 test.describe("/start — checkout CTA", () => {
-  test("Click 'Get access' → POST /api/stripe/start-checkout → redirect", async ({ page }) => {
+  test("Click primary CTA → POST /api/stripe/start-checkout → redirect", async ({ page }) => {
     await mockCheckoutEndpoint(page);
     const errors = attachErrorRecorder(page);
 
@@ -137,7 +137,7 @@ test.describe("/start — checkout CTA", () => {
     // Verify the request body was the shape /api/stripe/start-checkout expects.
     expect(postBody, "checkout endpoint received a POST body").not.toBeNull();
     expect(postBody).toMatchObject({
-      promoCode: null, // no ?code= in URL
+      promoCode: "PULPOFREEMONTH", // default /start offer, even without ?code=
       locale: "en",    // default locale
     });
 
