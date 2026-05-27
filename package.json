@@ -33,7 +33,7 @@
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
-    "@clerk/testing": "^1.4.6",
+    "@clerk/testing": "^1.14.8",
     "@playwright/test": "^1.59.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
