@@ -46,6 +46,7 @@ const {
 const posthog = require("../_posthog");
 const { sendActivationEmail } = require("../_activation_email");
 const { GRACE_MS } = require("../_plan");
+const { auditEnvOverridesOnce } = require("../_env_audit");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 // Statuses that mean "subscription is finished, not paused": fully
@@ -209,6 +210,7 @@ async function markStripeEventProcessed(stripe, subscriptionId, eventId) {
 
 module.exports = async (req, res) => {
   const t0 = Date.now();
+  await auditEnvOverridesOnce();
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     logApi("stripe.webhook", { status: 405, ms: Date.now() - t0, reason: "method" });
@@ -247,6 +249,7 @@ module.exports = async (req, res) => {
   // signature secret mismatch caught above). Distinct from
   // webhook.checkout_completed which fires per-path after processing.
   posthog.capture(null, "webhook.received", {
+    provider: "stripe",
     event_id: event.id,
     type: event.type,
     ms: Date.now() - t0,
@@ -609,6 +612,12 @@ module.exports = async (req, res) => {
         const canceledAtMs = typeof sub.canceled_at === "number"
           ? sub.canceled_at * 1000
           : null;
+        const pauseCollection = sub.pause_collection && typeof sub.pause_collection === "object"
+          ? sub.pause_collection
+          : null;
+        const defaultPaymentMethod = typeof sub.default_payment_method === "string"
+          ? sub.default_payment_method
+          : (sub.default_payment_method && sub.default_payment_method.id) || null;
 
         let patch = null;
         if (isActive) {
@@ -619,6 +628,8 @@ module.exports = async (req, res) => {
             grace_period_ends_at: undefined,
             current_period_end: currentPeriodEnd,
             cancel_at_period_end: cancelAtPeriodEnd,
+            pause_collection: pauseCollection,
+            default_payment_method: defaultPaymentMethod,
             // Pending cancellation = preserve canceled_at if Stripe set
             // one; otherwise clear so a reactivation reads clean.
             canceled_at: canceledAtMs,
@@ -646,6 +657,8 @@ module.exports = async (req, res) => {
             grace_period_ends_at: graceEndsAt,
             current_period_end: currentPeriodEnd,
             cancel_at_period_end: cancelAtPeriodEnd,
+            pause_collection: pauseCollection,
+            default_payment_method: defaultPaymentMethod,
             canceled_at: canceledAtMs,
           };
         } else {
@@ -659,6 +672,8 @@ module.exports = async (req, res) => {
             grace_period_ends_at: undefined,
             current_period_end: currentPeriodEnd,
             cancel_at_period_end: false,
+            pause_collection: pauseCollection,
+            default_payment_method: defaultPaymentMethod,
             canceled_at: canceledAtMs
               || ((event.created || Math.floor(Date.now() / 1000)) * 1000),
           };
@@ -675,6 +690,15 @@ module.exports = async (req, res) => {
           const subCustomerId = typeof sub.customer === "string"
             ? sub.customer
             : (sub.customer && sub.customer.id) || null;
+          if (!subCustomerId && isActive) {
+            posthog.capture(posthog.emailDistinctId(subEmail), "webhook.invitation_metadata_missing", {
+              source: "stripe_webhook",
+              subscription_id: sub.id,
+              clerk_user_id: userId,
+              status: status || "",
+              ms: Date.now() - t0,
+            });
+          }
           if (subCustomerId || sub.id) {
             await patchPrivateMetadata(clerk, userId, {
               ...(subCustomerId ? { stripeCustomerId: subCustomerId } : {}),

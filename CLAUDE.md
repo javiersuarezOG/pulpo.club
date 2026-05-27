@@ -19,6 +19,15 @@
 4. `git add <files>` (explicit — never `git add .` for sensitive trees) `&& git commit`
 5. `git push -u origin feat/your-task-name`
 
+## Worktree convention
+
+Before opening files for a substantial task, check whether a sibling
+worktree already exists for the scope. One agent per sibling directory:
+`pulpo.club.<scope>/`. Keep the main checkout on `main`, untouched,
+and do feature work in the scoped worktree/branch. This avoids two
+agents editing the same working tree while preserving a clean main
+checkout for quick diffs and emergency patches.
+
 ## Merging to main
 
 **PRs are required.** Direct push to `main` is blocked at the GitHub level (rule `GH006: protected branch update failed — Changes must be made through a pull request`).
@@ -131,6 +140,42 @@ Any PR touching `vercel.json`'s `Content-Security-Policy` must include:
 1. A Vercel preview DevTools Console screenshot or recording showing zero CSP violations on `/`, `/start`, and `/account?__clerk_status=sign_up&__clerk_ticket=invalid`.
 2. A PR-body list of every third-party CSP domain and why it is allowed. New domain = new line item.
 3. A local test run including `tests/api/vercel_security_headers.test.js` and `tests/e2e/captcha-csp.spec.ts`.
+
+## NEVER let a webhook go silent (post-2026-05-27)
+
+Every webhook endpoint Pulpo owns needs a positive heartbeat before it
+is called production-ready. A green handler test only proves it works
+when invoked; it does not prove the external provider is still sending,
+the signing secret still matches, or telemetry still lands.
+
+Mandatory rules:
+
+1. Add the event family to `scripts/check_webhook_health.py` before
+   shipping the endpoint. The scheduled workflow
+   `.github/workflows/pulpo-webhook-health.yml` runs every 6 hours and
+   alerts through `SLACK_WEBHOOK_URL`.
+2. Rotating a signing secret means re-run the provider dashboard smoke
+   test immediately. Do not declare the rotation done until the latest
+   delivery shows 2xx AND the matching PostHog event appears.
+3. A webhook silence alert is actionable even when the app "looks fine".
+   The 2026-05-27 Resend outage was invisible for 7 days because there
+   was no positive heartbeat.
+
+## Stripe return_url must be section-aware (post-2026-05-27)
+
+Stripe handoffs must return the user to the exact surface they came
+from, with enough query state for the landing route to refresh Clerk
+metadata. Customer Portal return URLs go to `/account/subscription`,
+not `/`; Checkout success URLs keep `?welcome=1&session_id=...`.
+
+New Stripe handoffs must:
+
+1. Include the account section in the return URL, e.g.
+   `/account/subscription?from=portal`.
+2. Carry a source flag such as `?from=portal` so the landing route can
+   call `reloadUser()` and avoid stale publicMetadata.
+3. Emit a PostHog return event and pair it with the rendered-state event
+   so dashboard queries can prove the UI saw the updated billing state.
 
 ## NEVER ship a UI control that lies about persistence (post-2026-05-27)
 

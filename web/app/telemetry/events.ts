@@ -789,6 +789,39 @@ export type EventMap = {
   "portal.opened": Record<string, never>;
   "portal.error": { reason: string };
 
+  // ───── Server guardrail telemetry ─────
+  "billing_portal.self_heal": {
+    had_email: boolean;
+    lookup_ok: boolean;
+    stamped: boolean;
+    ms?: number;
+  };
+  "webhook.invitation_metadata_missing": {
+    source: "billing_portal" | "stripe_webhook" | "clerk_webhook" | string;
+    had_email?: boolean;
+    subscription_id?: string;
+    clerk_user_id?: string;
+    status?: string;
+    ms?: number;
+  };
+  "env_var.override_detected": {
+    var_name: string;
+    code_default: string;
+    env_value_hash: string;
+  };
+  "invitation.stuck_alert": {
+    pending_count: number;
+    age_hours: number;
+    oldest_created_at?: string;
+  };
+  "csp.violation": {
+    blocked_uri?: string;
+    violated_directive?: string;
+    document_uri?: string;
+    source_file?: string;
+    line_number?: number;
+  };
+
   // ───── Locale ─────
   "locale.changed": { from: string; to: string };
 

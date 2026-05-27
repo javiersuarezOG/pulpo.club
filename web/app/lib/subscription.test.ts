@@ -245,6 +245,20 @@ describe("subscription i18n copy contracts (anti-renewal-leak canary)", () => {
     expect(none(s, ENDED_TOKENS)).toBe(null);
   });
 
+  it("active plan_meta copy (ES) contains 'Se renueva' AND NEVER 'Se cancela'", () => {
+    const s = t("account.sub.plan_meta.renews_on", "es", { date: SAMPLE_DATE_ES });
+    expect(any(s, RENEW_TOKENS)).toBe(true);
+    expect(none(s, CANCEL_TOKENS)).toBe(null);
+    expect(none(s, ENDED_TOKENS)).toBe(null);
+  });
+
+  it("grace copy contains expiration language in EN + ES", () => {
+    const en = t("account.sub.grace.copy", "en", { days: 3, date: SAMPLE_DATE_EN });
+    const es = t("account.sub.grace.copy", "es", { days: 3, date: SAMPLE_DATE_ES });
+    expect(en).toContain("expires");
+    expect(es).toContain("vence");
+  });
+
   it("date placeholder gets interpolated into every variant (EN)", () => {
     for (const key of [
       "account.sub.plan_meta.renews_on",
