@@ -246,6 +246,62 @@ control on /account MUST be exercised by this spec before merge.
 
 **Invoice access policy:** the "View invoices in the Stripe portal →" link is gated on `everPaid` (currently Pro OR ever past_due OR ever canceled OR has `current_period_end`), NOT on `isPaid`. A canceled user keeps full access to their historical receipts. The Customer Portal endpoint self-heals `stripeCustomerId` via email lookup (see PR #510), so the link is always safe to render for ever-paid users.
 
+## NEVER skip locale on third-party billing surfaces (post-2026-05-27)
+
+Every Stripe + Clerk API call that creates a user-facing surface
+(Checkout Session, Customer Portal session, hosted modal, invitation
+email) MUST receive the user's current `app.locale`. Locale captured
+only at signup is not enough: the user can switch languages later and
+expects the next Stripe/Clerk surface to follow.
+
+Mandatory for every new endpoint that calls
+`stripe.checkout.sessions.create`, `stripe.billingPortal.sessions.create`,
+`clerk.invitations.createInvitation`, or any API that ships text to the
+user:
+
+1. Accept `body.locale` on the request.
+2. Normalize through a `SUPPORTED_LOCALES` set.
+3. Pass the normalized value to the SDK call.
+4. Stamp the locale into session/invitation metadata when downstream
+   webhooks need to re-read it.
+5. Add `locale` to the corresponding `posthog.capture(...)` event.
+
+Mandatory for every client wrapper that POSTs to those endpoints:
+
+1. Accept `locale` as an argument or read `localStorage.pulpo-locale`.
+2. Include it in the request body.
+
+Smoke-test guardrail: every endpoint unit test covers `{ en, es,
+missing, garbage }` locale inputs. Endpoint without a locale test does
+not ship.
+
+## NEVER skip post-redirect state refresh (post-2026-05-27)
+
+Any client surface returning from a third-party billing/auth redirect
+(Stripe Portal, Stripe Checkout, Clerk hosted modal, etc.) MUST handle
+the webhook-vs-redirect race. A single `reloadUser()` on mount is not
+enough: the webhook can land 1-10s after the user redirects back, so
+the first reload can fetch stale metadata.
+
+Pattern:
+
+1. Detect the return via a `?from=<source>` query param set on the
+   redirect's `return_url`.
+2. Strip the param before the reload completes so refresh/back does not
+   replay it.
+3. Poll `reloadUser()` up to roughly 5 attempts x 1.5s, stopping on
+   the first detected metadata change.
+4. Render an inline "Refreshing..." indicator while polling.
+5. Fire `<surface>_state_changed` and `<surface>_stale` PostHog events
+   so the funnel is observable.
+
+Forbidden:
+
+- One-shot reload on mount with no retry.
+- Hardcoded `setTimeout(reload, 2000)`; webhook latency varies, so
+  reload must be state-diff driven.
+- Swallowing the stale case silently.
+
 ## Frontend conventions (post-PR-1.5)
 
 The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.

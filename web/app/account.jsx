@@ -27,6 +27,10 @@ import { splitFullName, joinFullName } from "./lib/name-split";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { deriveSubscriptionState, graceDaysLeft } from "./lib/subscription";
+import {
+  pollPortalReturnState,
+  subscriptionRefreshSnapshot,
+} from "./lib/portal-return-refresh";
 
 function AccountPage({ app }) {
   // Source of truth for the active tab is `app.routeParams.section` — set
@@ -780,6 +784,7 @@ function NotifProUpsell({ app }) {
     const flagEnabled = readFeatureFlag("cta_routing_v2", true);
     if (!flagEnabled) {
       startStripeCheckout({
+        locale: app.locale,
         onError: (code) => {
           if (code === "sign_in_required") {
             if (app.user) {
@@ -1109,6 +1114,11 @@ function SubscriptionSection({ app }) {
   // subscription_status in scope too — the grace banners still key off
   // the raw lifecycle field.
   const display = subState.display;
+  const [refreshingPortalState, setRefreshingPortalState] = React.useState(false);
+  const subSnapshotRef = React.useRef(subscriptionRefreshSnapshot(subState));
+  React.useEffect(() => {
+    subSnapshotRef.current = subscriptionRefreshSnapshot(subState);
+  }, [display, subState.cancel_at_period_end, subState.status, subState.canceled_at]);
 
   const isPaid = plan !== "free";
   const inGrace = subState.in_grace;
@@ -1175,10 +1185,45 @@ function SubscriptionSection({ app }) {
     const search = params.toString();
     const next = `${window.location.pathname}${search ? `?${search}` : ""}`;
     try { window.history.replaceState({}, "", next); } catch { /* ignore */ }
+    const initial = subscriptionRefreshSnapshot(subState);
     track("account.sub_portal_return", { had_period_end: subState.current_period_end !== null });
-    if (app.clerkActions && typeof app.clerkActions.reloadUser === "function") {
-      app.clerkActions.reloadUser();
-    }
+    let cancelled = false;
+    setRefreshingPortalState(true);
+    pollPortalReturnState({
+      initial,
+      getSnapshot: () => subSnapshotRef.current,
+      reloadUser: app.clerkActions && typeof app.clerkActions.reloadUser === "function"
+        ? app.clerkActions.reloadUser
+        : undefined,
+    }).then((result) => {
+      if (cancelled) return;
+      if (result.changed) {
+        track("account.sub_portal_return_state_changed", {
+          from_display: result.from.display,
+          to_display: result.to.display,
+          attempts_to_change: result.attempts,
+          ms_to_change: result.waited_ms,
+        });
+      } else {
+        track("account.sub_portal_return_stale", {
+          display: result.from.display,
+          attempts: result.attempts,
+          waited_ms: result.waited_ms,
+        });
+      }
+      setRefreshingPortalState(false);
+    }).catch(() => {
+      if (cancelled) return;
+      track("account.sub_portal_return_stale", {
+        display: initial.display,
+        attempts: 0,
+        waited_ms: 0,
+      });
+      setRefreshingPortalState(false);
+    });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.clerkActions]);
 
@@ -1186,7 +1231,9 @@ function SubscriptionSection({ app }) {
   // so we hand off rather than render fabricated rows that drift out
   // of date the moment the user actually pays.
   const onOpenInvoices = () => {
+    track("account.sub_portal_clicked", { locale: app.locale, display });
     openStripePortal({
+      locale: app.locale,
       onError: (code) => {
         if (code === "sign_in_required") {
           app.showToast(t("plans.checkout_auth_mismatch", app.locale));
@@ -1295,6 +1342,11 @@ function SubscriptionSection({ app }) {
               {isPaid && display === "active" && !periodEndStr
                 && t("account.sub.plan_meta.free", lc)}
             </div>
+            {refreshingPortalState && (
+              <div className="sub-plan-refreshing" aria-live="polite">
+                {t("account.sub.refreshing", lc)}
+              </div>
+            )}
           </div>
           <span
             className={`status-pill status-${
@@ -1330,7 +1382,9 @@ function SubscriptionSection({ app }) {
               type="button"
               className="link-btn"
               onClick={() => {
+                track("account.sub_portal_clicked", { locale: app.locale, display });
                 openStripePortal({
+                  locale: app.locale,
                   onError: (code) => {
                     if (code === "sign_in_required") {
                       // Cookie / session mismatch — show the same auth-
@@ -1353,6 +1407,7 @@ function SubscriptionSection({ app }) {
               onClick={() => {
                 track("account.sub_resubscribe_clicked", {});
                 startStripeCheckout({
+                  locale: app.locale,
                   onError: (code) => {
                     if (code === "sign_in_required") {
                       app.showToast(t("plans.checkout_auth_mismatch", app.locale));
@@ -1373,6 +1428,7 @@ function SubscriptionSection({ app }) {
                 // legacy "see plans" route so the button always does
                 // *something* meaningful.
                 startStripeCheckout({
+                  locale: app.locale,
                   onError: (code) => {
                     if (code === "sign_in_required") {
                       if (app.user) {

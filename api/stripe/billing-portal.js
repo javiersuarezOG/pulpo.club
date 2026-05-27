@@ -27,27 +27,53 @@ const { toWebRequest } = require("../_clerk");
 const posthog = require("../_posthog");
 const { auditEnvOverridesOnce } = require("../_env_audit");
 
+const SUPPORTED_PORTAL_LOCALES = new Set(["en", "es"]);
+
+function safeStr(v) {
+  return typeof v === "string" ? v : "";
+}
+
+function normalizePortalLocale(value) {
+  const lc = safeStr(value).trim().toLowerCase();
+  return SUPPORTED_PORTAL_LOCALES.has(lc) ? lc : "auto";
+}
+
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString("utf8");
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch { return {}; }
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
   await auditEnvOverridesOnce();
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     logApi("stripe.billing_portal", {
-      status: 405, ms: Date.now() - t0, reason: "method",
+      status: 405, ms: Date.now() - t0, reason: "method", locale: "auto",
     });
     return res.status(405).json({ error: "method_not_allowed" });
   }
+
+  const body = await readJsonBody(req);
+  const locale = normalizePortalLocale(body.locale);
 
   let userId = null;
   let stripeCustomerId = null;
   let userEmail = null;
   let userPrivateMetadata = null;
+  let userPublicMetadata = null;
   try {
     const clerk = clerkClient();
     const requestState = await clerk.authenticateRequest(toWebRequest(req));
     if (!requestState.isSignedIn) {
       logApi("stripe.billing_portal", {
-        status: 401, ms: Date.now() - t0, reason: "unauthenticated",
+        status: 401, ms: Date.now() - t0, reason: "unauthenticated", locale,
       });
       return res.status(401).json({ error: "sign_in_required" });
     }
@@ -55,6 +81,7 @@ module.exports = async (req, res) => {
     userId = auth.userId;
     const user = await clerk.users.getUser(userId);
     userPrivateMetadata = user.privateMetadata || {};
+    userPublicMetadata = user.publicMetadata || {};
     stripeCustomerId = userPrivateMetadata.stripeCustomerId || null;
     // Email is the load-bearing fallback identifier for the self-heal
     // lookup below. Clerk stores email on emailAddresses[].emailAddress;
@@ -68,7 +95,7 @@ module.exports = async (req, res) => {
       || null;
   } catch (err) {
     logApi("stripe.billing_portal", {
-      status: 500, ms: Date.now() - t0, reason: "auth_failed", error: err.message,
+      status: 500, ms: Date.now() - t0, reason: "auth_failed", error: err.message, locale,
     });
     return res.status(500).json({ error: "auth_failed" });
   }
@@ -103,7 +130,7 @@ module.exports = async (req, res) => {
         stamped = true;
         logApi("stripe.billing_portal", {
           status: 200, ms: Date.now() - t0, user_id: userId,
-          reason: "self_heal_ok", customer_id: customer.id,
+          reason: "self_heal_ok", customer_id: customer.id, locale,
         });
       }
       posthog.capture(userId ? `user:${userId}` : "server:billing_portal", "billing_portal.self_heal", {
@@ -118,7 +145,7 @@ module.exports = async (req, res) => {
       // to the 409 below so the user sees a graceful error rather than 500.
       logApi("stripe.billing_portal", {
         status: 200, ms: Date.now() - t0, user_id: userId,
-        reason: "self_heal_failed", error: err.message,
+        reason: "self_heal_failed", error: err.message, locale,
       });
     }
   }
@@ -130,7 +157,7 @@ module.exports = async (req, res) => {
     // endpoint directly. Surface a distinct error so the client can
     // show "contact support" instead of silently failing.
     logApi("stripe.billing_portal", {
-      status: 409, ms: Date.now() - t0, user_id: userId, reason: "no_customer",
+      status: 409, ms: Date.now() - t0, user_id: userId, reason: "no_customer", locale,
     });
     posthog.capture(userId ? `user:${userId}` : "server:billing_portal", "webhook.invitation_metadata_missing", {
       source: "billing_portal",
@@ -147,7 +174,22 @@ module.exports = async (req, res) => {
 
   let session;
   try {
-    session = await stripeClient().billingPortal.sessions.create({
+    const stripe = stripeClient();
+    if (locale !== "auto") {
+      try {
+        await stripe.customers.update(stripeCustomerId, { preferred_locales: [locale] });
+        posthog.capture(posthog.emailDistinctId(userEmail), "stripe.customer_locale_set", {
+          locale,
+          source: "portal",
+        });
+      } catch (err) {
+        logApi("stripe.billing_portal", {
+          status: 200, ms: Date.now() - t0, reason: "customer_locale_failed",
+          user_id: userId, locale, error: err && err.message,
+        });
+      }
+    }
+    session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
       // Land directly on the subscription tab. `?from=portal` is the
       // signal that the SubscriptionSection effect uses to force a
@@ -156,16 +198,26 @@ module.exports = async (req, res) => {
       // invisible to the browser until the user hard-refreshes (the
       // post-2026-05-27 follow-up bug to #513).
       return_url: `${origin}/account/subscription?from=portal`,
+      locale,
     });
+    posthog.capture(posthog.emailDistinctId(userEmail), "stripe.billing_portal_session_created", {
+      locale,
+      has_period_end: Boolean(userPublicMetadata && typeof userPublicMetadata.current_period_end === "number"),
+      session_id: session.id,
+      ms: Date.now() - t0,
+    });
+    await posthog.flush();
   } catch (err) {
     logApi("stripe.billing_portal", {
-      status: 500, ms: Date.now() - t0, reason: "stripe_error", error: err.message,
+      status: 500, ms: Date.now() - t0, reason: "stripe_error", error: err.message, locale,
     });
     return res.status(500).json({ error: "stripe_error", message: err.message });
   }
 
   logApi("stripe.billing_portal", {
-    status: 200, ms: Date.now() - t0, user_id: userId, session_id: session.id,
+    status: 200, ms: Date.now() - t0, user_id: userId, session_id: session.id, locale,
   });
   return res.status(200).json({ url: session.url, sessionId: session.id });
 };
+
+module.exports.normalizePortalLocale = normalizePortalLocale;
