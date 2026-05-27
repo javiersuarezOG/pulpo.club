@@ -725,6 +725,57 @@ export type EventMap = {
     status: number;
   };
 
+  // ───── Profile save / photo upload (post-2026-05-27) ─────
+  // These pair with the "NEVER ship a UI control that lies about
+  // persistence" guardrail. Started + (succeeded|failed) must balance
+  // for every save; a drift between counts means a code path is
+  // silently swallowing the action. PostHog dashboard:
+  //   `started == succeeded + failed + no_consumer`
+  // for any 5-min bucket — alert if not.
+  /** User clicked Save on /account/profile and at least one field
+   *  changed. `keys` is a comma-separated list of which surfaces were
+   *  dirty: "identity", "country", "language". */
+  "account.profile_save_started": { keys: string };
+  /** Save completed end-to-end (Clerk + metadata both ack'd). */
+  "account.profile_save_succeeded": { keys: string; elapsed_ms: number };
+  /** Save failed at the Clerk SDK identity write step. The
+   *  profile-metadata write has its own existing _sync_failed event. */
+  "account.profile_save_failed": {
+    keys: string;
+    reason: string;
+    status: number;
+    elapsed_ms: number;
+  };
+  /** Save handler ran but no Clerk action surface was wired (e.g.
+   *  ClerkActionsBinder didn't bind). Non-zero in prod = a regression
+   *  in clerk-bundle.jsx. Sev-2: the user clicks Save and nothing
+   *  persists, AND we'd otherwise have shipped without noticing. */
+  "account.profile_save_no_consumer": { keys: string };
+  /** Photo upload picker resolved with a real file. */
+  "account.profile_photo_upload_started": { mime: string; size_kb: number };
+  /** Photo upload succeeded — Clerk returned an img.clerk.com URL. */
+  "account.profile_photo_upload_succeeded": { elapsed_ms: number };
+  /** Photo upload failed at the Clerk SDK call (size, MIME, or
+   *  network). Reason captures the Clerk error code when present. */
+  "account.profile_photo_upload_failed": {
+    reason: string;
+    status: number;
+    elapsed_ms: number;
+  };
+  /** Client-side validation rejected the file before any network call.
+   *  Watching `reason` distribution tells us whether the 2 MB limit is
+   *  the right knob or we should bump it. */
+  "account.profile_photo_upload_rejected": {
+    reason: "too_big" | "wrong_type";
+    size_kb: number;
+    mime: string;
+  };
+  /** User clicked "Change in Security" on the read-only email row.
+   *  Funnel signal — confirms the affordance is discoverable. */
+  "account.profile_email_change_clicked": Record<string, never>;
+  /** User clicked "Remove photo" on the avatar row. */
+  "account.profile_photo_removed": Record<string, never>;
+
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
   // before we POST /api/stripe/billing-portal. Pairs with `portal.error`
@@ -964,6 +1015,27 @@ export type EventMap = {
     topic: string;
     status: "success" | "validation_error" | "rate_limit" | "server_error";
   };
+
+  // ───── Account → Subscription block (PR subscription-state-display) ─────
+  /** Fires once per display-state transition on the Account →
+   *  Subscription block render. Lets us alert in PostHog when a
+   *  display=canceling user is being shown copy that doesn't match
+   *  (e.g. a regression that leaks "Renews on" onto a canceled user).
+   *  `display` is the derived state from lib/subscription.ts; the
+   *  other props are the discriminating raw fields. */
+  "account.sub_block_rendered": {
+    display: "active" | "canceling" | "canceled" | "past_due" | "grace";
+    plan: "free" | "pro" | "agency";
+    raw_status: "active" | "past_due" | "canceled";
+    cancel_at_period_end: boolean;
+    in_grace: boolean;
+    has_period_end: boolean;
+    ever_paid: boolean;
+  };
+  /** Fires when a canceled user clicks the "Resubscribe" CTA in the
+   *  subscription block. Pairs with start_checkout.session_created to
+   *  build a re-acquisition funnel. */
+  "account.sub_resubscribe_clicked": Record<string, never>;
 };
 
 export type EventName = keyof EventMap;

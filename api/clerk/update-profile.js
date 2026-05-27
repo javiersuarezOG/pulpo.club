@@ -94,6 +94,19 @@ const ALLOWED_PROFILE_KEYS = {
   newsletter: {
     isValid: isNewsletterPreference,
   },
+  // ISO 3166-1 alpha-2. The client picker is restricted to the COUNTRIES
+  // table; this regex is a junk-input floor — a non-matching 2-letter
+  // code won't crash anything, it'd just render as an unknown country on
+  // the UI later. Two-letter shape is enough to keep storage tidy.
+  country: {
+    isValid: (v) => typeof v === "string" && /^[A-Z]{2}$/.test(v),
+  },
+  // App locale that should follow the user across devices. Same set the
+  // newsletter cron uses for per-recipient email locale, so we get the
+  // server-side normalization for free.
+  language: {
+    isValid: (v) => typeof v === "string" && NEWSLETTER_LOCALES.has(v),
+  },
 };
 
 function logApi(name, fields) {

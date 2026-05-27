@@ -14,7 +14,8 @@
     "lint:css": "stylelint 'web/app/**/*.css'",
     "check:contrast": "node web/app/styles/check-contrast.mjs",
     "check:size": "node web/app/styles/check-bundle-size.mjs",
-    "e2e:smoke": "playwright test"
+    "e2e:smoke": "playwright test --project=chromium",
+    "e2e:authed": "playwright test --project=authed tests/e2e/account-authed.spec.ts"
   },
   "dependencies": {
     "@clerk/backend": "^3.4.6",
@@ -32,6 +33,7 @@
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
+    "@clerk/testing": "^1.4.6",
     "@playwright/test": "^1.59.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

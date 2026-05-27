@@ -596,6 +596,20 @@ module.exports = async (req, res) => {
         const isTerminal = isDeleted || TERMINAL_STATUSES.has(status);
         const isPastDue = !isTerminal && (status === "past_due" || status === "unpaid");
 
+        // Subscription period + cancellation state — captured for every
+        // bucket so the account-page subscription block can render the
+        // correct copy ("Renews on {date}" vs "Cancels on {date}" vs
+        // "Ended on {date}") without falling back to a hardcoded
+        // placeholder. Stripe sends seconds; we store ms to match the
+        // existing payment_failed_at / grace_period_ends_at fields.
+        const currentPeriodEnd = typeof sub.current_period_end === "number"
+          ? sub.current_period_end * 1000
+          : null;
+        const cancelAtPeriodEnd = sub.cancel_at_period_end === true;
+        const canceledAtMs = typeof sub.canceled_at === "number"
+          ? sub.canceled_at * 1000
+          : null;
+
         let patch = null;
         if (isActive) {
           patch = {
@@ -603,6 +617,11 @@ module.exports = async (req, res) => {
             subscription_status: "active",
             payment_failed_at: undefined,
             grace_period_ends_at: undefined,
+            current_period_end: currentPeriodEnd,
+            cancel_at_period_end: cancelAtPeriodEnd,
+            // Pending cancellation = preserve canceled_at if Stripe set
+            // one; otherwise clear so a reactivation reads clean.
+            canceled_at: canceledAtMs,
           };
         } else if (isPastDue) {
           // Read current metadata so we don't reset the grace clock on
@@ -625,15 +644,23 @@ module.exports = async (req, res) => {
             subscription_status: "past_due",
             payment_failed_at: failedAt,
             grace_period_ends_at: graceEndsAt,
+            current_period_end: currentPeriodEnd,
+            cancel_at_period_end: cancelAtPeriodEnd,
+            canceled_at: canceledAtMs,
           };
         } else {
           // Terminal (canceled / expired / deleted): drop the user to
-          // free and clear grace bookkeeping.
+          // free and clear grace bookkeeping. Keep period_end +
+          // canceled_at so the account page can render "Ended on {date}".
           patch = {
             plan: "free",
             subscription_status: "canceled",
             payment_failed_at: undefined,
             grace_period_ends_at: undefined,
+            current_period_end: currentPeriodEnd,
+            cancel_at_period_end: false,
+            canceled_at: canceledAtMs
+              || ((event.created || Math.floor(Date.now() / 1000)) * 1000),
           };
         }
 

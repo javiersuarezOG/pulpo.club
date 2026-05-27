@@ -24,6 +24,7 @@ import {
   NEWSLETTER_LOCALES,
   NEWSLETTER_PROPERTY_TYPES,
 } from "./lib/user-profile";
+import { splitFullName, joinFullName } from "./lib/name-split";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { deriveSubscriptionState, graceDaysLeft } from "./lib/subscription";
@@ -190,21 +191,51 @@ function AccountPage({ app }) {
 }
 
 // ============== A.3.1 — Profile ==============
+// Wires the four real persistence surfaces:
+//   • firstName / lastName  →  Clerk SDK  (clerk.user.update)
+//   • imageUrl              →  Clerk SDK  (clerk.user.setProfileImage)
+//   • country / language    →  /api/clerk/update-profile  (publicMetadata.profile)
+// Every visible control has a downstream consumer — see CLAUDE.md
+// "NEVER ship a UI control that lies about persistence".
+const PHOTO_MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+const PHOTO_MIME_ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+
 function ProfileSection({ app }) {
-  const initial = {
-    name: app.user.name || "",
-    email: app.user.email || "",
+  const profile = readProfile(app.user);
+  const initial = aUseMemo(() => ({
+    firstName: app.user.firstName || app.user.name || "",
+    lastName: app.user.lastName || "",
     // PR-MC-4 — the user-profile country default is the active
-    // deployment's country (was hardcoded "SV"). Users without a
-    // saved country are most likely from the country whose
-    // subdomain they're browsing; a multi-country traveler can
-    // override anytime via the picker.
-    country: app.user.country || ACTIVE_COUNTRY.code,
-    language: app.locale,
-  };
-  const [values, setValues] = aUseState(initial);
+    // deployment's country (was hardcoded "SV"). Users without a saved
+    // country are most likely from the country whose subdomain they're
+    // browsing; a multi-country traveler can override anytime.
+    country: (typeof profile.country === "string" && profile.country) || ACTIVE_COUNTRY.code,
+    language: (typeof profile.language === "string" && profile.language) || app.locale,
+  }), [app.user.firstName, app.user.lastName, app.user.name, profile.country, profile.language, app.locale]);
+
+  const [fullName, setFullName] = aUseState(() => joinFullName(initial));
+  const [country, setCountry] = aUseState(initial.country);
+  const [language, setLanguage] = aUseState(initial.language);
+  const [saving, setSaving] = aUseState(false);
   const [saved, setSaved] = aUseState(false);
-  const dirty = JSON.stringify(values) !== JSON.stringify(initial);
+  const [uploading, setUploading] = aUseState(false);
+  const fileRef = React.useRef(null);
+
+  // Re-sync local form when Clerk hydration changes the underlying user.
+  // Without this, the form keeps stale values after a successful save +
+  // ClerkUserSync re-render.
+  aUseEffect(() => {
+    setFullName(joinFullName(initial));
+    setCountry(initial.country);
+    setLanguage(initial.language);
+  }, [initial]);
+
+  const { firstName, lastName } = splitFullName(fullName);
+  const dirty =
+    firstName !== initial.firstName ||
+    lastName !== initial.lastName ||
+    country !== initial.country ||
+    language !== initial.language;
 
   // Country picker is a `<datalist>` combobox: 250-row native `<select>`
   // is unfilterable on mobile (just a long alpha-stride list). Datalist
@@ -213,44 +244,241 @@ function ProfileSection({ app }) {
   // string reverts to the last valid country's name so the form never
   // ends up with a half-typed value silently saving as "".
   const codeToName = (code) => {
-    const c = COUNTRIES.find(x => x.code === code);
+    const c = COUNTRIES.find((x) => x.code === code);
     return c ? c.name : "";
   };
   const [countryInput, setCountryInput] = aUseState(() => codeToName(initial.country));
+  aUseEffect(() => { setCountryInput(codeToName(country)); }, [country]);
   const onCountryInputChange = (typed) => {
     setCountryInput(typed);
-    const match = COUNTRIES.find(c => c.name === typed);
-    if (match) setValues(v => ({ ...v, country: match.code }));
+    const match = COUNTRIES.find((c) => c.name === typed);
+    if (match) setCountry(match.code);
   };
   const onCountryInputBlur = () => {
-    const match = COUNTRIES.find(c => c.name === countryInput);
-    if (!match) setCountryInput(codeToName(values.country));
+    const match = COUNTRIES.find((c) => c.name === countryInput);
+    if (!match) setCountryInput(codeToName(country));
   };
 
-  const onSave = (e) => {
-    e.preventDefault();
+  const flashSaved = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const initials = (values.name || values.email || "?").trim()[0].toUpperCase();
+  const onSave = async (e) => {
+    e.preventDefault();
+    if (!dirty || saving) return;
+    const identityDirty = firstName !== initial.firstName || lastName !== initial.lastName;
+    const metadataDirty = country !== initial.country || language !== initial.language;
+    const dirtyKeys = [];
+    if (identityDirty) dirtyKeys.push("identity");
+    if (country !== initial.country) dirtyKeys.push("country");
+    if (language !== initial.language) dirtyKeys.push("language");
+    const keys = dirtyKeys.join(",");
+    track("account.profile_save_started", { keys });
+
+    // No-consumer guard. If we got here with identity changes but no
+    // Clerk action wired, we're about to silently swallow the user's
+    // save. Emit a dedicated event so the regression is visible in
+    // telemetry instead of disappearing into local state.
+    if (identityDirty && !(app.clerkActions && typeof app.clerkActions.updateIdentity === "function")) {
+      track("account.profile_save_no_consumer", { keys });
+      app.showToast(t("account.profile.sync_failed", app.locale));
+      return;
+    }
+
+    setSaving(true);
+    const startedAt = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    let ok = true;
+
+    // 1. Identity (firstName / lastName) → Clerk SDK direct write.
+    if (identityDirty) {
+      try {
+        await app.clerkActions.updateIdentity({ firstName, lastName });
+      } catch (err) {
+        ok = false;
+        const elapsed_ms = Math.max(0, Math.round(
+          ((typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now()) - startedAt,
+        ));
+        track("account.profile_save_failed", {
+          keys,
+          reason: (err && err.code) || (err && err.message) || "unknown",
+          status: (err && err.status) || 0,
+          elapsed_ms,
+        });
+        // Keep the legacy event firing too — existing dashboards depend
+        // on it. The new _save_failed is the structured replacement.
+        track("account.profile_sync_failed", {
+          keys: "identity",
+          reason: (err && err.code) || (err && err.message) || "unknown",
+          status: (err && err.status) || 0,
+        });
+        app.showToast(t("account.profile.sync_failed", app.locale));
+      }
+    }
+
+    // 2. Profile metadata (country / language) → /api/clerk/update-profile
+    // via the existing optimistic+rollback path. Fire-and-forget from
+    // here — rollback toast + profile_sync_failed live inside
+    // updateUserProfile already.
+    if (ok && metadataDirty) {
+      const patch = {};
+      if (country !== initial.country) patch.country = country;
+      if (language !== initial.language) patch.language = language;
+      app.updateUserProfile(patch);
+      // Reflect language locally before the round-trip resolves so the
+      // page chrome flips immediately.
+      if (language !== initial.language) app.setLocale(language);
+    }
+    setSaving(false);
+    if (ok) {
+      const elapsed_ms = Math.max(0, Math.round(
+        ((typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now()) - startedAt,
+      ));
+      track("account.profile_save_succeeded", { keys, elapsed_ms });
+      flashSaved();
+    }
+  };
+
+  const onUploadClick = () => {
+    if (uploading) return;
+    if (fileRef.current) fileRef.current.value = ""; // allow re-picking the same file
+    if (fileRef.current) fileRef.current.click();
+  };
+
+  const onFileChange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const size_kb = Math.round(file.size / 1024);
+    const mime = file.type || "unknown";
+    if (!PHOTO_MIME_ALLOWED.has(file.type)) {
+      track("account.profile_photo_upload_rejected", { reason: "wrong_type", size_kb, mime });
+      app.showToast(t("account.profile.upload_wrong_type", app.locale));
+      return;
+    }
+    if (file.size > PHOTO_MAX_BYTES) {
+      track("account.profile_photo_upload_rejected", { reason: "too_big", size_kb, mime });
+      app.showToast(t("account.profile.upload_too_big", app.locale));
+      return;
+    }
+    if (!(app.clerkActions && typeof app.clerkActions.setProfileImage === "function")) {
+      track("account.profile_save_no_consumer", { keys: "imageUrl" });
+      app.showToast(t("account.profile.upload_failed", app.locale));
+      return;
+    }
+    track("account.profile_photo_upload_started", { mime, size_kb });
+    setUploading(true);
+    const startedAt = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    try {
+      await app.clerkActions.setProfileImage(file);
+      const elapsed_ms = Math.max(0, Math.round(
+        ((typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now()) - startedAt,
+      ));
+      track("account.profile_photo_upload_succeeded", { elapsed_ms });
+    } catch (err) {
+      const elapsed_ms = Math.max(0, Math.round(
+        ((typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now()) - startedAt,
+      ));
+      track("account.profile_photo_upload_failed", {
+        reason: (err && err.code) || (err && err.message) || "unknown",
+        status: (err && err.status) || 0,
+        elapsed_ms,
+      });
+      track("account.profile_sync_failed", {
+        keys: "imageUrl",
+        reason: (err && err.code) || (err && err.message) || "unknown",
+        status: (err && err.status) || 0,
+      });
+      app.showToast(t("account.profile.upload_failed", app.locale));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onRemovePhoto = async () => {
+    if (uploading) return;
+    if (!(app.clerkActions && typeof app.clerkActions.setProfileImage === "function")) {
+      track("account.profile_save_no_consumer", { keys: "imageUrl_remove" });
+      return;
+    }
+    track("account.profile_photo_removed", {});
+    setUploading(true);
+    try {
+      await app.clerkActions.setProfileImage(null);
+    } catch (err) {
+      track("account.profile_sync_failed", {
+        keys: "imageUrl_remove",
+        reason: (err && err.code) || (err && err.message) || "unknown",
+        status: (err && err.status) || 0,
+      });
+      app.showToast(t("account.profile.upload_failed", app.locale));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onOpenSecurity = () => {
+    track("account.profile_email_change_clicked", {});
+    if (app.clerkActions && typeof app.clerkActions.openUserProfile === "function") {
+      app.clerkActions.openUserProfile();
+    } else {
+      app.go("account", { section: "security" });
+    }
+  };
+
+  const initials = ((fullName || app.user.email || "?").trim()[0] || "?").toUpperCase();
+  const imageUrl = app.user.imageUrl || "";
+  const hasImage = !!imageUrl;
 
   return (
     <form className="account-section" onSubmit={onSave}>
       <div className="profile-photo-row">
-        <div className="profile-avatar">{initials}</div>
-        <div>
+        <div className="profile-avatar" aria-busy={uploading || undefined}>
+          {hasImage
+            ? <img src={imageUrl} alt="" />
+            : <span aria-hidden="true">{initials}</span>}
+        </div>
+        <div className="profile-photo-actions">
           <div className="profile-photo-label">{t("account.profile.photo", app.locale)}</div>
-          <button type="button" className="link-btn">{t("account.profile.upload_photo", app.locale)}</button>
+          <button
+            type="button"
+            className="link-btn"
+            onClick={onUploadClick}
+            disabled={uploading}
+            aria-busy={uploading || undefined}
+          >
+            {uploading
+              ? t("account.profile.uploading", app.locale)
+              : t("account.profile.upload_photo", app.locale)}
+          </button>
+          {hasImage && !uploading && (
+            <button
+              type="button"
+              className="link-btn link-btn-muted"
+              onClick={onRemovePhoto}
+            >
+              {t("account.profile.remove_photo", app.locale)}
+            </button>
+          )}
+          <div className="profile-photo-helper">{t("account.profile.upload_helper", app.locale)}</div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            onChange={onFileChange}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
         </div>
       </div>
 
       <FieldRow label={t("account.profile.name", app.locale)}>
         <input
           type="text"
-          value={values.name}
+          value={fullName}
           placeholder={t("account.profile.name_placeholder", app.locale)}
-          onChange={(e) => setValues(v => ({ ...v, name: e.target.value }))}
+          onChange={(e) => setFullName(e.target.value)}
+          autoComplete="name"
         />
       </FieldRow>
 
@@ -258,18 +486,18 @@ function ProfileSection({ app }) {
         label={t("account.profile.email", app.locale)}
         hint={t("account.profile.email_note", app.locale)}
       >
-        <input
-          type="email"
-          value={values.email}
-          placeholder="your@email.com"
-          onChange={(e) => setValues(v => ({ ...v, email: e.target.value }))}
-        />
+        {/* Read-only display — NO <input>. Email change is genuinely
+            Clerk's job (verification flow + reachability); we hand the
+            user off to Clerk's hosted UserProfile via the inline link. */}
+        <div className="field-readonly-row">
+          <div className="field-readonly-value">{app.user.email || ""}</div>
+          <button type="button" className="link-btn link-btn-muted" onClick={onOpenSecurity}>
+            {t("account.profile.email_change_link", app.locale)}
+          </button>
+        </div>
       </FieldRow>
 
       <FieldRow label={t("account.profile.country", app.locale)}>
-        {/* Full ISO 3166-1 list as a `<datalist>` combobox — type-to-
-            filter on mobile and desktop. We show the country *name*
-            but persist the ISO code (values.country). */}
         <input
           type="text"
           list="pulpo-country-options"
@@ -280,7 +508,7 @@ function ProfileSection({ app }) {
           placeholder={t("account.profile.country_placeholder", app.locale)}
         />
         <datalist id="pulpo-country-options">
-          {COUNTRIES.map(c => (
+          {COUNTRIES.map((c) => (
             <option key={c.code} value={c.name} />
           ))}
         </datalist>
@@ -288,11 +516,8 @@ function ProfileSection({ app }) {
 
       <FieldRow label={t("account.profile.lang", app.locale)}>
         <select
-          value={values.language}
-          onChange={(e) => {
-            setValues(v => ({ ...v, language: e.target.value }));
-            app.setLocale(e.target.value);
-          }}
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
         >
           <option value="en">English</option>
           <option value="es">Español</option>
@@ -301,8 +526,15 @@ function ProfileSection({ app }) {
 
       {dirty && (
         <div className="account-save-row">
-          <button type="submit" className="btn-primary">
-            {t("account.profile.save", app.locale)}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={saving}
+            aria-busy={saving || undefined}
+          >
+            {saving
+              ? t("account.profile.saving", app.locale)
+              : t("account.profile.save", app.locale)}
           </button>
         </div>
       )}
@@ -324,40 +556,18 @@ function FieldRow({ label, hint, children }) {
 }
 
 // ============== A.3.2 — Notifications ==============
+// The on/off toggle, platform-updates toggle, and frequency picker that
+// used to live here have been REMOVED. The backend cron in
+// .github/workflows/pulpo-newsletter.yml runs weekly (Monday 14:00 UTC)
+// and `automation/newsletter/subscribers._preference_from_profile` does
+// not read `cadence`. Wiring those controls to publicMetadata would have
+// shipped a UI that lies — toggle off, reload, you still get emails.
+// Per the CLAUDE.md "NEVER ship a UI control that lies about persistence"
+// guardrail, we keep only the controls that have a real consumer:
+// PreferredCategoryChips + NewsletterFilterChips. Restore the toggles
+// once PR-NL-4 wires per-user cadence honoring (see plan).
 function NotificationsSection({ app }) {
-  const [prefs, setPrefs] = aUseState({
-    newsletter: true,
-    price_drops: true,
-    new_in_zones: false,
-    platform_updates: false,
-    whatsapp: false,
-    whatsapp_number: "",
-    frequency: "weekly",
-  });
-  const [confirm, setConfirm] = aUseState(false);
-
-  const flash = () => {
-    setConfirm(true);
-    setTimeout(() => setConfirm(false), 2000);
-  };
-  const setKey = (k, v) => { setPrefs(p => ({ ...p, [k]: v })); flash(); };
-
-  // Pro-only deal alerts. Free users see an upgrade prompt instead
-  // of these toggles; we keep `platform_updates` accessible to
-  // everyone because it's product news, not premium content.
   const isPaid = !!(app.user && app.user.plan && app.user.plan !== "free");
-
-  // Pro notification rows. `price_drops` and `new_in_zones` are wired
-  // in the UI table but their delivery features don't exist yet — hide
-  // them rather than promise something we can't deliver. To re-enable
-  // when the features ship, restore the two rows below; the i18n keys
-  // and the local prefs-state defaults are intentionally preserved.
-  const proCats = [
-    { key: "newsletter",   title: t("account.notif.newsletter.title",   app.locale), desc: t("account.notif.newsletter.desc",   app.locale) },
-  ];
-  const freeCats = [
-    { key: "platform_updates", title: t("account.notif.platform_updates.title", app.locale), desc: t("account.notif.platform_updates.desc", app.locale) },
-  ];
 
   return (
     <div className="account-section">
@@ -366,77 +576,17 @@ function NotificationsSection({ app }) {
       {!isPaid && <NotifProUpsell app={app} />}
 
       {isPaid && (
-        <div className="pref-list">
-          {proCats.map(c => (
-            <div className="pref-row" key={c.key}>
-              <div className="pref-text">
-                <div className="pref-title">{c.title}</div>
-                <div className="pref-desc">{c.desc}</div>
-              </div>
-              <Toggle
-                checked={prefs[c.key]}
-                onChange={v => setKey(c.key, v)}
-                ariaLabel={c.title}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Category preferences — sits directly under the newsletter toggle.
-          Hidden when newsletter is off (spec). Selection persists across
-          reloads via app.user.profile; cross-device sync arrives in PR-C. */}
-      {isPaid && prefs.newsletter && <PreferredCategoryChips app={app} />}
-
-      <div className="pref-list">
-        {freeCats.map(c => (
-          <div className="pref-row" key={c.key}>
-            <div className="pref-text">
-              <div className="pref-title">{c.title}</div>
-              <div className="pref-desc">{c.desc}</div>
-            </div>
-            <Toggle
-              checked={prefs[c.key]}
-              onChange={v => setKey(c.key, v)}
-              ariaLabel={c.title}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* "Channels" block (Email-always-on + WhatsApp opt-in) hidden
-          for now — email is the only delivery channel today, and a
-          single locked "Email — Required" row reads as noise. Restore
-          this whole block when WhatsApp delivery actually ships; i18n
-          keys + local prefs-state defaults are intentionally preserved. */}
-
-      {isPaid && prefs.newsletter && <NewsletterFilterChips app={app} />}
-
-      {isPaid && prefs.newsletter && (
-        <>
-          <h3 className="account-subhead">{t("account.notif.frequency", app.locale)}</h3>
-          <div className="freq-toggle">
-            {["weekly","biweekly"].map(f => (
-              <button
-                key={f}
-                type="button"
-                className={prefs.frequency === f ? "active" : ""}
-                onClick={() => setKey("frequency", f)}
-              >
-                {t(f === "weekly" ? "account.notif.freq_weekly" : "account.notif.freq_biweekly", app.locale)}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {confirm && <div className="account-inline-confirm">{t("account.notif.saved", app.locale)}</div>}
-
-      {isPaid && (
-        <p className="unsub-note">
-          {t("account.notif.unsub_note", app.locale)}
+        <p className="section-intro account-cadence-note">
+          {t("account.notif.cadence_note", app.locale)}
         </p>
       )}
+
+      {/* Category preferences + newsletter filter chips — both already
+          write through app.updateUserProfile and the cron reads every
+          field they touch. These are the only controls with a real
+          downstream consumer today. */}
+      {isPaid && <PreferredCategoryChips app={app} />}
+      {isPaid && <NewsletterFilterChips app={app} />}
     </div>
   );
 }
@@ -771,21 +921,6 @@ function NewsletterFilterChips({ app }) {
   );
 }
 
-function Toggle({ checked, onChange, ariaLabel }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={ariaLabel}
-      className={`toggle ${checked ? "on" : ""}`}
-      onClick={() => onChange(!checked)}
-    >
-      <span className="toggle-knob"/>
-    </button>
-  );
-}
-
 // ============== A.3.3 — Manage Subscription ==============
 function SubscriptionSection({ app }) {
   const lc = app.locale;
@@ -794,26 +929,50 @@ function SubscriptionSection({ app }) {
   // from this single derivation so they can't disagree.
   const subState = deriveSubscriptionState(app.user);
   const plan = subState.effective;
-  const status = subState.status === "past_due"
-    ? "payment_issue"
-    : subState.status === "canceled"
-      ? "paused"
-      : "active";
+  // display drives every per-state UI branch in this section. Keep raw
+  // subscription_status in scope too — the grace banners still key off
+  // the raw lifecycle field.
+  const display = subState.display;
 
   const isPaid = plan !== "free";
   const inGrace = subState.in_grace;
   const graceDays = graceDaysLeft(app.user);
-  const graceDate = subState.grace_period_ends_at
-    ? new Date(subState.grace_period_ends_at)
-    : null;
-  // Format the grace date in the user's locale — accepts the Date
-  // object directly; Intl.DateTimeFormat is locale-aware and matches
-  // the rest of Pulpo's date rendering (account.sub.intro, footer).
-  const graceDateStr = graceDate
-    ? graceDate.toLocaleDateString(lc === "es" ? "es-SV" : "en-US", {
+  // Locale-aware date formatter shared across grace / period_end /
+  // canceled_at rendering. Inputs are Unix ms or null; null returns "".
+  const fmtDate = (ms) => (typeof ms === "number" && ms > 0)
+    ? new Date(ms).toLocaleDateString(lc === "es" ? "es-SV" : "en-US", {
         day: "numeric", month: "long", year: "numeric",
       })
     : "";
+  const graceDateStr = fmtDate(subState.grace_period_ends_at);
+  const periodEndStr = fmtDate(subState.current_period_end);
+  const canceledAtStr = fmtDate(subState.canceled_at);
+
+  // A user who CURRENTLY has Pro OR who has ever paid (sub canceled or
+  // past_due) keeps the Stripe Customer Portal accessible so they can
+  // download invoices long after their plan ended. Only never-paid
+  // users see the empty-state copy.
+  const everPaid = isPaid
+    || subState.status === "canceled"
+    || subState.status === "past_due"
+    || subState.current_period_end !== null;
+
+  // Telemetry — fire once per display-state transition so we can detect
+  // bad display copy (e.g. "Renews on" leaking onto a canceling user)
+  // in PostHog without reaching for a Playwright crawl. Pairs with the
+  // vitest unit assertions on deriveSubscriptionState's display field.
+  React.useEffect(() => {
+    track("account.sub_block_rendered", {
+      display,
+      plan,
+      raw_status: subState.status,
+      cancel_at_period_end: subState.cancel_at_period_end,
+      in_grace: inGrace,
+      has_period_end: subState.current_period_end !== null,
+      ever_paid: everPaid,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [display]);
 
   // Open the Stripe Customer Portal — Stripe owns the invoice list,
   // so we hand off rather than render fabricated rows that drift out
@@ -895,7 +1054,13 @@ function SubscriptionSection({ app }) {
       {/* Block 1 — Active plan. Pro identity here uses the same gold
          "Pro" pill the SiteHeader renders next to the wordmark, so a
          signed-in Pro user sees the same brand mark on the chrome and
-         in the subscription block. */}
+         in the subscription block.
+
+         Display state drives every per-branch label below — see
+         lib/subscription.ts deriveSubscriptionState.display. Never
+         hardcode date strings here; the post-2026-05-27 PR-#509-followup
+         bug shipped "Renews on 5 Jun 2026" literal placeholders that
+         told canceled customers their subscription would renew. */}
       <div className="sub-block">
         <div className="sub-plan-head">
           <div>
@@ -907,20 +1072,52 @@ function SubscriptionSection({ app }) {
               ) : "Free"}
             </div>
             <div className="sub-plan-meta">
-              {isPaid ? "Renews on 5 Jun 2026" : "Browse the catalogue, no card required."}
+              {display === "active" && periodEndStr
+                && t("account.sub.plan_meta.renews_on", lc, { date: periodEndStr })}
+              {display === "canceling" && periodEndStr
+                && t("account.sub.plan_meta.cancels_on", lc, { date: periodEndStr })}
+              {display === "canceled"
+                && t("account.sub.plan_meta.ended_on", lc, { date: canceledAtStr || periodEndStr })}
+              {(display === "grace" || display === "past_due") && /* grace banner handles its own copy */ null}
+              {!isPaid && display === "active" && !subState.current_period_end
+                && t("account.sub.plan_meta.free", lc)}
+              {/* Defensive fallback — should never fire, but if a future
+                 state slips through the branches above we want something
+                 readable rather than a blank meta row. */}
+              {isPaid && display === "active" && !periodEndStr
+                && t("account.sub.plan_meta.free", lc)}
             </div>
           </div>
-          <span className={`status-pill status-${status}`}>
-            {status === "active" ? "Active" : status === "paused" ? "Paused" : "Payment issue"}
+          <span
+            className={`status-pill status-${
+              display === "active" ? "active"
+              : display === "canceling" ? "canceling"
+              : display === "canceled" ? "canceled"
+              : display === "grace" ? "paused"
+              : "payment_issue"
+            }`}
+            data-testid="sub-status-pill"
+          >
+            {display === "active" && t("account.sub.pill.active", lc)}
+            {display === "canceling" && t("account.sub.pill.canceling", lc)}
+            {display === "canceled" && t("account.sub.pill.canceled", lc)}
+            {(display === "grace" || display === "past_due") && t("account.sub.pill.past_due", lc)}
           </span>
         </div>
         <div className="sub-plan-status-copy">
-          {isPaid
-            ? "Your plan is active — renews on 5 Jun 2026."
-            : "You're on the free plan. Upgrade for off-market access and weekly alerts."}
+          {display === "active" && isPaid && periodEndStr
+            && t("account.sub.status_copy.active", lc, { date: periodEndStr })}
+          {display === "canceling"
+            && t("account.sub.status_copy.canceling", lc, { date: periodEndStr })}
+          {display === "canceled"
+            && t("account.sub.status_copy.canceled", lc, { date: canceledAtStr || periodEndStr })}
+          {!isPaid && display === "active"
+            && t("account.sub.status_copy.free", lc)}
         </div>
         <div className="sub-plan-actions">
-          {isPaid ? (
+          {/* Active or canceling: Stripe portal (manage / re-enable
+             renewal). Canceled or free: upgrade CTA. */}
+          {(display === "active" || display === "canceling") ? (
             <button
               type="button"
               className="link-btn"
@@ -942,6 +1139,22 @@ function SubscriptionSection({ app }) {
                 });
               }}
             >{t("account.sub.manage_plan", app.locale)}</button>
+          ) : display === "canceled" ? (
+            <button
+              className="btn-primary"
+              onClick={() => {
+                track("account.sub_resubscribe_clicked", {});
+                startStripeCheckout({
+                  onError: (code) => {
+                    if (code === "sign_in_required") {
+                      app.showToast(t("plans.checkout_auth_mismatch", app.locale));
+                    } else {
+                      app.go("plans");
+                    }
+                  },
+                });
+              }}
+            >{t("account.sub.reactivate", app.locale)}</button>
           ) : (
             <button
               className="btn-primary"
@@ -977,10 +1190,15 @@ function SubscriptionSection({ app }) {
         </div>
       </div>
 
-      {/* Block 2 — Invoices (handed off to Stripe Customer Portal) */}
+      {/* Block 2 — Invoices (handed off to Stripe Customer Portal).
+         Gated on `everPaid` rather than `isPaid` so a canceled user
+         can still pull historical receipts after dropping back to Free.
+         The billing-portal endpoint self-heals stripeCustomerId via
+         email lookup if missing, so the link is always safe to render
+         for ever-paid users. */}
       <div className="sub-divider" />
       <h3 className="account-subhead">{t("account.sub.invoices_heading", app.locale)}</h3>
-      {isPaid ? (
+      {everPaid ? (
         <p className="section-intro">
           {t("account.sub.invoices_intro", app.locale)}{" "}
           <button type="button" className="link-btn" onClick={onOpenInvoices}>

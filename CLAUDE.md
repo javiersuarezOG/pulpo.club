@@ -132,6 +132,75 @@ Any PR touching `vercel.json`'s `Content-Security-Policy` must include:
 2. A PR-body list of every third-party CSP domain and why it is allowed. New domain = new line item.
 3. A local test run including `tests/api/vercel_security_headers.test.js` and `tests/e2e/captcha-csp.spec.ts`.
 
+## NEVER ship a UI control that lies about persistence (post-2026-05-27)
+
+Found two examples in the Account area at once: the Profile Save button
+fired a "Changes saved." confirmation but called `setTimeout` instead of
+writing anything; the Notifications top-level toggles (Newsletter,
+Platform updates, Frequency) all flashed "Preference saved" while only
+mutating local React state. Users changed their settings, refreshed,
+and watched their changes vanish.
+
+**Rule:** any control that triggers a "Saved" / "Updated" / "Done"
+confirmation MUST have a real persistence consumer downstream. That
+means ONE of:
+
+1. **Clerk frontend SDK** (`clerk.user.update`, `clerk.user.setProfileImage`,
+   etc.) — for first-class identity fields. Verify by reloading the page
+   AND by reading the value back via the Clerk Backend API in tests.
+2. **`/api/clerk/update-profile`** — for everything stored in
+   `publicMetadata.profile.*`. Server-side `ALLOWED_PROFILE_KEYS` gates
+   writes. Adding a new field = (a) add the validator, AND (b) point at
+   the downstream consumer that reads it. No field ships without both.
+3. **A documented external system** (Resend audience for subscribe
+   state, Stripe for billing, etc.) — wire the API call before the
+   control ships, not after.
+
+**Forbidden patterns:**
+- Persisting to local React state + flashing a confirmation toast.
+  That's the literal bug we shipped twice.
+- Persisting to Clerk `publicMetadata` for a key no consumer reads
+  (today: `cadence`, `notifications.platform_updates`). That's a
+  hidden lie — the data lands somewhere but no behavior changes. If
+  no consumer exists yet, the control doesn't ship; document the
+  follow-up in the plan.
+- "We'll wire it later" — if there's no downstream consumer in the
+  same PR, remove the control or hide it behind a flag default off.
+
+**Smoke-test guardrail (mandatory when touching /account):**
+`tests/e2e/account-authed.spec.ts` (added post-2026-05-27) signs in
+with the Clerk test user, mutates every visible control, reloads, and
+reads each value back via `clerkClient.users.getUser(id)`. Any new
+control on /account MUST be exercised by this spec before merge.
+
+**Telemetry guardrail:**
+- `account.profile_save_started` / `_succeeded` / `_failed` and
+  `account.profile_photo_upload_started` / `_succeeded` / `_failed`
+  fire on every mutation. PostHog alert: if `_started` count diverges
+  from `_succeeded + _failed` for >5 minutes, a save path is silently
+  swallowing — investigate.
+- `account.profile_save_no_consumer` fires if the save handler runs
+  but no Clerk action surface is wired. Non-zero in prod = regression
+  in the action-binder; treat as a sev-2.
+
+## NEVER hardcode subscription state again (post-2026-05-27)
+
+`web/app/account.jsx`'s subscription block shipped `"Renews on 5 Jun 2026"` as a literal placeholder. Every customer — including canceled ones who clicked Cancel in the Stripe portal — saw "Renews on..." copy. Hardcoded dates can't track real subscription state, so any state that diverges from "active + renewing forever" silently lies to the user.
+
+**Three rules now mandate dynamic state on this surface:**
+
+1. **No hardcoded date strings in any account / subscription UI.** Dates render from real subscription fields via `web/app/lib/subscription.ts`'s `deriveSubscriptionState` (`current_period_end`, `cancel_at_period_end`, `canceled_at` — written by `customer.subscription.updated` in `api/stripe/webhook.js`). `Intl.DateTimeFormat` handles locale formatting. Any literal like `"5 Jun 2026"`, `"5 de junio de 2026"`, etc. in JSX is banned. If you can't derive the date from real state, don't render a date.
+
+2. **`subState.display` is the single switch for sub-block copy.** Each display value (`active` / `canceling` / `canceled` / `grace` / `past_due`) has its own i18n key set under `account.sub.plan_meta.*`, `account.sub.status_copy.*`, `account.sub.pill.*`. The anti-renewal-leak canary in [web/app/lib/subscription.test.ts](web/app/lib/subscription.test.ts) asserts:
+   - `canceling` and `canceled` copy NEVER contain "Renews on" / "Se renueva".
+   - `active` copy NEVER contains "Cancels on" / "Se cancela".
+   - Every variant interpolates `{date}` cleanly with no unresolved placeholder.
+   If you add a new display state, extend the canary AND the i18n keys together — don't ship one without the other.
+
+3. **PostHog `account.sub_block_rendered` fires once per display-state transition.** Properties include `display`, `cancel_at_period_end`, `raw_status`, `in_grace`, `has_period_end`, `ever_paid`. Alert on `display=canceling && raw_status=active && cancel_at_period_end=false` mismatches; spot regressions where the webhook stops stamping `current_period_end` or `cancel_at_period_end`. Pair with `account.sub_resubscribe_clicked` to measure re-acquisition funnel from canceled state.
+
+**Invoice access policy:** the "View invoices in the Stripe portal →" link is gated on `everPaid` (currently Pro OR ever past_due OR ever canceled OR has `current_period_end`), NOT on `isPaid`. A canceled user keeps full access to their historical receipts. The Customer Portal endpoint self-heals `stripeCustomerId` via email lookup (see PR #510), so the link is always safe to render for ever-paid users.
+
 ## Frontend conventions (post-PR-1.5)
 
 The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.

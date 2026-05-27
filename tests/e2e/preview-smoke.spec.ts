@@ -490,6 +490,12 @@ test.describe("New app boots cleanly on key routes", () => {
       "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)
       "We couldn't load",                             // DataFetchFailed
       "Upload photo",                                 // account profile
+      "Saving",                                       // account.profile.saving (Save button in-flight)
+      "Uploading",                                    // account.profile.uploading (Upload button in-flight)
+      "Remove photo",                                 // account.profile.remove_photo (link beside avatar)
+      "Change in Security",                           // account.profile.email_change_link (read-only email row CTA)
+      "fortnightly newsletter",                       // account.notif.cadence_note (Pro notifications intro)
+      "Monday mornings",                              // account.notif.cadence_note (Pro notifications intro)
       // Homepage v3 (dark hero redesign) — every CTA, label, or section
       // heading visible to a cold ES visitor on /. Trips when hardcoded
       // EN strings sneak in instead of t() lookups.
