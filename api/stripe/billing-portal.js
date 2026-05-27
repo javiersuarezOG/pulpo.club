@@ -131,9 +131,13 @@ module.exports = async (req, res) => {
   try {
     session = await stripeClient().billingPortal.sessions.create({
       customer: stripeCustomerId,
-      // PR-10 cutover: returns to `/` (the new app at the canonical
-      // root). The /preview/ rewrite is kept as a one-week fallback.
-      return_url: `${origin}/?account=subscription`,
+      // Land directly on the subscription tab. `?from=portal` is the
+      // signal that the SubscriptionSection effect uses to force a
+      // Clerk `user.reload()` — without that, the just-updated
+      // publicMetadata.cancel_at_period_end / canceled_at stays
+      // invisible to the browser until the user hard-refreshes (the
+      // post-2026-05-27 follow-up bug to #513).
+      return_url: `${origin}/account/subscription?from=portal`,
     });
   } catch (err) {
     logApi("stripe.billing_portal", {

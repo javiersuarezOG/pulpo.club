@@ -775,6 +775,12 @@ export type EventMap = {
   "account.profile_email_change_clicked": Record<string, never>;
   /** User clicked "Remove photo" on the avatar row. */
   "account.profile_photo_removed": Record<string, never>;
+  /** /account/subscription mounted with `?from=portal` — fires when
+   *  the user came back from the Stripe Customer Portal. Pairs with
+   *  the subsequent `sub_block_rendered` so we can confirm in PostHog
+   *  that the portal-return reload actually surfaced the new state
+   *  (e.g. canceling display after a cancel click). */
+  "account.sub_portal_return": { had_period_end: boolean };
 
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,

@@ -3103,6 +3103,80 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 
 .account-cadence-note { color: var(--ink-2); }
 
+/* Country combobox — accessible list-autocomplete picker.
+   Replaces the previous native <datalist> because Safari hides the
+   list until a partial match is typed, which Sebas read as "broken
+   autocomplete." This is a hand-rolled popover that mirrors the
+   existing input look (so the row matches Email + Full name above
+   it) with a list panel underneath. Tokens-only; mobile-first.
+*/
+.country-combobox { position: relative; width: 100%; }
+.country-combobox-input-row { position: relative; }
+.country-combobox-input-row input {
+  width: 100%;
+  padding-right: 32px; /* room for the × clear button */
+}
+.country-combobox-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  display: grid; place-items: center;
+}
+.country-combobox-clear:hover { color: var(--ink); background: var(--paper-2); }
+.country-combobox-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px oklch(0 0 0 / 0.10);
+}
+.country-combobox-option {
+  padding: 8px 12px;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.country-combobox-option.is-active { background: var(--accent-soft); color: var(--accent-strong); }
+.country-combobox-option.is-selected { font-weight: 600; }
+.country-combobox-option.is-selected::after {
+  content: "✓";
+  margin-left: 8px;
+  color: var(--accent);
+}
+.country-combobox-empty {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
 .account-save-row { display: flex; gap: 12px; padding-top: 8px; }
 .account-inline-confirm {
   display: inline-flex; align-items: center; gap: 6px;

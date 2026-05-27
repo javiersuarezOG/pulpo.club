@@ -324,6 +324,29 @@ function ClerkActionsBinder({ onActions }) {
           throw err;
         }
       },
+      // Pulls the freshest version of the signed-in user from Clerk —
+      // identity fields, publicMetadata, the lot. Use when an external
+      // system (Stripe webhook → publicMetadata) has updated the user
+      // server-side and the React copy is stale.
+      //
+      // Today's only caller: `/account/subscription` when the URL
+      // carries `?from=portal`, i.e. the user just came back from the
+      // Stripe Customer Portal. Without this, the "Cancels on {date}"
+      // copy stays invisible until a full page reload because
+      // `useUser()` doesn't poll for metadata changes.
+      //
+      // Returns the refreshed user (or null if no session). Never
+      // throws — silently no-ops on transient network errors so a
+      // metadata refresh hiccup doesn't break the page.
+      reloadUser: async () => {
+        if (!clerk.user) return null;
+        try {
+          await clerk.user.reload();
+          return clerk.user;
+        } catch {
+          return null;
+        }
+      },
     });
     return () => onActions(null);
   }, [clerk, onActions]);
