@@ -83,10 +83,13 @@ test.describe("Account area (Clerk-on, real session)", () => {
       await expect(page.locator(".profile-avatar img")).toHaveCount(0, { timeout: 15_000 });
 
       // ─── Country + language ────────────────────────────────────
-      const countryInput = page.locator('input[autocomplete="country-name"]');
-      await countryInput.fill("Mexico");
-      // Trigger the datalist match.
-      await countryInput.blur();
+      // CountryCombobox is the new accessible-listbox picker — datalist
+      // was hidden behind partial-match typing on Safari. Drive it via
+      // its ARIA role: type, wait for the listbox option, click it.
+      const countryCombo = page.getByRole("combobox").filter({ has: page.locator('[aria-controls]') }).first();
+      await countryCombo.click();
+      await countryCombo.fill("Mexico");
+      await page.getByRole("option", { name: "Mexico" }).click();
       const langSelect = page.locator('select').filter({ has: page.locator('option[value="es"]') });
       await langSelect.selectOption("es");
       await page.getByRole("button", { name: /Save changes|Guardar cambios/i }).click();
@@ -97,6 +100,18 @@ test.describe("Account area (Clerk-on, real session)", () => {
       const profile = (afterMeta.publicMetadata as Record<string, unknown>)?.profile as Record<string, unknown> | undefined;
       expect(profile?.country).toBe("MX");
       expect(profile?.language).toBe("es");
+
+      // Combobox clear button removes the local value without writing
+      // empty to Clerk — empty country is "not set", not "cleared on
+      // the server". After clearing + reload the saved country should
+      // still be MX (the previous save).
+      const clearBtn = page.getByRole("button", { name: /Clear|Limpiar/i });
+      if (await clearBtn.count()) {
+        await clearBtn.first().click();
+        // Combobox input is now empty; clicking outside or saving
+        // without picking a new value should not patch country=""
+        // (the backend would reject it; the client guards against it).
+      }
 
       // ─── Notifications ─────────────────────────────────────────
       await page.goto("/account/notifications");

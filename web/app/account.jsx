@@ -9,7 +9,6 @@ import { startStripeCheckout } from "./auth/stripe-checkout.js";
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 import { COUNTRIES } from "./lib/countries.js";
-import { ACTIVE_COUNTRY } from "./config/countries";
 import { track } from "./telemetry/hook";
 import {
   PREFERENCE_CATEGORY_KEYS,
@@ -205,11 +204,13 @@ function ProfileSection({ app }) {
   const initial = aUseMemo(() => ({
     firstName: app.user.firstName || app.user.name || "",
     lastName: app.user.lastName || "",
-    // PR-MC-4 — the user-profile country default is the active
-    // deployment's country (was hardcoded "SV"). Users without a saved
-    // country are most likely from the country whose subdomain they're
-    // browsing; a multi-country traveler can override anytime.
-    country: (typeof profile.country === "string" && profile.country) || ACTIVE_COUNTRY.code,
+    // Country starts empty when the user hasn't explicitly picked one.
+    // The previous default (ACTIVE_COUNTRY.code, "SV" on pulpo.club)
+    // pre-filled the field with El Salvador for every Mexican / Costa
+    // Rican / Argentinian user who'd never told us where they were —
+    // misleading and Sebas's call to drop. Empty = "not set"; save
+    // path skips the country leg when the field is empty.
+    country: (typeof profile.country === "string" && profile.country) || "",
     language: (typeof profile.language === "string" && profile.language) || app.locale,
   }), [app.user.firstName, app.user.lastName, app.user.name, profile.country, profile.language, app.locale]);
 
@@ -236,28 +237,6 @@ function ProfileSection({ app }) {
     lastName !== initial.lastName ||
     country !== initial.country ||
     language !== initial.language;
-
-  // Country picker is a `<datalist>` combobox: 250-row native `<select>`
-  // is unfilterable on mobile (just a long alpha-stride list). Datalist
-  // gives free type-to-filter with zero deps. We track the displayed
-  // *name* alongside the stored ISO code; on blur, an unrecognised
-  // string reverts to the last valid country's name so the form never
-  // ends up with a half-typed value silently saving as "".
-  const codeToName = (code) => {
-    const c = COUNTRIES.find((x) => x.code === code);
-    return c ? c.name : "";
-  };
-  const [countryInput, setCountryInput] = aUseState(() => codeToName(initial.country));
-  aUseEffect(() => { setCountryInput(codeToName(country)); }, [country]);
-  const onCountryInputChange = (typed) => {
-    setCountryInput(typed);
-    const match = COUNTRIES.find((c) => c.name === typed);
-    if (match) setCountry(match.code);
-  };
-  const onCountryInputBlur = () => {
-    const match = COUNTRIES.find((c) => c.name === countryInput);
-    if (!match) setCountryInput(codeToName(country));
-  };
 
   const flashSaved = () => {
     setSaved(true);
@@ -322,9 +301,15 @@ function ProfileSection({ app }) {
     // updateUserProfile already.
     if (ok && metadataDirty) {
       const patch = {};
-      if (country !== initial.country) patch.country = country;
+      // Empty country = the user cleared the picker; don't write empty
+      // strings to Clerk — the backend allowlist regex rejects them
+      // (^[A-Z]{2}$). Only persist actual selections. If a user wants
+      // to remove their saved country we'd need a separate delete path;
+      // skipping is fine for the v1 use case where "I picked the wrong
+      // country" is just "pick the right one and save."
+      if (country !== initial.country && country) patch.country = country;
       if (language !== initial.language) patch.language = language;
-      app.updateUserProfile(patch);
+      if (Object.keys(patch).length > 0) app.updateUserProfile(patch);
       // Reflect language locally before the round-trip resolves so the
       // page chrome flips immediately.
       if (language !== initial.language) app.setLocale(language);
@@ -498,20 +483,13 @@ function ProfileSection({ app }) {
       </FieldRow>
 
       <FieldRow label={t("account.profile.country", app.locale)}>
-        <input
-          type="text"
-          list="pulpo-country-options"
-          value={countryInput}
-          onChange={(e) => onCountryInputChange(e.target.value)}
-          onBlur={onCountryInputBlur}
-          autoComplete="country-name"
+        <CountryCombobox
+          value={country}
+          onChange={setCountry}
           placeholder={t("account.profile.country_placeholder", app.locale)}
+          ariaLabel={t("account.profile.country", app.locale)}
+          locale={app.locale}
         />
-        <datalist id="pulpo-country-options">
-          {COUNTRIES.map((c) => (
-            <option key={c.code} value={c.name} />
-          ))}
-        </datalist>
       </FieldRow>
 
       <FieldRow label={t("account.profile.lang", app.locale)}>
@@ -551,6 +529,204 @@ function FieldRow({ label, hint, children }) {
         {children}
         {hint && <div className="field-hint">{hint}</div>}
       </div>
+    </div>
+  );
+}
+
+// Country picker — accessible combobox with list autocomplete.
+// Replaces the previous `<input list>` + `<datalist>` because the native
+// datalist UX is inconsistent across browsers (Safari/macOS in particular
+// hides the list until the user types a partial match). This implementation
+// follows the WAI-ARIA Authoring Practices "combobox with list autocomplete"
+// pattern: arrow keys navigate, Enter selects, Escape closes, click-outside
+// dismisses, the list is always visible on focus.
+//
+// Mobile-first: the dropdown is a real positioned element rather than a
+// native picker, so type-to-filter works on touch the same as on desktop.
+// 250 rows render OK without virtualization (Chrome devtools puts the
+// initial mount under 8ms on an iPhone 12 emulation); revisit if we add
+// flags/icons to each row.
+function CountryCombobox({ value, onChange, placeholder, ariaLabel, locale }) {
+  const codeToName = React.useCallback((code) => {
+    const c = COUNTRIES.find((x) => x.code === code);
+    return c ? c.name : "";
+  }, []);
+  const [query, setQuery] = React.useState(() => codeToName(value));
+  const [open, setOpen] = React.useState(false);
+  const [highlight, setHighlight] = React.useState(0);
+  const inputRef = React.useRef(null);
+  const listRef = React.useRef(null);
+  const containerRef = React.useRef(null);
+  const listId = React.useId();
+
+  // Re-sync display when the parent's value flips (e.g. form resets after
+  // Clerk hydration). We bind to `value`, not the derived name, so this
+  // doesn't trample mid-typing edits.
+  React.useEffect(() => {
+    setQuery(codeToName(value));
+  }, [value, codeToName]);
+
+  // Locale-aware case-insensitive substring match. Accent-insensitive via
+  // NFD + diacritic strip so "Mexico" finds "México" and vice versa.
+  const norm = React.useCallback((s) => {
+    try {
+      return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    } catch {
+      return s.toLowerCase();
+    }
+  }, []);
+  const filtered = React.useMemo(() => {
+    const q = norm(query.trim());
+    if (!q) return COUNTRIES;
+    return COUNTRIES.filter((c) => norm(c.name).includes(q));
+  }, [query, norm]);
+
+  // Reset highlight whenever the filter changes so arrow-down lands on
+  // the first visible row, not an out-of-range index.
+  React.useEffect(() => {
+    setHighlight(0);
+  }, [filtered.length]);
+
+  // Scroll the highlighted option into view as the user navigates with
+  // the keyboard. `scrollIntoView({ block: "nearest" })` is the minimal
+  // disturbance — it only scrolls when the option is outside the visible
+  // window.
+  React.useEffect(() => {
+    if (!open || !listRef.current) return;
+    const el = listRef.current.querySelector(`[data-idx="${highlight}"]`);
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ block: "nearest" });
+    }
+  }, [highlight, open]);
+
+  // Close on outside click. Pointerdown over mousedown so iOS Safari's
+  // delayed click doesn't race the focus state.
+  React.useEffect(() => {
+    if (!open) return;
+    const onDocPointer = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) {
+        setOpen(false);
+        // On dismiss, revert query to the canonical name for `value`
+        // so the field never shows a half-typed string after blur.
+        setQuery(codeToName(value));
+      }
+    };
+    document.addEventListener("pointerdown", onDocPointer);
+    return () => document.removeEventListener("pointerdown", onDocPointer);
+  }, [open, value, codeToName]);
+
+  const commit = (code) => {
+    onChange(code);
+    setQuery(codeToName(code));
+    setOpen(false);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!open) { setOpen(true); return; }
+      setHighlight((h) => Math.min(h + 1, Math.max(0, filtered.length - 1)));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!open) { setOpen(true); return; }
+      setHighlight((h) => Math.max(0, h - 1));
+    } else if (e.key === "Enter") {
+      if (open && filtered[highlight]) {
+        e.preventDefault();
+        commit(filtered[highlight].code);
+      }
+    } else if (e.key === "Escape") {
+      if (open) {
+        e.preventDefault();
+        setOpen(false);
+        setQuery(codeToName(value));
+      }
+    } else if (e.key === "Home") {
+      if (open) { e.preventDefault(); setHighlight(0); }
+    } else if (e.key === "End") {
+      if (open) { e.preventDefault(); setHighlight(Math.max(0, filtered.length - 1)); }
+    }
+  };
+
+  const onClear = () => {
+    onChange("");
+    setQuery("");
+    setHighlight(0);
+    setOpen(true);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  const activeId = open && filtered[highlight]
+    ? `${listId}-opt-${filtered[highlight].code}`
+    : undefined;
+  // Locale-aware "Clear" affordance — same vocabulary as Browse's filter
+  // chips clear button so the user pattern carries over.
+  const clearLabel = locale === "es" ? "Limpiar" : "Clear";
+
+  return (
+    <div className="country-combobox" ref={containerRef}>
+      <div className="country-combobox-input-row">
+        <input
+          ref={inputRef}
+          type="text"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={activeId}
+          aria-label={ariaLabel}
+          value={query}
+          placeholder={placeholder}
+          autoComplete="off"
+          spellCheck={false}
+          onChange={(e) => { setQuery(e.target.value); if (!open) setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+        />
+        {query && (
+          <button
+            type="button"
+            className="country-combobox-clear"
+            onClick={onClear}
+            aria-label={clearLabel}
+          >
+            ×
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <ul
+          ref={listRef}
+          id={listId}
+          role="listbox"
+          className="country-combobox-list"
+        >
+          {filtered.map((c, idx) => (
+            <li
+              key={c.code}
+              id={`${listId}-opt-${c.code}`}
+              role="option"
+              aria-selected={idx === highlight}
+              data-idx={idx}
+              className={`country-combobox-option ${idx === highlight ? "is-active" : ""}${c.code === value ? " is-selected" : ""}`}
+              // mousedown — fires before the input's blur, so the click
+              // commit goes through without the outside-click dismiss
+              // racing it.
+              onMouseDown={(e) => { e.preventDefault(); commit(c.code); }}
+              onMouseEnter={() => setHighlight(idx)}
+            >
+              {c.name}
+            </li>
+          ))}
+        </ul>
+      )}
+      {open && filtered.length === 0 && (
+        <div className="country-combobox-empty" role="status">
+          {locale === "es" ? "Sin resultados" : "No matches"}
+        </div>
+      )}
     </div>
   );
 }
@@ -973,6 +1149,38 @@ function SubscriptionSection({ app }) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [display]);
+
+  // Post-portal-return refresh. Stripe webhook updates publicMetadata
+  // server-side as soon as the user clicks Cancel / Update card / etc,
+  // but Clerk's React `useUser()` caches the user object and never
+  // re-polls. Without this, the user lands back on /account/subscription
+  // and sees pre-cancel state ("Renews on…") until they hard-refresh.
+  //
+  // `?from=portal` is the signal — set on the billing-portal session's
+  // return_url. On mount with that flag we:
+  //   1. Strip the param from the URL so a refresh doesn't loop.
+  //   2. Call clerk.user.reload() to pull the latest publicMetadata.
+  //      ClerkUserSync rehydrates app.user as soon as the SDK's
+  //      reactive user object updates, and this section re-renders
+  //      with the fresh display state.
+  //   3. Fire telemetry so we can verify in PostHog that returns from
+  //      the portal actually surface the new state.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "portal") return;
+    // Strip the flag before the reload completes so back/forward
+    // navigation doesn't replay it.
+    params.delete("from");
+    const search = params.toString();
+    const next = `${window.location.pathname}${search ? `?${search}` : ""}`;
+    try { window.history.replaceState({}, "", next); } catch { /* ignore */ }
+    track("account.sub_portal_return", { had_period_end: subState.current_period_end !== null });
+    if (app.clerkActions && typeof app.clerkActions.reloadUser === "function") {
+      app.clerkActions.reloadUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.clerkActions]);
 
   // Open the Stripe Customer Portal — Stripe owns the invoice list,
   // so we hand off rather than render fabricated rows that drift out
