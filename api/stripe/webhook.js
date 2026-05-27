@@ -107,6 +107,29 @@ async function patchPublicMetadata(clerk, userId, patch) {
   await clerk.users.updateUserMetadata(userId, { publicMetadata: next });
 }
 
+// Sibling of patchPublicMetadata for privateMetadata. Needed for the
+// /start anonymous-invitation flow: createInvitation embeds
+// stripeCustomerId in the invitation's privateMetadata, but Clerk
+// does NOT auto-promote those fields onto the User record when the
+// invitation is accepted. So the /start path landed users in a state
+// where publicMetadata.plan = "pro" (set by subscription-lifecycle
+// webhooks via email lookup) but privateMetadata.stripeCustomerId was
+// never populated — breaking the Customer Portal endpoint, the
+// recovery path for reactivation, and anything else that needs the
+// customer ID. Calling this from the subscription-lifecycle handlers
+// closes the gap: every customer.subscription.updated event re-stamps
+// the customer + sub IDs on the user, idempotently.
+async function patchPrivateMetadata(clerk, userId, patch) {
+  if (!userId) return;
+  const user = await clerk.users.getUser(userId);
+  const current = (user && user.privateMetadata) || {};
+  const next = { ...current, ...patch };
+  for (const k of Object.keys(patch)) {
+    if (patch[k] === undefined) delete next[k];
+  }
+  await clerk.users.updateUserMetadata(userId, { privateMetadata: next });
+}
+
 // Look up an existing Clerk user by email. Returns the user object or
 // null. Clerk's getUserList API shape changes between SDK versions
 // (sometimes Array, sometimes { data: Array }) — tolerate both.
@@ -616,6 +639,21 @@ module.exports = async (req, res) => {
 
         if (userId) {
           await patchPublicMetadata(clerk, userId, patch);
+          // Also stamp privateMetadata.stripeCustomerId + stripeSubscriptionId
+          // so the Customer Portal endpoint can find them. The /start
+          // anonymous-invitation flow never gets these onto the User
+          // (only onto the invitation), so without this stamp the user
+          // sees "We couldn't find your billing details" forever.
+          // Idempotent: same IDs on every redelivery — safe to re-run.
+          const subCustomerId = typeof sub.customer === "string"
+            ? sub.customer
+            : (sub.customer && sub.customer.id) || null;
+          if (subCustomerId || sub.id) {
+            await patchPrivateMetadata(clerk, userId, {
+              ...(subCustomerId ? { stripeCustomerId: subCustomerId } : {}),
+              ...(sub.id ? { stripeSubscriptionId: sub.id } : {}),
+            });
+          }
         }
         posthog.capture(posthog.emailDistinctId(subEmail), "webhook.subscription_changed", {
           event_id: event.id,
