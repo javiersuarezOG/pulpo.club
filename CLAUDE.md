@@ -39,6 +39,21 @@ The `--auto` flag queues the merge to fire as soon as required checks pass. Auto
 
 If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back with `git reset --hard origin/main` and open a PR.
 
+### Merge-driver division of labour (post-2026-05-27)
+
+For routine PRs where Sebastian is online and watching, Claude Code drives the merge to keep the loop tight:
+
+1. **Claude opens the PR** with `gh pr create`, body includes the manual dry-run checklist.
+2. **Claude shares the Vercel preview URL + the exact dry-run steps** (and watches PostHog / logs in parallel for telemetry confirmation).
+3. **Sebastian walks the dry-run** on the preview URL. CLAUDE.md's existing per-class verification gates still apply (auth/billing flow, CSP, mobile viewport, etc.). Sebastian replies with "green" or paste of whatever broke.
+4. **Claude runs `gh pr merge <NUM> --auto --squash --delete-branch`** after the "green" — `--auto` waits for required CI then merges.
+
+This swaps the merge click off Sebastian's plate but preserves the human-in-the-loop on every verification gate. Sebastian can still merge manually whenever he prefers — the merge command is the same either way.
+
+**When Sebastian merges manually instead:** no Claude action needed; Claude verifies on `main` afterwards via `git log` / `gh pr view --json mergedAt`.
+
+**When NEITHER should merge automatically:** any PR where the dry-run can't be walked yet (broken Vercel preview, missing env var, blocked on a dashboard secret rotation, etc.). Hold the PR until the gate is walkable.
+
 ## Testing Before Pushing
 - **Frontend (Vite app)**: `npm run dev` opens http://localhost:5173. Build check: `npm run build`. Typecheck: `npm run typecheck`.
 - **Frontend (legacy)**: serves at `/legacy.html` until the PR-10 cutover. Tested via `npx serve .` if needed.
