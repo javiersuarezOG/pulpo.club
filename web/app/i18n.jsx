@@ -1146,8 +1146,8 @@ const UI_STRINGS = {
   // window hasn't closed yet. CTA bounces to Stripe Customer Portal.
   "account.sub.grace.head":         { en: "Your card couldn't be charged",
                                       es: "No pudimos cobrar tu tarjeta" },
-  "account.sub.grace.copy":         { en: "Pulpo Pro stays active for {days} more days — until {date}. Update your card to keep it.",
-                                      es: "Pulpo Pro sigue activo por {days} días más — hasta el {date}. Actualiza tu tarjeta para mantenerlo." },
+  "account.sub.grace.copy":         { en: "Pulpo Pro stays active for {days} more days and expires on {date}. Update your card to keep it.",
+                                      es: "Pulpo Pro sigue activo por {days} días más y vence el {date}. Actualiza tu tarjeta para mantenerlo." },
   "account.sub.grace.cta_update_card": { en: "Update card", es: "Actualizar tarjeta" },
   // Grace expired — user is back on Free, but we say "reactivate"
   // rather than "upgrade" because their subscription history is intact.

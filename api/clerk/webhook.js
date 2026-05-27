@@ -37,6 +37,7 @@
 const crypto = require("crypto");
 const { verifySvixSignature, readRawBody } = require("../_svix");
 const { capture, emailDistinctId, flush } = require("../_posthog");
+const { auditEnvOverridesOnce } = require("../_env_audit");
 
 const SVIX_SECRET_ENV = "CLERK_WEBHOOK_SECRET";
 
@@ -116,6 +117,10 @@ function pickPostHogProps(eventType, body) {
     props.source = data.private_metadata && data.private_metadata.invitation_id
       ? "invitation"
       : (data.external_accounts && data.external_accounts.length ? "oauth" : "direct");
+    if (data.public_metadata && data.public_metadata.plan === "pro"
+        && !(data.private_metadata && data.private_metadata.stripeCustomerId)) {
+      props.missing_stripe_customer_id = true;
+    }
     return props;
   }
 
@@ -134,6 +139,7 @@ function distinctIdFor(props) {
 
 module.exports = async (req, res) => {
   const t0 = Date.now();
+  await auditEnvOverridesOnce();
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
@@ -188,6 +194,13 @@ module.exports = async (req, res) => {
   const distinctId = distinctIdFor(props);
   try {
     capture(distinctId, phEvent, props);
+    if (props.missing_stripe_customer_id) {
+      capture(distinctId, "webhook.invitation_metadata_missing", {
+        source: "clerk_webhook",
+        clerk_event: eventType,
+        user_id: props.user_id || "",
+      });
+    }
     await flush();
   } catch (err) {
     // Telemetry must not block the webhook — Svix retries on 5xx and

@@ -24,9 +24,12 @@ const {
   logApi,
 } = require("./_stripe");
 const { toWebRequest } = require("../_clerk");
+const posthog = require("../_posthog");
+const { auditEnvOverridesOnce } = require("../_env_audit");
 
 module.exports = async (req, res) => {
   const t0 = Date.now();
+  await auditEnvOverridesOnce();
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     logApi("stripe.billing_portal", {
@@ -85,6 +88,7 @@ module.exports = async (req, res) => {
       const stripe = stripeClient();
       const result = await stripe.customers.list({ email: userEmail, limit: 1 });
       const customer = result && result.data && result.data[0];
+      let stamped = false;
       if (customer && customer.id) {
         stripeCustomerId = customer.id;
         const clerk = clerkClient();
@@ -96,11 +100,19 @@ module.exports = async (req, res) => {
           ...(subId ? { stripeSubscriptionId: subId } : {}),
         };
         await clerk.users.updateUserMetadata(userId, { privateMetadata: nextPrivate });
+        stamped = true;
         logApi("stripe.billing_portal", {
           status: 200, ms: Date.now() - t0, user_id: userId,
           reason: "self_heal_ok", customer_id: customer.id,
         });
       }
+      posthog.capture(userId ? `user:${userId}` : "server:billing_portal", "billing_portal.self_heal", {
+        had_email: Boolean(userEmail),
+        lookup_ok: Boolean(customer && customer.id),
+        stamped,
+        ms: Date.now() - t0,
+      });
+      await posthog.flush();
     } catch (err) {
       // Non-fatal: if Stripe lookup fails we still want to fall through
       // to the 409 below so the user sees a graceful error rather than 500.
@@ -120,6 +132,12 @@ module.exports = async (req, res) => {
     logApi("stripe.billing_portal", {
       status: 409, ms: Date.now() - t0, user_id: userId, reason: "no_customer",
     });
+    posthog.capture(userId ? `user:${userId}` : "server:billing_portal", "webhook.invitation_metadata_missing", {
+      source: "billing_portal",
+      had_email: Boolean(userEmail),
+      ms: Date.now() - t0,
+    });
+    await posthog.flush();
     return res.status(409).json({ error: "no_customer" });
   }
 
