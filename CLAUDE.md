@@ -89,7 +89,8 @@ The failure is purely a local-env artifact; do NOT change the photo-pipeline cod
    - Hit `/start` → run a Stripe-sandbox checkout (4242 4242 4242 4242).
    - Confirm the modal sequence on the success URL: **no SignupModal flash, only WelcomeModal**.
    - Confirm the Clerk invitation email arrives in **inbox** (not spam, not promotions tab) on a **brand-new email address that has never been used in any prior Pulpo test**. Existing-email tests hit the silent-no-email path on the webhook and are misleading.
-   - Click the email CTA → complete Clerk sign-up → confirm you land on `/account` signed in, in Pro state.
+   - Open DevTools Console before clicking the email CTA. Click the email CTA → complete Clerk sign-up → confirm the password input and CAPTCHA widget render, with zero CSP violations and zero `Clerk: Failed to load the CAPTCHA` messages.
+   - Confirm you land on `/account` signed in, in Pro state.
 
 2. **Who walks step 1:**
    - **Agents (Claude Code etc.) walk the LOCAL dev server**: `npm run dev` + Playwright against `localhost:5173` with the existing e2e suite (`npx playwright test --grep "welcome modal" preview-smoke.spec.ts` + `--grep "/account\?welcome=1" responsive-smoke.spec.ts`). Agents currently CANNOT access the Vercel preview URL because previews are SSO-gated to the Vercel team — external traffic redirects to a Vercel login. (Setting `VERCEL_AUTOMATION_BYPASS_SECRET` on the project + threading it into agent requests would unblock this; until then, agents can't.)
@@ -107,6 +108,14 @@ The failure is purely a local-env artifact; do NOT change the photo-pipeline cod
 5. **The Vercel preview URL is the testing surface for the Sebas-side check.** Production deploys carry real Stripe webhooks, real Clerk live keys, and real user money. The preview environment is the safest place to catch what CI can't see — use it.
 
 6. **Skipping these guardrails is how a broken funnel hits paying users.** The user sees a Clerk modal they don't recognize and an inbox with no email, not a green CI badge.
+
+## NEVER ship a broken CSP change again (post-2026-05-27)
+
+Any PR touching `vercel.json`'s `Content-Security-Policy` must include:
+
+1. A Vercel preview DevTools Console screenshot or recording showing zero CSP violations on `/`, `/start`, and `/account?__clerk_status=sign_up&__clerk_ticket=invalid`.
+2. A PR-body list of every third-party CSP domain and why it is allowed. New domain = new line item.
+3. A local test run including `tests/api/vercel_security_headers.test.js` and `tests/e2e/captcha-csp.spec.ts`.
 
 ## Frontend conventions (post-PR-1.5)
 

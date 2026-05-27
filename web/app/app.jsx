@@ -97,6 +97,7 @@ import {
 } from "./lib/url-routing";
 import { resolvePinFromParam, encodeShareToken } from "./lib/share";
 import { evaluateGate } from "./lib/route-gates";
+import { consumeTicketWithRetry } from "./lib/clerk-ticket";
 import { useDocumentMeta } from "./lib/use-document-meta";
 import { bootAssetTelemetry } from "./telemetry/asset-load";
 import { bootGlobalErrorHandlers } from "./telemetry/errors";
@@ -614,7 +615,21 @@ function App() {
       // so we can distinguish fresh-ticket-rejected from spent-ticket
       // from sdk-not-ready in production.
       if (ticket && clerkActions.consumeTicket) {
-        const consume = await clerkActions.consumeTicket(ticket);
+        const consume = await consumeTicketWithRetry(
+          clerkActions.consumeTicket,
+          ticket,
+          {
+            maxAttempts: 3,
+            initialDelayMs: 500,
+            onRetry: ({ attempt, code, message }) => {
+              track("invitation.ticket_consume_retry", {
+                attempt,
+                code,
+                message,
+              });
+            },
+          },
+        );
         if (consume && consume.ok) {
           track("invitation.ticket_consumed", {
             status: consume.status || "unknown",
@@ -1210,6 +1225,7 @@ function App() {
     // SignupModal from racing in but missed the welcomeModalState itself.
     setWelcomeModalState(null);
     track("invitation.password_creation_opened", {
+      source: "pending_sign_up",
       missing_fields: pending.missingFields.join(","),
     });
     try {

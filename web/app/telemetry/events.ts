@@ -307,6 +307,13 @@ export type EventMap = {
     mode: "signup" | "login";
   };
   "signup.completed": { provider: "email" | "google" | "apple" | "magic_link" | "clerk" | "legacy" };
+  "invitation.password_creation_opened": {
+    source?: "clerk_ticket_url" | "pending_sign_up";
+    missing_fields?: string;
+  };
+  "invitation.ticket_consumed": { status: string; had_email: boolean };
+  "invitation.ticket_rejected": { code: string; message: string };
+  "invitation.ticket_consume_retry": { attempt: number; code: string; message: string };
   // signin.completed fires on every signed-in transition (including
   // first-ever signups). signup.completed fires only when the SignupModal
   // was open with mode==="signup" at the moment of transition. Either or
@@ -464,19 +471,19 @@ export type EventMap = {
   //                    → upgrade.checkout_returned (result=success)
   // and then later, post-invitation-accept, the existing signin.completed
   // closes the loop with the (now-identified) PostHog person.
-  /** Cold-load of /start. `has_code` mirrors whether the URL carried
-   *  `?code=…`; everything else (utm_*, country, device_type) is auto-
+  /** Cold-load of /start. `has_code` means a promo will be sent to
+   *  Stripe, either from `?code=...` or the default first-month-free
+   *  offer. Everything else (utm_*, country, device_type) is auto-
    *  attached by PostHog. */
-  "start.viewed": { has_code: boolean };
-  /** User clicks "Get access". /start is a single-button page — no
-   *  email or code inputs (Stripe collects both). `has_code` echoes
-   *  whether a `?code=…` URL param was attached so PostHog funnels
-   *  can break down marketing-link conversion vs organic. */
-  "start.cta_clicked": { has_code: boolean };
+  "start.viewed": { has_code: boolean; explicit_code?: boolean; default_promo_code?: string };
+  /** User clicks the primary CTA. /start is a single-button page — no
+   *  email or code inputs (Stripe collects both). `explicit_code`
+   *  splits URL-code campaigns from the default offer. */
+  "start.cta_clicked": { has_code: boolean; explicit_code?: boolean };
   /** Fires immediately before window.location.assign(stripeUrl). Pairs
    *  with the existing upgrade.checkout_returned event so the same funnel
    *  logic computes completion rate for /start as it does for /plans. */
-  "start.checkout_redirected": { had_promo_code: boolean };
+  "start.checkout_redirected": { had_promo_code: boolean; explicit_code?: boolean };
   /** URL-supplied promo code didn't resolve (typo, exhausted, test-vs-
    *  live mismatch). The frontend soft-fails: retries the API call
    *  without the code, sends the user to Stripe at full price. This
@@ -551,6 +558,9 @@ export type EventMap = {
    *  recovery path that pre-PR was completely silent — users sat on
    *  the lying "check your inbox" copy forever. */
   "welcome_modal.signin_existing_clicked": Record<string, never>;
+  /** User_exists variant tertiary CTA. Opens Clerk's sign-in modal so
+   *  the native forgot-password path is one click away. */
+  "welcome_modal.forgot_password_clicked": Record<string, never>;
 
   /** / home-page Pro upsell modal mounted (PR-B.5). `trigger` reflects
    *  which URL signal opened the modal — utm_* params, a ?code=… link,

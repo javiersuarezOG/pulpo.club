@@ -91,6 +91,12 @@ module.exports = async (req, res) => {
   const email = rawEmail && EMAIL_RE.test(rawEmail) && rawEmail.length <= 254
     ? rawEmail
     : null;
+  // Client-side anonymous PostHog distinct_id. Carried through the
+  // Stripe session metadata so the webhook can alias() it to the
+  // email-derived id post-payment, stitching the anon→paid funnel into
+  // one PostHog person. Empty string if the client didn't send one
+  // (cold load, declined consent) — webhook tolerates absence.
+  const posthogAnonId = safeStr(body.posthog_anon_id).slice(0, 128);
   const promoCode = safeStr(body.promoCode).trim().toUpperCase();
   const locale = SUPPORTED_LOCALES.has(safeStr(body.locale))
     ? body.locale === "es" ? "es-419" : "en"
@@ -100,7 +106,7 @@ module.exports = async (req, res) => {
   // Distinct ID used for every PostHog event below — hashed email when
   // available so we can chain anonymous client-side events through the
   // server-side funnel via PostHog's alias machinery.
-  const distinctId = posthog.emailDistinctId(email);
+  const distinctId = email ? posthog.emailDistinctId(email) : (posthogAnonId || "server:webhook");
 
   // If a non-empty email was supplied but failed validation, surface a
   // 400 so the caller knows to fix it. (Empty/missing email is fine.)
@@ -193,13 +199,6 @@ module.exports = async (req, res) => {
   const proto = (req.headers["x-forwarded-proto"] || "https").split(",")[0].trim();
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const origin = `${proto}://${host}`;
-
-  // Client-side anonymous PostHog distinct_id. Carried through the
-  // Stripe session metadata so the webhook can alias() it to the
-  // email-derived id post-payment, stitching the anon→paid funnel into
-  // one PostHog person. Empty string if the client didn't send one
-  // (cold load, declined consent) — webhook tolerates absence.
-  const posthogAnonId = safeStr(body.posthog_anon_id).slice(0, 128);
 
   const sessionMetadata = {
     source: "start",
