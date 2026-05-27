@@ -25,10 +25,24 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      // Authed spec needs the live Clerk instance + the Sebas-only
+      // test creds in .env.local — keep it out of the default
+      // `e2e:smoke` run so CI without those env vars stays green.
+      testIgnore: /account-authed\.spec\.ts/,
+    },
+    {
+      // Clerk-on authenticated smoke. Runs the /account walk against
+      // an E2E_BASE_URL (defaults to the dev server) with a real
+      // signed-in user. Skipped when the env vars aren't present —
+      // see tests/e2e/account-authed.spec.ts. Sebas runs this locally
+      // before merging anything that touches /account.
+      name: "authed",
+      use: { ...devices["Desktop Chrome"], baseURL: process.env.E2E_BASE_URL || "http://localhost:5173" },
+      testMatch: /account-authed\.spec\.ts/,
     },
   ],
 
-  webServer: {
+  webServer: process.env.E2E_BASE_URL ? undefined : {
     command: "npm run dev",
     url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,

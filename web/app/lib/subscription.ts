@@ -21,6 +21,17 @@ export type UserSubscriptionFields = {
   subscription_status?: SubscriptionStatus | null;
   payment_failed_at?: number | null;
   grace_period_ends_at?: number | null;
+  // Stamped from Stripe's `customer.subscription.updated`. Unix ms.
+  // current_period_end: when the current paid period ends. Becomes
+  //   the renew date (status=active, !cancel_at_period_end) OR the
+  //   cancel-on date (status=active, cancel_at_period_end=true).
+  // cancel_at_period_end: user clicked Cancel in the Stripe portal —
+  //   plan stays "pro" until current_period_end, then drops to "free".
+  //   UI MUST NOT say "Renews on..." when this is true.
+  // canceled_at: when status became "canceled" (subscription ended).
+  current_period_end?: number | null;
+  cancel_at_period_end?: boolean | null;
+  canceled_at?: number | null;
 };
 
 export type SubscriptionState = {
@@ -30,6 +41,17 @@ export type SubscriptionState = {
   in_grace: boolean;
   grace_period_ends_at: number | null;
   payment_failed_at: number | null;
+  // Derived display state for the account-page subscription block.
+  // display: "active" — renewing normally.
+  //          "canceling" — cancel_at_period_end=true; plan still Pro
+  //                        but won't auto-renew.
+  //          "canceled" — subscription has ended; effective=free.
+  //          "past_due" — payment failed.
+  //          "grace" — past_due but inside the grace window.
+  display: "active" | "canceling" | "canceled" | "past_due" | "grace";
+  current_period_end: number | null;
+  cancel_at_period_end: boolean;
+  canceled_at: number | null;
 };
 
 export function deriveSubscriptionState(
@@ -45,6 +67,9 @@ export function deriveSubscriptionState(
       : "active";
   const graceEndsAt = typeof u.grace_period_ends_at === "number" ? u.grace_period_ends_at : null;
   const paymentFailedAt = typeof u.payment_failed_at === "number" ? u.payment_failed_at : null;
+  const currentPeriodEnd = typeof u.current_period_end === "number" ? u.current_period_end : null;
+  const cancelAtPeriodEnd = u.cancel_at_period_end === true;
+  const canceledAt = typeof u.canceled_at === "number" ? u.canceled_at : null;
   const t = typeof now === "number" ? now : Date.now();
   const inGrace = status === "past_due" && graceEndsAt !== null && t < graceEndsAt;
 
@@ -63,6 +88,17 @@ export function deriveSubscriptionState(
     effective = "free";
   }
 
+  let display: SubscriptionState["display"];
+  if (status === "canceled") {
+    display = "canceled";
+  } else if (status === "past_due") {
+    display = inGrace ? "grace" : "past_due";
+  } else if (cancelAtPeriodEnd) {
+    display = "canceling";
+  } else {
+    display = "active";
+  }
+
   return {
     plan: rawPlan,
     effective,
@@ -70,6 +106,10 @@ export function deriveSubscriptionState(
     in_grace: inGrace,
     grace_period_ends_at: graceEndsAt,
     payment_failed_at: paymentFailedAt,
+    display,
+    current_period_end: currentPeriodEnd,
+    cancel_at_period_end: cancelAtPeriodEnd,
+    canceled_at: canceledAt,
   };
 }
 

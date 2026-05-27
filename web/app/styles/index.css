@@ -3060,12 +3060,48 @@ h1,h2,h3,h4,h5 { margin: 0; }
 }
 .profile-avatar {
   width: 56px; height: 56px; border-radius: 50%;
-  background: var(--accent); color: white;
+  background: var(--accent); color: var(--paper);
   display: grid; place-items: center;
   font-size: 22px; font-weight: 600;
-  flex-shrink: 0;
+  flex-shrink: 0; overflow: hidden;
+  position: relative;
 }
+.profile-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+.profile-avatar[aria-busy="true"] { opacity: 0.6; }
 .profile-photo-label { font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 4px; }
+.profile-photo-actions { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.profile-photo-actions .link-btn { align-self: flex-start; padding: 4px 0; }
+.profile-photo-helper { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.link-btn-muted { color: var(--ink-3); }
+.link-btn-muted:hover { color: var(--ink-2); }
+button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
+
+/* Read-only field row — used for the email address on /account/profile.
+   Visually mirrors the disabled-input height + typography but is a
+   <div>, so there's no editing affordance at all (no caret on tap, no
+   autocomplete dropdown, no browser-extension form-stuffing risk). */
+.field-readonly-row {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap;
+}
+.field-readonly-value {
+  flex: 1 1 auto; min-width: 0;
+  padding: 10px 12px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 22px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.account-cadence-note { color: var(--ink-2); }
 
 .account-save-row { display: flex; gap: 12px; padding-top: 8px; }
 .account-inline-confirm {
@@ -3286,6 +3322,12 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .status-active        { background: oklch(94% 0.05 145); color: oklch(40% 0.10 145); }
 .status-paused        { background: oklch(95% 0.03 80);  color: oklch(50% 0.12 80); }
 .status-payment_issue { background: oklch(94% 0.05 25);  color: oklch(50% 0.18 25); }
+/* Canceling: same warm-amber as paused but slightly more saturated to
+   signal "in-progress termination" without slipping into the red of
+   payment issues. Canceled: muted neutral so the user understands the
+   plan has ended without the alarm. */
+.status-canceling     { background: oklch(94% 0.06 65);  color: oklch(46% 0.14 65); }
+.status-canceled      { background: oklch(94% 0.01 0);   color: oklch(46% 0.02 0); }
 
 /* Grace-period banner — shows above the subscription card when the
    user is in the 14-day window after a failed payment, or after the

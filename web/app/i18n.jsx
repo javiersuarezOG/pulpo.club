@@ -994,55 +994,40 @@ const UI_STRINGS = {
   "account.profile.country_placeholder": { en: "Type to search…",   es: "Escribe para buscar…" },
   "account.profile.lang":    { en: "Preferred language",            es: "Idioma preferido" },
   "account.profile.save":    { en: "Save changes",                  es: "Guardar cambios" },
+  "account.profile.saving":  { en: "Saving…",                       es: "Guardando…" },
   "account.profile.saved":   { en: "Changes saved.",                es: "Cambios guardados." },
   "account.profile.email_note": { en: "Email change requires verification.", es: "Cambiar el correo requiere verificación." },
+  "account.profile.email_change_link": { en: "Change in Security",  es: "Cambiar en Seguridad" },
+  // Photo upload helper + states. The numeric "2 MB" stays in both
+  // locales because it's a hard client-side limit, not a copy choice.
+  "account.profile.upload_helper":     { en: "JPG, PNG or WebP, up to 2 MB.",
+                                          es: "JPG, PNG o WebP, hasta 2 MB." },
+  "account.profile.uploading":         { en: "Uploading…",          es: "Subiendo…" },
+  "account.profile.upload_failed":     { en: "Couldn't upload — please try again.",
+                                          es: "No pudimos subir — inténtalo de nuevo." },
+  "account.profile.upload_too_big":    { en: "Image must be 2 MB or smaller.",
+                                          es: "La imagen debe ser de 2 MB o menos." },
+  "account.profile.upload_wrong_type": { en: "JPG, PNG or WebP only.",
+                                          es: "Solo JPG, PNG o WebP." },
+  "account.profile.remove_photo":      { en: "Remove photo",        es: "Quitar foto" },
   // Surfaced when an optimistic profile update (preferred categories,
   // future fields) fails to persist to Clerk and the UI rolls back.
   "account.profile.sync_failed": { en: "Couldn't save your preferences — please try again.",
                                     es: "No pudimos guardar tus preferencias — inténtalo de nuevo." },
   "account.notif.intro":     { en: "Choose what Pulpo sends you, and how.",
                                es: "Elige qué te envía Pulpo y cómo." },
-  "account.notif.saved":     { en: "Preference saved.",             es: "Preferencia guardada." },
+  // Honest framing for the Pro cohort — the cron in
+  // .github/workflows/pulpo-newsletter.yml runs every Monday today (the
+  // "Weekly Monday cadence" comment in the workflow). The team is moving
+  // toward fortnight gating in PR-NL-4; this copy stays accurate either
+  // way because the rendering still happens on Monday mornings.
+  "account.notif.cadence_note": { en: "We send a fortnightly newsletter on Monday mornings. Tune what you receive with the filters below.",
+                                   es: "Enviamos un boletín quincenal los lunes por la mañana. Ajusta qué recibes con los filtros de abajo." },
 
-  // Pro-gated notification categories. Free users see the upsell card
-  // below in place of these toggles.
-  "account.notif.newsletter.title":  { en: "Weekly newsletter",
-                                        es: "Boletín semanal" },
-  "account.notif.newsletter.desc":   { en: "The main Pulpo digest — new listings, price drops, curated picks.",
-                                        es: "El resumen principal de Pulpo — nuevos anuncios, bajadas de precio, selecciones curadas." },
-  "account.notif.price_drops.title": { en: "Price drop alerts",
-                                        es: "Alertas de rebajas de precio" },
-  "account.notif.price_drops.desc":  { en: "Email when a saved listing drops in price.",
-                                        es: "Te avisamos por correo cuando una propiedad guardada baja de precio." },
-  "account.notif.new_in_zones.title":{ en: "New listings in saved zones",
-                                        es: "Nuevas propiedades en zonas guardadas" },
-  "account.notif.new_in_zones.desc": { en: "Get early notice when something new appears in areas you've explored.",
-                                        es: "Entérate temprano cuando aparece algo nuevo en zonas que ya exploraste." },
-
-  // Free for everyone — product news, not premium content.
-  "account.notif.platform_updates.title": { en: "Platform updates",
-                                             es: "Novedades de Pulpo" },
-  "account.notif.platform_updates.desc":  { en: "Occasional product news and feature announcements.",
-                                             es: "Noticias del producto y novedades, sin saturarte el correo." },
-
-  // Channels.
-  "account.notif.channels":     { en: "Channels",  es: "Canales" },
-  "account.notif.email":        { en: "Email",     es: "Email" },
-  "account.notif.email_desc":   { en: "Always on — primary product delivery channel.",
-                                  es: "Siempre activado — canal principal del producto." },
-  "account.notif.required":     { en: "Required",  es: "Obligatorio" },
-  "account.notif.whatsapp":     { en: "WhatsApp",  es: "WhatsApp" },
-  "account.notif.whatsapp_desc":{ en: "Optional opt-in. Stores your number for future deal alerts.",
-                                  es: "Opcional. Guarda tu número para alertas de oportunidades." },
-  "account.notif.whatsapp_confirm": { en: "We'll send deal alerts to {number}. You can opt out anytime.",
-                                       es: "Te vamos a enviar alertas al {number}. Puedes desactivarlas cuando quieras." },
-
-  // Newsletter frequency (Pro-only — only renders when newsletter is on).
-  "account.notif.frequency":    { en: "Newsletter frequency", es: "Frecuencia del boletín" },
-  "account.notif.freq_weekly":  { en: "Weekly",   es: "Semanal" },
-  "account.notif.freq_biweekly":{ en: "Bi-weekly", es: "Quincenal" },
-  "account.notif.unsub_note":   { en: "You can also unsubscribe from any email using the link at the bottom of each message.",
-                                  es: "También puedes darte de baja desde el enlace al final de cada email." },
+  // Upsell card. Title + bullet text re-use "newsletter.title" deliberately
+  // so the upsell mirrors what the user lands on once they convert.
+  "account.notif.newsletter.title":  { en: "Fortnightly newsletter",
+                                        es: "Boletín quincenal" },
 
   // Preferred-category chip selector (PR-B). Rendered under the newsletter
   // toggle for Pro users; captures up to PREFERENCE_CATEGORIES_MAX picks
@@ -1171,6 +1156,41 @@ const UI_STRINGS = {
   "account.sub.grace_expired.copy": { en: "Your 14-day grace period has ended. Reactivate to get Pro back.",
                                       es: "Tu periodo de gracia de 14 días terminó. Reactiva para recuperar Pulpo Pro." },
   "account.sub.grace_expired.cta_reactivate": { en: "Reactivate", es: "Reactivar" },
+
+  // ── Subscription plan card — period + cancellation copy (post-2026-05-27) ──
+  // Replaces hardcoded "Renews on 5 Jun 2026" placeholder. Branches by
+  // sub-state display value derived in lib/subscription.ts:
+  //   active     → renews_on copy + status_active pill
+  //   canceling  → cancels_on copy + status_canceling pill (NEVER "Renews on")
+  //   canceled   → ended_on copy + status_canceled pill
+  //   past_due   → grace banner already handles copy; pill = status_past_due
+  // {date} is a localized date (no time) from current_period_end / canceled_at.
+  "account.sub.plan_meta.renews_on":   { en: "Renews on {date}",
+                                          es: "Se renueva el {date}" },
+  "account.sub.plan_meta.cancels_on":  { en: "Cancels on {date}",
+                                          es: "Se cancela el {date}" },
+  "account.sub.plan_meta.ended_on":    { en: "Subscription ended on {date}",
+                                          es: "Suscripción finalizada el {date}" },
+  "account.sub.plan_meta.free":        { en: "Browse the catalogue, no card required.",
+                                          es: "Explora el catálogo, sin tarjeta." },
+  // Status copy line below the plan name. Mirrors plan_meta with a
+  // softer, longer-form phrasing.
+  "account.sub.status_copy.active":    { en: "Your plan is active — renews on {date}.",
+                                          es: "Tu plan está activo — se renueva el {date}." },
+  "account.sub.status_copy.canceling": { en: "You've cancelled. Pulpo Pro stays active until {date}, then your account drops back to Free.",
+                                          es: "Has cancelado. Pulpo Pro sigue activo hasta el {date}, luego tu cuenta vuelve a Gratis." },
+  "account.sub.status_copy.canceled":  { en: "Your Pulpo Pro subscription ended on {date}. Resubscribe anytime to get Pro back.",
+                                          es: "Tu suscripción a Pulpo Pro terminó el {date}. Vuelve a suscribirte cuando quieras." },
+  "account.sub.status_copy.free":      { en: "You're on the free plan. Upgrade for off-market access and weekly alerts.",
+                                          es: "Estás en el plan Gratis. Hazte Pro para acceder a propiedades off-market y al digest semanal." },
+  // Status pill labels.
+  "account.sub.pill.active":           { en: "Active",     es: "Activa" },
+  "account.sub.pill.canceling":        { en: "Canceling",  es: "Cancelando" },
+  "account.sub.pill.canceled":         { en: "Canceled",   es: "Cancelada" },
+  "account.sub.pill.past_due":         { en: "Payment issue", es: "Problema de pago" },
+  // Reactivate CTA shown to canceling + canceled users instead of "Manage plan".
+  "account.sub.reactivate":            { en: "Resubscribe →",
+                                          es: "Volver a suscribirme →" },
 
   // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
   // Public marketing surfaces that funnel cold visitors into Stripe

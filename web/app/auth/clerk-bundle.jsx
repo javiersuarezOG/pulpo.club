@@ -86,6 +86,12 @@ function subscriptionFromMetadata(metadata) {
         : "active",
     payment_failed_at: typeof m.payment_failed_at === "number" ? m.payment_failed_at : null,
     grace_period_ends_at: typeof m.grace_period_ends_at === "number" ? m.grace_period_ends_at : null,
+    // Period + cancellation fields (post-2026-05-27). All optional —
+    // pre-PR-#512 users read as null and the Account page falls back to
+    // the static "Pro" label without a "Renews on..." line.
+    current_period_end: typeof m.current_period_end === "number" ? m.current_period_end : null,
+    cancel_at_period_end: m.cancel_at_period_end === true,
+    canceled_at: typeof m.canceled_at === "number" ? m.canceled_at : null,
   };
 }
 
@@ -120,7 +126,18 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
     const effective = deriveSubscriptionState({ plan: rawPlan, ...subFields }).effective;
     setUser(applyFounderPlan({
       email:    user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "",
+      // `name` stays first-name-only for backwards compat with SiteHeader's
+      // greeting + any legacy localStorage seeds. The full-name form on
+      // /account/profile reads `firstName` + `lastName` directly off
+      // app.user so it can split the field cleanly on save.
       name:     user.firstName || user.username || "",
+      firstName: user.firstName || "",
+      lastName:  user.lastName || "",
+      // Profile photo. Clerk returns "" for the default placeholder and a
+      // signed img.clerk.com URL once the user has uploaded one. The
+      // Account → Profile avatar renders <img> when this is truthy, falls
+      // back to the initial letter otherwise.
+      imageUrl: user.imageUrl || "",
       plan:     effective,
       joined:   user.createdAt ? +new Date(user.createdAt) : Date.now(),
       provider: "clerk",
@@ -253,6 +270,59 @@ function ClerkActionsBinder({ onActions }) {
         }
         const data = await res.json();
         return data && data.profile;
+      },
+      // Updates Clerk's first-class identity fields (firstName, lastName).
+      // Unlike publicMetadata, Clerk's frontend SDK is allowed to write
+      // these directly — the user is updating their own name, which Clerk
+      // trusts. ClerkUserSync re-renders app.user from the resulting
+      // useUser() change automatically; callers only need to await for
+      // failure handling.
+      //
+      // Patch shape: { firstName?, lastName? }. Empty strings are valid
+      // (Clerk clears the field). Rejects with the same Error shape as
+      // updateProfile so callers handle errors uniformly.
+      updateIdentity: async (patch) => {
+        if (!clerk.user) {
+          const err = new Error("not_signed_in");
+          err.code = "not_signed_in";
+          throw err;
+        }
+        try {
+          return await clerk.user.update(patch || {});
+        } catch (raw) {
+          const errors = raw && raw.errors;
+          const first = Array.isArray(errors) && errors.length ? errors[0] : null;
+          const err = new Error(
+            (first && first.longMessage) || (first && first.message) || (raw && raw.message) || "update_identity_failed",
+          );
+          err.code = (first && first.code) || (raw && raw.code) || "unknown";
+          err.status = (raw && raw.status) || 0;
+          throw err;
+        }
+      },
+      // Uploads (or clears) the Clerk profile image. Pass a File → upload;
+      // pass null → clear back to the placeholder. Clerk handles the
+      // multipart POST to img.clerk.com internally; we just hand it the
+      // File the user picked. ClerkUserSync re-hydrates app.user.imageUrl
+      // automatically once the SDK's reactive user object updates.
+      setProfileImage: async (file) => {
+        if (!clerk.user) {
+          const err = new Error("not_signed_in");
+          err.code = "not_signed_in";
+          throw err;
+        }
+        try {
+          return await clerk.user.setProfileImage({ file });
+        } catch (raw) {
+          const errors = raw && raw.errors;
+          const first = Array.isArray(errors) && errors.length ? errors[0] : null;
+          const err = new Error(
+            (first && first.longMessage) || (first && first.message) || (raw && raw.message) || "set_profile_image_failed",
+          );
+          err.code = (first && first.code) || (raw && raw.code) || "unknown";
+          err.status = (raw && raw.status) || 0;
+          throw err;
+        }
       },
     });
     return () => onActions(null);
