@@ -148,9 +148,16 @@ def _facts_for_prompt(
     """
 
     def pick_summary(li: dict) -> dict:
-        title = (li.get("title_canonical") or {}).get(locale) \
-            or (li.get("title_canonical") or {}).get("en") \
-            or li.get("title")
+        # Defensive coerce — `title_canonical` is supposed to be a
+        # {en, es} dict but stale rows from the early enrichment pipeline
+        # left a raw string in the field. The render path is guarded by
+        # `_canonical_dict()` in build_issue.py; this prompt-facts builder
+        # had its own copy of the .get-chain that wasn't guarded, so
+        # `'str' object has no attribute 'get'` took out the whole send.
+        # Same fix applied here for consistency.
+        tc_raw = li.get("title_canonical")
+        tc = tc_raw if isinstance(tc_raw, dict) else {}
+        title = tc.get(locale) or tc.get("en") or li.get("title")
         return {
             "rank": li.get("rank"),
             "title": title,

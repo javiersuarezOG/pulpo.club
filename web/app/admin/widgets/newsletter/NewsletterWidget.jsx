@@ -77,24 +77,9 @@ const WIDGET_STYLES = `
   outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
-.nl-preview-widget button.nl-trigger {
-  appearance: none;
-  font: inherit;
-  font-weight: 600;
-  background: var(--accent);
-  color: var(--paper);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  align-self: flex-start;
-  transition: background 120ms ease, border-color 120ms ease;
-}
-.nl-preview-widget button.nl-trigger:hover {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
-}
-.nl-preview-widget button.nl-trigger[disabled] { opacity: 0.55; cursor: not-allowed; }
+/* The nl-trigger class styled the bottom submit button — removed
+   alongside the button itself. The per-row "Send test" buttons in
+   Upcoming Sends use .nl-upcoming-btn (defined further down). */
 
 .nl-preview-widget .nl-hint {
   font-size: 13px;
@@ -394,10 +379,12 @@ export function NewsletterWidget() {
     <>
       <style>{WIDGET_STYLES}</style>
       <div className="nl-preview-widget">
-        <form
-          className="nl-card"
-          onSubmit={(e) => { e.preventDefault(); trigger({}); }}
-        >
+        {/* Was a <form> with a "Send next 3 cohort variants" submit
+            button at the bottom. PR-NL-9 follow-up: the per-row "Send
+            test →" buttons in Upcoming Sends are the only triggers, so
+            the form wrapper became dead weight. Plain <div> means Enter
+            on the email input no longer accidentally fires a preview. */}
+        <div className="nl-card">
           <div>
             <label htmlFor="nl-preview-email">Send test to</label>
             <input
@@ -447,9 +434,10 @@ export function NewsletterWidget() {
             </ul>
           </div>
 
-          <button type="submit" className="nl-trigger" disabled={busy}>
-            {busy ? "Dispatching…" : "Send Pro-with-prefs preview"}
-          </button>
+          {/* Bottom submit button removed — the per-row "Send test →"
+              buttons in Upcoming Sends cover the same intent without
+              forcing the operator to pick between two routes for the
+              same action. */}
 
           {status.kind === "success" && (
             <div className="nl-success" role="status" aria-live="polite">
@@ -490,7 +478,7 @@ export function NewsletterWidget() {
               {status.message}
             </p>
           )}
-        </form>
+        </div>
 
         <p className="nl-hint">
           Triggers the <code>pulpo-newsletter</code> GitHub Actions workflow
