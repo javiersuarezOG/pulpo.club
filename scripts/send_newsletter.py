@@ -33,7 +33,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from automation.newsletter import build_issue, render_html                 # noqa: E402
+from automation.newsletter import (                                        # noqa: E402
+    TEMPLATE_VERSION,
+    build_issue,
+    render_html,
+)
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
     build_recipient_queue,
@@ -186,10 +190,16 @@ def main() -> int:
                 "recipient_hash": recipient.email_hash,
                 "cohort": issue.cohort,
                 "locale": recipient.locale,
+                # LEARNING: discriminator read by api/resend-webhook.js so
+                # newsletter.* lifecycle events in PostHog carry a clean
+                # email_type=newsletter axis (vs activation). See
+                # docs/email-audit.md.
+                "email_type": "newsletter",
             },
             headers_extra={
                 "X-Pulpo-Issue": str(args.issue_number),
                 "X-Pulpo-Recipient": recipient.email_hash,
+                "X-Pulpo-Email-Type": "newsletter",
             },
         )
 
@@ -207,6 +217,16 @@ def main() -> int:
                 "latency_ms": result.latency_ms,
                 "attempt": result.attempt,
             })
+            # New per-recipient event in the email.* namespace. Lets PostHog
+            # slice "sends from template v2.1 to recipient_hash X" without
+            # joining tables. recipient_count carries the batch context so
+            # one event row is self-describing. dry_… ids are intentional
+            # telemetry, not noise — filter on dry_run=true to ignore.
+            _capture("email.newsletter.sent", {
+                "recipient_count": len(queue),
+                "template_version": TEMPLATE_VERSION,
+                "resend_message_id": result.message_id,
+            })
             print(
                 f"  ok  cohort={issue.cohort:<16s} tier={recipient.tier:<6s} "
                 f"id={result.message_id} attempt={result.attempt} {result.latency_ms}ms"
@@ -223,6 +243,19 @@ def main() -> int:
                 "attempt": result.attempt,
                 "latency_ms": result.latency_ms,
             })
+            # GUARDRAIL: cross-flow telemetry sibling to the activation-side
+            # `email.send.failed` in api/_activation_email.js. Same shape:
+            # { flow, error_code, error_message, recipient }. We keep the
+            # newsletter.send_failed event above for dashboard back-compat;
+            # this new event is what cross-flow ops dashboards subscribe to.
+            # See docs/email-audit.md.
+            _capture("email.send.failed", {
+                "flow": "newsletter",
+                "error_code": result.error or "",
+                "error_message": result.error_detail or "",
+                "recipient": recipient.email_hash,
+                "status_code": 0,  # SendResult does not surface HTTP status
+            })
             print(
                 f"  FAIL cohort={issue.cohort:<16s} error={result.error} "
                 f"detail={result.error_detail!r}",
@@ -230,6 +263,22 @@ def main() -> int:
             )
 
     elapsed_ms = int((time.monotonic() - t0) * 1000)
+    # Batch-summary event in the email.* namespace. One row per run with
+    # the whole-batch outcome — letting ops dashboards answer "what's the
+    # latest newsletter send doing?" without aggregating per-recipient
+    # rows. issue_id matches what newsletter.issue_built / send_succeeded
+    # already use so funnels can chain.
+    _capture("email.newsletter.batch_sent", {
+        "issue_number": args.issue_number,
+        "issue_id": issue_date.strftime("%Y-%m-%d"),
+        "recipient_count": len(queue),
+        "sent_count": sent,
+        "failed_count": failed,
+        "template_version": TEMPLATE_VERSION,
+        "dry_run": dry,
+        "preview_mode": preview_mode,
+        "elapsed_ms": elapsed_ms,
+    })
     print(f"[send] done sent={sent} failed={failed} elapsed={elapsed_ms}ms")
     return 0 if failed == 0 else 1
 

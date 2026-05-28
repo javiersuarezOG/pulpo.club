@@ -2578,6 +2578,7 @@ function PlansPage({ app }) {
   // bouncing to a separate page; other errors surface a toast.
   const onUpgrade = () => {
     startStripeCheckout({
+      locale: lc,
       onError: (code) => {
         if (code === "sign_in_required") {
           if (app.user) {

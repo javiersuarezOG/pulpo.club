@@ -81,6 +81,28 @@ function clerkLocaleFromStripe(stripeLocale) {
   return undefined;
 }
 
+async function setStripeCustomerPreferredLocale(stripe, customerId, locale, source, distinctId, t0) {
+  if (!stripe || !customerId || !locale) return;
+  try {
+    await stripe.customers.update(customerId, { preferred_locales: [locale] });
+    posthog.capture(distinctId, "stripe.customer_locale_set", {
+      locale,
+      source,
+      ms: Date.now() - t0,
+    });
+  } catch (err) {
+    logApi("stripe.webhook", {
+      status: 200,
+      reason: "customer_locale_failed",
+      customer_id: customerId,
+      locale,
+      source,
+      error: err && err.message,
+      ms: Date.now() - t0,
+    });
+  }
+}
+
 async function setPlanForClerkUser(clerk, userId, plan, extraPrivate) {
   if (!userId) return;
   await clerk.users.updateUser(userId, {
@@ -298,6 +320,8 @@ module.exports = async (req, res) => {
           utm_content: utms.utm_content || "",
         };
         const distinctId = posthog.emailDistinctId(email);
+        const stripe = stripeClient();
+        await setStripeCustomerPreferredLocale(stripe, customerId, clerkLocale, "checkout", distinctId, t0);
 
         // Alias the client-side anonymous PostHog distinct_id (carried
         // through Stripe session metadata by start-checkout.js) to the
@@ -392,7 +416,6 @@ module.exports = async (req, res) => {
         // for the user. Skip with a 200 if subscription.metadata says
         // we've already processed this event.id. See helpers above for
         // the design rationale.
-        const stripe = stripeClient();
         if (await isStripeEventAlreadyProcessed(stripe, subscriptionId, event.id)) {
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
@@ -704,6 +727,22 @@ module.exports = async (req, res) => {
               ...(subCustomerId ? { stripeCustomerId: subCustomerId } : {}),
               ...(sub.id ? { stripeSubscriptionId: sub.id } : {}),
             });
+          }
+          // Re-stamp Stripe Customer preferred_locales from the locale we
+          // captured at checkout (lives on sub.metadata.locale). Without
+          // this, a user who signed up in Spanish but never touched the
+          // Stripe Customer record afterwards gets English dunning +
+          // receipt emails the first time preferred_locales gets cleared
+          // by another integration or by Stripe Dashboard edits.
+          // Idempotent — same value on every webhook redelivery — and
+          // non-fatal so a Stripe API hiccup never blocks the
+          // subscription lifecycle.
+          const subLocale = clerkLocaleFromStripe(sub.metadata && sub.metadata.locale);
+          if (subCustomerId && subLocale) {
+            await setStripeCustomerPreferredLocale(
+              stripe, subCustomerId, subLocale, "subscription_updated",
+              posthog.emailDistinctId(subEmail), t0,
+            );
           }
         }
         posthog.capture(posthog.emailDistinctId(subEmail), "webhook.subscription_changed", {

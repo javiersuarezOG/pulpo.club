@@ -18,7 +18,7 @@ import { track } from "../telemetry/hook";
 import { captureCampaignParams } from "../lib/campaign";
 import { readFeatureFlag } from "../lib/feature-flag";
 
-export async function startStripeCheckout({ onError } = {}) {
+export async function startStripeCheckout({ onError, locale } = {}) {
   // PR-perf-5c — stamp click time so we can emit perf.stripe_redirect
   // right before window.location.assign. PostHog's sendBeacon path
   // flushes pending events on `beforeunload`, so the event survives the
@@ -32,9 +32,10 @@ export async function startStripeCheckout({ onError } = {}) {
   let body = "{}";
   let hasPromo = false;
   try {
+    const payload = {};
+    if (locale) payload.locale = locale;
     if (readFeatureFlag("promo_code_forwarding_v2", true)) {
       const { urlCode, utms } = captureCampaignParams();
-      const payload = {};
       if (urlCode) {
         payload.promoCode = urlCode;
         hasPromo = true;
@@ -42,13 +43,14 @@ export async function startStripeCheckout({ onError } = {}) {
       for (const [k, v] of Object.entries(utms || {})) {
         if (v) payload[k] = v;
       }
-      if (Object.keys(payload).length > 0) {
-        body = JSON.stringify(payload);
-      }
+    }
+    if (Object.keys(payload).length > 0) {
+      body = JSON.stringify(payload);
     }
   } catch {
-    // Defensive: any read failure → empty body, no regression.
-    body = "{}";
+    // Defensive: any campaign read failure → keep locale if present,
+    // otherwise fall back to an empty body.
+    body = locale ? JSON.stringify({ locale }) : "{}";
     hasPromo = false;
   }
 
