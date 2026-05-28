@@ -133,6 +133,46 @@ describe("pickPostHogProps", () => {
     });
     expect(out.bounce_type).toBe("hard");
   });
+
+  it("extracts email_type from the `email_type` tag", () => {
+    const out = pickPostHogProps("email.delivered", {
+      data: {
+        email_id: "msg_5",
+        tags: [
+          { name: "recipient_hash", value: "abc" },
+          { name: "email_type", value: "activation" },
+        ],
+      },
+    });
+    expect(out.email_type).toBe("activation");
+  });
+
+  it("falls back to `x-pulpo-email-type` header for email_type", () => {
+    const out = pickPostHogProps("email.sent", {
+      data: {
+        email_id: "msg_6",
+        headers: { "x-pulpo-email-type": "newsletter" },
+      },
+    });
+    expect(out.email_type).toBe("newsletter");
+  });
+
+  it("defaults email_type to 'unknown' when neither tag nor header set", () => {
+    const out = pickPostHogProps("email.opened", {
+      data: { email_id: "msg_7" },
+    });
+    expect(out.email_type).toBe("unknown");
+  });
+
+  it("rejects unknown email_type values (defends dashboard axis)", () => {
+    const out = pickPostHogProps("email.sent", {
+      data: {
+        email_id: "msg_8",
+        tags: [{ name: "email_type", value: "marketing_blast_xyz" }],
+      },
+    });
+    expect(out.email_type).toBe("unknown");
+  });
 });
 
 describe("EVENT_MAP", () => {
