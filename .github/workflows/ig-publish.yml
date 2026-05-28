@@ -32,6 +32,14 @@ on:
         description: 'Dry run — log without publishing'
         required: false
         default: 'false'
+      force_day:
+        description: |
+          Force-publish a specific queue day (integer), bypassing the
+          scheduled_for gate.  Used by the "Publish now" button in
+          /admin/ig-review.  Still requires approved + not-posted.
+          Leave blank for the normal next-due selection.
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -78,12 +86,18 @@ jobs:
 
       - name: Publish the next due item
         id: publish
+        env:
+          DRY_RUN:   ${{ github.event.inputs.dry_run }}
+          FORCE_DAY: ${{ github.event.inputs.force_day }}
         run: |
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            python3 -m automation.ig_publish --dry-run
-          else
-            python3 -m automation.ig_publish
+          ARGS=""
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
           fi
+          if [ -n "$FORCE_DAY" ]; then
+            ARGS="$ARGS --force-day $FORCE_DAY"
+          fi
+          python3 -m automation.ig_publish $ARGS
 
       - name: Commit queue mutation
         if: github.event.inputs.dry_run != 'true'
