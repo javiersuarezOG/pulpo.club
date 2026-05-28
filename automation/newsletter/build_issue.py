@@ -503,6 +503,90 @@ def _chips_for_listing(
     return chips[:ISSUE_CHIPS_PER_PICK]
 
 
+def _llm_or_deterministic_story(
+    listing: dict,
+    *,
+    locale: Locale,
+    issue_id: str,
+    llm_client_override: Any = None,
+) -> tuple[str, str]:
+    """Per-pick warm paragraph (PR-NL-6).
+
+    Returns `(story_html, source)` where source ∈
+    {"llm", "deterministic", "fallback_on_error"}.
+
+    Decision tree mirrors `_llm_or_deterministic_commentary`:
+
+      • LLM toggle off → deterministic
+      • LLM cap hit    → deterministic (with one stderr line so the
+        operator notices the cap was reached)
+      • LLM call errored / returned empty → deterministic, source
+        tagged `fallback_on_error` so the operator can grep PostHog
+        for actual quality vs LLM-output rate
+      • Otherwise → LLM paragraph
+
+    The deterministic story is always computed even when LLM is on —
+    cheap, has no side effects, and means we never block hero rendering
+    on the LLM finishing.
+    """
+    locale_safe: Locale = locale if locale in ("en", "es") else "en"
+    fallback = commentary_mod.deterministic_story_for_pick(listing, locale_safe)
+
+    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
+    if not use_llm and llm_client_override is None:
+        _telemetry_capture("newsletter.story_generated", {
+            "issue_id": issue_id,
+            "locale": locale_safe,
+            "source": "deterministic",
+            "source_id": f"{listing.get('source')}:{listing.get('source_id')}",
+        })
+        return (fallback, "deterministic")
+
+    # Stories share the same per-process cap with commentaries — the
+    # `_llm_commentary_count` counter is the runaway-billing guard for
+    # both. Increment before the call so a crash inside llm_story still
+    # counts against the cap.
+    global _llm_commentary_count
+    cap = _llm_commentary_cap()
+    if _llm_commentary_count >= cap and llm_client_override is None:
+        import sys as _sys
+        print(
+            f"[newsletter] LLM story cap reached "
+            f"({_llm_commentary_count}/{cap}); falling back to deterministic. "
+            f"Raise via {LLM_COMMENTARY_CAP_ENV}=N if intentional.",
+            file=_sys.stderr,
+        )
+        _telemetry_capture("newsletter.story_generated", {
+            "issue_id": issue_id,
+            "locale": locale_safe,
+            "source": "deterministic_cap_reached",
+        })
+        return (fallback, "deterministic")
+
+    # Local import — keep the deterministic-only test suite light.
+    from . import llm_story as llm_story_mod
+    _llm_commentary_count += 1
+    result = llm_story_mod.llm_story_for_pick(
+        listing=listing,
+        locale=locale_safe,
+        client_override=llm_client_override,
+    )
+    _telemetry_capture("newsletter.story_generated", {
+        "issue_id": issue_id,
+        "locale": locale_safe,
+        "source": "llm" if result.paragraph else "fallback_on_error",
+        "source_id": f"{listing.get('source')}:{listing.get('source_id')}",
+        "llm_error": result.error,
+        "tokens_in": result.tokens_in,
+        "tokens_out": result.tokens_out,
+        "cost_usd": result.cost_usd,
+        "latency_ms": result.latency_ms,
+    })
+    if result.paragraph:
+        return (result.paragraph, "llm")
+    return (fallback, "fallback_on_error")
+
+
 def _to_pick(
     listing: dict,
     *,
@@ -511,13 +595,33 @@ def _to_pick(
     paywalled: bool,
     site_root: str,
     issue_number: int = 0,
+    is_hero: bool = False,
+    issue_id: str = "",
+    llm_client_override: Any = None,
 ) -> IssuePick:
+    """Build an IssuePick from a Listing dict.
+
+    `is_hero=True` enables PR-NL-6 story_html generation (AI or
+    deterministic). Short picks keep using the legacy `blurb` so this
+    PR doesn't touch their renderer — story_html is hero-only.
+    `issue_id` and `llm_client_override` only matter when is_hero=True.
+    """
     tc = _canonical_dict(listing.get("title_canonical"))
     title = tc.get(locale) or tc.get("en") or listing.get("title") or "Listing"
     price_text, price_note = _format_price(listing, locale)
     callouts = commentary_mod.pick_callouts_for_listing(listing, locale)
     pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
+    story_html, story_source = ("", "")
+    if is_hero and not paywalled:
+        # Paywalled picks render the locked teaser instead of the story —
+        # no point burning LLM tokens on a paragraph the reader never sees.
+        story_html, story_source = _llm_or_deterministic_story(
+            listing,
+            locale=locale,
+            issue_id=issue_id,
+            llm_client_override=llm_client_override,
+        )
     return IssuePick(
         rank=rank,
         source_id=f"{listing.get('source')}:{listing.get('source_id')}",
@@ -537,6 +641,8 @@ def _to_pick(
         pulpo_url=pulpo_url,
         save_url=save_url,
         chips=chips,
+        story_html=story_html,
+        story_source=story_source,
     )
 
 
@@ -606,9 +712,25 @@ def build_issue(
     # see all.
     paywall_all = recipient.tier == "free"
 
+    # Computed once here so hero-pick story generation (PR-NL-6) can
+    # stamp it onto each telemetry event without re-deriving inside the
+    # loop. The downstream `issue_id = issue_date.strftime(...)` later
+    # in this function reuses the same string for the Issue dataclass.
+    issue_id = issue_date.strftime("%Y-%m-%d")
+
     rich_picks: list[IssuePick] = []
     for i, listing in enumerate(kept_listings[:ISSUE_TOP_PICKS_RICH]):
-        rich_picks.append(_to_pick(listing, rank=i + 1, locale=locale, paywalled=paywall_all and i > 0, site_root=site_root, issue_number=issue_number))
+        rich_picks.append(_to_pick(
+            listing,
+            rank=i + 1,
+            locale=locale,
+            paywalled=paywall_all and i > 0,
+            site_root=site_root,
+            issue_number=issue_number,
+            is_hero=True,                          # PR-NL-6 — generate story_html
+            issue_id=issue_id,
+            llm_client_override=llm_client_override,
+        ))
     short_picks: list[IssuePick] = []
     for i, listing in enumerate(kept_listings[ISSUE_TOP_PICKS_RICH:]):
         short_picks.append(_to_pick(listing, rank=ISSUE_TOP_PICKS_RICH + i + 1, locale=locale, paywalled=paywall_all, site_root=site_root, issue_number=issue_number))
@@ -635,7 +757,7 @@ def build_issue(
             "muted": True,
         })
 
-    issue_id = issue_date.strftime("%Y-%m-%d")
+    # issue_id already computed above for hero-pick story telemetry.
     commentary = _llm_or_deterministic_commentary(
         cohort=cohort,
         locale=locale,
