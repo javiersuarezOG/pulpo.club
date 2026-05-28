@@ -22,6 +22,20 @@ from . import i18n
 from .types import Issue, IssuePick, Locale
 
 
+# Bumped whenever the renderer's CSS or layout changes in a way we'd want
+# to slice in PostHog (audience tests, regression hunts, A/B pre-bake).
+# Stays in sync with docs/newsletter-audit.md. Exposed via
+# email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
+# <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
+TEMPLATE_VERSION = "newsletter-v2.1-2026-05"
+
+
+# LEARNING: hex literals live here on purpose. The :root { --paper: … }
+# block below also defines CSS vars for clients that support them, but
+# the source-of-truth values are hex because Outlook desktop + parts of
+# Yahoo strip var() from inline styles. The drift risk vs.
+# web/app/styles/tokens.css is mitigated by TEMPLATE_VERSION above —
+# bump it when these literals are touched.
 _CSS = """
 :root {
   --paper:        #F4EFE6;
@@ -52,7 +66,7 @@ a { color: var(--clay); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; height: auto; border: 0; }
 table { border-collapse: collapse; }
-.wrap   { width: 100%; background: var(--paper); padding: 32px 0; }
+.wrap   { width: 100%; background: var(--paper); padding: 24px 0; }
 .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
 .pad    { padding: 40px 48px; }
 .pad-md { padding: 28px 48px; }
@@ -70,7 +84,7 @@ table { border-collapse: collapse; }
 .rule-clay   { border: 0; border-top: 2px solid var(--clay); width: 56px; margin: 0; }
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--forest);
@@ -109,10 +123,10 @@ table { border-collapse: collapse; }
 .cta {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  padding: 11px 18px;
+  padding: 13px 22px;
   background: var(--button-dark);
   color: var(--button-text) !important;
   border-radius: 999px;
@@ -121,10 +135,10 @@ table { border-collapse: collapse; }
 .cta-ghost {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  padding: 10px 16px;
+  padding: 12px 20px;
   background: transparent;
   color: var(--ink) !important;
   border: 1px solid var(--ink);
@@ -149,12 +163,28 @@ table { border-collapse: collapse; }
 .footer-strip { background: var(--forest); color: var(--paper); }
 .footer-strip .small { color: var(--paper-3); }
 .footer-strip a { color: var(--paper); }
-@media (max-width: 560px) {
-  .pad, .pad-md, .pad-sm { padding-left: 22px; padding-right: 22px; }
-  .h-hero { font-size: 40px; }
-  .h1 { font-size: 30px; }
-  .h2 { font-size: 24px; }
-  .price { font-size: 26px; }
+/* LEARNING: this file uses max-width despite CLAUDE.md mandating
+   min-width in web/app/*. Emails are an inverse world — clients without
+   media-query support (Outlook 2007+, parts of Yahoo) must still receive
+   the baseline, so the baseline is desktop-safe and this query upgrades
+   for narrow widths. 480px matches --bp-sm in tokens.css. */
+@media (max-width: 480px) {
+  .pad, .pad-md, .pad-sm { padding-left: 20px; padding-right: 20px; }
+  .pad    { padding-top: 28px; padding-bottom: 28px; }
+  .pad-md { padding-top: 24px; padding-bottom: 24px; }
+  .h-hero { font-size: 38px; }
+  .h1     { font-size: 28px; }
+  .h2     { font-size: 22px; }
+  .h3     { font-size: 20px; }
+  .body, .body-2 { font-size: 16px; line-height: 1.6; }
+  .lede   { font-size: 16.5px; line-height: 1.55; }
+  .price  { font-size: 24px; }
+  .price-2 { font-size: 19px; }
+  .cta, .cta-ghost { padding: 14px 22px; font-size: 14px; }
+  /* Footer links get vertical tap targets on narrow widths so the three
+     options no longer collide at 320px. The &middot; separators stay so
+     legacy / no-CSS clients still get the comma-style read. */
+  .footer-strip a { display: inline-block; padding: 6px 4px; }
 }
 """
 
@@ -198,13 +228,15 @@ def _keytable_html(rows: list[tuple[str, str]]) -> str:
 def _photo_html(pick: IssuePick) -> str:
     if not pick.photo_url:
         return ""
-    return f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title)}" width="680" />'
+    alt = pick.title or "Pulpo listing photo"
+    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="680" />'
 
 
 def _photo_html_short(pick: IssuePick) -> str:
     if not pick.photo_url:
         return ""
-    return f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title)}" width="100%" />'
+    alt = pick.title or "Pulpo listing photo"
+    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="100%" />'
 
 
 def _new_pill(pick: IssuePick, locale: Locale) -> str:
@@ -251,8 +283,8 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     )
 
     return f"""
-    <tr><td style="padding: 36px 0 0 0;">{_photo_html(pick)}</td></tr>
-    <tr><td class="pad" style="padding-top: 28px;">
+    <tr><td style="padding: 32px 0 0 0;">{_photo_html(pick)}</td></tr>
+    <tr><td class="pad" style="padding-top: 24px;">
       <div>{pills_html}</div>
       <h2 class="h1">{_e(pick.title)}</h2>
       <div class="meta" style="margin: 6px 0 16px;">{_e(pick.location_line)}</div>
@@ -352,9 +384,9 @@ def _skip_block_html(issue: Issue) -> str:
     headline = issue.commentary.skip_headline or sp.title
     blurb = issue.commentary.skip_blurb or sp.blurb
     return f"""
-    <tr><td class="pad" style="padding-top: 36px;">
+    <tr><td class="pad" style="padding-top: 32px;">
       <hr class="rule" />
-      <div style="margin-top: 28px;">
+      <div style="margin-top: 24px;">
         <div class="eyebrow clay">{_e(eb)}</div>
         <h2 class="h1">{_e(headline)}</h2>
         <div class="meta" style="margin: 6px 0 16px; color: var(--clay);">{_e(sp.price_text)} · {_e(sp.location_line)}</div>
@@ -373,7 +405,7 @@ def _market_html(issue: Issue) -> str:
     hl = i18n.t("market.headline", locale)
     para_html = "".join(f'<p class="body">{_e(p)}</p>' for p in paras)
     return f"""
-    <tr><td class="pad" style="background: var(--paper-2); padding-top: 36px; padding-bottom: 36px;">
+    <tr><td class="pad" style="background: var(--paper-2); padding-top: 32px; padding-bottom: 32px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(hl)}</h2>
       {para_html}
@@ -389,7 +421,7 @@ def _one_number_html(issue: Issue) -> str:
     eb = i18n.t("one_number.eyebrow", issue.locale)
     body_html = f'<p class="body">{_e(body)}</p>' if body else ""
     return f"""
-    <tr><td class="pad" style="padding-top: 36px;">
+    <tr><td class="pad" style="padding-top: 32px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(title)}</h2>
       {body_html}
@@ -437,7 +469,7 @@ def _next_issue_html(issue: Issue) -> str:
         cta_label = i18n.t("next.cta", locale)
         href = issue.settings_url
     return f"""
-    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 36px;">
+    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 32px;">
       <hr class="rule" />
       <div style="margin-top: 24px;">
         <div class="eyebrow">{_e(eb)}</div>
@@ -462,9 +494,9 @@ def render_html(issue: Issue) -> str:
         sl_hl = i18n.t("shortlist.headline", locale, n=len(issue.picks_shortlist))
         sl_lede = i18n.t("shortlist.lede", locale)
         shortlist_header = f"""
-        <tr><td class="pad" style="padding-top: 36px; padding-bottom: 4px;">
+        <tr><td class="pad" style="padding-top: 32px; padding-bottom: 4px;">
           <hr class="rule" />
-          <div style="margin-top: 28px;">
+          <div style="margin-top: 24px;">
             <div class="eyebrow">{_e(sl_eb)}</div>
             <h2 class="h1">{_e(sl_hl)}</h2>
             <p class="body-2" style="margin-top: 8px; max-width: 480px;">{_e(sl_lede)}</p>
@@ -491,7 +523,7 @@ def render_html(issue: Issue) -> str:
         """
 
     hero_block = f"""
-    <tr><td class="pad" style="padding-top: 56px; padding-bottom: 36px;">
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 32px;">
       <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
       <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
       <hr class="rule-clay" style="margin: 8px 0 22px;" />
@@ -532,6 +564,7 @@ def render_html(issue: Issue) -> str:
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="x-pulpo-template" content="{_e(TEMPLATE_VERSION)}" />
 <title>{_e(head_title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

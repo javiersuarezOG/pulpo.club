@@ -153,3 +153,14 @@ def test_render_smoke_all_cohorts(pro_with_prefs, free_with_prefs, logged_no_pre
         assert "</html>" in html
         # Always carries a working unsubscribe link
         assert "/unsubscribe?r=" in html
+
+
+def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
+    """Every rendered issue carries the TEMPLATE_VERSION in a <meta> tag so
+    PostHog telemetry can be cross-referenced against the source HTML when
+    debugging a regression. Bump TEMPLATE_VERSION in lockstep with
+    docs/newsletter-audit.md when CSS or layout changes meaningfully."""
+    from automation.newsletter.render_html import TEMPLATE_VERSION
+    html = _render(pro_with_prefs, ranked_pool)
+    assert TEMPLATE_VERSION  # non-empty
+    assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
