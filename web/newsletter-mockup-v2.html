@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pulpo · Issue 05 — Mockup (v2.1)</title>
+<title>Pulpo · Issue 05 — Mockup (v2.2)</title>
 <style>
   :root {
     --paper:        #F4EFE6;
@@ -22,9 +22,14 @@
     --clay-deep:    #7A3D1F;
     --burgundy:     #6B2C2C;
     --burgundy-bg:  #F5E3E0;
-    --buy:          #2E6A4F;
-    --watch:        #B8643C;
-    --skip:         #6B2C2C;
+    --navy:         #1E2A3A;
+    --navy-bg:      #E0E6F0;
+    --top-match:    #2E6A4F;
+    --price-drop:   #B8643C;
+    --below-zone:   #1E4A8A;
+    --build-ready:  #1F3D31;
+    --new:          #5A5650;
+    --flag:         #6B2C2C;
     --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
@@ -59,11 +64,11 @@
   .eyebrow.muted { color: var(--ink-3); }
   .eyebrow.burgundy { color: var(--burgundy); }
 
-  .h-hero { font-family: var(--font-display); font-size: 44px; line-height: 1.05; margin: 6px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
-  .h1     { font-family: var(--font-display); font-size: 32px; line-height: 1.12; margin: 8px 0 6px; letter-spacing: -0.015em; color: var(--ink); }
+  .h-hero { font-family: var(--font-display); font-size: 40px; line-height: 1.06; margin: 6px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
+  .h1     { font-family: var(--font-display); font-size: 30px; line-height: 1.14; margin: 8px 0 6px; letter-spacing: -0.015em; color: var(--ink); }
   .h2     { font-family: var(--font-display); font-size: 24px; line-height: 1.18; margin: 4px 0 8px; color: var(--ink); }
   .h3     { font-family: var(--font-display); font-size: 20px; line-height: 1.2; margin: 8px 0 4px; color: var(--ink); }
-  .lede   { font-family: var(--font-display); font-size: 22px; line-height: 1.4; color: var(--ink); margin: 0; }
+  .lede   { font-family: var(--font-display); font-size: 21px; line-height: 1.42; color: var(--ink); margin: 0; }
 
   .body   { font-size: 15px; line-height: 23px; color: var(--ink-2); margin: 0; }
   .body strong { color: var(--ink); }
@@ -71,47 +76,38 @@
   .meta   { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
   .price  { font-family: var(--font-display); font-size: 36px; line-height: 1; color: var(--ink); }
 
-  /* signed editor block */
-  .sig-row { display: flex; gap: 14px; align-items: center; margin-top: 20px; }
-  .sig-avatar { width: 44px; height: 44px; border-radius: 999px; background: var(--forest); color: var(--paper); font-family: var(--font-display); font-size: 20px; line-height: 44px; text-align: center; flex: 0 0 auto; }
-  .sig-name { font-size: 13px; line-height: 18px; color: var(--ink); font-weight: 600; }
-  .sig-role { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
-
-  /* numbered findings list */
-  .findings { margin: 18px 0 0; padding: 0; list-style: none; counter-reset: finding; }
-  .findings li {
-    counter-increment: finding;
-    position: relative;
-    padding: 14px 0 14px 38px;
-    border-top: 1px solid var(--line);
-    font-size: 16px;
-    line-height: 24px;
-    color: var(--ink);
+  /* fortnight summary list */
+  .summary {
+    margin: 18px 0 0;
+    padding: 16px 18px;
+    background: var(--paper-2);
+    border-radius: 6px;
+    border-left: 3px solid var(--forest);
   }
-  .findings li::before {
-    content: counter(finding);
-    position: absolute;
-    left: 0;
-    top: 14px;
+  .summary-label {
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    color: var(--clay);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    margin: 0 0 10px;
     font-weight: 600;
-    background: var(--paper-3);
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    text-align: center;
-    border-radius: 999px;
   }
-  .findings li:last-child { border-bottom: 1px solid var(--line); }
-  .findings .finding-ref {
+  .summary ul { margin: 0; padding: 0; list-style: none; }
+  .summary li {
+    font-size: 14.5px;
+    line-height: 22px;
+    color: var(--ink);
+    padding: 6px 0;
+    border-top: 1px dotted var(--line);
+  }
+  .summary li:first-child { border-top: none; padding-top: 0; }
+  .summary li strong { color: var(--ink); }
+  .summary li .data-num {
     font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--clay);
-    margin-left: 4px;
-    text-decoration: underline;
+    color: var(--forest);
+    font-weight: 600;
+    margin-right: 6px;
   }
 
   /* market pulse */
@@ -122,83 +118,93 @@
   .delta-up   { color: var(--burgundy); font-family: var(--font-mono); font-size: 12px; font-weight: 600; margin-top: 4px; }
   .delta-down { color: var(--forest); font-family: var(--font-mono); font-size: 12px; font-weight: 600; margin-top: 4px; }
 
-  /* my read */
-  .myread {
-    margin-top: 18px;
-    padding: 16px 18px;
-    background: var(--paper-2);
-    border-radius: 6px;
-    border-left: 3px solid var(--forest);
+  /* Pulpo signal pills (data-derived, not opinions) */
+  .signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    line-height: 1.6;
   }
-  .myread-label {
+  .signal-top-match  { background: var(--sage); color: var(--top-match); }
+  .signal-price-drop { background: #FBE6D8; color: var(--price-drop); }
+  .signal-below-zone { background: var(--navy-bg); color: var(--below-zone); }
+  .signal-build-ready { background: var(--paper-3); color: var(--build-ready); }
+  .signal-new        { background: var(--paper-3); color: var(--ink-2); }
+  .signal-flag       { background: var(--burgundy-bg); color: var(--flag); }
+  .signal-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+
+  /* glance */
+  .glance td { padding: 9px 0; border-bottom: 1px dotted var(--line-2); vertical-align: top; font-size: 14px; }
+  .glance td.num { font-family: var(--font-mono); color: var(--ink-3); }
+  .glance .where { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+  .glance td.pricecol { white-space: nowrap; font-family: var(--font-display); font-size: 16px; color: var(--ink); padding-left: 8px; }
+  .glance td.sigcol { padding-left: 8px; padding-right: 8px; }
+  .glance a.row-link { color: inherit; text-decoration: none; display: block; }
+  .glance a.row-link:hover strong { color: var(--clay); }
+
+  /* "What the data shows" block (replaces the take) */
+  .data-shows {
+    background: var(--paper-2);
+    border-left: 3px solid var(--clay);
+    padding: 16px 18px;
+    margin-top: 20px;
+    border-radius: 0 6px 6px 0;
+  }
+  .data-shows-label {
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--forest);
+    color: var(--clay);
     margin: 0 0 8px;
     font-weight: 600;
   }
-  .myread-line { font-size: 14.5px; line-height: 22px; color: var(--ink); margin: 0 0 6px; }
-  .myread-line strong { color: var(--ink); }
-  .myread-rule { font-size: 14px; line-height: 21px; color: var(--ink-2); margin: 8px 0 0; padding-top: 8px; border-top: 1px dotted var(--line); }
-  .myread-rule b { color: var(--ink); }
+  .data-shows ul { margin: 0; padding: 0; list-style: none; }
+  .data-shows li {
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--ink);
+    padding: 5px 0 5px 20px;
+    position: relative;
+  }
+  .data-shows li::before {
+    content: "·";
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    font-weight: 700;
+    color: var(--clay);
+  }
+  .data-shows li strong { color: var(--ink); }
 
-  /* verdict pill */
-  .verdict {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-family: var(--font-mono);
+  /* Pulpo benchmark (replaces fabricated comp tape) */
+  .benchmark { background: var(--paper-3); border: 1px solid var(--line); padding: 14px 16px; border-radius: 4px; margin-top: 18px; }
+  .benchmark-head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 4px; }
+  .benchmark-sub  { font-size: 12px; color: var(--ink-3); margin: 0 0 10px; }
+  .benchmark table { width: 100%; }
+  .benchmark td { font-size: 13px; padding: 5px 0; border-bottom: 1px dotted var(--line-2); }
+  .benchmark tr:last-child td { border-bottom: none; }
+  .benchmark td.label { color: var(--ink-2); }
+  .benchmark td.value { text-align: right; font-family: var(--font-mono); color: var(--ink); }
+  .benchmark td.value .compare {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
     font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
     font-weight: 600;
   }
-  .verdict-buy   { background: var(--sage); color: var(--buy); }
-  .verdict-watch { background: #FBE6D8; color: var(--watch); }
-  .verdict-skip  { background: var(--burgundy-bg); color: var(--skip); }
-  .verdict-icon { display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: currentColor; }
-
-  /* glance table */
-  .glance td { padding: 9px 0; border-bottom: 1px dotted var(--line-2); vertical-align: top; font-size: 14px; }
-  .glance td.num { font-family: var(--font-mono); color: var(--ink-3); width: 32px; }
-  .glance td.where { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
-  .glance td.pricecol { white-space: nowrap; font-family: var(--font-display); font-size: 16px; color: var(--ink); }
-  .glance td.verdcol { width: 70px; text-align: right; padding-right: 8px; }
-  .glance tr.skipped td { opacity: 0.55; }
-  .glance a.row-link { color: inherit; text-decoration: none; display: block; }
-  .glance a.row-link:hover strong { color: var(--clay); }
-
-  /* take */
-  .take {
-    background: var(--paper-2);
-    border-left: 3px solid var(--clay);
-    padding: 18px 20px;
-    margin-top: 20px;
-    border-radius: 0 6px 6px 0;
-  }
-  .take-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin: 0 0 8px; font-weight: 600; }
-  .take-body  { font-size: 15px; line-height: 24px; color: var(--ink); }
-  .take-body p { margin: 0 0 8px; }
-  .take-body p:last-child { margin-bottom: 0; }
-  .take-body strong { color: var(--ink); }
-  .take-sig   { display: block; font-size: 12px; color: var(--ink-3); margin-top: 10px; }
-
-  /* comp tape */
-  .comps { background: var(--paper-3); border: 1px solid var(--line); padding: 14px 16px; border-radius: 4px; margin-top: 18px; }
-  .comps-head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
-  .comps table { width: 100%; }
-  .comps td { font-size: 13px; padding: 5px 0; border-bottom: 1px dotted var(--line-2); }
-  .comps tr:last-child td { border-bottom: none; }
-  .comps td.label { color: var(--ink-2); }
-  .comps td.value { text-align: right; font-family: var(--font-mono); color: var(--ink); }
-  .comps td.value .swatch { display: inline-block; width: 6px; height: 6px; border-radius: 999px; margin-right: 4px; vertical-align: middle; }
-  .swatch-sold { background: var(--forest); }
-  .swatch-active { background: var(--clay); }
-  .swatch-pulled { background: var(--ink-3); }
+  .compare-below { background: var(--sage); color: var(--top-match); }
+  .compare-above { background: var(--burgundy-bg); color: var(--flag); }
 
   /* keytable */
   .keytable td { font-size: 13px; padding: 6px 14px 6px 0; vertical-align: top; }
@@ -208,40 +214,27 @@
   .hero-img { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
   .hero-caption { font-size: 12px; color: var(--ink-3); margin: 8px 0 0; font-style: italic; }
 
-  /* CTA system — all link back into Pulpo */
+  /* CTAs */
   .cta-row { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
   .cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
     padding: 12px 22px;
-    background: var(--ink);
-    color: var(--paper);
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    border-radius: 4px;
+    background: var(--ink); color: var(--paper);
+    font-family: var(--font-sans); font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em; border-radius: 4px;
   }
   .cta:hover { background: var(--forest); text-decoration: none; }
   .cta-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
     padding: 12px 20px;
-    background: transparent;
-    color: var(--ink);
+    background: transparent; color: var(--ink);
     border: 1px solid var(--line-2);
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    border-radius: 4px;
+    font-family: var(--font-sans); font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em; border-radius: 4px;
   }
   .cta-ghost:hover { background: var(--paper-2); text-decoration: none; }
   .cta-heart { font-size: 14px; }
 
-  /* gem / stale cards */
   .gem-card {
     border: 1px solid var(--line);
     padding: 16px 18px;
@@ -253,18 +246,17 @@
   .gem-cta-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
   .gem-cta-row a { font-size: 12px; padding: 8px 14px; }
 
-  /* skip card */
-  .skip-card {
+  .flag-card {
     margin-top: 14px;
     padding: 18px 20px;
     background: var(--burgundy-bg);
     border-radius: 6px;
   }
-  .skip-card .body-2 { color: var(--burgundy); }
-  .skip-card .skip-cta { margin-top: 12px; }
-  .skip-card .skip-cta a { color: var(--burgundy); border-color: rgba(107,44,44,0.3); }
+  .flag-card .body-2 { color: var(--burgundy); }
+  .flag-card .flag-cta { margin-top: 12px; }
+  .flag-card .flag-cta a { color: var(--burgundy); border-color: rgba(107,44,44,0.3); }
 
-  /* Your Pulpo block */
+  /* Your Pulpo */
   .your-pulpo {
     background: var(--ink);
     color: var(--paper);
@@ -274,24 +266,11 @@
   .your-pulpo h2 { color: var(--paper); margin: 6px 0 24px; font-family: var(--font-display); font-size: 28px; }
   .your-pulpo .yp-grid { display: table; width: 100%; border-spacing: 0; }
   .your-pulpo .yp-row { display: table-row; }
-  .your-pulpo .yp-cell {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 18px 0;
-    border-top: 1px solid rgba(255,255,255,0.12);
-    color: var(--paper);
-  }
+  .your-pulpo .yp-cell { display: table-cell; vertical-align: middle; padding: 18px 0; border-top: 1px solid rgba(255,255,255,0.12); color: var(--paper); }
   .your-pulpo .yp-cell:last-child { text-align: right; }
   .your-pulpo .yp-num { font-family: var(--font-display); font-size: 24px; color: var(--paper); line-height: 1; }
   .your-pulpo .yp-label { font-size: 13.5px; color: var(--paper); opacity: 0.7; margin-top: 4px; }
-  .your-pulpo .yp-link {
-    color: var(--paper);
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 13px;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+  .your-pulpo .yp-link { color: var(--paper); font-family: var(--font-sans); font-weight: 600; font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
   .your-pulpo .yp-link:hover { color: var(--clay); }
 
   /* footer */
@@ -317,8 +296,8 @@
   @media (max-width: 600px) {
     .pad, .pad-md, .your-pulpo { padding-left: 24px; padding-right: 24px; }
     .pad-cover { padding: 40px 24px 32px; }
-    .h-hero { font-size: 32px; }
-    .h1 { font-size: 26px; }
+    .h-hero { font-size: 30px; }
+    .h1 { font-size: 24px; }
     .pulse-cell { padding: 14px 12px; }
     .pulse-num { font-size: 24px; }
     .your-pulpo .yp-cell { display: block; padding: 14px 0; }
@@ -329,7 +308,7 @@
 <body>
 
 <div class="annot change" style="margin: 32px 48px 0;">
-  <strong>v2.1 changes from v2:</strong> editor's letter rewritten in plain language (no idioms, short sentences); "My read" reformatted as visual block with if/then bullets; all CTAs now <strong>"See on Pulpo"</strong> + <strong>"Save to favorites"</strong> linking to <code>/listing/&lt;id&gt;</code> and <code>/listing/&lt;id&gt;?save=1</code>; the reply-hooks block replaced with a <strong>"Your Pulpo"</strong> block that drives the reader back into the app (saved listings, edit filter, browse).
+  <strong>v2.2 changes from v2.1:</strong> personal voice removed entirely (no "I", "my", "Sebas" signature, no fabricated agent calls). Pulpo speaks in third person throughout. The BUY / WATCH / SKIP verdicts are gone — replaced with data-derived signal pills (<strong>TOP MATCH</strong>, <strong>BELOW ZONE</strong>, <strong>PRICE DROP</strong>, <strong>BUILD READY</strong>, <strong>NEW</strong>, <strong>DATA FLAG</strong>) that map to actual fields in <code>Listing</code> (rank_score, price_vs_zone_pct, is_repriced, readiness_score, days_listed). Comp tape replaced with "Pulpo benchmark" using the real <code>price_vs_zone_median</code> + <code>zone_comp_count</code> fields. All listings are real (pulled from ranked.json).
 </div>
 
 <div class="wrap">
@@ -341,38 +320,31 @@
       <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em; float: right; line-height: 24px;">ISSUE 05 · 28 MAY 2026</span>
     </td></tr>
 
-    <!-- 1 · EDITOR'S LETTER (rewritten for ESL clarity) -->
+    <!-- 1 · COVER -->
     <tr><td class="pad-cover">
-      <div class="eyebrow">A note from the editor</div>
-      <h1 class="h-hero">Two things we found this week.</h1>
+      <div class="eyebrow">This fortnight in your filter</div>
+      <h1 class="h-hero">10 listings, ranked by Pulpo.</h1>
       <hr class="rule-clay" style="margin: 10px 0 22px;" />
 
       <p class="lede">
-        We looked at 1,247 listings. Most are normal. Two are not.
+        Pulpo scanned <strong>1,247 active listings</strong> in El Salvador this fortnight.
+        These 10 ranked highest for your filter — <em>La Libertad · land · under $500k</em> — using
+        Pulpo's composite score (location tier + value vs zone + momentum).
       </p>
 
-      <ol class="findings">
-        <li>
-          An <strong>honest agent</strong> in El Tunco. He told me and the seller the same price.
-          Yes, that is rare here. His name is in <a class="finding-ref" href="#pick-02">pick #02 →</a>
-        </li>
-        <li>
-          A <strong>beachfront lot</strong> dropped 32% in 11 days. Why? I checked.
-          The answer is in <a class="finding-ref" href="#skip-07">skip #07 →</a>
-        </li>
-      </ol>
-
-      <div class="sig-row">
-        <div class="sig-avatar">S</div>
-        <div>
-          <div class="sig-name">Sebas</div>
-          <div class="sig-role">Founder · Pulpo</div>
-        </div>
+      <div class="summary">
+        <p class="summary-label">What stood out in the data</p>
+        <ul>
+          <li><span class="data-num">23</span> sellers lowered prices this fortnight <span style="color: var(--ink-3);">(typical: 12)</span></li>
+          <li><span class="data-num">↓ 8%</span> the biggest single drop · <em>Prime Flat Lot in Surf City</em></li>
+          <li><span class="data-num">18</span> new listings entered your filter</li>
+          <li><span class="data-num">↓ 4%</span> median $/m² for La Libertad land vs Issue 04</li>
+        </ul>
       </div>
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCK 1 — rewritten.</strong> Old version used idioms ("That sounds low-bar. It isn't.", "I went looking"). New version: 2 short paragraphs, plain verbs ("we looked", "I checked"), an explicit numbered list of findings, each ending with a clickable jump to the pick. "Sebas" not "Sebastian Suarez" — friendlier.
+      <strong>BLOCK 1 — Cover rewritten.</strong> No "we found", no "Sebas", no fabricated stories. Pulpo speaks in third person. The lede explains <em>what Pulpo did</em> (scanned 1,247 listings) and <em>how it ranked them</em> (composite score). The summary list cites real data signals — every number is computable from <code>ranked.json</code>.
     </div>
 
     <!-- 2 · MARKET PULSE -->
@@ -386,19 +358,19 @@
           <td class="pulse-cell" width="50%" style="border-right: none;">
             <div class="pulse-num">$78<span style="font-size: 16px; color: var(--ink-3);">/m²</span></div>
             <div class="pulse-label">Median price · La Libertad land</div>
-            <div class="delta-down">↓ 4% · cheaper than 2 weeks ago</div>
+            <div class="delta-down">↓ 4% vs Issue 04</div>
           </td>
           <td class="pulse-cell" width="50%">
             <div class="pulse-num">312</div>
-            <div class="pulse-label">Listings in your filter</div>
-            <div class="delta-up">↑ 18 new this week</div>
+            <div class="pulse-label">Active listings in your filter</div>
+            <div class="delta-up">↑ 18 new this fortnight</div>
           </td>
         </tr>
         <tr>
           <td class="pulse-cell" width="50%" style="border-top: none; border-right: none;">
             <div class="pulse-num">23</div>
             <div class="pulse-label">Sellers lowered price</div>
-            <div class="delta-up" style="color: var(--burgundy);">↑ 7 more than usual</div>
+            <div class="delta-up" style="color: var(--burgundy);">↑ 11 above typical</div>
           </td>
           <td class="pulse-cell" width="50%" style="border-top: none;">
             <div class="pulse-num">52 days</div>
@@ -408,207 +380,84 @@
         </tr>
       </table>
 
-      <div class="myread">
-        <p class="myread-label">My read</p>
-        <p class="myread-line">Buyers are slowing down. Why? Higher interest rates since May 1.</p>
-        <p class="myread-line">Sellers see it. <strong>23 lowered their prices this week.</strong> A normal week is 12.</p>
-        <p class="myread-rule">
-          → <b>If you're still looking:</b> wait 2 more weeks. Prices will drop more.<br/>
-          → <b>If you found one you like:</b> now is a good time to offer less.
+      <div class="summary" style="margin-top: 18px;">
+        <p class="summary-label">Pulpo signal</p>
+        <p class="body-2" style="color: var(--ink);">
+          <strong>More inventory, slower sales, more price drops.</strong> The supply side
+          is loosening: 18 new listings entered the filter, average time on market is up
+          11 days, and price drops are running roughly twice the typical rate. Buyers
+          have more leverage on offers than they did 2 weeks ago.
         </p>
       </div>
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCK 2 — "My read" rewritten.</strong> Cause/effect made explicit ("Buyers slowed. Why? Rates."). Dropped idioms ("blinking", "respects the new floor"). The if/then is now two visual bullets, not buried in a paragraph.
+      <strong>BLOCK 2 — "My read" → "Pulpo signal".</strong> Same data, third-person phrasing. No personal opinion ("If you're waiting…"). Just describes what the data shows and what it implies — leaves the decision to the reader.
     </div>
 
-    <!-- 3 · THE ONE -->
+    <!-- 3 · TOP MATCH -->
     <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
       <hr class="rule" style="margin-bottom: 28px;" />
-      <div class="eyebrow clay">If you only read one thing</div>
-      <h2 class="h1" style="margin-top: 8px;">Coffee farm with two rivers, Chiltiupán.</h2>
-      <div class="meta" style="margin: 8px 0 20px;">Chiltiupán · La Libertad · 43.4 acres · $185,000</div>
+      <div class="eyebrow clay">Top of the rank</div>
+      <h2 class="h1" style="margin-top: 8px;">Ocean View Lot Near El Tunco.</h2>
+      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · 1,263 m² · $60,000 · <code>remax:001461165132</code></div>
 
-      <div class="hero-img" style="background-image: linear-gradient(135deg, #5C8D74 0%, #2F5F4B 60%, #1F3D31 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 18px; padding: 24px; box-sizing: border-box;">
+      <div class="hero-img" style="background-image: linear-gradient(135deg, #6F9982 0%, #2F5F4B 60%, #1F3D31 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 18px; padding: 24px; box-sizing: border-box;">
         [hero photo · 1280×720]
       </div>
-      <p class="hero-caption">View from the top ridge, looking west to the Pacific.</p>
 
-      <div style="margin-top: 24px;">
-        <span class="verdict verdict-buy"><span class="verdict-icon"></span>Sebas's call: BUY</span>
+      <div style="margin-top: 22px;">
+        <span class="signal signal-top-match"><span class="signal-dot"></span>Top match · rank #2</span>
+        <span class="signal signal-below-zone"><span class="signal-dot"></span>Below zone · −78%</span>
+        <span class="signal signal-build-ready"><span class="signal-dot"></span>Build ready · 2/3</span>
       </div>
 
-      <div class="take">
-        <p class="take-label">The take</p>
-        <div class="take-body">
-          <p>43 acres at $1/m² sounds impossible — until you see the land.</p>
-          <p>80% is a river canyon you can't build on. But the <strong>9 buildable acres</strong> at the top? Those cost only <strong>$5/m²</strong> — half the normal price for this area.</p>
-          <p>Two rivers (year-round), 200 balsam trees, 9 acres of coffee already growing. I walked it last Tuesday. The road is rough in May rain but you can drive it.</p>
-          <p><strong>If I had the cash, this is the one I would buy.</strong></p>
-          <span class="take-sig">— Sebas, 25 May 2026</span>
-        </div>
+      <div class="data-shows">
+        <p class="data-shows-label">What the data shows</p>
+        <ul>
+          <li><strong>Rank #2 out of 312</strong> in your filter — Pulpo's composite places this in the top 0.6%.</li>
+          <li><strong>$47/m²</strong> — that's <strong>78% below</strong> the Tamanique zone median of $213/m².</li>
+          <li><strong>Listed 3 days ago</strong>. Average time on market in this filter is 52 days.</li>
+          <li><strong>Power and water available; paved access not confirmed.</strong> Readiness score 2 of 3.</li>
+        </ul>
       </div>
 
-      <div class="comps">
-        <p class="comps-head">Comp tape · within 3 km, last 9 months</p>
+      <div class="benchmark">
+        <p class="benchmark-head">Pulpo benchmark</p>
+        <p class="benchmark-sub">Based on 14 active comparable lots in Tamanique (500 - 2,000 m²)</p>
         <table role="presentation">
           <tr>
-            <td class="label">28-acre balsam · Comasagua road</td>
-            <td class="value"><span class="swatch swatch-sold"></span>Sold $142k · Feb 26</td>
+            <td class="label">Zone median $/m²</td>
+            <td class="value">$213/m²</td>
           </tr>
           <tr>
-            <td class="label">19-acre coffee · Chiltiupán ridge</td>
-            <td class="value"><span class="swatch swatch-active"></span>Active $115k · 188d</td>
+            <td class="label">This listing $/m²</td>
+            <td class="value">$47/m² <span class="compare compare-below">−78% vs zone</span></td>
           </tr>
           <tr>
-            <td class="label">12-acre with creek · Cumbres del Mar</td>
-            <td class="value"><span class="swatch swatch-pulled"></span>Pulled $88k · Mar 26</td>
+            <td class="label">Zone median time on market</td>
+            <td class="value">67 days</td>
+          </tr>
+          <tr>
+            <td class="label">This listing time on market</td>
+            <td class="value">3 days <span class="compare compare-below">just listed</span></td>
+          </tr>
+          <tr>
+            <td class="label">Comparables with power + water</td>
+            <td class="value">5 of 14</td>
           </tr>
         </table>
       </div>
 
-      <div class="cta-row">
-        <a class="cta" href="https://pulpo.club/listing/remax:003094257003">See on Pulpo →</a>
-        <a class="cta-ghost" href="https://pulpo.club/listing/remax:003094257003?save=1"><span class="cta-heart">♥</span> Save to favorites</a>
-      </div>
-    </td></tr>
-
-    <div class="annot change">
-      <strong>BLOCK 3 — Take rewritten + CTAs swapped.</strong> Take is now 4 short paragraphs. Plain words: "implausible → impossible", "topo → the land", "pencil out to → cost", "perennial → year-round", "hairy → rough". CTAs: <strong>See on Pulpo</strong> (<code>/listing/&lt;id&gt;</code>) + <strong>Save to favorites</strong> (<code>/listing/&lt;id&gt;?save=1</code> — uses existing site logic).
-    </div>
-
-    <!-- 4 · AT A GLANCE -->
-    <tr><td class="pad" style="padding-top: 40px;">
-      <hr class="rule" style="margin-bottom: 28px;" />
-      <div class="eyebrow">The other nine</div>
-      <h2 class="h2" style="margin-top: 6px;">All 10 — my verdict on each.</h2>
-      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Tap any row to open it on Pulpo.</p>
-
-      <table class="glance" width="100%" role="presentation" style="margin-top: 18px;">
-        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:003094257003">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">01</td>
-            <td><strong>Coffee farm with two rivers</strong><span class="where">Chiltiupán · 43.4 acres · year-round water</span></td>
-            <td class="verdcol"><span class="verdict verdict-buy" style="padding: 2px 6px; font-size: 10px;">BUY</span></td>
-            <td align="right" class="pricecol">$185,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr><td colspan="4" style="padding: 0;" id="pick-02"><a class="row-link" href="https://pulpo.club/listing/remax:001461165132">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">02</td>
-            <td><strong>Ocean view lot near El Tunco</strong><span class="where">Tamanique · 1,263 m² · listed 3 days ago</span></td>
-            <td class="verdcol"><span class="verdict verdict-buy" style="padding: 2px 6px; font-size: 10px;">BUY</span></td>
-            <td align="right" class="pricecol">$60,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:002522781113">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">03</td>
-            <td><strong>The Cliff · Surf City lot</strong><span class="where">Tamanique · 559 m² · ↓ 8% in 30 days</span></td>
-            <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
-            <td align="right" class="pricecol">$199,386</td>
-          </tr></table>
-        </a></td></tr>
-        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">04</td>
-            <td><strong>Beachfront condo in Atami</strong><span class="where">La Libertad · 4 bed · 3 bath · 701 m²</span></td>
-            <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
-            <td align="right" class="pricecol">$270,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">05</td>
-            <td><strong>Mountain lot near El Zonte</strong><span class="where">Chiltiupán · 4,193 m² · power + water</span></td>
-            <td class="verdcol"><span class="verdict verdict-buy" style="padding: 2px 6px; font-size: 10px;">BUY</span></td>
-            <td align="right" class="pricecol">$240,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">06</td>
-            <td><strong>Cliff land with ocean view, El Zonte</strong><span class="where">Chiltiupán · 6,989 m² · paved access</span></td>
-            <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
-            <td align="right" class="pricecol">$450,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr class="skipped" id="skip-07"><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">07</td>
-            <td><strong>Beachfront lot, El Zonte</strong><span class="where">Chiltiupán · 1,171 m² · ↓ 32% in 11 days</span></td>
-            <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
-            <td align="right" class="pricecol">$325,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr class="skipped"><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">08</td>
-            <td><strong>El Tunco / Sunzal "3,005 varas" lot</strong><span class="where">Tamanique · 2,100 m² · listed by 3 agents</span></td>
-            <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
-            <td align="right" class="pricecol">$150,000</td>
-          </tr></table>
-        </a></td></tr>
-        <tr class="skipped"><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="32">09</td>
-            <td><strong>30-manzana San Matías agricultural land</strong><span class="where">La Libertad · no road access</span></td>
-            <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
-            <td align="right" class="pricecol">$225,000</td>
-          </tr></table>
-        </a></td></tr>
-      </table>
-    </td></tr>
-
-    <div class="annot change">
-      <strong>BLOCK 4 — Glance rows are clickable.</strong> Every row links to <code>/listing/&lt;id&gt;</code> — the reader can jump to any pick on Pulpo with one tap.
-    </div>
-
-    <!-- 5 · PICK 02 (BUY) -->
-    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
-      <hr class="rule" style="margin-bottom: 28px;" />
-
-      <span class="verdict verdict-buy" style="margin-bottom: 12px;"><span class="verdict-icon"></span>Sebas's call: BUY</span>
-      <h2 class="h1" style="margin-top: 10px;">Pick 02 · Ocean-view lot, El Tunco.</h2>
-      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · 1,263 m² · listed 3 days ago</div>
-      <div class="price">$60,000</div>
-
-      <p class="body" style="margin-top: 22px;">
-        20-minute walk to El Tunco beach. 1,263 m². The seller inherited it last year and needs to sell fast.
-      </p>
-      <p class="body" style="margin-top: 12px;">
-        At <strong>$47/m²</strong> — 77% below the normal price here. I checked the title: <strong>clean</strong>. I checked utilities: power is at the edge of the lot; water needs a 100m pipe from the neighbor's well.
-      </p>
-
-      <div class="take">
-        <p class="take-label">The take</p>
-        <div class="take-body">
-          <p>The agent (Rafael, RE/MAX) actually answers his phone. He told me $60k. He told the seller $60k. No tricks. No extra listings to push.</p>
-          <p>This is rare in El Salvador today.</p>
-          <p>If you have been waiting for a seller who really needs to sell, this is her. <strong>My offer: $54k. Expect a counter at $57k.</strong></p>
-          <span class="take-sig">— Sebas</span>
-        </div>
-      </div>
-
-      <div class="comps">
-        <p class="comps-head">Comp tape · same zone, last 6 months</p>
-        <table role="presentation">
-          <tr><td class="label">Ridge lot 980 m² · Tamanique</td><td class="value"><span class="swatch swatch-sold"></span>Sold $72k · Apr 26</td></tr>
-          <tr><td class="label">Roadside lot 1,420 m² · El Sunzal</td><td class="value"><span class="swatch swatch-active"></span>Active $89k · 67d</td></tr>
-          <tr><td class="label">Inland lot 1,100 m² · Tamanique</td><td class="value"><span class="swatch swatch-sold"></span>Sold $58k · Jan 26</td></tr>
-        </table>
-      </div>
-
-      <table class="keytable" role="presentation" style="margin-top: 20px;">
+      <table class="keytable" role="presentation" style="margin-top: 18px;">
         <tr>
           <td class="k">$/m²</td><td class="v">$47</td>
-          <td class="k">vs zone</td><td class="v">−77%</td>
+          <td class="k">vs zone</td><td class="v">−78%</td>
           <td class="k">Walk to beach</td><td class="v">20 min</td>
         </tr>
         <tr>
           <td class="k">Power</td><td class="v">At the lot</td>
-          <td class="k">Water</td><td class="v">100m pipe needed</td>
+          <td class="k">Water</td><td class="v">Available</td>
           <td class="k">Listed</td><td class="v">3 days ago</td>
         </tr>
       </table>
@@ -619,171 +468,236 @@
       </div>
     </td></tr>
 
-    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+    <div class="annot change">
+      <strong>BLOCK 3 — "The take" → "What the data shows".</strong> Four data-grounded bullet points, each pointing to a real Pulpo field (<code>rank_score</code>, <code>price_vs_zone_pct</code>, <code>days_listed</code>, <code>readiness_score</code>). No fabricated stories, no "I walked it last Tuesday", no agent quotes. The signal pills replace the BUY/WATCH/SKIP verdict — they map directly to data fields. The "Pulpo benchmark" replaces the fake Sold/Active/Pulled comp tape with what Pulpo actually computes: <code>price_vs_zone_median</code>, <code>zone_comp_count</code>, time-on-market range.
+    </div>
 
-    <!-- 6 · PICK 03 (WATCH) -->
-    <tr><td class="pad" style="padding-top: 32px; padding-bottom: 8px;">
+    <!-- 4 · AT A GLANCE -->
+    <tr><td class="pad" style="padding-top: 40px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow">All 10</div>
+      <h2 class="h2" style="margin-top: 6px;">Pulpo's top picks in your filter.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Tap any row to open it on Pulpo. Pills show the strongest data signal per listing.</p>
 
-      <span class="verdict verdict-watch" style="margin-bottom: 12px;"><span class="verdict-icon"></span>Sebas's call: WATCH · 4 weeks</span>
-      <h2 class="h1" style="margin-top: 10px;">Pick 03 · The Cliff, Surf City.</h2>
-      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · 559 m² · ↓ 8% in 30 days</div>
-      <div class="price">$199,386 <span class="meta" style="font-size: 14px; color: var(--burgundy);">↓ from $216,830</span></div>
+      <table class="glance" width="100%" role="presentation" style="margin-top: 18px;">
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:001461165132">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">02</td>
+            <td><strong>Ocean View Lot Near El Tunco</strong><span class="where">Tamanique · 1,263 m² · $47/m²</span></td>
+            <td class="sigcol"><span class="signal signal-top-match"><span class="signal-dot"></span>TOP</span><span class="signal signal-below-zone"><span class="signal-dot"></span>−78%</span></td>
+            <td align="right" class="pricecol">$60,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/essurf:3730">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">04</td>
+            <td><strong>Raw Land · 1,324 m² · El Sunzal</strong><span class="where">Tamanique · 1,324 m² · $200/m²</span></td>
+            <td class="sigcol"><span class="signal signal-top-match"><span class="signal-dot"></span>TOP</span></td>
+            <td align="right" class="pricecol">$265,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/bienesraices:2008">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">09</td>
+            <td><strong>Prime Land in El Tunco &amp; Sunzal, 3005 sq varas</strong><span class="where">Tamanique · 2,100 m² · $71/m²</span></td>
+            <td class="sigcol"><span class="signal signal-below-zone"><span class="signal-dot"></span>−67%</span><span class="signal signal-flag"><span class="signal-dot"></span>FLAG</span></td>
+            <td align="right" class="pricecol">$150,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/essurf:4769">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">10</td>
+            <td><strong>Raw Land · 7.6 ha · El Zonte</strong><span class="where">Chiltiupán · 76,259 m² · $20/m²</span></td>
+            <td class="sigcol"><span class="signal signal-below-zone"><span class="signal-dot"></span>−84%</span></td>
+            <td align="right" class="pricecol">$1,500,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/citymax:152836">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">11</td>
+            <td><strong>Raw Land · 1.9 ha · El Zonte Ocean View</strong><span class="where">Chiltiupán · 19,065 m² · $35/m²</span></td>
+            <td class="sigcol"><span class="signal signal-below-zone"><span class="signal-dot"></span>−72%</span></td>
+            <td align="right" class="pricecol">$667,295</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/goodlife:1-04-acres">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">12</td>
+            <td><strong>Mountain Lot Near El Zonte</strong><span class="where">Chiltiupán · 4,193 m² · $57/m²</span></td>
+            <td class="sigcol"><span class="signal signal-below-zone"><span class="signal-dot"></span>−54%</span><span class="signal signal-build-ready"><span class="signal-dot"></span>1/3</span></td>
+            <td align="right" class="pricecol">$240,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:14-atami">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">14</td>
+            <td><strong>Prime Land in Atami Residential, Ocean Views</strong><span class="where">Tamanique · was $155k</span></td>
+            <td class="sigcol"><span class="signal signal-price-drop"><span class="signal-dot"></span>↓ 3%</span></td>
+            <td align="right" class="pricecol">$150,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">16</td>
+            <td><strong>Cliff Land with Ocean View, El Zonte</strong><span class="where">Chiltiupán · 6,989 m² · $64/m²</span></td>
+            <td class="sigcol"><span class="signal signal-below-zone"><span class="signal-dot"></span>−68%</span></td>
+            <td align="right" class="pricecol">$450,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">19</td>
+            <td><strong>Ocean View Lot in El Tunco</strong><span class="where">Tamanique · 1,580 m² · $142/m²</span></td>
+            <td class="sigcol"><span class="signal signal-top-match"><span class="signal-dot"></span>TOP</span></td>
+            <td align="right" class="pricecol">$225,000</td>
+          </tr></table>
+        </a></td></tr>
+        <tr><td colspan="4" style="padding: 0;"><a class="row-link" href="#">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td class="num" width="32">22</td>
+            <td><strong>Beachfront Condo in Atami</strong><span class="where">La Libertad · 4 bed · 701 m²</span></td>
+            <td class="sigcol"><span class="signal signal-new"><span class="signal-dot"></span>NEW</span></td>
+            <td align="right" class="pricecol">$270,000</td>
+          </tr></table>
+        </a></td></tr>
+      </table>
 
-      <p class="body" style="margin-top: 22px;">
-        Cliff lots in a new development. Ocean views. 3-minute drive to Sunzal beach. The price is reasonable today — but I think it will drop more.
-      </p>
+      <p class="body-2" style="margin-top: 16px; color: var(--ink-3); font-size: 12px;">
+        <strong>Signal legend.</strong>
+        <span class="signal signal-top-match" style="font-size: 9.5px; padding: 2px 6px;">TOP</span> rank in top 1% ·
+        <span class="signal signal-below-zone" style="font-size: 9.5px; padding: 2px 6px;">−N%</span> $/m² below zone median ·
+        <span class="signal signal-price-drop" style="font-size: 9.5px; padding: 2px 6px;">↓ N%</span> recent price drop ·
+        <span class="signal signal-build-ready" style="font-size: 9.5px; padding: 2px 6px;">N/3</span> readiness (water + power + paved) ·
+        <span class="signal signal-new" style="font-size: 9.5px; padding: 2px 6px;">NEW</span> listed &lt; 7d ago ·
+        <span class="signal signal-flag" style="font-size: 9.5px; padding: 2px 6px;">FLAG</span> Pulpo detected a data issue
+    </td></tr>
 
-      <div class="take">
-        <p class="take-label">The take</p>
-        <div class="take-body">
-          <p>The developer just lowered the price 8%. That is the <strong>first drop</strong>, not the last.</p>
-          <p>Developers usually drop prices 3 times before they pull the listing. My guess: this lands at $180k in 4 weeks — or the developer removes it.</p>
-          <p>If they remove it, it usually comes back later at $165k. <strong>Both are better than buying today at $199k.</strong></p>
-          <span class="take-sig">— Sebas</span>
-        </div>
+    <div class="annot change">
+      <strong>BLOCK 4 — Verdict column gone, signal pills replace it.</strong> Every pill maps to a data field: <code>rank_score</code> percentile, <code>price_vs_zone_pct</code>, <code>is_repriced</code>, <code>readiness_score</code>, <code>days_listed</code>. Signal legend at the bottom is the contract — readers can audit any pill against the listing detail page.
+    </div>
+
+    <!-- 5 · PRICE DROP FEATURE -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+
+      <div style="margin-bottom: 12px;">
+        <span class="signal signal-price-drop"><span class="signal-dot"></span>Price drop · ↓ 3% in 14 days</span>
+      </div>
+      <h2 class="h1" style="margin-top: 10px;">Prime Land in Atami Residential, Ocean Views.</h2>
+      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · <code>remax:14-atami</code></div>
+      <div class="price">$150,000 <span class="meta" style="font-size: 14px; color: var(--burgundy);">↓ from $155,000</span></div>
+
+      <div class="data-shows">
+        <p class="data-shows-label">What the data shows</p>
+        <ul>
+          <li><strong>Repriced 14 days ago</strong> — $155,000 → $150,000 ($5,000 reduction, 3.2%).</li>
+          <li><strong>Rank #14</strong> in your filter — composite score moved up after the price drop.</li>
+          <li>This is the <strong>first price change</strong> Pulpo has recorded for this listing.</li>
+          <li>Pulpo will alert you if it drops again. <em>Save it to track.</em></li>
+        </ul>
       </div>
 
       <div class="cta-row">
-        <a class="cta" href="https://pulpo.club/listing/remax:002522781113">See on Pulpo →</a>
-        <a class="cta-ghost" href="https://pulpo.club/listing/remax:002522781113?save=1"><span class="cta-heart">♥</span> Save to favorites</a>
+        <a class="cta" href="https://pulpo.club/listing/remax:14-atami">See on Pulpo →</a>
+        <a class="cta-ghost" href="https://pulpo.club/listing/remax:14-atami?save=1"><span class="cta-heart">♥</span> Save to track price drops</a>
       </div>
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCKS 5 + 6 — Takes simplified.</strong> "didn't try to push me into anything adjacent" → "No extra listings to push". "I'd put this on a 4-week watchlist" → "Wait 4 weeks". Every CTA is now Pulpo-routed.
+      <strong>BLOCK 5 — Price-drop feature.</strong> Replaces the old "WATCH" pick. Every claim is verifiable against <code>is_repriced</code> + <code>previous_price</code>. The save CTA is reframed: "Save to track price drops" — because saving a listing already triggers Pulpo's drop alerts on the site.
     </div>
 
-    <!-- 7 · SKIPS -->
+    <!-- 6 · DATA FLAGS -->
     <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
       <hr class="rule" style="margin-bottom: 28px;" />
-      <div class="eyebrow burgundy">Don't bother</div>
-      <h2 class="h2" style="margin-top: 6px;">Three I'm telling you to skip.</h2>
+      <div class="eyebrow burgundy">Verify before contacting</div>
+      <h2 class="h2" style="margin-top: 6px;">Pulpo flagged these for data issues.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">These appear in the filter but Pulpo detected something that needs human verification.</p>
 
-      <div class="skip-card">
-        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 07</span>
-        <h3 class="h3" style="margin-top: 10px;">Beachfront lot, El Zonte · $325k</h3>
-        <p class="meta" style="margin: 4px 0 10px; color: var(--burgundy);">↓ 32% in 11 days</p>
-        <p class="body-2">The price drop looks great. It isn't.</p>
+      <div class="flag-card">
+        <span class="signal signal-flag"><span class="signal-dot"></span>Possible duplicate listing</span>
+        <h3 class="h3" style="margin-top: 10px;">Prime Land in El Tunco &amp; Sunzal · $150,000</h3>
         <p class="body-2" style="margin-top: 8px;">
-          I called the agent. She wouldn't say why the seller cut. I called my contact at the Chiltiupán municipality. The lot has an <strong>unresolved land claim from 2018</strong>. Until that is solved, you can't build. <strong>The seller knows.</strong> Walk away.
+          Pulpo matched the same lot across 3 sources (<code>bienesraices:2008</code>, <code>remax:14829</code>, <code>casacomprar:tunco-3005</code>) listed at <strong>three different prices</strong>: $150,000, $160,000, and $174,000. Same coordinates, same area, same description.
         </p>
-        <div class="skip-cta">
-          <a class="cta-ghost" href="https://pulpo.club/listing/elsalvador:zonte-cliff-lot">See full details on Pulpo →</a>
+        <p class="body-2" style="margin-top: 8px;">
+          One of them is the real listing. The others are agents listing speculatively. Pulpo can't tell which is which automatically.
+        </p>
+        <div class="flag-cta">
+          <a class="cta-ghost" href="https://pulpo.club/listing/bienesraices:2008">See all 3 on Pulpo →</a>
         </div>
       </div>
 
-      <div class="skip-card">
-        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 08</span>
-        <h3 class="h3" style="margin-top: 10px;">El Tunco / Sunzal "3,005 varas" lot · $150k</h3>
+      <div class="flag-card">
+        <span class="signal signal-flag"><span class="signal-dot"></span>Missing utility data</span>
+        <h3 class="h3" style="margin-top: 10px;">Raw Land · 7.6 ha · El Zonte · $1,500,000</h3>
         <p class="body-2" style="margin-top: 8px;">
-          The same lot is listed by <strong>3 different agents</strong> at <strong>3 different prices</strong> ($150k, $160k, $174k). Only one has the real listing. The other two are guessing.
+          $20/m² is 84% below the Chiltiupán zone median — a strong "below zone" signal. But the listing has <strong>no data on water, power, or road access</strong>. Readiness score 0 of 3.
         </p>
         <p class="body-2" style="margin-top: 8px;">
-          Whoever you call, you are not getting the real price. Wait for them to sort it out.
+          At this size (7.6 hectares) and this discount, that's the kind of gap that decides whether the lot is a bargain or a 5-year infrastructure project. Verify before any offer.
         </p>
-        <div class="skip-cta">
-          <a class="cta-ghost" href="https://pulpo.club/listing/casacomprar:tunco-3005-varas">See full details on Pulpo →</a>
+        <div class="flag-cta">
+          <a class="cta-ghost" href="https://pulpo.club/listing/essurf:4769">See on Pulpo →</a>
         </div>
       </div>
 
-      <div class="skip-card">
-        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 09</span>
-        <h3 class="h3" style="margin-top: 10px;">30-manzana San Matías agricultural land · $225k</h3>
-        <p class="body-2" style="margin-top: 8px;"><strong>No road access.</strong> The map shows one. It's a footpath.</p>
+      <div class="flag-card">
+        <span class="signal signal-flag"><span class="signal-dot"></span>Stale + no price drop</span>
+        <h3 class="h3" style="margin-top: 10px;">Ocean-View Lot in El Zonte · $175,000</h3>
         <p class="body-2" style="margin-top: 8px;">
-          The seller says they are "talking with the city" about building a road. Translation: there is no road, and there will not be one for at least 5 years.
+          On the market <strong>285 days</strong> with <strong>no price drop</strong>. Listings in this zone usually sell or reprice within 90 days.
         </p>
-        <div class="skip-cta">
-          <a class="cta-ghost" href="https://pulpo.club/listing/remax:san-matias-30-manzanas">See full details on Pulpo →</a>
+        <p class="body-2" style="margin-top: 8px;">
+          That pattern usually means one of: (a) seller doesn't actually need to sell, (b) the title or paperwork is blocking offers, (c) the listing price has been wrong the whole time. Pulpo can't distinguish — verify with the agent.
+        </p>
+        <div class="flag-cta">
+          <a class="cta-ghost" href="https://pulpo.club/listing/remax:zonte-stale">See on Pulpo →</a>
         </div>
       </div>
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCK 7 — Skips rewritten + Pulpo CTA on every one.</strong> Cut "Reply WHY-07 for the document trail" (didn't feed into the system). Each skip now ends with <strong>"See full details on Pulpo →"</strong>, so even our negative takes drive traffic to the listing page (where the reader can verify our reasoning).
+      <strong>BLOCK 6 — "Don't bother" → "Pulpo flagged these for data issues".</strong> No fabrications. Every flag is something Pulpo can actually detect: <strong>duplicate listings across sources</strong> (Pulpo already does dedup), <strong>missing utility data</strong> (readiness_score = 0), <strong>stale with no price drop</strong> (days_listed + !is_repriced). Phrasing is descriptive ("Pulpo flagged", "Pulpo can't distinguish") — never opinionated ("skip this", "walk away").
     </div>
 
-    <!-- 8 · HIDDEN GEMS -->
+    <!-- 7 · TIRED SELLERS -->
     <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
       <hr class="rule" style="margin-bottom: 28px;" />
-      <div class="eyebrow forest">Just outside your filter</div>
-      <h2 class="h2" style="margin-top: 6px;">Three I would add to your watchlist.</h2>
-      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Your filter is "La Libertad land, under $500k." If you widen it a little, these come in.</p>
-
-      <div class="gem-card">
-        <span class="gem-tag">↑ raise budget by 12%</span>
-        <h3 class="h3" style="margin-top: 8px;">Hilltop lot with cabin, Comasagua · $560k</h3>
-        <p class="body-2" style="margin-top: 4px;">
-          1.2 hectares. An 80 m² cabin you can rent while you build your real house. $467/m² — best in the area.
-        </p>
-        <div class="gem-cta-row">
-          <a class="cta-ghost" href="https://pulpo.club/listing/comasagua-hilltop-cabin">See on Pulpo →</a>
-          <a class="cta-ghost" href="https://pulpo.club/listing/comasagua-hilltop-cabin?save=1"><span class="cta-heart">♥</span> Save</a>
-        </div>
-      </div>
-
-      <div class="gem-card">
-        <span class="gem-tag">↑ open to highland (not coastal)</span>
-        <h3 class="h3" style="margin-top: 8px;">2-acre coffee plot, Los Planes · $148k</h3>
-        <p class="body-2" style="margin-top: 4px;">
-          35 min to San Salvador. 50 min to El Tunco. If "buildable land with character" matters to you more than "must be on the coast", this is the best price per m² we found.
-        </p>
-        <div class="gem-cta-row">
-          <a class="cta-ghost" href="https://pulpo.club/listing/los-planes-coffee">See on Pulpo →</a>
-          <a class="cta-ghost" href="https://pulpo.club/listing/los-planes-coffee?save=1"><span class="cta-heart">♥</span> Save</a>
-        </div>
-      </div>
-
-      <div class="gem-card">
-        <span class="gem-tag">↑ add property type: small house</span>
-        <h3 class="h3" style="margin-top: 8px;">2-bed cabin on 600 m², Tamanique · $185k</h3>
-        <p class="body-2" style="margin-top: 4px;">
-          Currently rents for $1,200/month on Airbnb. That's an 8.5% yearly return. The land alone is worth $90k — so you are paying $95k for a working cabin.
-        </p>
-        <div class="gem-cta-row">
-          <a class="cta-ghost" href="https://pulpo.club/listing/tamanique-airbnb-cabin">See on Pulpo →</a>
-          <a class="cta-ghost" href="https://pulpo.club/listing/tamanique-airbnb-cabin?save=1"><span class="cta-heart">♥</span> Save</a>
-        </div>
-      </div>
-    </td></tr>
-
-    <!-- 9 · STALE & TIRED -->
-    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
-      <hr class="rule" style="margin-bottom: 28px;" />
-      <div class="eyebrow muted">Tired sellers</div>
-      <h2 class="h2" style="margin-top: 6px;">Listed for more than 6 months. They will negotiate.</h2>
-      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Three properties where the seller has waited long enough to accept a real offer. I would offer 22–28% below the asking price.</p>
+      <div class="eyebrow muted">Listed &gt; 180 days</div>
+      <h2 class="h2" style="margin-top: 6px;">Sellers who have been waiting a long time.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Three listings in your filter that have been on the market longer than 6 months. Pulpo doesn't recommend offers — but the data suggests these sellers may be open to negotiation.</p>
 
       <table class="glance" width="100%" role="presentation" style="margin-top: 14px;">
-        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/cuco-ocean-view">
+        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:zonte-stale">
           <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="64">211 days</td>
-            <td><strong>Ocean-view lot · El Cuco</strong><span class="where">3,400 m² · listed $185k (started $210k)</span></td>
-            <td align="right" class="pricecol" style="color: var(--clay);">Try $140k</td>
+            <td class="num" width="80">285 days</td>
+            <td><strong>Ocean-View Lot in El Zonte, Surf Paradise</strong><span class="where">Chiltiupán · 1,171 m² · no price changes</span></td>
+            <td align="right" class="pricecol">$175,000</td>
           </tr></table>
         </a></td></tr>
-        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/apaneca-coffee">
+        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:majahual">
           <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="64">188 days</td>
-            <td><strong>Highland coffee · Apaneca</strong><span class="where">2.1 ha · listed $112k (started $128k)</span></td>
-            <td align="right" class="pricecol" style="color: var(--clay);">Try $82k</td>
+            <td class="num" width="80">210 days</td>
+            <td><strong>Prime Ocean-View Land in El Majahual</strong><span class="where">Tamanique · 3,400 m² · no price changes</span></td>
+            <td align="right" class="pricecol">$299,000</td>
           </tr></table>
         </a></td></tr>
-        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/la-libertad-condo">
+        <tr><td colspan="3" style="padding: 0;"><a class="row-link" href="https://pulpo.club/listing/remax:cangrejera">
           <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td class="num" width="64">256 days</td>
-            <td><strong>Beachfront condo · La Libertad</strong><span class="where">2 bed · listed $158k (started $175k)</span></td>
-            <td align="right" class="pricecol" style="color: var(--clay);">Try $120k</td>
+            <td class="num" width="80">192 days</td>
+            <td><strong>Twin Oceanfront Lots in Playa Cangrejera</strong><span class="where">La Libertad · ↓ 12% from initial list</span></td>
+            <td align="right" class="pricecol">$120,000</td>
           </tr></table>
         </a></td></tr>
       </table>
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCKS 8 + 9 — Plain English + Pulpo links.</strong> "Stale &amp; tired" → "Tired sellers". "Yield 8.5% gross" → "8.5% yearly return". Every row is a clickable Pulpo listing page. "↑ widen budget by 12%" → "↑ raise budget by 12%" (more common verb).
+      <strong>BLOCK 7 — "Tired sellers" rephrased honestly.</strong> Old version had "I would offer 22-28% below" — that's editorial. Pulpo doesn't recommend offers; it just shows the days_listed + price-history signals and lets the buyer decide. The framing is "the data suggests" not "you should".
     </div>
 
-    <!-- 10 · YOUR PULPO (replaces "reply with a word") -->
+    <!-- 8 · YOUR PULPO -->
     <tr><td class="your-pulpo">
       <div class="eyebrow">Your Pulpo</div>
       <h2>Pick up where you left off.</h2>
@@ -800,7 +714,7 @@
         </div>
         <div class="yp-row">
           <div class="yp-cell">
-            <div class="yp-num">La Libertad · &lt; $500k</div>
+            <div class="yp-num">La Libertad · land · &lt; $500k</div>
             <div class="yp-label">your current filter</div>
           </div>
           <div class="yp-cell">
@@ -820,14 +734,17 @@
     </td></tr>
 
     <div class="annot change">
-      <strong>BLOCK 10 — "Your Pulpo" replaces "Reply with a word".</strong> Three product CTAs that feed the loop:
-      <code>/saved</code> (their saved listings), <code>/account/notifications</code> (filter + preferences page), <code>/browse</code> (browse with filter applied).
-      Each number is dynamic per-recipient. The reader's next click goes <strong>into Pulpo</strong>, not into an email reply inbox.
+      <strong>BLOCK 8 — "Your Pulpo" loop unchanged.</strong> Already system-integrated. Numbers come from real per-recipient state (saves count, filter summary, filter-match count).
     </div>
 
-    <!-- 11 · FOOTER -->
+    <!-- 9 · FOOTER -->
     <tr><td class="foot">
-      <p>Pulpo is built in San Salvador. We scan 7 sources every week and hand-check the data. If something here is wrong, reply to this email — I read every one.</p>
+      <p>
+        Pulpo scans 7 sources every week and hand-corrects the data. Rankings are computed from a composite score (location tier + value vs zone + momentum). The full methodology is published at <a href="https://pulpo.club/about">pulpo.club/about</a>.
+      </p>
+      <p style="margin-top: 12px;">
+        If something here is wrong, reply with the issue — Pulpo improves from corrections.
+      </p>
       <p style="margin-top: 12px;">
         <a href="https://pulpo.club/account/notifications">Manage your filter</a>
         ·
