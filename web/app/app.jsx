@@ -755,6 +755,7 @@ function App() {
       // for users who actually intended to upgrade.
       import("./auth/stripe-checkout.js").then(({ startStripeCheckout }) => {
         startStripeCheckout({
+          locale,
           onError: (code) => {
             // sign_in_required shouldn't happen here (we just signed
             // in), but if it does, swallow rather than re-prompting.

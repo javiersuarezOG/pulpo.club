@@ -1,8 +1,16 @@
-// POST /api/newsletter  { email, source } -> 200 { ok: true }
-// GET  /api/newsletter                    -> 405
+// POST /api/newsletter  { email, source, locale? } -> 200 { ok: true }
+// GET  /api/newsletter                              -> 405
 //
 // Subscribes an email to the Resend Audience that powers the
 // rewrite's hero "Get the 10 best" form (NewHomePage / Hero.jsx).
+//
+// `locale` (optional, ∈ {"en","es"}, default "en") is persisted on the
+// Resend contact via the `first_name` field using the strict prefix
+// "pulpo-locale:<lc>". The newsletter dispatcher parses this back so
+// anonymous subscribers (no matching Clerk user) receive the issue in
+// the language they signed up in instead of always defaulting to English.
+// Resend's `first_name` is not rendered in our newsletter templates —
+// see docs/email-audit.md and automation/newsletter/subscribers.py.
 //
 // Required env vars (set in Vercel project settings):
 //   RESEND_API_KEY      — re_… secret from https://resend.com/api-keys
@@ -86,6 +94,20 @@ function checkRateLimit(ip) {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Locales the newsletter dispatcher knows how to render. Anything outside
+// this set is coerced back to "en" at subscribe time so the side-channel
+// can never persist garbage into the Resend contact first_name field.
+const SUPPORTED_LOCALES = new Set(["en", "es"]);
+
+function pickLocale(raw) {
+  if (typeof raw !== "string") return "en";
+  const lc = raw.trim().toLowerCase();
+  if (!lc) return "en";
+  if (lc === "es" || lc.startsWith("es-")) return "es";
+  if (lc === "en" || lc.startsWith("en-")) return "en";
+  return SUPPORTED_LOCALES.has(lc) ? lc : "en";
+}
+
 function emailDomain(email) {
   const at = email.lastIndexOf("@");
   if (at < 0) return "unknown";
@@ -140,6 +162,7 @@ module.exports = async (req, res) => {
   body = body || {};
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const source = typeof body.source === "string" ? body.source : "unknown";
+  const locale = pickLocale(body.locale);
 
   if (!email || !EMAIL_RE.test(email)) {
     logApi({
@@ -177,9 +200,18 @@ module.exports = async (req, res) => {
   // already_subscribed response so the Hero shows the "welcome back"
   // success copy.
   try {
+    // LEARNING: locale side-channel via the Resend `first_name` field.
+    // Pulpo's newsletter templates render `display_name` from Clerk's
+    // first_name, NOT from Resend's — so this field is free for us to
+    // use as a structured tag. The strict prefix "pulpo-locale:<lc>" is
+    // parsed by automation/newsletter/subscribers.py to set the anonymous
+    // recipient's locale. Contacts predating this change carry an empty
+    // first_name and default to "en" exactly as before. See
+    // docs/email-audit.md "Anonymous-subscriber locale gap".
     const result = await client.contacts.create({
       audienceId,
       email,
+      first_name: `pulpo-locale:${locale}`,
       unsubscribed: false,
     });
     // SDK error shape: { data: null, error: { name, message } } per
@@ -215,6 +247,7 @@ module.exports = async (req, res) => {
       status: 200, ms: Date.now() - t0,
       domain: emailDomain(email),
       source,
+      locale,
     });
     return res.status(200).json({ ok: true });
   } catch (err) {

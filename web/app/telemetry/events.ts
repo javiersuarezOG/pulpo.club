@@ -781,6 +781,21 @@ export type EventMap = {
    *  that the portal-return reload actually surfaced the new state
    *  (e.g. canceling display after a cancel click). */
   "account.sub_portal_return": { had_period_end: boolean };
+  "account.sub_portal_clicked": {
+    locale: string;
+    display: "active" | "canceling" | "canceled" | "past_due" | "grace" | string;
+  };
+  "account.sub_portal_return_state_changed": {
+    from_display: string;
+    to_display: string;
+    attempts_to_change: number;
+    ms_to_change: number;
+  };
+  "account.sub_portal_return_stale": {
+    display: string;
+    attempts: number;
+    waited_ms: number;
+  };
 
   // ───── Manage subscription (Stripe Customer Portal) ─────
   // Fires when the Pro user clicks "Manage plan" on the Account page,
@@ -820,6 +835,24 @@ export type EventMap = {
     document_uri?: string;
     source_file?: string;
     line_number?: number;
+  };
+  "stripe.billing_portal_session_created": {
+    locale: string;
+    has_period_end: boolean;
+    session_id?: string;
+    ms?: number;
+  };
+  "stripe.checkout_session_created": {
+    locale: string;
+    session_id?: string;
+    has_promo?: boolean;
+    promo_succeeded?: boolean | null;
+    ms?: number;
+  };
+  "stripe.customer_locale_set": {
+    locale: string;
+    source: "checkout" | "portal" | string;
+    ms?: number;
   };
 
   // ───── Locale ─────

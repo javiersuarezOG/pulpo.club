@@ -56,7 +56,7 @@ class ValidationResult:
 # `_KNOWN_COUNTRY_NAMES` map below is the only change needed for a
 # 9th+ country to slot in.
 _KNOWN_COUNTRY_NAMES: dict[str, tuple[str, ...]] = {
-    "SV": ("el.salvador", "salvador"),
+    "SV": ("el.salvador", "salvador"),  # multi-country-exempt: source-of-truth for the dynamic exclusion regex; must list every country
     "GT": ("guatemala",),
     "HN": ("honduras",),
     "CR": ("costa.?rica",),

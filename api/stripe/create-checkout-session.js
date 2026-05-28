@@ -24,6 +24,7 @@ const posthog = require("../_posthog");
 const { makeRateLimiter, send429 } = require("../_rate_limit");
 
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+const SUPPORTED_LOCALES = new Set(["en", "es"]);
 
 // Per-Clerk-user rate limit. The endpoint is auth-gated, so abuse is
 // bounded to an authenticated account, but each call mints a fresh
@@ -39,6 +40,12 @@ const checkoutLimiter = makeRateLimiter({
 
 function safeStr(v) {
   return typeof v === "string" ? v : "";
+}
+
+function normalizeCheckoutLocale(value) {
+  const lc = safeStr(value).trim().toLowerCase();
+  if (!SUPPORTED_LOCALES.has(lc)) return null;
+  return lc === "es" ? "es-419" : "en";
 }
 
 async function readJsonBody(req) {
@@ -126,6 +133,7 @@ module.exports = async (req, res) => {
   // Telemetry records `succeeded: false` so the funnel still sees it.
   const body = await readJsonBody(req);
   const promoCode = safeStr(body.promoCode).trim().toUpperCase();
+  const locale = normalizeCheckoutLocale(body.locale);
   const utms = {};
   for (const k of UTM_KEYS) {
     const v = safeStr(body[k]).slice(0, 100);
@@ -169,8 +177,9 @@ module.exports = async (req, res) => {
     subscription_data: {
       // Stamp UTMs into subscription metadata so cohort attribution
       // survives renewals. clerkUserId is always present.
-      metadata: { clerkUserId: userId, ...utms },
+      metadata: { clerkUserId: userId, locale: locale || "", ...utms },
     },
+    metadata: { locale: locale || "", ...utms },
     // If we already have a Stripe customer for this user, reuse it
     // so card-on-file + billing history stay attached. Otherwise let
     // Stripe create one based on the email we collected from Clerk.
@@ -196,6 +205,7 @@ module.exports = async (req, res) => {
   } else {
     sessionParams.allow_promotion_codes = true;
   }
+  if (locale) sessionParams.locale = locale;
 
   let session;
   try {
@@ -213,6 +223,14 @@ module.exports = async (req, res) => {
     status: 200, ms: Date.now() - t0, user_id: userId, session_id: session.id,
     has_promo: discounts ? 1 : 0,
     promo_succeeded: promoSucceeded === null ? "" : (promoSucceeded ? 1 : 0),
+    locale: locale || "auto",
+  });
+  posthog.capture(userId, "stripe.checkout_session_created", {
+    session_id: session.id,
+    locale: locale || "auto",
+    has_promo: !!discounts,
+    promo_succeeded: promoSucceeded === null ? null : promoSucceeded === true,
+    ms: Date.now() - t0,
   });
 
   // Wave-2: fire promo_code_applied server-side when a code was
@@ -225,8 +243,10 @@ module.exports = async (req, res) => {
       succeeded: promoSucceeded === true,
       source: "create_checkout_session",
     });
-    await posthog.flush();
   }
+  await posthog.flush();
 
   return res.status(200).json({ url: session.url, sessionId: session.id });
 };
+
+module.exports.normalizeCheckoutLocale = normalizeCheckoutLocale;

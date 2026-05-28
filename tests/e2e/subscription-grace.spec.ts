@@ -18,13 +18,15 @@
 import { test, expect, type Page } from "@playwright/test";
 import {
   attachErrorRecorder,
+  seedCanceledUser,
+  seedCancelingUser,
   seedPastDueUser,
   seedProUser,
   seedUser,
 } from "./_helpers";
 
-async function gotoAccountSubscription(page: Page) {
-  await page.goto("/account/subscription", {
+async function gotoAccountSubscription(page: Page, suffix = "") {
+  await page.goto(`/account/subscription${suffix}`, {
     waitUntil: "domcontentloaded",
   });
 }
@@ -127,6 +129,58 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     await expect(planName).toBeVisible();
     await expect(planName).toContainText("Free");
     await expect(planName.locator(".pulpo-logo-pro")).toHaveCount(0);
+
+    expect(errors).toEqual([]);
+  });
+
+  test("canceling user: EN and ES copy says cancellation, never renewal", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedCancelingUser(page);
+    await gotoAccountSubscription(page);
+
+    await expect(page.locator(".sub-plan-meta")).toContainText(/Cancels on/i);
+    await expect(page.locator(".sub-plan-status-copy")).toContainText(/stays active until/i);
+    await expect(page.getByTestId("sub-status-pill")).toHaveText(/Canceling/i);
+    await expect(page.locator(".account-section")).not.toContainText(/Renews on/i);
+
+    await gotoAccountSubscription(page, "?lang=es");
+    await expect(page.locator(".sub-plan-meta")).toContainText(/Se cancela/i);
+    await expect(page.locator(".sub-plan-status-copy")).toContainText(/permanece activo hasta/i);
+    await expect(page.getByTestId("sub-status-pill")).toHaveText(/Cancelando/i);
+    await expect(page.locator(".account-section")).not.toContainText(/Se renueva/i);
+
+    expect(errors).toEqual([]);
+  });
+
+  test("canceled user: EN and ES copy shows ended state + resubscribe CTA", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedCanceledUser(page);
+    await gotoAccountSubscription(page);
+
+    await expect(page.locator(".sub-plan-meta")).toContainText(/Subscription ended on/i);
+    await expect(page.getByTestId("sub-status-pill")).toHaveText(/Canceled/i);
+    await expect(page.getByRole("button", { name: /Resubscribe/i })).toBeVisible();
+    await expect(page.locator(".account-section")).not.toContainText(/Renews on/i);
+
+    await gotoAccountSubscription(page, "?lang=es");
+    await expect(page.locator(".sub-plan-meta")).toContainText(/Suscripción finalizada el/i);
+    await expect(page.getByTestId("sub-status-pill")).toHaveText(/Cancelada/i);
+    await expect(page.getByRole("button", { name: /Volver a suscribirme/i })).toBeVisible();
+    await expect(page.locator(".account-section")).not.toContainText(/Se renueva/i);
+
+    expect(errors).toEqual([]);
+  });
+
+  test("portal return strips URL flag and emits return telemetry", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedCancelingUser(page);
+    await gotoAccountSubscription(page, "?from=portal&posthog_capture=1");
+
+    await expect.poll(() => page.url()).not.toContain("from=portal");
+    await expect.poll(async () => page.evaluate(() => {
+      const w = window as unknown as { __pulpoEvents__?: Array<{ name: string }> };
+      return (w.__pulpoEvents__ || []).filter((e) => e.name === "account.sub_portal_return").length;
+    })).toBe(1);
 
     expect(errors).toEqual([]);
   });

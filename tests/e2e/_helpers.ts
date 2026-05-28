@@ -59,6 +59,45 @@ export async function seedProUser(page: Page): Promise<void> {
   await seedUser(page, "pro");
 }
 
+export async function seedCancelingUser(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const DAY = 24 * 60 * 60 * 1000;
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: "canceling-tester@pulpo.club",
+        name: "Canceling Tester",
+        plan: "pro",
+        subscription_status: "active",
+        cancel_at_period_end: true,
+        current_period_end: Date.now() + 10 * DAY,
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  });
+}
+
+export async function seedCanceledUser(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const DAY = 24 * 60 * 60 * 1000;
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: "canceled-tester@pulpo.club",
+        name: "Canceled Tester",
+        plan: "pro",
+        subscription_status: "canceled",
+        cancel_at_period_end: false,
+        canceled_at: Date.now() - DAY,
+        current_period_end: Date.now() - DAY,
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  });
+}
+
 // Pre-accept the cookie-consent banner so it doesn't render over
 // modal/CTA targets in the test (it's a fixed-position role="dialog"
 // that intercepts pointer events until the user clicks Accept / Reject).

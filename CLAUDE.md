@@ -246,6 +246,62 @@ control on /account MUST be exercised by this spec before merge.
 
 **Invoice access policy:** the "View invoices in the Stripe portal →" link is gated on `everPaid` (currently Pro OR ever past_due OR ever canceled OR has `current_period_end`), NOT on `isPaid`. A canceled user keeps full access to their historical receipts. The Customer Portal endpoint self-heals `stripeCustomerId` via email lookup (see PR #510), so the link is always safe to render for ever-paid users.
 
+## NEVER skip locale on third-party billing surfaces (post-2026-05-27)
+
+Every Stripe + Clerk API call that creates a user-facing surface
+(Checkout Session, Customer Portal session, hosted modal, invitation
+email) MUST receive the user's current `app.locale`. Locale captured
+only at signup is not enough: the user can switch languages later and
+expects the next Stripe/Clerk surface to follow.
+
+Mandatory for every new endpoint that calls
+`stripe.checkout.sessions.create`, `stripe.billingPortal.sessions.create`,
+`clerk.invitations.createInvitation`, or any API that ships text to the
+user:
+
+1. Accept `body.locale` on the request.
+2. Normalize through a `SUPPORTED_LOCALES` set.
+3. Pass the normalized value to the SDK call.
+4. Stamp the locale into session/invitation metadata when downstream
+   webhooks need to re-read it.
+5. Add `locale` to the corresponding `posthog.capture(...)` event.
+
+Mandatory for every client wrapper that POSTs to those endpoints:
+
+1. Accept `locale` as an argument or read `localStorage.pulpo-locale`.
+2. Include it in the request body.
+
+Smoke-test guardrail: every endpoint unit test covers `{ en, es,
+missing, garbage }` locale inputs. Endpoint without a locale test does
+not ship.
+
+## NEVER skip post-redirect state refresh (post-2026-05-27)
+
+Any client surface returning from a third-party billing/auth redirect
+(Stripe Portal, Stripe Checkout, Clerk hosted modal, etc.) MUST handle
+the webhook-vs-redirect race. A single `reloadUser()` on mount is not
+enough: the webhook can land 1-10s after the user redirects back, so
+the first reload can fetch stale metadata.
+
+Pattern:
+
+1. Detect the return via a `?from=<source>` query param set on the
+   redirect's `return_url`.
+2. Strip the param before the reload completes so refresh/back does not
+   replay it.
+3. Poll `reloadUser()` up to roughly 5 attempts x 1.5s, stopping on
+   the first detected metadata change.
+4. Render an inline "Refreshing..." indicator while polling.
+5. Fire `<surface>_state_changed` and `<surface>_stale` PostHog events
+   so the funnel is observable.
+
+Forbidden:
+
+- One-shot reload on mount with no retry.
+- Hardcoded `setTimeout(reload, 2000)`; webhook latency varies, so
+  reload must be state-diff driven.
+- Swallowing the stale case silently.
+
 ## Frontend conventions (post-PR-1.5)
 
 The new app lives at `web/app/` (React 18 + Vite). Build output → `web/dist/`. The legacy vanilla-JS dashboard is at `web/legacy.html` and stays untouched until PR-10.
@@ -351,6 +407,79 @@ All Pulpo persistence lives in one of two places:
 There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
 Upstash instance. If a future feature genuinely needs one, the PR that
 adds it must also add the backup posture to this section.
+
+## "Shipped" means the user-visible surface renders the change (post-2026-05-26)
+
+**PR-MC-PA-1 wrap-up overclaimed.** The smoke run exited 0, wrote
+`ranked.PA.json` (empty array, 2 bytes), and I declared "green for the
+parameterization scope." The user opened `pa.pulpo.club` and got a DNS
+error — no domain, no data, no usable surface. Two more PRs were needed
+to actually produce PA listings. "Pipeline ran" is upstream of done; it
+is not done.
+
+**The rule:** before claiming a change works, check the user-visible
+surface. If the change targets a URL, `curl -I` that URL and inspect a
+sample. If the change produces a file, open it and verify the content
+matches the claim, not just that the file exists. If the surface
+doesn't exist yet (DNS not configured, Vercel project not created,
+deploy not built), say **"code shipped; deploy pending: [explicit list
+of remaining manual steps]"** — never "works."
+
+Concrete checks per change-shape:
+
+- **API / route change** → `curl` the route, eyeball the response body.
+- **Frontend change** → load the page in a browser at the relevant
+  viewport (per the mobile-and-desktop rule above) and exercise the
+  feature.
+- **Pipeline / data change** → open the output file, count rows,
+  spot-check 2–3 records' content. "Row count > 0" is not enough; the
+  records must be correct for the change.
+- **New subdomain / Vercel project** → `dig +short <subdomain>` AND
+  `curl -I https://<subdomain>/` AND inspect rendered HTML. Three
+  separate failure modes; none subsumes the other.
+- **New CI guardrail** → run the guardrail against a known-bad input
+  to confirm it fails; then against current main to confirm it
+  passes. A guardrail that never triggers is decorative.
+
+**The smell test:** if the wrap-up reads "pipeline exited 0, file
+written, tests pass" without a sentence about what a user would
+actually see, it's incomplete. Add the user-visible verification or
+flag the deploy gap explicitly.
+
+## Country-hardcode guardrail (post-2026-05-26)
+
+Three SV-only string literals (`country="SV"`, an exclusion regex
+listing non-SV country names, and a schema `{"const": "SV"}`) silently
+dropped every PA listing in the MC-PA-1 smoke. PR #489 fixed them and
+[`scripts/check_country_hardcodes.py`](scripts/check_country_hardcodes.py)
+now runs in CI to prevent the regression class.
+
+**When the check fails:**
+
+1. Read the active country from the manifest:
+   ```python
+   from pulpo.countries import active as _active_country
+   country_name = _active_country().name_en
+   ```
+   or `loaded()` if you need a list of every registered country.
+2. If the hardcode is legitimately single-country (e.g. a scraper that
+   only serves one country's site, or the dataclass-default fallback),
+   add `# multi-country-exempt: <one-line reason>` on the offending
+   line. The reason makes the exemption auditable; "exempt" alone is
+   not enough.
+3. If the file is entirely country-specific by design (the SV manifest,
+   an SV-only scraper, the company-jurisdiction config), add its path
+   to `ALLOWED_FILES` in the script.
+
+**What NOT to do:**
+
+- Don't add `el.salvador|guatemala|panam[aá]|...` regex alternations
+  directly. Build them dynamically from `_KNOWN_COUNTRY_NAMES` minus
+  the active country (see `automation/validation.py` for the pattern).
+- Don't suppress the check with a blanket exempt marker on a long
+  list of code lines. If the change is broad enough that more than
+  2-3 lines need exemptions, you're probably hardcoding instead of
+  reading from the manifest.
 
 ## Commit Message Format
 - `feat:` new feature

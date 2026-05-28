@@ -10,7 +10,7 @@ Dry-run only: nothing in this module talks to Resend.
 
 from .types import Recipient, Preference, IssuePick, Issue, Commentary, Cohort
 from .build_issue import build_issue
-from .render_html import render_html
+from .render_html import render_html, TEMPLATE_VERSION
 
 __all__ = [
     "Recipient",
@@ -21,4 +21,5 @@ __all__ = [
     "Cohort",
     "build_issue",
     "render_html",
+    "TEMPLATE_VERSION",
 ]

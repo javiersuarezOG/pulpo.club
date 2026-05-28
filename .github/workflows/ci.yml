@@ -44,6 +44,15 @@ jobs:
       - name: Lint
         run: ruff check .
 
+      # PR-MC-PA-4 guardrail — catches SV-only string literals creeping
+      # into country-agnostic code (the bug class fixed in #489: three
+      # hardcoded "SV" / "El Salvador" / multi-country regex literals
+      # silently dropped every PA listing). Existing legitimate hits
+      # are inline-marked with `# multi-country-exempt: <reason>`; the
+      # script reports zero hits on a clean tree.
+      - name: Country-hardcode guard
+        run: python3 scripts/check_country_hardcodes.py
+
   frontend:
     name: frontend (typecheck + build)
     runs-on: ubuntu-latest
