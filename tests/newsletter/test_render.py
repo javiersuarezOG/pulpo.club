@@ -83,8 +83,9 @@ def test_render_es_locale_has_no_english_canary(pro_with_prefs, ranked_pool):
     html = _render(pro_with_prefs, ranked_pool)
     leaked = [c for c in ENGLISH_CANARIES if c in html]
     assert not leaked, f"English canaries leaked into ES render: {leaked}"
-    # And the Spanish hero copy is there
-    assert "Pulpo revisó" in html
+    # And the Spanish hero copy is there. PR-NL-7a moved the lede to
+    # the welcome teaser ("Empieza por #01 — …"); anchor on that phrase.
+    assert "Empieza por" in html
 
 
 def test_render_no_unfilled_placeholders(pro_with_prefs, ranked_pool):

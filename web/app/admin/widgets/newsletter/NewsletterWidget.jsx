@@ -216,7 +216,115 @@ const WIDGET_STYLES = `
   animation: nl-spin 800ms linear infinite;
 }
 @keyframes nl-spin { to { transform: rotate(360deg); } }
+
+/* ── PR-NL-7a · Upcoming sends panel ────────────────────────────── */
+.nl-preview-widget .nl-upcoming {
+  margin: 4px 0 0;
+  padding: 14px 16px 12px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.nl-preview-widget .nl-upcoming-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+.nl-preview-widget .nl-upcoming-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.nl-preview-widget .nl-upcoming-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+.nl-preview-widget .nl-upcoming-row .nl-upcoming-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.nl-preview-widget .nl-upcoming-row .nl-upcoming-issue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.nl-preview-widget .nl-upcoming-row .nl-upcoming-when {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.nl-preview-widget .nl-upcoming-btn {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.nl-preview-widget .nl-upcoming-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.nl-preview-widget .nl-upcoming-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 `;
+
+// PR-NL-7a — next-Monday helper. Cron runs every Mon 14:00 UTC; we
+// just enumerate the next N Mondays from "now" in the operator's local
+// timezone so the displayed date matches what they expect. Issue
+// numbers are inferred from the same source-of-truth in build_issue.py
+// — falling back to a "next / +2 weeks / +4 weeks" framing when no
+// concrete number is plumbed yet (PR-NL-9 will wire the real number).
+function nextMondays(count = 3, from = new Date()) {
+  const out = [];
+  const base = new Date(from);
+  base.setHours(0, 0, 0, 0);
+  // 0 = Sunday … 1 = Monday … 6 = Saturday
+  const daysUntilMon = (1 - base.getDay() + 7) % 7 || 7;
+  const next = new Date(base);
+  next.setDate(base.getDate() + daysUntilMon);
+  for (let i = 0; i < count; i++) {
+    const d = new Date(next);
+    d.setDate(next.getDate() + i * 7);
+    out.push(d);
+  }
+  return out;
+}
+
+function formatMondayLabel(d, now = new Date()) {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const today = new Date(now); today.setHours(0, 0, 0, 0);
+  const days = Math.round((d.getTime() - today.getTime()) / dayMs);
+  const dateStr = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  const inLabel = days <= 0 ? "today"
+    : days === 1 ? "tomorrow"
+    : days < 14 ? `in ${days} days`
+    : `in ${Math.round(days / 7)} weeks`;
+  return `${dateStr} · ${inLabel}`;
+}
+
 
 export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
@@ -228,20 +336,31 @@ export function NewsletterWidget() {
   //   { kind: "success", recipient, runsUrl }   — structured success card
   const [status, setStatus] = useState({ kind: null });
 
-  const trigger = async (e) => {
-    e.preventDefault();
+  // Upcoming Monday cron dates — computed on every render so the
+  // "in N days" label stays correct without an interval-tick state.
+  // Cheap (~3 ops), no useMemo needed.
+  const upcoming = nextMondays(3);
+
+  // Shared trigger for both the legacy "Send next 3 cohort variants"
+  // button and the per-row "Send test →" buttons in the Upcoming Sends
+  // panel. `issueNumber=null` keeps the legacy default ("1" server-side).
+  const trigger = async ({ issueNumber = null, when = null } = {}) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
       setStatus({ kind: "error", message: "Enter a valid email address." });
       return;
     }
     setBusy(true);
-    setStatus({ kind: "pending" });
+    setStatus({ kind: "pending", when });
     try {
       const r = await fetch("/api/admin/newsletter/trigger-preview", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: value }),
+        body: JSON.stringify(
+          issueNumber == null
+            ? { email: value }
+            : { email: value, issue_number: issueNumber },
+        ),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -254,6 +373,7 @@ export function NewsletterWidget() {
         kind: "success",
         recipient: value,
         runsUrl: body.runs_url || null,
+        when,
       });
     } catch (err) {
       setStatus({
@@ -269,9 +389,12 @@ export function NewsletterWidget() {
     <>
       <style>{WIDGET_STYLES}</style>
       <div className="nl-preview-widget">
-        <form className="nl-card" onSubmit={trigger}>
+        <form
+          className="nl-card"
+          onSubmit={(e) => { e.preventDefault(); trigger({}); }}
+        >
           <div>
-            <label htmlFor="nl-preview-email">Preview recipient</label>
+            <label htmlFor="nl-preview-email">Send test to</label>
             <input
               id="nl-preview-email"
               type="email"
@@ -283,6 +406,42 @@ export function NewsletterWidget() {
               required
             />
           </div>
+
+          {/* PR-NL-7a — Upcoming sends. Per-row test button fires the
+              same endpoint with that row's issue_number. The shared
+              email input above is the recipient for all of them. */}
+          <div className="nl-upcoming">
+            <p className="nl-upcoming-eyebrow">Upcoming sends</p>
+            <ul className="nl-upcoming-list">
+              {upcoming.map((d, idx) => {
+                const label = formatMondayLabel(d);
+                // Issue numbering: the cron's issue_number is operator-
+                // driven (PR-NL-9 will plumb the real next number). Until
+                // then we use "next / +2 weeks / +4 weeks" as the human
+                // label and a stable sequential number for the API call.
+                const humanIssue = idx === 0 ? "Next issue"
+                  : idx === 1 ? "Following"
+                  : "After that";
+                return (
+                  <li className="nl-upcoming-row" key={d.toISOString()}>
+                    <div className="nl-upcoming-meta">
+                      <span className="nl-upcoming-issue">{humanIssue}</span>
+                      <span className="nl-upcoming-when">{label}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="nl-upcoming-btn"
+                      disabled={busy}
+                      onClick={() => trigger({ issueNumber: idx + 1, when: label })}
+                    >
+                      Send test →
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
           <button type="submit" className="nl-trigger" disabled={busy}>
             {busy ? "Dispatching…" : "Send next 3 cohort variants"}
           </button>
@@ -294,8 +453,9 @@ export function NewsletterWidget() {
                 Dispatched · 3 emails on the way
               </p>
               <p className="nl-success-body">
-                Sending to <strong>{status.recipient}</strong>. They should
-                land in ~30–60 seconds. Look for these subjects in your inbox:
+                Sending to <strong>{status.recipient}</strong>
+                {status.when ? <> — preview of the issue scheduled for <strong>{status.when}</strong></> : null}.
+                They should land in ~30–60 seconds. Look for these subjects in your inbox:
               </p>
               <ul className="nl-success-subjects">
                 {PREVIEW_COHORTS.map((cohort) => (

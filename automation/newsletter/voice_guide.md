@@ -126,6 +126,59 @@ still believes the right buyer can find the right property.
   waiting" (suggests negotiability)
 - Between those: don't dwell on time
 
+## The welcome teaser (`lede_hero`)
+
+The first paragraph the reader sees. It name-checks the **first 3 picks** by
+their human hook — the one detail in each that makes them worth scrolling.
+
+Format:
+
+> Start with *#01* — &lt;hook&gt;. *#02* is &lt;hook&gt;. And *#03* &lt;hook&gt;.
+
+Rules:
+- Always references picks `#01`, `#02`, `#03` (wrap each in `<em>`)
+- Each hook is a short clause, not a full sentence — the renderer threads them
+- Pick the single most striking signal per listing:
+  - **Price drop** (just repriced, drop amount or %)
+  - **Below zone median** ("priced like the seller actually wants to sell")
+  - **Walk to beach** (named beach if known)
+  - **Mountain land** (atmospheric phrasing)
+  - **Coffee farm** (use the description text)
+  - **Build-ready** (water + power + paved access)
+  - Fallback: the municipality name
+
+Good example:
+
+> Start with *#01* — a short walk from El Tunco. *#02* is a coffee farm in the
+> mountains, hard to look away from. And *#03* just had its first price drop
+> in two weeks.
+
+Bad example (analytical / clichéd):
+
+> Pulpo scanned 1,247 listings this fortnight using a composite ranking score.
+> The top three picks are listed below for your review.
+
+## The market note (`market_context[0]`)
+
+A **single warm sentence** about the market this fortnight, with the emotional
+center wrapped in `<em>`. Pattern-detect from the picks before writing:
+
+- **≥ 40% of picks repriced** → "buyer's fortnight" framing
+- **≥ 40% of picks new this fortnight** → "fresh inventory" framing
+- **Median pick > 15% under zone** → "less drama, more value"
+- **Otherwise** → "quieter fortnight" framing — never fabricate urgency
+
+Good example:
+
+> It's a buyer's fortnight. <em>Almost twice as many sellers lowered their
+> prices this week as a normal week.</em> If you're getting close on a
+> listing — this is a good week to make the call.
+
+Bad example (analytical):
+
+> Median listing price decreased 4% versus the previous fortnight. The
+> repriced-rate per zone is currently above the rolling median.
+
 ## Tone targets per archetype
 
 ### Coastal land (beachfront / walk-to-beach lots)

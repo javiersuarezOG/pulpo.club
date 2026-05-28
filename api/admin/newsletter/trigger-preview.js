@@ -1,6 +1,12 @@
 // POST /api/admin/newsletter/trigger-preview
 //
-// Body: { email }
+// Body: { email, issue_number?: number }
+//
+// `issue_number` is optional. When omitted, defaults to "1" — matching the
+// workflow's pre-existing default so calls without an explicit issue
+// number behave exactly like the original endpoint. PR-NL-7a's
+// "Upcoming sends" panel passes a per-row number so each scheduled
+// Monday gets its own test send routable from the same admin button.
 //
 // Triggers the `pulpo-newsletter` GitHub Actions workflow with
 // `preview_cohorts=<email>`. The workflow runs the production Python
@@ -81,6 +87,21 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "invalid_email" });
   }
 
+  // Validate the optional issue_number — must be a positive integer in
+  // a sane range. The default ("1") matches the workflow's pre-existing
+  // default so backwards-compat is intact.
+  let issueNumberStr = "1";
+  if (body.issue_number !== undefined && body.issue_number !== null) {
+    const n = Number(body.issue_number);
+    if (!Number.isInteger(n) || n < 1 || n > 9999) {
+      return res.status(400).json({
+        error: "invalid_issue_number",
+        hint: "issue_number must be a positive integer ≤ 9999.",
+      });
+    }
+    issueNumberStr = String(n);
+  }
+
   const token = process.env.GITHUB_DISPATCH_TOKEN || "";
   if (!token) {
     logApi("admin.newsletter_trigger_preview", {
@@ -109,7 +130,10 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         ref,
-        inputs: { preview_cohorts: email },
+        inputs: {
+          preview_cohorts: email,
+          issue_number: issueNumberStr,
+        },
       }),
     });
   } catch (err) {
