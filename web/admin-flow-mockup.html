@@ -285,6 +285,62 @@
     font: inherit;
     box-sizing: border-box;
   }
+
+  /* multi-recipient chip input */
+  .chip-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 8px 8px 10px;
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    background: var(--paper);
+    align-items: center;
+    min-height: 38px;
+  }
+  .chip-input .recipient-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 4px 4px 10px;
+    background: var(--paper-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .chip-input .recipient-chip .x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.06);
+    color: var(--ink-3);
+    font-size: 11px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    line-height: 1;
+  }
+  .chip-input .add-input {
+    flex: 1;
+    min-width: 160px;
+    border: none;
+    background: transparent;
+    padding: 6px 4px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink-3);
+    outline: none;
+  }
+  .chip-helper {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin: 8px 0 0;
+    font-style: italic;
+  }
+
   .admin-btn {
     display: inline-flex;
     align-items: center;
@@ -523,10 +579,14 @@
           <div class="admin-shell">
             <p class="admin-eyebrow">Pulpo · internal tools</p>
             <h3 class="admin-title">Newsletter preview</h3>
-            <p class="admin-sub">Generate a draft of the next issue. Pulpo will email you a test, you'll approve or reject.</p>
+            <p class="admin-sub">Generate a draft of the next issue. Pulpo will email a test to everyone below — any one of you can approve or reject.</p>
 
             <p class="admin-label">Send test to</p>
-            <input class="admin-input" value="javier@suarez.ventures" readonly />
+            <div class="chip-input">
+              <span class="recipient-chip">javier@suarez.ventures<span class="x">×</span></span>
+              <input class="add-input" placeholder="Add another email, press Enter" />
+            </div>
+            <p class="chip-helper">Anyone in this list can approve from their inbox or this page. Add as many as you want.</p>
 
             <button class="admin-btn">Generate test issue</button>
 
@@ -541,10 +601,10 @@
     <div class="annot">
       <p class="annot-label">What you see</p>
       <p>
-        One input, one button. The grey row at the bottom tells you which commit on <code>main</code> is currently live on Vercel — this is the code that the next test will use to generate the issue.
+        One input box (where you can add as many emails as you want), one button. Pre-fill with whoever should review — your email is there by default; add Sebas's, anyone else who should sign off.
       </p>
       <p>
-        <strong>No drafts to manage, no editor, no scheduling UI.</strong> Just "Generate test issue."
+        <strong>Any recipient can approve.</strong> First click wins — the others get a small "already approved by ___" note if they try after.
       </p>
     </div>
   </div>
@@ -579,7 +639,9 @@
               <span class="h">Draft sent for review</span>
               <p class="body">
                 Generated 4 minutes ago against deploy <span class="mono">a1b2c3</span>.
-                Check your inbox at <strong>javier@suarez.ventures</strong> — subject <em>"[PULPO REVIEW] Issue 05 draft"</em>.
+              </p>
+              <p class="body">
+                Test email sent to: <strong>javier@suarez.ventures</strong>, <strong>sebas@…</strong> (subject: <em>"[PULPO REVIEW] Issue 05 draft"</em>).
               </p>
             </div>
 
@@ -624,7 +686,7 @@
     <div class="screen">
       <div class="inbox">
         <div class="inbox-head">
-          <span class="inbox-from">From: Pulpo &lt;hello@mail.pulpo.club&gt; · to: javier@suarez.ventures</span>
+          <span class="inbox-from">From: Pulpo &lt;hello@mail.pulpo.club&gt; · to: javier@suarez.ventures, sebas@pulpo.club</span>
           <h3 class="inbox-subject">[PULPO REVIEW] Issue 05 · 28 May 2026 · awaiting your approval</h3>
         </div>
         <div class="inbox-body">
@@ -654,7 +716,7 @@
         Both buttons are <strong>HMAC-signed URLs</strong> — they carry their own credential. You can click them from your phone, your laptop, anywhere — no admin login required for that single approval action.
       </p>
       <p>
-        The same URLs are wired to the admin buttons in step 2, so it doesn't matter which surface you click from.
+        <strong>Every recipient gets the same email with the same buttons.</strong> First click wins — whoever approves first (you, Sebas, anyone else on the recipient list) fires the audience send. The others see "already approved by ___" if they try after.
       </p>
     </div>
   </div>
@@ -754,7 +816,11 @@
             </div>
 
             <p class="admin-label">Send test to</p>
-            <input class="admin-input" value="javier@suarez.ventures" readonly />
+            <div class="chip-input">
+              <span class="recipient-chip">javier@suarez.ventures<span class="x">×</span></span>
+              <span class="recipient-chip">sebas@pulpo.club<span class="x">×</span></span>
+              <input class="add-input" placeholder="Add another email" />
+            </div>
 
             <button class="admin-btn">Generate test issue</button>
 
