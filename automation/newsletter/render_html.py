@@ -17,28 +17,9 @@ field crashing the renderer would break the entire batch.
 from __future__ import annotations
 
 from html import escape as _e
-from urllib.parse import urlparse
 
 from . import i18n
 from .types import Issue, IssuePick, Locale
-
-
-def _source_domain(url: str | None) -> str:
-    """Extract a clean source-domain string from a listing URL.
-
-    Used by the per-pick CTA copy ("View on remax-elsalvador.com →"),
-    making each row's button specific instead of repeating the generic
-    "Open the file →" ten times in one issue. Strips a leading `www.`;
-    returns "" when the URL is missing or unparseable — the caller
-    falls back to a generic CTA copy in that case.
-    """
-    if not url:
-        return ""
-    try:
-        netloc = (urlparse(url).netloc or "").lower()
-    except Exception:                                                       # noqa: BLE001
-        return ""
-    return netloc[4:] if netloc.startswith("www.") else netloc
 
 
 # Bumped whenever the renderer's CSS or layout changes in a way we'd want
@@ -46,7 +27,7 @@ def _source_domain(url: str | None) -> str:
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.2-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.4-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -138,6 +119,29 @@ table { border-collapse: collapse; }
 .pill-forest  { background: var(--sage); color: var(--forest); }
 .pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
 .pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
+
+/* ── PR-NL-5 chips — supportive context next to a hero pick ─────────
+   `chip` is the new container (replacing the older pill on hero picks).
+   `kind` defaults to neutral; warm + cool override the color to carry
+   emotional/positive weight without shouting. Tuned to feel quieter
+   than the old pill so the headline + hero photo + story paragraph
+   stay the focal point. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  background: var(--paper-3);
+  margin: 0 4px 6px 0;
+  line-height: 1.6;
+}
+.chip-warm { background: #FBE6D8; color: var(--clay-deep); }
+.chip-cool { background: var(--sage); color: var(--forest); }
 .cta {
   display: inline-block;
   font-family: var(--font-sans);
@@ -215,6 +219,27 @@ def _pills_html(pills: list[str]) -> str:
     if not pills:
         return ""
     return "".join(f'<span class="pill">{_e(p)}</span>' for p in pills)
+
+
+def _chips_html(pick: IssuePick) -> str:
+    """Render PR-NL-5 Chip objects (warm/cool/neutral) into the email.
+
+    Falls through to the legacy `pills` list when no chips are set so any
+    older fixture or upstream caller that hasn't migrated still renders
+    *something* useful instead of a blank row."""
+    chips = getattr(pick, "chips", None) or []
+    if not chips:
+        return _pills_html(pick.pills)
+    out: list[str] = []
+    for c in chips:
+        klass = "chip"
+        kind = getattr(c, "kind", "neutral")
+        if kind == "warm":
+            klass += " chip-warm"
+        elif kind == "cool":
+            klass += " chip-cool"
+        out.append(f'<span class="{klass}">{_e(c.label)}</span>')
+    return "".join(out)
 
 
 def _callouts_html(callouts: list[dict]) -> str:
@@ -299,36 +324,66 @@ def _new_pill(pick: IssuePick, locale: Locale) -> str:
 
 
 def _cta_for_pick(pick: IssuePick, locale: Locale, paywall_url: str, ghost: bool = False) -> str:
+    """Single "See on Pulpo" / "Unlock" CTA. Used by the short-pick rows
+    where space is tight. Prefer the canonical `pulpo_url` (PR-NL-5);
+    fall back to the external `listing_url` so older fixtures still
+    render something useful."""
     klass = "cta-ghost" if ghost else "cta"
     if pick.paywalled:
         label = i18n.t("pick.cta_locked", locale)
         href = paywall_url + f"&pick={pick.rank}"
         return f'<a class="{klass}" href="{_e(href)}">{_e(label)}</a>'
-    # Name the source — "View on remax-elsalvador.com →" beats the
-    # generic "Open the file →" repeated 10 times in one issue. Falls
-    # back to the plain "View listing →" when the URL is missing or
-    # unparseable (defensive, costs nothing).
-    source = _source_domain(pick.listing_url)
-    if source:
-        label = i18n.t("pick.cta_view_on", locale, source=source)
-    else:
-        label = i18n.t("pick.cta_view", locale)
-    return f'<a class="{klass}" href="{_e(pick.listing_url)}">{_e(label)}</a>'
+    # PR-NL-5: CTA points at pulpo.club, not the external source. Falls
+    # back to listing_url for older fixtures that haven't set pulpo_url.
+    label = i18n.t("pick.cta_open", locale)
+    href = getattr(pick, "pulpo_url", "") or pick.listing_url
+    return f'<a class="{klass}" href="{_e(href)}">{_e(label)}</a>'
+
+
+def _ctas_for_hero_pick(pick: IssuePick, locale: Locale, paywall_url: str) -> str:
+    """Dual CTA for the v2.4 hero layout: solid "See on Pulpo" + ghost
+    "♥ Save to favorites".
+
+    Both go into the Pulpo SPA. The save link adds `?save=1` which
+    PR-NL-8 will use to auto-trigger the save on mount; until then the
+    listing page ignores the unknown param and the reader clicks the
+    heart manually (graceful degrade). Paywalled picks keep the single
+    locked CTA — no save button on a teaser the reader can't open."""
+    if pick.paywalled:
+        return _cta_for_pick(pick, locale, paywall_url)
+    see_label = i18n.t("pick.cta_open", locale)
+    save_label = i18n.t("pick.cta_save", locale)
+    see_href = getattr(pick, "pulpo_url", "") or pick.listing_url
+    save_href = getattr(pick, "save_url", "") or see_href
+    # Spaced with non-breaking gap so the two CTAs sit side-by-side in
+    # email clients that respect inline whitespace.
+    return (
+        f'<a class="cta" href="{_e(see_href)}">{_e(see_label)}</a>'
+        f'&nbsp;&nbsp;'
+        f'<a class="cta-ghost" href="{_e(save_href)}">♥ {_e(save_label)}</a>'
+    )
 
 
 def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
+    """Hero pick render. Bumped to use:
+      • PR-NL-5 chips (warm/cool/neutral) instead of the older pill row
+        (legacy pills still survive via `_chips_html` fallback)
+      • Dual CTA (See on Pulpo + Save to favorites)
+    The structure stays IDENTICAL to the previous layout — same photo
+    on top, same headline/meta/price stack, same callouts + keytable
+    below the body — so existing snapshot tests only need the CTA +
+    chip row diff'd, not a full template rewrite."""
     top_label = i18n.t("pick.top_label", locale, rank=pick.rank)
-    # Cap rich-pick pills at 3 total. Old behavior rendered up to 6 pills:
-    # rank + new/repriced + up to 4 listing tags. That's visual noise at
-    # the top of every hero pick. Priority: (1) rank, (2) new/repriced,
-    # (3) at most ONE listing tag — the most editorial-priority one
-    # (which build_issue.py orders first in pick.pills).
-    new_pill = _new_pill(pick, locale)
-    extra_pills_html = _pills_html(pick.pills[:1])  # was [:] — now max 1
+    # The top-of-pick row: "TOP PICK · 01" always-on, plus the repriced/
+    # new signal pill if relevant, plus the PR-NL-5 chips driven by real
+    # Listing fields. Chips replace v2.2's `pills[:1]` cap — they're
+    # already trimmed to ISSUE_CHIPS_PER_PICK in build_issue.py and have
+    # color coding (warm/cool/neutral) the old pill row couldn't carry.
+    chips_html = _chips_html(pick)
     pills_html = (
         f'<span class="pill pill-forest">{_e(top_label)}</span>'
-        + new_pill
-        + extra_pills_html
+        + _new_pill(pick, locale)
+        + chips_html
     )
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
@@ -358,7 +413,7 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
       {meta_row_html}
       {blurb_html}
       {callouts_html}
-      <p style="margin-top: 16px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
+      <p style="margin-top: 16px;">{_ctas_for_hero_pick(pick, locale, paywall_url)}</p>
     </td></tr>
     <tr><td class="pad-sm"><hr class="rule" /></td></tr>
     """

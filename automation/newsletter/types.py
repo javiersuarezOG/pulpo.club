@@ -52,6 +52,26 @@ class Recipient:
     preference: Preference
 
 
+ChipKind = Literal["neutral", "warm", "cool"]
+# neutral = quiet context (e.g. "20 min walk to beach", "Power at the lot")
+# warm    = recent action / urgency (e.g. "↓ Just dropped −$5,000")
+# cool    = strong signal worth highlighting (e.g. "★ Top pick", "−78% under area average")
+
+
+@dataclass
+class Chip:
+    """Tiny supportive label rendered next to a pick.
+
+    Replaces the older `pills: list[str]` field on IssuePick — chips carry
+    a `kind` so the renderer can color them appropriately (matching the
+    mockup at /newsletter-mockup-v2). Max ~4 chips per pick; build_issue
+    prioritizes warm > cool > neutral when trimming to the cap.
+    """
+
+    label: str
+    kind: ChipKind = "neutral"
+
+
 @dataclass
 class IssuePick:
     """One listing as it lands in the rendered template.
@@ -67,14 +87,22 @@ class IssuePick:
     price_text: str                              # "$185,000" or "from $199,386"
     price_note: Optional[str]                    # "· negotiable · paperwork is clean"
     photo_url: str                               # absolute https://
-    listing_url: str
-    pills: list[str]                             # ["Working land", "Coffee · river · trees"]
-    blurb: str                                   # main paragraph
+    listing_url: str                             # external source URL (e.g. remax-elsalvador.com/...)
+    pills: list[str]                             # legacy; kept for back-compat with the old short_pick renderer
+    blurb: str                                   # main paragraph (LLM-enriched listing description)
     callouts: list[dict]                         # [{"label": "...", "body": "..."}]
     keytable: list[tuple[str, str]]              # [("Built", "Small casita"), ...]
     paywalled: bool = False                      # free-tier hides body/CTA below a teaser
     is_repriced: bool = False
     is_new_this_fortnight: bool = False
+    # ── PR-NL-5 additions ────────────────────────────────────────────
+    # `pulpo_url` is the canonical /listing/<source_id> page on pulpo.club
+    # — the "See on Pulpo" CTA. `save_url` carries `?save=1` so the SPA
+    # can auto-trigger the save on mount once PR-NL-8 wires it; today it
+    # degrades to the same listing page with the heart button.
+    pulpo_url: str = ""
+    save_url: str = ""
+    chips: list[Chip] = field(default_factory=list)
 
 
 @dataclass
