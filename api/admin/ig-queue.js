@@ -1,28 +1,42 @@
 // GET /api/admin/ig-queue
 //
-// Returns the current IG batch queue payload for /admin/ig-review.
-// Reads `web/data/ig_queue.json` (produced by automation/ig_queue_builder.py;
+// Returns the current IG batch queue payload plus a computed `health`
+// block for /admin/ig-review's dashboard tile.  Reads
+// `web/data/ig_queue.json` (produced by automation/ig_queue_builder.py;
 // see PR-3a #505) and forwards it untouched.  Empty state (queue file
-// missing or empty) returns 200 with `{ queue: null, hint: "..." }` so the
-// widget can show a "run the builder" call-to-action instead of an error.
+// missing or empty) returns 200 with `{ queue: null, hint: "..." }` so
+// the widget can show a "run the builder" call-to-action.
+//
+// `health` is computed server-side so the widget can render the dashboard
+// tile from a single fetch:
+//
+//   {
+//     ig_paused:          boolean,           // env IG_PAUSED == "1"
+//     ig_user_id_set:     boolean,           // env IG_USER_ID present
+//     ig_token_set:       boolean,           // env IG_ACCESS_TOKEN present
+//     items_total:        number,
+//     items_approved:     number,
+//     items_pending:      number,
+//     items_needs_human:  number,
+//     items_posted:       number,
+//     last_posted_at:     ISO | null,        // newest posted_at across items
+//     last_posted_day:    number | null,
+//     next_due:           { day, shelf, scheduled_for } | null,
+//                                            // earliest approved & unposted
+//     next_unapproved_due: { day, shelf, scheduled_for } | null,
+//                                            // earliest unapproved & overdue (alert)
+//     blockers:           [string]           // ordered list of human reasons
+//                                            // shipping is currently blocked
+//   }
 //
 // Auth: none, matching the precedent set by the newsletter trigger-preview
-// endpoint (api/admin/newsletter/trigger-preview.js).  The data here is
-// pre-publication captions + poster paths + listing IDs — non-sensitive
-// at the catalogue level (no PII, no credentials).  Bearer-token auth
-// kept blocking the operator on every iteration in the newsletter case
-// and we don't want to repeat that cost for read-only review.  Write
-// mutations (approve / skip) will route through GitHub workflow_dispatch
-// in PR-4 and the dispatch token (GITHUB_DISPATCH_TOKEN) is the real
-// security perimeter.
+// endpoint.  The data is pre-publication captions + poster paths +
+// listing IDs — non-sensitive at the catalogue level (no PII, no
+// credentials).  Write mutations route through workflow_dispatch
+// elsewhere.
 //
-// Why a Vercel function and not a static file served from /data/: keeps
-// the widget's data contract under a single owned URL so we can add
-// auth, filtering, or denormalisation later without rebuilding the
-// frontend deploy.  And the queue can legitimately be missing on a
-// fresh repo before the first build — the function turns that into a
-// clean 200 with hint rather than the static 404 a missing /data/*.json
-// file would produce.
+// Defensive shape: every health field has a clean default, so the widget
+// can render even against a half-broken queue file.
 
 const fs = require("fs");
 const path = require("path");
@@ -58,6 +72,125 @@ function logApi(name, fields) {
   console.log(parts.join(" "));
 }
 
+// ── health derivation ────────────────────────────────────────────────
+
+function _trueBool(v) {
+  if (v === true) return true;
+  if (typeof v !== "string") return false;
+  const s = v.trim().toLowerCase();
+  return s === "1" || s === "true" || s === "yes" || s === "on";
+}
+
+function _parseISO(s) {
+  if (!s || typeof s !== "string") return null;
+  const d = new Date(s.replace("Z", "+00:00"));
+  return Number.isFinite(d.getTime()) ? d : null;
+}
+
+function deriveHealth(payload) {
+  // Defaults so the widget always has stable keys to read.
+  const out = {
+    ig_paused:           _trueBool(process.env.IG_PAUSED || ""),
+    ig_user_id_set:      Boolean((process.env.IG_USER_ID || "").trim()),
+    ig_token_set:        Boolean((process.env.IG_ACCESS_TOKEN || "").trim()),
+    items_total:         0,
+    items_approved:      0,
+    items_pending:       0,
+    items_needs_human:   0,
+    items_posted:        0,
+    last_posted_at:      null,
+    last_posted_day:     null,
+    next_due:            null,
+    next_unapproved_due: null,
+    blockers:            [],
+  };
+
+  const items = Array.isArray(payload && payload.items) ? payload.items : [];
+  out.items_total = items.length;
+
+  const now = Date.now();
+  let bestNextDue = null;
+  let bestUnapprovedOverdue = null;
+  let latestPosted = null;
+
+  for (const it of items) {
+    if (it && it.approved === true) out.items_approved++;
+    if (it && it.status === "pending") out.items_pending++;
+    if (it && it.status === "needs_human") out.items_needs_human++;
+
+    if (it && it.posted === true) {
+      out.items_posted++;
+      const pa = _parseISO(it.posted_at);
+      if (pa && (!latestPosted || pa > latestPosted.at)) {
+        latestPosted = { at: pa, day: it.day };
+      }
+    }
+
+    const sched = _parseISO(it && it.scheduled_for);
+    if (!sched) continue;
+
+    if (it.approved === true && it.posted !== true) {
+      if (!bestNextDue || sched < bestNextDue.at) {
+        bestNextDue = {
+          at:    sched,
+          day:   it.day,
+          shelf: it.shelf || null,
+        };
+      }
+    }
+    // Overdue + unapproved = the operator forgot to approve before the
+    // scheduled time.  Surface this on the dashboard so a missed day
+    // doesn't silently slip.
+    if (it.approved !== true && it.posted !== true && sched.getTime() <= now) {
+      if (!bestUnapprovedOverdue || sched < bestUnapprovedOverdue.at) {
+        bestUnapprovedOverdue = {
+          at:    sched,
+          day:   it.day,
+          shelf: it.shelf || null,
+        };
+      }
+    }
+  }
+
+  if (latestPosted) {
+    out.last_posted_at = latestPosted.at.toISOString();
+    out.last_posted_day = latestPosted.day;
+  }
+  if (bestNextDue) {
+    out.next_due = {
+      day:           bestNextDue.day,
+      shelf:         bestNextDue.shelf,
+      scheduled_for: bestNextDue.at.toISOString(),
+    };
+  }
+  if (bestUnapprovedOverdue) {
+    out.next_unapproved_due = {
+      day:           bestUnapprovedOverdue.day,
+      shelf:         bestUnapprovedOverdue.shelf,
+      scheduled_for: bestUnapprovedOverdue.at.toISOString(),
+    };
+  }
+
+  // Ordered list of human-readable blockers.  The widget renders them
+  // verbatim with severity styling.  Order: hardest blockers first.
+  if (!out.ig_user_id_set || !out.ig_token_set) {
+    out.blockers.push("Missing IG_USER_ID or IG_ACCESS_TOKEN secret — publisher will exit before any API call.");
+  }
+  if (out.ig_paused) {
+    out.blockers.push("IG_PAUSED=1 — the cron skips every run. Set IG_PAUSED='' to resume.");
+  }
+  if (out.items_total === 0) {
+    out.blockers.push("Queue is empty. Run automation/ig_queue_builder to populate.");
+  }
+  if (out.items_total > 0 && out.items_approved === 0) {
+    out.blockers.push("Nothing approved. Edit ig_queue.json to set approved=true on items you want to ship.");
+  }
+  if (bestUnapprovedOverdue) {
+    out.blockers.push(`D${bestUnapprovedOverdue.day} (${bestUnapprovedOverdue.shelf || "?"}) was scheduled for ${bestUnapprovedOverdue.at.toISOString()} but isn't approved.`);
+  }
+  return out;
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
 
@@ -68,17 +201,20 @@ module.exports = async (req, res) => {
 
   const lookup = readQueueFile();
 
-  // Empty / missing state — return 200 with a hint, NOT 404.  The admin
-  // widget renders an actionable empty state ("run the queue builder")
-  // rather than a generic error.
+  // Empty / missing state — return 200 with a hint, NOT 404.  The widget
+  // renders an actionable empty state ("run the queue builder").  We
+  // still emit a partial `health` block so the dashboard tile can show
+  // "secrets configured: yes/no" + the empty-queue blocker.
   if (!lookup.found) {
+    const health = deriveHealth({});  // no items; surface secret + queue-empty blockers
     logApi("admin.ig_queue", {
       status: 200, ms: Date.now() - t0, queue: "empty",
       reason: lookup.reason || "unknown",
     });
     return res.status(200).json({
-      queue: null,
-      hint: (
+      queue:  null,
+      health,
+      hint:   (
         "ig_queue.json not found in web/data/. Run the builder: " +
         "`python3 -m automation.ig_queue_builder` (after the nightly's " +
         "ig_candidates.json is committed)."
@@ -99,9 +235,6 @@ module.exports = async (req, res) => {
     });
   }
 
-  // Defensive: payload should be the object the queue builder produced.
-  // A non-object (e.g. someone hand-edited it to a list) would crash
-  // the widget — turn it into a clean 500 instead.
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     logApi("admin.ig_queue", {
       status: 500, ms: Date.now() - t0, reason: "shape_invalid",
@@ -112,15 +245,14 @@ module.exports = async (req, res) => {
     });
   }
 
+  const health = deriveHealth(payload);
   const itemCount = Array.isArray(payload.items) ? payload.items.length : 0;
   logApi("admin.ig_queue", {
     status: 200, ms: Date.now() - t0,
     items: itemCount, batch: payload.batch || "(unset)",
+    approved: health.items_approved, paused: health.ig_paused,
   });
 
-  // Short cache: the admin loads this on every page view.  10 seconds is
-  // long enough to dedupe a tab refresh, short enough to see a fresh
-  // build moments after the queue builder commits.
   res.setHeader("Cache-Control", "private, max-age=10");
-  return res.status(200).json({ queue: payload });
+  return res.status(200).json({ queue: payload, health });
 };
