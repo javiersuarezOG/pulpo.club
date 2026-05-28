@@ -53,6 +53,7 @@
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
     { "source": "/l/:token",                "destination": "/api/l/:token" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
+    { "source": "/newsletter-mockup-v2",    "destination": "/web/newsletter-mockup-v2.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/api/404" }
   ],
   "redirects": [

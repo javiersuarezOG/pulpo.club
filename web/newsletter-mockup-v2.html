@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo · Issue 05 — Mockup</title>
+<style>
+  :root {
+    --paper:        #F4EFE6;
+    --paper-2:      #F8F4EC;
+    --paper-3:      #EEE9DF;
+    --white:        #FFFFFF;
+    --ink:          #1A1916;
+    --ink-2:        #5A5650;
+    --ink-3:        #888780;
+    --line:         rgba(0, 0, 0, 0.08);
+    --line-2:       rgba(0, 0, 0, 0.14);
+    --forest:       #1F3D31;
+    --forest-mid:   #3D6450;
+    --sage:         #DDE9DC;
+    --clay:         #B8643C;
+    --clay-deep:    #7A3D1F;
+    --navy:         #1E2A3A;
+    --burgundy:     #6B2C2C;
+    --burgundy-bg:  #F5E3E0;
+    --kelp:         #2A4A3E;
+    --buy:          #2E6A4F;
+    --watch:        #B8643C;
+    --skip:         #6B2C2C;
+    --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--clay); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { display: block; max-width: 100%; height: auto; border: 0; }
+  table { border-collapse: collapse; }
+
+  .wrap   { width: 100%; background: var(--paper); padding: 32px 0 56px; }
+  .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+  .pad    { padding: 40px 48px; }
+  .pad-md { padding: 28px 48px; }
+  .pad-sm { padding: 18px 48px; }
+  .pad-cover { padding: 56px 48px 44px; }
+  .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+  .sans    { font-family: var(--font-sans); }
+  .mono    { font-family: var(--font-mono); }
+  .ink     { color: var(--ink); }
+  .ink-2   { color: var(--ink-2); }
+  .muted   { color: var(--ink-3); }
+  .forest  { color: var(--forest); }
+  .clay    { color: var(--clay); }
+  .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
+  .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
+  .rule-clay   { border: 0; border-top: 2px solid var(--clay); width: 56px; margin: 0; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    font-weight: 500;
+  }
+  .eyebrow.clay { color: var(--clay); }
+  .eyebrow.muted { color: var(--ink-3); }
+  .eyebrow.burgundy { color: var(--burgundy); }
+
+  .h-hero { font-family: var(--font-display); font-size: 44px; line-height: 1.05; margin: 6px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
+  .h1     { font-family: var(--font-display); font-size: 32px; line-height: 1.12; margin: 8px 0 6px; letter-spacing: -0.015em; color: var(--ink); }
+  .h2     { font-family: var(--font-display); font-size: 24px; line-height: 1.18; margin: 4px 0 8px; color: var(--ink); }
+  .h3     { font-family: var(--font-display); font-size: 20px; line-height: 1.2; margin: 8px 0 4px; color: var(--ink); }
+  .lede   { font-family: var(--font-display); font-size: 20px; line-height: 1.4; color: var(--ink-2); margin: 0; }
+
+  .body   { font-size: 15px; line-height: 22px; color: var(--ink-2); margin: 0; }
+  .body strong { color: var(--ink); }
+  .body-2 { font-size: 14px; line-height: 21px; color: var(--ink-2); margin: 0; }
+  .meta   { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
+  .price  { font-family: var(--font-display); font-size: 36px; line-height: 1; color: var(--ink); }
+  .price-2 { font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--ink); }
+
+  /* signed editor block */
+  .sig-row { display: flex; gap: 14px; align-items: center; margin-top: 18px; }
+  .sig-avatar { width: 44px; height: 44px; border-radius: 999px; background: var(--forest); color: var(--paper); font-family: var(--font-display); font-size: 20px; line-height: 44px; text-align: center; flex: 0 0 auto; }
+  .sig-name { font-size: 13px; line-height: 18px; color: var(--ink); font-weight: 600; }
+  .sig-role { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
+
+  /* market pulse */
+  .pulse-grid { width: 100%; margin-top: 12px; }
+  .pulse-cell { background: var(--paper-3); padding: 18px 16px; vertical-align: top; border: 1px solid var(--line); }
+  .pulse-num  { font-family: var(--font-display); font-size: 28px; line-height: 1.1; color: var(--ink); }
+  .pulse-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-top: 6px; }
+  .delta-up   { color: var(--burgundy); font-family: var(--font-mono); font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .delta-down { color: var(--forest); font-family: var(--font-mono); font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .delta-flat { color: var(--ink-3); font-family: var(--font-mono); font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+  /* verdict pill (Sebas's call) */
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .verdict-buy   { background: var(--sage); color: var(--buy); }
+  .verdict-watch { background: #FBE6D8; color: var(--watch); }
+  .verdict-skip  { background: var(--burgundy-bg); color: var(--skip); }
+  .verdict-icon { display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: currentColor; }
+
+  /* pills */
+  .pill {
+    display: inline-block;
+    padding: 3px 9px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    background: var(--paper-3);
+    color: var(--ink-2);
+    border-radius: 3px;
+    margin: 0 4px 4px 0;
+  }
+  .pill-forest { background: var(--sage); color: var(--forest); }
+  .pill-filter { background: var(--paper-3); color: var(--ink-2); border: 1px solid var(--line-2); }
+  .pill-drop   { background: var(--burgundy-bg); color: var(--burgundy); }
+  .pill-new    { background: var(--sage); color: var(--forest); font-weight: 600; }
+
+  /* glance table */
+  .glance td { padding: 9px 0; border-bottom: 1px dotted var(--line-2); vertical-align: top; font-size: 14px; }
+  .glance td.num { font-family: var(--font-mono); color: var(--ink-3); width: 32px; }
+  .glance td.where { display: block; color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+  .glance td.pricecol { white-space: nowrap; font-family: var(--font-display); font-size: 16px; color: var(--ink); }
+  .glance td.verdcol { width: 70px; text-align: right; padding-right: 8px; }
+  .glance tr.skipped td { opacity: 0.55; }
+
+  /* the take (editorial verdict block under a pick) */
+  .take {
+    background: var(--paper-2);
+    border-left: 3px solid var(--clay);
+    padding: 18px 20px;
+    margin-top: 20px;
+    border-radius: 0 6px 6px 0;
+  }
+  .take-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin: 0 0 6px; font-weight: 600; }
+  .take-body  { font-size: 14.5px; line-height: 22px; color: var(--ink); margin: 0; font-style: italic; }
+  .take-body strong { font-style: normal; }
+  .take-sig   { display: block; font-style: normal; font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+
+  /* comp tape */
+  .comps {
+    background: var(--paper-3);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    border-radius: 4px;
+    margin-top: 18px;
+  }
+  .comps-head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+  .comps table { width: 100%; }
+  .comps td { font-size: 13px; padding: 5px 0; border-bottom: 1px dotted var(--line-2); }
+  .comps tr:last-child td { border-bottom: none; }
+  .comps td.label { color: var(--ink-2); }
+  .comps td.value { text-align: right; font-family: var(--font-mono); color: var(--ink); }
+  .comps td.value .swatch { display: inline-block; width: 6px; height: 6px; border-radius: 999px; margin-right: 4px; vertical-align: middle; }
+  .swatch-sold { background: var(--forest); }
+  .swatch-active { background: var(--clay); }
+  .swatch-pulled { background: var(--ink-3); }
+
+  /* keytable */
+  .keytable td { font-size: 13px; padding: 6px 14px 6px 0; vertical-align: top; }
+  .keytable td.k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding-right: 8px; }
+  .keytable td.v { color: var(--ink); padding-right: 18px; }
+
+  /* hero image */
+  .hero-img { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
+  .hero-caption { font-size: 12px; color: var(--ink-3); margin: 8px 0 0; font-style: italic; }
+
+  /* cta */
+  .cta {
+    display: inline-block;
+    padding: 12px 22px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+  }
+  .cta:hover { background: var(--forest); text-decoration: none; }
+  .cta-ghost {
+    display: inline-block;
+    padding: 10px 18px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+  }
+  .cta-ghost:hover { background: var(--paper-2); text-decoration: none; }
+  .cta-row { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* reply block */
+  .reply {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 32px 48px;
+  }
+  .reply .eyebrow { color: var(--paper); opacity: 0.5; }
+  .reply .h2 { color: var(--paper); margin-top: 6px; }
+  .reply .body { color: var(--paper); opacity: 0.85; }
+  .reply table { width: 100%; margin-top: 18px; }
+  .reply td { vertical-align: top; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; }
+  .reply .cmd { font-family: var(--font-mono); font-size: 13px; color: var(--paper); font-weight: 600; }
+  .reply .cmd-desc { font-size: 13px; color: var(--paper); opacity: 0.7; margin-top: 4px; }
+
+  /* hidden gems */
+  .gem-card {
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    border-radius: 6px;
+    background: var(--paper-2);
+    margin-top: 12px;
+  }
+  .gem-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); font-weight: 600; }
+
+  /* footer */
+  .foot { padding: 28px 48px 36px; }
+  .foot p { font-size: 12px; line-height: 18px; color: var(--ink-3); margin: 0 0 4px; }
+  .foot a { color: var(--ink-3); text-decoration: underline; }
+
+  /* annotations (so reader can read this mockup as a designed thing) */
+  .annot {
+    background: #FFF6D6;
+    border-left: 3px solid #C7A700;
+    padding: 12px 16px;
+    margin: 8px 48px 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: #6D5A00;
+    font-family: var(--font-mono);
+  }
+  .annot strong { color: #4A3D00; }
+
+  @media (max-width: 600px) {
+    .pad, .pad-md, .reply { padding-left: 24px; padding-right: 24px; }
+    .pad-cover { padding: 40px 24px 32px; }
+    .h-hero { font-size: 34px; }
+    .h1 { font-size: 26px; }
+    .pulse-cell { padding: 14px 12px; }
+    .pulse-num { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
+
+    <!-- ─────────────────────────────────────────────────────────────
+         HEADER
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad-sm" style="border-bottom: 1px solid var(--line); display: flex; align-items: baseline; justify-content: space-between;">
+      <span class="display" style="font-size: 24px; font-weight: 500; letter-spacing: -0.02em; color: var(--forest); line-height: 1;">pulpo</span>
+      <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em;">ISSUE 05 · 28 MAY 2026</span>
+    </td></tr>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         1 · EDITOR'S LETTER  (this is the signature block; replaces
+         "Pulpo scanned 910 active beach and lake properties…")
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad-cover">
+      <div class="eyebrow">A note from the editor</div>
+      <h1 class="h-hero">An honest agent, finally — and a price drop that smells off.</h1>
+      <hr class="rule-clay" style="margin: 10px 0 24px;" />
+
+      <p class="lede" style="margin-bottom: 18px;">
+        I spent five days in La Libertad this fortnight and found something rare:
+        an agent in El Tunco who quoted the same price he quoted the seller.
+        That sounds low-bar. It isn't. I'll tell you who.
+      </p>
+      <p class="body" style="font-size: 16px; line-height: 25px;">
+        I also watched a beachfront lot in El Zonte drop from $480k → $325k in eleven
+        days, with no story to explain it. The photos are still gorgeous. The seller
+        is panicking, or the title is bad, or both. I went looking. Pick #07 is what
+        I found.
+      </p>
+
+      <div class="sig-row">
+        <div class="sig-avatar">S</div>
+        <div>
+          <div class="sig-name">Sebastian Suarez</div>
+          <div class="sig-role">Founder · Pulpo</div>
+        </div>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 1 — Editor's letter.</strong> Signed, opinionated, this-fortnight specific.
+      Replaces today's generic "Pulpo scanned N listings…" line. This is what makes the
+      reader open Issue 06.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         2 · MARKET PULSE
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 36px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow">Market pulse · La Libertad</div>
+      <h2 class="h2" style="margin-top: 6px;">What changed in two weeks.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">From the 1,247 listings Pulpo scanned across El Salvador this fortnight.</p>
+
+      <table class="pulse-grid" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td class="pulse-cell" width="50%" style="border-right: none;">
+            <div class="pulse-num">$78<span style="font-size: 16px; color: var(--ink-3);">/m²</span></div>
+            <div class="pulse-label">Median ask · La Libertad land</div>
+            <div class="delta-down">↓ 4.2% vs Issue 04</div>
+          </td>
+          <td class="pulse-cell" width="50%">
+            <div class="pulse-num">312</div>
+            <div class="pulse-label">Active listings · your filter</div>
+            <div class="delta-up">↑ 18 new this fortnight</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="pulse-cell" width="50%" style="border-top: none; border-right: none;">
+            <div class="pulse-num">23</div>
+            <div class="pulse-label">Repriced ↓ this fortnight</div>
+            <div class="delta-up" style="color: var(--burgundy);">↑ 7 vs Issue 04</div>
+          </td>
+          <td class="pulse-cell" width="50%" style="border-top: none;">
+            <div class="pulse-num">52d</div>
+            <div class="pulse-label">Median time-on-market</div>
+            <div class="delta-up" style="color: var(--burgundy);">↑ 11d vs Issue 04</div>
+          </td>
+        </tr>
+      </table>
+
+      <p class="body-2" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--ink-2);">
+        <strong style="color: var(--ink);">My read:</strong>
+        Buyers slowed down after the May 1 rate news. Sellers are blinking — 23 price drops in
+        14 days vs. an average of 12. If you're waiting, wait two more weeks. If you've already
+        found the lot, this is the moment to bring a number that respects the new floor.
+      </p>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 2 — Market pulse.</strong> Four deltas + Sebas's read on what they mean.
+      Today's email has zero market context. This block answers "why this fortnight" in
+      data + opinion.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         3 · THE ONE  (pinned editor's choice)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow clay">If you only read one thing</div>
+      <h2 class="h1" style="margin-top: 8px;">Coffee farm with two rivers, Chiltiupán.</h2>
+      <div class="meta" style="margin: 8px 0 20px;">Chiltiupán · La Libertad · 43.4 acres · $185,000</div>
+
+      <div class="hero-img" style="background-image: linear-gradient(135deg, #5C8D74 0%, #2F5F4B 60%, #1F3D31 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 18px; padding: 24px; box-sizing: border-box;">
+        [hero photo here · 1280×720]
+      </div>
+      <p class="hero-caption">View from the upper ridge, looking west to the Pacific.</p>
+
+      <div style="margin-top: 24px;">
+        <span class="verdict verdict-buy"><span class="verdict-icon"></span>Sebas's call: BUY</span>
+      </div>
+
+      <div class="take" style="margin-top: 18px;">
+        <p class="take-label">The take</p>
+        <p class="take-body">
+          43.4 acres at <strong>$1/m²</strong> is implausible — until you see the topo. Eighty
+          percent of the parcel is the river canyon and unbuildable. The
+          <strong>9 buildable acres</strong> at the top of the ridge pencil out to
+          <strong>$5.1/m²</strong>, which is half the zone median for usable coffee land.
+          Two perennial rivers, 200 balsam trees, 9 acres of mature coffee. I walked it
+          last Tuesday. The road's hairy in May rain but passable. <strong>This is the
+          one I'd put a deposit on if I had the cash.</strong>
+          <span class="take-sig">— Sebas, 25 May 2026</span>
+        </p>
+      </div>
+
+      <div class="comps">
+        <p class="comps-head">Comp tape · within 3 km, last 9 months</p>
+        <table role="presentation">
+          <tr>
+            <td class="label">28-acre balsam · Comasagua road</td>
+            <td class="value"><span class="swatch swatch-sold"></span>Sold $142k · Feb 26</td>
+          </tr>
+          <tr>
+            <td class="label">19-acre coffee · Chiltiupán ridge</td>
+            <td class="value"><span class="swatch swatch-active"></span>Active $115k · 188d</td>
+          </tr>
+          <tr>
+            <td class="label">12-acre with creek · Cumbres del Mar</td>
+            <td class="value"><span class="swatch swatch-pulled"></span>Pulled $88k · Mar 26</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="cta-row">
+        <a class="cta" href="#">Open the file →</a>
+        <a class="cta-ghost" href="#">Reply VIEW to schedule a walk</a>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 3 — The One.</strong> Pinned editorial choice with the new <strong>Sebas's call:
+      BUY/WATCH/SKIP</strong> verdict pill, the take in his voice, real comp tape (sold/active/pulled
+      with color swatches), and TWO CTAs — passive "open the file" and active "reply VIEW to schedule."
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         4 · AT A GLANCE  (10 picks + verdict column)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow">The other nine</div>
+      <h2 class="h2" style="margin-top: 6px;">At a glance — my verdict on each.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Tap a row to jump to the full write-up below. Skips are the last three; opinionated reasons after each.</p>
+
+      <table class="glance" width="100%" role="presentation" style="margin-top: 18px;">
+        <tr>
+          <td class="num">02</td>
+          <td><strong>Ocean view lot near El Tunco</strong><div class="where">Tamanique · 1,263 m² · listed 3d ago</div></td>
+          <td class="verdcol"><span class="verdict verdict-buy" style="padding: 2px 6px; font-size: 10px;">BUY</span></td>
+          <td align="right" class="pricecol">$60,000</td>
+        </tr>
+        <tr>
+          <td class="num">03</td>
+          <td><strong>The Cliff · Surf City lot</strong><div class="where">Tamanique · 559 m² · ↓ 8% in 30d</div></td>
+          <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
+          <td align="right" class="pricecol">$199,386</td>
+        </tr>
+        <tr>
+          <td class="num">04</td>
+          <td><strong>Beachfront condo in Atami</strong><div class="where">La Libertad · 4bd/3ba · 701 m²</div></td>
+          <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
+          <td align="right" class="pricecol">$270,000</td>
+        </tr>
+        <tr>
+          <td class="num">05</td>
+          <td><strong>Mountain lot near El Zonte</strong><div class="where">Chiltiupán · 4,193 m² · power + water</div></td>
+          <td class="verdcol"><span class="verdict verdict-buy" style="padding: 2px 6px; font-size: 10px;">BUY</span></td>
+          <td align="right" class="pricecol">$240,000</td>
+        </tr>
+        <tr>
+          <td class="num">06</td>
+          <td><strong>Cliff land with ocean view, El Zonte</strong><div class="where">Chiltiupán · 6,989 m² · paved access</div></td>
+          <td class="verdcol"><span class="verdict verdict-watch" style="padding: 2px 6px; font-size: 10px;">WATCH</span></td>
+          <td align="right" class="pricecol">$450,000</td>
+        </tr>
+        <tr>
+          <td class="num">07</td>
+          <td><strong>Beachfront lot, El Zonte</strong><div class="where">Chiltiupán · 1,171 m² · ↓ 32% in 11d</div></td>
+          <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
+          <td align="right" class="pricecol">$325,000</td>
+        </tr>
+        <tr class="skipped">
+          <td class="num">08</td>
+          <td><strong>3,005-vara El Tunco / Sunzal lot</strong><div class="where">Tamanique · 2,100 m² · double-listed</div></td>
+          <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
+          <td align="right" class="pricecol">$150,000</td>
+        </tr>
+        <tr class="skipped">
+          <td class="num">09</td>
+          <td><strong>30 manzana San Matías land</strong><div class="where">La Libertad · agricultural · no road</div></td>
+          <td class="verdcol"><span class="verdict verdict-skip" style="padding: 2px 6px; font-size: 10px;">SKIP</span></td>
+          <td align="right" class="pricecol">$225,000</td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 4 — Glance + verdict column.</strong> Today's glance table has zero opinion.
+      Adding a single 70-pixel column with BUY/WATCH/SKIP is what turns a list into a brief.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         5 · TWO MORE FULL PICKS  (showing one BUY + one WATCH)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+
+      <span class="verdict verdict-buy" style="margin-bottom: 12px;"><span class="verdict-icon"></span>Sebas's call: BUY</span>
+      <h2 class="h1" style="margin-top: 10px;">Pick 02 · Ocean-view lot, El Tunco.</h2>
+      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · 1,263 m² · listed 3 days ago</div>
+      <div class="price">$60,000</div>
+
+      <p class="body" style="margin-top: 22px;">
+        Twenty-minute walk to El Tunco, 1,263 m², the seller inherited it last year and wants
+        out fast — that's the story I got from the listing agent (the honest one I mentioned
+        up top). At <strong>$47/m²</strong> this is 77% below the zone median. I checked the
+        title. It's clean. I checked utilities. Power's at the property line; water needs a
+        100m run from the well next door.
+      </p>
+
+      <div class="take">
+        <p class="take-label">The take</p>
+        <p class="take-body">
+          The agent (Rafael, RE/MAX) will <strong>actually answer his phone</strong>. He
+          quoted me $60k, told the seller $60k, and didn't try to push me into anything
+          adjacent. In El Salvador 2026 this is the rarest thing. If you've been waiting
+          for the kind of seller who needs to move, here she is. I'd offer $54k, expect a
+          counter at $57k.
+          <span class="take-sig">— Sebas</span>
+        </p>
+      </div>
+
+      <div class="comps">
+        <p class="comps-head">Comp tape · same zone, last 6 months</p>
+        <table role="presentation">
+          <tr><td class="label">Ridge lot 980 m² · Tamanique</td><td class="value"><span class="swatch swatch-sold"></span>Sold $72k · Apr 26</td></tr>
+          <tr><td class="label">Roadside lot 1,420 m² · El Sunzal</td><td class="value"><span class="swatch swatch-active"></span>Active $89k · 67d</td></tr>
+          <tr><td class="label">Inland lot 1,100 m² · Tamanique</td><td class="value"><span class="swatch swatch-sold"></span>Sold $58k · Jan 26</td></tr>
+        </table>
+      </div>
+
+      <table class="keytable" role="presentation" style="margin-top: 20px;">
+        <tr>
+          <td class="k">$/m²</td><td class="v">$47</td>
+          <td class="k">vs zone</td><td class="v">−77%</td>
+          <td class="k">Walk to beach</td><td class="v">20 min</td>
+        </tr>
+        <tr>
+          <td class="k">Power</td><td class="v">At property line</td>
+          <td class="k">Water</td><td class="v">100m run needed</td>
+          <td class="k">Listed</td><td class="v">3 days ago</td>
+        </tr>
+      </table>
+
+      <div class="cta-row">
+        <a class="cta" href="#">Open the file →</a>
+        <a class="cta-ghost" href="#">Reply RAFAEL for the agent's number</a>
+      </div>
+    </td></tr>
+
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+
+    <tr><td class="pad" style="padding-top: 32px; padding-bottom: 8px;">
+
+      <span class="verdict verdict-watch" style="margin-bottom: 12px;"><span class="verdict-icon"></span>Sebas's call: WATCH · 4 weeks</span>
+      <h2 class="h1" style="margin-top: 10px;">Pick 03 · The Cliff, Surf City.</h2>
+      <div class="meta" style="margin: 8px 0 16px;">Tamanique · La Libertad · 559 m² · ↓ 8% in last 30 days</div>
+      <div class="price">$199,386 <span class="meta" style="font-size: 14px; color: var(--burgundy);">↓ from $216,830</span></div>
+
+      <p class="body" style="margin-top: 22px;">
+        A residential development of cliff lots, panoramic ocean views, walking distance to
+        Sunzal. The asking is reasonable. The reason I'm calling it WATCH and not BUY is the
+        developer just lowered the price 8% — that's not the bottom. Developers don't drop
+        once. They drop three times.
+      </p>
+
+      <div class="take">
+        <p class="take-label">The take</p>
+        <p class="take-body">
+          I'd put this on a 4-week watchlist and re-check after Issue 07. My bet: it lands at
+          $180k or pulls entirely. <strong>If it pulls, it'll come back at $165k.</strong>
+          Either outcome is better than buying today at $199k.
+          <span class="take-sig">— Sebas</span>
+        </p>
+      </div>
+
+      <div class="cta-row">
+        <a class="cta-ghost" href="#">Open the file →</a>
+        <a class="cta-ghost" href="#">Reply WATCH-03 to track price drops</a>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 5 — Two more full picks.</strong> One BUY with the "honest agent" lede paid off
+      (now we know who Rafael is), one WATCH with a falsifiable prediction ("lands at $180k or
+      pulls"). Each has its own action: <strong>RAFAEL</strong> gets you the number,
+      <strong>WATCH-03</strong> opts you into price-drop alerts on that listing.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         6 · SKIPS  (today this is "one skip-pick" — we want 3)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow burgundy">Don't bother</div>
+      <h2 class="h2" style="margin-top: 6px;">Three I'm telling you to skip — and why.</h2>
+
+      <div style="margin-top: 22px; padding: 18px 20px; background: var(--burgundy-bg); border-radius: 6px;">
+        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 07</span>
+        <h3 class="h3" style="margin-top: 10px;">Beachfront lot, El Zonte · $325k (↓ 32% in 11d)</h3>
+        <p class="body-2" style="margin-top: 8px; color: var(--burgundy);">
+          The price drop looks irresistible. It isn't. I called the agent — she wouldn't say
+          why the seller cut. I called my contact at the Chiltiupán municipality. The lot
+          has an <strong>unresolved restitution claim</strong> from 2018. Until the claim
+          clears, you cannot build. <strong>The seller knows.</strong> Walk away.
+          <em>If you want the document trail, reply <strong>WHY-07</strong> and I'll send it.</em>
+        </p>
+      </div>
+
+      <div style="margin-top: 14px; padding: 18px 20px; background: var(--burgundy-bg); border-radius: 6px;">
+        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 08</span>
+        <h3 class="h3" style="margin-top: 10px;">El Tunco / Sunzal "3,005 varas" lot · $150k</h3>
+        <p class="body-2" style="margin-top: 8px; color: var(--burgundy);">
+          Same lot listed by three different agents at three different prices ($150k / $160k /
+          $174k). One of them has it on consignment, two are speculating. Whoever you call,
+          you're not getting the right price. Wait for the consignment agreement to lapse.
+        </p>
+      </div>
+
+      <div style="margin-top: 14px; padding: 18px 20px; background: var(--burgundy-bg); border-radius: 6px;">
+        <span class="verdict verdict-skip"><span class="verdict-icon"></span>SKIP · 09</span>
+        <h3 class="h3" style="margin-top: 10px;">30-manzana San Matías agricultural land · $225k</h3>
+        <p class="body-2" style="margin-top: 8px; color: var(--burgundy);">
+          No road access. The map shows one — it's a footpath. The seller says they're
+          "in conversation with the alcaldía" about a road. Translation: there is no road,
+          and there won't be one inside five years.
+        </p>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 6 — Three skips with explicit reasons.</strong> Today's email has one
+      generic skip with no story. Three opinionated skips with the document-trail offer
+      (<strong>WHY-07</strong>) is what builds the trust that converts free → Pro.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         7 · HIDDEN GEMS  (adjacent to filter)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow forest">Just outside your filter</div>
+      <h2 class="h2" style="margin-top: 6px;">Three I'd add to your watchlist if I were you.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Your filter is "La Libertad land, under $500k." Widening it by one notch gets you these three.</p>
+
+      <div class="gem-card">
+        <span class="gem-tag">↑ widen budget by 12% · La Libertad</span>
+        <h3 class="h3" style="margin-top: 8px;">Hilltop lot with cabin, Comasagua · $560k</h3>
+        <p class="body-2" style="margin-top: 4px;">
+          1.2 hectares, existing 80 m² cabin you can rent out while you build. $467/m² for the
+          buildable footprint — best in the zone. Just outside your $500k ceiling.
+        </p>
+      </div>
+
+      <div class="gem-card">
+        <span class="gem-tag">↑ open zone to San Salvador · highland · land</span>
+        <h3 class="h3" style="margin-top: 8px;">2-acre coffee plot, Los Planes · $148k</h3>
+        <p class="body-2" style="margin-top: 4px;">
+          Highland, not coastal. 35 min to the city, 50 min to El Tunco. If your filter is
+          "buildable land with character" not "must be coastal," this beats every La Libertad
+          land pick on $/m².
+        </p>
+      </div>
+
+      <div class="gem-card">
+        <span class="gem-tag">↑ add property type: small house · La Libertad</span>
+        <h3 class="h3" style="margin-top: 8px;">2-bed cabin on 600 m², Tamanique · $185k</h3>
+        <p class="body-2" style="margin-top: 4px;">
+          Currently rents $1,200/mo on Airbnb. 8.5% gross yield. The land alone is worth
+          $90k — you're paying $95k for a working cabin.
+        </p>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 7 — Hidden gems.</strong> Pulpo-only data play. Today the email shows
+      you only what's strictly inside your filter. Showing three "if you widened by one notch"
+      picks gives the reader a reason to forward this to a friend with a slightly different
+      brief.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         8 · STALE & TIRED  (low-ball candidates)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 8px;">
+      <hr class="rule" style="margin-bottom: 28px;" />
+      <div class="eyebrow muted">Stale &amp; tired</div>
+      <h2 class="h2" style="margin-top: 6px;">Listed &gt; 180 days. The seller is tired.</h2>
+      <p class="body-2" style="margin-top: 6px; color: var(--ink-3);">Three properties that have been on the market long enough to negotiate hard. I'd offer 22–28% below ask.</p>
+
+      <table class="glance" width="100%" role="presentation" style="margin-top: 14px;">
+        <tr>
+          <td class="num">211d</td>
+          <td><strong>Ocean-view lot · El Cuco</strong><div class="where">3,400 m² · $185k · originally $210k</div></td>
+          <td align="right" class="pricecol" style="color: var(--clay);">Try $140k</td>
+        </tr>
+        <tr>
+          <td class="num">188d</td>
+          <td><strong>Highland coffee · Apaneca</strong><div class="where">2.1 ha · $112k · originally $128k</div></td>
+          <td align="right" class="pricecol" style="color: var(--clay);">Try $82k</td>
+        </tr>
+        <tr>
+          <td class="num">256d</td>
+          <td><strong>Beachfront condo · La Libertad</strong><div class="where">2bd · $158k · originally $175k</div></td>
+          <td align="right" class="pricecol" style="color: var(--clay);">Try $120k</td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 8 — Stale & tired.</strong> Pulpo knows time-on-market. Surfacing
+      three "the seller will say yes to a number that scares you" candidates is the
+      kind of intelligence subscribers feel they can ONLY get from Pulpo.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         9 · REPLY HOOKS  (engagement)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="reply">
+      <div class="eyebrow">Reply with a word</div>
+      <h2 class="h2">I read every reply. Try one.</h2>
+      <p class="body">Each command does exactly what it says. No forms. No tracking links.</p>
+
+      <table cellpadding="0" cellspacing="6" role="presentation">
+        <tr>
+          <td width="50%">
+            <div class="cmd">RAFAEL</div>
+            <div class="cmd-desc">I'll send you the El Tunco agent's number.</div>
+          </td>
+          <td width="50%">
+            <div class="cmd">WATCH-03</div>
+            <div class="cmd-desc">Opt in to price-drop alerts on The Cliff.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="cmd">WHY-07</div>
+            <div class="cmd-desc">Get the document trail on the skip-07 restitution claim.</div>
+          </td>
+          <td>
+            <div class="cmd">LOW $250K</div>
+            <div class="cmd-desc">Refile your filter at this max budget for next issue.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="cmd">VIEW</div>
+            <div class="cmd-desc">I'll book a walk-through call for the coffee farm (#01).</div>
+          </td>
+          <td>
+            <div class="cmd">MORE LIKE 01</div>
+            <div class="cmd-desc">Pulpo will surface 5 listings with the same profile next issue.</div>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <div class="annot">
+      <strong>Block 9 — Reply hooks.</strong> Today the email has zero ways to reply.
+      Each command teaches the reader they have agency — and Sebas now has a feedback
+      loop that improves the next issue. The conversion from <em>"Pro is a database"</em>
+      to <em>"Pro is my guy"</em> happens here.
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────
+         10 · FOOTER  (acknowledgment + unsub)
+    ───────────────────────────────────────────────────────────── -->
+    <tr><td class="foot">
+      <p>Issue 05 went to 2,847 readers. 41 of you replied to Issue 04 — every reply was read, 19 led to a personal note back.</p>
+      <p style="margin-top: 12px;">
+        Pulpo is built in San Salvador by Sebastian Suarez. The data is scraped weekly from
+        seven sources and hand-corrected. If something here is wrong, reply <strong>WRONG</strong>
+        with the issue and I'll fix it before Issue 06.
+      </p>
+      <p style="margin-top: 12px;">
+        <a href="#">Manage your filter</a> · <a href="#">Forward to a friend</a> · <a href="#">Unsubscribe</a>
+      </p>
+    </td></tr>
+
+  </table>
+</div>
+
+</body>
+</html>
