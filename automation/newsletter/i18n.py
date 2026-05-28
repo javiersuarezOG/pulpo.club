@@ -54,18 +54,16 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "pick.top_label":              {"en": "🏆 Top pick · {rank:02d}",                     "es": "🏆 Selección · {rank:02d}"},
     "pick.new_pill":               {"en": "New this fortnight",                           "es": "Nueva esta quincena"},
     "pick.repriced_pill":          {"en": "Price moved",                                  "es": "Precio movido"},
-    # NEW (v2.2): source-aware CTAs. "View on remax-elsalvador.com →" reads
-    # editorially and respects the source brokerage. cta_view is the
-    # fallback when the listing URL is missing/unparseable.
-    "pick.cta_view_on":            {"en": "View on {source} →",                           "es": "Ver en {source} →"},
-    "pick.cta_view":               {"en": "View listing →",                               "es": "Ver propiedad →"},
+    # PR-NL-5 (v2.4 redesign): every pick CTA goes to pulpo.club, not the
+    # external source. The dual CTA on hero picks is `cta_open` (solid
+    # "See on Pulpo →") + `cta_save` (ghost "Save to favorites"). The
+    # source-aware `cta_view_on` / `cta_view` from v2.2 are deleted —
+    # the rich-pick CTA now points at pulpo_url, not listing_url.
+    "pick.cta_open":               {"en": "See on Pulpo →",                               "es": "Ver en Pulpo →"},
+    "pick.cta_save":               {"en": "Save to favorites",                            "es": "Guardar en favoritos"},
     # Price-anchored unlock — "$9.99/mo" matches the canonical pricing
     # source-of-truth (project_post_stripe_activation_series memory).
     "pick.cta_locked":             {"en": "Unlock this pick — $9.99/mo →",                "es": "Desbloquear esta selección — $9.99/mes →"},
-    # Legacy alias kept for one transition issue — every render path now
-    # uses cta_view_on / cta_view above. Safe to delete after the next
-    # send confirms no callers remain.
-    "pick.cta_open":               {"en": "Open the file →",                              "es": "Abrir la ficha →"},
     "pick.paywall_blurb":          {"en": "Pulpo Pro reveals the address, the broker file, and the full underwriting. Free members see the photo and the headline.",
                                      "es": "Pulpo Pro revela la dirección, la ficha del corredor y el análisis completo. Los miembros gratuitos ven foto y titular."},
     "shortlist.eyebrow":           {"en": "The shortlist",                                "es": "La lista corta"},

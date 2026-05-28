@@ -22,11 +22,11 @@ from automation.newsletter.store import email_hash
 ISSUE_DATE = datetime(2026, 5, 18, 14, 0, tzinfo=timezone.utc)
 
 ENGLISH_CANARIES = (
-    # v2.2: "Open the file" is the legacy fallback — should never render
-    # in ES locale because cta_view_on now drives the rich-pick CTA.
-    "Open the file",
-    "View on ",
-    "View listing →",
+    # PR-NL-5 (v2.4): the hero-pick CTAs are "See on Pulpo →" + "Save to
+    # favorites". Paywalled picks still use the v2.2 "Unlock this pick"
+    # text. None of these should leak into an ES render.
+    "See on Pulpo",
+    "Save to favorites",
     "Unlock this pick",
     "Top pick · ",
     "Hand-picked",
@@ -55,9 +55,9 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
     # class is always present in the <style> block; we check the rendered
     # element instead.
     assert '<div class="paywall-banner">' not in html
-    assert "Unlock this pick" not in html  # no locked CTAs for Pro
-    # v2.2: rich-pick CTAs name the source domain
-    assert "View on " in html
+    assert "Unlock this pick" not in html       # no locked CTAs for Pro
+    assert "See on Pulpo →" in html             # PR-NL-5: hero-pick solid CTA
+    assert "Save to favorites" in html          # PR-NL-5: hero-pick ghost CTA
     assert "Hand-picked for Javier" in html
 
 
@@ -170,26 +170,38 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     from automation.newsletter.render_html import TEMPLATE_VERSION
     html = _render(pro_with_prefs, ranked_pool)
     assert TEMPLATE_VERSION  # non-empty
-    assert TEMPLATE_VERSION.startswith("newsletter-v2.2"), (
+    assert TEMPLATE_VERSION.startswith("newsletter-v2.4"), (
         f"TEMPLATE_VERSION drifted: {TEMPLATE_VERSION!r}"
     )
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
 
 
-def test_render_v22_redesign_contract(pro_with_prefs, ranked_pool):
-    """v2.2 renderer contract: the keytable grid is gone, the meta-row
-    strip is present, the callout left-bar stripe is gone, and the CTA
-    names the source domain. These are the four visible changes —
-    locking them in here so a refactor doesn't quietly undo them."""
+def test_render_v24_redesign_contract(pro_with_prefs, ranked_pool):
+    """v2.4 renderer contract — the four visible changes that PR-NL-5
+    locked in, plus the two that survived from v2.2:
+
+    From v2.2 (still true):
+      • Keytable grid replaced by the meta-row strip
+      • Callout left-bar stripe is gone
+
+    From v2.4 / PR-NL-5:
+      • Per-pick CTAs route to pulpo.club/listing/<id>, NOT the external
+        source brokerage URL
+      • Hero picks render both a solid "See on Pulpo →" + a ghost
+        "Save to favorites" CTA (the dual-CTA pair)
+    """
     import re
     html = _render(pro_with_prefs, ranked_pool)
-    # Keytable HTML element gone
+    # From v2.2: keytable HTML element gone, meta-row present
     assert '<table class="keytable"' not in html
-    # New meta-row strip present
     assert 'class="meta-row"' in html
-    # Callout left-bar stripe + colored panel are gone
+    # From v2.2: callout left-bar stripe + colored panel are gone
     assert "border-left: 3px solid var(--clay)" not in html
-    # CTA names the source domain — at least one "View on <domain>" appears
-    assert re.search(r"View on [a-z0-9.-]+\.[a-z]{2,}", html), (
-        "Expected a 'View on <domain>' CTA in the rendered issue"
+    # PR-NL-5: CTAs go to pulpo.club, never to the source brokerage
+    assert "pulpo.club/listing/" in html
+    assert not re.search(r"View on [a-z0-9.-]+\.[a-z]{2,}", html), (
+        "v2.4 dropped the source-domain CTA; pulpo.club is the canonical CTA target now."
     )
+    # PR-NL-5: both hero CTAs present
+    assert "See on Pulpo →" in html
+    assert "Save to favorites" in html
