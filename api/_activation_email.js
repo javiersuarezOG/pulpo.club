@@ -1,5 +1,11 @@
 // Pulpo-owned activation email pipeline.
 //
+// GUARDRAIL: this is the INVITATION flow. Newsletter sends live at
+// automation/newsletter/send.py + api/admin/newsletter/send.js. We share
+// one Resend project (RESEND_API_KEY) but separate `from:` envs, no
+// audience overlap, and distinct PostHog event prefixes — see
+// docs/email-audit.md for the full topology.
+//
 // Background: Clerk's own email pipeline accepts our invitation send
 // requests but holds them indefinitely at `status: queued` (confirmed
 // via the Svix webhook telemetry in PR #341). DNS + DKIM are all
@@ -25,9 +31,22 @@
 // WelcomeModal's "Resend my invitation" button is the user recovery).
 
 const crypto = require("crypto");
+const posthog = require("./_posthog");
 
 const RESEND_API = "https://api.resend.com/emails";
 const DEFAULT_FROM = "Pulpo Club <hello@mail.pulpo.club>";
+
+// LEARNING: cross-flow telemetry events. The audit task asks for
+// `email.invitation.sent { invitee_email, resend_message_id, flow }` and
+// `email.send.failed { flow, error_code, error_message, recipient }`. Both
+// "invitee_email" and "recipient" are persisted as their PII-safe SHA256
+// hash (recipientHash) — same approach the rest of the codebase takes
+// (see api/_posthog.js#emailDistinctId, api/unsubscribe.js#hashEmail).
+// PostHog dashboards that need to join across flows do so on the hashed
+// identifier; the raw address never leaves the Vercel function.
+const EVENT_INVITATION_SENT = "email.invitation.sent";
+const EVENT_SEND_FAILED = "email.send.failed";
+const FLOW_INVITATION = "invitation";
 
 // PII-safe recipient hash — same algorithm as api/_posthog.js's
 // emailDistinctId. Stamped on the outbound mail as a tag so Resend's
@@ -39,6 +58,25 @@ function recipientHash(email) {
     .update(email.trim().toLowerCase())
     .digest("hex")
     .slice(0, 16);
+}
+
+// Single emission point for `email.send.failed`. Telemetry must never
+// throw — posthog.capture is already non-throwing, but route every
+// failure exit through here so we cannot accidentally skip an emission
+// in a future branch.
+function captureSendFailed({ email, errorCode, errorMessage, statusCode }) {
+  const hash = recipientHash(email);
+  posthog.capture(
+    hash ? `email:${hash}` : "server:activation_email",
+    EVENT_SEND_FAILED,
+    {
+      flow: FLOW_INVITATION,
+      error_code: errorCode || "",
+      error_message: errorMessage || "",
+      recipient: hash || "anon",
+      status_code: typeof statusCode === "number" ? statusCode : 0,
+    },
+  );
 }
 
 // Locale → template selector. Mirrors what Clerk's locale-aware
@@ -164,10 +202,19 @@ Si este correo llega a Promociones, muévelo a Principal para que el próximo em
 async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
   const apiKey = (process.env.RESEND_API_KEY || "").trim();
   if (!apiKey) {
+    captureSendFailed({
+      email, errorCode: "missing_api_key",
+      errorMessage: "RESEND_API_KEY not set", statusCode: 0,
+    });
     return { ok: false, error: "RESEND_API_KEY not set", status_code: 0 };
   }
   if (!email || !actionUrl) {
-    return { ok: false, error: "missing required field (email/actionUrl)", status_code: 0 };
+    const errorMessage = "missing required field (email/actionUrl)";
+    captureSendFailed({
+      email, errorCode: "missing_required_field",
+      errorMessage, statusCode: 0,
+    });
+    return { ok: false, error: errorMessage, status_code: 0 };
   }
 
   const from = (process.env.PULPO_ACTIVATION_FROM_EMAIL || DEFAULT_FROM).trim();
@@ -185,6 +232,14 @@ async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
     // join back to the post-Stripe funnel in PostHog. The resend-webhook
     // handler's pickPostHogProps reads tags.recipient_hash and the
     // x-pulpo-* headers; same names here.
+    //
+    // LEARNING: `email_type=activation` is the single discriminator
+    // /api/resend-webhook uses (post-2026-05-28) to distinguish activation
+    // lifecycle from newsletter lifecycle in PostHog. Both flows share the
+    // single Resend webhook endpoint. Keeping the existing `newsletter.*`
+    // event names plus an `email_type` prop preserves all existing
+    // dashboards while letting them filter activations out of the
+    // newsletter deliverability numerator. See docs/email-audit.md.
     tags: [
       { name: "recipient_hash", value: hash || "anon" },
       { name: "email_type", value: "activation" },
@@ -214,28 +269,37 @@ async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
       body: JSON.stringify(payload),
     });
   } catch (err) {
-    return {
-      ok: false,
-      error: `fetch_failed: ${err && err.message ? err.message : "unknown"}`,
-      status_code: 0,
-    };
+    const errorMessage = `fetch_failed: ${err && err.message ? err.message : "unknown"}`;
+    captureSendFailed({
+      email, errorCode: "fetch_failed", errorMessage, statusCode: 0,
+    });
+    return { ok: false, error: errorMessage, status_code: 0 };
   }
 
   let body;
   try { body = await res.json(); } catch { body = null; }
 
   if (!res.ok) {
-    return {
-      ok: false,
-      error: (body && (body.message || body.error)) || `http_${res.status}`,
-      status_code: res.status,
-    };
+    const errorMessage = (body && (body.message || body.error)) || `http_${res.status}`;
+    captureSendFailed({
+      email, errorCode: `http_${res.status}`,
+      errorMessage, statusCode: res.status,
+    });
+    return { ok: false, error: errorMessage, status_code: res.status };
   }
-  return {
-    ok: true,
-    message_id: (body && body.id) || "",
-    status_code: res.status,
-  };
+  const messageId = (body && body.id) || "";
+  posthog.capture(
+    `email:${hash}`,
+    EVENT_INVITATION_SENT,
+    {
+      flow: FLOW_INVITATION,
+      invitee_email: hash || "anon",  // hashed per PII rule; see LEARNING above
+      resend_message_id: messageId,
+      locale: lc,
+      from,
+    },
+  );
+  return { ok: true, message_id: messageId, status_code: res.status };
 }
 
 module.exports = {

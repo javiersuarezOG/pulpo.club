@@ -33,6 +33,13 @@ const SVIX_SECRET_ENV = "RESEND_WEBHOOK_SECRET";
 const TIMESTAMP_TOLERANCE_S = 300;          // ±5 minutes
 const MAX_BODY_SIZE = 64 * 1024;            // 64 KB
 
+// GUARDRAIL: activation and newsletter sends BOTH route lifecycle events
+// through this handler. Event names stay `newsletter.*` for back-compat
+// with existing PostHog dashboards/funnels; the `email_type` prop
+// (extracted by pickPostHogProps below, sourced from the `email_type`
+// tag and `x-pulpo-email-type` header stamped by the sender) is the
+// discriminator. Filter `email_type = "newsletter"` to exclude
+// activations from deliverability dashboards. See docs/email-audit.md.
 const EVENT_MAP = {
   "email.sent":              "newsletter.sent",
   "email.delivered":         "newsletter.delivered",
@@ -42,6 +49,10 @@ const EVENT_MAP = {
   "email.complained":        "newsletter.complained",
   "email.delivery_delayed":  "newsletter.delivery_delayed",
 };
+
+// Valid values the upstream senders stamp. Anything else (or missing)
+// becomes "unknown" so dashboards still get a non-null axis.
+const KNOWN_EMAIL_TYPES = new Set(["newsletter", "activation", "contact", "admin_test"]);
 
 function logApi(fields) {
   const parts = ["[api]", "resend_webhook"];
@@ -67,11 +78,21 @@ function pickPostHogProps(event, body) {
   const issue_raw = tag("issue_number") || headers["x-pulpo-issue"] || null;
   const issue_number = issue_raw ? Number.parseInt(issue_raw, 10) : null;
   const message_id = data.email_id || data.id || null;
+  // LEARNING: `email_type` discriminates activation vs newsletter lifecycle.
+  // Stamped by api/_activation_email.js (activation) and the newsletter
+  // dispatcher (newsletter). Filterable downstream in PostHog so existing
+  // newsletter.* dashboards can exclude activation pollution without
+  // event renames. See docs/email-audit.md for the full audit.
+  const email_type_raw = tag("email_type") || headers["x-pulpo-email-type"] || null;
+  const email_type = email_type_raw && KNOWN_EMAIL_TYPES.has(email_type_raw)
+    ? email_type_raw
+    : "unknown";
   const props = {
     resend_event: event,
     message_id,
     recipient_hash,
     issue_number: Number.isFinite(issue_number) ? issue_number : null,
+    email_type,
   };
   if (event === "email.clicked") {
     const click = (data.click && typeof data.click === "object") ? data.click : {};
@@ -151,6 +172,7 @@ module.exports = async (req, res) => {
     status: 200, ms: Date.now() - t0,
     event: phEvent, recipient_hash: props.recipient_hash || "anon",
     issue_number: props.issue_number != null ? props.issue_number : "?",
+    email_type: props.email_type,
   });
   return res.status(200).json({ ok: true });
 };
