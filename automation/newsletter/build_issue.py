@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 from . import commentary as commentary_mod
 from . import i18n
-from .segments import select_picks
+from .segments import apply_preference, select_picks
 from .store import excluded_source_ids_for, last_send_at_for
 from .types import (
     Chip,
@@ -24,6 +24,7 @@ from .types import (
     Locale,
     Preference,
     Recipient,
+    YourPulpoState,
 )
 
 ISSUE_DEFAULT_TOP_N = 10
@@ -400,6 +401,67 @@ def _blurb(listing: dict, locale: Locale) -> str:
     if buf.strip():
         sentences.append(buf.strip())
     return " ".join(sentences[:3]) or text[:400]
+
+
+def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> str:
+    """Turn the Recipient.preference into a single short human string.
+
+    Examples:
+      Preference(departments=["La Libertad"], property_types=["land"],
+                 max_price_usd=500000)
+                 → "La Libertad · land · under $500k"
+
+      Preference(zones=["el-zonte"], categories=["beachfront"])
+                 → "El Zonte · Beachfront"
+
+      Preference() (anonymous / no filter)
+                 → "" — the renderer swaps in welcome-style copy.
+
+    Locale-aware: "under" / "menos de", "land" / "terreno" mapped via
+    i18n keys to stay in sync with the rest of the email. Cohort
+    `anonymous` short-circuits to "" — they don't have a filter yet,
+    so showing a filter summary is misleading.
+    """
+    if cohort == "anonymous":
+        return ""
+
+    parts: list[str] = []
+
+    # Departments are the most readable filter dimension; lead with them
+    # but cap at 2 to keep the line short.
+    for d in pref.departments[:2]:
+        parts.append(d.title())
+    # Zones only show when no departments are set — they're more
+    # granular and would just repeat what the department row already says.
+    if not pref.departments:
+        for z in pref.zones[:2]:
+            parts.append(z.replace("-", " ").title())
+
+    # Property type — single most expected token.
+    if "land" in pref.property_types:
+        parts.append("land" if locale == "en" else "terreno")
+    elif "house" in pref.property_types:
+        parts.append("house" if locale == "en" else "casa")
+    elif "condo" in pref.property_types:
+        parts.append("condo" if locale == "en" else "condo")
+
+    # Price cap — present only when it bites. Compact dollar format
+    # ("$500k", not "$500,000") matches the mockup tone.
+    if pref.max_price_usd:
+        cap = int(pref.max_price_usd)
+        if cap >= 1_000_000:
+            money = f"${cap / 1_000_000:g}M"
+        elif cap >= 1_000:
+            money = f"${cap // 1_000}k"
+        else:
+            money = f"${cap}"
+        parts.append(f"under {money}" if locale == "en" else f"menos de {money}")
+
+    # Categories last — they're usually editorial, not structural.
+    for c in pref.categories[:2]:
+        parts.append(c.replace("_", " ").title())
+
+    return " · ".join(parts) if parts else ""
 
 
 def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[str, str]:
@@ -866,6 +928,21 @@ def build_issue(
             f"{site_root.rstrip('/')}/welcome?r={recipient.email_hash}&ref=newsletter_issue_{issue_number}"
         )
 
+    # ── PR-NL-8 — Your Pulpo block ─────────────────────────────────────
+    # `filter_match_count` is the size of the full filtered cut against
+    # `ranked_listings` (not the trimmed top-N) — it answers "how many
+    # listings match your filter right now" without coupling to whatever
+    # ISSUE_DEFAULT_TOP_N happens to be.
+    filter_match_count = (
+        len(apply_preference(ranked_listings, effective_pref))
+        if cohort != "anonymous" else len(ranked_listings)
+    )
+    your_pulpo = YourPulpoState(
+        saved_count=recipient.saved_count,
+        filter_summary_human=_filter_summary_human(effective_pref, locale, cohort),
+        filter_match_count=filter_match_count,
+    )
+
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
@@ -883,4 +960,5 @@ def build_issue(
         settings_url=settings_url,
         unsubscribe_url=unsubscribe_url,
         welcome_prefs_url=welcome_prefs_url,
+        your_pulpo=your_pulpo,
     )

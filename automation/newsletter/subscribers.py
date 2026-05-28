@@ -121,6 +121,11 @@ class ClerkUser:
     first_name: Optional[str]
     plan: str
     profile: dict
+    # PR-NL-8 — `privateMetadata.saves[]` length. The newsletter's
+    # "Your Pulpo" block reads this to render the saved-listings row.
+    # Stored as a count, not the actual ids, since the email only needs
+    # the headline number ("3 saved listings from past issues").
+    saved_count: int = 0
 
 
 def list_clerk_users(
@@ -170,12 +175,19 @@ def _parse_clerk_user(u: dict) -> Optional[ClerkUser]:
     if not isinstance(plan, str) or plan not in ("pro", "agency", "free"):
         plan = "free"
     profile = public_md.get("profile") if isinstance(public_md.get("profile"), dict) else {}
+    # PR-NL-8 — saves live in privateMetadata (per api/saves.js). Read
+    # defensively so a missing or wrong-shaped value degrades to 0
+    # rather than crashing the entire audience send.
+    private_md = u.get("private_metadata") or u.get("privateMetadata") or {}
+    saves = private_md.get("saves") if isinstance(private_md, dict) else None
+    saved_count = len(saves) if isinstance(saves, list) else 0
     return ClerkUser(
         id=str(u.get("id") or ""),
         email=email,
         first_name=(u.get("first_name") or u.get("firstName")) or None,
         plan=plan,
         profile=profile,
+        saved_count=saved_count,
     )
 
 
@@ -268,6 +280,7 @@ def join_recipients(
                 tier=user.plan,
                 has_account=True,
                 preference=preference,
+                saved_count=user.saved_count,
             )
         else:
             # Use the locale persisted via the Resend first_name side-channel

@@ -50,6 +50,11 @@ class Recipient:
     tier: Literal["free", "pro", "agency"]
     has_account: bool                            # False == anonymous Resend-only contact
     preference: Preference
+    # PR-NL-8 — population of this field happens in subscribers.py from
+    # Clerk's privateMetadata.saves[] length. Anonymous recipients (no
+    # Clerk record) stay at 0. Defaults so older callers that build a
+    # Recipient by hand don't have to pass it.
+    saved_count: int = 0
 
 
 ChipKind = Literal["neutral", "warm", "cool"]
@@ -140,6 +145,25 @@ class Commentary:
 
 
 @dataclass
+class YourPulpoState:
+    """PR-NL-8 — the "Your Pulpo" block at the bottom of the issue.
+
+    Three rows tying the email back to the SPA:
+      1. saved_count → /saved        ("Open your favorites")
+      2. filter_summary_human → /account/notifications  ("Edit your filter")
+      3. filter_match_count → /browse  ("Browse all in your filter")
+
+    Anonymous cohort (no Clerk record) renders a softened variant —
+    `saved_count = 0`, `filter_summary_human = ""` → the renderer
+    swaps in welcome-style copy.
+    """
+
+    saved_count: int = 0
+    filter_summary_human: str = ""               # "La Libertad · land · under $500k"
+    filter_match_count: int = 0
+
+
+@dataclass
 class Issue:
     issue_id: str                                # YYYY-MM-DD of generation
     issue_number: int                            # 01, 02, 03 …
@@ -157,3 +181,6 @@ class Issue:
     settings_url: str
     unsubscribe_url: str
     welcome_prefs_url: Optional[str]             # anonymous cohort gets a "set your filter" link
+    # PR-NL-8 — Your Pulpo block. Defaults so existing test fixtures
+    # that build Issue by hand still work.
+    your_pulpo: YourPulpoState = field(default_factory=YourPulpoState)

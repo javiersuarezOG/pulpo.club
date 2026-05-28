@@ -1037,6 +1037,46 @@ function App() {
     });
   }, [clerkUserId, showToast, locale]);
 
+  // ── PR-NL-8 — auto-save from email "♥ Save to favorites" links ────────
+  //
+  // The newsletter emits `/listing/<id>?save=1&ref=newsletter_issue_<N>`
+  // as the heart CTA target. When the SPA cold-loads onto that URL,
+  // this effect fires `toggleSave(openListingId)` exactly once and
+  // strips the `save=1` flag from the URL so a browser back/forward
+  // doesn't re-trigger it. Skips silently when the id is already
+  // saved (no toast surprise on a second click), and skips entirely
+  // when the URL never had `save=1`.
+  //
+  // Works for both signed-in and signed-out readers — `toggleSave`
+  // already handles each path (server-synced vs localStorage-only).
+  const autoSaveTriggeredRef = useRef(false);
+  useEffect(() => {
+    if (autoSaveTriggeredRef.current) return;
+    if (typeof window === "undefined") return;
+    if (!openListingId) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("save") !== "1") return;
+    autoSaveTriggeredRef.current = true;
+    if (!savedIds.has(openListingId)) {
+      toggleSave(openListingId);
+      track("save.auto_from_newsletter", {
+        listing_id: openListingId,
+        auth_state: clerkUserId ? "signed_in" : "signed_out",
+      });
+    }
+    // Strip ?save=1 from the URL without losing other params or the
+    // path itself. Use replaceState so back/forward doesn't bring it
+    // back. Falls through silently if history isn't available.
+    try {
+      params.delete("save");
+      const qs = params.toString();
+      const cleaned = window.location.pathname + (qs ? "?" + qs : "") + window.location.hash;
+      window.history.replaceState(window.history.state, "", cleaned);
+    } catch {
+      /* no-op — Safari private mode can throw on replaceState */
+    }
+  }, [openListingId, savedIds, toggleSave, clerkUserId]);
+
   const openSignup = useCallback((cfg = {}) => {
     // Telemetry — fire `signup_modal.shown` once per open. Trigger is
     // derived from the cfg we received (so callers don't have to pass
