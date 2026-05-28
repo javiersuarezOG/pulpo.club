@@ -30,6 +30,12 @@ import React, { useState } from "react";
 const DEFAULT_EMAIL = "javier@suarez.ventures";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Mirrors `synthesize_preview_recipients(email)` in
+// automation/newsletter/subscribers.py — the operator should see the
+// same three cohorts the script will actually generate, so the success
+// card's subject preview matches what shows up in their inbox.
+const PREVIEW_COHORTS = ["anonymous", "free_prefs", "pro_prefs"];
+
 const WIDGET_STYLES = `
 .nl-preview-widget {
   max-width: 560px;
@@ -66,7 +72,7 @@ const WIDGET_STYLES = `
   outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
-.nl-preview-widget button {
+.nl-preview-widget button.nl-trigger {
   appearance: none;
   font: inherit;
   font-weight: 600;
@@ -79,11 +85,12 @@ const WIDGET_STYLES = `
   align-self: flex-start;
   transition: background 120ms ease, border-color 120ms ease;
 }
-.nl-preview-widget button:hover {
+.nl-preview-widget button.nl-trigger:hover {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
 }
-.nl-preview-widget button[disabled] { opacity: 0.55; cursor: not-allowed; }
+.nl-preview-widget button.nl-trigger[disabled] { opacity: 0.55; cursor: not-allowed; }
+
 .nl-preview-widget .nl-hint {
   font-size: 13px;
   line-height: 19px;
@@ -97,31 +104,139 @@ const WIDGET_STYLES = `
   padding: 1px 4px;
   border-radius: 3px;
 }
+
+/* ── status: success → structured card ────────────────────────────── */
+.nl-preview-widget .nl-success {
+  margin: 4px 0 0;
+  background: var(--paper-2);
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--accent-strong);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nl-preview-widget .nl-success-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.nl-preview-widget .nl-success-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  color: var(--paper);
+  font-size: 11px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.nl-preview-widget .nl-success-body {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--ink-2);
+  margin: 0;
+}
+.nl-preview-widget .nl-success-body strong { color: var(--ink); }
+.nl-preview-widget .nl-success-subjects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nl-preview-widget .nl-success-subjects li {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-2);
+  padding: 4px 8px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.nl-preview-widget .nl-success-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin: 2px 0 0;
+}
+.nl-preview-widget .nl-success-footer a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 600;
+}
+.nl-preview-widget .nl-success-footer a:hover { text-decoration: underline; }
+
+/* ── status: error / pending → single inline line ─────────────────── */
 .nl-preview-widget .nl-status {
   font-size: 13px;
   line-height: 19px;
-  margin: 0;
+  margin: 4px 0 0;
   min-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.nl-preview-widget .nl-status.error { color: var(--badge-drop); }
-.nl-preview-widget .nl-status.success { color: var(--accent-strong); }
-.nl-preview-widget .nl-status a { color: inherit; text-decoration: underline; }
+.nl-preview-widget .nl-status.error {
+  color: var(--badge-drop);
+}
+.nl-preview-widget .nl-status.pending {
+  color: var(--ink-3);
+}
+.nl-preview-widget .nl-status .nl-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  font-size: 10px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.nl-preview-widget .nl-status.error .nl-status-icon {
+  background: var(--badge-drop);
+  color: var(--paper);
+}
+.nl-preview-widget .nl-status.pending .nl-status-icon {
+  border: 2px solid var(--line-2);
+  border-top-color: var(--ink-3);
+  animation: nl-spin 800ms linear infinite;
+}
+@keyframes nl-spin { to { transform: rotate(360deg); } }
 `;
 
 export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState({ kind: null, message: "", url: null });
+  // status is a discriminated union by `kind`:
+  //   { kind: null }                            — nothing rendered
+  //   { kind: "pending" }                       — spinner + "Dispatching…"
+  //   { kind: "error",   message }              — red inline line
+  //   { kind: "success", recipient, runsUrl }   — structured success card
+  const [status, setStatus] = useState({ kind: null });
 
   const trigger = async (e) => {
     e.preventDefault();
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
-      setStatus({ kind: "error", message: "Enter a valid email address.", url: null });
+      setStatus({ kind: "error", message: "Enter a valid email address." });
       return;
     }
     setBusy(true);
-    setStatus({ kind: null, message: "Dispatching workflow…", url: null });
+    setStatus({ kind: "pending" });
     try {
       const r = await fetch("/api/admin/newsletter/trigger-preview", {
         method: "POST",
@@ -132,21 +247,18 @@ export function NewsletterWidget() {
       if (!r.ok) {
         const detail = body.error || `HTTP ${r.status}`;
         const hint = body.hint ? ` — ${body.hint}` : "";
-        setStatus({ kind: "error", message: `${detail}${hint}`, url: null });
+        setStatus({ kind: "error", message: `${detail}${hint}` });
         return;
       }
       setStatus({
         kind: "success",
-        message:
-          `Workflow dispatched. Three emails to ${value} arrive in ~30–60s. ` +
-          `Subjects prefixed [PULPO PREVIEW · <cohort>].`,
-        url: body.runs_url || null,
+        recipient: value,
+        runsUrl: body.runs_url || null,
       });
     } catch (err) {
       setStatus({
         kind: "error",
         message: String(err && err.message || err),
-        url: null,
       });
     } finally {
       setBusy(false);
@@ -171,19 +283,48 @@ export function NewsletterWidget() {
               required
             />
           </div>
-          <button type="submit" disabled={busy}>
+          <button type="submit" className="nl-trigger" disabled={busy}>
             {busy ? "Dispatching…" : "Send next 3 cohort variants"}
           </button>
-          <p
-            className={`nl-status ${status.kind || ""}`}
-            role={status.kind === "error" ? "alert" : undefined}
-            aria-live="polite"
-          >
-            {status.message}
-            {status.url && (
-              <> · <a href={status.url} target="_blank" rel="noreferrer">workflow runs</a></>
-            )}
-          </p>
+
+          {status.kind === "success" && (
+            <div className="nl-success" role="status" aria-live="polite">
+              <p className="nl-success-head">
+                <span className="nl-success-check" aria-hidden="true">✓</span>
+                Dispatched · 3 emails on the way
+              </p>
+              <p className="nl-success-body">
+                Sending to <strong>{status.recipient}</strong>. They should
+                land in ~30–60 seconds. Look for these subjects in your inbox:
+              </p>
+              <ul className="nl-success-subjects">
+                {PREVIEW_COHORTS.map((cohort) => (
+                  <li key={cohort}>[PULPO PREVIEW · {cohort}] Issue 01</li>
+                ))}
+              </ul>
+              {status.runsUrl && (
+                <p className="nl-success-footer">
+                  <a href={status.runsUrl} target="_blank" rel="noreferrer">
+                    View workflow run on GitHub →
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
+
+          {status.kind === "pending" && (
+            <p className="nl-status pending" aria-live="polite">
+              <span className="nl-status-icon" aria-hidden="true" />
+              Dispatching workflow…
+            </p>
+          )}
+
+          {status.kind === "error" && (
+            <p className="nl-status error" role="alert" aria-live="polite">
+              <span className="nl-status-icon" aria-hidden="true">!</span>
+              {status.message}
+            </p>
+          )}
         </form>
 
         <p className="nl-hint">
