@@ -138,6 +138,29 @@ table { border-collapse: collapse; }
 .pill-forest  { background: var(--sage); color: var(--forest); }
 .pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
 .pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
+
+/* ── PR-NL-5 chips — supportive context next to a hero pick ─────────
+   `chip` is the new container (replacing the older pill on hero picks).
+   `kind` defaults to neutral; warm + cool override the color to carry
+   emotional/positive weight without shouting. Tuned to feel quieter
+   than the old pill so the headline + hero photo + story paragraph
+   stay the focal point. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  background: var(--paper-3);
+  margin: 0 4px 6px 0;
+  line-height: 1.6;
+}
+.chip-warm { background: #FBE6D8; color: var(--clay-deep); }
+.chip-cool { background: var(--sage); color: var(--forest); }
 .cta {
   display: inline-block;
   font-family: var(--font-sans);
@@ -215,6 +238,27 @@ def _pills_html(pills: list[str]) -> str:
     if not pills:
         return ""
     return "".join(f'<span class="pill">{_e(p)}</span>' for p in pills)
+
+
+def _chips_html(pick: IssuePick) -> str:
+    """Render PR-NL-5 Chip objects (warm/cool/neutral) into the email.
+
+    Falls through to the legacy `pills` list when no chips are set so any
+    older fixture or upstream caller that hasn't migrated still renders
+    *something* useful instead of a blank row."""
+    chips = getattr(pick, "chips", None) or []
+    if not chips:
+        return _pills_html(pick.pills)
+    out: list[str] = []
+    for c in chips:
+        klass = "chip"
+        kind = getattr(c, "kind", "neutral")
+        if kind == "warm":
+            klass += " chip-warm"
+        elif kind == "cool":
+            klass += " chip-cool"
+        out.append(f'<span class="{klass}">{_e(c.label)}</span>')
+    return "".join(out)
 
 
 def _callouts_html(callouts: list[dict]) -> str:

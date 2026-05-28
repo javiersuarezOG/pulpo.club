@@ -16,6 +16,7 @@ from . import i18n
 from .segments import select_picks
 from .store import excluded_source_ids_for, last_send_at_for
 from .types import (
+    Chip,
     Cohort,
     Commentary,
     Issue,
@@ -26,7 +27,8 @@ from .types import (
 )
 
 ISSUE_DEFAULT_TOP_N = 10
-ISSUE_TOP_PICKS_RICH = 2   # picks rendered with a full hero image + callouts
+ISSUE_TOP_PICKS_RICH = 3   # picks rendered with a full hero image + callouts (was 2 pre PR-NL-5)
+ISSUE_CHIPS_PER_PICK = 4   # max supportive chips alongside the hero / pick
 DEFAULT_WINDOW_DAYS = 14
 
 LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
@@ -376,11 +378,146 @@ def _blurb(listing: dict, locale: Locale) -> str:
     return " ".join(sentences[:3]) or text[:400]
 
 
-def _to_pick(listing: dict, *, rank: int, locale: Locale, paywalled: bool, site_root: str) -> IssuePick:
+def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[str, str]:
+    """The canonical /listing/<source>:<source_id> page on pulpo.club plus
+    a save variant. The save_url adds `?save=1` so the SPA can auto-trigger
+    the save on mount once PR-NL-8 is wired; today the listing page just
+    ignores the unknown param and the reader clicks the heart manually.
+
+    Both URLs include a `ref=newsletter_issue_<N>` so PostHog can attribute
+    in-app conversion back to the issue."""
+    source_id = f"{listing.get('source')}:{listing.get('source_id')}"
+    base = f"{site_root.rstrip('/')}/listing/{source_id}"
+    ref = f"ref=newsletter_issue_{issue_number}"
+    return (f"{base}?{ref}", f"{base}?{ref}&save=1")
+
+
+def _chips_for_listing(
+    listing: dict,
+    *,
+    rank: int,
+    locale: Locale,
+    rank_threshold_top: int = 3,
+) -> list[Chip]:
+    """Pulpo-data-derived supportive chips for a pick.
+
+    Each chip maps to a field on the Listing row — never to fabricated or
+    LLM-derived content. The renderer color-codes by `kind`:
+      warm    → recent action / urgency (price drop)
+      cool    → strong positive signal (top pick, deep discount, build-ready)
+      neutral → quiet context (distance, utilities, freshness)
+
+    Priority order (warm > cool > neutral) decides which chips survive when
+    we trim to `ISSUE_CHIPS_PER_PICK`. The first warm chip wins emotional
+    weight in the rendered email — keep that one truthful above all else.
+    """
+    chips: list[Chip] = []
+
+    # ── warm ── recent action the buyer cares about right now ────────
+    if listing.get("is_repriced"):
+        prev = listing.get("previous_price")
+        cur = listing.get("price_usd")
+        if isinstance(prev, (int, float)) and isinstance(cur, (int, float)) and prev > cur:
+            delta_pct = (prev - cur) / prev * 100
+            delta_usd = prev - cur
+            if delta_pct >= 10:
+                # Large drops lead with the percentage (more striking).
+                label = (
+                    f"↓ Just dropped −{delta_pct:.0f}%" if locale == "en"
+                    else f"↓ Acaba de bajar −{delta_pct:.0f}%"
+                )
+            else:
+                # Small drops lead with the dollar number (more concrete).
+                label = (
+                    f"↓ Just dropped −${int(delta_usd):,}" if locale == "en"
+                    else f"↓ Acaba de bajar −${int(delta_usd):,}"
+                )
+            chips.append(Chip(label=label, kind="warm"))
+
+    # ── cool ── strong positive signals ──────────────────────────────
+    if rank > 0 and rank <= rank_threshold_top:
+        chips.append(Chip(
+            label="★ Top pick this fortnight" if locale == "en" else "★ Selección destacada",
+            kind="cool",
+        ))
+
+    pct = listing.get("price_vs_zone_pct")
+    if isinstance(pct, (int, float)) and pct <= -30:
+        # Frame the discount in plain language ("under area average"), not
+        # the analyst phrasing ("vs zone median per m²"). The number stays
+        # honest; the wording stays warm.
+        n = abs(int(round(pct)))
+        chips.append(Chip(
+            label=f"−{n}% under area average" if locale == "en"
+            else f"−{n}% bajo el promedio",
+            kind="cool",
+        ))
+
+    readiness = listing.get("readiness_score")
+    if isinstance(readiness, int) and readiness >= 3:
+        chips.append(Chip(
+            label="Build ready" if locale == "en" else "Listo para construir",
+            kind="cool",
+        ))
+
+    # ── neutral ── quiet context the reader can scan ─────────────────
+    if listing.get("is_walk_to_beach"):
+        chips.append(Chip(
+            label="Walk to beach" if locale == "en" else "A pie de la playa",
+            kind="neutral",
+        ))
+    else:
+        beach_km = listing.get("dist_beach_km")
+        if isinstance(beach_km, (int, float)) and beach_km < 25:
+            mins = max(1, int(round(beach_km * 1.1)))
+            chips.append(Chip(
+                label=f"{mins} min to beach" if locale == "en" else f"{mins} min a la playa",
+                kind="neutral",
+            ))
+
+    if isinstance(readiness, int) and 1 <= readiness <= 2:
+        # Name what IS there (not what's missing) so the chip stays positive
+        # without misleading. The "trade-off" lives in the listing body.
+        has = []
+        if listing.get("has_power"):
+            has.append("power" if locale == "en" else "electricidad")
+        if listing.get("has_water"):
+            has.append("water" if locale == "en" else "agua")
+        if has:
+            joined = " + ".join(has)
+            chips.append(Chip(
+                label=f"{joined.capitalize()} at the lot" if locale == "en"
+                else f"{joined.capitalize()} en el lote",
+                kind="neutral",
+            ))
+
+    dom = listing.get("days_listed")
+    if isinstance(dom, int) and dom <= 7:
+        chips.append(Chip(
+            label="New this week" if locale == "en" else "Nueva esta semana",
+            kind="neutral",
+        ))
+
+    # Trim to cap, preserving the warm > cool > neutral priority order
+    # (the list above is already ordered that way).
+    return chips[:ISSUE_CHIPS_PER_PICK]
+
+
+def _to_pick(
+    listing: dict,
+    *,
+    rank: int,
+    locale: Locale,
+    paywalled: bool,
+    site_root: str,
+    issue_number: int = 0,
+) -> IssuePick:
     tc = _canonical_dict(listing.get("title_canonical"))
     title = tc.get(locale) or tc.get("en") or listing.get("title") or "Listing"
     price_text, price_note = _format_price(listing, locale)
     callouts = commentary_mod.pick_callouts_for_listing(listing, locale)
+    pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
+    chips = _chips_for_listing(listing, rank=rank, locale=locale)
     return IssuePick(
         rank=rank,
         source_id=f"{listing.get('source')}:{listing.get('source_id')}",
@@ -397,6 +534,9 @@ def _to_pick(listing: dict, *, rank: int, locale: Locale, paywalled: bool, site_
         paywalled=paywalled,
         is_repriced=bool(listing.get("is_repriced")),
         is_new_this_fortnight=bool(listing.get("_is_new_window")),
+        pulpo_url=pulpo_url,
+        save_url=save_url,
+        chips=chips,
     )
 
 
@@ -468,13 +608,13 @@ def build_issue(
 
     rich_picks: list[IssuePick] = []
     for i, listing in enumerate(kept_listings[:ISSUE_TOP_PICKS_RICH]):
-        rich_picks.append(_to_pick(listing, rank=i + 1, locale=locale, paywalled=paywall_all and i > 0, site_root=site_root))
+        rich_picks.append(_to_pick(listing, rank=i + 1, locale=locale, paywalled=paywall_all and i > 0, site_root=site_root, issue_number=issue_number))
     short_picks: list[IssuePick] = []
     for i, listing in enumerate(kept_listings[ISSUE_TOP_PICKS_RICH:]):
-        short_picks.append(_to_pick(listing, rank=ISSUE_TOP_PICKS_RICH + i + 1, locale=locale, paywalled=paywall_all, site_root=site_root))
+        short_picks.append(_to_pick(listing, rank=ISSUE_TOP_PICKS_RICH + i + 1, locale=locale, paywalled=paywall_all, site_root=site_root, issue_number=issue_number))
 
     skip_pick_listing = skip_candidates[0] if skip_candidates else None
-    skip_pick = _to_pick(skip_pick_listing, rank=0, locale=locale, paywalled=False, site_root=site_root) if skip_pick_listing else None
+    skip_pick = _to_pick(skip_pick_listing, rank=0, locale=locale, paywalled=False, site_root=site_root, issue_number=issue_number) if skip_pick_listing else None
 
     glance_rows: list[dict] = []
     for i, listing in enumerate(kept_listings):
