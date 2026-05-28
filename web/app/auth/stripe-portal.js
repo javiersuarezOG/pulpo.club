@@ -11,7 +11,7 @@
 
 import { track } from "../telemetry/hook";
 
-export async function openStripePortal({ onError } = {}) {
+export async function openStripePortal({ onError, locale } = {}) {
   track("portal.opened", {});
   let res;
   try {
@@ -19,7 +19,7 @@ export async function openStripePortal({ onError } = {}) {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: "{}",
+      body: JSON.stringify({ locale }),
     });
   } catch (err) {
     track("portal.error", { reason: "network" });

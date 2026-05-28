@@ -3381,6 +3381,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   gap: 8px;
 }
 .sub-plan-meta { font-size: 13px; color: var(--ink-3); margin-top: 4px; overflow-wrap: anywhere; }
+.sub-plan-refreshing { font-size: 13px; color: var(--ink-3); margin-top: 4px; overflow-wrap: anywhere; }
 .sub-plan-status-copy { font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
 .sub-plan-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
