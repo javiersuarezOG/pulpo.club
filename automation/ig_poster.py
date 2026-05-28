@@ -50,6 +50,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from automation._atomic import atomic_write_text
+from pulpo.countries import active as _active_country
 from automation.ig_units import (
     format_area_m2,
     format_price_per_m2,
@@ -268,7 +269,7 @@ def _listing_n(candidate: dict) -> str:
 
 def _zone_label(candidate: dict) -> str:
     """Human zone for the loc strip.  Falls back to department."""
-    return (candidate.get("zone") or candidate.get("department") or "EL SALVADOR").upper()
+    return (candidate.get("zone") or candidate.get("department") or _active_country().name_en).upper()
 
 
 def _encode_photo_as_data_url(photo_path: Path) -> str:
