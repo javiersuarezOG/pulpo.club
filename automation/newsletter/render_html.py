@@ -314,10 +314,17 @@ def _cta_for_pick(pick: IssuePick, locale: Locale, paywall_url: str, ghost: bool
 
 def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     top_label = i18n.t("pick.top_label", locale, rank=pick.rank)
+    # Cap rich-pick pills at 3 total. Old behavior rendered up to 6 pills:
+    # rank + new/repriced + up to 4 listing tags. That's visual noise at
+    # the top of every hero pick. Priority: (1) rank, (2) new/repriced,
+    # (3) at most ONE listing tag — the most editorial-priority one
+    # (which build_issue.py orders first in pick.pills).
+    new_pill = _new_pill(pick, locale)
+    extra_pills_html = _pills_html(pick.pills[:1])  # was [:] — now max 1
     pills_html = (
         f'<span class="pill pill-forest">{_e(top_label)}</span>'
-        + _new_pill(pick, locale)
-        + _pills_html(pick.pills)
+        + new_pill
+        + extra_pills_html
     )
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
@@ -355,7 +362,8 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
 
 def _short_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     eyebrow_text = ""  # not yet generated deterministically — PR-NL-3 LLM hook
-    pills_html = _new_pill(pick, locale) + _pills_html(pick.pills[:2])
+    # Shortlist gets at most 1 editorial tag (matches rich-pick cap).
+    pills_html = _new_pill(pick, locale) + _pills_html(pick.pills[:1])
     blurb_html = ""
     if pick.paywalled:
         blurb_html = f'<p class="body-2" style="margin: 8px 0 0;">{_e(i18n.t("pick.paywall_blurb", locale))}</p>'
