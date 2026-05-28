@@ -33,6 +33,30 @@ DEFAULT_WINDOW_DAYS = 14
 
 LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
 
+# PR-NL-6 default: LLM is ON unless explicitly disabled. Operators
+# disable it by setting PULPO_NEWSLETTER_USE_LLM=0 (or "false"/"no").
+# The fallback path is the deterministic story / commentary generator,
+# so any error (no_token, network, finish_reason=length, etc.) lands
+# safely. See `_llm_or_deterministic_story` for the decision tree.
+LLM_DEFAULT_ON = True
+
+# Per-listing story cache, scoped to one Python process. The audience
+# send loops every recipient through `build_issue` — but for a given
+# (source_id, locale) the warm paragraph is identical regardless of
+# which recipient is reading it. Without this cache we'd burn ~2,800×
+# the DeepSeek tokens that the cap is sized for. The cache is bounded
+# by the small universe of listings rendered in one issue (~10-15) so
+# it doesn't drift; `reset_story_cache()` is the test-only escape
+# hatch when a suite needs to exercise fresh generation."""
+_story_cache: dict[tuple[str, str], tuple[str, str]] = {}
+
+
+def reset_story_cache() -> None:
+    """Test-only — flushes the per-process story cache so each test can
+    exercise fresh generation in isolation."""
+    global _story_cache
+    _story_cache = {}
+
 # Per-process cap on LLM commentary calls (PR-7 of the reliability plan,
 # audit item #17 — newsletter workflow_dispatch can flip the LLM toggle
 # without a cost guard). The dry-run workflow today fires ~5 cohorts;
@@ -503,6 +527,22 @@ def _chips_for_listing(
     return chips[:ISSUE_CHIPS_PER_PICK]
 
 
+def _resolve_llm_toggle() -> bool:
+    """Decide whether LLM is on for this run.
+
+    PR-NL-6 default: ON unless explicitly disabled. The env var takes
+    precedence so operators can flip it per-issue via workflow_dispatch
+    without redeploying. Accepted off-values: "0", "false", "no" (case-
+    insensitive). Anything else (including unset / empty) → ON.
+    """
+    raw = os.environ.get(LLM_TOGGLE_ENV, "").strip().lower()
+    if raw in ("0", "false", "no", "off"):
+        return False
+    if raw in ("1", "true", "yes", "on"):
+        return True
+    return LLM_DEFAULT_ON
+
+
 def _llm_or_deterministic_story(
     listing: dict,
     *,
@@ -515,31 +555,50 @@ def _llm_or_deterministic_story(
     Returns `(story_html, source)` where source ∈
     {"llm", "deterministic", "fallback_on_error"}.
 
-    Decision tree mirrors `_llm_or_deterministic_commentary`:
+    Decision tree:
 
-      • LLM toggle off → deterministic
-      • LLM cap hit    → deterministic (with one stderr line so the
-        operator notices the cap was reached)
+      • Cache hit (same source_id + locale already generated this
+        process) → return the cached paragraph. **Critical at audience
+        scale**: a 2,800-reader audience would otherwise generate the
+        same listing's story 2,800× — wasteful and would punch through
+        the runaway-billing cap.
+      • LLM explicitly disabled (env=0/false/no) → deterministic
+      • LLM cap hit → deterministic (one stderr line so the operator
+        notices the cap was reached)
       • LLM call errored / returned empty → deterministic, source
-        tagged `fallback_on_error` so the operator can grep PostHog
-        for actual quality vs LLM-output rate
-      • Otherwise → LLM paragraph
+        tagged `fallback_on_error` so PostHog telemetry separates
+        baseline quality from LLM-output rate
+      • Otherwise (default: ON) → LLM paragraph
 
     The deterministic story is always computed even when LLM is on —
     cheap, has no side effects, and means we never block hero rendering
     on the LLM finishing.
     """
     locale_safe: Locale = locale if locale in ("en", "es") else "en"
+    source_id = f"{listing.get('source')}:{listing.get('source_id')}"
+
+    # Cache lookup — the per-process audience-loop optimization.
+    cache_key = (source_id, locale_safe)
+    if llm_client_override is None and cache_key in _story_cache:
+        cached_html, cached_source = _story_cache[cache_key]
+        _telemetry_capture("newsletter.story_generated", {
+            "issue_id": issue_id,
+            "locale": locale_safe,
+            "source": f"{cached_source}_cached",
+            "source_id": source_id,
+        })
+        return (cached_html, cached_source)
+
     fallback = commentary_mod.deterministic_story_for_pick(listing, locale_safe)
 
-    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
-    if not use_llm and llm_client_override is None:
+    if not _resolve_llm_toggle() and llm_client_override is None:
         _telemetry_capture("newsletter.story_generated", {
             "issue_id": issue_id,
             "locale": locale_safe,
             "source": "deterministic",
-            "source_id": f"{listing.get('source')}:{listing.get('source_id')}",
+            "source_id": source_id,
         })
+        _story_cache[cache_key] = (fallback, "deterministic")
         return (fallback, "deterministic")
 
     # Stories share the same per-process cap with commentaries — the
@@ -561,6 +620,7 @@ def _llm_or_deterministic_story(
             "locale": locale_safe,
             "source": "deterministic_cap_reached",
         })
+        _story_cache[cache_key] = (fallback, "deterministic")
         return (fallback, "deterministic")
 
     # Local import — keep the deterministic-only test suite light.
@@ -583,7 +643,15 @@ def _llm_or_deterministic_story(
         "latency_ms": result.latency_ms,
     })
     if result.paragraph:
+        # Cache the LLM result so subsequent recipients in the same
+        # audience send share the same paragraph for this listing.
+        if llm_client_override is None:
+            _story_cache[cache_key] = (result.paragraph, "llm")
         return (result.paragraph, "llm")
+    # LLM errored — cache the deterministic fallback under this key so
+    # we don't burn tokens retrying every recipient.
+    if llm_client_override is None:
+        _story_cache[cache_key] = (fallback, "fallback_on_error")
     return (fallback, "fallback_on_error")
 
 
