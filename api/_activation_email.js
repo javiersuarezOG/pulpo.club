@@ -1,5 +1,11 @@
 // Pulpo-owned activation email pipeline.
 //
+// GUARDRAIL: this is the INVITATION flow. Newsletter sends live at
+// automation/newsletter/send.py + api/admin/newsletter/send.js. We share
+// one Resend project (RESEND_API_KEY) but separate `from:` envs, no
+// audience overlap, and distinct PostHog event prefixes — see
+// docs/email-audit.md for the full topology.
+//
 // Background: Clerk's own email pipeline accepts our invitation send
 // requests but holds them indefinitely at `status: queued` (confirmed
 // via the Svix webhook telemetry in PR #341). DNS + DKIM are all
@@ -25,6 +31,7 @@
 // WelcomeModal's "Resend my invitation" button is the user recovery).
 
 const crypto = require("crypto");
+const posthog = require("./_posthog");
 
 const RESEND_API = "https://api.resend.com/emails";
 const DEFAULT_FROM = "Pulpo Club <hello@mail.pulpo.club>";
