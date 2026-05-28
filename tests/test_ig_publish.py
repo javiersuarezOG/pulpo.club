@@ -31,6 +31,7 @@ from automation.ig_publish import (   # noqa: E402
     main as publish_main,
     publish_item,
     run_publish,
+    select_forced_item,
     select_next_due_item,
     wait_for_ready,
 )
@@ -195,6 +196,48 @@ def test_select_skips_items_without_scheduled_for():
     assert select_next_due_item(items, now) is None
 
 
+# ── select_forced_item (operator's "Publish now" path) ────────────────
+
+def test_force_picks_approved_unposted_even_when_scheduled_future():
+    """The whole point of force-day: bypass the scheduled_for gate so
+    an item scheduled for tomorrow can be test-published today."""
+    items = [_it(day=3, approved=True, scheduled_for="2026-07-01T01:00:00+00:00")]
+    pick = select_forced_item(items, day=3)
+    assert pick is not None
+    assert pick["day"] == 3
+
+
+def test_force_returns_none_for_unapproved():
+    """The approved gate is the operator's safety net — never bypass it
+    just because the day matches."""
+    items = [_it(day=3, approved=False)]
+    assert select_forced_item(items, day=3) is None
+
+
+def test_force_returns_none_for_posted():
+    """Posted items must NEVER be re-published — would duplicate on IG."""
+    items = [_it(day=3, approved=True, posted=True)]
+    assert select_forced_item(items, day=3) is None
+
+
+def test_force_returns_none_for_missing_day():
+    """Operator may submit a stale day from a refresh-race; clean skip
+    rather than crash."""
+    items = [_it(day=1, approved=True), _it(day=2, approved=True)]
+    assert select_forced_item(items, day=99) is None
+
+
+def test_force_does_not_pick_a_different_day():
+    """Even if day 1 is the natural next-due, --force-day 5 must
+    return day 5 (not day 1)."""
+    items = [
+        _it(day=1, approved=True, scheduled_for="2026-06-01T01:00:00+00:00"),
+        _it(day=5, approved=True, scheduled_for="2026-06-05T01:00:00+00:00"),
+    ]
+    pick = select_forced_item(items, day=5)
+    assert pick is not None and pick["day"] == 5
+
+
 # ── publish_item with mock IgClient ───────────────────────────────────
 
 def _mock_client():
@@ -315,6 +358,53 @@ def test_run_publish_marks_item_posted(pub):
     assert payload["items"][0]["posted_media_id"] == "media_17841234567890"
     # 2 children (poster + 1 photo) + 1 carousel container = 3 waits.
     assert waiter.call_count == 3
+
+
+def test_run_publish_force_day_picks_future_scheduled_item(pub):
+    """The whole point of --force-day: skip the scheduled_for gate.
+    Day 5 is scheduled a month out; force-publishing day 5 today must
+    pick it (since it's approved + not posted)."""
+    now = datetime(2026, 6, 1, 5, 0, tzinfo=timezone.utc)
+    payload = {
+        "version": 1,
+        "items": [
+            _it(day=1, approved=False, scheduled_for="2026-06-01T01:00:00+00:00"),
+            _it(
+                day=5, approved=True, posted=False,
+                scheduled_for="2026-07-05T01:00:00+00:00",  # weeks out
+                caption="x", poster_path="web/data/p5.png",
+                carousel_photo_paths=["web/photos/a.jpg"],
+            ),
+        ],
+    }
+    client = _mock_client()
+    with patch.object(pub, "wait_for_ready"):
+        pub.run_publish(
+            payload, ig_user_id="x", access_token="y",
+            base_url="https://pulpo.club", now=now,
+            client=client, force_day=5,
+        )
+    items_by_day = {it["day"]: it for it in payload["items"]}
+    assert items_by_day[5]["posted"] is True
+    assert items_by_day[1]["posted"] is False
+
+
+def test_run_publish_force_day_skips_unapproved_item():
+    """Force-day must still refuse to publish unapproved drafts —
+    bypassing the approved gate would defeat the review surface."""
+    now = datetime(2026, 6, 5, tzinfo=timezone.utc)
+    payload = {
+        "version": 1,
+        "items": [_it(day=3, approved=False, poster_path="web/data/p.png")],
+    }
+    client = _mock_client()
+    result = run_publish(
+        payload, ig_user_id="x", access_token="y",
+        base_url="https://pulpo.club", now=now,
+        client=client, force_day=3,
+    )
+    client.upload_carousel_item.assert_not_called()
+    assert result["items"][0]["posted"] is False
 
 
 # ── wait_for_ready ────────────────────────────────────────────────────

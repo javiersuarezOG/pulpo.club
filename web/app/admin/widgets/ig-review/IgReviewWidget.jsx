@@ -34,6 +34,7 @@ import { t } from "../../../i18n.jsx";
 const STORAGE_KEY = "pulpo-ig-review-decisions/drop_01";
 const QUEUE_ENDPOINT = "/api/admin/ig-queue";
 const APPLY_ENDPOINT = "/api/admin/ig-queue-apply";
+const PUBLISH_NOW_ENDPOINT = "/api/admin/ig-publish-now";
 
 // Operator decision codes.  null = no local decision; the queue's own
 // approved/posted flags still apply.
@@ -582,6 +583,58 @@ const WIDGET_STYLES = `
   border-color: var(--ink);
 }
 
+.ig-side .publish-now {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+.ig-side .publish-now .pub-now {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: var(--accent);
+  color: var(--paper);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 9px 14px;
+  cursor: pointer;
+  min-height: 36px;
+}
+.ig-side .publish-now .pub-now:disabled { cursor: not-allowed; opacity: .55; }
+.ig-side .publish-now .pub-now:hover:not(:disabled) {
+  background: var(--accent-strong, var(--accent));
+}
+.ig-side .publish-now .pub-now.dispatched {
+  background: var(--accent-strong, var(--accent));
+  border-color: var(--accent-strong, var(--accent));
+  opacity: 1;
+}
+.ig-side .publish-now .pub-now.failed {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  opacity: 1;
+}
+.ig-side .publish-now .pub-link {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent);
+  align-self: flex-start;
+}
+.ig-side .publish-now .pub-error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-2);
+  line-height: 1.4;
+}
+
 /* ============ PREVIEW TILE (for /admin grid) ============ */
 .ig-preview-tile {
   display: flex;
@@ -707,6 +760,39 @@ function _Item({ item, decision, onDecide }) {
                  : item.status === "needs_human" ? "alert"
                  : "";
 
+  // Per-item "Publish now" lifecycle (test-publish ahead of schedule).
+  // State is local to the card — operator can fire only one publish-now
+  // per item per render and the workflow_dispatch is the source of truth.
+  // After success, IG_publish.yml's commit lands → next queue fetch
+  // shows item.posted=true → the button disappears (gated by posted).
+  const [pubNow, setPubNow] = useState({ kind: "idle" });
+  const canPublishNow = item.approved === true && item.posted !== true;
+  const pubKind = pubNow.kind;
+  const pubInFlight = pubKind === "submitting";
+  const pubDispatched = pubKind === "dispatched";
+  const pubFailed = pubKind === "failed";
+
+  async function onPublishNow() {
+    if (pubInFlight) return;
+    setPubNow({ kind: "submitting" });
+    try {
+      const r = await fetch(PUBLISH_NOW_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ day: item.day }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok || !body.ok) {
+        const detail = body.detail || body.error || `HTTP ${r.status}`;
+        setPubNow({ kind: "failed", error: detail });
+        return;
+      }
+      setPubNow({ kind: "dispatched", runs_url: body.runs_url || null });
+    } catch (err) {
+      setPubNow({ kind: "failed", error: (err && err.message) || "request_failed" });
+    }
+  }
+
   return (
     <article
       className={`ig-review-item ${itemClass}`}
@@ -793,6 +879,41 @@ function _Item({ item, decision, onDecide }) {
               >
                 {t("admin.ig_review.action.clear")}
               </button>
+            )}
+          </div>
+        )}
+        {canPublishNow && (
+          <div className="publish-now">
+            <button
+              type="button"
+              className={`pub-now${pubDispatched ? " dispatched" : ""}${pubFailed ? " failed" : ""}`}
+              disabled={pubInFlight || pubDispatched}
+              onClick={onPublishNow}
+              title={t("admin.ig_review.publish_now_hint")}
+              aria-label={t("admin.ig_review.publish_now_hint")}
+            >
+              {pubInFlight
+                ? t("admin.ig_review.publish_now_submitting")
+                : pubDispatched
+                  ? t("admin.ig_review.publish_now_dispatched")
+                  : pubFailed
+                    ? t("admin.ig_review.publish_now_retry")
+                    : t("admin.ig_review.publish_now")}
+            </button>
+            {pubDispatched && pubNow.runs_url && (
+              <a
+                className="pub-link"
+                href={pubNow.runs_url}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {t("admin.ig_review.submit_view_run")}
+              </a>
+            )}
+            {pubFailed && pubNow.error && (
+              <div className="pub-error" role="alert">
+                {t("admin.ig_review.publish_now_error_prefix")}: {pubNow.error}
+              </div>
             )}
           </div>
         )}

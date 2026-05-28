@@ -1611,6 +1611,28 @@ const UI_STRINGS = {
     en: "Submit failed",
     es: "Falló el envío",
   },
+  "admin.ig_review.publish_now":       { en: "⚡ Publish now",
+                                          es: "⚡ Publicar ahora" },
+  "admin.ig_review.publish_now_hint": {
+    en: "Test-publish this item to Instagram now (bypasses scheduled_for).",
+    es: "Test-publicar este ítem en Instagram ahora (omite scheduled_for).",
+  },
+  "admin.ig_review.publish_now_submitting": {
+    en: "Dispatching…",
+    es: "Disparando…",
+  },
+  "admin.ig_review.publish_now_dispatched": {
+    en: "Dispatched ✓",
+    es: "Disparado ✓",
+  },
+  "admin.ig_review.publish_now_retry": {
+    en: "Retry publish",
+    es: "Reintentar publicación",
+  },
+  "admin.ig_review.publish_now_error_prefix": {
+    en: "Dispatch failed",
+    es: "Falló el disparo",
+  },
   "admin.ig_review.preview_loading":   { en: "loading…",
                                           es: "cargando…" },
   "admin.ig_review.preview_empty":     { en: "no queue yet",

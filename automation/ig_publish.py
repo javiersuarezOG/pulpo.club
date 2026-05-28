@@ -146,6 +146,28 @@ def select_next_due_item(
     return due[0][1]
 
 
+def select_forced_item(items: list[dict], day: int) -> Optional[dict]:
+    """Return the item for `day` IF it's approved + not posted.
+
+    Used by --force-day (operator's "Publish now" button in /admin/ig-review).
+    Bypasses the scheduled_for gate so the operator can test-publish ahead
+    of the slot, but still respects approved + not-posted invariants:
+    publishing an unapproved draft would defeat the review surface, and
+    re-publishing a posted item would duplicate on IG.
+
+    Returns None when the item is missing, unapproved, or already posted.
+    """
+    for it in items:
+        if it.get("day") != day:
+            continue
+        if not it.get("approved"):
+            return None
+        if it.get("posted"):
+            return None
+        return it
+    return None
+
+
 # ── IG API thin client ───────────────────────────────────────────────
 
 class IgClient:
@@ -330,23 +352,38 @@ def run_publish(
     now: datetime,
     dry_run: bool = False,
     client: Optional[IgClient] = None,
+    force_day: Optional[int] = None,
 ) -> dict:
     """Run the publisher against an in-memory queue payload.  Returns
     the (possibly mutated) payload.
 
     Pure-ish: doesn't read or write the filesystem.  The CLI wrapper
-    handles I/O so tests don't need a tempfile."""
-    items = queue_payload.get("items") or []
-    due = select_next_due_item(items, now)
-    if due is None:
-        print(
-            f"[ig_publish] no due items at {now.isoformat()} "
-            f"(scanned {len(items)} queue entries)"
-        )
-        return queue_payload
+    handles I/O so tests don't need a tempfile.
 
+    When `force_day` is set, publishes that specific item (if approved
+    and not yet posted), bypassing the scheduled_for gate.  Used by the
+    "Publish now" button in /admin/ig-review for on-the-spot test posts."""
+    items = queue_payload.get("items") or []
+    if force_day is not None:
+        due = select_forced_item(items, force_day)
+        if due is None:
+            print(
+                f"[ig_publish] forced d{force_day:02d} not eligible "
+                f"(missing, unapproved, or already posted) — skipping"
+            )
+            return queue_payload
+    else:
+        due = select_next_due_item(items, now)
+        if due is None:
+            print(
+                f"[ig_publish] no due items at {now.isoformat()} "
+                f"(scanned {len(items)} queue entries)"
+            )
+            return queue_payload
+
+    forced_tag = " FORCED" if force_day is not None else ""
     print(
-        f"[ig_publish] publishing d{due['day']:02d} ({due.get('shelf')}) "
+        f"[ig_publish] publishing{forced_tag} d{due['day']:02d} ({due.get('shelf')}) "
         f"scheduled={due.get('scheduled_for')} "
         f"caption_status={due.get('caption_status')} "
         f"slides={1 + len(due.get('carousel_photo_paths') or [])}"
@@ -388,6 +425,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         "--now", default=None,
         help="ISO datetime to use as 'now' (mostly for tests).  Defaults to UTC now.",
     )
+    parser.add_argument(
+        "--force-day", type=int, default=None,
+        help=(
+            "Force-publish a specific queue day, bypassing the scheduled_for "
+            "gate.  Still requires the item to be approved and not yet posted. "
+            "Used by /admin/ig-review's Publish now button for test posts."
+        ),
+    )
     args = parser.parse_args(argv)
 
     if env_bool("IG_PAUSED", False):
@@ -425,6 +470,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         base_url=base_url,
         now=now,
         dry_run=args.dry_run,
+        force_day=args.force_day,
     )
 
     if not args.dry_run:
