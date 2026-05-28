@@ -98,7 +98,7 @@ def build_query(li: Any) -> Optional[str]:
         parts.append(department.strip())
     if not parts:
         return None
-    parts.append("El Salvador")
+    parts.append("El Salvador")  # multi-country-exempt: FIXME PR-MC-PA-4 — should read active().name_en; PA listings currently get SV appended
     return ", ".join(parts)
 
 

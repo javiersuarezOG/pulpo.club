@@ -90,8 +90,8 @@ BASE = "https://www.encuentra24.com"
 # Trade-off: import-time capture means an in-process monkeypatch of
 # these env vars won't refresh the module-level constants. Tests that
 # need to flip country must set env BEFORE Python imports this module.
-_E24_COUNTRY_CODE = os.environ.get("PULPO_E24_COUNTRY", "SV").upper()
-_E24_COUNTRY_SLUG = os.environ.get("PULPO_E24_COUNTRY_SLUG", "el-salvador-es")
+_E24_COUNTRY_CODE = os.environ.get("PULPO_E24_COUNTRY", "SV").upper()  # multi-country-exempt: env-var default — SV is the first deploy
+_E24_COUNTRY_SLUG = os.environ.get("PULPO_E24_COUNTRY_SLUG", "el-salvador-es")  # multi-country-exempt: env-var default
 
 INDEX_URL = f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices"
 
@@ -122,7 +122,7 @@ _NATIONAL_CATEGORY_URLS: list[str] = [
     f"{BASE}/{_E24_COUNTRY_SLUG}/bienes-raices-venta-de-propiedades-apartamentos",
 ]
 
-if _E24_COUNTRY_CODE == "SV":
+if _E24_COUNTRY_CODE == "SV":  # multi-country-exempt: SV's 15 dept subpaths probed individually; other countries get the 3 national URLs
     CATEGORY_URLS: list[str] = [
         # Terrenos (land): per-department subpaths returned empty during
         # the 2026-05-24 probe, so we use the national page only.
@@ -372,7 +372,7 @@ def _build_raw_record(html: str, url: str) -> Optional[dict]:
     # FX conversion before reaching this parser; until then this set is
     # the exact list of currency labels that mean "USD amount, no
     # conversion needed."
-    _AT_PAR_USD = {"USD", "PAB"}
+    _AT_PAR_USD = {"USD", "PAB"}  # multi-country-exempt: PAB is pegged 1:1 to USD in Panama (USD is legal tender)
     offers = ld.get("offers") or {}
     price_usd: Optional[float] = None
     if (offers.get("priceCurrency") or "").upper() in _AT_PAR_USD:

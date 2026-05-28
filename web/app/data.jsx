@@ -220,7 +220,7 @@ const LISTINGS = Array.from({ length: 48 }, (_, i) => {
     // ↓↓↓ NON-TRANSLATABLE (universal across locales)
     zone_name: zone.name,
     region: zone.region,
-    country: zone.country,                           // ISO 3166 alpha-2 — "SV" for now
+    country: zone.country,                           // ISO 3166 alpha-2 — dynamic from zone data  // multi-country-exempt: trailing comment mentions SV; code is dynamic
     province_state: `${zone.region}, ${COUNTRY_NAMES[zone.country].en}`,
     land_type: landType,                             // string key — translated via t("type." + land_type)
     size_m2: sizeM2,

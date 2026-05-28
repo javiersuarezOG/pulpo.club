@@ -47,6 +47,7 @@ from typing import Any, Optional
 
 from automation._config import env_float, env_int
 from automation.ig_caption_lint import check as lint_check, is_clean
+from pulpo.countries import active as _active_country
 from automation.ig_poster import (
     BIG_NUMBER, MAP_MARK, POSTER_TYPES, POST_IT, RECEIPT, STICKER, TYPO_MAX,
 )
@@ -146,7 +147,7 @@ def _build_user_prompt(candidate: dict, listing: dict) -> str:
 # computed fields and stays safely on-voice (no banned vocabulary).
 def _fallback_descriptive_line(candidate: dict, listing: dict, poster_type: str) -> str:
     area = format_area_m2(candidate.get("area_m2"))
-    zone = (candidate.get("zone") or listing.get("zone") or "el salvador").replace("-", " ").title()
+    zone = (candidate.get("zone") or listing.get("zone") or _active_country().name_en).replace("-", " ").title()
     has_view = listing.get("has_ocean_view") or listing.get("has_water_body")
     feature = "con vista al océano" if listing.get("has_ocean_view") else (
         "frente al agua" if has_view else "sin construir"
@@ -210,7 +211,7 @@ def generate_descriptive_line(
 def _hook_line(candidate: dict, listing: dict, poster_type: str) -> str:
     """Bold-faced opener.  Wrapped in ``**...**`` so IG renders the
     first line emphasised when copied through ig_queue → IG paste flow."""
-    zone = (candidate.get("zone") or "el salvador").replace("-", " ").title()
+    zone = (candidate.get("zone") or _active_country().name_en).replace("-", " ").title()
     area = format_area_m2(candidate.get("area_m2"))
     pct = candidate.get("price_vs_zone_pct")
     if poster_type == POST_IT and pct is not None and pct <= -20:

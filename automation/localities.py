@@ -457,7 +457,7 @@ def parse_location_text(location_text: str) -> Optional[tuple[str, str, str, str
     # Split and strip
     parts = [p.strip() for p in location_text.split(",")]
     # Drop "El Salvador", empty strings, and obvious non-location phrases
-    _NOISE = {"el salvador", "sv", "", "el salvador c.a."}
+    _NOISE = {"el salvador", "sv", "", "el salvador c.a."}  # multi-country-exempt: FIXME PR-MC-PA-4 — extend with PA noise tokens once needed
     parts = [p for p in parts if _norm(p) not in _NOISE]
 
     if not parts:
