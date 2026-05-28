@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "computed_at": "2026-05-28T12:46:57.968460+00:00",
+  "config": {
+    "bargain_pct_threshold": -20.0,
+    "bargain_cap_per_week": 2,
+    "top_rank_threshold": 15,
+    "top_rank_cap_per_week": 2,
+    "price_drop_cap_per_week": 2,
+    "fresh_days_threshold": 7,
+    "fresh_rank_threshold": 100,
+    "fresh_cap_per_week": 1,
+    "zone_dom_count": 3,
+    "zone_dom_top_n": 50,
+    "zone_dom_cap_per_week": 1,
+    "comp_crash_ratio": 0.4,
+    "comp_crash_min_comps": 3,
+    "comp_crash_cap_per_week": 1
+  },
+  "stats": {
+    "scanned": 863,
+    "candidates_per_trigger": {
+      "BARGAIN_ALERT": 23,
+      "TOP_RANK": 1,
+      "FRESH_AND_HOT": 11,
+      "COMPARABLE_CRASH": 13,
+      "ZONE_DOMINATION": 6
+    },
+    "after_cap_per_trigger": {
+      "BARGAIN_ALERT": 2,
+      "COMPARABLE_CRASH": 1,
+      "TOP_RANK": 1,
+      "FRESH_AND_HOT": 1,
+      "ZONE_DOMINATION": 1
+    },
+    "total_after_cap": 6
+  },
+  "triggers": [
+    {
+      "trigger": "BARGAIN_ALERT",
+      "listing_id": "bienesraices__1529",
+      "source": "bienesraices",
+      "source_id": "1529",
+      "rank": 15,
+      "priority": 4,
+      "data": {
+        "price_vs_zone_pct": -33.5,
+        "price_per_m2": 142.32,
+        "zone_price_per_m2_median": 213.9
+      },
+      "rationale": "Precio por m² 34% debajo de la mediana de la zona.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    },
+    {
+      "trigger": "BARGAIN_ALERT",
+      "listing_id": "bienesraices__1783",
+      "source": "bienesraices",
+      "source_id": "1783",
+      "rank": 36,
+      "priority": 4,
+      "data": {
+        "price_vs_zone_pct": -23.8,
+        "price_per_m2": 162.89,
+        "zone_price_per_m2_median": 213.9
+      },
+      "rationale": "Precio por m² 24% debajo de la mediana de la zona.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    },
+    {
+      "trigger": "COMPARABLE_CRASH",
+      "listing_id": "bienesraices__2191",
+      "source": "bienesraices",
+      "source_id": "2191",
+      "rank": 45,
+      "priority": 4,
+      "data": {
+        "ppm": 23.91,
+        "zone_median_ppm": 173.46,
+        "ratio": 0.138,
+        "comp_count": 84
+      },
+      "rationale": "Precio por m² 86% debajo de 84 comparables.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    },
+    {
+      "trigger": "TOP_RANK",
+      "listing_id": "bienesraices__1529",
+      "source": "bienesraices",
+      "source_id": "1529",
+      "rank": 15,
+      "priority": 3,
+      "data": {
+        "rank": 15,
+        "rank_score": 80.53
+      },
+      "rationale": "Entró al top 15 del catálogo.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    },
+    {
+      "trigger": "FRESH_AND_HOT",
+      "listing_id": "bienesraices__1529",
+      "source": "bienesraices",
+      "source_id": "1529",
+      "rank": 15,
+      "priority": 2,
+      "data": {
+        "days_listed": 0,
+        "rank": 15
+      },
+      "rationale": "Recién llegado (0 d) y ya entró al top 100.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    },
+    {
+      "trigger": "ZONE_DOMINATION",
+      "listing_id": "essurf__5247",
+      "source": "essurf",
+      "source_id": "5247",
+      "rank": 1,
+      "priority": 1,
+      "data": {
+        "zone": "el-sunzal",
+        "count_in_top_n": 3,
+        "top_n": 50
+      },
+      "rationale": "Zona el-sunzal: 3 listings entre los 50 mejor rankeados.",
+      "detected_at": "2026-05-28T12:46:57.968460+00:00"
+    }
+  ]
+}
