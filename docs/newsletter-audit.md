@@ -117,3 +117,44 @@ Two new events under the `email.*` namespace (the existing `newsletter.*` events
 | `email.newsletter.batch_sent` | Once at end of `main()` | `issue_number`, `issue_id`, `recipient_count`, `sent_count`, `failed_count`, `template_version`, `dry_run`, `preview_mode`, `elapsed_ms` |
 
 The per-recipient event lets PostHog slice "sends from template v2.1 to recipient_hash X"; the batch event gives a clean one-row-per-run rollup for ops dashboards. `recipient_count` is duplicated across both intentionally — letting PostHog answer "what's the batch size of every send" without joining tables.
+
+---
+
+## v2.2 update (2026-05-28)
+
+PR #521 (v2.1) was too timid. Sebastian flagged it correctly — 4–16px nibbles on padding, a font-size bump on the eyebrow, a `<meta>` tag. The actual offenders (way too much air, weak hierarchy, generic "Open the file →" CTAs, the unreadable keytable strip) all survived. v2.2 is the **redesign pass**, scoped to the renderer + i18n table only.
+
+The principle reversed: **good design first, minimal changes as a constraint** — not the other way around.
+
+### What changed (and why)
+
+| Area | Old | New | Why |
+| --- | --- | --- | --- |
+| `.pad` section padding | 40px 48px | 24px 36px | The earlier 40-vert was an air-bath. 24 fits the token scale + still gives the eye room. |
+| `.wrap` outer pad | 24px 0 | 0 | Frame now sits flush against email-client chrome; no double-padding waste. |
+| Hero `padding-top` | 40px | 28px | Hero stays the largest moment but stops eating 80px before the wordmark. |
+| 5 section `padding-top` overrides (market, skip, one-number, shortlist, etc.) | 32px | 16px | Was double-padding on top of `.pad`. Now sections breathe via `.pad` alone + a single hairline. |
+| Rich-pick photo `padding: 32px 0 0` | 32px | 12px | Photo sits closer to previous-pick's CTA so adjacent picks read as a sequence, not as separate planets. |
+| Type spread | 56 → 40 → 30 → 22 → 17 → 15 | 60 → 40 → 26 → 22 → 18 → 15 | h2/h3/lede zone was crushed (deltas 7/5/2). New deltas 4/4/3 are uniform; hero+h1 zone gets louder (20/14). |
+| Eyebrow weight + spacing | 500 / 0.14em | 600 / 0.12em | Eyebrows pop more without losing the mono editorial feel. |
+| `.rule-clay` 56×2px orange tick under hero | exists | DELETED | Decorative ornament reading as AI-slop. Hero is separated by header strip above + section gap below. |
+| Keytable grid | `<table>` w/ 4 k/v per row | `<p class="meta-row">` inline strip | The old table jammed 4 pairs into one row with no separation. Renders as `$47/m² · 5.7 km to beach · 36 km · 39 min to SAL · New this fortnight`. |
+| Keytable values | duplicated the label ("Beach: 5.7 km to beach") | label dropped, value stands alone | The values already carry context. Drops the redundancy. |
+| Callout block | bg fill + `border-left: 3px solid clay` + 18px padding | no bg, no border-left, no padding — just eyebrow + body | AI-slop blacklist pattern #8. The eyebrow label creates the visual break, not the colored stripe. |
+| Rich-pick pills | up to 6 in one row | capped at 3 (rank + new/repriced + 1 tag) | Visual noise reduction at the top of each hero pick. |
+| `pick.cta_open` ("Open the file →") | rendered 10× per issue identically | replaced by `pick.cta_view_on` ("View on {source} →") | Source-aware CTAs read editorially + respect the source brokerage. Falls back to "View listing →" when URL is unparseable. |
+| `pick.cta_locked` ("Unlock with Pulpo Pro →") | vague | "Unlock this pick — $9.99/mo →" | Price-anchored, specific. |
+| `paywall.cta` ("Go Pro — $19/month") | stale drift from app's canonical $9.99 | "Go Pro — $9.99/month →" | Pricing alignment with `web/app/lib/pricing.ts`. Bug fix, found while in the area. |
+| Footer-strip | forest bg + cream text | paper-2 bg + ink-2 text | The dark band made the issue feel bottom-heavy / branded-at-the-bottom. Cream-on-cream lets it end. |
+| `next.cta` ("Adjust your filters") | settings-speak | "Tune what you see →" | Product language tied to editorial framing. |
+
+### What v2.2 explicitly didn't do
+
+- No upstream change to `build_issue.py` — the redundancy strip happens at render time only, so a rollback to v2.1 is one commit revert.
+- No CSS-inlining (premailer-style) — still deferred to PR-NL-3.
+- No Litmus inbox audit — deferred to PR-NL-3.
+- No backwards-compat shim removal — `pick.cta_open` i18n key kept for one transition issue as a defensive fallback (delete after the next live send confirms no caller hits it).
+
+### Template version
+
+`TEMPLATE_VERSION` bumped `newsletter-v2.1-2026-05` → `newsletter-v2.2-2026-05`. The `<meta name="x-pulpo-template" content="newsletter-v2.2-2026-05">` tag in `<head>` is the unambiguous "did the new code render this?" check for live-send debugging.
