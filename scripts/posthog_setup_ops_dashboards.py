@@ -203,7 +203,10 @@ DASHBOARD_DESCRIPTIONS = {
     "Pulpo Ops - Webhook health overview": "External webhook heartbeat last-seen board.",
     "Pulpo Ops - Stuck invitations": "Pending activation invitation alert history.",
     "Pulpo Ops - CSP violations": "CSP violation count and samples. Pair with PostHog Slack notification.",
+    "Pulpo Ops - Overview": "Single-pane snapshot — all 5 ops insights (activation funnel, subscription lifecycle, webhook health, stuck invitations, CSP violations) on one dashboard. The per-domain dashboards stay as drill-downs.",
 }
+
+OVERVIEW_DASHBOARD = "Pulpo Ops - Overview"
 
 
 def main() -> int:
@@ -230,6 +233,7 @@ def main() -> int:
     if args.dry_run:
         return 0
 
+    all_insight_ids: list[int] = []
     for dashboard_name, ids in grouped.items():
         dash = upsert_dashboard(
             host,
@@ -240,6 +244,24 @@ def main() -> int:
             ids,
         )
         print(f"upserted dashboard: {dashboard_name} ({dash.get('id')})")
+        all_insight_ids.extend(ids)
+
+    # Overview dashboard — single pane with every insight as a tile.
+    # The per-domain dashboards above stay as drill-downs; this is the
+    # one Sebas opens daily. PostHog tolerates an insight being attached
+    # to multiple dashboards, and upsert_dashboard's PATCH path is
+    # idempotent for the attachment too.
+    if all_insight_ids:
+        overview = upsert_dashboard(
+            host,
+            project,
+            key,
+            OVERVIEW_DASHBOARD,
+            DASHBOARD_DESCRIPTIONS[OVERVIEW_DASHBOARD],
+            all_insight_ids,
+        )
+        print(f"upserted dashboard: {OVERVIEW_DASHBOARD} ({overview.get('id')})")
+
     print("PostHog UI step: add Slack notifications for profile_save_no_consumer and invitation_metadata_missing.")
     return 0
 
