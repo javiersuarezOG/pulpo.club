@@ -3,13 +3,18 @@
 // One email input + one button. Pressing the button asks
 // /api/admin/newsletter/trigger-preview to dispatch the `pulpo-newsletter`
 // GitHub Actions workflow with `preview_cohorts=<email>`. The workflow
-// then runs the production Python pipeline end-to-end and sends three
-// real emails — one per cohort variant (anonymous, free_prefs,
-// pro_prefs) — so the operator can vet what each subscriber type
-// receives before flipping send_mode=yes on the real audience.
+// runs the production Python pipeline end-to-end and sends ONE real
+// email — the Pro-with-prefs variant — so the operator can vet what a
+// real Pro subscriber sees before flipping send_mode=yes on the real
+// audience.
 //
-// Subjects are prefixed `[PULPO PREVIEW · <cohort>]` so the test
-// emails are unambiguously not real audience sends.
+// PR-NL-9 (audience scope): the personalised newsletter is a Pro
+// feature. The free + anonymous preview variants we used to send are
+// gone — Free users will get a different product on a separate
+// pipeline; anonymous subscribers are not part of this audience.
+//
+// Subject is prefixed `[PULPO PREVIEW · pro_prefs]` so the test
+// email is unambiguously not a real audience send.
 //
 // Why we don't preview / send inline in the admin UI: the production
 // renderer is Python. Routing through the workflow guarantees the
@@ -31,10 +36,10 @@ const DEFAULT_EMAIL = "javier@suarez.ventures";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Mirrors `synthesize_preview_recipients(email)` in
-// automation/newsletter/subscribers.py — the operator should see the
-// same three cohorts the script will actually generate, so the success
-// card's subject preview matches what shows up in their inbox.
-const PREVIEW_COHORTS = ["anonymous", "free_prefs", "pro_prefs"];
+// automation/newsletter/subscribers.py — kept here as an array (not a
+// scalar) so the rendering loop in the success card stays identical if
+// we ever add cohorts back. Today it's exactly one: pro_prefs.
+const PREVIEW_COHORTS = ["pro_prefs"];
 
 const WIDGET_STYLES = `
 .nl-preview-widget {
@@ -443,19 +448,19 @@ export function NewsletterWidget() {
           </div>
 
           <button type="submit" className="nl-trigger" disabled={busy}>
-            {busy ? "Dispatching…" : "Send next 3 cohort variants"}
+            {busy ? "Dispatching…" : "Send Pro-with-prefs preview"}
           </button>
 
           {status.kind === "success" && (
             <div className="nl-success" role="status" aria-live="polite">
               <p className="nl-success-head">
                 <span className="nl-success-check" aria-hidden="true">✓</span>
-                Dispatched · 3 emails on the way
+                Dispatched · 1 email on the way
               </p>
               <p className="nl-success-body">
                 Sending to <strong>{status.recipient}</strong>
                 {status.when ? <> — preview of the issue scheduled for <strong>{status.when}</strong></> : null}.
-                They should land in ~30–60 seconds. Look for these subjects in your inbox:
+                Should land in ~30–60 seconds. Look for this subject in your inbox:
               </p>
               <ul className="nl-success-subjects">
                 {PREVIEW_COHORTS.map((cohort) => (
@@ -490,12 +495,12 @@ export function NewsletterWidget() {
         <p className="nl-hint">
           Triggers the <code>pulpo-newsletter</code> GitHub Actions workflow
           with <code>preview_cohorts=&lt;email&gt;</code>. Runs the full
-          production Python pipeline and sends three real emails
-          (<strong>anonymous</strong>, <strong>free_prefs</strong>,
-          {" "}<strong>pro_prefs</strong>) to the address above. Use this
-          to vet what each subscriber type receives before flipping
-          {" "}<code>send_mode=yes</code> on the real audience. Modify
-          content via code, then re-trigger to re-check.
+          production Python pipeline and sends one real email — the
+          {" "}<strong>Pro-with-prefs</strong> variant — to the address
+          above. The personalised newsletter is a <strong>Pro feature</strong>;
+          Free users get a different product, anonymous subscribers get
+          nothing from this cron. Modify content via code, then
+          re-trigger to re-check.
         </p>
       </div>
     </>
