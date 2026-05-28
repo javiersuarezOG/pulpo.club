@@ -46,7 +46,7 @@ def _source_domain(url: str | None) -> str:
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.1-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.2-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }

@@ -170,4 +170,26 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     from automation.newsletter.render_html import TEMPLATE_VERSION
     html = _render(pro_with_prefs, ranked_pool)
     assert TEMPLATE_VERSION  # non-empty
+    assert TEMPLATE_VERSION.startswith("newsletter-v2.2"), (
+        f"TEMPLATE_VERSION drifted: {TEMPLATE_VERSION!r}"
+    )
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
+
+
+def test_render_v22_redesign_contract(pro_with_prefs, ranked_pool):
+    """v2.2 renderer contract: the keytable grid is gone, the meta-row
+    strip is present, the callout left-bar stripe is gone, and the CTA
+    names the source domain. These are the four visible changes —
+    locking them in here so a refactor doesn't quietly undo them."""
+    import re
+    html = _render(pro_with_prefs, ranked_pool)
+    # Keytable HTML element gone
+    assert '<table class="keytable"' not in html
+    # New meta-row strip present
+    assert 'class="meta-row"' in html
+    # Callout left-bar stripe + colored panel are gone
+    assert "border-left: 3px solid var(--clay)" not in html
+    # CTA names the source domain — at least one "View on <domain>" appears
+    assert re.search(r"View on [a-z0-9.-]+\.[a-z]{2,}", html), (
+        "Expected a 'View on <domain>' CTA in the rendered issue"
+    )
