@@ -148,9 +148,7 @@ table { border-collapse: collapse; }
 .glance .num { font-family: var(--font-mono); color: var(--clay); font-weight: 500; width: 32px; font-size: 12px; padding-top: 14px; }
 .glance .where { font-family: var(--font-mono); color: var(--ink-3); font-size: 11px; letter-spacing: 0.04em; }
 .glance .pricecol { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap; }
-.keytable td { padding: 7px 14px 7px 0; vertical-align: top; }
-.keytable .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest); padding-right: 10px; }
-.keytable .v { font-family: var(--font-sans); font-size: 14px; color: var(--ink); }
+.meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 .callout { background: var(--paper-2); padding: 18px 22px; border-left: 3px solid var(--clay); margin: 16px 0; }
 .callout .label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); }
 .callout .body  { margin-top: 6px; font-size: 14.5px; line-height: 1.6; color: var(--ink); }
@@ -211,18 +209,47 @@ def _callouts_html(callouts: list[dict]) -> str:
     return "".join(out)
 
 
-def _keytable_html(rows: list[tuple[str, str]]) -> str:
+def _meta_row_html(rows: list[tuple[str, str]]) -> str:
+    """Single-line magazine-spec strip replacing the old keytable grid.
+
+    The old `<table class="keytable">` jammed four key/value pairs into one
+    row with no visual separation — rendered as `$/m² $47 vs zone -78% per
+    m² vs zone Beach 5.7 km Airport 36 km Listed New this fortnight`. The
+    values already carry enough context to stand alone (e.g. "5.7 km to
+    beach"), so the labels are redundant.
+
+    New rendering: a flat inline strip separated by `·`. The `vs zone` row
+    is dropped here — the "price story" callout already covers that
+    comp-vs-market context, so duplicating it in the meta row wastes ink.
+    The `$/m²` label is preserved by concatenating the unit into the value
+    ("$47/m²") because "$47" alone doesn't read as price-per-square-meter.
+    """
     if not rows:
         return ""
-    tds: list[str] = []
-    for i, (k, v) in enumerate(rows):
-        tds.append(f'<td class="k">{_e(k)}</td><td class="v">{_e(v)}</td>')
-    # 2-column layout: pair adjacent rows
-    paired = []
-    for i in range(0, len(tds), 4):
-        chunk = "".join(tds[i:i + 4])
-        paired.append(f"<tr>{chunk}</tr>")
-    return f'<table class="keytable" role="presentation" style="margin-top: 14px;">{"".join(paired)}</table>'
+    cells: list[str] = []
+    for k, v in rows:
+        k_clean = (k or "").strip()
+        v_clean = (v or "").strip()
+        if not v_clean:
+            continue
+        # Skip the comp-vs-zone datapoint — already covered by the
+        # "price story" callout. Match case-insensitively + accept both
+        # the EN ("vs zone") and ES ("vs zona") spellings.
+        if k_clean.lower() in ("vs zone", "vs zona"):
+            continue
+        # Concatenate the price-per-m² unit into the value so it reads as
+        # "$47/m²" rather than a bare "$47" with a separate label.
+        if k_clean in ("$/m²", "$/m2") and "/m" not in v_clean:
+            cells.append(f"{_e(v_clean)}/m²")
+        else:
+            cells.append(_e(v_clean))
+    if not cells:
+        return ""
+    return (
+        '<p class="meta-row" style="margin: 12px 0 0;">'
+        + " &middot; ".join(cells)
+        + "</p>"
+    )
 
 
 def _photo_html(pick: IssuePick) -> str:
@@ -266,7 +293,7 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     )
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
-    keytable_html = "" if pick.paywalled else _keytable_html(pick.keytable)
+    meta_row_html = "" if pick.paywalled else _meta_row_html(pick.keytable)
     blurb_html = (
         f'<p class="body" style="margin-top: 14px;">{_e(pick.blurb)}</p>'
         if not pick.paywalled and pick.blurb
@@ -289,9 +316,9 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
       <h2 class="h1">{_e(pick.title)}</h2>
       <div class="meta" style="margin: 6px 0 16px;">{_e(pick.location_line)}</div>
       <div class="price">{_e(pick.price_text)}{price_note_html}</div>
+      {meta_row_html}
       {blurb_html}
       {callouts_html}
-      {keytable_html}
       <p style="margin-top: 16px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
     </td></tr>
     <tr><td class="pad-sm"><hr class="rule" /></td></tr>
