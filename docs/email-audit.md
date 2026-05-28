@@ -33,7 +33,7 @@ with existing dashboards.
 | 7 | `api/unsubscribe.js` | newsletter unsub (RFC 8058 one-click) | — | `new Resend(apiKey)` (per-request) | yes — `contacts.list` + `contacts.update` |
 | 8 | `api/resend-webhook.js` | inbound lifecycle → PostHog | — | — (Svix-signed) | no |
 | 9 | `api/contact.js` | contact-form forwarder | `RESEND_FROM_NOREPLY` ∥ `Pulpo <noreply@pulpo.club>` | `new Resend(apiKey)` (per-request) | no |
-| 10 | `api/admin/newsletter/send.js` | admin test send (≤5 recipients) | `RESEND_FROM_EMAIL` ∥ `Pulpo <hello@mail.pulpo.club>` | `new Resend(apiKey)` (per-request) | no (direct `to:`) |
+| 10 | `api/admin/newsletter/trigger-preview.js` | admin preview (dispatches #13) | — (delegated to #11 via workflow) | — (GitHub Actions dispatch; no in-process Resend) | no |
 | 11 | `automation/newsletter/send.py` | newsletter dispatch (Python cron) | `RESEND_FROM_EMAIL` (no default) | `httpx.post` to `https://api.resend.com/emails` | no (direct `to:`) |
 | 12 | `automation/newsletter/subscribers.py` | newsletter audience read | — | `httpx.get` to `/audiences/{id}/contacts` | read |
 | 13 | `.github/workflows/pulpo-newsletter.yml` | newsletter cron env | — | — | — |
@@ -46,10 +46,10 @@ with existing dashboards.
 |---|---|---|
 | `RESEND_API_KEY` | every flow | yes — single Resend project key |
 | `RESEND_AUDIENCE_ID` | #6 #7 #12 only | newsletter scope |
-| `RESEND_FROM_EMAIL` | #10 #11 | newsletter scope |
+| `RESEND_FROM_EMAIL` | #11 (via #13) | newsletter scope |
 | `PULPO_ACTIVATION_FROM_EMAIL` | #1 | invitation scope |
 | `RESEND_FROM_NOREPLY` | #9 | contact-form scope |
-| `RESEND_REPLY_TO_EMAIL` | #10 #11 (optional) | newsletter scope |
+| `RESEND_REPLY_TO_EMAIL` | #11 (optional) | newsletter scope |
 | `RESEND_WEBHOOK_SECRET` | #8 | single inbound endpoint |
 | `PULPO_UNSUBSCRIBE_SECRET` | #7 + send.py token mint | newsletter scope |
 
@@ -64,7 +64,7 @@ Same Resend tenant; SPF/DKIM/DMARC are common.
 | `/api/contact` | 5 / 5 min |
 | `/api/clerk/resend-invitation` | 5 / hr |
 | `/api/clerk/invitation-status` | 30 / min |
-| `/api/admin/newsletter/send` | 10 / hr |
+| `/api/admin/newsletter/trigger-preview` | 5 / hr |
 
 ## The conflict (and only the conflict)
 
