@@ -84,6 +84,14 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # newsletter ("the picks I see"), not generic settings-speak.
     "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajusta lo que ves →"},
     "next.cta.anon":               {"en": "Set your filter →",                            "es": "Configura tu filtro →"},
+    # ── Your Pulpo (PR-NL-8) — dark panel above the footer ──
+    "yp.eyebrow":                  {"en": "Your Pulpo",                                   "es": "Tu Pulpo"},
+    "yp.title":                    {"en": "Pick up where you left off.",                  "es": "Continúa donde lo dejaste."},
+    "yp.saved.label":              {"en": "{n} saved listings from past issues",          "es": "{n} propiedades guardadas en ediciones anteriores"},
+    "yp.saved.cta":                {"en": "Open your favorites →",                        "es": "Abrir tus favoritos →"},
+    "yp.filter.cta":               {"en": "Edit your filter →",                           "es": "Editar tu filtro →"},
+    "yp.browse.label":             {"en": "{n} listings in your filter right now",        "es": "{n} propiedades en tu filtro ahora"},
+    "yp.browse.cta":               {"en": "Browse them all →",                            "es": "Explorar todas →"},
     # ── Paywall (free tier) ──
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
     "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},

@@ -27,7 +27,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.7-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.8-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -193,6 +193,43 @@ table { border-collapse: collapse; }
 .footer-strip { background: var(--paper-2); color: var(--ink-2); border-top: 1px solid var(--line); }
 .footer-strip .small { color: var(--ink-3); }
 .footer-strip a { color: var(--forest); }
+/* PR-NL-8 — Your Pulpo dark panel (matches v2.4 mockup). Sits between
+   next-issue and footer. Dark surface signals "this is product, not
+   editorial" so the reader's eye reads it as a control panel, not as
+   another picks block. */
+.yp-panel {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 36px 48px;
+}
+.yp-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.55;
+}
+.yp-title {
+  color: var(--paper);
+  margin: 8px 0 24px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.15;
+}
+.yp-table { width: 100%; border-collapse: collapse; }
+.yp-table td { padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, 0.12); color: var(--paper); vertical-align: middle; }
+.yp-row-label { font-family: var(--font-display); font-size: 20px; line-height: 1.3; color: var(--paper); }
+.yp-row-cta { text-align: right; padding-left: 16px; white-space: nowrap; }
+.yp-row-cta a {
+  color: var(--paper) !important;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.yp-row-cta a:hover { color: var(--clay) !important; }
 /* LEARNING: this file uses max-width despite CLAUDE.md mandating
    min-width in web/app/*. Emails are an inverse world — clients without
    media-query support (Outlook 2007+, parts of Yahoo) must still receive
@@ -608,6 +645,85 @@ def _footer_html(issue: Issue) -> str:
     """
 
 
+def _your_pulpo_html(issue: Issue) -> str:
+    """PR-NL-8 — the dark "Your Pulpo" panel.
+
+    Three rows, each driven by `issue.your_pulpo`:
+      • saved listings count   → /saved
+      • filter summary line    → /account/notifications
+      • filter-match count     → /browse
+
+    All URLs carry `ref=newsletter_issue_<N>` so PostHog can attribute
+    in-app conversion back to the issue. The panel intentionally lives
+    AFTER the editorial content (skip, market, next-issue) and just
+    above the footer — the natural "what to do next on Pulpo" slot.
+
+    Anonymous cohort renders a softer variant: no saved-listings row,
+    no filter summary (they don't have one yet), just the "browse all"
+    nudge. The renderer falls through to those defaults when
+    `your_pulpo.filter_summary_human` is empty.
+    """
+    yp = issue.your_pulpo
+    locale = issue.locale
+    site = _site_root_from_issue(issue)
+    ref = f"?ref=newsletter_issue_{issue.issue_number:02d}"
+    eb = i18n.t("yp.eyebrow", locale)
+    title = i18n.t("yp.title", locale)
+
+    saved_url = f"{site}/saved{ref}"
+    filter_url = f"{site}/account/notifications{ref}"
+    browse_url = f"{site}/browse{ref}"
+
+    rows: list[str] = []
+
+    # Row 1 — saved listings (skip for anonymous / 0-saved cold-start).
+    if yp.saved_count > 0:
+        saved_label = i18n.t("yp.saved.label", locale, n=yp.saved_count)
+        saved_cta = i18n.t("yp.saved.cta", locale)
+        rows.append(
+            f'<tr><td class="yp-row-label">{_e(saved_label)}</td>'
+            f'<td class="yp-row-cta"><a href="{_e(saved_url)}">{_e(saved_cta)}</a></td></tr>'
+        )
+
+    # Row 2 — filter summary (skip for anonymous).
+    if yp.filter_summary_human:
+        filter_cta = i18n.t("yp.filter.cta", locale)
+        rows.append(
+            f'<tr><td class="yp-row-label">{_e(yp.filter_summary_human)}</td>'
+            f'<td class="yp-row-cta"><a href="{_e(filter_url)}">{_e(filter_cta)}</a></td></tr>'
+        )
+
+    # Row 3 — browse the full filter (always present).
+    browse_label = i18n.t("yp.browse.label", locale, n=yp.filter_match_count)
+    browse_cta = i18n.t("yp.browse.cta", locale)
+    rows.append(
+        f'<tr><td class="yp-row-label">{_e(browse_label)}</td>'
+        f'<td class="yp-row-cta"><a href="{_e(browse_url)}">{_e(browse_cta)}</a></td></tr>'
+    )
+
+    return f"""
+    <tr><td class="yp-panel">
+      <div class="yp-eyebrow">{_e(eb)}</div>
+      <h2 class="yp-title">{_e(title)}</h2>
+      <table class="yp-table" role="presentation">
+        {''.join(rows)}
+      </table>
+    </td></tr>
+    """
+
+
+def _site_root_from_issue(issue: Issue) -> str:
+    """Extract https://pulpo.club (or whatever PULPO_SITE_ROOT points at)
+    from any of the absolute URLs already on the Issue. Avoids re-reading
+    the env var here — build_issue.py already resolved it once."""
+    candidate = (
+        (issue.unsubscribe_url or "").split("/unsubscribe", 1)[0]
+        or (issue.settings_url or "").split("/account", 1)[0]
+        or "https://pulpo.club"
+    )
+    return candidate.rstrip("/") or "https://pulpo.club"
+
+
 def _next_issue_html(issue: Issue) -> str:
     locale = issue.locale
     eb = i18n.t("next.eyebrow", locale)
@@ -733,6 +849,7 @@ def render_html(issue: Issue) -> str:
     {_market_html(issue)}
     {_one_number_html(issue)}
     {_next_issue_html(issue)}
+    {_your_pulpo_html(issue)}
     {_footer_html(issue)}
   </table>
 </div>
