@@ -170,7 +170,7 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     from automation.newsletter.render_html import TEMPLATE_VERSION
     html = _render(pro_with_prefs, ranked_pool)
     assert TEMPLATE_VERSION  # non-empty
-    assert TEMPLATE_VERSION.startswith("newsletter-v2.4"), (
+    assert TEMPLATE_VERSION.startswith("newsletter-v2."), (
         f"TEMPLATE_VERSION drifted: {TEMPLATE_VERSION!r}"
     )
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html

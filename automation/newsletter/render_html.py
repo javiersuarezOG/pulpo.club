@@ -27,7 +27,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.4-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.6-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -98,6 +98,10 @@ table { border-collapse: collapse; }
 .lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
 .body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
 .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+/* PR-NL-6 — story_html wraps the single emotional-center sentence in
+   <em>...</em>. Lands the reader's eye there without using bold or a
+   colored callout block. */
+.body em, .body-2 em { font-style: italic; color: var(--clay-deep); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
 .meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
 .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
@@ -388,16 +392,28 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
     meta_row_html = "" if pick.paywalled else _meta_row_html(pick.keytable)
-    blurb_html = (
-        f'<p class="body" style="margin-top: 14px;">{_e(pick.blurb)}</p>'
-        if not pick.paywalled and pick.blurb
-        else ""
-    )
+    # PR-NL-6: prefer story_html (AI or deterministic — see
+    # build_issue._llm_or_deterministic_story). Falls back to the
+    # listing's enriched blurb when story_html is empty (short picks /
+    # legacy fixtures). story_html may contain a single <em>...</em>
+    # span around the emotional center, which the CSS .body em style
+    # picks up and lands in clay-deep italic — DON'T html-escape it.
     if pick.paywalled:
         paywall_blurb = i18n.t("pick.paywall_blurb", locale)
         blurb_html = (
             f'<p class="body" style="margin-top: 14px; color: var(--ink-2);">{_e(paywall_blurb)}</p>'
         )
+    elif getattr(pick, "story_html", ""):
+        # _e() would escape the <em>; we trust story_html because:
+        #   1. LLM output is sanitized in llm_story._sanitize_paragraph
+        #   2. deterministic_story_for_pick builds only known-good HTML
+        # If a future story source needs untrusted content, sanitize it
+        # at the boundary instead of re-escaping here.
+        blurb_html = f'<p class="body" style="margin-top: 14px;">{pick.story_html}</p>'
+    elif pick.blurb:
+        blurb_html = f'<p class="body" style="margin-top: 14px;">{_e(pick.blurb)}</p>'
+    else:
+        blurb_html = ""
 
     price_note_html = (
         f'<span class="price-note"> · {_e(pick.price_note)}</span>' if pick.price_note else ""
