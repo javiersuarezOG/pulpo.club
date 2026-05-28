@@ -66,11 +66,11 @@ a { color: var(--clay); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; height: auto; border: 0; }
 table { border-collapse: collapse; }
-.wrap   { width: 100%; background: var(--paper); padding: 24px 0; }
+.wrap   { width: 100%; background: var(--paper); padding: 0; }
 .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
-.pad    { padding: 40px 48px; }
-.pad-md { padding: 28px 48px; }
-.pad-sm { padding: 18px 48px; }
+.pad    { padding: 24px 36px; }
+.pad-md { padding: 18px 36px; }
+.pad-sm { padding: 12px 36px; }
 .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
 .sans    { font-family: var(--font-sans); }
 .mono    { font-family: var(--font-mono); }
@@ -81,22 +81,21 @@ table { border-collapse: collapse; }
 .clay    { color: var(--clay); }
 .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
 .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
-.rule-clay   { border: 0; border-top: 2px solid var(--clay); width: 56px; margin: 0; }
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--forest);
-  font-weight: 500;
+  font-weight: 600;
 }
 .eyebrow.clay { color: var(--clay); }
 .eyebrow.muted { color: var(--ink-3); }
-.h-hero  { font-family: var(--font-display); font-size: 56px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 14px 0 12px; color: var(--ink); }
-.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 12px 0 8px; color: var(--ink); }
-.h2      { font-family: var(--font-display); font-size: 30px; line-height: 1.12; letter-spacing: -0.01em; font-weight: 400; margin: 14px 0 6px; color: var(--ink); }
-.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 8px 0 4px; color: var(--ink); }
-.lede    { font-family: var(--font-sans); font-size: 17px; line-height: 1.6; color: var(--ink); font-weight: 400; }
+.h-hero  { font-family: var(--font-display); font-size: 60px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 8px 0 10px; color: var(--ink); }
+.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 8px 0 6px; color: var(--ink); }
+.h2      { font-family: var(--font-display); font-size: 26px; line-height: 1.14; letter-spacing: -0.01em; font-weight: 400; margin: 10px 0 4px; color: var(--ink); }
+.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 6px 0 2px; color: var(--ink); }
+.lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
 .body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
 .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
@@ -170,11 +169,12 @@ table { border-collapse: collapse; }
    for narrow widths. 480px matches --bp-sm in tokens.css. */
 @media (max-width: 480px) {
   .pad, .pad-md, .pad-sm { padding-left: 20px; padding-right: 20px; }
-  .pad    { padding-top: 28px; padding-bottom: 28px; }
-  .pad-md { padding-top: 24px; padding-bottom: 24px; }
+  .pad    { padding-top: 18px; padding-bottom: 18px; }
+  .pad-md { padding-top: 14px; padding-bottom: 14px; }
+  .pad-sm { padding-top: 10px; padding-bottom: 10px; }
   .h-hero { font-size: 38px; }
   .h1     { font-size: 28px; }
-  .h2     { font-size: 22px; }
+  .h2     { font-size: 21px; }
   .h3     { font-size: 20px; }
   .body, .body-2 { font-size: 16px; line-height: 1.6; }
   .lede   { font-size: 16.5px; line-height: 1.55; }
@@ -268,14 +268,14 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
     keytable_html = "" if pick.paywalled else _keytable_html(pick.keytable)
     blurb_html = (
-        f'<p class="body" style="margin-top: 22px;">{_e(pick.blurb)}</p>'
+        f'<p class="body" style="margin-top: 14px;">{_e(pick.blurb)}</p>'
         if not pick.paywalled and pick.blurb
         else ""
     )
     if pick.paywalled:
         paywall_blurb = i18n.t("pick.paywall_blurb", locale)
         blurb_html = (
-            f'<p class="body" style="margin-top: 22px; color: var(--ink-2);">{_e(paywall_blurb)}</p>'
+            f'<p class="body" style="margin-top: 14px; color: var(--ink-2);">{_e(paywall_blurb)}</p>'
         )
 
     price_note_html = (
@@ -283,8 +283,8 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     )
 
     return f"""
-    <tr><td style="padding: 32px 0 0 0;">{_photo_html(pick)}</td></tr>
-    <tr><td class="pad" style="padding-top: 24px;">
+    <tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>
+    <tr><td class="pad" style="padding-top: 16px;">
       <div>{pills_html}</div>
       <h2 class="h1">{_e(pick.title)}</h2>
       <div class="meta" style="margin: 6px 0 16px;">{_e(pick.location_line)}</div>
@@ -292,7 +292,7 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
       {blurb_html}
       {callouts_html}
       {keytable_html}
-      <p style="margin-top: 22px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
+      <p style="margin-top: 16px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
     </td></tr>
     <tr><td class="pad-sm"><hr class="rule" /></td></tr>
     """
@@ -364,7 +364,7 @@ def _paywall_banner_html(issue: Issue) -> str:
     body = i18n.t("paywall.body", issue.locale)
     cta = i18n.t("paywall.cta", issue.locale)
     return f"""
-    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 0;">
+    <tr><td class="pad" style="padding-top: 16px; padding-bottom: 0;">
       <div class="paywall-banner">
         <div class="eyebrow">{_e(eb)}</div>
         <h2 class="h2">{_e(hl)}</h2>
@@ -384,12 +384,12 @@ def _skip_block_html(issue: Issue) -> str:
     headline = issue.commentary.skip_headline or sp.title
     blurb = issue.commentary.skip_blurb or sp.blurb
     return f"""
-    <tr><td class="pad" style="padding-top: 32px;">
+    <tr><td class="pad" style="padding-top: 16px;">
       <hr class="rule" />
-      <div style="margin-top: 24px;">
+      <div style="margin-top: 12px;">
         <div class="eyebrow clay">{_e(eb)}</div>
         <h2 class="h1">{_e(headline)}</h2>
-        <div class="meta" style="margin: 6px 0 16px; color: var(--clay);">{_e(sp.price_text)} · {_e(sp.location_line)}</div>
+        <div class="meta" style="margin: 4px 0 12px; color: var(--clay);">{_e(sp.price_text)} · {_e(sp.location_line)}</div>
         <p class="body">{_e(blurb)}</p>
       </div>
     </td></tr>
@@ -405,7 +405,7 @@ def _market_html(issue: Issue) -> str:
     hl = i18n.t("market.headline", locale)
     para_html = "".join(f'<p class="body">{_e(p)}</p>' for p in paras)
     return f"""
-    <tr><td class="pad" style="background: var(--paper-2); padding-top: 32px; padding-bottom: 32px;">
+    <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(hl)}</h2>
       {para_html}
@@ -421,7 +421,7 @@ def _one_number_html(issue: Issue) -> str:
     eb = i18n.t("one_number.eyebrow", issue.locale)
     body_html = f'<p class="body">{_e(body)}</p>' if body else ""
     return f"""
-    <tr><td class="pad" style="padding-top: 32px;">
+    <tr><td class="pad" style="padding-top: 16px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(title)}</h2>
       {body_html}
@@ -469,12 +469,12 @@ def _next_issue_html(issue: Issue) -> str:
         cta_label = i18n.t("next.cta", locale)
         href = issue.settings_url
     return f"""
-    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 32px;">
+    <tr><td class="pad" style="padding-top: 16px; padding-bottom: 20px;">
       <hr class="rule" />
-      <div style="margin-top: 24px;">
+      <div style="margin-top: 12px;">
         <div class="eyebrow">{_e(eb)}</div>
         <p class="body" style="max-width: 520px;">{_e(body)}</p>
-        <p style="margin-top: 16px;"><a class="cta-ghost" href="{_e(href)}">{_e(cta_label)}</a></p>
+        <p style="margin-top: 12px;"><a class="cta-ghost" href="{_e(href)}">{_e(cta_label)}</a></p>
       </div>
     </td></tr>
     """
@@ -494,12 +494,12 @@ def render_html(issue: Issue) -> str:
         sl_hl = i18n.t("shortlist.headline", locale, n=len(issue.picks_shortlist))
         sl_lede = i18n.t("shortlist.lede", locale)
         shortlist_header = f"""
-        <tr><td class="pad" style="padding-top: 32px; padding-bottom: 4px;">
+        <tr><td class="pad" style="padding-top: 16px; padding-bottom: 4px;">
           <hr class="rule" />
-          <div style="margin-top: 24px;">
+          <div style="margin-top: 12px;">
             <div class="eyebrow">{_e(sl_eb)}</div>
             <h2 class="h1">{_e(sl_hl)}</h2>
-            <p class="body-2" style="margin-top: 8px; max-width: 480px;">{_e(sl_lede)}</p>
+            <p class="body-2" style="margin-top: 6px; max-width: 480px;">{_e(sl_lede)}</p>
           </div>
         </td></tr>
         """
@@ -510,12 +510,12 @@ def render_html(issue: Issue) -> str:
     glance_block = ""
     if issue.glance:
         glance_block = f"""
-        <tr><td class="pad" style="padding-top: 8px; padding-bottom: 8px;">
+        <tr><td class="pad" style="padding-top: 4px; padding-bottom: 8px;">
           <hr class="rule" />
-          <div style="margin-top: 24px;">
+          <div style="margin-top: 12px;">
             <div class="eyebrow">{_e(glance_eb)}</div>
             <h2 class="h2">{_e(issue.commentary.glance_subhead)}</h2>
-            <table class="glance" width="100%" role="presentation" style="margin-top: 16px;">
+            <table class="glance" width="100%" role="presentation" style="margin-top: 10px;">
               {_glance_html(issue.glance)}
             </table>
           </div>
@@ -523,11 +523,10 @@ def render_html(issue: Issue) -> str:
         """
 
     hero_block = f"""
-    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 32px;">
+    <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
       <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
-      <hr class="rule-clay" style="margin: 8px 0 22px;" />
-      <p class="lede" style="margin: 0 0 18px; max-width: 540px;">{_e(issue.commentary.lede_hero)}</p>
+      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{_e(issue.commentary.lede_hero)}</p>
       {_filter_chips_html(issue.commentary.filter_chips)}
     </td></tr>
     """
