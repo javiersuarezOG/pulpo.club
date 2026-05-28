@@ -249,3 +249,40 @@ def test_commentary_cap_honors_env_override(monkeypatch):
 
     monkeypatch.delenv(build_mod.LLM_COMMENTARY_CAP_ENV, raising=False)
     assert build_mod._llm_commentary_cap() == build_mod.LLM_COMMENTARY_CAP_DEFAULT
+
+
+def test_facts_for_prompt_survives_string_title_canonical():
+    """Regression — workflow run 26598893112 crashed the entire send
+    with `AttributeError: 'str' object has no attribute 'get'` because
+    one listing in ranked.json had `title_canonical` as a raw string
+    (legacy enrichment shape) instead of the `{en, es}` dict. The
+    render path in build_issue.py was already guarded; this guard
+    extends the same defensive coerce to llm_commentary._facts_for_prompt.
+    """
+    from automation.newsletter.llm_commentary import _facts_for_prompt
+    from automation.newsletter.types import Preference
+    listing_with_bad_canonical = {
+        "rank": 1,
+        "source": "remax",
+        "source_id": "BAD-CANONICAL",
+        "title_canonical": "Plain string instead of {en, es} dict",
+        "title": "Plain string instead of {en, es} dict",
+        "zone": "el-zonte",
+        "municipality": "Chiltiupán",
+        "department": "La Libertad",
+        "property_type": "land",
+        "price_usd": 60000,
+    }
+    # Should NOT raise — falls through to listing.get("title") instead
+    # of calling .get() on the string.
+    facts = _facts_for_prompt(
+        cohort="pro_prefs",
+        locale="en",
+        pref=Preference(departments=["La Libertad"]),
+        display_name="Test",
+        n_scanned=1,
+        picks=[listing_with_bad_canonical],
+        skip_pick=None,
+    )
+    assert len(facts["picks"]) == 1
+    assert facts["picks"][0]["title"] == "Plain string instead of {en, es} dict"
