@@ -402,3 +402,190 @@ def deterministic_story_for_pick(listing: dict, locale: Locale = "en") -> str:
     if line_c:
         sentences.append(line_c)
     return " ".join(s.strip() for s in sentences if s)
+
+
+# ── PR-NL-7a · welcome teaser + warm market note ────────────────────
+#
+# Two deterministic generators that match the v2.4 mockup voice.
+# Together with PR-NL-6's per-pick stories, they cover all the warm
+# editorial copy in the hero block.
+#
+# Each has an LLM upgrade in llm_commentary.py that's preferred when
+# PULPO_NEWSLETTER_USE_LLM is on (default). These deterministic
+# versions are the safety net — same shape, less personality.
+
+
+def _welcome_pick_hook(pick: dict, locale: Locale) -> str:
+    """Build a single-clause hook for one pick — the kind of phrasing
+    the welcome teaser strings together as 'Start with #01… #02 is…'.
+
+    Picks the strongest signal in the listing data:
+      1. Price drop (most recent action wins)
+      2. Strong below-zone discount (cool signal)
+      3. Walk-to-beach (location hook)
+      4. Build-ready (readiness=3, cool signal)
+      5. Generic fallback that names the location
+
+    The hook is a clause, not a full sentence — it slots after
+    "Start with #01" or "#02 is" with proper grammar.
+    """
+    en = locale == "en"
+
+    # Price-drop hook
+    prev = pick.get("previous_price")
+    cur = pick.get("price_usd")
+    if pick.get("is_repriced") and isinstance(prev, (int, float)) and isinstance(cur, (int, float)) and prev > cur:
+        drop_pct = (prev - cur) / prev * 100
+        if drop_pct >= 10:
+            return (f"just had a price drop of {drop_pct:.0f}%" if en
+                    else f"acaba de tener una baja de precio del {drop_pct:.0f}%")
+        return ("just had its first price drop in two weeks" if en
+                else "acaba de tener su primera baja de precio en dos semanas")
+
+    # Strong below-zone
+    pct = pick.get("price_vs_zone_pct")
+    if isinstance(pct, (int, float)) and pct <= -50:
+        return ("priced like the seller actually wants to sell" if en
+                else "con precio de vendedor que sí quiere vender")
+
+    # Walk to beach / location
+    if pick.get("is_walk_to_beach"):
+        beach = pick.get("nearest_beach") or pick.get("named_beach_nearest")
+        if beach:
+            return (f"a short walk from {beach}" if en
+                    else f"a pie de la playa de {beach}")
+        return ("a short walk from the beach" if en
+                else "a pie de la playa")
+
+    # Mountain land — sense of place
+    pt = pick.get("property_type")
+    dept = (pick.get("department") or "").lower()
+    if pt == "land" and (
+        (isinstance(pick.get("dist_beach_km"), (int, float)) and pick["dist_beach_km"] > 25)
+        or "morazán" in dept or "morazan" in dept or "chalatenango" in dept
+    ):
+        if pick.get("has_water_body"):
+            return ("a mountain plot with a river — hard to look away from" if en
+                    else "un terreno de montaña con río — difícil dejar de mirar")
+        return ("a mountain plot the kind of land you build a life on" if en
+                else "un terreno de montaña del tipo en el que se construye una vida")
+
+    # Build-ready
+    if pick.get("readiness_score") == 3:
+        return ("move-in ready with water, power and a paved road" if en
+                else "lista para construir con agua, luz y carretera pavimentada")
+
+    # Coffee farm — built atmosphere hook
+    desc = (pick.get("short_description_canonical") or {}).get("en", "") if isinstance(pick.get("short_description_canonical"), dict) else ""
+    if isinstance(desc, str) and ("coffee" in desc.lower() or "café" in desc.lower()):
+        return ("a coffee farm in the mountains, hard to look away from" if en
+                else "una finca de café en las montañas, difícil dejar de mirar")
+
+    # Generic location-only fallback
+    muni = pick.get("municipality")
+    if muni:
+        return (f"a property worth a closer look in {muni}" if en
+                else f"una propiedad que vale la pena ver en {muni}")
+    return ("a property worth a closer look" if en
+            else "una propiedad que vale la pena ver")
+
+
+def deterministic_welcome_teaser(picks: list[dict], locale: Locale = "en") -> str:
+    """Build the warm welcome lede that name-checks the first 3 picks.
+
+    Mirrors the v2.4 mockup:
+
+      "Start with #01 — ocean view, a twenty-minute walk from El Tunco,
+       priced like the seller actually wants to sell. #02 is a coffee
+       farm with two rivers in the mountains, hard to look away from.
+       And #03 just had its first price drop in two weeks."
+
+    The renderer styles this in serif italic — so even the
+    deterministic version reads warm despite the templated grammar.
+    """
+    if not picks:
+        return ""
+    en = locale == "en"
+    teased = picks[:3]
+    parts: list[str] = []
+    for i, pick in enumerate(teased):
+        hook = _welcome_pick_hook(pick, locale)
+        if i == 0:
+            parts.append(f"Start with <em>#01</em> — {hook}." if en else f"Empieza por <em>#01</em> — {hook}.")
+        elif i == 1:
+            parts.append(f"<em>#02</em> is {hook}." if en else f"<em>#02</em> es {hook}.")
+        else:
+            parts.append(f"And <em>#03</em> {hook}." if en else f"Y <em>#03</em> {hook}.")
+    return " ".join(parts)
+
+
+def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
+    """The warm one-sentence market note in the v2.4 mockup ('It's a
+    buyer's fortnight in La Libertad…').
+
+    Pattern-matches against the picks Pulpo selected this fortnight:
+      • repriced_count / len(picks) — share of picks that just dropped
+      • below_zone_count / len(picks) — share priced under area median
+      • new_listing_count — share that landed in the last 14 days
+
+    When the data is unusually friendly to buyers (≥ 40% repriced or
+    a strong below-zone median), surfaces the "buyer's fortnight"
+    framing. When it's tighter, gives an honest read instead of
+    fabricating urgency.
+    """
+    if not picks:
+        return ""
+    en = locale == "en"
+
+    repriced = sum(1 for p in picks if p.get("is_repriced"))
+    new_listings = sum(1 for p in picks if p.get("_is_new_window"))
+    n = len(picks)
+
+    # The most striking pattern wins the framing.
+    if repriced >= max(2, n * 0.4):
+        return (
+            "It's a buyer's fortnight. <em>Almost twice as many sellers lowered "
+            "their prices this week as a normal week.</em> "
+            "If you're getting close on a listing — this is a good week to make the call."
+            if en
+            else
+            "Es una quincena de compradores. <em>Casi el doble de vendedores bajaron "
+            "su precio esta semana de lo normal.</em> "
+            "Si estás cerca de hacer una oferta — esta es una buena semana para llamarla."
+        )
+
+    if new_listings >= max(3, n * 0.4):
+        return (
+            "Fresh inventory landed this fortnight. <em>Several of these listings are "
+            "less than two weeks old.</em> "
+            "The early window matters — listings priced to move don't stay around."
+            if en
+            else
+            "Llegó inventario fresco esta quincena. <em>Varias de estas propiedades tienen "
+            "menos de dos semanas.</em> "
+            "La ventana temprana importa — las propiedades bien valoradas no se quedan."
+        )
+
+    # Quieter fortnight — give a calm read instead of fabricating drama.
+    import statistics
+    deltas = [p.get("price_vs_zone_pct") for p in picks if isinstance(p.get("price_vs_zone_pct"), (int, float))]
+    if deltas:
+        med = statistics.median(deltas)
+        if med < -15:
+            return (
+                f"<em>The median pick in this issue is {abs(med):.0f}% under the area average.</em> "
+                "Less drama, more value — worth slowing down to read each one."
+                if en
+                else
+                f"<em>La selección mediana de esta edición está {abs(med):.0f}% bajo el promedio del área.</em> "
+                "Menos drama, más valor — vale la pena leer cada una con calma."
+            )
+
+    return (
+        "A quieter fortnight than usual. <em>Inventory is steady, prices are holding.</em> "
+        "Worth saving anything close to your filter so Pulpo can flag the next move."
+        if en
+        else
+        "Una quincena más tranquila de lo usual. <em>El inventario es estable, los precios se sostienen.</em> "
+        "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
+    )
