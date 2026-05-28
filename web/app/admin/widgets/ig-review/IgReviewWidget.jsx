@@ -10,10 +10,13 @@
 //   - Scheduled-for label
 //   - Lint violations (if any) + Approve / Skip / Clear actions
 //
-// Operator decisions still live in localStorage for PR-3b → PR-5.  The
-// workflow_dispatch persistence (so "Submit batch" actually writes back
-// to ig_queue.json) lands in a follow-up.  Until then, to ship an item
-// the operator hand-edits web/data/ig_queue.json and sets approved=true.
+// Operator decisions live in localStorage during review.  Submit batch
+// POSTs the decisions to /api/admin/ig-queue-apply, which dispatches
+// the `pulpo-ig-queue-apply` workflow — that workflow runs
+// automation/ig_queue_apply.py against main and commits the mutation
+// back via pulpo-bot.  Same persistence path the publisher uses for
+// posted_at.  The hourly publisher cron picks up newly-approved items
+// on the next tick.
 //
 // IgReviewPreview — narrow live-data tile rendered on the /admin grid.
 // Reads /api/admin/ig-queue and surfaces health: items_approved /
@@ -30,6 +33,7 @@ import { t } from "../../../i18n.jsx";
 
 const STORAGE_KEY = "pulpo-ig-review-decisions/drop_01";
 const QUEUE_ENDPOINT = "/api/admin/ig-queue";
+const APPLY_ENDPOINT = "/api/admin/ig-queue-apply";
 
 // Operator decision codes.  null = no local decision; the queue's own
 // approved/posted flags still apply.
@@ -229,6 +233,13 @@ const WIDGET_STYLES = `
 .ig-health-bar .chip.green  b { color: var(--accent); }
 .ig-health-bar .chip.alert  b { color: var(--accent-2); }
 .ig-health-bar .chip.muted  b { color: var(--ink-3); }
+.ig-health-bar .submit-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
 .ig-health-bar .submit {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -238,9 +249,43 @@ const WIDGET_STYLES = `
   border: none;
   border-radius: 10px;
   padding: 10px 18px;
-  cursor: not-allowed;
-  opacity: .55;
+  cursor: pointer;
   white-space: nowrap;
+}
+.ig-health-bar .submit:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+.ig-health-bar .submit:hover:not(:disabled) {
+  background: var(--accent-strong, var(--ink));
+}
+.ig-health-bar .submit.submitted {
+  background: var(--accent);
+  color: var(--paper);
+  opacity: 1;
+}
+.ig-health-bar .submit.failed {
+  background: var(--accent-2);
+  color: var(--paper);
+  opacity: 1;
+}
+.ig-health-bar .submit-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent);
+}
+.ig-health-bar .submit-link:hover { color: var(--accent-strong, var(--accent)); }
+.ig-health-bar .submit-error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-2);
+  max-width: 260px;
+  text-align: right;
+  line-height: 1.35;
 }
 .ig-health-bar .meta {
   grid-column: 1 / -1;
@@ -305,6 +350,9 @@ const WIDGET_STYLES = `
     gap: 14px;
     padding: 14px;
   }
+  .ig-health-bar .submit-col { align-items: stretch; width: 100%; }
+  .ig-health-bar .submit { width: 100%; text-align: center; }
+  .ig-health-bar .submit-error { max-width: none; text-align: left; }
 }
 
 /* IG card frame */
@@ -756,7 +804,7 @@ function _Item({ item, decision, onDecide }) {
 
 // ── health banner ────────────────────────────────────────────────────
 
-function _HealthBanner({ health, items, decisions }) {
+function _HealthBanner({ health, items, decisions, submit, onSubmit }) {
   const counts = useMemo(() => {
     let approve = 0, skip = 0, alert = 0, posted = 0, pending = 0;
     for (const it of items) {
@@ -772,6 +820,26 @@ function _HealthBanner({ health, items, decisions }) {
 
   const blockers = (health && Array.isArray(health.blockers)) ? health.blockers : [];
   const hasBlockers = blockers.length > 0 || counts.alert > 0;
+
+  const decisionCount = counts.approve + counts.skip;
+  const submitKind = submit ? submit.kind : "idle";
+  const isSubmitting = submitKind === "submitting";
+  const isSubmitted = submitKind === "submitted";
+  const submitFailed = submitKind === "failed";
+  // Disabled when: nothing to send, in flight, or just succeeded
+  // (a new decision via setDecision re-arms the button).
+  const submitDisabled = decisionCount === 0 || isSubmitting || isSubmitted;
+
+  let submitLabel;
+  if (isSubmitting) submitLabel = t("admin.ig_review.submit_submitting");
+  else if (isSubmitted) submitLabel = t("admin.ig_review.submit_submitted");
+  else if (submitFailed) submitLabel = t("admin.ig_review.submit_retry");
+  else if (decisionCount === 0) submitLabel = t("admin.ig_review.submit_button");
+  else submitLabel = t("admin.ig_review.submit_button_count", { count: String(decisionCount) });
+
+  const titleHint = decisionCount === 0
+    ? t("admin.ig_review.submit_disabled_hint")
+    : t("admin.ig_review.submit_ready_hint", { count: String(decisionCount) });
 
   return (
     <div className={`ig-health-bar ${hasBlockers ? "alert" : "ok"}`}>
@@ -789,15 +857,33 @@ function _HealthBanner({ health, items, decisions }) {
           <span className="chip green">{t("admin.ig_review.stat.posted")}: <b>{counts.posted}</b></span>
         )}
       </div>
-      <button
-        type="button"
-        className="submit"
-        disabled
-        title={t("admin.ig_review.submit_disabled_hint")}
-        aria-label={t("admin.ig_review.submit_disabled_hint")}
-      >
-        {t("admin.ig_review.submit_button")}
-      </button>
+      <div className="submit-col">
+        <button
+          type="button"
+          className={`submit${isSubmitted ? " submitted" : ""}${submitFailed ? " failed" : ""}`}
+          disabled={submitDisabled}
+          title={titleHint}
+          aria-label={titleHint}
+          onClick={() => { if (!submitDisabled && onSubmit) onSubmit(); }}
+        >
+          {submitLabel}
+        </button>
+        {isSubmitted && submit && submit.runs_url && (
+          <a
+            className="submit-link"
+            href={submit.runs_url}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            {t("admin.ig_review.submit_view_run")}
+          </a>
+        )}
+        {submitFailed && submit && submit.error && (
+          <div className="submit-error" role="alert">
+            {t("admin.ig_review.submit_error_prefix")}: {submit.error}
+          </div>
+        )}
+      </div>
       {(health && (health.next_due || health.last_posted_at)) && (
         <div className="meta">
           <span>
@@ -837,24 +923,26 @@ function _HealthBanner({ health, items, decisions }) {
 export function IgReviewWidget() {
   const [state, setState] = useState({ kind: "loading", data: null, error: null });
   const [decisions, setDecisions] = useState(() => _readDecisions());
+  // Submit lifecycle: idle | submitting | submitted | failed
+  const [submit, setSubmit] = useState({ kind: "idle" });
+
+  async function fetchQueue() {
+    try {
+      const r = await fetch(QUEUE_ENDPOINT, { headers: { "Accept": "application/json" } });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setState({ kind: "error", data: null, error: body.error || `HTTP ${r.status}` });
+        return;
+      }
+      setState({ kind: "loaded", data: body, error: null });
+    } catch (err) {
+      setState({ kind: "error", data: null, error: (err && err.message) || "fetch_failed" });
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch(QUEUE_ENDPOINT, { headers: { "Accept": "application/json" } });
-        const body = await r.json().catch(() => ({}));
-        if (cancelled) return;
-        if (!r.ok) {
-          setState({ kind: "error", data: null, error: body.error || `HTTP ${r.status}` });
-          return;
-        }
-        setState({ kind: "loaded", data: body, error: null });
-      } catch (err) {
-        if (cancelled) return;
-        setState({ kind: "error", data: null, error: (err && err.message) || "fetch_failed" });
-      }
-    })();
+    (async () => { if (!cancelled) await fetchQueue(); })();
     return () => { cancelled = true; };
   }, []);
 
@@ -866,6 +954,47 @@ export function IgReviewWidget() {
       _writeDecisions(next);
       return next;
     });
+    // A new decision after a submit completes (or fails) re-arms Submit.
+    setSubmit((s) => (s.kind === "idle" ? s : { kind: "idle" }));
+  }
+
+  async function onSubmit() {
+    if (submit.kind === "submitting") return;
+    const queue = state.data && state.data.queue;
+    if (!queue) return;
+    const batch = queue.batch;
+    if (!batch) {
+      setSubmit({ kind: "failed", error: "queue has no batch id" });
+      return;
+    }
+    if (!decisions || Object.keys(decisions).length === 0) return;
+
+    setSubmit({ kind: "submitting" });
+    try {
+      const r = await fetch(APPLY_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ batch, decisions }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok || !body.ok) {
+        const detail = body.detail || body.error || `HTTP ${r.status}`;
+        setSubmit({ kind: "failed", error: detail });
+        return;
+      }
+      setSubmit({
+        kind: "submitted",
+        runs_url: body.runs_url || null,
+        counts: body.counts || null,
+      });
+      // Refetch after a short delay so the workflow has time to land
+      // its commit on main.  The endpoint's 10s Cache-Control means
+      // we may still see stale data immediately; the local decisions
+      // state already reflects what we sent.
+      setTimeout(fetchQueue, 5000);
+    } catch (err) {
+      setSubmit({ kind: "failed", error: (err && err.message) || "request_failed" });
+    }
   }
 
   return (
@@ -912,6 +1041,8 @@ export function IgReviewWidget() {
             health={state.data.health}
             items={state.data.queue.items || []}
             decisions={decisions}
+            submit={submit}
+            onSubmit={onSubmit}
           />
           <ol className="ig-review-list" aria-label={t("admin.ig_review.list_aria")}>
             {(state.data.queue.items || []).map((it) => (
