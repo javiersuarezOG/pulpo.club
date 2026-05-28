@@ -56,7 +56,7 @@ const MANIFESTS: Record<string, CountryManifest> = {
 // identically without setting the var.
 const ACTIVE_CODE: string = (
   (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_PULPO_ACTIVE_COUNTRY
-  || "SV"
+  || "SV"  // multi-country-exempt: env-var default — mirrors Python's active() fallback
 ).toUpperCase();
 
 function resolveActive(): CountryManifest {
