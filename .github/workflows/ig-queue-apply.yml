@@ -1,0 +1,100 @@
+# Apply operator approve/skip decisions to the IG batch queue.
+#
+# Dispatched by /api/admin/ig-queue-apply (which the Submit button in
+# /admin/ig-review POSTs).  Runs automation/ig_queue_apply.py against
+# web/data/ig_queue.json on main, then commits the mutation back via
+# pulpo-bot — same persistence path the publisher uses for posted_at.
+#
+# Why a workflow rather than a Vercel-side write: the queue lives in
+# git, and the only credentialed write path to main is the bot PAT
+# inside Actions.  Routing through the same channel preserves a single
+# audit trail (workflow run + commit SHA) and lets the existing
+# concurrency group serialize back-to-back submits.
+
+name: pulpo-ig-queue-apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: 'Queue batch ID (must match queue.batch — e.g. drop_01)'
+        required: true
+      decisions_json:
+        description: 'Decisions object: {"1":"approve","2":"skip",...}'
+        required: true
+      dry_run:
+        description: 'Print summary without writing'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+concurrency:
+  # Serialize any concurrent submits to avoid two runs racing on the
+  # same queue file.  We don't cancel — every submit's decisions
+  # matter, and runs finish in ~30s.
+  group: ig-queue-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # Bot PAT so the queue commit can push back to main with
+          # branch protection on.
+          token: ${{ secrets.PULPO_BOT_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        # ig_queue_apply only needs stdlib + automation/_atomic.  No
+        # external deps, but requirements.txt install is cheap and
+        # keeps the env consistent with ig-publish.yml.
+        run: pip install -r requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+
+      - name: Apply decisions
+        env:
+          BATCH:         ${{ github.event.inputs.batch }}
+          DECISIONS:     ${{ github.event.inputs.decisions_json }}
+          DRY_RUN:       ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            python3 -m automation.ig_queue_apply \
+              --batch "$BATCH" \
+              --decisions "$DECISIONS" \
+              --dry-run
+          else
+            python3 -m automation.ig_queue_apply \
+              --batch "$BATCH" \
+              --decisions "$DECISIONS"
+          fi
+
+      - name: Commit queue mutation
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          BATCH: ${{ github.event.inputs.batch }}
+        run: |
+          if git diff --quiet web/data/ig_queue.json; then
+            echo "[ig-queue-apply] queue unchanged — nothing to commit"
+            exit 0
+          fi
+          git add web/data/ig_queue.json
+          git commit -m "chore(ig): operator decisions applied to ${BATCH}"
+          git push origin main

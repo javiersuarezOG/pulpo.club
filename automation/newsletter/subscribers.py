@@ -49,6 +49,27 @@ class ResendContact:
     email: str
     unsubscribed: bool
     created_at: Optional[str]
+    # LEARNING: locale side-channel. /api/newsletter writes
+    # "pulpo-locale:<lc>" into the Resend contact's first_name on
+    # subscribe; we parse it back here so anonymous subscribers
+    # (no matching Clerk user) get their newsletter in the language
+    # they signed up in. None when the prefix is missing or malformed;
+    # the consumer in join_recipients() falls back to "en" in that case
+    # — identical to pre-2026-05-28 behavior. See docs/email-audit.md.
+    locale: Optional[Locale] = None
+
+
+_LOCALE_PREFIX = "pulpo-locale:"
+_LOCALE_VALUES: tuple[Locale, ...] = ("en", "es")
+
+
+def _parse_locale_first_name(raw: Any) -> Optional[Locale]:
+    if not isinstance(raw, str):
+        return None
+    if not raw.startswith(_LOCALE_PREFIX):
+        return None
+    suffix = raw[len(_LOCALE_PREFIX):].strip().lower()
+    return suffix if suffix in _LOCALE_VALUES else None  # type: ignore[return-value]
 
 
 def list_audience(
@@ -79,11 +100,15 @@ def list_audience(
         email = r.get("email")
         if not isinstance(email, str) or "@" not in email:
             continue
+        # Resend returns first_name in either snake- or camel-case
+        # depending on SDK version; tolerate both.
+        first_name = r.get("first_name") or r.get("firstName")
         out.append(ResendContact(
             id=str(r.get("id") or ""),
             email=email.strip().lower(),
             unsubscribed=bool(r.get("unsubscribed", False)),
             created_at=r.get("created_at"),
+            locale=_parse_locale_first_name(first_name),
         ))
     return out
 
@@ -245,10 +270,14 @@ def join_recipients(
                 preference=preference,
             )
         else:
+            # Use the locale persisted via the Resend first_name side-channel
+            # (written by /api/newsletter on subscribe). Falls back to "en"
+            # when the contact predates the prefix or it's malformed —
+            # identical to the prior hardcoded behavior.
             recipient = Recipient(
                 email_hash=email_hash(c.email),
                 display_name=None,
-                locale="en",
+                locale=c.locale or "en",
                 tier="free",
                 has_account=False,
                 preference=Preference(),

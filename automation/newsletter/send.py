@@ -1,5 +1,11 @@
 """Send a rendered newsletter Issue via the Resend HTTP API.
 
+GUARDRAIL: this is the NEWSLETTER flow. Activation/invitation emails go
+through api/_activation_email.js. We share one Resend project
+(RESEND_API_KEY) but separate `from:` envs, no audience overlap, and
+distinct PostHog event prefixes. See docs/email-audit.md for the full
+topology.
+
 Dry-run gate (default ON):
     PULPO_NEWSLETTER_DRY_RUN unset or "1" / "true" / "yes" → no HTTP call;
     returns a fake message_id and fires the same PostHog telemetry as a
