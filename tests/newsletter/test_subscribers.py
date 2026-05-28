@@ -253,17 +253,8 @@ def test_join_uses_contact_locale_for_anonymous_when_present():
                            unsubscribed=False, created_at=None),
     ]
     recipients = subs.join_recipients(contacts=contacts, clerk_users=[])
-    by_email = {email_hash_email(c.email): r for r, c in zip(recipients, contacts)}
     # Locale persisted from the side-channel wins for anonymous contacts.
-    by_locale = {r.locale for r in recipients}
-    assert by_locale == {"es", "en"}      # legacy falls back to "en"
     locales = [r.locale for r in recipients]
     assert locales[0] == "es"             # anon-es
     assert locales[1] == "en"             # anon-en
     assert locales[2] == "en"             # legacy (no prefix → default)
-
-
-def email_hash_email(email):
-    """Helper for the dict zip above; subs.email_hash is the source-of-truth."""
-    from automation.newsletter.store import email_hash
-    return email_hash(email)
