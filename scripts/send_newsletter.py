@@ -84,11 +84,13 @@ def main() -> int:
         default=None,
         metavar="EMAIL",
         help=(
-            "Admin preview mode. Skip the audience queue; instead send the "
-            "3 cohort variants (anonymous, free_prefs, pro_prefs) of the "
-            "current issue to this single email. Subjects are prefixed "
-            "'[PULPO PREVIEW · <cohort>]' so the operator can tell them "
-            "apart. Forces LIVE send (DRY_RUN must be off in the env)."
+            "Admin preview mode. Skip the audience queue; instead send a "
+            "single Pro-with-prefs preview of the current issue to this "
+            "email. Subject is prefixed '[PULPO PREVIEW · pro_prefs]' so "
+            "the operator can tell it apart from real audience sends. "
+            "PR-NL-9 (audience scope): the personalised newsletter is a "
+            "Pro feature; only the pro_prefs variant is meaningful here. "
+            "Forces LIVE send (DRY_RUN must be off in the env)."
         ),
     )
     p.add_argument(

@@ -89,6 +89,9 @@ def test_list_clerk_users_no_secret_quiet_no_op(monkeypatch):
 
 # ── join_recipients ──────────────────────────────────────────────────────
 def test_join_promotes_clerk_matched_to_full_cohort():
+    """PR-NL-9 (audience scope): only Pro/Agency Clerk-matched contacts
+    land in the queue. The anonymous contact is dropped — Free users
+    will be served by a different system."""
     contacts = [
         subs.ResendContact(id="c1", email="javier@suarez.ventures",
                            unsubscribed=False, created_at=None),
@@ -109,8 +112,9 @@ def test_join_promotes_clerk_matched_to_full_cohort():
         },
     ))
     recipients = subs.join_recipients(contacts=contacts, clerk_users=[clerk_user])
-    assert len(recipients) == 2
-    javier = next(r for r in recipients if r.display_name == "Javier")
+    assert len(recipients) == 1
+    javier = recipients[0]
+    assert javier.display_name == "Javier"
     assert javier.tier == "pro"
     assert javier.has_account is True
     assert javier.locale == "es"
@@ -118,42 +122,91 @@ def test_join_promotes_clerk_matched_to_full_cohort():
     assert javier.preference.property_types == ["land"]
     assert javier.preference.max_price_usd == 500_000
 
-    anon = next(r for r in recipients if r.display_name is None)
-    assert anon.tier == "free"
-    assert anon.has_account is False
-    assert anon.preference == Preference()
-
 
 def test_join_excludes_unsubscribed_by_default():
+    """Subscribers with `unsubscribed=True` are dropped even when their
+    Clerk record makes them Pro-eligible."""
     contacts = [
         subs.ResendContact(id="c1", email="ok@pulpo.club", unsubscribed=False, created_at=None),
         subs.ResendContact(id="c2", email="off@pulpo.club", unsubscribed=True, created_at=None),
     ]
-    recipients = subs.join_recipients(contacts=contacts, clerk_users=[])
+    pros = [
+        subs._parse_clerk_user(_clerk_user("ok@pulpo.club", plan="pro")),
+        subs._parse_clerk_user(_clerk_user("off@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=pros)
     assert len(recipients) == 1
+    assert recipients[0].email_hash == subs.email_hash("ok@pulpo.club")
 
 
 def test_join_only_emails_filters():
+    """`only_emails` further restricts the Pro-eligible queue — passing
+    a Free or anonymous-only address through this seam still drops them."""
     contacts = [
         subs.ResendContact(id="c1", email="javier@suarez.ventures",
                            unsubscribed=False, created_at=None),
         subs.ResendContact(id="c2", email="someone@other.com",
                            unsubscribed=False, created_at=None),
     ]
+    pro = subs._parse_clerk_user(_clerk_user("javier@suarez.ventures", plan="pro"))
     recipients = subs.join_recipients(
         contacts=contacts,
-        clerk_users=[],
+        clerk_users=[pro],
         only_emails={"javier@suarez.ventures"},
     )
     assert len(recipients) == 1
 
 
 def test_join_dedupes_duplicate_contacts():
+    """Duplicate Resend contacts collapse to one Pro recipient."""
     contacts = [
         subs.ResendContact(id="c1", email="dup@pulpo.club", unsubscribed=False, created_at=None),
         subs.ResendContact(id="c2", email="dup@pulpo.club", unsubscribed=False, created_at=None),
     ]
-    assert len(subs.join_recipients(contacts=contacts, clerk_users=[])) == 1
+    pro = subs._parse_clerk_user(_clerk_user("dup@pulpo.club", plan="pro"))
+    assert len(subs.join_recipients(contacts=contacts, clerk_users=[pro])) == 1
+
+
+def test_join_drops_free_tier_clerk_users():
+    """PR-NL-9 audience scope: Free-tier Clerk users (signed up but
+    haven't upgraded) are dropped — they belong to a different product."""
+    contacts = [
+        subs.ResendContact(id="c1", email="free@pulpo.club",
+                           unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="pro@pulpo.club",
+                           unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users)
+    assert len(recipients) == 1
+    assert recipients[0].tier == "pro"
+
+
+def test_join_drops_anonymous_resend_only_contacts():
+    """PR-NL-9 audience scope: contacts in Resend with no Clerk record
+    (anonymous email-only signups) are dropped — they used to receive a
+    fallback variant; that variant is gone."""
+    contacts = [
+        subs.ResendContact(id="c1", email="anon@example.com",
+                           unsubscribed=False, created_at=None),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=[])
+    assert recipients == []
+
+
+def test_join_keeps_agency_tier():
+    """Agency tier is also part of the Pro audience."""
+    contacts = [
+        subs.ResendContact(id="c1", email="agency@pulpo.club",
+                           unsubscribed=False, created_at=None),
+    ]
+    agency = subs._parse_clerk_user(_clerk_user("agency@pulpo.club", plan="agency"))
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=[agency])
+    assert len(recipients) == 1
+    assert recipients[0].tier == "agency"
 
 
 def test_preference_from_profile_tolerates_garbage():
@@ -176,15 +229,22 @@ def test_preference_from_missing_newsletter_block():
     assert p2 == Preference()
 
 
-def test_synthesize_preview_recipients_covers_three_cohorts():
+def test_synthesize_preview_recipients_yields_pro_prefs_only():
+    """PR-NL-9 audience scope: the preview is the Pro-with-prefs
+    variant only. The earlier anonymous + free_prefs variants are gone
+    because Free / anonymous users don't receive this newsletter."""
     from automation.newsletter.build_issue import detect_cohort
 
     queue = subs.synthesize_preview_recipients("Preview@Pulpo.Club")
-    assert len(queue) == 3
-    emails = {email for _, email in queue}
-    assert emails == {"preview@pulpo.club"}        # normalized + same address everywhere
-    cohorts = [detect_cohort(r) for r, _ in queue]
-    assert cohorts == ["anonymous", "free_prefs", "pro_prefs"]
+    assert len(queue) == 1
+    recipient, email = queue[0]
+    assert email == "preview@pulpo.club"           # normalized
+    assert detect_cohort(recipient) == "pro_prefs"
+    assert recipient.tier == "pro"
+    assert recipient.has_account is True
+    # Preference is wide enough to find picks but narrow enough to
+    # exercise the "filter applied" branch.
+    assert recipient.preference.departments == ["La Libertad"]
 
 
 def test_synthesize_preview_recipients_rejects_bad_email():
@@ -243,7 +303,13 @@ def test_list_audience_extracts_locale_from_first_name(monkeypatch):
     assert contacts["bogus@pulpo.club"].locale is None
 
 
-def test_join_uses_contact_locale_for_anonymous_when_present():
+def test_resend_locale_sidechannel_still_parses_for_audience():
+    """PR-NL-9 audience scope: anonymous Resend contacts no longer flow
+    through to recipients, but the locale side-channel parser stays
+    relevant — when a Pro user's Clerk record is missing a locale, we
+    used to fall through to the Resend first_name. Keep the parser
+    test in place to guard the parser itself; the join-time behaviour
+    is now exercised in test_join_drops_anonymous_resend_only_contacts."""
     contacts = [
         subs.ResendContact(id="c1", email="anon-es@example.com",
                            unsubscribed=False, created_at=None, locale="es"),
@@ -252,9 +318,6 @@ def test_join_uses_contact_locale_for_anonymous_when_present():
         subs.ResendContact(id="c3", email="anon-legacy@example.com",
                            unsubscribed=False, created_at=None),
     ]
-    recipients = subs.join_recipients(contacts=contacts, clerk_users=[])
-    # Locale persisted from the side-channel wins for anonymous contacts.
-    locales = [r.locale for r in recipients]
-    assert locales[0] == "es"             # anon-es
-    assert locales[1] == "en"             # anon-en
-    assert locales[2] == "en"             # legacy (no prefix → default)
+    # No Clerk users → all three are dropped (anonymous-only contacts
+    # have no Pro account).
+    assert subs.join_recipients(contacts=contacts, clerk_users=[]) == []

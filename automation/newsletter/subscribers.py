@@ -242,6 +242,15 @@ def _locale_for(user: Optional[ClerkUser]) -> Locale:
     return "es" if lc == "es" else "en"
 
 
+# PR-NL-9 (audience scope) — the personalised newsletter is a Pro
+# feature. Free and anonymous recipients used to receive a paywalled /
+# fallback variant; that's removed. Free users will get a different
+# product on a separate pipeline; anonymous subscribers get nothing
+# from this cron. The filter is enforced in join_recipients so a stale
+# call site that bypasses it can't quietly re-introduce free sends.
+PRO_AUDIENCE_TIERS: frozenset[str] = frozenset({"pro", "agency"})
+
+
 def join_recipients(
     *,
     contacts: Iterable[ResendContact],
@@ -251,9 +260,16 @@ def join_recipients(
 ) -> list[Recipient]:
     """Build the cron's per-recipient queue.
 
+    PR-NL-9 (audience scope): only Pro + Agency recipients land in the
+    queue. Free-tier and Resend-only (anonymous, no Clerk match)
+    contacts are silently dropped — they're not the audience for this
+    newsletter, and a different system will handle them.
+
     `only_emails` is the smoke-test seam — pass `{"javier@suarez.ventures"}`
     to send Issue 01 to a single address. The set is matched case-insensitively
-    against the Resend audience.
+    against the Resend audience. Note: even with `only_emails`, the Pro
+    filter still applies; a free-tier address passed through this seam
+    will still be dropped.
     """
     by_email: dict[str, ClerkUser] = {
         u.email: u for u in clerk_users if u.email
@@ -271,63 +287,54 @@ def join_recipients(
         if only is not None and c.email not in only:
             continue
         user = by_email.get(c.email)
-        if user is not None:
-            preference = _preference_from_profile(user.profile)
-            recipient = Recipient(
-                email_hash=email_hash(c.email),
-                display_name=user.first_name,
-                locale=_locale_for(user),
-                tier=user.plan,
-                has_account=True,
-                preference=preference,
-                saved_count=user.saved_count,
-            )
-        else:
-            # Use the locale persisted via the Resend first_name side-channel
-            # (written by /api/newsletter on subscribe). Falls back to "en"
-            # when the contact predates the prefix or it's malformed —
-            # identical to the prior hardcoded behavior.
-            recipient = Recipient(
-                email_hash=email_hash(c.email),
-                display_name=None,
-                locale=c.locale or "en",
-                tier="free",
-                has_account=False,
-                preference=Preference(),
-            )
+        # Pro / Agency gate. Anonymous (no Clerk record) is filtered
+        # here; free-tier Clerk users are filtered by the tier check
+        # right after.
+        if user is None:
+            continue
+        if user.plan not in PRO_AUDIENCE_TIERS:
+            continue
+        preference = _preference_from_profile(user.profile)
+        recipient = Recipient(
+            email_hash=email_hash(c.email),
+            display_name=user.first_name,
+            locale=_locale_for(user),
+            tier=user.plan,
+            has_account=True,
+            preference=preference,
+            saved_count=user.saved_count,
+        )
         out.append(recipient)
     return out
 
 
 def synthesize_preview_recipients(email: str) -> list[tuple[Recipient, str]]:
-    """Three fake recipients addressed to the same email — one per cohort
-    the production renderer can produce (anonymous, free_prefs, pro_prefs).
+    """ONE fake recipient — the Pro-with-prefs variant — addressed to the
+    operator's email.
 
-    Used by `scripts/send_newsletter.py --preview-cohorts <email>` so the
-    operator can preview all three subscriber experiences in their own
-    inbox before flipping `send_mode=yes` on the real audience.
+    PR-NL-9 (audience scope): the personalised newsletter is a Pro
+    feature, so the preview only needs to vet what a Pro subscriber
+    actually sees. The earlier anonymous + free_prefs variants are
+    removed; Free users will get a different product on a separate
+    pipeline, and anonymous subscribers are not part of this audience.
 
-    `logged_no_prefs` is intentionally omitted — its render diverges from
-    `anonymous` only by a settings-link path, and the cohort is rare in
-    the audience. Three variants is enough to vet the editorial cut.
-
-    Preference for the prefs cohorts: `departments=["La Libertad"]`. Wide
-    enough that the picker always finds picks, narrow enough that the
-    operator sees the "filter applied" branch render (not the broad
-    fallback). The renderer's filter-trace shows up in the rendered chips.
+    Preference: `departments=["La Libertad"]`. Wide enough that the
+    picker always finds picks, narrow enough that the operator sees
+    the "filter applied" branch render (not the broad fallback).
     """
     email = email.strip().lower()
     if not email or "@" not in email:
         raise ValueError(f"synthesize_preview_recipients: invalid email {email!r}")
     eh = email_hash(email)
-    prefs = Preference(departments=["La Libertad"])
     recipients = [
-        Recipient(email_hash=eh, display_name=None, locale="en",
-                  tier="free", has_account=False, preference=Preference()),
-        Recipient(email_hash=eh, display_name="Preview", locale="en",
-                  tier="free", has_account=True, preference=prefs),
-        Recipient(email_hash=eh, display_name="Preview", locale="en",
-                  tier="pro", has_account=True, preference=prefs),
+        Recipient(
+            email_hash=eh,
+            display_name="Preview",
+            locale="en",
+            tier="pro",
+            has_account=True,
+            preference=Preference(departments=["La Libertad"]),
+        ),
     ]
     return [(r, email) for r in recipients]
 
