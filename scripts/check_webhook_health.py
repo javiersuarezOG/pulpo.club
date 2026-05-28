@@ -26,18 +26,35 @@ DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflow
 # that pre-dates the deploy — false-alarming on healthy systems until the
 # next Stripe webhook fires post-merge. Match all `webhook.received` rows
 # while it's still single-source.
+#
+# `max_age_hours` per family — calibrated against Pulpo's actual event
+# rates rather than a single global threshold:
+#   • Resend fires on every newsletter generation (twice/fortnight) AND on
+#     every user signup. Quiet > 12h = something's wrong.
+#   • Clerk fires on user actions (signin, signup, invitation accept).
+#     Overnight gaps of 12-18h are normal on a small subscriber base; 24h
+#     is the right "still nothing? investigate" threshold.
+#   • Stripe webhook.received fires on subscription state changes — most
+#     accounts go 30 days between renewal events. 48h is generous; tighten
+#     once we're > 100 paying users.
+# These can be overridden per family via WEBHOOK_HEALTH_MAX_AGE_<FAMILY>
+# env vars; the legacy WEBHOOK_HEALTH_MAX_AGE_HOURS still works as a
+# global override for the workflow-dispatch test-fire path.
 FAMILIES = {
     "resend": {
         "label": "Resend newsletter.*",
         "where": "startsWith(event, 'newsletter.')",
+        "max_age_hours": 12.0,
     },
     "clerk": {
         "label": "Clerk clerk.*",
         "where": "startsWith(event, 'clerk.')",
+        "max_age_hours": 24.0,
     },
     "stripe": {
         "label": "Stripe webhook.received",
         "where": "event = 'webhook.received'",
+        "max_age_hours": 48.0,
     },
 }
 
@@ -92,9 +109,18 @@ def slack(webhook_url: str, text: str, dry_run: bool) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check webhook event heartbeats in PostHog.")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--max-age-hours", type=float, default=float(env("WEBHOOK_HEALTH_MAX_AGE_HOURS", "6")))
+    # Optional global override. When set, applies to every family —
+    # useful for the "force a test alert" path (`--max-age-hours 0`).
+    # When unset, per-family thresholds from FAMILIES win.
+    parser.add_argument("--max-age-hours", type=float, default=None,
+                        help="Global override; if unset, per-family thresholds from FAMILIES apply.")
     parser.add_argument("--runbook-url", default=env("WEBHOOK_HEALTH_RUNBOOK_URL", DEFAULT_RUNBOOK))
     args = parser.parse_args()
+
+    # Legacy env var still respected for the workflow file's existing
+    # test-fire pattern. Per-family env vars (WEBHOOK_HEALTH_MAX_AGE_RESEND
+    # etc.) take precedence when defined.
+    legacy_global = env("WEBHOOK_HEALTH_MAX_AGE_HOURS", "")
 
     host = env("POSTHOG_HOST", DEFAULT_HOST)
     project = env("POSTHOG_PROJECT_ID")
@@ -106,15 +132,26 @@ def main() -> int:
     now = dt.datetime.now(dt.timezone.utc)
     failures: list[str] = []
     for name, cfg in FAMILIES.items():
+        # Resolution order: CLI > per-family env > legacy global env > FAMILIES default.
+        per_family_env = env(f"WEBHOOK_HEALTH_MAX_AGE_{name.upper()}", "")
+        if args.max_age_hours is not None:
+            threshold = args.max_age_hours
+        elif per_family_env:
+            threshold = float(per_family_env)
+        elif legacy_global:
+            threshold = float(legacy_global)
+        else:
+            threshold = float(cfg["max_age_hours"])
+
         last_seen = query_last_seen(host, project, key, cfg["where"])
         if last_seen is None:
             failures.append(f"{cfg['label']} has never been seen")
             continue
         age_hours = (now - last_seen).total_seconds() / 3600
-        print(f"{name}: last_seen={last_seen.isoformat()} age_hours={age_hours:.2f}")
-        if age_hours > args.max_age_hours:
+        print(f"{name}: last_seen={last_seen.isoformat()} age_hours={age_hours:.2f} threshold={threshold:.1f}h")
+        if age_hours > threshold:
             failures.append(
-                f"{cfg['label']} silent for {age_hours:.1f}h - last event {last_seen.isoformat()}"
+                f"{cfg['label']} silent for {age_hours:.1f}h (threshold {threshold:.0f}h) - last event {last_seen.isoformat()}"
             )
 
     for failure in failures:
