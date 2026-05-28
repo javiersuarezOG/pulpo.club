@@ -262,11 +262,17 @@ def test_llm_story_exception_returns_error():
 
 # ── build_issue → story_html plumbing ────────────────────────────────
 
-def test_build_issue_hero_picks_get_story_html(pro_with_prefs, ranked_pool):
+def test_build_issue_hero_picks_get_story_html(pro_with_prefs, ranked_pool, monkeypatch):
     """The top 3 picks (ISSUE_TOP_PICKS_RICH = 3) all carry a populated
-    story_html + story_source. Short picks deliberately do not."""
+    story_html + story_source. Short picks deliberately do not.
+
+    Forces LLM off so the test exercises the deterministic path
+    deterministically. Production default is LLM=ON (PR-NL-6 follow-
+    up); the LLM-on path is covered by test_llm_story_* mocks above."""
     from datetime import datetime, timezone
-    from automation.newsletter.build_issue import build_issue
+    from automation.newsletter.build_issue import build_issue, reset_story_cache
+    monkeypatch.setenv("PULPO_NEWSLETTER_USE_LLM", "0")
+    reset_story_cache()
     issue = build_issue(
         recipient=pro_with_prefs,
         ranked_listings=ranked_pool,
@@ -276,12 +282,54 @@ def test_build_issue_hero_picks_get_story_html(pro_with_prefs, ranked_pool):
     assert len(issue.picks_top) == 3
     for pick in issue.picks_top:
         assert pick.story_html, f"story_html empty on hero pick {pick.title}"
-        assert pick.story_source == "deterministic"  # LLM off in tests
+        assert pick.story_source == "deterministic"
         # <em> wraps the emotional center
         assert "<em>" in pick.story_html
     for pick in issue.picks_shortlist:
         # Short picks deliberately stay on legacy `blurb` for this PR
         assert pick.story_html == ""
+
+
+def test_default_is_llm_on_when_env_unset(monkeypatch):
+    """PR-NL-6 follow-up: when the env var is missing or empty, LLM is
+    treated as ON. Operators opt OUT explicitly with =0."""
+    from automation.newsletter.build_issue import _resolve_llm_toggle
+    monkeypatch.delenv("PULPO_NEWSLETTER_USE_LLM", raising=False)
+    assert _resolve_llm_toggle() is True
+    monkeypatch.setenv("PULPO_NEWSLETTER_USE_LLM", "")
+    assert _resolve_llm_toggle() is True
+
+
+def test_explicit_zero_disables_llm(monkeypatch):
+    """Operators can disable LLM with =0 / false / no / off."""
+    from automation.newsletter.build_issue import _resolve_llm_toggle
+    for disable_value in ("0", "false", "no", "off", "FALSE", "No"):
+        monkeypatch.setenv("PULPO_NEWSLETTER_USE_LLM", disable_value)
+        assert _resolve_llm_toggle() is False, f"{disable_value} should disable LLM"
+
+
+def test_story_cache_dedupes_across_recipients(make_listing, monkeypatch):
+    """The audience send loops `build_issue` per recipient; same listing
+    × same locale should produce ONE LLM call regardless of how many
+    recipients see it. The cache makes this true."""
+    # `automation.newsletter.__init__` re-exports `build_issue` as a
+    # function, so plain `import automation.newsletter.build_issue` would
+    # resolve to that function. `importlib.import_module` reliably
+    # returns the submodule object.
+    import importlib
+    bi_module = importlib.import_module("automation.newsletter.build_issue")
+    bi_module.reset_story_cache()
+    monkeypatch.setenv("PULPO_NEWSLETTER_USE_LLM", "0")  # keep test deterministic
+    listing = make_listing(rank=1, source_id="CACHE_TEST")
+    out_1 = bi_module._llm_or_deterministic_story(
+        listing, locale="en", issue_id="2026-05-28",
+    )
+    out_2 = bi_module._llm_or_deterministic_story(
+        listing, locale="en", issue_id="2026-05-28",
+    )
+    assert out_1 == out_2, "Same listing should produce the same story"
+    # Cache should hold exactly one entry for this listing+locale
+    assert ("remax:CACHE_TEST", "en") in bi_module._story_cache
 
 
 def test_renderer_emits_em_styling():
