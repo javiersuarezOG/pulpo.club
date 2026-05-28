@@ -1799,7 +1799,7 @@ function PriceContextBlock({ listing, locale }) {
       scope = listing.zone_name || listing.zone;
     }
   } else {
-    scope = t(`country.${listing.country || "SV"}`, locale);
+    scope = t(`country.${listing.country || ACTIVE_COUNTRY.code}`, locale);
   }
 
   // Peer-kind: "lots" / "homes" / "condos" / generic "listings".

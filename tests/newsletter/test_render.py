@@ -22,11 +22,16 @@ from automation.newsletter.store import email_hash
 ISSUE_DATE = datetime(2026, 5, 18, 14, 0, tzinfo=timezone.utc)
 
 ENGLISH_CANARIES = (
+    # v2.2: "Open the file" is the legacy fallback — should never render
+    # in ES locale because cta_view_on now drives the rich-pick CTA.
     "Open the file",
+    "View on ",
+    "View listing →",
+    "Unlock this pick",
     "Top pick · ",
     "Hand-picked",
     "Skip this one",
-    "Adjust your filters",
+    "Tune what you see",
     "Unsubscribe",
     "The shortlist",
     "Market context",
@@ -50,15 +55,17 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
     # class is always present in the <style> block; we check the rendered
     # element instead.
     assert '<div class="paywall-banner">' not in html
-    assert "Unlock with Pulpo Pro" not in html  # no locked CTAs for Pro
-    assert "Open the file →" in html
+    assert "Unlock this pick" not in html  # no locked CTAs for Pro
+    # v2.2: rich-pick CTAs name the source domain
+    assert "View on " in html
     assert "Hand-picked for Javier" in html
 
 
 def test_render_free_prefs_shows_paywall(free_with_prefs, ranked_pool):
     html = _render(free_with_prefs, ranked_pool)
     assert '<div class="paywall-banner">' in html
-    assert "Unlock with Pulpo Pro" in html
+    # v2.2: paywalled rich-pick CTA carries the price anchor
+    assert "Unlock this pick — $9.99/mo →" in html
     assert "stripe/start-checkout" in html
 
 
@@ -163,4 +170,26 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     from automation.newsletter.render_html import TEMPLATE_VERSION
     html = _render(pro_with_prefs, ranked_pool)
     assert TEMPLATE_VERSION  # non-empty
+    assert TEMPLATE_VERSION.startswith("newsletter-v2.2"), (
+        f"TEMPLATE_VERSION drifted: {TEMPLATE_VERSION!r}"
+    )
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
+
+
+def test_render_v22_redesign_contract(pro_with_prefs, ranked_pool):
+    """v2.2 renderer contract: the keytable grid is gone, the meta-row
+    strip is present, the callout left-bar stripe is gone, and the CTA
+    names the source domain. These are the four visible changes —
+    locking them in here so a refactor doesn't quietly undo them."""
+    import re
+    html = _render(pro_with_prefs, ranked_pool)
+    # Keytable HTML element gone
+    assert '<table class="keytable"' not in html
+    # New meta-row strip present
+    assert 'class="meta-row"' in html
+    # Callout left-bar stripe + colored panel are gone
+    assert "border-left: 3px solid var(--clay)" not in html
+    # CTA names the source domain — at least one "View on <domain>" appears
+    assert re.search(r"View on [a-z0-9.-]+\.[a-z]{2,}", html), (
+        "Expected a 'View on <domain>' CTA in the rendered issue"
+    )

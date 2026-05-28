@@ -60,10 +60,14 @@ MIN_LISTINGS_PER_ZONE = 10
 # PRD §FR-7.5 — max days_listed before excluding from comp pool.
 MAX_DAYS_LISTED_FOR_COMPS = 365
 
-# Fallback country code when a listing lacks an explicit country. Today
-# the pipeline runs SV-only; MC-3+ tags every listing with `country` so
-# this default is increasingly defensive.
-DEFAULT_COUNTRY = "SV"
+# Fallback country code when a listing lacks an explicit `country` tag.
+# Today the pipeline runs SV-only; MC-3+ tags every listing with `country`
+# so this default is increasingly defensive. Reads from the active
+# deployment's manifest so a PA/GT/etc. deployment doesn't silently
+# stamp SV onto orphan listings.
+def _default_country() -> str:
+    from pulpo.countries import active
+    return active().code
 
 
 def _g(li: Any, name: str) -> Any:
@@ -137,7 +141,7 @@ def compute_zone_medians(listings: list[Any]) -> dict[tuple[str, str, str], dict
             continue
         ppm = float(_g(li, "price_per_m2"))
         ptype = _g(li, "property_type") or "land"
-        country = _g(li, "country") or DEFAULT_COUNTRY
+        country = _g(li, "country") or _default_country()
 
         zone = _g(li, "zone")
         if isinstance(zone, str) and zone and zone != "unresolved":
@@ -175,7 +179,7 @@ def _pick_bucket(
     """
     ptype = _g(li, "property_type") or "land"
     zone = _g(li, "zone")
-    country = _g(li, "country") or DEFAULT_COUNTRY
+    country = _g(li, "country") or _default_country()
 
     if isinstance(zone, str) and zone and zone != "unresolved":
         bucket = stats.get(("zone", zone, ptype))

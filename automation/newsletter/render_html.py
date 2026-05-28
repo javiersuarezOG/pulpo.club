@@ -17,9 +17,28 @@ field crashing the renderer would break the entire batch.
 from __future__ import annotations
 
 from html import escape as _e
+from urllib.parse import urlparse
 
 from . import i18n
 from .types import Issue, IssuePick, Locale
+
+
+def _source_domain(url: str | None) -> str:
+    """Extract a clean source-domain string from a listing URL.
+
+    Used by the per-pick CTA copy ("View on remax-elsalvador.com →"),
+    making each row's button specific instead of repeating the generic
+    "Open the file →" ten times in one issue. Strips a leading `www.`;
+    returns "" when the URL is missing or unparseable — the caller
+    falls back to a generic CTA copy in that case.
+    """
+    if not url:
+        return ""
+    try:
+        netloc = (urlparse(url).netloc or "").lower()
+    except Exception:                                                       # noqa: BLE001
+        return ""
+    return netloc[4:] if netloc.startswith("www.") else netloc
 
 
 # Bumped whenever the renderer's CSS or layout changes in a way we'd want
@@ -27,7 +46,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.1-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.2-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -66,11 +85,11 @@ a { color: var(--clay); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; height: auto; border: 0; }
 table { border-collapse: collapse; }
-.wrap   { width: 100%; background: var(--paper); padding: 24px 0; }
+.wrap   { width: 100%; background: var(--paper); padding: 0; }
 .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
-.pad    { padding: 40px 48px; }
-.pad-md { padding: 28px 48px; }
-.pad-sm { padding: 18px 48px; }
+.pad    { padding: 24px 36px; }
+.pad-md { padding: 18px 36px; }
+.pad-sm { padding: 12px 36px; }
 .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
 .sans    { font-family: var(--font-sans); }
 .mono    { font-family: var(--font-mono); }
@@ -81,22 +100,21 @@ table { border-collapse: collapse; }
 .clay    { color: var(--clay); }
 .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
 .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
-.rule-clay   { border: 0; border-top: 2px solid var(--clay); width: 56px; margin: 0; }
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--forest);
-  font-weight: 500;
+  font-weight: 600;
 }
 .eyebrow.clay { color: var(--clay); }
 .eyebrow.muted { color: var(--ink-3); }
-.h-hero  { font-family: var(--font-display); font-size: 56px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 14px 0 12px; color: var(--ink); }
-.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 12px 0 8px; color: var(--ink); }
-.h2      { font-family: var(--font-display); font-size: 30px; line-height: 1.12; letter-spacing: -0.01em; font-weight: 400; margin: 14px 0 6px; color: var(--ink); }
-.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 8px 0 4px; color: var(--ink); }
-.lede    { font-family: var(--font-sans); font-size: 17px; line-height: 1.6; color: var(--ink); font-weight: 400; }
+.h-hero  { font-family: var(--font-display); font-size: 60px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 8px 0 10px; color: var(--ink); }
+.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 8px 0 6px; color: var(--ink); }
+.h2      { font-family: var(--font-display); font-size: 26px; line-height: 1.14; letter-spacing: -0.01em; font-weight: 400; margin: 10px 0 4px; color: var(--ink); }
+.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 6px 0 2px; color: var(--ink); }
+.lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
 .body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
 .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
@@ -149,20 +167,23 @@ table { border-collapse: collapse; }
 .glance .num { font-family: var(--font-mono); color: var(--clay); font-weight: 500; width: 32px; font-size: 12px; padding-top: 14px; }
 .glance .where { font-family: var(--font-mono); color: var(--ink-3); font-size: 11px; letter-spacing: 0.04em; }
 .glance .pricecol { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap; }
-.keytable td { padding: 7px 14px 7px 0; vertical-align: top; }
-.keytable .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--forest); padding-right: 10px; }
-.keytable .v { font-family: var(--font-sans); font-size: 14px; color: var(--ink); }
-.callout { background: var(--paper-2); padding: 18px 22px; border-left: 3px solid var(--clay); margin: 16px 0; }
-.callout .label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); }
-.callout .body  { margin-top: 6px; font-size: 14.5px; line-height: 1.6; color: var(--ink); }
+.meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+.callout { margin: 14px 0 0; padding: 0; background: none; }
+.callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
+.callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.callout + .callout { margin-top: 12px; }
 .paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
 .paywall-banner .eyebrow { color: var(--sage); }
 .paywall-banner .h2 { color: var(--paper); }
 .paywall-banner .body { color: var(--paper-3); }
 .paywall-banner .cta { background: var(--clay); color: var(--paper) !important; }
-.footer-strip { background: var(--forest); color: var(--paper); }
-.footer-strip .small { color: var(--paper-3); }
-.footer-strip a { color: var(--paper); }
+/* v2.2: lightened footer. The forest-on-cream "stamp" at the end made
+   the email feel bottom-heavy. Cream-on-cream lets the issue end
+   instead of getting branded at the bottom. The horizontal rule
+   above the footer is now the only visual separator from content. */
+.footer-strip { background: var(--paper-2); color: var(--ink-2); border-top: 1px solid var(--line); }
+.footer-strip .small { color: var(--ink-3); }
+.footer-strip a { color: var(--forest); }
 /* LEARNING: this file uses max-width despite CLAUDE.md mandating
    min-width in web/app/*. Emails are an inverse world — clients without
    media-query support (Outlook 2007+, parts of Yahoo) must still receive
@@ -170,11 +191,12 @@ table { border-collapse: collapse; }
    for narrow widths. 480px matches --bp-sm in tokens.css. */
 @media (max-width: 480px) {
   .pad, .pad-md, .pad-sm { padding-left: 20px; padding-right: 20px; }
-  .pad    { padding-top: 28px; padding-bottom: 28px; }
-  .pad-md { padding-top: 24px; padding-bottom: 24px; }
+  .pad    { padding-top: 18px; padding-bottom: 18px; }
+  .pad-md { padding-top: 14px; padding-bottom: 14px; }
+  .pad-sm { padding-top: 10px; padding-bottom: 10px; }
   .h-hero { font-size: 38px; }
   .h1     { font-size: 28px; }
-  .h2     { font-size: 22px; }
+  .h2     { font-size: 21px; }
   .h3     { font-size: 20px; }
   .body, .body-2 { font-size: 16px; line-height: 1.6; }
   .lede   { font-size: 16.5px; line-height: 1.55; }
@@ -211,18 +233,47 @@ def _callouts_html(callouts: list[dict]) -> str:
     return "".join(out)
 
 
-def _keytable_html(rows: list[tuple[str, str]]) -> str:
+def _meta_row_html(rows: list[tuple[str, str]]) -> str:
+    """Single-line magazine-spec strip replacing the old keytable grid.
+
+    The old `<table class="keytable">` jammed four key/value pairs into one
+    row with no visual separation — rendered as `$/m² $47 vs zone -78% per
+    m² vs zone Beach 5.7 km Airport 36 km Listed New this fortnight`. The
+    values already carry enough context to stand alone (e.g. "5.7 km to
+    beach"), so the labels are redundant.
+
+    New rendering: a flat inline strip separated by `·`. The `vs zone` row
+    is dropped here — the "price story" callout already covers that
+    comp-vs-market context, so duplicating it in the meta row wastes ink.
+    The `$/m²` label is preserved by concatenating the unit into the value
+    ("$47/m²") because "$47" alone doesn't read as price-per-square-meter.
+    """
     if not rows:
         return ""
-    tds: list[str] = []
-    for i, (k, v) in enumerate(rows):
-        tds.append(f'<td class="k">{_e(k)}</td><td class="v">{_e(v)}</td>')
-    # 2-column layout: pair adjacent rows
-    paired = []
-    for i in range(0, len(tds), 4):
-        chunk = "".join(tds[i:i + 4])
-        paired.append(f"<tr>{chunk}</tr>")
-    return f'<table class="keytable" role="presentation" style="margin-top: 14px;">{"".join(paired)}</table>'
+    cells: list[str] = []
+    for k, v in rows:
+        k_clean = (k or "").strip()
+        v_clean = (v or "").strip()
+        if not v_clean:
+            continue
+        # Skip the comp-vs-zone datapoint — already covered by the
+        # "price story" callout. Match case-insensitively + accept both
+        # the EN ("vs zone") and ES ("vs zona") spellings.
+        if k_clean.lower() in ("vs zone", "vs zona"):
+            continue
+        # Concatenate the price-per-m² unit into the value so it reads as
+        # "$47/m²" rather than a bare "$47" with a separate label.
+        if k_clean in ("$/m²", "$/m2") and "/m" not in v_clean:
+            cells.append(f"{_e(v_clean)}/m²")
+        else:
+            cells.append(_e(v_clean))
+    if not cells:
+        return ""
+    return (
+        '<p class="meta-row" style="margin: 12px 0 0;">'
+        + " &middot; ".join(cells)
+        + "</p>"
+    )
 
 
 def _photo_html(pick: IssuePick) -> str:
@@ -253,29 +304,44 @@ def _cta_for_pick(pick: IssuePick, locale: Locale, paywall_url: str, ghost: bool
         label = i18n.t("pick.cta_locked", locale)
         href = paywall_url + f"&pick={pick.rank}"
         return f'<a class="{klass}" href="{_e(href)}">{_e(label)}</a>'
-    label = i18n.t("pick.cta_open", locale)
+    # Name the source — "View on remax-elsalvador.com →" beats the
+    # generic "Open the file →" repeated 10 times in one issue. Falls
+    # back to the plain "View listing →" when the URL is missing or
+    # unparseable (defensive, costs nothing).
+    source = _source_domain(pick.listing_url)
+    if source:
+        label = i18n.t("pick.cta_view_on", locale, source=source)
+    else:
+        label = i18n.t("pick.cta_view", locale)
     return f'<a class="{klass}" href="{_e(pick.listing_url)}">{_e(label)}</a>'
 
 
 def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     top_label = i18n.t("pick.top_label", locale, rank=pick.rank)
+    # Cap rich-pick pills at 3 total. Old behavior rendered up to 6 pills:
+    # rank + new/repriced + up to 4 listing tags. That's visual noise at
+    # the top of every hero pick. Priority: (1) rank, (2) new/repriced,
+    # (3) at most ONE listing tag — the most editorial-priority one
+    # (which build_issue.py orders first in pick.pills).
+    new_pill = _new_pill(pick, locale)
+    extra_pills_html = _pills_html(pick.pills[:1])  # was [:] — now max 1
     pills_html = (
         f'<span class="pill pill-forest">{_e(top_label)}</span>'
-        + _new_pill(pick, locale)
-        + _pills_html(pick.pills)
+        + new_pill
+        + extra_pills_html
     )
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
-    keytable_html = "" if pick.paywalled else _keytable_html(pick.keytable)
+    meta_row_html = "" if pick.paywalled else _meta_row_html(pick.keytable)
     blurb_html = (
-        f'<p class="body" style="margin-top: 22px;">{_e(pick.blurb)}</p>'
+        f'<p class="body" style="margin-top: 14px;">{_e(pick.blurb)}</p>'
         if not pick.paywalled and pick.blurb
         else ""
     )
     if pick.paywalled:
         paywall_blurb = i18n.t("pick.paywall_blurb", locale)
         blurb_html = (
-            f'<p class="body" style="margin-top: 22px; color: var(--ink-2);">{_e(paywall_blurb)}</p>'
+            f'<p class="body" style="margin-top: 14px; color: var(--ink-2);">{_e(paywall_blurb)}</p>'
         )
 
     price_note_html = (
@@ -283,16 +349,16 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     )
 
     return f"""
-    <tr><td style="padding: 32px 0 0 0;">{_photo_html(pick)}</td></tr>
-    <tr><td class="pad" style="padding-top: 24px;">
+    <tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>
+    <tr><td class="pad" style="padding-top: 16px;">
       <div>{pills_html}</div>
       <h2 class="h1">{_e(pick.title)}</h2>
       <div class="meta" style="margin: 6px 0 16px;">{_e(pick.location_line)}</div>
       <div class="price">{_e(pick.price_text)}{price_note_html}</div>
+      {meta_row_html}
       {blurb_html}
       {callouts_html}
-      {keytable_html}
-      <p style="margin-top: 22px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
+      <p style="margin-top: 16px;">{_cta_for_pick(pick, locale, paywall_url)}</p>
     </td></tr>
     <tr><td class="pad-sm"><hr class="rule" /></td></tr>
     """
@@ -300,7 +366,8 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
 
 def _short_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
     eyebrow_text = ""  # not yet generated deterministically — PR-NL-3 LLM hook
-    pills_html = _new_pill(pick, locale) + _pills_html(pick.pills[:2])
+    # Shortlist gets at most 1 editorial tag (matches rich-pick cap).
+    pills_html = _new_pill(pick, locale) + _pills_html(pick.pills[:1])
     blurb_html = ""
     if pick.paywalled:
         blurb_html = f'<p class="body-2" style="margin: 8px 0 0;">{_e(i18n.t("pick.paywall_blurb", locale))}</p>'
@@ -364,7 +431,7 @@ def _paywall_banner_html(issue: Issue) -> str:
     body = i18n.t("paywall.body", issue.locale)
     cta = i18n.t("paywall.cta", issue.locale)
     return f"""
-    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 0;">
+    <tr><td class="pad" style="padding-top: 16px; padding-bottom: 0;">
       <div class="paywall-banner">
         <div class="eyebrow">{_e(eb)}</div>
         <h2 class="h2">{_e(hl)}</h2>
@@ -384,12 +451,12 @@ def _skip_block_html(issue: Issue) -> str:
     headline = issue.commentary.skip_headline or sp.title
     blurb = issue.commentary.skip_blurb or sp.blurb
     return f"""
-    <tr><td class="pad" style="padding-top: 32px;">
+    <tr><td class="pad" style="padding-top: 16px;">
       <hr class="rule" />
-      <div style="margin-top: 24px;">
+      <div style="margin-top: 12px;">
         <div class="eyebrow clay">{_e(eb)}</div>
         <h2 class="h1">{_e(headline)}</h2>
-        <div class="meta" style="margin: 6px 0 16px; color: var(--clay);">{_e(sp.price_text)} · {_e(sp.location_line)}</div>
+        <div class="meta" style="margin: 4px 0 12px; color: var(--clay);">{_e(sp.price_text)} · {_e(sp.location_line)}</div>
         <p class="body">{_e(blurb)}</p>
       </div>
     </td></tr>
@@ -405,7 +472,7 @@ def _market_html(issue: Issue) -> str:
     hl = i18n.t("market.headline", locale)
     para_html = "".join(f'<p class="body">{_e(p)}</p>' for p in paras)
     return f"""
-    <tr><td class="pad" style="background: var(--paper-2); padding-top: 32px; padding-bottom: 32px;">
+    <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(hl)}</h2>
       {para_html}
@@ -421,7 +488,7 @@ def _one_number_html(issue: Issue) -> str:
     eb = i18n.t("one_number.eyebrow", issue.locale)
     body_html = f'<p class="body">{_e(body)}</p>' if body else ""
     return f"""
-    <tr><td class="pad" style="padding-top: 32px;">
+    <tr><td class="pad" style="padding-top: 16px;">
       <div class="eyebrow">{_e(eb)}</div>
       <h2 class="h1">{_e(title)}</h2>
       {body_html}
@@ -445,15 +512,15 @@ def _footer_html(issue: Issue) -> str:
     copyright_line = i18n.t("footer.copyright", locale, year=issue.issue_id[:4])
     return f"""
     <tr><td class="pad footer-strip">
-      <p class="small" style="color: var(--paper-3);">{_e(tagline)}</p>
-      <p class="small" style="color: var(--paper-3); margin-top: 8px;">{_e(you_line)}</p>
-      <p class="small" style="margin-top: 14px;">
+      <p class="small">{_e(tagline)}</p>
+      <p class="small" style="margin-top: 6px;">{_e(you_line)}</p>
+      <p class="small" style="margin-top: 12px;">
         <a href="{_e(issue.settings_url)}">{_e(change_filters_label)}</a> &middot;
         <a href="{_e(issue.settings_url)}">{_e(change_cadence_label)}</a> &middot;
         <a href="{_e(issue.unsubscribe_url)}">{_e(unsubscribe_label)}</a>
       </p>
-      <p class="small" style="color: var(--paper-3); margin-top: 18px;">{_e(no_commission)}</p>
-      <p class="small" style="color: var(--paper-3); margin-top: 18px;">{_e(copyright_line)} &middot; <span class="mono">pulpo.club</span></p>
+      <p class="small" style="margin-top: 14px;">{_e(no_commission)}</p>
+      <p class="small" style="margin-top: 14px;">{_e(copyright_line)} &middot; <span class="mono">pulpo.club</span></p>
     </td></tr>
     """
 
@@ -469,12 +536,12 @@ def _next_issue_html(issue: Issue) -> str:
         cta_label = i18n.t("next.cta", locale)
         href = issue.settings_url
     return f"""
-    <tr><td class="pad" style="padding-top: 24px; padding-bottom: 32px;">
+    <tr><td class="pad" style="padding-top: 16px; padding-bottom: 20px;">
       <hr class="rule" />
-      <div style="margin-top: 24px;">
+      <div style="margin-top: 12px;">
         <div class="eyebrow">{_e(eb)}</div>
         <p class="body" style="max-width: 520px;">{_e(body)}</p>
-        <p style="margin-top: 16px;"><a class="cta-ghost" href="{_e(href)}">{_e(cta_label)}</a></p>
+        <p style="margin-top: 12px;"><a class="cta-ghost" href="{_e(href)}">{_e(cta_label)}</a></p>
       </div>
     </td></tr>
     """
@@ -494,12 +561,12 @@ def render_html(issue: Issue) -> str:
         sl_hl = i18n.t("shortlist.headline", locale, n=len(issue.picks_shortlist))
         sl_lede = i18n.t("shortlist.lede", locale)
         shortlist_header = f"""
-        <tr><td class="pad" style="padding-top: 32px; padding-bottom: 4px;">
+        <tr><td class="pad" style="padding-top: 16px; padding-bottom: 4px;">
           <hr class="rule" />
-          <div style="margin-top: 24px;">
+          <div style="margin-top: 12px;">
             <div class="eyebrow">{_e(sl_eb)}</div>
             <h2 class="h1">{_e(sl_hl)}</h2>
-            <p class="body-2" style="margin-top: 8px; max-width: 480px;">{_e(sl_lede)}</p>
+            <p class="body-2" style="margin-top: 6px; max-width: 480px;">{_e(sl_lede)}</p>
           </div>
         </td></tr>
         """
@@ -510,12 +577,12 @@ def render_html(issue: Issue) -> str:
     glance_block = ""
     if issue.glance:
         glance_block = f"""
-        <tr><td class="pad" style="padding-top: 8px; padding-bottom: 8px;">
+        <tr><td class="pad" style="padding-top: 4px; padding-bottom: 8px;">
           <hr class="rule" />
-          <div style="margin-top: 24px;">
+          <div style="margin-top: 12px;">
             <div class="eyebrow">{_e(glance_eb)}</div>
             <h2 class="h2">{_e(issue.commentary.glance_subhead)}</h2>
-            <table class="glance" width="100%" role="presentation" style="margin-top: 16px;">
+            <table class="glance" width="100%" role="presentation" style="margin-top: 10px;">
               {_glance_html(issue.glance)}
             </table>
           </div>
@@ -523,11 +590,10 @@ def render_html(issue: Issue) -> str:
         """
 
     hero_block = f"""
-    <tr><td class="pad" style="padding-top: 40px; padding-bottom: 32px;">
+    <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
       <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
-      <hr class="rule-clay" style="margin: 8px 0 22px;" />
-      <p class="lede" style="margin: 0 0 18px; max-width: 540px;">{_e(issue.commentary.lede_hero)}</p>
+      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{_e(issue.commentary.lede_hero)}</p>
       {_filter_chips_html(issue.commentary.filter_chips)}
     </td></tr>
     """
