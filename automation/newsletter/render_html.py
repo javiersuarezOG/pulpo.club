@@ -177,9 +177,13 @@ table { border-collapse: collapse; }
 .paywall-banner .h2 { color: var(--paper); }
 .paywall-banner .body { color: var(--paper-3); }
 .paywall-banner .cta { background: var(--clay); color: var(--paper) !important; }
-.footer-strip { background: var(--forest); color: var(--paper); }
-.footer-strip .small { color: var(--paper-3); }
-.footer-strip a { color: var(--paper); }
+/* v2.2: lightened footer. The forest-on-cream "stamp" at the end made
+   the email feel bottom-heavy. Cream-on-cream lets the issue end
+   instead of getting branded at the bottom. The horizontal rule
+   above the footer is now the only visual separator from content. */
+.footer-strip { background: var(--paper-2); color: var(--ink-2); border-top: 1px solid var(--line); }
+.footer-strip .small { color: var(--ink-3); }
+.footer-strip a { color: var(--forest); }
 /* LEARNING: this file uses max-width despite CLAUDE.md mandating
    min-width in web/app/*. Emails are an inverse world — clients without
    media-query support (Outlook 2007+, parts of Yahoo) must still receive
@@ -508,15 +512,15 @@ def _footer_html(issue: Issue) -> str:
     copyright_line = i18n.t("footer.copyright", locale, year=issue.issue_id[:4])
     return f"""
     <tr><td class="pad footer-strip">
-      <p class="small" style="color: var(--paper-3);">{_e(tagline)}</p>
-      <p class="small" style="color: var(--paper-3); margin-top: 8px;">{_e(you_line)}</p>
-      <p class="small" style="margin-top: 14px;">
+      <p class="small">{_e(tagline)}</p>
+      <p class="small" style="margin-top: 6px;">{_e(you_line)}</p>
+      <p class="small" style="margin-top: 12px;">
         <a href="{_e(issue.settings_url)}">{_e(change_filters_label)}</a> &middot;
         <a href="{_e(issue.settings_url)}">{_e(change_cadence_label)}</a> &middot;
         <a href="{_e(issue.unsubscribe_url)}">{_e(unsubscribe_label)}</a>
       </p>
-      <p class="small" style="color: var(--paper-3); margin-top: 18px;">{_e(no_commission)}</p>
-      <p class="small" style="color: var(--paper-3); margin-top: 18px;">{_e(copyright_line)} &middot; <span class="mono">pulpo.club</span></p>
+      <p class="small" style="margin-top: 14px;">{_e(no_commission)}</p>
+      <p class="small" style="margin-top: 14px;">{_e(copyright_line)} &middot; <span class="mono">pulpo.club</span></p>
     </td></tr>
     """
 

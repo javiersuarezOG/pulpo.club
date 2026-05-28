@@ -82,7 +82,9 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "next.eyebrow":                {"en": "Next issue",                                   "es": "Próxima edición"},
     "next.body":                   {"en": "Pulpo will scan the next 14 days of inventory against your filter and ship the next ten. Adjust filters anytime — changes apply to the next issue.",
                                      "es": "Pulpo revisará los próximos 14 días de inventario contra tu filtro y enviará las próximas diez. Ajusta filtros cuando quieras — los cambios aplican a la siguiente edición."},
-    "next.cta":                    {"en": "Adjust your filters",                          "es": "Ajusta tus filtros"},
+    # v2.2: product-language CTA tied to the editorial framing of the
+    # newsletter ("the picks I see"), not generic settings-speak.
+    "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajusta lo que ves →"},
     "next.cta.anon":               {"en": "Set your filter →",                            "es": "Configura tu filtro →"},
     # ── Paywall (free tier) ──
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
