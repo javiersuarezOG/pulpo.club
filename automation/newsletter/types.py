@@ -103,6 +103,20 @@ class IssuePick:
     pulpo_url: str = ""
     save_url: str = ""
     chips: list[Chip] = field(default_factory=list)
+    # ── PR-NL-6 additions ────────────────────────────────────────────
+    # `story_html` is the warm editorial paragraph rendered above the
+    # callouts on hero picks. Sourced from voice_guide.md +
+    # llm_story.py when PULPO_NEWSLETTER_USE_LLM is on, falling back to
+    # commentary.deterministic_story_for_pick when LLM is off / over-cap
+    # / errors. Wrapped in `<em>...</em>` around the single emotional
+    # center sentence (the renderer styles `em` clay-deep italic).
+    # `blurb` stays on the type for short-pick rendering — story_html is
+    # hero-only for now.
+    story_html: str = ""
+    # Records how the story was sourced so PostHog telemetry +
+    # post-mortems can tell LLM output apart from the deterministic
+    # fallback when chasing a quality regression.
+    story_source: Literal["llm", "deterministic", "fallback_on_error", ""] = ""
 
 
 @dataclass

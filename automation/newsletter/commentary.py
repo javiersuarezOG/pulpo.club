@@ -195,3 +195,210 @@ def pick_callouts_for_listing(listing: dict, locale: Locale) -> list[dict]:
         })
 
     return out[:2]  # keep the email scannable
+
+
+# ── PR-NL-6 · deterministic story paragraphs ────────────────────────
+#
+# Fallback for the warm hero-pick paragraph used when:
+#   • PULPO_NEWSLETTER_USE_LLM is off
+#   • LLM cost cap is exceeded
+#   • DeepSeek returns an error (network, schema, finish_reason=length)
+#
+# Templates are picked by archetype (coastal land / mountain land /
+# dropped-price / stale / built / generic). Each template wraps the
+# emotional center sentence in <em>...</em>, which the renderer styles
+# clay-deep italic so the eye lands there.
+#
+# Hard rule: every claim made by these templates must map to a real
+# Listing field. No invented features. If we don't have the data, the
+# template either skips the line or falls back to a more generic
+# phrasing.
+
+
+def _has_named_beach_nearby(listing: dict) -> str:
+    """Return the named beach if the listing is close to one, else ''."""
+    if not listing.get("is_walk_to_beach"):
+        return ""
+    # The pipeline tags walk-to-beach against the nearest named beach in
+    # automation/distance_fields.py. Surface it when present so the story
+    # can say "walk to El Tunco" instead of just "walk to the beach".
+    nearest = listing.get("nearest_beach") or listing.get("named_beach_nearest")
+    return nearest if isinstance(nearest, str) else ""
+
+
+def _utility_phrase(listing: dict, locale: Locale) -> str:
+    """Plain-language utility status — never hide the gap."""
+    readiness = listing.get("readiness_score")
+    has_power = listing.get("has_power")
+    has_water = listing.get("has_water")
+    has_road = listing.get("has_paved_access")
+    if readiness == 3:
+        return ("Water, power and a paved road are already there." if locale == "en"
+                else "Agua, luz y carretera pavimentada ya en el lote.")
+    if has_power and has_water:
+        return ("Power and water are at the lot; you'd add the road." if locale == "en"
+                else "Luz y agua en el lote; tú añades la carretera.")
+    if has_power and has_road:
+        return ("Power and the road are there; water you'd bring from a well." if locale == "en"
+                else "Luz y carretera ya están; el agua la traes de un pozo.")
+    if has_water and has_road:
+        return ("Water and the road are at the lot; you'd run power from the nearest connection."
+                if locale == "en"
+                else "Agua y carretera ya en el lote; la luz la traes de la conexión más cercana.")
+    if has_power:
+        return ("Power runs to the boundary; water and the road are on you." if locale == "en"
+                else "Luz hasta el límite; agua y carretera quedan por hacer.")
+    if has_water:
+        return ("Water is on site; you'd add power and the road." if locale == "en"
+                else "Agua en el lote; faltan luz y carretera.")
+    return ("Bring a build budget — none of the utilities are in yet." if locale == "en"
+            else "Trae presupuesto para construir — todavía no hay servicios.")
+
+
+def _archetype(listing: dict) -> str:
+    """Decide the listing's voice-target archetype."""
+    if listing.get("is_repriced") and listing.get("previous_price"):
+        return "dropped_price"
+    if (listing.get("days_listed") or 0) > 180 and not listing.get("is_repriced"):
+        return "stale"
+    if listing.get("property_type") in ("house", "condo"):
+        return "built"
+    if listing.get("is_walk_to_beach") or listing.get("is_beachfront"):
+        return "coastal"
+    dept = (listing.get("department") or "").lower()
+    if dept in ("morazán", "morazan", "chalatenango") or "highland" in dept:
+        return "mountain"
+    # Default for "raw land" — call coastal vs mountain by beach distance.
+    beach_km = listing.get("dist_beach_km")
+    if isinstance(beach_km, (int, float)) and beach_km <= 15:
+        return "coastal"
+    return "mountain"
+
+
+def _price_under_phrase(listing: dict, locale: Locale) -> str:
+    """How the deterministic templates name a below-zone price."""
+    pct = listing.get("price_vs_zone_pct")
+    if not isinstance(pct, (int, float)) or pct >= -15:
+        return ""
+    if pct <= -50:
+        return ("well under what nearby lots are asking" if locale == "en"
+                else "muy por debajo de lo que piden los lotes vecinos")
+    if pct <= -30:
+        return ("noticeably under the neighbors" if locale == "en"
+                else "claramente debajo de los lotes vecinos")
+    return ("a little under the area average" if locale == "en"
+            else "un poco debajo del promedio del área")
+
+
+def _drop_phrase(listing: dict, locale: Locale) -> str:
+    """Concrete framing for a recent price drop."""
+    prev = listing.get("previous_price")
+    cur = listing.get("price_usd")
+    if not (isinstance(prev, (int, float)) and isinstance(cur, (int, float)) and prev > cur):
+        return ""
+    delta_usd = int(prev - cur)
+    delta_pct = (prev - cur) / prev * 100
+    if delta_pct >= 10:
+        return (f"the seller just lowered the price by {delta_pct:.0f}% — their first move on this listing"
+                if locale == "en"
+                else f"el vendedor acaba de bajar el precio un {delta_pct:.0f}% — su primer movimiento en esta ficha")
+    return (f"the seller just lowered the price by ${delta_usd:,} — their first move on this listing"
+            if locale == "en"
+            else f"el vendedor acaba de bajar el precio en ${delta_usd:,} — su primer movimiento en esta ficha")
+
+
+def deterministic_story_for_pick(listing: dict, locale: Locale = "en") -> str:
+    """Per-archetype warm paragraph using only listing-data fields.
+
+    Templates wrap a single emotional-center sentence in <em>...</em>
+    so the renderer's `em` styling lands the reader's eye there.
+
+    This is the safety net under llm_story.py — every error path in
+    the LLM module funnels here. Operators can read this function to
+    understand the worst-case voice quality."""
+    arch = _archetype(listing)
+    locale_en = locale == "en"
+
+    # Sentence A — open with the dream / hook (NEVER price, NEVER rank).
+    beach = _has_named_beach_nearby(listing)
+    if arch == "coastal":
+        if beach:
+            line_a = (f"A short walk to {beach}." if locale_en
+                      else f"A pie de la playa de {beach}.")
+        elif listing.get("is_beachfront"):
+            line_a = ("Right at the beach." if locale_en else "Justo en la playa.")
+        else:
+            km = listing.get("dist_beach_km")
+            if isinstance(km, (int, float)) and km <= 15:
+                mins = max(5, int(round(km * 1.3)))
+                line_a = (f"A {mins}-minute drive to the surf." if locale_en
+                          else f"A {mins} minutos del mar.")
+            else:
+                line_a = ("A property close to the coast." if locale_en
+                          else "Una propiedad cerca de la costa.")
+    elif arch == "mountain":
+        line_a = ("Land in the highlands — the kind of place where the morning fog comes in low."
+                  if locale_en else
+                  "Tierra en las montañas — del tipo donde la niebla baja con la mañana.")
+    elif arch == "dropped_price":
+        drop = _drop_phrase(listing, locale)
+        line_a = (f"On this one, {drop}." if drop else
+                  ("The seller is moving on price." if locale_en else
+                   "El vendedor está moviendo el precio."))
+    elif arch == "stale":
+        dom = listing.get("days_listed") or 0
+        line_a = (f"The seller has been waiting {dom} days." if locale_en
+                  else f"El vendedor lleva {dom} días esperando.")
+    elif arch == "built":
+        bd = listing.get("bedrooms")
+        ba = listing.get("bathrooms")
+        if bd and ba:
+            line_a = (f"{bd} bedrooms and {int(ba)} bathrooms — room for a family."
+                      if locale_en
+                      else f"{bd} habitaciones y {int(ba)} baños — espacio para una familia.")
+        else:
+            line_a = ("A built property ready to live in." if locale_en
+                      else "Una propiedad construida lista para habitar.")
+    else:
+        line_a = ("A property worth a closer look." if locale_en
+                  else "Una propiedad que vale la pena revisar de cerca.")
+
+    # Sentence B — the emotional center, wrapped in <em>. This is what
+    # the renderer styles clay-deep italic.
+    under_phrase = _price_under_phrase(listing, locale)
+    drop_phrase = _drop_phrase(listing, locale)
+    if drop_phrase and arch != "dropped_price":
+        line_b = f"<em>{drop_phrase}</em>"
+    elif under_phrase:
+        line_b = (f"<em>The price is {under_phrase}.</em>" if locale_en
+                  else f"<em>El precio está {under_phrase}.</em>")
+    elif arch == "mountain":
+        line_b = ("<em>Quiet, slow, the kind of land you build a life on.</em>" if locale_en
+                  else "<em>Tranquilo, sin prisa — del tipo de tierra donde se construye una vida.</em>")
+    elif arch == "stale":
+        line_b = ("<em>That usually means the seller will negotiate.</em>" if locale_en
+                  else "<em>Eso normalmente significa que el vendedor va a negociar.</em>")
+    elif arch == "built":
+        line_b = ("<em>Move-in ready, with the work already done.</em>" if locale_en
+                  else "<em>Listo para habitar, con el trabajo ya hecho.</em>")
+    else:
+        line_b = ("<em>Worth a closer look.</em>" if locale_en
+                  else "<em>Vale la pena verla más de cerca.</em>")
+
+    # Sentence C — the honest trade-off (utility / road / terrain).
+    line_c = ""
+    pt = listing.get("property_type")
+    if pt == "land":
+        line_c = _utility_phrase(listing, locale)
+    elif pt in ("house", "condo"):
+        # Built property — name the year / built area if useful, else
+        # skip rather than fabricate.
+        ba = listing.get("built_area_m2")
+        if isinstance(ba, (int, float)) and ba > 0:
+            line_c = (f"{int(ba)} m² of built area on the lot."
+                      if locale_en else f"{int(ba)} m² construidos en el lote.")
+
+    sentences = [line_a, line_b]
+    if line_c:
+        sentences.append(line_c)
+    return " ".join(s.strip() for s in sentences if s)
