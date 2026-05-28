@@ -39,8 +39,15 @@ def deterministic_commentary(
     else:
         eyebrow = i18n.t("hero.eyebrow.unnamed", locale)
     headline = i18n.t("hero.headline.default", locale)
-    lede_key = "hero.lede.with_prefs" if (pref.zones or pref.departments or pref.max_price_usd or pref.categories or pref.property_types) else "hero.lede.no_prefs"
-    lede = i18n.t(lede_key, locale, n_scanned=n_scanned)
+    # PR-NL-7a: lede_hero is now the warm welcome teaser that name-checks
+    # the first 3 picks ("Start with #01… #02 is… And #03…"). Falls back
+    # to the older "Pulpo scanned N listings…" template when picks is
+    # empty so cold-start cohorts still get something readable.
+    if picks:
+        lede = deterministic_welcome_teaser(picks, locale)
+    else:
+        lede_key = "hero.lede.with_prefs" if (pref.zones or pref.departments or pref.max_price_usd or pref.categories or pref.property_types) else "hero.lede.no_prefs"
+        lede = i18n.t(lede_key, locale, n_scanned=n_scanned)
 
     # Filter chips — render the same Preference summary the footer uses
     chips: list[str] = []
@@ -88,8 +95,13 @@ def deterministic_commentary(
         skip_blurb = " · ".join(bits).capitalize() + "."
 
     # Market context ─────────────────────────────────────────────────────
+    # PR-NL-7a: the first paragraph is the warm one-sentence "buyer's
+    # fortnight" market note (matches v2.4 mockup). The older data-stat
+    # paragraphs follow it as supporting detail — readers who care about
+    # the numbers see them; everyone else gets the warm read.
     market: list[str] = []
     if picks:
+        market.append(deterministic_market_note(picks, locale))
         # 1) freshness: how many of the kept picks are new this fortnight
         new_count = sum(1 for p in picks if p.get("_is_new_window"))
         if new_count:

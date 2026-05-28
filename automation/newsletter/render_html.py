@@ -27,7 +27,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.6-2026-05"
+TEMPLATE_VERSION = "newsletter-v2.7-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -100,8 +100,9 @@ table { border-collapse: collapse; }
 .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
 /* PR-NL-6 — story_html wraps the single emotional-center sentence in
    <em>...</em>. Lands the reader's eye there without using bold or a
-   colored callout block. */
-.body em, .body-2 em { font-style: italic; color: var(--clay-deep); }
+   colored callout block. PR-NL-7a extends to .lede for the welcome
+   teaser and to the first market_context paragraph. */
+.body em, .body-2 em, .lede em { font-style: italic; color: var(--clay-deep); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
 .meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
 .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
@@ -541,7 +542,18 @@ def _market_html(issue: Issue) -> str:
     locale = issue.locale
     eb = i18n.t("market.eyebrow", locale)
     hl = i18n.t("market.headline", locale)
-    para_html = "".join(f'<p class="body">{_e(p)}</p>' for p in paras)
+    # PR-NL-7a: the first paragraph is the warm market note that may
+    # contain a single <em>...</em> span — don't html-escape it. Source
+    # is either deterministic_market_note (known-good HTML) or
+    # llm_commentary (prompt enforces only <em> tags, no other markup).
+    # Subsequent paragraphs stay plain text and ARE escaped.
+    para_html_parts: list[str] = []
+    for i, para in enumerate(paras):
+        if i == 0:
+            para_html_parts.append(f'<p class="body">{para}</p>')
+        else:
+            para_html_parts.append(f'<p class="body">{_e(para)}</p>')
+    para_html = "".join(para_html_parts)
     return f"""
     <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(eb)}</div>
@@ -664,7 +676,7 @@ def render_html(issue: Issue) -> str:
     <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
       <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
       <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
-      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{_e(issue.commentary.lede_hero)}</p>
+      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{issue.commentary.lede_hero}</p>
       {_filter_chips_html(issue.commentary.filter_chips)}
     </td></tr>
     """
