@@ -193,3 +193,77 @@ def test_synthesize_preview_recipients_rejects_bad_email():
         subs.synthesize_preview_recipients("not-an-email")
     with pytest.raises(ValueError):
         subs.synthesize_preview_recipients("   ")
+
+
+# ── locale side-channel (pulpo-locale: prefix on Resend first_name) ──────
+def test_parse_locale_first_name_extracts_known_locales():
+    assert subs._parse_locale_first_name("pulpo-locale:es") == "es"
+    assert subs._parse_locale_first_name("pulpo-locale:en") == "en"
+    assert subs._parse_locale_first_name("pulpo-locale:ES") == "es"
+    # Surrounding whitespace tolerated (defensive)
+    assert subs._parse_locale_first_name("pulpo-locale:  es ") == "es"
+
+
+def test_parse_locale_first_name_rejects_garbage():
+    assert subs._parse_locale_first_name(None) is None
+    assert subs._parse_locale_first_name("") is None
+    assert subs._parse_locale_first_name("Javier") is None
+    assert subs._parse_locale_first_name("pulpo-locale:") is None
+    assert subs._parse_locale_first_name("pulpo-locale:fr") is None
+    # Wrong prefix
+    assert subs._parse_locale_first_name("locale:es") is None
+    # Wrong type
+    assert subs._parse_locale_first_name(42) is None
+
+
+def test_list_audience_extracts_locale_from_first_name(monkeypatch):
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("RESEND_AUDIENCE_ID", "aud-123")
+
+    def fake_get(url, headers=None, params=None, timeout=None):
+        return _resend_payload([
+            {"id": "c1", "email": "es@pulpo.club", "unsubscribed": False,
+             "first_name": "pulpo-locale:es"},
+            {"id": "c2", "email": "en@pulpo.club", "unsubscribed": False,
+             "first_name": "pulpo-locale:en"},
+            {"id": "c3", "email": "legacy@pulpo.club", "unsubscribed": False},
+            # camelCase variant from SDK; should still parse
+            {"id": "c4", "email": "camel@pulpo.club", "unsubscribed": False,
+             "firstName": "pulpo-locale:es"},
+            # Garbage prefix → None (falls back to "en" downstream)
+            {"id": "c5", "email": "bogus@pulpo.club", "unsubscribed": False,
+             "first_name": "Some Person"},
+        ])
+
+    contacts = {c.email: c for c in subs.list_audience(get_override=fake_get)}
+    assert contacts["es@pulpo.club"].locale == "es"
+    assert contacts["en@pulpo.club"].locale == "en"
+    assert contacts["legacy@pulpo.club"].locale is None
+    assert contacts["camel@pulpo.club"].locale == "es"
+    assert contacts["bogus@pulpo.club"].locale is None
+
+
+def test_join_uses_contact_locale_for_anonymous_when_present():
+    contacts = [
+        subs.ResendContact(id="c1", email="anon-es@example.com",
+                           unsubscribed=False, created_at=None, locale="es"),
+        subs.ResendContact(id="c2", email="anon-en@example.com",
+                           unsubscribed=False, created_at=None, locale="en"),
+        subs.ResendContact(id="c3", email="anon-legacy@example.com",
+                           unsubscribed=False, created_at=None),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=[])
+    by_email = {email_hash_email(c.email): r for r, c in zip(recipients, contacts)}
+    # Locale persisted from the side-channel wins for anonymous contacts.
+    by_locale = {r.locale for r in recipients}
+    assert by_locale == {"es", "en"}      # legacy falls back to "en"
+    locales = [r.locale for r in recipients]
+    assert locales[0] == "es"             # anon-es
+    assert locales[1] == "en"             # anon-en
+    assert locales[2] == "en"             # legacy (no prefix → default)
+
+
+def email_hash_email(email):
+    """Helper for the dict zip above; subs.email_hash is the source-of-truth."""
+    from automation.newsletter.store import email_hash
+    return email_hash(email)
