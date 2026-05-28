@@ -149,9 +149,10 @@ table { border-collapse: collapse; }
 .glance .where { font-family: var(--font-mono); color: var(--ink-3); font-size: 11px; letter-spacing: 0.04em; }
 .glance .pricecol { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap; }
 .meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
-.callout { background: var(--paper-2); padding: 18px 22px; border-left: 3px solid var(--clay); margin: 16px 0; }
-.callout .label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay); }
-.callout .body  { margin-top: 6px; font-size: 14.5px; line-height: 1.6; color: var(--ink); }
+.callout { margin: 14px 0 0; padding: 0; background: none; }
+.callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
+.callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.callout + .callout { margin-top: 12px; }
 .paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
 .paywall-banner .eyebrow { color: var(--sage); }
 .paywall-banner .h2 { color: var(--paper); }
