@@ -33,7 +33,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from automation.newsletter import build_issue, render_html                 # noqa: E402
+from automation.newsletter import (                                        # noqa: E402
+    TEMPLATE_VERSION,
+    build_issue,
+    render_html,
+)
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
     build_recipient_queue,
@@ -207,6 +211,16 @@ def main() -> int:
                 "latency_ms": result.latency_ms,
                 "attempt": result.attempt,
             })
+            # New per-recipient event in the email.* namespace. Lets PostHog
+            # slice "sends from template v2.1 to recipient_hash X" without
+            # joining tables. recipient_count carries the batch context so
+            # one event row is self-describing. dry_… ids are intentional
+            # telemetry, not noise — filter on dry_run=true to ignore.
+            _capture("email.newsletter.sent", {
+                "recipient_count": len(queue),
+                "template_version": TEMPLATE_VERSION,
+                "resend_message_id": result.message_id,
+            })
             print(
                 f"  ok  cohort={issue.cohort:<16s} tier={recipient.tier:<6s} "
                 f"id={result.message_id} attempt={result.attempt} {result.latency_ms}ms"
@@ -230,6 +244,22 @@ def main() -> int:
             )
 
     elapsed_ms = int((time.monotonic() - t0) * 1000)
+    # Batch-summary event in the email.* namespace. One row per run with
+    # the whole-batch outcome — letting ops dashboards answer "what's the
+    # latest newsletter send doing?" without aggregating per-recipient
+    # rows. issue_id matches what newsletter.issue_built / send_succeeded
+    # already use so funnels can chain.
+    _capture("email.newsletter.batch_sent", {
+        "issue_number": args.issue_number,
+        "issue_id": issue_date.strftime("%Y-%m-%d"),
+        "recipient_count": len(queue),
+        "sent_count": sent,
+        "failed_count": failed,
+        "template_version": TEMPLATE_VERSION,
+        "dry_run": dry,
+        "preview_mode": preview_mode,
+        "elapsed_ms": elapsed_ms,
+    })
     print(f"[send] done sent={sent} failed={failed} elapsed={elapsed_ms}ms")
     return 0 if failed == 0 else 1
 
