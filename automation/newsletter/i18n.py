@@ -54,8 +54,18 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "pick.top_label":              {"en": "🏆 Top pick · {rank:02d}",                     "es": "🏆 Selección · {rank:02d}"},
     "pick.new_pill":               {"en": "New this fortnight",                           "es": "Nueva esta quincena"},
     "pick.repriced_pill":          {"en": "Price moved",                                  "es": "Precio movido"},
+    # NEW (v2.2): source-aware CTAs. "View on remax-elsalvador.com →" reads
+    # editorially and respects the source brokerage. cta_view is the
+    # fallback when the listing URL is missing/unparseable.
+    "pick.cta_view_on":            {"en": "View on {source} →",                           "es": "Ver en {source} →"},
+    "pick.cta_view":               {"en": "View listing →",                               "es": "Ver propiedad →"},
+    # Price-anchored unlock — "$9.99/mo" matches the canonical pricing
+    # source-of-truth (project_post_stripe_activation_series memory).
+    "pick.cta_locked":             {"en": "Unlock this pick — $9.99/mo →",                "es": "Desbloquear esta selección — $9.99/mes →"},
+    # Legacy alias kept for one transition issue — every render path now
+    # uses cta_view_on / cta_view above. Safe to delete after the next
+    # send confirms no callers remain.
     "pick.cta_open":               {"en": "Open the file →",                              "es": "Abrir la ficha →"},
-    "pick.cta_locked":             {"en": "Unlock with Pulpo Pro →",                      "es": "Desbloquear con Pulpo Pro →"},
     "pick.paywall_blurb":          {"en": "Pulpo Pro reveals the address, the broker file, and the full underwriting. Free members see the photo and the headline.",
                                      "es": "Pulpo Pro revela la dirección, la ficha del corredor y el análisis completo. Los miembros gratuitos ven foto y titular."},
     "shortlist.eyebrow":           {"en": "The shortlist",                                "es": "La lista corta"},
@@ -79,7 +89,10 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},
     "paywall.body":                {"en": "Pulpo Pro lifts the curtain on every pick — address, broker contact, full underwriting, and the negotiation lever the seller doesn't know we know about. Same fortnight cadence, eight times the depth.",
                                      "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia quincenal, ocho veces la profundidad."},
-    "paywall.cta":                 {"en": "Go Pro — $19/month",                           "es": "Hazte Pro — $19/mes"},
+    # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
+    # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
+    # $19/month which was stale drift — fixed in v2.2.
+    "paywall.cta":                 {"en": "Go Pro — $9.99/month →",                       "es": "Hazte Pro — $9.99/mes →"},
     # ── Footer ──
     "footer.tagline":              {"en": f"Every beach and lake home in {_country_en}, ranked by value.",
                                      "es": f"Cada casa frente al mar y al lago en {_country_es}, clasificada por valor."},

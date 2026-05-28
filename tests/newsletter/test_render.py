@@ -22,11 +22,16 @@ from automation.newsletter.store import email_hash
 ISSUE_DATE = datetime(2026, 5, 18, 14, 0, tzinfo=timezone.utc)
 
 ENGLISH_CANARIES = (
+    # v2.2: "Open the file" is the legacy fallback — should never render
+    # in ES locale because cta_view_on now drives the rich-pick CTA.
     "Open the file",
+    "View on ",
+    "View listing →",
+    "Unlock this pick",
     "Top pick · ",
     "Hand-picked",
     "Skip this one",
-    "Adjust your filters",
+    "Tune what you see",
     "Unsubscribe",
     "The shortlist",
     "Market context",
@@ -50,15 +55,17 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
     # class is always present in the <style> block; we check the rendered
     # element instead.
     assert '<div class="paywall-banner">' not in html
-    assert "Unlock with Pulpo Pro" not in html  # no locked CTAs for Pro
-    assert "Open the file →" in html
+    assert "Unlock this pick" not in html  # no locked CTAs for Pro
+    # v2.2: rich-pick CTAs name the source domain
+    assert "View on " in html
     assert "Hand-picked for Javier" in html
 
 
 def test_render_free_prefs_shows_paywall(free_with_prefs, ranked_pool):
     html = _render(free_with_prefs, ranked_pool)
     assert '<div class="paywall-banner">' in html
-    assert "Unlock with Pulpo Pro" in html
+    # v2.2: paywalled rich-pick CTA carries the price anchor
+    assert "Unlock this pick — $9.99/mo →" in html
     assert "stripe/start-checkout" in html
 
 

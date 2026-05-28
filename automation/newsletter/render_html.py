@@ -17,9 +17,28 @@ field crashing the renderer would break the entire batch.
 from __future__ import annotations
 
 from html import escape as _e
+from urllib.parse import urlparse
 
 from . import i18n
 from .types import Issue, IssuePick, Locale
+
+
+def _source_domain(url: str | None) -> str:
+    """Extract a clean source-domain string from a listing URL.
+
+    Used by the per-pick CTA copy ("View on remax-elsalvador.com →"),
+    making each row's button specific instead of repeating the generic
+    "Open the file →" ten times in one issue. Strips a leading `www.`;
+    returns "" when the URL is missing or unparseable — the caller
+    falls back to a generic CTA copy in that case.
+    """
+    if not url:
+        return ""
+    try:
+        netloc = (urlparse(url).netloc or "").lower()
+    except Exception:                                                       # noqa: BLE001
+        return ""
+    return netloc[4:] if netloc.startswith("www.") else netloc
 
 
 # Bumped whenever the renderer's CSS or layout changes in a way we'd want
@@ -281,7 +300,15 @@ def _cta_for_pick(pick: IssuePick, locale: Locale, paywall_url: str, ghost: bool
         label = i18n.t("pick.cta_locked", locale)
         href = paywall_url + f"&pick={pick.rank}"
         return f'<a class="{klass}" href="{_e(href)}">{_e(label)}</a>'
-    label = i18n.t("pick.cta_open", locale)
+    # Name the source — "View on remax-elsalvador.com →" beats the
+    # generic "Open the file →" repeated 10 times in one issue. Falls
+    # back to the plain "View listing →" when the URL is missing or
+    # unparseable (defensive, costs nothing).
+    source = _source_domain(pick.listing_url)
+    if source:
+        label = i18n.t("pick.cta_view_on", locale, source=source)
+    else:
+        label = i18n.t("pick.cta_view", locale)
     return f'<a class="{klass}" href="{_e(pick.listing_url)}">{_e(label)}</a>'
 
 
