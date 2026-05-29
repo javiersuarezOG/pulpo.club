@@ -232,3 +232,131 @@ def test_polite_get_user_agent_rotates_per_request(monkeypatch):
     assert len(set(captured)) >= 2
     for ua in captured:
         assert ua in _runtime.UA_POOLS["default"]
+
+
+# ── polite_curl_cffi_get — TLS-impersonating transport ─────────────────
+#
+# These tests mock the lazy-imported ``curl_cffi.requests`` module so
+# they run without the C-extension installed. The rate-limit / jitter /
+# retry contract is the same as polite_get, so the asserts mirror the
+# httpx-transport tests above.
+
+
+class _FakeCurlCffiResponse:
+    def __init__(self, status_code: int, *, headers=None, text: str = "", url: str = ""):
+        self.status_code = status_code
+        self.headers = headers or {}
+        self.text = text
+        self.content = text.encode("utf-8")
+        self.url = url
+
+
+def _install_fake_curl_cffi(monkeypatch, side_effect):
+    """Replace the lazy-imported curl_cffi.requests with a fake module.
+
+    ``side_effect`` is forwarded to ``MagicMock.side_effect`` so tests
+    can return a sequence of responses or raise exceptions deterministic-
+    ally without hitting the network.
+    """
+    fake_requests = MagicMock()
+    fake_requests.get = MagicMock(side_effect=side_effect)
+    monkeypatch.setattr(_runtime, "_curl_requests", fake_requests)
+    return fake_requests
+
+
+def test_polite_curl_cffi_get_returns_2xx_on_first_try(monkeypatch):
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    p = Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=3)
+    fake = _install_fake_curl_cffi(monkeypatch, [_FakeCurlCffiResponse(200, text="ok")])
+
+    resp = _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc1", policy=p)
+    assert resp.status_code == 200
+    assert resp.text == "ok"
+    assert fake.get.call_count == 1
+    # The Chrome impersonation profile must be passed to curl_cffi.
+    assert fake.get.call_args.kwargs["impersonate"] == p.curl_cffi_impersonate
+
+
+def test_polite_curl_cffi_get_retries_on_5xx_then_succeeds(monkeypatch):
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    monkeypatch.setattr(_runtime.time, "sleep", lambda s: None)
+    p = Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=3,
+               retry_backoff_base_s=0.01)
+    fake = _install_fake_curl_cffi(monkeypatch, [
+        _FakeCurlCffiResponse(503),
+        _FakeCurlCffiResponse(503),
+        _FakeCurlCffiResponse(200, text="ok"),
+    ])
+
+    resp = _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc2", policy=p)
+    assert resp.status_code == 200
+    assert fake.get.call_count == 3
+
+
+def test_polite_curl_cffi_get_returns_429_after_budget(monkeypatch):
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    monkeypatch.setattr(_runtime.time, "sleep", lambda s: None)
+    p = Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=2,
+               retry_backoff_base_s=0.01)
+    _install_fake_curl_cffi(monkeypatch, [
+        _FakeCurlCffiResponse(429, headers={"Retry-After": "0.1"}),
+        _FakeCurlCffiResponse(429, headers={"Retry-After": "0.1"}),
+    ])
+
+    resp = _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc3", policy=p)
+    assert resp.status_code == 429
+
+
+def test_polite_curl_cffi_get_403_no_retry(monkeypatch):
+    """403 is the canonical WAF reject — return immediately, no retries."""
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    p = Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=3)
+    fake = _install_fake_curl_cffi(monkeypatch, [_FakeCurlCffiResponse(403)])
+
+    resp = _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc4", policy=p)
+    assert resp.status_code == 403
+    assert fake.get.call_count == 1
+
+
+def test_polite_curl_cffi_get_raises_for_status_on_4xx(monkeypatch):
+    """The _PoliteResponse facade must raise like httpx on 4xx/5xx."""
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    p = Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=1)
+    _install_fake_curl_cffi(monkeypatch, [_FakeCurlCffiResponse(404)])
+
+    resp = _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc5", policy=p)
+    with pytest.raises(_runtime._PoliteHTTPError):
+        resp.raise_for_status()
+
+
+def test_polite_curl_cffi_get_rejects_wrong_transport_policy(monkeypatch):
+    """Calling polite_curl_cffi_get for an httpx source is a programmer
+    error and should be caught loudly — not produce silent 0-record runs."""
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    p = Policy(transport="httpx")
+    with pytest.raises(RuntimeError, match="curl_cffi"):
+        _runtime.polite_curl_cffi_get("https://x.test/", source="cffisrc6", policy=p)
+
+
+def test_polite_get_for_dispatches_to_curl_cffi_for_curl_policy(monkeypatch):
+    """polite_get_for must dispatch transport based on the source's policy.
+
+    This is the single seam that lets a one-line policy change in
+    _policy.py flip an existing scraper from httpx to curl_cffi without
+    touching its call sites.
+    """
+    monkeypatch.setenv("PULPO_DISABLE_JITTER", "1")
+    from pulpo.scrapers import _base, _policy
+
+    monkeypatch.setitem(
+        _policy.POLICIES,
+        "dispatch_test_src",
+        Policy(transport="curl_cffi", rate_limit_rps=0.0, retry_max=1),
+    )
+    fake = _install_fake_curl_cffi(monkeypatch, [_FakeCurlCffiResponse(200, text="ok")])
+
+    get = _base.polite_get_for("dispatch_test_src")
+    # The httpx client argument must be ignored on the curl_cffi path.
+    resp = get(client=None, url="https://x.test/")
+    assert resp.status_code == 200
+    assert fake.get.call_count == 1
