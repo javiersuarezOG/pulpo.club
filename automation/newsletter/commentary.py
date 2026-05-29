@@ -594,27 +594,30 @@ def deterministic_story_for_pick(listing: dict, locale: Locale = "en") -> str:
         line_a = ("A property worth a closer look." if locale_en
                   else "Una propiedad que vale la pena revisar de cerca.")
 
-    # Sentence B — the emotional center, wrapped in <em>. This is what
-    # the renderer styles clay-deep italic.
+    # Sentence B — the editorial center. v3.2 (2026-05-29) dropped the
+    # <em> wrapping. The v3.1 emit wrapped this sentence in <em>...</em>
+    # which the renderer styled clay-deep italic. Sebas: italics in copy
+    # add noise — the sentence carries its own weight without typographic
+    # emphasis. The italic-clay CSS rule is dropped in the same change.
     under_phrase = _price_under_phrase(listing, locale)
     drop_phrase = _drop_phrase(listing, locale)
     if drop_phrase and arch != "dropped_price":
-        line_b = f"<em>{drop_phrase}</em>"
+        line_b = drop_phrase if drop_phrase.endswith((".", "!", "?")) else f"{drop_phrase}."
     elif under_phrase:
-        line_b = (f"<em>The price is {under_phrase}.</em>" if locale_en
-                  else f"<em>El precio está {under_phrase}.</em>")
+        line_b = (f"The price is {under_phrase}." if locale_en
+                  else f"El precio está {under_phrase}.")
     elif arch == "mountain":
-        line_b = ("<em>Quiet, slow, the kind of land you build a life on.</em>" if locale_en
-                  else "<em>Tranquilo, sin prisa — del tipo de tierra donde se construye una vida.</em>")
+        line_b = ("Quiet, slow, the kind of land you build a life on." if locale_en
+                  else "Tranquilo, sin prisa — del tipo de tierra donde se construye una vida.")
     elif arch == "stale":
-        line_b = ("<em>That usually means the seller will negotiate.</em>" if locale_en
-                  else "<em>Eso normalmente significa que el vendedor va a negociar.</em>")
+        line_b = ("That usually means the seller will negotiate." if locale_en
+                  else "Eso normalmente significa que el vendedor va a negociar.")
     elif arch == "built":
-        line_b = ("<em>Move-in ready, with the work already done.</em>" if locale_en
-                  else "<em>Listo para habitar, con el trabajo ya hecho.</em>")
+        line_b = ("Move-in ready, with the work already done." if locale_en
+                  else "Listo para habitar, con el trabajo ya hecho.")
     else:
-        line_b = ("<em>Worth a closer look.</em>" if locale_en
-                  else "<em>Vale la pena verla más de cerca.</em>")
+        line_b = ("Worth a closer look." if locale_en
+                  else "Vale la pena verla más de cerca.")
 
     # Sentence C — the honest trade-off (utility / road / terrain).
     line_c = ""
@@ -826,10 +829,25 @@ def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = Tru
     area = pick.get("area_m2")
     is_beachfront = bool(pick.get("is_beachfront"))
 
+    # v3.2 (2026-05-29) — phrase is now PURELY QUALITATIVE.
+    # The v3.1 version stamped literal "$47.48/m² — 78% below the area
+    # average" into the market paragraph. Every one of those numbers
+    # already appears on the per-pick card just below (chip + meta row +
+    # big price), so the market paragraph was repeating itself two
+    # paragraphs early. Sebas: "never repeat numbers."
+    #
+    # The phrase now reads as a noun-phrase the reader can click —
+    # "a 1,263 m² lot in Tamanique" — and the per-pick card carries the
+    # numeric breakdown. `pct`, `price_usd`, `ppm` and `is_beachfront`
+    # are intentionally kept in scope (above) so future copy can opt
+    # back into a number when it earns its place — but the default
+    # path emits no $$ or %.
+    _ = (pct, price_usd, ppm, is_beachfront)  # kept for future-proofing; not used here
+
     bits: list[str] = []
     if pt == "land" and isinstance(area, (int, float)) and area >= 100:
         bits.append(f"{int(area):,} m² lot" if en else f"lote de {int(area):,} m²")
-    elif is_beachfront and pt in ("house", "condo"):
+    elif pick.get("is_beachfront") and pt in ("house", "condo"):
         bits.append("beachfront home" if en else "casa frente al mar")
     elif pt in ("house", "condo"):
         bits.append(("home" if pt == "house" else "condo") if en else ("casa" if pt == "house" else "condominio"))
@@ -838,15 +856,6 @@ def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = Tru
 
     if municipality:
         bits.append(f"in {municipality}" if en else f"en {municipality}")
-
-    if pt == "land" and isinstance(ppm, (int, float)) and ppm > 0:
-        bits.append(f"at ${ppm:,.2f}/m²" if en else f"a ${ppm:,.2f}/m²")
-    elif isinstance(price_usd, (int, float)):
-        bits.append(f"at ${int(price_usd):,}" if en else f"a ${int(price_usd):,}")
-
-    if isinstance(pct, (int, float)) and pct <= -15:
-        n = abs(int(round(pct)))
-        bits.append(f"— {n}% below the area average" if en else f"— {n}% bajo el promedio del área")
 
     phrase = " ".join(bits)
 
@@ -912,21 +921,21 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
         new_listings = sum(1 for p in picks if p.get("_is_new_window"))
         if new_listings >= max(2, len(picks) // 3):
             return (
-                f"<em>Fresh inventory landed this week — {new_listings} of these "
-                f"{len(picks)} listings are less than seven days old.</em> "
+                f"Fresh inventory landed this week — {new_listings} of these "
+                f"{len(picks)} listings are less than seven days old. "
                 "The early window matters; listings priced to move don't stay around."
                 if en
                 else
-                f"<em>Llegó inventario fresco esta semana — {new_listings} de estas "
-                f"{len(picks)} propiedades tienen menos de siete días.</em> "
+                f"Llegó inventario fresco esta semana — {new_listings} de estas "
+                f"{len(picks)} propiedades tienen menos de siete días. "
                 "La ventana temprana importa; las propiedades bien valoradas no se quedan."
             )
         return (
-            "<em>A quieter week than usual — inventory is steady, prices are holding.</em> "
+            "A quieter week than usual — inventory is steady, prices are holding. "
             "Worth saving anything close to your filter so Pulpo can flag the next move."
             if en
             else
-            "<em>Una semana más tranquila — el inventario es estable, los precios se sostienen.</em> "
+            "Una semana más tranquila — el inventario es estable, los precios se sostienen. "
             "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
         )
 
@@ -935,20 +944,20 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
         distinct_phrase = _market_property_phrase(distinct_pick, locale, with_link=True)
         if en:
             return (
-                f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+                f"The most aggressive discount this week is {discount_phrase}. "
                 f"In a different lane, {distinct_phrase} is also worth a look."
             )
         return (
-            f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+            f"El descuento más agresivo esta semana es {discount_phrase}. "
             f"En otro carril, {distinct_phrase} también vale la pena revisar."
         )
 
     if en:
         return (
-            f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+            f"The most aggressive discount this week is {discount_phrase}. "
             "Worth a closer look before someone else moves on it."
         )
     return (
-        f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+        f"El descuento más agresivo esta semana es {discount_phrase}. "
         "Vale la pena revisarla antes de que alguien más se mueva."
     )
