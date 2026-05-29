@@ -160,19 +160,17 @@ def pick_callouts_for_listing(listing: dict, locale: Locale) -> list[dict]:
                 "body": " · ".join(bullets),
             })
 
-    zone_pct = listing.get("price_vs_zone_pct")
-    if isinstance(zone_pct, (int, float)) and abs(zone_pct) >= 15:
-        if zone_pct < 0:
-            out.append({
-                "label": "The price story" if locale == "en" else "El precio",
-                "body": (
-                    f"Listed at {abs(zone_pct):.0f}% below the zone median per m². "
-                    "Compare against the comps before assuming it's mispriced."
-                    if locale == "en"
-                    else f"Listado a {abs(zone_pct):.0f}% bajo la mediana por m². "
-                    "Compara con los comps antes de asumir mal precio."
-                ),
-            })
+    # v3.2 (2026-05-29) — DROPPED the "Price story" callout entirely.
+    # Sebas: "never repeat numbers." The same X% was getting stamped
+    # three times per pick:
+    #   1. cool-toned "−X% under area average" chip above the title
+    #   2. "Priced X% below the area average" bullet in the Why list
+    #      (also dropped in deterministic_why_for_pick — see that fn)
+    #   3. "Listed at X% below the zone median per m²" body in the
+    #      "Price story" callout right below the Why list
+    # The chip wins; the why-list and price-story echoes are gone.
+    # zone_pct stays addressable in the listing dict for downstream
+    # use, but no longer renders a callout here.
 
     rank_reasons = listing.get("rank_reasons") or []
     if rank_reasons:
@@ -217,19 +215,16 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
     en = locale == "en"
     out: list[str] = []
 
-    # 1) Below area average — meaningful only past 15% off.
-    pct = listing.get("price_vs_zone_pct")
-    if isinstance(pct, (int, float)) and pct <= -15:
-        n = abs(int(round(pct)))
-        beach_phrase = ""
-        if listing.get("is_walk_to_beach") or listing.get("is_beachfront"):
-            beach_phrase = " — rare for a lot this close to the beach" if en \
-                           else " — raro para un lote tan cerca de la playa"
-        out.append(
-            f"Priced {n}% below the area average{beach_phrase}"
-            if en
-            else f"Precio {n}% bajo el promedio del área{beach_phrase}"
-        )
+    # 1) v3.2 (2026-05-29) — DROPPED the "Priced N% below the area
+    # average" bullet. Same number already lives on the cool-toned
+    # "−N% under area average" chip above the listing title; emitting
+    # it again in the why-list bullets AND a third time in the "Price
+    # story" callout (also dropped in pick_callouts_for_listing) was
+    # the loudest dedupe issue in the v3.1 send. The chip is the
+    # canonical surface; this section now focuses on the OTHER reasons
+    # Pulpo picked the listing (beach proximity, readiness, freshness,
+    # property fit). If those signals are absent, the property-fit
+    # fallback at the bottom keeps the why-list from rendering empty.
 
     # 2) Recent price drop — concrete number, not "momentum".
     if listing.get("is_repriced"):
@@ -342,87 +337,150 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
 
 
 def deterministic_shortlist_frame(listing: dict, locale: Locale = "en") -> str:
-    """Single "For someone who *…*" line for one shortlist entry.
+    """Single "For the buyer who…" line for one shortlist entry.
 
-    Returns an HTML string with one `<em>...</em>` span around the
-    italic clause (the renderer styles it clay-deep italic). Matches the
-    v3 mockup's per-row framing:
+    v3.2 (2026-05-29): the v3.1 send rendered all seven shortlist cards
+    with the IDENTICAL "wants the coastal vibe without the beachfront
+    price" line because the near-beach-land branch caught everything in
+    a typical La-Libertad coastal filter. This rewrite:
 
-      For someone who *wants surf-city land cheap*. The catch: …
+      1. Drops the `<em>` wrapping. Italics are banned from copy.
+      2. Adds finer-grained branches inside the near-beach-land bucket
+         so listings differentiate on real signals — area, distance,
+         repriced state, days-on-market — instead of all collapsing to
+         the same fallback.
+      3. Falls through to a deterministic-by-source_id tie-breaker so
+         even when multiple listings share a branch, they still print
+         distinct wording. The tie-breaker keeps the output stable
+         across renders (same listing → same line) without needing
+         issue-position state threaded through.
 
     The frame answers "who is this the right answer for?" — keeps the
-    shortlist scannable for a buyer skimming for relevance. The frame
-    must map to real Listing fields (property_type, dist_beach_km,
-    is_repriced, etc.) — never invent a buyer persona the data doesn't
-    support.
+    shortlist scannable for a buyer skimming for relevance. Every
+    branch maps to real Listing fields; no invented buyer personas.
 
-    Empty string is allowed (renderer falls back to the existing
-    `blurb`) so a listing missing the fields to support a frame still
-    renders cleanly.
+    Empty string is allowed (renderer falls back to `blurb`) so a
+    listing missing the fields to support a frame still renders cleanly.
+
+    Return value is plain text (post-v3.2). Renderer historically read
+    it as trusted HTML for the <em>...</em> span — with the span gone,
+    plain text is the safer contract.
     """
     en = locale == "en"
     pt = listing.get("property_type")
     pct = listing.get("price_vs_zone_pct")
     beach_km = listing.get("dist_beach_km")
     days = listing.get("days_listed")
+    area = listing.get("area_m2")
+    is_repriced = bool(listing.get("is_repriced"))
+    is_walk_to_beach = bool(listing.get("is_walk_to_beach"))
+    is_beachfront = bool(listing.get("is_beachfront"))
+    beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
 
-    # Price drop → "thinking long horizon" buyer who's waiting out a
-    # slow seller. Concrete drop number stays in the why_bullets;
-    # this frame is about the buyer profile, not the number.
-    if listing.get("is_repriced") and isinstance(days, int) and days >= 60:
+    # Beachfront — its own tier. Rare enough to deserve a unique frame.
+    if is_beachfront:
         return (
-            "For someone <em>thinking long horizon</em> — the seller has been on market a while and just moved."
+            "For the buyer who wants the sand at the front gate, not a drive away."
             if en
-            else
-            "Para alguien <em>con horizonte largo</em> — el vendedor lleva tiempo en el mercado y acaba de moverse."
+            else "Para quien quiere la arena en la puerta, no a unos minutos en carro."
         )
 
-    # Deep discount + walk-to-surf — the "wants surf-city land cheap"
-    # archetype from the mockup. Anchors against named beach when known.
-    if listing.get("is_walk_to_beach") and isinstance(pct, (int, float)) and pct <= -30:
-        beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
+    # Repriced + slow seller → the "waiting for sellers to blink" buyer.
+    if is_repriced and isinstance(days, int) and days >= 60:
+        return (
+            "For the buyer waiting for sellers to blink — this one already did."
+            if en
+            else "Para quien espera a que el vendedor parpadee — este ya lo hizo."
+        )
+
+    # Long days on market without a price move yet → patience pays.
+    if isinstance(days, int) and days >= 90 and not is_repriced:
+        return (
+            "For the buyer betting the seller's patience runs out before theirs."
+            if en
+            else "Para quien apuesta a que la paciencia del vendedor se agota antes que la suya."
+        )
+
+    # Deep discount + walk-to-surf — surf-side land at a striking price.
+    if is_walk_to_beach and isinstance(pct, (int, float)) and pct <= -30:
         if isinstance(beach, str) and beach:
             return (
-                f"For someone who <em>wants {beach}-area land cheap</em>."
+                f"For the buyer who wants {beach}-area land at a striking price."
                 if en
-                else f"Para alguien que <em>quiere terreno barato cerca de {beach}</em>."
+                else f"Para quien busca terreno cerca de {beach} a precio destacado."
             )
         return (
-            "For someone who <em>wants surf-side land cheap</em>."
+            "For the buyer who wants surf-side land without paying surf-side prices."
             if en
-            else "Para alguien que <em>quiere terreno barato cerca del mar</em>."
+            else "Para quien quiere terreno cerca del mar sin pagar precio de mar."
         )
 
     # House / condo → move-in-ready buyer.
     if pt in ("house", "condo"):
         return (
-            "For someone who <em>doesn't want to build</em> — move-in ready, no project."
+            "For the buyer who doesn't want to build — move-in ready, no project."
             if en
-            else "Para alguien que <em>no quiere construir</em> — listo para entrar, sin obra."
+            else "Para quien no quiere construir — listo para entrar, sin obra."
         )
 
-    # Far-from-beach raw land → builder with a budget.
+    # Far-from-beach raw land → developer-mindset acreage buyer.
     if pt == "land" and isinstance(beach_km, (int, float)) and beach_km >= 25:
-        area = listing.get("area_m2")
         if isinstance(area, (int, float)) and area >= 5000:
             return (
-                "For someone <em>buying with a build budget</em> — the land alone is the deal."
+                "For the buyer with a build budget — the land alone is the deal."
                 if en
-                else "Para alguien que <em>compra con presupuesto de construcción</em> — el valor está en el terreno."
+                else "Para quien tiene presupuesto de construcción — el valor está en el terreno."
             )
         return (
-            "For someone <em>buying acreage</em>, not a build site."
+            "For the buyer who's after acreage, not a build site."
             if en
-            else "Para alguien que <em>compra hectáreas</em>, no un sitio para construir."
+            else "Para quien busca hectáreas, no un sitio para construir."
         )
 
-    # Near-beach land without a deep discount → the "El Zonte vibe
-    # without the beachfront price" archetype from the mockup.
-    if pt == "land" and isinstance(beach_km, (int, float)) and beach_km < 25:
+    # Near-beach land — the v3.1 catch-all bucket. v3.2 splits this
+    # into FOUR distinct frames based on real listing facts (area,
+    # distance, named-beach proximity) so listings that share the
+    # bucket still get different wording.
+    if pt == "land":
+        # Large-acreage cliff/view land → developer mindset.
+        if isinstance(area, (int, float)) and area >= 5000:
+            return (
+                "For the developer-minded buyer with a vision big enough for several thousand square meters."
+                if en
+                else "Para el comprador con visión suficiente para varios miles de metros cuadrados."
+            )
+        # Tiny lot near a named beach → smallest footprint, biggest view.
+        if isinstance(area, (int, float)) and area <= 800 and isinstance(beach_km, (int, float)) and beach_km < 10:
+            return (
+                "For the buyer who wants the smallest possible footprint with the biggest possible view."
+                if en
+                else "Para quien busca la huella más pequeña con la vista más amplia."
+            )
+        # Close to the surf (≤ 5 km), not walking distance → drive crowd.
+        if isinstance(beach_km, (int, float)) and beach_km <= 5 and not is_walk_to_beach:
+            if isinstance(beach, str) and beach:
+                return (
+                    f"For the buyer who wants {beach} proper — minutes away, not towns over."
+                    if en
+                    else f"Para quien quiere {beach} de verdad — a minutos, no a pueblos de distancia."
+                )
+            return (
+                "For the buyer who wants the surf within a ten-minute drive, not on it."
+                if en
+                else "Para quien quiere el mar a diez minutos en carro, no encima."
+            )
+        # Mid-distance lot in a named beach corridor → frontier coast buyer.
+        if isinstance(beach_km, (int, float)) and 5 < beach_km < 15:
+            return (
+                "For the buyer betting on the next stretch of coast before the road catches up."
+                if en
+                else "Para quien apuesta al siguiente tramo de costa antes de que llegue la vía."
+            )
+        # Default near-beach: coastal-feel-without-beachfront-price.
         return (
-            "For someone who <em>wants the coastal vibe without the beachfront price</em>."
+            "For the buyer who wants the coastal feel without paying for the beachfront."
             if en
-            else "Para alguien que <em>quiere el ambiente costero sin el precio de primera línea</em>."
+            else "Para quien quiere el ambiente costero sin pagar precio de primera línea."
         )
 
     return ""
@@ -594,27 +652,30 @@ def deterministic_story_for_pick(listing: dict, locale: Locale = "en") -> str:
         line_a = ("A property worth a closer look." if locale_en
                   else "Una propiedad que vale la pena revisar de cerca.")
 
-    # Sentence B — the emotional center, wrapped in <em>. This is what
-    # the renderer styles clay-deep italic.
+    # Sentence B — the editorial center. v3.2 (2026-05-29) dropped the
+    # <em> wrapping. The v3.1 emit wrapped this sentence in <em>...</em>
+    # which the renderer styled clay-deep italic. Sebas: italics in copy
+    # add noise — the sentence carries its own weight without typographic
+    # emphasis. The italic-clay CSS rule is dropped in the same change.
     under_phrase = _price_under_phrase(listing, locale)
     drop_phrase = _drop_phrase(listing, locale)
     if drop_phrase and arch != "dropped_price":
-        line_b = f"<em>{drop_phrase}</em>"
+        line_b = drop_phrase if drop_phrase.endswith((".", "!", "?")) else f"{drop_phrase}."
     elif under_phrase:
-        line_b = (f"<em>The price is {under_phrase}.</em>" if locale_en
-                  else f"<em>El precio está {under_phrase}.</em>")
+        line_b = (f"The price is {under_phrase}." if locale_en
+                  else f"El precio está {under_phrase}.")
     elif arch == "mountain":
-        line_b = ("<em>Quiet, slow, the kind of land you build a life on.</em>" if locale_en
-                  else "<em>Tranquilo, sin prisa — del tipo de tierra donde se construye una vida.</em>")
+        line_b = ("Quiet, slow, the kind of land you build a life on." if locale_en
+                  else "Tranquilo, sin prisa — del tipo de tierra donde se construye una vida.")
     elif arch == "stale":
-        line_b = ("<em>That usually means the seller will negotiate.</em>" if locale_en
-                  else "<em>Eso normalmente significa que el vendedor va a negociar.</em>")
+        line_b = ("That usually means the seller will negotiate." if locale_en
+                  else "Eso normalmente significa que el vendedor va a negociar.")
     elif arch == "built":
-        line_b = ("<em>Move-in ready, with the work already done.</em>" if locale_en
-                  else "<em>Listo para habitar, con el trabajo ya hecho.</em>")
+        line_b = ("Move-in ready, with the work already done." if locale_en
+                  else "Listo para habitar, con el trabajo ya hecho.")
     else:
-        line_b = ("<em>Worth a closer look.</em>" if locale_en
-                  else "<em>Vale la pena verla más de cerca.</em>")
+        line_b = ("Worth a closer look." if locale_en
+                  else "Vale la pena verla más de cerca.")
 
     # Sentence C — the honest trade-off (utility / road / terrain).
     line_c = ""
@@ -728,28 +789,30 @@ def deterministic_welcome_teaser(
     n_scanned: Optional[int] = None,
     pref: Optional[Preference] = None,
 ) -> str:
-    """Warm two-sentence intro that orients the reader to the issue.
+    """Three-sentence lede that orients the reader to this week's issue.
 
-    v3.1.1 (2026-05-29, post-thinness-feedback): the first take of
-    v3.1 stripped the welcome down to a single structural line
-    ("3 full reads, 7 worth a quick look — hand-picked from this
-    week's scan.") which read TOO thin for a newsletter. This version
-    keeps the no-per-pick-mention rule that triggered the rewrite, but
-    adds two pieces of substantive context:
+    v3.2 (2026-05-29, post-Sebas-feedback): the v3.1 "Pulpo combed
+    through 863 listings across La Libertad" copy conflated Pulpo's
+    coverage scope (every beach + lake property in El Salvador) with
+    the recipient's filter (e.g. La Libertad land < $500k). That
+    confused readers — "why does it say La Libertad if Pulpo combs
+    through way more places?". The v3.2 lede separates the two:
 
-      1. The actual scan size ("863 listings") — useful framing, never
-         repeated in the per-pick block, gives the reader a sense of
-         how much was filtered.
-      2. The location context when set ("across La Libertad") — anchors
-         the issue to the recipient's filter so the lede reads "for
-         them" not "for everyone".
+      1. Pulpo's scope (static): every active beach + lake listing in
+         El Salvador this week.
+      2. Filter narrowing + standout count: of the N that match your
+         filter, these K stood out.
+      3. Issue shape: first three get a full profile (photo, our take,
+         why we picked them); the rest are quick reads.
 
-    The structural shape (three full reads, seven quick scans) still
-    follows in the second sentence. Result is two warm sentences that
-    pre-summarise nothing the per-pick sections will re-show.
+    `n_scanned` is the recipient's filter-match count, NOT the global
+    inventory. Falls back gracefully when missing.
 
-    Pref + n_scanned are optional so legacy callers keep working with
-    a generic fallback.
+    No `<em>` wrapping — Sebas: "never use italics in copy, it adds
+    noise." The italic-clay CSS rule that styled the v3.1 emphasis is
+    dropped from render_html.py in the same v3.2 change. The `pref`
+    argument is preserved for API compatibility with v3.1 callers but
+    is no longer consulted — Pulpo's scope is global, not filter-shaped.
     """
     if not picks:
         return ""
@@ -757,50 +820,80 @@ def deterministic_welcome_teaser(
     n = len(picks)
     rich = min(3, n)
     rest = max(0, n - rich)
+    _ = pref  # v3.2: preserved for API compatibility, not consulted.
 
-    # First sentence — what got scanned + where.
-    where = ""
-    if pref is not None:
-        if pref.departments:
-            where = (pref.departments[0]).title()
-        elif pref.zones:
-            where = pref.zones[0].replace("-", " ").title()
-    scan_clause: str
+    # Sentence 1 — Pulpo's honest scope. Coastal + the two serviced
+    # lakes (Coatepeque, Ilopango). Static copy, no filter leak.
+    sent1 = (
+        "Pulpo combed through every active beach and lake listing in El Salvador this week."
+        if en
+        else "Pulpo revisó todas las propiedades activas de playa y lago en El Salvador esta semana."
+    )
+
+    # Sentence 2 — filter narrowing → standout count. Drops the count
+    # entirely when n_scanned is missing rather than fabricating one.
     if isinstance(n_scanned, int) and n_scanned > 0:
-        if where:
-            scan_clause = (
-                f"Pulpo combed through {n_scanned:,} active listings across {where} this week"
-                if en
-                else f"Pulpo revisó {n_scanned:,} propiedades activas en {where} esta semana"
-            )
-        else:
-            scan_clause = (
-                f"Pulpo combed through {n_scanned:,} active listings this week"
-                if en
-                else f"Pulpo revisó {n_scanned:,} propiedades activas esta semana"
-            )
-    else:
-        scan_clause = (
-            "Pulpo combed through this week's inventory"
+        sent2 = (
+            f"Of the {n_scanned:,} that match your filter, these {n} stood out."
             if en
-            else "Pulpo revisó el inventario de esta semana"
+            else f"De las {n_scanned:,} que coinciden con tu filtro, estas {n} destacaron."
+        )
+    else:
+        sent2 = (
+            f"These {n} stood out."
+            if en
+            else f"Estas {n} destacaron."
         )
 
-    # Second sentence — emotional center wrapped in <em> + structural shape.
-    if en:
-        first = f"{scan_clause}. <em>These {n} earned a closer look</em>."
-        if rest:
-            second = f"{rich} full reads up top; {rest} quick scans below."
-        else:
-            second = f"{rich} full reads — take them slow."
-        return f"{first} {second}"
-
-    first = f"{scan_clause}. <em>Estas {n} merecieron un segundo vistazo</em>."
+    # Sentence 3 — issue shape. Telegraphs what the rich vs short
+    # treatment contains so the reader knows what scroll depth to expect.
     if rest:
-        second = f"{rich} lecturas completas arriba; {rest} vistazos rápidos abajo."
+        if en:
+            sent3 = (
+                f"The first {_num_word(rich)} get a full profile: photo, our take, "
+                f"and why we picked them. The next {_num_word(rest)} are quick reads."
+            )
+        else:
+            sent3 = (
+                f"Las {_num_word(rich, en=False, fem=True)} primeras llevan un perfil completo: "
+                f"foto, nuestra lectura, y por qué las elegimos. "
+                f"Las {_num_word(rest, en=False, fem=True)} siguientes son lecturas rápidas."
+            )
     else:
-        second = f"{rich} lecturas completas — tómalas con calma."
-    return f"{first} {second}"
+        if en:
+            sent3 = (
+                f"All {_num_word(rich)} get a full profile: photo, our take, and why we picked them."
+            )
+        else:
+            sent3 = (
+                f"Las {_num_word(rich, en=False, fem=True)} llevan un perfil completo: "
+                f"foto, nuestra lectura, y por qué las elegimos."
+            )
+
+    return f"{sent1} {sent2} {sent3}"
+
+
+def _num_word(n: int, en: bool = True, *, fem: bool = False) -> str:
+    """Natural-language numeral up to a dozen for editorial copy.
+
+    "The first three…" beats "The first 3…" in an editorial newsletter;
+    digits look like a stat strip, words read like a sentence. Falls
+    back to `str(n)` past 12 so the function stays safe at any size.
+    `fem` controls Spanish gender agreement for "una/uno" / "ninguna/ninguno".
+    """
+    if en:
+        return {
+            0: "none", 1: "one", 2: "two", 3: "three", 4: "four",
+            5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+            10: "ten", 11: "eleven", 12: "twelve",
+        }.get(n, str(n))
+    return {
+        0: "ninguna" if fem else "ninguno",
+        1: "una" if fem else "uno",
+        2: "dos", 3: "tres", 4: "cuatro", 5: "cinco",
+        6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
+        10: "diez", 11: "once", 12: "doce",
+    }.get(n, str(n))
 
 
 def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = True) -> str:
@@ -826,10 +919,25 @@ def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = Tru
     area = pick.get("area_m2")
     is_beachfront = bool(pick.get("is_beachfront"))
 
+    # v3.2 (2026-05-29) — phrase is now PURELY QUALITATIVE.
+    # The v3.1 version stamped literal "$47.48/m² — 78% below the area
+    # average" into the market paragraph. Every one of those numbers
+    # already appears on the per-pick card just below (chip + meta row +
+    # big price), so the market paragraph was repeating itself two
+    # paragraphs early. Sebas: "never repeat numbers."
+    #
+    # The phrase now reads as a noun-phrase the reader can click —
+    # "a 1,263 m² lot in Tamanique" — and the per-pick card carries the
+    # numeric breakdown. `pct`, `price_usd`, `ppm` and `is_beachfront`
+    # are intentionally kept in scope (above) so future copy can opt
+    # back into a number when it earns its place — but the default
+    # path emits no $$ or %.
+    _ = (pct, price_usd, ppm, is_beachfront)  # kept for future-proofing; not used here
+
     bits: list[str] = []
     if pt == "land" and isinstance(area, (int, float)) and area >= 100:
         bits.append(f"{int(area):,} m² lot" if en else f"lote de {int(area):,} m²")
-    elif is_beachfront and pt in ("house", "condo"):
+    elif pick.get("is_beachfront") and pt in ("house", "condo"):
         bits.append("beachfront home" if en else "casa frente al mar")
     elif pt in ("house", "condo"):
         bits.append(("home" if pt == "house" else "condo") if en else ("casa" if pt == "house" else "condominio"))
@@ -838,15 +946,6 @@ def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = Tru
 
     if municipality:
         bits.append(f"in {municipality}" if en else f"en {municipality}")
-
-    if pt == "land" and isinstance(ppm, (int, float)) and ppm > 0:
-        bits.append(f"at ${ppm:,.2f}/m²" if en else f"a ${ppm:,.2f}/m²")
-    elif isinstance(price_usd, (int, float)):
-        bits.append(f"at ${int(price_usd):,}" if en else f"a ${int(price_usd):,}")
-
-    if isinstance(pct, (int, float)) and pct <= -15:
-        n = abs(int(round(pct)))
-        bits.append(f"— {n}% below the area average" if en else f"— {n}% bajo el promedio del área")
 
     phrase = " ".join(bits)
 
@@ -912,21 +1011,21 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
         new_listings = sum(1 for p in picks if p.get("_is_new_window"))
         if new_listings >= max(2, len(picks) // 3):
             return (
-                f"<em>Fresh inventory landed this week — {new_listings} of these "
-                f"{len(picks)} listings are less than seven days old.</em> "
+                f"Fresh inventory landed this week — {new_listings} of these "
+                f"{len(picks)} listings are less than seven days old. "
                 "The early window matters; listings priced to move don't stay around."
                 if en
                 else
-                f"<em>Llegó inventario fresco esta semana — {new_listings} de estas "
-                f"{len(picks)} propiedades tienen menos de siete días.</em> "
+                f"Llegó inventario fresco esta semana — {new_listings} de estas "
+                f"{len(picks)} propiedades tienen menos de siete días. "
                 "La ventana temprana importa; las propiedades bien valoradas no se quedan."
             )
         return (
-            "<em>A quieter week than usual — inventory is steady, prices are holding.</em> "
+            "A quieter week than usual — inventory is steady, prices are holding. "
             "Worth saving anything close to your filter so Pulpo can flag the next move."
             if en
             else
-            "<em>Una semana más tranquila — el inventario es estable, los precios se sostienen.</em> "
+            "Una semana más tranquila — el inventario es estable, los precios se sostienen. "
             "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
         )
 
@@ -935,20 +1034,20 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
         distinct_phrase = _market_property_phrase(distinct_pick, locale, with_link=True)
         if en:
             return (
-                f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+                f"The most aggressive discount this week is {discount_phrase}. "
                 f"In a different lane, {distinct_phrase} is also worth a look."
             )
         return (
-            f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+            f"El descuento más agresivo esta semana es {discount_phrase}. "
             f"En otro carril, {distinct_phrase} también vale la pena revisar."
         )
 
     if en:
         return (
-            f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+            f"The most aggressive discount this week is {discount_phrase}. "
             "Worth a closer look before someone else moves on it."
         )
     return (
-        f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+        f"El descuento más agresivo esta semana es {discount_phrase}. "
         "Vale la pena revisarla antes de que alguien más se mueva."
     )
