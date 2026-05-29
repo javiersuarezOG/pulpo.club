@@ -45,4 +45,52 @@ describe("api/clerk/update-profile ALLOWED_PROFILE_KEYS", () => {
     // allowlist + remove this assertion + add a consumer test.
     expect(src).not.toMatch(/platform_updates:\s*\{/);
   });
+
+  // P2a — Discover panel filter state syncs to Clerk so /browse changes
+  // round-trip to /account/newsletter and feed the weekly newsletter
+  // pipeline. Validator must accept the 13 user-facing filter axes and
+  // reject tuning knobs (weights / score_min / photos /
+  // include_incomplete) which stay client-state.
+  it("includes discover_filters (P2a — Discover ↔ /account/newsletter sync)", () => {
+    expect(src).toMatch(/discover_filters:\s*\{[^}]*isValid:\s*isDiscoverFilter/);
+  });
+
+  it("isDiscoverFilter validates each persisted axis", () => {
+    // The validator enforces shape bounds per axis. Asserting the
+    // axis names appear inside the function body is the cheapest way
+    // to catch a future regression that silently drops one of the
+    // 13 axes from the allow-list without anyone noticing in CI.
+    const fnMatch = src.match(/function isDiscoverFilter\(v\)\s*\{[\s\S]*?\n\}/);
+    expect(fnMatch, "isDiscoverFilter function body found").toBeTruthy();
+    const body = fnMatch[0];
+    for (const axis of [
+      "zones",
+      "land_types",
+      "features",
+      "infra",
+      "status",
+      "discovery_tags",
+      "price_min",
+      "price_max",
+      "size_min",
+      "readiness",
+      "rank_max",
+      "master_category",
+      "subcategory",
+    ]) {
+      expect(body, `axis ${axis} validated`).toContain(`"${axis}"`);
+    }
+  });
+
+  it("isDiscoverFilter excludes tuning knobs (weights / score_min / photos / include_incomplete)", () => {
+    // These four are the Discover-specific 'how I read the catalogue'
+    // knobs and must NOT round-trip to Clerk: persisting them would
+    // (a) burn write quota on every slider tick, (b) leak local
+    // preferences across the catalogue/newsletter boundary.
+    const fnMatch = src.match(/function isDiscoverFilter\(v\)\s*\{[\s\S]*?\n\}/);
+    const body = fnMatch[0];
+    for (const knob of ["weights", "score_min", "photos", "include_incomplete"]) {
+      expect(body, `knob ${knob} NOT in validator`).not.toContain(`"${knob}"`);
+    }
+  });
 });

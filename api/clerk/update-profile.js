@@ -79,6 +79,56 @@ function isNewsletterPreference(v) {
   return true;
 }
 
+// ── discover_filters ─────────────────────────────────────────────────
+// P2a (2026-05-29): the Discover panel's filter state persists to Clerk
+// publicMetadata.profile.discover_filters so it round-trips across
+// devices AND drives the weekly newsletter pipeline (replaces the
+// older `newsletter` blob in a follow-up PR).
+//
+// Persisted axes (13) — what the user wants to FIND. Excluded
+// (weights, score_min, photos, include_incomplete) are tuning knobs
+// for how the user reads the catalogue and stay client-state.
+//
+// Shape mirrors `makeDefaultFilters()` in web/app/pages.jsx with all
+// Set<string> axes serialised to arrays for JSON-safe storage.
+const DISCOVER_MASTER_CATEGORIES = new Set(["beach", "lake"]);
+const DISCOVER_SUBCATEGORIES = new Set(["homes", "condos", "land"]);
+const DISCOVER_FILTER_KEY_LIMIT = 16;          // 13 axes + headroom for future axes
+
+function isDiscoverFilter(v) {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return false;
+  if (Object.keys(v).length > DISCOVER_FILTER_KEY_LIMIT) return false;
+  // Set-shaped axes — every axis is optional; missing key = no opinion.
+  if ("zones"          in v && !isShortStringArray(v.zones, 32))          return false;
+  if ("land_types"     in v && !isShortStringArray(v.land_types, 8))      return false;
+  if ("features"       in v && !isShortStringArray(v.features, 16))       return false;
+  if ("infra"          in v && !isShortStringArray(v.infra, 8))           return false;
+  if ("status"         in v && !isShortStringArray(v.status, 8))          return false;
+  if ("discovery_tags" in v && !isShortStringArray(v.discovery_tags, 16)) return false;
+  // Numeric axes with sane bounds.
+  if ("price_min" in v && (typeof v.price_min !== "number" || v.price_min < 0 || v.price_min > 1e10)) return false;
+  if ("price_max" in v && v.price_max !== null
+      && (typeof v.price_max !== "number" || v.price_max < 0 || v.price_max > 1e10)) {
+    return false;
+  }
+  if ("size_min"  in v && (typeof v.size_min  !== "number" || v.size_min  < 0 || v.size_min  > 1e9)) return false;
+  if ("readiness" in v && (typeof v.readiness !== "number" || v.readiness < 0 || v.readiness > 4))   return false;
+  if ("rank_max"  in v && v.rank_max !== null
+      && (typeof v.rank_max !== "number" || v.rank_max < 1 || v.rank_max > 100)) {
+    return false;
+  }
+  // Enum axes.
+  if ("master_category" in v && v.master_category !== null
+      && !DISCOVER_MASTER_CATEGORIES.has(v.master_category)) {
+    return false;
+  }
+  if ("subcategory" in v && v.subcategory !== null
+      && !DISCOVER_SUBCATEGORIES.has(v.subcategory)) {
+    return false;
+  }
+  return true;
+}
+
 const ALLOWED_PROFILE_KEYS = {
   // Newsletter / personalization categories. Keys are the
   // PreferenceCategoryKey vocabulary defined in
@@ -88,11 +138,20 @@ const ALLOWED_PROFILE_KEYS = {
       && v.length <= 8
       && v.every((s) => typeof s === "string" && s.length <= 64),
   },
-  // Fortnightly newsletter filter spec. Shape mirrored on the client by
-  // NewsletterPreference in web/app/lib/user-profile.ts and on the cron
-  // side by automation/newsletter/types.Preference.
+  // Legacy newsletter filter spec — narrow shape (departments,
+  // property_types, max_price_usd). Retained for back-compat while P3
+  // migrates the cron to read discover_filters instead.
   newsletter: {
     isValid: isNewsletterPreference,
+  },
+  // Discover panel filter state (P2a, 2026-05-29). 13 "what to find"
+  // axes — zones, types, features, infra, status, price band, size,
+  // discovery_tags, ranking, etc. The Discover panel writes here on
+  // change; /account/newsletter reads from the same blob so changes
+  // round-trip. Tuning controls (weights / score_min / photos /
+  // include_incomplete) stay client-state.
+  discover_filters: {
+    isValid: isDiscoverFilter,
   },
   // ISO 3166-1 alpha-2. The client picker is restricted to the COUNTRIES
   // table; this regex is a junk-input floor — a non-matching 2-letter
