@@ -39,12 +39,17 @@ def deterministic_commentary(
     else:
         eyebrow = i18n.t("hero.eyebrow.unnamed", locale)
     headline = i18n.t("hero.headline.default", locale)
-    # PR-NL-7a: lede_hero is now the warm welcome teaser that name-checks
-    # the first 3 picks ("Start with #01… #02 is… And #03…"). Falls back
-    # to the older "Pulpo scanned N listings…" template when picks is
-    # empty so cold-start cohorts still get something readable.
+    # v3.1.1 (2026-05-29): lede_hero is the warm two-sentence intro
+    # that names the scan size + location context, then sets the
+    # structural shape (full reads vs quick scans). Pre-picks redundancy
+    # was the bug the first v3 take introduced — this version threads
+    # `n_scanned` and `pref` through so the lede reads concrete without
+    # repeating per-pick detail. Falls back to the static i18n template
+    # when the picks list is empty.
     if picks:
-        lede = deterministic_welcome_teaser(picks, locale)
+        lede = deterministic_welcome_teaser(
+            picks, locale, n_scanned=n_scanned, pref=pref
+        )
     else:
         lede_key = "hero.lede.with_prefs" if (pref.zones or pref.departments or pref.max_price_usd or pref.categories or pref.property_types) else "hero.lede.no_prefs"
         lede = i18n.t(lede_key, locale, n_scanned=n_scanned)
@@ -716,20 +721,35 @@ def _welcome_pick_hook(pick: dict, locale: Locale) -> str:
             else "una propiedad que vale la pena ver")
 
 
-def deterministic_welcome_teaser(picks: list[dict], locale: Locale = "en") -> str:
-    """Single structural intro line that orients the reader to the issue.
+def deterministic_welcome_teaser(
+    picks: list[dict],
+    locale: Locale = "en",
+    *,
+    n_scanned: Optional[int] = None,
+    pref: Optional[Preference] = None,
+) -> str:
+    """Warm two-sentence intro that orients the reader to the issue.
 
-    v3.1 (2026-05-29): replaced the v2.4 "Start with #01… #02 is…"
-    welcome teaser. Sebas's review of the v2.8 send called the prior
-    teaser redundant — it repeated what the per-pick sections show in
-    full just below. The new intro tells the reader the *shape* of the
-    issue (three full reads, seven worth a quick look) instead of
-    pre-summarising the picks. Less repetition, more clarity about
-    what's coming.
+    v3.1.1 (2026-05-29, post-thinness-feedback): the first take of
+    v3.1 stripped the welcome down to a single structural line
+    ("3 full reads, 7 worth a quick look — hand-picked from this
+    week's scan.") which read TOO thin for a newsletter. This version
+    keeps the no-per-pick-mention rule that triggered the rewrite, but
+    adds two pieces of substantive context:
 
-    The renderer still styles this in italic serif so the single
-    structural clause keeps the warm typographic anchor without the
-    redundant copy.
+      1. The actual scan size ("863 listings") — useful framing, never
+         repeated in the per-pick block, gives the reader a sense of
+         how much was filtered.
+      2. The location context when set ("across La Libertad") — anchors
+         the issue to the recipient's filter so the lede reads "for
+         them" not "for everyone".
+
+    The structural shape (three full reads, seven quick scans) still
+    follows in the second sentence. Result is two warm sentences that
+    pre-summarise nothing the per-pick sections will re-show.
+
+    Pref + n_scanned are optional so legacy callers keep working with
+    a generic fallback.
     """
     if not picks:
         return ""
@@ -737,19 +757,50 @@ def deterministic_welcome_teaser(picks: list[dict], locale: Locale = "en") -> st
     n = len(picks)
     rich = min(3, n)
     rest = max(0, n - rich)
-    if en:
-        if rest:
-            return (
-                f"<em>{rich} full reads, {rest} worth a quick look</em> — "
-                f"hand-picked from this week's scan."
+
+    # First sentence — what got scanned + where.
+    where = ""
+    if pref is not None:
+        if pref.departments:
+            where = (pref.departments[0]).title()
+        elif pref.zones:
+            where = pref.zones[0].replace("-", " ").title()
+    scan_clause: str
+    if isinstance(n_scanned, int) and n_scanned > 0:
+        if where:
+            scan_clause = (
+                f"Pulpo combed through {n_scanned:,} active listings across {where} this week"
+                if en
+                else f"Pulpo revisó {n_scanned:,} propiedades activas en {where} esta semana"
             )
-        return f"<em>{rich} full reads</em> — hand-picked from this week's scan."
-    if rest:
-        return (
-            f"<em>{rich} lecturas completas, {rest} que vale la pena ver</em> — "
-            f"seleccionadas de la revisión de esta semana."
+        else:
+            scan_clause = (
+                f"Pulpo combed through {n_scanned:,} active listings this week"
+                if en
+                else f"Pulpo revisó {n_scanned:,} propiedades activas esta semana"
+            )
+    else:
+        scan_clause = (
+            "Pulpo combed through this week's inventory"
+            if en
+            else "Pulpo revisó el inventario de esta semana"
         )
-    return f"<em>{rich} lecturas completas</em> — seleccionadas de la revisión de esta semana."
+
+    # Second sentence — emotional center wrapped in <em> + structural shape.
+    if en:
+        first = f"{scan_clause}. <em>These {n} earned a closer look</em>."
+        if rest:
+            second = f"{rich} full reads up top; {rest} quick scans below."
+        else:
+            second = f"{rich} full reads — take them slow."
+        return f"{first} {second}"
+
+    first = f"{scan_clause}. <em>Estas {n} merecieron un segundo vistazo</em>."
+    if rest:
+        second = f"{rich} lecturas completas arriba; {rest} vistazos rápidos abajo."
+    else:
+        second = f"{rich} lecturas completas — tómalas con calma."
+    return f"{first} {second}"
 
 
 def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = True) -> str:

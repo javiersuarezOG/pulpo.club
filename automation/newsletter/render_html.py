@@ -564,8 +564,18 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
         f'<span class="price-note"> · {_e(pick.price_note)}</span>' if pick.price_note else ""
     )
 
+    # Skip the photo row entirely when there's no eligible hero image —
+    # build_issue._absolute_photo returns "" for listings where the
+    # source could surface a broker logo (REMAX, Citymax, etc.). Dropping
+    # the row (instead of rendering an empty <tr>) avoids a stray 12px
+    # gap above the headline.
+    photo_row = (
+        f'<tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>'
+        if pick.photo_url
+        else ""
+    )
     return f"""
-    <tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>
+    {photo_row}
     <tr><td class="pad" style="padding-top: 16px;">
       <div>{pills_html}</div>
       <h2 class="h1">{_e(pick.title)}</h2>

@@ -246,7 +246,27 @@ def fallback_preference(global_listings: list[dict]) -> Preference:
 
 def _absolute_photo(listing: dict, site_root: str) -> str:
     """Email needs absolute URLs. Prefer the source CDN; fall back to our
-    Cloud-hosted copy at site_root + hero_photo_path."""
+    Cloud-hosted copy at site_root + hero_photo_path.
+
+    Hard rule (2026-05-29): photos are surfaced only when the pipeline
+    has tagged the thumbnail as `card_eligible == True`. Source CDNs
+    sometimes serve a broker brand logo (REMAX, Citymax, etc.) when
+    the underlying listing has no real photo — `card_eligible` is False
+    in those cases (the pipeline's resolution + overlay checks reject
+    them). We never surface broker branding in the newsletter, so a
+    False flag → empty string here → the renderer omits the image
+    block entirely. We use the looser `card_eligible` gate (not
+    `hero_eligible`) so listings with a real but lower-res photo still
+    get a hero image — that's a different kind of "not perfect" than a
+    brand-logo placeholder.
+
+    Belt-and-suspenders: also reject when `has_text_overlay == True`
+    (the pipeline's positive flag for branded watermarks).
+    """
+    if listing.get("card_eligible") is not True:
+        return ""
+    if listing.get("has_text_overlay") is True:
+        return ""
     urls = listing.get("photo_urls") or []
     if urls and isinstance(urls[0], str) and urls[0].startswith("http"):
         return urls[0]
@@ -255,7 +275,7 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
         return p
     if p:
         return site_root.rstrip("/") + (p if p.startswith("/") else "/" + p)
-    return ""  # renderer hides the image block when empty
+    return ""
 
 
 def _location_line(listing: dict, locale: Locale) -> str:
