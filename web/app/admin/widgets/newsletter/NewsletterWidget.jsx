@@ -33,6 +33,11 @@
 import React, { useState } from "react";
 
 const DEFAULT_EMAIL = "javier@suarez.ventures";
+const DEFAULT_LOCALE = "en";
+const LOCALE_OPTIONS = [
+  { value: "en", label: "EN" },
+  { value: "es", label: "ES" },
+];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Mirrors `synthesize_preview_recipients(email)` in
@@ -207,6 +212,44 @@ const WIDGET_STYLES = `
 }
 @keyframes nl-spin { to { transform: rotate(360deg); } }
 
+/* ── Locale toggle (EN | ES) ──────────────────────────────────────── */
+.nl-preview-widget .nl-locale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nl-preview-widget .nl-locale-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.nl-preview-widget .nl-locale-btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.nl-preview-widget .nl-locale-btn + .nl-locale-btn {
+  border-left: 1px solid var(--line-2);
+}
+.nl-preview-widget .nl-locale-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.nl-preview-widget .nl-locale-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 /* ── PR-NL-7a · Upcoming sends panel ────────────────────────────── */
 .nl-preview-widget .nl-upcoming {
   margin: 4px 0 0;
@@ -318,6 +361,7 @@ function formatMondayLabel(d, now = new Date()) {
 
 export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
+  const [locale, setLocale] = useState(DEFAULT_LOCALE);
   const [busy, setBusy] = useState(false);
   // status is a discriminated union by `kind`:
   //   { kind: null }                            — nothing rendered
@@ -343,14 +387,12 @@ export function NewsletterWidget() {
     setBusy(true);
     setStatus({ kind: "pending", when });
     try {
+      const payload = { email: value, locale };
+      if (issueNumber != null) payload.issue_number = issueNumber;
       const r = await fetch("/api/admin/newsletter/trigger-preview", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(
-          issueNumber == null
-            ? { email: value }
-            : { email: value, issue_number: issueNumber },
-        ),
+        body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -397,6 +439,24 @@ export function NewsletterWidget() {
               spellCheck={false}
               required
             />
+          </div>
+
+          <div className="nl-locale">
+            <label htmlFor="nl-preview-locale-en">Language</label>
+            <div className="nl-locale-toggle">
+              {LOCALE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  id={`nl-preview-locale-${opt.value}`}
+                  type="button"
+                  className="nl-locale-btn"
+                  aria-pressed={locale === opt.value}
+                  onClick={() => setLocale(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* PR-NL-7a — Upcoming sends. Per-row test button fires the
@@ -479,17 +539,6 @@ export function NewsletterWidget() {
             </p>
           )}
         </div>
-
-        <p className="nl-hint">
-          Triggers the <code>pulpo-newsletter</code> GitHub Actions workflow
-          with <code>preview_cohorts=&lt;email&gt;</code>. Runs the full
-          production Python pipeline and sends one real email — the
-          {" "}<strong>Pro-with-prefs</strong> variant — to the address
-          above. The personalised newsletter is a <strong>Pro feature</strong>;
-          Free users get a different product, anonymous subscribers get
-          nothing from this cron. Modify content via code, then
-          re-trigger to re-check.
-        </p>
       </div>
     </>
   );

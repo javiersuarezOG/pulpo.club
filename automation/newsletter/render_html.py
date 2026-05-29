@@ -16,6 +16,7 @@ field crashing the renderer would break the entire batch.
 
 from __future__ import annotations
 
+import re as _re
 from html import escape as _e
 
 from . import i18n
@@ -27,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.0-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.2-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -61,9 +62,14 @@ _CSS = """
   --button-text:  #F4EFE6;
   --burgundy:     #6B2C2C;
   --burgundy-bg:  #F5E3E0;
+  /* Two-font system (v3.2, 2026-05-29). Serif anchors headlines and
+     the emphasised emotional centers; sans does everything else.
+     Mono (JetBrains Mono) was dropped — three fonts in one email
+     reads as typographic noise. Eyebrows, chips, meta strips and
+     pills keep their tag-like feel via uppercase + letter-spacing
+     in sans, not a monospaced family. */
   --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 }
 body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 a { color: var(--clay); text-decoration: none; }
@@ -77,7 +83,9 @@ table { border-collapse: collapse; }
 .pad-sm { padding: 12px 36px; }
 .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
 .sans    { font-family: var(--font-sans); }
-.mono    { font-family: var(--font-mono); }
+/* `.mono` is kept as a no-op utility class so existing markup using
+   `<span class="mono">` still resolves to the document's sans body —
+   removing the class hits a wider blast radius for no visible win. */
 .ink     { color: var(--ink); }
 .ink-2   { color: var(--ink-2); }
 .muted   { color: var(--ink-3); }
@@ -86,7 +94,7 @@ table { border-collapse: collapse; }
 .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
 .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -108,13 +116,13 @@ table { border-collapse: collapse; }
    teaser and to the first market_context paragraph. */
 .body em, .body-2 em, .lede em { font-style: italic; color: var(--clay-deep); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
-.meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
+.meta    { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
 .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
 .price-2     { font-family: var(--font-display); font-size: 22px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
 .price-note  { font-family: var(--font-sans); font-size: 12.5px; color: var(--ink-3); }
 .pill {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.10em;
@@ -140,7 +148,7 @@ table { border-collapse: collapse; }
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.04em;
   color: #5A5650;
@@ -162,7 +170,7 @@ table { border-collapse: collapse; }
   border-radius: 6px;
 }
 .why-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -226,7 +234,7 @@ table { border-collapse: collapse; }
 .sl-card .sl-photo { margin: 0 0 12px; }
 .sl-card .sl-photo img { border-radius: 4px; }
 .sl-card .sl-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-3);
@@ -242,7 +250,7 @@ table { border-collapse: collapse; }
 .sl-card .sl-why em { font-style: italic; color: var(--clay-deep); }
 .meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 .callout { margin: 14px 0 0; padding: 0; background: none; }
-.callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
+.callout .label { font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
 .callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
 .callout + .callout { margin-top: 12px; }
 .paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
@@ -267,7 +275,7 @@ table { border-collapse: collapse; }
   padding: 36px 48px;
 }
 .yp-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -330,7 +338,7 @@ def _pills_html(pills: list[str]) -> str:
 def _chips_html(pick: IssuePick) -> str:
     """Render Chip objects (warm/cool/neutral/top) into the email.
 
-    v3: the "★ Top pick this fortnight" chip — emitted by
+    v3: the "★ Top pick this week" chip — emitted by
     build_issue._chips_for_listing with `kind=cool` for the top N — is
     promoted visually to the forest-on-cream `chip-top` treatment when
     its label starts with the star glyph. The detection is label-based
@@ -563,8 +571,18 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
         f'<span class="price-note"> · {_e(pick.price_note)}</span>' if pick.price_note else ""
     )
 
+    # Skip the photo row entirely when there's no eligible hero image —
+    # build_issue._absolute_photo returns "" for listings where the
+    # source could surface a broker logo (REMAX, Citymax, etc.). Dropping
+    # the row (instead of rendering an empty <tr>) avoids a stray 12px
+    # gap above the headline.
+    photo_row = (
+        f'<tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>'
+        if pick.photo_url
+        else ""
+    )
     return f"""
-    <tr><td style="padding: 12px 0 0 0;">{_photo_html(pick)}</td></tr>
+    {photo_row}
     <tr><td class="pad" style="padding-top: 16px;">
       <div>{pills_html}</div>
       <h2 class="h1">{_e(pick.title)}</h2>
@@ -682,6 +700,56 @@ def _skip_block_html(issue: Issue) -> str:
     """
 
 
+# Matches a full anchor: `<a href="…">…</a>`. Captures the href and the
+# inner text. Used for the post-processing pass over LLM /
+# deterministic market-context paragraphs.
+_ANCHOR_RE = _re.compile(
+    r'<a\s+href="([^"]*)"[^>]*>(.*?)</a>',
+    flags=_re.IGNORECASE | _re.DOTALL,
+)
+_PICK_URL_RE = _re.compile(r"^PICK_URL_(\d+)$")
+
+
+def _hydrate_pick_urls(paragraph: str, issue: Issue) -> str:
+    """Resolve `PICK_URL_<N>` placeholders in market-context paragraphs.
+
+    Source paths producing placeholders:
+      • `commentary.deterministic_market_note` emits
+        `<a href="PICK_URL_3">…</a>` around property phrases.
+      • `llm_commentary`'s system prompt instructs DeepSeek to use the
+        same convention; the renderer is what makes them real.
+
+    For each `<a href="X">text</a>` we encounter:
+      • X is `PICK_URL_<N>` AND N maps to a known pick → emit
+        `<a href="<pulpo_url>">text</a>`.
+      • X is `PICK_URL_<N>` but N is unknown (LLM hallucinated a rank
+        outside the issue) → drop the wrapper, keep `text`.
+      • X is anything else (LLM invented a literal URL) → drop the
+        wrapper, keep `text`. Defensive guard so the email never ships
+        a link to a URL the system didn't authorize.
+    """
+    # Build rank → pulpo_url lookup once. Includes rich + shortlist
+    # picks so the LLM can link into either; paywalled picks excluded
+    # because the reader can't open them anyway.
+    rank_to_url: dict[int, str] = {}
+    for p in list(issue.picks_top) + list(issue.picks_shortlist):
+        if p.rank and p.pulpo_url and not p.paywalled:
+            rank_to_url[p.rank] = p.pulpo_url
+
+    def _resolve(match: _re.Match) -> str:
+        href, text = match.group(1), match.group(2)
+        m = _PICK_URL_RE.match(href)
+        if not m:
+            return text  # invented URL — strip wrapper, keep text
+        rank = int(m.group(1))
+        url = rank_to_url.get(rank)
+        if not url:
+            return text  # unknown rank — strip wrapper, keep text
+        return f'<a href="{url}">{text}</a>'
+
+    return _ANCHOR_RE.sub(_resolve, paragraph)
+
+
 def _market_html(issue: Issue) -> str:
     paras = issue.commentary.market_context
     if not paras:
@@ -689,17 +757,16 @@ def _market_html(issue: Issue) -> str:
     locale = issue.locale
     eb = i18n.t("market.eyebrow", locale)
     hl = i18n.t("market.headline", locale)
-    # PR-NL-7a: the first paragraph is the warm market note that may
-    # contain a single <em>...</em> span — don't html-escape it. Source
-    # is either deterministic_market_note (known-good HTML) or
-    # llm_commentary (prompt enforces only <em> tags, no other markup).
-    # Subsequent paragraphs stay plain text and ARE escaped.
+    # The market paragraph(s) may contain <em>...</em> spans plus
+    # `<a href="PICK_URL_N">…</a>` placeholders. Resolve the
+    # placeholders against real picks BEFORE rendering. `_hydrate_pick_urls`
+    # also strips any other <a> tags as a defensive measure against the LLM
+    # inventing URLs. Don't html-escape after hydration — `<em>` and
+    # `<a href>` are part of the trusted output shape.
     para_html_parts: list[str] = []
-    for i, para in enumerate(paras):
-        if i == 0:
-            para_html_parts.append(f'<p class="body">{para}</p>')
-        else:
-            para_html_parts.append(f'<p class="body">{_e(para)}</p>')
+    for para in paras:
+        hydrated = _hydrate_pick_urls(para, issue)
+        para_html_parts.append(f'<p class="body">{hydrated}</p>')
     para_html = "".join(para_html_parts)
     return f"""
     <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
@@ -948,7 +1015,7 @@ def render_html(issue: Issue) -> str:
 <title>{_e(head_title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <style>{_CSS}</style>
 </head>
 <body>

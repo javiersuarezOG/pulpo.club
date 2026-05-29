@@ -94,6 +94,15 @@ def main() -> int:
         ),
     )
     p.add_argument(
+        "--preview-locale",
+        choices=("en", "es"),
+        default="en",
+        help=(
+            "Locale for the preview render. EN or ES. Only meaningful "
+            "alongside --preview-cohorts."
+        ),
+    )
+    p.add_argument(
         "--include-unsubscribed",
         action="store_true",
         help="Ignore audience-level unsubscribed flag (FOR DEBUGGING ONLY).",
@@ -128,7 +137,10 @@ def main() -> int:
             )
             return 2
         try:
-            queue = synthesize_preview_recipients(args.preview_cohorts)
+            queue = synthesize_preview_recipients(
+                args.preview_cohorts,
+                locale=args.preview_locale,
+            )
         except ValueError as e:
             print(f"[send] {e}", file=sys.stderr)
             return 2

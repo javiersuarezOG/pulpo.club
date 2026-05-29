@@ -126,57 +126,63 @@ still believes the right buyer can find the right property.
   waiting" (suggests negotiability)
 - Between those: don't dwell on time
 
-## The welcome teaser (`lede_hero`)
+## The intro lede (`lede_hero`)
 
-The first paragraph the reader sees. It name-checks the **first 3 picks** by
-their human hook — the one detail in each that makes them worth scrolling.
+The first sentence the reader sees. v3.1 (2026-05-29) replaced the v2.x
+"Start with *#01* — &lt;hook&gt;" welcome teaser with a short structural
+intro: how many full reads, how many quick looks, and that it's this
+week's scan. Sebas's review of the v2.8 send called the prior teaser
+redundant because the per-pick sections show the same picks in full
+just below.
 
-Format:
+Format: **≤ 2 sentences**, one warm clause wrapped in `<em>`. NO per-pick
+mentions, NO listing names — those belong in the picks block, not here.
 
-> Start with *#01* — &lt;hook&gt;. *#02* is &lt;hook&gt;. And *#03* &lt;hook&gt;.
+Good examples:
 
-Rules:
-- Always references picks `#01`, `#02`, `#03` (wrap each in `<em>`)
-- Each hook is a short clause, not a full sentence — the renderer threads them
-- Pick the single most striking signal per listing:
-  - **Price drop** (just repriced, drop amount or %)
-  - **Below zone median** ("priced like the seller actually wants to sell")
-  - **Walk to beach** (named beach if known)
-  - **Mountain land** (atmospheric phrasing)
-  - **Coffee farm** (use the description text)
-  - **Build-ready** (water + power + paved access)
-  - Fallback: the municipality name
+> <em>3 full reads, 7 worth a quick look</em> — hand-picked from this week's scan.
 
-Good example:
+> <em>Three full reads</em> — hand-picked from this week's scan.
+
+Bad examples (the v2 welcome teaser, banned in v3.1):
 
 > Start with *#01* — a short walk from El Tunco. *#02* is a coffee farm in the
-> mountains, hard to look away from. And *#03* just had its first price drop
-> in two weeks.
+> mountains. And *#03* just had its first price drop in two weeks.
 
-Bad example (analytical / clichéd):
-
-> Pulpo scanned 1,247 listings this fortnight using a composite ranking score.
+> Pulpo scanned 1,247 listings this week using a composite ranking score.
 > The top three picks are listed below for your review.
 
-## The market note (`market_context[0]`)
+## The market note (`market_context`)
 
-A **single warm sentence** about the market this fortnight, with the emotional
-center wrapped in `<em>`. Pattern-detect from the picks before writing:
+**Exactly ONE paragraph** that surfaces the single most striking pattern
+in the data this week. Wrap the emotional-center clause in `<em>`. When you
+name a specific pick, wrap the descriptive noun phrase in
+`<a href="PICK_URL_N">…</a>` where N is the pick's rank in the FACTS.
+The renderer replaces PICK_URL_N with the real pulpo_url before mailing.
 
-- **≥ 40% of picks repriced** → "buyer's fortnight" framing
-- **≥ 40% of picks new this fortnight** → "fresh inventory" framing
-- **Median pick > 15% under zone** → "less drama, more value"
-- **Otherwise** → "quieter fortnight" framing — never fabricate urgency
+Pattern-detect from the picks before writing:
+
+- **Deepest discount in the issue** → lead with that pick by name + the
+  concrete number ("78% below the area average"), linked
+- **No striking discount but ≥ 2 fresh listings** → "Fresh inventory
+  landed this week" framing
+- **Otherwise** → "quieter week" framing — never fabricate urgency
 
 Good example:
 
-> It's a buyer's fortnight. <em>Almost twice as many sellers lowered their
-> prices this week as a normal week.</em> If you're getting close on a
-> listing — this is a good week to make the call.
+> <em>The most aggressive discount this week is
+> <a href="PICK_URL_1">a 1,263 m² lot in Tamanique at $47/m² — 78% below
+> the area average</a>.</em> In a different lane,
+> <a href="PICK_URL_4">a beachfront home in La Libertad at $900,000</a> is
+> also worth a look.
 
-Bad example (analytical):
+Bad examples (v2.8, banned in v3.1):
 
-> Median listing price decreased 4% versus the previous fortnight. The
+> Pulpo scanned 863 properties and found 10 new listings worth your attention.
+> Many are land parcels with ocean views, and several are priced well below
+> their zone average.
+
+> Median listing price decreased 4% versus the previous week. The
 > repriced-rate per zone is currently above the rolling median.
 
 ## Tone targets per archetype

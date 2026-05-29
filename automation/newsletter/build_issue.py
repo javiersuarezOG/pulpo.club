@@ -30,7 +30,11 @@ from .types import (
 ISSUE_DEFAULT_TOP_N = 10
 ISSUE_TOP_PICKS_RICH = 3   # picks rendered with a full hero image + callouts (was 2 pre PR-NL-5)
 ISSUE_CHIPS_PER_PICK = 4   # max supportive chips alongside the hero / pick
-DEFAULT_WINDOW_DAYS = 14
+# Cadence is weekly (post-2026-05-29); 7-day lookback matches that.
+# Older `DEFAULT_WINDOW_DAYS = 14` was a holdover from the original
+# fortnightly plan and would have labelled 8–14 day-old listings as
+# "new this week" on cold-start sends.
+DEFAULT_WINDOW_DAYS = 7
 
 LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
 
@@ -242,7 +246,27 @@ def fallback_preference(global_listings: list[dict]) -> Preference:
 
 def _absolute_photo(listing: dict, site_root: str) -> str:
     """Email needs absolute URLs. Prefer the source CDN; fall back to our
-    Cloud-hosted copy at site_root + hero_photo_path."""
+    Cloud-hosted copy at site_root + hero_photo_path.
+
+    Hard rule (2026-05-29): photos are surfaced only when the pipeline
+    has tagged the thumbnail as `card_eligible == True`. Source CDNs
+    sometimes serve a broker brand logo (REMAX, Citymax, etc.) when
+    the underlying listing has no real photo — `card_eligible` is False
+    in those cases (the pipeline's resolution + overlay checks reject
+    them). We never surface broker branding in the newsletter, so a
+    False flag → empty string here → the renderer omits the image
+    block entirely. We use the looser `card_eligible` gate (not
+    `hero_eligible`) so listings with a real but lower-res photo still
+    get a hero image — that's a different kind of "not perfect" than a
+    brand-logo placeholder.
+
+    Belt-and-suspenders: also reject when `has_text_overlay == True`
+    (the pipeline's positive flag for branded watermarks).
+    """
+    if listing.get("card_eligible") is not True:
+        return ""
+    if listing.get("has_text_overlay") is True:
+        return ""
     urls = listing.get("photo_urls") or []
     if urls and isinstance(urls[0], str) and urls[0].startswith("http"):
         return urls[0]
@@ -251,7 +275,7 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
         return p
     if p:
         return site_root.rstrip("/") + (p if p.startswith("/") else "/" + p)
-    return ""  # renderer hides the image block when empty
+    return ""
 
 
 def _location_line(listing: dict, locale: Locale) -> str:
@@ -529,7 +553,7 @@ def _chips_for_listing(
     # ── cool ── strong positive signals ──────────────────────────────
     if rank > 0 and rank <= rank_threshold_top:
         chips.append(Chip(
-            label="★ Top pick this fortnight" if locale == "en" else "★ Selección destacada",
+            label="★ Top pick this week" if locale == "en" else "★ Selección destacada",
             kind="cool",
         ))
 
@@ -852,6 +876,15 @@ def build_issue(
             top_n=ISSUE_DEFAULT_TOP_N - len(kept_listings),
         )[0]
         kept_listings = kept_listings + fallback
+
+    # Tag each kept listing with its per-issue rank (1..N). The market-note
+    # generator in commentary.py reads `_issue_rank` to emit
+    # `PICK_URL_<rank>` placeholders inside its <a href> tags; the renderer
+    # then swaps those placeholders for the real pulpo_urls. Tagging here
+    # (after the fallback top-up) ensures the rank matches what the
+    # per-pick rendering uses below.
+    for i, listing in enumerate(kept_listings):
+        listing["_issue_rank"] = i + 1
 
     # ── Cohort-aware paywall flag ───────────────────────────────────────
     # free_prefs and free-logged-in users get pick #1 photo+headline only;

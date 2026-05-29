@@ -42,6 +42,12 @@ on:
         description: "Admin preview: send the 3 cohort variants (anonymous, free, pro) of the current issue to this email. Bypasses the audience queue + forces LIVE send. Blank = disabled."
         required: false
         default: ""
+      preview_locale:
+        description: "Locale for the preview render (only used when preview_cohorts is set)."
+        required: false
+        type: choice
+        default: "en"
+        options: ["en", "es"]
 
 concurrency:
   group: pulpo-newsletter
@@ -127,10 +133,11 @@ jobs:
         run: |
           ONLY_EMAIL="${{ github.event.inputs.only_email || '' }}"
           PREVIEW_EMAIL="${{ github.event.inputs.preview_cohorts || '' }}"
+          PREVIEW_LOCALE="${{ github.event.inputs.preview_locale || 'en' }}"
           ARGS=(--issue-number "${{ github.event.inputs.issue_number || '1' }}" \
                 --write-html-to newsletter-drafts/sent)
           if [ -n "$PREVIEW_EMAIL" ]; then
-            ARGS+=(--preview-cohorts "$PREVIEW_EMAIL")
+            ARGS+=(--preview-cohorts "$PREVIEW_EMAIL" --preview-locale "$PREVIEW_LOCALE")
           elif [ -n "$ONLY_EMAIL" ]; then
             ARGS+=(--only-email "$ONLY_EMAIL")
           fi
