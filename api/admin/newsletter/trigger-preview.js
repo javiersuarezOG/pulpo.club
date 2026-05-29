@@ -1,12 +1,16 @@
 // POST /api/admin/newsletter/trigger-preview
 //
-// Body: { email, issue_number?: number }
+// Body: { email, issue_number?: number, locale?: "en" | "es" }
 //
 // `issue_number` is optional. When omitted, defaults to "1" — matching the
 // workflow's pre-existing default so calls without an explicit issue
 // number behave exactly like the original endpoint. PR-NL-7a's
 // "Upcoming sends" panel passes a per-row number so each scheduled
 // Monday gets its own test send routable from the same admin button.
+//
+// `locale` is optional. When omitted, defaults to "en". The admin widget
+// exposes a small EN/ES toggle so the operator can QA both language
+// renders from the same surface.
 //
 // Triggers the `pulpo-newsletter` GitHub Actions workflow with
 // `preview_cohorts=<email>`. The workflow runs the production Python
@@ -102,6 +106,19 @@ module.exports = async (req, res) => {
     issueNumberStr = String(n);
   }
 
+  // Validate the optional locale — closed set, defaults to "en".
+  let locale = "en";
+  if (body.locale !== undefined && body.locale !== null) {
+    const v = String(body.locale).toLowerCase();
+    if (v !== "en" && v !== "es") {
+      return res.status(400).json({
+        error: "invalid_locale",
+        hint: "locale must be 'en' or 'es'.",
+      });
+    }
+    locale = v;
+  }
+
   const token = process.env.GITHUB_DISPATCH_TOKEN || "";
   if (!token) {
     logApi("admin.newsletter_trigger_preview", {
@@ -133,6 +150,7 @@ module.exports = async (req, res) => {
         inputs: {
           preview_cohorts: email,
           issue_number: issueNumberStr,
+          preview_locale: locale,
         },
       }),
     });
@@ -161,7 +179,7 @@ module.exports = async (req, res) => {
 
   logApi("admin.newsletter_trigger_preview", {
     status: 202, ms: Date.now() - t0,
-    repo, ref, email_domain: email.split("@")[1] || "",
+    repo, ref, locale, email_domain: email.split("@")[1] || "",
   });
 
   return res.status(202).json({

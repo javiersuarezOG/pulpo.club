@@ -255,6 +255,23 @@ def test_synthesize_preview_recipients_rejects_bad_email():
         subs.synthesize_preview_recipients("   ")
 
 
+def test_synthesize_preview_recipients_honours_locale():
+    """Admin widget passes the operator-selected locale through so the
+    EN/ES toggle actually renders the matching language."""
+    import pytest
+
+    en_queue = subs.synthesize_preview_recipients("preview@pulpo.club")
+    assert en_queue[0][0].locale == "en"
+
+    es_queue = subs.synthesize_preview_recipients(
+        "preview@pulpo.club", locale="es"
+    )
+    assert es_queue[0][0].locale == "es"
+
+    with pytest.raises(ValueError):
+        subs.synthesize_preview_recipients("preview@pulpo.club", locale="fr")
+
+
 # ── locale side-channel (pulpo-locale: prefix on Resend first_name) ──────
 def test_parse_locale_first_name_extracts_known_locales():
     assert subs._parse_locale_first_name("pulpo-locale:es") == "es"

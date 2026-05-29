@@ -308,7 +308,11 @@ def join_recipients(
     return out
 
 
-def synthesize_preview_recipients(email: str) -> list[tuple[Recipient, str]]:
+def synthesize_preview_recipients(
+    email: str,
+    *,
+    locale: Locale = "en",
+) -> list[tuple[Recipient, str]]:
     """ONE fake recipient — the Pro-with-prefs variant — addressed to the
     operator's email.
 
@@ -321,16 +325,22 @@ def synthesize_preview_recipients(email: str) -> list[tuple[Recipient, str]]:
     Preference: `departments=["La Libertad"]`. Wide enough that the
     picker always finds picks, narrow enough that the operator sees
     the "filter applied" branch render (not the broad fallback).
+
+    `locale` controls which language the rendered email is in. The
+    admin widget lets the operator pick EN or ES so they can QA both
+    variants from the same surface.
     """
     email = email.strip().lower()
     if not email or "@" not in email:
         raise ValueError(f"synthesize_preview_recipients: invalid email {email!r}")
+    if locale not in ("en", "es"):
+        raise ValueError(f"synthesize_preview_recipients: invalid locale {locale!r}")
     eh = email_hash(email)
     recipients = [
         Recipient(
             email_hash=eh,
             display_name="Preview",
-            locale="en",
+            locale=locale,
             tier="pro",
             has_account=True,
             preference=Preference(departments=["La Libertad"]),
