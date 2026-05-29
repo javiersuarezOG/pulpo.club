@@ -2,7 +2,7 @@
 //
 // Why this exists: until now our entire e2e suite runs with Clerk OFF.
 // CI never sees a signed-in user, which is exactly why two persistence
-// bugs shipped to /account/profile and /account/notifications invisibly
+// bugs shipped to /account/profile and /account/newsletter invisibly
 // — there was no test that walked a real Clerk session.
 //
 // What it does:

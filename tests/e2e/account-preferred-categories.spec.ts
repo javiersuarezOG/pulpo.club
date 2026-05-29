@@ -1,4 +1,4 @@
-// /account/notifications — preferred-category chip selector (PR-B).
+// /account/newsletter — preferred-category chip selector (PR-B).
 //
 // Covers:
 //   - Pro user sees chips under the newsletter toggle
@@ -11,11 +11,11 @@
 import { test, expect } from "@playwright/test";
 import { attachErrorRecorder, seedProUser } from "./_helpers";
 
-test.describe("/account/notifications — preferred categories", () => {
+test.describe("/account/newsletter — preferred categories", () => {
   test("Pro user can pick up to 4 chips; 5th no-ops + limit hint", async ({ page }) => {
     await seedProUser(page);
     const errors = attachErrorRecorder(page);
-    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    await page.goto("/account/newsletter", { waitUntil: "networkidle" });
 
     const grid = page.locator('[data-chip-group="preferred-categories"]');
     await grid.waitFor({ state: "visible", timeout: 10_000 });
@@ -72,7 +72,7 @@ test.describe("/account/notifications — preferred categories", () => {
         }));
       }
     });
-    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    await page.goto("/account/newsletter", { waitUntil: "networkidle" });
     await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     await page.locator('[data-category-key="beachfront"]').click();
@@ -89,7 +89,7 @@ test.describe("/account/notifications — preferred categories", () => {
 
   test("toggling newsletter off hides the chip group entirely", async ({ page }) => {
     await seedProUser(page);
-    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    await page.goto("/account/newsletter", { waitUntil: "networkidle" });
     await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     // The newsletter toggle is a role="switch" with aria-label set to
@@ -107,7 +107,7 @@ test.describe("/account/notifications — preferred categories", () => {
     await page.addInitScript(() => {
       try { localStorage.setItem("pulpo-locale", "es"); } catch {}
     });
-    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    await page.goto("/account/newsletter", { waitUntil: "networkidle" });
     await page.locator('[data-chip-group="preferred-categories"]').waitFor({ state: "visible", timeout: 10_000 });
 
     const gridText = (await page.locator('[data-chip-group="preferred-categories"]').innerText()).toLowerCase();
