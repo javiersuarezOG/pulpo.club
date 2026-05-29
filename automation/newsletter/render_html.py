@@ -110,11 +110,14 @@ table { border-collapse: collapse; }
 .lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
 .body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
 .body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
-/* PR-NL-6 — story_html wraps the single emotional-center sentence in
-   <em>...</em>. Lands the reader's eye there without using bold or a
-   colored callout block. PR-NL-7a extends to .lede for the welcome
-   teaser and to the first market_context paragraph. */
-.body em, .body-2 em, .lede em { font-style: italic; color: var(--clay-deep); }
+/* v3.2 (2026-05-29) — italics removed from copy. Sebas: "never use
+   italics in copy, it adds noise." The v3.1 rule used <em> wrapping
+   + clay-deep italic to land the reader's eye on the emotional-center
+   sentence; the v3.2 generators no longer emit <em>, so this rule is
+   now a no-op safety net (covers any inbound LLM/copy that still
+   carries an <em>). Belt-and-suspenders: copy passes through clean
+   even if upstream forgets the v3.2 contract. */
+.body em, .body-2 em, .lede em { font-style: normal; color: inherit; }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
 .meta    { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
 .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
@@ -247,7 +250,7 @@ table { border-collapse: collapse; }
   color: var(--ink-2);
   margin: 8px 0 0;
 }
-.sl-card .sl-why em { font-style: italic; color: var(--clay-deep); }
+.sl-card .sl-why em { font-style: normal; color: inherit; }  /* v3.2 — italics removed from copy */
 .meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 .callout { margin: 14px 0 0; padding: 0; background: none; }
 .callout .label { font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
