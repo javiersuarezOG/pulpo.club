@@ -158,11 +158,14 @@ test.describe("responsive — section sweep (anonymous)", () => {
 // flipped via env or fixture; in CI today the publishable key is unset
 // so clerkEnabled() returns false and the legacy account renders. We
 // seed a Pro/Free user via localStorage and click each tab.
+// 2026-05-29: section key `notifications` renamed to `newsletter`; the
+// tab label is "Newsletter" in both locales (the EN brand word reads
+// fine in Spanish too — same as "Pro" / "Stripe" elsewhere in the app).
 const ACCOUNT_TABS = [
-  { key: "profile",       label: /Profile|Perfil/ },
-  { key: "notifications", label: /Notifications|Notificaciones/ },
-  { key: "subscription",  label: /Subscription|Suscripción/ },
-  { key: "security",      label: /Security|Seguridad/ },
+  { key: "profile",      label: /Profile|Perfil/ },
+  { key: "newsletter",   label: /Newsletter|Boletín/ },
+  { key: "subscription", label: /Subscription|Suscripción/ },
+  { key: "security",     label: /Security|Seguridad/ },
 ] as const;
 
 // 3. WelcomeModal signed-in variant — Pro seed lands on
