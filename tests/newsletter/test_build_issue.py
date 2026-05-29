@@ -352,10 +352,12 @@ def test_pro_user_every_link_is_routable(pro_with_prefs, ranked_pool, monkeypatc
         f"unsubscribe link missing HMAC token (handler rejects without it): {u}"
     )
 
-    # 3. /account, /account/notifications, /saved, /browse — vercel.json
-    #    has explicit rewrites for all of these. Catch a future
-    #    /account/foo (where foo isn't in ACCOUNT_SECTION_KEYS) here.
-    SPA_PATHS = {"/account", "/account/notifications", "/saved", "/browse"}
+    # 3. /account, /account/newsletter, /saved, /browse — vercel.json
+    #    rewrites these to the SPA; parseLocation allow-lists the section
+    #    keys (ACCOUNT_SECTION_KEYS in web/app/lib/url-routing.ts). The
+    #    rename aliases /account/notifications → newsletter for bookmark
+    #    survival; the renderer itself emits the new canonical URL.
+    SPA_PATHS = {"/account", "/account/newsletter", "/saved", "/browse"}
     for h in hrefs:
         if "/listing/" in h or "unsubscribe" in h:
             continue
