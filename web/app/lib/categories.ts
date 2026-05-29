@@ -42,7 +42,7 @@ export const CATEGORY_KEYS = [
 export type CategoryKey = typeof CATEGORY_KEYS[number];
 const CATEGORY_KEY_SET = new Set<string>(CATEGORY_KEYS);
 
-// ── User-selectable subset (chip selector in /account/notifications) ─
+// ── User-selectable subset (chip selector in /account/newsletter) ─
 //
 // Not all categories are useful as user preferences. The selector
 // surfaces a curated subset chosen for buyer mental model:

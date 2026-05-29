@@ -152,11 +152,14 @@ function AccountPage({ app }) {
     return null;
   }
 
+  // 2026-05-29: renamed `notifications` → `newsletter`. The tab always
+  // managed the newsletter filter; ACCOUNT_SECTION_KEYS aliases the old
+  // slug in url-routing.ts so existing bookmarks survive.
   const subs = [
-    { key: "profile",       label: t("account.profile", app.locale),       icon: "user" },
-    { key: "notifications", label: t("account.notifications", app.locale), icon: "bell" },
-    { key: "subscription",  label: t("account.subscription", app.locale),  icon: "sparkle" },
-    { key: "security",      label: t("account.security", app.locale),      icon: "lock" },
+    { key: "profile",      label: t("account.profile", app.locale),      icon: "user" },
+    { key: "newsletter",   label: t("account.newsletter", app.locale),   icon: "bell" },
+    { key: "subscription", label: t("account.subscription", app.locale), icon: "sparkle" },
+    { key: "security",     label: t("account.security", app.locale),     icon: "lock" },
   ];
 
   return (
@@ -183,10 +186,10 @@ function AccountPage({ app }) {
         </aside>
 
         <main className="account-content">
-          {section === "profile"       && <ProfileSection app={app} />}
-          {section === "notifications" && <NotificationsSection app={app} />}
-          {section === "subscription"  && <SubscriptionSection app={app} />}
-          {section === "security"      && <SecuritySection app={app} />}
+          {section === "profile"      && <ProfileSection app={app} />}
+          {section === "newsletter"   && <NotificationsSection app={app} />}
+          {section === "subscription" && <SubscriptionSection app={app} />}
+          {section === "security"     && <SecuritySection app={app} />}
         </main>
       </div>
     </div>

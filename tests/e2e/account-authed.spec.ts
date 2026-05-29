@@ -4,7 +4,7 @@
 // other test in the suite runs with Clerk OFF, which is exactly why the
 // "Save my profile name" and "Upload my profile photo" bugs shipped
 // invisibly. This spec signs in as a real user, mutates every visible
-// control on /account/profile + /account/notifications + /account/security,
+// control on /account/profile + /account/newsletter + /account/security,
 // reads the values back from the Clerk Backend API, and restores the
 // account to its pre-test state.
 //
@@ -113,10 +113,10 @@ test.describe("Account area (Clerk-on, real session)", () => {
         // (the backend would reject it; the client guards against it).
       }
 
-      // ─── Notifications ─────────────────────────────────────────
-      await page.goto("/account/notifications");
-      // The new cadence note paragraph is present (Pro user).
-      await expect(page.getByText(/fortnightly newsletter|boletín quincenal/i)).toBeVisible();
+      // ─── Newsletter ────────────────────────────────────────────
+      await page.goto("/account/newsletter");
+      // The cadence note paragraph is present (Pro user).
+      await expect(page.getByText(/weekly newsletter|boletín semanal/i)).toBeVisible();
       // Regression guard — the dead toggles MUST NOT come back.
       await expect(page.locator(".pref-row .toggle")).toHaveCount(0);
       await expect(page.locator(".freq-toggle")).toHaveCount(0);

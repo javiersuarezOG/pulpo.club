@@ -688,12 +688,15 @@ export type EventMap = {
    *  distinguishes inbound traffic vs intra-page navigation so the
    *  dashboards don't conflate the two. */
   "account.section_viewed": {
-    section: "profile" | "notifications" | "subscription" | "security";
+    // Renamed `notifications` → `newsletter` 2026-05-29. Legacy slug
+    // kept in the union so historical PostHog rows still typecheck
+    // against this event shape during the migration window.
+    section: "profile" | "newsletter" | "notifications" | "subscription" | "security";
     entry: "url" | "nav_click" | "popstate";
   };
 
   // ───── Preferred category chip selector (PR preferred-categories) ─────
-  /** Fires every time a chip is toggled inside the /account/notifications
+  /** Fires every time a chip is toggled inside the /account/newsletter
    *  preference selector. `selected_categories_after` is the resulting
    *  array (post-change), so dashboards can compute the most-common
    *  picks without joining sequential events. Categories are the same

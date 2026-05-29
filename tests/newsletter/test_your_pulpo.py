@@ -164,7 +164,7 @@ def test_renderer_emits_your_pulpo_panel(pro_with_prefs, ranked_pool):
     assert 'class="yp-panel"' in html
     # Three URLs present + carry the ref param
     assert "/saved?ref=newsletter_issue_08" in html
-    assert "/account/notifications?ref=newsletter_issue_08" in html
+    assert "/account/newsletter?ref=newsletter_issue_08" in html
     assert "/browse?ref=newsletter_issue_08" in html
     # Eyebrow + title rendered
     assert "Your Pulpo" in html

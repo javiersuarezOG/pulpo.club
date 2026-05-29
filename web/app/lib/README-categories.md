@@ -5,7 +5,7 @@ concepts. They power **multiple surfaces**:
 
 - Discover shelves (`SHELVES` in [`../data.jsx`](../data.jsx))
 - Browse pill rail (`PILLS` in [`../data.jsx`](../data.jsx))
-- Account preference chip selector (`/account/notifications`)
+- Account preference chip selector (`/account/newsletter`)
 - Future weekly newsletter generator
 - Future personalization (Discover re-rank, alerts, etc.)
 
@@ -20,7 +20,7 @@ tones, so we don't try to share copy.
 
 The change-cost depends on *where* the category needs to show up.
 
-### To make a category user-selectable in `/account/notifications`
+### To make a category user-selectable in `/account/newsletter`
 
 1. Confirm the key is in `CATEGORY_KEYS` in `categories.ts`. If not,
    add it (see "Adding to the whole-app vocabulary" below).

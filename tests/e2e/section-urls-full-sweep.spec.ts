@@ -29,6 +29,10 @@ test.describe("Section URLs — full app sweep", () => {
     // get the same sign-in modal as /account; the URL must stay put so
     // post-signin AccountPage mounts straight on the right tab.
     { path: "/account/profile",        surface: ".account-page, .modal-signup",      modalExpected: true  },
+    { path: "/account/newsletter",     surface: ".account-page, .modal-signup",      modalExpected: true  },
+    // Legacy URL — parseLocation aliases it to the newsletter section
+    // so existing bookmarks + footer links in previously-sent issues
+    // survive without a 404 flash.
     { path: "/account/notifications",  surface: ".account-page, .modal-signup",      modalExpected: true  },
     { path: "/account/subscription",   surface: ".account-page, .modal-signup",      modalExpected: true  },
     { path: "/account/security",       surface: ".account-page, .modal-signup",      modalExpected: true  },
@@ -74,6 +78,7 @@ test.describe("Section URLs — full app sweep", () => {
     "/plans":                 /Plans|pricing|Planes/i,
     "/account":               /account|cuenta/i,
     "/account/profile":       /account|cuenta/i,
+    "/account/newsletter":    /account|cuenta/i,
     "/account/notifications": /account|cuenta/i,
     "/account/subscription":  /account|cuenta/i,
     "/account/security":      /account|cuenta/i,
@@ -149,22 +154,22 @@ test.describe("Section URLs — full app sweep", () => {
     });
     const errors = attachErrorRecorder(page);
 
-    // Cold-load on /account/notifications — URL must survive mount.
-    await page.goto("/account/notifications", { waitUntil: "networkidle" });
+    // Cold-load on /account/newsletter — URL must survive mount.
+    await page.goto("/account/newsletter", { waitUntil: "networkidle" });
     await page.locator(".account-nav").waitFor({ state: "visible", timeout: 10_000 });
-    expect(new URL(page.url()).pathname, "URL after cold-load").toBe("/account/notifications");
+    expect(new URL(page.url()).pathname, "URL after cold-load").toBe("/account/newsletter");
     await expect(
-      page.locator(".account-nav button").filter({ hasText: /Notifications|Notificaciones/ }),
-      "Notifications tab is active",
+      page.locator(".account-nav button").filter({ hasText: /Newsletter|Boletín/ }),
+      "Newsletter tab is active",
     ).toHaveClass(/is-active/);
 
     // Click Profile in the in-page nav → URL becomes /account/profile.
     await page.locator(".account-nav button").filter({ hasText: /Profile|Perfil/ }).click();
     await expect.poll(() => new URL(page.url()).pathname).toBe("/account/profile");
 
-    // Browser back → /account/notifications.
+    // Browser back → /account/newsletter.
     await page.goBack();
-    await expect.poll(() => new URL(page.url()).pathname).toBe("/account/notifications");
+    await expect.poll(() => new URL(page.url()).pathname).toBe("/account/newsletter");
 
     // Browser forward → /account/profile again.
     await page.goForward();

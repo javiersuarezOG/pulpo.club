@@ -982,7 +982,10 @@ const UI_STRINGS = {
   // "Home" to match the actual destination.
   "account.back":            { en: "← Back to Home",                es: "← Volver al Inicio" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
-  "account.notifications":   { en: "Notifications",                 es: "Notificaciones" },
+  // Renamed `notifications` → `newsletter` 2026-05-29. The legacy key
+  // is preserved for back-compat with cached bundles during rollout.
+  "account.notifications":   { en: "Newsletter",                    es: "Newsletter" },
+  "account.newsletter":      { en: "Newsletter",                    es: "Newsletter" },
   "account.subscription":    { en: "Manage Subscription",           es: "Suscripción" },
   "account.security":        { en: "Security",                      es: "Seguridad" },
   "account.profile.name":    { en: "Full name",                     es: "Nombre completo" },
@@ -1016,18 +1019,15 @@ const UI_STRINGS = {
                                     es: "No pudimos guardar tus preferencias — inténtalo de nuevo." },
   "account.notif.intro":     { en: "Choose what Pulpo sends you, and how.",
                                es: "Elige qué te envía Pulpo y cómo." },
-  // Honest framing for the Pro cohort — the cron in
-  // .github/workflows/pulpo-newsletter.yml runs every Monday today (the
-  // "Weekly Monday cadence" comment in the workflow). The team is moving
-  // toward fortnight gating in PR-NL-4; this copy stays accurate either
-  // way because the rendering still happens on Monday mornings.
-  "account.notif.cadence_note": { en: "We send a fortnightly newsletter on Monday mornings. Tune what you receive with the filters below.",
-                                   es: "Enviamos un boletín quincenal los lunes por la mañana. Ajusta qué recibes con los filtros de abajo." },
+  // Cadence is weekly (Sundays at 9 AM) post-2026-05-29; copy here
+  // reflects that.
+  "account.notif.cadence_note": { en: "Pulpo sends a weekly newsletter on Sunday mornings. Tune what you receive with the filters below.",
+                                   es: "Pulpo envía un boletín semanal los domingos por la mañana. Ajusta qué recibes con los filtros de abajo." },
 
   // Upsell card. Title + bullet text re-use "newsletter.title" deliberately
   // so the upsell mirrors what the user lands on once they convert.
-  "account.notif.newsletter.title":  { en: "Fortnightly newsletter",
-                                        es: "Boletín quincenal" },
+  "account.notif.newsletter.title":  { en: "Weekly newsletter",
+                                        es: "Boletín semanal" },
 
   // Preferred-category chip selector (PR-B). Rendered under the newsletter
   // toggle for Pro users; captures up to PREFERENCE_CATEGORIES_MAX picks
