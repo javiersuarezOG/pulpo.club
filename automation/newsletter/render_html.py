@@ -825,13 +825,20 @@ def _your_pulpo_html(issue: Issue) -> str:
 def _site_root_from_issue(issue: Issue) -> str:
     """Extract https://pulpo.club (or whatever PULPO_SITE_ROOT points at)
     from any of the absolute URLs already on the Issue. Avoids re-reading
-    the env var here — build_issue.py already resolved it once."""
-    candidate = (
-        (issue.unsubscribe_url or "").split("/unsubscribe", 1)[0]
-        or (issue.settings_url or "").split("/account", 1)[0]
-        or "https://pulpo.club"
-    )
-    return candidate.rstrip("/") or "https://pulpo.club"
+    the env var here — build_issue.py already resolved it once.
+
+    `settings_url` is the safest anchor because `/account` is a stable
+    SPA route (the unsubscribe URL is `/api/unsubscribe?...` post-2026-05-29,
+    so splitting on "/unsubscribe" would leave a stray "/api" suffix and
+    produce `https://pulpo.club/api/saved` etc. for the "Your Pulpo" links).
+    """
+    settings_part = (issue.settings_url or "").split("/account", 1)[0]
+    if settings_part:
+        return settings_part.rstrip("/") or "https://pulpo.club"
+    unsub_part = (issue.unsubscribe_url or "").split("/api/unsubscribe", 1)[0]
+    if unsub_part:
+        return unsub_part.rstrip("/") or "https://pulpo.club"
+    return "https://pulpo.club"
 
 
 def _next_issue_html(issue: Issue) -> str:
