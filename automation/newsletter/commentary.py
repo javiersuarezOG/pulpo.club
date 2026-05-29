@@ -160,19 +160,17 @@ def pick_callouts_for_listing(listing: dict, locale: Locale) -> list[dict]:
                 "body": " · ".join(bullets),
             })
 
-    zone_pct = listing.get("price_vs_zone_pct")
-    if isinstance(zone_pct, (int, float)) and abs(zone_pct) >= 15:
-        if zone_pct < 0:
-            out.append({
-                "label": "The price story" if locale == "en" else "El precio",
-                "body": (
-                    f"Listed at {abs(zone_pct):.0f}% below the zone median per m². "
-                    "Compare against the comps before assuming it's mispriced."
-                    if locale == "en"
-                    else f"Listado a {abs(zone_pct):.0f}% bajo la mediana por m². "
-                    "Compara con los comps antes de asumir mal precio."
-                ),
-            })
+    # v3.2 (2026-05-29) — DROPPED the "Price story" callout entirely.
+    # Sebas: "never repeat numbers." The same X% was getting stamped
+    # three times per pick:
+    #   1. cool-toned "−X% under area average" chip above the title
+    #   2. "Priced X% below the area average" bullet in the Why list
+    #      (also dropped in deterministic_why_for_pick — see that fn)
+    #   3. "Listed at X% below the zone median per m²" body in the
+    #      "Price story" callout right below the Why list
+    # The chip wins; the why-list and price-story echoes are gone.
+    # zone_pct stays addressable in the listing dict for downstream
+    # use, but no longer renders a callout here.
 
     rank_reasons = listing.get("rank_reasons") or []
     if rank_reasons:
@@ -217,19 +215,16 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
     en = locale == "en"
     out: list[str] = []
 
-    # 1) Below area average — meaningful only past 15% off.
-    pct = listing.get("price_vs_zone_pct")
-    if isinstance(pct, (int, float)) and pct <= -15:
-        n = abs(int(round(pct)))
-        beach_phrase = ""
-        if listing.get("is_walk_to_beach") or listing.get("is_beachfront"):
-            beach_phrase = " — rare for a lot this close to the beach" if en \
-                           else " — raro para un lote tan cerca de la playa"
-        out.append(
-            f"Priced {n}% below the area average{beach_phrase}"
-            if en
-            else f"Precio {n}% bajo el promedio del área{beach_phrase}"
-        )
+    # 1) v3.2 (2026-05-29) — DROPPED the "Priced N% below the area
+    # average" bullet. Same number already lives on the cool-toned
+    # "−N% under area average" chip above the listing title; emitting
+    # it again in the why-list bullets AND a third time in the "Price
+    # story" callout (also dropped in pick_callouts_for_listing) was
+    # the loudest dedupe issue in the v3.1 send. The chip is the
+    # canonical surface; this section now focuses on the OTHER reasons
+    # Pulpo picked the listing (beach proximity, readiness, freshness,
+    # property fit). If those signals are absent, the property-fit
+    # fallback at the bottom keeps the why-list from rendering empty.
 
     # 2) Recent price drop — concrete number, not "momentum".
     if listing.get("is_repriced"):
