@@ -36,6 +36,28 @@ class Preference:
 
 
 @dataclass
+class SavedListing:
+    """One entry in a recipient's saved-listings set.
+
+    Populated by subscribers.py from Clerk privateMetadata.saves[].
+    Legacy entries (pre-favorites-backend) live in Clerk as bare
+    listing-ID strings — the read path normalizes those to
+    SavedListing(id=..., saved_at=None, price_at_save_usd=None).
+
+    Newer entries (post-favorites-backend) come through enriched by
+    api/saves.js, which looks up ranked.json on the write path and
+    captures price + timestamp at save time. The newsletter pipeline
+    uses those baselines to compute "↓ Price dropped $X since you
+    saved it" deltas in the favorites section.
+    """
+
+    id: str                                      # "remax__001461165132"
+    saved_at: Optional[str] = None               # ISO 8601 string; None for legacy
+    price_at_save_usd: Optional[float] = None    # USD at save time; None for legacy
+    source: Optional[str] = None                 # "remax" / "essurf" / etc; redundant w/ id prefix
+
+
+@dataclass
 class Recipient:
     """A single newsletter recipient at send time.
 
@@ -55,6 +77,11 @@ class Recipient:
     # Clerk record) stay at 0. Defaults so older callers that build a
     # Recipient by hand don't have to pass it.
     saved_count: int = 0
+    # Favorites backend — the full enriched saves array. `saved_count`
+    # above stays addressable for the Your-Pulpo block; `saves` here
+    # carries the per-listing baselines (saved_at, price_at_save_usd)
+    # used by the favorites diff in commentary.compute_favorites.
+    saves: list[SavedListing] = field(default_factory=list)
 
 
 ChipKind = Literal["neutral", "warm", "cool"]
@@ -177,6 +204,49 @@ class YourPulpoState:
     filter_match_count: int = 0
 
 
+FavoriteState = Literal["price_dropped", "no_change", "off_market", "price_up"]
+
+
+@dataclass
+class FavoriteUpdate:
+    """One row in the "Your saved listings — what changed this week"
+    section. Each row maps to one of the recipient's saved listings,
+    enriched with the meaningful change since they saved it.
+
+    States (see commentary.compute_favorites for the picker logic):
+
+      • price_dropped — current price < price_at_save_usd. Carries
+        `delta_usd` (positive) for "↓ Price dropped $5,000". Only
+        emitted when both baselines are known.
+      • price_up — current price > price_at_save_usd. Same shape,
+        opposite direction. Rare; surfaced for honesty, not urgency.
+      • no_change — listing still on the market at the price the user
+        last saw. Carries `days_listed` for the "47 days listed" copy.
+      • off_market — saved listing no longer in ranked.json. Carries
+        `last_seen_price_usd` (price_at_save_usd) for the "Last seen
+        at $X" line.
+
+    `title`, `location_line`, `photo_url`, `listing_url`, `pulpo_url`
+    are populated from the current ranked.json row when available;
+    for off-market entries they fall back to whatever was captured at
+    save time (today: just the ID; future: snapshot at save).
+    """
+
+    state: FavoriteState
+    listing_id: str                              # "remax__001461165132"
+    title: str
+    location_line: str
+    photo_url: str
+    pulpo_url: str
+    # Numeric fields — only the relevant one is populated per state.
+    current_price_usd: Optional[float] = None    # price_dropped / no_change / price_up
+    price_at_save_usd: Optional[float] = None    # price_dropped / off_market / price_up
+    delta_usd: Optional[float] = None            # price_dropped / price_up (always positive)
+    days_listed: Optional[int] = None            # no_change
+    # Internal — kept for telemetry / debugging; not rendered directly.
+    saved_at: Optional[str] = None
+
+
 @dataclass
 class Issue:
     issue_id: str                                # YYYY-MM-DD of generation
@@ -198,3 +268,10 @@ class Issue:
     # PR-NL-8 — Your Pulpo block. Defaults so existing test fixtures
     # that build Issue by hand still work.
     your_pulpo: YourPulpoState = field(default_factory=YourPulpoState)
+    # Favorites backend — list of update rows to render in the
+    # "Your saved listings — what changed this week" section.
+    # Empty list → renderer skips the section entirely (mockup's
+    # "no saves → section skipped" edge case). Up to 3 rendered per
+    # issue; build_issue picks the most meaningful by state priority
+    # (price_dropped > off_market > price_up > no_change).
+    favorites: list[FavoriteUpdate] = field(default_factory=list)

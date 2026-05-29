@@ -21,11 +21,11 @@ Env contract:
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Iterable, Optional
 
 from .store import email_hash
-from .types import Locale, Preference, Recipient
+from .types import Locale, Preference, Recipient, SavedListing
 
 RESEND_API_BASE = "https://api.resend.com"
 CLERK_API_BASE = "https://api.clerk.com/v1"
@@ -126,6 +126,13 @@ class ClerkUser:
     # Stored as a count, not the actual ids, since the email only needs
     # the headline number ("3 saved listings from past issues").
     saved_count: int = 0
+    # Favorites backend — the FULL saves array, normalized to a list of
+    # `{id, saved_at?, price_at_save_usd?, source?}` dicts. Newer
+    # entries are emitted by api/saves.js with enrichment; older
+    # entries are bare ID strings and surface here with None baselines.
+    # The newsletter pipeline turns this into FavoriteUpdate rows for
+    # the "Your saved listings" section via commentary.compute_favorites.
+    saves: list[dict] = field(default_factory=list)
 
 
 def list_clerk_users(
@@ -179,16 +186,53 @@ def _parse_clerk_user(u: dict) -> Optional[ClerkUser]:
     # defensively so a missing or wrong-shaped value degrades to 0
     # rather than crashing the entire audience send.
     private_md = u.get("private_metadata") or u.get("privateMetadata") or {}
-    saves = private_md.get("saves") if isinstance(private_md, dict) else None
-    saved_count = len(saves) if isinstance(saves, list) else 0
+    raw_saves = private_md.get("saves") if isinstance(private_md, dict) else None
+    saves = _normalize_saves(raw_saves)
     return ClerkUser(
         id=str(u.get("id") or ""),
         email=email,
         first_name=(u.get("first_name") or u.get("firstName")) or None,
         plan=plan,
         profile=profile,
-        saved_count=saved_count,
+        saved_count=len(saves),
+        saves=saves,
     )
+
+
+def _normalize_saves(raw: Any) -> list[dict]:
+    """Coerce the mixed saves array into a list of enriched dicts.
+
+    privateMetadata.saves[] is a MIXED array (post-favorites-backend):
+      • Legacy entries: bare ID strings — `"remax__001461165132"`
+      • New entries: `{id, saved_at?, price_at_save_usd?, source?}`
+
+    Returns a flat list of normalized dicts. Always-present `id`,
+    optional baselines. Malformed entries (None, ints, dicts without
+    `id`) are dropped silently so a single bad record can't block the
+    rest of the recipient's favorites section.
+    """
+    if not isinstance(raw, list):
+        return []
+    out: list[dict] = []
+    for entry in raw:
+        if isinstance(entry, str) and entry:
+            out.append({"id": entry})
+            continue
+        if isinstance(entry, dict):
+            eid = entry.get("id")
+            if isinstance(eid, str) and eid:
+                normalized: dict = {"id": eid}
+                sa = entry.get("saved_at")
+                if isinstance(sa, str) and sa:
+                    normalized["saved_at"] = sa
+                pas = entry.get("price_at_save_usd")
+                if isinstance(pas, (int, float)) and pas > 0:
+                    normalized["price_at_save_usd"] = float(pas)
+                src = entry.get("source")
+                if isinstance(src, str) and src:
+                    normalized["source"] = src
+                out.append(normalized)
+    return out
 
 
 def _primary_email(u: dict) -> Optional[str]:
@@ -303,6 +347,12 @@ def join_recipients(
             has_account=True,
             preference=preference,
             saved_count=user.saved_count,
+            saves=[SavedListing(
+                id=s["id"],
+                saved_at=s.get("saved_at"),
+                price_at_save_usd=s.get("price_at_save_usd"),
+                source=s.get("source"),
+            ) for s in user.saves],
         )
         out.append(recipient)
     return out

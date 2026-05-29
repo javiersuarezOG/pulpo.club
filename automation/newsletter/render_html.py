@@ -28,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.2-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.3-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -256,6 +256,128 @@ table { border-collapse: collapse; }
 .callout .label { font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
 .callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
 .callout + .callout { margin-top: 12px; }
+
+/* ── Favorites section ────────────────────────────────────────────
+   "Your saved listings — what changed this week." Sits between the
+   welcome lede and the market context (highest-attention slot in the
+   issue). Renderer only emits the section when Issue.favorites is
+   non-empty; an empty list collapses to a no-op.
+
+   Email-safe layout: each card is a 2-column <table>, NOT the flex
+   layout the mockup at web/newsletter-with-saves-mockup.html uses
+   for browser preview. Flex doesn't survive Outlook / older Gmail. */
+.saves-wrap { background: var(--paper-2); border-top: 1px solid var(--line); }
+.saves-pad  { padding: 24px 36px 22px; }
+.saves-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--forest);
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.saves-h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.18;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.saves-summary {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 4px 0 16px;
+}
+.save-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0 0 10px;
+}
+.save-card-table { width: 100%; border-collapse: collapse; }
+.save-thumb-cell {
+  width: 96px;
+  vertical-align: top;
+  padding-right: 14px;
+}
+.save-thumb-cell img {
+  width: 96px;
+  height: 84px;
+  border-radius: 6px;
+  display: block;
+  object-fit: cover;
+}
+.save-thumb-fallback {
+  width: 96px;
+  height: 84px;
+  border-radius: 6px;
+  background: var(--paper-3);
+  display: block;
+}
+.save-body-cell { vertical-align: top; }
+.change-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.change-chip-warm  { background: #FBE6D8; color: #7A3D1F; }     /* price drop */
+.change-chip-calm  { background: #E8DFC6; color: #5A5650; }     /* no change  */
+.change-chip-sold  { background: #F5E3E0; color: #6B2C2C; }     /* off market */
+.change-chip-up    { background: #EDE7DB; color: #5A5650; }     /* price up   */
+.save-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1.22;
+  color: var(--ink);
+  margin: 2px 0 4px;
+}
+.save-meta {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+.save-price {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.save-price .struck {
+  color: var(--burgundy);
+  text-decoration: line-through;
+  font-size: 13px;
+  margin-left: 6px;
+  font-family: var(--font-sans);
+}
+.save-cta {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.saves-footer {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: 12px 0 0;
+}
+.saves-footer a { color: var(--clay); font-weight: 500; text-decoration: none; }
+.saves-footer a:hover { text-decoration: underline; }
+
 .paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
 .paywall-banner .eyebrow { color: var(--sage); }
 .paywall-banner .h2 { color: var(--paper); }
@@ -753,6 +875,236 @@ def _hydrate_pick_urls(paragraph: str, issue: Issue) -> str:
     return _ANCHOR_RE.sub(_resolve, paragraph)
 
 
+def _favorites_html(issue: Issue) -> str:
+    """Render the "Your saved listings — what changed this week" section.
+
+    Empty `issue.favorites` → empty string → renderer skips the
+    section block entirely (no border, no spacing leak). Cap is
+    enforced upstream in compute_favorites.
+
+    Sits between the hero/lede block and market context per the
+    mockup at web/newsletter-with-saves-mockup.html — the highest
+    attention slot for an existing-engaged user (Pro plan, has
+    saved listings before).
+    """
+    favorites = getattr(issue, "favorites", None) or []
+    if not favorites:
+        return ""
+
+    locale = issue.locale
+    en = locale == "en"
+
+    count = len(favorites)
+    eyebrow = (
+        "Your saved listings · this week" if en
+        else "Tus favoritos · esta semana"
+    )
+    if count == 1:
+        headline = "One you're following." if en else "Uno que sigues."
+    else:
+        word = _favorites_count_word(count, en)
+        headline = (
+            f"{word} you're following." if en
+            else f"{word} que sigues."
+        )
+
+    summary = _favorites_summary(favorites, locale)
+
+    cards = "".join(_favorite_card_html(u, locale) for u in favorites)
+
+    site = (issue.settings_url.split("/account")[0] if "/account" in issue.settings_url else "https://pulpo.club")
+    ref = f"?ref=newsletter_issue_{issue.issue_number:02d}"
+    saved_url = f"{site}/saved{ref}&from=favorites"
+    footer_count = issue.recipient.saved_count or count
+    if en:
+        footer_text = (
+            f"You're following {footer_count} listing{'s' if footer_count != 1 else ''}. "
+            f'<a href="{_e(saved_url)}">Open your favorites &rarr;</a>'
+        )
+    else:
+        word = "" if footer_count == 1 else "s"
+        footer_text = (
+            f"Sigues {footer_count} propiedad{'es' if footer_count != 1 else ''}. "
+            f'<a href="{_e(saved_url)}">Abre tus favoritos &rarr;</a>'
+        )
+
+    return f"""
+    <tr><td class="saves-wrap">
+      <div class="saves-pad">
+        <p class="saves-eyebrow">{_e(eyebrow)}</p>
+        <h2 class="saves-h2">{_e(headline)}</h2>
+        <p class="saves-summary">{summary}</p>
+        {cards}
+        <p class="saves-footer">{footer_text}</p>
+      </div>
+    </td></tr>
+    """
+
+
+def _favorites_count_word(n: int, en: bool) -> str:
+    """Editorial numeral for the saves headline. Matches the v3.2
+    lede convention (digits read as a stat strip, words as a sentence)."""
+    en_words = {2: "Two", 3: "Three", 4: "Four"}
+    es_words = {2: "Dos", 3: "Tres", 4: "Cuatro"}
+    return (en_words.get(n) or str(n)) if en else (es_words.get(n) or str(n))
+
+
+def _favorites_summary(favorites: list, locale: str) -> str:
+    """Build the qualitative one-line summary above the cards.
+
+    Mockup: "One had a price drop, one's still where you left it,
+    and one came off the market." The summary is composed from the
+    actual state counts so it stays truthful (no fabricated drama
+    when nothing actually moved).
+    """
+    en = locale == "en"
+    counts = {"price_dropped": 0, "no_change": 0, "off_market": 0, "price_up": 0}
+    for u in favorites:
+        counts[u.state] = counts.get(u.state, 0) + 1
+
+    if en:
+        parts: list[str] = []
+        if counts["price_dropped"]:
+            parts.append(_count_phrase(counts["price_dropped"], "had a price drop", "had price drops", en=True))
+        if counts["off_market"]:
+            parts.append(_count_phrase(counts["off_market"], "came off the market", "came off the market", en=True))
+        if counts["price_up"]:
+            parts.append(_count_phrase(counts["price_up"], "moved up in price", "moved up in price", en=True))
+        if counts["no_change"]:
+            parts.append(
+                _count_phrase(counts["no_change"], "is still where you left it", "are still where you left them", en=True)
+            )
+        return _join_with_and(parts, "and") + "."
+    parts_es: list[str] = []
+    if counts["price_dropped"]:
+        parts_es.append(_count_phrase(counts["price_dropped"], "bajó de precio", "bajaron de precio", en=False))
+    if counts["off_market"]:
+        parts_es.append(_count_phrase(counts["off_market"], "salió del mercado", "salieron del mercado", en=False))
+    if counts["price_up"]:
+        parts_es.append(_count_phrase(counts["price_up"], "subió de precio", "subieron de precio", en=False))
+    if counts["no_change"]:
+        parts_es.append(_count_phrase(counts["no_change"], "sigue donde la dejaste", "siguen donde las dejaste", en=False))
+    return _join_with_and(parts_es, "y") + "."
+
+
+def _count_phrase(n: int, singular: str, plural: str, *, en: bool) -> str:
+    if n == 1:
+        return ("One " if en else "Una ") + singular
+    word_en = {2: "Two", 3: "Three", 4: "Four"}.get(n, str(n))
+    word_es = {2: "Dos", 3: "Tres", 4: "Cuatro"}.get(n, str(n))
+    return ((word_en if en else word_es) + " ") + plural
+
+
+def _join_with_and(parts: list[str], conj: str) -> str:
+    if not parts:
+        return ""
+    if len(parts) == 1:
+        return parts[0]
+    if len(parts) == 2:
+        return f"{parts[0]} {conj} {parts[1]}"
+    return ", ".join(parts[:-1]) + f", {conj} {parts[-1]}"
+
+
+def _favorite_card_html(u, locale: str) -> str:
+    """Render one card. Layout: 2-column table (thumb 96px + body),
+    email-safe. CSS classes carry the visual style; inline `style`
+    used only for fallback thumbnail color (variable per state).
+    """
+    en = locale == "en"
+
+    # Change chip — one per state, kept terse so the card scans fast.
+    if u.state == "price_dropped":
+        amount = _format_price_compact(u.delta_usd or 0)
+        chip_text = (f"&darr; Price dropped {amount} since you saved it" if en
+                     else f"&darr; Bajó {amount} desde que la guardaste")
+        chip_class = "change-chip change-chip-warm"
+    elif u.state == "off_market":
+        chip_text = "Marked off-market this week" if en else "Salió del mercado esta semana"
+        chip_class = "change-chip change-chip-sold"
+    elif u.state == "price_up":
+        amount = _format_price_compact(u.delta_usd or 0)
+        chip_text = (f"&uarr; Price moved up {amount} since you saved it" if en
+                     else f"&uarr; Subió {amount} desde que la guardaste")
+        chip_class = "change-chip change-chip-up"
+    else:  # no_change
+        if u.days_listed is not None:
+            chip_text = (f"Still on market &middot; {u.days_listed} day{'s' if u.days_listed != 1 else ''} listed" if en
+                         else f"Sigue en el mercado &middot; {u.days_listed} día{'s' if u.days_listed != 1 else ''} listada")
+        else:
+            chip_text = "Still on market" if en else "Sigue en el mercado"
+        chip_class = "change-chip change-chip-calm"
+
+    # Price line — varies by state.
+    if u.state == "price_dropped" and u.current_price_usd is not None and u.price_at_save_usd is not None:
+        price_line = (
+            f'{_format_price_full(u.current_price_usd)}'
+            f' <span class="struck">{_format_price_full(u.price_at_save_usd)}</span>'
+        )
+    elif u.state == "off_market" and u.price_at_save_usd is not None:
+        price_line = (
+            f"Last seen at {_format_price_full(u.price_at_save_usd)}" if en
+            else f"Visto por última vez a {_format_price_full(u.price_at_save_usd)}"
+        )
+    elif u.current_price_usd is not None:
+        price_line = _format_price_full(u.current_price_usd)
+    elif u.price_at_save_usd is not None:
+        price_line = _format_price_full(u.price_at_save_usd)
+    else:
+        price_line = "&mdash;"
+
+    # CTA — off-market routes to /saved; everything else to the listing.
+    if u.state == "off_market":
+        cta_text = "See your favorites &rarr;" if en else "Ver tus favoritos &rarr;"
+    else:
+        cta_text = "See on Pulpo &rarr;" if en else "Verla en Pulpo &rarr;"
+
+    photo_block = (
+        f'<img src="{_e(u.photo_url)}" alt="" />'
+        if u.photo_url
+        else '<span class="save-thumb-fallback" aria-hidden="true"></span>'
+    )
+
+    title_esc = _e(u.title) if u.title else ""
+    location_esc = _e(u.location_line) if u.location_line else ""
+
+    return f"""
+        <div class="save-card">
+          <table class="save-card-table" role="presentation"><tr>
+            <td class="save-thumb-cell">{photo_block}</td>
+            <td class="save-body-cell">
+              <span class="{chip_class}">{chip_text}</span>
+              <p class="save-title">{title_esc}</p>
+              {f'<p class="save-meta">{location_esc}</p>' if location_esc else ''}
+              <p class="save-price">{price_line}</p>
+              <a class="save-cta" href="{_e(u.pulpo_url)}">{cta_text}</a>
+            </td>
+          </tr></table>
+        </div>
+"""
+
+
+def _format_price_full(amount: float) -> str:
+    return f"${int(round(amount)):,}"
+
+
+def _format_price_compact(amount: float) -> str:
+    """`$1,250` → `$1,250` ; `$25,000` → `$25k` ; `$250,000` → `$250k`.
+
+    The delta chip in the favorites section is tight on width — a
+    compact representation reads cleaner than full thousands."""
+    n = int(round(abs(amount)))
+    if n < 1000:
+        return f"${n}"
+    if n < 100_000:
+        # 1,000–99,999: keep one comma group when the leading digit is
+        # ambiguous (e.g. $5k vs $5,400). Fallback to k-form for round.
+        if n % 1000 == 0:
+            return f"${n // 1000}k"
+        return f"${n:,}"
+    # 100,000+: always k.
+    return f"${n // 1000}k"
+
+
 def _market_html(issue: Issue) -> str:
     paras = issue.commentary.market_context
     if not paras:
@@ -1026,6 +1378,7 @@ def render_html(issue: Issue) -> str:
   <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
     {header_strip}
     {hero_block}
+    {_favorites_html(issue)}
     {_market_html(issue)}
     {rich_html}
     {_paywall_banner_html(issue)}
