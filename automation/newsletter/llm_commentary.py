@@ -159,7 +159,11 @@ def _facts_for_prompt(
         tc = tc_raw if isinstance(tc_raw, dict) else {}
         title = tc.get(locale) or tc.get("en") or li.get("title")
         return {
-            "rank": li.get("rank"),
+            # `rank` here is the PER-ISSUE rank (1..10), not the global
+            # ranker rank. The LLM prompt's `PICK_URL_N` placeholder
+            # convention expects this value; the renderer maps it back
+            # to the pick's pulpo_url at render time.
+            "rank": li.get("_issue_rank") or li.get("rank"),
             "title": title,
             "zone": li.get("zone"),
             "municipality": li.get("municipality"),

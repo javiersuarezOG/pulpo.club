@@ -16,6 +16,7 @@ field crashing the renderer would break the entire batch.
 
 from __future__ import annotations
 
+import re as _re
 from html import escape as _e
 
 from . import i18n
@@ -27,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.0-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.1-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -330,7 +331,7 @@ def _pills_html(pills: list[str]) -> str:
 def _chips_html(pick: IssuePick) -> str:
     """Render Chip objects (warm/cool/neutral/top) into the email.
 
-    v3: the "★ Top pick this fortnight" chip — emitted by
+    v3: the "★ Top pick this week" chip — emitted by
     build_issue._chips_for_listing with `kind=cool` for the top N — is
     promoted visually to the forest-on-cream `chip-top` treatment when
     its label starts with the star glyph. The detection is label-based
@@ -682,6 +683,56 @@ def _skip_block_html(issue: Issue) -> str:
     """
 
 
+# Matches a full anchor: `<a href="…">…</a>`. Captures the href and the
+# inner text. Used for the post-processing pass over LLM /
+# deterministic market-context paragraphs.
+_ANCHOR_RE = _re.compile(
+    r'<a\s+href="([^"]*)"[^>]*>(.*?)</a>',
+    flags=_re.IGNORECASE | _re.DOTALL,
+)
+_PICK_URL_RE = _re.compile(r"^PICK_URL_(\d+)$")
+
+
+def _hydrate_pick_urls(paragraph: str, issue: Issue) -> str:
+    """Resolve `PICK_URL_<N>` placeholders in market-context paragraphs.
+
+    Source paths producing placeholders:
+      • `commentary.deterministic_market_note` emits
+        `<a href="PICK_URL_3">…</a>` around property phrases.
+      • `llm_commentary`'s system prompt instructs DeepSeek to use the
+        same convention; the renderer is what makes them real.
+
+    For each `<a href="X">text</a>` we encounter:
+      • X is `PICK_URL_<N>` AND N maps to a known pick → emit
+        `<a href="<pulpo_url>">text</a>`.
+      • X is `PICK_URL_<N>` but N is unknown (LLM hallucinated a rank
+        outside the issue) → drop the wrapper, keep `text`.
+      • X is anything else (LLM invented a literal URL) → drop the
+        wrapper, keep `text`. Defensive guard so the email never ships
+        a link to a URL the system didn't authorize.
+    """
+    # Build rank → pulpo_url lookup once. Includes rich + shortlist
+    # picks so the LLM can link into either; paywalled picks excluded
+    # because the reader can't open them anyway.
+    rank_to_url: dict[int, str] = {}
+    for p in list(issue.picks_top) + list(issue.picks_shortlist):
+        if p.rank and p.pulpo_url and not p.paywalled:
+            rank_to_url[p.rank] = p.pulpo_url
+
+    def _resolve(match: _re.Match) -> str:
+        href, text = match.group(1), match.group(2)
+        m = _PICK_URL_RE.match(href)
+        if not m:
+            return text  # invented URL — strip wrapper, keep text
+        rank = int(m.group(1))
+        url = rank_to_url.get(rank)
+        if not url:
+            return text  # unknown rank — strip wrapper, keep text
+        return f'<a href="{url}">{text}</a>'
+
+    return _ANCHOR_RE.sub(_resolve, paragraph)
+
+
 def _market_html(issue: Issue) -> str:
     paras = issue.commentary.market_context
     if not paras:
@@ -689,17 +740,16 @@ def _market_html(issue: Issue) -> str:
     locale = issue.locale
     eb = i18n.t("market.eyebrow", locale)
     hl = i18n.t("market.headline", locale)
-    # PR-NL-7a: the first paragraph is the warm market note that may
-    # contain a single <em>...</em> span — don't html-escape it. Source
-    # is either deterministic_market_note (known-good HTML) or
-    # llm_commentary (prompt enforces only <em> tags, no other markup).
-    # Subsequent paragraphs stay plain text and ARE escaped.
+    # The market paragraph(s) may contain <em>...</em> spans plus
+    # `<a href="PICK_URL_N">…</a>` placeholders. Resolve the
+    # placeholders against real picks BEFORE rendering. `_hydrate_pick_urls`
+    # also strips any other <a> tags as a defensive measure against the LLM
+    # inventing URLs. Don't html-escape after hydration — `<em>` and
+    # `<a href>` are part of the trusted output shape.
     para_html_parts: list[str] = []
-    for i, para in enumerate(paras):
-        if i == 0:
-            para_html_parts.append(f'<p class="body">{para}</p>')
-        else:
-            para_html_parts.append(f'<p class="body">{_e(para)}</p>')
+    for para in paras:
+        hydrated = _hydrate_pick_urls(para, issue)
+        para_html_parts.append(f'<p class="body">{hydrated}</p>')
     para_html = "".join(para_html_parts)
     return f"""
     <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">

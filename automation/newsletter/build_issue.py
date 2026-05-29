@@ -30,7 +30,11 @@ from .types import (
 ISSUE_DEFAULT_TOP_N = 10
 ISSUE_TOP_PICKS_RICH = 3   # picks rendered with a full hero image + callouts (was 2 pre PR-NL-5)
 ISSUE_CHIPS_PER_PICK = 4   # max supportive chips alongside the hero / pick
-DEFAULT_WINDOW_DAYS = 14
+# Cadence is weekly (post-2026-05-29); 7-day lookback matches that.
+# Older `DEFAULT_WINDOW_DAYS = 14` was a holdover from the original
+# fortnightly plan and would have labelled 8–14 day-old listings as
+# "new this week" on cold-start sends.
+DEFAULT_WINDOW_DAYS = 7
 
 LLM_TOGGLE_ENV = "PULPO_NEWSLETTER_USE_LLM"
 
@@ -529,7 +533,7 @@ def _chips_for_listing(
     # ── cool ── strong positive signals ──────────────────────────────
     if rank > 0 and rank <= rank_threshold_top:
         chips.append(Chip(
-            label="★ Top pick this fortnight" if locale == "en" else "★ Selección destacada",
+            label="★ Top pick this week" if locale == "en" else "★ Selección destacada",
             kind="cool",
         ))
 
@@ -852,6 +856,15 @@ def build_issue(
             top_n=ISSUE_DEFAULT_TOP_N - len(kept_listings),
         )[0]
         kept_listings = kept_listings + fallback
+
+    # Tag each kept listing with its per-issue rank (1..N). The market-note
+    # generator in commentary.py reads `_issue_rank` to emit
+    # `PICK_URL_<rank>` placeholders inside its <a href> tags; the renderer
+    # then swaps those placeholders for the real pulpo_urls. Tagging here
+    # (after the fallback top-up) ensures the rank matches what the
+    # per-pick rendering uses below.
+    for i, listing in enumerate(kept_listings):
+        listing["_issue_rank"] = i + 1
 
     # ── Cohort-aware paywall flag ───────────────────────────────────────
     # free_prefs and free-logged-in users get pick #1 photo+headline only;

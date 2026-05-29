@@ -75,7 +75,8 @@ def test_render_anonymous_has_welcome_cta(anonymous, ranked_pool):
     assert anonymous.email_hash in html
     # No named greeting
     assert "Hand-picked for " not in html
-    assert "Hand-picked this fortnight" in html or "The 10 best, this fortnight" in html
+    # v3.1 (2026-05-29): cadence flipped to weekly across all hero copy.
+    assert "Hand-picked this week" in html or "The 10 best, this week" in html
 
 
 def test_render_es_locale_has_no_english_canary(pro_with_prefs, ranked_pool):
@@ -83,9 +84,10 @@ def test_render_es_locale_has_no_english_canary(pro_with_prefs, ranked_pool):
     html = _render(pro_with_prefs, ranked_pool)
     leaked = [c for c in ENGLISH_CANARIES if c in html]
     assert not leaked, f"English canaries leaked into ES render: {leaked}"
-    # And the Spanish hero copy is there. PR-NL-7a moved the lede to
-    # the welcome teaser ("Empieza por #01 — …"); anchor on that phrase.
-    assert "Empieza por" in html
+    # v3.1 (2026-05-29): the welcome teaser was dropped in favour of a
+    # structural intro line ("3 lecturas completas — seleccionadas de
+    # la revisión de esta semana."). Anchor on the new Spanish phrase.
+    assert "lecturas completas" in html or "revisión de esta semana" in html
 
 
 def test_render_no_unfilled_placeholders(pro_with_prefs, ranked_pool):

@@ -139,10 +139,12 @@ def test_locale_propagates_through_commentary(pro_with_prefs, ranked_pool):
         history_rows=[],
     )
     assert issue.locale == "es"
-    # PR-NL-7a: lede_hero is now the welcome teaser ("Empieza por #01 — …").
-    # Spanish anchor: "Empieza por" + a pick reference.
-    assert "Empieza por" in issue.commentary.lede_hero
-    assert "#01" in issue.commentary.lede_hero
+    # v3.1 (2026-05-29): lede_hero is now the structural intro
+    # ("3 lecturas completas, … — seleccionadas de la revisión de esta
+    # semana."). Welcome teaser dropped; Spanish anchor moved to the
+    # structural intro phrase.
+    assert "lecturas completas" in issue.commentary.lede_hero
+    assert "esta semana" in issue.commentary.lede_hero
 
 
 def test_repriced_listing_can_repeat(make_listing, pro_with_prefs):

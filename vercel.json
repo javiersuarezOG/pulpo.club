@@ -55,6 +55,7 @@
     { "source": "/l/:token",                "destination": "/api/l/:token" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/newsletter-v3-preview",   "destination": "/web/newsletter-v3-live-preview.html" },
+    { "source": "/newsletter-v31-preview",  "destination": "/web/newsletter-v31-live-preview.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/api/404" }
   ],
   "redirects": [

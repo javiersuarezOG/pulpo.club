@@ -95,45 +95,15 @@ def deterministic_commentary(
         skip_blurb = " · ".join(bits).capitalize() + "."
 
     # Market context ─────────────────────────────────────────────────────
-    # PR-NL-7a: the first paragraph is the warm one-sentence "buyer's
-    # fortnight" market note (matches v2.4 mockup). The older data-stat
-    # paragraphs follow it as supporting detail — readers who care about
-    # the numbers see them; everyone else gets the warm read.
+    # v3.1 (2026-05-29): collapsed to ONE paragraph. The v2.8 send
+    # surfaced four paragraphs — a warm framing line plus three data
+    # stats — and Sebas's review called the data-stat paragraphs
+    # redundant filler. The single paragraph now names the most
+    # striking 1–2 picks of the week (with links the renderer wires
+    # in), and stops.
     market: list[str] = []
     if picks:
         market.append(deterministic_market_note(picks, locale))
-        # 1) freshness: how many of the kept picks are new this week
-        new_count = sum(1 for p in picks if p.get("_is_new_window"))
-        if new_count:
-            market.append(
-                f"{new_count} of these {len(picks)} listings landed inside the last 14 days."
-                if locale == "en"
-                else f"{new_count} de estas {len(picks)} apareció en los últimos 14 días."
-            )
-        # 2) value spread: median price vs zone delta on the kept list
-        deltas = [p.get("price_vs_zone_pct") for p in picks if isinstance(p.get("price_vs_zone_pct"), (int, float))]
-        if deltas:
-            med = statistics.median(deltas)
-            if med < -10:
-                market.append(
-                    f"Median pick prices {abs(med):.0f}% below the zone median — the issue leans value over polish."
-                    if locale == "en"
-                    else f"Las selecciones están {abs(med):.0f}% bajo la mediana de zona — esta edición se inclina al valor sobre el acabado."
-                )
-            elif med > 10:
-                market.append(
-                    f"Median pick is priced {med:.0f}% above zone — quality over discount this week."
-                    if locale == "en"
-                    else f"Las selecciones están {med:.0f}% sobre la zona — calidad por encima de descuento."
-                )
-        # 3) momentum hint: any repriced?
-        repriced = sum(1 for p in picks if p.get("is_repriced"))
-        if repriced:
-            market.append(
-                f"{repriced} listings have moved on price since first scan — the sellers are negotiable."
-                if locale == "en"
-                else f"{repriced} propiedades han movido el precio — los vendedores están abiertos."
-            )
 
     # One-number block ──────────────────────────────────────────────────
     one_title: Optional[str] = None
@@ -747,101 +717,187 @@ def _welcome_pick_hook(pick: dict, locale: Locale) -> str:
 
 
 def deterministic_welcome_teaser(picks: list[dict], locale: Locale = "en") -> str:
-    """Build the warm welcome lede that name-checks the first 3 picks.
+    """Single structural intro line that orients the reader to the issue.
 
-    Mirrors the v2.4 mockup:
+    v3.1 (2026-05-29): replaced the v2.4 "Start with #01… #02 is…"
+    welcome teaser. Sebas's review of the v2.8 send called the prior
+    teaser redundant — it repeated what the per-pick sections show in
+    full just below. The new intro tells the reader the *shape* of the
+    issue (three full reads, seven worth a quick look) instead of
+    pre-summarising the picks. Less repetition, more clarity about
+    what's coming.
 
-      "Start with #01 — ocean view, a twenty-minute walk from El Tunco,
-       priced like the seller actually wants to sell. #02 is a coffee
-       farm with two rivers in the mountains, hard to look away from.
-       And #03 just had its first price drop in two weeks."
-
-    The renderer styles this in serif italic — so even the
-    deterministic version reads warm despite the templated grammar.
+    The renderer still styles this in italic serif so the single
+    structural clause keeps the warm typographic anchor without the
+    redundant copy.
     """
     if not picks:
         return ""
     en = locale == "en"
-    teased = picks[:3]
-    parts: list[str] = []
-    for i, pick in enumerate(teased):
-        hook = _welcome_pick_hook(pick, locale)
-        if i == 0:
-            parts.append(f"Start with <em>#01</em> — {hook}." if en else f"Empieza por <em>#01</em> — {hook}.")
-        elif i == 1:
-            parts.append(f"<em>#02</em> is {hook}." if en else f"<em>#02</em> es {hook}.")
-        else:
-            parts.append(f"And <em>#03</em> {hook}." if en else f"Y <em>#03</em> {hook}.")
-    return " ".join(parts)
+    n = len(picks)
+    rich = min(3, n)
+    rest = max(0, n - rich)
+    if en:
+        if rest:
+            return (
+                f"<em>{rich} full reads, {rest} worth a quick look</em> — "
+                f"hand-picked from this week's scan."
+            )
+        return f"<em>{rich} full reads</em> — hand-picked from this week's scan."
+    if rest:
+        return (
+            f"<em>{rich} lecturas completas, {rest} que vale la pena ver</em> — "
+            f"seleccionadas de la revisión de esta semana."
+        )
+    return f"<em>{rich} lecturas completas</em> — seleccionadas de la revisión de esta semana."
+
+
+def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = True) -> str:
+    """A short descriptive phrase for one pick, optionally wrapped in a
+    PICK_URL placeholder anchor.
+
+    Examples (EN):
+      • 76,259 m² lot in El Zonte at $19.67/m² — 84% below the area average
+      • beachfront home in La Libertad at $900,000
+
+    Engineered to read naturally inside the market-note sentence (no
+    leading article — caller adds "a"/"the" so noun-article agreement
+    stays clean across locales). The renderer replaces `PICK_URL_<rank>`
+    with the real pulpo_url at render time.
+    """
+    en = locale == "en"
+    rank = pick.get("_issue_rank") if isinstance(pick.get("_issue_rank"), int) else None
+    municipality = pick.get("municipality") or pick.get("department") or ""
+    pt = pick.get("property_type")
+    pct = pick.get("price_vs_zone_pct")
+    price_usd = pick.get("price_usd")
+    ppm = pick.get("price_per_m2")
+    area = pick.get("area_m2")
+    is_beachfront = bool(pick.get("is_beachfront"))
+
+    bits: list[str] = []
+    if pt == "land" and isinstance(area, (int, float)) and area >= 100:
+        bits.append(f"{int(area):,} m² lot" if en else f"lote de {int(area):,} m²")
+    elif is_beachfront and pt in ("house", "condo"):
+        bits.append("beachfront home" if en else "casa frente al mar")
+    elif pt in ("house", "condo"):
+        bits.append(("home" if pt == "house" else "condo") if en else ("casa" if pt == "house" else "condominio"))
+    else:
+        bits.append("property" if en else "propiedad")
+
+    if municipality:
+        bits.append(f"in {municipality}" if en else f"en {municipality}")
+
+    if pt == "land" and isinstance(ppm, (int, float)) and ppm > 0:
+        bits.append(f"at ${ppm:,.2f}/m²" if en else f"a ${ppm:,.2f}/m²")
+    elif isinstance(price_usd, (int, float)):
+        bits.append(f"at ${int(price_usd):,}" if en else f"a ${int(price_usd):,}")
+
+    if isinstance(pct, (int, float)) and pct <= -15:
+        n = abs(int(round(pct)))
+        bits.append(f"— {n}% below the area average" if en else f"— {n}% bajo el promedio del área")
+
+    phrase = " ".join(bits)
+
+    if with_link and isinstance(rank, int) and 1 <= rank <= 10:
+        # PICK_URL_<rank> is a template token; render_html replaces it
+        # with the actual pulpo_url before the email goes out.
+        return f'<a href="PICK_URL_{rank}">{phrase}</a>'
+    return phrase
 
 
 def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
-    """The warm one-sentence market note in the v2.4 mockup ('It's a
-    buyer's week in La Libertad…').
+    """One data-rich market paragraph that names the most striking 1–2
+    picks of the week, with each property mention wrapped in a
+    `PICK_URL_<rank>` placeholder the renderer replaces with the real
+    pulpo_url before mailing.
 
-    Pattern-matches against the picks Pulpo selected this week:
-      • repriced_count / len(picks) — share of picks that just dropped
-      • below_zone_count / len(picks) — share priced under area median
-      • new_listing_count — share that landed in the last 14 days
+    v3.1 (2026-05-29): collapsed the v2.8 multi-paragraph structure
+    (warm framing + freshness stat + median delta + repricing count)
+    into a single concrete paragraph. Sebas's review of the v2.8 send
+    flagged the earlier "Pulpo scanned 863 properties…" + "If you're
+    looking for a deal…" paragraphs as redundant filler. The single
+    paragraph below leads with the most striking discount, optionally
+    names a second distinct pick (beachfront, slow-mover, etc.), and
+    stops. The intro lede tells the reader the shape of the issue;
+    this paragraph tells them the headline of the data.
 
-    When the data is unusually friendly to buyers (≥ 40% repriced or
-    a strong below-zone median), surfaces the "buyer's week"
-    framing. When it's tighter, gives an honest read instead of
-    fabricating urgency.
+    Every claim maps to a real Listing field — no invented stats.
+    Picks must be tagged with `_issue_rank` (1..N) so the placeholder
+    substitution can look up the matching pulpo_url; build_issue does
+    this tagging right before calling here.
     """
     if not picks:
         return ""
     en = locale == "en"
 
-    repriced = sum(1 for p in picks if p.get("is_repriced"))
-    new_listings = sum(1 for p in picks if p.get("_is_new_window"))
-    n = len(picks)
+    # Pick #1 — deepest discount that's concrete enough to describe.
+    discount_pick = None
+    deepest_pct = 0.0
+    for p in picks:
+        pct = p.get("price_vs_zone_pct")
+        if isinstance(pct, (int, float)) and pct < deepest_pct:
+            deepest_pct = pct
+            discount_pick = p
 
-    # The most striking pattern wins the framing.
-    if repriced >= max(2, n * 0.4):
-        return (
-            "It's a buyer's week. <em>Almost twice as many sellers lowered "
-            "their prices this week as a normal week.</em> "
-            "If you're getting close on a listing — this is a good week to make the call."
-            if en
-            else
-            "Es una semana de compradores. <em>Casi el doble de vendedores bajaron "
-            "su precio esta semana de lo normal.</em> "
-            "Si estás cerca de hacer una oferta — esta es una buena semana para llamarla."
-        )
+    # Pick #2 — most distinct pick that ISN'T the discount one.
+    distinct_pick = None
+    for p in picks:
+        if p is discount_pick:
+            continue
+        if p.get("is_beachfront"):
+            distinct_pick = p
+            break
+    if distinct_pick is None:
+        for p in picks:
+            if p is discount_pick:
+                continue
+            if p.get("is_repriced") and (p.get("days_listed") or 0) >= 60:
+                distinct_pick = p
+                break
 
-    if new_listings >= max(3, n * 0.4):
-        return (
-            "Fresh inventory landed this week. <em>Several of these listings are "
-            "less than two weeks old.</em> "
-            "The early window matters — listings priced to move don't stay around."
-            if en
-            else
-            "Llegó inventario fresco esta semana. <em>Varias de estas propiedades tienen "
-            "menos de dos semanas.</em> "
-            "La ventana temprana importa — las propiedades bien valoradas no se quedan."
-        )
-
-    # Quieter fortnight — give a calm read instead of fabricating drama.
-    import statistics
-    deltas = [p.get("price_vs_zone_pct") for p in picks if isinstance(p.get("price_vs_zone_pct"), (int, float))]
-    if deltas:
-        med = statistics.median(deltas)
-        if med < -15:
+    if discount_pick is None:
+        # No striking discount — give a calm read of inventory state.
+        new_listings = sum(1 for p in picks if p.get("_is_new_window"))
+        if new_listings >= max(2, len(picks) // 3):
             return (
-                f"<em>The median pick in this issue is {abs(med):.0f}% under the area average.</em> "
-                "Less drama, more value — worth slowing down to read each one."
+                f"<em>Fresh inventory landed this week — {new_listings} of these "
+                f"{len(picks)} listings are less than seven days old.</em> "
+                "The early window matters; listings priced to move don't stay around."
                 if en
                 else
-                f"<em>La selección mediana de esta edición está {abs(med):.0f}% bajo el promedio del área.</em> "
-                "Menos drama, más valor — vale la pena leer cada una con calma."
+                f"<em>Llegó inventario fresco esta semana — {new_listings} de estas "
+                f"{len(picks)} propiedades tienen menos de siete días.</em> "
+                "La ventana temprana importa; las propiedades bien valoradas no se quedan."
             )
+        return (
+            "<em>A quieter week than usual — inventory is steady, prices are holding.</em> "
+            "Worth saving anything close to your filter so Pulpo can flag the next move."
+            if en
+            else
+            "<em>Una semana más tranquila — el inventario es estable, los precios se sostienen.</em> "
+            "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
+        )
 
+    discount_phrase = _market_property_phrase(discount_pick, locale, with_link=True)
+    if distinct_pick is not None:
+        distinct_phrase = _market_property_phrase(distinct_pick, locale, with_link=True)
+        if en:
+            return (
+                f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+                f"In a different lane, {distinct_phrase} is also worth a look."
+            )
+        return (
+            f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+            f"En otro carril, {distinct_phrase} también vale la pena revisar."
+        )
+
+    if en:
+        return (
+            f"<em>The most aggressive discount this week is {discount_phrase}.</em> "
+            "Worth a closer look before someone else moves on it."
+        )
     return (
-        "A quieter week than usual. <em>Inventory is steady, prices are holding.</em> "
-        "Worth saving anything close to your filter so Pulpo can flag the next move."
-        if en
-        else
-        "Una semana más tranquila de lo usual. <em>El inventario es estable, los precios se sostienen.</em> "
-        "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
+        f"<em>El descuento más agresivo esta semana es {discount_phrase}.</em> "
+        "Vale la pena revisarla antes de que alguien más se mueva."
     )

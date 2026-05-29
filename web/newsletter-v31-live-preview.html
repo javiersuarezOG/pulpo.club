@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="x-pulpo-template" content="newsletter-v3.1-2026-05" />
+<title>Pulpo — Issue 07 · 29 May 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --paper:        #F4EFE6;
+  --paper-2:      #F8F4EC;
+  /* v3 — bumped from #EEE9DF. The paler tone was so close to --paper that
+     chip backgrounds were nearly invisible against the cream page. Hex
+     literal lives in `.chip` directly below for the same reason. */
+  --paper-3:      #E8DFC6;
+  --white:        #FFFFFF;
+  --ink:          #1A1916;
+  --ink-2:        #5A5650;
+  --ink-3:        #888780;
+  --line:         rgba(0, 0, 0, 0.08);
+  --line-2:       rgba(0, 0, 0, 0.14);
+  --forest:       #1F3D31;
+  --forest-mid:   #3D6450;
+  --sage:         #DDE9DC;
+  --sage-strong:  #C9DEC6;
+  --clay:         #B8643C;
+  --clay-deep:    #7A3D1F;
+  --navy:         #1E2A3A;
+  --button-dark:  #18211C;
+  --button-text:  #F4EFE6;
+  --burgundy:     #6B2C2C;
+  --burgundy-bg:  #F5E3E0;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--clay); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { display: block; max-width: 100%; height: auto; border: 0; }
+table { border-collapse: collapse; }
+.wrap   { width: 100%; background: var(--paper); padding: 0; }
+.frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+.pad    { padding: 24px 36px; }
+.pad-md { padding: 18px 36px; }
+.pad-sm { padding: 12px 36px; }
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+.sans    { font-family: var(--font-sans); }
+.mono    { font-family: var(--font-mono); }
+.ink     { color: var(--ink); }
+.ink-2   { color: var(--ink-2); }
+.muted   { color: var(--ink-3); }
+.forest  { color: var(--forest); }
+.clay    { color: var(--clay); }
+.rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
+.rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forest);
+  font-weight: 600;
+}
+.eyebrow.clay { color: var(--clay); }
+.eyebrow.muted { color: var(--ink-3); }
+.h-hero  { font-family: var(--font-display); font-size: 60px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 8px 0 10px; color: var(--ink); }
+.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 8px 0 6px; color: var(--ink); }
+.h2      { font-family: var(--font-display); font-size: 26px; line-height: 1.14; letter-spacing: -0.01em; font-weight: 400; margin: 10px 0 4px; color: var(--ink); }
+.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 6px 0 2px; color: var(--ink); }
+.lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
+.body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
+.body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+/* PR-NL-6 — story_html wraps the single emotional-center sentence in
+   <em>...</em>. Lands the reader's eye there without using bold or a
+   colored callout block. PR-NL-7a extends to .lede for the welcome
+   teaser and to the first market_context paragraph. */
+.body em, .body-2 em, .lede em { font-style: italic; color: var(--clay-deep); }
+.small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+.meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
+.price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+.price-2     { font-family: var(--font-display); font-size: 22px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+.price-note  { font-family: var(--font-sans); font-size: 12.5px; color: var(--ink-3); }
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  background: var(--paper-3);
+  color: var(--ink-2);
+  margin: 0 5px 6px 0;
+  border-radius: 999px;
+}
+.pill-forest  { background: var(--sage); color: var(--forest); }
+.pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
+.pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
+
+/* ── chips — supportive context next to a hero pick ─────────────────
+   v3 update: backgrounds use hex literals (NOT var()) so Outlook /
+   Yahoo, which strip var() from inline + email-stripped CSS, still
+   render the right tone. The neutral chip's `#E8DFC6` matches the
+   bumped `--paper-3` token — kept hex here so the chip stays visible
+   even when the var() is stripped. The `chip-top` variant is the
+   forest-on-cream "Top pick" treatment from the v3 mockup. */
+.chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #5A5650;
+  background: #E8DFC6;
+  margin: 0 4px 6px 0;
+  line-height: 1.6;
+}
+.chip-warm { background: #FBE6D8; color: #7A3D1F; font-weight: 600; }
+.chip-cool { background: #C9DEC6; color: #1F3D31; font-weight: 600; }
+.chip-top  { background: #1F3D31; color: #F4EFE6; font-weight: 600; }
+/* "Why we picked it" — three plain-English bullets per hero pick.
+   Replaces the v2.x rank-score callout (value 100 / momentum 50) that
+   exposed analyst-y internals. Each bullet maps 1:1 to a real Listing
+   field; the green check matches the "verified fact" feel. */
+.why-block {
+  margin: 18px 0 0;
+  padding: 16px 18px 18px;
+  background: var(--paper-2);
+  border-radius: 6px;
+}
+.why-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clay);
+  margin: 0 0 10px;
+}
+.why-list { list-style: none; margin: 0; padding: 0; }
+.why-list li {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding: 4px 0 4px 22px;
+  position: relative;
+}
+.why-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  color: var(--forest);
+  font-weight: 700;
+}
+.cta {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 13px 22px;
+  background: var(--button-dark);
+  color: var(--button-text) !important;
+  border-radius: 999px;
+}
+.cta:hover { background: var(--forest); text-decoration: none; }
+.cta-ghost {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+}
+.cta-ghost:hover { background: var(--ink); color: var(--paper) !important; text-decoration: none; }
+/* v3: shortlist entries render as stacked .sl-card divs (no inner
+   <table>). The mockup's per-row "For someone who *…*" frame line is
+   `.sl-why` — italic clause styled clay-deep via the shared
+   `.body em` rule. */
+.sl-card {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.sl-card .sl-photo { margin: 0 0 12px; }
+.sl-card .sl-photo img { border-radius: 4px; }
+.sl-card .sl-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  margin: 4px 0 4px;
+}
+.sl-card .sl-why {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin: 8px 0 0;
+}
+.sl-card .sl-why em { font-style: italic; color: var(--clay-deep); }
+.meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+.callout { margin: 14px 0 0; padding: 0; background: none; }
+.callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
+.callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+.callout + .callout { margin-top: 12px; }
+.paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
+.paywall-banner .eyebrow { color: var(--sage); }
+.paywall-banner .h2 { color: var(--paper); }
+.paywall-banner .body { color: var(--paper-3); }
+.paywall-banner .cta { background: var(--clay); color: var(--paper) !important; }
+/* v2.2: lightened footer. The forest-on-cream "stamp" at the end made
+   the email feel bottom-heavy. Cream-on-cream lets the issue end
+   instead of getting branded at the bottom. The horizontal rule
+   above the footer is now the only visual separator from content. */
+.footer-strip { background: var(--paper-2); color: var(--ink-2); border-top: 1px solid var(--line); }
+.footer-strip .small { color: var(--ink-3); }
+.footer-strip a { color: var(--forest); }
+/* PR-NL-8 — Your Pulpo dark panel (matches v2.4 mockup). Sits between
+   next-issue and footer. Dark surface signals "this is product, not
+   editorial" so the reader's eye reads it as a control panel, not as
+   another picks block. */
+.yp-panel {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 36px 48px;
+}
+.yp-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.55;
+}
+.yp-title {
+  color: var(--paper);
+  margin: 8px 0 24px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.15;
+}
+.yp-table { width: 100%; border-collapse: collapse; }
+.yp-table td { padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, 0.12); color: var(--paper); vertical-align: middle; }
+.yp-row-label { font-family: var(--font-display); font-size: 20px; line-height: 1.3; color: var(--paper); }
+.yp-row-cta { text-align: right; padding-left: 16px; white-space: nowrap; }
+.yp-row-cta a {
+  color: var(--paper) !important;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.yp-row-cta a:hover { color: var(--clay) !important; }
+/* LEARNING: this file uses max-width despite CLAUDE.md mandating
+   min-width in web/app/*. Emails are an inverse world — clients without
+   media-query support (Outlook 2007+, parts of Yahoo) must still receive
+   the baseline, so the baseline is desktop-safe and this query upgrades
+   for narrow widths. 480px matches --bp-sm in tokens.css. */
+@media (max-width: 480px) {
+  .pad, .pad-md, .pad-sm { padding-left: 20px; padding-right: 20px; }
+  .pad    { padding-top: 18px; padding-bottom: 18px; }
+  .pad-md { padding-top: 14px; padding-bottom: 14px; }
+  .pad-sm { padding-top: 10px; padding-bottom: 10px; }
+  .h-hero { font-size: 38px; }
+  .h1     { font-size: 28px; }
+  .h2     { font-size: 21px; }
+  .h3     { font-size: 20px; }
+  .body, .body-2 { font-size: 16px; line-height: 1.6; }
+  .lede   { font-size: 16.5px; line-height: 1.55; }
+  .price  { font-size: 24px; }
+  .price-2 { font-size: 19px; }
+  .cta, .cta-ghost { padding: 14px 22px; font-size: 14px; }
+  /* Footer links get vertical tap targets on narrow widths so the three
+     options no longer collide at 320px. The &middot; separators stay so
+     legacy / no-CSS clients still get the comma-style read. */
+  .footer-strip a { display: inline-block; padding: 6px 4px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
+    
+    <tr><td class="pad-sm" style="border-bottom: 1px solid var(--line);">
+      <table width="100%" role="presentation"><tr>
+        <td style="vertical-align: middle;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+            <td style="vertical-align: middle; padding-right: 10px; line-height: 0;">
+              <svg width="26" height="26" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+                <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+                <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+              </svg>
+            </td>
+            <td style="vertical-align: middle;">
+              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span>
+            </td>
+          </tr></table>
+        </td>
+        <td align="right" style="vertical-align: middle;">
+          <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em;">ISSUE 07 · 29 MAY 2026</span>
+        </td>
+      </tr></table>
+    </td></tr>
+    
+    
+    <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
+      <div class="eyebrow">Hand-picked for Sebas</div>
+      <h1 class="h-hero">The 10 best, this week.</h1>
+      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;"><em>3 full reads, 7 worth a quick look</em> — hand-picked from this week's scan.</p>
+      <div style="margin-top: 16px;"><span class="pill pill-filter">La Libertad</span><span class="pill pill-filter">Under $500,000</span><span class="pill pill-filter">Land OK</span></div>
+    </td></tr>
+    
+    
+    <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
+      <div class="eyebrow">Market context</div>
+      <h2 class="h1">Worth knowing this week.</h2>
+      <p class="body"><em>The most aggressive discount this week is <a href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_7">1,263 m² lot in Tamanique at $47.48/m² — 78% below the area average</a>.</em> Worth a closer look before someone else moves on it.</p>
+    </td></tr>
+    
+    
+    <tr><td style="padding: 12px 0 0 0;"><img src="https://remax-central.com.sv/storage/properties/5KHV67pR4GvrRwTqV1Jj-large.png" alt="Ocean View Lot Near El Tunco" width="680" /></td></tr>
+    <tr><td class="pad" style="padding-top: 16px;">
+      <div><span class="pill pill-forest">🏆 Top pick · 01</span><span class="pill pill-forest">New this week</span><span class="chip chip-top">★ Top pick this week</span><span class="chip chip-cool">−78% under area average</span><span class="chip">6 min to beach</span><span class="chip">Power + water at the lot</span></div>
+      <h2 class="h1">Ocean View Lot Near El Tunco</h2>
+      <div class="meta" style="margin: 6px 0 16px;">Tamanique · La Libertad · 1,263 m² lot</div>
+      <div class="price">$60,000</div>
+      <p class="meta-row" style="margin: 12px 0 0;">$47/m² &middot; 5.7 km to beach &middot; 36 km · 39 min to SAL &middot; New this week</p>
+      <p class="body" style="margin-top: 14px;">A 7-minute drive to the surf. <em>The price is well under what nearby lots are asking.</em> Power and water are at the lot; you'd add the road.</p>
+      <div class="why-block"><p class="why-label">Why we picked it</p><ul class="why-list"><li>Priced 78% below the area average</li><li>6 min to the nearest beach</li><li>Power and water already at the lot — you just add the road</li></ul></div>
+      <div class="callout"><div class="label">Reasons to buy</div><div class="body">Minutes from Playa El Tunco · Spectacular ocean views · Ideal for home or Airbnb project</div></div><div class="callout"><div class="label">The price story</div><div class="body">Listed at 78% below the zone median per m². Compare against the comps before assuming it&#x27;s mispriced.</div></div>
+      <p style="margin-top: 16px;"><a class="cta" href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_7">See on Pulpo →</a>&nbsp;&nbsp;<a class="cta-ghost" href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_7&amp;save=1">♥ Save to favorites</a></p>
+    </td></tr>
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+    
+    <tr><td style="padding: 12px 0 0 0;"><img src="https://assets.thesparksite.com/uploads/sites/1521/2023/08/PHOTO-2023-08-29-13-05-47-1200x800.fit.jpg" alt="Cerromar El Sunzal Lot" width="680" /></td></tr>
+    <tr><td class="pad" style="padding-top: 16px;">
+      <div><span class="pill pill-forest">🏆 Top pick · 02</span><span class="pill pill-forest">New this week</span><span class="chip chip-top">★ Top pick this week</span><span class="chip">7 min to beach</span><span class="chip">New this week</span></div>
+      <h2 class="h1">Cerromar El Sunzal Lot</h2>
+      <div class="meta" style="margin: 6px 0 16px;">Tamanique · La Libertad · 1,324 m² lot</div>
+      <div class="price">$265,000</div>
+      <p class="meta-row" style="margin: 12px 0 0;">$200/m² &middot; 6.4 km to beach &middot; 37 km · 40 min to SAL &middot; New this week</p>
+      <p class="body" style="margin-top: 14px;">A 8-minute drive to the surf. <em>Worth a closer look.</em> Bring a build budget — none of the utilities are in yet.</p>
+      <div class="why-block"><p class="why-label">Why we picked it</p><ul class="why-list"><li>7 min to the nearest beach</li><li>Brand new this week — early window matters</li></ul></div>
+      
+      <p style="margin-top: 16px;"><a class="cta" href="https://pulpo.club/listing/essurf__3730?ref=newsletter_issue_7">See on Pulpo →</a>&nbsp;&nbsp;<a class="cta-ghost" href="https://pulpo.club/listing/essurf__3730?ref=newsletter_issue_7&amp;save=1">♥ Save to favorites</a></p>
+    </td></tr>
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+    
+    <tr><td style="padding: 12px 0 0 0;"><img src="https://assets.easybroker.com/property_images/2474863/39189745/EB-IM4863.jpg?rasterize=true&amp;version=1633438933" alt="Prime Land in El Tunco &amp; Sunzal, 3005 sq varas" width="680" /></td></tr>
+    <tr><td class="pad" style="padding-top: 16px;">
+      <div><span class="pill pill-forest">🏆 Top pick · 03</span><span class="pill pill-forest">New this week</span><span class="chip chip-top">★ Top pick this week</span><span class="chip chip-cool">−67% under area average</span><span class="chip">4 min to beach</span><span class="chip">New this week</span></div>
+      <h2 class="h1">Prime Land in El Tunco &amp; Sunzal, 3005 sq varas</h2>
+      <div class="meta" style="margin: 6px 0 16px;">Tamanique · La Libertad · 2,100 m² lot</div>
+      <div class="price">$150,000</div>
+      <p class="meta-row" style="margin: 12px 0 0;">$71/m² &middot; 4.1 km to beach &middot; 34 km · 37 min to SAL &middot; New this week</p>
+      <p class="body" style="margin-top: 14px;">A 5-minute drive to the surf. <em>The price is well under what nearby lots are asking.</em> Bring a build budget — none of the utilities are in yet.</p>
+      <div class="why-block"><p class="why-label">Why we picked it</p><ul class="why-list"><li>Priced 67% below the area average</li><li>4 min to the nearest beach</li><li>Brand new this week — early window matters</li></ul></div>
+      <div class="callout"><div class="label">Reasons to buy</div><div class="body">5 minutes from El Tunco and El Sunzal beaches · 2,100 m² (3,005 sq varas) of land · Ideal for hostel, hotel, or house development</div></div><div class="callout"><div class="label">The price story</div><div class="body">Listed at 67% below the zone median per m². Compare against the comps before assuming it&#x27;s mispriced.</div></div>
+      <p style="margin-top: 16px;"><a class="cta" href="https://pulpo.club/listing/bienesraices__2008?ref=newsletter_issue_7">See on Pulpo →</a>&nbsp;&nbsp;<a class="cta-ghost" href="https://pulpo.club/listing/bienesraices__2008?ref=newsletter_issue_7&amp;save=1">♥ Save to favorites</a></p>
+    </td></tr>
+    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
+    
+    
+    
+        <tr><td class="pad" style="padding-top: 16px; padding-bottom: 4px;">
+          <hr class="rule" />
+          <div style="margin-top: 12px;">
+            <div class="eyebrow">7 more worth a look</div>
+            <h2 class="h1">Each one suits a different kind of buyer.</h2>
+            <p class="body-2" style="margin-top: 6px; max-width: 480px;">Pulpo ranked these inside your filter too. Skim the short reads below — each one tells you who the right buyer is.</p>
+          </div>
+        </td></tr>
+        
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://goodlifeelsalvador.com/wp-content/uploads/2025/08/lot-in-chiltiupan-for-sale02-1024x683.jpg" alt="Mountain Lot Near El Zonte, Chiltiupán" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Mountain Lot Near El Zonte, Chiltiupán</h3>
+        <div class="sl-meta">Chiltiupán · La Libertad · 4,193 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$240,000</div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/goodlife__1-04-acres-of-land-in-chiltiupan-240000?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://remaxcaribbeanandcentralamerica.azureedge.net/images/002282623028/v3/HDPhotos/125630.png" alt="Prime Land in Atami Residential with Ocean Views" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Prime Land in Atami Residential with Ocean Views</h3>
+        <div class="sl-meta">Tamanique · La Libertad · 1,036 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$150,000<span class="price-note"> · down 3% from $155,000</span></div>
+        <div><span class="pill pill-clay">Price moved</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/remax__002282623028?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://assets.easybroker.com/property_images/4922798/83879470/EB-RX2798.jpg?rasterize=true&amp;version=1734712380" alt="Ocean View Lot in El Tunco, Tamanique" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Ocean View Lot in El Tunco, Tamanique</h3>
+        <div class="sl-meta">Tamanique · La Libertad · 1,580 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$225,000</div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/bienesraices__1529?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://assets.easybroker.com/property_images/1291243/19226648/EB-DY1243.jpg?rasterize=true&amp;version=1571096022" alt="Cliff Land with Ocean View in El Zonte" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Cliff Land with Ocean View in El Zonte</h3>
+        <div class="sl-meta">Chiltiupán · La Libertad · 6,989 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$450,000<span class="price-note"> · motivated seller</span></div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/bienesraices__2059?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/05/tunne-2.jpg?fit=1600%2C900&amp;ssl=1" alt="Prime Ocean View Land in Surf City 2 Corridor" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Prime Ocean View Land in Surf City 2 Corridor</h3>
+        <div class="sl-meta">Teotepeque · La Libertad · 3,322 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$250,000<span class="price-note"> · motivated seller</span></div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/oceanside__15402?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522781113/v3/HDPhotos/reconnect 0 Arte The Cliff.png" alt="The Cliff: Ocean View Lots in Surf City" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">The Cliff: Ocean View Lots in Surf City</h3>
+        <div class="sl-meta">Tamanique · La Libertad · 559 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$199,386</div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/remax__002522781113?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    <tr><td class="pad-md">
+      <div class="sl-card">
+        <div class="sl-photo"><img src="https://d3owphs4fllasc.cloudfront.net/fotos-destacados/f5922e24eef8da194971a44dd78d5fa9.JPG" alt="Terreno de 11,000 varas El Zonte Surf City vista al mar" width="100%" /></div>
+        <h3 class="h3" style="margin-top: 0;">Terreno de 11,000 varas El Zonte Surf City vista al mar</h3>
+        <div class="sl-meta">Chiltiupán · La Libertad · 7,687 m² lot</div>
+        <div class="price-2" style="margin: 4px 0 6px;">$500,000</div>
+        <div><span class="pill pill-forest">New this week</span><span class="pill">Land</span></div>
+        <p class="sl-why">For someone who <em>wants the coastal vibe without the beachfront price</em>.</p>
+        <p style="margin-top: 10px;"><a class="cta-ghost" href="https://pulpo.club/listing/citymax__146898?ref=newsletter_issue_7">See on Pulpo →</a></p>
+      </div>
+    </td></tr>
+    
+    
+    
+    <tr><td class="pad" style="padding-top: 16px; padding-bottom: 20px;">
+      <hr class="rule" />
+      <div style="margin-top: 12px;">
+        <div class="eyebrow">Next issue</div>
+        <p class="body" style="max-width: 520px;">Pulpo scans the next 7 days of inventory against your filter and ships the next ten. Adjust filters anytime — changes apply to the next issue.</p>
+        <p style="margin-top: 12px;"><a class="cta-ghost" href="https://pulpo.club/account?ref=newsletter_issue_7">Tune what you see →</a></p>
+      </div>
+    </td></tr>
+    
+    
+    <tr><td class="yp-panel">
+      <div class="yp-eyebrow">Your Pulpo</div>
+      <h2 class="yp-title">Pick up where you left off.</h2>
+      <table class="yp-table" role="presentation">
+        <tr><td class="yp-row-label">3 saved listings from past issues</td><td class="yp-row-cta"><a href="https://pulpo.club/saved?ref=newsletter_issue_07">Open your favorites →</a></td></tr><tr><td class="yp-row-label">La Libertad · land · under $500k</td><td class="yp-row-cta"><a href="https://pulpo.club/account/notifications?ref=newsletter_issue_07">Edit your filter →</a></td></tr><tr><td class="yp-row-label">10 listings in your filter right now</td><td class="yp-row-cta"><a href="https://pulpo.club/browse?ref=newsletter_issue_07">Browse them all →</a></td></tr>
+      </table>
+    </td></tr>
+    
+    
+    <tr><td class="pad footer-strip">
+      <p class="small">Every beach and lake home in El Salvador, ranked by value.</p>
+      <p class="small" style="margin-top: 6px;">You&#x27;re getting this because your filter is set to La Libertad · under $500,000 · Land OK.</p>
+      <p class="small" style="margin-top: 12px;">
+        <a href="https://pulpo.club/account?ref=newsletter_issue_7">Change filters</a> &middot;
+        <a href="https://pulpo.club/account?ref=newsletter_issue_7">Change cadence</a> &middot;
+        <a href="https://pulpo.club/api/unsubscribe?r=300fd5df3a78eb1e8bbd86b9&amp;i=7&amp;t=">Unsubscribe</a>
+      </p>
+      <p class="small" style="margin-top: 14px;">Pulpo doesn&#x27;t take commission and doesn&#x27;t list its own properties. We pick from what&#x27;s already on the market and tell you which ones are worth your time.</p>
+      <p class="small" style="margin-top: 14px;">© 2026 Pulpo Club &middot; <span class="mono">pulpo.club</span></p>
+    </td></tr>
+    
+  </table>
+</div>
+</body>
+</html>
