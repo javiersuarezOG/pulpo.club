@@ -362,6 +362,31 @@ def _preference_from_discover_filters(discover: dict) -> Preference:
     )
 
 
+def _preference_source_from_profile(profile: dict) -> str:
+    """Return the blob name `_preference_from_profile` would read from.
+
+    One of:
+      "discover_filters" — unified P2a-2 store
+      "newsletter"       — legacy P1-era blob
+      "none"             — neither present
+
+    Used by `join_recipients` to stamp the source onto each Recipient
+    so `build_issue` can fire it on the `newsletter.issue_built`
+    telemetry event — that's how the dashboard tells us when it's safe
+    to retire the legacy fallback in `_preference_from_profile`. Must
+    stay in lock-step with the precedence logic below.
+    """
+    if not isinstance(profile, dict):
+        return "none"
+    discover = profile.get("discover_filters")
+    if isinstance(discover, dict) and discover:
+        return "discover_filters"
+    nl = profile.get("newsletter")
+    if isinstance(nl, dict) and nl:
+        return "newsletter"
+    return "none"
+
+
 def _preference_from_profile(profile: dict) -> Preference:
     """Read the recipient's preference off Clerk's publicMetadata.profile.
 
@@ -461,6 +486,7 @@ def join_recipients(
         if user.plan not in PRO_AUDIENCE_TIERS:
             continue
         preference = _preference_from_profile(user.profile)
+        preference_source = _preference_source_from_profile(user.profile)
         recipient = Recipient(
             email_hash=email_hash(c.email),
             display_name=user.first_name,
@@ -475,6 +501,7 @@ def join_recipients(
                 price_at_save_usd=s.get("price_at_save_usd"),
                 source=s.get("source"),
             ) for s in user.saves],
+            preference_source=preference_source,
         )
         out.append(recipient)
     return out

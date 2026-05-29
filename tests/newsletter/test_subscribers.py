@@ -463,3 +463,85 @@ def test_preference_from_profile_empty_when_neither_blob_present():
     in build_issue picks the broad cut."""
     assert subs._preference_from_profile({}) == Preference()
     assert subs._preference_from_profile({"something_unrelated": 1}) == Preference()
+
+
+# ── P3-cleanup telemetry: preference_source ──────────────────────────
+# Stamped onto every Recipient so `newsletter.issue_built` can carry
+# it on the PostHog event — that's how we'll know when it's safe to
+# drop the legacy newsletter-blob fallback in _preference_from_profile.
+
+def test_preference_source_discover_filters_wins_when_present():
+    assert subs._preference_source_from_profile({
+        "discover_filters": {"zones": ["el-tunco"]},
+        "newsletter": {"departments": ["La Libertad"]},
+    }) == "discover_filters"
+
+
+def test_preference_source_newsletter_when_only_legacy_blob():
+    assert subs._preference_source_from_profile({
+        "newsletter": {"departments": ["La Libertad"]},
+    }) == "newsletter"
+
+
+def test_preference_source_none_when_empty_or_missing_blobs():
+    assert subs._preference_source_from_profile({}) == "none"
+    assert subs._preference_source_from_profile({"discover_filters": {}}) == "none"
+    assert subs._preference_source_from_profile({
+        "discover_filters": {},
+        "newsletter": {},
+    }) == "none"
+
+
+def test_preference_source_stays_in_lockstep_with_preference_from_profile():
+    """Belt-and-suspenders: if the source helper ever diverges from the
+    precedence logic in _preference_from_profile, the telemetry would
+    silently lie about which blob the cron actually consumed."""
+    cases = [
+        {},
+        {"discover_filters": {"zones": ["el-tunco"]}},
+        {"newsletter": {"departments": ["La Libertad"]}},
+        {"discover_filters": {}, "newsletter": {"departments": ["La Paz"]}},
+        {"discover_filters": {"subcategory": "land"}, "newsletter": {"departments": ["La Paz"]}},
+    ]
+    for profile in cases:
+        source = subs._preference_source_from_profile(profile)
+        pref = subs._preference_from_profile(profile)
+        if source == "none":
+            assert pref == Preference(), f"source=none but pref non-empty for {profile!r}"
+        elif source == "discover_filters":
+            # `departments` is always empty when discover_filters drives
+            # the read (Discover panel uses zones, not departments).
+            assert pref.departments == [], f"source=discover but departments={pref.departments} for {profile!r}"
+        elif source == "newsletter":
+            assert pref.departments == [x for x in profile.get("newsletter", {}).get("departments", []) if isinstance(x, str)]
+        else:
+            raise AssertionError(f"unknown source {source!r}")
+
+
+def test_join_recipients_stamps_preference_source_per_user():
+    """End-to-end: join_recipients reads each user's Clerk profile and
+    sets preference_source on the Recipient."""
+    contacts = [
+        subs.ResendContact(id="c1", email="discover@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="legacy@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="empty@pulpo.club", unsubscribed=False, created_at=None),
+    ]
+    pros = [
+        subs._parse_clerk_user(_clerk_user(
+            "discover@pulpo.club", plan="pro",
+            profile={"discover_filters": {"zones": ["el-tunco"]}},
+        )),
+        subs._parse_clerk_user(_clerk_user(
+            "legacy@pulpo.club", plan="pro",
+            profile={"newsletter": {"departments": ["La Libertad"]}},
+        )),
+        subs._parse_clerk_user(_clerk_user(
+            "empty@pulpo.club", plan="pro",
+            profile={},
+        )),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=pros)
+    by_hash = {r.email_hash: r for r in recipients}
+    assert by_hash[subs.email_hash("discover@pulpo.club")].preference_source == "discover_filters"
+    assert by_hash[subs.email_hash("legacy@pulpo.club")].preference_source == "newsletter"
+    assert by_hash[subs.email_hash("empty@pulpo.club")].preference_source == "none"
