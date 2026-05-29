@@ -256,14 +256,136 @@ def _primary_email(u: dict) -> Optional[str]:
 
 
 # ── Join → Recipient list ─────────────────────────────────────────────────
-def _preference_from_profile(profile: dict) -> Preference:
-    """Translate Clerk's publicMetadata.profile.newsletter into a Preference.
 
-    Empty / missing → empty Preference (the cohort fallback kicks in inside
-    build_issue). Tolerates extra keys we don't know about — the cron is
-    forward-compatible with new fields the UI starts writing.
+# P3 (2026-05-29) — DiscoverFilter → Preference translation table.
+#
+# The Discover filter (web/app/lib/user-profile.ts :: DiscoverFilter)
+# carries axes the cron's `Preference` shape doesn't model 1-1. The
+# tables below pin the mapping. Axes that DON'T appear here are
+# intentionally dropped (they're Discover-only browsing controls):
+#
+#   land_types     — residential/commercial/tourist tagging (no cron use)
+#   infra          — water/power/paved/sewage (no cron use)
+#   status         — Discover "new"/"price_drop" pills (already implied by ranker)
+#   size_min       — no min-size filter on Preference yet
+#   readiness      — Discover-only readiness floor
+#   rank_max       — Discover-only "Top 10" pill
+#   master_category — Beach/Lake IA navigation, not a filter axis
+_DISCOVER_SUBCATEGORY_TO_PROPERTY_TYPE = {
+    "homes": "house",
+    "condos": "condo",
+    "land":  "land",
+}
+
+# `features` + `discovery_tags` both map into the cron's `categories`
+# vocabulary. The mapping is intentionally narrow: only values that
+# have a clear semantic equivalent on the cron side are translated.
+# Unknown entries are dropped — the cron will fall back to the broad
+# cut rather than apply a category predicate it doesn't recognise.
+_DISCOVER_FEATURE_TO_CATEGORY = {
+    "beachfront":     "beachfront",
+    "water_body":     "water_features",
+    # Drop without mapping (no cron-side category):
+    #   ocean_view, mountain_view, flat
+}
+_DISCOVER_TAG_TO_CATEGORY = {
+    "under_250k": "under_250k",
+    "waterfront": "beachfront",      # the Discover "Waterfront" pill is the
+                                     # broad beachfront/water-body bucket;
+                                     # cron's "beachfront" category captures it.
+    # Drop without mapping:
+    #   top_rated  — rank-floor concept, not a category
+    #   gated      — no cron-side category yet
+}
+
+
+def _preference_from_discover_filters(discover: dict) -> Preference:
+    """Translate `publicMetadata.profile.discover_filters` → Preference.
+
+    P3 of the unified-filter rollout (Discover panel ↔ /account/newsletter
+    ↔ newsletter cron). Empty / missing → empty Preference (the cohort
+    fallback kicks in inside build_issue).
+
+    See the mapping tables above for which Discover axes survive the
+    translation and which are intentionally dropped (Discover-only
+    browsing controls vs. cron-consumable filter axes).
     """
-    nl = profile.get("newsletter") if isinstance(profile, dict) else None
+    if not isinstance(discover, dict):
+        return Preference()
+
+    def _list_of_str(v):
+        return [x for x in v if isinstance(x, str)] if isinstance(v, list) else []
+
+    # property_types ← subcategory (single string → 1-element list)
+    property_types: list[str] = []
+    sub = discover.get("subcategory")
+    if isinstance(sub, str):
+        translated = _DISCOVER_SUBCATEGORY_TO_PROPERTY_TYPE.get(sub)
+        if translated:
+            property_types.append(translated)
+
+    # categories ← features + discovery_tags (translated + deduped,
+    # preserving insertion order for deterministic test output)
+    categories: list[str] = []
+    seen: set[str] = set()
+    for feat in _list_of_str(discover.get("features")):
+        mapped = _DISCOVER_FEATURE_TO_CATEGORY.get(feat)
+        if mapped and mapped not in seen:
+            categories.append(mapped)
+            seen.add(mapped)
+    for tag in _list_of_str(discover.get("discovery_tags")):
+        mapped = _DISCOVER_TAG_TO_CATEGORY.get(tag)
+        if mapped and mapped not in seen:
+            categories.append(mapped)
+            seen.add(mapped)
+
+    return Preference(
+        zones=_list_of_str(discover.get("zones")),
+        # `departments` doesn't exist in DiscoverFilter — users who
+        # migrated to the unified filter pick zones (more specific)
+        # instead. Leave departments empty; apply_preference's
+        # conjunctive AND on department + zone means an empty
+        # departments list is the "no opinion" branch.
+        departments=[],
+        property_types=property_types,
+        max_price_usd=(
+            discover["price_max"]
+            if isinstance(discover.get("price_max"), (int, float))
+            else None
+        ),
+        min_price_usd=(
+            discover["price_min"]
+            if isinstance(discover.get("price_min"), (int, float)) and discover["price_min"] > 0
+            else None
+        ),
+        categories=categories,
+    )
+
+
+def _preference_from_profile(profile: dict) -> Preference:
+    """Read the recipient's preference off Clerk's publicMetadata.profile.
+
+    Precedence (post-2026-05-29):
+      1. `discover_filters` — the unified Discover ↔ /account/newsletter
+         shape (P2a-2). Picked when the blob is present + non-empty.
+      2. `newsletter` — legacy narrow shape (departments / property_types /
+         max_price_usd). Retained as a fallback for users who hadn't
+         touched the new UI by the time P3 shipped; the dashboard will
+         tell us when to drop it.
+      3. Empty Preference — the cohort fallback inside build_issue then
+         picks the broadest cut.
+
+    Tolerates extra keys we don't know about — the cron is forward-
+    compatible with new fields either UI starts writing.
+    """
+    if not isinstance(profile, dict):
+        return Preference()
+
+    discover = profile.get("discover_filters")
+    if isinstance(discover, dict) and discover:
+        return _preference_from_discover_filters(discover)
+
+    nl = profile.get("newsletter")
     if not isinstance(nl, dict):
         return Preference()
     def _list_of_str(v):
