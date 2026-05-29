@@ -728,28 +728,30 @@ def deterministic_welcome_teaser(
     n_scanned: Optional[int] = None,
     pref: Optional[Preference] = None,
 ) -> str:
-    """Warm two-sentence intro that orients the reader to the issue.
+    """Three-sentence lede that orients the reader to this week's issue.
 
-    v3.1.1 (2026-05-29, post-thinness-feedback): the first take of
-    v3.1 stripped the welcome down to a single structural line
-    ("3 full reads, 7 worth a quick look — hand-picked from this
-    week's scan.") which read TOO thin for a newsletter. This version
-    keeps the no-per-pick-mention rule that triggered the rewrite, but
-    adds two pieces of substantive context:
+    v3.2 (2026-05-29, post-Sebas-feedback): the v3.1 "Pulpo combed
+    through 863 listings across La Libertad" copy conflated Pulpo's
+    coverage scope (every beach + lake property in El Salvador) with
+    the recipient's filter (e.g. La Libertad land < $500k). That
+    confused readers — "why does it say La Libertad if Pulpo combs
+    through way more places?". The v3.2 lede separates the two:
 
-      1. The actual scan size ("863 listings") — useful framing, never
-         repeated in the per-pick block, gives the reader a sense of
-         how much was filtered.
-      2. The location context when set ("across La Libertad") — anchors
-         the issue to the recipient's filter so the lede reads "for
-         them" not "for everyone".
+      1. Pulpo's scope (static): every active beach + lake listing in
+         El Salvador this week.
+      2. Filter narrowing: of the N that match your filter, these K
+         stood out.
+      3. Issue shape: first three get a full profile (photo, our take,
+         why we picked them); the rest are quick reads.
 
-    The structural shape (three full reads, seven quick scans) still
-    follows in the second sentence. Result is two warm sentences that
-    pre-summarise nothing the per-pick sections will re-show.
+    `n_scanned` is the recipient's filter-match count, NOT the global
+    inventory. Falls back gracefully when missing.
 
-    Pref + n_scanned are optional so legacy callers keep working with
-    a generic fallback.
+    No `<em>` wrapping — Sebas: "never use italics in copy, it adds
+    noise." The italic-clay CSS rule that styled the emphasis is
+    dropped from render_html.py in the same v3.2 change. The `pref`
+    argument is preserved for API compatibility with v3.1 callers but
+    is no longer consulted — Pulpo's scope is global, not filter-shaped.
     """
     if not picks:
         return ""
@@ -758,49 +760,78 @@ def deterministic_welcome_teaser(
     rich = min(3, n)
     rest = max(0, n - rich)
 
-    # First sentence — what got scanned + where.
-    where = ""
-    if pref is not None:
-        if pref.departments:
-            where = (pref.departments[0]).title()
-        elif pref.zones:
-            where = pref.zones[0].replace("-", " ").title()
-    scan_clause: str
+    # Sentence 1 — Pulpo's honest scope. Coastal + the two serviced
+    # lakes (Coatepeque, Ilopango). Static copy, no filter leak.
+    sent1 = (
+        "Pulpo combed through every active beach and lake listing in El Salvador this week."
+        if en
+        else "Pulpo revisó todas las propiedades activas de playa y lago en El Salvador esta semana."
+    )
+
+    # Sentence 2 — filter narrowing → standout count. Drops the count
+    # entirely when n_scanned is missing rather than fabricating one.
     if isinstance(n_scanned, int) and n_scanned > 0:
-        if where:
-            scan_clause = (
-                f"Pulpo combed through {n_scanned:,} active listings across {where} this week"
-                if en
-                else f"Pulpo revisó {n_scanned:,} propiedades activas en {where} esta semana"
-            )
-        else:
-            scan_clause = (
-                f"Pulpo combed through {n_scanned:,} active listings this week"
-                if en
-                else f"Pulpo revisó {n_scanned:,} propiedades activas esta semana"
-            )
-    else:
-        scan_clause = (
-            "Pulpo combed through this week's inventory"
+        sent2 = (
+            f"Of the {n_scanned:,} that match your filter, these {n} stood out."
             if en
-            else "Pulpo revisó el inventario de esta semana"
+            else f"De las {n_scanned:,} que coinciden con tu filtro, estas {n} destacaron."
+        )
+    else:
+        sent2 = (
+            f"These {n} stood out."
+            if en
+            else f"Estas {n} destacaron."
         )
 
-    # Second sentence — emotional center wrapped in <em> + structural shape.
-    if en:
-        first = f"{scan_clause}. <em>These {n} earned a closer look</em>."
-        if rest:
-            second = f"{rich} full reads up top; {rest} quick scans below."
-        else:
-            second = f"{rich} full reads — take them slow."
-        return f"{first} {second}"
-
-    first = f"{scan_clause}. <em>Estas {n} merecieron un segundo vistazo</em>."
+    # Sentence 3 — issue shape. Telegraphs what the rich vs short
+    # treatment contains so the reader knows what scroll depth to expect.
     if rest:
-        second = f"{rich} lecturas completas arriba; {rest} vistazos rápidos abajo."
+        if en:
+            sent3 = (
+                f"The first {_num_word(rich)} get a full profile: photo, our take, "
+                f"and why we picked them. The next {_num_word(rest)} are quick reads."
+            )
+        else:
+            sent3 = (
+                f"Las {_num_word(rich, en=False, fem=True)} primeras llevan un perfil completo: "
+                f"foto, nuestra lectura, y por qué las elegimos. "
+                f"Las {_num_word(rest, en=False, fem=True)} siguientes son lecturas rápidas."
+            )
     else:
-        second = f"{rich} lecturas completas — tómalas con calma."
-    return f"{first} {second}"
+        if en:
+            sent3 = (
+                f"All {_num_word(rich)} get a full profile: photo, our take, and why we picked them."
+            )
+        else:
+            sent3 = (
+                f"Las {_num_word(rich, en=False, fem=True)} llevan un perfil completo: "
+                f"foto, nuestra lectura, y por qué las elegimos."
+            )
+
+    return f"{sent1} {sent2} {sent3}"
+
+
+def _num_word(n: int, en: bool = True, *, fem: bool = False) -> str:
+    """Natural-language numeral up to a dozen for editorial copy.
+
+    "The first three…" beats "The first 3…" in an editorial newsletter;
+    digits look like a stat strip, words read like a sentence. Falls
+    back to `str(n)` past 12 so the function stays safe at any size.
+    `fem` controls Spanish gender agreement for "una/uno" / "ninguna/ninguno".
+    """
+    if en:
+        return {
+            0: "none", 1: "one", 2: "two", 3: "three", 4: "four",
+            5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+            10: "ten", 11: "eleven", 12: "twelve",
+        }.get(n, str(n))
+    return {
+        0: "ninguna" if fem else "ninguno",
+        1: "una" if fem else "uno",
+        2: "dos", 3: "tres", 4: "cuatro", 5: "cinco",
+        6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
+        10: "diez", 11: "once", 12: "doce",
+    }.get(n, str(n))
 
 
 def _market_property_phrase(pick: dict, locale: Locale, *, with_link: bool = True) -> str:
