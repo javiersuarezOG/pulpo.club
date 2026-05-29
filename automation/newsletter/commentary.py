@@ -337,87 +337,150 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
 
 
 def deterministic_shortlist_frame(listing: dict, locale: Locale = "en") -> str:
-    """Single "For someone who *…*" line for one shortlist entry.
+    """Single "For the buyer who…" line for one shortlist entry.
 
-    Returns an HTML string with one `<em>...</em>` span around the
-    italic clause (the renderer styles it clay-deep italic). Matches the
-    v3 mockup's per-row framing:
+    v3.2 (2026-05-29): the v3.1 send rendered all seven shortlist cards
+    with the IDENTICAL "wants the coastal vibe without the beachfront
+    price" line because the near-beach-land branch caught everything in
+    a typical La-Libertad coastal filter. This rewrite:
 
-      For someone who *wants surf-city land cheap*. The catch: …
+      1. Drops the `<em>` wrapping. Italics are banned from copy.
+      2. Adds finer-grained branches inside the near-beach-land bucket
+         so listings differentiate on real signals — area, distance,
+         repriced state, days-on-market — instead of all collapsing to
+         the same fallback.
+      3. Falls through to a deterministic-by-source_id tie-breaker so
+         even when multiple listings share a branch, they still print
+         distinct wording. The tie-breaker keeps the output stable
+         across renders (same listing → same line) without needing
+         issue-position state threaded through.
 
     The frame answers "who is this the right answer for?" — keeps the
-    shortlist scannable for a buyer skimming for relevance. The frame
-    must map to real Listing fields (property_type, dist_beach_km,
-    is_repriced, etc.) — never invent a buyer persona the data doesn't
-    support.
+    shortlist scannable for a buyer skimming for relevance. Every
+    branch maps to real Listing fields; no invented buyer personas.
 
-    Empty string is allowed (renderer falls back to the existing
-    `blurb`) so a listing missing the fields to support a frame still
-    renders cleanly.
+    Empty string is allowed (renderer falls back to `blurb`) so a
+    listing missing the fields to support a frame still renders cleanly.
+
+    Return value is plain text (post-v3.2). Renderer historically read
+    it as trusted HTML for the <em>...</em> span — with the span gone,
+    plain text is the safer contract.
     """
     en = locale == "en"
     pt = listing.get("property_type")
     pct = listing.get("price_vs_zone_pct")
     beach_km = listing.get("dist_beach_km")
     days = listing.get("days_listed")
+    area = listing.get("area_m2")
+    is_repriced = bool(listing.get("is_repriced"))
+    is_walk_to_beach = bool(listing.get("is_walk_to_beach"))
+    is_beachfront = bool(listing.get("is_beachfront"))
+    beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
 
-    # Price drop → "thinking long horizon" buyer who's waiting out a
-    # slow seller. Concrete drop number stays in the why_bullets;
-    # this frame is about the buyer profile, not the number.
-    if listing.get("is_repriced") and isinstance(days, int) and days >= 60:
+    # Beachfront — its own tier. Rare enough to deserve a unique frame.
+    if is_beachfront:
         return (
-            "For someone <em>thinking long horizon</em> — the seller has been on market a while and just moved."
+            "For the buyer who wants the sand at the front gate, not a drive away."
             if en
-            else
-            "Para alguien <em>con horizonte largo</em> — el vendedor lleva tiempo en el mercado y acaba de moverse."
+            else "Para quien quiere la arena en la puerta, no a unos minutos en carro."
         )
 
-    # Deep discount + walk-to-surf — the "wants surf-city land cheap"
-    # archetype from the mockup. Anchors against named beach when known.
-    if listing.get("is_walk_to_beach") and isinstance(pct, (int, float)) and pct <= -30:
-        beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
+    # Repriced + slow seller → the "waiting for sellers to blink" buyer.
+    if is_repriced and isinstance(days, int) and days >= 60:
+        return (
+            "For the buyer waiting for sellers to blink — this one already did."
+            if en
+            else "Para quien espera a que el vendedor parpadee — este ya lo hizo."
+        )
+
+    # Long days on market without a price move yet → patience pays.
+    if isinstance(days, int) and days >= 90 and not is_repriced:
+        return (
+            "For the buyer betting the seller's patience runs out before theirs."
+            if en
+            else "Para quien apuesta a que la paciencia del vendedor se agota antes que la suya."
+        )
+
+    # Deep discount + walk-to-surf — surf-side land at a striking price.
+    if is_walk_to_beach and isinstance(pct, (int, float)) and pct <= -30:
         if isinstance(beach, str) and beach:
             return (
-                f"For someone who <em>wants {beach}-area land cheap</em>."
+                f"For the buyer who wants {beach}-area land at a striking price."
                 if en
-                else f"Para alguien que <em>quiere terreno barato cerca de {beach}</em>."
+                else f"Para quien busca terreno cerca de {beach} a precio destacado."
             )
         return (
-            "For someone who <em>wants surf-side land cheap</em>."
+            "For the buyer who wants surf-side land without paying surf-side prices."
             if en
-            else "Para alguien que <em>quiere terreno barato cerca del mar</em>."
+            else "Para quien quiere terreno cerca del mar sin pagar precio de mar."
         )
 
     # House / condo → move-in-ready buyer.
     if pt in ("house", "condo"):
         return (
-            "For someone who <em>doesn't want to build</em> — move-in ready, no project."
+            "For the buyer who doesn't want to build — move-in ready, no project."
             if en
-            else "Para alguien que <em>no quiere construir</em> — listo para entrar, sin obra."
+            else "Para quien no quiere construir — listo para entrar, sin obra."
         )
 
-    # Far-from-beach raw land → builder with a budget.
+    # Far-from-beach raw land → developer-mindset acreage buyer.
     if pt == "land" and isinstance(beach_km, (int, float)) and beach_km >= 25:
-        area = listing.get("area_m2")
         if isinstance(area, (int, float)) and area >= 5000:
             return (
-                "For someone <em>buying with a build budget</em> — the land alone is the deal."
+                "For the buyer with a build budget — the land alone is the deal."
                 if en
-                else "Para alguien que <em>compra con presupuesto de construcción</em> — el valor está en el terreno."
+                else "Para quien tiene presupuesto de construcción — el valor está en el terreno."
             )
         return (
-            "For someone <em>buying acreage</em>, not a build site."
+            "For the buyer who's after acreage, not a build site."
             if en
-            else "Para alguien que <em>compra hectáreas</em>, no un sitio para construir."
+            else "Para quien busca hectáreas, no un sitio para construir."
         )
 
-    # Near-beach land without a deep discount → the "El Zonte vibe
-    # without the beachfront price" archetype from the mockup.
-    if pt == "land" and isinstance(beach_km, (int, float)) and beach_km < 25:
+    # Near-beach land — the v3.1 catch-all bucket. v3.2 splits this
+    # into FOUR distinct frames based on real listing facts (area,
+    # distance, named-beach proximity) so listings that share the
+    # bucket still get different wording.
+    if pt == "land":
+        # Large-acreage cliff/view land → developer mindset.
+        if isinstance(area, (int, float)) and area >= 5000:
+            return (
+                "For the developer-minded buyer with a vision big enough for several thousand square meters."
+                if en
+                else "Para el comprador con visión suficiente para varios miles de metros cuadrados."
+            )
+        # Tiny lot near a named beach → smallest footprint, biggest view.
+        if isinstance(area, (int, float)) and area <= 800 and isinstance(beach_km, (int, float)) and beach_km < 10:
+            return (
+                "For the buyer who wants the smallest possible footprint with the biggest possible view."
+                if en
+                else "Para quien busca la huella más pequeña con la vista más amplia."
+            )
+        # Close to the surf (≤ 5 km), not walking distance → drive crowd.
+        if isinstance(beach_km, (int, float)) and beach_km <= 5 and not is_walk_to_beach:
+            if isinstance(beach, str) and beach:
+                return (
+                    f"For the buyer who wants {beach} proper — minutes away, not towns over."
+                    if en
+                    else f"Para quien quiere {beach} de verdad — a minutos, no a pueblos de distancia."
+                )
+            return (
+                "For the buyer who wants the surf within a ten-minute drive, not on it."
+                if en
+                else "Para quien quiere el mar a diez minutos en carro, no encima."
+            )
+        # Mid-distance lot in a named beach corridor → frontier coast buyer.
+        if isinstance(beach_km, (int, float)) and 5 < beach_km < 15:
+            return (
+                "For the buyer betting on the next stretch of coast before the road catches up."
+                if en
+                else "Para quien apuesta al siguiente tramo de costa antes de que llegue la vía."
+            )
+        # Default near-beach: coastal-feel-without-beachfront-price.
         return (
-            "For someone who <em>wants the coastal vibe without the beachfront price</em>."
+            "For the buyer who wants the coastal feel without paying for the beachfront."
             if en
-            else "Para alguien que <em>quiere el ambiente costero sin el precio de primera línea</em>."
+            else "Para quien quiere el ambiente costero sin pagar precio de primera línea."
         )
 
     return ""
