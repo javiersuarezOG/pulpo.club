@@ -443,12 +443,7 @@ export function NewsletterWidget() {
 
           <div className="nl-locale">
             <label htmlFor="nl-preview-locale-en">Language</label>
-            <div
-              id="nl-preview-locale"
-              className="nl-locale-toggle"
-              role="group"
-              aria-label="Preview language"
-            >
+            <div className="nl-locale-toggle">
               {LOCALE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
