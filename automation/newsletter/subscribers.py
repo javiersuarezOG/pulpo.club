@@ -486,6 +486,7 @@ def join_recipients(
         if user.plan not in PRO_AUDIENCE_TIERS:
             continue
         preference = _preference_from_profile(user.profile)
+        preference_source = _preference_source_from_profile(user.profile)
         recipient = Recipient(
             email_hash=email_hash(c.email),
             display_name=user.first_name,
@@ -500,6 +501,7 @@ def join_recipients(
                 price_at_save_usd=s.get("price_at_save_usd"),
                 source=s.get("source"),
             ) for s in user.saves],
+            preference_source=preference_source,
         )
         out.append(recipient)
     return out

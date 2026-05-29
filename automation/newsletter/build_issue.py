@@ -963,6 +963,14 @@ def build_issue(
         "picks_total": len(kept_listings),
         "has_skip": skip_pick_listing is not None,
         "paywall_banner": paywall_all,
+        # P3-cleanup readout: which publicMetadata blob the cron derived
+        # this recipient's Preference from. Dashboard query for retiring
+        # the legacy fallback in subscribers._preference_from_profile is
+        # "count distinct recipient_hash where preference_source ==
+        # 'newsletter' over the last 30 days" — when that trends to ~0
+        # everyone has interacted with the unified UI at least once and
+        # the legacy read is safe to drop.
+        "preference_source": getattr(recipient, "preference_source", "none"),
     })
 
     # ── URLs ────────────────────────────────────────────────────────────
