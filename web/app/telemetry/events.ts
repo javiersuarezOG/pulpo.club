@@ -696,7 +696,7 @@ export type EventMap = {
   };
 
   // ───── Preferred category chip selector (PR preferred-categories) ─────
-  /** Fires every time a chip is toggled inside the /account/notifications
+  /** Fires every time a chip is toggled inside the /account/newsletter
    *  preference selector. `selected_categories_after` is the resulting
    *  array (post-change), so dashboards can compute the most-common
    *  picks without joining sequential events. Categories are the same

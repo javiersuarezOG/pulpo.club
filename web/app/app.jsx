@@ -172,7 +172,7 @@ function App() {
   }, []);
   const [route, setRoute] = useState(_initialParsed.route);
   // Seed `section` / `adminWidget` from the cold-load URL so a deep-link
-  // like `/account/notifications` or `/admin/newsletter` mounts straight
+  // like `/account/newsletter` or `/admin/newsletter` mounts straight
   // on the right tab/widget. Without this seed there's a one-frame flash
   // of the default landing tab before the URL resyncs.
   const [routeParams, setRouteParams] = useState(() => {
@@ -412,7 +412,7 @@ function App() {
       const prevRoute = routeRef.current;
       setOpenListingId(parsed.openListingId);
       setRoute(parsed.route);
-      // Account sub-section deep-links (`/account/notifications` etc.)
+      // Account sub-section deep-links (`/account/newsletter` etc.)
       // round-trip through popstate too — re-seed routeParams.section so
       // browser-back from /account/security to /account/profile lands on
       // the right tab. `_entry` is consumed by AccountPage's section-
@@ -867,7 +867,7 @@ function App() {
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
       : "";
-    // Account sub-sections round-trip through the URL — `/account/notifications`
+    // Account sub-sections round-trip through the URL — `/account/newsletter`
     // is shareable. For every other route, `section` is ignored by urlFor.
     const section = r === "account" ? (params.section || null) : null;
     // Admin widget slugs round-trip the same way — `/admin/newsletter`
