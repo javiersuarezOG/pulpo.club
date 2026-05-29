@@ -301,3 +301,61 @@ def test_top_picks_rich_bumped_to_three():
     shortlist begins."""
     from automation.newsletter.build_issue import ISSUE_TOP_PICKS_RICH
     assert ISSUE_TOP_PICKS_RICH == 3
+
+
+def test_pro_user_every_link_is_routable(pro_with_prefs, ranked_pool, monkeypatch):
+    """Pro-user link contract — pins every URL the rendered email can
+    surface against a valid SPA route, vercel.json rewrite, or live API
+    endpoint. Added 2026-05-29 after Sebas reported that both the "See
+    on Pulpo" CTA (fix #542) AND the footer Unsubscribe link were
+    routing to /api/404. This test catches that whole class of regression
+    in one pass.
+
+    The catch-all `/:slug([A-Za-z0-9_-]+)` rewrite in vercel.json sends
+    any unknown single-segment path to /api/404 — so a missing rewrite
+    or a wrong URL prefix here silently 404s without raising in CI."""
+    import re
+    from automation.newsletter.render_html import render_html
+    monkeypatch.setenv("PULPO_UNSUBSCRIBE_SECRET", "test_secret_for_token_check")
+    issue = build_issue(
+        recipient=pro_with_prefs,
+        ranked_listings=ranked_pool,
+        issue_number=7,
+        issue_date=ISSUE_DATE,
+        history_rows=[],
+    )
+    html = render_html(issue)
+    hrefs = {h for h in re.findall(r'href="([^"]+)"', html) if h.startswith("https://pulpo.club")}
+
+    # 1. /listing/<source>__<source_id> URLs use __ separator (PR #542).
+    listing_hrefs = [h for h in hrefs if "/listing/" in h]
+    assert listing_hrefs, "no listing CTAs rendered"
+    for h in listing_hrefs:
+        path = h.split("/listing/", 1)[1].split("?", 1)[0]
+        # SPA's SAFE_LISTING_ID_RE = /^[A-Za-z0-9._\-]+$/ — colon is
+        # banned + would silently route the reader to home.
+        assert ":" not in path, f"listing id contains ':' which the SPA regex rejects: {h}"
+        assert re.match(r"^[A-Za-z0-9._\-]+$", path), f"listing id contains banned chars: {h}"
+        assert "__" in path, f"listing id must use '__' separator: {h}"
+
+    # 2. Footer Unsubscribe must hit /api/unsubscribe (not /unsubscribe,
+    #    which Vercel's catch-all 404s) AND carry the HMAC token.
+    unsub = [h for h in hrefs if "unsubscribe" in h]
+    assert len(unsub) == 1, f"expected 1 unsubscribe link, got: {unsub}"
+    u = unsub[0].replace("&amp;", "&")  # un-escape so query parsing is straightforward
+    assert "/api/unsubscribe" in u, f"unsubscribe link missing /api prefix: {u}"
+    assert re.search(r"[?&]r=[a-f0-9]+", u), f"unsubscribe link missing r=: {u}"
+    assert re.search(r"[?&]i=7(?:&|$)", u), f"unsubscribe link missing/wrong i=: {u}"
+    assert re.search(r"[?&]t=[a-f0-9]{32}(?:&|$)", u), (
+        f"unsubscribe link missing HMAC token (handler rejects without it): {u}"
+    )
+
+    # 3. /account, /account/notifications, /saved, /browse — vercel.json
+    #    has explicit rewrites for all of these. Catch a future
+    #    /account/foo (where foo isn't in ACCOUNT_SECTION_KEYS) here.
+    SPA_PATHS = {"/account", "/account/notifications", "/saved", "/browse"}
+    for h in hrefs:
+        if "/listing/" in h or "unsubscribe" in h:
+            continue
+        path = h.replace("https://pulpo.club", "").split("?", 1)[0]
+        assert path in SPA_PATHS, f"unrecognised SPA path: {h} (path={path!r})"
