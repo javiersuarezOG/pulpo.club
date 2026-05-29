@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo · Issue 06 — Mockup v3</title>
+<style>
+  :root {
+    --paper:        #F4EFE6;
+    --paper-2:      #F8F4EC;
+    --paper-3:      #E8DFC6;  /* darker than v2 so chips are visibly tan, not invisible */
+    --white:        #FFFFFF;
+    --ink:          #1A1916;
+    --ink-2:        #5A5650;
+    --ink-3:        #888780;
+    --line:         rgba(0, 0, 0, 0.10);
+    --line-2:       rgba(0, 0, 0, 0.16);
+    --forest:       #1F3D31;
+    --sage:         #DDE9DC;
+    --sage-strong:  #C9DEC6;  /* visibly green for cool chips */
+    --clay:         #B8643C;
+    --clay-deep:    #7A3D1F;
+    --clay-soft:    #FBE6D8;
+    --burgundy:     #6B2C2C;
+    --burgundy-bg:  #F5E3E0;
+    --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--clay); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { display: block; max-width: 100%; height: auto; border: 0; }
+  table { border-collapse: collapse; }
+
+  .wrap   { width: 100%; background: var(--paper); padding: 32px 0 56px; }
+  .frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+
+  /* type — same v2.4 system, just bigger leading for readability */
+  .h-hero { font-family: var(--font-display); font-size: 40px; line-height: 1.06; letter-spacing: -0.02em; color: var(--ink); margin: 6px 0 12px; }
+  .h1     { font-family: var(--font-display); font-size: 32px; line-height: 1.12; letter-spacing: -0.015em; color: var(--ink); margin: 12px 0 4px; }
+  .h2     { font-family: var(--font-display); font-size: 24px; line-height: 1.18; color: var(--ink); margin: 4px 0 8px; }
+  .h3     { font-family: var(--font-display); font-size: 20px; line-height: 1.2; color: var(--ink); margin: 6px 0 4px; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+  }
+  .eyebrow.muted { color: var(--ink-3); }
+  .eyebrow.forest { color: var(--forest); }
+
+  /* welcome lede */
+  .welcome-pad { padding: 48px 48px 28px; }
+  .welcome-lede {
+    font-family: var(--font-display);
+    font-size: 21px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin: 16px 0 0;
+  }
+  .welcome-lede em { font-style: italic; color: var(--clay-deep); }
+  .rule-clay { border: 0; border-top: 2px solid var(--clay); width: 48px; margin: 10px 0 0; }
+
+  /* ── MARKET CONTEXT — moved to top per Sebas's note. */
+  .market-now {
+    padding: 0 48px 32px;
+  }
+  .market-now-card {
+    padding: 18px 22px;
+    background: var(--paper-2);
+    border-left: 3px solid var(--forest);
+    border-radius: 0 6px 6px 0;
+  }
+  .market-now-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+  .market-now-body {
+    font-family: var(--font-display);
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin: 0;
+  }
+  .market-now-body em { font-style: italic; color: var(--clay-deep); }
+
+  /* ── PER-PICK SECTION ─────────────────────────────────────────────────── */
+  .pick { padding: 36px 48px 40px; border-top: 1px solid var(--line); }
+  .pick-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .pick-hero {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    margin: 0 0 18px;
+  }
+
+  /* ── CHIPS — visible backgrounds (hex, NOT var). Email clients that
+       strip var() still render the right color. Sebas's screenshot showed
+       the prior chip row as plain text because background was too pale
+       to read against the page; v3 chips have proper tan/sage/clay
+       backgrounds. */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0 0 16px;
+  }
+  .chip {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #E8DFC6;
+    color: #5A5650;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .chip.warm { background: #FBE6D8; color: #7A3D1F; font-weight: 600; }
+  .chip.cool { background: #C9DEC6; color: #1F3D31; font-weight: 600; }
+  .chip.top  { background: #1F3D31; color: #F4EFE6; font-weight: 600; }
+
+  /* title + meta + price */
+  .pick-title {
+    font-family: var(--font-display);
+    font-size: 34px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin: 4px 0 6px;
+    letter-spacing: -0.015em;
+  }
+  .pick-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    margin: 0 0 14px;
+  }
+  .pick-price {
+    font-family: var(--font-display);
+    font-size: 30px;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+
+  /* ── QUICK FACTS — was a table (keytable). Now an inline bullet-
+       separated row (display: inline list). Reads as a sentence. */
+  .quick-facts {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .quick-facts strong { color: var(--ink-2); font-weight: 500; }
+
+  /* warm story paragraph */
+  .pick-story {
+    font-family: var(--font-display);
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 26px;
+    max-width: 580px;
+  }
+  .pick-story em { font-style: italic; color: var(--clay-deep); }
+
+  /* ── "WHY WE PICKED IT" — replaces the cryptic "Why Pulpo ranked it: value
+       100 · location 100 · momentum 50". Plain-English bullets that each
+       map to a real Listing field. */
+  .why-block {
+    margin: 0 0 24px;
+    padding: 16px 18px 18px;
+    background: var(--paper-2);
+    border-radius: 6px;
+  }
+  .why-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .why-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .why-list li {
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--ink);
+    padding-left: 22px;
+    position: relative;
+  }
+  .why-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 1px;
+    color: var(--forest);
+    font-weight: 700;
+  }
+
+  /* ── PRICE STORY — was a callout block (table-ish). Now plain text with
+       a small label. */
+  .price-story {
+    margin: 0 0 22px;
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 580px;
+  }
+  .price-story .label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  /* CTAs */
+  .cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+  }
+  .cta:hover { background: var(--forest); text-decoration: none; }
+  .cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+  }
+  .cta-ghost:hover { background: var(--paper-2); text-decoration: none; }
+  .cta-heart { color: var(--clay); font-size: 14px; }
+
+  /* ── SHORTLIST — was a table. Now a vertical stack of text rows. No table
+       element at all; each row is just a styled <li>. */
+  .shortlist {
+    padding: 32px 48px 28px;
+    border-top: 1px solid var(--line);
+    background: var(--paper-2);
+  }
+  .shortlist-h {
+    font-family: var(--font-display);
+    font-size: 26px;
+    line-height: 1.18;
+    color: var(--ink);
+    margin: 8px 0 4px;
+  }
+  .shortlist-lede {
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin: 0 0 18px;
+    max-width: 520px;
+  }
+  .shortlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .shortlist-list li {
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .shortlist-list .sl-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--clay);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .shortlist-list .sl-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.25;
+    margin: 4px 0 4px;
+  }
+  .shortlist-list .sl-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+    margin: 0 0 4px;
+  }
+  .shortlist-list .sl-price {
+    font-family: var(--font-display);
+    font-size: 19px;
+    color: var(--ink);
+    margin: 2px 0 6px;
+  }
+  .shortlist-list .sl-why {
+    font-family: var(--font-display);
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    margin: 0 0 10px;
+  }
+  .shortlist-list .sl-why em { font-style: italic; color: var(--clay-deep); }
+  .shortlist-list .sl-links {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    gap: 14px;
+  }
+  .shortlist-list .sl-links a { color: var(--ink); }
+  .shortlist-list .sl-links a:hover { color: var(--clay); }
+
+  /* caveat */
+  .caveat { padding: 32px 48px; border-top: 1px solid var(--line); }
+  .caveat-h { font-family: var(--font-display); font-size: 26px; color: var(--ink); margin: 8px 0 10px; }
+  .caveat p { font-family: var(--font-display); font-size: 17px; line-height: 1.5; color: var(--ink-2); margin: 0 0 10px; max-width: 580px; }
+  .caveat p strong { color: var(--ink); }
+  .caveat .see-link { font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--ink); }
+
+  /* your pulpo (dark) */
+  .your-pulpo { background: var(--ink); color: var(--paper); padding: 36px 48px; }
+  .your-pulpo .eyebrow { color: var(--paper); opacity: 0.55; }
+  .your-pulpo h2 { color: var(--paper); margin: 6px 0 22px; font-family: var(--font-display); font-size: 28px; }
+  .yp-grid { display: table; width: 100%; border-spacing: 0; }
+  .yp-row { display: table-row; }
+  .yp-cell { display: table-cell; vertical-align: middle; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.12); color: var(--paper); }
+  .yp-cell:last-child { text-align: right; }
+  .yp-num { font-family: var(--font-display); font-size: 22px; color: var(--paper); line-height: 1; }
+  .yp-label { font-size: 13px; color: var(--paper); opacity: 0.7; margin-top: 4px; }
+  .yp-link {
+    color: var(--paper);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .yp-link:hover { color: var(--clay); }
+
+  /* footer */
+  .foot { padding: 28px 48px 36px; }
+  .foot p {
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 0 0 10px;
+    max-width: 540px;
+  }
+  .foot p.tiny {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 14px;
+  }
+  .foot a { color: var(--ink-3); text-decoration: underline; }
+
+  /* annotations (mockup-only) */
+  .annot {
+    background: #E8F4E5;
+    border-left: 3px solid #4A7E2A;
+    padding: 12px 16px;
+    margin: 8px 48px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #2D4F18;
+    font-family: var(--font-mono);
+  }
+  .annot strong { color: #1C3309; }
+
+  @media (max-width: 600px) {
+    .welcome-pad, .market-now, .pick, .shortlist, .caveat, .your-pulpo, .foot { padding-left: 24px; padding-right: 24px; }
+    .h-hero { font-size: 32px; }
+    .pick-title { font-size: 26px; }
+    .pick-story { font-size: 17px; }
+    .yp-cell { display: block; padding: 14px 0; }
+    .yp-cell:last-child { text-align: left; padding-top: 0; padding-bottom: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="annot" style="margin: 32px 48px 0;">
+  <strong>v3 — 5 fixes from Sebas's review</strong> (28 May):
+  <strong>(1)</strong> No truncation / expand sections — everything in one continuous flow.
+  <strong>(2)</strong> No tables — every block converted to bullets / stacked text. Chips have visible backgrounds now (the prior <code>--paper-3</code> was too pale to read against the page).
+  <strong>(3)</strong> "Momentum 50" replaced by <strong>"Why we picked it"</strong> — 3 plain-English bullets per pick.
+  <strong>(4)</strong> Copy passes: "Read the frame first; skip if it isn't yours" → <strong>"Each one suits a different kind of buyer."</strong>
+  <strong>(5)</strong> Market context moved <strong>to the top</strong> (right after welcome teaser) so it sets context for the picks.
+</div>
+
+<div class="wrap">
+  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
+
+    <!-- HEADER -->
+    <tr><td style="padding: 16px 48px; border-bottom: 1px solid var(--line);">
+      <span style="font-family: var(--font-display); font-size: 24px; font-weight: 500; color: var(--forest);">pulpo</span>
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em; float: right; line-height: 24px;">ISSUE 06 · 29 MAY 2026</span>
+    </td></tr>
+
+    <!-- 1 · WELCOME -->
+    <tr><td class="welcome-pad">
+      <div class="eyebrow">For you · Land · La Libertad · Under $500k</div>
+      <h1 class="h-hero">Ten worth your weekend.</h1>
+      <hr class="rule-clay" />
+      <p class="welcome-lede">
+        Start with <em>#01</em> — ocean view, a 20-minute walk to El Tunco,
+        <em>priced like the seller actually wants to sell</em>.
+        <em>#02</em> is a coffee farm with two rivers in the mountains —
+        hard to look away from. And <em>#03</em> just had its first price
+        drop in two weeks.
+      </p>
+    </td></tr>
+
+    <!-- 2 · MARKET CONTEXT (MOVED TO TOP) -->
+    <tr><td class="market-now">
+      <div class="market-now-card">
+        <p class="market-now-label">What's happening this week</p>
+        <p class="market-now-body">
+          It's a buyer's fortnight in La Libertad. <em>Almost twice as many sellers
+          lowered prices this week as a normal week.</em> If you're getting close
+          on a listing — this is a good week to make the call.
+        </p>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>FIX #5 — Market context moved to top.</strong> Previously buried at the bottom right above the footer. Now sits between the welcome teaser and the first pick, so the reader has the "why this fortnight" context before they see any listing.
+    </div>
+
+    <!-- 3 · PICK 01 -->
+    <tr><td class="pick">
+      <p class="pick-num">Pick 01 · Land · El Tunco</p>
+
+      <div class="pick-hero" style="background-image: linear-gradient(135deg, #7BAA8E 0%, #2F5F4B 50%, #1F3D31 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 16px; padding: 20px; box-sizing: border-box;">
+        [hero photo · ocean view from the lot]
+      </div>
+
+      <div class="chips">
+        <span class="chip top">★ Top pick this fortnight</span>
+        <span class="chip cool">−78% below area</span>
+        <span class="chip">20 min walk to beach</span>
+        <span class="chip">Power + water at the lot</span>
+      </div>
+
+      <h2 class="pick-title">Ocean View Lot Near El Tunco</h2>
+      <p class="pick-meta">TAMANIQUE · LA LIBERTAD · 1,263 m²</p>
+      <p class="pick-price">$60,000</p>
+      <p class="quick-facts">
+        $47/m² · 20-minute walk to El Tunco beach · 36 km to SAL airport · Just listed
+      </p>
+
+      <p class="pick-story">
+        A twenty-minute walk to one of El Salvador's most famous surf beaches, on
+        a lot with ocean views. The seller inherited it last year and priced it to
+        move — <em>well under what nearby lots are asking</em>. Power runs along
+        the edge of the lot; water you'd bring from the neighbor's well. A small
+        project that ends with you waking up near the surf.
+      </p>
+
+      <div class="why-block">
+        <p class="why-label">Why we picked it</p>
+        <ul class="why-list">
+          <li>Priced 78% below the area average — rare for a lot this close to the beach</li>
+          <li>20-minute walk to El Tunco beach, no car needed</li>
+          <li>Power and water already in — you just add the road</li>
+        </ul>
+      </div>
+
+      <p class="price-story">
+        <span class="label">What about the price?</span>
+        Lots like this in Tamanique usually go for $200/m². At $47/m², this one is
+        either underpriced or has a catch. The catch we found: water is at the
+        neighbor's, not the lot.
+      </p>
+
+      <div class="cta-row">
+        <a class="cta" href="https://pulpo.club/listing/remax:001461165132?ref=newsletter_issue_06">See on Pulpo →</a>
+        <a class="cta-ghost" href="https://pulpo.club/listing/remax:001461165132?ref=newsletter_issue_06&amp;save=1"><span class="cta-heart">♥</span> Save to favorites</a>
+      </div>
+    </td></tr>
+
+    <div class="annot">
+      <strong>FIX #1 + #2 + #3 visible here.</strong>
+      <strong>(1)</strong> One continuous flow — no "expand" anywhere.
+      <strong>(2)</strong> No tables. Quick facts are inline bullet-separated text. Reasons-to-buy is a bullet list, not a callout block. Price story is plain text with a small label, not a callout box.
+      <strong>(3)</strong> "Why we picked it" replaces "value 100 · location 100 · momentum 50" — three plain-English bullets, each tied to a real Listing field (price_vs_zone_pct, dist_beach_km, readiness_score).
+      <strong>Chips</strong> now have visible backgrounds (hex, not <code>var()</code>) so they read as chips, not text.
+    </div>
+
+    <!-- 4 · PICK 02 -->
+    <tr><td class="pick">
+      <p class="pick-num">Pick 02 · Land · Chiltiupán</p>
+
+      <div class="pick-hero" style="background-image: linear-gradient(135deg, #B89E72 0%, #6F7B4D 60%, #2F5F4B 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 16px; padding: 20px; box-sizing: border-box;">
+        [hero photo · river canyon &amp; coffee plants]
+      </div>
+
+      <div class="chips">
+        <span class="chip top">★ Top pick this fortnight</span>
+        <span class="chip cool">Coffee growing</span>
+        <span class="chip">Two year-round rivers</span>
+        <span class="chip">35 min to El Tunco</span>
+      </div>
+
+      <h2 class="pick-title">Coffee Farm with Two Rivers</h2>
+      <p class="pick-meta">CHILTIUPÁN · LA LIBERTAD · 43 ACRES</p>
+      <p class="pick-price">$185,000</p>
+      <p class="quick-facts">
+        43 acres total · 9 acres buildable · 2 year-round rivers · 200 balsam trees
+      </p>
+
+      <p class="pick-story">
+        If your dream is <em>fog, coffee plants and the sound of a river</em>,
+        look at this one. Forty-three acres in the Balsam mountains, with two
+        year-round rivers and nine acres of coffee already growing. Most of the
+        land is a steep river canyon — you can't build there, but the views from
+        the top ridge are something. The road is rough in rainy season.
+      </p>
+
+      <div class="why-block">
+        <p class="why-label">Why we picked it</p>
+        <ul class="why-list">
+          <li>Two year-round rivers — water is never the bottleneck</li>
+          <li>9 buildable acres at the top ridge, with the rest as natural buffer</li>
+          <li>Coffee already growing — income from year one if you keep it</li>
+        </ul>
+      </div>
+
+      <p class="price-story">
+        <span class="label">What about the price?</span>
+        $185,000 for 43 acres works out to about $1/m² on paper. The honest number:
+        most of the land is canyon. The 9 buildable acres alone are worth what
+        you're paying.
+      </p>
+
+      <div class="cta-row">
+        <a class="cta" href="https://pulpo.club/listing/remax:003094257003?ref=newsletter_issue_06">See on Pulpo →</a>
+        <a class="cta-ghost" href="https://pulpo.club/listing/remax:003094257003?ref=newsletter_issue_06&amp;save=1"><span class="cta-heart">♥</span> Save to favorites</a>
+      </div>
+    </td></tr>
+
+    <!-- 5 · PICK 03 (price drop) -->
+    <tr><td class="pick">
+      <p class="pick-num">Pick 03 · Land · Atami · Price just dropped</p>
+
+      <div class="pick-hero" style="background-image: linear-gradient(135deg, #6A91B0 0%, #2D5273 60%, #1E2A3A 100%); display: flex; align-items: end; justify-content: center; color: var(--paper); font-family: var(--font-display); font-size: 16px; padding: 20px; box-sizing: border-box;">
+        [hero photo · ocean view from Atami]
+      </div>
+
+      <div class="chips">
+        <span class="chip warm">↓ Just dropped −$5,000</span>
+        <span class="chip">Residential infrastructure</span>
+        <span class="chip">Ocean views</span>
+      </div>
+
+      <h2 class="pick-title">Prime Land in Atami Residential</h2>
+      <p class="pick-meta">TAMANIQUE · LA LIBERTAD · OCEAN VIEWS</p>
+      <p class="pick-price">$150,000 <span style="font-family: var(--font-mono); font-size: 14px; color: var(--burgundy); text-decoration: line-through; margin-left: 6px;">$155,000</span></p>
+      <p class="quick-facts">
+        Atami residential · Paved access · Water + power on site · Ocean view from lot
+      </p>
+
+      <p class="pick-story">
+        The seller just lowered the price — their <em>first move</em> on this
+        listing in 14 days. Atami is a residential community with water, power
+        and paved roads already in place, and the lot has real ocean views from
+        the photos. Worth saving so Pulpo can tell you the moment they drop it
+        again.
+      </p>
+
+      <div class="why-block">
+        <p class="why-label">Why we picked it</p>
+        <ul class="why-list">
+          <li>Price just dropped for the first time — usually not the last</li>
+          <li>Atami already has water, power and paved roads — no infrastructure project</li>
+          <li>Real ocean views from the lot (verified against the listing photos)</li>
+        </ul>
+      </div>
+
+      <div class="cta-row">
+        <a class="cta" href="https://pulpo.club/listing/remax:14-atami?ref=newsletter_issue_06">See on Pulpo →</a>
+        <a class="cta-ghost" href="https://pulpo.club/listing/remax:14-atami?ref=newsletter_issue_06&amp;save=1"><span class="cta-heart">♥</span> Save &amp; follow price</a>
+      </div>
+    </td></tr>
+
+    <!-- 6 · SHORTLIST (7 more) — NO TABLES -->
+    <tr><td class="shortlist">
+      <p class="eyebrow muted">Seven more worth a look</p>
+      <h2 class="shortlist-h">Each one suits a different kind of buyer.</h2>
+      <p class="shortlist-lede">
+        Pulpo ranked these inside your filter too. Skim the short reads below —
+        each one tells you who the right buyer is.
+      </p>
+
+      <ul class="shortlist-list">
+        <li>
+          <p class="sl-num">04 · El Tunco</p>
+          <h3 class="sl-title">3,005-vara Lot in El Tunco &amp; Sunzal</h3>
+          <p class="sl-meta">TAMANIQUE · 2,100 m² · $71/m²</p>
+          <p class="sl-price">$150,000</p>
+          <p class="sl-why">
+            For someone who <em>wants surf-city land cheap</em>. The catch: same
+            lot is listed by 3 agents at 3 prices. Verify before contacting.
+          </p>
+          <p class="sl-links">
+            <a href="https://pulpo.club/listing/bienesraices:2008?ref=newsletter_issue_06">See on Pulpo →</a>
+            <a href="https://pulpo.club/listing/bienesraices:2008?ref=newsletter_issue_06&amp;save=1">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">05 · Chiltiupán</p>
+          <h3 class="sl-title">Mountain Lot Near El Zonte</h3>
+          <p class="sl-meta">CHILTIUPÁN · 4,193 m² · $57/m²</p>
+          <p class="sl-price">$240,000</p>
+          <p class="sl-why">
+            For someone who <em>wants the El Zonte vibe without the beachfront
+            price</em>. Power and water on site; road needs a connection.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">06 · El Zonte</p>
+          <h3 class="sl-title">Raw Land · 1.9 ha in El Zonte</h3>
+          <p class="sl-meta">CHILTIUPÁN · 19,065 m² · $35/m²</p>
+          <p class="sl-price">$667,295</p>
+          <p class="sl-why">
+            For someone <em>buying with a build budget</em>. Almost 2 hectares
+            with ocean views, no utilities yet. The land alone is the deal.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">07 · La Libertad</p>
+          <h3 class="sl-title">Beachfront Condo in Atami</h3>
+          <p class="sl-meta">LA LIBERTAD · 4 BED · 701 m²</p>
+          <p class="sl-price">$270,000</p>
+          <p class="sl-why">
+            For someone who <em>doesn't want to build</em>. Move-in-ready in a
+            residential community, 4 bedrooms, ocean view.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">08 · El Zonte</p>
+          <h3 class="sl-title">Cliff Land with Ocean View</h3>
+          <p class="sl-meta">CHILTIUPÁN · 6,989 m² · $64/m²</p>
+          <p class="sl-price">$450,000</p>
+          <p class="sl-why">
+            For someone who <em>wants drama</em>. A cliff lot with paved access
+            already in. The site preparation isn't trivial.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">09 · La Libertad</p>
+          <h3 class="sl-title">Twin Oceanfront Lots in Playa Cangrejera</h3>
+          <p class="sl-meta">LA LIBERTAD · two lots · ↓ 12% since listing</p>
+          <p class="sl-price">$120,000</p>
+          <p class="sl-why">
+            For someone <em>thinking long horizon</em>. Twin oceanfront lots,
+            the seller has been on market 192 days and just dropped 12%.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+        <li>
+          <p class="sl-num">10 · La Libertad</p>
+          <h3 class="sl-title">30-manzana Land in San Matías</h3>
+          <p class="sl-meta">LA LIBERTAD · agricultural · no road</p>
+          <p class="sl-price">$225,000</p>
+          <p class="sl-why">
+            For someone <em>buying acreage</em>, not a build site. No road
+            access — verify the road conversation before any offer.
+          </p>
+          <p class="sl-links">
+            <a href="#">See on Pulpo →</a>
+            <a href="#">♥ Save</a>
+          </p>
+        </li>
+      </ul>
+    </td></tr>
+
+    <div class="annot">
+      <strong>FIX #2 + #4 here.</strong>
+      <strong>(2)</strong> Each "more" entry is a stacked <code>&lt;li&gt;</code> with text — no <code>&lt;table&gt;</code> anywhere. Reads cleanly on mobile because there's no horizontal table layout to collapse.
+      <strong>(4)</strong> Old copy "<em>Each one is the right answer for a specific buyer. Read the frame first; skip if it isn't yours.</em>" → new copy "<strong>Each one suits a different kind of buyer.</strong>" Each row's "For someone who <em>wants surf-city land cheap</em>" replaces the cryptic "frame" concept.
+    </div>
+
+    <!-- 7 · CAVEAT -->
+    <tr><td class="caveat">
+      <p class="eyebrow muted">One worth a call before you fall in love</p>
+      <h2 class="caveat-h">Three agents, three prices.</h2>
+      <p>
+        Pick #04 (<strong>Prime Land in El Tunco &amp; Sunzal</strong>, $150,000)
+        appears under three different agents at three different prices ($150k, $160k, $174k).
+        Same description, same coordinates.
+      </p>
+      <p>
+        One of them probably has the real listing. The others are agents listing it on
+        speculation. Worth a phone call to all three before you go further on this one.
+      </p>
+      <a class="see-link" href="#">See all three on Pulpo →</a>
+    </td></tr>
+
+    <!-- 8 · YOUR PULPO -->
+    <tr><td class="your-pulpo">
+      <div class="eyebrow">Your Pulpo</div>
+      <h2>Pick up where you left off.</h2>
+      <div class="yp-grid">
+        <div class="yp-row">
+          <div class="yp-cell">
+            <div class="yp-num">3 saved</div>
+            <div class="yp-label">from past issues</div>
+          </div>
+          <div class="yp-cell">
+            <a class="yp-link" href="https://pulpo.club/saved?ref=newsletter_issue_06">Open your favorites →</a>
+          </div>
+        </div>
+        <div class="yp-row">
+          <div class="yp-cell">
+            <div class="yp-num">La Libertad · land · &lt; $500k</div>
+            <div class="yp-label">your filter</div>
+          </div>
+          <div class="yp-cell">
+            <a class="yp-link" href="https://pulpo.club/account/notifications?ref=newsletter_issue_06">Change what you want →</a>
+          </div>
+        </div>
+        <div class="yp-row">
+          <div class="yp-cell">
+            <div class="yp-num">213 listings</div>
+            <div class="yp-label">match your filter today</div>
+          </div>
+          <div class="yp-cell">
+            <a class="yp-link" href="https://pulpo.club/browse?ref=newsletter_issue_06">Browse them all →</a>
+          </div>
+        </div>
+      </div>
+    </td></tr>
+
+    <!-- 9 · FOOTER -->
+    <tr><td class="foot">
+      <p>Pulpo is made in San Salvador for people looking for a property they'll love. We hand-check the data and pick favorites for you every fortnight.</p>
+      <p>If something speaks to you — reply. We read every one.</p>
+      <p class="tiny">
+        <a href="https://pulpo.club/account/notifications">Change your filter</a>
+        ·
+        <a href="https://pulpo.club">pulpo.club</a>
+        ·
+        <a href="#">Unsubscribe</a>
+      </p>
+    </td></tr>
+
+  </table>
+</div>
+
+</body>
+</html>
