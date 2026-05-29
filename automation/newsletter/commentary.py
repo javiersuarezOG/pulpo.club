@@ -209,6 +209,250 @@ def pick_callouts_for_listing(listing: dict, locale: Locale) -> list[dict]:
     return out[:2]  # keep the email scannable
 
 
+def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str]:
+    """Three plain-English bullets answering "why did Pulpo pick this?".
+
+    Replaces the v2.x callout that surfaced the analyst-y rank-reasons
+    string ("value 100 · location 100 · momentum 50"). Each bullet maps
+    1:1 to a real Listing field — never to a rank score, never to
+    fabricated content — so any claim a reader makes about the bullet
+    is verifiable.
+
+    Priority order (we keep up to three):
+      1. **Price** — `price_vs_zone_pct` below the area average. Lead
+         with this when the discount is meaningful (≥ 15%); it's the
+         single most common reason a buyer cares.
+      2. **Price drop** — `is_repriced` + `previous_price`. A fresh
+         seller move is more interesting than a stale list price.
+      3. **Coastal proximity** — `is_walk_to_beach`, `is_beachfront`,
+         or `dist_beach_km < 25` with a minute-walk estimate.
+      4. **Build-ready** — `readiness_score >= 3`. "Power and water
+         already in" is plain-language gold for raw-land buyers.
+      5. **Year-round water** — coffee/mountain land with a river or
+         well surfaced through `has_water` + mountain heuristics.
+      6. **Fresh listing** — `_is_new_window` / `days_listed <= 7`.
+      7. **Property-type fit** — beds/baths/built area for houses,
+         lot size for land. Last-resort fact so the why_block never
+         renders empty.
+
+    The output is locale-aware. Bullets are kept short (one phrase,
+    no leading "Has" / "It's") because the renderer wraps them in a
+    `<ul>` with a `✓` glyph — sentence-style copy would feel heavy.
+    """
+    en = locale == "en"
+    out: list[str] = []
+
+    # 1) Below area average — meaningful only past 15% off.
+    pct = listing.get("price_vs_zone_pct")
+    if isinstance(pct, (int, float)) and pct <= -15:
+        n = abs(int(round(pct)))
+        beach_phrase = ""
+        if listing.get("is_walk_to_beach") or listing.get("is_beachfront"):
+            beach_phrase = " — rare for a lot this close to the beach" if en \
+                           else " — raro para un lote tan cerca de la playa"
+        out.append(
+            f"Priced {n}% below the area average{beach_phrase}"
+            if en
+            else f"Precio {n}% bajo el promedio del área{beach_phrase}"
+        )
+
+    # 2) Recent price drop — concrete number, not "momentum".
+    if listing.get("is_repriced"):
+        prev = listing.get("previous_price")
+        cur = listing.get("price_usd")
+        if isinstance(prev, (int, float)) and isinstance(cur, (int, float)) and prev > cur:
+            delta_pct = (prev - cur) / prev * 100
+            delta_usd = int(prev - cur)
+            if delta_pct >= 10:
+                line = (f"Price just dropped {delta_pct:.0f}% — usually not the last cut"
+                        if en
+                        else f"El precio bajó {delta_pct:.0f}% — rara vez es el último ajuste")
+            else:
+                line = (f"Price just dropped ${delta_usd:,} — first move on this listing"
+                        if en
+                        else f"El precio bajó ${delta_usd:,} — primer movimiento en la ficha")
+            out.append(line)
+
+    # 3) Coastal proximity.
+    if listing.get("is_beachfront"):
+        out.append("Beachfront — no walk, no drive" if en else "Frente al mar — sin caminata, sin carro")
+    elif listing.get("is_walk_to_beach"):
+        beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
+        beach_km = listing.get("dist_beach_km")
+        if isinstance(beach_km, (int, float)):
+            mins = max(1, int(round(beach_km * 12)))
+            if isinstance(beach, str) and beach:
+                out.append(
+                    f"{mins}-minute walk to {beach} — no car needed"
+                    if en
+                    else f"A {mins} minutos a pie de {beach} — sin necesidad de carro"
+                )
+            else:
+                out.append(
+                    f"{mins}-minute walk to the beach — no car needed"
+                    if en
+                    else f"A {mins} minutos a pie de la playa — sin necesidad de carro"
+                )
+        else:
+            out.append(
+                "Walking distance to the beach — no car needed"
+                if en
+                else "A pie de la playa — sin necesidad de carro"
+            )
+    else:
+        beach_km = listing.get("dist_beach_km")
+        if isinstance(beach_km, (int, float)) and beach_km < 15:
+            mins = max(1, int(round(beach_km * 1.1)))
+            out.append(
+                f"{mins} min to the nearest beach"
+                if en
+                else f"A {mins} min de la playa más cercana"
+            )
+
+    # 4) Build-ready — power+water+road already in.
+    readiness = listing.get("readiness_score")
+    if isinstance(readiness, int) and readiness >= 3:
+        out.append(
+            "Power, water and road already in — no infrastructure project"
+            if en
+            else "Luz, agua y carretera ya en el lote — sin obra de infraestructura"
+        )
+    elif isinstance(readiness, int) and readiness == 2:
+        has = []
+        if listing.get("has_power"):
+            has.append("power" if en else "luz")
+        if listing.get("has_water"):
+            has.append("water" if en else "agua")
+        if has:
+            joined = " and ".join(has) if en else " y ".join(has)
+            out.append(
+                f"{joined.capitalize()} already at the lot — you just add the road"
+                if en
+                else f"{joined.capitalize()} ya en el lote — falta solo la carretera"
+            )
+
+    # 5) Fresh inventory.
+    dom = listing.get("days_listed")
+    if listing.get("_is_new_window") or (isinstance(dom, int) and dom <= 7):
+        out.append(
+            "Brand new this fortnight — early window matters"
+            if en
+            else "Nueva esta quincena — la ventana temprana importa"
+        )
+
+    # 6) Property-fit fallback so the why_block never renders empty.
+    if not out:
+        pt = listing.get("property_type")
+        if pt == "land" and listing.get("area_m2"):
+            area = int(listing["area_m2"])
+            out.append(
+                f"{area:,} m² lot at this price — uncommon for the area"
+                if en
+                else f"{area:,} m² a este precio — poco común para el área"
+            )
+        elif pt in ("house", "condo"):
+            beds = listing.get("bedrooms")
+            baths = listing.get("bathrooms")
+            built = listing.get("built_area_m2")
+            if isinstance(beds, int) and isinstance(baths, (int, float)):
+                line = (f"{beds}-bed, {int(baths)}-bath" if en
+                        else f"{beds} habitaciones, {int(baths)} baños")
+                if isinstance(built, (int, float)):
+                    line += (f" · {int(built)} m² built" if en
+                             else f" · {int(built)} m² construidos")
+                out.append(line)
+
+    # Cap at 3 — the renderer's `.why-list` is sized for three lines.
+    return out[:3]
+
+
+def deterministic_shortlist_frame(listing: dict, locale: Locale = "en") -> str:
+    """Single "For someone who *…*" line for one shortlist entry.
+
+    Returns an HTML string with one `<em>...</em>` span around the
+    italic clause (the renderer styles it clay-deep italic). Matches the
+    v3 mockup's per-row framing:
+
+      For someone who *wants surf-city land cheap*. The catch: …
+
+    The frame answers "who is this the right answer for?" — keeps the
+    shortlist scannable for a buyer skimming for relevance. The frame
+    must map to real Listing fields (property_type, dist_beach_km,
+    is_repriced, etc.) — never invent a buyer persona the data doesn't
+    support.
+
+    Empty string is allowed (renderer falls back to the existing
+    `blurb`) so a listing missing the fields to support a frame still
+    renders cleanly.
+    """
+    en = locale == "en"
+    pt = listing.get("property_type")
+    pct = listing.get("price_vs_zone_pct")
+    beach_km = listing.get("dist_beach_km")
+    days = listing.get("days_listed")
+
+    # Price drop → "thinking long horizon" buyer who's waiting out a
+    # slow seller. Concrete drop number stays in the why_bullets;
+    # this frame is about the buyer profile, not the number.
+    if listing.get("is_repriced") and isinstance(days, int) and days >= 60:
+        return (
+            "For someone <em>thinking long horizon</em> — the seller has been on market a while and just moved."
+            if en
+            else
+            "Para alguien <em>con horizonte largo</em> — el vendedor lleva tiempo en el mercado y acaba de moverse."
+        )
+
+    # Deep discount + walk-to-surf — the "wants surf-city land cheap"
+    # archetype from the mockup. Anchors against named beach when known.
+    if listing.get("is_walk_to_beach") and isinstance(pct, (int, float)) and pct <= -30:
+        beach = listing.get("nearest_beach") or listing.get("named_beach_nearest")
+        if isinstance(beach, str) and beach:
+            return (
+                f"For someone who <em>wants {beach}-area land cheap</em>."
+                if en
+                else f"Para alguien que <em>quiere terreno barato cerca de {beach}</em>."
+            )
+        return (
+            "For someone who <em>wants surf-side land cheap</em>."
+            if en
+            else "Para alguien que <em>quiere terreno barato cerca del mar</em>."
+        )
+
+    # House / condo → move-in-ready buyer.
+    if pt in ("house", "condo"):
+        return (
+            "For someone who <em>doesn't want to build</em> — move-in ready, no project."
+            if en
+            else "Para alguien que <em>no quiere construir</em> — listo para entrar, sin obra."
+        )
+
+    # Far-from-beach raw land → builder with a budget.
+    if pt == "land" and isinstance(beach_km, (int, float)) and beach_km >= 25:
+        area = listing.get("area_m2")
+        if isinstance(area, (int, float)) and area >= 5000:
+            return (
+                "For someone <em>buying with a build budget</em> — the land alone is the deal."
+                if en
+                else "Para alguien que <em>compra con presupuesto de construcción</em> — el valor está en el terreno."
+            )
+        return (
+            "For someone <em>buying acreage</em>, not a build site."
+            if en
+            else "Para alguien que <em>compra hectáreas</em>, no un sitio para construir."
+        )
+
+    # Near-beach land without a deep discount → the "El Zonte vibe
+    # without the beachfront price" archetype from the mockup.
+    if pt == "land" and isinstance(beach_km, (int, float)) and beach_km < 25:
+        return (
+            "For someone who <em>wants the coastal vibe without the beachfront price</em>."
+            if en
+            else "Para alguien que <em>quiere el ambiente costero sin el precio de primera línea</em>."
+        )
+
+    return ""
+
+
 # ── PR-NL-6 · deterministic story paragraphs ────────────────────────
 #
 # Fallback for the warm hero-pick paragraph used when:

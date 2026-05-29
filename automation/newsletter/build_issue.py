@@ -743,6 +743,8 @@ def _to_pick(
     pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
     story_html, story_source = ("", "")
+    why_bullets: list[str] = []
+    shortlist_frame_html = ""
     if is_hero and not paywalled:
         # Paywalled picks render the locked teaser instead of the story —
         # no point burning LLM tokens on a paragraph the reader never sees.
@@ -752,6 +754,13 @@ def _to_pick(
             issue_id=issue_id,
             llm_client_override=llm_client_override,
         )
+        # v3 — three plain-English bullets replacing the opaque
+        # "Why Pulpo ranked it: value 100 · momentum 50" row. Hero-only
+        # because the shortlist gets a single "For someone who…" frame
+        # below instead.
+        why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
+    elif not is_hero and not paywalled:
+        shortlist_frame_html = commentary_mod.deterministic_shortlist_frame(listing, locale)
     return IssuePick(
         rank=rank,
         source_id=f"{listing.get('source')}:{listing.get('source_id')}",
@@ -773,6 +782,8 @@ def _to_pick(
         chips=chips,
         story_html=story_html,
         story_source=story_source,
+        why_bullets=why_bullets,
+        shortlist_frame_html=shortlist_frame_html,
     )
 
 

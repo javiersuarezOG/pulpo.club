@@ -27,7 +27,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v2.8-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.0-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -40,7 +40,10 @@ _CSS = """
 :root {
   --paper:        #F4EFE6;
   --paper-2:      #F8F4EC;
-  --paper-3:      #EEE9DF;
+  /* v3 — bumped from #EEE9DF. The paler tone was so close to --paper that
+     chip backgrounds were nearly invisible against the cream page. Hex
+     literal lives in `.chip` directly below for the same reason. */
+  --paper-3:      #E8DFC6;
   --white:        #FFFFFF;
   --ink:          #1A1916;
   --ink-2:        #5A5650;
@@ -50,6 +53,7 @@ _CSS = """
   --forest:       #1F3D31;
   --forest-mid:   #3D6450;
   --sage:         #DDE9DC;
+  --sage-strong:  #C9DEC6;
   --clay:         #B8643C;
   --clay-deep:    #7A3D1F;
   --navy:         #1E2A3A;
@@ -125,28 +129,64 @@ table { border-collapse: collapse; }
 .pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
 .pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
 
-/* ── PR-NL-5 chips — supportive context next to a hero pick ─────────
-   `chip` is the new container (replacing the older pill on hero picks).
-   `kind` defaults to neutral; warm + cool override the color to carry
-   emotional/positive weight without shouting. Tuned to feel quieter
-   than the old pill so the headline + hero photo + story paragraph
-   stay the focal point. */
+/* ── chips — supportive context next to a hero pick ─────────────────
+   v3 update: backgrounds use hex literals (NOT var()) so Outlook /
+   Yahoo, which strip var() from inline + email-stripped CSS, still
+   render the right tone. The neutral chip's `#E8DFC6` matches the
+   bumped `--paper-3` token — kept hex here so the chip stays visible
+   even when the var() is stripped. The `chip-top` variant is the
+   forest-on-cream "Top pick" treatment from the v3 mockup. */
 .chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--ink-2);
-  background: var(--paper-3);
+  color: #5A5650;
+  background: #E8DFC6;
   margin: 0 4px 6px 0;
   line-height: 1.6;
 }
-.chip-warm { background: #FBE6D8; color: var(--clay-deep); }
-.chip-cool { background: var(--sage); color: var(--forest); }
+.chip-warm { background: #FBE6D8; color: #7A3D1F; font-weight: 600; }
+.chip-cool { background: #C9DEC6; color: #1F3D31; font-weight: 600; }
+.chip-top  { background: #1F3D31; color: #F4EFE6; font-weight: 600; }
+/* "Why we picked it" — three plain-English bullets per hero pick.
+   Replaces the v2.x rank-score callout (value 100 / momentum 50) that
+   exposed analyst-y internals. Each bullet maps 1:1 to a real Listing
+   field; the green check matches the "verified fact" feel. */
+.why-block {
+  margin: 18px 0 0;
+  padding: 16px 18px 18px;
+  background: var(--paper-2);
+  border-radius: 6px;
+}
+.why-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clay);
+  margin: 0 0 10px;
+}
+.why-list { list-style: none; margin: 0; padding: 0; }
+.why-list li {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding: 4px 0 4px 22px;
+  position: relative;
+}
+.why-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  color: var(--forest);
+  font-weight: 700;
+}
 .cta {
   display: inline-block;
   font-family: var(--font-sans);
@@ -172,10 +212,34 @@ table { border-collapse: collapse; }
   border-radius: 999px;
 }
 .cta-ghost:hover { background: var(--ink); color: var(--paper) !important; text-decoration: none; }
-.glance td { padding: 12px 0; border-bottom: 1px solid var(--line); font-family: var(--font-sans); font-size: 14px; vertical-align: top; color: var(--ink); }
-.glance .num { font-family: var(--font-mono); color: var(--clay); font-weight: 500; width: 32px; font-size: 12px; padding-top: 14px; }
-.glance .where { font-family: var(--font-mono); color: var(--ink-3); font-size: 11px; letter-spacing: 0.04em; }
-.glance .pricecol { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap; }
+/* v3: shortlist entries render as stacked .sl-card divs (no inner
+   <table>). The mockup's per-row "For someone who *…*" frame line is
+   `.sl-why` — italic clause styled clay-deep via the shared
+   `.body em` rule. */
+.sl-card {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.sl-card .sl-photo { margin: 0 0 12px; }
+.sl-card .sl-photo img { border-radius: 4px; }
+.sl-card .sl-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  margin: 4px 0 4px;
+}
+.sl-card .sl-why {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin: 8px 0 0;
+}
+.sl-card .sl-why em { font-style: italic; color: var(--clay-deep); }
 .meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 .callout { margin: 14px 0 0; padding: 0; background: none; }
 .callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
@@ -264,11 +328,18 @@ def _pills_html(pills: list[str]) -> str:
 
 
 def _chips_html(pick: IssuePick) -> str:
-    """Render PR-NL-5 Chip objects (warm/cool/neutral) into the email.
+    """Render Chip objects (warm/cool/neutral/top) into the email.
 
-    Falls through to the legacy `pills` list when no chips are set so any
-    older fixture or upstream caller that hasn't migrated still renders
-    *something* useful instead of a blank row."""
+    v3: the "★ Top pick this fortnight" chip — emitted by
+    build_issue._chips_for_listing with `kind=cool` for the top N — is
+    promoted visually to the forest-on-cream `chip-top` treatment when
+    its label starts with the star glyph. The detection is label-based
+    so the underlying Chip type stays at three kinds (the mockup's
+    fourth variant is purely a render-side choice).
+
+    Falls through to the legacy `pills` list when no chips are set so
+    older fixtures that haven't migrated still render something useful.
+    """
     chips = getattr(pick, "chips", None) or []
     if not chips:
         return _pills_html(pick.pills)
@@ -276,28 +347,62 @@ def _chips_html(pick: IssuePick) -> str:
     for c in chips:
         klass = "chip"
         kind = getattr(c, "kind", "neutral")
-        if kind == "warm":
+        label = c.label or ""
+        if label.startswith("★"):
+            klass += " chip-top"
+        elif kind == "warm":
             klass += " chip-warm"
         elif kind == "cool":
             klass += " chip-cool"
-        out.append(f'<span class="{klass}">{_e(c.label)}</span>')
+        out.append(f'<span class="{klass}">{_e(label)}</span>')
     return "".join(out)
 
 
 def _callouts_html(callouts: list[dict]) -> str:
+    """Render the structured callouts under a hero pick.
+
+    v3: the "Why Pulpo ranked it" callout — which surfaced analyst-y
+    rank-reasons strings ("value 100 · location 100 · momentum 50") —
+    is dropped here. The plain-English "Why we picked it" `.why-block`
+    above the callouts covers the same job in language a reader can
+    actually use. "Reasons to buy" and "The price story" stay.
+    """
     if not callouts:
         return ""
     out: list[str] = []
     for c in callouts:
-        label = _e(c.get("label", ""))
-        body = _e(c.get("body", ""))
-        if not body:
+        label_raw = (c.get("label") or "").strip()
+        body_raw = (c.get("body") or "").strip()
+        if not body_raw:
+            continue
+        if "Why Pulpo ranked it" in label_raw or "Por qué Pulpo lo clasifica" in label_raw:
             continue
         out.append(
-            f'<div class="callout"><div class="label">{label}</div>'
-            f'<div class="body">{body}</div></div>'
+            f'<div class="callout"><div class="label">{_e(label_raw)}</div>'
+            f'<div class="body">{_e(body_raw)}</div></div>'
         )
     return "".join(out)
+
+
+def _why_block_html(pick: IssuePick, locale: Locale) -> str:
+    """Render the v3 "Why we picked it" `<ul>` of plain-English bullets.
+
+    Empty list → no block rendered (paywalled picks and any pick whose
+    `deterministic_why_for_pick` falls through every branch). Each
+    bullet is escaped — they're plain text out of commentary.py, no
+    embedded markup.
+    """
+    bullets = getattr(pick, "why_bullets", None) or []
+    if not bullets:
+        return ""
+    label = i18n.t("pick.why_label", locale)
+    items = "".join(f"<li>{_e(b)}</li>" for b in bullets)
+    return (
+        f'<div class="why-block">'
+        f'<p class="why-label">{_e(label)}</p>'
+        f'<ul class="why-list">{items}</ul>'
+        f"</div>"
+    )
 
 
 def _meta_row_html(rows: list[tuple[str, str]]) -> str:
@@ -430,6 +535,7 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
 
     callouts_html = "" if pick.paywalled else _callouts_html(pick.callouts)
     meta_row_html = "" if pick.paywalled else _meta_row_html(pick.keytable)
+    why_html = "" if pick.paywalled else _why_block_html(pick, locale)
     # PR-NL-6: prefer story_html (AI or deterministic — see
     # build_issue._llm_or_deterministic_story). Falls back to the
     # listing's enriched blurb when story_html is empty (short picks /
@@ -466,6 +572,7 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
       <div class="price">{_e(pick.price_text)}{price_note_html}</div>
       {meta_row_html}
       {blurb_html}
+      {why_html}
       {callouts_html}
       <p style="margin-top: 16px;">{_ctas_for_hero_pick(pick, locale, paywall_url)}</p>
     </td></tr>
@@ -474,55 +581,58 @@ def _rich_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
 
 
 def _short_pick(pick: IssuePick, *, locale: Locale, paywall_url: str) -> str:
-    eyebrow_text = ""  # not yet generated deterministically — PR-NL-3 LLM hook
+    """v3 shortlist entry — stacked card layout, no inner <table>.
+
+    The v2 layout used a 2-column inner `<table>` to put a tiny photo
+    next to the headline + price + ghost CTA. That was the table the
+    user called out — even though a `role="presentation"` table doesn't
+    render visually as a grid, the surrounding chrome (cell padding,
+    column widths) read as one. v3 stacks everything vertically inside
+    a `.sl-card` div and surfaces a "For someone who *…*" frame line so
+    the reader knows who the listing suits before they decide to click.
+    """
     # Shortlist gets at most 1 editorial tag (matches rich-pick cap).
     pills_html = _new_pill(pick, locale) + _pills_html(pick.pills[:1])
-    blurb_html = ""
-    if pick.paywalled:
-        blurb_html = f'<p class="body-2" style="margin: 8px 0 0;">{_e(i18n.t("pick.paywall_blurb", locale))}</p>'
-    elif pick.blurb:
-        blurb_html = f'<p class="body-2" style="margin: 8px 0 0;">{_e(pick.blurb)}</p>'
     price_note_html = (
         f'<span class="price-note"> · {_e(pick.price_note)}</span>' if pick.price_note else ""
     )
-    eyebrow_html = (
-        f'<div class="eyebrow">{_e(eyebrow_text)}</div>' if eyebrow_text else ""
+
+    # The "For someone who *wants surf-city land cheap*" frame line.
+    # `shortlist_frame_html` contains a single trusted `<em>...</em>`
+    # span built by commentary.deterministic_shortlist_frame — DON'T
+    # html-escape it. Falls back to the listing blurb when the frame is
+    # empty (paywalled picks / listings without enough data) so the row
+    # still says something useful.
+    frame_html_raw = getattr(pick, "shortlist_frame_html", "") or ""
+    if pick.paywalled:
+        frame_html = (
+            f'<p class="sl-why">{_e(i18n.t("pick.paywall_blurb", locale))}</p>'
+        )
+    elif frame_html_raw:
+        frame_html = f'<p class="sl-why">{frame_html_raw}</p>'
+    elif pick.blurb:
+        frame_html = f'<p class="sl-why">{_e(pick.blurb)}</p>'
+    else:
+        frame_html = ""
+
+    photo = _photo_html_short(pick)
+    photo_html = (
+        f'<div class="sl-photo">{photo}</div>' if photo else ""
     )
+
     return f"""
     <tr><td class="pad-md">
-      <table width="100%" role="presentation"><tr>
-        <td width="38%" style="vertical-align: top; padding-right: 22px;">{_photo_html_short(pick)}</td>
-        <td style="vertical-align: top;">
-          {eyebrow_html}
-          <h3 class="h3" style="margin-top: 6px;">{_e(pick.title)}</h3>
-          <div class="price-2" style="margin: 6px 0;">{_e(pick.price_text)}{price_note_html}</div>
-          {('<div>' + pills_html + '</div>') if pills_html else ''}
-          {blurb_html}
-          <p style="margin-top: 12px;">{_cta_for_pick(pick, locale, paywall_url, ghost=True)}</p>
-        </td>
-      </tr></table>
+      <div class="sl-card">
+        {photo_html}
+        <h3 class="h3" style="margin-top: 0;">{_e(pick.title)}</h3>
+        <div class="sl-meta">{_e(pick.location_line)}</div>
+        <div class="price-2" style="margin: 4px 0 6px;">{_e(pick.price_text)}{price_note_html}</div>
+        {('<div>' + pills_html + '</div>') if pills_html else ''}
+        {frame_html}
+        <p style="margin-top: 10px;">{_cta_for_pick(pick, locale, paywall_url, ghost=True)}</p>
+      </div>
     </td></tr>
-    <tr><td class="pad-sm"><hr class="rule" /></td></tr>
     """
-
-
-def _glance_html(rows: list[dict]) -> str:
-    if not rows:
-        return ""
-    out: list[str] = []
-    for r in rows:
-        muted = r.get("muted", False)
-        num_style = ' style="color: var(--ink-3);"' if muted else ""
-        price_style = ' style="color: var(--ink-3);"' if muted else ""
-        out.append(
-            f'<tr>'
-            f'<td class="num"{num_style}>{_e(r["num"])}</td>'
-            f'<td><strong>{_e(r["title"])}</strong><br/>'
-            f'<span class="where">{_e(r["where"])}</span></td>'
-            f'<td align="right" class="pricecol"{price_style}>{_e(r["price"])}</td>'
-            f'</tr>'
-        )
-    return "".join(out)
 
 
 def _filter_chips_html(chips: list[str]) -> str:
@@ -756,8 +866,8 @@ def render_html(issue: Issue) -> str:
     rich_html = "".join(_rich_pick(p, locale=locale, paywall_url=issue.paywall_target_url) for p in issue.picks_top)
     shortlist_html = ""
     if issue.picks_shortlist:
-        sl_eb = i18n.t("shortlist.eyebrow", locale)
-        sl_hl = i18n.t("shortlist.headline", locale, n=len(issue.picks_shortlist))
+        sl_eb = i18n.t("shortlist.eyebrow", locale, n=len(issue.picks_shortlist))
+        sl_hl = i18n.t("shortlist.headline", locale)
         sl_lede = i18n.t("shortlist.lede", locale)
         shortlist_header = f"""
         <tr><td class="pad" style="padding-top: 16px; padding-bottom: 4px;">
@@ -771,22 +881,6 @@ def render_html(issue: Issue) -> str:
         """
         shortlist_rows = "".join(_short_pick(p, locale=locale, paywall_url=issue.paywall_target_url) for p in issue.picks_shortlist)
         shortlist_html = shortlist_header + shortlist_rows
-
-    glance_eb = i18n.t("glance.eyebrow", locale)
-    glance_block = ""
-    if issue.glance:
-        glance_block = f"""
-        <tr><td class="pad" style="padding-top: 4px; padding-bottom: 8px;">
-          <hr class="rule" />
-          <div style="margin-top: 12px;">
-            <div class="eyebrow">{_e(glance_eb)}</div>
-            <h2 class="h2">{_e(issue.commentary.glance_subhead)}</h2>
-            <table class="glance" width="100%" role="presentation" style="margin-top: 10px;">
-              {_glance_html(issue.glance)}
-            </table>
-          </div>
-        </td></tr>
-        """
 
     hero_block = f"""
     <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
@@ -824,6 +918,20 @@ def render_html(issue: Issue) -> str:
     </td></tr>
     """
 
+    # v3 layout order (Sebas's 5 fixes, 2026-05-29):
+    #   header → hero (welcome teaser) → MARKET CONTEXT → top 3 picks →
+    #   paywall banner (if free) → shortlist → skip → next issue →
+    #   your pulpo → footer.
+    #
+    # Fix #5: market context moved up from just-above-the-footer to
+    # right after the welcome teaser. That gives the reader the "why
+    # this fortnight" framing BEFORE they see any listing.
+    #
+    # Dropped from v2: the `<table class="glance">` numbered-list block
+    # (the welcome teaser already names #01-#03 and the per-pick
+    # sections cover the rest) and the `_one_number_html` block (the
+    # "$X per m² median" callout duplicated the market_context data dump
+    # the user called "horrible" — the warm market note carries the load).
     return f"""<!doctype html>
 <html lang="{locale}">
 <head>
@@ -841,13 +949,11 @@ def render_html(issue: Issue) -> str:
   <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
     {header_strip}
     {hero_block}
-    {glance_block}
+    {_market_html(issue)}
     {rich_html}
     {_paywall_banner_html(issue)}
     {shortlist_html}
     {_skip_block_html(issue)}
-    {_market_html(issue)}
-    {_one_number_html(issue)}
     {_next_issue_html(issue)}
     {_your_pulpo_html(issue)}
     {_footer_html(issue)}
