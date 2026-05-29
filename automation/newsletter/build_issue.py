@@ -933,8 +933,26 @@ def build_issue(
 
     # ── URLs ────────────────────────────────────────────────────────────
     settings_url = f"{site_root.rstrip('/')}/account?ref=newsletter_issue_{issue_number}"
+    # The visible footer Unsubscribe link must match the URL pattern the
+    # `/api/unsubscribe` handler accepts: `/api/unsubscribe?r=<hash>&i=<n>&t=<hmac>`.
+    # Two bugs the prior path had:
+    #   1. Missing /api prefix — `/unsubscribe?...` hit Vercel's
+    #      catch-all `/:slug([A-Za-z0-9_-]+)` rule and 404'd before the
+    #      handler ran.
+    #   2. Missing &t=<hmac> token — the handler rejects requests
+    #      without it (HMAC-SHA256 keyed on PULPO_UNSUBSCRIBE_SECRET).
+    # The token logic lives in `send.unsubscribe_token` so the
+    # security-critical HMAC stays single-sourced; URL assembly happens
+    # here so the test-injected `site_root` parameter takes effect (which
+    # `send.unsubscribe_url` couldn't honor because it reads the env var
+    # itself).
+    from .send import unsubscribe_token as _unsub_token
+    UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
+    _unsub_secret = os.environ.get(UNSUBSCRIBE_SECRET_ENV, "")
+    _unsub_t = _unsub_token(recipient.email_hash, issue_number, _unsub_secret) if _unsub_secret else ""
     unsubscribe_url = (
-        f"{site_root.rstrip('/')}/unsubscribe?r={recipient.email_hash}&i={issue_number}"
+        f"{site_root.rstrip('/')}/api/unsubscribe"
+        f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
     )
     paywall_url = (
         f"{site_root.rstrip('/')}/api/stripe/start-checkout?ref=newsletter_issue_{issue_number}"
