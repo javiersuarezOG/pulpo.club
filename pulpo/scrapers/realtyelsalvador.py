@@ -56,8 +56,8 @@ from pulpo.agents.html_crawler import (
     make_client,
 )
 from pulpo.agents import SOURCES, register
+from pulpo.scrapers._base import polite_get_for
 from pulpo.scrapers._policy import get_policy
-from pulpo.scrapers._runtime import polite_get
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 
 BASE         = "https://realtyelsalvador.com"
@@ -291,13 +291,21 @@ class RealtyElSalvadorScraper:
         effective_limit = min(limit, MAX_LISTINGS)
         policy = get_policy(self.slug)
 
-        client = make_client()
-        try:
-            return self._crawl_live(client, policy, effective_limit)
-        finally:
-            client.close()
+        # Transport dispatch lives in polite_get_for — when the policy
+        # selects curl_cffi the returned callable opens its own
+        # connection and the client we pass is ignored. Keep the make_client
+        # block for the httpx path so the helper sees a real client object
+        # when transport is "httpx".
+        get = polite_get_for(self.slug)
+        if policy.transport == "httpx":
+            client = make_client()
+            try:
+                return self._crawl_live(client, get, effective_limit)
+            finally:
+                client.close()
+        return self._crawl_live(None, get, effective_limit)
 
-    def _crawl_live(self, client, policy, limit: int) -> list[dict]:
+    def _crawl_live(self, client, get, limit: int) -> list[dict]:
         out: list[dict] = []
         seen_urls: set[str] = set()
         last_had_results = False
@@ -305,7 +313,7 @@ class RealtyElSalvadorScraper:
         for page in range(1, MAX_PAGES + 1):
             archive_url = ARCHIVE_FIRST if page == 1 else ARCHIVE_URL.format(page=page)
             self.last_request_url = archive_url
-            resp = polite_get(client, archive_url, source=self.slug, policy=policy)
+            resp = get(client, archive_url)
             self.last_response = resp
 
             if resp.status_code != 200:
@@ -329,7 +337,7 @@ class RealtyElSalvadorScraper:
                 new_this_page = True
 
                 self.last_request_url = durl
-                d_resp = polite_get(client, durl, source=self.slug, policy=policy)
+                d_resp = get(client, durl)
                 self.last_response = d_resp
                 if d_resp.status_code != 200:
                     print(f"[realtyelsalvador] detail {durl} HTTP {d_resp.status_code}")

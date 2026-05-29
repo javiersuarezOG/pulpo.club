@@ -66,7 +66,7 @@ def test_policy_is_immutable():
 
 def test_all_registered_sources_have_valid_transports():
     for source, policy in POLICIES.items():
-        assert policy.transport in ("httpx", "playwright"), (
+        assert policy.transport in ("httpx", "playwright", "curl_cffi"), (
             f"{source} has invalid transport {policy.transport!r}"
         )
         assert policy.rate_limit_rps >= 0

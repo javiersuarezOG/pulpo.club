@@ -11,8 +11,12 @@ Why a Python dict (not YAML)
 
 Fields
 ------
-- ``transport``         "httpx" | "playwright" — informational, used by
-                        ``_runtime.polite_get`` callers to dispatch.
+- ``transport``         "httpx" | "playwright" | "curl_cffi" — informational,
+                        used by ``_runtime.polite_get`` callers to dispatch.
+                        ``curl_cffi`` is for hosts whose WAFs fingerprint on
+                        TLS handshake (JA3/JA4) rather than just IP+UA;
+                        bundles real Chrome/Safari handshake bytes via the
+                        curl-impersonate fork.
 - ``rate_limit_rps``    Token-bucket cap, requests/sec. Honored by
                         ``_runtime.RateLimiter`` per-source instance.
 - ``jitter_ms``         (min, max) — uniform random pause added before
@@ -45,7 +49,15 @@ from dataclasses import dataclass, replace
 from typing import Literal
 
 
-Transport = Literal["httpx", "playwright"]
+Transport = Literal["httpx", "playwright", "curl_cffi"]
+
+
+# curl_cffi browser impersonation profile. See
+# https://github.com/lexiforest/curl_cffi/tree/main/curl_cffi/requests for
+# the full pool. We default to a recent Chrome on macOS because that
+# fingerprint matches the bulk of regional traffic the target WAFs see
+# from real users.
+CURL_CFFI_IMPERSONATE_DEFAULT = "chrome124"
 
 
 @dataclass(frozen=True)
@@ -58,6 +70,12 @@ class Policy:
     user_agent_pool: str = "default"
     auto_repair: bool = True
     capture_failure_snapshot: bool = True
+    # Only consulted when ``transport == "curl_cffi"``. Names a browser
+    # fingerprint bundled with curl_cffi (chrome124, safari17_0, ...).
+    # Kept separate from ``user_agent_pool`` because the UA string and
+    # the TLS fingerprint are independent decisions — curl_cffi sets
+    # the handshake, the UA header is still chosen from the pool.
+    curl_cffi_impersonate: str = CURL_CFFI_IMPERSONATE_DEFAULT
 
 
 DEFAULT_POLICY = Policy()
@@ -72,7 +90,19 @@ POLICIES: dict[str, Policy] = {
     "goodlife":         Policy(transport="httpx", rate_limit_rps=0.5),
     "oceanside":        Policy(transport="httpx", rate_limit_rps=2.0),  # single fast API call today
     "century21":        Policy(transport="httpx", rate_limit_rps=0.5),
-    "nexo":             Policy(transport="httpx", rate_limit_rps=0.5),
+    # nexo: site redesigned to a Vite SPA in 2026-05 and put behind
+    # Cloudflare managed-challenge mode. The new backend exposes a public
+    # JSON API at /api/v1/public/listings — much cleaner than the old
+    # 2017 HTML scrape — but Cloudflare's JA3 fingerprint check rejects
+    # bare httpx requests from every IP, residential included. curl_cffi
+    # (Chrome handshake impersonation) slips through and the API answers
+    # normally. user_agent_pool stays "safari_macos" so the UA header
+    # the WAF logs alongside the JA3 also looks like a Mac user.
+    "nexo":             Policy(
+        transport="curl_cffi",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+    ),
 
     # --- New sources (PR-C ... PR-F) ---
     # CityMax: SSR-parse the Next.js Flight payload, 12 listings per page.
@@ -95,17 +125,17 @@ POLICIES: dict[str, Policy] = {
     # parse. ~55 active listings = ~60 HTTP requests per nightly. Keep
     # rps polite (0.5) so we don't trip the host's WAF.
     #
-    # auto_repair=False: first nightly (2026-05-25) returned HTTP 403
-    # from the GitHub Actions runner IP — Wordfence / generic bot
-    # plugin block. Same failure class as realtyelsalvador's Cloudflare
-    # WAF: an LLM editing parser code can't bypass an IP-level reject.
-    # The scraper now sends full browser-realistic headers (see
-    # _BROWSER_HEADERS in elagente.py) as a best-effort header-class
-    # fix; if the host is also doing Azure-range IP filtering this
-    # won't help and the source stays red. Flip back to True if a
-    # future shadow suggestion is worth experimenting with.
+    # Transport switched to curl_cffi 2026-05-29: PR #458's browser-
+    # realistic headers shipped on httpx and the source stayed red
+    # (HTTP 403 from GitHub Actions runner IPs). On retest the block
+    # was reproducible from any environment with httpx's Python TLS
+    # handshake and bypassable with curl_cffi's Chrome-impersonated
+    # handshake — i.e. the WAF is fingerprinting JA3, not the IP. Same
+    # transport switch applied to realtyelsalvador + nexo below.
+    # auto_repair stays False: if the JA3-impersonation also stops
+    # working in future, an LLM still can't talk its way past a WAF.
     "elagente":         Policy(
-        transport="httpx",
+        transport="curl_cffi",
         rate_limit_rps=0.5,
         user_agent_pool="safari_macos",
         auto_repair=False,
@@ -120,12 +150,16 @@ POLICIES: dict[str, Policy] = {
         user_agent_pool="safari_macos",
     ),
 
-    # --- realtyelsalvador: header tweaks already attempted and failed
-    # against the WP REST endpoint (Cloudflare WAF, IP-based). Phase 2
-    # rewrites this to HTML scrape. Auto-repair is OFF — an LLM can't
-    # bypass a WAF; failures need human attention.
+    # realtyelsalvador: previous diagnosis was "IP-based Cloudflare WAF
+    # block." Retest on 2026-05-29 showed the block reproduces from a
+    # residential IP with httpx (Python TLS handshake) AND clears with
+    # curl_cffi's Chrome JA3 impersonation from the same IP — so the
+    # WAF is gating on TLS fingerprint, not IP. Transport switched to
+    # curl_cffi. user_agent_pool stays "default" since the previous
+    # working diet of mixed UAs survived once the handshake matched.
+    # auto_repair stays False: same reason as elagente above.
     "realtyelsalvador": Policy(
-        transport="httpx",
+        transport="curl_cffi",
         rate_limit_rps=0.5,
         auto_repair=False,
     ),

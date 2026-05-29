@@ -52,7 +52,7 @@ from typing import Callable, Optional
 from pulpo.agents.html_crawler import is_offline, load_fixtures
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
 from pulpo.scrapers._policy import get_policy
-from pulpo.scrapers._runtime import polite_get
+from pulpo.scrapers._runtime import polite_curl_cffi_get, polite_get
 from pulpo.scrapers._type_classifier import classify_property_type
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
@@ -72,8 +72,25 @@ def polite_get_for(slug: str) -> Callable:
     Resolves the source's `Policy` once at scraper-construction time so
     each request doesn't re-look it up. The returned callable mirrors
     `polite_get`'s signature minus `source=` and `policy=`.
+
+    Transport dispatch: when ``policy.transport == "curl_cffi"`` the
+    returned callable ignores the ``client`` argument and dispatches to
+    ``polite_curl_cffi_get`` instead. The signature is preserved so
+    existing scrapers can flip transports via policy alone — no call-site
+    edit, no separate ``make_client`` branch. Pass ``client=None`` from
+    curl_cffi-transport scrapers if you want to skip the make_client
+    allocation entirely.
     """
     policy = get_policy(slug)
+
+    if policy.transport == "curl_cffi":
+        def _get_cffi(client, url: str, *, extra_headers: Optional[dict] = None):
+            # client is ignored — curl_cffi opens its own connection.
+            return polite_curl_cffi_get(
+                url,
+                source=slug, policy=policy, extra_headers=extra_headers,
+            )
+        return _get_cffi
 
     def _get(client, url: str, *, extra_headers: Optional[dict] = None):
         return polite_get(
