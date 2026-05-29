@@ -465,14 +465,20 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
 
 
 def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[str, str]:
-    """The canonical /listing/<source>:<source_id> page on pulpo.club plus
-    a save variant. The save_url adds `?save=1` so the SPA can auto-trigger
-    the save on mount once PR-NL-8 is wired; today the listing page just
-    ignores the unknown param and the reader clicks the heart manually.
+    """The canonical /listing/<source>__<source_id> page on pulpo.club plus
+    a save variant. The save_url adds `?save=1` so the SPA auto-saves
+    the listing on mount (PR-NL-8 wired this for /account-authed users).
 
-    Both URLs include a `ref=newsletter_issue_<N>` so PostHog can attribute
+    Separator is `__` (double underscore), matching the SPA's
+    `adaptListing` id format at web/app/data/listings.ts:165 — the SPA's
+    `parseLocation` regex `SAFE_LISTING_ID_RE = /^[A-Za-z0-9._\\-]+$/` at
+    web/app/lib/url-routing.ts:102 rejects any other punctuation, so a
+    colon or `/` here lands the reader on home instead of the listing
+    detail. Caught 2026-05-29 after the first v3 send.
+
+    Both URLs include `ref=newsletter_issue_<N>` so PostHog can attribute
     in-app conversion back to the issue."""
-    source_id = f"{listing.get('source')}:{listing.get('source_id')}"
+    source_id = f"{listing.get('source')}__{listing.get('source_id')}"
     base = f"{site_root.rstrip('/')}/listing/{source_id}"
     ref = f"ref=newsletter_issue_{issue_number}"
     return (f"{base}?{ref}", f"{base}?{ref}&save=1")

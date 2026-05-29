@@ -177,14 +177,23 @@ def test_repriced_listing_can_repeat(make_listing, pro_with_prefs):
 # directly without building a full Issue.
 
 def test_pulpo_urls_canonical_form():
-    """The /listing/<source>:<source_id> URL pattern matches what vercel.json
-    rewrites and what the SPA expects. The `?save=1` variant carries the
-    same path plus the save hint for PR-NL-8."""
+    """The /listing/<source>__<source_id> URL pattern matches the SPA's
+    `adaptListing` id format (web/app/data/listings.ts:165:
+    `${source}__${source_id}`) and what the SPA's `parseLocation` regex
+    `SAFE_LISTING_ID_RE = /^[A-Za-z0-9._\\-]+$/` will accept. A colon (`:`)
+    here was the regression — caught 2026-05-29 when the first v3
+    newsletter send routed every "See on Pulpo →" CTA to home.
+
+    The `?save=1` variant carries the same path plus the save hint for
+    PR-NL-8."""
     from automation.newsletter.build_issue import _pulpo_urls
     listing = {"source": "remax", "source_id": "001461165132"}
     see_url, save_url = _pulpo_urls(listing, issue_number=5, site_root="https://pulpo.club")
-    assert see_url == "https://pulpo.club/listing/remax:001461165132?ref=newsletter_issue_5"
+    assert see_url == "https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_5"
     assert save_url == see_url + "&save=1"
+    # Defensive — the separator must not be a colon. A colon would
+    # silently route every CTA to home because the SPA's regex bans it.
+    assert ":" not in see_url.split("/listing/", 1)[1].split("?", 1)[0]
 
 
 def test_chips_warm_price_drop():
