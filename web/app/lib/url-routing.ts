@@ -34,12 +34,21 @@ const ADMIN_PREFIX = "/admin/";
 // is the FIRST entry.
 export const ACCOUNT_SECTION_KEYS = [
   "profile",
-  "notifications",
+  "newsletter",
   "subscription",
   "security",
 ] as const;
 export type AccountSection = typeof ACCOUNT_SECTION_KEYS[number];
 const ACCOUNT_SECTION_SET = new Set<string>(ACCOUNT_SECTION_KEYS);
+
+// Back-compat alias map. `/account/notifications` was the section name
+// pre-2026-05-29 — the page already managed the newsletter filter, so
+// "Notifications" was always a misnomer. Renamed to `newsletter`.
+// parseLocation maps the old slug to the new section so existing
+// bookmarks + email footer links from sent issues survive.
+const ACCOUNT_SECTION_ALIASES: Record<string, AccountSection> = {
+  notifications: "newsletter",
+};
 
 export type ParsedLocation = {
   route: Route;
@@ -120,6 +129,11 @@ export function parseLocation(pathname: string, fallbackRoute: Route = "home"): 
     // Reject nested paths (`/account/foo/bar`) — only single-segment sub-
     // sections are valid. The router doesn't model anything deeper.
     if (rest && !rest.includes("/")) {
+      // Alias old slugs first so bookmarks survive renames.
+      const aliased = ACCOUNT_SECTION_ALIASES[rest];
+      if (aliased) {
+        return { route: "account", openListingId: null, isListingPath: false, section: aliased, adminWidget: null, pinListingId: null };
+      }
       const section = ACCOUNT_SECTION_SET.has(rest) ? (rest as AccountSection) : null;
       return { route: "account", openListingId: null, isListingPath: false, section, adminWidget: null, pinListingId: null };
     }
