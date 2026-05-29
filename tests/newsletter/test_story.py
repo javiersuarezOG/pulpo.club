@@ -65,8 +65,10 @@ def test_deterministic_story_coastal_walk_to_beach():
     )
     story = commentary.deterministic_story_for_pick(listing, locale="en")
     assert "walk to El Tunco" in story
-    # Emotional center is wrapped in <em>
-    assert "<em>" in story and "</em>" in story
+    # v3.2: no italics in copy. The emotional-center sentence is no
+    # longer wrapped in <em>; the matching CSS rule renders any stray
+    # <em> as normal text.
+    assert "<em>" not in story and "</em>" not in story
     # Price gap surfaced honestly
     assert "well under" in story
     # Trade-off named
@@ -83,7 +85,8 @@ def test_deterministic_story_mountain_archetype():
     )
     story = commentary.deterministic_story_for_pick(listing, locale="en")
     assert "highlands" in story
-    assert "<em>" in story
+    # v3.2: no italics in copy.
+    assert "<em>" not in story
 
 
 def test_deterministic_story_dropped_price():
@@ -98,7 +101,8 @@ def test_deterministic_story_dropped_price():
     # "$10,000" or "8%" — both are valid framings
     assert "$10,000" in story or "8%" in story
     assert "first move" in story
-    assert "<em>" in story
+    # v3.2: no italics in copy.
+    assert "<em>" not in story
 
 
 def test_deterministic_story_stale_archetype():
@@ -110,7 +114,8 @@ def test_deterministic_story_stale_archetype():
     )
     story = commentary.deterministic_story_for_pick(listing, locale="en")
     assert "285 days" in story
-    assert "<em>" in story
+    # v3.2: no italics in copy.
+    assert "<em>" not in story
     # Voice guide rule: never fabricate urgency on stale
     assert "Don't miss" not in story
     assert "now or never" not in story
@@ -127,7 +132,8 @@ def test_deterministic_story_built_property():
     assert "4 bedrooms" in story
     # Voice guide rule: room for a family, NOT investment opportunity
     assert "investment opportunity" not in story
-    assert "<em>" in story
+    # v3.2: no italics in copy.
+    assert "<em>" not in story
 
 
 def test_deterministic_story_readiness_zero_names_the_gap():
@@ -283,8 +289,11 @@ def test_build_issue_hero_picks_get_story_html(pro_with_prefs, ranked_pool, monk
     for pick in issue.picks_top:
         assert pick.story_html, f"story_html empty on hero pick {pick.title}"
         assert pick.story_source == "deterministic"
-        # <em> wraps the emotional center
-        assert "<em>" in pick.story_html
+        # v3.2: emotional-center sentence is no longer wrapped in <em>.
+        # Italics are banned from copy. The deterministic generator
+        # emits a plain three-sentence paragraph; if a stray <em>
+        # appears, the renderer's CSS still treats it as normal text.
+        assert "<em>" not in pick.story_html
     for pick in issue.picks_shortlist:
         # Short picks deliberately stay on legacy `blurb` for this PR
         assert pick.story_html == ""

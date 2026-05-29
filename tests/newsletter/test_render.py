@@ -84,10 +84,16 @@ def test_render_es_locale_has_no_english_canary(pro_with_prefs, ranked_pool):
     html = _render(pro_with_prefs, ranked_pool)
     leaked = [c for c in ENGLISH_CANARIES if c in html]
     assert not leaked, f"English canaries leaked into ES render: {leaked}"
-    # v3.1 (2026-05-29): the welcome teaser was dropped in favour of a
-    # structural intro line ("3 lecturas completas — seleccionadas de
-    # la revisión de esta semana."). Anchor on the new Spanish phrase.
-    assert "lecturas completas" in html or "revisión de esta semana" in html
+    # v3.2 (2026-05-29): the Spanish lede now opens with the beach+lake
+    # scope ("propiedades activas de playa y lago en El Salvador") and
+    # spells out the issue shape ("perfil completo: foto, nuestra
+    # lectura"). Anchor on either as a positive signal the ES render
+    # emitted the v3.2 lede and not a fallback.
+    assert (
+        "playa y lago" in html
+        or "perfil completo" in html
+        or "lecturas rápidas" in html
+    ), "Spanish v3.2 lede phrases all missing from ES render"
 
 
 def test_render_no_unfilled_placeholders(pro_with_prefs, ranked_pool):
