@@ -139,11 +139,14 @@ def test_locale_propagates_through_commentary(pro_with_prefs, ranked_pool):
         history_rows=[],
     )
     assert issue.locale == "es"
-    # v3.1 (2026-05-29): lede_hero is now the structural intro
-    # ("3 lecturas completas, … — seleccionadas de la revisión de esta
-    # semana."). Welcome teaser dropped; Spanish anchor moved to the
-    # structural intro phrase.
-    assert "lecturas completas" in issue.commentary.lede_hero
+    # v3.2 (2026-05-29): the Spanish lede opens with the beach+lake
+    # scope ("propiedades activas de playa y lago en El Salvador") and
+    # spells out the issue shape ("perfil completo: foto, nuestra
+    # lectura"). Anchor on those + the weekly cadence so a regression
+    # to the v3.1 "lecturas completas" / "across La Libertad" wording
+    # would fail this test.
+    assert "playa y lago" in issue.commentary.lede_hero
+    assert "perfil completo" in issue.commentary.lede_hero
     assert "esta semana" in issue.commentary.lede_hero
 
 
