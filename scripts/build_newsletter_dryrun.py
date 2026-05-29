@@ -25,7 +25,7 @@ if str(ROOT) not in sys.path:
 
 from automation.newsletter import build_issue, render_html  # noqa: E402
 from automation.newsletter.store import email_hash  # noqa: E402
-from automation.newsletter.types import Preference, Recipient  # noqa: E402
+from automation.newsletter.types import Preference, Recipient, SavedListing  # noqa: E402
 
 
 # ── Cohort fixtures ────────────────────────────────────────────────────
@@ -49,6 +49,41 @@ FIXTURES = [
                 categories=[],
             ),
         ),
+    },
+    {
+        # Variant of pro-prefs that seeds the recipient with three
+        # saved listings, one per favorite-section state:
+        #   1. price_dropped — a real listing's source__source_id
+        #      with a price_at_save_usd $5k higher than current
+        #   2. off_market   — a synthetic ID guaranteed to be absent
+        #      from ranked.json, carrying a price_at_save baseline
+        #   3. no_change    — another real ID with price_at_save
+        #      matching the listing's current price
+        # Lets the live preview render the favorites section without
+        # waiting on real production saves.
+        "key": "pro-prefs-with-saves",
+        "label": "A2 · Pro + prefs + sample saves (favorites section live)",
+        "recipient": Recipient(
+            email_hash=email_hash("javier-saves-fixture@pulpo.club"),
+            display_name="Javier",
+            locale="en",
+            tier="pro",
+            has_account=True,
+            preference=Preference(
+                departments=["La Libertad"],
+                property_types=["land", "house"],
+                max_price_usd=500_000,
+                categories=[],
+            ),
+            saved_count=3,
+            # Sample saves — `_seed_sample_saves` mutates these post-construction
+            # against the actual ranked.json so the IDs always resolve. Leaving
+            # the list empty here keeps the fixture parseable even if ranked.json
+            # is missing.
+            saves=[],
+        ),
+        # Marker so the loader knows to seed saves at run time.
+        "seed_saves": True,
     },
     {
         "key": "free-prefs",
@@ -111,6 +146,55 @@ FIXTURES = [
 ]
 
 
+def _seed_sample_saves(recipient: Recipient, ranked: list[dict]) -> None:
+    """Mutate a fixture Recipient with three sample saves, one per
+    favorites state. Reads real listings from ranked.json so the
+    rendered preview shows realistic titles + photos.
+
+    Picks:
+      • saves[0] — first listing in the filter, simulating a price
+        drop (baseline = current + $5,000).
+      • saves[1] — a synthetic ID guaranteed to be off-market
+        (fictional source/source_id never present in ranked.json).
+      • saves[2] — second listing in the filter, baseline = current
+        price (renders as no_change).
+
+    If ranked.json has fewer than two suitable listings, falls back
+    to single-listing seeding so the preview still has content.
+    """
+    if not ranked:
+        return
+    # Pull two real listings near the top of the ranked list.
+    sample = [row for row in ranked if isinstance(row, dict) and row.get("source") and row.get("source_id") and row.get("price_usd")]
+    if not sample:
+        return
+    first = sample[0]
+    second = sample[1] if len(sample) > 1 else None
+
+    saves = [
+        SavedListing(
+            id=f"{first['source']}__{first['source_id']}",
+            saved_at="2026-05-22T18:45:00Z",
+            price_at_save_usd=float(first["price_usd"]) + 5_000.0,
+            source=first.get("source"),
+        ),
+        SavedListing(
+            id="dryrun-fixture__off-market",
+            saved_at="2026-04-12T10:00:00Z",
+            price_at_save_usd=270_000.0,
+        ),
+    ]
+    if second is not None:
+        saves.append(SavedListing(
+            id=f"{second['source']}__{second['source_id']}",
+            saved_at="2026-05-01T09:00:00Z",
+            price_at_save_usd=float(second["price_usd"]),
+            source=second.get("source"),
+        ))
+    recipient.saves = saves
+    recipient.saved_count = len(saves)
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--ranked", default="web/data/ranked.json")
@@ -140,6 +224,8 @@ def main() -> int:
             return 1
 
     for fx in fixtures:
+        if fx.get("seed_saves"):
+            _seed_sample_saves(fx["recipient"], ranked)
         issue = build_issue(
             recipient=fx["recipient"],
             ranked_listings=ranked,
