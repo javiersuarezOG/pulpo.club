@@ -13,6 +13,7 @@ from typing import Any, Optional
 
 from . import commentary as commentary_mod
 from . import i18n
+from .favorites import build_ranked_index, compute_favorites
 from .segments import apply_preference, select_picks
 from .store import excluded_source_ids_for, last_send_at_for
 from .types import (
@@ -1011,6 +1012,26 @@ def build_issue(
         filter_match_count=filter_match_count,
     )
 
+    # Favorites — "Your saved listings, this week. What moved on the
+    # ones you're following." Empty list → renderer skips the section
+    # entirely. The diff runs against the full ranked.json index (not
+    # the filtered picks) because a user can save a listing that drops
+    # out of their filter; we still want to flag price moves there.
+    favorites = compute_favorites(
+        saves=recipient.saves,
+        ranked_index=build_ranked_index(ranked_listings),
+        locale=locale,
+        location_line_fn=_location_line,
+        absolute_photo_fn=_absolute_photo,
+        pulpo_url_fn=lambda lid, n, root: _pulpo_urls(
+            {"source": lid.split("__")[0], "source_id": lid.split("__", 1)[1] if "__" in lid else ""},
+            issue_number=n,
+            site_root=root,
+        )[0],
+        issue_number=issue_number,
+        site_root=site_root,
+    )
+
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
@@ -1029,4 +1050,5 @@ def build_issue(
         unsubscribe_url=unsubscribe_url,
         welcome_prefs_url=welcome_prefs_url,
         your_pulpo=your_pulpo,
+        favorites=favorites,
     )
