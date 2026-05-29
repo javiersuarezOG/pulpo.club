@@ -28,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.1-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.2-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -62,9 +62,14 @@ _CSS = """
   --button-text:  #F4EFE6;
   --burgundy:     #6B2C2C;
   --burgundy-bg:  #F5E3E0;
+  /* Two-font system (v3.2, 2026-05-29). Serif anchors headlines and
+     the emphasised emotional centers; sans does everything else.
+     Mono (JetBrains Mono) was dropped — three fonts in one email
+     reads as typographic noise. Eyebrows, chips, meta strips and
+     pills keep their tag-like feel via uppercase + letter-spacing
+     in sans, not a monospaced family. */
   --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
 }
 body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 a { color: var(--clay); text-decoration: none; }
@@ -78,7 +83,9 @@ table { border-collapse: collapse; }
 .pad-sm { padding: 12px 36px; }
 .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
 .sans    { font-family: var(--font-sans); }
-.mono    { font-family: var(--font-mono); }
+/* `.mono` is kept as a no-op utility class so existing markup using
+   `<span class="mono">` still resolves to the document's sans body —
+   removing the class hits a wider blast radius for no visible win. */
 .ink     { color: var(--ink); }
 .ink-2   { color: var(--ink-2); }
 .muted   { color: var(--ink-3); }
@@ -87,7 +94,7 @@ table { border-collapse: collapse; }
 .rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
 .rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -109,13 +116,13 @@ table { border-collapse: collapse; }
    teaser and to the first market_context paragraph. */
 .body em, .body-2 em, .lede em { font-style: italic; color: var(--clay-deep); }
 .small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
-.meta    { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
+.meta    { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
 .price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
 .price-2     { font-family: var(--font-display); font-size: 22px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
 .price-note  { font-family: var(--font-sans); font-size: 12.5px; color: var(--ink-3); }
 .pill {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.10em;
@@ -141,7 +148,7 @@ table { border-collapse: collapse; }
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.04em;
   color: #5A5650;
@@ -163,7 +170,7 @@ table { border-collapse: collapse; }
   border-radius: 6px;
 }
 .why-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -227,7 +234,7 @@ table { border-collapse: collapse; }
 .sl-card .sl-photo { margin: 0 0 12px; }
 .sl-card .sl-photo img { border-radius: 4px; }
 .sl-card .sl-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-3);
@@ -243,7 +250,7 @@ table { border-collapse: collapse; }
 .sl-card .sl-why em { font-style: italic; color: var(--clay-deep); }
 .meta-row { font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
 .callout { margin: 14px 0 0; padding: 0; background: none; }
-.callout .label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
+.callout .label { font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); margin: 0 0 4px; }
 .callout .body  { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
 .callout + .callout { margin-top: 12px; }
 .paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
@@ -268,7 +275,7 @@ table { border-collapse: collapse; }
   padding: 36px 48px;
 }
 .yp-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1008,7 +1015,7 @@ def render_html(issue: Issue) -> str:
 <title>{_e(head_title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <style>{_CSS}</style>
 </head>
 <body>
