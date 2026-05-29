@@ -6,12 +6,16 @@ Coverage:
     enriched objects + malformed entries collapse into a uniform
     `list[dict]` with `{id, saved_at?, price_at_save_usd?, source?}`.
   • compute_favorites in favorites.py: classification into one of
-    `price_dropped / no_change / off_market / price_up`, priority
-    ordering, MAX_FAVORITES cap, noise floor on small price moves,
-    truthful fallback when baselines are missing.
+    `price_dropped / no_change / price_up`, priority ordering,
+    MAX_FAVORITES cap, noise floor on small price moves, truthful
+    fallback when baselines are missing, AND silent skipping of
+    saves missing from ranked.json (v3.3.1: no off_market state —
+    a save's absence could mean sold / withdrawn / scraper hiccup /
+    filtered out for data quality, and conflating them lies to the
+    reader).
   • Renderer behavior: empty favorites → section skipped; non-empty
     → cards in the expected order, price-drop chip with the delta,
-    off-market chip + "Last seen at $X", no italics.
+    no italics.
 """
 
 from __future__ import annotations
@@ -131,21 +135,51 @@ def test_price_up_state_when_current_is_higher():
     assert result[0].delta_usd == 5_000.0
 
 
-def test_off_market_when_not_in_ranked_index():
+def test_save_missing_from_ranked_is_silently_skipped():
+    """v3.3.1 (2026-05-29): a saved listing missing from this week's
+    ranked.json is silently dropped — NOT surfaced as "off-market".
+    Absence could mean any of {sold, withdrawn, scraper hiccup,
+    filtered out for data quality}, and reporting it as sold would
+    lie to the reader. Add back as a separate state the day
+    ranked.json carries a real status=sold signal.
+
+    Applies regardless of whether the save has a price baseline —
+    no off_market card means no fabricated "Last seen at $X" copy.
+    """
+    # With a price baseline — still skipped under v3.3.1.
     saves = [_save(price_at_save_usd=60_000)]
     result = compute_favorites(saves=saves, ranked_index={})
-    assert len(result) == 1
-    assert result[0].state == "off_market"
-    assert result[0].price_at_save_usd == 60_000.0
+    assert result == []
 
-
-def test_off_market_with_no_baseline_is_skipped():
-    """A legacy save with no price_at_save_usd that's also gone from
-    ranked.json has no content to render — skip rather than emit a
-    half-empty card."""
-    saves = [_save()]  # no price baseline
+    # Without a baseline — still skipped (same as v3.3).
+    saves = [_save()]
     result = compute_favorites(saves=saves, ranked_index={})
     assert result == []
+
+
+def test_partial_index_skips_missing_keeps_present():
+    """A mix of saves where some are in ranked.json and some aren't:
+    only the ones present in ranked.json surface; missing ones are
+    silently dropped without affecting the rest."""
+    saves = [
+        SavedListing(id="a__present", price_at_save_usd=60_000),
+        SavedListing(id="b__missing", price_at_save_usd=60_000),
+        SavedListing(id="c__present", price_at_save_usd=55_000),
+    ]
+    index = build_ranked_index([
+        {"source": "a", "source_id": "present", "price_usd": 60_000,
+         "title_canonical": {"en": "A"}, "days_listed": 5},
+        # b is intentionally absent
+        {"source": "c", "source_id": "present", "price_usd": 60_000,
+         "title_canonical": {"en": "C"}, "days_listed": 5},
+    ])
+    result = compute_favorites(saves=saves, ranked_index=index)
+    ids = [u.listing_id for u in result]
+    assert "a__present" in ids
+    assert "c__present" in ids
+    assert "b__missing" not in ids
+    # And no off_market state ever returned
+    assert all(u.state != "off_market" for u in result)
 
 
 def test_no_change_when_price_match():
@@ -183,18 +217,19 @@ def test_noise_floor_treats_tiny_drops_as_no_change():
 def test_state_priority_orders_drops_first():
     saves = [
         SavedListing(id="a__no_change", price_at_save_usd=60_000),
-        SavedListing(id="b__off_market", price_at_save_usd=60_000),
+        SavedListing(id="b__price_up", price_at_save_usd=55_000),
         SavedListing(id="c__price_drop", price_at_save_usd=60_000),
     ]
     index = build_ranked_index([
         {"source": "a", "source_id": "no_change", "price_usd": 60_000,
          "title_canonical": {"en": "A"}, "days_listed": 5},
-        # b is missing — triggers off_market
+        {"source": "b", "source_id": "price_up", "price_usd": 60_000,
+         "title_canonical": {"en": "B"}, "days_listed": 5},
         {"source": "c", "source_id": "price_drop", "price_usd": 55_000,
          "title_canonical": {"en": "C"}, "days_listed": 5},
     ])
     result = compute_favorites(saves=saves, ranked_index=index)
-    assert [u.state for u in result] == ["price_dropped", "off_market", "no_change"]
+    assert [u.state for u in result] == ["price_dropped", "price_up", "no_change"]
 
 
 def test_max_favorites_caps_the_list():
@@ -259,9 +294,109 @@ def test_render_emits_section_with_price_drop_chip(pro_with_prefs, ranked_pool):
     assert 'class="struck"' in html  # struck-through previous price
 
 
-def test_render_off_market_chip_and_last_seen(pro_with_prefs, ranked_pool):
-    """A saved listing no longer in ranked.json renders as off-market
-    with the price-at-save as "Last seen at $X"."""
+# ── Observability ───────────────────────────────────────────────────
+
+
+def test_favorites_telemetry_fires_with_state_counts(pro_with_prefs, ranked_pool, monkeypatch):
+    """`newsletter.favorites_section_rendered` fires once per Issue with
+    per-state counts + diagnostic shape. Dashboard rollups need every
+    one of these to land.
+    """
+    captured: list[tuple[str, dict]] = []
+
+    def fake_capture(event, props):
+        captured.append((event, props))
+
+    # Inject our fake into the same path build_issue imports through.
+    # The package __init__ re-exports the build_issue FUNCTION as
+    # `automation.newsletter.build_issue`, shadowing the module of
+    # the same name. Reach the module via importlib so the
+    # monkeypatch targets the actual `_telemetry_capture` symbol.
+    import importlib
+    bi_module = importlib.import_module("automation.newsletter.build_issue")
+    monkeypatch.setattr(bi_module, "_telemetry_capture",
+                        lambda event, props: captured.append((event, props)))
+
+    target = ranked_pool[0]
+    sid = f"{target['source']}__{target['source_id']}"
+    pro_with_prefs.saves = [SavedListing(id=sid, price_at_save_usd=target["price_usd"] + 5_000)]
+    pro_with_prefs.saved_count = 1
+
+    build_issue(
+        recipient=pro_with_prefs,
+        ranked_listings=ranked_pool,
+        issue_number=8,
+        issue_date=ISSUE_DATE,
+        history_rows=[],
+    )
+
+    favorites_events = [(e, p) for e, p in captured if e == "newsletter.favorites_section_rendered"]
+    assert len(favorites_events) == 1, "telemetry must fire exactly once per Issue"
+    _, props = favorites_events[0]
+    # Section was rendered (one save, with baseline, found in ranked) → price_dropped surface
+    assert props["section_rendered"] is True
+    assert props["favorites_count"] == 1
+    assert props["state_price_dropped"] == 1
+    assert props["state_price_up"] == 0
+    assert props["state_no_change"] == 0
+    assert props["saves_total"] == 1
+    assert props["saves_with_baseline"] == 1
+    assert props["saves_missing_from_ranked"] == 0
+    assert props["template_version"].startswith("newsletter-v")
+    assert props["issue_number"] == 8
+    assert "issue_id" in props
+    assert "recipient_hash" in props
+    # PII guard — never leak the raw email
+    assert "@" not in props["recipient_hash"]
+
+
+def test_favorites_telemetry_dark_section_branch(pro_with_prefs, ranked_pool, monkeypatch):
+    """The dashboard distinguishes 'no saves at all' from 'has saves
+    but all missing from ranked' — both render no section but mean
+    different things. saves_missing_from_ranked carries the count
+    so we can separate them."""
+    captured: list[tuple[str, dict]] = []
+
+    # The package __init__ re-exports the build_issue FUNCTION as
+    # `automation.newsletter.build_issue`, shadowing the module of
+    # the same name. Reach the module via importlib so the
+    # monkeypatch targets the actual `_telemetry_capture` symbol.
+    import importlib
+    bi_module = importlib.import_module("automation.newsletter.build_issue")
+    monkeypatch.setattr(bi_module, "_telemetry_capture",
+                        lambda event, props: captured.append((event, props)))
+
+    # Recipient has 2 saves but neither is in ranked_pool — section goes dark.
+    pro_with_prefs.saves = [
+        SavedListing(id="ghost__1", price_at_save_usd=100_000),
+        SavedListing(id="ghost__2", price_at_save_usd=200_000),
+    ]
+    pro_with_prefs.saved_count = 2
+
+    build_issue(
+        recipient=pro_with_prefs,
+        ranked_listings=ranked_pool,
+        issue_number=8,
+        issue_date=ISSUE_DATE,
+        history_rows=[],
+    )
+
+    favorites_events = [p for e, p in captured if e == "newsletter.favorites_section_rendered"]
+    assert len(favorites_events) == 1
+    props = favorites_events[0]
+    assert props["section_rendered"] is False
+    assert props["favorites_count"] == 0
+    assert props["saves_total"] == 2
+    assert props["saves_missing_from_ranked"] == 2
+
+
+def test_render_skips_save_missing_from_ranked(pro_with_prefs, ranked_pool):
+    """v3.3.1: a saved listing whose ID is not in ranked.json no longer
+    surfaces an "off-market" card. The section vanishes entirely when
+    every save is missing — no chrome, no chip, no "Last seen at $X"
+    leaks into the rendered HTML (those copy strings would mislead).
+    """
+    import re
     pro_with_prefs.saves = [SavedListing(id="ghost__999", price_at_save_usd=125_000)]
     issue = build_issue(
         recipient=pro_with_prefs,
@@ -270,9 +405,16 @@ def test_render_off_market_chip_and_last_seen(pro_with_prefs, ranked_pool):
         issue_date=ISSUE_DATE,
         history_rows=[],
     )
+    assert issue.favorites == [], "Missing-save should not surface any FavoriteUpdate"
     html = render_html(issue)
-    assert "off-market" in html.lower() or "marked off-market" in html.lower()
-    assert "Last seen at $125,000" in html
+    body = re.sub(r"<style[\s\S]*?</style>", "", html, flags=re.IGNORECASE)
+    # No section
+    assert 'class="saves-wrap"' not in body
+    # And no off-market language anywhere
+    assert "off-market" not in body.lower()
+    assert "Marked off-market" not in body
+    assert "Last seen at" not in body
+    assert "off_market" not in body
 
 
 def test_render_favorites_carries_no_italics(pro_with_prefs, ranked_pool):

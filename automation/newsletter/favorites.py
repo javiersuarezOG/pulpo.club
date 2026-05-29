@@ -5,18 +5,23 @@ enriched with `saved_at` + `price_at_save_usd`), diffs it against the
 current week's `ranked.json`, and produces a list of `FavoriteUpdate`
 rows ordered by editorial priority.
 
-Design contract (from web/newsletter-with-saves-mockup.html):
+Design contract:
 
   • No saves → empty list → renderer skips the section entirely.
-  • Each saved listing maps to ONE of four states:
+  • Each saved listing maps to ONE of three states:
       - price_dropped → current price < price_at_save_usd, delta > $0
-      - off_market   → no longer in ranked.json
       - price_up     → current price > price_at_save_usd (rare; truthful)
       - no_change    → still on market, same/near-same price
+  • Saves missing from this week's ranked.json (sold? withdrawn?
+    scraper hiccup? filtered out for data quality?) are silently
+    SKIPPED. v3.3.1 (2026-05-29) removed an "off_market" state — its
+    absence from ranked.json could mean any of those things, and
+    conflating them with "sold" would lie to the reader. Add the
+    state back the day ranked.json carries a real status=sold signal.
   • Up to MAX_FAVORITES rows surface. State priority on selection:
-      price_dropped > off_market > price_up > no_change
-  • Legacy entries without `price_at_save_usd` can still surface as
-    `no_change` or `off_market` — we just can't compute a delta.
+      price_dropped > price_up > no_change
+  • Legacy entries without `price_at_save_usd` still surface as
+    `no_change` — we just can't compute a delta.
 
 The hard rule: never invent a baseline. If we don't have
 `price_at_save_usd`, we don't emit `price_dropped`. The Account
@@ -89,9 +94,9 @@ def compute_favorites(
         if upd is not None:
             candidates.append(upd)
 
-    # Priority: price_dropped > off_market > price_up > no_change.
+    # Priority: price_dropped > price_up > no_change.
     # Within a state, preserve the user's saved-order (their list).
-    _state_rank = {"price_dropped": 0, "off_market": 1, "price_up": 2, "no_change": 3}
+    _state_rank = {"price_dropped": 0, "price_up": 1, "no_change": 2}
     candidates.sort(key=lambda u: _state_rank.get(u.state, 99))
     return candidates[:MAX_FAVORITES]
 
@@ -110,22 +115,15 @@ def _classify_one(
     listing = ranked_index.get(save.id)
 
     if listing is None:
-        # Off-market — saved listing no longer in this week's ranked.json.
-        # Surface only when we have at least a price baseline so the
-        # "Last seen at $X" line has content; otherwise the row reads
-        # as a half-empty card and we'd rather skip it.
-        if save.price_at_save_usd is None:
-            return None
-        return FavoriteUpdate(
-            state="off_market",
-            listing_id=save.id,
-            title=_title_fallback(save),
-            location_line="",
-            photo_url="",
-            pulpo_url=_safe(pulpo_url_fn, save.id, issue_number, site_root),
-            price_at_save_usd=save.price_at_save_usd,
-            saved_at=save.saved_at,
-        )
+        # Saved listing not in this week's ranked.json. v3.3.1 (2026-05-29):
+        # we silently skip these instead of surfacing an "off-market"
+        # card. Absence from ranked.json could mean any of {sold,
+        # withdrawn, filtered out for data quality, scraper transient
+        # error} — we can't tell those apart today, and reporting
+        # "marked off-market" for what may just be a scraper hiccup
+        # would lie to the reader. Add back as a separate state the
+        # day ranked.json carries a real status=sold signal.
+        return None
 
     # Still on the market. Build the common metadata block.
     title = _title(listing, locale)
@@ -191,12 +189,6 @@ def _title(listing: dict, locale: str) -> str:
     if isinstance(tc, dict):
         return (tc.get(locale) or tc.get("en") or listing.get("title") or "Listing")
     return listing.get("title") or "Listing"
-
-
-def _title_fallback(save: SavedListing) -> str:
-    """Off-market listings have no current title; show the saved ID
-    in a humanized form."""
-    return save.id.replace("__", " · ")
 
 
 def _safe(fn, *args):

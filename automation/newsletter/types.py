@@ -217,7 +217,7 @@ class YourPulpoState:
     filter_match_count: int = 0
 
 
-FavoriteState = Literal["price_dropped", "no_change", "off_market", "price_up"]
+FavoriteState = Literal["price_dropped", "no_change", "price_up"]
 
 
 @dataclass
@@ -226,7 +226,7 @@ class FavoriteUpdate:
     section. Each row maps to one of the recipient's saved listings,
     enriched with the meaningful change since they saved it.
 
-    States (see commentary.compute_favorites for the picker logic):
+    States (see favorites.compute_favorites for the picker logic):
 
       • price_dropped — current price < price_at_save_usd. Carries
         `delta_usd` (positive) for "↓ Price dropped $5,000". Only
@@ -235,14 +235,17 @@ class FavoriteUpdate:
         opposite direction. Rare; surfaced for honesty, not urgency.
       • no_change — listing still on the market at the price the user
         last saw. Carries `days_listed` for the "47 days listed" copy.
-      • off_market — saved listing no longer in ranked.json. Carries
-        `last_seen_price_usd` (price_at_save_usd) for the "Last seen
-        at $X" line.
 
-    `title`, `location_line`, `photo_url`, `listing_url`, `pulpo_url`
-    are populated from the current ranked.json row when available;
-    for off-market entries they fall back to whatever was captured at
-    save time (today: just the ID; future: snapshot at save).
+    v3.3.1 (2026-05-29): the `off_market` state was REMOVED. A saved
+    listing missing from this week's ranked.json is silently skipped
+    — its absence could mean any of {sold, withdrawn, filtered out,
+    scraper-side transient error}, and conflating those with "sold"
+    would lie to the reader. The data we have today can't tell those
+    apart. When a real `status=sold` signal arrives in ranked.json,
+    add it back as a separate state with that signal as the trigger.
+
+    `title`, `location_line`, `photo_url`, `pulpo_url` come from the
+    current ranked.json row.
     """
 
     state: FavoriteState
@@ -253,7 +256,7 @@ class FavoriteUpdate:
     pulpo_url: str
     # Numeric fields — only the relevant one is populated per state.
     current_price_usd: Optional[float] = None    # price_dropped / no_change / price_up
-    price_at_save_usd: Optional[float] = None    # price_dropped / off_market / price_up
+    price_at_save_usd: Optional[float] = None    # price_dropped / price_up
     delta_usd: Optional[float] = None            # price_dropped / price_up (always positive)
     days_listed: Optional[int] = None            # no_change
     # Internal — kept for telemetry / debugging; not rendered directly.
@@ -284,7 +287,9 @@ class Issue:
     # Favorites backend — list of update rows to render in the
     # "Your saved listings — what changed this week" section.
     # Empty list → renderer skips the section entirely (mockup's
-    # "no saves → section skipped" edge case). Up to 3 rendered per
-    # issue; build_issue picks the most meaningful by state priority
-    # (price_dropped > off_market > price_up > no_change).
+    # "no saves → section skipped" edge case). Up to MAX_FAVORITES
+    # rendered per issue; build_issue picks the most meaningful by
+    # state priority (price_dropped > price_up > no_change). Saves
+    # missing from ranked.json are silently skipped, not surfaced
+    # as off-market.
     favorites: list[FavoriteUpdate] = field(default_factory=list)
