@@ -338,3 +338,128 @@ def test_resend_locale_sidechannel_still_parses_for_audience():
     # No Clerk users → all three are dropped (anonymous-only contacts
     # have no Pro account).
     assert subs.join_recipients(contacts=contacts, clerk_users=[]) == []
+
+
+# ── P3 — DiscoverFilter → Preference translation ─────────────────────
+# The Discover panel (web/app/pages.jsx) writes its filter state to
+# publicMetadata.profile.discover_filters via the P2a-2 hook. The cron
+# now consumes that blob first and falls back to the legacy `newsletter`
+# blob (P1-era shape) when the user hasn't migrated yet.
+
+def test_preference_from_discover_filters_empty():
+    """Empty / non-dict input → empty Preference (cohort fallback in
+    build_issue then picks the broad cut)."""
+    assert subs._preference_from_discover_filters({}) == Preference()
+    assert subs._preference_from_discover_filters(None) == Preference()  # type: ignore[arg-type]
+
+
+def test_preference_from_discover_filters_full_translation():
+    """Every axis with a defined mapping translates; departments stays
+    empty (Discover panel uses zones, not departments)."""
+    pref = subs._preference_from_discover_filters({
+        "zones": ["el-tunco", "el-zonte"],
+        "subcategory": "land",
+        "price_min": 50_000,
+        "price_max": 500_000,
+        "features": ["beachfront", "water_body", "ocean_view"],
+        "discovery_tags": ["under_250k", "top_rated"],
+        # Axes that get dropped (Discover-only browsing controls):
+        "land_types": ["residential"],
+        "infra": ["water", "power"],
+        "status": ["new"],
+        "size_min": 1000,
+        "readiness": 3,
+        "rank_max": 10,
+        "master_category": "beach",
+    })
+    assert pref.zones == ["el-tunco", "el-zonte"]
+    assert pref.departments == []
+    assert pref.property_types == ["land"]
+    assert pref.max_price_usd == 500_000
+    assert pref.min_price_usd == 50_000
+    # categories preserves insertion order: features first, then tags,
+    # deduped. ocean_view + top_rated are dropped (no cron mapping).
+    assert pref.categories == ["beachfront", "water_features", "under_250k"]
+
+
+def test_preference_from_discover_filters_subcategory_homes_and_condos():
+    """homes → house, condos → condo (cron's vocabulary uses singular)."""
+    assert subs._preference_from_discover_filters({"subcategory": "homes"}).property_types == ["house"]
+    assert subs._preference_from_discover_filters({"subcategory": "condos"}).property_types == ["condo"]
+    assert subs._preference_from_discover_filters({"subcategory": "land"}).property_types == ["land"]
+    # Bogus value gracefully drops.
+    assert subs._preference_from_discover_filters({"subcategory": "yurts"}).property_types == []
+
+
+def test_preference_from_discover_filters_waterfront_aliases_to_beachfront():
+    """The Discover 'waterfront' pill is the broad beachfront/water-body
+    bucket; cron's 'beachfront' category captures it."""
+    pref = subs._preference_from_discover_filters({"discovery_tags": ["waterfront"]})
+    assert pref.categories == ["beachfront"]
+
+
+def test_preference_from_discover_filters_dedupes_overlapping_inputs():
+    """features + discovery_tags can both surface 'beachfront' — dedupe
+    so the cron's category predicate doesn't run twice."""
+    pref = subs._preference_from_discover_filters({
+        "features": ["beachfront"],
+        "discovery_tags": ["waterfront"],
+    })
+    assert pref.categories == ["beachfront"]
+
+
+def test_preference_from_discover_filters_drops_zero_price_min():
+    """price_min == 0 is the default state — don't surface it as a real
+    minimum (apply_preference would reject every $0 listing, but the
+    intent is 'no opinion')."""
+    pref = subs._preference_from_discover_filters({"price_min": 0, "price_max": 500_000})
+    assert pref.min_price_usd is None
+    assert pref.max_price_usd == 500_000
+
+
+def test_preference_from_profile_prefers_discover_filters_over_newsletter():
+    """When both blobs are present, discover_filters wins — the user
+    moved to the unified UI and we should trust that signal."""
+    pref = subs._preference_from_profile({
+        "discover_filters": {
+            "zones": ["el-zonte"],
+            "subcategory": "land",
+            "price_max": 250_000,
+        },
+        "newsletter": {
+            # Legacy values that would lose if both blobs landed.
+            "departments": ["La Paz"],
+            "property_types": ["house"],
+            "max_price_usd": 500_000,
+        },
+    })
+    assert pref.zones == ["el-zonte"]
+    assert pref.departments == []
+    assert pref.property_types == ["land"]
+    assert pref.max_price_usd == 250_000
+
+
+def test_preference_from_profile_falls_back_to_newsletter_when_discover_empty():
+    """Users who haven't touched the new UI still have only the legacy
+    newsletter blob — the cron must keep delivering until P3 dashboards
+    confirm migration."""
+    pref = subs._preference_from_profile({
+        "newsletter": {
+            "departments": ["La Libertad"],
+            "property_types": ["land"],
+            "max_price_usd": 500_000,
+        },
+        # Empty {} dict for discover_filters is treated as "user has not
+        # interacted" and falls through to the legacy blob.
+        "discover_filters": {},
+    })
+    assert pref.departments == ["La Libertad"]
+    assert pref.property_types == ["land"]
+    assert pref.max_price_usd == 500_000
+
+
+def test_preference_from_profile_empty_when_neither_blob_present():
+    """No Clerk profile data at all → empty Preference; cohort fallback
+    in build_issue picks the broad cut."""
+    assert subs._preference_from_profile({}) == Preference()
+    assert subs._preference_from_profile({"something_unrelated": 1}) == Preference()
