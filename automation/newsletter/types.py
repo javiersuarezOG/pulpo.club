@@ -164,7 +164,7 @@ class YourPulpoState:
 
     Three rows tying the email back to the SPA:
       1. saved_count → /saved        ("Open your favorites")
-      2. filter_summary_human → /account/notifications  ("Edit your filter")
+      2. filter_summary_human → /account/newsletter  ("Edit your filter")
       3. filter_match_count → /browse  ("Browse all in your filter")
 
     Anonymous cohort (no Clerk record) renders a softened variant —

@@ -827,7 +827,7 @@ def _your_pulpo_html(issue: Issue) -> str:
 
     Three rows, each driven by `issue.your_pulpo`:
       • saved listings count   → /saved
-      • filter summary line    → /account/notifications
+      • filter summary line    → /account/newsletter
       • filter-match count     → /browse
 
     All URLs carry `ref=newsletter_issue_<N>` so PostHog can attribute
@@ -848,7 +848,7 @@ def _your_pulpo_html(issue: Issue) -> str:
     title = i18n.t("yp.title", locale)
 
     saved_url = f"{site}/saved{ref}"
-    filter_url = f"{site}/account/notifications{ref}"
+    filter_url = f"{site}/account/newsletter{ref}"
     browse_url = f"{site}/browse{ref}"
 
     rows: list[str] = []
