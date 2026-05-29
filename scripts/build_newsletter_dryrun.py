@@ -147,50 +147,57 @@ FIXTURES = [
 
 
 def _seed_sample_saves(recipient: Recipient, ranked: list[dict]) -> None:
-    """Mutate a fixture Recipient with three sample saves, one per
-    favorites state. Reads real listings from ranked.json so the
-    rendered preview shows realistic titles + photos.
+    """Mutate a fixture Recipient with sample saves spanning the
+    three favorites states. Reads real listings from ranked.json so
+    the rendered preview shows realistic titles + photos.
 
-    Picks:
-      • saves[0] — first listing in the filter, simulating a price
-        drop (baseline = current + $5,000).
-      • saves[1] — a synthetic ID guaranteed to be off-market
-        (fictional source/source_id never present in ranked.json).
-      • saves[2] — second listing in the filter, baseline = current
-        price (renders as no_change).
+    v3.3.1 (2026-05-29): dropped the off_market seed. A saved listing
+    missing from ranked.json now silently skips (it could be sold OR
+    a scraper hiccup OR filtered for data quality — we don't surface
+    a card we can't be honest about). The fixture now seeds three
+    in-ranked listings:
 
-    If ranked.json has fewer than two suitable listings, falls back
-    to single-listing seeding so the preview still has content.
+      • saves[0] — price_dropped (baseline = current + $5,000)
+      • saves[1] — no_change (baseline = current price)
+      • saves[2] — price_up (baseline = current - $3,000)
+
+    If ranked.json has fewer than three suitable listings, falls
+    back to single-listing seeding so the preview still has content.
     """
     if not ranked:
         return
-    # Pull two real listings near the top of the ranked list.
     sample = [row for row in ranked if isinstance(row, dict) and row.get("source") and row.get("source_id") and row.get("price_usd")]
     if not sample:
         return
-    first = sample[0]
-    second = sample[1] if len(sample) > 1 else None
 
-    saves = [
-        SavedListing(
-            id=f"{first['source']}__{first['source_id']}",
-            saved_at="2026-05-22T18:45:00Z",
-            price_at_save_usd=float(first["price_usd"]) + 5_000.0,
-            source=first.get("source"),
-        ),
-        SavedListing(
-            id="dryrun-fixture__off-market",
-            saved_at="2026-04-12T10:00:00Z",
-            price_at_save_usd=270_000.0,
-        ),
-    ]
-    if second is not None:
+    saves: list[SavedListing] = []
+
+    first = sample[0]
+    saves.append(SavedListing(
+        id=f"{first['source']}__{first['source_id']}",
+        saved_at="2026-05-22T18:45:00Z",
+        price_at_save_usd=float(first["price_usd"]) + 5_000.0,
+        source=first.get("source"),
+    ))
+
+    if len(sample) > 1:
+        second = sample[1]
         saves.append(SavedListing(
             id=f"{second['source']}__{second['source_id']}",
             saved_at="2026-05-01T09:00:00Z",
             price_at_save_usd=float(second["price_usd"]),
             source=second.get("source"),
         ))
+
+    if len(sample) > 2:
+        third = sample[2]
+        saves.append(SavedListing(
+            id=f"{third['source']}__{third['source_id']}",
+            saved_at="2026-04-18T11:00:00Z",
+            price_at_save_usd=max(1000.0, float(third["price_usd"]) - 3_000.0),
+            source=third.get("source"),
+        ))
+
     recipient.saves = saves
     recipient.saved_count = len(saves)
 

@@ -107,6 +107,77 @@ def _telemetry_capture(event: str, props: dict) -> None:
         pass
 
 
+def _emit_favorites_telemetry(
+    *,
+    favorites: list,
+    recipient: Recipient,
+    cohort: str,
+    locale: str,
+    issue_number: int,
+    issue_id: str,
+) -> None:
+    """One event per Issue: `newsletter.favorites_section_rendered`.
+
+    Props are designed for PostHog dashboard rollups:
+
+      • state_price_dropped / state_price_up / state_no_change —
+        per-state counts so the chart can show "this week: 17
+        price-drop cards rendered across the audience".
+      • favorites_count — total rows in the section (≤ MAX_FAVORITES).
+      • section_rendered — bool. False when the recipient has saves
+        but none survived the diff (every save was missing from
+        ranked.json or no baseline + no current price). Lets the
+        dashboard count "section dark" recipients separately from
+        "no saves at all" — two different funnels to investigate.
+      • saves_total — recipient.saved_count. Leading indicator of
+        engagement on the save action itself.
+      • saves_with_baseline — count of recipient.saves carrying a
+        price_at_save_usd. Should trend up week over week as new
+        saves land enriched (per the v3.2 api/saves change). When
+        this trends flat / falls, the enrichment write path is
+        broken — sev-2 telemetry alert candidate.
+      • saves_missing_from_ranked — count of saves that were silently
+        skipped by compute_favorites because their ID wasn't in
+        this week's ranked.json. High numbers here flag either real
+        churn (listings going off-market) OR scraper hiccups —
+        worth surfacing so the dashboard distinguishes.
+      • cohort / locale / template_version / issue_number / issue_id —
+        slicing dimensions.
+
+    No PII — `recipient_hash` is the deterministic email_hash, never
+    the raw address. Mirrors the rest of the newsletter telemetry.
+    """
+    from .render_html import TEMPLATE_VERSION  # local import to avoid cycle
+
+    saves = getattr(recipient, "saves", None) or []
+    saves_with_baseline = sum(
+        1 for s in saves if getattr(s, "price_at_save_usd", None) is not None
+    )
+    state_counts = {"price_dropped": 0, "price_up": 0, "no_change": 0}
+    for u in favorites:
+        state = getattr(u, "state", None)
+        if state in state_counts:
+            state_counts[state] += 1
+    saves_missing = max(0, len(saves) - len(favorites))
+
+    _telemetry_capture("newsletter.favorites_section_rendered", {
+        "section_rendered": bool(favorites),
+        "favorites_count": len(favorites),
+        "state_price_dropped": state_counts["price_dropped"],
+        "state_price_up": state_counts["price_up"],
+        "state_no_change": state_counts["no_change"],
+        "saves_total": len(saves),
+        "saves_with_baseline": saves_with_baseline,
+        "saves_missing_from_ranked": saves_missing,
+        "cohort": cohort,
+        "locale": locale,
+        "template_version": TEMPLATE_VERSION,
+        "issue_number": issue_number,
+        "issue_id": issue_id,
+        "recipient_hash": recipient.email_hash,
+    })
+
+
 def _llm_or_deterministic_commentary(
     *,
     cohort: str,
@@ -963,6 +1034,14 @@ def build_issue(
         "picks_total": len(kept_listings),
         "has_skip": skip_pick_listing is not None,
         "paywall_banner": paywall_all,
+        # P3-cleanup readout: which publicMetadata blob the cron derived
+        # this recipient's Preference from. Dashboard query for retiring
+        # the legacy fallback in subscribers._preference_from_profile is
+        # "count distinct recipient_hash where preference_source ==
+        # 'newsletter' over the last 30 days" — when that trends to ~0
+        # everyone has interacted with the unified UI at least once and
+        # the legacy read is safe to drop.
+        "preference_source": getattr(recipient, "preference_source", "none"),
     })
 
     # ── URLs ────────────────────────────────────────────────────────────
@@ -1030,6 +1109,22 @@ def build_issue(
         )[0],
         issue_number=issue_number,
         site_root=site_root,
+    )
+
+    # Observability — fire ONCE per Issue built. PostHog dashboard can
+    # roll these up across the audience to answer: how many recipients
+    # got a favorites section this week? How many price drops did we
+    # surface? Are people accumulating saves over time (saves_total)?
+    # Are baselines landing on new saves (saves_with_baseline)? The
+    # last two are the leading indicators that the v3.3 enrichment is
+    # actually capturing data we need for next week's diffs.
+    _emit_favorites_telemetry(
+        favorites=favorites,
+        recipient=recipient,
+        cohort=cohort,
+        locale=locale,
+        issue_number=issue_number,
+        issue_id=issue_id,
     )
 
     return Issue(

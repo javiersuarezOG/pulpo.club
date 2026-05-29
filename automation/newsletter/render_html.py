@@ -28,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.3-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.3.1-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -331,7 +331,6 @@ table { border-collapse: collapse; }
 }
 .change-chip-warm  { background: #FBE6D8; color: #7A3D1F; }     /* price drop */
 .change-chip-calm  { background: #E8DFC6; color: #5A5650; }     /* no change  */
-.change-chip-sold  { background: #F5E3E0; color: #6B2C2C; }     /* off market */
 .change-chip-up    { background: #EDE7DB; color: #5A5650; }     /* price up   */
 .save-title {
   font-family: var(--font-display);
@@ -952,13 +951,14 @@ def _favorites_count_word(n: int, en: bool) -> str:
 def _favorites_summary(favorites: list, locale: str) -> str:
     """Build the qualitative one-line summary above the cards.
 
-    Mockup: "One had a price drop, one's still where you left it,
-    and one came off the market." The summary is composed from the
-    actual state counts so it stays truthful (no fabricated drama
-    when nothing actually moved).
+    Summary is composed from the actual state counts so it stays
+    truthful (no fabricated drama when nothing actually moved).
+    v3.3.1: the off_market state was removed; saves missing from
+    ranked.json are silently skipped rather than reported as sold,
+    so the summary builder no longer has that branch.
     """
     en = locale == "en"
-    counts = {"price_dropped": 0, "no_change": 0, "off_market": 0, "price_up": 0}
+    counts = {"price_dropped": 0, "no_change": 0, "price_up": 0}
     for u in favorites:
         counts[u.state] = counts.get(u.state, 0) + 1
 
@@ -966,8 +966,6 @@ def _favorites_summary(favorites: list, locale: str) -> str:
         parts: list[str] = []
         if counts["price_dropped"]:
             parts.append(_count_phrase(counts["price_dropped"], "had a price drop", "had price drops", en=True))
-        if counts["off_market"]:
-            parts.append(_count_phrase(counts["off_market"], "came off the market", "came off the market", en=True))
         if counts["price_up"]:
             parts.append(_count_phrase(counts["price_up"], "moved up in price", "moved up in price", en=True))
         if counts["no_change"]:
@@ -978,8 +976,6 @@ def _favorites_summary(favorites: list, locale: str) -> str:
     parts_es: list[str] = []
     if counts["price_dropped"]:
         parts_es.append(_count_phrase(counts["price_dropped"], "bajó de precio", "bajaron de precio", en=False))
-    if counts["off_market"]:
-        parts_es.append(_count_phrase(counts["off_market"], "salió del mercado", "salieron del mercado", en=False))
     if counts["price_up"]:
         parts_es.append(_count_phrase(counts["price_up"], "subió de precio", "subieron de precio", en=False))
     if counts["no_change"]:
@@ -1018,9 +1014,6 @@ def _favorite_card_html(u, locale: str) -> str:
         chip_text = (f"&darr; Price dropped {amount} since you saved it" if en
                      else f"&darr; Bajó {amount} desde que la guardaste")
         chip_class = "change-chip change-chip-warm"
-    elif u.state == "off_market":
-        chip_text = "Marked off-market this week" if en else "Salió del mercado esta semana"
-        chip_class = "change-chip change-chip-sold"
     elif u.state == "price_up":
         amount = _format_price_compact(u.delta_usd or 0)
         chip_text = (f"&uarr; Price moved up {amount} since you saved it" if en
@@ -1040,11 +1033,6 @@ def _favorite_card_html(u, locale: str) -> str:
             f'{_format_price_full(u.current_price_usd)}'
             f' <span class="struck">{_format_price_full(u.price_at_save_usd)}</span>'
         )
-    elif u.state == "off_market" and u.price_at_save_usd is not None:
-        price_line = (
-            f"Last seen at {_format_price_full(u.price_at_save_usd)}" if en
-            else f"Visto por última vez a {_format_price_full(u.price_at_save_usd)}"
-        )
     elif u.current_price_usd is not None:
         price_line = _format_price_full(u.current_price_usd)
     elif u.price_at_save_usd is not None:
@@ -1052,11 +1040,7 @@ def _favorite_card_html(u, locale: str) -> str:
     else:
         price_line = "&mdash;"
 
-    # CTA — off-market routes to /saved; everything else to the listing.
-    if u.state == "off_market":
-        cta_text = "See your favorites &rarr;" if en else "Ver tus favoritos &rarr;"
-    else:
-        cta_text = "See on Pulpo &rarr;" if en else "Verla en Pulpo &rarr;"
+    cta_text = "See on Pulpo &rarr;" if en else "Verla en Pulpo &rarr;"
 
     photo_block = (
         f'<img src="{_e(u.photo_url)}" alt="" />'
