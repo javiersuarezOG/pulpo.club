@@ -122,6 +122,20 @@ class IssuePick:
     # post-mortems can tell LLM output apart from the deterministic
     # fallback when chasing a quality regression.
     story_source: Literal["llm", "deterministic", "fallback_on_error", ""] = ""
+    # ── v3 redesign · "Why we picked it" block ──────────────────────
+    # Three plain-English bullets, each tied to a real Listing field
+    # (price_vs_zone_pct / dist_beach_km / readiness_score / …).
+    # Replaces the opaque "value 100 · location 100 · momentum 50"
+    # rank-reasons row from v2.x. Sourced from
+    # commentary.deterministic_why_for_pick — never from an LLM, never
+    # from the rank score itself. Empty for paywalled picks (the
+    # reader can't see the listing yet) and for short picks (those
+    # use a single "For someone who…" framing line instead).
+    why_bullets: list[str] = field(default_factory=list)
+    # Single "For someone who *wants surf-city land cheap*" line shown
+    # under each shortlist entry. Renderer wraps the italic phrase in
+    # <em>. Sourced from commentary.deterministic_shortlist_frame.
+    shortlist_frame_html: str = ""
 
 
 @dataclass

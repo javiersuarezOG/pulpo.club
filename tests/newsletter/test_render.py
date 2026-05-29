@@ -140,12 +140,20 @@ def test_render_issue_header_carries_issue_number(pro_with_prefs, ranked_pool):
     assert "ISSUE 07" in html
 
 
-def test_render_glance_includes_skip_row(pro_with_prefs, ranked_pool):
+def test_render_v3_drops_at_a_glance_table(pro_with_prefs, ranked_pool):
+    """v3 dropped the `<table class="glance">` numbered list.
+
+    The welcome teaser already names #01-#03 inline; the per-pick + the
+    shortlist sections cover the rest. The table was the most visible
+    `<table>` left in the document and the user called out "no tables"
+    in the 2026-05-29 review of the v2.8 send. The "Skip this one"
+    block survives as its own editorial section."""
     html = _render(pro_with_prefs, ranked_pool)
-    # At-a-glance section exists
-    assert "At a glance" in html
-    # Skip block uses the muted '×' marker
-    assert ">×<" in html or ">×</td>" in html
+    assert "At a glance" not in html
+    assert 'class="glance"' not in html
+    # Skip block lives outside the (gone) glance table — survives as its
+    # own editorial section.
+    assert "Skip this one" in html
 
 
 def test_render_keytable_does_not_double_up_keys(pro_with_prefs, ranked_pool):
@@ -171,10 +179,48 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     from automation.newsletter.render_html import TEMPLATE_VERSION
     html = _render(pro_with_prefs, ranked_pool)
     assert TEMPLATE_VERSION  # non-empty
-    assert TEMPLATE_VERSION.startswith("newsletter-v2."), (
+    assert TEMPLATE_VERSION.startswith("newsletter-v"), (
         f"TEMPLATE_VERSION drifted: {TEMPLATE_VERSION!r}"
     )
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
+
+
+def test_render_v3_redesign_contract(pro_with_prefs, ranked_pool):
+    """v3 renderer contract — the 5 fixes from Sebas's 2026-05-29 review:
+
+      1. Layout flows top-to-bottom, nothing collapses or expands
+         (smoke: every section's heading is present on a single render).
+      2. No `<table>` elements past the outer email frame and the
+         opt-in dark "Your Pulpo" rows. The v2.x `<table class="glance">`
+         and the inner shortlist tables are gone.
+      3. Each hero pick renders a "Why we picked it" `<ul>` driven by
+         the why_bullets generator instead of the v2 "Why Pulpo ranked
+         it: value 100 · momentum 50" callout.
+      4. Shortlist copy is the simpler "Each one suits a different
+         kind of buyer" — the v2 "Read the frame first; skip if it
+         isn't yours" copy is banned.
+      5. Market context renders BEFORE the first hero pick (the warm
+         "buyer's fortnight" framing the v2 send buried at the bottom).
+    """
+    html = _render(pro_with_prefs, ranked_pool)
+    # Fix #2 — only the outer frame `<table>` and the `yp-table`
+    # survive. Both have specific class hooks so we can count exactly.
+    assert html.count('class="glance"') == 0
+    assert html.count('<table class="frame"') == 1
+    assert html.count('<table class="yp-table"') == 1
+    # Fix #3 — at least one hero pick rendered a why-block (data is
+    # rich enough to surface bullets).
+    assert 'class="why-block"' in html
+    assert "Why we picked it" in html
+    assert "Why Pulpo ranked it" not in html  # v2 callout label is gone
+    # Fix #4 — new copy in, old copy out.
+    assert "Each one suits a different kind of buyer" in html
+    assert "Read the frame first" not in html
+    # Fix #5 — market-context HTML appears before the first hero pick.
+    market_idx = html.find("Market context")
+    pick_idx = html.find('class="pill pill-forest"')  # "TOP PICK · 01" pill
+    if market_idx != -1 and pick_idx != -1:
+        assert market_idx < pick_idx, "market context must render before the first pick"
 
 
 def test_render_v24_redesign_contract(pro_with_prefs, ranked_pool):

@@ -66,10 +66,15 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "pick.cta_locked":             {"en": "Unlock this pick — $9.99/mo →",                "es": "Desbloquear esta selección — $9.99/mes →"},
     "pick.paywall_blurb":          {"en": "Pulpo Pro reveals the address, the broker file, and the full underwriting. Free members see the photo and the headline.",
                                      "es": "Pulpo Pro revela la dirección, la ficha del corredor y el análisis completo. Los miembros gratuitos ven foto y titular."},
-    "shortlist.eyebrow":           {"en": "The shortlist",                                "es": "La lista corta"},
-    "shortlist.headline":          {"en": "{n} more — situational picks.",                "es": "{n} más — selecciones situacionales."},
-    "shortlist.lede":              {"en": "Each one is the right answer for a specific buyer. Read the frame first; skip if it isn't yours.",
-                                     "es": "Cada una es la respuesta correcta para un comprador específico. Lee el marco primero; salta si no es el tuyo."},
+    "shortlist.eyebrow":           {"en": "{n} more worth a look",                        "es": "{n} más que valen la pena"},
+    "shortlist.headline":          {"en": "Each one suits a different kind of buyer.",
+                                     "es": "Cada una le encaja a un comprador distinto."},
+    "shortlist.lede":              {"en": "Pulpo ranked these inside your filter too. Skim the short reads below — each one tells you who the right buyer is.",
+                                     "es": "Pulpo también las clasificó dentro de tu filtro. Lee los resúmenes cortos — cada uno te dice a quién le encaja."},
+    # v3: "Why we picked it" label that sits above the 3 plain-English
+    # bullets on each hero pick. Replaces the v2.x "Why Pulpo ranked it"
+    # callout that exposed analyst-y rank-reasons strings.
+    "pick.why_label":              {"en": "Why we picked it",                              "es": "Por qué la elegimos"},
     # ── Skip ──
     "skip.eyebrow":                {"en": "Skip this one",                                "es": "Esta sí, sáltala"},
     # ── Market context ──
