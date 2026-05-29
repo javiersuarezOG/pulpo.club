@@ -764,12 +764,81 @@ function NotificationsSection({ app }) {
         </p>
       )}
 
-      {/* Category preferences + newsletter filter chips — both already
-          write through app.updateUserProfile and the cron reads every
-          field they touch. These are the only controls with a real
-          downstream consumer today. */}
+      {/* Preferred categories stay above the filter — they tag what
+          gets surfaced in the editor's voice (PR-B). */}
       {isPaid && <PreferredCategoryChips app={app} />}
-      {isPaid && <NewsletterFilterChips app={app} />}
+      {/* P2b — the Discover FilterPanel, bound to the same
+          publicMetadata.profile.discover_filters blob BrowsePage
+          persists to (P2a). Changes here round-trip with /browse so
+          the user maintains a single filter spec across both surfaces. */}
+      {isPaid && <NewsletterFilterPanelBlock app={app} />}
+    </div>
+  );
+}
+
+// ── NewsletterFilterPanelBlock (P2b, 2026-05-29) ─────────────────────
+// Wraps the BrowsePage `<FilterPanel>` in an /account/newsletter chrome
+// (heading, intro, live count) and binds it to the same
+// `publicMetadata.profile.discover_filters` blob the Discover panel
+// writes (see web/app/lib/use-discover-filter.ts). Pro users only —
+// the Pro upsell renders above when isPaid=false.
+//
+// Hydration:
+//   • Mount-time: seed in-memory filter state from Clerk via
+//     storageToDiscover(readDiscoverFilter(app.user)). Falls back to
+//     makeDefaultFilters() when the user has no persisted blob (cold
+//     start) so the FilterPanel renders against a known shape.
+//
+// Persistence:
+//   • useDiscoverFilterPersist (same hook BrowsePage uses) mirrors
+//     filter changes back to Clerk on the standard 800ms debounce.
+//     Skip-if-equal guards against the post-write re-render burning a
+//     second round-trip.
+//
+// Live count:
+//   • applyFilters against the catalog yields the result count —
+//     same function the Discover panel uses, so the number rendered
+//     here matches what /browse would show for the same filter.
+function NewsletterFilterPanelBlock({ app }) {
+  // Hydrate once from Clerk. Subsequent re-renders driven by the
+  // FilterPanel's own setFilters; we don't re-read Clerk on every
+  // render because that would clobber in-progress edits.
+  const [filters, setFilters] = aUseState(() => {
+    const stored = readDiscoverFilter(app.user);
+    return { ...makeDefaultFilters(), ...storageToDiscover(stored) };
+  });
+
+  // Mirror changes back to Clerk via the same debounced hook the
+  // Discover panel uses. Skip-if-equal is the load-bearing guard
+  // against the mount-time hydration round-trip burning a write.
+  useDiscoverFilterPersist(app, filters);
+
+  // Live count — apply the in-memory filter against the catalog. The
+  // useListings hook returns an empty array until the JSON resolves,
+  // so the count renders as 0 during the initial load (acceptable —
+  // the FilterPanel still works on a zero-listings catalog).
+  const listings = useListings();
+  const count = aUseMemo(
+    () => applyFilters(listings, filters).length,
+    [listings, filters],
+  );
+
+  return (
+    <div className="account-newsletter-filter">
+      <h3 className="account-subhead">
+        {t("account.notif.newsletter_filter.heading", app.locale)}
+      </h3>
+      <p className="notif-categories-intro">
+        {t("account.notif.newsletter_filter.intro", app.locale)}
+      </p>
+      <div className="account-newsletter-filter-panel">
+        <FilterPanel
+          filters={filters}
+          setFilters={setFilters}
+          count={count}
+          app={app}
+        />
+      </div>
     </div>
   );
 }

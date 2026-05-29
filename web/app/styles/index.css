@@ -3264,6 +3264,24 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   margin-top: 12px;
 }
 
+/* P2b — Discover FilterPanel embedded on /account/newsletter. The
+   panel ships sticky positioning (works on /browse where the
+   catalogue scrolls underneath) but the Account page lays out as a
+   single flow column, so override sticky here. Same chip styles, same
+   accordion behaviour — just no sticky anchor + a top margin so it
+   doesn't bump the preferred-categories block. */
+.account-newsletter-filter {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-top: 8px;
+}
+.account-newsletter-filter .notif-categories-intro { margin-bottom: 4px; }
+.account-newsletter-filter-panel .filter-panel {
+  position: static;
+  max-height: none;
+  overflow-y: visible;
+  padding-right: 0;
+}
+
 /* Pro upsell card shown in Account → Notifications when user is on
    the free plan (or anonymous). Same visual weight as a pref-list
    block so it slots in cleanly above the platform-updates row. */

@@ -3918,6 +3918,11 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
 export {
   BrowsePage, ListingDetail,
   SavedPage, PlansPage, SignupModal, WelcomeModal, ProUpsellModal, ToastHost,
+  // P2b — FilterPanel mounts on /account/newsletter so changes there
+  // round-trip with /browse via the shared `discover_filters` Clerk
+  // blob. makeDefaultFilters / applyFilters are needed there too: the
+  // first to seed in-memory state, the second to compute the live count.
+  FilterPanel,
   makeDefaultFilters, applyFilters,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
 };
