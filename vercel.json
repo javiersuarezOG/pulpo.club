@@ -56,6 +56,8 @@
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/newsletter-v3-preview",   "destination": "/web/newsletter-v3-live-preview.html" },
     { "source": "/newsletter-v31-preview",  "destination": "/web/newsletter-v31-live-preview.html" },
+    { "source": "/account-newsletter-mockup",  "destination": "/web/account-newsletter-mockup.html" },
+    { "source": "/newsletter-with-saves-mockup", "destination": "/web/newsletter-with-saves-mockup.html" },
     { "source": "/:slug([A-Za-z0-9_-]+)",   "destination": "/api/404" }
   ],
   "redirects": [

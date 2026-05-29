@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo · Issue 07 — With saved-listings section</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper:        #F4EFE6;
+    --paper-2:      #F8F4EC;
+    --paper-3:      #E8DFC6;
+    --white:        #FFFFFF;
+    --ink:          #1A1916;
+    --ink-2:        #5A5650;
+    --ink-3:        #888780;
+    --line:         rgba(0, 0, 0, 0.10);
+    --line-2:       rgba(0, 0, 0, 0.16);
+    --forest:       #1F3D31;
+    --sage:         #DDE9DC;
+    --sage-strong:  #C9DEC6;
+    --clay:         #B8643C;
+    --clay-deep:    #7A3D1F;
+    --clay-soft:    #FBE6D8;
+    --burgundy:     #6B2C2C;
+    --burgundy-bg:  #F5E3E0;
+    --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--clay); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* annotation banner — mockup-only */
+  .annot {
+    background: #FFF8E1;
+    border-bottom: 1px solid #E8C766;
+    padding: 14px 32px;
+    font-size: 12.5px;
+    color: #5C4A0E;
+    line-height: 1.5;
+  }
+  .annot strong { color: #3D3206; }
+  .annot code {
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 11.5px;
+  }
+
+  .wrap { width: 100%; background: var(--paper); padding: 32px 0 56px; }
+  .frame { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+
+  /* type */
+  .h-hero { font-family: var(--font-display); font-size: 40px; line-height: 1.06; letter-spacing: -0.02em; color: var(--ink); margin: 6px 0 12px; }
+  .h1 { font-family: var(--font-display); font-size: 30px; line-height: 1.12; letter-spacing: -0.015em; color: var(--ink); margin: 12px 0 4px; }
+  .h2 { font-family: var(--font-display); font-size: 22px; line-height: 1.2; color: var(--ink); margin: 4px 0 8px; }
+  .h3 { font-family: var(--font-display); font-size: 19px; line-height: 1.22; color: var(--ink); margin: 6px 0 4px; }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0;
+  }
+  .eyebrow.muted { color: var(--ink-3); }
+  .eyebrow.forest { color: var(--forest); }
+
+  /* header strip */
+  .header-strip {
+    padding: 16px 48px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-strip .brand-pulpo {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+    color: var(--forest);
+  }
+  .header-strip .issue-strip {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  /* welcome */
+  .welcome-pad { padding: 40px 48px 28px; }
+  .welcome-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0;
+  }
+  .welcome-lede {
+    font-family: var(--font-display);
+    font-size: 21px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin: 14px 0 0;
+  }
+  .welcome-lede em { font-style: italic; color: var(--clay-deep); }
+  .rule-clay { border: 0; border-top: 2px solid var(--clay); width: 48px; margin: 12px 0 0; }
+
+  /* ───────────────────────── SAVED LISTINGS SECTION (NEW) ──────────────────── */
+  .saves {
+    padding: 28px 48px 32px;
+    border-top: 1px solid var(--line);
+    background: var(--paper-2);
+  }
+  .saves-head {
+    margin: 0 0 18px;
+  }
+  .saves-head .eyebrow { color: var(--forest); }
+  .saves-head h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    line-height: 1.18;
+    color: var(--ink);
+    margin: 6px 0 4px;
+  }
+  .saves-head .summary {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .saves-head .summary em { font-style: italic; color: var(--clay-deep); }
+  .saves-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .save-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .save-card.sold { opacity: 0.85; }
+  .save-thumb {
+    width: 84px;
+    height: 84px;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+  .save-thumb.placeholder {
+    background: linear-gradient(135deg, #B8643C 0%, #7A3D1F 100%);
+  }
+  .save-body { flex: 1; min-width: 0; }
+  .change-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+  .change-chip.warm   { background: #FBE6D8; color: #7A3D1F; }
+  .change-chip.calm   { background: #E8DFC6; color: #5A5650; }
+  .change-chip.sold   { background: var(--burgundy-bg); color: var(--burgundy); }
+  .save-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 2px 0 4px;
+  }
+  .save-meta {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .save-price {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+  .save-price .struck {
+    color: var(--burgundy);
+    text-decoration: line-through;
+    font-size: 13px;
+    margin-left: 6px;
+  }
+  .save-cta {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .saves-footer {
+    margin: 16px 0 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+  .saves-footer a { color: var(--clay); font-weight: 500; }
+
+  /* market context */
+  .market {
+    padding: 26px 48px 30px;
+    background: var(--paper-2);
+    border-top: 1px solid var(--line);
+  }
+  .market .eyebrow { color: var(--forest); }
+  .market h2 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--ink);
+    margin: 6px 0 12px;
+  }
+  .market p {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+  }
+  .market p em { font-style: italic; color: var(--clay-deep); }
+  .market p a { color: var(--clay); text-decoration: underline; text-underline-offset: 2px; }
+
+  /* per-pick (compact preview) */
+  .pick {
+    padding: 32px 48px 30px;
+    border-top: 1px solid var(--line);
+  }
+  .pick-num {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .pick-hero {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    margin: 0 0 14px;
+  }
+  .pick-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin: 4px 0 6px;
+  }
+  .pick-meta {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 12px;
+  }
+  .pick-price {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+
+  /* your pulpo */
+  .your-pulpo { background: var(--ink); color: var(--paper); padding: 32px 48px; }
+  .your-pulpo .eyebrow { color: var(--paper); opacity: 0.55; }
+  .your-pulpo h2 { color: var(--paper); margin: 6px 0 20px; font-family: var(--font-display); font-size: 26px; }
+  .yp-grid { display: table; width: 100%; border-spacing: 0; }
+  .yp-row { display: table-row; }
+  .yp-cell { display: table-cell; vertical-align: middle; padding: 14px 0; border-top: 1px solid rgba(255,255,255,0.12); color: var(--paper); }
+  .yp-cell:last-child { text-align: right; }
+  .yp-num { font-family: var(--font-display); font-size: 20px; color: var(--paper); }
+  .yp-link {
+    color: var(--paper);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .foot { padding: 24px 48px 32px; }
+  .foot p {
+    font-family: var(--font-display);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 0 0 8px;
+  }
+
+  @media (max-width: 600px) {
+    .welcome-pad, .saves, .market, .pick, .your-pulpo, .foot, .header-strip {
+      padding-left: 22px;
+      padding-right: 22px;
+    }
+    .h-hero { font-size: 30px; }
+    .save-card { flex-direction: column; }
+    .save-thumb { width: 100%; height: 140px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="annot">
+  <strong>Mockup of the v3.2 newsletter with the new "Your saved listings" section.</strong>
+  Sits <em>between the welcome lede and the market context</em> — highest-attention slot in the email.
+  Cards show the saved listing's current state plus <strong>what changed this week</strong> (price drop, status change, days on market).
+  Edge cases: no saves → section is skipped; all saves unchanged → cards collapse into a single line.
+</div>
+
+<div class="wrap">
+  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
+
+    <!-- HEADER -->
+    <tr><td>
+      <div class="header-strip">
+        <span class="brand-pulpo">pulpo</span>
+        <span class="issue-strip">Issue 07 · 31 May 2026</span>
+      </div>
+    </td></tr>
+
+    <!-- WELCOME -->
+    <tr><td>
+      <div class="welcome-pad">
+        <p class="welcome-eyebrow">Hand-picked for Sebas</p>
+        <h1 class="h-hero">The 10 best, this week.</h1>
+        <hr class="rule-clay" />
+        <p class="welcome-lede">
+          Pulpo combed through <strong>863 active listings</strong> across La Libertad this week.
+          <em>These 10 earned a closer look.</em> 3 full reads up top; 7 quick scans below.
+        </p>
+      </div>
+    </td></tr>
+
+    <!-- ──────────── NEW: SAVED LISTINGS — WHAT CHANGED THIS WEEK ──────────── -->
+    <tr><td>
+      <div class="saves">
+        <div class="saves-head">
+          <p class="eyebrow">Your saved listings · this week</p>
+          <h2>Three you're following.</h2>
+          <p class="summary">
+            <em>One had a price drop</em>, one's still where you left it,
+            and one came off the market.
+          </p>
+        </div>
+
+        <ul class="saves-list">
+
+          <!-- Save card 1: PRICE DROPPED -->
+          <li class="save-card">
+            <div class="save-thumb" style="background-image: linear-gradient(135deg, #7BAA8E 0%, #2F5F4B 50%, #1F3D31 100%);"></div>
+            <div class="save-body">
+              <span class="change-chip warm">↓ Price dropped $5,000 this week</span>
+              <h3 class="save-title">Ocean View Lot Near El Tunco</h3>
+              <p class="save-meta">Tamanique · La Libertad · 1,263 m²</p>
+              <p class="save-price">$145,000 <span class="struck">$150,000</span></p>
+              <a class="save-cta" href="#">See on Pulpo →</a>
+            </div>
+          </li>
+
+          <!-- Save card 2: NO CHANGE -->
+          <li class="save-card">
+            <div class="save-thumb" style="background-image: linear-gradient(135deg, #B89E72 0%, #6F7B4D 60%, #2F5F4B 100%);"></div>
+            <div class="save-body">
+              <span class="change-chip calm">Still on market · 47 days listed</span>
+              <h3 class="save-title">Coffee Farm with Two Rivers</h3>
+              <p class="save-meta">Chiltiupán · La Libertad · 43 acres</p>
+              <p class="save-price">$185,000</p>
+              <a class="save-cta" href="#">See on Pulpo →</a>
+            </div>
+          </li>
+
+          <!-- Save card 3: SOLD -->
+          <li class="save-card sold">
+            <div class="save-thumb placeholder"></div>
+            <div class="save-body">
+              <span class="change-chip sold">Marked sold this week</span>
+              <h3 class="save-title">Beachfront Condo in Atami</h3>
+              <p class="save-meta">La Libertad · 4 bed · 701 m²</p>
+              <p class="save-price">Last seen at $270,000</p>
+              <a class="save-cta" href="#">See your saves →</a>
+            </div>
+          </li>
+
+        </ul>
+
+        <p class="saves-footer">
+          You're following 3 listings. <a href="#">Open your favorites →</a>
+        </p>
+      </div>
+    </td></tr>
+
+    <!-- MARKET CONTEXT -->
+    <tr><td>
+      <div class="market">
+        <p class="eyebrow">Market context</p>
+        <h2>Worth knowing this week.</h2>
+        <p>
+          <em>The most aggressive discount this week is
+          <a href="#">a 1,263 m² lot in Tamanique at $47/m² — 78% below the area average</a>.</em>
+          Worth a closer look before someone else moves on it.
+        </p>
+      </div>
+    </td></tr>
+
+    <!-- PICK 01 (compact preview) -->
+    <tr><td>
+      <div class="pick">
+        <p class="pick-num">Pick 01 · Land · El Tunco</p>
+        <div class="pick-hero" style="background-image: linear-gradient(135deg, #7BAA8E 0%, #2F5F4B 50%, #1F3D31 100%);"></div>
+        <h2 class="pick-title">Ocean View Lot Near El Tunco</h2>
+        <p class="pick-meta">Tamanique · La Libertad · 1,263 m²</p>
+        <p class="pick-price">$60,000</p>
+        <p style="color: var(--ink-3); font-size: 13px; margin: 8px 0 0;">[Full pick layout with chips, why-block, CTAs — same as v3.2]</p>
+      </div>
+    </td></tr>
+
+    <tr><td>
+      <div class="pick">
+        <p class="pick-num">Pick 02 · Land · Chiltiupán</p>
+        <p style="color: var(--ink-3); font-size: 13px;">[Full pick layout]</p>
+      </div>
+    </td></tr>
+
+    <tr><td>
+      <div class="pick">
+        <p class="pick-num">Pick 03 · Land · El Sunzal</p>
+        <p style="color: var(--ink-3); font-size: 13px;">[Full pick layout]</p>
+      </div>
+    </td></tr>
+
+    <tr><td style="padding: 18px 48px; border-top: 1px solid var(--line); background: var(--paper-2);">
+      <p class="eyebrow muted">7 more worth a look</p>
+      <p style="font-family: var(--font-display); font-size: 22px; color: var(--ink); margin: 6px 0 0;">Each one suits a different kind of buyer.</p>
+      <p style="color: var(--ink-3); font-size: 13px; margin: 8px 0 0;">[Shortlist cards — same as v3.2]</p>
+    </td></tr>
+
+    <!-- YOUR PULPO -->
+    <tr><td>
+      <div class="your-pulpo">
+        <p class="eyebrow">Your Pulpo</p>
+        <h2>Pick up where you left off.</h2>
+        <div class="yp-grid">
+          <div class="yp-row">
+            <div class="yp-cell"><div class="yp-num">3 saved</div></div>
+            <div class="yp-cell"><a class="yp-link" href="#">Open your favorites →</a></div>
+          </div>
+          <div class="yp-row">
+            <div class="yp-cell"><div class="yp-num">La Libertad · land · &lt; $500k</div></div>
+            <div class="yp-cell"><a class="yp-link" href="#">Edit your filter →</a></div>
+          </div>
+          <div class="yp-row">
+            <div class="yp-cell"><div class="yp-num">12 listings match your filter</div></div>
+            <div class="yp-cell"><a class="yp-link" href="#">Browse them all →</a></div>
+          </div>
+        </div>
+      </div>
+    </td></tr>
+
+    <!-- FOOTER -->
+    <tr><td>
+      <div class="foot">
+        <p>Pulpo is made in San Salvador for people looking for a property they'll love. Every beach and lake home in El Salvador, ranked by value.</p>
+        <p style="font-size: 12px; color: var(--ink-3); margin-top: 14px;">
+          <a href="#">Change your filter</a> · <a href="#">Unsubscribe</a> · pulpo.club
+        </p>
+      </div>
+    </td></tr>
+
+  </table>
+</div>
+
+</body>
+</html>
