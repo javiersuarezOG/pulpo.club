@@ -9,26 +9,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --paper:        #F4EFE6;
-    --paper-2:      #F8F4EC;
-    --paper-3:      #E8DFC6;
-    --white:        #FFFFFF;
-    --ink:          #1A1916;
-    --ink-2:        #5A5650;
-    --ink-3:        #888780;
-    --line:         rgba(0, 0, 0, 0.10);
-    --line-2:       rgba(0, 0, 0, 0.16);
-    --forest:       #1F3D31;
-    --forest-mid:   #3D6450;
-    --sage:         #DDE9DC;
-    --sage-strong:  #C9DEC6;
-    --clay:         #B8643C;
-    --clay-deep:    #7A3D1F;
-    --clay-soft:    #FBE6D8;
-    --burgundy:     #6B2C2C;
-    --burgundy-bg:  #F5E3E0;
-    --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --paper:         #F4EFE6;
+    --paper-2:       #F8F4EC;
+    --paper-3:       #E8DFC6;
+    --white:         #FFFFFF;
+    --ink:           #1A1916;
+    --ink-2:         #5A5650;
+    --ink-3:         #888780;
+    --line:          rgba(0, 0, 0, 0.10);
+    --line-2:        rgba(0, 0, 0, 0.16);
+    --forest:        #1F3D31;
+    --sage:          #DDE9DC;
+    --sage-strong:   #C9DEC6;
+    --clay:          #B8643C;
+    --clay-deep:     #7A3D1F;
+    --burgundy:      #6B2C2C;
+    --burgundy-bg:   #F5E3E0;
+    --accent:        #1F3D31;
+    --accent-soft:   #E6EFE5;
+    --accent-strong: #14422D;
+    --font-display:  "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --font-sans:     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
   body {
     margin: 0;
@@ -68,15 +69,8 @@
     align-items: center;
     gap: 18px;
   }
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand-mark {
-    width: 28px;
-    height: 28px;
-  }
+  .brand { display: inline-flex; align-items: center; gap: 10px; }
+  .brand-mark { width: 28px; height: 28px; }
   .brand-name {
     font-family: var(--font-sans);
     font-weight: 700;
@@ -84,23 +78,16 @@
     letter-spacing: -0.03em;
     color: var(--forest);
   }
-  .nav-rest {
-    margin-left: auto;
-    color: var(--ink-3);
-    font-size: 13px;
-  }
+  .nav-rest { margin-left: auto; color: var(--ink-3); font-size: 13px; }
 
   .wrap {
-    max-width: 960px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 28px 32px 80px;
   }
 
-  .pagehead {
-    margin: 4px 0 22px;
-  }
+  .pagehead { margin: 4px 0 22px; }
   .pagehead .eyebrow {
-    font-family: var(--font-sans);
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -122,7 +109,7 @@
     display: flex;
     gap: 24px;
     border-bottom: 1px solid var(--line);
-    margin: 0 0 32px;
+    margin: 0 0 28px;
   }
   .tab {
     padding: 14px 0 12px;
@@ -137,10 +124,7 @@
     font-weight: 600;
     border-bottom-color: var(--clay);
   }
-  .tab.changed {
-    color: var(--clay);
-    font-weight: 600;
-  }
+  .tab.changed { color: var(--clay); font-weight: 600; }
   .tab .pill-new {
     display: inline-block;
     font-size: 10px;
@@ -162,9 +146,7 @@
     border-radius: 8px;
     margin: 0 0 18px;
   }
-  .card .pad {
-    padding: 22px 26px;
-  }
+  .card .pad { padding: 22px 26px; }
   .card h2 {
     font-family: var(--font-display);
     font-size: 22px;
@@ -185,6 +167,7 @@
     align-items: center;
     gap: 14px;
     margin: 6px 0 2px;
+    flex-wrap: wrap;
   }
   .status-pill {
     display: inline-flex;
@@ -210,11 +193,7 @@
     font-size: 19px;
     color: var(--ink);
   }
-  .status-actions {
-    margin-top: 14px;
-    display: flex;
-    gap: 10px;
-  }
+  .status-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -239,97 +218,141 @@
     background: var(--forest);
     color: var(--paper);
   }
-  .btn.danger {
-    color: var(--burgundy);
-    border-color: var(--burgundy-bg);
+
+  /* ─────────────────────────────────────────────────────────────────
+     FILTER PANEL — matches the Discover panel structure 1:1.
+     web/app/pages.jsx :: FilterPanel + web/app/styles/index.css
+     :: .filter-panel / .filter-primary / .chip-grid / .chip
+     ───────────────────────────────────────────────────────────────── */
+
+  .filter-card .pad { padding: 22px 26px 16px; }
+  .filter-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .filter-head h3 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--ink);
+  }
+  .filter-head .clear-link {
+    color: var(--clay);
+    background: none;
+    border: 0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .filter-group { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .filter-group:last-child { border-bottom: none; }
+  .filter-group-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 12px;
   }
 
-  /* filter form */
-  .field {
-    margin: 0 0 22px;
+  /* Primary tier wrapper — Where / Type / Ranking. */
+  .filter-primary {
+    margin: 0 -8px 12px;
+    padding: 4px 12px 8px;
+    background: var(--accent-soft);
+    border-radius: 12px;
   }
-  .field-label {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-2);
-    font-weight: 600;
-    margin: 0 0 10px;
+  .filter-primary .filter-group {
+    border-bottom: 1px solid rgba(31, 61, 49, 0.15);
+    padding: 10px 0;
   }
-  .field-hint {
-    font-size: 12.5px;
-    color: var(--ink-3);
-    margin: 6px 0 0;
-  }
-  .chips {
+  .filter-primary .filter-group:last-child { border-bottom: none; }
+  .filter-primary .filter-group-title { color: var(--accent-strong); }
+
+  /* Collapsible refine groups. */
+  .filter-group.collapsible .filter-group-toggle {
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
   }
-  .checkbox-chip {
+  .filter-group.collapsible .filter-group-toggle:hover { color: var(--ink); }
+  .filter-group.collapsible.is-open .filter-group-toggle { margin-bottom: 12px; }
+  .filter-group.collapsible .caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--ink-3);
+  }
+  .filter-group.collapsible.is-open .caret {
+    border-top: 0;
+    border-bottom: 6px solid var(--ink-3);
+  }
+
+  /* Chip grid + chip. */
+  .chip-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 6px 12px;
+    font-size: 13px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-2);
+    transition: all 160ms;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 8px 14px;
-    border: 1px solid var(--line-2);
-    border-radius: 999px;
-    font-size: 13.5px;
-    color: var(--ink-2);
-    background: var(--white);
-    cursor: pointer;
-    user-select: none;
+    gap: 6px;
   }
-  .checkbox-chip:hover { background: var(--paper-2); }
-  .checkbox-chip.on {
-    background: var(--forest);
-    color: var(--paper);
-    border-color: var(--forest);
-    font-weight: 500;
+  .chip:hover {
+    background: var(--paper-2);
+    border-color: var(--line-2);
+    color: var(--ink);
   }
-  .checkbox-chip.on::before {
-    content: "✓";
-    font-weight: 700;
-  }
-  .radio-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .radio-pill {
-    padding: 8px 16px;
-    border: 1px solid var(--line-2);
-    border-radius: 999px;
-    font-size: 13.5px;
-    color: var(--ink-2);
-    background: var(--white);
-    cursor: pointer;
-  }
-  .radio-pill.on {
+  .chip.is-active {
     background: var(--ink);
     color: var(--paper);
     border-color: var(--ink);
-    font-weight: 500;
   }
-  .slider-frame {
-    margin: 8px 0 4px;
-  }
-  .slider-row {
+  .chip svg { width: 14px; height: 14px; }
+
+  /* Price slider stub (real panel uses an interactive histogram). */
+  .price-frame { padding: 4px 0; }
+  .price-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     font-family: var(--font-display);
     font-size: 16px;
     color: var(--ink);
   }
-  .slider-track {
+  .price-track {
     flex: 1;
     height: 6px;
     background: var(--paper-3);
     border-radius: 999px;
     position: relative;
   }
-  .slider-fill {
+  .price-fill {
     position: absolute;
     left: 4%;
     right: 50%;
@@ -338,7 +361,7 @@
     background: var(--ink);
     border-radius: 999px;
   }
-  .slider-knob {
+  .price-knob {
     position: absolute;
     width: 16px;
     height: 16px;
@@ -350,77 +373,43 @@
   }
   .knob-min { left: 4%; }
   .knob-max { left: 50%; }
-  .slider-vals {
+  .price-vals {
     color: var(--ink-3);
-    font-size: 13px;
-    margin: 6px 0 0;
+    font-size: 12.5px;
+    margin: 8px 0 0;
   }
 
-  /* live count */
+  .size-row { padding: 4px 0; }
+  .size-row label { font-size: 13px; color: var(--ink-2); display: block; margin-bottom: 6px; }
+  .size-row input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  /* Live count panel just below the filter card. */
   .live-count {
-    margin: 6px 0 0;
-    padding: 12px 16px;
+    margin: 0 0 18px;
+    padding: 14px 18px;
     background: var(--sage);
     border-left: 3px solid var(--forest);
-    border-radius: 0 6px 6px 0;
+    border-radius: 0 8px 8px 0;
     font-size: 13.5px;
     color: var(--forest);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .live-count .num {
     font-family: var(--font-display);
     font-size: 22px;
     color: var(--forest);
-    margin-right: 6px;
     line-height: 1;
   }
   .live-count a {
     color: var(--forest);
     text-decoration: underline;
     text-underline-offset: 3px;
+    margin-left: auto;
   }
 
-  /* cadence — locked */
-  .cadence-row {
-    display: flex;
-    gap: 10px;
-  }
-  .cadence-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    background: var(--paper-2);
-    border: 1px solid var(--line);
-    font-size: 14px;
-    color: var(--ink);
-  }
-  .cadence-chip.locked {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-    font-weight: 600;
-  }
-  .cadence-chip.soon {
-    color: var(--ink-3);
-    opacity: 0.85;
-  }
-  .cadence-chip .badge {
-    font-size: 10px;
-    background: rgba(255,255,255,0.2);
-    color: var(--paper);
-    padding: 2px 6px;
-    border-radius: 999px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-  .cadence-chip.soon .badge {
-    background: var(--paper-3);
-    color: var(--ink-3);
-  }
-
-  /* what you'll get */
+  /* what you'll get preview */
   .preview-card {
     background: var(--paper-2);
     border-radius: 8px;
@@ -434,13 +423,8 @@
     line-height: 1.5;
     color: var(--ink);
   }
-  .preview-card p em {
-    font-style: italic;
-    color: var(--clay-deep);
-  }
-  .preview-card p:last-child {
-    margin-bottom: 0;
-  }
+  .preview-card p em { font-style: italic; color: var(--clay-deep); }
+  .preview-card p:last-child { margin-bottom: 0; }
 
   /* footer save bar */
   .save-bar {
@@ -465,6 +449,7 @@
     .tab { font-size: 13px; }
     .pagehead h1 { font-size: 32px; }
     .card .pad { padding: 18px 20px; }
+    .filter-card .pad { padding: 18px 20px 12px; }
     .status-row { flex-wrap: wrap; }
     .status-actions { flex-wrap: wrap; }
     .save-bar { flex-wrap: wrap; }
@@ -476,9 +461,7 @@
 
 <div class="annot">
   <strong>Mockup of <code>/account/newsletter</code> (proposed)</strong> ·
-  Option <strong>A1</strong>: rename the <em>Notifications</em> tab to <em>Newsletter</em> (single source of truth).
-  The old <code>/account/notifications</code> URL 301-redirects here so existing bookmarks survive.
-  Four blocks below — Status, Filter, Cadence, What you'll get — all write to <code>publicMetadata.profile.newsletter.*</code> via the existing <code>/api/clerk/update-profile</code> endpoint.
+  Option <strong>A1</strong>: rename Notifications → Newsletter. Filter UI is <strong>identical to the Discover panel</strong> (same primary-tier + collapsible-refine structure, same chip styling, same components from <code>web/app/pages.jsx :: FilterPanel</code>). Cadence block removed. All writes go through the existing <code>/api/clerk/update-profile</code> endpoint to <code>publicMetadata.profile.newsletter.*</code>.
 </div>
 
 <!-- topbar -->
@@ -508,7 +491,7 @@
     <div class="tab">Security</div>
   </div>
 
-  <!-- BLOCK 1: Status -->
+  <!-- ─────── STATUS ─────── -->
   <section class="card">
     <div class="pad">
       <h2>Status</h2>
@@ -516,7 +499,7 @@
 
       <div class="status-row">
         <span class="status-pill">Active</span>
-        <span class="status-when">Next issue lands <strong>Sunday, 1 Jun 2026 · 9:00 AM</strong>.</span>
+        <span class="status-when">Next issue lands <strong>Sunday, 1 Jun · 9:00 AM</strong>.</span>
       </div>
 
       <div class="status-actions">
@@ -527,101 +510,144 @@
     </div>
   </section>
 
-  <!-- BLOCK 2: Filter -->
-  <section class="card">
+  <!-- ─────── FILTER (identical structure to Discover panel) ─────── -->
+  <section class="card filter-card">
     <div class="pad">
       <h2>Filter</h2>
-      <p class="sub">What you want Pulpo to look for. Picks each week match these criteria.</p>
+      <p class="sub">What Pulpo looks for. Same controls as the Discover panel — your newsletter shows up to 10 listings each week matching these.</p>
 
-      <!-- WHERE -->
-      <div class="field">
-        <p class="field-label">Where</p>
-        <div class="chips">
-          <span class="checkbox-chip on">La Libertad</span>
-          <span class="checkbox-chip">San Salvador</span>
-          <span class="checkbox-chip">Sonsonate</span>
-          <span class="checkbox-chip">La Paz</span>
-          <span class="checkbox-chip">Ahuachapán</span>
-          <span class="checkbox-chip">Usulután</span>
-          <span class="checkbox-chip">Santa Ana</span>
-        </div>
-        <p class="field-hint">Pick one or more departments. Leave all unchecked to see everything in El Salvador.</p>
+      <div class="filter-head">
+        <h3>Filters</h3>
+        <button class="clear-link" type="button">Clear</button>
       </div>
 
-      <!-- WHAT (property type) -->
-      <div class="field">
-        <p class="field-label">What</p>
-        <div class="radio-row">
-          <span class="radio-pill on">Land</span>
-          <span class="radio-pill">Houses</span>
-          <span class="radio-pill">Condos</span>
-          <span class="radio-pill">Any</span>
+      <!-- PRIMARY TIER ────────────────────────────── -->
+      <div class="filter-primary">
+        <div class="filter-group">
+          <p class="filter-group-title">Where</p>
+          <div class="chip-grid">
+            <button class="chip is-active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 18s3-2 6-2 4 2 8 2 6-2 6-2M2 22s3-2 6-2 4 2 8 2 6-2 6-2M12 2v9M8 7l4-4 4 4"/></svg>
+              Beach
+            </button>
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 10c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>
+              Lake
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <p class="filter-group-title">Type</p>
+          <div class="chip-grid">
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-8 9 8M5 9v12h14V9"/></svg>
+              Homes
+            </button>
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h6M9 11h6M9 15h6"/></svg>
+              Condos
+            </button>
+            <button class="chip is-active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 20h18M5 20V8l7-4 7 4v12"/></svg>
+              Land
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <p class="filter-group-title">Ranking</p>
+          <div class="chip-grid">
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4-6.5 4 2-7L2 9h7z"/></svg>
+              Top 10
+            </button>
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+              Price drops
+            </button>
+            <button class="chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+              New
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- CATEGORIES -->
-      <div class="field">
-        <p class="field-label">Categories</p>
-        <div class="chips">
-          <span class="checkbox-chip on">Beachfront</span>
-          <span class="checkbox-chip">Walk to beach</span>
-          <span class="checkbox-chip on">Build-ready</span>
-          <span class="checkbox-chip">Mountain land</span>
-          <span class="checkbox-chip">Coffee farm</span>
-          <span class="checkbox-chip">With water</span>
+      <!-- REFINE TIER — collapsible accordions ──────────────────── -->
+
+      <div class="filter-group collapsible is-open">
+        <button class="filter-group-toggle"><span>Use</span><span class="caret"></span></button>
+        <div class="chip-grid">
+          <button class="chip is-active">Residential</button>
+          <button class="chip">Commercial</button>
+          <button class="chip">Tourist</button>
         </div>
-        <p class="field-hint">Optional. Picks at least one of the checked categories will rise to the top.</p>
       </div>
 
-      <!-- HOW MUCH -->
-      <div class="field">
-        <p class="field-label">How much</p>
-        <div class="slider-frame">
-          <div class="slider-row">
+      <div class="filter-group collapsible is-open">
+        <button class="filter-group-toggle"><span>Price</span><span class="caret"></span></button>
+        <div class="price-frame">
+          <div class="price-row">
             <span>$0</span>
-            <div class="slider-track">
-              <div class="slider-fill"></div>
-              <div class="slider-knob knob-min"></div>
-              <div class="slider-knob knob-max"></div>
+            <div class="price-track">
+              <div class="price-fill"></div>
+              <div class="price-knob knob-min"></div>
+              <div class="price-knob knob-max"></div>
             </div>
             <span>$1M+</span>
           </div>
-          <p class="slider-vals">Show listings between <strong>$50,000</strong> and <strong>$500,000</strong>.</p>
+          <p class="price-vals">Show listings between <strong>$50,000</strong> and <strong>$500,000</strong>.</p>
         </div>
       </div>
 
-      <!-- LIVE COUNT -->
-      <div class="live-count">
-        <span class="num">12</span> listings match this filter right now.
-        <a href="#">Preview them →</a>
+      <div class="filter-group collapsible">
+        <button class="filter-group-toggle"><span>Size</span><span class="caret"></span></button>
       </div>
+
+      <div class="filter-group collapsible">
+        <button class="filter-group-toggle"><span>Zone</span><span class="caret"></span></button>
+      </div>
+
+      <div class="filter-group collapsible is-open">
+        <button class="filter-group-toggle"><span>Features</span><span class="caret"></span></button>
+        <div class="chip-grid">
+          <button class="chip is-active">Beachfront</button>
+          <button class="chip">Ocean view</button>
+          <button class="chip">Mountain view</button>
+          <button class="chip">Flat</button>
+          <button class="chip">Water body</button>
+        </div>
+      </div>
+
+      <div class="filter-group collapsible is-open">
+        <button class="filter-group-toggle"><span>Infrastructure</span><span class="caret"></span></button>
+        <div class="chip-grid">
+          <button class="chip is-active">Water</button>
+          <button class="chip is-active">Power</button>
+          <button class="chip">Paved</button>
+          <button class="chip">Sewage</button>
+        </div>
+      </div>
+
+      <div class="filter-group collapsible">
+        <button class="filter-group-toggle"><span>Quick filters</span><span class="caret"></span></button>
+      </div>
+
+      <div class="filter-group collapsible">
+        <button class="filter-group-toggle"><span>Photos</span><span class="caret"></span></button>
+      </div>
+
     </div>
   </section>
 
-  <!-- BLOCK 3: Cadence -->
-  <section class="card">
-    <div class="pad">
-      <h2>Cadence</h2>
-      <p class="sub">How often the newsletter arrives.</p>
+  <div class="live-count">
+    <span class="num">12</span>
+    <span>listings match this filter right now.</span>
+    <a href="#">Preview them →</a>
+  </div>
 
-      <div class="cadence-row">
-        <span class="cadence-chip locked">
-          Every Sunday
-          <span class="badge">Active</span>
-        </span>
-        <span class="cadence-chip soon">
-          Bi-weekly
-          <span class="badge">Coming soon</span>
-        </span>
-        <span class="cadence-chip soon">
-          Monthly
-          <span class="badge">Coming soon</span>
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- BLOCK 4: What you'll get -->
+  <!-- ─────── WHAT YOU'LL GET ─────── -->
   <section class="card">
     <div class="pad">
       <h2>What you'll get</h2>
@@ -629,13 +655,12 @@
 
       <div class="preview-card">
         <p>Pulpo combs <em>{N} new listings</em> across La Libertad each week and surfaces up to ten worth your time.</p>
-        <p>Plus a section showing what changed on your <em>3 saved listings</em> — price drops, status changes, days on market.</p>
-        <p>Issues land Sunday at 9 AM. Adjust filters anytime; changes apply to the next issue.</p>
+        <p>Issues land Sunday morning. Adjust filters anytime; changes apply to the next issue.</p>
       </div>
     </div>
   </section>
 
-  <!-- SAVE BAR -->
+  <!-- ─────── SAVE BAR ─────── -->
   <div class="save-bar">
     <button class="btn primary">Save changes</button>
     <button class="btn">Discard</button>
