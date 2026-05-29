@@ -82,6 +82,19 @@ class Recipient:
     # carries the per-listing baselines (saved_at, price_at_save_usd)
     # used by the favorites diff in commentary.compute_favorites.
     saves: list[SavedListing] = field(default_factory=list)
+    # P3 migration telemetry (2026-05-29) — which Clerk blob the cron
+    # used to derive this recipient's Preference. Stamped onto the
+    # `newsletter.issue_built` event so the dashboard can answer "how
+    # many recipients are still on the legacy `profile.newsletter`
+    # blob?" and tell us when it's safe to retire the fallback branch
+    # in subscribers._preference_from_profile.
+    #
+    # Values:
+    #   "discover_filters" — read from the new unified P2a-2 store
+    #   "newsletter"       — read from the legacy P1-era blob
+    #   "none"             — neither blob present (cohort fallback in
+    #                        build_issue picks the broad cut)
+    preference_source: Literal["discover_filters", "newsletter", "none"] = "none"
 
 
 ChipKind = Literal["neutral", "warm", "cool"]
