@@ -45,6 +45,7 @@ from typing import Optional
 from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK, make_client
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._base import OfflineFixtureMixin, finalize_record, polite_get_for
+from pulpo.scrapers._policy import get_policy
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -402,7 +403,12 @@ class ElAgenteScraper(OfflineFixtureMixin):
             return {"records": [], "max_pages_hit": False, "limit_hit": False}
 
         page_cap = max_pages if max_pages is not None else MAX_PAGES
-        client = make_client()
+        # Transport-conditional client allocation. httpx wants a shared
+        # Client (cookies, connection pool); curl_cffi opens its own
+        # connection per call and ignores the client argument. The
+        # polite_get_for callable handles the dispatch — see _base.py.
+        policy = get_policy(self.slug)
+        client = make_client() if policy.transport == "httpx" else None
         get = polite_get_for(self.slug)
         out: list[dict] = []
         seen_urls: set[str] = set()
@@ -415,6 +421,11 @@ class ElAgenteScraper(OfflineFixtureMixin):
             # paginating. Failure of the warmup is not fatal — the
             # paginated GETs below run regardless and will surface the
             # real error if the site is blocking us at the IP layer.
+            #
+            # On the curl_cffi transport the warmup is functionally a
+            # no-op (each call opens a fresh connection), but the GET
+            # still costs nothing meaningful and keeps the behaviour
+            # symmetric across transports.
             try:
                 _ = get(client, f"{BASE_URL}/", extra_headers=_BROWSER_HEADERS)
             except Exception as e:
@@ -476,7 +487,8 @@ class ElAgenteScraper(OfflineFixtureMixin):
                 if page >= page_cap:
                     max_pages_hit = True
         finally:
-            client.close()
+            if client is not None:
+                client.close()
         return {"records": out, "max_pages_hit": max_pages_hit, "limit_hit": limit_hit}
 
     def parse_index_page(self, html: str) -> list[dict]:

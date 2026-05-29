@@ -1,8 +1,16 @@
 """
 Tests for the Nexo Inmobiliario scraper (pulpo/scrapers/nexo.py).
 
-Runs in offline mode against the fixture in
-samples/calibration/nexo/sample_listings.json.
+After the 2026-05-29 rewrite the scraper consumes
+``/api/v1/public/listings`` JSON via curl_cffi instead of parsing
+2017-era static HTML. These tests:
+
+  1. Verify the fixture-mode crawl path still produces well-formed
+     records (offline contract unchanged).
+  2. Exercise the pure helpers ``parse_listing``, ``_slugify``,
+     ``_photo_urls``, ``_parse_price_usd``, ``_parse_location`` against
+     handcrafted API payloads so the parser's behaviour is testable
+     without a live network.
 """
 from __future__ import annotations
 import sys
@@ -13,7 +21,14 @@ import pytest
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
-from pulpo.scrapers.nexo import NexoScraper, _parse_listing_page, _abs  # noqa: E402
+from pulpo.scrapers.nexo import (  # noqa: E402
+    NexoScraper,
+    _parse_location,
+    _parse_price_usd,
+    _photo_urls,
+    _slugify,
+    parse_listing,
+)
 
 
 # ── Offline fixture crawl ──────────────────────────────────────────────
@@ -66,34 +81,181 @@ def test_price_text_contains_dollar(offline_records):
             assert "$" in r["raw_price_text"], f"Price text missing $: {r['raw_price_text']!r}"
 
 
-# ── Unit tests for helper functions ───────────────────────────────────
+# ── Unit tests for the API JSON parser ────────────────────────────────
 
-def test_abs_resolves_relative():
-    assert _abs("../nexocrm/imagenes/x.jpg") == "https://nexo.com.sv/nexocrm/imagenes/x.jpg"
+# Canonical payload shape — minimal version of one production record.
+# Kept inline (not a JSON fixture file) so the schema-vs-test relationship
+# stays visible: a future API change is a code change in this test, not
+# a "did anyone notice the fixture drifted" silent failure.
+_VALID_API_LISTING = {
+    "id": 1061,
+    "listing_code": "C-VE-TER-15-000-57812510",
+    "listing_type": {
+        "id": 15,
+        "name": "Lotes Residenciales",
+        "category": "terrenos",
+        "sale_rent": "venta",
+    },
+    "title": "San José Villanueva - terreno en venta 583 vrs2",
+    "description": "Lote residencial en venta...",
+    "price": "115000.00",
+    "area": "583.00",
+    "address": "Altos de la casona",
+    "city": {"name": "San José Villanueva"},
+    "zone": None,
+    "listing_medias": [
+        {
+            "media_type": "image",
+            "relative_path": "media/listings/1061/secondary.jpeg",
+            "is_primary": False,
+        },
+        {
+            "media_type": "image",
+            "relative_path": "media/listings/1061/hero.jpeg",
+            "is_primary": True,
+        },
+    ],
+    "is_published": True,
+    "is_active": True,
+}
 
 
-def test_abs_passthrough_absolute():
-    url = "https://nexo.com.sv/images/logo.png"
-    assert _abs(url) == url
+def test_parse_listing_canonical():
+    rec = parse_listing(_VALID_API_LISTING)
+    assert rec is not None
+    assert rec["source_id"] == "C-VE-TER-15-000-57812510"
+    assert rec["property_type"] == "land"
+    assert rec["price_usd"] == 115000.0
+    assert "$" in rec["raw_price_text"]
+    assert rec["raw_size_text"] == "583.00 v²"
+    assert rec["location_text"] == "San José Villanueva, El Salvador"
+    assert rec["url"].endswith("/15/1061/san-jose-villanueva-terreno-en-venta-583-vrs2")
+    # is_primary=True media is hoisted to position 0
+    assert rec["photo_urls"][0].endswith("hero.jpeg")
+    assert rec["photo_urls"][1].endswith("secondary.jpeg")
 
 
-def test_abs_empty_string():
-    assert _abs("") == ""
+def test_parse_listing_skips_non_terreno_categories():
+    """Apartamentos, casas, oficinas, etc. must not slip through."""
+    payload = {**_VALID_API_LISTING}
+    payload["listing_type"] = {
+        "id": 1, "name": "Casas en Venta",
+        "category": "residenciales", "sale_rent": "venta",
+    }
+    assert parse_listing(payload) is None
 
 
-def test_parse_listing_page_minimal_html():
-    """Parser must return empty list (not crash) on minimal/empty HTML."""
-    result = _parse_listing_page("<html><body></body></html>")
-    assert result == []
+def test_parse_listing_skips_rentals():
+    """sale_rent == 'alquiler' is out of scope for the for-sale Pulpo feed."""
+    payload = {**_VALID_API_LISTING}
+    payload["listing_type"] = {
+        "id": 16, "name": "Terrenos en Alquiler",
+        "category": "terrenos", "sale_rent": "alquiler",
+    }
+    assert parse_listing(payload) is None
 
 
-def test_photo_urls_empty_list_when_no_photos():
-    """If no image in the card, photo_urls must be [] not None."""
-    html = """<div class="dresultado">
-      <h2 itemprop="name">Test Terreno</h2>
-      <a href="../6/99/Test-Terreno">VER</a>
-      <P class="price">US<span itemprop="price">$50,000</span></P>
-    </div>"""
-    records = _parse_listing_page(html)
-    if records:
-        assert isinstance(records[0]["photo_urls"], list)
+def test_parse_listing_skips_unpublished():
+    payload = {**_VALID_API_LISTING, "is_published": False}
+    assert parse_listing(payload) is None
+
+
+def test_parse_listing_skips_inactive():
+    payload = {**_VALID_API_LISTING, "is_active": False}
+    assert parse_listing(payload) is None
+
+
+def test_parse_listing_skips_missing_essentials():
+    payload = {**_VALID_API_LISTING, "title": ""}
+    assert parse_listing(payload) is None
+    payload = {**_VALID_API_LISTING, "id": None}
+    assert parse_listing(payload) is None
+
+
+def test_parse_listing_falls_back_to_id_when_code_missing():
+    payload = {**_VALID_API_LISTING, "listing_code": None}
+    rec = parse_listing(payload)
+    assert rec is not None
+    assert rec["source_id"] == "id:1061"
+
+
+def test_parse_listing_address_fallback_when_city_null():
+    payload = {**_VALID_API_LISTING, "city": None}
+    rec = parse_listing(payload)
+    assert rec is not None
+    assert rec["location_text"] == "Altos de la casona, El Salvador"
+
+
+def test_parse_listing_country_only_when_no_city_no_address():
+    payload = {**_VALID_API_LISTING, "city": None, "address": ""}
+    rec = parse_listing(payload)
+    assert rec is not None
+    assert rec["location_text"] == "El Salvador"
+
+
+# ── Helper unit tests ─────────────────────────────────────────────────
+
+def test_slugify_strips_spanish_accents():
+    # Mirrors the SPA's normalize("NFD") + accent-strip — exact slug the
+    # site itself would route to for this title.
+    assert _slugify("San José Villanueva - 583 vrs²") == "san-jose-villanueva-583-vrs"
+
+
+def test_slugify_falls_back_to_inmueble_on_empty():
+    assert _slugify("") == "inmueble"
+    assert _slugify("!!!") == "inmueble"
+
+
+def test_photo_urls_primary_first_then_order():
+    medias = [
+        {"media_type": "image", "relative_path": "a.jpg", "is_primary": False},
+        {"media_type": "image", "relative_path": "hero.jpg", "is_primary": True},
+        {"media_type": "image", "relative_path": "b.jpg", "is_primary": False},
+    ]
+    urls = _photo_urls(medias)
+    assert urls[0].endswith("hero.jpg")
+    assert urls[1].endswith("a.jpg")
+    assert urls[2].endswith("b.jpg")
+    assert all(u.startswith("https://nexo.com.sv/") for u in urls)
+
+
+def test_photo_urls_skips_non_image_media_types():
+    """Future-proof: if the API ever returns videos/PDFs, drop them.
+
+    The schema today only carries images, but defensiveness costs nothing
+    and the pre-rewrite scraper had the same guard."""
+    medias = [
+        {"media_type": "video", "relative_path": "promo.mp4"},
+        {"media_type": "image", "relative_path": "ok.jpg"},
+    ]
+    urls = _photo_urls(medias)
+    assert urls == ["https://nexo.com.sv/ok.jpg"]
+
+
+def test_parse_price_usd_handles_string_decimals():
+    val, text = _parse_price_usd("115000.00")
+    assert val == 115000.0
+    assert "$" in text
+
+
+def test_parse_price_usd_handles_comma_separators():
+    val, text = _parse_price_usd("1,500,000.00")
+    assert val == 1500000.0
+
+
+def test_parse_price_usd_returns_none_for_invalid():
+    assert _parse_price_usd(None) == (None, "")
+    assert _parse_price_usd("") == (None, "")
+    assert _parse_price_usd("not a number") == (None, "")
+    # Zero / negative prices treated as missing — the broker uses them
+    # as a "price on request" marker.
+    assert _parse_price_usd(0) == (None, "")
+    assert _parse_price_usd("-5") == (None, "")
+
+
+def test_parse_location_prefers_city_over_address():
+    listing = {
+        "city": {"name": "Comasagua"},
+        "address": "Calle el almendro",
+    }
+    assert _parse_location(listing) == "Comasagua, El Salvador"

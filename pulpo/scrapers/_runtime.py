@@ -296,6 +296,182 @@ def polite_get(
     raise RuntimeError("polite_get exited the loop without a result — unreachable")
 
 
+# ── polite_curl_cffi_get — TLS-impersonating sibling of polite_get ────
+#
+# Same contract as ``polite_get`` (rate-limit, jitter, retry, Retry-After-
+# aware) but uses curl_cffi instead of httpx so the TLS handshake matches
+# a real browser. Returns a wrapped object that exposes
+# ``status_code``, ``headers``, ``text``, and ``content`` so callers can
+# stay transport-agnostic.
+#
+# Why a wrapper and not "import the curl_cffi Response": curl_cffi's
+# Response and httpx's Response are nominally similar but diverge on
+# details (header case-insensitivity, ``raise_for_status`` behavior,
+# encoding auto-detection). The thin wrapper documents the small surface
+# that both transports must support and keeps the call sites in
+# scrapers from leaking transport-specific quirks.
+
+
+class _PoliteResponse:
+    """Transport-agnostic Response facade returned by polite_curl_cffi_get.
+
+    Mimics the minimum surface ``polite_get`` callers actually use:
+    ``status_code``, ``headers`` (dict-like), ``text`` (decoded),
+    ``content`` (bytes), and ``raise_for_status()``. Header lookup is
+    case-insensitive on both transports already.
+    """
+
+    __slots__ = ("status_code", "headers", "text", "content", "url")
+
+    def __init__(self, status_code: int, headers, text: str, content: bytes, url: str = ""):
+        self.status_code = status_code
+        self.headers = headers
+        self.text = text
+        self.content = content
+        self.url = url
+
+    def raise_for_status(self):
+        """Match httpx.Response.raise_for_status() — raise on 4xx/5xx."""
+        if 400 <= self.status_code < 600:
+            # Use the stdlib URLError-friendly message — we don't pull
+            # httpx here because curl_cffi callers shouldn't have to
+            # import httpx just to catch the failure type.
+            raise _PoliteHTTPError(
+                f"HTTP {self.status_code} for url {self.url!r}",
+                response=self,
+            )
+
+
+class _PoliteHTTPError(Exception):
+    """Raised by ``_PoliteResponse.raise_for_status`` on 4xx/5xx.
+
+    Mirrors httpx.HTTPStatusError's user-facing shape (a ``.response``
+    attribute pointing at the failing response). Existing scrapers that
+    catch a bare ``Exception`` around ``resp.raise_for_status()`` keep
+    working unchanged; new code can ``except _PoliteHTTPError`` directly.
+    """
+
+    def __init__(self, msg: str, *, response: "_PoliteResponse"):
+        super().__init__(msg)
+        self.response = response
+
+
+# Module-level handle to the curl_cffi.requests module. Lazy-imported on
+# first use so the offline test path doesn't pull the C-extension dep.
+_curl_requests = None
+
+
+def _import_curl_cffi():
+    global _curl_requests
+    if _curl_requests is not None:
+        return _curl_requests
+    try:
+        from curl_cffi import requests as _r   # type: ignore
+    except ImportError as e:
+        raise RuntimeError(
+            "curl_cffi not installed — polite_curl_cffi_get cannot run. "
+            "Add curl_cffi to requirements.txt (already pinned in the "
+            "default requirements; this branch fires when running outside "
+            "the standard environment)."
+        ) from e
+    _curl_requests = _r
+    return _r
+
+
+def polite_curl_cffi_get(
+    url: str,
+    *,
+    source: str,
+    policy: Optional[Policy] = None,
+    extra_headers: Optional[dict] = None,
+    rng: Optional[random.Random] = None,
+    timeout: float = 20.0,
+):
+    """Polite GET via curl_cffi (TLS handshake impersonation).
+
+    Same rate-limit + jitter + retry contract as ``polite_get``.  No
+    persistent client: each call opens its own connection. Hosts that
+    need this transport (Cloudflare-fronted WAFs) are slow-rate-limited
+    anyway, so the per-call connection setup cost is in the noise next
+    to the polite-cadence sleep budget.
+
+    Returns a ``_PoliteResponse`` with ``status_code``, ``headers``,
+    ``text``, ``content`` — matching the subset of the httpx Response
+    interface that scrapers actually consume.
+    """
+    p = policy or get_policy(source)
+    if p.transport != "curl_cffi":
+        # Defensive guard — calling the wrong polite_get is the kind of
+        # bug that produces silent green-with-zero-records empty yields.
+        raise RuntimeError(
+            f"polite_curl_cffi_get called for source={source!r} whose "
+            f"policy.transport is {p.transport!r}; use polite_get instead."
+        )
+
+    curl_requests = _import_curl_cffi()
+    limiter = get_limiter(source, p)
+
+    last_exc: Optional[BaseException] = None
+    last_resp: Optional[_PoliteResponse] = None
+
+    for attempt in range(1, p.retry_max + 1):
+        limiter.acquire()
+        jitter_sleep(p, rng)
+
+        headers = {"User-Agent": pick_user_agent(p.user_agent_pool, rng)}
+        if extra_headers:
+            headers.update(extra_headers)
+
+        try:
+            raw = curl_requests.get(
+                url,
+                headers=headers,
+                impersonate=p.curl_cffi_impersonate,
+                timeout=timeout,
+            )
+        except Exception as e:
+            # curl_cffi raises its own exceptions (curl_cffi.curl.CurlError,
+            # DNSError, TimeoutError). Treat any non-Response exception as
+            # a transient and let the retry decision filter it.
+            last_exc = e
+            decision = decide_retry(attempt=attempt, policy=p, exception=e)
+            if decision.should_retry:
+                time.sleep(decision.sleep_seconds)
+                continue
+            # Out of budget — propagate so the caller's diagnostic-capture
+            # path gets a real exception, not a synthetic 500.
+            raise
+
+        resp = _PoliteResponse(
+            status_code=int(raw.status_code),
+            headers=raw.headers,
+            text=raw.text,
+            content=raw.content,
+            url=str(getattr(raw, "url", url) or url),
+        )
+
+        if resp.status_code == 429 or 500 <= resp.status_code < 600:
+            last_resp = resp
+            decision = decide_retry(
+                attempt=attempt,
+                policy=p,
+                status_code=resp.status_code,
+                retry_after=(raw.headers.get("Retry-After") if hasattr(raw.headers, "get") else None),
+            )
+            if decision.should_retry:
+                time.sleep(decision.sleep_seconds)
+                continue
+            return resp
+
+        return resp
+
+    if last_resp is not None:
+        return last_resp
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError("polite_curl_cffi_get exited the loop without a result — unreachable")
+
+
 # ── polite_playwright_goto — Playwright equivalent ────────────────────
 
 
