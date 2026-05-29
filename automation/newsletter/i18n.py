@@ -39,20 +39,20 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "header.issue":                {"en": "ISSUE {n} · {date}",                          "es": "EDICIÓN {n} · {date}"},
     # ── Hero ──
     "hero.eyebrow.named":          {"en": "Hand-picked for {name}",                       "es": "Selección para {name}"},
-    "hero.eyebrow.unnamed":        {"en": "Hand-picked this fortnight",                   "es": "Selección de esta quincena"},
-    "hero.eyebrow.anon":           {"en": "The 10 best, this fortnight",                  "es": "Las 10 mejores, esta quincena"},
-    "hero.headline.default":       {"en": "The 10 best, this fortnight.",                 "es": "Las 10 mejores, esta quincena."},
-    "hero.lede.with_prefs":        {"en": f"Pulpo scanned {{n_scanned}} active beach and lake properties across {_country_en} this fortnight. These ten matched your filter closely enough to make the cut.",
-                                     "es": f"Pulpo revisó {{n_scanned}} propiedades activas frente al mar y al lago en {_country_es} esta quincena. Estas diez encajan con tu filtro lo suficiente para entrar."},
-    "hero.lede.no_prefs":          {"en": "Pulpo scanned {n_scanned} active properties this fortnight and ranked them by value, location and momentum. You'll get a sharper edition once you set a filter — link at the bottom.",
-                                     "es": "Pulpo revisó {n_scanned} propiedades esta quincena y las clasificó por valor, ubicación y momentum. Recibirás una edición más afinada cuando configures un filtro — enlace al final."},
+    "hero.eyebrow.unnamed":        {"en": "Hand-picked this week",                   "es": "Selección de esta semana"},
+    "hero.eyebrow.anon":           {"en": "The 10 best, this week",                  "es": "Las 10 mejores, esta semana"},
+    "hero.headline.default":       {"en": "The 10 best, this week.",                 "es": "Las 10 mejores, esta semana."},
+    "hero.lede.with_prefs":        {"en": f"Pulpo scanned {{n_scanned}} active beach and lake properties across {_country_en} this week. These ten matched your filter closely enough to make the cut.",
+                                     "es": f"Pulpo revisó {{n_scanned}} propiedades activas frente al mar y al lago en {_country_es} esta semana. Estas diez encajan con tu filtro lo suficiente para entrar."},
+    "hero.lede.no_prefs":          {"en": "Pulpo scanned {n_scanned} active properties this week and ranked them by value, location and momentum. You'll get a sharper edition once you set a filter — link at the bottom.",
+                                     "es": "Pulpo revisó {n_scanned} propiedades esta semana y las clasificó por valor, ubicación y momentum. Recibirás una edición más afinada cuando configures un filtro — enlace al final."},
     # ── At a glance ──
     "glance.eyebrow":              {"en": "At a glance",                                  "es": "Vistazo rápido"},
     "glance.subhead.with_skip":    {"en": "{kept} to consider. One to skip.",             "es": "{kept} para considerar. Una para saltar."},
     "glance.subhead.no_skip":      {"en": "{kept} to consider.",                          "es": "{kept} para considerar."},
     # ── Pick / shortlist labels ──
     "pick.top_label":              {"en": "🏆 Top pick · {rank:02d}",                     "es": "🏆 Selección · {rank:02d}"},
-    "pick.new_pill":               {"en": "New this fortnight",                           "es": "Nueva esta quincena"},
+    "pick.new_pill":               {"en": "New this week",                           "es": "Nueva esta semana"},
     "pick.repriced_pill":          {"en": "Price moved",                                  "es": "Precio movido"},
     # PR-NL-5 (v2.4 redesign): every pick CTA goes to pulpo.club, not the
     # external source. The dual CTA on hero picks is `cta_open` (solid
@@ -79,12 +79,12 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "skip.eyebrow":                {"en": "Skip this one",                                "es": "Esta sí, sáltala"},
     # ── Market context ──
     "market.eyebrow":              {"en": "Market context",                               "es": "Contexto del mercado"},
-    "market.headline":             {"en": "Worth knowing this fortnight.",                "es": "Vale la pena saber esta quincena."},
+    "market.headline":             {"en": "Worth knowing this week.",                "es": "Vale la pena saber esta semana."},
     "one_number.eyebrow":          {"en": "One number worth knowing",                     "es": "Un número que vale la pena saber"},
     # ── Next issue ──
     "next.eyebrow":                {"en": "Next issue",                                   "es": "Próxima edición"},
-    "next.body":                   {"en": "Pulpo will scan the next 14 days of inventory against your filter and ship the next ten. Adjust filters anytime — changes apply to the next issue.",
-                                     "es": "Pulpo revisará los próximos 14 días de inventario contra tu filtro y enviará las próximas diez. Ajusta filtros cuando quieras — los cambios aplican a la siguiente edición."},
+    "next.body":                   {"en": "Pulpo scans the next 7 days of inventory against your filter and ships the next ten. Adjust filters anytime — changes apply to the next issue.",
+                                     "es": "Pulpo revisa los próximos 7 días de inventario contra tu filtro y envía las próximas diez. Ajusta filtros cuando quieras — los cambios aplican a la siguiente edición."},
     # v2.2: product-language CTA tied to the editorial framing of the
     # newsletter ("the picks I see"), not generic settings-speak.
     "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajusta lo que ves →"},
@@ -100,8 +100,8 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # ── Paywall (free tier) ──
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
     "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},
-    "paywall.body":                {"en": "Pulpo Pro lifts the curtain on every pick — address, broker contact, full underwriting, and the negotiation lever the seller doesn't know we know about. Same fortnight cadence, eight times the depth.",
-                                     "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia quincenal, ocho veces la profundidad."},
+    "paywall.body":                {"en": "Pulpo Pro lifts the curtain on every pick — address, broker contact, full underwriting, and the negotiation lever the seller doesn't know we know about. Same weekly cadence, eight times the depth.",
+                                     "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia semanal, ocho veces la profundidad."},
     # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
     # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
     # $19/month which was stale drift — fixed in v2.2.
@@ -137,7 +137,7 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "facts.bed_bath":              {"en": "{beds} bed · {baths} bath",                    "es": "{beds} hab · {baths} baño"},
     "facts.built_m2":              {"en": "{n} m² built",                                 "es": "{n} m² construidos"},
     "facts.lot_m2":                {"en": "{n} m² lot",                                   "es": "{n} m² terreno"},
-    "facts.listed_new":            {"en": "New this fortnight",                           "es": "Nueva esta quincena"},
+    "facts.listed_new":            {"en": "New this week",                           "es": "Nueva esta semana"},
     "facts.listed_days":           {"en": "{n} days on market",                           "es": "{n} días en el mercado"},
 }
 

@@ -102,7 +102,7 @@ def deterministic_commentary(
     market: list[str] = []
     if picks:
         market.append(deterministic_market_note(picks, locale))
-        # 1) freshness: how many of the kept picks are new this fortnight
+        # 1) freshness: how many of the kept picks are new this week
         new_count = sum(1 for p in picks if p.get("_is_new_window"))
         if new_count:
             market.append(
@@ -122,7 +122,7 @@ def deterministic_commentary(
                 )
             elif med > 10:
                 market.append(
-                    f"Median pick is priced {med:.0f}% above zone — quality over discount this fortnight."
+                    f"Median pick is priced {med:.0f}% above zone — quality over discount this week."
                     if locale == "en"
                     else f"Las selecciones están {med:.0f}% sobre la zona — calidad por encima de descuento."
                 )
@@ -335,9 +335,9 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
     dom = listing.get("days_listed")
     if listing.get("_is_new_window") or (isinstance(dom, int) and dom <= 7):
         out.append(
-            "Brand new this fortnight — early window matters"
+            "Brand new this week — early window matters"
             if en
-            else "Nueva esta quincena — la ventana temprana importa"
+            else "Nueva esta semana — la ventana temprana importa"
         )
 
     # 6) Property-fit fallback so the why_block never renders empty.
@@ -777,15 +777,15 @@ def deterministic_welcome_teaser(picks: list[dict], locale: Locale = "en") -> st
 
 def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
     """The warm one-sentence market note in the v2.4 mockup ('It's a
-    buyer's fortnight in La Libertad…').
+    buyer's week in La Libertad…').
 
-    Pattern-matches against the picks Pulpo selected this fortnight:
+    Pattern-matches against the picks Pulpo selected this week:
       • repriced_count / len(picks) — share of picks that just dropped
       • below_zone_count / len(picks) — share priced under area median
       • new_listing_count — share that landed in the last 14 days
 
     When the data is unusually friendly to buyers (≥ 40% repriced or
-    a strong below-zone median), surfaces the "buyer's fortnight"
+    a strong below-zone median), surfaces the "buyer's week"
     framing. When it's tighter, gives an honest read instead of
     fabricating urgency.
     """
@@ -800,24 +800,24 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
     # The most striking pattern wins the framing.
     if repriced >= max(2, n * 0.4):
         return (
-            "It's a buyer's fortnight. <em>Almost twice as many sellers lowered "
+            "It's a buyer's week. <em>Almost twice as many sellers lowered "
             "their prices this week as a normal week.</em> "
             "If you're getting close on a listing — this is a good week to make the call."
             if en
             else
-            "Es una quincena de compradores. <em>Casi el doble de vendedores bajaron "
+            "Es una semana de compradores. <em>Casi el doble de vendedores bajaron "
             "su precio esta semana de lo normal.</em> "
             "Si estás cerca de hacer una oferta — esta es una buena semana para llamarla."
         )
 
     if new_listings >= max(3, n * 0.4):
         return (
-            "Fresh inventory landed this fortnight. <em>Several of these listings are "
+            "Fresh inventory landed this week. <em>Several of these listings are "
             "less than two weeks old.</em> "
             "The early window matters — listings priced to move don't stay around."
             if en
             else
-            "Llegó inventario fresco esta quincena. <em>Varias de estas propiedades tienen "
+            "Llegó inventario fresco esta semana. <em>Varias de estas propiedades tienen "
             "menos de dos semanas.</em> "
             "La ventana temprana importa — las propiedades bien valoradas no se quedan."
         )
@@ -838,10 +838,10 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
             )
 
     return (
-        "A quieter fortnight than usual. <em>Inventory is steady, prices are holding.</em> "
+        "A quieter week than usual. <em>Inventory is steady, prices are holding.</em> "
         "Worth saving anything close to your filter so Pulpo can flag the next move."
         if en
         else
-        "Una quincena más tranquila de lo usual. <em>El inventario es estable, los precios se sostienen.</em> "
+        "Una semana más tranquila de lo usual. <em>El inventario es estable, los precios se sostienen.</em> "
         "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
     )
