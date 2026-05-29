@@ -1556,7 +1556,7 @@ function App() {
           <TweakButton onClick={() => go("saved")}>Saved</TweakButton>
           <TweakButton onClick={() => go("plans")}>Plans</TweakButton>
           <TweakButton onClick={() => go("account", { section: "profile" })}>Account · Profile</TweakButton>
-          <TweakButton onClick={() => go("account", { section: "notifications" })}>· Notifs</TweakButton>
+          <TweakButton onClick={() => go("account", { section: "newsletter" })}>· Newsletter</TweakButton>
           <TweakButton onClick={() => go("account", { section: "subscription" })}>· Subscription</TweakButton>
           <TweakButton onClick={() => go("account", { section: "security" })}>· Security</TweakButton>
         </div>
