@@ -92,3 +92,27 @@ describe("parseLocation — /l/<token>", () => {
     expect(parsed.isListingPath).toBe(false);
   });
 });
+
+describe("parseLocation — /account section rename (2026-05-29)", () => {
+  // `notifications` tab renamed to `newsletter`. parseLocation aliases
+  // the old slug so existing bookmarks + the footer link in every
+  // previously-sent newsletter issue still land on the right tab
+  // without a 404 flash.
+  it("/account/newsletter parses to section='newsletter'", () => {
+    const parsed = parseLocation("/account/newsletter");
+    expect(parsed.route).toBe("account");
+    expect(parsed.section).toBe("newsletter");
+  });
+
+  it("/account/notifications aliases to section='newsletter'", () => {
+    const parsed = parseLocation("/account/notifications");
+    expect(parsed.route).toBe("account");
+    expect(parsed.section).toBe("newsletter");
+  });
+
+  it("an unknown sub-section still falls through to section=null", () => {
+    const parsed = parseLocation("/account/whatever");
+    expect(parsed.route).toBe("account");
+    expect(parsed.section).toBeNull();
+  });
+});
