@@ -21,10 +21,15 @@ import {
 import { getCategoryImage } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
+  hasFilterParamsInURL,
   readFilterFromURL,
   readSortFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
+import {
+  getDiscoverFilterSeed,
+  useDiscoverFilterPersist,
+} from "./lib/use-discover-filter.ts";
 import { track, optIn, optOut } from "./telemetry/hook";
 import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
@@ -1067,15 +1072,31 @@ function resolveResultsHeader(filters, locale, resultCount) {
 function BrowsePage({ app }) {
   const LISTINGS = useListings();
   const listingsState = useListingsState();
-  // Initial filter state — seed from URL on first render so a refresh
-  // of /browse?features=beachfront&pmax=100000 reproduces the view.
+  // Initial filter state — precedence: URL params > Clerk-persisted
+  // (P2a) > category preset > makeDefaultFilters. URL wins so shared
+  // /browse?features=beachfront&pmax=100000 links keep working; the
+  // Clerk path only fires when the URL is empty (typed /browse).
   const [filters, setFilters] = pUseState(() => {
     const seeded = buildFiltersForCategory(app.routeParams.category);
-    if (typeof window !== "undefined") {
-      return readFilterFromURL(window.location.search, seeded);
+    if (typeof window === "undefined") return seeded;
+    const search = window.location.search;
+    if (hasFilterParamsInURL(search)) {
+      return readFilterFromURL(search, seeded);
     }
-    return seeded;
+    // No URL filter — let the Clerk-persisted Discover filter seed
+    // the panel when the user has one. Anonymous + no-persisted-filter
+    // returns null and we keep the category preset / defaults.
+    const persistedSeed = getDiscoverFilterSeed(app, false);
+    if (persistedSeed) {
+      return { ...seeded, ...persistedSeed };
+    }
+    return readFilterFromURL(search, seeded);
   });
+  // P2a — mirror filter changes back to Clerk publicMetadata so the
+  // Discover panel round-trips with /account/newsletter (and feeds the
+  // weekly newsletter pipeline in P3). Debounced + skip-if-equal; no
+  // write for anonymous users.
+  useDiscoverFilterPersist(app, filters);
   const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
   const [sort, setSort] = pUseState(() =>
     typeof window !== "undefined"

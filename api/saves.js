@@ -17,12 +17,102 @@
 // Auth: Clerk session cookie on the request; verified via
 // `authenticateClerkRequest`. No session → 401.
 
+const fs = require("fs");
+const path = require("path");
 const { clerkClient, authenticateClerkRequest } = require("./_clerk");
 const { effectivePlan } = require("./_plan");
 const { makeRateLimiter, send429 } = require("./_rate_limit");
 const withTiming = require("./_perf");
 
 const FREE_SAVE_CAP = 10;
+
+// ── Storage shape (post-favorites-backend, 2026-05-29) ─────────────
+//
+// `privateMetadata.saves[]` is a MIXED array of:
+//   • Legacy bare ID strings  → "remax__001461165132"
+//   • Enriched objects        → { id, saved_at, price_at_save_usd?,
+//                                  source? }
+//
+// All read paths normalize to the enriched shape via `_normalizeSave`.
+// External callers (GET response, frontend Set membership) get the
+// bare-ID array via `_extractIds` — the enrichment is invisible to
+// the SPA. The newsletter Python pipeline reads the raw mixed array
+// out of Clerk and runs its own normalizer for week-over-week diffs.
+//
+// When the user saves a NEW listing, we enrich on the write path by
+// looking up the listing's current price + source in ranked.json. If
+// the lookup fails (stale ID, transient FS error), we still persist a
+// minimal `{id, saved_at}` so the save itself never fails.
+//
+// `ranked.json` is read once per Vercel cold start and cached in
+// `_rankedIndex` for the lifetime of the lambda instance. 6.4MB file,
+// ~100ms first read; subsequent saves use the indexed lookup.
+
+let _rankedIndex = null;
+function rankedIndex() {
+  if (_rankedIndex) return _rankedIndex;
+  try {
+    const filepath = path.join(process.cwd(), "web", "data", "ranked.json");
+    const arr = JSON.parse(fs.readFileSync(filepath, "utf8"));
+    const map = new Map();
+    for (const l of arr) {
+      if (!l || !l.source || !l.source_id) continue;
+      map.set(`${l.source}__${l.source_id}`, l);
+    }
+    _rankedIndex = map;
+  } catch (err) {
+    // FS / parse failure shouldn't kill the save endpoint — fall back
+    // to an empty index so the save still persists, just without
+    // enrichment metadata. Logged so we notice if it happens in prod.
+    console.log(`[api] saves ranked_index_load_failed error=${err && err.message}`);
+    _rankedIndex = new Map();
+  }
+  return _rankedIndex;
+}
+
+function _normalizeSave(entry) {
+  if (typeof entry === "string") return { id: entry };
+  if (entry && typeof entry === "object" && typeof entry.id === "string") {
+    return entry;
+  }
+  return null;
+}
+
+function _extractIds(saves) {
+  const out = [];
+  for (const e of saves || []) {
+    const n = _normalizeSave(e);
+    if (n) out.push(n.id);
+  }
+  return out;
+}
+
+function _hasId(saves, id) {
+  return _extractIds(saves).includes(id);
+}
+
+function _removeById(saves, id) {
+  return (saves || []).filter((e) => {
+    const n = _normalizeSave(e);
+    return n && n.id !== id;
+  });
+}
+
+function _enrichForSave(id) {
+  // Build the enriched save record for a newly-added listing. Looks
+  // the listing up in ranked.json so the price + source is captured
+  // at save time — the newsletter pipeline later uses this to compute
+  // "↓ Price dropped $X since you saved it".
+  const entry = { id, saved_at: new Date().toISOString() };
+  const listing = rankedIndex().get(id);
+  if (listing) {
+    if (typeof listing.price_usd === "number" && listing.price_usd > 0) {
+      entry.price_at_save_usd = listing.price_usd;
+    }
+    if (typeof listing.source === "string") entry.source = listing.source;
+  }
+  return entry;
+}
 
 // 30 writes / 60s per user (or per IP for unauthenticated requests, which
 // 401 quickly anyway). Generous for legit use — a user couldn't realistically
@@ -101,8 +191,12 @@ module.exports = withTiming(async (req, res) => {
   if (req.method === "GET") {
     try {
       const { saves, plan } = await readUser(userId);
-      logApi("saves", { status: 200, ms: Date.now() - t0, op: "get", count: saves.length });
-      return res.status(200).json({ saves, cap: FREE_SAVE_CAP, plan });
+      // External contract: saves[] is a flat string-ID array. Internal
+      // storage may be mixed (legacy strings + enriched objects); we
+      // extract IDs here so the SPA Set membership logic stays simple.
+      const ids = _extractIds(saves);
+      logApi("saves", { status: 200, ms: Date.now() - t0, op: "get", count: ids.length });
+      return res.status(200).json({ saves: ids, cap: FREE_SAVE_CAP, plan });
     } catch (err) {
       logApi("saves", { status: 500, ms: Date.now() - t0, op: "get", error: err.message });
       return res.status(500).json({ error: "lookup_failed" });
@@ -128,13 +222,16 @@ module.exports = withTiming(async (req, res) => {
 
     try {
       const { saves, plan } = await readUser(userId);
-      const set = new Set(saves);
+      let next = Array.isArray(saves) ? [...saves] : [];
 
       if (action === "add") {
-        if (!set.has(listingId)) {
-          if (plan === "free" && set.size >= FREE_SAVE_CAP) {
+        if (!_hasId(next, listingId)) {
+          // Cap check against the dedup'd ID count, not raw array length,
+          // so a legacy duplicate doesn't burn one of the user's slots.
+          const currentCount = _extractIds(next).length;
+          if (plan === "free" && currentCount >= FREE_SAVE_CAP) {
             logApi("saves", {
-              status: 402, ms: Date.now() - t0, op: "add", reason: "cap_reached", count: set.size,
+              status: 402, ms: Date.now() - t0, op: "add", reason: "cap_reached", count: currentCount,
             });
             return res.status(402).json({
               error: "save_cap_reached",
@@ -142,18 +239,22 @@ module.exports = withTiming(async (req, res) => {
               plan,
             });
           }
-          set.add(listingId);
+          // Server-side enrichment: look up ranked.json so the saved
+          // entry carries price_at_save_usd + saved_at. The newsletter
+          // pipeline uses these to compute "↓ Price dropped $X" deltas.
+          next.push(_enrichForSave(listingId));
         }
       } else {
-        set.delete(listingId);
+        next = _removeById(next, listingId);
       }
 
-      const next = Array.from(set);
       await writeSaves(userId, next);
+      const ids = _extractIds(next);
       logApi("saves", {
-        status: 200, ms: Date.now() - t0, op: action, count: next.length, plan,
+        status: 200, ms: Date.now() - t0, op: action, count: ids.length, plan,
       });
-      return res.status(200).json({ saves: next, cap: FREE_SAVE_CAP, plan });
+      // Response still carries bare IDs — frontend Set logic untouched.
+      return res.status(200).json({ saves: ids, cap: FREE_SAVE_CAP, plan });
     } catch (err) {
       logApi("saves", { status: 500, ms: Date.now() - t0, op: action, error: err.message });
       return res.status(500).json({ error: "write_failed" });
