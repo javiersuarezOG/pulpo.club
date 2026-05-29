@@ -92,6 +92,34 @@ function parseTags(value: string | null): Set<DiscoveryTag> {
   return out;
 }
 
+// Filter-URL keys that represent persisted "what to find" axes. Used
+// by the discover-filter hydration logic (web/app/lib/use-discover-filter.ts)
+// to decide whether to apply a Clerk-persisted filter as the BrowsePage
+// seed — when ANY of these is present in the URL, the URL wins (so
+// shared links stay shareable). Tuning knobs (wv/wl/wm/score_min/inc)
+// are intentionally excluded — they live on /browse for "how I read
+// the catalogue" only.
+export const FILTER_URL_KEYS: readonly string[] = [
+  "zones",
+  "types",
+  "features",
+  "infra",
+  "status",
+  "pmin",
+  "pmax",
+  "smin",
+  "ready",
+  "master",
+  "sub",
+  "tag",
+  "rmax",
+] as const;
+
+export function hasFilterParamsInURL(search: string): boolean {
+  const p = new URLSearchParams(search);
+  return FILTER_URL_KEYS.some((k) => p.has(k));
+}
+
 export function readFilterFromURL(search: string, baseDefaults: FilterShape): FilterShape {
   const p = new URLSearchParams(search);
   // master/sub/tag from URL win over the baseDefaults values when
