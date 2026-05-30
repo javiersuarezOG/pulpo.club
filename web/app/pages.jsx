@@ -256,10 +256,14 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
       </div>
 
       {/* ──────────────────────────────────────────────────────────
-         Refine tier. Collapsed accordions — open the ones you care
-         about. Order matches the mockup: Use → Price → Size → Zones
-         → Features → Infrastructure → Discovery → Photos → Advanced. */}
-      <FilterGroup title={t("filter.use", lc)} collapsible defaultOpen={filters.land_types.size > 0}>
+         Refine tier. All sections always visible — the mockup Sebas
+         approved had no accordions so the new Surf City 1/2 + lakes
+         pattern in Location lands in front of the user instead of
+         hiding behind a "Location ▾" toggle. Advanced ranking still
+         lives in its own collapsed surface below (power-user only).
+         Order: Use → Price → Size → Location → Features →
+         Infrastructure → Discovery → Photos → Advanced. */}
+      <FilterGroup title={t("filter.use", lc)}>
         <div className="chip-grid">
           {["residential","commercial","tourist"].map(typeKey => (
             <button key={typeKey}
@@ -269,11 +273,11 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.price", lc)} collapsible defaultOpen={filters.price_max != null || filters.price_min > 0}>
+      <FilterGroup title={t("filter.price", lc)}>
         <PriceHistogram filters={filters} setFilters={update} />
       </FilterGroup>
 
-      <FilterGroup title={t("filter.size", lc)} collapsible defaultOpen={filters.size_min > 0}>
+      <FilterGroup title={t("filter.size", lc)}>
         <div className="range-row">
           <label>{t("filter.size_min", lc, { n: (filters.size_min/10000).toFixed(1) })}</label>
           <input type="range" min="0" max="200000" step="500"
@@ -281,7 +285,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.zone", lc)} collapsible defaultOpen={filters.zones.size > 0}>
+      <FilterGroup title={t("filter.zone", lc)}>
         <LocationFilter
           selected={filters.zones}
           onChange={(next) => update({ zones: next })}
@@ -289,7 +293,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         />
       </FilterGroup>
 
-      <FilterGroup title={t("filter.features", lc)} collapsible defaultOpen={filters.features.size > 0}>
+      <FilterGroup title={t("filter.features", lc)}>
         <div className="chip-grid">
           {["beachfront","ocean_view","mountain_view","flat","water_body"].map(k => (
             <button key={k}
@@ -299,7 +303,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.infrastructure", lc)} collapsible defaultOpen={filters.infra.size > 0}>
+      <FilterGroup title={t("filter.infrastructure", lc)}>
         <div className="chip-grid">
           {["water","power","paved","sewage"].map(k => (
             <button key={k}
@@ -309,7 +313,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={t("filter.discovery_tags", lc)} collapsible defaultOpen={filters.discovery_tags?.size > 0 || filters.include_incomplete}>
+      <FilterGroup title={t("filter.discovery_tags", lc)}>
         <div className="chip-grid">
           {["top_rated", "under_250k", "gated", "waterfront"].map((tag) => (
             <button
@@ -333,7 +337,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
       </FilterGroup>
 
       {/* PR-4b — photos chip (legacy parity). */}
-      <FilterGroup title={t("filter.photos", lc)} collapsible defaultOpen={filters.photos !== "all"}>
+      <FilterGroup title={t("filter.photos", lc)}>
         <div className="chip-grid">
           {["all","with","none"].map(k => (
             <button key={k}
