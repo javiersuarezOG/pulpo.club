@@ -949,7 +949,7 @@ export function NewsletterWidget() {
                           className="nl-upcoming-btn"
                           disabled={busy || !!audienceConfirm}
                           onClick={() => trigger({ issueNumber: issueNum, when: label })}
-                          title="Send a test copy to your email only — no real subscribers receive this."
+                          title="Send a test copy to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
                         >
                           Send test →
                         </button>
@@ -958,7 +958,7 @@ export function NewsletterWidget() {
                           className="nl-audience-btn"
                           disabled={busy || !!audienceConfirm}
                           onClick={() => openAudienceConfirm(issueNum)}
-                          title="Send this issue to every paying Pulpo subscriber. Confirmation required."
+                          title="Send this issue to every paying Pulpo subscriber. Confirmation required." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
                         >
                           Send to everyone
                         </button>
