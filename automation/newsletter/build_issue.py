@@ -1127,6 +1127,17 @@ def build_issue(
         issue_id=issue_id,
     )
 
+    # Weekly News Spotlight (v4.0) — LLM-curated regional news story.
+    # Cached per-issue across recipients via `_make_news_spotlight` so
+    # 1000 recipients in a single cron run share one LLM call. None →
+    # renderer falls back to the deterministic "What we're watching"
+    # copy; never fabricates a citation.
+    news_spotlight = _make_news_spotlight(
+        locale=locale,
+        issue_id=issue_id,
+        issue_number=issue_number,
+    )
+
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
@@ -1146,4 +1157,58 @@ def build_issue(
         welcome_prefs_url=welcome_prefs_url,
         your_pulpo=your_pulpo,
         favorites=favorites,
+        news_spotlight=news_spotlight,
     )
+
+
+# ── Weekly News Spotlight — LLM news pipeline ────────────────────────
+
+# Per-process cache so a single cron run that builds N issues hits the
+# news fetch + LLM ONCE per (issue_id, locale). Cleared between processes
+# by being module-level state. Keyed on (issue_id, locale) so EN and ES
+# sends in the same run each get one call.
+_NEWS_SPOTLIGHT_CACHE: dict[tuple[str, str], object] = {}
+
+
+def _make_news_spotlight(*, locale: str, issue_id: str, issue_number: int):
+    """Fetch + LLM-pick the Weekly News Spotlight for this issue.
+
+    Returns a `NewsSpotlight` (truthy) when the LLM picked an article,
+    `None` for: LLM toggle off, no DEEPSEEK_API_TOKEN, no candidates
+    surfaced this week, LLM picked `{"pick": null}` (slow week), or
+    any exception. Renderer handles None via deterministic fallback.
+
+    Cached per-process by (issue_id, locale) — a cron with N recipients
+    in the same locale fires the LLM exactly once.
+    """
+    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
+    if not use_llm:
+        return None
+    # Skip the RSS fetch + LLM call entirely when no DeepSeek key is
+    # available. Avoids burning 5×10s network timeouts in tests / dev
+    # environments that toggle USE_LLM on but don't have a token wired.
+    if not os.environ.get("DEEPSEEK_API_TOKEN", "").strip():
+        return None
+
+    cache_key = (issue_id, locale)
+    if cache_key in _NEWS_SPOTLIGHT_CACHE:
+        return _NEWS_SPOTLIGHT_CACHE[cache_key]
+
+    try:
+        from . import llm_news as llm_news_mod
+        spotlight = llm_news_mod.fetch_pick_and_summarize(locale=locale)
+    except Exception:  # noqa: BLE001
+        spotlight = None
+
+    _NEWS_SPOTLIGHT_CACHE[cache_key] = spotlight
+    _telemetry_capture("newsletter.news_spotlight_built", {
+        "issue_id": issue_id,
+        "issue_number": issue_number,
+        "locale": locale,
+        "source": "llm" if spotlight else "fallback",
+        "outlet": getattr(spotlight, "source_name", None),
+        "article_url": getattr(spotlight, "source_url", None),
+        "candidates_seen": getattr(spotlight, "candidates_seen", 0),
+        "llm_cost_usd": getattr(spotlight, "llm_cost_usd", 0.0),
+    })
+    return spotlight
