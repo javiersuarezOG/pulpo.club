@@ -19,10 +19,15 @@ import {
 import {
   readProfile,
   readNewsletterPreference,
+  readDiscoverFilter,
+  storageToDiscover,
   NEWSLETTER_CADENCES,
   NEWSLETTER_LOCALES,
   NEWSLETTER_PROPERTY_TYPES,
 } from "./lib/user-profile";
+import { useDiscoverFilterPersist } from "./lib/use-discover-filter";
+import { useListings } from "./data/use-listings";
+import { FilterPanel, makeDefaultFilters, applyFilters } from "./pages.jsx";
 import { splitFullName, joinFullName } from "./lib/name-split";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
