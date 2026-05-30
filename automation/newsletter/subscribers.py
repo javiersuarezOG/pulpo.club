@@ -528,6 +528,15 @@ def synthesize_preview_recipients(
     `locale` controls which language the rendered email is in. The
     admin widget lets the operator pick EN or ES so they can QA both
     variants from the same surface.
+
+    Saves: the preview recipient is seeded with three synthetic saves
+    spanning the favorites states (price_dropped / no_change /
+    price_up) so the admin preview actually renders the "Your saved
+    listings" section. Without seeded saves the section silently
+    collapses (correct behaviour for a real recipient with no saves,
+    but useless for operator QA — the operator can't tell if the
+    section is working vs broken). Falls back to no-saves cleanly if
+    ranked.json is unreadable.
     """
     email = email.strip().lower()
     if not email or "@" not in email:
@@ -535,6 +544,7 @@ def synthesize_preview_recipients(
     if locale not in ("en", "es"):
         raise ValueError(f"synthesize_preview_recipients: invalid locale {locale!r}")
     eh = email_hash(email)
+    sample_saves = _build_preview_saves()
     recipients = [
         Recipient(
             email_hash=eh,
@@ -543,9 +553,78 @@ def synthesize_preview_recipients(
             tier="pro",
             has_account=True,
             preference=Preference(departments=["La Libertad"]),
+            saves=sample_saves,
+            saved_count=len(sample_saves),
         ),
     ]
     return [(r, email) for r in recipients]
+
+
+def _build_preview_saves() -> list[SavedListing]:
+    """Synthesize three saved-listing entries spanning the favorites
+    states, using real listing IDs from ranked.json so the preview
+    email shows realistic titles + photos.
+
+    Read errors / empty ranked.json → empty list returned. The
+    favorites section will collapse like in production for that case,
+    which is fine — the operator will see the same "section dark"
+    behaviour real recipients with no saves get.
+
+    Mirrors the seeding logic in `scripts/build_newsletter_dryrun.py`'s
+    `_seed_sample_saves` so the admin preview and the dryrun fixture
+    show the same shape.
+    """
+    import json
+    from pathlib import Path
+
+    # Walk up to the repo root: subscribers.py → newsletter → automation → root.
+    path = Path(__file__).resolve().parents[2] / "web" / "data" / "ranked.json"
+    try:
+        ranked = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    if not isinstance(ranked, list) or not ranked:
+        return []
+
+    sample = [
+        r for r in ranked
+        if isinstance(r, dict)
+        and r.get("source")
+        and r.get("source_id")
+        and isinstance(r.get("price_usd"), (int, float))
+        and r["price_usd"] > 0
+    ]
+    if not sample:
+        return []
+
+    saves: list[SavedListing] = []
+    # 1. price_dropped — baseline $5,000 higher than current
+    first = sample[0]
+    saves.append(SavedListing(
+        id=f"{first['source']}__{first['source_id']}",
+        saved_at="2026-05-22T18:45:00Z",
+        price_at_save_usd=float(first["price_usd"]) + 5_000.0,
+        source=first.get("source"),
+    ))
+    # 2. no_change — baseline matches current
+    if len(sample) > 1:
+        second = sample[1]
+        saves.append(SavedListing(
+            id=f"{second['source']}__{second['source_id']}",
+            saved_at="2026-05-01T09:00:00Z",
+            price_at_save_usd=float(second["price_usd"]),
+            source=second.get("source"),
+        ))
+    # 3. price_up — baseline $3,000 lower than current (clamped > 0)
+    if len(sample) > 2:
+        third = sample[2]
+        saves.append(SavedListing(
+            id=f"{third['source']}__{third['source_id']}",
+            saved_at="2026-04-18T11:00:00Z",
+            price_at_save_usd=max(1_000.0, float(third["price_usd"]) - 3_000.0),
+            source=third.get("source"),
+        ))
+    return saves
 
 
 def build_recipient_queue(

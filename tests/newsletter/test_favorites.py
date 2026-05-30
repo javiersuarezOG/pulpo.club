@@ -294,6 +294,59 @@ def test_render_emits_section_with_price_drop_chip(pro_with_prefs, ranked_pool):
     assert 'class="struck"' in html  # struck-through previous price
 
 
+# ── Admin preview path seeds saves ─────────────────────────────────
+
+
+def test_synthesize_preview_recipients_seeds_three_saves():
+    """The admin preview button must render the favorites section so
+    the operator can QA it. Pre-fix the preview Recipient had
+    saves=[] → compute_favorites returned [] → renderer collapsed the
+    section. Operators triggered EN + ES previews and saw no favorites
+    cards even though the renderer was fully v3.3.1.
+
+    This test pins the fix: synthesize_preview_recipients now seeds
+    three SavedListing entries against real IDs from ranked.json,
+    spanning the three favorites states.
+    """
+    from automation.newsletter.subscribers import synthesize_preview_recipients
+
+    recipients = synthesize_preview_recipients("operator@example.com", locale="en")
+    assert len(recipients) == 1
+    recipient, raw_email = recipients[0]
+    # Match the ranked.json availability — could be 0/1/2/3 depending
+    # on test fixture state, but ranked.json is checked into web/data
+    # so we expect the full three here.
+    assert len(recipient.saves) == 3, (
+        "preview recipient must carry 3 sample saves; got "
+        f"{len(recipient.saves)} — admin preview won't render favorites"
+    )
+    assert recipient.saved_count == 3
+    # Each save has the full enriched shape so the diff can produce
+    # all three states (price_dropped / no_change / price_up).
+    for s in recipient.saves:
+        assert s.id and "__" in s.id, f"malformed save id: {s.id}"
+        assert s.price_at_save_usd is not None
+        assert s.price_at_save_usd > 0
+        assert s.saved_at is not None
+
+
+def test_synthesize_preview_recipients_survives_missing_ranked(monkeypatch, tmp_path):
+    """If ranked.json is unreadable (CI race, fresh checkout, file
+    corrupt), the preview must still build successfully — just with
+    an empty saves list. The favorites section will collapse, but the
+    preview email itself ships."""
+    from automation.newsletter import subscribers as subs
+
+    def fake_build_preview_saves():
+        return []
+
+    monkeypatch.setattr(subs, "_build_preview_saves", fake_build_preview_saves)
+    recipients = subs.synthesize_preview_recipients("op@example.com", locale="en")
+    assert len(recipients) == 1
+    assert recipients[0][0].saves == []
+    assert recipients[0][0].saved_count == 0
+
+
 # ── Observability ───────────────────────────────────────────────────
 
 
