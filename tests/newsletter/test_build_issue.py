@@ -139,15 +139,22 @@ def test_locale_propagates_through_commentary(pro_with_prefs, ranked_pool):
         history_rows=[],
     )
     assert issue.locale == "es"
-    # v3.2 (2026-05-29): the Spanish lede opens with the beach+lake
-    # scope ("propiedades activas de playa y lago en El Salvador") and
-    # spells out the issue shape ("perfil completo: foto, nuestra
-    # lectura"). Anchor on those + the weekly cadence so a regression
-    # to the v3.1 "lecturas completas" / "across La Libertad" wording
-    # would fail this test.
+    # v4 (2026-05-30): the Spanish lede opens with the beach+lake scope
+    # ("propiedades activas de playa y lago en El Salvador") and names
+    # the filter-match count + standout count ("De las N que coinciden
+    # con tu filtro, estas 10 destacaron"). Sentence 3 ("perfil
+    # completo: foto, nuestra lectura ... lecturas rápidas") was DROPPED
+    # in v4 — it described the v3 rich/short split which the locked
+    # `_pick_card_html` removed, so claiming it now would lie. Anchor
+    # on the surviving phrases + the weekly cadence so a regression
+    # would still fail the test.
     assert "playa y lago" in issue.commentary.lede_hero
-    assert "perfil completo" in issue.commentary.lede_hero
+    assert "destacaron" in issue.commentary.lede_hero
+    assert "tu filtro" in issue.commentary.lede_hero
     assert "esta semana" in issue.commentary.lede_hero
+    # v4 lede shape — exactly 2 sentences, no rich/short claim.
+    assert "perfil completo" not in issue.commentary.lede_hero
+    assert "lecturas rápidas" not in issue.commentary.lede_hero
 
 
 def test_repriced_listing_can_repeat(make_listing, pro_with_prefs):

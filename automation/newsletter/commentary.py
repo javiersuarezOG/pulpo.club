@@ -845,32 +845,17 @@ def deterministic_welcome_teaser(
             else f"Estas {n} destacaron."
         )
 
-    # Sentence 3 — issue shape. Telegraphs what the rich vs short
-    # treatment contains so the reader knows what scroll depth to expect.
-    if rest:
-        if en:
-            sent3 = (
-                f"The first {_num_word(rich)} get a full profile: photo, our take, "
-                f"and why we picked them. The next {_num_word(rest)} are quick reads."
-            )
-        else:
-            sent3 = (
-                f"Las {_num_word(rich, en=False, fem=True)} primeras llevan un perfil completo: "
-                f"foto, nuestra lectura, y por qué las elegimos. "
-                f"Las {_num_word(rest, en=False, fem=True)} siguientes son lecturas rápidas."
-            )
-    else:
-        if en:
-            sent3 = (
-                f"All {_num_word(rich)} get a full profile: photo, our take, and why we picked them."
-            )
-        else:
-            sent3 = (
-                f"Las {_num_word(rich, en=False, fem=True)} llevan un perfil completo: "
-                f"foto, nuestra lectura, y por qué las elegimos."
-            )
+    # v4 (2026-05-30) — DROPPED the third sentence ("The first three
+    # get a full profile: photo, our take, and why we picked them. The
+    # next seven are quick reads"). It described the v3 rich/short
+    # split, which v4 removed: every pick now renders through the same
+    # `_pick_card_html` component with the same content shape. Keeping
+    # the sentence after the redesign would lie to the reader. The
+    # `rest` / `rich` locals are preserved above in case a future
+    # iteration brings back a tiered treatment.
+    _ = rest, rich  # preserved for future reuse; intentionally unused now
 
-    return f"{sent1} {sent2} {sent3}"
+    return f"{sent1} {sent2}"
 
 
 def _num_word(n: int, en: bool = True, *, fem: bool = False) -> str:
