@@ -74,7 +74,7 @@ def _row(li: Listing) -> dict:
 # slug and dispatches there before argparse ever runs. Anything else
 # falls through to the original rank-pipeline flow unchanged.
 
-_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "check-hero-variants", "backfill-listing-photo-meta"}
+_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "check-hero-variants", "backfill-listing-photo-meta", "scrape-external"}
 
 
 def _run_enrich_photos(argv: list[str]) -> int:
@@ -586,6 +586,141 @@ def _run_backfill_listing_photo_meta(argv: list[str]) -> int:
     return 0
 
 
+def _run_scrape_external(argv: list[str]) -> int:
+    """Scrape a comma-separated list of sources from this host and write
+    the records to <out>/<source>.json for the main nightly to pick up.
+
+    Purpose
+    -------
+    realtyelsalvador + elagente's WAFs block GitHub-hosted (Azure)
+    runner IPs, so the main nightly on Azure can't reach them.
+    Confirmed 2026-05-30 via probes from GH-runner, Vercel/AWS Lambda,
+    Google Cloud Shell, and a laptop residential IP. GCP IPs pass.
+    This command runs on a GCP self-hosted runner (label
+    `gcp-residential`, see scripts/setup-gcp-runner.sh), scrapes the
+    two blocked sources live, and writes a cache file the main
+    nightly's scrapers fall back to.
+
+    Output
+    ------
+    For each source, ``<out>/<source>.json`` of the form:
+
+        {
+          "ts":      "2026-05-30T01:34:12Z",
+          "source":  "realtyelsalvador",
+          "scraper_version": "html-v2-2026-05",
+          "count":   118,
+          "records": [...]   // same dict-per-listing shape produced
+                              //   by ``scraper.crawl()`` — the main
+                              //   nightly consumes these directly
+        }
+
+    The ts is the wall-clock time the scrape completed. The main
+    nightly's scrapers treat the cache as authoritative if ts is
+    within a freshness window (configurable, default 25h — one
+    nightly + slack); otherwise they fall through to the live fetch
+    (which will still 403 on Azure, surfacing the staleness as a red
+    source-health row that's actionable).
+
+    Exit code
+    ---------
+    0 — every requested source produced a non-empty cache file.
+    1 — at least one source produced zero records OR raised an
+        exception. The shim workflow uses this to decide whether to
+        commit + push (we never commit a regression).
+
+    Usage
+    -----
+        # Run by the scrape-shim workflow on the GCP self-hosted runner:
+        python3 -m pulpo.cli scrape-external \\
+            --sources realtyelsalvador,elagente \\
+            --out web/data/scrape_cache
+    """
+    from datetime import datetime, timezone
+
+    sp = argparse.ArgumentParser(
+        prog="pulpo scrape-external",
+        description="Scrape one or more sources and write cache files for the main nightly.",
+    )
+    sp.add_argument(
+        "--sources", type=str, required=True,
+        help="Comma-separated source slugs (e.g. realtyelsalvador,elagente).",
+    )
+    sp.add_argument(
+        "--out", type=str, required=True,
+        help="Output directory for <source>.json cache files (created if absent).",
+    )
+    sp.add_argument(
+        "--limit", type=int, default=200,
+        help="Max records per source (default 200 — enough for realty+elagente "
+             "current catalogues with headroom).",
+    )
+    args = sp.parse_args(argv)
+
+    repo_root = Path(__file__).resolve().parents[1]
+    out_dir = Path(args.out)
+    if not out_dir.is_absolute():
+        out_dir = repo_root / out_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Import lazily so a fresh checkout that hasn't installed scraper
+    # deps yet still loads the CLI without errors. The scrape itself
+    # will obviously need the deps; we want a clean stack trace from
+    # the scrape, not a CLI import-time crash.
+    from pulpo.agents import SOURCES
+
+    requested = [s.strip() for s in args.sources.split(",") if s.strip()]
+    if not requested:
+        print("scrape-external: --sources is empty", file=sys.stderr)
+        return 2
+
+    overall_ok = True
+    for slug in requested:
+        scraper = SOURCES.get(slug)
+        if scraper is None:
+            print(f"scrape-external: unknown source {slug!r} (registered: "
+                  f"{sorted(SOURCES.keys())})", file=sys.stderr)
+            overall_ok = False
+            continue
+
+        print(f"[scrape-external] scraping {slug} (limit={args.limit})")
+        try:
+            records = scraper.crawl(limit=args.limit, offline=False)
+        except Exception as e:
+            # Surfacing the exception in the cache file would let the
+            # main nightly distinguish "WAF block downstream" from
+            # "scraper code raised" — but a corrupted cache is worse
+            # than no cache. Skip the write so the main nightly falls
+            # through to the live path (which will also fail, but in
+            # the existing failure mode that the watchdog already
+            # understands).
+            print(f"[scrape-external] {slug} crawl raised: {e!r}", file=sys.stderr)
+            overall_ok = False
+            continue
+
+        if not records:
+            print(f"[scrape-external] {slug} produced 0 records — "
+                  f"not writing cache (would mask the failure)", file=sys.stderr)
+            overall_ok = False
+            continue
+
+        # ts uses Z suffix (UTC) rather than the ISO offset form to
+        # match the rest of Pulpo's telemetry files
+        # (last_updated.json's started_at, source_health_history's ts).
+        envelope = {
+            "ts":      datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "source":  slug,
+            "count":   len(records),
+            "records": records,
+        }
+        cache_path = out_dir / f"{slug}.json"
+        cache_path.write_text(json.dumps(envelope, indent=2, default=str) + "\n",
+                              encoding="utf-8")
+        print(f"[scrape-external] {slug}: wrote {len(records)} records to {cache_path}")
+
+    return 0 if overall_ok else 1
+
+
 def _dispatch_subcommand(name: str, argv: list[str]) -> int:
     if name == "enrich-photos":
         return _run_enrich_photos(argv)
@@ -595,6 +730,8 @@ def _dispatch_subcommand(name: str, argv: list[str]) -> int:
         return _run_check_hero_variants(argv)
     if name == "backfill-listing-photo-meta":
         return _run_backfill_listing_photo_meta(argv)
+    if name == "scrape-external":
+        return _run_scrape_external(argv)
     print(f"pulpo: unknown subcommand '{name}'", file=sys.stderr)
     return 2
 

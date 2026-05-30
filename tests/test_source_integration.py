@@ -52,7 +52,7 @@ TESTS_DIR    = REPO / "tests" / "scrapers"
 # scraper-file glob below.
 KNOWN_HELPERS = {
     "_base", "_policy", "_runtime", "_type_classifier", "_photo_url_upgrade",
-    "__init__",
+    "_scrape_cache", "__init__",
 }
 
 

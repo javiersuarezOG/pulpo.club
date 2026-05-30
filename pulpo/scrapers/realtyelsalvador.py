@@ -59,6 +59,7 @@ from pulpo.agents import SOURCES, register
 from pulpo.scrapers._base import polite_get_for
 from pulpo.scrapers._policy import get_policy
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
+from pulpo.scrapers._scrape_cache import load_fresh_cache
 
 BASE         = "https://realtyelsalvador.com"
 ARCHIVE_URL  = f"{BASE}/tipo-de-propiedad/terrenos/page/{{page}}/"
@@ -288,6 +289,16 @@ class RealtyElSalvadorScraper:
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
         if not (HTTPX_OK and SELECTOLAX_OK):
             return load_fixtures(self.slug, FIXTURE_FILE, limit)
+
+        # Cache-first fallback: the GCP self-hosted runner's scrape-shim
+        # workflow writes fresh records to web/data/scrape_cache/<slug>.json
+        # daily. The runner's IP isn't WAF-blocked; the main nightly's
+        # Azure IP is. If a fresh cache exists, use it directly and skip
+        # the doomed live fetch. Cache miss / staleness falls through.
+        cached = load_fresh_cache(self.slug)
+        if cached is not None:
+            return cached[:limit]
+
         effective_limit = min(limit, MAX_LISTINGS)
         policy = get_policy(self.slug)
 

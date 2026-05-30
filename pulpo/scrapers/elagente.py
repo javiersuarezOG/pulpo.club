@@ -46,6 +46,7 @@ from pulpo.agents.html_crawler import HTTPX_OK, SELECTOLAX_OK, make_client
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._base import OfflineFixtureMixin, finalize_record, polite_get_for
 from pulpo.scrapers._policy import get_policy
+from pulpo.scrapers._scrape_cache import load_fresh_cache
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -397,6 +398,17 @@ class ElAgenteScraper(OfflineFixtureMixin):
         fix = self._offline_or_fixtures(limit, override_offline=offline)
         if fix is not None:
             return {"records": fix, "max_pages_hit": False, "limit_hit": len(fix) >= limit}
+
+        # Cache-first fallback: GCP self-hosted runner's scrape-shim
+        # writes fresh records to web/data/scrape_cache/<slug>.json
+        # daily. Same rationale as realtyelsalvador — Azure GH-runner
+        # IPs are WAF-blocked, GCP IPs aren't. Cache miss / staleness
+        # falls through to the live (doomed-on-Azure) path so the
+        # source-health row turns red and the watchdog fires.
+        cached = load_fresh_cache(self.slug)
+        if cached is not None:
+            capped = cached[:limit]
+            return {"records": capped, "max_pages_hit": False, "limit_hit": len(capped) >= limit}
 
         if not SELECTOLAX_OK:
             print(f"[{self.slug}] selectolax not installed, skipping")
