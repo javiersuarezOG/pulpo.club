@@ -47,6 +47,7 @@ const posthog = require("../_posthog");
 const { sendActivationEmail } = require("../_activation_email");
 const { GRACE_MS } = require("../_plan");
 const { auditEnvOverridesOnce } = require("../_env_audit");
+const { enrollPaidUserInAudience, unsubscribeOnPlanLoss } = require("../_resend_audience");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 // Statuses that mean "subscription is finished, not paused": fully
@@ -352,6 +353,14 @@ module.exports = async (req, res) => {
             stripeCustomerId: customerId || undefined,
             stripeSubscriptionId: subscriptionId || undefined,
           });
+          // Resend audience enrollment — newsletter is a Pro feature
+          // per paywall copy. Best-effort: never blocks the payment.
+          if (email) {
+            await enrollPaidUserInAudience({
+              email, locale: stripeLocale || "en",
+              source: "stripe.checkout.auth_gated",
+            });
+          }
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "auth_gated", clerk_user_id: explicitUserId,
@@ -391,6 +400,11 @@ module.exports = async (req, res) => {
             stripeSubscriptionId: subscriptionId || undefined,
             acquisitionSource: source || undefined,
             acquisitionUtms: Object.keys(utms).length ? utms : undefined,
+          });
+          // Resend audience enrollment — newsletter is a Pro feature.
+          await enrollPaidUserInAudience({
+            email, locale: stripeLocale || "en",
+            source: "stripe.checkout.anonymous_existing_user",
           });
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
@@ -513,6 +527,14 @@ module.exports = async (req, res) => {
             sessionId: session.id,
           });
 
+          // Resend audience enrollment — newsletter is a Pro feature.
+          // Fires AFTER the invitation goes out so the user has an
+          // account to sign into before their first newsletter lands.
+          await enrollPaidUserInAudience({
+            email, locale: stripeLocale || clerkLocale || "en",
+            source: "stripe.checkout.anonymous_new_user",
+          });
+
           // Mark the event as processed BEFORE telemetry so a Stripe
           // retry hits the dedup branch above even if the function gets
           // killed mid-handler. Failures are swallowed inside the
@@ -561,6 +583,11 @@ module.exports = async (req, res) => {
                 stripeSubscriptionId: subscriptionId || undefined,
                 acquisitionSource: source || undefined,
                 acquisitionUtms: Object.keys(utms).length ? utms : undefined,
+              });
+              // Resend audience enrollment — newsletter is a Pro feature.
+              await enrollPaidUserInAudience({
+                email, locale: stripeLocale || "en",
+                source: "stripe.checkout.anonymous_race_recovered",
               });
               logApi("stripe.webhook", {
                 status: 200, ms: Date.now() - t0, type: event.type,
@@ -704,6 +731,20 @@ module.exports = async (req, res) => {
 
         if (userId) {
           await patchPublicMetadata(clerk, userId, patch);
+          // Resend audience symmetry — when the subscription terminates
+          // (canceled / expired / deleted), the user is no longer in the
+          // Pro tier the newsletter is gated to. Flag their Resend
+          // contact unsubscribed=true so they stop receiving issues.
+          // Reversible: a re-upgrade re-enrolls them via the checkout
+          // path above (enrollPaidUserInAudience flips unsubscribed=false
+          // on the dedup branch). Best-effort: Resend outage doesn't
+          // block subscription cleanup.
+          if (isTerminal && subEmail) {
+            await unsubscribeOnPlanLoss({
+              email: subEmail,
+              source: `stripe.${event.type}`,
+            });
+          }
           // Also stamp privateMetadata.stripeCustomerId + stripeSubscriptionId
           // so the Customer Portal endpoint can find them. The /start
           // anonymous-invitation flow never gets these onto the User
