@@ -1595,21 +1595,26 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
         source_url = _g("source_url")
         source_date = _g("source_date")
     else:
-        # Deterministic fallback — generic editorial frame keyed off the
-        # issue's recipient filter. Honest, sources-free since no LLM
-        # has scanned articles. Renders nothing if no useful frame
-        # available.
+        # Deterministic fallback — generic editorial frame keyed off
+        # the issue's data. Honest, no LLM-curated article. We DO
+        # attribute it to Pulpo's own coastal market scan so the
+        # spotlight block has a complete "Reported by …" line at the
+        # top (otherwise the section looks unbranded — operator
+        # feedback, 2026-05-30). The attribution is sourceless (no
+        # URL), which the renderer below handles by emitting the
+        # citation text without a link.
         title = i18n.t("spotlight.fallback.title", locale)
         paragraph = i18n.t("spotlight.fallback.body", locale)
-        source_name = ""
+        source_name = "Pulpo's coastal market scan" if en else "Escaneo costero de Pulpo"
         source_url = ""
-        source_date = ""
+        source_date = _e(issue.issue_date_human) if getattr(issue, "issue_date_human", "") else ""
 
     if not title or not paragraph:
         return ""
 
     # Source citation only when a source is named. Article URL is the
-    # specific story the LLM pulled, NOT a homepage.
+    # specific story the LLM pulled (or empty for the deterministic
+    # fallback's self-attribution).
     source_line_html = ""
     if source_name:
         reported_by = "Reported by" if en else "Reportado por"
