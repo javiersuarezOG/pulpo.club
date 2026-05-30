@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo · Admin · Newsletter (redesign mockup)</title>
+<style>
+  :root {
+    --paper:        oklch(1 0 0);
+    --paper-2:      oklch(0.97 0.012 160);
+    --paper-3:      oklch(0.94 0.018 160);
+    --ink:          oklch(0.22 0.04 165);
+    --ink-2:        oklch(0.38 0.035 165);
+    --ink-3:        oklch(0.50 0.025 165);
+    --ink-4:        oklch(0.68 0.018 160);
+    --line:         oklch(0.90 0.015 160);
+    --line-2:       oklch(0.84 0.018 160);
+    --accent:       oklch(0.40 0.09 165);
+    --accent-soft:  oklch(0.93 0.035 160);
+    --accent-strong:oklch(0.28 0.08 165);
+    --badge-drop:   oklch(0.58 0.18 25);
+    --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper-2);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* annotation banner */
+  .annot {
+    background: #FFF8E1;
+    border-bottom: 1px solid #E8C766;
+    padding: 14px 32px;
+    font-size: 12.5px;
+    color: #5C4A0E;
+    line-height: 1.5;
+  }
+  .annot strong { color: #3D3206; }
+  .annot code {
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+  }
+
+  /* admin chrome (stub) */
+  .topbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  .topbar .nav-rest {
+    margin-left: auto;
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+  }
+
+  .pagehead { margin: 4px 0 22px; }
+  .pagehead .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin: 0;
+  }
+  .pagehead h1 {
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    margin: 6px 0 0;
+    font-weight: 600;
+  }
+  .pagehead p.sub {
+    color: var(--ink-3);
+    font-size: 13.5px;
+    margin: 6px 0 0;
+    line-height: 1.5;
+    max-width: 60ch;
+  }
+
+  /* shared controls bar */
+  .controls {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .controls .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 240px;
+  }
+  .controls .field.flex-1 { flex: 1; }
+  .controls label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .controls input[type=email] {
+    font: inherit;
+    padding: 9px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .controls input[type=email]:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+  .locale-toggle {
+    display: inline-flex;
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .locale-toggle button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 7px 14px;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .locale-toggle button + button { border-left: 1px solid var(--line-2); }
+  .locale-toggle button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* tier section */
+  .tier-section { margin: 0 0 36px; }
+  .tier-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 0 0 14px;
+  }
+  .tier-rule {
+    flex: 1;
+    border: 0;
+    border-top: 1px solid var(--line-2);
+    margin: 0;
+  }
+  .tier-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .tier-label.pro {
+    background: var(--accent-strong);
+    color: var(--paper);
+  }
+  .tier-label.free {
+    background: var(--paper-3);
+    color: var(--ink-2);
+  }
+  .tier-count {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  /* newsletter card */
+  .nl-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 0 0 12px;
+    overflow: hidden;
+  }
+  .nl-card.coming-soon { opacity: 0.75; }
+  .nl-card-head {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .nl-card.coming-soon .nl-card-head {
+    border-bottom-color: transparent;
+  }
+  .nl-card-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .nl-card-status {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .nl-card-status.live {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+  .nl-card-status.coming-soon {
+    background: var(--paper-3);
+    color: var(--ink-3);
+  }
+  .nl-card-desc {
+    padding: 8px 18px 14px;
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .nl-card-body {
+    padding: 4px 18px 16px;
+  }
+  .nl-card.coming-soon .nl-card-body { display: none; }
+
+  /* upcoming sends list inside a card */
+  .upcoming-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .upcoming-row:first-child { border-top: 0; }
+  .upcoming-meta { flex: 1; min-width: 0; }
+  .upcoming-issue {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .upcoming-when {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .row-btns { display: flex; gap: 6px; }
+  .btn {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid var(--line-2);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn.primary {
+    background: var(--accent-strong);
+    color: var(--paper);
+    border-color: var(--accent-strong);
+  }
+  .btn.primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+  .btn.danger {
+    background: oklch(0.95 0.04 25);
+    color: var(--badge-drop);
+    border-color: oklch(0.85 0.10 25);
+  }
+  .btn.danger:hover {
+    background: var(--badge-drop);
+    border-color: var(--badge-drop);
+    color: var(--paper);
+  }
+  .btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* one-time trigger row (welcome-style cards) */
+  .one-time-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .one-time-row .meta {
+    flex: 1;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  /* test sends log */
+  .log {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 24px;
+  }
+  .log-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 0 0 12px;
+  }
+  .log-title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .log-sub {
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--ink-3);
+  }
+  .log-clear {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    table-layout: fixed;
+  }
+  .log-table th,
+  .log-table td {
+    text-align: left;
+    padding: 7px 10px 7px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .log-table th {
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    border-bottom-color: var(--line-2);
+  }
+  .log-table tr:last-child td { border-bottom: 0; }
+  .log-when { width: 14%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+  .log-newsletter { width: 22%; }
+  .log-newsletter .pill {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-right: 6px;
+    vertical-align: 1px;
+  }
+  .log-newsletter .pill.pro {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+  .log-newsletter .pill.free {
+    background: var(--paper-3);
+    color: var(--ink-2);
+  }
+  .log-to { width: 22%; }
+  .log-lang { width: 6%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; }
+  .log-by { width: 22%; color: var(--ink-3); }
+  .log-result { width: 14%; font-weight: 600; }
+  .log-result.ok { color: var(--accent); }
+  .log-result.err { color: var(--badge-drop); }
+</style>
+</head>
+<body>
+
+<div class="annot">
+  <strong>Mockup: /admin/newsletter redesigned</strong> ·
+  Pro and Free sections split out so the editorial-voice + audience differ visually.
+  Each tier has cards per newsletter type. The Pro · Weekly digest is the existing live behaviour; Welcome cards stub the planned newsletters (Pro · Welcome on Free→Pro upgrade, Free · Welcome on homepage subscribe, Free · Weekly for the future Free-tier digest).
+  The Recent test sends log adds a <strong>Newsletter</strong> column so the operator can spot regressions per type.
+</div>
+
+<div class="topbar">
+  <span class="brand">pulpo</span>
+  <span class="nav-rest">Admin · Newsletter</span>
+</div>
+
+<div class="wrap">
+
+  <div class="pagehead">
+    <p class="eyebrow">Admin</p>
+    <h1>Newsletter</h1>
+    <p class="sub">Trigger test sends and audience sends for every newsletter Pulpo publishes. Each tier has its own section; each card represents one newsletter type.</p>
+  </div>
+
+  <!-- SHARED CONTROLS -->
+  <div class="controls">
+    <div class="field flex-1">
+      <label for="email">Send test to</label>
+      <input id="email" type="email" value="javier@suarez.ventures" />
+    </div>
+    <div class="field">
+      <label>Language</label>
+      <div class="locale-toggle">
+        <button type="button" aria-pressed="true">EN</button>
+        <button type="button" aria-pressed="false">ES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRO SECTION -->
+  <section class="tier-section">
+    <div class="tier-header">
+      <span class="tier-label pro">Pro</span>
+      <hr class="tier-rule" />
+      <span class="tier-count">2 newsletters</span>
+    </div>
+
+    <!-- Pro · Weekly digest (LIVE) -->
+    <article class="nl-card">
+      <div class="nl-card-head">
+        <h3 class="nl-card-title">Pro · Weekly digest</h3>
+        <span class="nl-card-status live">● Live</span>
+      </div>
+      <p class="nl-card-desc">
+        Sundays 9 AM · 10 curated picks per recipient, personalised to their <code style="font-family: var(--font-mono); font-size: 12px; background: var(--paper-3); padding: 1px 4px; border-radius: 3px;">discover_filters</code>.
+        The audience send fires the GitHub Actions workflow with <code style="font-family: var(--font-mono); font-size: 12px; background: var(--paper-3); padding: 1px 4px; border-radius: 3px;">send_mode=yes</code>.
+      </p>
+      <div class="nl-card-body">
+
+        <div class="upcoming-row">
+          <div class="upcoming-meta">
+            <span class="upcoming-issue">Next issue</span>
+            <span class="upcoming-when">Sun, 1 Jun · in 2 days</span>
+          </div>
+          <div class="row-btns">
+            <button class="btn">Send test →</button>
+            <button class="btn danger">Send to everyone</button>
+          </div>
+        </div>
+
+        <div class="upcoming-row">
+          <div class="upcoming-meta">
+            <span class="upcoming-issue">Following</span>
+            <span class="upcoming-when">Sun, 8 Jun · in 9 days</span>
+          </div>
+          <div class="row-btns">
+            <button class="btn">Send test →</button>
+            <button class="btn danger">Send to everyone</button>
+          </div>
+        </div>
+
+        <div class="upcoming-row">
+          <div class="upcoming-meta">
+            <span class="upcoming-issue">After that</span>
+            <span class="upcoming-when">Sun, 15 Jun · in 16 days</span>
+          </div>
+          <div class="row-btns">
+            <button class="btn">Send test →</button>
+            <button class="btn danger">Send to everyone</button>
+          </div>
+        </div>
+
+      </div>
+    </article>
+
+    <!-- Pro · Welcome (COMING SOON) -->
+    <article class="nl-card coming-soon">
+      <div class="nl-card-head">
+        <h3 class="nl-card-title">Pro · Welcome</h3>
+        <span class="nl-card-status coming-soon">◌ Coming soon</span>
+      </div>
+      <p class="nl-card-desc">
+        Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.
+      </p>
+    </article>
+
+  </section>
+
+  <!-- FREE SECTION -->
+  <section class="tier-section">
+    <div class="tier-header">
+      <span class="tier-label free">Free</span>
+      <hr class="tier-rule" />
+      <span class="tier-count">2 newsletters</span>
+    </div>
+
+    <!-- Free · Welcome (COMING SOON) -->
+    <article class="nl-card coming-soon">
+      <div class="nl-card-head">
+        <h3 class="nl-card-title">Free · Welcome</h3>
+        <span class="nl-card-status coming-soon">◌ Coming soon</span>
+      </div>
+      <p class="nl-card-desc">
+        Sent once when an anonymous email subscribes via the homepage form. Sets the audience expectation and surfaces a Pro upgrade CTA at the bottom.
+      </p>
+    </article>
+
+    <!-- Free · Weekly (COMING SOON) -->
+    <article class="nl-card coming-soon">
+      <div class="nl-card-head">
+        <h3 class="nl-card-title">Free · Weekly</h3>
+        <span class="nl-card-status coming-soon">◌ Coming soon</span>
+      </div>
+      <p class="nl-card-desc">
+        Lightweight Free-tier digest. Same Sunday cadence as Pro, fewer picks, no personalisation, upgrade nudge baked in.
+      </p>
+    </article>
+
+  </section>
+
+  <!-- TEST SENDS LOG -->
+  <section class="log">
+    <div class="log-head">
+      <div>
+        <h3 class="log-title">Recent test sends</h3>
+        <p class="log-sub">Cross-device · last 20 across all newsletters · PostHog-backed.</p>
+      </div>
+      <button class="log-clear">Clear local</button>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th class="log-when">When</th>
+          <th class="log-newsletter">Newsletter</th>
+          <th class="log-to">To</th>
+          <th class="log-lang">Lang</th>
+          <th class="log-by">By</th>
+          <th class="log-result">Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="log-when" title="2026-05-30T10:43:00Z">just now</td>
+          <td class="log-newsletter"><span class="pill pro">Pro</span>Weekly · Issue 1</td>
+          <td class="log-to">javier@suarez.ventures</td>
+          <td class="log-lang">en</td>
+          <td class="log-by">sebas@pulpo.club</td>
+          <td class="log-result ok">✓ Sent</td>
+        </tr>
+        <tr>
+          <td class="log-when">8 min ago</td>
+          <td class="log-newsletter"><span class="pill pro">Pro</span>Weekly · Issue 1</td>
+          <td class="log-to">sebas@pulpo.club</td>
+          <td class="log-lang">es</td>
+          <td class="log-by">sebas@pulpo.club</td>
+          <td class="log-result ok">✓ Sent</td>
+        </tr>
+        <tr>
+          <td class="log-when">2 h ago</td>
+          <td class="log-newsletter"><span class="pill pro">Pro</span>Weekly · Issue 2</td>
+          <td class="log-to">javier@suarez.ventures</td>
+          <td class="log-lang">en</td>
+          <td class="log-by">javier@suarez.ventures</td>
+          <td class="log-result err" title="github_status_502: workflow_dispatch failed">✗ Failed</td>
+        </tr>
+        <tr>
+          <td class="log-when">Wed 28 May, 14:12</td>
+          <td class="log-newsletter"><span class="pill pro">Pro</span>Weekly · Issue 1</td>
+          <td class="log-to">javier@suarez.ventures</td>
+          <td class="log-lang">en</td>
+          <td class="log-by">javier@suarez.ventures</td>
+          <td class="log-result ok">✓ Sent</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+</body>
+</html>
