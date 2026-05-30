@@ -30,6 +30,22 @@ const ZONES = (ACTIVE_COUNTRY.known_zones || []).map((z) => ({
   country: ACTIVE_COUNTRY.code,
 }));
 
+// SUPER_ZONES — user-facing groupings of `known_zones`. The browse filter
+// and the account-newsletter prefs both render these as parent rows with
+// their child zones below. `children` arrays reference `known_zones[*].name`
+// by exact match; a child that doesn't appear in `known_zones` is rendered
+// but won't match any listings. Zones not referenced by any super_zone fall
+// into the "More places" rail. See web/app/components/LocationFilter.jsx.
+const SUPER_ZONES = (ACTIVE_COUNTRY.super_zones || []).map((sz) => ({
+  key: sz.key,
+  name_en: sz.name_en,
+  name_es: sz.name_es,
+  subtitle_en: sz.subtitle_en,
+  subtitle_es: sz.subtitle_es,
+  type: sz.type,
+  children: Array.isArray(sz.children) ? sz.children : [],
+}));
+
 // Country-name map keyed by ISO code. In the single-country-per-
 // deployment model only the active country is populated; a future
 // multi-country UI extends this from a manifest registry.
@@ -290,4 +306,4 @@ const SHELVES = [
 // tier (Where / Type / Ranking) inside pages.jsx. SHELVES below is
 // the only remaining home-shelf metadata exported from this module.
 
-export { LISTINGS, SHELVES, ZONES, COUNTRY_NAMES };
+export { LISTINGS, SHELVES, ZONES, SUPER_ZONES, COUNTRY_NAMES };

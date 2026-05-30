@@ -28,6 +28,7 @@ import {
 import { useDiscoverFilterPersist } from "./lib/use-discover-filter";
 import { useListings } from "./data/use-listings";
 import { FilterPanel, makeDefaultFilters, applyFilters } from "./pages.jsx";
+import { LocationFilter } from "./components/LocationFilter.jsx";
 import { splitFullName, joinFullName } from "./lib/name-split";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
@@ -1006,20 +1007,6 @@ function PreferredCategoryChips({ app }) {
   );
 }
 
-// Vocabulary lives next to the renderer (the cron is the consumer); we
-// surface the same labels in the account UI. Departments are the six
-// Salvadoran coastal / lake departments where Pulpo has continuous
-// listing coverage. Anything else gets a "request a region" CTA in
-// a future PR — out of scope here.
-const NEWSLETTER_DEPARTMENT_KEYS = [
-  "La Libertad",
-  "La Paz",
-  "La Unión",
-  "Usulután",
-  "Sonsonate",
-  "Santa Ana",
-];
-
 const NEWSLETTER_PRICE_BANDS = [
   { key: "none",    max: null,    label_en: "No cap",     label_es: "Sin tope"   },
   { key: "50k",     max:  50_000, label_en: "Under $50k", label_es: "Hasta $50k" },
@@ -1039,13 +1026,18 @@ const NEWSLETTER_PRICE_BANDS = [
 // which expects a complete object shape.
 function NewsletterFilterChips({ app }) {
   const pref = readNewsletterPreference(app.user);
-  const selectedDepts   = Array.isArray(pref.departments)    ? pref.departments    : [];
+  const selectedZones   = Array.isArray(pref.zones)          ? pref.zones          : [];
   const selectedTypes   = Array.isArray(pref.property_types) ? pref.property_types : [];
   const selectedMax     = pref.max_price_usd ?? null;
   const selectedLocale  = NEWSLETTER_LOCALES.includes(pref.locale) ? pref.locale : "en";
 
   const write = (patch) => {
     const next = { ...pref, ...patch };
+    // Drop the deprecated `departments` field on any write so a user's
+    // first save migrates them off the old vocabulary. The pipeline
+    // (automation/newsletter/subscribers.py) reads `zones` as primary;
+    // `departments` was its predecessor.
+    delete next.departments;
     // Strip null/empty fields so the stored blob stays compact and the
     // server validator's "no opinion" path (missing key) is preferred
     // over an explicit null we'd have to defend.
@@ -1058,17 +1050,14 @@ function NewsletterFilterChips({ app }) {
     app.updateUserProfile({ newsletter: cleaned });
     track("account.newsletter_pref_changed", {
       changed_keys: Object.keys(patch),
-      departments_count: (cleaned.departments || []).length,
+      zones_count: (cleaned.zones || []).length,
       property_types_count: (cleaned.property_types || []).length,
       has_max_price: cleaned.max_price_usd != null,
     });
   };
 
-  const toggleDept = (d) => {
-    const next = selectedDepts.includes(d)
-      ? selectedDepts.filter((x) => x !== d)
-      : [...selectedDepts, d];
-    write({ departments: next });
+  const handleZonesChange = (nextSet) => {
+    write({ zones: [...nextSet] });
   };
 
   const toggleType = (typ) => {
@@ -1092,27 +1081,15 @@ function NewsletterFilterChips({ app }) {
       </p>
 
       <div className="account-subhead-mini">
-        {t("account.notif.newsletter_filter.departments", app.locale)}
+        {t("account.notif.newsletter_filter.locations", app.locale)}
       </div>
-      <div className="chip-grid notif-categories-grid" role="group"
-           data-chip-group="newsletter-departments"
-           aria-label={t("account.notif.newsletter_filter.departments", app.locale)}>
-        {NEWSLETTER_DEPARTMENT_KEYS.map((d) => {
-          const isSelected = selectedDepts.includes(d);
-          return (
-            <button
-              key={d}
-              type="button"
-              role="switch"
-              aria-checked={isSelected}
-              className={`chip ${isSelected ? "is-active" : ""}`}
-              onClick={() => toggleDept(d)}
-            >
-              {d}
-            </button>
-          );
-        })}
-      </div>
+      <LocationFilter
+        selected={new Set(selectedZones)}
+        onChange={handleZonesChange}
+        locale={app.locale}
+        helpText={t("account.notif.newsletter_filter.locations_help", app.locale)}
+      />
+
 
       <div className="account-subhead-mini">
         {t("account.notif.newsletter_filter.property_types", app.locale)}
