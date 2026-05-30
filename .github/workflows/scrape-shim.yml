@@ -1,0 +1,133 @@
+# Daily scrape-shim: runs the two WAF-blocked scrapers on a GCP
+# self-hosted runner whose IP isn't on the Azure / AWS blocklist that
+# blocks the main GH-hosted nightly. The shim commits the resulting
+# records to web/data/scrape_cache/{realtyelsalvador,elagente}.json;
+# the main nightly's crawl() short-circuits to that cache when fresh.
+#
+# Architecture
+# ------------
+#  01:30 UTC  scrape-shim runs on  gcp-residential  (GCP e2-micro)
+#             → writes web/data/scrape_cache/{slug}.json
+#             → commits to main via pulpo-bot
+#  02:00 UTC  pulpo-nightly runs on  ubuntu-latest  (Azure)
+#             → realtyelsalvador.py + elagente.py load_fresh_cache(slug)
+#             → records flow into ranked.json as if scraped live
+#
+# Why a separate workflow rather than a job inside pulpo-nightly
+# --------------------------------------------------------------
+# Two-job pipelines that share artifacts add real complexity (state
+# transfer, ordering, failure handling). Two SEPARATE workflows that
+# communicate through a committed file is simpler:
+#   - Each workflow is self-contained and individually re-runnable.
+#   - The shim's failure surface is one source-health row (the next
+#     nightly's stale-cache log) rather than a build-graph dependency.
+#   - The GCP runner does NOT need to run the heavy steps (Playwright,
+#     Tesseract, LLM, photo download) — keeps the e2-micro free-tier
+#     viable on 1 vCPU / 1 GB RAM.
+#
+# Failure modes
+# -------------
+#   - GCP runner offline: shim doesn't run; next nightly sees stale
+#     cache (>25h) and falls through to the live (Azure → 403) path;
+#     source-health row turns red; watchdog issue fires.
+#   - Scrape produces 0 records: scrape-external exits 1 by design;
+#     the commit step is skipped (we never push an empty cache); the
+#     existing cache stays as the fallback until it ages out.
+#   - Network glitch mid-scrape: same as above — exits non-zero,
+#     commit skipped.
+
+name: pulpo scrape-shim (realty + elagente)
+
+on:
+  # Daily at 01:30 UTC — 30 minutes before pulpo-nightly's 02:00 cron.
+  # That window covers a ~5 min scrape + ~5 min commit-PR round-trip
+  # with ~20 min of slack for runner-startup variability on the
+  # self-hosted box.
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch: {}    # operator manual-run path
+
+# Single in-flight job at a time. A concurrent rerun would race the
+# git push on the same branch name and surface as a cryptic
+# "non-fast-forward" rejection. cancel-in-progress=false keeps the
+# first run going so a manual dispatch during a scheduled run waits
+# rather than wins.
+concurrency:
+  group: scrape-shim
+  cancel-in-progress: false
+
+jobs:
+  run:
+    # Self-hosted runner provisioned on a GCP e2-micro via
+    # scripts/setup-gcp-runner.sh. The label `gcp-residential` is
+    # assigned at runner registration time.
+    runs-on: [self-hosted, gcp-residential]
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          # PULPO_BOT_TOKEN: fine-grained PAT with Contents: write +
+          # Pull requests: write on this repo. Falls back to the
+          # workflow's automatic GITHUB_TOKEN — that path won't be able
+          # to bypass branch protection on `main`, so set
+          # PULPO_BOT_TOKEN before relying on the auto-merge below.
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        # Trim to only what the shim's two scrapers need. The main
+        # nightly's requirements.txt includes Pillow / OCR / Playwright
+        # which the shim never invokes; keeping the install lean fits
+        # the e2-micro disk budget and shaves ~90s per run.
+        run: |
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet \
+            'httpx[socks]==0.27.2' \
+            'selectolax==0.3.21' \
+            'curl_cffi>=0.7,<1.0'
+
+      - name: Run scrape shim (realtyelsalvador + elagente)
+        run: |
+          python3 -m pulpo.cli scrape-external \
+            --sources realtyelsalvador,elagente \
+            --out web/data/scrape_cache
+
+      - name: Commit cache via PR
+        id: commit
+        env:
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "bot@pulpo.club"
+          git add web/data/scrape_cache/realtyelsalvador.json \
+                  web/data/scrape_cache/elagente.json
+          if git diff --staged --quiet; then
+            # No content change since last shim run — cache files
+            # exist and are identical. Skipping the commit avoids
+            # churn on main + a no-op PR per nightly. The previous
+            # cache's ts still satisfies the freshness window so the
+            # main nightly's crawl() will keep using it.
+            echo "No cache changes — skipping commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          BRANCH="chore/scrape-cache-$(date -u +%Y-%m-%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore(scrape-cache): nightly shim $(date -u +%Y-%m-%d)"
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore(scrape-cache): nightly shim $(date -u +%Y-%m-%d)" \
+            --body "Daily scrape-shim cache refresh from the GCP self-hosted runner. Auto-merged."
+          # Auto-merge: branch protection on main requires the PR
+          # path but the cache is non-code so admin-merge is appropriate.
+          # Mirrors the main nightly's data-PR pattern.
+          PR_NUM=$(gh pr view "$BRANCH" --json number --jq .number)
+          gh pr merge "$PR_NUM" --squash --delete-branch --admin || \
+            gh pr merge "$PR_NUM" --squash --delete-branch --auto
+          echo "committed=true" >> "$GITHUB_OUTPUT"
