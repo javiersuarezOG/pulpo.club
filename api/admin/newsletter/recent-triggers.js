@@ -1,6 +1,6 @@
 // GET /api/admin/newsletter/recent-triggers
 //
-// Returns the last 20 admin.newsletter_test_triggered events the
+// Returns the last 20 `admin.newsletter_test_triggered` events the
 // matching POST endpoint (./trigger-preview.js) fired. Powers the
 // "Recent test sends" log in the /admin/newsletter widget so every
 // operator on any device sees the same history.
