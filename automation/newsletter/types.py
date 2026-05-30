@@ -293,3 +293,32 @@ class Issue:
     # missing from ranked.json are silently skipped, not surfaced
     # as off-market.
     favorites: list[FavoriteUpdate] = field(default_factory=list)
+    # ── v4.0 — Weekly News Spotlight ──────────────────────────────────
+    # The single regional-news editorial story for this issue. Sourced
+    # from `llm_news.pick_and_summarize` against a whitelist of El
+    # Salvador outlets (`news_search.WHITELIST`) ranked by relevance to
+    # a coastal-property buyer. None → renderer falls back to the
+    # deterministic "What we're watching on the coast" copy. Never
+    # fabricates a citation — only populated when the LLM picked an
+    # actual article from the whitelist.
+    news_spotlight: Optional["NewsSpotlight"] = None
+
+
+@dataclass
+class NewsSpotlight:
+    """One curated regional-news story for an issue's Weekly News Spotlight.
+
+    Populated by `automation.newsletter.llm_news.pick_and_summarize`
+    each Sunday before the Monday send. The renderer cites
+    `source_name` linking to `source_url` (the SPECIFIC article URL,
+    not the outlet homepage) so readers can audit the source.
+    """
+
+    title: str                                   # H2 headline ≤ 12 words
+    paragraph: str                               # ≤ 80 word editorial body
+    source_name: str                             # "El Diario de Hoy" / "La Prensa Gráfica" / …
+    source_url: str                              # the specific article URL (https://…)
+    source_date: str                             # "28 May 2026" / "28 may 2026"
+    # Lineage — useful in telemetry + post-mortems.
+    candidates_seen: int = 0                     # how many articles the picker considered
+    llm_cost_usd: float = 0.0                    # DeepSeek bill for the pick+summarize call

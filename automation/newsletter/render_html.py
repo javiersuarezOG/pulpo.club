@@ -1582,11 +1582,18 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
 
     spot = getattr(issue, "news_spotlight", None)
     if spot:
-        title = spot.get("title") or ""
-        paragraph = spot.get("paragraph") or ""
-        source_name = spot.get("source_name") or ""
-        source_url = spot.get("source_url") or ""
-        source_date = spot.get("source_date") or ""
+        # Accept either the `NewsSpotlight` dataclass or a plain dict —
+        # keeps the renderer testable without a build_issue round-trip.
+        def _g(key: str) -> str:
+            val = getattr(spot, key, None)
+            if val is None and isinstance(spot, dict):
+                val = spot.get(key)
+            return val or ""
+        title = _g("title")
+        paragraph = _g("paragraph")
+        source_name = _g("source_name")
+        source_url = _g("source_url")
+        source_date = _g("source_date")
     else:
         # Deterministic fallback — generic editorial frame keyed off the
         # issue's recipient filter. Honest, sources-free since no LLM
