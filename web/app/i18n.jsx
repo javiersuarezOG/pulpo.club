@@ -533,7 +533,8 @@ const UI_STRINGS = {
   // Filter / browse
   "filter.title":            { en: "Filters",             es: "Filtros" },
   "filter.clear":            { en: "Clear all",           es: "Limpiar todo" },
-  "filter.zone":             { en: "Zone",                es: "Zona" },
+  "filter.zone":             { en: "Location",            es: "Ubicación" },
+  "filter.zone.more_places": { en: "More places",         es: "Otros lugares" },
   "filter.price":            { en: "Price",               es: "Precio" },
   // Filter values cover residential / commercial / tourist / mixed /
   // raw — broad use categories, not strictly plots-of-land
@@ -1067,8 +1068,11 @@ const UI_STRINGS = {
   "account.notif.newsletter_filter.intro":
     { en: "Pulpo will scan the next 14 days against this filter and ship the ten that match. Leave a row unselected to keep that axis open.",
       es: "Pulpo revisará los próximos 14 días contra este filtro y enviará las diez que coincidan. Deja una fila sin seleccionar para mantener ese eje abierto." },
-  "account.notif.newsletter_filter.departments":
-    { en: "Departments",                                  es: "Departamentos" },
+  "account.notif.newsletter_filter.locations":
+    { en: "Locations to follow",                          es: "Ubicaciones a seguir" },
+  "account.notif.newsletter_filter.locations_help":
+    { en: "Tap a zone to follow every place in it, or pick individual spots.",
+      es: "Toca una zona para seguir todos sus lugares, o elige sitios individuales." },
   "account.notif.newsletter_filter.property_types":
     { en: "Property type",                                es: "Tipo de propiedad" },
   "account.notif.newsletter_filter.price_band":

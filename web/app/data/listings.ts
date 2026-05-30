@@ -73,6 +73,9 @@ const ZONE_NAMES: Record<string, string> = {
   "puerto-la-libertad": "Puerto La Libertad",
   "la-libertad": "La Libertad",
   "la-union": "La Unión",
+  "lago-coatepeque": "Lago de Coatepeque",
+  "lago-ilopango": "Lago de Ilopango",
+  "costa-del-sol": "Costa del Sol",
 };
 
 function pretty(slug: string | null | undefined, lookup: Record<string, string>): string {

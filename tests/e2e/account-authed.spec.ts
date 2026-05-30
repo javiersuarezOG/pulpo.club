@@ -133,6 +133,35 @@ test.describe("Account area (Clerk-on, real session)", () => {
       const wasActiveAfter = (await chipNow.getAttribute("aria-checked")) === "true";
       expect(wasActiveAfter).not.toBe(wasActiveBefore);
 
+      // ─── Newsletter location filter (Surf City + lakes) ─────────
+      // Tap the Surf City 1 super-zone row: it should select every
+      // child zone in one tap. Reload, confirm the parent renders
+      // as "all" (aria-pressed=true), and confirm publicMetadata
+      // carries the expanded `newsletter.zones` array.
+      const sc1Parent = page.locator(".location-zone-parent")
+        .filter({ hasText: /Surf City 1/ })
+        .first();
+      await sc1Parent.waitFor({ state: "visible" });
+      await sc1Parent.click();
+      await page.waitForTimeout(500);
+      await page.reload();
+      const sc1ParentAfter = page.locator(".location-zone-parent")
+        .filter({ hasText: /Surf City 1/ })
+        .first();
+      await expect(sc1ParentAfter).toHaveAttribute("aria-pressed", "true");
+      const newsletterMeta = await readUser(env, snap.userId);
+      const newsletterProfile = (newsletterMeta.publicMetadata as Record<string, unknown>)
+        ?.profile as Record<string, unknown> | undefined;
+      const newsletter = newsletterProfile?.newsletter as Record<string, unknown> | undefined;
+      const zones = newsletter?.zones as string[] | undefined;
+      expect(Array.isArray(zones)).toBe(true);
+      // SC1's six known children — exact list lives in the country
+      // manifest at pulpo/countries/sv.json:super_zones.
+      expect(zones).toContain("El Tunco");
+      expect(zones).toContain("El Sunzal");
+      // And no stray legacy `departments` key left in the blob.
+      expect(newsletter && "departments" in newsletter).toBe(false);
+
       // ─── Security ──────────────────────────────────────────────
       await page.goto("/account/security");
       await page.getByRole("button", { name: /Manage|Administrar/i }).first().click();
