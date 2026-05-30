@@ -48,6 +48,20 @@ const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
 const DEFAULT_REF = "main";
 const WORKFLOW_FILE = "pulpo-newsletter.yml";
 
+// Closed set of newsletter IDs the widget registry can dispatch.
+// Anything outside this list is rejected with `invalid_newsletter_id`
+// so a typo / forged client can't quietly route a Pro · Weekly test
+// through a "free-weekly" identity, polluting the audit trail.
+// Coming-soon entries live here too — once their endpoints ship the
+// widget will enable the cards and pick them up automatically.
+const KNOWN_NEWSLETTER_IDS = new Set([
+  "pro-weekly",
+  "pro-welcome",     // coming soon — kept in the allowlist so the
+  "free-welcome",    // future trigger doesn't need an API redeploy.
+  "free-weekly",
+]);
+const DEFAULT_NEWSLETTER_ID = "pro-weekly";
+
 // Fire a PostHog event so /api/admin/newsletter/recent-triggers can
 // read the cross-device + cross-operator audit log back via HogQL.
 // Best-effort + never blocks the response — the GitHub dispatch is the
@@ -59,7 +73,7 @@ const WORKFLOW_FILE = "pulpo-newsletter.yml";
 // triggered. The widget passes it in the request body; the endpoint
 // is intentionally auth-light (worst-case the property is spoofed to
 // somebody else's name — not a real attack vector).
-async function emitTriggerEvent({ to, locale, by, issueNumber, result, detail }) {
+async function emitTriggerEvent({ to, locale, by, issueNumber, newsletterId, result, detail }) {
   try {
     posthog.capture(
       posthog.emailDistinctId(by || to),
@@ -69,6 +83,7 @@ async function emitTriggerEvent({ to, locale, by, issueNumber, result, detail })
         locale,
         by: by || null,
         issue_number: issueNumber,
+        newsletter_id: newsletterId,     // "pro-weekly" / "pro-welcome" / …
         result,                          // "ok" | "error"
         detail: detail || null,          // populated on failure
         dispatched_at: new Date().toISOString(),
@@ -129,6 +144,21 @@ module.exports = async (req, res) => {
   const by = typeof body.by === "string" && EMAIL_RE.test(body.by.trim().toLowerCase())
     ? body.by.trim().toLowerCase()
     : null;
+
+  // Optional newsletter_id — closed allow-list. Defaults to "pro-weekly"
+  // for back-compat with the pre-registry trigger payload. Routes the
+  // PostHog event so the cross-device log can filter / slice per type.
+  let newsletterId = DEFAULT_NEWSLETTER_ID;
+  if (body.newsletter_id !== undefined && body.newsletter_id !== null) {
+    const v = String(body.newsletter_id);
+    if (!KNOWN_NEWSLETTER_IDS.has(v)) {
+      return res.status(400).json({
+        error: "invalid_newsletter_id",
+        hint: `newsletter_id must be one of: ${[...KNOWN_NEWSLETTER_IDS].join(", ")}.`,
+      });
+    }
+    newsletterId = v;
+  }
 
   // Validate the optional issue_number — must be a positive integer in
   // a sane range. The default ("1") matches the workflow's pre-existing
@@ -199,7 +229,7 @@ module.exports = async (req, res) => {
       error: (err && err.message) || "(no message)",
     });
     await emitTriggerEvent({
-      to: email, locale, by, issueNumber: issueNumberStr,
+      to: email, locale, by, issueNumber: issueNumberStr, newsletterId,
       result: "error",
       detail: `github_dispatch_failed: ${(err && err.message) || "(no message)"}`,
     });
@@ -215,7 +245,7 @@ module.exports = async (req, res) => {
       status: gh.status, ms: Date.now() - t0, reason: "github_non_204",
     });
     await emitTriggerEvent({
-      to: email, locale, by, issueNumber: issueNumberStr,
+      to: email, locale, by, issueNumber: issueNumberStr, newsletterId,
       result: "error",
       detail: `github_status_${gh.status}: ${detail.slice(0, 200)}`,
     });
@@ -229,10 +259,11 @@ module.exports = async (req, res) => {
   logApi("admin.newsletter_trigger_preview", {
     status: 202, ms: Date.now() - t0,
     repo, ref, locale, email_domain: email.split("@")[1] || "",
+    newsletter_id: newsletterId,
   });
 
   await emitTriggerEvent({
-    to: email, locale, by, issueNumber: issueNumberStr,
+    to: email, locale, by, issueNumber: issueNumberStr, newsletterId,
     result: "ok",
   });
 
