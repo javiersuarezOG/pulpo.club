@@ -1,0 +1,247 @@
+// POST /api/admin/newsletter/trigger-audience-send
+//
+// Body: { confirm: "SEND", issue_number?: number, by?: string }
+//
+// Triggers a LIVE audience send — every Pro/Agency subscriber in the
+// Resend audience receives Issue <issue_number> in their inbox. This is
+// the "Send to everyone" button in the admin widget; the operator
+// preview button uses trigger-preview.js instead.
+//
+// Guardrails (in this order, fail-fast):
+//
+//   1. Method must be POST.
+//   2. Rate limit: 1 send per IP per hour. A double-click can't fire
+//      two real sends. The window matches the operator's expected
+//      cadence (weekly + hot-fix room).
+//   3. `confirm` body field must be the literal string "SEND" — the
+//      modal's type-to-confirm input is mirrored server-side so a
+//      forged client can't skip the gate.
+//   4. issue_number is required and validated (positive int ≤ 9999).
+//   5. GITHUB_DISPATCH_TOKEN must be present (else 503).
+//
+// On success: dispatches the pulpo-newsletter workflow with
+// `send_mode=yes`, `issue_number=<N>`. Fires a PostHog audit event
+// `admin.newsletter_audience_send_triggered` carrying who, when, and
+// how many. Returns { run_url_hint, dispatched_at } so the UI can
+// link the operator to the workflow run.
+//
+// Auth: deliberately none beyond rate-limiting + the SEND gate. The
+// real security perimeter is the GITHUB_DISPATCH_TOKEN (fine-grained,
+// scoped `actions:write` on this repo). An attacker who bypasses the
+// rate limit + types SEND can at worst trigger one extra audience
+// send per hour — bad, but bounded. If that turns out to matter, add
+// an admin bearer-token check here (the PULPO_ADMIN_DEBUG_TOKEN
+// pattern from earlier preview-endpoint versions).
+
+const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
+const posthog = require("../../_posthog");
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
+const DEFAULT_REF = "main";
+const WORKFLOW_FILE = "pulpo-newsletter.yml";
+const REQUIRED_CONFIRM_STRING = "SEND";
+
+const limiter = makeRateLimiter({
+  windowMs: 60 * 60 * 1000,                       // 1 hour
+  maxAttempts: 1,                                 // one send per hour per IP
+  name: "admin_newsletter_audience_send",
+});
+
+function logApi(fields) {
+  const parts = ["[api]", "admin_newsletter_audience_send"];
+  for (const [k, v] of Object.entries(fields)) parts.push(`${k}=${v}`);
+  console.log(parts.join(" "));
+}
+
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
+  try {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+    const raw = Buffer.concat(chunks).toString("utf8");
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+async function emitAuditEvent({ by, issueNumber, result, detail, audienceCount }) {
+  // Fire-and-forget audit trail. Never blocks the dispatch response.
+  // PostHog dashboard can roll up
+  // `admin.newsletter_audience_send_triggered` to answer "who sent
+  // what, when" without crawling GitHub Actions UI.
+  try {
+    posthog.capture(
+      posthog.emailDistinctId(by || "anonymous"),
+      "admin.newsletter_audience_send_triggered",
+      {
+        by: by || null,
+        issue_number: issueNumber,
+        result,                                   // "ok" | "error"
+        detail: detail || null,                   // populated on failure
+        audience_count: audienceCount,            // null when not provided
+        dispatched_at: new Date().toISOString(),
+      },
+    );
+    await posthog.flush();
+  } catch {
+    /* never let telemetry block the dispatch response */
+  }
+}
+
+module.exports = async (req, res) => {
+  const t0 = Date.now();
+
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
+    return res.status(405).json({ error: "method_not_allowed" });
+  }
+
+  // Rate limit FIRST so the type-to-confirm gate doesn't get a free
+  // pass to retry forever. 429 carries Retry-After so the UI can
+  // surface the cooldown.
+  const ip = ipFromRequest(req);
+  const rl = limiter.hit(ip);
+  if (!rl.allowed) {
+    logApi({
+      status: 429, ms: Date.now() - t0, reason: "rate_limited",
+      retry_after_s: Math.ceil(rl.retryAfterMs / 1000),
+    });
+    return send429(res, rl, "admin_newsletter_audience_send");
+  }
+
+  const body = await readJsonBody(req);
+
+  // The literal "SEND" gate. Mirrors the modal's text input — a
+  // forged or scripted POST that skips the input must still send this
+  // exact string. Case-sensitive on purpose.
+  const confirm = typeof body.confirm === "string" ? body.confirm : "";
+  if (confirm !== REQUIRED_CONFIRM_STRING) {
+    logApi({ status: 400, ms: Date.now() - t0, reason: "confirm_missing" });
+    return res.status(400).json({
+      error: "confirm_required",
+      hint: `body.confirm must be the literal string "${REQUIRED_CONFIRM_STRING}".`,
+    });
+  }
+
+  // issue_number is REQUIRED for audience sends. Default-1 would let a
+  // misfire send last issue's content; force the operator to pass it.
+  if (body.issue_number === undefined || body.issue_number === null) {
+    logApi({ status: 400, ms: Date.now() - t0, reason: "issue_number_missing" });
+    return res.status(400).json({
+      error: "issue_number_required",
+      hint: "issue_number is required for audience sends.",
+    });
+  }
+  const issueNum = Number(body.issue_number);
+  if (!Number.isInteger(issueNum) || issueNum < 1 || issueNum > 9999) {
+    logApi({ status: 400, ms: Date.now() - t0, reason: "issue_number_invalid" });
+    return res.status(400).json({
+      error: "invalid_issue_number",
+      hint: "issue_number must be a positive integer ≤ 9999.",
+    });
+  }
+  const issueNumberStr = String(issueNum);
+
+  // Optional `by` — operator email for the audit log. Same shape as
+  // trigger-preview.js.
+  const by = typeof body.by === "string" && EMAIL_RE.test(body.by.trim().toLowerCase())
+    ? body.by.trim().toLowerCase()
+    : null;
+
+  // Optional audience_count carried from the modal's prior /audience-
+  // count call. Stamped onto the audit event so the dashboard shows
+  // what the operator THOUGHT they were sending to vs what actually
+  // landed (the workflow logs the actual recipient count).
+  const audienceCount = Number.isInteger(body.audience_count) ? body.audience_count : null;
+
+  const token = process.env.GITHUB_DISPATCH_TOKEN || "";
+  if (!token) {
+    logApi({ status: 503, ms: Date.now() - t0, reason: "github_token_missing" });
+    return res.status(503).json({
+      error: "github_dispatch_not_configured",
+      hint: "Set GITHUB_DISPATCH_TOKEN in Vercel env (fine-grained PAT, actions:write on this repo).",
+    });
+  }
+
+  const repo = process.env.GITHUB_DISPATCH_REPO || DEFAULT_REPO;
+  const ref = process.env.GITHUB_DISPATCH_REF || DEFAULT_REF;
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
+
+  let gh;
+  try {
+    gh = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "pulpo-admin-newsletter-audience-send",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ref,
+        inputs: {
+          issue_number: issueNumberStr,
+          send_mode: "yes",
+        },
+      }),
+    });
+  } catch (err) {
+    logApi({
+      status: 502, ms: Date.now() - t0, reason: "github_fetch_failed",
+      error: (err && err.message) || "(no message)",
+    });
+    await emitAuditEvent({
+      by, issueNumber: issueNumberStr, audienceCount,
+      result: "error",
+      detail: `github_dispatch_failed: ${(err && err.message) || "(no message)"}`,
+    });
+    return res.status(502).json({ error: "github_dispatch_failed" });
+  }
+
+  if (!gh.ok) {
+    const text = await gh.text().catch(() => "(no body)");
+    logApi({
+      status: gh.status, ms: Date.now() - t0, reason: "github_dispatch_non_ok",
+      body_snippet: text.slice(0, 200),
+    });
+    await emitAuditEvent({
+      by, issueNumber: issueNumberStr, audienceCount,
+      result: "error",
+      detail: `github ${gh.status}: ${text.slice(0, 200)}`,
+    });
+    return res.status(502).json({
+      error: "github_dispatch_rejected",
+      status: gh.status,
+    });
+  }
+
+  // GitHub Actions dispatches don't return the new run ID synchronously
+  // — the workflow shows up at the runs list a few seconds later. We
+  // return a hint pointing at the workflow's runs page so the UI can
+  // open it and the operator can find their run (always the most
+  // recent workflow_dispatch entry).
+  const runsUrlHint = `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE.replace(".yml", "")}`;
+
+  logApi({
+    status: 200, ms: Date.now() - t0, op: "dispatch", issue: issueNumberStr,
+    audience: audienceCount, by: by || "anon",
+  });
+
+  await emitAuditEvent({
+    by, issueNumber: issueNumberStr, audienceCount,
+    result: "ok", detail: null,
+  });
+
+  return res.status(200).json({
+    ok: true,
+    issue_number: issueNum,
+    audience_count: audienceCount,
+    dispatched_at: new Date().toISOString(),
+    runs_url_hint: runsUrlHint,
+  });
+};

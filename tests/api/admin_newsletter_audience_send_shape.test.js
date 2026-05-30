@@ -1,0 +1,112 @@
+// Shape regression for the two new admin newsletter endpoints:
+//
+//   api/admin/newsletter/audience-count.js
+//   api/admin/newsletter/trigger-audience-send.js
+//
+// Both are auth-light per repo convention; the real security perimeter
+// is GITHUB_DISPATCH_TOKEN + rate limits + (for the send endpoint) the
+// SEND type-to-confirm gate. This file is the cheap reliable insurance
+// that a refactor doesn't silently drop one of those gates.
+//
+// True behavioural coverage of the dispatch flow lives at the e2e
+// admin widget click test (when it lands). This file mirrors the
+// existing pattern at tests/api/saves_storage_shape.test.js +
+// tests/api/update_profile_allowlist.test.js.
+
+import { describe, expect, it } from "vitest";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+const COUNT_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/audience-count.js",
+);
+const SEND_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-audience-send.js",
+);
+
+const countSrc = fs.readFileSync(COUNT_HANDLER, "utf8");
+const sendSrc = fs.readFileSync(SEND_HANDLER, "utf8");
+
+describe("api/admin/newsletter/audience-count", () => {
+  it("is GET-only", () => {
+    expect(countSrc).toMatch(/req\.method !== "GET"/);
+    expect(countSrc).toMatch(/method_not_allowed/);
+  });
+
+  it("intersects Resend audience with Clerk Pro/Agency users", () => {
+    expect(countSrc).toMatch(/listResendAudienceEmails/);
+    expect(countSrc).toMatch(/listClerkProEmails/);
+    expect(countSrc).toMatch(/plan !== "pro" && plan !== "agency"/);
+    expect(countSrc).toMatch(/resendEmails\.has\(email\)/);
+  });
+
+  it("excludes unsubscribed Resend contacts", () => {
+    expect(countSrc).toMatch(/if \(r\.unsubscribed\) continue/);
+  });
+
+  it("rate-limits per IP at 30/min", () => {
+    expect(countSrc).toMatch(/makeRateLimiter/);
+    expect(countSrc).toMatch(/windowMs:\s*60_000/);
+    expect(countSrc).toMatch(/maxAttempts:\s*30/);
+  });
+
+  it("returns count + diagnostic totals + computed_at", () => {
+    expect(countSrc).toMatch(/count,/);
+    expect(countSrc).toMatch(/resend_total/);
+    expect(countSrc).toMatch(/clerk_pro_total/);
+    expect(countSrc).toMatch(/computed_at/);
+  });
+
+  it("degrades to empty when secrets are missing (silent no-op)", () => {
+    // Resend env vars
+    expect(countSrc).toMatch(/if \(!RESEND_API_KEY \|\| !RESEND_AUDIENCE_ID\) return \[\]/);
+    // Clerk env var
+    expect(countSrc).toMatch(/if \(!CLERK_SECRET_KEY\) return new Set\(\)/);
+  });
+});
+
+describe("api/admin/newsletter/trigger-audience-send", () => {
+  it("is POST-only", () => {
+    expect(sendSrc).toMatch(/req\.method !== "POST"/);
+    expect(sendSrc).toMatch(/method_not_allowed/);
+  });
+
+  it("rate-limits to 1 send per IP per hour", () => {
+    expect(sendSrc).toMatch(/makeRateLimiter/);
+    expect(sendSrc).toMatch(/windowMs:\s*60\s*\*\s*60\s*\*\s*1000/);
+    expect(sendSrc).toMatch(/maxAttempts:\s*1/);
+  });
+
+  it("requires the literal SEND confirm string (server-side mirror of the modal gate)", () => {
+    expect(sendSrc).toMatch(/REQUIRED_CONFIRM_STRING\s*=\s*"SEND"/);
+    expect(sendSrc).toMatch(/confirm !== REQUIRED_CONFIRM_STRING/);
+    expect(sendSrc).toMatch(/confirm_required/);
+  });
+
+  it("requires issue_number (no default)", () => {
+    expect(sendSrc).toMatch(/issue_number_required/);
+    expect(sendSrc).toMatch(/body\.issue_number === undefined \|\| body\.issue_number === null/);
+  });
+
+  it("dispatches the workflow with send_mode=yes", () => {
+    expect(sendSrc).toMatch(/send_mode:\s*"yes"/);
+    expect(sendSrc).toMatch(/WORKFLOW_FILE\s*=\s*"pulpo-newsletter\.yml"/);
+  });
+
+  it("fires PostHog audit event with operator + result + audience_count", () => {
+    expect(sendSrc).toMatch(/admin\.newsletter_audience_send_triggered/);
+    expect(sendSrc).toMatch(/emitAuditEvent/);
+    expect(sendSrc).toMatch(/audience_count: audienceCount/);
+  });
+
+  it("returns 503 when GITHUB_DISPATCH_TOKEN is missing", () => {
+    expect(sendSrc).toMatch(/GITHUB_DISPATCH_TOKEN/);
+    expect(sendSrc).toMatch(/github_dispatch_not_configured/);
+  });
+
+  it("emits audit event on failure paths too (not just success)", () => {
+    // Three failure exits all hit emitAuditEvent before returning
+    const auditCalls = (sendSrc.match(/await emitAuditEvent\(/g) || []).length;
+    expect(auditCalls).toBeGreaterThanOrEqual(3);
+  });
+});
