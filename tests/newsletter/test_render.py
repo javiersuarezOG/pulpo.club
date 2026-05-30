@@ -64,8 +64,11 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
 def test_render_free_prefs_shows_paywall(free_with_prefs, ranked_pool):
     html = _render(free_with_prefs, ranked_pool)
     assert '<div class="paywall-banner">' in html
-    # v2.2: paywalled rich-pick CTA carries the price anchor
-    assert "Unlock this pick — $9.99/mo →" in html
+    # v4: per-pick locked CTA was dropped — the paywall banner one row up
+    # carries the price-anchored upsell instead. The banner's CTA text
+    # comes from `paywall.cta` ("Go Pro — $9.99/month →") and links to
+    # the same Stripe checkout endpoint.
+    assert "Go Pro — $9.99/month →" in html
     assert "stripe/start-checkout" in html
 
 
@@ -181,16 +184,16 @@ def test_render_v3_drops_at_a_glance_table(pro_with_prefs, ranked_pool):
     """v3 dropped the `<table class="glance">` numbered list.
 
     The welcome teaser already names #01-#03 inline; the per-pick + the
-    shortlist sections cover the rest. The table was the most visible
-    `<table>` left in the document and the user called out "no tables"
-    in the 2026-05-29 review of the v2.8 send. The "Skip this one"
-    block survives as its own editorial section."""
+    section-intro blocks cover the rest. v4 (2026-05-30) ALSO dropped
+    the "Skip this one" editorial block — it was deemed noise in the
+    redesign review. The remaining content is in the locked card grid
+    plus the editorial Weekly News Spotlight."""
     html = _render(pro_with_prefs, ranked_pool)
     assert "At a glance" not in html
     assert 'class="glance"' not in html
-    # Skip block lives outside the (gone) glance table — survives as its
-    # own editorial section.
-    assert "Skip this one" in html
+    # v4 — the skip-block is gone for good.
+    assert "Skip this one" not in html
+    assert 'class="eyebrow clay"' not in html  # skip-block's clay eyebrow
 
 
 def test_render_keytable_does_not_double_up_keys(pro_with_prefs, ranked_pool):
@@ -222,70 +225,70 @@ def test_render_carries_template_version_meta(pro_with_prefs, ranked_pool):
     assert f'<meta name="x-pulpo-template" content="{TEMPLATE_VERSION}"' in html
 
 
-def test_render_v3_redesign_contract(pro_with_prefs, ranked_pool):
-    """v3 renderer contract — the 5 fixes from Sebas's 2026-05-29 review:
+def test_render_v4_redesign_contract(pro_with_prefs, ranked_pool):
+    """v4 renderer contract — what the 2026-05-30 redesign locks in:
 
-      1. Layout flows top-to-bottom, nothing collapses or expands
-         (smoke: every section's heading is present on a single render).
-      2. No `<table>` elements past the outer email frame and the
-         opt-in dark "Your Pulpo" rows. The v2.x `<table class="glance">`
-         and the inner shortlist tables are gone.
-      3. Each hero pick renders a "Why we picked it" `<ul>` driven by
-         the why_bullets generator instead of the v2 "Why Pulpo ranked
-         it: value 100 · momentum 50" callout.
-      4. Shortlist copy is the simpler "Each one suits a different
-         kind of buyer" — the v2 "Read the frame first; skip if it
-         isn't yours" copy is banned.
-      5. Market context renders BEFORE the first hero pick (the warm
-         "buyer's fortnight" framing the v2 send buried at the bottom).
+      1. ONE locked card component (`_pick_card_html`) renders every
+         pick (top 3 and 4-10 alike). Only background color + rank
+         pill copy differ. No more rich/short split.
+      2. Section intros sit above each pick block: "Top 3 this week"
+         and "{N} more this week".
+      3. Market context renders BEFORE the first pick and carries the
+         Surf City 1/2 decoder line.
+      4. The "Weekly News Spotlight" block (deterministic fallback
+         in v4, LLM-curated in PR-news) replaces the v3 skip + next-
+         issue blocks.
+      5. Why-bullets card still present on every non-paywalled pick.
     """
     html = _render(pro_with_prefs, ranked_pool)
-    # Fix #2 — only the outer frame `<table>` and the `yp-table`
-    # survive. Both have specific class hooks so we can count exactly.
-    assert html.count('class="glance"') == 0
-    assert html.count('<table class="frame"') == 1
-    assert html.count('<table class="yp-table"') == 1
-    # Fix #3 — at least one hero pick rendered a why-block (data is
-    # rich enough to surface bullets).
+    # Fix #1 — every pick renders via `.pick-card` (the locked component).
+    assert 'class="pick-card"' in html
+    # Fix #2 — section intros land.
+    assert "Top 3 this week" in html
+    # When the shortlist is non-empty (it is for a Pro-with-prefs
+    # fixture) the "{n} more this week" intro renders too.
+    assert "more this week" in html
+    # Fix #3 — market context with decoder line.
+    assert "Market context" in html
+    assert "Surf City 1" in html and "Surf City 2" in html
+    # Fix #4 — Weekly News Spotlight is rendered, skip+next-issue gone.
+    assert "Weekly News Spotlight" in html
+    assert "Skip this one" not in html
+    assert "Next issue" not in html
+    # Fix #5 — why-block still present.
     assert 'class="why-block"' in html
     assert "Why we picked it" in html
-    assert "Why Pulpo ranked it" not in html  # v2 callout label is gone
-    # Fix #4 — new copy in, old copy out.
-    assert "Each one suits a different kind of buyer" in html
-    assert "Read the frame first" not in html
-    # Fix #5 — market-context HTML appears before the first hero pick.
+    # Composition guard: market context must precede the first pick card.
     market_idx = html.find("Market context")
-    pick_idx = html.find('class="pill pill-forest"')  # "TOP PICK · 01" pill
-    if market_idx != -1 and pick_idx != -1:
-        assert market_idx < pick_idx, "market context must render before the first pick"
+    card_idx = html.find('class="pick-card"')
+    assert market_idx != -1 and card_idx != -1
+    assert market_idx < card_idx, "market context must render before the first pick card"
+    # Frame table count guard — only the outer frame + `yp-table` survive
+    # as visible tables (the email-safe action tables on each card are
+    # role="presentation" and aren't selectable by class).
+    assert html.count('<table class="frame"') == 1
+    assert html.count('<table class="yp-table"') == 1
 
 
-def test_render_v24_redesign_contract(pro_with_prefs, ranked_pool):
-    """v2.4 renderer contract — the four visible changes that PR-NL-5
-    locked in, plus the two that survived from v2.2:
-
-    From v2.2 (still true):
-      • Keytable grid replaced by the meta-row strip
-      • Callout left-bar stripe is gone
-
-    From v2.4 / PR-NL-5:
-      • Per-pick CTAs route to pulpo.club/listing/<id>, NOT the external
-        source brokerage URL
-      • Hero picks render both a solid "See on Pulpo →" + a ghost
-        "Save to favorites" CTA (the dual-CTA pair)
+def test_render_card_component_contract(pro_with_prefs, ranked_pool):
+    """v4 locked card component contract — same CTA pair on every pick,
+    pulpo.club routing, no source-brokerage CTAs, paired filled+ghost
+    buttons.
     """
     import re
     html = _render(pro_with_prefs, ranked_pool)
-    # From v2.2: keytable HTML element gone, meta-row present
+    # v3 keytable grid gone — v4 dropped the meta-row strip too. The
+    # locked card now carries: photo + pill row + title + spec strip +
+    # price + why card + filled/ghost CTAs.
     assert '<table class="keytable"' not in html
-    assert 'class="meta-row"' in html
-    # From v2.2: callout left-bar stripe + colored panel are gone
+    # v4 callout/blurb/meta-row stripes are gone — the card body is
+    # photo → title → spec → price → why → CTAs only.
     assert "border-left: 3px solid var(--clay)" not in html
-    # PR-NL-5: CTAs go to pulpo.club, never to the source brokerage
+    # CTAs route to pulpo.club, never to source brokerage.
     assert "pulpo.club/listing/" in html
     assert not re.search(r"View on [a-z0-9.-]+\.[a-z]{2,}", html), (
-        "v2.4 dropped the source-domain CTA; pulpo.club is the canonical CTA target now."
+        "v4 keeps pulpo.club as the canonical CTA target — no source-domain CTAs."
     )
-    # PR-NL-5: both hero CTAs present
+    # Every non-paywalled pick renders the dual CTA pair.
     assert "See on Pulpo →" in html
     assert "Save to favorites" in html

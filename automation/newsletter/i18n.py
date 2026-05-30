@@ -77,9 +77,30 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "pick.why_label":              {"en": "Why we picked it",                              "es": "Por qué la elegimos"},
     # ── Skip ──
     "skip.eyebrow":                {"en": "Skip this one",                                "es": "Esta sí, sáltala"},
-    # ── Market context ──
+    # ── Market context (v4) ──
     "market.eyebrow":              {"en": "Market context",                               "es": "Contexto del mercado"},
-    "market.headline":             {"en": "Worth knowing this week.",                "es": "Vale la pena saber esta semana."},
+    "market.headline":             {"en": "What's moving this week.",                "es": "Qué se está moviendo esta semana."},
+    # Surf City decoder line (italic, sits between H2 and body). Names the
+    # two regional corridors for any reader who isn't fluent in gov-coined
+    # coastal branding. Bold tags survive in italic body via inline color.
+    "market.decoder":              {"en": "<strong style=\"color:#1A1916;\">Surf City 1</strong> = the La Libertad coast (El Tunco → El Sunzal → El Zonte). <strong style=\"color:#1A1916;\">Surf City 2</strong> = the eastern coast from Las Flores to El Cuco. We cover both.",
+                                     "es": "<strong style=\"color:#1A1916;\">Surf City 1</strong> = la costa de La Libertad (El Tunco → El Sunzal → El Zonte). <strong style=\"color:#1A1916;\">Surf City 2</strong> = la costa este de Las Flores a El Cuco. Cubrimos ambas."},
+    # ── v4 section intros (sit above picks 01 + picks 04) ─────────────
+    "section.top3.title":          {"en": "Top 3 this week.",                              "es": "Top 3 esta semana."},
+    "section.top3.body":           {"en": "Three picks, three different fits. One is move-in-ready beachfront — if you want the work already done. One is an underpriced lot with utilities — if you can run the build but don't want to deal with the infrastructure. One is a blank-canvas lot at a fair price — if you want both.",
+                                     "es": "Tres selecciones, tres formas distintas. Una es frente al mar lista para mudarse — si querés el trabajo ya hecho. Una es un lote con bajo precio y servicios — si podés armar la construcción pero no querés lidiar con la infraestructura. Una es un lote en blanco a precio justo — si querés ambas."},
+    "section.rest.title":          {"en": "{n} more this week.",                           "es": "{n} más esta semana."},
+    "section.rest.body":           {"en": "Past the top 3. These each fit a clear segment — Bitcoin Beach move-in, trophy oceanfront, developer-scale lots, mid-range build sites. Skim the \"Why we picked it\" bullets and stop on the one that fits you.",
+                                     "es": "Después del top 3. Cada una calza en un segmento — Bitcoin Beach lista para mudarse, frente al mar trofeo, lotes a escala de desarrollador, sitios de construcción de rango medio. Hojeá los puntos de \"por qué la elegimos\" y parate en la que te calza a vos."},
+    # ── Weekly News Spotlight (v4) ────────────────────────────────────
+    "spotlight.eyebrow":           {"en": "Weekly News Spotlight",                         "es": "Noticia de la semana"},
+    # Deterministic fallback that ships when the LLM news-search pipeline
+    # returns no relevant article (slow news week or pre-pipeline ship).
+    # No fake source citation — the renderer only attaches a citation
+    # line when `issue.news_spotlight` carries a real `source_url`.
+    "spotlight.fallback.title":    {"en": "What we're watching on the coast.",             "es": "Lo que estamos viendo en la costa."},
+    "spotlight.fallback.body":     {"en": "No single headline drove the market this week. Surf City 1 (the La Libertad stretch) remains the most active corridor by listing volume; Surf City 2 (the eastern coast) is quieter. We'll surface a sourced story in next week's edition when one earns it.",
+                                     "es": "Ningún titular en particular movió al mercado esta semana. Surf City 1 (la franja de La Libertad) sigue siendo el corredor más activo por volumen de listados; Surf City 2 (la costa este) está más tranquila. Sacaremos una historia con fuente en la próxima edición cuando se la gane."},
     "one_number.eyebrow":          {"en": "One number worth knowing",                     "es": "Un número que vale la pena saber"},
     # ── Next issue ──
     "next.eyebrow":                {"en": "Next issue",                                   "es": "Próxima edición"},
@@ -97,6 +118,10 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "yp.filter.cta":               {"en": "Edit your filter →",                           "es": "Editar tu filtro →"},
     "yp.browse.label":             {"en": "{n} listings in your filter right now",        "es": "{n} propiedades en tu filtro ahora"},
     "yp.browse.cta":               {"en": "Browse them all →",                            "es": "Explorar todas →"},
+    # Anonymous-cohort-only welcome row (v4 — moved from the dropped
+    # `_next_issue_html` block).
+    "yp.welcome.label":            {"en": "No filter set yet",                            "es": "Aún no configuraste tu filtro"},
+    "yp.welcome.cta":              {"en": "Set your filter →",                            "es": "Configurá tu filtro →"},
     # ── Paywall (free tier) ──
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
     "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},

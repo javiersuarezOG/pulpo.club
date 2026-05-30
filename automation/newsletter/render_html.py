@@ -28,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.3.2-2026-05"
+TEMPLATE_VERSION = "newsletter-v4.0-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -944,7 +944,7 @@ def _favorites_html(issue: Issue) -> str:
             else f"{word} que seguís."
         )
 
-    summary = _favorites_summary(favorites, locale)
+    summary = _favorites_editorial_summary(favorites, locale)
 
     cards = "".join(_favorite_card_html(u, locale) for u in favorites)
 
@@ -969,7 +969,7 @@ def _favorites_html(issue: Issue) -> str:
       <div class="saves-pad">
         <p class="saves-eyebrow">{_e(eyebrow)}</p>
         <h2 class="saves-h2">{_e(headline)}</h2>
-        <p class="saves-summary">{summary}</p>
+        <p class="saves-summary" style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 16px;font-style:italic;max-width:540px;">{summary}</p>
         {cards}
         <p class="saves-footer">{footer_text}</p>
       </div>
@@ -1127,27 +1127,40 @@ def _format_price_compact(amount: float) -> str:
 
 
 def _market_html(issue: Issue) -> str:
+    """v4.0 market context — H2 + small Surf-City decoder + plain-language paragraph.
+
+    Plain layman framing replaces v3's "two segments correcting at the
+    same time means the market is breathing, not bracing". The
+    decoder line names the two regional corridors (Surf City 1 / 2)
+    for any reader who isn't fluent in gov-coined coastal branding.
+    """
     paras = issue.commentary.market_context
     if not paras:
         return ""
     locale = issue.locale
     eb = i18n.t("market.eyebrow", locale)
     hl = i18n.t("market.headline", locale)
-    # The market paragraph(s) may contain <em>...</em> spans plus
-    # `<a href="PICK_URL_N">…</a>` placeholders. Resolve the
-    # placeholders against real picks BEFORE rendering. `_hydrate_pick_urls`
-    # also strips any other <a> tags as a defensive measure against the LLM
-    # inventing URLs. Don't html-escape after hydration — `<em>` and
-    # `<a href>` are part of the trusted output shape.
+    decoder = i18n.t("market.decoder", locale)
+
+    # Hydrate any <a href="PICK_URL_N"> placeholders against real picks.
     para_html_parts: list[str] = []
     for para in paras:
         hydrated = _hydrate_pick_urls(para, issue)
-        para_html_parts.append(f'<p class="body">{hydrated}</p>')
+        para_html_parts.append(
+            f'<p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0 0 12px;">{hydrated}</p>'
+        )
+    # Drop the trailing margin on the last paragraph for tighter spacing.
+    if para_html_parts:
+        para_html_parts[-1] = para_html_parts[-1].replace(
+            "margin:0 0 12px;", "margin:0;"
+        )
     para_html = "".join(para_html_parts)
+
     return f"""
-    <tr><td class="pad" style="background: var(--paper-2); padding-top: 20px; padding-bottom: 20px;">
-      <div class="eyebrow">{_e(eb)}</div>
-      <h2 class="h1">{_e(hl)}</h2>
+    <tr><td class="pad-h" style="padding:18px 24px 16px;">
+      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:600;margin-bottom:6px;">{_e(eb)}</div>
+      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(hl)}</h2>
+      <p style="font-size:13px;line-height:1.55;color:#5A5650;margin:0 0 12px;font-style:italic;">{decoder}</p>
       {para_html}
     </td></tr>
     """
@@ -1254,6 +1267,18 @@ def _your_pulpo_html(issue: Issue) -> str:
         f'<td class="yp-row-cta"><a href="{_e(browse_url)}">{_e(browse_cta)}</a></td></tr>'
     )
 
+    # Row 4 (anonymous cohort only) — welcome / set-your-filter CTA.
+    # v4: the welcome URL used to live in the dropped `_next_issue_html`
+    # block; surfacing it here preserves the anonymous-cohort onboarding
+    # nudge and the `/welcome?r=` link the cross-device telemetry pipes off.
+    if issue.cohort == "anonymous" and issue.welcome_prefs_url:
+        welcome_label = i18n.t("yp.welcome.label", locale)
+        welcome_cta = i18n.t("yp.welcome.cta", locale)
+        rows.append(
+            f'<tr><td class="yp-row-label">{_e(welcome_label)}</td>'
+            f'<td class="yp-row-cta"><a href="{_e(issue.welcome_prefs_url)}">{_e(welcome_cta)}</a></td></tr>'
+        )
+
     return f"""
     <tr><td class="yp-panel">
       <div class="yp-eyebrow">{_e(eb)}</div>
@@ -1306,6 +1331,361 @@ def _next_issue_html(issue: Issue) -> str:
     """
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# v4.0 — locked card component + new section intros + weekly news spotlight
+#
+# These replace the v3.x rich/short split. EVERY pick (top 3 and 4-10)
+# renders through `_pick_card_html` — only the background color and the
+# rank-pill copy differ between the two variants. Section intros sit
+# between blocks of picks. The Weekly News Spotlight replaces the v3
+# skip-block + next-issue pair with a single LLM-curated regional news
+# story (deterministic placeholder until the LLM pipeline ships).
+# ─────────────────────────────────────────────────────────────────────────
+
+
+def _state_pill_html(text: str, bg: str, color: str) -> str:
+    """One small uppercase chip rendered with inline styles (Outlook-safe)."""
+    return (
+        f'<span style="display:inline-block;font-size:11px;font-weight:600;'
+        f'letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;'
+        f'background:{bg};color:{color};border-radius:999px;">{_e(text)}</span>'
+    )
+
+
+def _pick_state_pill_html(pick: IssuePick, locale: Locale) -> str:
+    """Derive the per-card state pill from real Listing fields.
+
+    Order of precedence (one pill at most):
+      1. Significantly under area average → sage discount pill
+      2. New on the market this fortnight → clay "New this week" pill
+      3. Repriced this fortnight           → "Price moved" pill
+      4. None of the above                 → no pill
+    """
+    en = locale == "en"
+
+    # Keytable carries pre-formatted "vs zone -78%" / "·" rows from build_issue.
+    # Look for a negative percentage on the value/zone row.
+    zone_pct: int | None = None
+    for k, v in (pick.keytable or []):
+        if "vs zone" in (k or "").lower() or "zona" in (k or "").lower():
+            v_clean = (v or "").strip().replace("%", "").replace("−", "-")
+            try:
+                n = int(float(v_clean))
+                if n < 0:
+                    zone_pct = n
+            except ValueError:
+                pass
+            break
+    if zone_pct is not None and zone_pct <= -25:
+        text = f"−{abs(zone_pct)}% under area avg" if en else f"−{abs(zone_pct)}% bajo el promedio"
+        return _state_pill_html(text, bg="#C9DEC6", color="#1F3D31")
+
+    if pick.is_new_this_fortnight:
+        text = i18n.t("pick.new_pill", locale)
+        return _state_pill_html(text, bg="#FBE6D8", color="#7A3D1F")
+
+    if pick.is_repriced:
+        text = i18n.t("pick.repriced_pill", locale)
+        return _state_pill_html(text, bg="#EDE7DB", color="#5A5650")
+
+    return ""
+
+
+def _pick_ppm_from_keytable(pick: IssuePick) -> str:
+    """Pull '$XXX/m²' out of the legacy keytable. Returns '' if absent."""
+    for k, v in (pick.keytable or []):
+        k_clean = (k or "").strip()
+        if k_clean in ("$/m²", "$/m2"):
+            v_clean = (v or "").strip()
+            if not v_clean or v_clean == "—":
+                return ""
+            return v_clean + ("/m²" if "/m" not in v_clean else "")
+    return ""
+
+
+def _pick_card_html(
+    pick: IssuePick,
+    *,
+    locale: Locale,
+    is_top_deal: bool,
+    paywall_url: str,
+) -> str:
+    """The single locked listing-card component for all 10 picks.
+
+    Top-deal variant (ranks 01–03): sage `#DDE9DC` background +
+    forest "TOP DEAL · NN" pill. Regular variant (ranks 04–10):
+    white background + sand "PICK · NN" pill. Every other slot —
+    photo, title, spec strip, price, "Why we picked it" card,
+    See-on-Pulpo + Save CTAs — renders identically across both.
+
+    All visual rules are duplicated as inline `style=""` on each
+    element so Gmail / Outlook / Yahoo (which strip `<style>` for
+    most selectors and ALL pseudo-elements + CSS vars) still
+    render the design. The class names stay for rich-client
+    enhancement and for `tests/newsletter/test_render.py`
+    snapshot assertions.
+
+    Paywalled picks (Free cohort) render the photo and a teaser
+    pill but suppress the title, price, why card, and CTAs — the
+    paywall banner one row up carries the upsell.
+    """
+    en = locale == "en"
+    rank = pick.rank
+
+    if is_top_deal:
+        card_bg = "#DDE9DC"
+        rank_pill_bg = "#1F3D31"
+        rank_pill_color = "#F4EFE6"
+        rank_label = "Top deal" if en else "Mejor oferta"
+    else:
+        card_bg = "#FFFFFF"
+        rank_pill_bg = "#E8DFC6"
+        rank_pill_color = "#5A5650"
+        rank_label = "Pick" if en else "Selección"
+
+    state_pill = _pick_state_pill_html(pick, locale)
+
+    # Pill row — rank pill ALWAYS, state pill if any.
+    pill_row = (
+        f'<div style="margin-bottom:8px;">'
+        f'<span style="display:inline-block;font-size:11px;font-weight:700;'
+        f'letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;'
+        f'background:{rank_pill_bg};color:{rank_pill_color};border-radius:999px;'
+        f'margin-right:6px;">{_e(rank_label)} · {rank:02d}</span>'
+        f'{state_pill}'
+        f'</div>'
+    )
+
+    # Photo (full-width). Skip when there's no eligible hero image (e.g.
+    # broker-logo source like REMAX) — same rule as the v3 renderer.
+    photo_html = ""
+    if pick.photo_url:
+        photo_html = (
+            f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title or "")}" '
+            f'width="100%" style="width:100%;height:auto;display:block;" />'
+        )
+
+    # Price line — "$900,000" + optional " · $621/m²" inline.
+    ppm = _pick_ppm_from_keytable(pick) if not pick.paywalled else ""
+    price_text = _e(pick.price_text or "—")
+    if ppm:
+        price_line = (
+            f'{price_text} <span style="font-size:14px;color:#5A5650;'
+            f'font-family:\'Inter\',-apple-system,sans-serif;letter-spacing:0;">· '
+            f'{_e(ppm)}</span>'
+        )
+    else:
+        price_line = price_text
+
+    # Paywalled picks hide the body + CTAs — the paywall banner upsells.
+    body_html = ""
+    cta_html = ""
+    if pick.paywalled:
+        teaser = _e(i18n.t("pick.paywall_blurb", locale))
+        body_html = (
+            f'<p style="margin:0 0 14px;font-family:\'Inter\',sans-serif;'
+            f'font-size:14.5px;line-height:1.55;color:#5A5650;">{teaser}</p>'
+        )
+    else:
+        why_html = _why_block_html(pick, locale)
+        cta_label = i18n.t("pick.cta_open", locale)
+        save_label = i18n.t("pick.cta_save", locale)
+        primary_url = pick.pulpo_url or pick.listing_url or paywall_url
+        save_url = pick.save_url or (primary_url + ("&save=1" if "?" in primary_url else "?save=1"))
+        body_html = (
+            f'<h2 class="pick-title" style="font-family:\'Instrument Serif\','
+            f'Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;'
+            f'font-weight:400;margin:0 0 4px;color:#1A1916;">{_e(pick.title or "")}</h2>'
+            f'<p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;'
+            f'letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">'
+            f'{_e(pick.location_line or "")}</p>'
+            f'<p style="margin:0 0 14px;font-family:\'Instrument Serif\','
+            f'Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;'
+            f'color:#1A1916;">{price_line}</p>'
+            f'{why_html}'
+        )
+        cta_html = (
+            f'<table role="presentation"><tr>'
+            f'<td style="padding-right:8px;">'
+            f'<a class="btn-fill" href="{_e(primary_url)}" '
+            f'style="display:inline-block;font-size:13px;font-weight:600;'
+            f'padding:11px 18px;background:#18211C;color:#F4EFE6;'
+            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;">'
+            f'{_e(cta_label)}</a></td>'
+            f'<td><a class="btn-ghost" href="{_e(save_url)}" '
+            f'style="display:inline-block;font-size:13px;font-weight:600;'
+            f'padding:10px 16px;color:#1A1916;border:1px solid #1A1916;'
+            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;">'
+            f'&hearts; {_e(save_label)}</a></td>'
+            f'</tr></table>'
+        )
+
+    # Open the title block with a "TOP DEAL · 01" pill for the top-3
+    # variant only if we render full content (otherwise the pill row
+    # already carries the rank). Paywalled picks still get the pill row.
+    return f"""
+    <tr><td class="pad-h" style="padding:8px 24px 8px;">
+      <div class="pick-card" style="background:{card_bg};border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+        {photo_html}
+        <div style="padding:16px 18px 18px;">
+          {pill_row}
+          {body_html}
+          {cta_html}
+        </div>
+      </div>
+    </td></tr>
+    """
+
+
+def _section_intro_top3_html(locale: Locale) -> str:
+    """Editorial section header sitting between market context and pick 01."""
+    title = i18n.t("section.top3.title", locale)
+    body = i18n.t("section.top3.body", locale)
+    return f"""
+    <tr><td class="pad-h" style="padding:26px 24px 14px;">
+      <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
+      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">{_e(body)}</p>
+    </td></tr>
+    """
+
+
+def _section_intro_rest_html(locale: Locale, n_rest: int) -> str:
+    """Editorial section header sitting between pick 03 and pick 04."""
+    title = i18n.t("section.rest.title", locale, n=n_rest)
+    body = i18n.t("section.rest.body", locale)
+    return f"""
+    <tr><td class="pad-h" style="padding:26px 24px 14px;">
+      <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
+      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">{_e(body)}</p>
+    </td></tr>
+    """
+
+
+def _weekly_news_spotlight_html(issue: Issue) -> str:
+    """The "Weekly News Spotlight" block — one curated regional-news
+    story per issue, sourced from a whitelist of El Salvador outlets
+    (El Diario de Hoy, La Prensa Gráfica, El Mundo, Diario El Salvador,
+    La Página).
+
+    v4.0 ships a DETERMINISTIC placeholder so the block renders today.
+    The LLM news-search pipeline is the follow-up (separate PR): it
+    will populate `issue.news_spotlight` with `{title, paragraph,
+    source_name, source_url, source_date}` each Sunday before the
+    Monday send. When that field is empty, the deterministic fallback
+    below renders — no fake news, no fabricated citations.
+    """
+    locale = issue.locale
+    en = locale == "en"
+    eyebrow = i18n.t("spotlight.eyebrow", locale)
+
+    spot = getattr(issue, "news_spotlight", None)
+    if spot:
+        title = spot.get("title") or ""
+        paragraph = spot.get("paragraph") or ""
+        source_name = spot.get("source_name") or ""
+        source_url = spot.get("source_url") or ""
+        source_date = spot.get("source_date") or ""
+    else:
+        # Deterministic fallback — generic editorial frame keyed off the
+        # issue's recipient filter. Honest, sources-free since no LLM
+        # has scanned articles. Renders nothing if no useful frame
+        # available.
+        title = i18n.t("spotlight.fallback.title", locale)
+        paragraph = i18n.t("spotlight.fallback.body", locale)
+        source_name = ""
+        source_url = ""
+        source_date = ""
+
+    if not title or not paragraph:
+        return ""
+
+    # Source citation only when a source is named. Article URL is the
+    # specific story the LLM pulled, NOT a homepage.
+    source_line_html = ""
+    if source_name:
+        reported_by = "Reported by" if en else "Reportado por"
+        if source_url:
+            src_html = (
+                f'<a href="{_e(source_url)}" target="_blank" rel="noopener" '
+                f'style="color:#5A5650;border-bottom:1px solid #5A5650;">'
+                f'{_e(source_name)}</a>'
+            )
+        else:
+            src_html = _e(source_name)
+        date_html = f" · {_e(source_date)}" if source_date else ""
+        source_line_html = (
+            f'<p style="font-size:11.5px;color:#5A5650;letter-spacing:0.04em;'
+            f'margin:0 0 12px;font-weight:500;">{reported_by} {src_html}{date_html}</p>'
+        )
+
+    # Pulpo brand-mark icon next to the eyebrow — signals this is a
+    # recurring Pulpo institutional section.
+    return f"""
+    <tr><td class="pad-h" style="padding:28px 24px 22px;">
+      <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:6px;"><tr>
+        <td style="line-height:0;padding-right:8px;vertical-align:middle;">
+          <svg width="18" height="18" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+            <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+            <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+          </svg>
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#1F3D31;font-weight:700;">{_e(eyebrow)}</div>
+        </td>
+      </tr></table>
+      {source_line_html}
+      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
+      <p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0;max-width:580px;">{paragraph}</p>
+    </td></tr>
+    """
+
+
+def _favorites_editorial_summary(favorites: list, locale: str) -> str:
+    """Editorial framing line for the favorites block.
+
+    Replaces v3's verbose state-by-state summary ("One had a price
+    drop, One moved up in price, …") with a single editorial sentence
+    keyed off the count of movers vs total saves. Honest in both
+    directions: a quiet week reads "your watchlist held flat", a
+    busy week reads "busier than a typical week".
+    """
+    en = locale == "en"
+    total = len(favorites)
+    moved = sum(1 for u in favorites if u.state in ("price_dropped", "price_up"))
+
+    en_word = {0: "None", 1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five"}
+    es_word = {0: "Ninguno", 1: "Uno", 2: "Dos", 3: "Tres", 4: "Cuatro", 5: "Cinco"}
+    total_en = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
+    total_es = {1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco"}
+
+    moved_word = (en_word.get(moved) or str(moved)) if en else (es_word.get(moved) or str(moved))
+    total_word = (total_en.get(total) or str(total)) if en else (total_es.get(total) or str(total))
+
+    if moved == 0:
+        return (
+            "<strong style='font-style:normal;'>None moved on price this fortnight</strong> — your watchlist held flat."
+            if en else
+            "<strong style='font-style:normal;'>Ninguno se movió en precio esta quincena</strong> — tu lista quedó plana."
+        )
+
+    # Busy vs quiet read — "busy" when most/all moved.
+    busy = moved >= max(2, total - 1)
+    if en:
+        tail = "busier than a typical week on your watchlist" if busy else "fewer moves than usual on your watchlist"
+        return (
+            f"<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this fortnight</strong> — {tail}."
+        )
+    else:
+        tail = "más actividad que una semana típica en tu lista" if busy else "menos actividad de la habitual en tu lista"
+        return (
+            f"<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta quincena</strong> — {tail}."
+        )
+
+
 def render_html(issue: Issue) -> str:
     locale = issue.locale
     head_title = f"Pulpo — Issue {issue.issue_number:02d} · {issue.issue_date_human}"
@@ -1313,24 +1693,26 @@ def render_html(issue: Issue) -> str:
         "header.issue", locale, n=f"{issue.issue_number:02d}", date=issue.issue_date_human.upper()
     )
 
-    rich_html = "".join(_rich_pick(p, locale=locale, paywall_url=issue.paywall_target_url) for p in issue.picks_top)
-    shortlist_html = ""
+    # v4.0 — every pick (top 3 + 4-10) renders through the SAME locked
+    # `_pick_card_html` component. Only the background color and the
+    # rank-pill copy differ. The v3 split between `_rich_pick` and
+    # `_short_pick` is dead.
+    top3_html = "".join(
+        _pick_card_html(p, locale=locale, is_top_deal=True, paywall_url=issue.paywall_target_url)
+        for p in issue.picks_top
+    )
+    rest_html = ""
+    section_intro_rest_html = ""
     if issue.picks_shortlist:
-        sl_eb = i18n.t("shortlist.eyebrow", locale, n=len(issue.picks_shortlist))
-        sl_hl = i18n.t("shortlist.headline", locale)
-        sl_lede = i18n.t("shortlist.lede", locale)
-        shortlist_header = f"""
-        <tr><td class="pad" style="padding-top: 16px; padding-bottom: 4px;">
-          <hr class="rule" />
-          <div style="margin-top: 12px;">
-            <div class="eyebrow">{_e(sl_eb)}</div>
-            <h2 class="h1">{_e(sl_hl)}</h2>
-            <p class="body-2" style="margin-top: 6px; max-width: 480px;">{_e(sl_lede)}</p>
-          </div>
-        </td></tr>
-        """
-        shortlist_rows = "".join(_short_pick(p, locale=locale, paywall_url=issue.paywall_target_url) for p in issue.picks_shortlist)
-        shortlist_html = shortlist_header + shortlist_rows
+        rest_html = "".join(
+            _pick_card_html(p, locale=locale, is_top_deal=False, paywall_url=issue.paywall_target_url)
+            for p in issue.picks_shortlist
+        )
+        section_intro_rest_html = _section_intro_rest_html(locale, len(issue.picks_shortlist))
+
+    section_intro_top3_html = (
+        _section_intro_top3_html(locale) if issue.picks_top else ""
+    )
 
     hero_block = f"""
     <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
@@ -1368,20 +1750,15 @@ def render_html(issue: Issue) -> str:
     </td></tr>
     """
 
-    # v3 layout order (Sebas's 5 fixes, 2026-05-29):
-    #   header → hero (welcome teaser) → MARKET CONTEXT → top 3 picks →
-    #   paywall banner (if free) → shortlist → skip → next issue →
-    #   your pulpo → footer.
+    # v4.0 layout order:
+    #   header → hero → favorites → market context →
+    #   [Top 3 this week intro] → picks 01-03 → paywall (if free) →
+    #   [7 more this week intro] → picks 04-10 →
+    #   Weekly News Spotlight → Your Pulpo → footer.
     #
-    # Fix #5: market context moved up from just-above-the-footer to
-    # right after the welcome teaser. That gives the reader the "why
-    # this fortnight" framing BEFORE they see any listing.
-    #
-    # Dropped from v2: the `<table class="glance">` numbered-list block
-    # (the welcome teaser already names #01-#03 and the per-pick
-    # sections cover the rest) and the `_one_number_html` block (the
-    # "$X per m² median" callout duplicated the market_context data dump
-    # the user called "horrible" — the warm market note carries the load).
+    # Dropped from v3: skip block (just noise) and "next issue" block
+    # (replaced by the Weekly News Spotlight). The shortlist section
+    # header is replaced by the bigger `_section_intro_rest_html`.
     return f"""<!doctype html>
 <html lang="{locale}">
 <head>
@@ -1401,11 +1778,12 @@ def render_html(issue: Issue) -> str:
     {hero_block}
     {_favorites_html(issue)}
     {_market_html(issue)}
-    {rich_html}
+    {section_intro_top3_html}
+    {top3_html}
     {_paywall_banner_html(issue)}
-    {shortlist_html}
-    {_skip_block_html(issue)}
-    {_next_issue_html(issue)}
+    {section_intro_rest_html}
+    {rest_html}
+    {_weekly_news_spotlight_html(issue)}
     {_your_pulpo_html(issue)}
     {_footer_html(issue)}
   </table>
