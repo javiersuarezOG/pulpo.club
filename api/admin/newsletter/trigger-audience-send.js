@@ -100,24 +100,23 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
-  // Rate limit FIRST so the type-to-confirm gate doesn't get a free
-  // pass to retry forever. 429 carries Retry-After so the UI can
-  // surface the cooldown.
-  const ip = ipFromRequest(req);
-  const rl = limiter.hit(ip);
-  if (!rl.allowed) {
-    logApi({
-      status: 429, ms: Date.now() - t0, reason: "rate_limited",
-      retry_after_s: Math.ceil(rl.retryAfterMs / 1000),
-    });
-    return send429(res, rl, "admin_newsletter_audience_send");
-  }
+  // Validation FIRST, rate-limit AFTER. The rate-limiter exists to
+  // prevent runaway REAL sends (one per hour cap); it should only
+  // count meaningful, well-formed POSTs that would actually trigger
+  // a dispatch. The original ordering (rate-limit before validation)
+  // burned the hour-long slot on a typo in the SEND input — a real
+  // operator misclick that mistyped "Send" (lowercase) had to wait
+  // an hour before retrying. Found in smoke-testing immediately
+  // after PR #562 landed. The "admin abuse" attack vector this
+  // ordering trades against is non-existent (admin-only surface,
+  // no real attackers; CPU cost of validation is negligible).
 
   const body = await readJsonBody(req);
 
   // The literal "SEND" gate. Mirrors the modal's text input — a
   // forged or scripted POST that skips the input must still send this
-  // exact string. Case-sensitive on purpose.
+  // exact string. Case-sensitive on purpose. Failing here does NOT
+  // consume the rate-limit slot.
   const confirm = typeof body.confirm === "string" ? body.confirm : "";
   if (confirm !== REQUIRED_CONFIRM_STRING) {
     logApi({ status: 400, ms: Date.now() - t0, reason: "confirm_missing" });
@@ -129,6 +128,8 @@ module.exports = async (req, res) => {
 
   // issue_number is REQUIRED for audience sends. Default-1 would let a
   // misfire send last issue's content; force the operator to pass it.
+  // Also fails before the rate-limit so a bad number doesn't burn the
+  // slot.
   if (body.issue_number === undefined || body.issue_number === null) {
     logApi({ status: 400, ms: Date.now() - t0, reason: "issue_number_missing" });
     return res.status(400).json({
@@ -145,6 +146,20 @@ module.exports = async (req, res) => {
     });
   }
   const issueNumberStr = String(issueNum);
+
+  // Rate limit NOW — only after we've confirmed this POST is the
+  // well-formed real-send shape. A double-click on a valid request
+  // still gets one 200 + one 429; a typo'd request gets a 400 and
+  // the next attempt is free.
+  const ip = ipFromRequest(req);
+  const rl = limiter.hit(ip);
+  if (!rl.allowed) {
+    logApi({
+      status: 429, ms: Date.now() - t0, reason: "rate_limited",
+      retry_after_s: Math.ceil(rl.retryAfterMs / 1000),
+    });
+    return send429(res, rl, "admin_newsletter_audience_send");
+  }
 
   // Optional `by` — operator email for the audit log. Same shape as
   // trigger-preview.js.
