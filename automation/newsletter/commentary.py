@@ -310,15 +310,24 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
             else "Nueva esta semana — la ventana temprana importa"
         )
 
-    # 6) Property-fit fallback so the why_block never renders empty.
-    if not out:
+    # v4 (2026-05-30) — TARGET 4 bullets per pick to match the locked
+    # `_pick_card_html` design. Earlier this only fired as a fallback
+    # when `out` was empty, which left most cards at 2-3 bullets and
+    # broke the "all cards identical" contract. Now: every concrete
+    # fact below gets appended if not already covered, until we reach
+    # the target. Capped at 4 (renderer sized for four lines).
+    TARGET = 4
+
+    # 6a) Property-fit (beds/baths or lot area). Real fact from the
+    #     listing, always safe to surface.
+    if len(out) < TARGET:
         pt = listing.get("property_type")
         if pt == "land" and listing.get("area_m2"):
             area = int(listing["area_m2"])
             out.append(
-                f"{area:,} m² lot at this price — uncommon for the area"
+                f"{area:,} m² lot — room to build what you want"
                 if en
-                else f"{area:,} m² a este precio — poco común para el área"
+                else f"{area:,} m² de lote — espacio para construir lo que quieras"
             )
         elif pt in ("house", "condo"):
             beds = listing.get("bedrooms")
@@ -332,8 +341,53 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
                              else f" · {int(built)} m² construidos")
                 out.append(line)
 
-    # Cap at 3 — the renderer's `.why-list` is sized for three lines.
-    return out[:3]
+    # 6b) Airport / drive to SAL — concrete fact, useful for buyers
+    #     evaluating travel access.
+    if len(out) < TARGET:
+        airport_km = listing.get("dist_airport_km")
+        airport_min = listing.get("travel_time_to_sal_min") or listing.get("dist_airport_min")
+        if isinstance(airport_min, (int, float)) and airport_min > 0:
+            out.append(
+                f"{int(airport_min)} min drive to San Salvador airport"
+                if en
+                else f"{int(airport_min)} min en carro al aeropuerto SAL"
+            )
+        elif isinstance(airport_km, (int, float)) and airport_km > 0:
+            out.append(
+                f"{int(airport_km)} km from San Salvador airport"
+                if en
+                else f"{int(airport_km)} km del aeropuerto SAL"
+            )
+
+    # 6c) Price-per-m² anchor — universally available on land + house
+    #     picks via the rank pipeline; a real number a reader can take
+    #     to another listing for comparison.
+    if len(out) < TARGET:
+        ppm = listing.get("price_per_m2")
+        if isinstance(ppm, (int, float)) and ppm > 0:
+            out.append(
+                f"${int(ppm):,}/m² — a clear anchor for comparison shopping"
+                if en
+                else f"${int(ppm):,}/m² — un ancla clara para comparar con otras fichas"
+            )
+
+    # 6d) Days-on-market context (when not already covered by the
+    #     "Brand new this week" branch above). Useful negotiation signal
+    #     for older listings.
+    if len(out) < TARGET:
+        dom = listing.get("days_listed")
+        already_new = any(("Brand new" in s or "Recién publicada" in s or "Nueva esta semana" in s) for s in out)
+        if isinstance(dom, int) and dom > 14 and not already_new:
+            out.append(
+                f"{dom} days on market — seller may be open to negotiation"
+                if en
+                else f"{dom} días en el mercado — el vendedor puede estar abierto a negociar"
+            )
+
+    # Cap at TARGET (4) — the renderer's `.why-list` is sized for four
+    # lines and exceeding the count breaks the "all cards identical"
+    # contract by making top picks visually heavier.
+    return out[:TARGET]
 
 
 def deterministic_shortlist_frame(listing: dict, locale: Locale = "en") -> str:
