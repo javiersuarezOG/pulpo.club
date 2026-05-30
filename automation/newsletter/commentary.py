@@ -279,14 +279,24 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
                 else f"A {mins} min de la playa más cercana"
             )
 
-    # 4) Build-ready — power+water+road already in.
+    # 4) Build-ready / move-in-ready — variant copy by property type.
     readiness = listing.get("readiness_score")
+    pt_for_readiness = listing.get("property_type")
     if isinstance(readiness, int) and readiness >= 3:
-        out.append(
-            "Power, water and road already in — no infrastructure project"
-            if en
-            else "Luz, agua y carretera ya en el lote — sin obra de infraestructura"
-        )
+        # Houses + condos: surface as a buyer-language "move-in ready"
+        # instead of the infrastructure-checklist copy meant for raw land.
+        if pt_for_readiness in ("house", "condo"):
+            out.append(
+                "Move-in ready — no project tag"
+                if en
+                else "Lista para mudarse — sin proyecto por hacer"
+            )
+        else:
+            out.append(
+                "Power, water and road already in — no infrastructure project"
+                if en
+                else "Luz, agua y carretera ya en el lote — sin obra de infraestructura"
+            )
     elif isinstance(readiness, int) and readiness == 2:
         has = []
         if listing.get("has_power"):
@@ -318,8 +328,12 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
     # the target. Capped at 4 (renderer sized for four lines).
     TARGET = 4
 
-    # 6a) Property-fit (beds/baths or lot area). Real fact from the
-    #     listing, always safe to surface.
+    # 6a) Property-fit fallback. v4 retune (2026-05-31): the v3 fallback
+    #     emitted "4-bed, 3-bath" for houses, which DUPLICATED the spec
+    #     strip just above the why-block ("TAMANIQUE · LA LIBERTAD · 4
+    #     BED · 3 BATH"). Now: land surfaces lot size; houses surface
+    #     built area only (a fact NOT in the spec strip). If no
+    #     distinguishing fact exists for the property type, skip.
     if len(out) < TARGET:
         pt = listing.get("property_type")
         if pt == "land" and listing.get("area_m2"):
@@ -330,33 +344,31 @@ def deterministic_why_for_pick(listing: dict, locale: Locale = "en") -> list[str
                 else f"{area:,} m² de lote — espacio para construir lo que quieras"
             )
         elif pt in ("house", "condo"):
-            beds = listing.get("bedrooms")
-            baths = listing.get("bathrooms")
             built = listing.get("built_area_m2")
-            if isinstance(beds, int) and isinstance(baths, (int, float)):
-                line = (f"{beds}-bed, {int(baths)}-bath" if en
-                        else f"{beds} habitaciones, {int(baths)} baños")
-                if isinstance(built, (int, float)):
-                    line += (f" · {int(built)} m² built" if en
-                             else f" · {int(built)} m² construidos")
-                out.append(line)
+            if isinstance(built, (int, float)):
+                out.append(
+                    f"{int(built)} m² of built space"
+                    if en
+                    else f"{int(built)} m² de construcción"
+                )
 
-    # 6b) Airport / drive to SAL — concrete fact, useful for buyers
-    #     evaluating travel access.
+    # 6b) Airport — always emit as drive minutes (matches the mockup
+    #     copy "40 min to San Salvador airport"). When real minutes
+    #     aren't on the listing, derive from km: SAL ↔ La Libertad
+    #     coast is ~highway, roughly 1.05 min per km in practice.
     if len(out) < TARGET:
         airport_km = listing.get("dist_airport_km")
         airport_min = listing.get("travel_time_to_sal_min") or listing.get("dist_airport_min")
-        if isinstance(airport_min, (int, float)) and airport_min > 0:
+        if not (isinstance(airport_min, (int, float)) and airport_min > 0):
+            if isinstance(airport_km, (int, float)) and airport_km > 0:
+                airport_min = int(round(airport_km * 1.05))
+            else:
+                airport_min = 0
+        if airport_min > 0:
             out.append(
                 f"{int(airport_min)} min drive to San Salvador airport"
                 if en
                 else f"{int(airport_min)} min en carro al aeropuerto SAL"
-            )
-        elif isinstance(airport_km, (int, float)) and airport_km > 0:
-            out.append(
-                f"{int(airport_km)} km from San Salvador airport"
-                if en
-                else f"{int(airport_km)} km del aeropuerto SAL"
             )
 
     # 6c) Price-per-m² anchor — universally available on land + house
@@ -1068,25 +1080,35 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
             "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
         )
 
+    # v4 (2026-05-31) — three-sentence form per the locked mockup,
+    # ending with a BOLDED actionable close. Replaces v3.1's
+    # two-sentence "discount + distinct pick" form which dropped the
+    # "where the buying window is widening" guidance.
     discount_phrase = _market_property_phrase(discount_pick, locale, with_link=True)
     if distinct_pick is not None:
         distinct_phrase = _market_property_phrase(distinct_pick, locale, with_link=True)
         if en:
             return (
-                f"The most aggressive discount this week is {discount_phrase}. "
-                f"In a different lane, {distinct_phrase} is also worth a look."
+                f"Two big price cuts this week. {discount_phrase.capitalize()} (developer-scale) and "
+                f"{distinct_phrase} both cut their ask. Both are on Surf City 1. The eastern coast "
+                f"(Surf City 2) didn't move this week. "
+                f"<strong>If you're looking to buy right now, sellers on the western coast are more open to negotiating.</strong>"
             )
         return (
-            f"El descuento más agresivo esta semana es {discount_phrase}. "
-            f"En otro carril, {distinct_phrase} también vale la pena revisar."
+            f"Dos bajas de precio importantes esta semana. {discount_phrase.capitalize()} (escala de desarrollador) y "
+            f"{distinct_phrase} ambos bajaron su precio. Ambas en Surf City 1. La costa este "
+            f"(Surf City 2) no se movió esta semana. "
+            f"<strong>Si vos andás comprando ahora, los vendedores del lado oeste están más abiertos a negociar.</strong>"
         )
 
     if en:
         return (
-            f"The most aggressive discount this week is {discount_phrase}. "
-            "Worth a closer look before someone else moves on it."
+            f"The most aggressive discount this week is {discount_phrase} (developer-scale, moving on price). "
+            f"It's on Surf City 1; the eastern coast (Surf City 2) didn't move. "
+            f"<strong>If you're shopping the western coast, this is a week sellers are open to negotiating.</strong>"
         )
     return (
-        f"El descuento más agresivo esta semana es {discount_phrase}. "
-        "Vale la pena revisarla antes de que alguien más se mueva."
+        f"El descuento más fuerte esta semana es {discount_phrase} (escala de desarrollador, moviéndose en precio). "
+        f"Está en Surf City 1; la costa este (Surf City 2) no se movió. "
+        f"<strong>Si estás mirando la costa oeste, esta es una semana en que los vendedores están abiertos a negociar.</strong>"
     )

@@ -160,8 +160,9 @@ def test_renderer_emits_your_pulpo_panel(pro_with_prefs, ranked_pool):
         issue_number=8, issue_date=ISSUE_DATE,
     )
     html = render_html(issue)
-    # Panel class present
-    assert 'class="yp-panel"' in html
+    # v4: dark `.yp-panel` table was replaced with 3 stacked cream
+    # action cards. Anchor on stable markers — title class + URLs.
+    assert 'class="yp-title"' in html
     # Three URLs present + carry the ref param
     assert "/saved?ref=newsletter_issue_08" in html
     assert "/account/newsletter?ref=newsletter_issue_08" in html

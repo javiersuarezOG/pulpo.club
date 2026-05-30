@@ -932,16 +932,18 @@ def _favorites_html(issue: Issue) -> str:
 
     count = len(favorites)
     eyebrow = (
-        "Your saved listings · this week" if en
+        "Your favorites · this week" if en
         else "Tus favoritos · esta semana"
     )
+    # v4 (2026-05-31): numeric headline per the locked mockup —
+    # "3 you're following." not "Three you're following." Spelled-out
+    # numerals read editorial in body copy but slow the eye in an H2.
     if count == 1:
-        headline = "One you're following." if en else "Uno que seguís."
+        headline = "1 you're following." if en else "1 que seguís."
     else:
-        word = _favorites_count_word(count, en)
         headline = (
-            f"{word} you're following." if en
-            else f"{word} que seguís."
+            f"{count} you're following." if en
+            else f"{count} que seguís."
         )
 
     summary = _favorites_editorial_summary(favorites, locale)
@@ -951,28 +953,15 @@ def _favorites_html(issue: Issue) -> str:
     site = (issue.settings_url.split("/account")[0] if "/account" in issue.settings_url else "https://pulpo.club")
     ref = f"?ref=newsletter_issue_{issue.issue_number:02d}"
     saved_url = f"{site}/saved{ref}&from=favorites"
-    footer_count = issue.recipient.saved_count or count
-    if en:
-        footer_text = (
-            f"You're following {footer_count} listing{'s' if footer_count != 1 else ''}. "
-            f'<a href="{_e(saved_url)}">Open your favorites &rarr;</a>'
-        )
-    else:
-        word = "" if footer_count == 1 else "s"
-        footer_text = (
-            f"Seguís {footer_count} propiedad{'es' if footer_count != 1 else ''}. "
-            f'<a href="{_e(saved_url)}">Abrí tus favoritos &rarr;</a>'
-        )
+    open_all = "Open all favorites" if en else "Abrir todos los favoritos"
 
     return f"""
-    <tr><td class="saves-wrap">
-      <div class="saves-pad">
-        <p class="saves-eyebrow">{_e(eyebrow)}</p>
-        <h2 class="saves-h2">{_e(headline)}</h2>
-        <p class="saves-summary" style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 16px;font-style:italic;max-width:540px;">{summary}</p>
-        {cards}
-        <p class="saves-footer">{footer_text}</p>
-      </div>
+    <tr><td class="pad-h" style="padding:16px 24px 16px;background:#F8F4EC;">
+      <p class="saves-eyebrow" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;font-weight:600;margin:0 0 4px;">{_e(eyebrow)}</p>
+      <h2 class="saves-h2" style="font-family:'Instrument Serif',Georgia,serif;font-size:32px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 4px;color:#1A1916;">{_e(headline)}</h2>
+      <p class="saves-summary" style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 14px;font-style:italic;max-width:540px;">{summary}</p>
+      {cards}
+      <p style="margin:14px 0 0;"><a href="{_e(saved_url)}" style="display:inline-block;font-size:13px;font-weight:600;color:#1A1916;border-bottom:1px solid #1A1916;padding-bottom:1px;text-decoration:none;">{_e(open_all)} &rarr;</a></p>
     </td></tr>
     """
 
@@ -1183,6 +1172,23 @@ def _one_number_html(issue: Issue) -> str:
 
 
 def _footer_html(issue: Issue) -> str:
+    """v4 (2026-05-31) — branded footer matching the locked mockup.
+
+    Layout (top to bottom inside the cream `footer-strip` cell):
+      • Small Pulpo octopus mark + lowercase "pulpo" wordmark
+      • Brand tagline ("Every beach and lake home in El Salvador,
+        ranked by value.")
+      • Trust paragraph ("Pulpo doesn't take commission...")
+      • Horizontal rule
+      • Personalisation note ("You're getting this because your filter
+        is set to La Libertad")
+      • Pill-button row: [Change filters] [Change cadence] [Unsubscribe]
+      • Copyright line
+
+    Replaces v3's pipe-separated link row + 4-paragraph stack. Pill
+    buttons are inline-styled so Gmail/Outlook render them as filled
+    chips (not text links).
+    """
     locale = issue.locale
     from . import i18n as _i18n
     tagline = i18n.t("footer.tagline", locale)
@@ -1196,38 +1202,60 @@ def _footer_html(issue: Issue) -> str:
     unsubscribe_label = i18n.t("footer.unsubscribe", locale)
     no_commission = i18n.t("footer.no_commission", locale)
     copyright_line = i18n.t("footer.copyright", locale, year=issue.issue_id[:4])
+
+    def _pill(href: str, label: str) -> str:
+        return (
+            f'<a href="{_e(href)}" style="display:inline-block;'
+            f'font-size:12px;font-weight:600;padding:6px 12px;'
+            f'color:#1A1916;border:1px solid rgba(0,0,0,0.18);'
+            f'border-radius:999px;text-decoration:none;margin:0 6px 6px 0;">'
+            f'{_e(label)}</a>'
+        )
+
     return f"""
-    <tr><td class="pad footer-strip">
-      <p class="small">{_e(tagline)}</p>
-      <p class="small" style="margin-top: 6px;">{_e(you_line)}</p>
-      <p class="small" style="margin-top: 12px;">
-        <a href="{_e(issue.settings_url)}">{_e(change_filters_label)}</a> &middot;
-        <a href="{_e(issue.settings_url)}">{_e(change_cadence_label)}</a> &middot;
-        <a href="{_e(issue.unsubscribe_url)}">{_e(unsubscribe_label)}</a>
-      </p>
-      <p class="small" style="margin-top: 14px;">{_e(no_commission)}</p>
-      <p class="small" style="margin-top: 14px;">{_e(copyright_line)} &middot; <span class="mono">pulpo.club</span></p>
+    <tr><td class="pad footer-strip" style="padding:24px 24px 28px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);">
+      <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+        <td style="line-height:0;padding-right:8px;vertical-align:middle;">
+          <svg width="20" height="20" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+            <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+            <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+          </svg>
+        </td>
+        <td style="vertical-align:middle;">
+          <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span>
+        </td>
+      </tr></table>
+      <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#1A1916;font-weight:500;">{_e(tagline)}</p>
+      <p style="margin:8px 0 0;font-size:12.5px;line-height:1.55;color:#5A5650;">{_e(no_commission)}</p>
+      <div style="margin:18px 0 14px;height:1px;background:rgba(0,0,0,0.08);"></div>
+      <p style="margin:0 0 10px;font-size:12px;color:#888780;letter-spacing:0.04em;">{_e(you_line)}</p>
+      <div>
+        {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(issue.unsubscribe_url, unsubscribe_label)}
+      </div>
+      <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">{_e(copyright_line)} · pulpo.club</p>
     </td></tr>
     """
 
 
 def _your_pulpo_html(issue: Issue) -> str:
-    """PR-NL-8 — the dark "Your Pulpo" panel.
+    """v4 (2026-05-31) — "Pick up where you left off" block.
 
-    Three rows, each driven by `issue.your_pulpo`:
-      • saved listings count   → /saved
-      • filter summary line    → /account/newsletter
-      • filter-match count     → /browse
+    Three stacked cream action cards (one per CTA) matching the locked
+    mockup. Replaces the v3 dark navy `yp-panel` table. Each card is a
+    full-width anchor with: small uppercase eyebrow (context — e.g.
+    "3 saved listings") + bold title (action — e.g. "Open your
+    favorites") + right-aligned arrow.
 
-    All URLs carry `ref=newsletter_issue_<N>` so PostHog can attribute
-    in-app conversion back to the issue. The panel intentionally lives
-    AFTER the editorial content (skip, market, next-issue) and just
-    above the footer — the natural "what to do next on Pulpo" slot.
-
-    Anonymous cohort renders a softer variant: no saved-listings row,
-    no filter summary (they don't have one yet), just the "browse all"
-    nudge. The renderer falls through to those defaults when
-    `your_pulpo.filter_summary_human` is empty.
+    Card visibility:
+      • Saved-listings card — only when `your_pulpo.saved_count > 0`
+        (cold-start / anonymous cohorts skip).
+      • Filter card — only when `your_pulpo.filter_summary_human` is
+        set (anonymous + logged-no-prefs skip).
+      • Browse card — always rendered.
+      • Welcome card — anonymous cohort only, carries the `/welcome?r=`
+        URL the cross-device telemetry pipes off (was previously in
+        the dropped `_next_issue_html` block).
     """
     yp = issue.your_pulpo
     locale = issue.locale
@@ -1240,52 +1268,51 @@ def _your_pulpo_html(issue: Issue) -> str:
     filter_url = f"{site}/account/newsletter{ref}"
     browse_url = f"{site}/browse{ref}"
 
-    rows: list[str] = []
+    def _card(href: str, eyebrow: str, action: str) -> str:
+        return (
+            f'<a href="{_e(href)}" style="display:block;background:#F8F4EC;'
+            f'border:1px solid rgba(0,0,0,0.08);border-radius:8px;'
+            f'padding:14px 16px;margin:0 0 10px;color:#1A1916;'
+            f'text-decoration:none;">'
+            f'<table width="100%" role="presentation"><tr>'
+            f'<td>'
+            f'<p style="margin:0 0 2px;font-size:11px;letter-spacing:0.10em;'
+            f'text-transform:uppercase;color:#888780;font-weight:600;">'
+            f'{_e(eyebrow)}</p>'
+            f'<p style="margin:0;font-size:16px;font-weight:600;'
+            f'color:#1A1916;">{_e(action)}</p>'
+            f'</td>'
+            f'<td align="right" style="font-size:18px;color:#1A1916;'
+            f'font-weight:600;">&rarr;</td>'
+            f'</tr></table></a>'
+        )
 
-    # Row 1 — saved listings (skip for anonymous / 0-saved cold-start).
+    cards: list[str] = []
+
     if yp.saved_count > 0:
-        saved_label = i18n.t("yp.saved.label", locale, n=yp.saved_count)
-        saved_cta = i18n.t("yp.saved.cta", locale)
-        rows.append(
-            f'<tr><td class="yp-row-label">{_e(saved_label)}</td>'
-            f'<td class="yp-row-cta"><a href="{_e(saved_url)}">{_e(saved_cta)}</a></td></tr>'
-        )
+        eyebrow = i18n.t("yp.saved.label", locale, n=yp.saved_count)
+        action = i18n.t("yp.saved.cta", locale)
+        cards.append(_card(saved_url, eyebrow, action))
 
-    # Row 2 — filter summary (skip for anonymous).
     if yp.filter_summary_human:
-        filter_cta = i18n.t("yp.filter.cta", locale)
-        rows.append(
-            f'<tr><td class="yp-row-label">{_e(yp.filter_summary_human)}</td>'
-            f'<td class="yp-row-cta"><a href="{_e(filter_url)}">{_e(filter_cta)}</a></td></tr>'
-        )
+        eyebrow = i18n.t("yp.filter.label", locale, filter=yp.filter_summary_human)
+        action = i18n.t("yp.filter.cta", locale)
+        cards.append(_card(filter_url, eyebrow, action))
 
-    # Row 3 — browse the full filter (always present).
-    browse_label = i18n.t("yp.browse.label", locale, n=yp.filter_match_count)
-    browse_cta = i18n.t("yp.browse.cta", locale)
-    rows.append(
-        f'<tr><td class="yp-row-label">{_e(browse_label)}</td>'
-        f'<td class="yp-row-cta"><a href="{_e(browse_url)}">{_e(browse_cta)}</a></td></tr>'
-    )
+    browse_eyebrow = i18n.t("yp.browse.label", locale, n=yp.filter_match_count)
+    browse_action = i18n.t("yp.browse.cta", locale)
+    cards.append(_card(browse_url, browse_eyebrow, browse_action))
 
-    # Row 4 (anonymous cohort only) — welcome / set-your-filter CTA.
-    # v4: the welcome URL used to live in the dropped `_next_issue_html`
-    # block; surfacing it here preserves the anonymous-cohort onboarding
-    # nudge and the `/welcome?r=` link the cross-device telemetry pipes off.
     if issue.cohort == "anonymous" and issue.welcome_prefs_url:
-        welcome_label = i18n.t("yp.welcome.label", locale)
-        welcome_cta = i18n.t("yp.welcome.cta", locale)
-        rows.append(
-            f'<tr><td class="yp-row-label">{_e(welcome_label)}</td>'
-            f'<td class="yp-row-cta"><a href="{_e(issue.welcome_prefs_url)}">{_e(welcome_cta)}</a></td></tr>'
-        )
+        welcome_eyebrow = i18n.t("yp.welcome.label", locale)
+        welcome_action = i18n.t("yp.welcome.cta", locale)
+        cards.append(_card(issue.welcome_prefs_url, welcome_eyebrow, welcome_action))
 
     return f"""
-    <tr><td class="yp-panel">
-      <div class="yp-eyebrow">{_e(eb)}</div>
-      <h2 class="yp-title">{_e(title)}</h2>
-      <table class="yp-table" role="presentation">
-        {''.join(rows)}
-      </table>
+    <tr><td class="pad-h" style="padding:18px 24px 8px;">
+      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:700;margin-bottom:4px;">{_e(eb)}</div>
+      <h2 class="yp-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 16px;color:#1A1916;">{_e(title)}</h2>
+      {"".join(cards)}
     </td></tr>
     """
 

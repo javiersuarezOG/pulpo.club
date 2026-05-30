@@ -288,8 +288,12 @@ def test_render_emits_section_with_price_drop_chip(pro_with_prefs, ranked_pool):
     )
     html = render_html(issue)
 
-    assert 'class="saves-wrap"' in html
-    assert "Your saved listings" in html
+    # v4 (2026-05-31): `class="saves-wrap"` / `class="saves-pad"` were
+    # the v3 saves chrome; the v4 rewrite uses inline-styled blocks
+    # keyed on `saves-eyebrow` / `saves-h2` (still present as class
+    # hooks for snapshot stability).
+    assert 'class="saves-eyebrow"' in html
+    assert "Your favorites" in html  # v4 eyebrow copy
     assert "Price dropped" in html
     assert 'class="struck"' in html  # struck-through previous price
 
@@ -505,7 +509,9 @@ def test_render_section_sits_between_lede_and_market(pro_with_prefs, ranked_pool
     html = render_html(issue)
 
     lede_idx = html.find("Hand-picked for")
-    saves_idx = html.find('class="saves-wrap"')
+    # v4: `saves-wrap` was dropped in the inline-style rewrite; anchor on
+    # the surviving `saves-eyebrow` class hook instead.
+    saves_idx = html.find('class="saves-eyebrow"')
     market_idx = html.find("Market context")
     assert lede_idx != -1 and saves_idx != -1 and market_idx != -1
     assert lede_idx < saves_idx < market_idx

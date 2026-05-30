@@ -263,11 +263,12 @@ def test_render_v4_redesign_contract(pro_with_prefs, ranked_pool):
     card_idx = html.find('class="pick-card"')
     assert market_idx != -1 and card_idx != -1
     assert market_idx < card_idx, "market context must render before the first pick card"
-    # Frame table count guard — only the outer frame + `yp-table` survive
-    # as visible tables (the email-safe action tables on each card are
-    # role="presentation" and aren't selectable by class).
+    # Frame table count guard — v4 redesign drops v3's `.yp-table`
+    # (dark panel rewritten as 3 stacked cream action cards). Only the
+    # outer frame survives as a `class`-selectable visible table; every
+    # other table is `role="presentation"` for email-safe layout.
     assert html.count('<table class="frame"') == 1
-    assert html.count('<table class="yp-table"') == 1
+    assert 'class="yp-table"' not in html  # v3 dark panel gone
 
 
 def test_render_card_component_contract(pro_with_prefs, ranked_pool):
