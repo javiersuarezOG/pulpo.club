@@ -899,12 +899,12 @@ def _favorites_html(issue: Issue) -> str:
         else "Tus favoritos · esta semana"
     )
     if count == 1:
-        headline = "One you're following." if en else "Uno que sigues."
+        headline = "One you're following." if en else "Uno que seguís."
     else:
         word = _favorites_count_word(count, en)
         headline = (
             f"{word} you're following." if en
-            else f"{word} que sigues."
+            else f"{word} que seguís."
         )
 
     summary = _favorites_summary(favorites, locale)
@@ -923,8 +923,8 @@ def _favorites_html(issue: Issue) -> str:
     else:
         word = "" if footer_count == 1 else "s"
         footer_text = (
-            f"Sigues {footer_count} propiedad{'es' if footer_count != 1 else ''}. "
-            f'<a href="{_e(saved_url)}">Abre tus favoritos &rarr;</a>'
+            f"Seguís {footer_count} propiedad{'es' if footer_count != 1 else ''}. "
+            f'<a href="{_e(saved_url)}">Abrí tus favoritos &rarr;</a>'
         )
 
     return f"""

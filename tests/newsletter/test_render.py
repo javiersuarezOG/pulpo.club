@@ -95,6 +95,35 @@ def test_render_es_locale_has_no_english_canary(pro_with_prefs, ranked_pool):
         or "lecturas rápidas" in html
     ), "Spanish v3.2 lede phrases all missing from ES render"
 
+    # v3.3.2 (2026-05-30) — Salvadoran voseo. The audience is Salvadoran;
+    # every imperative or 2nd-person-singular present in editorial copy
+    # uses VOS, not TÚ. Castilian/Mexican tú-forms ("Ajusta", "Continúa",
+    # "Recibes", "Sigues", "Lee los", "Hazte", "Trae", "Úsalo") are
+    # banned. Possessives ("tu filtro") stay — "tu" works for vos and tú.
+    # Each entry below is a tú-form the renderer was caught emitting
+    # before this rule landed; add new entries when more leak.
+    TU_FORMS_FORBIDDEN = (
+        "Ajusta filtros",
+        "Ajusta lo que ves",
+        "Configura tu filtro",
+        "Continúa donde",
+        "Hazte Pro",
+        "Recibes esto",
+        "Sigues ",          # "Sigues 3 propiedades"
+        "Abre tus favoritos",
+        "Lee los resúmenes",
+        "Trae presupuesto",
+        "Úsalo como ancla",
+        "tú añades",
+        "la traes de",
+    )
+    tu_leaked = [t for t in TU_FORMS_FORBIDDEN if t in html]
+    assert not tu_leaked, (
+        f"Castilian/Mexican tú-forms leaked into Salvadoran ES render: {tu_leaked}. "
+        "Use voseo: Ajustá / Configurá / Seguí / Hacete / Recibís / Seguís / "
+        "Abrí / Leé / Traé / Usalo / vos le ponés / la traés."
+    )
+
 
 def test_render_no_unfilled_placeholders(pro_with_prefs, ranked_pool):
     html = _render(pro_with_prefs, ranked_pool)
