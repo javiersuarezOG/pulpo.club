@@ -259,8 +259,38 @@ def _run_check_hero_pool(argv: list[str]) -> int:
     return 0
 
 
+def _list_origin_main_photos(repo_root: Path) -> set[str]:
+    """Return every blob path under web/photos/ at origin/main's tip.
+
+    Used by ``check-hero-variants`` to treat "exists in committed main"
+    as "present" — production serves photos from main, so a file that
+    exists there will be live regardless of the runner's working-tree
+    state. Returns an empty set if git is unavailable, the repo isn't
+    a git checkout, or origin/main isn't fetched; the caller treats an
+    empty result as "no fallback", which collapses cleanly to the strict
+    working-tree-only check.
+
+    Output paths are relative to repo root, e.g. ``web/photos/foo.hero.jpg``.
+    """
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["git", "ls-tree", "-r", "--name-only", "origin/main", "web/photos/"],
+            cwd=repo_root, capture_output=True, text=True, timeout=30,
+            check=False,
+        )
+    except (subprocess.SubprocessError, FileNotFoundError):
+        # git missing or repo isn't a checkout — degrade to strict mode
+        # silently. Same effect as --no-main-fallback.
+        return set()
+    if result.returncode != 0:
+        return set()
+    return {ln.strip() for ln in result.stdout.splitlines() if ln.strip()}
+
+
 def _run_check_hero_variants(argv: list[str]) -> int:
-    """Verify every ranked.json listing's `.hero.jpg` variant is present.
+    """Verify every ranked.json listing's `.hero.jpg` variant will be
+    present on `main` after this nightly's data commit lands.
 
     Frontend regression guard for the home-hero LCP fix (PR-perf-hero,
     2026-05-21). HeroV4 derives a local `/photos/<id>.hero.jpg` path
@@ -270,19 +300,38 @@ def _run_check_hero_variants(argv: list[str]) -> int:
     broker URL — re-introducing the 14.5s P95 LCP regression we just
     closed.
 
-    The check is cheap (O(N) filesystem stats) and fails loudly. Wire
-    into CI / nightly alongside `check-hero-pool`.
+    What "present" means
+    --------------------
+    Production serves photos from `main` (Vercel deploys the committed
+    tree). The check therefore treats a hero variant as present if EITHER:
+
+      (a) it exists in the runner's working tree (the just-produced
+          pipeline output), OR
+      (b) it exists in `origin/main` and the nightly's commit step
+          isn't removing it (`git add` is additive — files in main
+          stay in main unless explicitly `git rm`-ed).
+
+    The origin/main fallback fixes a false-alarm class first observed
+    2026-05-27: the canary failed 4 nightlies in a row claiming 182/200
+    top hero variants were missing, yet every offender was present on
+    `main` and serving cleanly via /api/img. Production was unaffected
+    but the data commit was blocked for 4 days, masking the
+    source_health_history updates that drive /admin/sources. Consulting
+    origin/main as a fallback eliminates that false-positive class
+    while keeping the regression guard intact: a hero variant truly
+    missing from BOTH the working tree AND main will still fail.
 
     Exit code:
-        0 — every listing with a `hero_photo_path` has the sibling
-            `.hero.jpg` on disk, and every filename satisfies
-            /api/img's path-traversal guard (^[a-z0-9_.-]+$).
-        1 — at least one listing is missing the variant OR carries an
-            unsafe filename. Stdout summarises; stderr lists offenders.
+        0 — every listing with a `hero_photo_path` will have a safe
+            `.hero.jpg` variant on main after this nightly commits.
+        1 — at least one listing's variant is missing from both the
+            working tree AND main, OR a filename is unsafe. Stdout
+            summarises; stderr lists offenders.
 
     Usage:
         python3 -m pulpo.cli check-hero-variants
         python3 -m pulpo.cli check-hero-variants --top-only 50
+        python3 -m pulpo.cli check-hero-variants --no-main-fallback
     """
     import re
 
@@ -295,12 +344,24 @@ def _run_check_hero_variants(argv: list[str]) -> int:
         help="Override ranked.json path (default: <repo>/web/data/ranked.json).",
     )
     sp.add_argument(
+        "--repo-root", type=str, default=None,
+        help="Override the repo root used to resolve photo paths and to "
+             "consult origin/main (default: auto-detected from this script's "
+             "location). Tests use this to run against a temp repo.",
+    )
+    sp.add_argument(
         "--top-only", type=int, default=0,
         help="Restrict the check to the N highest-rank_score listings (default: 0 = all).",
     )
+    sp.add_argument(
+        "--no-main-fallback", action="store_true",
+        help="Skip the origin/main fallback. Strict working-tree-only check; "
+             "useful for local debugging when you want the pre-2026-05-30 "
+             "behaviour. Not appropriate for nightly CI — see docstring.",
+    )
     args = sp.parse_args(argv)
 
-    repo_root = Path(__file__).resolve().parents[1]
+    repo_root = Path(args.repo_root) if args.repo_root else Path(__file__).resolve().parents[1]
     ranked_path = Path(args.ranked_path) if args.ranked_path else repo_root / "web" / "data" / "ranked.json"
     if not ranked_path.exists():
         print(f"check-hero-variants: ranked.json not found: {ranked_path}", file=sys.stderr)
@@ -324,8 +385,19 @@ def _run_check_hero_variants(argv: list[str]) -> int:
     # which is exactly the regression this check exists to catch.
     SAFE_FILENAME = re.compile(r"^[a-z0-9_.-]+$", re.IGNORECASE)
 
+    # ── origin/main file index (lazy, single git call) ────────────────
+    # `git ls-tree -r origin/main web/photos/` returns every blob path
+    # under web/photos at the current tip of main. Converting to a set
+    # makes membership checks O(1) and avoids ~200 git subprocess calls
+    # in the hot loop. Returns an empty set if the repo isn't a git
+    # checkout (test environments, distribution tarballs) or if
+    # origin/main isn't fetched — in both cases the fallback degrades
+    # gracefully and the check behaves like the pre-2026-05-30 version.
+    main_files = _list_origin_main_photos(repo_root) if not args.no_main_fallback else set()
+
     missing: list[tuple[float, str]] = []
     unsafe: list[str] = []
+    rescued_from_main = 0
     skipped_no_path = 0
     checked = 0
 
@@ -338,7 +410,14 @@ def _run_check_hero_variants(argv: list[str]) -> int:
         hero_rel = hp[:-4] + ".hero.jpg"
         hero_fs = repo_root / "web" / hero_rel.lstrip("/")
         if not hero_fs.exists():
-            missing.append((rec.get("rank_score") or 0.0, hp))
+            # Fallback: file is "present" if origin/main has it and our
+            # commit step won't remove it. Path in git is relative to
+            # repo root, so strip the leading "/" and prepend "web".
+            main_path = "web" + hero_rel  # e.g. "web/photos/foo.hero.jpg"
+            if main_path in main_files:
+                rescued_from_main += 1
+            else:
+                missing.append((rec.get("rank_score") or 0.0, hp))
         # Filename safety
         filename = hero_rel.rsplit("/", 1)[-1]
         if not SAFE_FILENAME.match(filename):
@@ -349,13 +428,24 @@ def _run_check_hero_variants(argv: list[str]) -> int:
     print(f"  checked (have path):  {checked}")
     print(f"  skipped (no path):    {skipped_no_path}")
     print(f"  missing .hero.jpg:    {len(missing)}")
+    if rescued_from_main:
+        # Surfaced so a sustained non-zero value (working tree drifting
+        # away from main mid-pipeline) is visible without parsing JSON.
+        # Zero is the goal; a large number means something is removing
+        # working-tree files between checkout and this step.
+        print(f"  rescued from main:    {rescued_from_main}")
     print(f"  unsafe filenames:     {len(unsafe)}")
     sys.stdout.flush()
 
     if missing or unsafe:
         if missing:
+            fallback_note = (
+                " (not in working tree AND not in origin/main)"
+                if not args.no_main_fallback else ""
+            )
             print(
-                f"\n[check-hero-variants] FAIL: {len(missing)} listing(s) missing .hero.jpg",
+                f"\n[check-hero-variants] FAIL: {len(missing)} listing(s) "
+                f"missing .hero.jpg{fallback_note}",
                 file=sys.stderr,
             )
             for rs, hp in missing[:20]:
