@@ -28,7 +28,7 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v3.3.1-2026-05"
+TEMPLATE_VERSION = "newsletter-v3.3.2-2026-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -523,16 +523,53 @@ def _why_block_html(pick: IssuePick, locale: Locale) -> str:
     `deterministic_why_for_pick` falls through every branch). Each
     bullet is escaped — they're plain text out of commentary.py, no
     embedded markup.
+
+    Email-safe styling: the `<style>` block in <head> styles `.why-block`
+    via CSS vars + `:before` for the ✓ glyph, but Gmail / Outlook / Yahoo
+    strip both — the cream square + checkmarks were invisible in every
+    inbox we ship to. So every visual the user must see (background
+    shading, ✓ glyph, clay label color) is duplicated as inline styles
+    + literal text on this block. Inline always wins over <style>, so
+    rich clients (Apple Mail / iOS Mail) still get the same look from
+    the inline rules. Class names are preserved so the existing
+    test_render.py assertions and any future `:has(.why-block)` CSS
+    keep working.
     """
     bullets = getattr(pick, "why_bullets", None) or []
     if not bullets:
         return ""
     label = i18n.t("pick.why_label", locale)
-    items = "".join(f"<li>{_e(b)}</li>" for b in bullets)
+    # Inline ✓ + bullet text. No `position:absolute` — Outlook's Word
+    # engine is unreliable with it; a single space + non-breaking space
+    # is robust enough for the hanging-indent feel without absolute
+    # positioning, and `vertical-align: top` keeps the check aligned
+    # with the first line of multi-line bullets.
+    li_style = (
+        "padding:6px 0;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;"
+        "font-size:14.5px;line-height:1.5;color:#1A1916;"
+    )
+    check_style = (
+        "color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;"
+    )
+    items = "".join(
+        f'<li style="{li_style}">'
+        f'<span style="{check_style}">&#10003;</span>{_e(b)}'
+        "</li>"
+        for b in bullets
+    )
+    block_style = (
+        "margin:18px 0 0;padding:16px 18px 18px;background:#F8F4EC;border-radius:6px;"
+    )
+    label_style = (
+        "font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;"
+        "font-size:11px;font-weight:600;letter-spacing:0.12em;"
+        "text-transform:uppercase;color:#B8643C;margin:0 0 10px;"
+    )
+    ul_style = "list-style:none;margin:0;padding:0;"
     return (
-        f'<div class="why-block">'
-        f'<p class="why-label">{_e(label)}</p>'
-        f'<ul class="why-list">{items}</ul>'
+        f'<div class="why-block" style="{block_style}">'
+        f'<p class="why-label" style="{label_style}">{_e(label)}</p>'
+        f'<ul class="why-list" style="{ul_style}">{items}</ul>'
         f"</div>"
     )
 
