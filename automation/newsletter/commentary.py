@@ -124,7 +124,7 @@ def deterministic_commentary(
         one_body = (
             "Use this as the anchor when a broker quotes outside the band."
             if locale == "en"
-            else "Úsalo como ancla cuando un corredor cotice fuera de la banda."
+            else "Usalo como ancla cuando un corredor te cotice fuera de la banda."
         )
 
     return Commentary(
@@ -526,22 +526,22 @@ def _utility_phrase(listing: dict, locale: Locale) -> str:
                 else "Agua, luz y carretera pavimentada ya en el lote.")
     if has_power and has_water:
         return ("Power and water are at the lot; you'd add the road." if locale == "en"
-                else "Luz y agua en el lote; tú añades la carretera.")
+                else "Luz y agua en el lote; vos le ponés la carretera.")
     if has_power and has_road:
         return ("Power and the road are there; water you'd bring from a well." if locale == "en"
-                else "Luz y carretera ya están; el agua la traes de un pozo.")
+                else "Luz y carretera ya están; el agua la traés de un pozo.")
     if has_water and has_road:
         return ("Water and the road are at the lot; you'd run power from the nearest connection."
                 if locale == "en"
-                else "Agua y carretera ya en el lote; la luz la traes de la conexión más cercana.")
+                else "Agua y carretera ya en el lote; la luz la traés de la conexión más cercana.")
     if has_power:
         return ("Power runs to the boundary; water and the road are on you." if locale == "en"
                 else "Luz hasta el límite; agua y carretera quedan por hacer.")
     if has_water:
         return ("Water is on site; you'd add power and the road." if locale == "en"
-                else "Agua en el lote; faltan luz y carretera.")
+                else "Agua en el lote; falta meter luz y carretera.")
     return ("Bring a build budget — none of the utilities are in yet." if locale == "en"
-            else "Trae presupuesto para construir — todavía no hay servicios.")
+            else "Traé presupuesto para construir — todavía no hay servicios.")
 
 
 def _archetype(listing: dict) -> str:
