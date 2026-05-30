@@ -46,13 +46,180 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // we ever add cohorts back. Today it's exactly one: pro_prefs.
 const PREVIEW_COHORTS = ["pro_prefs"];
 
+// ── Newsletter registry ────────────────────────────────────────────
+// One row per newsletter Pulpo publishes (or plans to). The widget
+// renders tier sections (PRO / FREE) and cards from this list — adding
+// a new newsletter once it ships is a one-row patch here plus enabling
+// `status: "live"`. The matching server allow-list lives in
+// `api/admin/newsletter/trigger-preview.js :: KNOWN_NEWSLETTER_IDS`;
+// keep them in lock-step.
+//
+//   id            stable PostHog event key + closed-set allow-list value
+//   tier          "pro" | "free" — drives section assignment + log pill
+//   title         card heading shown in the chrome
+//   description   one-line subhead under the title
+//   cadenceMode   "scheduled" (shows the 3-row Upcoming sends list) |
+//                 "onetime"   (single trigger row — welcome-style)
+//   status        "live" (card renders the trigger UI) |
+//                 "coming-soon" (card renders disabled with a tag)
+//
+// `cadenceMode` is wired today only for "scheduled". When the welcome
+// newsletters ship we'll add the "onetime" body next to the existing
+// upcoming-list renderer.
+const NEWSLETTERS = [
+  {
+    id: "pro-weekly",
+    tier: "pro",
+    title: "Pro · Weekly digest",
+    description: "Sundays 9 AM · 10 curated picks per recipient, personalised to their discover_filters.",
+    cadenceMode: "scheduled",
+    status: "live",
+  },
+  {
+    id: "pro-welcome",
+    tier: "pro",
+    title: "Pro · Welcome",
+    description: "Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.",
+    cadenceMode: "onetime",
+    status: "coming-soon",
+  },
+  {
+    id: "free-welcome",
+    tier: "free",
+    title: "Free · Welcome",
+    description: "Sent once when an anonymous email subscribes via the homepage form. Sets the audience expectation and surfaces a Pro upgrade CTA.",
+    cadenceMode: "onetime",
+    status: "coming-soon",
+  },
+  {
+    id: "free-weekly",
+    tier: "free",
+    title: "Free · Weekly",
+    description: "Lightweight Free-tier digest. Same Sunday cadence as Pro, fewer picks, no personalisation, upgrade nudge baked in.",
+    cadenceMode: "scheduled",
+    status: "coming-soon",
+  },
+];
+
+const PRO_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "pro");
+const FREE_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "free");
+
+// Look up the registry row for a given id. Pre-registry log rows from
+// before the rollout have `newsletter_id == null` — the log renders
+// those as Pro · Weekly (the only newsletter that existed before this
+// rollout, so attribution is correct).
+function newsletterForId(id) {
+  return NEWSLETTERS.find((n) => n.id === id) || NEWSLETTERS[0];
+}
+
 const WIDGET_STYLES = `
 .nl-preview-widget {
-  max-width: 560px;
+  /* Was a single column at 560px. The tier-section layout needs
+     more width so the "Send test" + "Send to everyone" buttons stay
+     on one row inside each upcoming-send row at 980px container width. */
+  max-width: 760px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
+/* ── Tier sections (PRO / FREE) ─────────────────────────────────── */
+.nl-preview-widget .nl-tier-section {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nl-preview-widget .nl-tier-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 12px 0 2px;
+}
+.nl-preview-widget .nl-tier-header hr {
+  flex: 1;
+  border: 0;
+  border-top: 1px solid var(--line-2);
+  margin: 0;
+}
+.nl-preview-widget .nl-tier-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.nl-preview-widget .nl-tier-label.pro {
+  background: var(--accent-strong);
+  color: var(--paper);
+}
+.nl-preview-widget .nl-tier-label.free {
+  background: var(--paper-3);
+  color: var(--ink-2);
+}
+.nl-preview-widget .nl-tier-count {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+/* ── Per-newsletter card (head + body) ──────────────────────────── */
+.nl-preview-widget .nl-newsletter-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.nl-preview-widget .nl-newsletter-card.coming-soon { opacity: 0.7; }
+.nl-preview-widget .nl-newsletter-head {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.nl-preview-widget .nl-newsletter-card.coming-soon .nl-newsletter-head {
+  border-bottom-color: transparent;
+}
+.nl-preview-widget .nl-newsletter-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.nl-preview-widget .nl-newsletter-status {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.nl-preview-widget .nl-newsletter-status.live {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.nl-preview-widget .nl-newsletter-status.coming-soon {
+  background: var(--paper-3);
+  color: var(--ink-3);
+}
+.nl-preview-widget .nl-newsletter-desc {
+  padding: 10px 18px 14px;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 0;
+}
+.nl-preview-widget .nl-newsletter-body {
+  padding: 0 18px 16px;
+}
+.nl-preview-widget .nl-newsletter-card.coming-soon .nl-newsletter-body {
+  display: none;
+}
+/* Existing .nl-card primitive retained below for back-compat (used by
+   the shared controls bar). */
+
 .nl-preview-widget .nl-card {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -496,11 +663,32 @@ const WIDGET_STYLES = `
   border-bottom-color: var(--line-2);
 }
 .nl-preview-widget .nl-log-table tr:last-child td { border-bottom: 0; }
-.nl-preview-widget .nl-log-when { width: 22%; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
-.nl-preview-widget .nl-log-to { width: 36%; color: var(--ink); }
-.nl-preview-widget .nl-log-locale { width: 8%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; }
+.nl-preview-widget .nl-log-when { width: 14%; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
+.nl-preview-widget .nl-log-newsletter { width: 22%; }
+.nl-preview-widget .nl-log-newsletter .nl-log-pill {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+.nl-preview-widget .nl-log-newsletter .nl-log-pill.pro {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.nl-preview-widget .nl-log-newsletter .nl-log-pill.free {
+  background: var(--paper-3);
+  color: var(--ink-2);
+}
+.nl-preview-widget .nl-log-to { width: 22%; color: var(--ink); }
+.nl-preview-widget .nl-log-locale { width: 6%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; }
 .nl-preview-widget .nl-log-by { width: 22%; color: var(--ink-3); }
-.nl-preview-widget .nl-log-result { width: 12%; font-weight: 600; }
+.nl-preview-widget .nl-log-result { width: 14%; font-weight: 600; }
 .nl-preview-widget .nl-log-result.ok { color: var(--accent); }
 .nl-preview-widget .nl-log-result.err { color: oklch(55% 0.18 25); }
 `;
@@ -819,7 +1007,12 @@ export function NewsletterWidget() {
       // to a specific operator on the cross-device log. Spoofable
       // (the endpoint is intentionally auth-light) but useful for
       // the legitimate-traffic happy path.
-      const payload = { email: value, locale, by: operatorEmail || undefined };
+      // Today every test trigger comes from the Pro · Weekly card —
+      // the only LIVE row in the registry. When Pro · Welcome ships
+      // its card will pass its own newsletter_id through; the server
+      // allow-list (KNOWN_NEWSLETTER_IDS) is already prepped for the
+      // expansion.
+      const payload = { email: value, locale, by: operatorEmail || undefined, newsletter_id: "pro-weekly" };
       if (issueNumber != null) payload.issue_number = issueNumber;
       const r = await fetch("/api/admin/newsletter/trigger-preview", {
         method: "POST",
@@ -832,6 +1025,7 @@ export function NewsletterWidget() {
         to: value,
         locale,
         by: operatorEmail,
+        newsletter_id: "pro-weekly",
       };
       if (!r.ok) {
         const detail = body.error || `HTTP ${r.status}`;
@@ -855,6 +1049,7 @@ export function NewsletterWidget() {
         to: value,
         locale,
         by: operatorEmail,
+        newsletter_id: "pro-weekly",
         result: "error",
         detail: msg,
       }));
@@ -918,6 +1113,24 @@ export function NewsletterWidget() {
               ))}
             </div>
           </div>
+
+          {/* ── PRO section ─────────────────────────────────────── */}
+          <div className="nl-tier-section">
+            <div className="nl-tier-header">
+              <span className="nl-tier-label pro">Pro</span>
+              <hr />
+              <span className="nl-tier-count">{PRO_NEWSLETTERS.length} newsletters</span>
+            </div>
+
+            {/* Pro · Weekly — LIVE. Body wraps the existing Upcoming
+                sends panel (test + audience triggers per row). */}
+            <article className="nl-newsletter-card">
+              <div className="nl-newsletter-head">
+                <h3 className="nl-newsletter-title">{NEWSLETTERS.find(n => n.id === "pro-weekly").title}</h3>
+                <span className="nl-newsletter-status live">● Live</span>
+              </div>
+              <p className="nl-newsletter-desc">{NEWSLETTERS.find(n => n.id === "pro-weekly").description}</p>
+              <div className="nl-newsletter-body">
 
           {/* PR-NL-7a — Upcoming sends. Per-row test button fires the
               same endpoint with that row's issue_number. The shared
@@ -1068,6 +1281,41 @@ export function NewsletterWidget() {
             </ul>
           </div>
 
+              </div>
+            </article>
+
+            {/* Pro · Welcome — COMING SOON */}
+            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => (
+              <article key={nl.id} className="nl-newsletter-card coming-soon">
+                <div className="nl-newsletter-head">
+                  <h3 className="nl-newsletter-title">{nl.title}</h3>
+                  <span className="nl-newsletter-status coming-soon">◌ Coming soon</span>
+                </div>
+                <p className="nl-newsletter-desc">{nl.description}</p>
+              </article>
+            ))}
+          </div>
+
+          {/* ── FREE section ────────────────────────────────────── */}
+          <div className="nl-tier-section">
+            <div className="nl-tier-header">
+              <span className="nl-tier-label free">Free</span>
+              <hr />
+              <span className="nl-tier-count">{FREE_NEWSLETTERS.length} newsletters</span>
+            </div>
+            {FREE_NEWSLETTERS.map((nl) => (
+              <article key={nl.id} className={`nl-newsletter-card ${nl.status === "live" ? "" : "coming-soon"}`}>
+                <div className="nl-newsletter-head">
+                  <h3 className="nl-newsletter-title">{nl.title}</h3>
+                  <span className={`nl-newsletter-status ${nl.status === "live" ? "live" : "coming-soon"}`}>
+                    {nl.status === "live" ? "● Live" : "◌ Coming soon"}
+                  </span>
+                </div>
+                <p className="nl-newsletter-desc">{nl.description}</p>
+              </article>
+            ))}
+          </div>
+
           {/* Per-browser log of trigger attempts (localStorage). Cap at
               LOG_CAP rows so the row never grows unbounded. Empty state
               renders a one-liner so the operator knows the panel exists
@@ -1083,15 +1331,22 @@ export function NewsletterWidget() {
             </div>
             {log.length === 0 ? (
               <p className="nl-log-empty">
-                {serverUnavailable
-                  ? "No test sends yet — fire one above. (Cross-device log unavailable: set POSTHOG_PERSONAL_API_KEY + POSTHOG_PROJECT_ID in Vercel to share history across operators.)"
-                  : "No test sends yet — fire one above."}
+                No test sends yet — try one above.
+                {serverUnavailable ? (
+                  <>
+                    <br />
+                    <span style={{ color: "var(--ink-3)", fontSize: "12px" }}>
+                      You're only seeing sends from this browser. To see what other operators sent (and to see your own sends on other devices), ask your dev to add <code>POSTHOG_PERSONAL_API_KEY</code> and <code>POSTHOG_PROJECT_ID</code> to Vercel.
+                    </span>
+                  </>
+                ) : null}
               </p>
             ) : (
               <table className="nl-log-table">
                 <thead>
                   <tr>
                     <th className="nl-log-when">When</th>
+                    <th className="nl-log-newsletter">Newsletter</th>
                     <th className="nl-log-to">To</th>
                     <th className="nl-log-locale">Lang</th>
                     <th className="nl-log-by">By</th>
@@ -1099,17 +1354,27 @@ export function NewsletterWidget() {
                   </tr>
                 </thead>
                 <tbody>
-                  {log.map((entry, idx) => (
-                    <tr key={`${entry.at}-${idx}`}>
-                      <td className="nl-log-when" title={entry.at}>{formatLogWhen(entry.at)}</td>
-                      <td className="nl-log-to" title={entry.to}>{entry.to}</td>
-                      <td className="nl-log-locale">{entry.locale}</td>
-                      <td className="nl-log-by" title={entry.by || ""}>{entry.by || "—"}</td>
-                      <td className={`nl-log-result ${entry.result === "ok" ? "ok" : "err"}`} title={entry.detail || ""}>
-                        {entry.result === "ok" ? "✓ Sent" : "✗ Failed"}
-                      </td>
-                    </tr>
-                  ))}
+                  {log.map((entry, idx) => {
+                    // Pre-registry events have newsletter_id == null —
+                    // attribute those to Pro · Weekly, the only newsletter
+                    // that existed before the rollout.
+                    const nl = newsletterForId(entry.newsletter_id || "pro-weekly");
+                    return (
+                      <tr key={`${entry.at}-${idx}`}>
+                        <td className="nl-log-when" title={entry.at}>{formatLogWhen(entry.at)}</td>
+                        <td className="nl-log-newsletter">
+                          <span className={`nl-log-pill ${nl.tier}`}>{nl.tier}</span>
+                          {nl.title.replace(/^(Pro|Free)\s*·\s*/, "")}
+                        </td>
+                        <td className="nl-log-to" title={entry.to}>{entry.to}</td>
+                        <td className="nl-log-locale">{entry.locale}</td>
+                        <td className="nl-log-by" title={entry.by || ""}>{entry.by || "—"}</td>
+                        <td className={`nl-log-result ${entry.result === "ok" ? "ok" : "err"}`} title={entry.detail || ""}>
+                          {entry.result === "ok" ? "✓ Sent" : "✗ Failed"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
