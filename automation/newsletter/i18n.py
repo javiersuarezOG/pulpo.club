@@ -70,7 +70,7 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "shortlist.headline":          {"en": "Each one suits a different kind of buyer.",
                                      "es": "Cada una le encaja a un comprador distinto."},
     "shortlist.lede":              {"en": "Pulpo ranked these inside your filter too. Skim the short reads below — each one tells you who the right buyer is.",
-                                     "es": "Pulpo también las clasificó dentro de tu filtro. Lee los resúmenes cortos — cada uno te dice a quién le encaja."},
+                                     "es": "Pulpo también las clasificó dentro de tu filtro. Leé los resúmenes cortos — cada uno te dice a quién le encaja."},
     # v3: "Why we picked it" label that sits above the 3 plain-English
     # bullets on each hero pick. Replaces the v2.x "Why Pulpo ranked it"
     # callout that exposed analyst-y rank-reasons strings.
@@ -84,14 +84,14 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # ── Next issue ──
     "next.eyebrow":                {"en": "Next issue",                                   "es": "Próxima edición"},
     "next.body":                   {"en": "Pulpo scans the next 7 days of inventory against your filter and ships the next ten. Adjust filters anytime — changes apply to the next issue.",
-                                     "es": "Pulpo revisa los próximos 7 días de inventario contra tu filtro y envía las próximas diez. Ajusta filtros cuando quieras — los cambios aplican a la siguiente edición."},
+                                     "es": "Pulpo revisa los próximos 7 días de inventario contra tu filtro y envía las próximas diez. Ajustá filtros cuando querás — los cambios aplican a la siguiente edición."},
     # v2.2: product-language CTA tied to the editorial framing of the
     # newsletter ("the picks I see"), not generic settings-speak.
-    "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajusta lo que ves →"},
-    "next.cta.anon":               {"en": "Set your filter →",                            "es": "Configura tu filtro →"},
+    "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajustá lo que ves →"},
+    "next.cta.anon":               {"en": "Set your filter →",                            "es": "Configurá tu filtro →"},
     # ── Your Pulpo (PR-NL-8) — dark panel above the footer ──
     "yp.eyebrow":                  {"en": "Your Pulpo",                                   "es": "Tu Pulpo"},
-    "yp.title":                    {"en": "Pick up where you left off.",                  "es": "Continúa donde lo dejaste."},
+    "yp.title":                    {"en": "Pick up where you left off.",                  "es": "Seguí donde lo dejaste."},
     "yp.saved.label":              {"en": "{n} saved listings from past issues",          "es": "{n} propiedades guardadas en ediciones anteriores"},
     "yp.saved.cta":                {"en": "Open your favorites →",                        "es": "Abrir tus favoritos →"},
     "yp.filter.cta":               {"en": "Edit your filter →",                           "es": "Editar tu filtro →"},
@@ -105,14 +105,14 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
     # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
     # $19/month which was stale drift — fixed in v2.2.
-    "paywall.cta":                 {"en": "Go Pro — $9.99/month →",                       "es": "Hazte Pro — $9.99/mes →"},
+    "paywall.cta":                 {"en": "Go Pro — $9.99/month →",                       "es": "Hacete Pro — $9.99/mes →"},
     # ── Footer ──
     "footer.tagline":              {"en": f"Every beach and lake home in {_country_en}, ranked by value.",
                                      "es": f"Cada casa frente al mar y al lago en {_country_es}, clasificada por valor."},
     "footer.you_get_this":         {"en": "You're getting this because your filter is set to {filter_summary}.",
-                                     "es": "Recibes esto porque tu filtro está configurado en {filter_summary}."},
+                                     "es": "Recibís esto porque tu filtro está configurado en {filter_summary}."},
     "footer.you_get_this.no_prefs": {"en": "You're getting this because you signed up — we haven't captured your filter yet.",
-                                     "es": "Recibes esto porque te suscribiste — aún no hemos capturado tu filtro."},
+                                     "es": "Recibís esto porque te suscribiste — aún no capturamos tu filtro."},
     "footer.change_filters":       {"en": "Change filters",                               "es": "Cambiar filtros"},
     "footer.change_cadence":       {"en": "Change cadence",                               "es": "Cambiar cadencia"},
     "footer.unsubscribe":          {"en": "Unsubscribe",                                  "es": "Cancelar suscripción"},
