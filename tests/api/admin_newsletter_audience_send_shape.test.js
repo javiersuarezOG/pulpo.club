@@ -77,6 +77,23 @@ describe("api/admin/newsletter/trigger-audience-send", () => {
     expect(sendSrc).toMatch(/maxAttempts:\s*1/);
   });
 
+  it("rate-limit fires AFTER SEND + issue_number validation (not before)", () => {
+    // Regression catch: the original v1 ordering put limiter.hit()
+    // before the body-validation gates, which meant a typo on the
+    // SEND input burned the 1-hour slot. The operator's next valid
+    // attempt 429'd for an hour over a typo. Fix shipped in the
+    // follow-up PR; this assertion makes sure no refactor moves the
+    // limiter back ahead of validation.
+    const confirmIdx = sendSrc.indexOf(`confirm !== REQUIRED_CONFIRM_STRING`);
+    const issueNumIdx = sendSrc.indexOf(`issue_number_required`);
+    const limiterHitIdx = sendSrc.indexOf(`limiter.hit(ip)`);
+    expect(confirmIdx).toBeGreaterThan(-1);
+    expect(issueNumIdx).toBeGreaterThan(-1);
+    expect(limiterHitIdx).toBeGreaterThan(-1);
+    expect(limiterHitIdx).toBeGreaterThan(confirmIdx);
+    expect(limiterHitIdx).toBeGreaterThan(issueNumIdx);
+  });
+
   it("requires the literal SEND confirm string (server-side mirror of the modal gate)", () => {
     expect(sendSrc).toMatch(/REQUIRED_CONFIRM_STRING\s*=\s*"SEND"/);
     expect(sendSrc).toMatch(/confirm !== REQUIRED_CONFIRM_STRING/);
