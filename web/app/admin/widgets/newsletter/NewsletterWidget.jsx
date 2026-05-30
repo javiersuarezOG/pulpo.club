@@ -1331,9 +1331,15 @@ export function NewsletterWidget() {
             </div>
             {log.length === 0 ? (
               <p className="nl-log-empty">
-                {serverUnavailable
-                  ? "No test sends yet — fire one above. (Cross-device log unavailable: set POSTHOG_PERSONAL_API_KEY + POSTHOG_PROJECT_ID in Vercel to share history across operators.)"
-                  : "No test sends yet — fire one above."}
+                No test sends yet — try one above.
+                {serverUnavailable ? (
+                  <>
+                    <br />
+                    <span style={{ color: "var(--ink-3)", fontSize: "12px" }}>
+                      You're only seeing sends from this browser. To see what other operators sent (and to see your own sends on other devices), ask your dev to add <code>POSTHOG_PERSONAL_API_KEY</code> and <code>POSTHOG_PROJECT_ID</code> to Vercel.
+                    </span>
+                  </>
+                ) : null}
               </p>
             ) : (
               <table className="nl-log-table">
