@@ -12,7 +12,7 @@ import { ACTIVE_COUNTRY } from "./config/countries";
 // Static-only imports from the prototype data file (shelves, pills, zones).
 // The LISTINGS array is now live data, accessed per-component via
 // useListings() / useListingsState().
-import { ZONES } from "./data.jsx";
+import { LocationFilter } from "./components/LocationFilter.jsx";
 import {
   MASTER_CATEGORY_LABELS,
   SUBCATEGORY_LABELS,
@@ -156,7 +156,6 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
   const toggleSingle = (key, val) => {
     update({ [key]: filters[key] === val ? null : val });
   };
-  const zoneList = ZONES.map(z => z.name);
   const activeCount = countActive(filters);
   const lc = app?.locale || currentLocale();
 
@@ -283,13 +282,11 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
       </FilterGroup>
 
       <FilterGroup title={t("filter.zone", lc)} collapsible defaultOpen={filters.zones.size > 0}>
-        <div className="chip-grid">
-          {zoneList.map(z => (
-            <button key={z}
-              className={`chip ${filters.zones.has(z) ? "is-active" : ""}`}
-              onClick={() => toggleSet("zones", z)}>{z}</button>
-          ))}
-        </div>
+        <LocationFilter
+          selected={filters.zones}
+          onChange={(next) => update({ zones: next })}
+          locale={lc}
+        />
       </FilterGroup>
 
       <FilterGroup title={t("filter.features", lc)} collapsible defaultOpen={filters.features.size > 0}>

@@ -10,16 +10,62 @@
   "centroid_lng": -88.8965,
   "traditional_units": ["manzanas", "varas"],
   "known_zones": [
-    { "name": "Surf City",          "region": "La Libertad" },
     { "name": "El Tunco",           "region": "La Libertad" },
+    { "name": "El Sunzal",          "region": "La Libertad" },
     { "name": "El Zonte",           "region": "La Libertad" },
+    { "name": "La Libertad",        "region": "La Libertad" },
+    { "name": "San Diego (K59)",    "region": "La Libertad" },
+    { "name": "Mizata",             "region": "La Libertad" },
     { "name": "Playa El Cuco",      "region": "San Miguel" },
+    { "name": "Las Flores",         "region": "La Unión" },
     { "name": "Punta Mango",        "region": "Usulután" },
     { "name": "Conchagua",          "region": "La Unión" },
+    { "name": "Lago de Coatepeque", "region": "Santa Ana" },
+    { "name": "Lago de Ilopango",   "region": "San Salvador" },
+    { "name": "Costa del Sol",      "region": "La Paz" },
+    { "name": "El Espino",          "region": "Usulután" },
+    { "name": "Jiquilisco",         "region": "Usulután" },
     { "name": "Suchitoto",          "region": "Cuscatlán" },
     { "name": "Ataco",              "region": "Ahuachapán" },
-    { "name": "Lago de Coatepeque", "region": "Santa Ana" },
     { "name": "Juayúa",             "region": "Sonsonate" }
+  ],
+  "super_zones": [
+    {
+      "key": "surf-city-1",
+      "name_en": "Surf City 1",
+      "name_es": "Surf City 1",
+      "subtitle_en": "La Libertad coast",
+      "subtitle_es": "Costa de La Libertad",
+      "type": "beach",
+      "children": ["El Tunco", "El Sunzal", "El Zonte", "La Libertad", "San Diego (K59)", "Mizata"]
+    },
+    {
+      "key": "surf-city-2",
+      "name_en": "Surf City 2",
+      "name_es": "Surf City 2",
+      "subtitle_en": "Eastern coast",
+      "subtitle_es": "Costa oriental",
+      "type": "beach",
+      "children": ["Playa El Cuco", "Las Flores", "Punta Mango", "Conchagua"]
+    },
+    {
+      "key": "lago-coatepeque",
+      "name_en": "Lago Coatepeque",
+      "name_es": "Lago Coatepeque",
+      "subtitle_en": "Santa Ana",
+      "subtitle_es": "Santa Ana",
+      "type": "lake",
+      "children": ["Lago de Coatepeque"]
+    },
+    {
+      "key": "lago-ilopango",
+      "name_en": "Lago Ilopango",
+      "name_es": "Lago Ilopango",
+      "subtitle_en": "San Salvador",
+      "subtitle_es": "San Salvador",
+      "type": "lake",
+      "children": ["Lago de Ilopango"]
+    }
   ],
   "listing_count_floor": 700,
   "listing_count_ceiling": 1300,

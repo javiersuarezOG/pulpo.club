@@ -1392,6 +1392,129 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .chip.is-active {
   background: var(--ink); color: var(--paper); border-color: var(--ink);
 }
+
+/* ──────────────────────────────────────────────────────────────
+   LocationFilter — shared between the browse FilterPanel and the
+   account NewsletterFilterChips. Renders the four "super zones"
+   (Surf City 1 / Surf City 2 / Lago Coatepeque / Lago Ilopango)
+   as parent rows with their child zones as chips beneath. Lakes
+   render as single-child rows (no children rail). Leftover zones
+   fall into the "More places" rail below the stack.
+   ────────────────────────────────────────────────────────────── */
+.location-filter {
+  display: flex; flex-direction: column;
+  gap: 12px;
+}
+.location-filter-help {
+  font-size: 12.5px; line-height: 1.5;
+  color: var(--ink-3);
+  margin: 0 0 4px;
+}
+.location-zones-stack {
+  display: flex; flex-direction: column;
+  gap: 12px;
+}
+.location-zone { display: flex; flex-direction: column; }
+
+.location-zone-parent {
+  width: 100%;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  text-align: left; cursor: pointer;
+  font: inherit; color: inherit;
+  transition: border-color 160ms var(--ease-out),
+              background 160ms var(--ease-out),
+              color 160ms var(--ease-out);
+}
+.location-zone-parent:hover { border-color: var(--ink-3); }
+.location-zone-parent.is-all {
+  background: var(--accent); color: var(--paper); border-color: var(--accent);
+}
+.location-zone-parent.is-partial {
+  background: var(--accent-soft); border-color: var(--accent);
+}
+.location-zone-parent.is-lake.is-all {
+  background: var(--accent-lake); border-color: var(--accent-lake); color: var(--paper);
+}
+.location-zone-parent.is-lake.is-partial,
+.location-zone-parent.is-lake:hover { border-color: var(--accent-lake); }
+
+.location-zone-icon {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; flex-shrink: 0;
+  background: var(--accent-soft); color: var(--accent-strong);
+  font-size: 14px;
+}
+.location-zone-parent.is-all .location-zone-icon,
+.location-zone-parent.is-partial .location-zone-icon {
+  background: var(--paper); color: var(--accent-strong);
+}
+.location-zone-parent.is-lake .location-zone-icon {
+  background: color-mix(in oklab, var(--accent-lake) 14%, var(--paper));
+  color: var(--accent-lake);
+}
+.location-zone-parent.is-lake.is-all .location-zone-icon {
+  background: var(--paper); color: var(--accent-lake);
+}
+
+.location-zone-meta { flex: 1; min-width: 0; }
+.location-zone-name {
+  display: block;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: -0.002em;
+}
+.location-zone-sub {
+  display: block;
+  font-size: 12px; color: var(--ink-3);
+  margin-top: 1px;
+}
+.location-zone-parent.is-all .location-zone-name,
+.location-zone-parent.is-all .location-zone-sub { color: var(--paper); }
+.location-zone-parent.is-all .location-zone-sub { opacity: 0.85; }
+
+.location-zone-tally {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+  background: var(--paper-2); color: var(--ink-2);
+  border: 1px solid var(--line);
+  min-width: 38px; text-align: center;
+}
+.location-zone-parent.is-all .location-zone-tally {
+  background: var(--paper); color: var(--accent-strong); border-color: var(--paper);
+}
+.location-zone-parent.is-partial .location-zone-tally {
+  background: var(--accent); color: var(--paper); border-color: var(--accent);
+}
+.location-zone-parent.is-lake .location-zone-tally { color: var(--accent-lake); }
+.location-zone-parent.is-lake.is-all .location-zone-tally {
+  background: var(--paper); color: var(--accent-lake); border-color: var(--paper);
+}
+
+.location-zone-children {
+  margin: 8px 0 0 20px;
+  padding-left: 12px;
+  border-left: 1.5px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.location-zone-divider {
+  display: flex; align-items: center; gap: 8px;
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--ink-4);
+}
+.location-zone-divider::before,
+.location-zone-divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--line);
+}
+.location-zone-more { margin-top: 8px; }
+
 .range-row { display: flex; flex-direction: column; gap: 8px; }
 .range-row label { font-size: 13px; color: var(--ink-2); }
 .range-row input[type="range"] { width: 100%; accent-color: var(--accent); }
