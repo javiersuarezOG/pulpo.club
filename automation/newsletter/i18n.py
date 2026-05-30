@@ -110,18 +110,21 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # newsletter ("the picks I see"), not generic settings-speak.
     "next.cta":                    {"en": "Tune what you see →",                          "es": "Ajustá lo que ves →"},
     "next.cta.anon":               {"en": "Set your filter →",                            "es": "Configurá tu filtro →"},
-    # ── Your Pulpo (PR-NL-8) — dark panel above the footer ──
+    # ── Your Pulpo (v4 — 3 stacked cream action cards) ─────────────────
+    # Eyebrow text = small-caps context line; CTA text = bold action
+    # (no trailing arrow — the arrow renders as its own right-aligned
+    # column in `_your_pulpo_html` for visual consistency across cards).
     "yp.eyebrow":                  {"en": "Your Pulpo",                                   "es": "Tu Pulpo"},
-    "yp.title":                    {"en": "Pick up where you left off.",                  "es": "Seguí donde lo dejaste."},
-    "yp.saved.label":              {"en": "{n} saved listings from past issues",          "es": "{n} propiedades guardadas en ediciones anteriores"},
-    "yp.saved.cta":                {"en": "Open your favorites →",                        "es": "Abrir tus favoritos →"},
-    "yp.filter.cta":               {"en": "Edit your filter →",                           "es": "Editar tu filtro →"},
-    "yp.browse.label":             {"en": "{n} listings in your filter right now",        "es": "{n} propiedades en tu filtro ahora"},
-    "yp.browse.cta":               {"en": "Browse them all →",                            "es": "Explorar todas →"},
-    # Anonymous-cohort-only welcome row (v4 — moved from the dropped
-    # `_next_issue_html` block).
+    "yp.title":                    {"en": "Pick up where you left off.",                  "es": "Retomá donde lo dejaste."},
+    "yp.saved.label":              {"en": "{n} saved listings",                           "es": "{n} propiedades guardadas"},
+    "yp.saved.cta":                {"en": "Open your favorites",                          "es": "Abrir tus favoritos"},
+    "yp.filter.label":             {"en": "Filter: {filter}",                             "es": "Filtro: {filter}"},
+    "yp.filter.cta":               {"en": "Edit your filter",                             "es": "Editar tu filtro"},
+    "yp.browse.label":             {"en": "{n} listings match",                           "es": "{n} propiedades coinciden"},
+    "yp.browse.cta":               {"en": "Browse them all",                              "es": "Verlas todas"},
+    # Anonymous-cohort-only welcome card.
     "yp.welcome.label":            {"en": "No filter set yet",                            "es": "Aún no configuraste tu filtro"},
-    "yp.welcome.cta":              {"en": "Set your filter →",                            "es": "Configurá tu filtro →"},
+    "yp.welcome.cta":              {"en": "Set your filter",                              "es": "Configurá tu filtro"},
     # ── Paywall (free tier) ──
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
     "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},
