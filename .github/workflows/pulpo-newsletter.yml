@@ -25,9 +25,9 @@ on:
         required: false
         default: "1"
       use_llm:
-        description: "DeepSeek voice — 1 = on (default), 0 = deterministic fallback"
+        description: "DeepSeek voice — 1 = on, 0 = deterministic (default)"
         required: false
-        default: "1"
+        default: "0"
       send_mode:
         description: "Switch from dry-run to LIVE Resend send"
         required: false
@@ -58,9 +58,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Deterministic dry-run by default. LLM toggle OFF unless the
-      # dispatch input flips it — never burn DeepSeek credits from cron.
-      PULPO_NEWSLETTER_USE_LLM: "${{ github.event.inputs.use_llm || '1' }}"
+      # LLM toggle OFF by default — both the Sunday cron and the admin
+      # preview button render with `deterministic_commentary` so the copy
+      # matches the editorial template Sebas signed off on. Flip via
+      # `workflow_dispatch use_llm=1` when iterating on the LLM voice.
+      # Never burn DeepSeek credits from cron.
+      PULPO_NEWSLETTER_USE_LLM: "${{ github.event.inputs.use_llm || '0' }}"
 
       # Send gate. Default OFF — weekly cron stays in dry-run. Setting
       # send_mode=yes via workflow_dispatch flips DRY_RUN=0 and the send
