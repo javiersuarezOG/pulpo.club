@@ -322,6 +322,78 @@ const WIDGET_STYLES = `
   opacity: 0.45;
   cursor: not-allowed;
 }
+/* ── Recent test sends log ─────────────────────────────────────────
+   Per-browser localStorage log of trigger attempts. Lives below the
+   Upcoming sends panel so the operator can see whether the last test
+   actually fired without flipping to Gmail or PostHog. Persistence is
+   browser-scoped — operators on a fresh laptop start with an empty
+   log. Cross-device history is a follow-up. */
+.nl-preview-widget .nl-log {
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.nl-preview-widget .nl-log-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.nl-preview-widget .nl-log-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0;
+}
+.nl-preview-widget .nl-log-clear {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 0;
+}
+.nl-preview-widget .nl-log-clear:hover { color: var(--ink); }
+.nl-preview-widget .nl-log-empty {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin: 0;
+}
+.nl-preview-widget .nl-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.nl-preview-widget .nl-log-table th,
+.nl-preview-widget .nl-log-table td {
+  text-align: left;
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nl-preview-widget .nl-log-table th {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  border-bottom-color: var(--line-2);
+}
+.nl-preview-widget .nl-log-table tr:last-child td { border-bottom: 0; }
+.nl-preview-widget .nl-log-when { width: 22%; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
+.nl-preview-widget .nl-log-to { width: 36%; color: var(--ink); }
+.nl-preview-widget .nl-log-locale { width: 8%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; }
+.nl-preview-widget .nl-log-by { width: 22%; color: var(--ink-3); }
+.nl-preview-widget .nl-log-result { width: 12%; font-weight: 600; }
+.nl-preview-widget .nl-log-result.ok { color: var(--accent); }
+.nl-preview-widget .nl-log-result.err { color: oklch(55% 0.18 25); }
 `;
 
 // PR-NL-7a — next-Monday helper. Cron runs every Mon 14:00 UTC; we
@@ -358,6 +430,74 @@ function formatMondayLabel(d, now = new Date()) {
   return `${dateStr} · ${inLabel}`;
 }
 
+// ── Recent test sends log ────────────────────────────────────────────
+// Per-browser localStorage log of trigger attempts. Keys + helpers live
+// at module scope so a future operator surface (e.g. an admin export
+// button) can reuse them. Cap at LOG_CAP so the row never grows
+// unbounded; oldest entries fall off first.
+const LOG_LS_KEY = "pulpo-admin-newsletter-trigger-log";
+const LOG_CAP = 20;
+
+function readLog() {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(LOG_LS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLog(entries) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LOG_LS_KEY, JSON.stringify(entries.slice(0, LOG_CAP)));
+  } catch {
+    // localStorage quota / private-mode failures are silent — the
+    // log is a UX convenience, not a contract.
+  }
+}
+
+function appendLogEntry(entry) {
+  const next = [entry, ...readLog()];
+  writeLog(next);
+  return next;
+}
+
+// Operator identity for the "By" column. /admin is Clerk-gated so a
+// session is guaranteed to exist by the time a trigger fires — we read
+// it off the same `pulpo-user` localStorage blob app.jsx writes (see
+// app.jsx :: setUser localStorage mirror). Falls back to "—" if the
+// blob is missing or malformed (legacy auth path, dev without Clerk).
+function readOperatorEmail() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem("pulpo-user");
+    if (!raw) return null;
+    const u = JSON.parse(raw);
+    return typeof u?.email === "string" ? u.email : null;
+  } catch {
+    return null;
+  }
+}
+
+// Compact "5 min ago" / "Wed 30 May, 10:43" formatter. Recent rows
+// stay relative so the operator can scan latency at a glance; rows
+// older than ~6 hours flip to absolute so the log still reads after
+// returning the next day.
+function formatLogWhen(iso, now = new Date()) {
+  const t = new Date(iso);
+  const diffMs = now.getTime() - t.getTime();
+  const min = Math.round(diffMs / 60_000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 6) return `${hr} h ago`;
+  return t.toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
 
 export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
@@ -369,6 +509,9 @@ export function NewsletterWidget() {
   //   { kind: "error",   message }              — red inline line
   //   { kind: "success", recipient, runsUrl }   — structured success card
   const [status, setStatus] = useState({ kind: null });
+  // Per-browser localStorage log of trigger attempts. Hydrates from
+  // localStorage on mount so the log survives a reload.
+  const [log, setLog] = useState(() => readLog());
 
   // Upcoming Monday cron dates — computed on every render so the
   // "in N days" label stays correct without an interval-tick state.
@@ -395,10 +538,18 @@ export function NewsletterWidget() {
         body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
+      const operatorEmail = readOperatorEmail();
+      const baseEntry = {
+        at: new Date().toISOString(),
+        to: value,
+        locale,
+        by: operatorEmail,
+      };
       if (!r.ok) {
         const detail = body.error || `HTTP ${r.status}`;
         const hint = body.hint ? ` — ${body.hint}` : "";
         setStatus({ kind: "error", message: `${detail}${hint}` });
+        setLog(appendLogEntry({ ...baseEntry, result: "error", detail: `${detail}${hint}` }));
         return;
       }
       setStatus({
@@ -407,14 +558,26 @@ export function NewsletterWidget() {
         runsUrl: body.runs_url || null,
         when,
       });
+      setLog(appendLogEntry({ ...baseEntry, result: "ok" }));
     } catch (err) {
-      setStatus({
-        kind: "error",
-        message: String(err && err.message || err),
-      });
+      const msg = String(err && err.message || err);
+      setStatus({ kind: "error", message: msg });
+      setLog(appendLogEntry({
+        at: new Date().toISOString(),
+        to: value,
+        locale,
+        by: readOperatorEmail(),
+        result: "error",
+        detail: msg,
+      }));
     } finally {
       setBusy(false);
     }
+  };
+
+  const clearLog = () => {
+    writeLog([]);
+    setLog([]);
   };
 
   return (
@@ -492,6 +655,49 @@ export function NewsletterWidget() {
                 );
               })}
             </ul>
+          </div>
+
+          {/* Per-browser log of trigger attempts (localStorage). Cap at
+              LOG_CAP rows so the row never grows unbounded. Empty state
+              renders a one-liner so the operator knows the panel exists
+              before they've fired anything. */}
+          <div className="nl-log">
+            <div className="nl-log-head">
+              <p className="nl-log-eyebrow">Recent test sends</p>
+              {log.length > 0 && (
+                <button type="button" className="nl-log-clear" onClick={clearLog}>
+                  Clear
+                </button>
+              )}
+            </div>
+            {log.length === 0 ? (
+              <p className="nl-log-empty">No test sends yet — fire one above.</p>
+            ) : (
+              <table className="nl-log-table">
+                <thead>
+                  <tr>
+                    <th className="nl-log-when">When</th>
+                    <th className="nl-log-to">To</th>
+                    <th className="nl-log-locale">Lang</th>
+                    <th className="nl-log-by">By</th>
+                    <th className="nl-log-result">Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {log.map((entry, idx) => (
+                    <tr key={`${entry.at}-${idx}`}>
+                      <td className="nl-log-when" title={entry.at}>{formatLogWhen(entry.at)}</td>
+                      <td className="nl-log-to" title={entry.to}>{entry.to}</td>
+                      <td className="nl-log-locale">{entry.locale}</td>
+                      <td className="nl-log-by" title={entry.by || ""}>{entry.by || "—"}</td>
+                      <td className={`nl-log-result ${entry.result === "ok" ? "ok" : "err"}`} title={entry.detail || ""}>
+                        {entry.result === "ok" ? "✓ Sent" : "✗ Failed"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
           {/* Bottom submit button removed — the per-row "Send test →"
