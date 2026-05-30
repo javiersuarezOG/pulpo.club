@@ -41,11 +41,44 @@
 // AND a real Resend send — cheap insurance against a stuck-button loop).
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
+const posthog = require("../../_posthog");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
 const DEFAULT_REF = "main";
 const WORKFLOW_FILE = "pulpo-newsletter.yml";
+
+// Fire a PostHog event so /api/admin/newsletter/recent-triggers can
+// read the cross-device + cross-operator audit log back via HogQL.
+// Best-effort + never blocks the response — the GitHub dispatch is the
+// real action here, the event is an audit trail. capture() in
+// api/_posthog.js is a silent no-op when POSTHOG_PROJECT_TOKEN is
+// missing, so this works in any env.
+//
+// Includes the operator email as a property so the log shows WHO
+// triggered. The widget passes it in the request body; the endpoint
+// is intentionally auth-light (worst-case the property is spoofed to
+// somebody else's name — not a real attack vector).
+async function emitTriggerEvent({ to, locale, by, issueNumber, result, detail }) {
+  try {
+    posthog.capture(
+      posthog.emailDistinctId(by || to),
+      "admin.newsletter_test_triggered",
+      {
+        to,
+        locale,
+        by: by || null,
+        issue_number: issueNumber,
+        result,                          // "ok" | "error"
+        detail: detail || null,          // populated on failure
+        dispatched_at: new Date().toISOString(),
+      },
+    );
+    await posthog.flush();
+  } catch {
+    /* never let telemetry block the dispatch response */
+  }
+}
 
 const limiter = makeRateLimiter({
   windowMs: 60 * 60 * 1000,
@@ -90,6 +123,12 @@ module.exports = async (req, res) => {
   if (!email || !EMAIL_RE.test(email)) {
     return res.status(400).json({ error: "invalid_email" });
   }
+  // Optional `by` — the operator's email (widget reads it from the
+  // Clerk-mirrored localStorage blob). Stamped onto the PostHog
+  // event so the cross-device log shows WHO triggered each test.
+  const by = typeof body.by === "string" && EMAIL_RE.test(body.by.trim().toLowerCase())
+    ? body.by.trim().toLowerCase()
+    : null;
 
   // Validate the optional issue_number — must be a positive integer in
   // a sane range. The default ("1") matches the workflow's pre-existing
@@ -159,6 +198,11 @@ module.exports = async (req, res) => {
       status: 502, ms: Date.now() - t0, reason: "github_fetch_failed",
       error: (err && err.message) || "(no message)",
     });
+    await emitTriggerEvent({
+      to: email, locale, by, issueNumber: issueNumberStr,
+      result: "error",
+      detail: `github_dispatch_failed: ${(err && err.message) || "(no message)"}`,
+    });
     return res.status(502).json({
       error: "github_dispatch_failed",
       detail: (err && err.message) || "(no message)",
@@ -170,6 +214,11 @@ module.exports = async (req, res) => {
     logApi("admin.newsletter_trigger_preview", {
       status: gh.status, ms: Date.now() - t0, reason: "github_non_204",
     });
+    await emitTriggerEvent({
+      to: email, locale, by, issueNumber: issueNumberStr,
+      result: "error",
+      detail: `github_status_${gh.status}: ${detail.slice(0, 200)}`,
+    });
     return res.status(gh.status === 404 ? 404 : 502).json({
       error: "github_dispatch_rejected",
       github_status: gh.status,
@@ -180,6 +229,11 @@ module.exports = async (req, res) => {
   logApi("admin.newsletter_trigger_preview", {
     status: 202, ms: Date.now() - t0,
     repo, ref, locale, email_domain: email.split("@")[1] || "",
+  });
+
+  await emitTriggerEvent({
+    to: email, locale, by, issueNumber: issueNumberStr,
+    result: "ok",
   });
 
   return res.status(202).json({
