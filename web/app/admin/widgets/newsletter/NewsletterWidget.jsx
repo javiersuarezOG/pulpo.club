@@ -277,13 +277,18 @@ const WIDGET_STYLES = `
 }
 .nl-preview-widget .nl-upcoming-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   padding: 8px 10px;
   background: var(--paper);
   border: 1px solid var(--line-2);
   border-radius: 6px;
+}
+.nl-preview-widget .nl-upcoming-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 .nl-preview-widget .nl-upcoming-row .nl-upcoming-meta {
   display: flex;
@@ -301,7 +306,14 @@ const WIDGET_STYLES = `
   font-size: 11px;
   color: var(--ink-3);
 }
-.nl-preview-widget .nl-upcoming-btn {
+.nl-preview-widget .nl-upcoming-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.nl-preview-widget .nl-upcoming-btn,
+.nl-preview-widget .nl-audience-btn {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--line-2);
@@ -312,15 +324,112 @@ const WIDGET_STYLES = `
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
-  flex: 0 0 auto;
 }
 .nl-preview-widget .nl-upcoming-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
-.nl-preview-widget .nl-upcoming-btn[disabled] {
+.nl-preview-widget .nl-audience-btn {
+  /* Audience send is the high-blast-radius action — use a deliberate
+     warm tone (clay border) so the button doesn't look like just
+     another "Send test" sibling. Type-to-confirm gate sits behind it. */
+  border-color: var(--clay, #B8643C);
+  color: var(--clay, #B8643C);
+}
+.nl-preview-widget .nl-audience-btn:hover {
+  background: var(--clay, #B8643C);
+  color: #fff;
+}
+.nl-preview-widget .nl-upcoming-btn[disabled],
+.nl-preview-widget .nl-audience-btn[disabled] {
   opacity: 0.45;
   cursor: not-allowed;
+}
+/* ── Audience-send inline confirmation ─────────────────────────────
+   Drops in below the row when the operator clicks "Send to everyone".
+   Type-to-confirm input + Cancel/Send buttons. Server-side mirror of
+   the SEND gate at /api/admin/newsletter/trigger-audience-send. */
+.nl-preview-widget .nl-audience-confirm {
+  margin-top: 4px;
+  padding: 14px;
+  background: #FFF8F0;
+  border: 1px solid var(--clay, #B8643C);
+  border-radius: 6px;
+}
+.nl-preview-widget .nl-audience-headline {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.nl-preview-widget .nl-audience-headline.ok { color: #1F3D31; }
+.nl-preview-widget .nl-audience-headline.err { color: #6B2C2C; }
+.nl-preview-widget .nl-audience-warn,
+.nl-preview-widget .nl-audience-body {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.nl-preview-widget .nl-audience-confirm-label {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+.nl-preview-widget .nl-audience-confirm-input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-mono, monospace);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+}
+.nl-preview-widget .nl-audience-confirm-input:focus {
+  outline: 2px solid var(--clay, #B8643C);
+  outline-offset: 1px;
+}
+.nl-preview-widget .nl-audience-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.nl-preview-widget .nl-audience-cancel {
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.nl-preview-widget .nl-audience-send {
+  background: var(--clay, #B8643C);
+  color: #fff;
+  border: 1px solid var(--clay, #B8643C);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.nl-preview-widget .nl-audience-send[disabled] {
+  background: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+.nl-preview-widget .nl-audience-loading {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
 }
 /* ── Recent test sends log ─────────────────────────────────────────
    Per-browser localStorage log of trigger attempts. Lives below the
@@ -518,6 +627,116 @@ export function NewsletterWidget() {
   // Cheap (~3 ops), no useMemo needed.
   const upcoming = nextMondays(3);
 
+  // ── Audience-send (per-row inline confirmation) ─────────────────
+  //
+  // The "Send to everyone" button next to each upcoming row fires a
+  // LIVE send to every Pro/Agency subscriber. The flow:
+  //
+  //   1. Operator clicks "Send to everyone".
+  //   2. `audienceConfirm` opens for that row + we GET
+  //      /api/admin/newsletter/audience-count to populate the count.
+  //   3. The inline card shows "Send Issue N to X readers?" + a
+  //      type-to-confirm input.
+  //   4. Operator types SEND + clicks Send → POST
+  //      /api/admin/newsletter/trigger-audience-send.
+  //   5. On success: row's audienceConfirm transitions to "dispatched"
+  //      with a link to the workflow run.
+  //
+  // State shape (null = no row in confirm mode; only one at a time):
+  //   {
+  //     issueNumber: number,
+  //     phase: "loading_count" | "ready" | "submitting" | "dispatched" | "error",
+  //     typedConfirm: string,         // what's in the input
+  //     audienceCount: number | null, // populated after step 2
+  //     runsUrl: string | null,       // populated after step 5
+  //     errorMessage: string | null,
+  //   }
+  const [audienceConfirm, setAudienceConfirm] = useState(null);
+
+  const openAudienceConfirm = useCallback(async (issueNumber) => {
+    setAudienceConfirm({
+      issueNumber,
+      phase: "loading_count",
+      typedConfirm: "",
+      audienceCount: null,
+      runsUrl: null,
+      errorMessage: null,
+    });
+    try {
+      const r = await fetch("/api/admin/newsletter/audience-count");
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
+          ...prev,
+          phase: "error",
+          errorMessage: body.error || `Couldn't load audience count (HTTP ${r.status})`,
+        } : prev);
+        return;
+      }
+      setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
+        ...prev,
+        phase: "ready",
+        audienceCount: typeof body.count === "number" ? body.count : 0,
+      } : prev);
+    } catch (err) {
+      const msg = String(err && err.message || err);
+      setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
+        ...prev,
+        phase: "error",
+        errorMessage: msg,
+      } : prev);
+    }
+  }, []);
+
+  const cancelAudienceConfirm = useCallback(() => {
+    setAudienceConfirm(null);
+  }, []);
+
+  const submitAudienceConfirm = useCallback(async () => {
+    setAudienceConfirm((prev) => prev ? { ...prev, phase: "submitting", errorMessage: null } : prev);
+    const operatorEmail = readOperatorEmail();
+    const snapshot = audienceConfirm;
+    if (!snapshot) return;
+    try {
+      const r = await fetch("/api/admin/newsletter/trigger-audience-send", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          confirm: snapshot.typedConfirm,
+          issue_number: snapshot.issueNumber,
+          audience_count: snapshot.audienceCount,
+          by: operatorEmail || undefined,
+        }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const detail = body.error || `HTTP ${r.status}`;
+        const hint = body.hint ? ` — ${body.hint}` : "";
+        setAudienceConfirm((prev) => prev ? {
+          ...prev,
+          phase: "error",
+          errorMessage: `${detail}${hint}`,
+        } : prev);
+        return;
+      }
+      setAudienceConfirm((prev) => prev ? {
+        ...prev,
+        phase: "dispatched",
+        runsUrl: body.runs_url_hint || null,
+      } : prev);
+      // Refresh the server-side log so the audience send shows up in
+      // "Recent test sends" — uses the same PostHog ingestion path.
+      window.setTimeout(() => { refreshServerLog(); }, 5000);
+    } catch (err) {
+      const msg = String(err && err.message || err);
+      setAudienceConfirm((prev) => prev ? {
+        ...prev,
+        phase: "error",
+        errorMessage: msg,
+      } : prev);
+    }
+  }, [audienceConfirm, refreshServerLog]);
+
   // Shared trigger for both the legacy "Send next 3 cohort variants"
   // button and the per-row "Send test →" buttons in the Upcoming Sends
   // panel. `issueNumber=null` keeps the legacy default ("1" server-side).
@@ -637,20 +856,134 @@ export function NewsletterWidget() {
                 const humanIssue = idx === 0 ? "Next issue"
                   : idx === 1 ? "Following"
                   : "After that";
+                const issueNum = idx + 1;
+                const confirmOpen = audienceConfirm && audienceConfirm.issueNumber === issueNum;
                 return (
                   <li className="nl-upcoming-row" key={d.toISOString()}>
-                    <div className="nl-upcoming-meta">
-                      <span className="nl-upcoming-issue">{humanIssue}</span>
-                      <span className="nl-upcoming-when">{label}</span>
+                    <div className="nl-upcoming-row-main">
+                      <div className="nl-upcoming-meta">
+                        <span className="nl-upcoming-issue">{humanIssue}</span>
+                        <span className="nl-upcoming-when">{label}</span>
+                      </div>
+                      <div className="nl-upcoming-actions">
+                        <button
+                          type="button"
+                          className="nl-upcoming-btn"
+                          disabled={busy || !!audienceConfirm}
+                          onClick={() => trigger({ issueNumber: issueNum, when: label })}
+                          title="Send a test copy to your email only — no real subscribers receive this."
+                        >
+                          Send test →
+                        </button>
+                        <button
+                          type="button"
+                          className="nl-audience-btn"
+                          disabled={busy || !!audienceConfirm}
+                          onClick={() => openAudienceConfirm(issueNum)}
+                          title="Send this issue to every paying Pulpo subscriber. Confirmation required."
+                        >
+                          Send to everyone
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      className="nl-upcoming-btn"
-                      disabled={busy}
-                      onClick={() => trigger({ issueNumber: idx + 1, when: label })}
-                    >
-                      Send test →
-                    </button>
+                    {confirmOpen && (
+                      <div className="nl-audience-confirm" role="dialog" aria-live="polite">
+                        {audienceConfirm.phase === "loading_count" && (
+                          <p className="nl-audience-loading">
+                            <span className="nl-status-icon" aria-hidden="true" />
+                            Counting subscribers…
+                          </p>
+                        )}
+                        {audienceConfirm.phase === "ready" && (
+                          <>
+                            <p className="nl-audience-headline">
+                              Send Issue {issueNum} to <strong>{audienceConfirm.audienceCount} {audienceConfirm.audienceCount === 1 ? "reader" : "readers"}</strong>?
+                            </p>
+                            <p className="nl-audience-warn">
+                              This goes to every paying Pulpo subscriber right now. The email can&rsquo;t be recalled once sent.
+                            </p>
+                            <label className="nl-audience-confirm-label">
+                              Type <strong>SEND</strong> to confirm:
+                              <input
+                                type="text"
+                                className="nl-audience-confirm-input"
+                                value={audienceConfirm.typedConfirm}
+                                onChange={(e) => setAudienceConfirm((prev) => prev ? { ...prev, typedConfirm: e.target.value } : prev)}
+                                autoFocus
+                                spellCheck={false}
+                                autoComplete="off"
+                              />
+                            </label>
+                            <div className="nl-audience-confirm-actions">
+                              <button
+                                type="button"
+                                className="nl-audience-cancel"
+                                onClick={cancelAudienceConfirm}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                className="nl-audience-send"
+                                disabled={audienceConfirm.typedConfirm !== "SEND"}
+                                onClick={submitAudienceConfirm}
+                              >
+                                Send now
+                              </button>
+                            </div>
+                          </>
+                        )}
+                        {audienceConfirm.phase === "submitting" && (
+                          <p className="nl-audience-loading">
+                            <span className="nl-status-icon" aria-hidden="true" />
+                            Dispatching to all subscribers…
+                          </p>
+                        )}
+                        {audienceConfirm.phase === "dispatched" && (
+                          <>
+                            <p className="nl-audience-headline ok">
+                              <span className="nl-success-check" aria-hidden="true">✓</span>
+                              Sent Issue {issueNum} to {audienceConfirm.audienceCount} {audienceConfirm.audienceCount === 1 ? "reader" : "readers"}
+                            </p>
+                            <p className="nl-audience-body">
+                              The workflow is dispatching now. Resend deliveries follow as the job runs (~30s–2m).
+                            </p>
+                            {audienceConfirm.runsUrl && (
+                              <p>
+                                <a href={audienceConfirm.runsUrl} target="_blank" rel="noreferrer">
+                                  View workflow run on GitHub →
+                                </a>
+                              </p>
+                            )}
+                            <div className="nl-audience-confirm-actions">
+                              <button
+                                type="button"
+                                className="nl-audience-cancel"
+                                onClick={cancelAudienceConfirm}
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </>
+                        )}
+                        {audienceConfirm.phase === "error" && (
+                          <>
+                            <p className="nl-audience-headline err">
+                              <span aria-hidden="true">!</span> {audienceConfirm.errorMessage || "Something went wrong."}
+                            </p>
+                            <div className="nl-audience-confirm-actions">
+                              <button
+                                type="button"
+                                className="nl-audience-cancel"
+                                onClick={cancelAudienceConfirm}
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </li>
                 );
               })}
