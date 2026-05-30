@@ -89,7 +89,8 @@ module.exports = async (req, res) => {
       properties.by AS by,
       properties.result AS result,
       properties.detail AS detail,
-      properties.issue_number AS issue_number
+      properties.issue_number AS issue_number,
+      properties.newsletter_id AS newsletter_id
     FROM events
     WHERE event = '${EVENT_NAME}'
     ORDER BY timestamp DESC
@@ -150,6 +151,12 @@ module.exports = async (req, res) => {
         result: out.result || null,
         detail: out.detail || null,
         issue_number: out.issue_number || null,
+        // Pre-registry events (sent before the widget started forwarding
+        // newsletter_id) have no value here — the widget falls back to
+        // "pro-weekly" since that's the only newsletter the cron sent
+        // before the rollout. Stays null when the event came from a
+        // future endpoint that doesn't supply it.
+        newsletter_id: out.newsletter_id || null,
       };
     })
     : [];
