@@ -847,22 +847,31 @@ def _to_pick(
     story_html, story_source = ("", "")
     why_bullets: list[str] = []
     shortlist_frame_html = ""
-    if is_hero and not paywalled:
-        # Paywalled picks render the locked teaser instead of the story —
-        # no point burning LLM tokens on a paragraph the reader never sees.
-        story_html, story_source = _llm_or_deterministic_story(
-            listing,
-            locale=locale,
-            issue_id=issue_id,
-            llm_client_override=llm_client_override,
-        )
-        # v3 — three plain-English bullets replacing the opaque
-        # "Why Pulpo ranked it: value 100 · momentum 50" row. Hero-only
-        # because the shortlist gets a single "For someone who…" frame
-        # below instead.
+    if not paywalled:
+        # v4 (2026-05-30): the locked `_pick_card_html` component
+        # renders ALL 10 picks through the same Why-block — top 3 and
+        # picks 04-10 alike. Generating why_bullets only for heroes (the
+        # v3 split) left picks 04-10 with an EMPTY why-block in v4 — the
+        # cards looked dramatically less informative than the top 3 and
+        # broke the "all cards identical except background color"
+        # contract the redesign locked in. Fix: populate why_bullets for
+        # every non-paywalled pick.
         why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
-    elif not is_hero and not paywalled:
-        shortlist_frame_html = commentary_mod.deterministic_shortlist_frame(listing, locale)
+        if is_hero:
+            # `story_html` and `shortlist_frame_html` are dead code in
+            # v4 (only the legacy `_rich_pick` / `_short_pick` renderers
+            # consumed them, and v4's `render_html()` no longer calls
+            # those). Kept populated here so a rollback to v3 wouldn't
+            # silently regress, and so the per-process story cache + LLM
+            # telemetry stay warm — both negligible overhead.
+            story_html, story_source = _llm_or_deterministic_story(
+                listing,
+                locale=locale,
+                issue_id=issue_id,
+                llm_client_override=llm_client_override,
+            )
+        else:
+            shortlist_frame_html = commentary_mod.deterministic_shortlist_frame(listing, locale)
     return IssuePick(
         rank=rank,
         source_id=f"{listing.get('source')}:{listing.get('source_id')}",
