@@ -875,10 +875,12 @@ export function NewsletterWidget() {
   // either source — both are tiny arrays so the cost is negligible.
   const log = mergeLogs(serverEntries, localEntries);
 
-  // Upcoming Monday cron dates — computed on every render so the
-  // "in N days" label stays correct without an interval-tick state.
-  // Cheap (~3 ops), no useMemo needed.
-  const upcoming = nextMondays(3);
+  // Upcoming Monday cron date — only the next one. Operator feedback
+  // (2026-05-30): the 3-row preview was clutter; only the very next
+  // issue is what gets tested or sent ad-hoc. `nextMondays` returns
+  // an array so the existing `.map(...)` renderer keeps working
+  // unchanged — it just iterates a 1-element list.
+  const upcoming = nextMondays(1);
 
   // ── Audience-send (per-row inline confirmation) ─────────────────
   //
