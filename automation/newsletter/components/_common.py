@@ -28,7 +28,28 @@ from ..types import Issue
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v4.0-2026-05"
+#
+# Revision history (most recent first):
+#   v4.3 (2026-05-31) — hard photo-eligibility filter (no broker-logo
+#       placeholders) · chrome alignment (header/hero/footer flush at
+#       24px horizontal) · inline-SVG brand mark replaced with hosted
+#       PNG (works on Gmail iOS / Outlook desktop / Yahoo / AOL) ·
+#       `&hearts;&#xfe0e;` text variation selector + `white-space:
+#       nowrap` on Save / See-on-Pulpo CTAs
+#   v4.2 (2026-05-31) — component package + templates registry scaffolding
+#   v4.1 (2026-05-31) — italic removal · Pro branding pill in header/footer ·
+#       numbered editorial blocks in market context · v4.0 photo-fallback
+#       placeholder (superseded in v4.3 by the hard upstream filter)
+#   v4.0 (2026-05-30) — locked card component · section intros ·
+#       Weekly News Spotlight · Your Pulpo cream cards · footer pill
+#       buttons · skip + next-issue blocks removed
+TEMPLATE_VERSION = "newsletter-v4.3-2026-05-31"
+
+# Human-readable timestamp surfaced in component docs + the admin
+# widget so collaborators can see when the locked design was last
+# revised without trawling git log. Matches the `vN.N (date)` line at
+# the top of the revision history above.
+LAST_UPDATED = "2026-05-31"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -222,4 +243,4 @@ def site_root_from_issue(issue: Issue) -> str:
     return "https://pulpo.club"
 
 
-__all__ = ["TEMPLATE_VERSION", "CSS", "escape", "site_root_from_issue"]
+__all__ = ["TEMPLATE_VERSION", "LAST_UPDATED", "CSS", "escape", "site_root_from_issue"]

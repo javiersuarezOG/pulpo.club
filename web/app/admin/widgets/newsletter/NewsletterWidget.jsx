@@ -121,6 +121,18 @@ const NEWSLETTERS = [
   },
 ];
 
+// v4.3 (2026-05-31) — surface the locked template's version + last
+// revision date on every newsletter card. The values here are the
+// human-readable form of `TEMPLATE_VERSION` + `LAST_UPDATED` in
+// `automation/newsletter/components/_common.py`. The Python-side
+// values are the source of truth; this map mirrors them for display.
+// `tests/newsletter/test_templates.py::test_template_version_in_widget_matches_python`
+// enforces alignment in CI — if the operator bumps TEMPLATE_VERSION
+// in Python but forgets to bump this map (or vice versa), CI fails.
+const TEMPLATE_VERSIONS = {
+  "pulpo-pro-general": { version: "v4.3", lastUpdated: "2026-05-31" },
+};
+
 const PRO_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "pro");
 const FREE_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "free");
 
@@ -1191,6 +1203,9 @@ export function NewsletterWidget() {
               <p className="nl-newsletter-desc">{NEWSLETTERS.find(n => n.id === "pro-weekly").description}</p>
               <p className="nl-newsletter-template">
                 Template · <strong>{NEWSLETTERS.find(n => n.id === "pro-weekly").templateLabel}</strong>
+                {TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template] && (
+                  <> · {TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template].version} ({TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template].lastUpdated})</>
+                )}
                 <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
               </p>
               <div className="nl-newsletter-body">
@@ -1400,6 +1415,9 @@ export function NewsletterWidget() {
                 <p className="nl-newsletter-desc">{nl.description}</p>
                 <p className="nl-newsletter-template">
                   Template · <strong>{nl.templateLabel}</strong>
+                  {TEMPLATE_VERSIONS[nl.template] && (
+                    <> · {TEMPLATE_VERSIONS[nl.template].version} ({TEMPLATE_VERSIONS[nl.template].lastUpdated})</>
+                  )}
                 </p>
               </article>
             ))}
@@ -1423,6 +1441,9 @@ export function NewsletterWidget() {
                 <p className="nl-newsletter-desc">{nl.description}</p>
                 <p className="nl-newsletter-template">
                   Template · <strong>{nl.templateLabel}</strong>
+                  {TEMPLATE_VERSIONS[nl.template] && (
+                    <> · {TEMPLATE_VERSIONS[nl.template].version} ({TEMPLATE_VERSIONS[nl.template].lastUpdated})</>
+                  )}
                   {nl.status === "live" && (
                     <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
                   )}

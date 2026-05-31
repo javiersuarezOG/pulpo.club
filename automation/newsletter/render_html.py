@@ -1250,11 +1250,7 @@ def _footer_html(issue: Issue) -> str:
     <tr><td class="pad footer-strip" style="padding:24px 24px 28px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);">
       <table role="presentation" cellpadding="0" cellspacing="0"><tr>
         <td style="line-height:0;padding-right:8px;vertical-align:middle;">
-          <svg width="20" height="20" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
-            <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
-            <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
-          </svg>
+          <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="20" height="20" alt="Pulpo" style="display:block;width:20px;height:20px;border:0;" />
         </td>
         <td style="vertical-align:middle;">
           <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span><span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.14em;padding:2px 5px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:5px;vertical-align:middle;line-height:1;">PRO</span>
@@ -1517,47 +1513,16 @@ def _pick_card_html(
         f'</div>'
     )
 
-    # Photo (full-width). v4.1 (2026-05-31): when the listing source
-    # only serves a broker-logo image (REMAX / Citymax — filtered
-    # upstream to avoid leaking the broker's brand into our card),
-    # `pick.photo_url` is empty. v4.0 rendered nothing in that slot,
-    # which made the affected cards visually inconsistent with the
-    # rest (no fixed-height image at the top). Now we render a soft
-    # branded placeholder band — same shape footprint as a real
-    # photo — so card heights stay consistent and the missing-image
-    # state reads as "image withheld" rather than "broken layout".
-    if pick.photo_url:
-        photo_html = (
-            f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title or "")}" '
-            f'width="100%" style="width:100%;height:auto;display:block;" />'
-        )
-    else:
-        placeholder_bg = "#C9DEC6" if is_top_deal else "#E8DFC6"
-        placeholder_label = (
-            "Photo not available from source" if en
-            else "Imagen no disponible desde la fuente"
-        )
-        photo_html = (
-            f'<div style="height:180px;background:{placeholder_bg};display:block;'
-            f'text-align:center;vertical-align:middle;line-height:180px;">'
-            f'<table role="presentation" cellpadding="0" cellspacing="0" '
-            f'style="margin:0 auto;height:180px;"><tr>'
-            f'<td style="vertical-align:middle;text-align:center;line-height:1;padding:0;">'
-            f'<svg width="36" height="36" viewBox="-50 -50 100 100" '
-            f'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-            f'<path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 '
-            f'C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 '
-            f'C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" '
-            f'stroke-linecap="round" fill="none" opacity="0.45"/>'
-            f'<circle cx="18" cy="-4" r="9.5" fill="#1F3D31" opacity="0.45"/>'
-            f'<circle cx="18" cy="-4" r="5.5" fill="#D4A04A" opacity="0.7"/>'
-            f'</svg>'
-            f'<div style="font-size:11px;letter-spacing:0.06em;color:#5A5650;'
-            f'margin-top:6px;text-transform:uppercase;font-weight:500;">'
-            f'{_e(placeholder_label)}</div>'
-            f'</td></tr></table>'
-            f'</div>'
-        )
+    # Photo (full-width). v4.3 (2026-05-31): listings without a
+    # card-eligible photo are filtered out in `build_issue` via
+    # `_listing_has_eligible_photo` BEFORE picking, so by the time we
+    # reach here `pick.photo_url` is guaranteed non-empty. Operator
+    # policy: a listing can only appear in the newsletter if every
+    # field needed to render its card — photo included — is available.
+    photo_html = (
+        f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title or "")}" '
+        f'width="100%" style="width:100%;height:auto;display:block;" />'
+    )
 
     # Price line — "$900,000" + optional " · $621/m²" inline.
     ppm = _pick_ppm_from_keytable(pick) if not pick.paywalled else ""
@@ -1598,19 +1563,32 @@ def _pick_card_html(
             f'color:#1A1916;">{price_line}</p>'
             f'{why_html}'
         )
+        # v4.3 (2026-05-31) — operator feedback: the &hearts; entity
+        # was being rendered as a full-size red emoji by Apple Mail /
+        # iOS Mail (U+2665 gets emoji-substituted at line-height),
+        # pushing the button to 2 lines. Two defenses:
+        #   1. `white-space:nowrap` on the anchor — even if the heart
+        #      stays large, the content never wraps.
+        #   2. `&#xfe0e;` after the heart — the U+FE0E text variation
+        #      selector forces every client to render the preceding
+        #      glyph as text, not emoji. Cross-client safe.
+        # Same nowrap on the filled CTA so the right-arrow can't wrap
+        # away from the label on tight viewports.
         cta_html = (
             f'<table role="presentation"><tr>'
             f'<td style="padding-right:8px;">'
             f'<a class="btn-fill" href="{_e(primary_url)}" '
             f'style="display:inline-block;font-size:13px;font-weight:600;'
             f'padding:11px 18px;background:#18211C;color:#F4EFE6;'
-            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;">'
+            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
+            f'white-space:nowrap;">'
             f'{_e(cta_label)}</a></td>'
             f'<td><a class="btn-ghost" href="{_e(save_url)}" '
             f'style="display:inline-block;font-size:13px;font-weight:600;'
             f'padding:10px 16px;color:#1A1916;border:1px solid #1A1916;'
-            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;">'
-            f'&hearts; {_e(save_label)}</a></td>'
+            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
+            f'white-space:nowrap;">'
+            f'&hearts;&#xfe0e; {_e(save_label)}</a></td>'
             f'</tr></table>'
         )
 
@@ -1733,11 +1711,7 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
       <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
       <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:6px;"><tr>
         <td style="line-height:0;padding-right:8px;vertical-align:middle;">
-          <svg width="18" height="18" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
-            <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
-            <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
-          </svg>
+          <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="18" height="18" alt="Pulpo" style="display:block;width:18px;height:18px;border:0;" />
         </td>
         <td style="vertical-align:middle;">
           <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#1F3D31;font-weight:700;">{_e(eyebrow)}</div>
@@ -1821,7 +1795,7 @@ def render_html(issue: Issue) -> str:
     )
 
     hero_block = f"""
-    <tr><td class="pad" style="padding-top: 28px; padding-bottom: 20px;">
+    <tr><td style="padding:28px 24px 20px;">
       <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
       <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
       <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{issue.commentary.lede_hero}</p>
@@ -1829,20 +1803,23 @@ def render_html(issue: Issue) -> str:
     </td></tr>
     """
 
-    # Brand mark: a tentacle coiled around the gold catch. Inline SVG so
-    # email clients render it without external assets. Hex colors only —
-    # most clients strip CSS vars from inline styles.
+    # Brand mark: hosted PNG so every email client renders it. Inline
+    # SVGs are stripped by Gmail iOS app, Outlook desktop, Yahoo, AOL —
+    # `web/assets/email-logo-32@2x.png` (64x64 RGBA) is the canonical
+    # Pulpo octopus + gold-catch mark. Served from pulpo.club with a
+    # 1-day CDN cache + image/png Content-Type.
+    #
+    # Horizontal padding switched from `class="pad-sm"` (36px from the
+    # v3 CSS block) to inline 24px to match every v4 body block —
+    # without this the header sat 12px further out than the content
+    # below it, producing the "floating header" effect.
     header_strip = f"""
-    <tr><td class="pad-sm" style="border-bottom: 1px solid var(--line);">
+    <tr><td style="padding:14px 24px;border-bottom: 1px solid var(--line);">
       <table width="100%" role="presentation"><tr>
         <td style="vertical-align: middle;">
           <table role="presentation" cellpadding="0" cellspacing="0"><tr>
             <td style="vertical-align: middle; padding-right: 10px; line-height: 0;">
-              <svg width="26" height="26" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
-                <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
-                <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
-              </svg>
+              <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="26" height="26" alt="Pulpo" style="display:block;width:26px;height:26px;border:0;" />
             </td>
             <td style="vertical-align: middle;">
               <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span><span style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.14em;padding:2px 6px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:6px;vertical-align:middle;line-height:1;">PRO</span>

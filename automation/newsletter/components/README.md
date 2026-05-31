@@ -1,10 +1,39 @@
 # Pulpo newsletter components
 
+**Template version:** see `TEMPLATE_VERSION` in [`_common.py`](_common.py)
+**Last updated:** see `LAST_UPDATED` in [`_common.py`](_common.py)
+
 Every Pulpo newsletter is composed from the components in this package.
 The canonical reference is the **Pulpo Pro General** template — the
 weekly digest every Pro subscriber gets. Future newsletters (Pro
 Welcome, Free Welcome, Free Weekly) build on top of these same
 components.
+
+## Latest revision (v4.3 · 2026-05-31)
+
+Operator-driven polish + hard data-quality gate:
+
+- **Photo-eligibility filter** — listings without a card-eligible
+  photo (broker-logo source, text-overlay watermark, no `photo_urls`
+  AND no `hero_photo_path`) are dropped from the picks pool BEFORE
+  selection runs. Implemented in
+  [`build_issue._listing_has_eligible_photo`](../build_issue.py).
+  Operator policy: a listing can only appear in the newsletter if
+  every field needed to render its card — photo included — is
+  available. The v4.1 placeholder-band fallback is removed.
+- **Chrome alignment** — header, hero, body, and footer all use 24px
+  horizontal padding now. The v3 `.pad`/`.pad-sm` 36px classes are
+  no longer used by chrome blocks (the header used to sit 12px
+  further out than the body, producing a "floating" effect).
+- **Brand marks** — three inline SVGs (header / spotlight / footer)
+  are replaced with hosted PNG `<img>` tags pointing at
+  `https://pulpo.club/assets/email-logo-32@2x.png`. Gmail iOS app,
+  Outlook desktop, Yahoo, and AOL strip inline SVG; the hosted PNG
+  renders everywhere.
+- **Save button** — `&hearts;` gets the U+FE0E text variation
+  selector appended so Apple Mail / iOS Mail render it as text, not
+  a full-size red emoji. Both CTAs (Save + See-on-Pulpo) carry
+  `white-space: nowrap` so the button content never wraps to 2 lines.
 
 ## Component map
 

@@ -91,6 +91,13 @@ def _listing(
         "is_flat": True,
         "photo_urls": [photo_url],
         "hero_photo_path": f"/photos/{source}_{resolved_id}.jpg",
+        # v4.3 (2026-05-31) — `build_issue._listing_has_eligible_photo`
+        # filters out listings without `card_eligible=True` BEFORE
+        # picking, so the test pool needs the flag set to mirror
+        # production (where `ranked.json` stamps it from the photo
+        # pipeline). Tests can override per-fixture via the dict.
+        "card_eligible": True,
+        "has_text_overlay": False,
     }
 
 
