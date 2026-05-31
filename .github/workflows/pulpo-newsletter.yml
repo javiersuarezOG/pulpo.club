@@ -11,9 +11,11 @@ name: pulpo newsletter
 #     fires newsletter.send_succeeded/failed events into PostHog. Pair with
 #     only_email=javier@suarez.ventures for the first live smoke test.
 #
-# Fortnight gating (every other Monday) lands in PR-NL-4 once we've
-# verified end-to-end sending. For now: weekly cron in dry-run, send_mode
-# is operator-driven.
+# issue_number defaults to auto: when the operator leaves the input
+# blank, the script queries PostHog for max(issue_number) from past
+# successful sends and uses that + 1. Smoke (only_email) and preview
+# (preview_cohorts) sends require an explicit number so a tester send
+# can't bump production state.
 
 on:
   schedule:
@@ -21,9 +23,9 @@ on:
   workflow_dispatch:
     inputs:
       issue_number:
-        description: "Issue number to stamp into the header (defaults to 1)"
+        description: "Issue number (LEAVE BLANK to auto-increment from PostHog; required for preview / only_email runs)"
         required: false
-        default: "1"
+        default: ""
       use_llm:
         description: "DeepSeek voice — 1 = on, 0 = deterministic (default)"
         required: false
@@ -77,6 +79,12 @@ jobs:
       POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
       POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
       DEEPSEEK_API_TOKEN: "${{ secrets.DEEPSEEK_API_TOKEN }}"
+      # Read-side PostHog auth — used by automation/newsletter/issue_state.py
+      # to query max(issue_number) from newsletter.send_succeeded events
+      # when issue_number input is blank (auto-increment path). Missing
+      # secrets degrade to default=1; the send still runs.
+      POSTHOG_PROJECT_ID: "${{ secrets.POSTHOG_PROJECT_ID }}"
+      POSTHOG_PERSONAL_API_KEY: "${{ secrets.POSTHOG_PERSONAL_API_KEY }}"
 
       # Send pipeline secrets. Missing-key paths return SendResult.error
       # — the script logs + PostHogs them, never crashes.
@@ -133,12 +141,20 @@ jobs:
         #  • workflow_dispatch + preview_cohorts=<email> — LIVE to that
         #    one address, three sends (anonymous, free_prefs, pro_prefs)
         #    so the operator can vet what each subscriber type receives.
+        #
+        # issue_number is passed ONLY when the operator provided one
+        # (blank input → script auto-increments from PostHog). Smoke
+        # / preview runs require an explicit value; the script exits
+        # 2 if the input is blank in those modes.
         run: |
           ONLY_EMAIL="${{ github.event.inputs.only_email || '' }}"
           PREVIEW_EMAIL="${{ github.event.inputs.preview_cohorts || '' }}"
           PREVIEW_LOCALE="${{ github.event.inputs.preview_locale || 'en' }}"
-          ARGS=(--issue-number "${{ github.event.inputs.issue_number || '1' }}" \
-                --write-html-to newsletter-drafts/sent)
+          ISSUE_NUMBER="${{ github.event.inputs.issue_number || '' }}"
+          ARGS=(--write-html-to newsletter-drafts/sent)
+          if [ -n "$ISSUE_NUMBER" ]; then
+            ARGS+=(--issue-number "$ISSUE_NUMBER")
+          fi
           if [ -n "$PREVIEW_EMAIL" ]; then
             ARGS+=(--preview-cohorts "$PREVIEW_EMAIL" --preview-locale "$PREVIEW_LOCALE")
           elif [ -n "$ONLY_EMAIL" ]; then

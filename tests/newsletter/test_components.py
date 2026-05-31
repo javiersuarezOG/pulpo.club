@@ -139,9 +139,13 @@ def test_pro_general_renders_hidden_preheader(rendered_pro_general_html):
     # Real-content tease, not generic boilerplate. Pool fixture has
     # 30 listings under the Pro filter so there's always picks_top[0]
     # + at least one shortlist pick.
-    assert "more picks for the fortnight" in html
+    assert "more picks this week" in html
     # The generic fallback should NOT render when picks_top is populated.
     assert "10 hand-picked listings from El Salvador" not in html
+    # Cadence guard: never reintroduce the fortnight/quincena copy now
+    # that we ship weekly.
+    assert "fortnight" not in html
+    assert "quincena" not in html
 
 
 def test_pro_general_renders_locked_v4_markers(rendered_pro_general_html):

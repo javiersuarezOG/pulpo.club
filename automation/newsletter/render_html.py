@@ -586,7 +586,7 @@ def _meta_row_html(rows: list[tuple[str, str]]) -> str:
 
     The old `<table class="keytable">` jammed four key/value pairs into one
     row with no visual separation — rendered as `$/m² $47 vs zone -78% per
-    m² vs zone Beach 5.7 km Airport 36 km Listed New this fortnight`. The
+    m² vs zone Beach 5.7 km Airport 36 km Listed New this week`. The
     values already carry enough context to stand alone (e.g. "5.7 km to
     beach"), so the labels are redundant.
 
@@ -1414,8 +1414,8 @@ def _pick_state_pill_html(pick: IssuePick, locale: Locale) -> str:
 
     Order of precedence (one pill at most):
       1. Significantly under area average → sage discount pill
-      2. New on the market this fortnight → clay "New this week" pill
-      3. Repriced this fortnight           → "Price moved" pill
+      2. New on the market this week → clay "New this week" pill
+      3. Repriced this week           → "Price moved" pill
       4. None of the above                 → no pill
     """
     en = locale == "en"
@@ -1622,9 +1622,9 @@ def _preheader_html(issue: Issue) -> str:
     n_rest = len(issue.picks_shortlist)
     if top and n_rest:
         if locale == "es":
-            text = f"{top} — y {n_rest} más para la quincena."
+            text = f"{top} — y {n_rest} más esta semana."
         else:
-            text = f"{top} — plus {n_rest} more picks for the fortnight."
+            text = f"{top} — plus {n_rest} more picks this week."
     elif top:
         if locale == "es":
             text = top
@@ -1632,9 +1632,9 @@ def _preheader_html(issue: Issue) -> str:
             text = top
     else:
         if locale == "es":
-            text = "10 propiedades seleccionadas de El Salvador, esta quincena."
+            text = "10 propiedades seleccionadas de El Salvador, esta semana."
         else:
-            text = "10 hand-picked listings from El Salvador, this fortnight."
+            text = "10 hand-picked listings from El Salvador, this week."
     # Belt-and-braces hide chain: every property here covers a real
     # client. `mso-hide:all` covers Outlook; `display:none + opacity:0`
     # covers Gmail web + Apple Mail; the zeroed font/line/max-height
@@ -1788,9 +1788,9 @@ def _favorites_editorial_summary(favorites: list, locale: str) -> str:
 
     if moved == 0:
         return (
-            "<strong style='font-style:normal;'>None moved on price this fortnight</strong> — your watchlist held flat."
+            "<strong style='font-style:normal;'>None moved on price this week</strong> — your watchlist held flat."
             if en else
-            "<strong style='font-style:normal;'>Ninguno se movió en precio esta quincena</strong> — tu lista quedó plana."
+            "<strong style='font-style:normal;'>Ninguno se movió en precio esta semana</strong> — tu lista quedó plana."
         )
 
     # Busy vs quiet read — "busy" when most/all moved.
@@ -1798,12 +1798,12 @@ def _favorites_editorial_summary(favorites: list, locale: str) -> str:
     if en:
         tail = "busier than a typical week on your watchlist" if busy else "fewer moves than usual on your watchlist"
         return (
-            f"<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this fortnight</strong> — {tail}."
+            f"<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this week</strong> — {tail}."
         )
     else:
         tail = "más actividad que una semana típica en tu lista" if busy else "menos actividad de la habitual en tu lista"
         return (
-            f"<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta quincena</strong> — {tail}."
+            f"<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta semana</strong> — {tail}."
         )
 
 

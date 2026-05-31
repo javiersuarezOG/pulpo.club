@@ -1,4 +1,4 @@
-"""Pulpo fortnightly newsletter — build + render (PR-NL-2, dry-run only).
+"""Pulpo weekly newsletter — build + render (PR-NL-2, dry-run only).
 
 Public entry points:
     build_issue(recipient, listings, history, issue_date) -> Issue
