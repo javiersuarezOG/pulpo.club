@@ -64,7 +64,10 @@ def env(name: str, default: str = "") -> str:
     return value.strip() if value and value.strip() else default
 
 
-def post_json(url: str, headers: dict[str, str], payload: dict) -> dict:
+def post_json(url: str, headers: dict[str, str], payload: dict, parse_response: bool = True) -> dict:
+    # Slack's incoming-webhooks endpoint replies with the literal string "ok"
+    # on success, not JSON — so parse_response=False from the slack() caller
+    # avoids JSONDecodeError after a successful post.
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
@@ -74,6 +77,8 @@ def post_json(url: str, headers: dict[str, str], payload: dict) -> dict:
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             body = r.read().decode("utf-8")
+            if not parse_response:
+                return {}
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
@@ -103,7 +108,7 @@ def slack(webhook_url: str, text: str, dry_run: bool) -> None:
     if dry_run or not webhook_url:
         print(text)
         return
-    post_json(webhook_url, {}, {"text": text})
+    post_json(webhook_url, {}, {"text": text}, parse_response=False)
 
 
 def main() -> int:
