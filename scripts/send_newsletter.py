@@ -284,6 +284,11 @@ def main() -> int:
                 "dry_run": result.dry_run,
                 "latency_ms": result.latency_ms,
                 "attempt": result.attempt,
+                # Audit signal: True when --allow-all-subscribers bypassed
+                # the PR-NL-9 Pro/Agency gate. Dashboards can alert when
+                # this is True across multiple consecutive sends (would
+                # indicate the launch flag was accidentally left on).
+                "audience_gate_bypassed": bool(args.allow_all_subscribers),
             })
             # New per-recipient event in the email.* namespace. Lets PostHog
             # slice "sends from template v2.1 to recipient_hash X" without
@@ -310,6 +315,7 @@ def main() -> int:
                 "error_detail": result.error_detail,
                 "attempt": result.attempt,
                 "latency_ms": result.latency_ms,
+                "audience_gate_bypassed": bool(args.allow_all_subscribers),
             })
             # GUARDRAIL: cross-flow telemetry sibling to the activation-side
             # `email.send.failed` in api/_activation_email.js. Same shape:
@@ -346,6 +352,7 @@ def main() -> int:
         "dry_run": dry,
         "preview_mode": preview_mode,
         "elapsed_ms": elapsed_ms,
+        "audience_gate_bypassed": bool(args.allow_all_subscribers),
     })
     print(f"[send] done sent={sent} failed={failed} elapsed={elapsed_ms}ms")
     return 0 if failed == 0 else 1
