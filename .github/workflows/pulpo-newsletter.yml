@@ -50,6 +50,12 @@ on:
         type: choice
         default: "en"
         options: ["en", "es"]
+      allow_all_subscribers:
+        description: "LAUNCH SEND — bypass the Pro/Agency gate; send to ALL audience contacts (anonymous, free, Pro). Default no."
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
 
 concurrency:
   group: pulpo-newsletter
@@ -151,6 +157,7 @@ jobs:
           PREVIEW_EMAIL="${{ github.event.inputs.preview_cohorts || '' }}"
           PREVIEW_LOCALE="${{ github.event.inputs.preview_locale || 'en' }}"
           ISSUE_NUMBER="${{ github.event.inputs.issue_number || '' }}"
+          ALLOW_ALL="${{ github.event.inputs.allow_all_subscribers || 'no' }}"
           ARGS=(--write-html-to newsletter-drafts/sent)
           if [ -n "$ISSUE_NUMBER" ]; then
             ARGS+=(--issue-number "$ISSUE_NUMBER")
@@ -159,6 +166,9 @@ jobs:
             ARGS+=(--preview-cohorts "$PREVIEW_EMAIL" --preview-locale "$PREVIEW_LOCALE")
           elif [ -n "$ONLY_EMAIL" ]; then
             ARGS+=(--only-email "$ONLY_EMAIL")
+          fi
+          if [ "$ALLOW_ALL" = "yes" ]; then
+            ARGS+=(--allow-all-subscribers)
           fi
           python3 scripts/send_newsletter.py "${ARGS[@]}"
 

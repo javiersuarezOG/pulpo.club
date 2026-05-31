@@ -1264,6 +1264,7 @@ def _footer_html(issue: Issue) -> str:
         {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(issue.unsubscribe_url, unsubscribe_label)}
       </div>
       <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">{_e(copyright_line)} · pulpo.club</p>
+      <p style="margin:4px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">Pulpo · San Salvador, El Salvador</p>
     </td></tr>
     """
 

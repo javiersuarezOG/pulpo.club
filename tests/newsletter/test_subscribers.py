@@ -209,6 +209,79 @@ def test_join_keeps_agency_tier():
     assert recipients[0].tier == "agency"
 
 
+# ── allow_non_pro escape hatch (launch sends) ────────────────────────────
+
+
+def test_allow_non_pro_keeps_anonymous_and_free():
+    """The launch escape hatch lets anonymous + free contacts through.
+    Anonymous synthesises a Recipient with has_account=False; free
+    Clerk users keep their actual tier + Clerk profile."""
+    contacts = [
+        subs.ResendContact(id="c1", email="anon@example.com",
+                           unsubscribed=False, created_at=None, locale="es"),
+        subs.ResendContact(id="c2", email="free@pulpo.club",
+                           unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="pro@pulpo.club",
+                           unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(
+        contacts=contacts, clerk_users=clerk_users, allow_non_pro=True,
+    )
+    # All three contacts land in the queue.
+    assert len(recipients) == 3
+    tiers = sorted(r.tier for r in recipients)
+    assert tiers == ["free", "free", "pro"]
+    # Anonymous recipient (no Clerk match) has has_account=False and
+    # picked up the Resend-side-channel locale.
+    anon = next(r for r in recipients if not r.has_account)
+    assert anon.locale == "es"
+    assert anon.saved_count == 0
+    assert anon.saves == []
+    assert anon.preference_source == "none"
+
+
+def test_allow_non_pro_off_by_default_keeps_existing_gate():
+    """Regression guard: PR-NL-9 audience scope still in force when
+    allow_non_pro is not explicitly set. Free + anonymous dropped."""
+    contacts = [
+        subs.ResendContact(id="c1", email="anon@example.com",
+                           unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="free@pulpo.club",
+                           unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="pro@pulpo.club",
+                           unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users)
+    assert len(recipients) == 1
+    assert recipients[0].tier == "pro"
+
+
+def test_allow_non_pro_still_respects_unsubscribed_flag():
+    """The launch escape hatch widens the tier gate, NOT the
+    unsubscribed gate. An unsubscribed contact still must not receive."""
+    contacts = [
+        subs.ResendContact(id="c1", email="anon@example.com",
+                           unsubscribed=True, created_at=None),
+        subs.ResendContact(id="c2", email="anon2@example.com",
+                           unsubscribed=False, created_at=None),
+    ]
+    recipients = subs.join_recipients(
+        contacts=contacts, clerk_users=[], allow_non_pro=True,
+    )
+    assert len(recipients) == 1
+    # The non-unsubscribed one made it through; the unsubscribed one
+    # did not.
+    assert recipients[0].email_hash != subs.email_hash("anon@example.com")
+
+
 def test_preference_from_profile_tolerates_garbage():
     p = subs._preference_from_profile({"newsletter": {
         "zones": ["el-zonte", 7, None],          # mixed types — strings only kept

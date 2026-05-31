@@ -148,6 +148,14 @@ def test_pro_general_renders_hidden_preheader(rendered_pro_general_html):
     assert "quincena" not in html
 
 
+def test_pro_general_footer_carries_postal_address(rendered_pro_general_html):
+    """CAN-SPAM § 5(a)(5) requires every commercial email to include the
+    sender's physical postal address. Today's minimum is the city +
+    country line; refine when a registered street address exists."""
+    html = rendered_pro_general_html
+    assert "San Salvador, El Salvador" in html
+
+
 def test_pro_general_renders_locked_v4_markers(rendered_pro_general_html):
     html = rendered_pro_general_html
     # Pro branding (the gold pill next to the wordmark)

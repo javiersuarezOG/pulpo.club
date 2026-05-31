@@ -125,6 +125,18 @@ def main() -> int:
         help="Ignore audience-level unsubscribed flag (FOR DEBUGGING ONLY).",
     )
     p.add_argument(
+        "--allow-all-subscribers",
+        action="store_true",
+        help=(
+            "Bypass the Pro/Agency audience gate. Anonymous Resend-only "
+            "contacts AND free-tier Clerk users land in the queue alongside "
+            "Pro/Agency. Intended for one-off launch/announcement sends; "
+            "non-Pro recipients see the Pro-weekly template with fallback "
+            "preferences and (for free Clerk users) the paywall banner. "
+            "Do not leave on for recurring sends — overrides PR-NL-9."
+        ),
+    )
+    p.add_argument(
         "--limit",
         type=int,
         default=None,
@@ -163,9 +175,15 @@ def main() -> int:
             return 2
     else:
         only = set(args.only_email) if args.only_email else None
+        if args.allow_all_subscribers:
+            # Loud single line so the audit log is unambiguous about why
+            # non-Pro recipients are in this run. PR review + post-mortem
+            # should grep for this exact string.
+            print("[send] ⚠️  --allow-all-subscribers ON — Pro/Agency gate BYPASSED")
         queue = build_recipient_queue(
             only_emails=only,
             include_unsubscribed=args.include_unsubscribed,
+            allow_non_pro=args.allow_all_subscribers,
         )
     if args.limit:
         queue = queue[: args.limit]

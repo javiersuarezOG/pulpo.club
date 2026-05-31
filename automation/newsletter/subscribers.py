@@ -448,19 +448,29 @@ def join_recipients(
     clerk_users: Iterable[ClerkUser],
     include_unsubscribed: bool = False,
     only_emails: Optional[set[str]] = None,
+    allow_non_pro: bool = False,
 ) -> list[Recipient]:
     """Build the cron's per-recipient queue.
 
-    PR-NL-9 (audience scope): only Pro + Agency recipients land in the
-    queue. Free-tier and Resend-only (anonymous, no Clerk match)
-    contacts are silently dropped — they're not the audience for this
-    newsletter, and a different system will handle them.
+    PR-NL-9 (audience scope): by default only Pro + Agency recipients
+    land in the queue. Free-tier Clerk users and anonymous (no Clerk
+    match) Resend contacts are silently dropped — they're not the
+    audience for the personalised Pro newsletter, and free-weekly /
+    pro-welcome templates will eventually handle them on a separate
+    pipeline.
+
+    `allow_non_pro=True` is the launch / one-off-broadcast escape hatch.
+    When set, anonymous Resend contacts are synthesised as
+    `tier="free", has_account=False, preference=Preference()`, and free
+    Clerk users keep their actual tier + (possibly empty) preference.
+    The build_issue / render path already supports both cohorts (it
+    falls back to a derived preference for anonymous + logged_no_prefs).
+    Use only when sending a content variant intended for a non-Pro
+    reader (launch issue, milestone, etc.).
 
     `only_emails` is the smoke-test seam — pass `{"javier@suarez.ventures"}`
     to send Issue 01 to a single address. The set is matched case-insensitively
-    against the Resend audience. Note: even with `only_emails`, the Pro
-    filter still applies; a free-tier address passed through this seam
-    will still be dropped.
+    against the Resend audience.
     """
     by_email: dict[str, ClerkUser] = {
         u.email: u for u in clerk_users if u.email
@@ -480,10 +490,27 @@ def join_recipients(
         user = by_email.get(c.email)
         # Pro / Agency gate. Anonymous (no Clerk record) is filtered
         # here; free-tier Clerk users are filtered by the tier check
-        # right after.
+        # right after. Both are bypassed when allow_non_pro=True.
         if user is None:
+            if not allow_non_pro:
+                continue
+            # Anonymous synthesis: locale from Resend first_name
+            # side-channel, everything else nominal. The build_issue
+            # path treats cohort=anonymous with a fallback_preference.
+            recipient = Recipient(
+                email_hash=email_hash(c.email),
+                display_name=None,
+                locale=c.locale or "en",
+                tier="free",
+                has_account=False,
+                preference=Preference(),
+                saved_count=0,
+                saves=[],
+                preference_source="none",
+            )
+            out.append(recipient)
             continue
-        if user.plan not in PRO_AUDIENCE_TIERS:
+        if user.plan not in PRO_AUDIENCE_TIERS and not allow_non_pro:
             continue
         preference = _preference_from_profile(user.profile)
         preference_source = _preference_source_from_profile(user.profile)
@@ -631,12 +658,16 @@ def build_recipient_queue(
     *,
     only_emails: Optional[set[str]] = None,
     include_unsubscribed: bool = False,
+    allow_non_pro: bool = False,
 ) -> list[tuple[Recipient, str]]:
     """End-to-end helper: fetch + join + return (recipient, raw_email) tuples.
 
     `raw_email` is what gets passed to Resend's `to` field — we keep it
     out of the Recipient dataclass so logs that serialize Recipient don't
     accidentally leak PII.
+
+    `allow_non_pro` is the launch escape hatch — see join_recipients
+    docstring. Default False keeps the Pro/Agency gate in force.
     """
     contacts = list_audience()
     users = list_clerk_users()
@@ -645,6 +676,7 @@ def build_recipient_queue(
         clerk_users=users,
         include_unsubscribed=include_unsubscribed,
         only_emails=only_emails,
+        allow_non_pro=allow_non_pro,
     )
     # Pair each Recipient with its raw email — rely on positional order
     # being stable inside join_recipients (it iterates contacts in input
