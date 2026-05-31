@@ -62,16 +62,30 @@ const PREVIEW_COHORTS = ["pro_prefs"];
 //                 "onetime"   (single trigger row — welcome-style)
 //   status        "live" (card renders the trigger UI) |
 //                 "coming-soon" (card renders disabled with a tag)
+//   template      stable template id (matches the Python composition
+//                 function on the renderer side — kept in lock-step)
+//   templateLabel human-readable template name shown on the card
+//                 chrome ("TEMPLATE · Pulpo Pro General"). When a
+//                 new template ships (e.g. "Pulpo Pro Welcome"), the
+//                 corresponding newsletter row swaps to that template.
 //
 // `cadenceMode` is wired today only for "scheduled". When the welcome
 // newsletters ship we'll add the "onetime" body next to the existing
 // upcoming-list renderer.
+//
+// All four newsletters currently reference the SAME template
+// ("pulpo-pro-general") since it's the only one that exists. Each
+// newsletter will swap to its own template when that template lands
+// (e.g. Pro Welcome → "pulpo-pro-welcome"). The label is what the
+// operator sees on the card chrome.
 const NEWSLETTERS = [
   {
     id: "pro-weekly",
     tier: "pro",
     title: "Pro · Weekly digest",
     description: "Sundays 9 AM · 10 curated picks per recipient, personalised to their discover_filters.",
+    template: "pulpo-pro-general",
+    templateLabel: "Pulpo Pro General",
     cadenceMode: "scheduled",
     status: "live",
   },
@@ -80,6 +94,8 @@ const NEWSLETTERS = [
     tier: "pro",
     title: "Pro · Welcome",
     description: "Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.",
+    template: "pulpo-pro-general",
+    templateLabel: "Pulpo Pro General",
     cadenceMode: "onetime",
     status: "coming-soon",
   },
@@ -88,6 +104,8 @@ const NEWSLETTERS = [
     tier: "free",
     title: "Free · Welcome",
     description: "Sent once when an anonymous email subscribes via the homepage form. Sets the audience expectation and surfaces a Pro upgrade CTA.",
+    template: "pulpo-pro-general",
+    templateLabel: "Pulpo Pro General",
     cadenceMode: "onetime",
     status: "coming-soon",
   },
@@ -96,6 +114,8 @@ const NEWSLETTERS = [
     tier: "free",
     title: "Free · Weekly",
     description: "Lightweight Free-tier digest. Same Sunday cadence as Pro, fewer picks, no personalisation, upgrade nudge baked in.",
+    template: "pulpo-pro-general",
+    templateLabel: "Pulpo Pro General",
     cadenceMode: "scheduled",
     status: "coming-soon",
   },
@@ -205,11 +225,40 @@ const WIDGET_STYLES = `
   color: var(--ink-3);
 }
 .nl-preview-widget .nl-newsletter-desc {
-  padding: 10px 18px 14px;
+  padding: 10px 18px 8px;
   font-size: 13px;
   color: var(--ink-3);
   line-height: 1.5;
   margin: 0;
+}
+/* Template label row — small caps badge + optional hint, sits under
+   the description so every card is self-describing about which
+   renderer template it uses. When a future newsletter swaps templates
+   (e.g. Pro Welcome → Pulpo Pro Welcome), this line is where the
+   operator sees that. The hint after the dot only shows on live
+   newsletters where a test send is actually possible. */
+.nl-preview-widget .nl-newsletter-template {
+  padding: 0 18px 14px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  color: var(--ink-3);
+  line-height: 1.5;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.nl-preview-widget .nl-newsletter-template strong {
+  color: var(--ink-2);
+  font-weight: 700;
+}
+.nl-preview-widget .nl-newsletter-template .nl-newsletter-template-hint {
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: 12px;
 }
 .nl-preview-widget .nl-newsletter-body {
   padding: 0 18px 16px;
@@ -847,12 +896,22 @@ export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
   const [locale, setLocale] = useState(DEFAULT_LOCALE);
   const [busy, setBusy] = useState(false);
-  // status is a discriminated union by `kind`:
+  // statusByNewsletterId — per-card status, so the success/pending/
+  // error confirmation lands INSIDE the card the operator triggered
+  // from instead of at the bottom of the page (operator feedback
+  // 2026-05-31: the global block was easy to miss without scrolling).
+  // Shape: { [newsletterId]: { kind, message?, recipient?, runsUrl?, when? } }
+  // Each entry is the same discriminated union by `kind` as v3's
+  // single `status` state:
   //   { kind: null }                            — nothing rendered
   //   { kind: "pending" }                       — spinner + "Dispatching…"
   //   { kind: "error",   message }              — red inline line
   //   { kind: "success", recipient, runsUrl }   — structured success card
-  const [status, setStatus] = useState({ kind: null });
+  const [statusByNewsletterId, setStatusByNewsletterId] = useState({});
+  const setStatusFor = useCallback((newsletterId, next) => {
+    setStatusByNewsletterId((prev) => ({ ...prev, [newsletterId]: next }));
+  }, []);
+  const statusFor = (newsletterId) => statusByNewsletterId[newsletterId] || { kind: null };
   // Per-browser localStorage log of trigger attempts. Hydrates from
   // localStorage on mount so the log survives a reload.
   const [localEntries, setLocalEntries] = useState(() => readLog());
@@ -992,29 +1051,27 @@ export function NewsletterWidget() {
     }
   }, [audienceConfirm, refreshServerLog]);
 
-  // Shared trigger for both the legacy "Send next 3 cohort variants"
-  // button and the per-row "Send test →" buttons in the Upcoming Sends
-  // panel. `issueNumber=null` keeps the legacy default ("1" server-side).
-  const trigger = async ({ issueNumber = null, when = null } = {}) => {
+  // Shared trigger for the per-row "Send test →" buttons in the
+  // Upcoming Sends panel. `issueNumber=null` keeps the legacy default
+  // ("1" server-side). `newsletterId` defaults to "pro-weekly" for
+  // back-compat with callers that don't thread it (today every live
+  // trigger is Pro Weekly — Pro Welcome / Free Weekly will pass their
+  // own IDs when they ship; the server allow-list already accepts them).
+  const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly" } = {}) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
-      setStatus({ kind: "error", message: "Enter a valid email address." });
+      setStatusFor(newsletterId, { kind: "error", message: "Enter a valid email address." });
       return;
     }
     setBusy(true);
-    setStatus({ kind: "pending", when });
+    setStatusFor(newsletterId, { kind: "pending", when });
     const operatorEmail = readOperatorEmail();
     try {
       // `by` lets the server-side audit trail attribute the dispatch
       // to a specific operator on the cross-device log. Spoofable
       // (the endpoint is intentionally auth-light) but useful for
       // the legitimate-traffic happy path.
-      // Today every test trigger comes from the Pro · Weekly card —
-      // the only LIVE row in the registry. When Pro · Welcome ships
-      // its card will pass its own newsletter_id through; the server
-      // allow-list (KNOWN_NEWSLETTER_IDS) is already prepped for the
-      // expansion.
-      const payload = { email: value, locale, by: operatorEmail || undefined, newsletter_id: "pro-weekly" };
+      const payload = { email: value, locale, by: operatorEmail || undefined, newsletter_id: newsletterId };
       if (issueNumber != null) payload.issue_number = issueNumber;
       const r = await fetch("/api/admin/newsletter/trigger-preview", {
         method: "POST",
@@ -1027,16 +1084,16 @@ export function NewsletterWidget() {
         to: value,
         locale,
         by: operatorEmail,
-        newsletter_id: "pro-weekly",
+        newsletter_id: newsletterId,
       };
       if (!r.ok) {
         const detail = body.error || `HTTP ${r.status}`;
         const hint = body.hint ? ` — ${body.hint}` : "";
-        setStatus({ kind: "error", message: `${detail}${hint}` });
+        setStatusFor(newsletterId, { kind: "error", message: `${detail}${hint}` });
         setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: `${detail}${hint}` }));
         return;
       }
-      setStatus({
+      setStatusFor(newsletterId, {
         kind: "success",
         recipient: value,
         runsUrl: body.runs_url || null,
@@ -1045,13 +1102,13 @@ export function NewsletterWidget() {
       setLocalEntries(appendLogEntry({ ...baseEntry, result: "ok" }));
     } catch (err) {
       const msg = String(err && err.message || err);
-      setStatus({ kind: "error", message: msg });
+      setStatusFor(newsletterId, { kind: "error", message: msg });
       setLocalEntries(appendLogEntry({
         at: new Date().toISOString(),
         to: value,
         locale,
         by: operatorEmail,
-        newsletter_id: "pro-weekly",
+        newsletter_id: newsletterId,
         result: "error",
         detail: msg,
       }));
@@ -1132,6 +1189,10 @@ export function NewsletterWidget() {
                 <span className="nl-newsletter-status live">● Live</span>
               </div>
               <p className="nl-newsletter-desc">{NEWSLETTERS.find(n => n.id === "pro-weekly").description}</p>
+              <p className="nl-newsletter-template">
+                Template · <strong>{NEWSLETTERS.find(n => n.id === "pro-weekly").templateLabel}</strong>
+                <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
+              </p>
               <div className="nl-newsletter-body">
 
           {/* PR-NL-7a — Upcoming sends. Per-row test button fires the
@@ -1163,7 +1224,7 @@ export function NewsletterWidget() {
                           type="button"
                           className="nl-upcoming-btn"
                           disabled={busy || !!audienceConfirm}
-                          onClick={() => trigger({ issueNumber: issueNum, when: label })}
+                          onClick={() => trigger({ issueNumber: issueNum, when: label, newsletterId: "pro-weekly" })}
                           title="Send a test copy to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
                         >
                           Send test →
@@ -1283,6 +1344,49 @@ export function NewsletterWidget() {
             </ul>
           </div>
 
+          {/* PR-A (2026-05-31) — per-card test-send confirmation. Lives
+              INSIDE the Pro · Weekly card body so the operator sees
+              the result without scrolling past the cross-device log
+              to find a global status block. Threaded by newsletter
+              ID via `statusFor()`. */}
+          {statusFor("pro-weekly").kind === "pending" && (
+            <p className="nl-status pending" aria-live="polite" style={{ marginTop: "12px" }}>
+              <span className="nl-status-icon" aria-hidden="true" />
+              Dispatching workflow…
+            </p>
+          )}
+          {statusFor("pro-weekly").kind === "error" && (
+            <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: "12px" }}>
+              <span className="nl-status-icon" aria-hidden="true">!</span>
+              {statusFor("pro-weekly").message}
+            </p>
+          )}
+          {statusFor("pro-weekly").kind === "success" && (
+            <div className="nl-success" role="status" aria-live="polite" style={{ marginTop: "12px" }}>
+              <p className="nl-success-head">
+                <span className="nl-success-check" aria-hidden="true">✓</span>
+                Dispatched · 1 email on the way
+              </p>
+              <p className="nl-success-body">
+                Sending to <strong>{statusFor("pro-weekly").recipient}</strong>
+                {statusFor("pro-weekly").when ? <> — preview of the issue scheduled for <strong>{statusFor("pro-weekly").when}</strong></> : null}.
+                Should land in ~30–60 seconds. Look for this subject in your inbox:
+              </p>
+              <ul className="nl-success-subjects">
+                {PREVIEW_COHORTS.map((cohort) => (
+                  <li key={cohort}>[PULPO PREVIEW · {cohort}] Issue 01</li>
+                ))}
+              </ul>
+              {statusFor("pro-weekly").runsUrl && (
+                <p className="nl-success-footer">
+                  <a href={statusFor("pro-weekly").runsUrl} target="_blank" rel="noreferrer">
+                    View workflow run on GitHub →
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
+
               </div>
             </article>
 
@@ -1294,6 +1398,9 @@ export function NewsletterWidget() {
                   <span className="nl-newsletter-status coming-soon">◌ Coming soon</span>
                 </div>
                 <p className="nl-newsletter-desc">{nl.description}</p>
+                <p className="nl-newsletter-template">
+                  Template · <strong>{nl.templateLabel}</strong>
+                </p>
               </article>
             ))}
           </div>
@@ -1314,6 +1421,12 @@ export function NewsletterWidget() {
                   </span>
                 </div>
                 <p className="nl-newsletter-desc">{nl.description}</p>
+                <p className="nl-newsletter-template">
+                  Template · <strong>{nl.templateLabel}</strong>
+                  {nl.status === "live" && (
+                    <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
+                  )}
+                </p>
               </article>
             ))}
           </div>
@@ -1382,50 +1495,12 @@ export function NewsletterWidget() {
             )}
           </div>
 
-          {/* Bottom submit button removed — the per-row "Send test →"
-              buttons in Upcoming Sends cover the same intent without
-              forcing the operator to pick between two routes for the
-              same action. */}
-
-          {status.kind === "success" && (
-            <div className="nl-success" role="status" aria-live="polite">
-              <p className="nl-success-head">
-                <span className="nl-success-check" aria-hidden="true">✓</span>
-                Dispatched · 1 email on the way
-              </p>
-              <p className="nl-success-body">
-                Sending to <strong>{status.recipient}</strong>
-                {status.when ? <> — preview of the issue scheduled for <strong>{status.when}</strong></> : null}.
-                Should land in ~30–60 seconds. Look for this subject in your inbox:
-              </p>
-              <ul className="nl-success-subjects">
-                {PREVIEW_COHORTS.map((cohort) => (
-                  <li key={cohort}>[PULPO PREVIEW · {cohort}] Issue 01</li>
-                ))}
-              </ul>
-              {status.runsUrl && (
-                <p className="nl-success-footer">
-                  <a href={status.runsUrl} target="_blank" rel="noreferrer">
-                    View workflow run on GitHub →
-                  </a>
-                </p>
-              )}
-            </div>
-          )}
-
-          {status.kind === "pending" && (
-            <p className="nl-status pending" aria-live="polite">
-              <span className="nl-status-icon" aria-hidden="true" />
-              Dispatching workflow…
-            </p>
-          )}
-
-          {status.kind === "error" && (
-            <p className="nl-status error" role="alert" aria-live="polite">
-              <span className="nl-status-icon" aria-hidden="true">!</span>
-              {status.message}
-            </p>
-          )}
+          {/* PR-A (2026-05-31): the global success/pending/error block
+              that used to live here is gone — status now renders
+              inline UNDER the specific newsletter card that was
+              triggered (see the `statusFor(...)` blocks inside each
+              card body above). The "Recent test sends" table above
+              still gives the cross-device audit log. */}
         </div>
       </div>
     </>
