@@ -60,7 +60,13 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # source-aware `cta_view_on` / `cta_view` from v2.2 are deleted —
     # the rich-pick CTA now points at pulpo_url, not listing_url.
     "pick.cta_open":               {"en": "See on Pulpo →",                               "es": "Ver en Pulpo →"},
-    "pick.cta_save":               {"en": "Save to favorites",                            "es": "Guardar en favoritos"},
+    # v4 (2026-05-31): shortened from "Save to favorites" / "Guardar en
+    # favoritos" — the long Spanish form was overflowing the card width
+    # on mobile (375px in Gmail's narrow rendering) and breaking the
+    # paired-CTA row layout. "Save" / "Guardar" fits at every viewport
+    # and matches the locked mockup. The heart glyph is rendered by
+    # `_pick_card_html` outside this string for layout flexibility.
+    "pick.cta_save":               {"en": "Save",                                         "es": "Guardar"},
     # Price-anchored unlock — "$9.99/mo" matches the canonical pricing
     # source-of-truth (project_post_stripe_activation_series memory).
     "pick.cta_locked":             {"en": "Unlock this pick — $9.99/mo →",                "es": "Desbloquear esta selección — $9.99/mes →"},
@@ -146,8 +152,12 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "footer.unsubscribe":          {"en": "Unsubscribe",                                  "es": "Cancelar suscripción"},
     "footer.no_commission":        {"en": "Pulpo doesn't take commission and doesn't list its own properties. We pick from what's already on the market and tell you which ones are worth your time.",
                                      "es": "Pulpo no cobra comisión ni publica sus propias propiedades. Elegimos de lo que ya está en el mercado y te decimos cuáles merecen tu tiempo."},
-    "footer.copyright":            {"en": "© {year} Pulpo Club",
-                                     "es": "© {year} Pulpo Club"},
+    # v4.1 (2026-05-31): footer copyright signals Pulpo Pro since this
+    # newsletter is the personalised Pro product (audience scoped to
+    # Pro recipients per PR-NL-9). Matches the PRO pills next to the
+    # `pulpo` wordmark in the header + footer.
+    "footer.copyright":            {"en": "© {year} Pulpo Pro",
+                                     "es": "© {year} Pulpo Pro"},
     # ── Generic facts ──
     "facts.beach":                 {"en": "{km} km to beach",                             "es": "{km} km a la playa"},
     "facts.walk_to_beach":         {"en": "Walk to the beach",                            "es": "A pie de la playa"},

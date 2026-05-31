@@ -22,11 +22,13 @@ from automation.newsletter.store import email_hash
 ISSUE_DATE = datetime(2026, 5, 18, 14, 0, tzinfo=timezone.utc)
 
 ENGLISH_CANARIES = (
-    # PR-NL-5 (v2.4): the hero-pick CTAs are "See on Pulpo →" + "Save to
-    # favorites". Paywalled picks still use the v2.2 "Unlock this pick"
+    # PR-NL-5 (v2.4): the hero-pick CTAs are "See on Pulpo →" + "Save"
+    # (v4 shortened from "Save to favorites" to fit narrow mobile
+    # widths). Paywalled picks still use the v2.2 "Unlock this pick"
     # text. None of these should leak into an ES render.
     "See on Pulpo",
-    "Save to favorites",
+    # NB: bare "Save" is too ambiguous (could be Spanish "salvar"
+    # collision) to be a canary — we anchor on "See on Pulpo" instead.
     "Unlock this pick",
     "Top pick · ",
     "Hand-picked",
@@ -57,7 +59,10 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
     assert '<div class="paywall-banner">' not in html
     assert "Unlock this pick" not in html       # no locked CTAs for Pro
     assert "See on Pulpo →" in html             # PR-NL-5: hero-pick solid CTA
-    assert "Save to favorites" in html          # PR-NL-5: hero-pick ghost CTA
+    # v4: shortened "Save to favorites" → "Save" — the &hearts; glyph is
+    # rendered alongside the label by the card component, so the
+    # full rendered button is "♥ Save". Assert on the glyph + label.
+    assert "&hearts; Save" in html          # PR-NL-5: hero-pick ghost CTA
     assert "Hand-picked for Javier" in html
 
 
@@ -292,4 +297,7 @@ def test_render_card_component_contract(pro_with_prefs, ranked_pool):
     )
     # Every non-paywalled pick renders the dual CTA pair.
     assert "See on Pulpo →" in html
-    assert "Save to favorites" in html
+    # v4: shortened "Save to favorites" → "Save" — the &hearts; glyph is
+    # rendered alongside the label by the card component, so the
+    # full rendered button is "♥ Save". Assert on the glyph + label.
+    assert "&hearts; Save" in html
