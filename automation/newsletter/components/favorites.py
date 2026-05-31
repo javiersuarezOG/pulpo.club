@@ -7,7 +7,7 @@ Locked contract for v4:
   • Cream `#F8F4EC` background, clay-colored eyebrow
   • Numeric headline ("3 you're following.", not spelled-out)
   • Italic editorial summary line ("Two of three moved on price
-    this fortnight — busier than a typical week on your watchlist")
+    this week — busier than a typical week on your watchlist")
   • Per-save card: thumb + change chip + title + meta + price +
     See-on-Pulpo + ♥ Following badge
   • Bottom underlined "Open all favorites →" link

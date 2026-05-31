@@ -38,6 +38,7 @@ from automation.newsletter import (                                        # noq
     build_issue,
     render_html,
 )
+from automation.newsletter.issue_state import next_issue_number            # noqa: E402
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
     build_recipient_queue,
@@ -73,7 +74,19 @@ def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--ranked", default="web/data/ranked.json")
-    p.add_argument("--issue-number", type=int, default=1)
+    p.add_argument(
+        "--issue-number",
+        type=int,
+        default=None,
+        help=(
+            "Issue number to stamp into this run. When omitted, the script "
+            "queries PostHog for max(issue_number) from successful past "
+            "sends and uses that + 1 (falls back to 1 on any error). Auto-"
+            "increment only applies to audience-wide LIVE sends; preview "
+            "and --only-email smoke sends require an explicit value so a "
+            "tester send can't bump production state."
+        ),
+    )
     p.add_argument(
         "--only-email",
         action="append",
@@ -156,6 +169,25 @@ def main() -> int:
         )
     if args.limit:
         queue = queue[: args.limit]
+
+    # Resolve issue_number: explicit CLI > PostHog auto-increment > 1.
+    # Smoke (--only-email) and preview sends MUST pass an explicit
+    # number so a tester send can't bump the audience's running counter
+    # (and so a 1-recipient test doesn't end up looking like Issue NN+1
+    # in everyone's history of received issues).
+    if args.issue_number is None:
+        if preview_mode or args.only_email:
+            print(
+                "[send] --issue-number is required for --preview-cohorts "
+                "and --only-email runs (auto-increment is audience-only)",
+                file=sys.stderr,
+            )
+            return 2
+        resolved_issue_number = next_issue_number(default=1)
+        print(f"[send] auto-incremented issue_number={resolved_issue_number} (from PostHog)")
+    else:
+        resolved_issue_number = args.issue_number
+    args.issue_number = resolved_issue_number
 
     issue_date = datetime.now(timezone.utc)
     dry = is_dry_run()
