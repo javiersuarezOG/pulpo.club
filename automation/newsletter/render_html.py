@@ -1609,6 +1609,47 @@ def _pick_card_html(
     """
 
 
+def _preheader_html(issue: Issue) -> str:
+    # The inbox-preview line. Hidden in the rendered email (CSS +
+    # mso-hide:all for Outlook) but harvested by Gmail / Apple Mail /
+    # Yahoo as the snippet shown next to the subject. Without this
+    # block, mailers fall back to the first visible body text — which
+    # is just the header chrome ("PULPO PRO · ISSUE 01 · 31 MAY 2026")
+    # and adds zero curiosity. Source the tease from real content so
+    # operators don't have to remember to set it per issue.
+    locale = issue.locale
+    top = issue.picks_top[0].title if issue.picks_top else ""
+    n_rest = len(issue.picks_shortlist)
+    if top and n_rest:
+        if locale == "es":
+            text = f"{top} — y {n_rest} más para la quincena."
+        else:
+            text = f"{top} — plus {n_rest} more picks for the fortnight."
+    elif top:
+        if locale == "es":
+            text = top
+        else:
+            text = top
+    else:
+        if locale == "es":
+            text = "10 propiedades seleccionadas de El Salvador, esta quincena."
+        else:
+            text = "10 hand-picked listings from El Salvador, this fortnight."
+    # Belt-and-braces hide chain: every property here covers a real
+    # client. `mso-hide:all` covers Outlook; `display:none + opacity:0`
+    # covers Gmail web + Apple Mail; the zeroed font/line/max-height
+    # covers the rest. Trailing &#847; characters discourage Gmail from
+    # appending the next visible block to the snippet.
+    return (
+        '<div style="display:none;font-size:1px;line-height:1px;'
+        'max-height:0;max-width:0;opacity:0;overflow:hidden;'
+        'mso-hide:all;color:transparent;visibility:hidden;">'
+        f"{_e(text)}"
+        f"{'&#847;&zwnj;&nbsp;' * 60}"
+        "</div>"
+    )
+
+
 def _section_intro_top3_html(locale: Locale) -> str:
     """Editorial section header sitting between market context and pick 01."""
     title = i18n.t("section.top3.title", locale)
@@ -1855,6 +1896,7 @@ def render_html(issue: Issue) -> str:
 <style>{_CSS}</style>
 </head>
 <body>
+{_preheader_html(issue)}
 <div class="wrap">
   <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
     {header_strip}

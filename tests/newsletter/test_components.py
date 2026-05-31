@@ -127,6 +127,23 @@ def test_pro_general_template_in_registry():
     assert callable(TEMPLATES["pulpo-pro-general"])
 
 
+def test_pro_general_renders_hidden_preheader(rendered_pro_general_html):
+    """The inbox-preview snippet must come from a hidden div at the
+    top of the body — not the visible header chrome. Asserts both
+    the hide-styling and that the preheader text references real
+    content (top pick + remaining count), so a stale operator render
+    won't ship the generic fallback."""
+    html = rendered_pro_general_html
+    assert "mso-hide:all" in html
+    assert "display:none" in html
+    # Real-content tease, not generic boilerplate. Pool fixture has
+    # 30 listings under the Pro filter so there's always picks_top[0]
+    # + at least one shortlist pick.
+    assert "more picks for the fortnight" in html
+    # The generic fallback should NOT render when picks_top is populated.
+    assert "10 hand-picked listings from El Salvador" not in html
+
+
 def test_pro_general_renders_locked_v4_markers(rendered_pro_general_html):
     html = rendered_pro_general_html
     # Pro branding (the gold pill next to the wordmark)

@@ -54,16 +54,20 @@ def _capture(event: str, props: dict) -> None:
 
 
 def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
-    # Editorial subject — variable substitution stays here so a future
-    # A/B-test fixture can override per-recipient. The 14-day window is
-    # the cadence reader expects ("this fortnight").
-    # In preview mode the cohort is stamped into the prefix so the
-    # operator can tell the three variants apart in their own inbox.
+    # Tag-style subject: "{Brand} {Tier} · Issue NN". The brand-only
+    # prefix was redundant with the From column ("Pulpo · ...") so we
+    # drop the wasted chars and surface the tier ("Pro") instead — both
+    # for product clarity today and so free-weekly reads differently in
+    # the inbox once that template ships. Issue-content tease moves to
+    # the hidden preheader (`render_html._preheader_html`) — the inbox
+    # preview line should carry curiosity, the subject should carry
+    # identity. Preview-cohort sends keep their `[PULPO PREVIEW · …]`
+    # prefix so operators can tell test sends from real broadcasts.
     if preview:
         return f"[PULPO PREVIEW · {issue.cohort}] Issue {issue.issue_number:02d}"
     if locale == "es":
-        return f"Pulpo · Edición {issue.issue_number:02d} · 10 selecciones esta quincena"
-    return f"Pulpo · Issue {issue.issue_number:02d} · 10 picks this fortnight"
+        return f"Pulpo Pro · Edición {issue.issue_number:02d}"
+    return f"Pulpo Pro · Issue {issue.issue_number:02d}"
 
 
 def main() -> int:
