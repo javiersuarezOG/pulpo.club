@@ -39,9 +39,20 @@
 //
 // Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
 // AND a real Resend send — cheap insurance against a stuck-button loop).
+//
+// Dispatch verification: GitHub's `workflow_dispatch` POST returns 204
+// once the payload is accepted, but the actual run is created
+// asynchronously and CAN be silently dropped during GitHub Actions
+// service hiccups (this bit us in production 2026-05-31 — the admin
+// widget logged "✓ Sent" for a preview that never went out because no
+// workflow ever ran). After GitHub returns 204 we poll the runs API
+// for ~8s and only return 202 if a fresh run actually appears.
+// Otherwise we return 502 `dispatch_accepted_but_no_run_created` so
+// the widget surfaces a real error and the operator can retry.
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
+const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
@@ -203,6 +214,13 @@ module.exports = async (req, res) => {
   const ref = process.env.GITHUB_DISPATCH_REF || DEFAULT_REF;
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
 
+  // Capture the newest existing workflow_dispatch run id BEFORE we
+  // dispatch. After the dispatch returns 204, we poll for a run with a
+  // larger id — that's the proof GitHub actually created the run, not
+  // just accepted the dispatch payload. See _verify_dispatch.js for the
+  // failure mode this guards against.
+  const baselineRunId = await getLatestRunId({ repo, workflowFile: WORKFLOW_FILE, token });
+
   let gh;
   try {
     gh = await fetch(url, {
@@ -256,10 +274,61 @@ module.exports = async (req, res) => {
     });
   }
 
+  // GitHub returned 204 — the dispatch was accepted. But that does NOT
+  // mean a run was created. Poll until a fresh run appears, or give up
+  // and surface a 502 so the widget shows a real error instead of
+  // falsely logging success.
+  //
+  // Skip verification (return 202 with verified=false) when we couldn't
+  // get a baseline — that means GitHub's runs API was unavailable when
+  // we tried, so failing-closed would surface a misleading error during
+  // a wider GitHub outage. The baseline=null case is rare; the verify
+  // failure case (got baseline, didn't see a newer run) is the one we
+  // actually care about catching.
+  if (baselineRunId !== null) {
+    const newRun = await pollForNewerRun({
+      repo, workflowFile: WORKFLOW_FILE, token, baselineId: baselineRunId,
+    });
+    if (!newRun) {
+      logApi("admin.newsletter_trigger_preview", {
+        status: 502, ms: Date.now() - t0, reason: "dispatch_accepted_but_no_run_created",
+        baseline_run_id: baselineRunId,
+      });
+      await emitTriggerEvent({
+        to: email, locale, by, issueNumber: issueNumberStr, newsletterId,
+        result: "error",
+        detail: "dispatch_accepted_but_no_run_created: GitHub returned 204 but no workflow run appeared within poll window",
+      });
+      return res.status(502).json({
+        error: "dispatch_accepted_but_no_run_created",
+        hint: "GitHub accepted the dispatch but no workflow run materialized within ~8s. This is usually a transient GitHub Actions issue — retry in ~30s. If it persists, check https://www.githubstatus.com.",
+      });
+    }
+    logApi("admin.newsletter_trigger_preview", {
+      status: 202, ms: Date.now() - t0,
+      repo, ref, locale, email_domain: email.split("@")[1] || "",
+      newsletter_id: newsletterId, run_id: newRun.id, verified: true,
+    });
+    await emitTriggerEvent({
+      to: email, locale, by, issueNumber: issueNumberStr, newsletterId,
+      result: "ok",
+    });
+    return res.status(202).json({
+      ok: true,
+      repo,
+      ref,
+      workflow: WORKFLOW_FILE,
+      runs_url: newRun.html_url || `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}`,
+      run_id: newRun.id,
+      verified: true,
+      hint: "Email arrives in ~30–60s once the workflow finishes. Subject is prefixed [PULPO PREVIEW · pro_prefs].",
+    });
+  }
+
   logApi("admin.newsletter_trigger_preview", {
     status: 202, ms: Date.now() - t0,
     repo, ref, locale, email_domain: email.split("@")[1] || "",
-    newsletter_id: newsletterId,
+    newsletter_id: newsletterId, verified: false, reason: "baseline_unavailable",
   });
 
   await emitTriggerEvent({
@@ -273,6 +342,7 @@ module.exports = async (req, res) => {
     ref,
     workflow: WORKFLOW_FILE,
     runs_url: `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}`,
-    hint: "Three emails arrive in ~30–60s once the workflow picks up the dispatch. Subjects are prefixed [PULPO PREVIEW · <cohort>].",
+    verified: false,
+    hint: "Dispatch accepted; couldn't verify the run was created (GitHub runs API was unavailable). Watch the workflow page directly to confirm.",
   });
 };
