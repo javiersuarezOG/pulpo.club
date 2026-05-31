@@ -196,9 +196,12 @@ module.exports = async (req, res) => {
   // ── Resend Audiences contact create ─────────────────────────────
   // Resend's contacts.create handles dedup server-side — sending the
   // same email twice returns 200 the first time and a structured
-  // error the second. We map the dedup error to a friendly
-  // already_subscribed response so the Hero shows the "welcome back"
-  // success copy.
+  // error the second. On dedup we attempt an update to flip
+  // `unsubscribed: false`; without that step, a previously-unsubscribed
+  // contact who re-enters their email at the homepage form would stay
+  // unsubscribed (the create no-ops on dup, the previous state sticks)
+  // and the "Changed your mind?" CTA on the unsubscribe page would be
+  // a lie. Falling back to 409 only when the update itself fails.
   try {
     // LEARNING: locale side-channel via the Resend `first_name` field.
     // Pulpo's newsletter templates render `display_name` from Clerk's
@@ -226,13 +229,30 @@ module.exports = async (req, res) => {
         errName === "validation_error" &&
         /already exists|already subscribed|duplicate/i.test(errMessage);
       if (isDup) {
-        logApi({
-          status: 409, ms: Date.now() - t0,
-          reason: "already_subscribed",
-          domain: emailDomain(email),
-          source,
-        });
-        return res.status(409).json({ error: "already_subscribed" });
+        try {
+          await client.contacts.update({
+            audienceId,
+            email,
+            unsubscribed: false,
+          });
+          logApi({
+            status: 200, ms: Date.now() - t0,
+            reason: "resubscribed",
+            domain: emailDomain(email),
+            source,
+            locale,
+          });
+          return res.status(200).json({ ok: true, resubscribed: true });
+        } catch (updateErr) {
+          logApi({
+            status: 409, ms: Date.now() - t0,
+            reason: "already_subscribed_update_failed",
+            err_name: updateErr && updateErr.name,
+            domain: emailDomain(email),
+            source,
+          });
+          return res.status(409).json({ error: "already_subscribed" });
+        }
       }
       logApi({
         status: 502, ms: Date.now() - t0,
