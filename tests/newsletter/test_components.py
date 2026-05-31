@@ -45,6 +45,18 @@ def test_common_exports_template_version_and_css():
     assert "#1F3D31" in _common.CSS  # forest — brand primary
 
 
+def test_common_exports_last_updated():
+    """LAST_UPDATED is surfaced in component docs + admin so collaborators
+    can see the template's revision timestamp at a glance."""
+    from automation.newsletter.components import _common
+    assert isinstance(_common.LAST_UPDATED, str)
+    # ISO yyyy-mm-dd; cheap regex guard so a typo doesn't ship.
+    import re
+    assert re.match(r"^\d{4}-\d{2}-\d{2}$", _common.LAST_UPDATED), (
+        f"LAST_UPDATED should be ISO yyyy-mm-dd, got {_common.LAST_UPDATED!r}"
+    )
+
+
 def test_picks_exposes_pick_card_and_section_intros():
     from automation.newsletter.components import picks
     expected = {
@@ -147,3 +159,74 @@ def test_pro_general_no_v3_leftovers(rendered_pro_general_html):
     assert 'class="yp-panel"' not in html  # dark navy Your Pulpo
     assert 'class="meta-row"' not in html  # v3 rich-pick meta strip
     assert "Each one suits a different kind of buyer" not in html  # v3 shortlist copy
+
+
+def test_pro_general_every_pick_card_has_a_real_photo(rendered_pro_general_html):
+    """v4.3 operator policy: a listing can only appear if its photo is
+    available. The pool is filtered upstream in
+    `build_issue._listing_has_eligible_photo`, the renderer's photo
+    placeholder branch is dead-removed, so the rendered output must
+    contain ONE `<img>` inside every pick-card and zero placeholder
+    bands ("Photo not available from source" / "Imagen no disponible
+    desde la fuente").
+    """
+    import re
+    html = rendered_pro_general_html
+    # No placeholder text in either locale
+    assert "Photo not available from source" not in html
+    assert "Imagen no disponible desde la fuente" not in html
+    # Count pick-cards and the photo <img> inside them. The photo is
+    # the first <img> in each card (`<div class="pick-card"...><img ...>`).
+    cards = re.findall(
+        r'class="pick-card"[\s\S]*?(?=class="pick-card"|</table>)',
+        html,
+    )
+    assert cards, "Rendered HTML had zero pick-cards — unexpected fixture"
+    for i, card in enumerate(cards, start=1):
+        first_img = re.search(r'<img\s+src="([^"]+)"', card)
+        assert first_img, f"Pick card {i:02d} has no <img> tag (photo missing)"
+        assert first_img.group(1).startswith("http"), (
+            f"Pick card {i:02d} <img> src is not an http(s) URL: "
+            f"{first_img.group(1)!r}"
+        )
+
+
+def test_listing_without_photo_is_filtered_before_render():
+    """Belt-and-suspenders for the upstream filter — drop in a synthetic
+    listing where every photo-eligibility check fails and assert it
+    never makes it to the rendered output.
+    """
+    from datetime import datetime, timezone
+    from automation.newsletter import build_issue
+    from automation.newsletter.types import Preference, Recipient
+    from automation.newsletter.store import email_hash
+    from tests.newsletter.conftest import _listing
+
+    pool = [_listing(rank=i + 1) for i in range(15)]
+    # The first listing fails the card-eligible gate.
+    pool[0]["card_eligible"] = False
+    pool[0]["title"] = "BROKER-LOGO-ONLY · SHOULD NEVER RENDER"
+
+    recipient = Recipient(
+        email_hash=email_hash("test@example.com"),
+        display_name="Test",
+        locale="en",
+        tier="pro",
+        has_account=True,
+        preference=Preference(),
+    )
+    issue = build_issue(
+        recipient=recipient,
+        ranked_listings=pool,
+        issue_number=1,
+        issue_date=datetime(2026, 5, 31, 14, 0, tzinfo=timezone.utc),
+        history_rows=[],
+    )
+    # The synthetic ineligible listing's title must not show up anywhere
+    # in the picks tuple (top, shortlist, skip).
+    all_titles = (
+        [p.title for p in issue.picks_top]
+        + [p.title for p in issue.picks_shortlist]
+        + ([issue.skip_pick.title] if issue.skip_pick else [])
+    )
+    assert "BROKER-LOGO-ONLY · SHOULD NEVER RENDER" not in all_titles

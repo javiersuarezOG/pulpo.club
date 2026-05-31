@@ -316,6 +316,29 @@ def fallback_preference(global_listings: list[dict]) -> Preference:
     return Preference(departments=[dominant])
 
 
+def _listing_has_eligible_photo(listing: dict) -> bool:
+    """v4.3 (2026-05-31) — operator policy gate. Returns True only when
+    the listing carries a real, card-eligible photo. Anything that would
+    have resolved to an empty image slot in `_absolute_photo` (broker-
+    logo source, text-overlay watermark, no `photo_urls` AND no
+    `hero_photo_path`) returns False and gets dropped from the pool
+    BEFORE picking — never reaches the renderer.
+
+    Mirrors the eligibility checks in `_absolute_photo` so a listing
+    that passes here will always produce a non-empty photo_url after
+    being picked. Keeping the rules in one helper here prevents drift
+    between the upstream filter and the downstream resolver.
+    """
+    if listing.get("card_eligible") is not True:
+        return False
+    if listing.get("has_text_overlay") is True:
+        return False
+    urls = listing.get("photo_urls") or []
+    has_url = bool(urls and isinstance(urls[0], str) and urls[0].startswith("http"))
+    has_path = bool(listing.get("hero_photo_path"))
+    return has_url or has_path
+
+
 def _absolute_photo(listing: dict, site_root: str) -> str:
     """Email needs absolute URLs. Prefer the source CDN; fall back to our
     Cloud-hosted copy at site_root + hero_photo_path.
@@ -937,8 +960,21 @@ def build_issue(
     else:
         effective_pref = recipient.preference
 
+    # v4.3 (2026-05-31) — operator policy: a listing can ONLY appear in
+    # the newsletter if all data needed to render its card is available,
+    # including a real (non-broker-logo) photo. We apply this gate
+    # upstream of `select_picks` so both the primary cut AND the
+    # fallback top-up draw from the same photo-eligible pool. The
+    # filter mirrors `_absolute_photo`'s existing `card_eligible` +
+    # `has_text_overlay` rules — anything that would have rendered an
+    # empty image slot (or the v4.2 placeholder band) gets dropped
+    # entirely instead.
+    photo_eligible_pool = [
+        listing for listing in ranked_listings if _listing_has_eligible_photo(listing)
+    ]
+
     kept_listings, skip_candidates = select_picks(
-        ranked_listings,
+        photo_eligible_pool,
         pref=effective_pref,
         excluded_source_ids=excluded,
         window_start=window_start,
@@ -946,12 +982,11 @@ def build_issue(
     )
 
     # If a tight filter starved the cut, top up from the global fallback so
-    # we never ship a near-empty issue. Mark the top-ups visually (not yet —
-    # PR-NL-3 will brand them "broader cut"). Always preserve global rank.
+    # we never ship a near-empty issue. Same photo-eligibility gate applies.
     if len(kept_listings) < 6 and cohort != "anonymous":
         fallback = select_picks(
-            ranked_listings,
-            pref=fallback_preference(ranked_listings),
+            photo_eligible_pool,
+            pref=fallback_preference(photo_eligible_pool),
             excluded_source_ids=excluded | {f"{listing.get('source')}:{listing.get('source_id')}" for listing in kept_listings},
             window_start=window_start,
             top_n=ISSUE_DEFAULT_TOP_N - len(kept_listings),
