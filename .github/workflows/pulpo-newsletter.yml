@@ -1,15 +1,18 @@
 name: pulpo newsletter
 
-# Weekly Monday cadence. Two modes:
-#   • Cron / default dispatch: dry-run. Builds the per-cohort cohort HTMLs
-#     against committed ranked.json, runs the full enumerate-and-send
-#     pipeline with PULPO_NEWSLETTER_DRY_RUN=1 (no Resend API hits), and
-#     uploads everything as artifacts. Use this to QA before flipping
-#     send_mode=yes.
-#   • Manual dispatch with send_mode=yes: LIVE send. Builds the recipient
-#     queue from the Resend audience × Clerk users, calls Resend for real,
-#     fires newsletter.send_succeeded/failed events into PostHog. Pair with
-#     only_email=javier@suarez.ventures for the first live smoke test.
+# Weekly Sunday cadence. Two modes:
+#   • Scheduled cron: LIVE send to the Pro/Agency audience. Auto-resolves
+#     the next issue number from PostHog, builds the per-recipient queue
+#     from the Resend audience × Clerk users, calls Resend for real, fires
+#     newsletter.send_succeeded/failed events. The PR-NL-9 Pro/Agency
+#     audience gate is in force — free + anonymous subscribers are
+#     filtered out. For a one-off launch broadcast to everyone, manually
+#     dispatch with allow_all_subscribers=yes.
+#   • Manual workflow_dispatch: dry-run by default for operator QA.
+#     Override with send_mode=yes for a LIVE manual send, or
+#     preview_cohorts=<email> for the admin-preview LIVE-to-one-address
+#     path. only_email=<address> scopes a LIVE send to a single recipient
+#     for smoke-testing.
 #
 # issue_number defaults to auto: when the operator leaves the input
 # blank, the script queries PostHog for max(issue_number) from past
@@ -19,7 +22,7 @@ name: pulpo newsletter
 
 on:
   schedule:
-    - cron: "0 14 * * 1"    # every Monday 14:00 UTC (08:00 SV)
+    - cron: "0 16 * * 0"    # every Sunday 16:00 UTC (10:00 SV — no DST)
   workflow_dispatch:
     inputs:
       issue_number:
@@ -73,12 +76,13 @@ jobs:
       # Never burn DeepSeek credits from cron.
       PULPO_NEWSLETTER_USE_LLM: "${{ github.event.inputs.use_llm || '0' }}"
 
-      # Send gate. Default OFF — weekly cron stays in dry-run. Setting
-      # send_mode=yes via workflow_dispatch flips DRY_RUN=0 and the send
-      # pipeline talks to Resend for real. preview_cohorts=<email> also
-      # forces LIVE — the admin preview button needs a real send to put
-      # the rendered email in the operator's inbox.
-      PULPO_NEWSLETTER_DRY_RUN: "${{ (github.event.inputs.send_mode == 'yes' || github.event.inputs.preview_cohorts != '') && '0' || '1' }}"
+      # Send gate. The scheduled cron is LIVE — every Sunday 10:00 SV
+      # the recipient queue is built and Resend is called for real.
+      # Manual workflow_dispatch stays dry-run by default so an operator
+      # can QA without sending; flip to LIVE per-dispatch by setting
+      # send_mode=yes (or preview_cohorts=<email> for the admin-preview
+      # LIVE-to-one-address path).
+      PULPO_NEWSLETTER_DRY_RUN: "${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.send_mode != 'yes' && github.event.inputs.preview_cohorts == '') && '1' || '0' }}"
 
       # Telemetry — silent no-op when secret is missing (per
       # automation/posthog_client.py + api/_posthog.js).
