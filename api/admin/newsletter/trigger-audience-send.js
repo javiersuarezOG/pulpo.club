@@ -32,9 +32,20 @@
 // send per hour — bad, but bounded. If that turns out to matter, add
 // an admin bearer-token check here (the PULPO_ADMIN_DEBUG_TOKEN
 // pattern from earlier preview-endpoint versions).
+//
+// Dispatch verification: GitHub's workflow_dispatch POST returns 204
+// on accepted payload, but the run is created async and can be
+// silently dropped during transient GH Actions hiccups (bit us
+// 2026-05-31 on the preview path; this path has higher blast radius —
+// a falsely-claimed audience send means every Pro subscriber is
+// silently skipped). After GitHub returns 2xx we poll the runs API
+// for ~8s and only return 200 if a fresh run appears; otherwise 502
+// `dispatch_accepted_but_no_run_created` so the modal shows a real
+// error instead of "Sent Issue N to X readers."
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
+const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
@@ -186,6 +197,15 @@ module.exports = async (req, res) => {
   const ref = process.env.GITHUB_DISPATCH_REF || DEFAULT_REF;
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
 
+  // Capture the newest existing workflow_dispatch run id BEFORE we
+  // dispatch. Used by the post-dispatch verify-poll below to confirm
+  // GitHub actually created a run (not just accepted the dispatch).
+  // See api/admin/newsletter/_verify_dispatch.js for the failure mode
+  // this guards against — bit us 2026-05-31 on the preview path, same
+  // class of bug applies here with HIGHER blast radius (a missing
+  // audience send is a silent skip of every Pro subscriber's weekly).
+  const baselineRunId = await getLatestRunId({ repo, workflowFile: WORKFLOW_FILE, token });
+
   let gh;
   try {
     gh = await fetch(url, {
@@ -235,16 +255,60 @@ module.exports = async (req, res) => {
     });
   }
 
-  // GitHub Actions dispatches don't return the new run ID synchronously
-  // — the workflow shows up at the runs list a few seconds later. We
-  // return a hint pointing at the workflow's runs page so the UI can
-  // open it and the operator can find their run (always the most
-  // recent workflow_dispatch entry).
+  // GitHub accepted the dispatch (2xx). Now confirm the run actually
+  // exists — otherwise we'd happily flash "Sent Issue N to X readers"
+  // in the modal while no email goes out. Skip verification only when
+  // we couldn't get a baseline (GitHub runs API unavailable); that
+  // failure mode would falsely block dispatches during a wider GH
+  // outage, which is worse than the rare missed verify.
+  if (baselineRunId !== null) {
+    const newRun = await pollForNewerRun({
+      repo, workflowFile: WORKFLOW_FILE, token, baselineId: baselineRunId,
+    });
+    if (!newRun) {
+      logApi({
+        status: 502, ms: Date.now() - t0, reason: "dispatch_accepted_but_no_run_created",
+        baseline_run_id: baselineRunId, issue: issueNumberStr,
+      });
+      await emitAuditEvent({
+        by, issueNumber: issueNumberStr, audienceCount,
+        result: "error",
+        detail: "dispatch_accepted_but_no_run_created: GitHub returned 2xx but no workflow run appeared within poll window",
+      });
+      return res.status(502).json({
+        error: "dispatch_accepted_but_no_run_created",
+        hint: "GitHub accepted the dispatch but no workflow run materialized within ~8s. This is usually a transient GitHub Actions issue — retry in ~30s. If it persists, check https://www.githubstatus.com.",
+      });
+    }
+
+    logApi({
+      status: 200, ms: Date.now() - t0, op: "dispatch", issue: issueNumberStr,
+      audience: audienceCount, by: by || "anon", run_id: newRun.id, verified: true,
+    });
+
+    await emitAuditEvent({
+      by, issueNumber: issueNumberStr, audienceCount,
+      result: "ok", detail: null,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      issue_number: issueNum,
+      audience_count: audienceCount,
+      dispatched_at: new Date().toISOString(),
+      runs_url_hint: newRun.html_url || `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE.replace(".yml", "")}`,
+      run_id: newRun.id,
+      verified: true,
+    });
+  }
+
+  // Baseline unavailable — return success but flag the unverified
+  // state so the UI can warn the operator to watch the workflow page.
   const runsUrlHint = `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE.replace(".yml", "")}`;
 
   logApi({
     status: 200, ms: Date.now() - t0, op: "dispatch", issue: issueNumberStr,
-    audience: audienceCount, by: by || "anon",
+    audience: audienceCount, by: by || "anon", verified: false, reason: "baseline_unavailable",
   });
 
   await emitAuditEvent({
@@ -258,5 +322,6 @@ module.exports = async (req, res) => {
     audience_count: audienceCount,
     dispatched_at: new Date().toISOString(),
     runs_url_hint: runsUrlHint,
+    verified: false,
   });
 };
