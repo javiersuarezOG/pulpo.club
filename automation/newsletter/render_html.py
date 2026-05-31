@@ -959,7 +959,7 @@ def _favorites_html(issue: Issue) -> str:
     <tr><td class="pad-h" style="padding:16px 24px 16px;background:#F8F4EC;">
       <p class="saves-eyebrow" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;font-weight:600;margin:0 0 4px;">{_e(eyebrow)}</p>
       <h2 class="saves-h2" style="font-family:'Instrument Serif',Georgia,serif;font-size:32px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 4px;color:#1A1916;">{_e(headline)}</h2>
-      <p class="saves-summary" style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 14px;font-style:italic;max-width:540px;">{summary}</p>
+      <p class="saves-summary" style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 14px;max-width:540px;">{summary}</p>
       {cards}
       <p style="margin:14px 0 0;"><a href="{_e(saved_url)}" style="display:inline-block;font-size:13px;font-weight:600;color:#1A1916;border-bottom:1px solid #1A1916;padding-bottom:1px;text-decoration:none;">{_e(open_all)} &rarr;</a></p>
     </td></tr>
@@ -1116,12 +1116,26 @@ def _format_price_compact(amount: float) -> str:
 
 
 def _market_html(issue: Issue) -> str:
-    """v4.0 market context — H2 + small Surf-City decoder + plain-language paragraph.
+    """v4.1 (2026-05-31) market context — numbered editorial mini-blocks.
 
-    Plain layman framing replaces v3's "two segments correcting at the
-    same time means the market is breathing, not bracing". The
-    decoder line names the two regional corridors (Surf City 1 / 2)
-    for any reader who isn't fluent in gov-coined coastal branding.
+    Restructure (operator feedback 2026-05-31): the v4.0 form was a
+    prose paragraph that read as a wall of text. Now each beat of the
+    market story renders as a numbered block: big serif numeral on
+    the left (forest green, mockup-locked), bold lead + body on the
+    right. Scans like a 1-2-3 checklist while keeping editorial tone.
+
+    Splits each `market_context` string on the `||BLOCK||` sentinel
+    emitted by `commentary.deterministic_market_note`. Backwards-
+    compatible with LLM commentary which still returns one prose
+    paragraph (rendered as a single "01" block).
+
+    Hydrates `<a href="PICK_URL_N">` placeholders to real pulpo_url
+    targets via `_hydrate_pick_urls`. Bold `<strong>` tags survive
+    untouched.
+
+    Mobile-safe layout: 44px-wide numeral cell + content column. At
+    375px viewport (Gmail mobile), content gets ~250px which still
+    holds a 12-15 word lead + 1 sentence comfortably.
     """
     paras = issue.commentary.market_context
     if not paras:
@@ -1131,26 +1145,39 @@ def _market_html(issue: Issue) -> str:
     hl = i18n.t("market.headline", locale)
     decoder = i18n.t("market.decoder", locale)
 
-    # Hydrate any <a href="PICK_URL_N"> placeholders against real picks.
-    para_html_parts: list[str] = []
+    # Flatten paragraph entries + the ||BLOCK|| sentinel into one
+    # ordered list of editorial blocks.
+    blocks: list[str] = []
     for para in paras:
-        hydrated = _hydrate_pick_urls(para, issue)
-        para_html_parts.append(
-            f'<p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0 0 12px;">{hydrated}</p>'
+        for chunk in para.split("||BLOCK||"):
+            chunk = chunk.strip()
+            if chunk:
+                blocks.append(chunk)
+
+    block_html_parts: list[str] = []
+    for idx, block in enumerate(blocks, start=1):
+        hydrated = _hydrate_pick_urls(block, issue)
+        is_last = idx == len(blocks)
+        block_margin = "0" if is_last else "0 0 18px"
+        block_html_parts.append(
+            f'<table width="100%" role="presentation" cellpadding="0" cellspacing="0" style="margin:{block_margin};">'
+            f'<tr>'
+            f'<td width="44" valign="top" style="width:44px;padding:0 12px 0 0;vertical-align:top;">'
+            f'<div style="font-family:\'Instrument Serif\',Georgia,serif;font-size:32px;line-height:1;color:#1F3D31;font-weight:400;letter-spacing:-0.02em;">{idx:02d}</div>'
+            f'</td>'
+            f'<td valign="top" style="vertical-align:top;">'
+            f'<p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0;">{hydrated}</p>'
+            f'</td>'
+            f'</tr></table>'
         )
-    # Drop the trailing margin on the last paragraph for tighter spacing.
-    if para_html_parts:
-        para_html_parts[-1] = para_html_parts[-1].replace(
-            "margin:0 0 12px;", "margin:0;"
-        )
-    para_html = "".join(para_html_parts)
+    blocks_html = "".join(block_html_parts)
 
     return f"""
     <tr><td class="pad-h" style="padding:18px 24px 16px;">
       <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:600;margin-bottom:6px;">{_e(eb)}</div>
       <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(hl)}</h2>
-      <p style="font-size:13px;line-height:1.55;color:#5A5650;margin:0 0 12px;font-style:italic;">{decoder}</p>
-      {para_html}
+      <p style="font-size:13px;line-height:1.55;color:#5A5650;margin:0 0 18px;">{decoder}</p>
+      {blocks_html}
     </td></tr>
     """
 
@@ -1223,7 +1250,7 @@ def _footer_html(issue: Issue) -> str:
           </svg>
         </td>
         <td style="vertical-align:middle;">
-          <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span>
+          <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span><span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.14em;padding:2px 5px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:5px;vertical-align:middle;line-height:1;">PRO</span>
         </td>
       </tr></table>
       <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#1A1916;font-weight:500;">{_e(tagline)}</p>
@@ -1483,13 +1510,46 @@ def _pick_card_html(
         f'</div>'
     )
 
-    # Photo (full-width). Skip when there's no eligible hero image (e.g.
-    # broker-logo source like REMAX) — same rule as the v3 renderer.
-    photo_html = ""
+    # Photo (full-width). v4.1 (2026-05-31): when the listing source
+    # only serves a broker-logo image (REMAX / Citymax — filtered
+    # upstream to avoid leaking the broker's brand into our card),
+    # `pick.photo_url` is empty. v4.0 rendered nothing in that slot,
+    # which made the affected cards visually inconsistent with the
+    # rest (no fixed-height image at the top). Now we render a soft
+    # branded placeholder band — same shape footprint as a real
+    # photo — so card heights stay consistent and the missing-image
+    # state reads as "image withheld" rather than "broken layout".
     if pick.photo_url:
         photo_html = (
             f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title or "")}" '
             f'width="100%" style="width:100%;height:auto;display:block;" />'
+        )
+    else:
+        placeholder_bg = "#C9DEC6" if is_top_deal else "#E8DFC6"
+        placeholder_label = (
+            "Photo not available from source" if en
+            else "Imagen no disponible desde la fuente"
+        )
+        photo_html = (
+            f'<div style="height:180px;background:{placeholder_bg};display:block;'
+            f'text-align:center;vertical-align:middle;line-height:180px;">'
+            f'<table role="presentation" cellpadding="0" cellspacing="0" '
+            f'style="margin:0 auto;height:180px;"><tr>'
+            f'<td style="vertical-align:middle;text-align:center;line-height:1;padding:0;">'
+            f'<svg width="36" height="36" viewBox="-50 -50 100 100" '
+            f'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+            f'<path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 '
+            f'C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 '
+            f'C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" '
+            f'stroke-linecap="round" fill="none" opacity="0.45"/>'
+            f'<circle cx="18" cy="-4" r="9.5" fill="#1F3D31" opacity="0.45"/>'
+            f'<circle cx="18" cy="-4" r="5.5" fill="#D4A04A" opacity="0.7"/>'
+            f'</svg>'
+            f'<div style="font-size:11px;letter-spacing:0.06em;color:#5A5650;'
+            f'margin-top:6px;text-transform:uppercase;font-weight:500;">'
+            f'{_e(placeholder_label)}</div>'
+            f'</td></tr></table>'
+            f'</div>'
         )
 
     # Price line — "$900,000" + optional " · $621/m²" inline.
@@ -1572,7 +1632,7 @@ def _section_intro_top3_html(locale: Locale) -> str:
     <tr><td class="pad-h" style="padding:26px 24px 14px;">
       <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
       <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
-      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">{_e(body)}</p>
+      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;margin:0;max-width:560px;">{_e(body)}</p>
     </td></tr>
     """
 
@@ -1585,7 +1645,7 @@ def _section_intro_rest_html(locale: Locale, n_rest: int) -> str:
     <tr><td class="pad-h" style="padding:26px 24px 14px;">
       <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
       <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
-      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">{_e(body)}</p>
+      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;margin:0;max-width:560px;">{_e(body)}</p>
     </td></tr>
     """
 
@@ -1632,7 +1692,7 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
         # citation text without a link.
         title = i18n.t("spotlight.fallback.title", locale)
         paragraph = i18n.t("spotlight.fallback.body", locale)
-        source_name = "Pulpo's coastal market scan" if en else "Escaneo costero de Pulpo"
+        source_name = "Pulpo Pro coastal scan" if en else "Escaneo costero de Pulpo Pro"
         source_url = ""
         source_date = _e(issue.issue_date_human) if getattr(issue, "issue_date_human", "") else ""
 
@@ -1778,7 +1838,7 @@ def render_html(issue: Issue) -> str:
               </svg>
             </td>
             <td style="vertical-align: middle;">
-              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span>
+              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span><span style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.14em;padding:2px 6px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:6px;vertical-align:middle;line-height:1;">PRO</span>
             </td>
           </tr></table>
         </td>

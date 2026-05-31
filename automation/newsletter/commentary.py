@@ -1080,35 +1080,55 @@ def deterministic_market_note(picks: list[dict], locale: Locale = "en") -> str:
             "Vale la pena guardar lo que se acerque a tu filtro para que Pulpo avise del siguiente movimiento."
         )
 
-    # v4 (2026-05-31) — three-sentence form per the locked mockup,
-    # ending with a BOLDED actionable close. Replaces v3.1's
-    # two-sentence "discount + distinct pick" form which dropped the
-    # "where the buying window is widening" guidance.
+    # v4.1 (2026-05-31) — return a JOIN-on-pipe form so the renderer
+    # can split into numbered editorial blocks. Each block has a bold
+    # lead line + a body sentence (which may contain a linked
+    # <a href="PICK_URL_N">…</a> placeholder).
+    #
+    # Three blocks when both a discount pick and a distinct pick exist;
+    # two blocks otherwise (the "take" closer always fires).
+    # The renderer reads the leading `<strong>…:</strong>` as the
+    # block's headline and renders the rest as body — but for
+    # transport convenience we keep everything in one string per
+    # block separated by the `||BLOCK||` sentinel. The sentinel never
+    # appears in editorial copy, so the split is safe.
+    #
+    # Earlier v4 used `.capitalize()` on `discount_phrase` to start
+    # the sentence — that lowercased the `PICK_URL_N` placeholder
+    # and broke link hydration. The new form keeps the linked phrase
+    # mid-sentence (no capitalization needed), so hydration survives.
     discount_phrase = _market_property_phrase(discount_pick, locale, with_link=True)
+
     if distinct_pick is not None:
         distinct_phrase = _market_property_phrase(distinct_pick, locale, with_link=True)
         if en:
             return (
-                f"Two big price cuts this week. {discount_phrase.capitalize()} (developer-scale) and "
-                f"{distinct_phrase} both cut their ask. Both are on Surf City 1. The eastern coast "
-                f"(Surf City 2) didn't move this week. "
-                f"<strong>If you're looking to buy right now, sellers on the western coast are more open to negotiating.</strong>"
+                f"<strong>The biggest move:</strong> {discount_phrase} cut its ask — developer-scale, moving on price."
+                f"||BLOCK||"
+                f"<strong>In another lane:</strong> {distinct_phrase} dropped too — no project tag."
+                f"||BLOCK||"
+                f"<strong>The take:</strong> Both moves are on Surf City 1. The eastern coast (Surf City 2) didn't budge. "
+                f"<strong>If you're shopping now, sellers on the western coast are open to negotiating.</strong>"
             )
         return (
-            f"Dos bajas de precio importantes esta semana. {discount_phrase.capitalize()} (escala de desarrollador) y "
-            f"{distinct_phrase} ambos bajaron su precio. Ambas en Surf City 1. La costa este "
-            f"(Surf City 2) no se movió esta semana. "
-            f"<strong>Si vos andás comprando ahora, los vendedores del lado oeste están más abiertos a negociar.</strong>"
+            f"<strong>El movimiento más grande:</strong> {discount_phrase} bajó su precio — escala de desarrollador, moviéndose."
+            f"||BLOCK||"
+            f"<strong>En otro carril:</strong> {distinct_phrase} también bajó — sin proyecto por hacer."
+            f"||BLOCK||"
+            f"<strong>La lectura:</strong> Ambos movimientos están en Surf City 1. La costa este (Surf City 2) no se movió. "
+            f"<strong>Si vos andás comprando ahora, los vendedores del lado oeste están abiertos a negociar.</strong>"
         )
 
     if en:
         return (
-            f"The most aggressive discount this week is {discount_phrase} (developer-scale, moving on price). "
-            f"It's on Surf City 1; the eastern coast (Surf City 2) didn't move. "
+            f"<strong>The biggest move:</strong> {discount_phrase} cut its ask — developer-scale, moving on price."
+            f"||BLOCK||"
+            f"<strong>The take:</strong> It's on Surf City 1; the eastern coast (Surf City 2) didn't move. "
             f"<strong>If you're shopping the western coast, this is a week sellers are open to negotiating.</strong>"
         )
     return (
-        f"El descuento más fuerte esta semana es {discount_phrase} (escala de desarrollador, moviéndose en precio). "
-        f"Está en Surf City 1; la costa este (Surf City 2) no se movió. "
+        f"<strong>El movimiento más grande:</strong> {discount_phrase} bajó su precio — escala de desarrollador, moviéndose."
+        f"||BLOCK||"
+        f"<strong>La lectura:</strong> Está en Surf City 1; la costa este (Surf City 2) no se movió. "
         f"<strong>Si estás mirando la costa oeste, esta es una semana en que los vendedores están abiertos a negociar.</strong>"
     )
