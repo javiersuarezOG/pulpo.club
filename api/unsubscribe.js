@@ -1,6 +1,6 @@
 // GET/POST /api/unsubscribe
 //
-// One-click unsubscribe for the fortnightly newsletter. Two entry points:
+// One-click unsubscribe for the weekly newsletter. Two entry points:
 //
 //   GET /api/unsubscribe?r=<recipient_hash>&i=<issue_number>&t=<token>
 //       Browser navigation from the footer link. Renders a small HTML
@@ -185,8 +185,8 @@ function renderConfirmationHtml() {
 <body>
 <div class="wrap">
   <h1>You're unsubscribed.</h1>
-  <p>We'll stop sending the fortnightly newsletter to this address. Existing transactional emails (account, billing) still send normally.</p>
-  <p>Changed your mind? Resubscribe and tune your filter from your account.</p>
+  <p>We'll stop sending the weekly newsletter to this address. Existing transactional emails (account, billing) still send normally.</p>
+  <p>Changed your mind? Resubscribe from the Pulpo homepage or tune your filter from your account.</p>
   <a class="cta" href="https://pulpo.club/account">Go to account</a>
 </div>
 </body>
