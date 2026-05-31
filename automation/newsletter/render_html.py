@@ -20,6 +20,7 @@ import re as _re
 from html import escape as _e
 
 from . import i18n
+from .components._common import TEMPLATE_VERSION as _TEMPLATE_VERSION_SHARED
 from .types import Issue, IssuePick, Locale
 
 
@@ -28,7 +29,13 @@ from .types import Issue, IssuePick, Locale
 # Stays in sync with docs/newsletter-audit.md. Exposed via
 # email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
-TEMPLATE_VERSION = "newsletter-v4.0-2026-05"
+#
+# v4.2 (2026-05-31): single source of truth lives in
+# `automation.newsletter.components._common`. Re-exported here so
+# existing imports (`from automation.newsletter.render_html import
+# TEMPLATE_VERSION`) keep working — both in tests and in
+# `build_issue._emit_favorites_telemetry`.
+TEMPLATE_VERSION = _TEMPLATE_VERSION_SHARED
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }

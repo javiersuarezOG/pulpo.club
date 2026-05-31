@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pulpo — Issue 99 · 30 May 2026 (mockup v4)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+/* MOCKUP v4 — visual proposal. Every visual rule is also duplicated as
+   inline `style=""` on its element so this mockup renders identically
+   in Gmail / Outlook / Yahoo when ported to the real renderer. The
+   <style> block here only adds (a) mobile media-query enhancements and
+   (b) hover states — both purely optional for email clients. */
+body { margin: 0; padding: 0; background: #F4EFE6; -webkit-font-smoothing: antialiased; }
+a { text-decoration: none; }
+img { display: block; max-width: 100%; height: auto; border: 0; }
+table { border-collapse: collapse; }
+.wrap { width: 100%; background: #F4EFE6; }
+.frame { width: 100%; max-width: 680px; margin: 0 auto; background: #FFFFFF; }
+
+/* Mobile (≤ 600px): reduce edge padding from 24px → 16px so cards
+   breathe at 375px. Hero h1 scales down. Photos stay edge-to-edge. */
+@media (max-width: 600px) {
+  .pad-h          { padding-left: 16px !important; padding-right: 16px !important; }
+  .hero-h1        { font-size: 36px !important; line-height: 1.05 !important; }
+  .pick-title     { font-size: 26px !important; }
+  .saves-h2       { font-size: 26px !important; }
+  .yp-title       { font-size: 22px !important; }
+  .ribbon-stack { display: block !important; }
+  .ribbon-stack > * { display: block !important; margin: 0 0 6px 0 !important; }
+}
+a.btn-fill:hover    { background: #0F2018 !important; }
+a.btn-ghost:hover   { background: #1A1916 !important; color: #F4EFE6 !important; }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#F4EFE6;-webkit-font-smoothing:antialiased;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:#1A1916;">
+
+<div class="wrap" style="width:100%;background:#F4EFE6;">
+<table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680" style="width:100%;max-width:680px;margin:0 auto;background:#FFFFFF;">
+
+  <!-- ── HEADER STRIP ─────────────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:14px 24px;border-bottom:1px solid rgba(0,0,0,0.08);">
+    <table width="100%" role="presentation"><tr>
+      <td style="vertical-align:middle;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="padding-right:10px;line-height:0;">
+            <svg width="24" height="24" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+              <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+              <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+            </svg>
+          </td>
+          <td style="vertical-align:middle;">
+            <span style="font-size:22px;font-weight:700;letter-spacing:-0.035em;color:#1F3D31;line-height:1;">pulpo</span>
+          </td>
+        </tr></table>
+      </td>
+      <td align="right" style="vertical-align:middle;">
+        <span style="font-size:11px;color:#888780;letter-spacing:0.08em;">ISSUE 99 · 30 MAY 2026</span>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- ── HERO ─────────────────────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:20px 24px 14px;">
+    <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:600;margin-bottom:6px;">Hand-picked for Preview</div>
+    <h1 class="hero-h1" style="font-family:'Instrument Serif',Georgia,serif;font-size:48px;line-height:1.03;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">The 10 best, this week.</h1>
+    <p style="font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 12px;max-width:540px;">Pulpo combed through every active beach and lake listing in El Salvador this week. Of the 863 that match your filter, these 10 stood out.</p>
+    <div><span style="display:inline-block;font-size:10.5px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:transparent;color:#1F3D31;border:1px solid #1F3D31;border-radius:999px;">La Libertad</span></div>
+  </td></tr>
+
+  <!-- ── YOUR FAVORITES THIS WEEK ─────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 4px;">
+    <div style="height:1px;background:rgba(0,0,0,0.08);"></div>
+  </td></tr>
+  <tr><td class="pad-h" style="padding:16px 24px 16px;background:#F8F4EC;">
+    <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;font-weight:600;margin-bottom:4px;">Your favorites · this week</div>
+    <h2 class="saves-h2" style="font-family:'Instrument Serif',Georgia,serif;font-size:32px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 4px;color:#1A1916;">3 you're following.</h2>
+    <p style="font-family:'Instrument Serif',Georgia,serif;font-size:16px;line-height:1.5;color:#1A1916;margin:0 0 16px;font-style:italic;max-width:540px;"><strong style="font-style:normal;">Two of three moved on price this fortnight</strong> — busier than a typical week on your watchlist.</p>
+
+    <!-- Saved card 1: price dropped -->
+    <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px;margin:0 0 10px;">
+      <table width="100%" role="presentation" cellpadding="0" cellspacing="0"><tr>
+        <td width="88" style="vertical-align:top;padding-right:12px;width:88px;">
+          <img src="https://assets.thesparksite.com/uploads/sites/1521/2025/12/IMG-6228-1-1200x800.fit.jpg" alt="" width="88" style="width:88px;height:88px;object-fit:cover;border-radius:6px;display:block;" />
+        </td>
+        <td style="vertical-align:top;">
+          <span style="display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;background:#FBE6D8;color:#7A3D1F;border-radius:4px;margin-bottom:6px;">&darr; Dropped $5,000</span>
+          <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#1A1916;line-height:1.3;">Beachfront Home El Sunzal</p>
+          <p style="margin:0 0 6px;font-size:12px;color:#888780;letter-spacing:0.02em;">Tamanique · 4 bed · 3 bath</p>
+          <p style="margin:0 0 10px;font-size:15px;color:#1A1916;font-weight:600;">$900,000 <span style="font-size:13px;color:#888780;text-decoration:line-through;font-weight:400;">$905,000</span></p>
+          <table role="presentation"><tr>
+            <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/essurf__5247?ref=newsletter_issue_99" style="display:inline-block;font-size:12px;font-weight:600;padding:8px 14px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+            <td><span style="display:inline-block;font-size:12px;font-weight:600;padding:7px 12px;color:#B8643C;border:1px solid #B8643C;border-radius:999px;letter-spacing:0.02em;">&hearts; Following</span></td>
+          </tr></table>
+        </td>
+      </tr></table>
+    </div>
+
+    <!-- Saved card 2: price moved up -->
+    <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px;margin:0 0 10px;">
+      <table width="100%" role="presentation" cellpadding="0" cellspacing="0"><tr>
+        <td width="88" style="vertical-align:top;padding-right:12px;width:88px;">
+          <img src="https://assets.thesparksite.com/uploads/sites/1521/2023/08/PHOTO-2023-08-29-13-05-47-1200x800.fit.jpg" alt="" width="88" style="width:88px;height:88px;object-fit:cover;border-radius:6px;display:block;" />
+        </td>
+        <td style="vertical-align:top;">
+          <span style="display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;background:#EDE7DB;color:#5A5650;border-radius:4px;margin-bottom:6px;">&uarr; Up $3,000</span>
+          <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#1A1916;line-height:1.3;">Cerromar El Sunzal Lot</p>
+          <p style="margin:0 0 6px;font-size:12px;color:#888780;letter-spacing:0.02em;">Tamanique · 1,324 m² lot</p>
+          <p style="margin:0 0 10px;font-size:15px;color:#1A1916;font-weight:600;">$265,000</p>
+          <table role="presentation"><tr>
+            <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/essurf__3730?ref=newsletter_issue_99" style="display:inline-block;font-size:12px;font-weight:600;padding:8px 14px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+            <td><span style="display:inline-block;font-size:12px;font-weight:600;padding:7px 12px;color:#B8643C;border:1px solid #B8643C;border-radius:999px;letter-spacing:0.02em;">&hearts; Following</span></td>
+          </tr></table>
+        </td>
+      </tr></table>
+    </div>
+
+    <!-- Saved card 3: unchanged -->
+    <div style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px;margin:0 0 14px;">
+      <table width="100%" role="presentation" cellpadding="0" cellspacing="0"><tr>
+        <td width="88" style="vertical-align:top;padding-right:12px;width:88px;">
+          <div style="width:88px;height:88px;background:#E8DFC6;border-radius:6px;"></div>
+        </td>
+        <td style="vertical-align:top;">
+          <span style="display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;background:#E8DFC6;color:#5A5650;border-radius:4px;margin-bottom:6px;">Unchanged</span>
+          <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#1A1916;line-height:1.3;">Ocean View Lot Near El Tunco</p>
+          <p style="margin:0 0 6px;font-size:12px;color:#888780;letter-spacing:0.02em;">Tamanique · 1,263 m² lot</p>
+          <p style="margin:0 0 10px;font-size:15px;color:#1A1916;font-weight:600;">$60,000</p>
+          <table role="presentation"><tr>
+            <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_99" style="display:inline-block;font-size:12px;font-weight:600;padding:8px 14px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+            <td><span style="display:inline-block;font-size:12px;font-weight:600;padding:7px 12px;color:#B8643C;border:1px solid #B8643C;border-radius:999px;letter-spacing:0.02em;">&hearts; Following</span></td>
+          </tr></table>
+        </td>
+      </tr></table>
+    </div>
+
+    <a href="https://pulpo.club/saved?ref=newsletter_issue_99&from=favorites" style="display:inline-block;font-size:13px;font-weight:600;color:#1A1916;border-bottom:1px solid #1A1916;padding-bottom:1px;">Open all favorites &rarr;</a>
+  </td></tr>
+
+  <!-- ── MARKET CONTEXT ───────────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:18px 24px 16px;">
+    <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:600;margin-bottom:6px;">Market context</div>
+    <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">What's moving this week.</h2>
+    <p style="font-size:13px;line-height:1.55;color:#5A5650;margin:0 0 12px;font-style:italic;"><strong style="color:#1A1916;">Surf City 1</strong> = the La Libertad coast (El Tunco → El Sunzal → El Zonte). <strong style="color:#1A1916;">Surf City 2</strong> = the eastern coast from Las Flores to El Cuco. We cover both.</p>
+    <p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0;">Two big price cuts this week. A <a href="https://pulpo.club/listing/essurf__4769?ref=newsletter_issue_99" style="color:#B8643C;border-bottom:1px solid #B8643C;">76,259 m² lot in Chiltiupán</a> (about the size of nine soccer fields — the kind of land a developer buys) and a <a href="https://pulpo.club/listing/essurf__5247?ref=newsletter_issue_99" style="color:#B8643C;border-bottom:1px solid #B8643C;">beachfront home in Tamanique</a> with no work needed both cut their ask. Both are on Surf City 1. The eastern coast (Surf City 2) didn't move this week. <strong>If you're looking to buy right now, sellers on the western coast are more open to negotiating.</strong></p>
+  </td></tr>
+
+  <!-- ── SECTION INTRO: TOP 3 ─────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:26px 24px 14px;">
+    <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+    <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">Top 3 this week.</h2>
+    <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">Three picks, three different fits. One is move-in-ready beachfront — if you want the work already done. One is an underpriced lot with utilities — if you can run the build but don't want to deal with the infrastructure. One is a blank-canvas lot at a fair price — if you want both.</p>
+  </td></tr>
+
+  <!-- ── PICK 01 (TOP — cream background) ─────────────────────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 8px;">
+    <div style="background:#DDE9DC;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+      <img src="https://assets.thesparksite.com/uploads/sites/1521/2025/12/IMG-6228-1-1200x800.fit.jpg" alt="Beachfront Home El Sunzal" width="100%" style="width:100%;height:auto;display:block;" />
+      <div style="padding:16px 18px 18px;">
+        <div style="margin-bottom:8px;">
+          <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#1F3D31;color:#F4EFE6;border-radius:999px;margin-right:6px;">Top deal · 01</span>
+          <span style="display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#FBE6D8;color:#7A3D1F;border-radius:999px;">New this week</span>
+        </div>
+        <h2 class="pick-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;font-weight:400;margin:0 0 4px;color:#1A1916;">Beachfront Home El Sunzal</h2>
+        <p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">Tamanique · La Libertad · 4 bed · 3 bath</p>
+        <p style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;color:#1A1916;">$900,000 <span style="font-size:14px;color:#5A5650;font-family:'Inter',sans-serif;letter-spacing:0;">· $621/m²</span></p>
+
+        <!-- Why we picked it -->
+        <div style="background:#FFFFFF;border-radius:6px;padding:14px 16px;margin:0 0 14px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;">Why we picked it</p>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Beachfront — no walk, no drive</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>7 min drive to the nearest beach</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>40 min to San Salvador airport</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Move-in ready — work already done</li>
+          </ul>
+        </div>
+
+        <!-- Actions: same pair on every pick -->
+        <table role="presentation"><tr>
+          <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/essurf__5247?ref=newsletter_issue_99" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+          <td><a class="btn-ghost" href="https://pulpo.club/listing/essurf__5247?ref=newsletter_issue_99&save=1" style="display:inline-block;font-size:13px;font-weight:600;padding:10px 16px;color:#1A1916;border:1px solid #1A1916;border-radius:999px;letter-spacing:0.02em;">&hearts; Save</a></td>
+        </tr></table>
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- ── PICK 02 (TOP — cream background) ─────────────────────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 8px;">
+    <div style="background:#DDE9DC;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+      <img src="https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/05/41.jpg?fit=1600%2C900&ssl=1" alt="Ocean View Lot Near El Tunco" width="100%" style="width:100%;height:auto;display:block;" />
+      <div style="padding:16px 18px 18px;">
+        <div style="margin-bottom:8px;">
+          <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#1F3D31;color:#F4EFE6;border-radius:999px;margin-right:6px;">Top deal · 02</span>
+          <span style="display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#C9DEC6;color:#1F3D31;border-radius:999px;">−78% under area avg</span>
+        </div>
+        <h2 class="pick-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;font-weight:400;margin:0 0 4px;color:#1A1916;">Ocean View Lot Near El Tunco</h2>
+        <p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">Tamanique · La Libertad · 1,263 m² lot</p>
+        <p style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;color:#1A1916;">$60,000 <span style="font-size:14px;color:#5A5650;font-family:'Inter',sans-serif;letter-spacing:0;">· $47/m²</span></p>
+
+        <div style="background:#FFFFFF;border-radius:6px;padding:14px 16px;margin:0 0 14px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;">Why we picked it</p>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>6 min drive to the nearest beach</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Power and water at the lot — you add the road</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Priced 78% under comparable lots in the area</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Brand new this week — early window matters</li>
+          </ul>
+        </div>
+
+        <table role="presentation"><tr>
+          <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_99" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+          <td><a class="btn-ghost" href="https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_99&save=1" style="display:inline-block;font-size:13px;font-weight:600;padding:10px 16px;color:#1A1916;border:1px solid #1A1916;border-radius:999px;letter-spacing:0.02em;">&hearts; Save</a></td>
+        </tr></table>
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- ── PICK 03 (TOP — cream background) ─────────────────────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 16px;">
+    <div style="background:#DDE9DC;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+      <img src="https://assets.thesparksite.com/uploads/sites/1521/2023/08/PHOTO-2023-08-29-13-05-47-1200x800.fit.jpg" alt="Cerromar El Sunzal Lot" width="100%" style="width:100%;height:auto;display:block;" />
+      <div style="padding:16px 18px 18px;">
+        <div style="margin-bottom:8px;">
+          <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#1F3D31;color:#F4EFE6;border-radius:999px;margin-right:6px;">Top deal · 03</span>
+          <span style="display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#FBE6D8;color:#7A3D1F;border-radius:999px;">New this week</span>
+        </div>
+        <h2 class="pick-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;font-weight:400;margin:0 0 4px;color:#1A1916;">Cerromar El Sunzal Lot</h2>
+        <p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">Tamanique · La Libertad · 1,324 m² lot</p>
+        <p style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;color:#1A1916;">$265,000 <span style="font-size:14px;color:#5A5650;font-family:'Inter',sans-serif;letter-spacing:0;">· $200/m²</span></p>
+
+        <div style="background:#FFFFFF;border-radius:6px;padding:14px 16px;margin:0 0 14px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;">Why we picked it</p>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>8 min drive to the surf</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Bring a build budget — no utilities at the lot</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Located in an established gated community</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Brand new this week — early window matters</li>
+          </ul>
+        </div>
+
+        <table role="presentation"><tr>
+          <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/essurf__3730?ref=newsletter_issue_99" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+          <td><a class="btn-ghost" href="https://pulpo.club/listing/essurf__3730?ref=newsletter_issue_99&save=1" style="display:inline-block;font-size:13px;font-weight:600;padding:10px 16px;color:#1A1916;border:1px solid #1A1916;border-radius:999px;letter-spacing:0.02em;">&hearts; Save</a></td>
+        </tr></table>
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- ── SECTION INTRO: NEXT 7 ────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:26px 24px 14px;">
+    <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+    <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">7 more this week.</h2>
+    <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;font-style:italic;margin:0;max-width:560px;">Past the top 3. These each fit a clear segment — Bitcoin Beach move-in, trophy oceanfront, developer-scale lots, mid-range build sites. Skim the "Why we picked it" bullets and stop on the one that fits you.</p>
+  </td></tr>
+
+  <!-- ── PICK 04 (white background — but SAME template) ───────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 8px;">
+    <div style="background:#FFFFFF;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+      <img src="https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/05/41.jpg?fit=1600%2C900&ssl=1" alt="Ocean View Lot in Bitcoin Beach El Zonte" width="100%" style="width:100%;height:auto;display:block;" />
+      <div style="padding:16px 18px 18px;">
+        <div style="margin-bottom:8px;">
+          <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#E8DFC6;color:#5A5650;border-radius:999px;margin-right:6px;">Pick · 04</span>
+          <span style="display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#FBE6D8;color:#7A3D1F;border-radius:999px;">New this week</span>
+        </div>
+        <h2 class="pick-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;font-weight:400;margin:0 0 4px;color:#1A1916;">Ocean View Lot in Bitcoin Beach</h2>
+        <p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">Chiltiupán · La Libertad · 1 bed · 1 bath</p>
+        <p style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;color:#1A1916;">$350,000</p>
+
+        <div style="background:#F8F4EC;border-radius:6px;padding:14px 16px;margin:0 0 14px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;">Why we picked it</p>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Move-in ready — no build project</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Walking distance to Bitcoin Beach</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Utilities already at the lot</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Ocean view from the property</li>
+          </ul>
+        </div>
+
+        <table role="presentation"><tr>
+          <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/oceanside__15463?ref=newsletter_issue_99" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+          <td><a class="btn-ghost" href="https://pulpo.club/listing/oceanside__15463?ref=newsletter_issue_99&save=1" style="display:inline-block;font-size:13px;font-weight:600;padding:10px 16px;color:#1A1916;border:1px solid #1A1916;border-radius:999px;letter-spacing:0.02em;">&hearts; Save</a></td>
+        </tr></table>
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- ── PICK 05 ──────────────────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:8px 24px 8px;">
+    <div style="background:#FFFFFF;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.10);">
+      <img src="https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2025/05/7-1-scaled.jpg?fit=2560%2C1807&ssl=1" alt="Oceanfront Cliff Property" width="100%" style="width:100%;height:auto;display:block;" />
+      <div style="padding:16px 18px 18px;">
+        <div style="margin-bottom:8px;">
+          <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#E8DFC6;color:#5A5650;border-radius:999px;margin-right:6px;">Pick · 05</span>
+          <span style="display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.10em;text-transform:uppercase;padding:5px 10px;background:#FBE6D8;color:#7A3D1F;border-radius:999px;">New this week</span>
+        </div>
+        <h2 class="pick-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;font-weight:400;margin:0 0 4px;color:#1A1916;">Oceanfront Cliff Property</h2>
+        <p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">Tamanique · La Libertad</p>
+        <p style="margin:0 0 14px;font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1;letter-spacing:-0.01em;color:#1A1916;">$1,053,600</p>
+
+        <div style="background:#F8F4EC;border-radius:6px;padding:14px 16px;margin:0 0 14px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B8643C;">Why we picked it</p>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Oceanfront — sand at the front gate</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Cliffside views with private beach path</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Located on the established Tamanique stretch</li>
+            <li style="padding:5px 0;font-size:14.5px;line-height:1.5;color:#1A1916;"><span style="color:#1F3D31;font-weight:700;margin-right:10px;display:inline-block;">&#10003;</span>Move-in ready — no project tag</li>
+          </ul>
+        </div>
+
+        <table role="presentation"><tr>
+          <td style="padding-right:8px;"><a class="btn-fill" href="https://pulpo.club/listing/oceanside__12451?ref=newsletter_issue_99" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#18211C;color:#F4EFE6;border-radius:999px;letter-spacing:0.02em;">See on Pulpo &rarr;</a></td>
+          <td><a class="btn-ghost" href="https://pulpo.club/listing/oceanside__12451?ref=newsletter_issue_99&save=1" style="display:inline-block;font-size:13px;font-weight:600;padding:10px 16px;color:#1A1916;border:1px solid #1A1916;border-radius:999px;letter-spacing:0.02em;">&hearts; Save</a></td>
+        </tr></table>
+      </div>
+    </div>
+  </td></tr>
+
+  <!-- (picks 06-10 trimmed in this mockup — they use the same template as 04/05 above) -->
+
+  <tr><td class="pad-h" style="padding:8px 24px 16px;">
+    <p style="text-align:center;font-size:12px;color:#888780;font-style:italic;letter-spacing:0.04em;margin:8px 0;">[ Picks 06–10 follow the same template ]</p>
+  </td></tr>
+
+  <!-- ── ONE LAST THING (editor's close) ──────────────────────────── -->
+  <tr><td class="pad-h" style="padding:28px 24px 22px;">
+    <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:6px;"><tr>
+      <td style="line-height:0;padding-right:8px;vertical-align:middle;">
+        <svg width="18" height="18" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+          <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+          <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+        </svg>
+      </td>
+      <td style="vertical-align:middle;">
+        <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#1F3D31;font-weight:700;">Weekly News Spotlight</div>
+      </td>
+    </tr></table>
+    <p style="font-size:11.5px;color:#5A5650;letter-spacing:0.04em;margin:0 0 12px;font-weight:500;">Reported by <a href="https://www.elsalvador.com/noticias/nacional/puente-rio-lempa-fovial-2026/" target="_blank" rel="noopener" style="color:#5A5650;border-bottom:1px solid #5A5650;">El Diario de Hoy</a> · 28 May 2026</p>
+    <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">Why Surf City 2 is the coast's quietest stretch.</h2>
+    <p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0;max-width:580px;">The eastern coast (Las Flores → El Cuco) has been our least active stretch this year. The reason is simple: your drive from San Salvador still takes about 2 hours 30 minutes. The government's 2026 road plan includes a new bridge over the Lempa river that's expected to cut your drive to roughly 1h45. If the bridge opens on schedule, you'll be looking at a different market in 12 months. <strong>Worth a closer look now while prices are flat — by the time the bridge opens, you may have missed the window.</strong></p>
+  </td></tr>
+
+  <!-- ── PICK UP WHERE YOU LEFT OFF ───────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:18px 24px 8px;">
+    <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:700;margin-bottom:4px;">Your Pulpo</div>
+    <h2 class="yp-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 16px;color:#1A1916;">Pick up where you left off.</h2>
+
+    <!-- 3 stacked action cards (mobile-first; desktop could side-by-side via media query) -->
+    <a href="https://pulpo.club/saved?ref=newsletter_issue_99" style="display:block;background:#F8F4EC;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px 16px;margin:0 0 10px;color:#1A1916;">
+      <table width="100%" role="presentation"><tr>
+        <td><p style="margin:0 0 2px;font-size:11px;letter-spacing:0.10em;text-transform:uppercase;color:#888780;font-weight:600;">3 saved listings</p><p style="margin:0;font-size:16px;font-weight:600;color:#1A1916;">Open your favorites</p></td>
+        <td align="right" style="font-size:18px;color:#1A1916;">&rarr;</td>
+      </tr></table>
+    </a>
+    <a href="https://pulpo.club/account/newsletter?ref=newsletter_issue_99" style="display:block;background:#F8F4EC;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px 16px;margin:0 0 10px;color:#1A1916;">
+      <table width="100%" role="presentation"><tr>
+        <td><p style="margin:0 0 2px;font-size:11px;letter-spacing:0.10em;text-transform:uppercase;color:#888780;font-weight:600;">Filter: La Libertad</p><p style="margin:0;font-size:16px;font-weight:600;color:#1A1916;">Edit your filter</p></td>
+        <td align="right" style="font-size:18px;color:#1A1916;">&rarr;</td>
+      </tr></table>
+    </a>
+    <a href="https://pulpo.club/browse?ref=newsletter_issue_99" style="display:block;background:#F8F4EC;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px 16px;margin:0 0 6px;color:#1A1916;">
+      <table width="100%" role="presentation"><tr>
+        <td><p style="margin:0 0 2px;font-size:11px;letter-spacing:0.10em;text-transform:uppercase;color:#888780;font-weight:600;">354 listings match</p><p style="margin:0;font-size:16px;font-weight:600;color:#1A1916;">Browse them all</p></td>
+        <td align="right" style="font-size:18px;color:#1A1916;">&rarr;</td>
+      </tr></table>
+    </a>
+  </td></tr>
+
+  <!-- ── FOOTER ───────────────────────────────────────────────────── -->
+  <tr><td class="pad-h" style="padding:24px 24px 28px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);margin-top:18px;">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="line-height:0;padding-right:8px;">
+        <svg width="20" height="20" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M -38 0 C -38 -21, -21 -38, 0 -38 C 21 -38, 38 -21, 38 0 C 38 17, 24 30, 7 30 C -8 30, -18 18, -18 4 C -18 -8, -8 -18, 4 -18 C 12 -18, 18 -12, 18 -4" stroke="#1F3D31" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+          <circle cx="18" cy="-4" r="9.5" fill="#1F3D31"/>
+          <circle cx="18" cy="-4" r="5.5" fill="#D4A04A"/>
+        </svg>
+      </td>
+      <td style="vertical-align:middle;">
+        <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span>
+      </td>
+    </tr></table>
+    <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#1A1916;font-weight:500;">Every beach and lake home in El Salvador, ranked by value.</p>
+    <p style="margin:8px 0 0;font-size:12.5px;line-height:1.55;color:#5A5650;">Pulpo doesn't take commission and doesn't list its own properties. We pick from what's already on the market.</p>
+
+    <div style="margin:18px 0 14px;height:1px;background:rgba(0,0,0,0.08);"></div>
+
+    <p style="margin:0 0 10px;font-size:12px;color:#888780;letter-spacing:0.04em;">You're getting this because your filter is set to <strong style="color:#1A1916;">La Libertad</strong>.</p>
+    <table role="presentation"><tr>
+      <td style="padding:0 6px 6px 0;"><a href="https://pulpo.club/account?ref=newsletter_issue_99" style="display:inline-block;font-size:12px;font-weight:600;padding:6px 12px;color:#1A1916;border:1px solid rgba(0,0,0,0.18);border-radius:999px;">Change filters</a></td>
+      <td style="padding:0 6px 6px 0;"><a href="https://pulpo.club/account?ref=newsletter_issue_99" style="display:inline-block;font-size:12px;font-weight:600;padding:6px 12px;color:#1A1916;border:1px solid rgba(0,0,0,0.18);border-radius:999px;">Change cadence</a></td>
+      <td style="padding:0 6px 6px 0;"><a href="https://pulpo.club/api/unsubscribe?r=d8a6a60eba89bed4413983dd&i=99&t=" style="display:inline-block;font-size:12px;font-weight:600;padding:6px 12px;color:#1A1916;border:1px solid rgba(0,0,0,0.18);border-radius:999px;">Unsubscribe</a></td>
+    </tr></table>
+
+    <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">© 2026 Pulpo Club · pulpo.club</p>
+  </td></tr>
+
+</table>
+</div>
+</body>
+</html>

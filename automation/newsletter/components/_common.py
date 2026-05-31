@@ -1,0 +1,225 @@
+"""Shared helpers used by every component in this package.
+
+Public exports:
+  • `TEMPLATE_VERSION` — stamped into the rendered `<meta>` tag so
+    PostHog telemetry can slice rendered emails by template revision.
+    Bump this when the renderer's CSS or layout changes meaningfully.
+  • `escape` (re-export of `html.escape`) — single import path for every
+    component so we don't sprinkle `from html import escape` across N files.
+  • `CSS` — the canonical `<style>` block. Email clients without inline-only
+    rendering will pick up these rules; the components also duplicate critical
+    styles inline so Outlook / Yahoo still render the design (see PR #572).
+  • `site_root_from_issue` — extract the canonical `https://pulpo.club` host
+    from an Issue's settings/unsubscribe URL. Used wherever components need
+    to build a fresh URL.
+
+Anything kept here is genuinely cross-cutting. Component-specific helpers
+live with their component.
+"""
+
+from __future__ import annotations
+
+from html import escape
+
+from ..types import Issue
+
+# Bumped whenever the renderer's CSS or layout changes in a way we'd want
+# to slice in PostHog (audience tests, regression hunts, A/B pre-bake).
+# Stays in sync with docs/newsletter-audit.md. Exposed via
+# email.newsletter.sent / email.newsletter.batch_sent telemetry AND a
+# <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
+TEMPLATE_VERSION = "newsletter-v4.0-2026-05"
+
+
+# LEARNING: hex literals live here on purpose. The :root { --paper: … }
+# block below also defines CSS vars for clients that support them, but
+# the source-of-truth values are hex because Outlook desktop + parts of
+# Yahoo strip var() from inline styles. The drift risk vs.
+# web/app/styles/tokens.css is mitigated by TEMPLATE_VERSION above —
+# bump it when these literals are touched.
+CSS = """
+:root {
+  --paper:        #F4EFE6;
+  --paper-2:      #F8F4EC;
+  --paper-3:      #E8DFC6;
+  --white:        #FFFFFF;
+  --ink:          #1A1916;
+  --ink-2:        #5A5650;
+  --ink-3:        #888780;
+  --line:         rgba(0, 0, 0, 0.08);
+  --line-2:       rgba(0, 0, 0, 0.14);
+  --forest:       #1F3D31;
+  --forest-mid:   #3D6450;
+  --sage:         #DDE9DC;
+  --sage-strong:  #C9DEC6;
+  --clay:         #B8643C;
+  --clay-deep:    #7A3D1F;
+  --navy:         #1E2A3A;
+  --button-dark:  #18211C;
+  --button-text:  #F4EFE6;
+  --burgundy:     #6B2C2C;
+  --burgundy-bg:  #F5E3E0;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--clay); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { display: block; max-width: 100%; height: auto; border: 0; }
+table { border-collapse: collapse; }
+.wrap   { width: 100%; background: var(--paper); padding: 0; }
+.frame  { width: 100%; max-width: 680px; margin: 0 auto; background: var(--white); border: 1px solid var(--line); }
+.pad    { padding: 24px 36px; }
+.pad-md { padding: 18px 36px; }
+.pad-sm { padding: 12px 36px; }
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+.sans    { font-family: var(--font-sans); }
+.ink     { color: var(--ink); }
+.ink-2   { color: var(--ink-2); }
+.muted   { color: var(--ink-3); }
+.forest  { color: var(--forest); }
+.clay    { color: var(--clay); }
+.rule        { border: 0; border-top: 1px solid var(--line); margin: 0; }
+.rule-strong { border: 0; border-top: 1px solid var(--ink); margin: 0; }
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forest);
+  font-weight: 600;
+}
+.eyebrow.clay { color: var(--clay); }
+.eyebrow.muted { color: var(--ink-3); }
+.h-hero  { font-family: var(--font-display); font-size: 60px; line-height: 1.02; letter-spacing: -0.015em; font-weight: 400; margin: 8px 0 10px; color: var(--ink); }
+.h1      { font-family: var(--font-display); font-size: 40px; line-height: 1.08; letter-spacing: -0.012em; font-weight: 400; margin: 8px 0 6px; color: var(--ink); }
+.h2      { font-family: var(--font-display); font-size: 26px; line-height: 1.14; letter-spacing: -0.01em; font-weight: 400; margin: 10px 0 4px; color: var(--ink); }
+.h3      { font-family: var(--font-display); font-size: 22px; line-height: 1.18; letter-spacing: -0.005em; font-weight: 400; margin: 6px 0 2px; color: var(--ink); }
+.lede    { font-family: var(--font-sans); font-size: 18px; line-height: 1.5; color: var(--ink); font-weight: 400; }
+.body    { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--ink); }
+.body-2  { font-family: var(--font-sans); font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.body em, .body-2 em, .lede em { font-style: normal; color: inherit; }
+.small   { font-family: var(--font-sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-3); }
+.meta    { font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.06em; color: var(--forest); text-transform: uppercase; }
+.price       { font-family: var(--font-display); font-size: 30px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+.price-2     { font-family: var(--font-display); font-size: 22px; line-height: 1; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+.price-note  { font-family: var(--font-sans); font-size: 12.5px; color: var(--ink-3); }
+.pill {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  background: var(--paper-3);
+  color: var(--ink-2);
+  margin: 0 5px 6px 0;
+  border-radius: 999px;
+}
+.pill-forest  { background: var(--sage); color: var(--forest); }
+.pill-clay    { background: var(--burgundy-bg); color: var(--clay-deep); }
+.pill-filter  { background: transparent; color: var(--forest); border: 1px solid var(--forest); }
+.why-block {
+  margin: 18px 0 0;
+  padding: 16px 18px 18px;
+  background: var(--paper-2);
+  border-radius: 6px;
+}
+.why-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clay);
+  margin: 0 0 10px;
+}
+.why-list { list-style: none; margin: 0; padding: 0; }
+.why-list li {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding: 4px 0 4px 22px;
+  position: relative;
+}
+.why-list li:before {
+  content: "\\2713";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  color: var(--forest);
+  font-weight: 700;
+}
+.paywall-banner { background: var(--forest); color: var(--paper); padding: 28px 32px; margin: 16px 0; border-radius: 6px; }
+.paywall-banner .eyebrow { color: var(--sage); }
+.paywall-banner .h2 { color: var(--paper); }
+.paywall-banner .body { color: var(--paper-3); }
+.paywall-banner .cta { background: var(--clay); color: var(--paper) !important; }
+.cta {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 13px 22px;
+  background: var(--button-dark);
+  color: var(--button-text) !important;
+  border-radius: 999px;
+}
+.cta:hover { background: var(--forest); text-decoration: none; }
+.cta-ghost {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--ink) !important;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+}
+.cta-ghost:hover { background: var(--ink); color: var(--paper) !important; text-decoration: none; }
+.footer-strip { background: var(--paper-2); color: var(--ink-2); border-top: 1px solid var(--line); }
+.footer-strip .small { color: var(--ink-3); }
+.footer-strip a { color: var(--forest); }
+@media (max-width: 480px) {
+  .pad, .pad-md, .pad-sm { padding-left: 20px; padding-right: 20px; }
+  .pad    { padding-top: 18px; padding-bottom: 18px; }
+  .pad-md { padding-top: 14px; padding-bottom: 14px; }
+  .pad-sm { padding-top: 10px; padding-bottom: 10px; }
+  .h-hero { font-size: 38px; }
+  .h1     { font-size: 28px; }
+  .h2     { font-size: 21px; }
+  .h3     { font-size: 20px; }
+  .body, .body-2 { font-size: 16px; line-height: 1.6; }
+  .lede   { font-size: 16.5px; line-height: 1.55; }
+  .price  { font-size: 24px; }
+  .price-2 { font-size: 19px; }
+  .cta, .cta-ghost { padding: 14px 22px; font-size: 14px; }
+}
+"""
+
+
+def site_root_from_issue(issue: Issue) -> str:
+    """Extract https://pulpo.club (or whatever PULPO_SITE_ROOT points at)
+    from any of the absolute URLs already on the Issue. Avoids re-reading
+    the env var here — build_issue.py already resolved it once.
+
+    `settings_url` is the safest anchor because `/account` is a stable
+    SPA route (the unsubscribe URL is `/api/unsubscribe?...` post-2026-05-29,
+    so splitting on "/unsubscribe" would leave a stray "/api" suffix and
+    produce `https://pulpo.club/api/saved` etc. for the "Your Pulpo" links).
+    """
+    settings_part = (issue.settings_url or "").split("/account", 1)[0]
+    if settings_part:
+        return settings_part.rstrip("/") or "https://pulpo.club"
+    unsub_part = (issue.unsubscribe_url or "").split("/api/unsubscribe", 1)[0]
+    if unsub_part:
+        return unsub_part.rstrip("/") or "https://pulpo.club"
+    return "https://pulpo.club"
+
+
+__all__ = ["TEMPLATE_VERSION", "CSS", "escape", "site_root_from_issue"]
