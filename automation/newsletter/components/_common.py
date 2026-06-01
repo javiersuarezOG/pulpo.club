@@ -58,6 +58,33 @@ TEMPLATE_VERSION = "newsletter-v4.4-2026-06-01"
 LAST_UPDATED = "2026-06-01"
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo Pro Welcome — own version line.
+#
+# The welcome template ships on a separate cadence from the weekly
+# General digest: a copy tweak to the warm hero, a re-shape of the
+# "How Pulpo works" beats, or a new onboarding card all bump the
+# welcome version WITHOUT touching the General's. Keeping the two
+# version lines in parallel lets PostHog slice rendered welcomes from
+# weeklies cleanly and lets the admin widget surface the right
+# version chip on each newsletter card.
+#
+# The regex in `api/admin/newsletter/template-version.js` is anchored
+# with `^...` + the `m` flag so it can disambiguate
+# WELCOME_TEMPLATE_VERSION from TEMPLATE_VERSION at the line-start
+# level. Adding more named templates here in future = one more
+# constant pair + one more regex row in the API.
+#
+# Revision history (most recent first):
+#   welcome-v1.0 (2026-06-01) — initial ship. Welcome hero + "How
+#       Pulpo works" 3-beat block + cadence note + "Your first 10
+#       picks" section intro + "Start here" onboarding cards.
+#       Drops favorites / market_context / paywall / news_spotlight /
+#       returning-user Your Pulpo block vs. the General weekly.
+WELCOME_TEMPLATE_VERSION = "welcome-v1.0-2026-06-01"
+WELCOME_LAST_UPDATED = "2026-06-01"
+
+
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
 # block below also defines CSS vars for clients that support them, but
 # the source-of-truth values are hex because Outlook desktop + parts of
@@ -249,4 +276,12 @@ def site_root_from_issue(issue: Issue) -> str:
     return "https://pulpo.club"
 
 
-__all__ = ["TEMPLATE_VERSION", "LAST_UPDATED", "CSS", "escape", "site_root_from_issue"]
+__all__ = [
+    "TEMPLATE_VERSION",
+    "LAST_UPDATED",
+    "WELCOME_TEMPLATE_VERSION",
+    "WELCOME_LAST_UPDATED",
+    "CSS",
+    "escape",
+    "site_root_from_issue",
+]

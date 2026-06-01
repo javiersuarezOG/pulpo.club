@@ -20,7 +20,10 @@ import re as _re
 from html import escape as _e
 
 from . import i18n
-from .components._common import TEMPLATE_VERSION as _TEMPLATE_VERSION_SHARED
+from .components._common import (
+    TEMPLATE_VERSION as _TEMPLATE_VERSION_SHARED,
+    WELCOME_TEMPLATE_VERSION as _WELCOME_TEMPLATE_VERSION_SHARED,
+)
 from .types import Issue, IssuePick, Locale
 
 
@@ -62,6 +65,11 @@ def _title_with_widow_guard(escaped_title: str) -> str:
 # TEMPLATE_VERSION`) keep working — both in tests and in
 # `build_issue._emit_favorites_telemetry`.
 TEMPLATE_VERSION = _TEMPLATE_VERSION_SHARED
+# Welcome carries its own version line so PostHog can slice rendered
+# welcomes from weeklies cleanly. Bumped whenever the welcome's hero,
+# how-it-works block, cadence note, picks intro, or onboarding cards
+# change in a way worth tracking.
+WELCOME_TEMPLATE_VERSION = _WELCOME_TEMPLATE_VERSION_SHARED
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -2251,7 +2259,7 @@ def render_welcome_html(issue: Issue, *, now=None) -> str:
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="x-pulpo-template" content="{_e(TEMPLATE_VERSION)}-welcome" />
+<meta name="x-pulpo-template" content="{_e(WELCOME_TEMPLATE_VERSION)}" />
 <title>{_e(head_title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

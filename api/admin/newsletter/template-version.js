@@ -36,10 +36,12 @@
 const fs = require("fs");
 const path = require("path");
 
-// Single source of truth. If a future template lands (free-weekly,
-// pro-welcome, etc.) and gets its own Python constant, add a row here
-// and the regex accordingly. Today there's only one template, so the
-// map has one entry and one regex per row.
+// Single source of truth. Each named template here gets one Python
+// constant pair in `automation/newsletter/components/_common.py`:
+//   • TEMPLATE_VERSION + LAST_UPDATED          → pulpo-pro-general
+//   • WELCOME_TEMPLATE_VERSION + WELCOME_LAST_UPDATED → pulpo-pro-welcome
+// Adding a future template (free-weekly, free-welcome, …) = one more
+// constant pair in _common.py + one more `TEMPLATES` row below.
 const COMMON_PY_PATH = path.join(
   process.cwd(),
   "automation",
@@ -48,11 +50,26 @@ const COMMON_PY_PATH = path.join(
   "_common.py",
 );
 
-const VERSION_RE = /TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/;
-const LAST_UPDATED_RE = /LAST_UPDATED\s*=\s*["']([^"']+)["']/;
+// Regexes are anchored at line-start with the `m` flag so
+// WELCOME_TEMPLATE_VERSION can't accidentally match the
+// TEMPLATE_VERSION extractor (or vice versa). The line-start anchor
+// also prevents docstring mentions of these names from being matched
+// as live assignments.
+const TEMPLATES = [
+  {
+    id: "pulpo-pro-general",
+    versionRe: /^TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
+  {
+    id: "pulpo-pro-welcome",
+    versionRe: /^WELCOME_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^WELCOME_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
+];
 
-// Extract the "v4.4" portion from the full Python constant string
-// "newsletter-v4.4-2026-06-01" so the widget can render the short form.
+// Extract the "v4.4" / "v1.0" portion from the full Python constant
+// string so the widget can render the short form.
 const SHORT_VERSION_RE = /-(v\d+\.\d+)-/;
 
 function logApi(fields) {
@@ -85,36 +102,52 @@ module.exports = async (req, res) => {
     });
   }
 
-  const versionMatch = raw.match(VERSION_RE);
-  const lastUpdatedMatch = raw.match(LAST_UPDATED_RE);
-  if (!versionMatch || !lastUpdatedMatch) {
+  const out = {};
+  const missing = [];
+  for (const { id, versionRe, lastUpdatedRe } of TEMPLATES) {
+    const versionMatch = raw.match(versionRe);
+    const lastUpdatedMatch = raw.match(lastUpdatedRe);
+    if (!versionMatch || !lastUpdatedMatch) {
+      missing.push({
+        id,
+        has_version: !!versionMatch,
+        has_last_updated: !!lastUpdatedMatch,
+      });
+      continue;
+    }
+    const fullVersion = versionMatch[1];
+    const shortMatch = fullVersion.match(SHORT_VERSION_RE);
+    out[id] = {
+      version: shortMatch ? shortMatch[1] : fullVersion,
+      lastUpdated: lastUpdatedMatch[1],
+      fullVersion,
+    };
+  }
+
+  // The General template's row is structurally load-bearing — the
+  // widget falls back to "—" placeholders for missing keys, but a
+  // missing General row would mean the weekly digest's version chrome
+  // never renders. Treat that as a 500 (deployment drift). Welcome
+  // and future templates degrade gracefully (their card shows "—").
+  if (!out["pulpo-pro-general"]) {
     logApi({
       status: 500, ms: Date.now() - t0,
       reason: "extraction_failed",
-      has_version: !!versionMatch,
-      has_last_updated: !!lastUpdatedMatch,
+      missing: JSON.stringify(missing),
     });
     return res.status(500).json({
       error: "template_version_unparseable",
-      diagnostic: "TEMPLATE_VERSION or LAST_UPDATED regex did not match",
+      diagnostic: "TEMPLATE_VERSION or LAST_UPDATED regex did not match for pulpo-pro-general",
+      missing,
     });
   }
-
-  const fullVersion = versionMatch[1];
-  const shortMatch = fullVersion.match(SHORT_VERSION_RE);
-  const shortVersion = shortMatch ? shortMatch[1] : fullVersion;
-  const lastUpdated = lastUpdatedMatch[1];
 
   res.setHeader("Cache-Control", "public, max-age=300");
   logApi({
     status: 200, ms: Date.now() - t0,
-    version: shortVersion, last_updated: lastUpdated,
+    templates: Object.keys(out).join(","),
+    general_version: out["pulpo-pro-general"].version,
+    welcome_version: (out["pulpo-pro-welcome"] && out["pulpo-pro-welcome"].version) || "missing",
   });
-  return res.status(200).json({
-    "pulpo-pro-general": {
-      version: shortVersion,
-      lastUpdated,
-      fullVersion,
-    },
-  });
+  return res.status(200).json(out);
 };

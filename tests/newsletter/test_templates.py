@@ -107,6 +107,59 @@ def test_widget_does_not_carry_a_hardcoded_version_mirror():
     )
 
 
+def test_python_template_version_shape():
+    """Sanity guard on the Python source-of-truth constants — both the
+    weekly General and the one-shot Welcome version lines must follow
+    the `<prefix>-vN.N-YYYY-MM-DD` shape so the API endpoint's
+    `SHORT_VERSION_RE` (in api/admin/newsletter/template-version.js)
+    can extract the short `vN.N` form for the admin widget chrome.
+
+    A misformatted constant (typo, missing year, wrong dash style)
+    would silently render the full string on the operator chip until
+    someone noticed. Catching it here keeps the admin widget pretty
+    AND keeps the API endpoint's match logic correct.
+
+    Also asserts that the date inside the version line agrees with
+    LAST_UPDATED — bumping one without the other is the classic drift
+    bug. Each template (General / Welcome) carries its own pair.
+    """
+    from automation.newsletter.components import _common
+
+    general_pattern = re.compile(r"^newsletter-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_general = general_pattern.match(_common.TEMPLATE_VERSION)
+    assert m_general, (
+        f"TEMPLATE_VERSION isn't in 'newsletter-vN.N-YYYY-MM-DD' form: "
+        f"{_common.TEMPLATE_VERSION!r}"
+    )
+
+    welcome_pattern = re.compile(r"^welcome-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_welcome = welcome_pattern.match(_common.WELCOME_TEMPLATE_VERSION)
+    assert m_welcome, (
+        f"WELCOME_TEMPLATE_VERSION isn't in 'welcome-vN.N-YYYY-MM-DD' form: "
+        f"{_common.WELCOME_TEMPLATE_VERSION!r}"
+    )
+
+    iso_date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    assert iso_date.match(_common.LAST_UPDATED), (
+        f"LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: {_common.LAST_UPDATED!r}"
+    )
+    assert iso_date.match(_common.WELCOME_LAST_UPDATED), (
+        f"WELCOME_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
+        f"{_common.WELCOME_LAST_UPDATED!r}"
+    )
+
+    assert m_general.group(2) == _common.LAST_UPDATED, (
+        f"TEMPLATE_VERSION date ({m_general.group(2)!r}) doesn't match "
+        f"LAST_UPDATED ({_common.LAST_UPDATED!r}). Bump both — Python is "
+        f"the source of truth."
+    )
+    assert m_welcome.group(2) == _common.WELCOME_LAST_UPDATED, (
+        f"WELCOME_TEMPLATE_VERSION date ({m_welcome.group(2)!r}) doesn't "
+        f"match WELCOME_LAST_UPDATED ({_common.WELCOME_LAST_UPDATED!r}). "
+        f"Bump both — Python is the source of truth."
+    )
+
+
 def test_templates_callable_signature():
     """Every TEMPLATES entry must accept exactly one Issue arg and
     return a string. Catches accidental partial-init renderers."""
