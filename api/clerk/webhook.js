@@ -153,13 +153,34 @@ function distinctIdFor(props) {
 // Filter: only fire when the user came from a Stripe-paid invitation.
 // The Stripe webhook (api/stripe/webhook.js Path C) creates the
 // invitation with `publicMetadata: { plan: "pro" }` + `privateMetadata:
-// { stripeCustomerId, stripeSubscriptionId, ... }`. When the
-// invitation is accepted those metadata fields propagate to the new
-// User record — so `data.public_metadata.plan === "pro"` AND
-// `data.private_metadata.invitation_id` is the unambiguous marker.
+// { stripeCustomerId, stripeSubscriptionId, ... }`. Clerk propagates
+// privateMetadata from the invitation to the new User record at
+// signup completion — so `private_metadata.stripeCustomerId` is the
+// load-bearing "came from a paid Stripe invitation" signal.
 //
-// Direct-signup users (no invitation, no plan metadata) and OAuth
-// signups stay out — they're not Pro-paid yet.
+// DON'T use `private_metadata.invitation_id` here even though it
+// reads as the obvious choice. Clerk's event ordering is:
+//
+//   invitation.created  →  user.created  →  invitation.accepted
+//
+// `invitation_id` only gets stamped onto the user's private_metadata
+// at the invitation.accepted step — AFTER user.created has already
+// been processed. Filtering on it produces silent
+// `welcome=skipped:filter_skipped` for every Path C user. This bug
+// shipped in Phase 2 (PR #603) and was caught during the 2026-06-01
+// prod sandbox dry-run.
+//
+// stripeCustomerId is timing-safe: it's part of the invitation's
+// privateMetadata at creation time, which Clerk copies to the user
+// record atomically when the user is minted (before user.created
+// fires).
+//
+// Direct-signup users (no invitation) won't have stripeCustomerId
+// in their private_metadata, so they correctly get filtered out.
+// Admin-stamped plan=pro users (rare, e.g. founder tools) also won't
+// have stripeCustomerId — also correctly filtered out (we don't want
+// to send them a "Welcome to Pulpo Pro — your first 10" framing
+// since they didn't actually pay).
 //
 // Idempotency: dispatchProWelcome reads
 // `publicMetadata.welcome_newsletter_sent_at` and short-circuits if
@@ -169,12 +190,17 @@ function shouldDispatchWelcomeForUserCreated(body) {
   const data = (body && body.data) || {};
   const pub = data.public_metadata || {};
   const priv = data.private_metadata || {};
-  // plan="pro" is set by the Stripe webhook on the invitation —
-  // the user is born Pro the moment they complete invitation signup.
+  // plan="pro" is set by the Stripe webhook on the invitation;
+  // Clerk propagates publicMetadata from invitation → user at
+  // user creation. The user is born Pro.
   if (pub.plan !== "pro") return false;
-  // Confirm it came via invitation, not some other path that
-  // happened to land plan="pro" via Stripe metadata pre-population.
-  if (!priv.invitation_id) return false;
+  // Confirm it came via Stripe payment, not via an admin tool that
+  // happened to stamp plan="pro" on the user record. The Stripe
+  // webhook puts stripeCustomerId in the invitation's
+  // privateMetadata; Clerk copies it atomically to the user's
+  // private_metadata at signup. See block-comment above for why
+  // we can't use invitation_id (timing).
+  if (!priv.stripeCustomerId) return false;
   // Re-send guard. Belt-and-suspenders: dispatchProWelcome also checks.
   if (pub.welcome_newsletter_sent_at) return false;
   return true;

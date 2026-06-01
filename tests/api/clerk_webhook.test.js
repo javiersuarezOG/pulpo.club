@@ -353,13 +353,25 @@ describe("handler", () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe("shouldDispatchWelcomeForUserCreated", () => {
+  // Real-world payload shape: Clerk propagates the invitation's
+  // privateMetadata to the new user's private_metadata at user
+  // creation. The Stripe webhook (api/stripe/webhook.js Path C)
+  // stamps stripeCustomerId + stripeSubscriptionId on the invitation;
+  // both propagate to the user. `invitation_id` does NOT propagate
+  // until invitation.accepted fires AFTER user.created — see the
+  // block comment in api/clerk/webhook.js for the bug history.
+
   it("returns true for a Stripe-paid invitation acceptance", () => {
     const body = {
       type: "user.created",
       data: {
         id: "user_abc",
         public_metadata: { plan: "pro" },
-        private_metadata: { invitation_id: "inv_123", stripeCustomerId: "cus_x" },
+        // stripeCustomerId IS on the user record at user.created time
+        // (Clerk copies it from the invitation's privateMetadata).
+        // invitation_id is NOT yet — Clerk stamps it later, on
+        // invitation.accepted. Reflecting reality.
+        private_metadata: { stripeCustomerId: "cus_x", stripeSubscriptionId: "sub_y" },
         email_addresses: [{ id: "ea_1", email_address: "buyer@example.com" }],
         primary_email_address_id: "ea_1",
       },
@@ -367,7 +379,7 @@ describe("shouldDispatchWelcomeForUserCreated", () => {
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(true);
   });
 
-  it("returns false for a direct signup (no invitation, no plan)", () => {
+  it("returns false for a direct signup (no plan, no stripeCustomerId)", () => {
     const body = {
       type: "user.created",
       data: {
@@ -379,31 +391,34 @@ describe("shouldDispatchWelcomeForUserCreated", () => {
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
   });
 
-  it("returns false when plan='pro' but no invitation_id (edge case — pre-stamped publicMetadata, not from /start)", () => {
-    // Defensive: someone could conceivably stamp plan=pro on a user
-    // through a different path (admin tool, manual update). We only
-    // want to fire the welcome for genuine Stripe-paid invitations.
+  it("returns false when plan='pro' but no stripeCustomerId (admin-stamped, not paid)", () => {
+    // Defensive: an admin tool could conceivably stamp plan=pro on a
+    // user record without going through Stripe payment. We only want
+    // to fire the welcome for genuine paying customers — admin
+    // grants shouldn't get a "your first 10" framing since they
+    // didn't actually buy anything.
     const body = {
       type: "user.created",
       data: {
-        id: "user_mystery",
+        id: "user_admin_granted",
         public_metadata: { plan: "pro" },
-        private_metadata: {},
+        private_metadata: {},  // no stripeCustomerId — not from a Stripe payment
       },
     };
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
   });
 
-  it("returns false when invitation_id present but plan != 'pro' (non-paid invitation)", () => {
-    // Future-proofing: if Clerk invitations are ever used for non-Pro
-    // flows (admin invites, beta access, etc.), they won't carry
-    // plan=pro and shouldn't trigger the welcome.
+  it("returns false when stripeCustomerId present but plan != 'pro' (free tier paid customer? shouldn't happen but defensive)", () => {
+    // Future-proofing: if for some reason a user has stripeCustomerId
+    // but plan isn't pro (e.g. an out-of-band billing edit dropped
+    // the plan but kept the customer mapping), we don't want to fire
+    // a "Welcome to Pulpo Pro" email to a non-Pro user.
     const body = {
       type: "user.created",
       data: {
-        id: "user_admin_invite",
+        id: "user_weird_state",
         public_metadata: { plan: "free" },
-        private_metadata: { invitation_id: "inv_xyz" },
+        private_metadata: { stripeCustomerId: "cus_oldcustomer" },
       },
     };
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
@@ -420,7 +435,7 @@ describe("shouldDispatchWelcomeForUserCreated", () => {
           plan: "pro",
           welcome_newsletter_sent_at: "2026-06-01T10:00:00Z",
         },
-        private_metadata: { invitation_id: "inv_dup" },
+        private_metadata: { stripeCustomerId: "cus_dup" },
       },
     };
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
@@ -430,6 +445,30 @@ describe("shouldDispatchWelcomeForUserCreated", () => {
     expect(shouldDispatchWelcomeForUserCreated({})).toBe(false);
     expect(shouldDispatchWelcomeForUserCreated({ type: "user.created" })).toBe(false);
     expect(shouldDispatchWelcomeForUserCreated(null)).toBe(false);
+  });
+
+  it("returns true even when invitation_id is absent (regression guard for the timing bug)", () => {
+    // The original Phase 2 filter (PR #603) required
+    // private_metadata.invitation_id which Clerk doesn't stamp until
+    // invitation.accepted fires — AFTER user.created. Every Path C
+    // user was silently rejected. Caught during the 2026-06-01 prod
+    // sandbox dry-run. This test locks the fix: a user record with
+    // plan=pro + stripeCustomerId + NO invitation_id must still
+    // dispatch the welcome.
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_real_path_c",
+        public_metadata: { plan: "pro" },
+        private_metadata: {
+          stripeCustomerId: "cus_real",
+          stripeSubscriptionId: "sub_real",
+          // intentionally NO invitation_id — matches the real
+          // Clerk payload at user.created time
+        },
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(true);
   });
 });
 
