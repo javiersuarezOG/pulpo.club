@@ -75,21 +75,31 @@ jobs:
           # PULPO_BOT_TOKEN before relying on the auto-merge below.
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
-      - name: Verify Python
+      - name: Setup Python venv
         # The self-hosted GCP runner provisioned by scripts/setup-gcp-runner.sh
-        # ships Debian 12 + distro python3 (3.11). actions/setup-python's
-        # python-versions manifest does not list a Debian 12 / 3.12 build,
-        # so the previous `setup-python@v6.2.0 python-version: 3.12` step
-        # failed at 06:28 UTC on 2026-06-01 with:
-        #   "Version 3.12 was not found in the local cache"
-        #   "The version '3.12' with architecture 'x64' was not found for Debian 12."
+        # ships Debian 12 + distro python3 (3.11). Two prior attempts failed:
+        #
+        #   1. `setup-python@v6.2.0 python-version: 3.12` failed because
+        #      python-versions doesn't ship a Debian 12 / 3.12 build:
+        #      "Version 3.12 was not found in the local cache"
+        #      "The version '3.12' with architecture 'x64' was not found for Debian 12."
+        #   2. System `pip install` failed under PEP 668 (Debian 12's distro
+        #      python3 is externally managed):
+        #      "error: externally-managed-environment"
+        #      "× This environment is externally managed"
+        #
+        # Fix: create a per-run venv. setup-gcp-runner.sh installs
+        # python3-venv, so this works without further runner provisioning.
         # The shim's three deps (httpx, selectolax, curl_cffi) all support
-        # Python ≥ 3.8, so the system python3 is fine. Log the version so
-        # a future drift (e.g. distro upgrade) shows up in the workflow
-        # log rather than silently changing behaviour.
+        # Python ≥ 3.8, so 3.11 is fine. ``$GITHUB_PATH`` puts the venv's
+        # bin first on PATH for every subsequent step in this job, so
+        # `python3`/`pip` resolve to the venv without each step needing
+        # an explicit `source .venv/bin/activate`.
         run: |
           python3 --version
-          python3 -m pip --version
+          python3 -m venv .venv
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+          .venv/bin/python -m pip install --quiet --upgrade pip
 
       - name: Install dependencies
         # Trim to only what the shim's two scrapers need. The main
@@ -97,7 +107,6 @@ jobs:
         # which the shim never invokes; keeping the install lean fits
         # the e2-micro disk budget and shaves ~90s per run.
         run: |
-          python3 -m pip install --quiet --upgrade pip
           python3 -m pip install --quiet \
             'httpx[socks]==0.27.2' \
             'selectolax==0.3.21' \
