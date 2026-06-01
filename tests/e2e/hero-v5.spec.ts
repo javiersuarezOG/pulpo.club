@@ -2,12 +2,13 @@
 // end-to-end smoke.
 //
 // Coverage:
-//   * Flag off (default in production) → HeroV5 does NOT render. The
-//     legacy hero block + PickShoreline both render as before.
-//   * Flag on (?ff_hero_v5=1) → HeroV5 renders. Old hero block AND
-//     PickShoreline both absent (registry swaps them out). hero_v5_viewed
-//     event fires. No horizontal overflow at any of the 5 standard
-//     viewports.
+//   * Flag off (?ff_hero_v5=0 — kill-switch path; the production default
+//     is now ON as of 2026-06-01) → HeroV5 does NOT render. The legacy
+//     hero block + PickShoreline render as the fallback.
+//   * Flag on (production default, or ?ff_hero_v5=1) → HeroV5 renders.
+//     Old hero block AND PickShoreline both absent (registry swaps them
+//     out). hero_v5_viewed event fires. No horizontal overflow at any
+//     of the 5 standard viewports.
 //   * Flag on + click destination card → navigates to /browse with the
 //     expected category filter applied (master_category for now; zone-
 //     level filtering is a follow-up).
@@ -37,7 +38,7 @@ const VIEWPORTS = [
   { name: "1280×800 desktop",       width: 1280, height: 800  },
 ];
 
-test.describe("hero_v5 — flag off (production default)", () => {
+test.describe("hero_v5 — flag off (kill-switch path)", () => {
   test("HeroV5 absent, legacy hero + shoreline render", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await page.goto("/?ff_hero_v5=0", { waitUntil: "networkidle" });
