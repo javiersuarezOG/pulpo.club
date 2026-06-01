@@ -6034,11 +6034,24 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   align-items: center;
   gap: 8px;
   /* Wave-6: titles like "Top 10 condos · Coatepeque + Ilopango" can
-     exceed the 320px viewport. Allow icon + text to wrap to a new
-     line and constrain to parent width so the heading doesn't push
-     the document past the viewport. */
+     exceed the 320px viewport. Allow icon + text to wrap and constrain
+     to parent width so the heading doesn't push the document past the
+     viewport. */
   flex-wrap: wrap;
   max-width: 100%;
+}
+/* Wave-6: shelf titles now use NBSPs to keep region names together
+   ("Surf City I + II", "Coatepeque + Ilopango") so the wrap never
+   orphans a "+ II" alone on its own line. The lake-region atom is
+   ~210 px wide at the default 22 px font — which overflows the 320 px
+   iPhone-SE viewport. Reduce title size at narrow widths so the atom
+   fits without pushing the document past the viewport.
+
+   Scoped via `.app.hero-v4 .homepage-v2.hero-v5` (0,4,1 specificity)
+   to beat the hero-v4 `.hp-shelf-h2 { font-size: 22px }` override
+   that lives later in this file with 0,3,1 specificity. */
+@media (max-width: 480px) {
+  .app.hero-v4 .homepage-v2.hero-v5 .hp-shelf-h2 { font-size: 17px; }
 }
 .homepage-v2 .hp-shelf-h2-icon {
   color: var(--color-clay-primary);
@@ -7046,10 +7059,36 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 .app.hero-v4 .homepage-v2.hero-v5 .hp-usp-inner {
   max-width: 1180px; /* matches HeroV5's container so icons line up under cards */
 }
-/* The eyebrow + h2 are already hidden by the hero-v4 styles. With them
-   collapsed, the 24px margin-top on `.hp-usp-cards` is the only thing
-   pushing the icons further from the section's top padding — drop it
-   so the section's own padding-top owns the gap. */
+/* Hero-v4 default hides BOTH eyebrow + h2 on the USPs. Under hero-v5
+   we keep the h2 hidden (the HeroV5 H1 already carries the value
+   prop), but UN-HIDE the eyebrow and restyle it as a gold Pulpo Pro
+   pill so the three cards visually read as Pro features. The pill
+   borrows the same tokens as `.pulpo-logo-pro` in the nav so the
+   "Pulpo Pro" affiliation reads identically in both places.
+   Anonymous users are the only audience here (per blockRegistry
+   visibility) — the pill is an upsell hook, not a feature label. */
+.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-h2 { display: none; }
+.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  background: transparent;
+  color: var(--pro-ink);
+  border: 1px solid var(--pro-line);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-eyebrow-icon {
+  color: var(--gold);
+}
+/* Drop the 24px margin-top on the cards so the eyebrow sits flush
+   above them and the icons line up immediately after. */
 .app.hero-v4 .homepage-v2.hero-v5 .hp-usp-cards { margin-top: 0; }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
