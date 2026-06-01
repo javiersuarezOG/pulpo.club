@@ -798,6 +798,7 @@ jobs:
         # CLI; no --token flag needed (which was rejected for containing hyphens).
         # vercel.json ignoreCommand stops the GitHub-integration from making a
         # duplicate Blocked deploy for the same bot commit.
+        id: deploy
         if: steps.commit.outputs.committed == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -806,6 +807,29 @@ jobs:
         run: |
           npm install -g vercel@latest
           vercel deploy --prod --yes
+
+      - name: Nightly summary (story)
+        # End-of-run synthesis. Reads run_history.json +
+        # source_health_history.jsonl + last_updated.json + ranked.json
+        # off the runner and prints a single self-contained block at
+        # the bottom of the job log answering: pipeline produced what?
+        # per-source health? did the commit + deploy land? what date
+        # will pulpo.club show?
+        #
+        # Runs `if: always()` — every nightly, success or failure, so
+        # the post-mortem surface is one scroll-to-bottom instead of
+        # grepping 70 min of stdout + three JSONL files.
+        #
+        # Also writes web/data/nightly_summary.md so the artifact
+        # carries the story even when the data commit didn't land.
+        if: always()
+        env:
+          NIGHTLY_RUN_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          NIGHTLY_COMMITTED: ${{ steps.commit.outputs.committed || 'false' }}
+          NIGHTLY_DEPLOY_OUTCOME: ${{ steps.deploy.outcome || 'skipped' }}
+        run: |
+          python3 scripts/nightly_summary.py --data-dir web/data --write-md \
+            || echo "::warning::nightly summary script failed (non-blocking)"
 
       - name: Upload nightly diagnostics
         # Runs on success AND failure so the auto-repair workflow + a
@@ -831,6 +855,7 @@ jobs:
             web/data/last_updated.json
             web/data/run_history.json
             web/data/hires_pipeline_metrics.jsonl
+            web/data/nightly_summary.md
 
       - name: Slack on failure
         # Final-line alert: any failed step in this job sends a Slack
