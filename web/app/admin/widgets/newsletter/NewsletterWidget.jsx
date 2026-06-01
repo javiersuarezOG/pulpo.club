@@ -94,10 +94,15 @@ const NEWSLETTERS = [
     tier: "pro",
     title: "Pro · Welcome",
     description: "Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.",
-    template: "pulpo-pro-general",
-    templateLabel: "Pulpo Pro General",
+    template: "pulpo-pro-welcome",
+    templateLabel: "Pulpo Pro Welcome",
     cadenceMode: "onetime",
-    status: "coming-soon",
+    // status="draft" until the Stripe webhook trigger lands in a follow-up
+    // PR. The admin Test-send-to-me surface
+    // (POST /api/admin/newsletter/trigger-welcome-test) already works
+    // against this template — operators can preview the welcome end-to-end
+    // before production wiring goes live.
+    status: "draft",
   },
   {
     id: "free-welcome",

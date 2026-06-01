@@ -54,6 +54,46 @@ def _capture(event: str, props: dict) -> None:
         pass
 
 
+def _run_welcome(args) -> int:
+    """Welcome-route entry. Returns 0 for sent OR skipped (skips are
+    expected outcomes, not failures). Returns 1 on actual send failure,
+    2 on bad CLI args."""
+    from automation.newsletter.welcome_dispatch import dispatch_welcome  # noqa: PLC0415
+
+    if not args.welcome_single_email:
+        print(
+            "[send] --newsletter=pulpo-pro-welcome requires "
+            "--welcome-single-email <email>",
+            file=sys.stderr,
+        )
+        return 2
+    if args.only_email or args.preview_cohorts or args.allow_all_subscribers:
+        print(
+            "[send] --welcome-single-email is mutually exclusive with "
+            "--only-email / --preview-cohorts / --allow-all-subscribers",
+            file=sys.stderr,
+        )
+        return 2
+
+    email = args.welcome_single_email.strip().lower()
+    print(f"[welcome] dispatching email={email} source={args.welcome_source} "
+          f"force={args.welcome_force}")
+    result = dispatch_welcome(
+        email=email,
+        source=args.welcome_source,
+        ranked_path=args.ranked,
+        force=args.welcome_force,
+    )
+    print(
+        f"[welcome] status={result.status} reason={result.reason or '-'} "
+        f"message_id={result.message_id or '-'} dry_run={result.dry_run} "
+        f"latency_ms={result.latency_ms}"
+    )
+    if result.status == "failed":
+        return 1
+    return 0
+
+
 def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
     # Tag-style subject: "{Brand} {Tier} · Issue NN". The brand-only
     # prefix was redundant with the From column ("Pulpo · ...") so we
@@ -74,6 +114,49 @@ def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--ranked", default="web/data/ranked.json")
+    p.add_argument(
+        "--newsletter",
+        default="pulpo-pro-general",
+        choices=("pulpo-pro-general", "pulpo-pro-welcome"),
+        help=(
+            "Which template to route this run through. Default is the "
+            "weekly digest (`pulpo-pro-general`). `pulpo-pro-welcome` is "
+            "the one-shot welcome — REQUIRES --welcome-single-email and "
+            "no other audience flag. The two paths share send.py + the "
+            "Resend send mechanics but the audience and idempotency model "
+            "differ entirely."
+        ),
+    )
+    p.add_argument(
+        "--welcome-single-email",
+        default=None,
+        metavar="EMAIL",
+        help=(
+            "Welcome-template path only. Single recipient email. The "
+            "dispatcher in automation/newsletter/welcome_dispatch.py "
+            "handles Clerk lookup, idempotency check, render + send. "
+            "Pre-flight skips (already_sent, not_pro, etc.) exit 0 — "
+            "they're expected outcomes, not failures."
+        ),
+    )
+    p.add_argument(
+        "--welcome-source",
+        default="admin",
+        help=(
+            "Welcome-template telemetry tag — \"stripe\", \"admin\", "
+            "\"test\", etc. Surfaces in newsletter.welcome_sent so "
+            "dashboards can slice by trigger source."
+        ),
+    )
+    p.add_argument(
+        "--welcome-force",
+        action="store_true",
+        help=(
+            "Welcome-template: bypass the already_sent idempotency "
+            "check (admin Test-send-to-me uses this so an operator can "
+            "re-render the welcome without manually clearing Clerk)."
+        ),
+    )
     p.add_argument(
         "--issue-number",
         type=int,
@@ -148,6 +231,15 @@ def main() -> int:
         help="Optional dir — when set, every rendered issue is also written there.",
     )
     args = p.parse_args()
+
+    # ── Welcome route — early branch ──────────────────────────────────
+    # The welcome template runs through a separate dispatcher with its
+    # own idempotency model (Clerk publicMetadata stamp) and audience
+    # (one email at a time, not the joined Resend+Clerk queue). Keeping
+    # the branch high lets us reject incompatible flags loudly and avoid
+    # touching ranked.json twice.
+    if args.newsletter == "pulpo-pro-welcome":
+        return _run_welcome(args)
 
     ranked_path = Path(args.ranked)
     if not ranked_path.exists():

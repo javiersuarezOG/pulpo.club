@@ -1,0 +1,109 @@
+name: pulpo pro welcome
+
+# One-shot Pulpo Pro Welcome email. NO schedule — workflow_dispatch only.
+#
+# Two trigger paths:
+#   • Stripe webhook (production, future PR): customer.subscription.created
+#     → api/stripe/webhook.js dispatches this workflow with
+#     send_mode=yes + source=stripe + recipient_email=<the new Pro user>.
+#   • Admin "Test send to me" (operator surface): api/admin/newsletter/
+#     trigger-welcome-test.js dispatches with send_mode=yes + source=admin
+#     + force=yes (so the operator can re-render the welcome without
+#     manually clearing the recipient's Clerk metadata).
+#
+# Idempotency: the dispatcher in welcome_dispatch.py checks Clerk
+# publicMetadata.welcome_newsletter_sent_at BEFORE rendering. Stripe
+# retries on missed ACKs are safe — the second call no-ops with
+# reason=already_sent.
+
+on:
+  workflow_dispatch:
+    inputs:
+      recipient_email:
+        description: "Recipient email address (required)"
+        required: true
+      send_mode:
+        description: "Switch from dry-run to LIVE Resend send"
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+      source:
+        description: "Trigger source — surfaces in newsletter.welcome_sent telemetry"
+        required: false
+        type: choice
+        default: "admin"
+        options: ["admin", "stripe", "test"]
+      force:
+        description: "Bypass already_sent idempotency check (admin re-send)"
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+
+concurrency:
+  # Per-recipient concurrency so a Stripe retry storm can't race a
+  # legitimate admin test send for the same address. The dispatcher's
+  # idempotency check still backstops this.
+  group: pulpo-pro-welcome-${{ github.event.inputs.recipient_email }}
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Send gate. Manual workflow_dispatch stays dry-run by default so an
+      # operator can QA without sending; flip with send_mode=yes.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ github.event.inputs.send_mode != 'yes' && '1' || '0' }}"
+
+      # Telemetry — silent no-op when missing.
+      POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
+      POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
+
+      # Send pipeline secrets — same as pulpo-newsletter.yml. Missing
+      # keys return SendResult.error; the dispatcher logs + PostHogs.
+      RESEND_API_KEY: "${{ secrets.RESEND_API_KEY }}"
+      RESEND_FROM_EMAIL: "${{ vars.RESEND_FROM_EMAIL }}"
+      RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
+      PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
+
+      # Clerk — required for recipient lookup + the post-send
+      # publicMetadata stamp. Dispatcher exits with skipped/clerk_lookup_failed
+      # when this is empty, so a misconfigured secret is observable in PostHog.
+      CLERK_SECRET_KEY: "${{ secrets.CLERK_SECRET_KEY }}"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: install runtime deps
+        run: pip install -q posthog httpx
+
+      - name: assert ranked.json present
+        # The welcome carries the SAME 10 picks the weekly would have
+        # sent on the next Sunday — sourced from the current ranked.json.
+        # If the nightly hasn't run yet, the dispatcher exits with
+        # skipped/ranked_missing rather than crashing.
+        run: |
+          test -s web/data/ranked.json \
+            || (echo "::warning::web/data/ranked.json missing — dispatcher will skip with reason=ranked_missing")
+
+      - name: dispatch welcome
+        run: |
+          EMAIL="${{ github.event.inputs.recipient_email }}"
+          SOURCE="${{ github.event.inputs.source || 'admin' }}"
+          FORCE="${{ github.event.inputs.force || 'no' }}"
+          ARGS=(--newsletter pulpo-pro-welcome --welcome-single-email "$EMAIL" --welcome-source "$SOURCE")
+          if [ "$FORCE" = "yes" ]; then
+            ARGS+=(--welcome-force)
+          fi
+          python3 scripts/send_newsletter.py "${ARGS[@]}"
