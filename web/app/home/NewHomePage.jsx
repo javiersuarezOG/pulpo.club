@@ -1,15 +1,25 @@
 // Homepage v2 — editorial coastal-index design.
 //
-// Sections, top to bottom:
-//   1. HeroV2           — H1 with serif-italic "ranked.", CTAs, CSS-only newsletter preview
-//   2. FeaturedDeal     — single editorial card between hero and USPs
-//   3. USPBand          — "For subscribers only" + 3 cards on white
-//   4. PickShoreline    — Lake / Beach nav cards with editorial mockups
-//   5–10. Six Top-10 shelves (Phase 3): Beach × terrenos / condos /
+// Sections, top to bottom (default = hero_v5 on):
+//   1. HeroV5           — editorial "Sunday morning, coffee, your top
+//                          10 properties." H1 + postcard preview +
+//                          5-card destination picker (absorbs the
+//                          legacy hero + shoreline blocks).
+//   2–7. Six Top-10 shelves (Phase 3): Beach × terrenos / condos /
 //        homes, then Lake × terrenos / condos / homes. Each renders
 //        only when ≥5 listings qualify; otherwise it's hidden. The
 //        NEW + PRICE-DROP signals that used to drive their own shelves
 //        now ride as per-card chips (PR #421).
+//
+// Kill-switch (`hero_v5: false`) falls back to:
+//   1. HeroV2 / HeroV4 (depending on hero_v4 flag)
+//   2. FeaturedDeal (when hero_v4 off)
+//   3. PickShoreline
+//   then the same six Top-10 shelves.
+//
+// USPBand (the "For subscribers only" 3-card band) was eliminated in
+// Wave-6 — its content moved to the standalone UspPopup modal which
+// fires on scroll/exit-intent and is gated by `usp_popup_v1`.
 //
 // Wave-3a: HomepageHeader removed — SiteHeader (mounted at the app
 // level) is the single header for every route. The hero still owns the
@@ -29,7 +39,6 @@ import { HeroV2 } from "./HeroV2.jsx";
 import { HeroV4 } from "./HeroV4.jsx";
 import { HeroV5 } from "./HeroV5.jsx";
 import { FeaturedDeal } from "./FeaturedDeal.jsx";
-import { USPBand } from "./USPBand.jsx";
 import { PickShoreline } from "./PickShoreline.jsx";
 import {
   TopBeachTerrenosShelf,
@@ -65,7 +74,6 @@ const BLOCK_COMPONENTS = {
   ),
   hero_v5:       ({ app, locale }) => <HeroV5 app={app} locale={locale} />,
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
-  usps:          ({ app, locale }) => <USPBand app={app} locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
   top_beach_terrenos: ({ app, locale, heroV4 }) => <TopBeachTerrenosShelf app={app} locale={locale} heroV4={heroV4} />,
   top_beach_condos:   ({ app, locale, heroV4 }) => <TopBeachCondosShelf   app={app} locale={locale} heroV4={heroV4} />,
