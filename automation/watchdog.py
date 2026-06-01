@@ -170,7 +170,29 @@ LATENCY_MIN_DURATION_S   = 5.0    # don't alert on <5s baselines (too jittery)
 
 
 def _read_source_history(data_dir: Path) -> list[dict]:
-    """Read all rows from source_health_history.jsonl. Empty list if missing."""
+    """Read all rows from source_health_history.jsonl, deduped by (source, ts).
+
+    Empty list if missing.
+
+    Dedup rationale
+    ---------------
+    2026-06 onwards run.py writes two rows per source per nightly: one
+    after the crawl phase (legacy schema, no ``phase`` field, captures
+    HTTP errors + scraper exceptions) and one after the validation phase
+    (``phase=post_validation``, captures placeholder-storms where the
+    scraper returned records but validation dropped them all). The
+    consecutive-red detector below walks the top-N most recent rows per
+    source — without deduping, those N can be exhausted by two rows from
+    the same nightly, and the detector silently stops looking back far
+    enough to catch a multi-nightly streak.
+
+    Collapse rule: within each (source, ts) group, keep one row whose
+    ``status`` is the worst of the group (red > skipped > green) and
+    whose other fields are merged. ``error_class`` / ``error_msg`` /
+    ``failure_id`` come from the crawl-phase row when present; ``kept``
+    / ``scraped`` / ``dropped_at_validation`` come from the
+    post-validation row when present.
+    """
     path = data_dir / "source_health_history.jsonl"
     if not path.exists():
         return []
@@ -184,7 +206,29 @@ def _read_source_history(data_dir: Path) -> list[dict]:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
-    return rows
+
+    # Group by (source, ts) and collapse.
+    _STATUS_ORDER = {"red": 2, "skipped": 1, "green": 0, None: -1}
+    groups: dict[tuple[str, str], dict] = {}
+    for r in rows:
+        key = (r.get("source") or "?", r.get("ts") or "")
+        existing = groups.get(key)
+        if existing is None:
+            groups[key] = dict(r)
+            continue
+        # Status: take the worse of the two.
+        if _STATUS_ORDER.get(r.get("status"), -1) > _STATUS_ORDER.get(existing.get("status"), -1):
+            existing["status"] = r.get("status")
+        # Error fields: take whichever is present (crawl-phase row carries
+        # them; post_validation row leaves them None).
+        for k in ("error_class", "error_msg", "failure_id"):
+            if existing.get(k) in (None, "") and r.get(k):
+                existing[k] = r[k]
+        # Post-validation fields: keep from whichever row carries them.
+        for k in ("scraped", "kept", "dropped_at_validation", "phase"):
+            if k in r and k not in existing:
+                existing[k] = r[k]
+    return list(groups.values())
 
 
 def check_source_consecutive_red(

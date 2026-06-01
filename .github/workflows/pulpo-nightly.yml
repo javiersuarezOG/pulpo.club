@@ -616,13 +616,27 @@ jobs:
         # falls back to the broker URL (photos[0]) — the exact 14.5 s
         # P95 LCP regression we just closed.
         #
-        # Soft fail: warn-only on first miss so a single off-market
-        # listing without a hero variant doesn't block the nightly. The
-        # canary is gated to the top 200 by rank_score — those are the
-        # listings the hero rotator can actually pick. A miss in the
-        # tail is harmless; a miss in the top is a real regression.
+        # Scope: --top-only 10.
+        # ─────────────────────
+        # web/app/home/HeroV4.jsx:75 reads `pickTopRanked(listings, 10)`
+        # — the hero rotator + HomeShelf's Top-10 shelf both consume
+        # exactly the global top 10 by rank_score. The previous
+        # --top-only 200 was over-broad: a missing .hero.jpg at rank
+        # 50-200 cannot drive an LCP regression on the homepage hero
+        # (those listings never render as the hero) yet blocked the
+        # nightly's commit. That false-alarm class kept the data PR
+        # frozen for 5+ nightlies in a row (2026-05-27 → 2026-05-31).
+        # Narrowing to top 10 = exact hero-photo contract; misses at
+        # rank 11+ degrade gracefully via /api/img's broker fallback
+        # on the per-listing detail page where they're still seen.
+        #
+        # Hard fail by design: a miss inside the top 10 IS a real
+        # homepage LCP regression. Do not soft-fail this canary; the
+        # cost of a stale ranked.json is bounded (Vercel keeps serving
+        # yesterday's commit) and capped by PR-NR-D's pre-canary
+        # Slack alert.
         run: |
-          python3 -m pulpo.cli check-hero-variants --top-only 200 \
+          python3 -m pulpo.cli check-hero-variants --top-only 10 \
             || { echo "::error::hero variant canary FAILED — see logs above"; exit 1; }
 
       - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)

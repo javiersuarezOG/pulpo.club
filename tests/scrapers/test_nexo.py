@@ -23,6 +23,7 @@ sys.path.insert(0, str(REPO))
 
 from pulpo.scrapers.nexo import (  # noqa: E402
     NexoScraper,
+    _is_placeholder_rel,
     _parse_location,
     _parse_price_usd,
     _photo_urls,
@@ -230,6 +231,86 @@ def test_photo_urls_skips_non_image_media_types():
     ]
     urls = _photo_urls(medias)
     assert urls == ["https://nexo.com.sv/ok.jpg"]
+
+
+# Regression: NR-C — nexo "propiedad-no-disponible.jpg" placeholder
+# leaked into ranked.json from 2026-05-26 onward and cascaded to a
+# hero-canary failure that blocked the nightly's commit + deploy for
+# 6 days. /qa 2026-06-01.
+# Report: ~/.claude/plans/the-last-nightly-run-tranquil-starfish.md
+def test_is_placeholder_rel_catches_known_pattern():
+    assert _is_placeholder_rel("images/propiedad-no-disponible.jpg") is True
+    # Tolerate leading slash + uppercase drift — broker CDNs sometimes serve
+    # capitalised paths or normalise leading slashes.
+    assert _is_placeholder_rel("/images/propiedad-no-disponible.jpg") is True
+    assert _is_placeholder_rel("IMAGES/PROPIEDAD-NO-DISPONIBLE.JPG") is True
+
+
+def test_is_placeholder_rel_does_not_match_real_paths():
+    assert _is_placeholder_rel("media/listings/1061/hero.jpeg") is False
+    assert _is_placeholder_rel("") is False
+
+
+def test_photo_urls_filters_placeholders():
+    """A media list mixing real + placeholder paths drops the placeholder."""
+    medias = [
+        {"media_type": "image", "relative_path": "images/propiedad-no-disponible.jpg",
+         "is_primary": True},
+        {"media_type": "image", "relative_path": "media/listings/1061/real.jpg",
+         "is_primary": False},
+    ]
+    urls = _photo_urls(medias)
+    assert urls == ["https://nexo.com.sv/media/listings/1061/real.jpg"]
+
+
+def test_photo_urls_returns_empty_when_all_placeholders():
+    medias = [
+        {"media_type": "image", "relative_path": "images/propiedad-no-disponible.jpg",
+         "is_primary": True},
+    ]
+    assert _photo_urls(medias) == []
+
+
+def test_parse_listing_drops_when_only_placeholder_photos():
+    """A listing whose only media is the placeholder is unrenderable — drop it.
+
+    Pre-NR-C the row would have survived with photo_urls=[<placeholder>] and
+    poisoned the hero / detail / newsletter surfaces. NR-C drops the row
+    so the hero canary never sees the missing .hero.jpg cascade."""
+    payload = {
+        **_VALID_API_LISTING,
+        "listing_medias": [
+            {
+                "media_type": "image",
+                "relative_path": "images/propiedad-no-disponible.jpg",
+                "is_primary": True,
+            },
+        ],
+    }
+    assert parse_listing(payload) is None
+
+
+def test_parse_listing_keeps_when_mixed_real_and_placeholder_photos():
+    """A listing with a placeholder + at least one real photo survives;
+    the placeholder is filtered, the real photo becomes the hero."""
+    payload = {
+        **_VALID_API_LISTING,
+        "listing_medias": [
+            {
+                "media_type": "image",
+                "relative_path": "images/propiedad-no-disponible.jpg",
+                "is_primary": True,
+            },
+            {
+                "media_type": "image",
+                "relative_path": "media/listings/1061/real.jpg",
+                "is_primary": False,
+            },
+        ],
+    }
+    rec = parse_listing(payload)
+    assert rec is not None
+    assert rec["photo_urls"] == ["https://nexo.com.sv/media/listings/1061/real.jpg"]
 
 
 def test_parse_price_usd_handles_string_decimals():

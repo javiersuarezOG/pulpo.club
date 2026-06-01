@@ -75,10 +75,21 @@ jobs:
           # PULPO_BOT_TOKEN before relying on the auto-merge below.
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.12"
+      - name: Verify Python
+        # The self-hosted GCP runner provisioned by scripts/setup-gcp-runner.sh
+        # ships Debian 12 + distro python3 (3.11). actions/setup-python's
+        # python-versions manifest does not list a Debian 12 / 3.12 build,
+        # so the previous `setup-python@v6.2.0 python-version: 3.12` step
+        # failed at 06:28 UTC on 2026-06-01 with:
+        #   "Version 3.12 was not found in the local cache"
+        #   "The version '3.12' with architecture 'x64' was not found for Debian 12."
+        # The shim's three deps (httpx, selectolax, curl_cffi) all support
+        # Python ≥ 3.8, so the system python3 is fine. Log the version so
+        # a future drift (e.g. distro upgrade) shows up in the workflow
+        # log rather than silently changing behaviour.
+        run: |
+          python3 --version
+          python3 -m pip --version
 
       - name: Install dependencies
         # Trim to only what the shim's two scrapers need. The main

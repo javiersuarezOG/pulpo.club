@@ -213,6 +213,46 @@ def _rule_photos_bounds(li: dict) -> tuple[Disposition, Optional[str]]:
     return ("PASS", None)
 
 
+# Known per-source "property unavailable" placeholder images. A listing
+# whose photo_urls leads with one of these would render the placeholder
+# graphic as the hero on /, /listing/:id, and the newsletter. Drop the
+# row instead. Patterns are substring matches against the URL — exact
+# query-string / CDN-prefix variations don't matter.
+#
+# Defense-in-depth — the originating scraper (nexo.py:_is_placeholder_rel)
+# already filters these from photo_urls before persisting. This rule
+# catches any listing whose scraper changes shape later (new source
+# adopting the same CRM, regex drift) without the validator needing to
+# be updated in lockstep.
+_PLACEHOLDER_PHOTO_PATTERNS: tuple[str, ...] = (
+    # nexo.com.sv — confirmed 2026-05-26 onwards as the placeholder served
+    # for every CRM record without real media attached.
+    "/images/propiedad-no-disponible.jpg",
+)
+
+
+def _rule_photo_placeholder(li: dict) -> tuple[Disposition, Optional[str]]:
+    """Reject listings whose hero photo URL matches a known placeholder.
+
+    A non-empty ``photo_urls`` field whose first entry resolves to the
+    broker's "property unavailable" / "no disponible" generic graphic is
+    not a renderable listing. The hires step would derive a useless
+    .hero.jpg, the home hero would show the graphic, and the newsletter
+    photo-gate would let the row through. Dropping at this layer keeps
+    every downstream consumer simple.
+    """
+    photos = li.get("photo_urls") or []
+    if not isinstance(photos, list) or not photos:
+        return ("PASS", None)
+    first = (photos[0] or "").lower() if isinstance(photos[0], str) else ""
+    if not first:
+        return ("PASS", None)
+    for pat in _PLACEHOLDER_PHOTO_PATTERNS:
+        if pat in first:
+            return ("DROP", f"photo_placeholder: hero_url matches {pat}")
+    return ("PASS", None)
+
+
 def _rule_ppm_consistency(li: dict) -> tuple[Disposition, Optional[str]]:
     price = li.get("price_usd")
     area  = li.get("area_m2")
@@ -342,6 +382,7 @@ _RULES: list[RuleFn] = [
     _rule_ppm_bounds,
     _rule_days_bounds,
     _rule_photos_bounds,
+    _rule_photo_placeholder,
     _rule_ppm_consistency,
     _rule_manzana_suspicion,
     _rule_coastal_large_area,

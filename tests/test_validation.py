@@ -324,6 +324,51 @@ def test_stale_no_photos_flagged():
     assert any("stale_no_photos" in r for r in result.reasons)
 
 
+# Regression: NR-C defense-in-depth — nexo placeholder photo URL leaked
+# past the scraper before this rule shipped. /qa 2026-06-01.
+# Report: ~/.claude/plans/the-last-nightly-run-tranquil-starfish.md
+def test_photo_placeholder_hero_url_dropped():
+    """A listing whose hero photo URL is the nexo 'no disponible' placeholder
+    is DROPPED so the homepage hero / detail / newsletter never render the
+    'property unavailable' graphic."""
+    li = _listing(
+        photo_urls=["https://nexo.com.sv/images/propiedad-no-disponible.jpg"],
+    )
+    result = validate(li)
+    assert result.disposition == "DROP"
+    assert any("photo_placeholder" in r for r in result.reasons)
+
+
+def test_photo_placeholder_case_insensitive():
+    """Match is case-insensitive so a future CDN-prefix shift to uppercase
+    still trips the rule."""
+    li = _listing(
+        photo_urls=["https://NEXO.COM.SV/IMAGES/Propiedad-No-Disponible.JPG"],
+    )
+    result = validate(li)
+    assert result.disposition == "DROP"
+    assert any("photo_placeholder" in r for r in result.reasons)
+
+
+def test_photo_placeholder_passes_real_hero_photo():
+    """A listing with a real photo URL passes the placeholder rule cleanly."""
+    li = _listing(
+        photo_urls=["https://nexo.com.sv/media/listings/1061/real-hero.jpeg"],
+    )
+    result = validate(li)
+    # Disposition is PASS (no other rule fires on this fixture).
+    assert result.disposition == "PASS"
+    assert not any("photo_placeholder" in r for r in result.reasons)
+
+
+def test_photo_placeholder_passes_empty_photos():
+    """No photo_urls means no hero to evaluate — rule no-ops, leaving the
+    decision to _rule_photos_bounds / _rule_stale_no_photos."""
+    li = _listing(photo_urls=[])
+    result = validate(li)
+    assert not any("photo_placeholder" in r for r in result.reasons)
+
+
 def test_zone_unresolved_flagged():
     """Missing zone field is FLAGGED (not dropped — zone miss should be visible)."""
     li = _listing(zone=None)
