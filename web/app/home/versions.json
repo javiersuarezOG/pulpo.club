@@ -7,11 +7,11 @@
     "featured": "v1",
     "usps": "v1",
     "shoreline": "v2",
-    "top_beach_terrenos": "v1",
-    "top_beach_condos": "v1",
-    "top_beach_homes": "v1",
-    "top_lake_terrenos": "v1",
-    "top_lake_condos": "v1",
-    "top_lake_homes": "v1"
+    "top_beach_terrenos": "v2",
+    "top_beach_condos": "v2",
+    "top_beach_homes": "v2",
+    "top_lake_terrenos": "v2",
+    "top_lake_condos": "v2",
+    "top_lake_homes": "v2"
   }
 }
