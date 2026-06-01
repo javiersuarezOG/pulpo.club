@@ -154,6 +154,179 @@ async function patchPrivateMetadata(clerk, userId, patch) {
   await clerk.users.updateUserMetadata(userId, { privateMetadata: next });
 }
 
+// Pulpo Pro Welcome — one-shot dispatch helper.
+//
+// Fires the `pulpo-pro-welcome.yml` GitHub Actions workflow against
+// the recipient who just completed first-checkout. The Python
+// dispatcher (`automation/newsletter/welcome_dispatch.py`) does the
+// actual render + Resend send + Clerk metadata stamp.
+//
+// Webhook-side idempotency: read `publicMetadata.welcome_newsletter_sent_at`
+// FIRST and skip the GH dispatch entirely when already set. The
+// dispatcher would skip again on the Python side, but a workflow
+// dispatch still costs ~30s of GH runtime — every Stripe retry on an
+// already-welcomed user wastes a slot in the per-recipient concurrency
+// queue, delaying legitimate sends.
+//
+// Race-safe: the workflow's `concurrency.group:
+// pulpo-pro-welcome-${recipient_email}` enforces serial execution per
+// email, so even if two webhook invocations race past the
+// publicMetadata read, the second workflow run queues behind the first
+// and finds the stamp set by the time it dispatches.
+//
+// Never throws. Stripe must always get its 200; a failed welcome
+// dispatch is a marketing failure, not a payment failure. All errors
+// log + PostHog and fall through.
+//
+// Returns one of: "dispatched" | "skipped:already_sent" |
+// "skipped:no_github_token" | "skipped:no_clerk_user" | "error:<reason>".
+const WELCOME_WORKFLOW_FILE = "pulpo-pro-welcome.yml";
+const DEFAULT_DISPATCH_REPO = "javiersuarezOG/pulpo.club";
+const DEFAULT_DISPATCH_REF = "main";
+
+async function dispatchProWelcomeWorkflow({
+  clerk,
+  clerkUserId,
+  email,
+  source,
+  distinctId,
+  t0,
+  fetchImpl,
+}) {
+  // Anything missing here is a "skip" outcome, not a webhook failure.
+  // Stripe still gets a 200 — the user has paid; their welcome is a
+  // best-effort marketing follow-up.
+  if (!clerk || !clerkUserId || !email) {
+    return "skipped:missing_input";
+  }
+
+  // Idempotency check — read the current Clerk user once. The
+  // publicMetadata stamp is permanent; locked 2026-06-01, see
+  // project_resubscribe_welcome_funnel memory for why we never
+  // re-send (resubscribe is a separate funnel, not a welcome).
+  let alreadySent = false;
+  try {
+    const user = await clerk.users.getUser(clerkUserId);
+    const md = (user && user.publicMetadata) || {};
+    if (md.welcome_newsletter_sent_at) alreadySent = true;
+  } catch (err) {
+    // Clerk read failure: fail open so we don't strand a user without
+    // their welcome. The Python dispatcher's own idempotency check
+    // backstops a real duplicate.
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_clerk_read_failed",
+      clerk_user_id: clerkUserId, error: (err && err.message) || "(no message)",
+    });
+  }
+
+  if (alreadySent) {
+    posthog.capture(distinctId, "newsletter.welcome_skipped", {
+      reason: "already_sent",
+      source: source || "stripe.checkout",
+      clerk_user_id: clerkUserId,
+      ms: Date.now() - t0,
+    });
+    return "skipped:already_sent";
+  }
+
+  const token = process.env.GITHUB_DISPATCH_TOKEN || "";
+  if (!token) {
+    // Token missing in dev / preview without the secret. Log loudly
+    // so the missing config is visible in Vercel logs.
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_no_github_token",
+      clerk_user_id: clerkUserId,
+    });
+    posthog.capture(distinctId, "newsletter.welcome_failed", {
+      reason: "no_github_token",
+      source: source || "stripe.checkout",
+      clerk_user_id: clerkUserId,
+      ms: Date.now() - t0,
+    });
+    return "skipped:no_github_token";
+  }
+
+  const repo = process.env.GITHUB_DISPATCH_REPO || DEFAULT_DISPATCH_REPO;
+  const ref = process.env.GITHUB_DISPATCH_REF || DEFAULT_DISPATCH_REF;
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WELCOME_WORKFLOW_FILE}/dispatches`;
+
+  let gh;
+  try {
+    gh = await (fetchImpl || fetch)(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "pulpo-stripe-webhook-welcome",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ref,
+        inputs: {
+          recipient_email: email,
+          send_mode: "yes",
+          // The `source` argument is operator-friendly free text; we
+          // restrict the workflow input to the closed set
+          // {admin, stripe, test}. Anything Stripe-flavored maps to
+          // "stripe" so dashboards can slice cleanly.
+          source: "stripe",
+          // Stripe path NEVER forces — production path respects the
+          // idempotency stamp at the dispatcher layer too.
+          force: "no",
+        },
+      }),
+    });
+  } catch (err) {
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_github_fetch_failed",
+      clerk_user_id: clerkUserId, error: (err && err.message) || "(no message)",
+    });
+    posthog.capture(distinctId, "newsletter.welcome_failed", {
+      reason: "github_fetch_failed",
+      source: source || "stripe.checkout",
+      clerk_user_id: clerkUserId,
+      error: (err && err.message) || "(no message)",
+      ms: Date.now() - t0,
+    });
+    return `error:fetch_failed`;
+  }
+
+  if (gh.status !== 204) {
+    let detail = "";
+    try { detail = await gh.text(); } catch { /* best-effort */ }
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_github_non_204",
+      clerk_user_id: clerkUserId, github_status: gh.status,
+    });
+    posthog.capture(distinctId, "newsletter.welcome_failed", {
+      reason: "github_dispatch_rejected",
+      source: source || "stripe.checkout",
+      clerk_user_id: clerkUserId,
+      github_status: gh.status,
+      github_detail: (detail || "").slice(0, 200),
+      ms: Date.now() - t0,
+    });
+    return `error:github_${gh.status}`;
+  }
+
+  // Dispatch accepted. We do NOT poll the runs API here — the Stripe
+  // webhook has a tight latency budget (Stripe gives up after ~30s
+  // and retries the event), and the per-recipient concurrency group
+  // on the workflow makes a missed dispatch self-healing on retry.
+  logApi("stripe.webhook", {
+    status: 200, reason: "welcome_dispatched",
+    clerk_user_id: clerkUserId, repo, ref,
+  });
+  posthog.capture(distinctId, "newsletter.welcome_dispatched", {
+    source: source || "stripe.checkout",
+    clerk_user_id: clerkUserId,
+    ms: Date.now() - t0,
+  });
+  return "dispatched";
+}
+
+
 // Look up an existing Clerk user by email. Returns the user object or
 // null. Clerk's getUserList API shape changes between SDK versions
 // (sometimes Array, sometimes { data: Array }) — tolerate both.
@@ -361,9 +534,18 @@ module.exports = async (req, res) => {
               source: "stripe.checkout.auth_gated",
             });
           }
+          // Pulpo Pro Welcome — fire the one-shot onboarding email.
+          // Best-effort: never blocks the payment. Idempotent —
+          // Clerk publicMetadata stamp prevents re-send on retries.
+          const welcomeOutcome = email ? await dispatchProWelcomeWorkflow({
+            clerk, clerkUserId: explicitUserId, email,
+            source: "stripe.checkout.auth_gated",
+            distinctId, t0,
+          }) : "skipped:no_email";
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "auth_gated", clerk_user_id: explicitUserId,
+            welcome: welcomeOutcome,
           });
           // invitation_sent: false on auth_gated — the user was
           // already signed in pre-checkout, so no activation email
@@ -406,10 +588,18 @@ module.exports = async (req, res) => {
             email, locale: stripeLocale || "en",
             source: "stripe.checkout.anonymous_existing_user",
           });
+          // Pulpo Pro Welcome — same one-shot send as the auth-gated
+          // path. Idempotent: the Clerk publicMetadata stamp prevents
+          // duplicate sends across Stripe retries.
+          const welcomeOutcome = await dispatchProWelcomeWorkflow({
+            clerk, clerkUserId: existing.id, email,
+            source: "stripe.checkout.anonymous_existing_user",
+            distinctId, t0,
+          });
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_existing_user", clerk_user_id: existing.id,
-            locale: stripeLocale,
+            locale: stripeLocale, welcome: welcomeOutcome,
           });
           // invitation_sent: false on existing-user — Clerk already has
           // a user record for this email, so no new invitation is sent.
@@ -542,6 +732,19 @@ module.exports = async (req, res) => {
           // retry redoes the work, which is the tolerated failure mode.
           await markStripeEventProcessed(stripe, subscriptionId, event.id);
 
+          // NOTE: the Pulpo Pro Welcome is INTENTIONALLY NOT
+          // dispatched on this path. At this point no Clerk user
+          // exists yet for this email — the dispatcher's Clerk
+          // lookup would return null and the welcome would skip with
+          // reason=clerk_lookup_failed. The right trigger surface for
+          // anonymous-invitation users is the post-invitation
+          // user.created hook (Clerk webhook, separate file). The
+          // activation email itself already carries the warm
+          // "set up your Pulpo Pro account" framing; layering the
+          // Pro Welcome on top of an unaccepted invitation would
+          // also be premature — the user hasn't onboarded yet. Saved
+          // in `project_pro_welcome_anonymous_path` memory as a
+          // follow-up item.
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_invitation_created", session_id: session.id,
@@ -550,6 +753,7 @@ module.exports = async (req, res) => {
             resend_ok: sendResult.ok,
             resend_message_id: sendResult.message_id || "",
             resend_error: sendResult.error || "",
+            welcome: "deferred:anonymous_invitation",
           });
           // invitation_sent: true means we ASKED Resend to send. The
           // truer delivered/bounced signal comes from api/resend-webhook
@@ -940,3 +1144,4 @@ module.exports.config = { api: { bodyParser: false } };
 // import these in prod; the bundler tree-shakes them out.
 module.exports.isStripeEventAlreadyProcessed = isStripeEventAlreadyProcessed;
 module.exports.markStripeEventProcessed = markStripeEventProcessed;
+module.exports.dispatchProWelcomeWorkflow = dispatchProWelcomeWorkflow;

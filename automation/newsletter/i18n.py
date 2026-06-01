@@ -177,6 +177,51 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "facts.lot_m2":                {"en": "{n} m² lot",                                   "es": "{n} m² terreno"},
     "facts.listed_new":            {"en": "New this week",                           "es": "Nueva esta semana"},
     "facts.listed_days":           {"en": "{n} days on market",                           "es": "{n} días en el mercado"},
+    # ── Pro Welcome (one-shot, fires after first successful Stripe payment) ──
+    # Email subject — Resend `subject` field. Kept short so it doesn't
+    # truncate in narrow inbox previews (Gmail mobile snippet is ~38 chars).
+    "welcome.email.subject":       {"en": "Welcome to Pulpo Pro — your first 10",          "es": "Bienvenido a Pulpo Pro — tus primeras 10"},
+    # Hero
+    "welcome.hero.eyebrow":        {"en": "Welcome to Pulpo Pro",                         "es": "Bienvenido a Pulpo Pro"},
+    "welcome.hero.headline.named": {"en": "Welcome, {name}.",                              "es": "Bienvenido, {name}."},
+    "welcome.hero.headline.unnamed": {"en": "Welcome aboard.",                             "es": "Bienvenido a bordo."},
+    "welcome.hero.lede":           {"en": "Pulpo covers the coast and the volcanic lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your first 10 are below; same shape every Sunday from here.",
+                                     "es": "Pulpo cubre la costa y los lagos volcánicos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo; mismo formato cada domingo."},
+    # "How Pulpo works" — 3 numbered editorial beats (same component as
+    # market context on the weekly digest). Each beat ends with a hard fact
+    # about what Pulpo does or what the reader can do, not a vague promise.
+    "welcome.how.eyebrow":         {"en": "How Pulpo works",                              "es": "Cómo funciona Pulpo"},
+    "welcome.how.headline":        {"en": "The short version.",                           "es": "La versión corta."},
+    "welcome.how.step1":           {"en": f"<strong style=\"color:#1A1916;\">We scan every supplier in {_country_en}.</strong> Local brokers, MLS feeds, classifieds, agency sites — checked by people on the ground who know the market. You don't have to open ten tabs.",
+                                     "es": f"<strong style=\"color:#1A1916;\">Revisamos a cada proveedor en {_country_es}.</strong> Corredores locales, MLS, clasificados, sitios de agencias — revisado por gente local que conoce el mercado. No tenés que abrir diez pestañas."},
+    "welcome.how.step2":           {"en": "<strong style=\"color:#1A1916;\">We rank them on value, location, and momentum.</strong> The Top 10 against your filter land in your inbox every Sunday.",
+                                     "es": "<strong style=\"color:#1A1916;\">Las clasificamos por valor, ubicación y momentum.</strong> Las Top 10 contra tu filtro te llegan cada domingo."},
+    "welcome.how.step3":           {"en": "<strong style=\"color:#1A1916;\">You filter and save.</strong> Tighten the filter in settings to match what you actually want. Hit ♥ on anything that catches your eye — we'll tell you when the price moves.",
+                                     "es": "<strong style=\"color:#1A1916;\">Vos filtrás y guardás.</strong> Ajustá el filtro en configuración para que calce con lo que querés. Hacé ♥ en lo que te llame la atención — te avisamos cuando el precio se mueva."},
+    # Cadence note — short editorial line beneath the how-it-works block.
+    # Two variants depending on whether the next weekly digest lands later
+    # today or on a future Sunday. The renderer picks one at render time
+    # based on `now()` vs the next Sunday 10:00 SV.
+    "welcome.cadence.same_day":    {"en": "Your first weekly digest lands today at 10 AM SV time. If you're reading this after 10 AM, it's already in your inbox.",
+                                     "es": "Tu primera edición semanal sale hoy a las 10 AM (hora SV). Si estás leyendo esto después de las 10 AM, ya está en tu bandeja."},
+    "welcome.cadence.future":      {"en": "Your first weekly digest lands {date} at 10 AM SV time. Same shape, refreshed picks, every Sunday.",
+                                     "es": "Tu primera edición semanal sale {date} a las 10 AM (hora SV). Mismo formato, selecciones renovadas, cada domingo."},
+    # Section intro above the picks block. Different copy from the weekly's
+    # `section.top3.title` so the reader feels a clear "your first batch" framing.
+    "welcome.section.picks.title": {"en": "Your first 10 picks.",                          "es": "Tus primeras 10 selecciones."},
+    "welcome.section.picks.body":  {"en": "Same ranking we'll send every Sunday. Top 3 are the highest-value matches this week; the next 7 fit different buyer profiles. Hit ♥ on anything that fits — we'll track price moves for you.",
+                                     "es": "El mismo ranking que mandaremos cada domingo. Las primeras 3 son los matches de mayor valor esta semana; las 7 siguientes calzan a perfiles de comprador distintos. Hacé ♥ en lo que te calce — vamos a seguir los cambios de precio por vos."},
+    # "Start here" — replaces the weekly's "Your Pulpo / Pick up where you
+    # left off" block. Three cards tuned for first-time onboarding instead
+    # of returning-user re-engagement.
+    "welcome.start.eyebrow":       {"en": "Start here",                                   "es": "Empezá acá"},
+    "welcome.start.title":         {"en": "Three things to set up.",                       "es": "Tres cosas para configurar."},
+    "welcome.start.filter.label":  {"en": "Step 1 · Tune what you see",                    "es": "Paso 1 · Ajustá lo que ves"},
+    "welcome.start.filter.cta":    {"en": "Set your filter",                              "es": "Configurá tu filtro"},
+    "welcome.start.browse.label":  {"en": "Step 2 · Explore the full inventory",          "es": "Paso 2 · Explorá todo el inventario"},
+    "welcome.start.browse.cta":    {"en": "Browse all listings",                          "es": "Verlas todas"},
+    "welcome.start.account.label": {"en": "Step 3 · Manage profile, cadence, billing",    "es": "Paso 3 · Perfil, cadencia, facturación"},
+    "welcome.start.account.cta":   {"en": "Open your account",                            "es": "Abrir tu cuenta"},
 }
 
 

@@ -618,3 +618,123 @@ def test_join_recipients_stamps_preference_source_per_user():
     assert by_hash[subs.email_hash("discover@pulpo.club")].preference_source == "discover_filters"
     assert by_hash[subs.email_hash("legacy@pulpo.club")].preference_source == "newsletter"
     assert by_hash[subs.email_hash("empty@pulpo.club")].preference_source == "none"
+
+
+# ── Pro Welcome — 24h weekly-skip filter ──────────────────────────────
+# Locked 2026-06-01: a Pro recipient whose welcome shipped in the past
+# 24h is dropped from the weekly queue to avoid back-to-back welcome +
+# weekly with the same 10 picks. Stamp lives on
+# publicMetadata.welcome_newsletter_sent_at (ISO-8601 UTC).
+
+def _clerk_user_with_welcome(email, *, welcome_sent_at):
+    return {
+        "id": f"user_{email.split('@')[0]}",
+        "first_name": None,
+        "email_addresses": [{"id": "ea_1", "email_address": email}],
+        "primary_email_address_id": "ea_1",
+        "public_metadata": {
+            "plan": "pro",
+            "profile": {},
+            "welcome_newsletter_sent_at": welcome_sent_at,
+        },
+    }
+
+
+def test_welcome_within_24h_helper_handles_recent_stamp():
+    from datetime import datetime, timedelta, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    # 6h ago — within window
+    recent = (now - timedelta(hours=6)).isoformat()
+    assert subs._welcome_within_24h(recent, now=now) is True
+    # 30h ago — outside window
+    stale = (now - timedelta(hours=30)).isoformat()
+    assert subs._welcome_within_24h(stale, now=now) is False
+    # 23h59m ago — just barely inside
+    edge = (now - timedelta(hours=23, minutes=59)).isoformat()
+    assert subs._welcome_within_24h(edge, now=now) is True
+
+
+def test_welcome_within_24h_helper_handles_z_suffix_and_garbage():
+    from datetime import datetime, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    # `Z` suffix is the spec-compliant UTC marker; we tolerate it.
+    assert subs._welcome_within_24h("2026-06-01T10:00:00Z", now=now) is True
+    # Garbage strings degrade to False (don't crash the weekly send
+    # over an upstream metadata format change).
+    assert subs._welcome_within_24h("not-a-date", now=now) is False
+    assert subs._welcome_within_24h("", now=now) is False
+    assert subs._welcome_within_24h(None, now=now) is False
+
+
+def test_parse_clerk_user_reads_welcome_sent_at():
+    """ClerkUser.welcome_sent_at carries the publicMetadata stamp.
+    Tolerates both snake_case + camelCase; empty/missing → None."""
+    user = subs._parse_clerk_user(
+        _clerk_user_with_welcome("javi@pulpo.club", welcome_sent_at="2026-05-31T10:00:00Z")
+    )
+    assert user.welcome_sent_at == "2026-05-31T10:00:00Z"
+
+    no_stamp = subs._parse_clerk_user(_clerk_user("javi@pulpo.club", plan="pro"))
+    assert no_stamp.welcome_sent_at is None
+
+
+def test_join_recipients_drops_user_with_recent_welcome(monkeypatch):
+    """Pro user whose welcome shipped 6h ago must NOT land in the
+    weekly queue. Without this filter the user gets two emails with
+    the same 10 picks on a same-day collision."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    recent_stamp = (now - timedelta(hours=6)).isoformat()
+    # Patch the helper's wall-clock so the test is deterministic.
+    monkeypatch.setattr(
+        subs, "_welcome_within_24h",
+        lambda iso, now=None: subs._welcome_within_24h.__wrapped__(iso, now=now) if hasattr(subs._welcome_within_24h, "__wrapped__") else (iso is not None and "2026-06-01" in (iso or "")),
+    )
+    # Simpler: just verify the integration via the date constants.
+    contacts = [
+        subs.ResendContact(id="c1", email="recent@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="old@pulpo.club", unsubscribed=False, created_at=None),
+    ]
+    users = [
+        subs._parse_clerk_user(
+            _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=recent_stamp)
+        ),
+        subs._parse_clerk_user(
+            _clerk_user_with_welcome("old@pulpo.club", welcome_sent_at="2025-01-01T10:00:00Z")
+        ),
+    ]
+    # Reset the monkeypatch — we want the real helper now.
+    monkeypatch.undo()
+    # We can't easily inject `now=` into join_recipients, so use a
+    # `welcome_sent_at` that's guaranteed-recent (just now).
+    fresh = datetime.now(timezone.utc).isoformat()
+    users[0] = subs._parse_clerk_user(
+        _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=fresh)
+    )
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=users)
+    emails_in_queue = {r.email_hash for r in recipients}
+    assert subs.email_hash("recent@pulpo.club") not in emails_in_queue
+    assert subs.email_hash("old@pulpo.club") in emails_in_queue
+
+
+def test_allow_all_subscribers_bypasses_welcome_skip():
+    """Operator launch broadcasts use --allow-all-subscribers to bypass
+    gates wholesale. The welcome 24h skip MUST be bypassed too — the
+    operator is deliberately overriding cohort filters."""
+    from datetime import datetime, timezone
+    fresh = datetime.now(timezone.utc).isoformat()
+    contacts = [
+        subs.ResendContact(id="c1", email="recent@pulpo.club", unsubscribed=False, created_at=None),
+    ]
+    users = [
+        subs._parse_clerk_user(
+            _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=fresh)
+        ),
+    ]
+    recipients = subs.join_recipients(
+        contacts=contacts, clerk_users=users, allow_non_pro=True
+    )
+    # With allow_non_pro=True (the --allow-all-subscribers flag), the
+    # recent-welcome recipient should still be in the queue.
+    assert len(recipients) == 1
+    assert recipients[0].email_hash == subs.email_hash("recent@pulpo.club")
