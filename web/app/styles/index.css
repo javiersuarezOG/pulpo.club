@@ -6849,15 +6849,24 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   padding-top: 12px;
 }
 
-/* ── Subsection: "Where to start" + 5 destination cards ───────────── */
+/* ── Subsection: "Where to start" + 5 destination cards ─────────────
+   Mirror-symmetric thin dividers above + below the destination cards
+   so the cards read as a discrete subsection of the hero rather than
+   as floating space between sections. Same hairline + spacing rhythm
+   on both sides; the top line separates the cards from the H1 +
+   postcard above, the bottom line separates them from the catalogue
+   shelves below. Mobile-first; min-width breakpoint scales up. */
 .homepage-v2 .hp-hero-v5-section {
   border-top: 1px solid var(--color-line-soft);
+  border-bottom: 1px solid var(--color-line-soft);
   padding-top: 28px;
+  padding-bottom: 28px;
   margin-top: 8px;
 }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-hero-v5-section {
     padding-top: 44px;
+    padding-bottom: 44px;
     margin-top: 24px;
   }
 }
