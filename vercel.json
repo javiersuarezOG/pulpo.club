@@ -21,7 +21,7 @@
     "api/internal/welcome-send.py": {
       "memory": 1024,
       "maxDuration": 30,
-      "excludeFiles": "web/photos/**,web/photos-hires/**,docs/**,tests/**,newsletter-drafts/**"
+      "includeFiles": "{automation/newsletter/**,automation/posthog_client.py,pulpo/__init__.py,pulpo/countries/**,web/data/ranked.json}"
     }
   },
   "rewrites": [

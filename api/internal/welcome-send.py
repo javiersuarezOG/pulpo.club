@@ -60,6 +60,18 @@ if str(_ROOT) not in sys.path:
 # pins). Cold-start cost: ~500ms. Warm calls: <50ms.
 from automation.newsletter.welcome_dispatch import dispatch_welcome  # noqa: E402
 
+# Absolute path to web/data/ranked.json. The default in
+# `welcome_dispatch.dispatch_welcome` is the relative form
+# "web/data/ranked.json" which resolves against CWD — fine on the GH
+# Actions runner (CWD = repo root) but NOT in the Vercel function
+# (CWD differs). Resolving once at module load lets every per-request
+# call pass the absolute path without re-stat'ing.
+#
+# `ranked.json` must be included in the function bundle via
+# `includeFiles` in vercel.json. Without it the dispatcher exits
+# cleanly with reason=ranked_missing.
+_RANKED_JSON = str(_ROOT / "web" / "data" / "ranked.json")
+
 
 _EMAIL_RE = __import__("re").compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 _VALID_SOURCES = {"stripe", "stripe.checkout.auth_gated",
@@ -162,6 +174,7 @@ class handler(BaseHTTPRequestHandler):
                 locale=locale,
                 source=source,
                 force=force,
+                ranked_path=_RANKED_JSON,
             )
         except Exception as exc:                                     # noqa: BLE001
             # Unhandled dispatcher exception. Log the traceback for

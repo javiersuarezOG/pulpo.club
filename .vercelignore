@@ -1,4 +1,12 @@
-# Python pipeline runs in GitHub Actions only — Vercel runtime is static + Node.
+# Python pipeline runs primarily in GitHub Actions; Vercel runtime
+# is Node-first. ONE exception (post 2026-06-01): the Pulpo Pro
+# Welcome instant-dispatch path runs a Vercel Python serverless
+# function at api/internal/welcome-send.py. The function + its
+# co-located requirements.txt MUST ship; its imported modules
+# (automation/newsletter/**, pulpo/countries/**, web/data/ranked.json)
+# are pulled in by the function's `includeFiles` config in vercel.json
+# rather than re-included here, so the broad excludes below stay
+# in force for everything else.
 pulpo/
 automation/
 fixtures/
@@ -8,6 +16,15 @@ requirements.txt
 *.py
 __pycache__/
 *.pyc
+# Re-include the Vercel Python function tree. The function file +
+# its co-located requirements.txt are matched by these negations,
+# overriding the `*.py` and `requirements.txt` excludes above. The
+# function's transitive Python imports (automation/, pulpo/) are
+# NOT re-included here — they're pulled into the function bundle
+# selectively via `includeFiles` in vercel.json so we don't ship
+# the entire automation/ + pulpo/ trees to every Node function.
+!api/**/*.py
+!api/**/requirements.txt
 
 # Local artifacts
 .env
