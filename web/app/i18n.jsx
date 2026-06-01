@@ -174,8 +174,8 @@ const UI_STRINGS = {
   // Eyebrow + headline + tagline + CTA + sub-text per the brief.
   "new_hero.eyebrow":        { en: "★ Ranked by value",
                                es: "★ Rankeado por valor" },
-  "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
-                               es: "Todas las casas de playa y lago de El Salvador, rankeadas por valor." },
+  "new_hero.headline":       { en: "Every beach and lake home in El Salvador, ranked by value.",
+                               es: "Todas las casas de playa y lago de El Salvador, rankeadas por valor." },
   "new_hero.tagline":        { en: "No more scrolling through 50 listing sites. We rank every beach and lake listing by value and deliver the 10 best to your inbox every week.",
                                es: "Olvídate de buscar en 50 sitios. Rankeamos cada propiedad de playa y lago por valor y te enviamos las 10 mejores al correo cada semana." },
   "new_hero.email_placeholder": { en: "you@example.com",
@@ -276,8 +276,8 @@ const UI_STRINGS = {
                                    es: "{n} FUENTES" },
   "home.hero.eyebrow_after":     { en: " EVERY 90 SECONDS",
                                    es: " CADA 90 SEGUNDOS" },
-  "home.hero.h1.before":         { en: "Every beach and lake property in El Salvador,",
-                                   es: "Todas las propiedades de playa y lago de El Salvador," },
+  "home.hero.h1.before":         { en: "Every beach and lake property in El Salvador,",
+                                   es: "Todas las propiedades de playa y lago de El Salvador," },
   "home.hero.h1.italic":         { en: "ranked.",
                                    es: "rankeadas." },
   "home.hero.subhead":           { en: "We scan every site, rank every beach and lake listing by value, and deliver the 10 best to your inbox every week.",
@@ -472,33 +472,33 @@ const UI_STRINGS = {
   // when ≥5 listings qualify; otherwise the section is hidden. NEW
   // and PRICE-DROP signals now ride on per-card chips (PR #421) so
   // no dedicated shelves for those any more.
-  // Wave-6: titles name the actual regions (Surf City I + II,
-  // Coatepeque + Ilopango) instead of generic "beach"/"lake". Subs
+  // Wave-6: titles name the actual regions (Surf City I + II,
+  // Coatepeque + Ilopango) instead of generic "beach"/"lake". Subs
   // lead with geographic spread + a value-add so each shelf answers
   // "is this for me?". Spanish uses SV "vos"-form ("construí",
   // "mudarte") and "apartamentos" (not "condos") for the unit type.
-  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 lots · Surf City I + II",
-                                          es: "Top 10 terrenos · Surf City I + II" },
+  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 lots · Surf City I + II",
+                                          es: "Top 10 terrenos · Surf City I + II" },
   "home.shelf.top_beach_terrenos.sub": { en: "El Tunco to Punta Mango — build your own beach place.",
                                           es: "Desde El Tunco hasta Punta Mango — construí tu casa de playa." },
-  "home.shelf.top_beach_condos.h2":    { en: "Top 10 condos · Surf City I + II",
-                                          es: "Top 10 apartamentos · Surf City I + II" },
+  "home.shelf.top_beach_condos.h2":    { en: "Top 10 condos · Surf City I + II",
+                                          es: "Top 10 apartamentos · Surf City I + II" },
   "home.shelf.top_beach_condos.sub":   { en: "Walk-to-surf apartments, low maintenance.",
                                           es: "Apartamentos a la playa caminando, bajo mantenimiento." },
-  "home.shelf.top_beach_homes.h2":     { en: "Top 10 homes · Surf City I + II",
-                                          es: "Top 10 casas · Surf City I + II" },
+  "home.shelf.top_beach_homes.h2":     { en: "Top 10 homes · Surf City I + II",
+                                          es: "Top 10 casas · Surf City I + II" },
   "home.shelf.top_beach_homes.sub":    { en: "Move-in-ready beach houses across both coasts.",
                                           es: "Casas de playa listas para mudarte, en ambas costas." },
-  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lots · Coatepeque + Ilopango",
-                                          es: "Top 10 terrenos · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lots · Coatepeque + Ilopango",
+                                          es: "Top 10 terrenos · Coatepeque e Ilopango" },
   "home.shelf.top_lake_terrenos.sub":  { en: "Lake-rim land in Santa Ana and San Salvador.",
                                           es: "Terrenos frente al lago, en Santa Ana y San Salvador." },
-  "home.shelf.top_lake_condos.h2":     { en: "Top 10 condos · Coatepeque + Ilopango",
-                                          es: "Top 10 apartamentos · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_condos.h2":     { en: "Top 10 condos · Coatepeque + Ilopango",
+                                          es: "Top 10 apartamentos · Coatepeque e Ilopango" },
   "home.shelf.top_lake_condos.sub":    { en: "Turn-key lakeside weekenders on both lakes.",
                                           es: "Escapadas al lago, llave en mano — en ambos lagos." },
-  "home.shelf.top_lake_homes.h2":      { en: "Top 10 homes · Coatepeque + Ilopango",
-                                          es: "Top 10 casas · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_homes.h2":      { en: "Top 10 homes · Coatepeque + Ilopango",
+                                          es: "Top 10 casas · Coatepeque e Ilopango" },
   "home.shelf.top_lake_homes.sub":     { en: "Lake-view houses, cooler than the coast — 30–60 min from the capital.",
                                           es: "Casas con vista al lago, más fresco que la costa — a 30–60 min de la capital." },
   "home.shelf.prev":             { en: "Show previous listings",
@@ -574,7 +574,7 @@ const UI_STRINGS = {
   "card.listings_count":     { en: "listings",            es: "propiedades" },
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
-  "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
+  "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /
@@ -722,10 +722,10 @@ const UI_STRINGS = {
   "toast.logged_out":        { en: "Logged out",           es: "Sesión cerrada" },
 
   // Footer
-  "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
-                               es: "Las propiedades que valen la pena en El Salvador." },
-  "footer.country_badge":    { en: "Listings in El Salvador",
-                               es: "Propiedades en El Salvador" },
+  "footer.tagline":          { en: "Properties worth wanting in El Salvador.",
+                               es: "Las propiedades que valen la pena en El Salvador." },
+  "footer.country_badge":    { en: "Listings in El Salvador",
+                               es: "Propiedades en El Salvador" },
 
   // Find Your Style carousel — deleted in the rewrite cutover (Phase 9)
   // with the legacy StyleCarousel component. Keys removed.
@@ -1290,12 +1290,12 @@ const UI_STRINGS = {
   // Login link → opens Clerk hosted sign-in modal (PR-B.4). Keep wording
   // identical to the in-app TopNav so the user sees a consistent "Log in"
   // across surfaces.
-  "start.hero.eyebrow":       { en: "Real estate in El Salvador",
-                                es: "Bienes raíces en El Salvador" },
-  "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
-  "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
-                                es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas y locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
+  "start.hero.eyebrow":       { en: "Real estate in El Salvador",
+                                es: "Bienes raíces en El Salvador" },
+  "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
+  "start.hero.sub":           { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas y locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
   "start.hero.cta_primary":   { en: "Try a free month — then {price}/month",
                                 es: "Pruébalo un mes gratis — luego {price}/mes" },
   "start.hero.trust_micro":   { en: "Cancel anytime. No commitment.",
@@ -1326,8 +1326,8 @@ const UI_STRINGS = {
                                 es: "Con el plan gratis ves la foto. Con Pro recibes el enlace directo al vendedor." },
   "start.value.a.label":      { en: "Before the portals",
                                 es: "Antes que los portales" },
-  "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
-                                es: "La mayoría de las propiedades en El Salvador nunca llegan a Encuentra24 ni a Facebook. Los vendedores se mueven rápido, las ofertas se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al correo." },
+  "start.value.a.body":       { en: "Most El Salvador real estate never makes it to Encuentra24 or Facebook. Sellers move fast, deals close over WhatsApp. Pulpo taps into that network and brings it to your inbox.",
+                                es: "La mayoría de las propiedades en El Salvador nunca llegan a Encuentra24 ni a Facebook. Los vendedores se mueven rápido, las ofertas se cierran por WhatsApp. Pulpo se conecta a esa red y te la trae al correo." },
   "start.value.b.label":      { en: "Land, homes, commercial",
                                 es: "Terrenos, casas y locales" },
   "start.value.b.body":       { en: "Residential plots, beachfront land, homes, and commercial properties — all in one place, with the data you actually need.",
@@ -1336,8 +1336,8 @@ const UI_STRINGS = {
                                 es: "Datos de inversionista" },
   "start.value.c.body":       { en: "Price history, days on market, road access, utilities — the data points serious buyers need, in plain language.",
                                 es: "Historial de precios, días en el mercado, acceso vial, servicios — los datos que un comprador serio necesita, en lenguaje claro." },
-  "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
-                                es: "MÃ¡s de {n} propiedades revisadas en todo El Salvador" },
+  "start.trust.stat":         { en: "{n}+ properties tracked across El Salvador",
+                                es: "MÃ¡s de {n} propiedades revisadas en todo El Salvador" },
   "start.join.heading":       { en: "Join Pulpo",
                                 es: "Únete a Pulpo" },
   "start.join.paid.label":    { en: "Full access",
@@ -1487,10 +1487,10 @@ const UI_STRINGS = {
   // and listing-card clicks for anon + free users (paid users skip).
   // Replaces the previous "redirect to /start?intent=upgrade" page
   // jump with an in-page modal that POSTs to /api/stripe/start-checkout.
-  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
-  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
-                                          es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
+  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
+                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
+  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
+                                          es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
   "free_month_modal.bullet.1":         { en: "Weekly 10 picks in your inbox",
                                           es: "10 propiedades cada semana, en tu correo" },
   "free_month_modal.bullet.2":         { en: "Filters + smart sorting",

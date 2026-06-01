@@ -6034,11 +6034,24 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   align-items: center;
   gap: 8px;
   /* Wave-6: titles like "Top 10 condos · Coatepeque + Ilopango" can
-     exceed the 320px viewport. Allow icon + text to wrap to a new
-     line and constrain to parent width so the heading doesn't push
-     the document past the viewport. */
+     exceed the 320px viewport. Allow icon + text to wrap and constrain
+     to parent width so the heading doesn't push the document past the
+     viewport. */
   flex-wrap: wrap;
   max-width: 100%;
+}
+/* Wave-6: shelf titles now use NBSPs to keep region names together
+   ("Surf City I + II", "Coatepeque + Ilopango") so the wrap never
+   orphans a "+ II" alone on its own line. The lake-region atom is
+   ~210 px wide at the default 22 px font — which overflows the 320 px
+   iPhone-SE viewport. Reduce title size at narrow widths so the atom
+   fits without pushing the document past the viewport.
+
+   Scoped via `.app.hero-v4 .homepage-v2.hero-v5` (0,4,1 specificity)
+   to beat the hero-v4 `.hp-shelf-h2 { font-size: 22px }` override
+   that lives later in this file with 0,3,1 specificity. */
+@media (max-width: 480px) {
+  .app.hero-v4 .homepage-v2.hero-v5 .hp-shelf-h2 { font-size: 17px; }
 }
 .homepage-v2 .hp-shelf-h2-icon {
   color: var(--color-clay-primary);
@@ -7002,23 +7015,13 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────
-   HeroV5 → USPs → Shelves transition (Wave-6 polish)
+   HeroV5 → Shelves transition (Wave-6 polish)
    ──────────────────────────────────────────────────────────────────────
-   Without this block the gap from the destination cards (HeroV5's last
-   subsection) to the USP icons was ~96px on mobile and ~136px on
-   desktop — "two disconnected pages stacked", not a designed flow.
-   Below: tighter gap between hero ↔ USPs (they share the same value
-   proposition, should feel continuous), more breathing room between
-   USPs ↔ shelves (different topic — entering the catalogue).
-
-   Also re-aligns USP horizontal padding + container width to HeroV5's
-   so the three USP icons line up under the destination cards above.
-
-   Specificity note: USP selectors are 5-class scoped
-   (`.app.hero-v4 .homepage-v2.hero-v5`) to beat the Wave-5-round-3 USP
-   rule lower in this file (`.app.hero-v4 .homepage-v2 .hp-usp`, 0,4,0).
-   Without the bump my override loses to specificity AND source order.
-   Mobile-first; min-width breakpoints scale up.
+   Under hero_v5 the USP block is hidden for every tier (matching what
+   Pro users already see) — see blockRegistry.ts. So the only seam to
+   smooth here is HeroV5 → first shelf. The destination cards' own
+   bottom padding leaves enough breathing room for the catalogue
+   shelves below; HeroV5's section just needs less of its own gap.
    ────────────────────────────────────────────────────────────────────── */
 
 .homepage-v2.hero-v5 .hp-hero-v5 {
@@ -7030,27 +7033,6 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 @media (min-width: 1024px) {
   .homepage-v2.hero-v5 .hp-hero-v5 { padding-bottom: 32px; }
 }
-
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp {
-  /* top / right / bottom / left — tight top (continues hero rhythm),
-     more bottom (breathing room before catalogue shelves), horizontal
-     padding matches HeroV5's `clamp(24px, 5vw, 80px)` shape. */
-  padding: 20px 24px 40px;
-}
-@media (min-width: 768px) {
-  .app.hero-v4 .homepage-v2.hero-v5 .hp-usp { padding: 24px 40px 56px; }
-}
-@media (min-width: 1024px) {
-  .app.hero-v4 .homepage-v2.hero-v5 .hp-usp { padding: 32px 64px 64px; }
-}
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-inner {
-  max-width: 1180px; /* matches HeroV5's container so icons line up under cards */
-}
-/* The eyebrow + h2 are already hidden by the hero-v4 styles. With them
-   collapsed, the 24px margin-top on `.hp-usp-cards` is the only thing
-   pushing the icons further from the section's top padding — drop it
-   so the section's own padding-top owns the gap. */
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-cards { margin-top: 0; }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
 

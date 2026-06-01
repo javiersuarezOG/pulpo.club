@@ -30,24 +30,21 @@ const SIX_TOP_SHELVES: readonly BlockId[] = [
   "top_beach_terrenos", "top_beach_condos", "top_beach_homes",
   "top_lake_terrenos",  "top_lake_condos",  "top_lake_homes",
 ];
+// Wave-6: the legacy `usps` block was eliminated entirely. Tests
+// below no longer reference it.
 const ALL_BLOCKS: readonly BlockId[] = [
-  "hero", "featured", "usps",
-  "shoreline", ...SIX_TOP_SHELVES,
-];
-// Post-Wave-5 paid trim: hero stays (image-only — CTA gated in
-// component), featured/usps/shoreline drop. Catalogue shelves stay.
-const PAID_BLOCKS: readonly BlockId[] = [
-  "hero", ...SIX_TOP_SHELVES,
-];
-const ALL_BLOCKS_NO_USPS: readonly BlockId[] = [
   "hero", "featured",
   "shoreline", ...SIX_TOP_SHELVES,
 ];
+// Post-Wave-5 paid trim: hero stays (image-only — CTA gated in
+// component), featured + shoreline drop. Catalogue shelves stay.
+const PAID_BLOCKS: readonly BlockId[] = [
+  "hero", ...SIX_TOP_SHELVES,
+];
 // Wave-6 hero_v5: replaces both `hero` and `shoreline` slots with the
-// new editorial postcard-preview hero. featured + usps stay (no special
-// suppression — the test asserts the swap, not the trim).
+// new editorial postcard-preview hero. `featured` stays.
 const HERO_V5_BLOCKS: readonly BlockId[] = [
-  "hero_v5", "featured", "usps",
+  "hero_v5", "featured",
   ...SIX_TOP_SHELVES,
 ];
 
@@ -85,8 +82,8 @@ describe("visibleBlocksFor — paid_home_variant_v1 only (production default)", 
     expect(visibleBlocksFor(anon as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS);
   });
 
-  it("free skips `usps` (the marketing band is anon-only) but keeps the rest", () => {
-    expect(visibleBlocksFor(free as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS_NO_USPS);
+  it("free sees all blocks (the legacy `usps`-only trim no longer applies — block was eliminated in Wave-6)", () => {
+    expect(visibleBlocksFor(free as never, PAID_HOME_ON)).toEqual(ALL_BLOCKS);
   });
 
   it("pro sees the trimmed paid-home list (hero image + shelves)", () => {
@@ -98,30 +95,28 @@ describe("visibleBlocksFor — paid_home_variant_v1 only (production default)", 
   });
 });
 
-describe("visibleBlocksFor — usp_popup_v1 only", () => {
-  // The popup-migration flag drops `usps` for every tier (the popup
-  // is mounted separately at the homepage root).
+describe("visibleBlocksFor — usp_popup_v1 flag (post-Wave-6 no-op on registry)", () => {
+  // Wave 6: the in-page USPBand was eliminated, so usp_popup_v1 no
+  // longer filters anything in the registry — its only remaining
+  // purpose is controlling whether the standalone UspPopup modal
+  // arms its scroll/exit-intent triggers (handled in NewHomePage).
   it.each([
     ["anonymous", anon],
     ["free",      free],
     ["pro",       pro],
     ["agency",    agency],
-  ])("drops `usps` for %s", (_, user) => {
-    expect(visibleBlocksFor(user as never, POPUP_ON)).toEqual(ALL_BLOCKS_NO_USPS);
+  ])("is a no-op for %s (registry no longer filters on it)", (_, user) => {
+    expect(visibleBlocksFor(user as never, POPUP_ON))
+      .toEqual(visibleBlocksFor(user as never, ALL_FLAGS_OFF));
   });
 });
 
-describe("visibleBlocksFor — both flags on (compose)", () => {
-  it("anonymous: usps gone, hero + featured still visible", () => {
-    expect(visibleBlocksFor(anon as never, BOTH_ON)).toEqual(ALL_BLOCKS_NO_USPS);
+describe("visibleBlocksFor — paid_home + usp_popup_v1 (compose)", () => {
+  it("anonymous: same as paid_home alone (usp_popup_v1 is a registry no-op)", () => {
+    expect(visibleBlocksFor(anon as never, BOTH_ON)).toEqual(ALL_BLOCKS);
   });
 
-  it("free: usps gone, hero + featured still visible", () => {
-    expect(visibleBlocksFor(free as never, BOTH_ON)).toEqual(ALL_BLOCKS_NO_USPS);
-  });
-
-  it("pro: usps already filtered by paid_home; popup flag is redundant", () => {
-    // PAID_BLOCKS already excludes usps; popup flag is a no-op for pro.
+  it("pro: paid_home trim applies, popup flag is a no-op", () => {
     expect(visibleBlocksFor(pro as never, BOTH_ON)).toEqual(PAID_BLOCKS);
   });
 });
@@ -136,7 +131,6 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
     const out = visibleBlocksFor(user as never, HERO_V4_ON);
     expect(out).not.toContain("featured");
     expect(out).toContain("hero");
-    expect(out).toContain("usps");
     expect(out).toContain("shoreline");
   });
 
@@ -152,18 +146,6 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
     expect(out).toContain("shoreline");
   });
 
-  it("composes with usp_popup_v1: both `featured` and `usps` gone", () => {
-    const out = visibleBlocksFor(anon as never, {
-      paid_home_variant_v1: false,
-      usp_popup_v1:         true,
-      hero_v4:              true,
-      hero_v5:              false,
-    });
-    expect(out).not.toContain("featured");
-    expect(out).not.toContain("usps");
-    expect(out).toContain("hero");
-  });
-
   it("composes with all flags on for paid: only hero + shelves remain", () => {
     const out = visibleBlocksFor(pro as never, ALL_FLAGS_ON);
     expect(out).toEqual(["hero", ...SIX_TOP_SHELVES]);
@@ -171,8 +153,8 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
 });
 
 describe("visibleBlocksFor — hero_v5 flag (Wave-6)", () => {
-  // hero_v5 replaces both `hero` and `shoreline` — the new editorial
-  // hero absorbs the destination picker via its 5 cards.
+  // hero_v5 replaces both `hero` and `shoreline` for every tier — the
+  // new editorial hero absorbs the destination picker via its 5 cards.
   it.each([
     ["anonymous", anon],
     ["free",      free],
@@ -185,7 +167,7 @@ describe("visibleBlocksFor — hero_v5 flag (Wave-6)", () => {
     expect(out).not.toContain("shoreline");
   });
 
-  it("composes with usp_popup_v1: hero_v5 + featured remain, usps + shoreline gone", () => {
+  it("composes with usp_popup_v1: hero_v5 + featured remain, shoreline gone, popup-flag is a registry no-op", () => {
     const out = visibleBlocksFor(anon as never, {
       paid_home_variant_v1: false,
       usp_popup_v1:         true,
@@ -195,7 +177,6 @@ describe("visibleBlocksFor — hero_v5 flag (Wave-6)", () => {
     expect(out).toContain("hero_v5");
     expect(out).toContain("featured");
     expect(out).not.toContain("hero");
-    expect(out).not.toContain("usps");
     expect(out).not.toContain("shoreline");
   });
 
@@ -211,9 +192,11 @@ describe("visibleBlocksFor — defensive defaults", () => {
   });
 
   it("treats unknown plan as free (per gating.ts tierFor)", () => {
+    // Post-Wave-6: free tier sees the same blocks as anonymous (the
+    // `usps` block was eliminated, removing the old free-vs-anon delta).
     expect(
       visibleBlocksFor({ plan: "mystery_tier" as never } as never, PAID_HOME_ON),
-    ).toEqual(ALL_BLOCKS_NO_USPS);
+    ).toEqual(ALL_BLOCKS);
   });
 });
 
