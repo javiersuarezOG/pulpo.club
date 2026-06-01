@@ -43,11 +43,13 @@ const ALL_BLOCKS_NO_USPS: readonly BlockId[] = [
   "hero", "featured",
   "shoreline", ...SIX_TOP_SHELVES,
 ];
-// Wave-6 hero_v5: replaces both `hero` and `shoreline` slots with the
-// new editorial postcard-preview hero. featured + usps stay (no special
-// suppression — the test asserts the swap, not the trim).
+// Wave-6 hero_v5: replaces the legacy `hero` and `shoreline` slots
+// with the new editorial postcard-preview hero, AND suppresses `usps`
+// for every tier (matching what Pro users already see — HeroV5's H1 +
+// destination cards carry the value prop, no need for a 3-card
+// "Why Pulpo Pro?" band). `featured` stays.
 const HERO_V5_BLOCKS: readonly BlockId[] = [
-  "hero_v5", "featured", "usps",
+  "hero_v5", "featured",
   ...SIX_TOP_SHELVES,
 ];
 
@@ -171,18 +173,20 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
 });
 
 describe("visibleBlocksFor — hero_v5 flag (Wave-6)", () => {
-  // hero_v5 replaces both `hero` and `shoreline` — the new editorial
-  // hero absorbs the destination picker via its 5 cards.
+  // hero_v5 replaces both `hero` and `shoreline`, AND suppresses
+  // `usps` for every tier (matching what Pro users already see —
+  // HeroV5's H1 + destination cards carry the value prop).
   it.each([
     ["anonymous", anon],
     ["free",      free],
     ["pro",       pro],
     ["agency",    agency],
-  ])("swaps hero+shoreline for hero_v5 for %s", (_, user) => {
+  ])("swaps hero+shoreline+usps for hero_v5 for %s", (_, user) => {
     const out = visibleBlocksFor(user as never, HERO_V5_ON);
     expect(out).toContain("hero_v5");
     expect(out).not.toContain("hero");
     expect(out).not.toContain("shoreline");
+    expect(out).not.toContain("usps");
   });
 
   it("composes with usp_popup_v1: hero_v5 + featured remain, usps + shoreline gone", () => {

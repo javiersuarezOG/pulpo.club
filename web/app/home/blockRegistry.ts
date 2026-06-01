@@ -152,10 +152,14 @@ export function visibleBlocksFor(
     //   * hero_v5 is the rendered hero
     //   * hero is suppressed (legacy v2/v4 hero would double up)
     //   * shoreline is suppressed (the 5 destination cards absorb it)
+    //   * usps is suppressed for ALL tiers (matches what Pro users
+    //     already see — HeroV5's H1 + destination cards carry the
+    //     value prop, no need for a 3-card "Why Pulpo Pro?" band).
     // When the flag is off, hero_v5 itself is suppressed.
     if (flags.hero_v5) {
       if (blockId === "hero") return false;
       if (blockId === "shoreline") return false;
+      if (blockId === "usps") return false;
     } else {
       if (blockId === "hero_v5") return false;
     }
