@@ -108,6 +108,8 @@ The `Pulpo webhook health` workflow (`.github/workflows/pulpo-webhook-health.yml
 | `Welcome dispatch failure rate` > 10% | The dispatcher is returning `status=failed` on more than 1 in 10 attempts | Check Resend status; check `RESEND_API_KEY` valid; check Resend dashboard for bounces |
 | `Welcome Vercel Python fallback rate` > 25% | Vercel Python instant path unreachable, GH Actions carrying everything; users still get welcomes but slower (30-75s vs <5s) | Check Vercel dashboard for `api/internal/welcome-send` function errors. Check `PULPO_INTERNAL_TOKEN` env var still set. |
 | `Weekly Pro digest send failure rate` > 5% over 8d | The Sunday cron has been failing for >5% of recipients | Check Sunday's `pulpo-newsletter` workflow run logs |
+| `Newsletter unsubscribe rate` > 2% over 30d | Audience-fit signal — content / cadence / audience drift causing sustained unsubscribes | Review last few sends for content quality; check if a specific issue triggered a spike (correlate via per-event Slack pings below) |
+| `📤 Unsubscribe` per-event Slack pings | A specific user just unsubscribed (real-time, every 30 min) | Track patterns; if a spike correlates with a specific issue, that issue had a problem |
 
 ---
 
