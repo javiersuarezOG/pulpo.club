@@ -17,6 +17,19 @@ fixtures/
 samples/
 tests/
 
+# Root requirements.txt is GH-Actions-only — it carries heavy deps
+# (selectolax, curl_cffi, Pillow, pytesseract, openai) needed by the
+# scrape + enrichment pipeline but irrelevant at Vercel runtime.
+# Vercel's Python runtime auto-installs the project-root requirements,
+# so leaving it uploaded would force the function bundle through
+# 100+ MB of CC compilation (selectolax against Python 3.14 even
+# breaks compilation outright). The function-local
+# api/internal/requirements.txt below is re-included via negation
+# and carries only the welcome path's actual runtime deps (httpx,
+# posthog).
+/requirements.txt
+!api/internal/requirements.txt
+
 # Local artifacts
 .env
 .env.local
