@@ -75,6 +75,28 @@ jobs:
           # PULPO_BOT_TOKEN before relying on the auto-merge below.
           token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
 
+      - name: Ensure GitHub CLI
+        # The 14:05 UTC 2026-06-01 manual run scraped both sources
+        # successfully, pushed the branch, and then died on
+        # `gh: command not found` when opening the cache PR. The GCP
+        # self-hosted runner provisioned by setup-gcp-runner.sh does
+        # NOT install gh (Debian 12 ships it only via the GitHub APT
+        # repo, which the provision script doesn't add). Rather than
+        # widen the runner setup, pull the prebuilt binary into the
+        # workspace per-run. Idempotent: skips when gh already exists.
+        run: |
+          if command -v gh >/dev/null 2>&1; then
+            echo "gh already present: $(gh --version | head -1)"
+            exit 0
+          fi
+          GH_VER="2.62.0"
+          TARBALL="gh_${GH_VER}_linux_amd64.tar.gz"
+          mkdir -p "$HOME/.local/bin"
+          curl -sL "https://github.com/cli/cli/releases/download/v${GH_VER}/${TARBALL}" \
+            | tar -xz --strip-components=2 -C "$HOME/.local/bin" "gh_${GH_VER}_linux_amd64/bin/gh"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/gh" --version | head -1
+
       - name: Setup Python venv
         # The self-hosted GCP runner provisioned by scripts/setup-gcp-runner.sh
         # ships Debian 12 + distro python3 (3.11). Two prior attempts failed:
