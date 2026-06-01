@@ -118,12 +118,47 @@ def _slugify(title: str) -> str:
     return s or "inmueble"
 
 
+# Placeholder relative-paths nexo.com.sv serves when a CRM record has no
+# real media attached (or when the broker un-publishes the listing without
+# removing it). These resolve to a generic "property unavailable" graphic
+# rather than a real photo. Keeping them in photo_urls poisons three
+# downstream surfaces:
+#   1. The hires step tries to fetch the placeholder, succeeds, and
+#      writes a useless .hero.jpg derivative — homepage hero renders the
+#      "unavailable" graphic.
+#   2. /api/img caches the placeholder, surfacing it on the detail page.
+#   3. The newsletter v4 photo-gate (which requires a real photo) lets
+#      placeholder rows through and embeds the graphic in the email.
+# Strip them at scrape time; defense-in-depth lives in validation.py
+# (rule _rule_photo_placeholder).
+_PLACEHOLDER_REL_PATHS = (
+    "images/propiedad-no-disponible.jpg",
+)
+
+
+def _is_placeholder_rel(rel: str) -> bool:
+    """True if ``rel`` matches a known nexo placeholder relative path.
+
+    Match is case-insensitive on a normalised leading-slash-stripped form
+    so future variants like ``/images/propiedad-no-disponible.jpg`` or
+    ``IMAGES/PROPIEDAD-NO-DISPONIBLE.JPG`` still get caught.
+    """
+    norm = (rel or "").lstrip("/").lower()
+    return norm in _PLACEHOLDER_REL_PATHS
+
+
 def _photo_urls(listing_medias: list[dict]) -> list[str]:
     """Build full-size photo URLs, primary first.
 
     Photos are served from ``https://nexo.com.sv/<relative_path>``. The
     thumbnail variant exists too (``thumb_relative_path``) but we want
     the full-size for Pulpo's hero/photo pipeline.
+
+    Known placeholder images (see ``_PLACEHOLDER_REL_PATHS``) are filtered
+    out at this layer so a listing whose CRM record has no real media
+    ends up with ``photo_urls=[]`` — the caller drops the listing rather
+    than persisting a row whose hero photo is the "property unavailable"
+    graphic.
     """
     if not isinstance(listing_medias, list):
         return []
@@ -136,6 +171,8 @@ def _photo_urls(listing_medias: list[dict]) -> list[str]:
             continue
         rel = m.get("relative_path") or ""
         if not rel:
+            continue
+        if _is_placeholder_rel(rel):
             continue
         url = f"{BASE}/{rel.lstrip('/')}"
         (primary if m.get("is_primary") else rest).append(url)
@@ -227,6 +264,17 @@ def parse_listing(listing: dict) -> Optional[dict]:
 
     photos = _photo_urls(listing.get("listing_medias") or [])
     photos = upgrade_photo_urls("nexo", photos)
+    # A listing whose CRM record carries only placeholder media (the
+    # "propiedad-no-disponible.jpg" graphic) cannot render a usable hero
+    # photo. After _photo_urls strips placeholders the list is empty —
+    # drop the row entirely so it never reaches ranked.json. The
+    # broker either un-published the listing or hasn't uploaded photos
+    # yet; re-publishing with real photos brings the row back the next
+    # nightly. defense-in-depth: validation.py's _rule_photo_placeholder
+    # catches any listing whose photo_urls[0] still smells like a
+    # placeholder after future scraper changes.
+    if not photos:
+        return None
 
     return {
         # Use listing_code over numeric id: the code is the broker's

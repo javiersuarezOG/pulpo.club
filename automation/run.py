@@ -1508,6 +1508,61 @@ def main() -> int:
         f"[validation] PASS={val_counts['pass']} FLAG={val_counts['flag']} "
         f"DROP={val_counts['drop']} (total in={val_total})"
     )
+
+    # ── Post-validation per-source health amendment ───────────────────
+    # The source_health_history row written above (after crawl) only sees
+    # the pre-validation scraper count. A source that scraped 100 records
+    # and lost all 100 at validation (e.g. nexo's 2026-05-26 outage where
+    # every photo was the "propiedad-no-disponible.jpg" placeholder) used
+    # to report `status=green count=100` while contributing zero rows to
+    # ranked.json — silent failure invisible to the consecutive-red watchdog.
+    #
+    # Append one extra row per source with the post-validation kept count
+    # AND a derived status that flips to "red" when a non-trivial pre-
+    # validation count (≥ POST_VAL_RED_MIN_SCRAPED) collapses to zero after
+    # validation. The row carries `phase=post_validation` so the watchdog +
+    # /admin/sources can distinguish it from the existing crawl-phase row.
+    health_path = REPO / "web" / "data" / "source_health_history.jsonl"
+    health_path.parent.mkdir(parents=True, exist_ok=True)
+    from collections import Counter as _Counter
+    per_source_kept = _Counter(li.source for li in listings)
+    POST_VAL_RED_MIN_SCRAPED = 5  # below this we attribute to flaky small-batch sources
+    with health_path.open("a", encoding="utf-8") as _hf:
+        for src in sources:
+            src = src.strip()
+            scraped = per_source_count.get(src, 0)
+            kept = per_source_kept.get(src, 0)
+            if scraped >= POST_VAL_RED_MIN_SCRAPED and kept == 0:
+                pv_status = "red"
+            elif kept > 0:
+                pv_status = "green"
+            else:
+                # scraped == 0 — the crawl-phase row already captured the
+                # red. Don't double-count by also marking post_validation
+                # red on the same condition; mark "skipped" so dashboards
+                # can render the row without inflating the streak.
+                pv_status = "skipped"
+            _hf.write(json.dumps({
+                "ts":            started.isoformat(),
+                "source":        src,
+                "phase":         "post_validation",
+                "status":        pv_status,
+                "scraped":       scraped,
+                "kept":          kept,
+                "dropped_at_validation": max(0, scraped - kept),
+            }, ensure_ascii=False) + "\n")
+        # Console summary — surfaces "scraped 100 / kept 0" on the
+        # nightly log next to the [validation] PASS/FLAG/DROP line so
+        # an operator scanning the log catches the placeholder-storm
+        # without having to grep source_health_history.jsonl.
+        for src in sorted(sources):
+            src = src.strip()
+            scraped = per_source_count.get(src, 0)
+            kept = per_source_kept.get(src, 0)
+            if scraped > 0 and kept < scraped:
+                print(f"[post_validation] {src}: scraped={scraped} kept={kept} "
+                      f"dropped={scraped - kept}")
+
     # Per-type breakdown — empty for land-only datasets, useful as soon
     # as houses/condos appear so red flags surface per type instead of
     # being averaged with land's much larger denominator.

@@ -107,6 +107,80 @@ def test_consecutive_red_handles_two_sources_simultaneously(tmp_path):
     assert "century21" in msg
 
 
+# Regression: NR-C — run.py writes a second post_validation row per source
+# per nightly starting 2026-06. Without (source, ts) dedup, the two rows
+# from a single nightly fill the consecutive-red detector's top-N window
+# and the streak across nightlies becomes invisible. /qa 2026-06-01.
+# Report: ~/.claude/plans/the-last-nightly-run-tranquil-starfish.md
+def test_consecutive_red_dedupes_two_rows_per_nightly(tmp_path):
+    """A nightly that writes crawl+post_validation rows for the SAME (source, ts)
+    must collapse to one row before streak detection runs, so a two-nightly
+    placeholder-storm still fires the alert."""
+    rows = [
+        # Nightly 1: scraped 100 but kept 0 (placeholder-storm).
+        _row("nexo", _ts(28), "green", count=100, error_class=None),
+        {
+            "ts":     _ts(28),
+            "source": "nexo",
+            "phase":  "post_validation",
+            "status": "red",
+            "scraped": 100,
+            "kept":    0,
+        },
+        # Nightly 2: same pattern.
+        _row("nexo", _ts(4), "green", count=100, error_class=None),
+        {
+            "ts":     _ts(4),
+            "source": "nexo",
+            "phase":  "post_validation",
+            "status": "red",
+            "scraped": 100,
+            "kept":    0,
+        },
+    ]
+    _write_health(rows, tmp_path)
+    ok, msg = check_source_consecutive_red(tmp_path, now=NOW)
+    assert not ok, (
+        "Dedup must collapse each (source, ts) group to one row whose status is "
+        "the worse of the pair (red here), so two consecutive nightlies of "
+        "placeholder-storms trip the alert."
+    )
+    assert "nexo" in msg
+
+
+def test_dedup_keeps_single_run_quiet(tmp_path):
+    """A single nightly with one crawl-green + one post_validation-red row
+    collapses to ONE red row — not enough for the threshold (default 2)."""
+    rows = [
+        _row("nexo", _ts(4), "green", count=100),
+        {
+            "ts":     _ts(4),
+            "source": "nexo",
+            "phase":  "post_validation",
+            "status": "red",
+            "scraped": 100,
+            "kept":    0,
+        },
+    ]
+    _write_health(rows, tmp_path)
+    ok, _ = check_source_consecutive_red(tmp_path, now=NOW)
+    assert ok  # 1 deduped red row is below the 2-row threshold
+
+
+def test_dedup_keeps_legacy_rows_unchanged(tmp_path):
+    """Existing single-row-per-(source,ts) JSONL (pre-NR-C schema) must
+    behave exactly as before — dedup is a no-op on groups of size 1."""
+    rows = [
+        _row("remax", _ts(28), "red", count=0, error_class="ParseError"),
+        _row("remax", _ts(4),  "red", count=0, error_class="ParseError"),
+    ]
+    _write_health(rows, tmp_path)
+    ok, msg = check_source_consecutive_red(tmp_path, now=NOW)
+    assert not ok
+    assert "remax" in msg
+    assert "ParseError" in msg
+
+
 def test_consecutive_red_threshold_is_documented():
     """Sanity guard: SOURCE_CONSECUTIVE_RED_THRESHOLD shouldn't drift to 1."""
     assert SOURCE_CONSECUTIVE_RED_THRESHOLD >= 2
