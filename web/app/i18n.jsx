@@ -438,25 +438,18 @@ const UI_STRINGS = {
   "home.featured.stat_days":     { en: "Days on market",
                                    es: "Días en venta" },
 
-  // Wave-6: when hero_v5 is on, the eyebrow becomes a gold Pro pill
-  // visible above the 3 USP cards (instead of being hidden as it is
-  // under the legacy hero-v4 layout). Copy makes the Pro affiliation
-  // explicit. Keep the icon at the call site as IconLock.
-  "home.usp.eyebrow":            { en: "Included with Pulpo Pro",
-                                   es: "Incluido en Pulpo Pro" },
+  "home.usp.eyebrow":            { en: "FOR SUBSCRIBERS ONLY",
+                                   es: "SOLO PARA SUSCRIPTORES" },
   "home.usp.h2":                 { en: "What your {price} a month buys you.",
                                    es: "Esto es lo que te llevas por {price} al mes." },
   "home.usp.card1.title":        { en: "10 best deals,\nevery week",
                                    es: "Las 10 mejores ofertas,\ncada semana" },
   "home.usp.card1.body":         { en: "Matched to your filters. Straight to your inbox.",
                                    es: "Filtradas por lo que buscas. Directo a tu correo." },
-  // Wave-6: dropped "Full catalogue, anytime" — that's table-stakes for
-  // any listings site. Replaced with the actual Pro differentiator:
-  // private shortlist + cross-device favorites.
-  "home.usp.card2.title":        { en: "Save your favorites,\nin one place",
-                                   es: "Guardá tus favoritos,\nen un solo lugar" },
-  "home.usp.card2.body":         { en: "Star the listings you love. Your shortlist syncs across devices.",
-                                   es: "Marcá las propiedades que te gustan. Tu lista se sincroniza en todos tus dispositivos." },
+  "home.usp.card2.title":        { en: "Full catalogue,\nanytime",
+                                   es: "Catálogo completo,\ncuando quieras" },
+  "home.usp.card2.body":         { en: `Every property in ${ACTIVE_COUNTRY.name_en}. Yours to filter, sort, and save.`,
+                                   es: `Cada propiedad en ${ACTIVE_COUNTRY.name_es}. Tuya para filtrar, ordenar y guardar.` },
   "home.usp.card3.title":        { en: "Built by locals",
                                    es: "Hecho por locales" },
   "home.usp.card3.body":         { en: "We live on this coast. We know which listings are real and which are overpriced.",

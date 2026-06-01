@@ -7015,23 +7015,13 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────
-   HeroV5 → USPs → Shelves transition (Wave-6 polish)
+   HeroV5 → Shelves transition (Wave-6 polish)
    ──────────────────────────────────────────────────────────────────────
-   Without this block the gap from the destination cards (HeroV5's last
-   subsection) to the USP icons was ~96px on mobile and ~136px on
-   desktop — "two disconnected pages stacked", not a designed flow.
-   Below: tighter gap between hero ↔ USPs (they share the same value
-   proposition, should feel continuous), more breathing room between
-   USPs ↔ shelves (different topic — entering the catalogue).
-
-   Also re-aligns USP horizontal padding + container width to HeroV5's
-   so the three USP icons line up under the destination cards above.
-
-   Specificity note: USP selectors are 5-class scoped
-   (`.app.hero-v4 .homepage-v2.hero-v5`) to beat the Wave-5-round-3 USP
-   rule lower in this file (`.app.hero-v4 .homepage-v2 .hp-usp`, 0,4,0).
-   Without the bump my override loses to specificity AND source order.
-   Mobile-first; min-width breakpoints scale up.
+   Under hero_v5 the USP block is hidden for every tier (matching what
+   Pro users already see) — see blockRegistry.ts. So the only seam to
+   smooth here is HeroV5 → first shelf. The destination cards' own
+   bottom padding leaves enough breathing room for the catalogue
+   shelves below; HeroV5's section just needs less of its own gap.
    ────────────────────────────────────────────────────────────────────── */
 
 .homepage-v2.hero-v5 .hp-hero-v5 {
@@ -7043,53 +7033,6 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 @media (min-width: 1024px) {
   .homepage-v2.hero-v5 .hp-hero-v5 { padding-bottom: 32px; }
 }
-
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp {
-  /* top / right / bottom / left — tight top (continues hero rhythm),
-     more bottom (breathing room before catalogue shelves), horizontal
-     padding matches HeroV5's `clamp(24px, 5vw, 80px)` shape. */
-  padding: 20px 24px 40px;
-}
-@media (min-width: 768px) {
-  .app.hero-v4 .homepage-v2.hero-v5 .hp-usp { padding: 24px 40px 56px; }
-}
-@media (min-width: 1024px) {
-  .app.hero-v4 .homepage-v2.hero-v5 .hp-usp { padding: 32px 64px 64px; }
-}
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-inner {
-  max-width: 1180px; /* matches HeroV5's container so icons line up under cards */
-}
-/* Hero-v4 default hides BOTH eyebrow + h2 on the USPs. Under hero-v5
-   we keep the h2 hidden (the HeroV5 H1 already carries the value
-   prop), but UN-HIDE the eyebrow and restyle it as a gold Pulpo Pro
-   pill so the three cards visually read as Pro features. The pill
-   borrows the same tokens as `.pulpo-logo-pro` in the nav so the
-   "Pulpo Pro" affiliation reads identically in both places.
-   Anonymous users are the only audience here (per blockRegistry
-   visibility) — the pill is an upsell hook, not a feature label. */
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-h2 { display: none; }
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
-  background: transparent;
-  color: var(--pro-ink);
-  border: 1px solid var(--pro-line);
-  border-radius: 6px;
-  padding: 4px 9px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-}
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-eyebrow-icon {
-  color: var(--gold);
-}
-/* Drop the 24px margin-top on the cards so the eyebrow sits flush
-   above them and the icons line up immediately after. */
-.app.hero-v4 .homepage-v2.hero-v5 .hp-usp-cards { margin-top: 0; }
 
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
 
