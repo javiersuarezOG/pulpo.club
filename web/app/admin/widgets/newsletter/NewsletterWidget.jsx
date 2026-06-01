@@ -83,7 +83,7 @@ const NEWSLETTERS = [
     id: "pro-weekly",
     tier: "pro",
     title: "Pro · Weekly digest",
-    description: "Sundays 9 AM · 10 curated picks per recipient, personalised to their discover_filters.",
+    description: "Sundays 10 AM SV · 10 curated picks per recipient, personalised to their discover_filters.",
     template: "pulpo-pro-general",
     templateLabel: "Pulpo Pro General",
     cadenceMode: "scheduled",
@@ -1084,10 +1084,18 @@ export function NewsletterWidget() {
 
   // Shared trigger for the per-row "Send test →" buttons in the
   // Upcoming Sends panel. `issueNumber=null` keeps the legacy default
-  // ("1" server-side). `newsletterId` defaults to "pro-weekly" for
-  // back-compat with callers that don't thread it (today every live
-  // trigger is Pro Weekly — Pro Welcome / Free Weekly will pass their
-  // own IDs when they ship; the server allow-list already accepts them).
+  // ("1" server-side). `newsletterId` routes per-newsletter to the
+  // correct admin endpoint:
+  //   • pro-weekly → /api/admin/newsletter/trigger-preview (dispatches
+  //     the weekly digest workflow with preview_cohorts=<email>)
+  //   • pro-welcome → /api/admin/newsletter/trigger-welcome-test
+  //     (dispatches the welcome workflow with force=yes so the
+  //     operator can re-test against Clerk users who already have
+  //     the welcome_newsletter_sent_at stamp)
+  //   • free-* → not yet live; will route to their own endpoints
+  //     when those templates ship.
+  // The endpoint shapes differ (body fields, headers) so we branch
+  // here rather than hiding the routing in the server-side allow-list.
   const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly" } = {}) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
@@ -1097,14 +1105,32 @@ export function NewsletterWidget() {
     setBusy(true);
     setStatusFor(newsletterId, { kind: "pending", when });
     const operatorEmail = readOperatorEmail();
+    // Per-newsletter endpoint routing. Each card's trigger goes to
+    // the admin endpoint that drives its specific dispatch pipeline
+    // — there's no shared one-size-fits-all "send test" route.
+    const endpoint = newsletterId === "pro-welcome"
+      ? "/api/admin/newsletter/trigger-welcome-test"
+      : "/api/admin/newsletter/trigger-preview";
     try {
       // `by` lets the server-side audit trail attribute the dispatch
       // to a specific operator on the cross-device log. Spoofable
       // (the endpoint is intentionally auth-light) but useful for
       // the legitimate-traffic happy path.
-      const payload = { email: value, locale, by: operatorEmail || undefined, newsletter_id: newsletterId };
-      if (issueNumber != null) payload.issue_number = issueNumber;
-      const r = await fetch("/api/admin/newsletter/trigger-preview", {
+      const payload = { email: value, by: operatorEmail || undefined };
+      // The weekly endpoint accepts locale + newsletter_id +
+      // issue_number; the welcome endpoint accepts force (and
+      // defaults to force=true server-side). Conditionally attach
+      // fields based on which endpoint we're calling so the
+      // payload matches each endpoint's schema cleanly.
+      if (newsletterId === "pro-welcome") {
+        // No additional payload — welcome endpoint reads everything
+        // (locale, plan, email) from the recipient's Clerk record.
+      } else {
+        payload.locale = locale;
+        payload.newsletter_id = newsletterId;
+        if (issueNumber != null) payload.issue_number = issueNumber;
+      }
+      const r = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
@@ -1424,22 +1450,65 @@ export function NewsletterWidget() {
               </div>
             </article>
 
-            {/* Pro · Welcome — COMING SOON */}
-            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => (
-              <article key={nl.id} className="nl-newsletter-card coming-soon">
-                <div className="nl-newsletter-head">
-                  <h3 className="nl-newsletter-title">{nl.title}</h3>
-                  <span className="nl-newsletter-status coming-soon">◌ Coming soon</span>
-                </div>
-                <p className="nl-newsletter-desc">{nl.description}</p>
-                <p className="nl-newsletter-template">
-                  Template · <strong>{nl.templateLabel}</strong>
-                  {templateVersions[nl.template] && (
-                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+            {/* Pro · Welcome (+ any future non-weekly Pro newsletter).
+                Status comes from the NEWSLETTERS registry — when a
+                card flips status: "live" the render here picks it up
+                automatically. The previous version hardcoded "Coming
+                soon" for every non-weekly card, missing the 2026-06-01
+                Pro Welcome go-live.
+
+                Live cards get a "Send test welcome to me" button that
+                dispatches via /api/admin/newsletter/trigger-welcome-test
+                (the trigger() helper routes by newsletterId). Status
+                feedback renders inline below the button using the same
+                statusFor() store the weekly card uses. */}
+            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => {
+              const isLive = nl.status === "live";
+              const cardStatus = statusFor(nl.id);
+              return (
+                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
+                  <div className="nl-newsletter-head">
+                    <h3 className="nl-newsletter-title">{nl.title}</h3>
+                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
+                      {isLive ? "● Live" : "◌ Coming soon"}
+                    </span>
+                  </div>
+                  <p className="nl-newsletter-desc">{nl.description}</p>
+                  <p className="nl-newsletter-template">
+                    Template · <strong>{nl.templateLabel}</strong>
+                    {templateVersions[nl.template] && (
+                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+                    )}
+                  </p>
+                  {isLive && (
+                    <div className="nl-upcoming-actions" style={{ marginTop: 10 }}>
+                      <button
+                        type="button"
+                        className="nl-send-button"
+                        onClick={() => trigger({ newsletterId: nl.id })}
+                        disabled={busy}
+                      >
+                        Send test welcome to me →
+                      </button>
+                      {cardStatus.kind === "pending" && (
+                        <p className="nl-row-status pending">⌛ Dispatching…</p>
+                      )}
+                      {cardStatus.kind === "error" && (
+                        <p className="nl-row-status error">⚠ {cardStatus.message}</p>
+                      )}
+                      {cardStatus.kind === "success" && (
+                        <p className="nl-row-status success">
+                          ✓ Dispatched to <strong>{cardStatus.recipient}</strong> · arrives in ~30–60s
+                          {cardStatus.runsUrl && (
+                            <> · <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">View run →</a></>
+                          )}
+                        </p>
+                      )}
+                    </div>
                   )}
-                </p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* ── FREE section ────────────────────────────────────── */}
