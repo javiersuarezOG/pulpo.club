@@ -326,6 +326,85 @@ const UI_STRINGS = {
   "home.hero.new_badge":         { en: "NEW",
                                    es: "NUEVO" },
 
+  // ── HeroV5 (Wave-6) — "Sunday morning, coffee, your top 10 properties."
+  // Renders when the `hero_v5` feature flag is on, replacing HeroV4 and
+  // PickShoreline (the 5 destination cards absorb the shoreline picker).
+  // Copy was iterated on with Javier in the Pulpo mockup at
+  // /tmp/pulpo-home-hero-v2.html; tweaks below should keep the editorial
+  // newsletter voice intact ("Domingo en la mañana, café, …").
+  "home.hero.v5.h1_a":           { en: "Sunday morning, coffee, and…",
+                                   es: "Domingo en la mañana, café, y…" },
+  "home.hero.v5.h1_b":           { en: "your top 10 properties.",
+                                   es: "tu top 10 propiedades." },
+  "home.hero.v5.sub":            { en: "We watch every property site in El Salvador so you don't have to — top picks ranked, in your inbox, every Sunday.",
+                                   es: "Revisamos cada sitio de propiedades en El Salvador por vos — los mejores ranqueados, en tu inbox, cada domingo." },
+
+  // "Where to start" subsection above the 5 destination cards.
+  "home.hero.v5.section_title":  { en: "Where to start",
+                                   es: "Por dónde empezar" },
+  "home.hero.v5.section_sub":    { en: "Or keep scrolling for more.",
+                                   es: "O seguí bajando para ver más." },
+
+  // 5 destination cards. Slugs (surf_city_1 / surf_city_2 / coatepeque /
+  // ilopango) are recognized by pages.jsx#buildFiltersForCategory.
+  "home.hero.v5.dest.all.label": { en: "All listings",
+                                   es: "Todo el catálogo" },
+  "home.hero.v5.dest.all.tag":   { en: "The full catalogue",
+                                   es: "Las cuatro regiones" },
+  "home.hero.v5.dest.s1.label":  { en: "Surf City I",
+                                   es: "Surf City I" },
+  "home.hero.v5.dest.s1.tag":    { en: "El Tunco · Sunzal · Zonte",
+                                   es: "El Tunco · Sunzal · Zonte" },
+  "home.hero.v5.dest.s2.label":  { en: "Surf City II",
+                                   es: "Surf City II" },
+  "home.hero.v5.dest.s2.tag":    { en: "Las Flores · Punta Mango",
+                                   es: "Las Flores · Punta Mango" },
+  "home.hero.v5.dest.cp.label":  { en: "Lago Coatepeque",
+                                   es: "Lago Coatepeque" },
+  "home.hero.v5.dest.cp.tag":    { en: "Santa Ana",
+                                   es: "Santa Ana" },
+  "home.hero.v5.dest.il.label":  { en: "Lago Ilopango",
+                                   es: "Lago Ilopango" },
+  "home.hero.v5.dest.il.tag":    { en: "San Salvador",
+                                   es: "San Salvador" },
+
+  // Newsletter postcard preview (right column). Editorial format
+  // mirroring the Sunday newsletter "MARKET CONTEXT" section. Static —
+  // updated by hand alongside the newsletter cadence.
+  "home.hero.v5.pc.brand":            { en: "pulpo",
+                                        es: "pulpo" },
+  "home.hero.v5.pc.issue":            { en: "Issue Nº 47",
+                                        es: "Edición Nº 47" },
+  "home.hero.v5.pc.date":             { en: "Sunday · June 1, 2026",
+                                        es: "Domingo · 1 de junio, 2026" },
+  "home.hero.v5.pc.market_eyebrow":   { en: "Market context",
+                                        es: "Contexto de mercado" },
+  "home.hero.v5.pc.market_title_a":   { en: "What's moving",
+                                        es: "Qué se está" },
+  "home.hero.v5.pc.market_title_b":   { en: "this week.",
+                                        es: "moviendo." },
+  // Three numbered insights. `body` allows inline <strong> bolding for
+  // place names — rendered with dangerouslySetInnerHTML (i18n-trusted
+  // strings only; never user input).
+  "home.hero.v5.pc.insight_0_lead":   { en: "Biggest mover:",
+                                        es: "Mayor movimiento:" },
+  "home.hero.v5.pc.insight_0_body":   { en: "76,259m² lot in <strong>Chiltiupán</strong> cut its ask — developer-scale.",
+                                        es: "Lote de 76,259m² en <strong>Chiltiupán</strong> bajó su precio — escala desarrollador." },
+  "home.hero.v5.pc.insight_1_lead":   { en: "Second mover:",
+                                        es: "Segundo movimiento:" },
+  "home.hero.v5.pc.insight_1_body":   { en: "Beachfront home in <strong>Tamanique</strong> dropped $40K — no project tag.",
+                                        es: "Casa frente al mar en <strong>Tamanique</strong> bajó $40K — sin tag de proyecto." },
+  "home.hero.v5.pc.insight_2_lead":   { en: "The take:",
+                                        es: "La toma:" },
+  "home.hero.v5.pc.insight_2_body":   { en: "Both moves on Surf City I. Western coast sellers are open to negotiating.",
+                                        es: "Ambos movimientos en Surf City I. Los vendedores de la costa oeste están abiertos a negociar." },
+  "home.hero.v5.pc.more":             { en: "Read full edition →",
+                                        es: "Leé la edición completa →" },
+  "home.hero.v5.pc.foot_left":        { en: "Delivered Sundays · 7am",
+                                        es: "Cada domingo · 7am" },
+  "home.hero.v5.pc.foot_right":       { en: "pulpo.club",
+                                        es: "pulpo.club" },
+
   "home.featured.eyebrow":       { en: "FEATURED DEAL",
                                    es: "OFERTA DESTACADA" },
   // Wave-5b: when featured_deal_real_v1 flag is on, the card renders a

@@ -15,12 +15,13 @@ const free: User = { plan: "free" };
 const pro: User = { plan: "pro" };
 const agency: User = { plan: "agency" };
 
-const ALL_FLAGS_OFF = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: false };
-const PAID_HOME_ON  = { paid_home_variant_v1: true,  usp_popup_v1: false, hero_v4: false };
-const POPUP_ON      = { paid_home_variant_v1: false, usp_popup_v1: true,  hero_v4: false };
-const BOTH_ON       = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: false };
-const HERO_V4_ON    = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: true  };
-const ALL_FLAGS_ON  = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: true  };
+const ALL_FLAGS_OFF = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: false, hero_v5: false };
+const PAID_HOME_ON  = { paid_home_variant_v1: true,  usp_popup_v1: false, hero_v4: false, hero_v5: false };
+const POPUP_ON      = { paid_home_variant_v1: false, usp_popup_v1: true,  hero_v4: false, hero_v5: false };
+const BOTH_ON       = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: false, hero_v5: false };
+const HERO_V4_ON    = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: true,  hero_v5: false };
+const HERO_V5_ON    = { paid_home_variant_v1: false, usp_popup_v1: false, hero_v4: false, hero_v5: true  };
+const ALL_FLAGS_ON  = { paid_home_variant_v1: true,  usp_popup_v1: true,  hero_v4: true,  hero_v5: false };
 
 // Phase 3 — the catalogue shelves are now six (Beach × Land/Condos/
 // Homes, then Lake × Land/Condos/Homes) instead of the legacy three
@@ -41,6 +42,13 @@ const PAID_BLOCKS: readonly BlockId[] = [
 const ALL_BLOCKS_NO_USPS: readonly BlockId[] = [
   "hero", "featured",
   "shoreline", ...SIX_TOP_SHELVES,
+];
+// Wave-6 hero_v5: replaces both `hero` and `shoreline` slots with the
+// new editorial postcard-preview hero. featured + usps stay (no special
+// suppression — the test asserts the swap, not the trim).
+const HERO_V5_BLOCKS: readonly BlockId[] = [
+  "hero_v5", "featured", "usps",
+  ...SIX_TOP_SHELVES,
 ];
 
 // localStorage stub — visibleBlocksFor reads window.localStorage for
@@ -149,6 +157,7 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
       paid_home_variant_v1: false,
       usp_popup_v1:         true,
       hero_v4:              true,
+      hero_v5:              false,
     });
     expect(out).not.toContain("featured");
     expect(out).not.toContain("usps");
@@ -158,6 +167,41 @@ describe("visibleBlocksFor — hero_v4 flag", () => {
   it("composes with all flags on for paid: only hero + shelves remain", () => {
     const out = visibleBlocksFor(pro as never, ALL_FLAGS_ON);
     expect(out).toEqual(["hero", ...SIX_TOP_SHELVES]);
+  });
+});
+
+describe("visibleBlocksFor — hero_v5 flag (Wave-6)", () => {
+  // hero_v5 replaces both `hero` and `shoreline` — the new editorial
+  // hero absorbs the destination picker via its 5 cards.
+  it.each([
+    ["anonymous", anon],
+    ["free",      free],
+    ["pro",       pro],
+    ["agency",    agency],
+  ])("swaps hero+shoreline for hero_v5 for %s", (_, user) => {
+    const out = visibleBlocksFor(user as never, HERO_V5_ON);
+    expect(out).toContain("hero_v5");
+    expect(out).not.toContain("hero");
+    expect(out).not.toContain("shoreline");
+  });
+
+  it("composes with usp_popup_v1: hero_v5 + featured remain, usps + shoreline gone", () => {
+    const out = visibleBlocksFor(anon as never, {
+      paid_home_variant_v1: false,
+      usp_popup_v1:         true,
+      hero_v4:              false,
+      hero_v5:              true,
+    });
+    expect(out).toContain("hero_v5");
+    expect(out).toContain("featured");
+    expect(out).not.toContain("hero");
+    expect(out).not.toContain("usps");
+    expect(out).not.toContain("shoreline");
+  });
+
+  it("hero_v5 off (default): hero_v5 block never renders", () => {
+    expect(visibleBlocksFor(anon as never, ALL_FLAGS_OFF)).not.toContain("hero_v5");
+    expect(visibleBlocksFor(pro as never, PAID_HOME_ON)).not.toContain("hero_v5");
   });
 });
 

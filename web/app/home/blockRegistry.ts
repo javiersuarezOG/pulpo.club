@@ -17,6 +17,11 @@ import { tierFor, type GatingUser, type Tier } from "../lib/gating";
 // Keep them in sync so dashboards don't need a translation table.
 export type BlockId =
   | "hero"
+  // Wave-6: editorial "Sunday morning, coffee, your top 10 properties"
+  // hero. Absorbs both the legacy `hero` block AND the `shoreline`
+  // block (its 5 destination cards include All listings + 4 regions),
+  // so when hero_v5 is on the registry suppresses those two slots.
+  | "hero_v5"
   | "featured"
   | "usps"
   | "shoreline"
@@ -42,6 +47,7 @@ export type BlockId =
 const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
   // block               anon    free    pro     agency
   hero:               { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
+  hero_v5:            { anonymous: true,  free: true,  pro: true,  agency: true  }, // Wave-6: replaces hero + shoreline when flag on
   featured:           { anonymous: true,  free: true,  pro: false, agency: false },
   usps:               { anonymous: true,  free: false, pro: false, agency: false }, // signed-in users (free OR paid) skip the marketing band
   shoreline:          { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
@@ -61,6 +67,7 @@ const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
 // homes ascending by entry price), then Lake.
 const BLOCK_ORDER: readonly BlockId[] = [
   "hero",
+  "hero_v5",
   "featured",
   "usps",
   "shoreline",
@@ -85,6 +92,12 @@ export type RegistryFlags = {
   // featured listing visually, so the standalone `featured` block is
   // suppressed when the flag is on.
   hero_v4: boolean;
+  // Wave 6: editorial "Sunday morning, coffee, your top 10 properties"
+  // hero with a postcard preview + 5 destination cards. When on, this
+  // suppresses BOTH the legacy `hero` block AND `shoreline` (the
+  // destination cards include All listings + the 4 regions that
+  // PickShoreline used to surface).
+  hero_v5: boolean;
 };
 
 // Per-block dev override. When set, forces a block on or off for the
@@ -134,6 +147,18 @@ export function visibleBlocksFor(
     // Wave 5 flag-driven exclusions, applied after tier filtering.
     if (flags.usp_popup_v1 && blockId === "usps") return false;
     if (flags.hero_v4 && blockId === "featured") return false;
+    // Wave 6: hero_v5 replaces both the legacy hero AND shoreline.
+    // When the flag is on:
+    //   * hero_v5 is the rendered hero
+    //   * hero is suppressed (legacy v2/v4 hero would double up)
+    //   * shoreline is suppressed (the 5 destination cards absorb it)
+    // When the flag is off, hero_v5 itself is suppressed.
+    if (flags.hero_v5) {
+      if (blockId === "hero") return false;
+      if (blockId === "shoreline") return false;
+    } else {
+      if (blockId === "hero_v5") return false;
+    }
     return true;
   });
 }

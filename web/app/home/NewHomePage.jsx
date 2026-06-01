@@ -27,6 +27,7 @@ import { decideShouldShowUpsell } from "../lib/upsell-config.ts";
 import { ErrorBoundary } from "../error-boundary.jsx";
 import { HeroV2 } from "./HeroV2.jsx";
 import { HeroV4 } from "./HeroV4.jsx";
+import { HeroV5 } from "./HeroV5.jsx";
 import { FeaturedDeal } from "./FeaturedDeal.jsx";
 import { USPBand } from "./USPBand.jsx";
 import { PickShoreline } from "./PickShoreline.jsx";
@@ -62,6 +63,7 @@ const BLOCK_COMPONENTS = {
   hero:          ({ app, locale, heroV4 }) => (
     heroV4 ? <HeroV4 app={app} locale={locale} /> : <HeroV2 app={app} locale={locale} />
   ),
+  hero_v5:       ({ app, locale }) => <HeroV5 app={app} locale={locale} />,
   featured:      ({ app, locale }) => <FeaturedDeal app={app} locale={locale} />,
   usps:          ({ app, locale }) => <USPBand app={app} locale={locale} />,
   shoreline:     ({ app, locale }) => <PickShoreline app={app} locale={locale} />,
@@ -88,10 +90,15 @@ export function NewHomePage({ app }) {
   const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", true);
   const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
   const heroV4Flag   = readFeatureFlag("hero_v4", true);
+  // Wave-6: hero_v5 defaults OFF in production — Javier toggles via the
+  // tweaks panel for the dry-run on the Vercel preview. Once approved,
+  // flip the default to true here.
+  const heroV5Flag   = readFeatureFlag("hero_v5", false);
   const blocks = visibleBlocksFor(app.user, {
     paid_home_variant_v1: paidHomeFlag,
     usp_popup_v1:         uspPopupFlag,
     hero_v4:              heroV4Flag,
+    hero_v5:              heroV5Flag,
   });
 
   // Fire `paid_home_rendered` once per mount with the resolved list.

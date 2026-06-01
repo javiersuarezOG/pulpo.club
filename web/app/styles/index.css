@@ -6561,6 +6561,440 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   .homepage-v2.hero-v4 .hp-hero-v4-brief-meta  { font-size: 15px; }
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   HeroV5 (Wave-6) — "Sunday morning, coffee, your top 10 properties."
+   Replaces HeroV4 + PickShoreline when the `hero_v5` flag is on.
+   Mobile-first: defaults size for 320–768px, then min-width breakpoints
+   scale up. Iteration source: /tmp/pulpo-home-hero-v2.html.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.homepage-v2 .hp-hero-v5 {
+  background: var(--color-bg-white);
+  padding: 48px 24px 56px;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .homepage-v2 .hp-hero-v5 { padding: 64px 40px 72px; }
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5 { padding: 96px 64px 88px; }
+}
+.homepage-v2 .hp-hero-v5-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Top half: copy on the left, newsletter postcard preview on the right.
+   Mobile stacks (copy → postcard); ≥1024 splits into 1fr / 1fr columns. */
+.homepage-v2 .hp-hero-v5-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 32px;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+}
+
+/* H1 — bold sans on top line(s), italic clay reveal on its own line. */
+.homepage-v2 .hp-hero-v5-h1 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1.0;
+  letter-spacing: -0.035em;
+  color: var(--color-ink-primary);
+  margin: 0 0 20px;
+}
+@media (min-width: 768px) {
+  .homepage-v2 .hp-hero-v5-h1 {
+    font-size: 52px;
+    letter-spacing: -0.04em;
+    margin-bottom: 22px;
+  }
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-h1 {
+    font-size: 64px;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    margin-bottom: 24px;
+  }
+}
+/* Italic clay reveal — its own line, fixed clamp so "your top 10
+   properties." always fits one line at any viewport. */
+.homepage-v2 .hp-hero-v5-h1-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-clay-primary);
+  letter-spacing: -0.015em;
+  font-size: 30px;
+  white-space: nowrap;
+  display: block;
+  margin-top: 0.12em;
+}
+@media (min-width: 768px) {
+  .homepage-v2 .hp-hero-v5-h1-italic { font-size: 42px; }
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-h1-italic { font-size: 56px; }
+}
+
+.homepage-v2 .hp-hero-v5-sub {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-ink-secondary);
+  max-width: 620px;
+  margin: 0;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-sub {
+    font-size: 19px;
+    line-height: 1.55;
+  }
+}
+
+/* ── Newsletter postcard preview (right column) ───────────────────── */
+.homepage-v2 .hp-hero-v5-postcard-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.homepage-v2 .hp-hero-v5-postcard {
+  width: 100%;
+  max-width: 100%;
+  background: var(--color-bg-cream-soft);
+  border: 1px solid var(--color-bg-pebble);
+  border-radius: 16px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.06);
+  transform: rotate(1.5deg);
+  transition: transform var(--dur-slow) var(--ease-out);
+  position: relative;
+  font-family: var(--font-sans);
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-postcard {
+    max-width: 500px;
+    padding: 30px 30px 24px;
+    transform: rotate(2deg);
+  }
+}
+.homepage-v2 .hp-hero-v5-postcard:hover {
+  transform: rotate(0deg) translateY(-4px);
+}
+.homepage-v2 .hp-hero-v5-pc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.homepage-v2 .hp-hero-v5-pc-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.homepage-v2 .hp-hero-v5-pc-mark {
+  color: var(--color-forest-deep);
+  display: inline-flex;
+}
+.homepage-v2 .hp-hero-v5-pc-wm {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-ink-primary);
+  letter-spacing: -0.045em;
+}
+.homepage-v2 .hp-hero-v5-pc-pro {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  border: 1px solid var(--color-clay-primary);
+  color: var(--color-clay-dark);
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-left: 2px;
+}
+.homepage-v2 .hp-hero-v5-pc-issue {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.homepage-v2 .hp-hero-v5-pc-date {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  padding-bottom: 14px;
+}
+.homepage-v2 .hp-hero-v5-pc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-forest-deep);
+  margin: 12px 0 8px;
+}
+.homepage-v2 .hp-hero-v5-pc-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  color: var(--color-ink-primary);
+  margin: 0 0 20px;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-pc-title { font-size: 38px; }
+}
+.homepage-v2 .hp-hero-v5-pc-title em {
+  font-style: italic;
+  color: var(--color-clay-primary);
+  display: block;
+}
+.homepage-v2 .hp-hero-v5-pc-insights {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.homepage-v2 .hp-hero-v5-pc-insight {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.homepage-v2 .hp-hero-v5-pc-num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--color-forest-deep);
+  flex-shrink: 0;
+  line-height: 0.95;
+  width: 26px;
+  letter-spacing: -0.02em;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-pc-num { font-size: 30px; width: 32px; }
+}
+.homepage-v2 .hp-hero-v5-pc-body {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--color-ink-secondary);
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-pc-body { font-size: 15px; }
+}
+.homepage-v2 .hp-hero-v5-pc-lead,
+.homepage-v2 .hp-hero-v5-pc-body strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+.homepage-v2 .hp-hero-v5-pc-more {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--color-clay-primary);
+  padding: 12px 0 14px;
+  text-align: center;
+  border-top: 1px dashed var(--color-bg-pebble);
+}
+.homepage-v2 .hp-hero-v5-pc-foot {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-bg-pebble);
+  padding-top: 12px;
+}
+
+/* ── Subsection: "Where to start" + 5 destination cards ───────────── */
+.homepage-v2 .hp-hero-v5-section {
+  border-top: 1px solid var(--color-line-soft);
+  padding-top: 28px;
+  margin-top: 8px;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-section {
+    padding-top: 44px;
+    margin-top: 24px;
+  }
+}
+.homepage-v2 .hp-hero-v5-section-head {
+  margin-bottom: 22px;
+  max-width: 1180px;
+}
+.homepage-v2 .hp-hero-v5-section-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--color-ink-primary);
+  margin: 0;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-section-title { font-size: 30px; }
+}
+.homepage-v2 .hp-hero-v5-section-sub {
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  margin-top: 4px;
+}
+
+/* 5 destination cards. Mobile stacks single column; tablet 2-up;
+   desktop 5-up in a row. */
+.homepage-v2 .hp-hero-v5-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  max-width: 1180px;
+}
+@media (min-width: 480px) {
+  .homepage-v2 .hp-hero-v5-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-cards {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+}
+
+.homepage-v2 .hp-hero-v5-dest {
+  position: relative;
+  background: var(--color-bg-white);
+  border: none;
+  border-radius: 20px;
+  padding: 14px 16px;
+  cursor: pointer;
+  color: var(--color-ink-primary);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  /* Always-on shadow so cards lift off the white hero bg; hover adds depth. */
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-dest {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px 22px 22px;
+    border-radius: 22px;
+  }
+}
+.homepage-v2 .hp-hero-v5-dest:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2);
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-dest:hover {
+    transform: translateY(-5px);
+  }
+}
+.homepage-v2 .hp-hero-v5-dest:focus-visible {
+  outline: 2px solid var(--color-forest-deep);
+  outline-offset: 2px;
+}
+
+.homepage-v2 .hp-hero-v5-dest-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-bg-sage);
+  color: var(--color-forest-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+.homepage-v2 .hp-hero-v5-dest:hover .hp-hero-v5-dest-mark {
+  background: var(--color-forest-deep);
+  color: var(--color-bg-white);
+  transform: rotate(-8deg);
+}
+
+.homepage-v2 .hp-hero-v5-dest-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.homepage-v2 .hp-hero-v5-dest-label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--color-ink-primary);
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-dest-label { font-size: 19px; letter-spacing: -0.02em; }
+}
+.homepage-v2 .hp-hero-v5-dest-tag {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-ink-muted);
+  line-height: 1.4;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-dest-tag { font-size: 14px; }
+}
+
+/* First card — dark ink fill (primary CTA treatment). */
+.homepage-v2 .hp-hero-v5-dest-all {
+  background: var(--color-ink-primary);
+  color: var(--color-bg-white);
+}
+.homepage-v2 .hp-hero-v5-dest-all:hover {
+  background: var(--color-forest-bg);
+}
+.homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-mark {
+  background: rgba(255, 255, 255, 0.10); /* token-exception: inverse mark bg */
+  color: var(--gold);
+}
+.homepage-v2 .hp-hero-v5-dest-all:hover .hp-hero-v5-dest-mark {
+  background: rgba(255, 255, 255, 0.18); /* token-exception: inverse hover bg */
+}
+.homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-label {
+  color: var(--color-bg-white);
+}
+.homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-tag {
+  color: rgba(255, 255, 255, 0.65); /* token-exception: inverse muted tagline */
+}
+
 /* ────── Page sections under hero_v4 (cream → white, no gradients) ────── */
 
 .homepage-v2.hero-v4 .hp-featured,
