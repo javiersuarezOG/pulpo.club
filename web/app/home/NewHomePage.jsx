@@ -172,7 +172,7 @@ export function NewHomePage({ app }) {
   }, []);
 
   return (
-    <div className={`homepage-v2${heroV4Flag ? " hero-v4" : ""}`}>
+    <div className={`homepage-v2${heroV4Flag ? " hero-v4" : ""}${heroV5Flag ? " hero-v5" : ""}`}>
       <main className="homepage-v2-main">
         {blocks.map((blockId) => {
           const Block = BLOCK_COMPONENTS[blockId];
