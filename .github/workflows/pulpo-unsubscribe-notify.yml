@@ -1,0 +1,50 @@
+name: Pulpo unsubscribe notify
+
+# Per-event Slack ping for newsletter unsubscribes. Runs every 30 min.
+# Companion to the rate-check alert in scripts/check_webhook_health.py
+# (which fires every 6h on sustained-high rate); this surface gives
+# the operator a real-time signal on individual unsubs so they can
+# watch for patterns (e.g. spike after a bad send).
+#
+# Privacy: PostHog `newsletter.unsubscribed` events carry
+# `recipient_hash` (sha256-truncated), not raw emails. The Slack
+# message shows only the hash prefix — enough to track trends without
+# exposing PII to chat history.
+#
+# At-most-twice delivery: the 35-min query window + 30-min cron tick
+# allows boundary events to appear in two consecutive windows. The
+# Slack message includes the PostHog event ID (last 8 chars) so the
+# operator can spot duplicates.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+# Single in-flight run at a time. A slow run shouldn't queue + double-
+# ping; the 5-min overlap in the query window already covers a missed
+# tick.
+concurrency:
+  group: pulpo-unsubscribe-notify
+  cancel-in-progress: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Post unsubscribes to Slack
+        env:
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 scripts/notify_unsubscribes.py
