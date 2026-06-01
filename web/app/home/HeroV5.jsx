@@ -22,6 +22,13 @@
 import React, { useCallback } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
+import versions from "./versions.json";
+
+// Compile-time import of the version registry — Vite inlines this so
+// there's no runtime fetch. Carried as a property on every HeroV5
+// telemetry event so PostHog cohorts can split funnels by visual
+// revision (v5 vs v5.1 vs future) without changing event names.
+const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
 
 // ── Pulpo mark (matches PulpoMark in components.jsx — spiral + gripper bulb).
 // Inlined here to keep HeroV5 self-contained and avoid a circular import
@@ -62,8 +69,12 @@ const DESTINATIONS = [
 function DestinationCard({ dest, locale, onNavigate }) {
   const isAll = dest.mod === "all";
   const onClick = useCallback(() => {
-    try { track("hero_v5_destination_clicked", { destination: dest.slug || "all" }); }
-    catch { /* never crash on telemetry */ }
+    try {
+      track("hero_v5_destination_clicked", {
+        destination: dest.slug || "all",
+        version: HERO_V5_VERSION,
+      });
+    } catch { /* never crash on telemetry */ }
     onNavigate(dest.slug);
   }, [dest.slug, onNavigate]);
 
@@ -139,7 +150,7 @@ export function HeroV5({ app, locale }) {
   // Mount telemetry — fire once per page load so dashboards can split
   // hero_v5 sessions from legacy hero_v4 sessions.
   React.useEffect(() => {
-    try { track("hero_v5_viewed", {}); } catch { /* ignore */ }
+    try { track("hero_v5_viewed", { version: HERO_V5_VERSION }); } catch { /* ignore */ }
   }, []);
 
   const onNavigate = useCallback(

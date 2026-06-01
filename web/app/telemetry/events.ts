@@ -185,8 +185,15 @@ export type EventMap = {
   // union so historical PostHog events still match the schema (they're
   // never emitted by current code but live forever in the warehouse).
   "homepage.section_viewed": {
+    // Active sections (Wave-6, hero_v5 default-on):
+    //   `hero_v5` (the editorial postcard + 5-card destination picker),
+    //   plus the six Top-10 shelves.
+    // Legacy sections (no new events emitted; live in warehouse):
+    //   `hero` / `featured` / `usps` / `shoreline` retired or absorbed
+    //   into hero_v5; `top_10` / `price_drops` / `new_this_week`
+    //   replaced by the six type-specific shelves in Phase 3.
     section:
-      | "hero" | "featured" | "usps" | "shoreline"
+      | "hero" | "hero_v5" | "featured" | "usps" | "shoreline"
       | "top_beach_terrenos" | "top_beach_condos" | "top_beach_homes"
       | "top_lake_terrenos"  | "top_lake_condos"  | "top_lake_homes"
       | "top_10" | "price_drops" | "new_this_week";   // legacy, retained for historical event compatibility
@@ -440,6 +447,30 @@ export type EventMap = {
   // refresh moves conversion. Empty payload — flag/user_state already
   // captured by paid_home_rendered and cta_routed.
   "hero_v4_viewed": Record<string, never>;
+
+  // Wave 6 (hero_v5 flag) — fires once per homepage mount when the
+  // editorial "Sunday morning, coffee, your top 10 properties" hero
+  // renders. The `version` property carries the current `hero_v5`
+  // version string from `web/app/home/versions.json`, so PostHog
+  // cohorts can split funnels by visual revision (v5 vs v5.1 vs
+  // future) without changing the event name. Bumped via the CI
+  // version-bump guard whenever HeroV5's rendered output changes.
+  "hero_v5_viewed": {
+    version: string;
+  };
+
+  // Wave 6 — fires when the user clicks one of the 5 destination
+  // cards under "Where to start" (All listings + Surf City I/II +
+  // Lago Coatepeque + Lago Ilopango). The `destination` slug matches
+  // what HeroV5 passes to `app.goBrowse({ category })`, which is
+  // then expanded by `buildFiltersForCategory` in pages.jsx —
+  // dashboards can join this event with `browse.filters_applied`
+  // for end-to-end destination → filter funnel analysis. `version`
+  // pairs with `hero_v5_viewed` for cohort consistency.
+  "hero_v5_destination_clicked": {
+    destination: "all" | "surf_city_1" | "surf_city_2" | "coatepeque" | "ilopango";
+    version: string;
+  };
   // Fires when the user lands back at /preview/?upgrade=success or
   // ?upgrade=cancelled after Stripe Checkout. The webhook (server-side)
   // is the source of truth for the actual plan flip; this event is
