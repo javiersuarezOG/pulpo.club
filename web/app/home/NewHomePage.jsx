@@ -90,10 +90,11 @@ export function NewHomePage({ app }) {
   const paidHomeFlag = readFeatureFlag("paid_home_variant_v1", true);
   const uspPopupFlag = readFeatureFlag("usp_popup_v1", false);
   const heroV4Flag   = readFeatureFlag("hero_v4", true);
-  // Wave-6: hero_v5 defaults OFF in production — Javier toggles via the
-  // tweaks panel for the dry-run on the Vercel preview. Once approved,
-  // flip the default to true here.
-  const heroV5Flag   = readFeatureFlag("hero_v5", false);
+  // Wave-6: hero_v5 is the production default as of 2026-06-01. The
+  // PostHog flag still exists as a kill-switch — set `hero_v5: false`
+  // on the dashboard (or pass `?ff_hero_v5=0`) to fall back to HeroV4
+  // + PickShoreline if a regression surfaces.
+  const heroV5Flag   = readFeatureFlag("hero_v5", true);
   const blocks = visibleBlocksFor(app.user, {
     paid_home_variant_v1: paidHomeFlag,
     usp_popup_v1:         uspPopupFlag,
