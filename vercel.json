@@ -21,7 +21,8 @@
     "api/internal/welcome-send.py": {
       "memory": 1024,
       "maxDuration": 30,
-      "includeFiles": "pulpo/countries/*.json,web/data/ranked.json"
+      "includeFiles": "pulpo/countries/*.json,web/data/ranked.json",
+      "excludeFiles": "web/photos/**,web/photos-hires/**"
     }
   },
   "rewrites": [
