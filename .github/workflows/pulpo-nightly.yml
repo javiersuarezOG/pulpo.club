@@ -739,6 +739,31 @@ jobs:
           BRANCH="chore/nightly-data-$(date -u +%Y-%m-%d-%H%M)"
           git checkout -b "$BRANCH"
           git commit -m "chore(data): nightly run $(date -u +%Y-%m-%d)"
+          # Rebase onto the freshest origin/main before pushing. A long
+          # pipeline (cold-cache LLM enrichment runs ~50-100 min) can let
+          # an unrelated PR land on main between checkout and push. When
+          # the PR touched .github/workflows/, GitHub's PAT-scope check
+          # treats the data branch's older workflow blobs as a "workflow
+          # update" and rejects the push with:
+          #
+          #   ! [remote rejected] chore/nightly-data-... (refusing to allow
+          #   a Personal Access Token to create or update workflow `.github/
+          #   workflows/<name>.yml` without `workflow` scope)
+          #
+          # PULPO_BOT_TOKEN intentionally lacks `workflow` scope (least-
+          # privilege; this PAT only writes data + photos). Rebasing onto
+          # the new tip brings in those workflow changes so the data
+          # commit replays on top, and the resulting branch diff is data-
+          # only — no `workflow` scope needed. The data commit never
+          # conflicts because the pipeline doesn't touch .github/.
+          #
+          # First observed: nightly 26758631085 on 2026-06-01, blocked by
+          # PR #602 landing mid-run.
+          git fetch origin main
+          git rebase origin/main || {
+              echo "::warning::rebase onto origin/main failed; aborting and pushing as-is — push may be PAT-scope rejected if main moved."
+              git rebase --abort || true
+          }
           git push origin "$BRANCH"
           gh pr create --base main --head "$BRANCH" \
             --title "chore(data): nightly run $(date -u +%Y-%m-%d)" \
