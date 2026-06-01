@@ -69,6 +69,78 @@ def test_rate_checks_have_min_denominator_floor():
     assert health.RATE_CHECKS["newsletter_complaint_rate"]["min_denominator"] >= 10
 
 
+# ── Welcome system observability (2026-06-01) ─────────────────────────
+
+
+def test_welcome_reconcile_family_registered():
+    """Hourly reconcile cron heartbeat — if no welcome_reconcile_completed
+    in 2h, GH Actions stopped honoring the cron OR the script threw before
+    capture. Either is operator-visible. 2h = 1 hourly tick + 1 grace."""
+    assert "welcome_reconcile" in health.FAMILIES
+    cfg = health.FAMILIES["welcome_reconcile"]
+    assert "newsletter.welcome_reconcile_completed" in cfg["where"]
+    assert cfg["max_age_hours"] == 2.0
+
+
+def test_welcome_failure_rate_check_registered():
+    """welcome_failed / welcome_sent — 10% threshold, 5-recipient floor.
+    Failures should be rare; sustained > 10% points at an upstream issue
+    (Resend outage, Clerk auth broken, ranked.json missing)."""
+    assert "welcome_failure_rate" in health.RATE_CHECKS
+    cfg = health.RATE_CHECKS["welcome_failure_rate"]
+    assert "newsletter.welcome_failed" in cfg["numerator_where"]
+    assert "newsletter.welcome_sent" in cfg["denominator_where"]
+    assert cfg["threshold"] == 0.10
+    assert cfg["min_denominator"] >= 5
+    assert cfg["window_hours"] == 24.0
+
+
+def test_welcome_internal_fallback_rate_check_registered():
+    """Vercel Python instant-path unreachability — alerts when the
+    primary path falls back to GH Actions > 25% over 6h. Customer-visible
+    degradation: welcomes go from <5s to 30-75s."""
+    assert "welcome_internal_fallback_rate" in health.RATE_CHECKS
+    cfg = health.RATE_CHECKS["welcome_internal_fallback_rate"]
+    assert "newsletter.welcome_internal_unreachable" in cfg["numerator_where"]
+    # Denominator counts BOTH outcomes — reached + unreachable — so
+    # the rate is "what fraction of attempts couldn't reach Vercel
+    # Python." A numerator-only check would alarm whenever traffic
+    # exists, even at a low fallback rate.
+    assert "newsletter.welcome_internal_responded" in cfg["denominator_where"]
+    assert "newsletter.welcome_internal_unreachable" in cfg["denominator_where"]
+    assert cfg["threshold"] == 0.25
+    assert cfg["window_hours"] == 6.0
+
+
+def test_weekly_send_failure_rate_check_registered():
+    """Weekly Pro digest send failures > 5% across a Sunday cycle is
+    a real reliability issue. Filters non-dry-run so test sends don't
+    pollute the numerator/denominator."""
+    assert "weekly_send_failure_rate" in health.RATE_CHECKS
+    cfg = health.RATE_CHECKS["weekly_send_failure_rate"]
+    assert "newsletter.send_failed" in cfg["numerator_where"]
+    assert "newsletter.send_succeeded" in cfg["denominator_where"]
+    # CRITICAL: both must filter to non-dry-run so a smoke-test send
+    # to one operator address doesn't dominate the rate. Without this
+    # filter, dry-run failures would inflate the alarm.
+    assert "dry_run" in cfg["numerator_where"]
+    assert "dry_run" in cfg["denominator_where"]
+    assert cfg["threshold"] == 0.05
+    # min_denominator=20 means we need a real Sunday send completed
+    # before the rate is meaningful — avoids false-alarming on a
+    # 3-recipient operator test.
+    assert cfg["min_denominator"] >= 20
+    assert cfg["window_hours"] == 192.0  # 8 days = weekly cadence + grace
+
+
+def test_welcome_rate_checks_share_window_consistency():
+    """Welcome failure rate uses 24h, fallback rate uses 6h. Different
+    windows are intentional (different failure-mode time constants),
+    but both must be > 1h to avoid alarming on a single bad event."""
+    assert health.RATE_CHECKS["welcome_failure_rate"]["window_hours"] >= 1.0
+    assert health.RATE_CHECKS["welcome_internal_fallback_rate"]["window_hours"] >= 1.0
+
+
 # ── query_count_window ────────────────────────────────────────────────
 
 
