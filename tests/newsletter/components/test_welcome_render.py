@@ -161,3 +161,32 @@ def test_welcome_subject_localized():
     from automation.newsletter import i18n
     assert i18n.t("welcome.email.subject", "en") == "Welcome to Pulpo Pro — your first 10"
     assert i18n.t("welcome.email.subject", "es") == "Bienvenido a Pulpo Pro — tus primeras 10"
+
+
+def test_welcome_meta_tag_uses_welcome_version_constant(ranked_pool, pro_with_prefs):
+    """The welcome's `<meta name="x-pulpo-template">` must carry the
+    welcome-specific version (`welcome-vN.N-YYYY-MM-DD`), NOT the
+    General's. This is the discriminator PostHog uses to slice
+    rendered welcomes from weeklies — getting it wrong collapses two
+    funnels into one in the dashboard.
+
+    Also assert the General's version is NOT present in the welcome
+    HTML (catches a regression where someone re-introduces the
+    `{TEMPLATE_VERSION}-welcome` suffix hack)."""
+    from automation.newsletter.components._common import (
+        TEMPLATE_VERSION as GENERAL_VERSION,
+        WELCOME_TEMPLATE_VERSION,
+    )
+    issue = _issue(locale="en", ranked=ranked_pool, recipient=pro_with_prefs)
+    html = render_welcome_html(issue)
+    assert f'<meta name="x-pulpo-template" content="{WELCOME_TEMPLATE_VERSION}"' in html, (
+        f"welcome render should stamp WELCOME_TEMPLATE_VERSION "
+        f"({WELCOME_TEMPLATE_VERSION!r}) into the x-pulpo-template meta tag"
+    )
+    # The General version must NOT leak into the welcome's meta tag.
+    suffix_hack = f'content="{GENERAL_VERSION}-welcome"'
+    assert suffix_hack not in html, (
+        "Welcome HTML is stamping the old `{TEMPLATE_VERSION}-welcome` "
+        "suffix hack instead of the dedicated WELCOME_TEMPLATE_VERSION "
+        "constant. Use the welcome constant directly."
+    )
