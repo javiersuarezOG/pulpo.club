@@ -1,0 +1,101 @@
+name: pulpo welcome reconcile
+
+# Hourly reconciliation cron. Catches Pro users whose welcome silently
+# failed in the live dispatch paths (Vercel Python timeout, GH Actions
+# fallback didn't trigger, Resend transient 5xx, etc.) — queries Clerk
+# for "Pro users without the welcome_newsletter_sent_at stamp, created
+# 1h-7d ago" and dispatches the welcome for each.
+#
+# Three trigger paths:
+#   • Scheduled cron — LIVE send mode. Hourly. Reads Clerk, dispatches
+#     for any orphan Pro users.
+#   • workflow_dispatch (manual, dry-run default) — operator can preview
+#     what the cron WOULD do without actually sending. Flip
+#     send_mode=yes for a manual LIVE pass.
+#   • workflow_dispatch send_mode=yes max_users=N — operator can force
+#     a wider sweep (e.g. after an outage) by raising the per-run cap.
+#
+# Per-run cap is 20 by default to stay under Resend rate limits and
+# keep GH Actions runtime under ~60s. If a backlog builds up, the
+# next cron tick picks up where this one left off (ascending
+# created_at order). Operator can use workflow_dispatch with a
+# higher max_users to clear faster.
+
+on:
+  schedule:
+    # Every hour at minute 15 — staggered off the weekly cron's :00 to
+    # avoid contention on Clerk's rate limits and GH Actions runners.
+    - cron: "15 * * * *"
+  workflow_dispatch:
+    inputs:
+      send_mode:
+        description: "no = dry-run (log eligible users only). yes = LIVE dispatch."
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+      max_users:
+        description: "Per-run cap (default 20). Higher = clears backlog faster but risks Resend rate limit."
+        required: false
+        default: "20"
+
+concurrency:
+  group: pulpo-welcome-reconcile
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # Scheduled cron = LIVE. Manual workflow_dispatch = dry-run
+      # unless the operator flips send_mode=yes. Mirror of the pattern
+      # in pulpo-newsletter.yml so operators get the same mental model.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.send_mode != 'yes') && '1' || '0' }}"
+
+      # Telemetry — silent no-op when missing.
+      POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
+      POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
+
+      # Send pipeline secrets — same as pulpo-pro-welcome.yml. Missing
+      # keys cause the dispatcher to skip with a clear reason code.
+      RESEND_API_KEY: "${{ secrets.RESEND_API_KEY }}"
+      RESEND_FROM_EMAIL: "${{ vars.RESEND_FROM_EMAIL }}"
+      RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
+      PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
+
+      # Clerk — required for the user enumeration query. Without it the
+      # script exits 2 (pre-flight failure).
+      CLERK_SECRET_KEY: "${{ secrets.CLERK_SECRET_KEY }}"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: install runtime deps
+        run: pip install -q posthog httpx
+
+      - name: assert ranked.json present
+        # The dispatcher needs ranked.json to build the 10 picks. If
+        # the nightly hasn't run yet, individual dispatches skip with
+        # reason=ranked_missing — the reconcile completes anyway and
+        # will retry the same users on the next hourly tick.
+        run: |
+          test -s web/data/ranked.json \
+            || echo "::warning::web/data/ranked.json missing — dispatcher will skip per user"
+
+      - name: run reconcile
+        run: |
+          SEND_MODE="${{ github.event_name == 'schedule' && 'yes' || github.event.inputs.send_mode || 'no' }}"
+          MAX_USERS="${{ github.event.inputs.max_users || '20' }}"
+          python3 -m automation.newsletter.welcome_reconcile \
+            --send-mode "$SEND_MODE" \
+            --max-users "$MAX_USERS"
