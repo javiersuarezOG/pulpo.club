@@ -1,0 +1,88 @@
+{
+  "ts": "2026-06-01T14:48:42Z",
+  "source": "elagente",
+  "count": 2,
+  "records": [
+    {
+      "source": "elagente",
+      "source_id": "complejo-bahia-dorada-la-libertad",
+      "url": "https://www.elagenteinmobiliario.com/propiedad/complejo-bahia-dorada-la-libertad",
+      "title": "Complejo Bah\u00eda Dorada, La Libertad",
+      "price_usd": 650000.0,
+      "raw_price_text": "$650,000",
+      "raw_size_text": "370 m2",
+      "location_text": "Kil\u00f3metro 73, Carretera Litoral, a 20 minutos de Playa El Tunco y Surf City, El Salvador",
+      "description": "\ud83d\udccd Bah\u00eda Dorada, La Libertad (Kil\u00f3metro 73, Carretera Litoral, a 20 minutos de Playa El Tunco y Surf City).",
+      "property_type": "house",
+      "photo_urls": [
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/portada.png",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/portada-780x720.png",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_163958_250-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0359-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0354-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0342-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0349-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_164208_069-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_164230_366-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_164457_328-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_164517_151-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_164520_496-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165404_520-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165430_937-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165443_321-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165457_446-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165527_743-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165536_582-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165600_789-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165632_870-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165656_063-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165709_414-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_165728_410-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_170212_515-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_170220_729-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_170238_762-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_170249_461-780x780.jpg",
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0352-780x780.jpg"
+      ],
+      "scraped_at": "2026-06-01T14:48:02.890605+00:00",
+      "bathrooms": 5.0,
+      "_type_signals": [],
+      "_type_confidence": "uncertain",
+      "_type_total": 0.0
+    },
+    {
+      "source": "elagente",
+      "source_id": "rancho-de-playa-frente-al-estero-jaltepeque",
+      "url": "https://www.elagenteinmobiliario.com/propiedad/rancho-de-playa-frente-al-estero-jaltepeque",
+      "title": "Rancho de playa - Frente al estero Jaltepeque",
+      "price_usd": 1150000.0,
+      "raw_price_text": "$1,150,000",
+      "raw_size_text": "150 m2",
+      "location_text": "Costa del Sol, El Salvador",
+      "description": "Naturaleza, aventura y una oportunidad de inversi\u00f3n inigualable.",
+      "property_type": "house",
+      "photo_urls": [
+        "https://www.elagenteinmobiliario.com/wp-content/uploads/2024/07/Costa-del-Sol-3.jpeg"
+      ],
+      "scraped_at": "2026-06-01T14:48:08.741353+00:00",
+      "_type_signals": [
+        {
+          "type": "land",
+          "weight": 2.5,
+          "source": "url_slug"
+        },
+        {
+          "type": "land",
+          "weight": 1.5,
+          "source": "title_first_5"
+        }
+      ],
+      "_type_confidence": "high",
+      "_type_total": 4.0,
+      "validation_status": "flagged",
+      "validation_warnings": [
+        "type_classifier_disagree"
+      ]
+    }
+  ]
+}
