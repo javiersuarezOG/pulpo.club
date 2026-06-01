@@ -121,17 +121,13 @@ const NEWSLETTERS = [
   },
 ];
 
-// v4.4 (2026-06-01) — surface the locked template's version + last
-// revision date on every newsletter card. The values here are the
-// human-readable form of `TEMPLATE_VERSION` + `LAST_UPDATED` in
-// `automation/newsletter/components/_common.py`. The Python-side
-// values are the source of truth; this map mirrors them for display.
-// `tests/newsletter/test_templates.py::test_widget_template_version_matches_python_constant`
-// enforces alignment in CI — if the operator bumps TEMPLATE_VERSION
-// in Python but forgets to bump this map (or vice versa), CI fails.
-const TEMPLATE_VERSIONS = {
-  "pulpo-pro-general": { version: "v4.4", lastUpdated: "2026-06-01" },
-};
+// Template-version source of truth: Python `TEMPLATE_VERSION` +
+// `LAST_UPDATED` in `automation/newsletter/components/_common.py`,
+// surfaced via `GET /api/admin/newsletter/template-version`. The
+// widget fetches once at mount and renders `—` for the brief window
+// before the response lands. No hardcoded mirror: a template bump
+// in Python is now a single-file edit; this widget reflects whatever
+// is currently deployed automatically.
 
 const PRO_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "pro");
 const FREE_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "free");
@@ -942,6 +938,23 @@ export function NewsletterWidget() {
   useEffect(() => {
     refreshServerLog();
   }, [refreshServerLog]);
+
+  // Template version — pulled from the deployed Python source of truth
+  // (automation/newsletter/components/_common.py) via the dedicated
+  // endpoint, so the widget always reflects what's actually live. The
+  // initial empty object renders `—` placeholders; the fetch settles in
+  // ~50ms after mount. If the endpoint errors (Python file missing or
+  // unparseable), we surface a {error: ...} shape and the chrome keeps
+  // the placeholder rather than lying with a stale hardcoded value.
+  const [templateVersions, setTemplateVersions] = useState({});
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/newsletter/template-version")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((data) => { if (!cancelled) setTemplateVersions(data); })
+      .catch(() => { /* fallthrough: keep placeholders */ });
+    return () => { cancelled = true; };
+  }, []);
   // Merged + capped log for rendering. Re-derived on every change of
   // either source — both are tiny arrays so the cost is negligible.
   const log = mergeLogs(serverEntries, localEntries);
@@ -1203,8 +1216,8 @@ export function NewsletterWidget() {
               <p className="nl-newsletter-desc">{NEWSLETTERS.find(n => n.id === "pro-weekly").description}</p>
               <p className="nl-newsletter-template">
                 Template · <strong>{NEWSLETTERS.find(n => n.id === "pro-weekly").templateLabel}</strong>
-                {TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template] && (
-                  <> · {TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template].version} ({TEMPLATE_VERSIONS[NEWSLETTERS.find(n => n.id === "pro-weekly").template].lastUpdated})</>
+                {templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template] && (
+                  <> · {templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template].version} ({templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template].lastUpdated})</>
                 )}
                 <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
               </p>
@@ -1415,8 +1428,8 @@ export function NewsletterWidget() {
                 <p className="nl-newsletter-desc">{nl.description}</p>
                 <p className="nl-newsletter-template">
                   Template · <strong>{nl.templateLabel}</strong>
-                  {TEMPLATE_VERSIONS[nl.template] && (
-                    <> · {TEMPLATE_VERSIONS[nl.template].version} ({TEMPLATE_VERSIONS[nl.template].lastUpdated})</>
+                  {templateVersions[nl.template] && (
+                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
                   )}
                 </p>
               </article>
@@ -1441,8 +1454,8 @@ export function NewsletterWidget() {
                 <p className="nl-newsletter-desc">{nl.description}</p>
                 <p className="nl-newsletter-template">
                   Template · <strong>{nl.templateLabel}</strong>
-                  {TEMPLATE_VERSIONS[nl.template] && (
-                    <> · {TEMPLATE_VERSIONS[nl.template].version} ({TEMPLATE_VERSIONS[nl.template].lastUpdated})</>
+                  {templateVersions[nl.template] && (
+                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
                   )}
                   {nl.status === "live" && (
                     <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>

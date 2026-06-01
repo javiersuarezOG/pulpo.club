@@ -65,65 +65,45 @@ def test_template_ids_align_widget_to_python():
     # operator-facing 4xx.
 
 
-def test_widget_template_version_matches_python_constant():
-    """Widget surfaces a `TEMPLATE_VERSIONS` map keyed by template id.
-    For every Python template registered in TEMPLATES, the widget's
-    `version` + `lastUpdated` strings must reflect the Python source
-    of truth — the `TEMPLATE_VERSION` constant in `_common.py`.
+def test_widget_does_not_carry_a_hardcoded_version_mirror():
+    """v4.4 (2026-06-01): the widget used to maintain a hardcoded
+    `TEMPLATE_VERSIONS` map that had to be bumped in lock-step with
+    every Python TEMPLATE_VERSION change. That mirror is gone —
+    replaced by a fetch to /api/admin/newsletter/template-version
+    which reads the Python constant from disk at request time.
 
-    Today the Python constant has the form:
-        newsletter-v4.3-2026-05-31
-    The widget splits this into a {version: "v4.3", lastUpdated:
-    "2026-05-31"} pair (operator-friendly display). This guard
-    parses the widget's literal map back out and asserts both halves
-    match what `_common.TEMPLATE_VERSION` carries — so if anyone
-    bumps Python without bumping the widget (or vice versa), CI fails.
+    This guard prevents the mirror from creeping back in. If a
+    future change re-adds a literal `TEMPLATE_VERSIONS = { ... }`
+    object with hardcoded version strings, this test fails and the
+    reviewer is forced to consciously decide whether to reintroduce
+    the drift risk. The hardcoded version pattern is unmistakable:
+    `vN.N` literal next to a `YYYY-MM-DD` literal inside the same
+    object. Operator-facing template chrome reads
+    `templateVersions[nl.template]` (state from useState), not a
+    module-level constant.
     """
-    from automation.newsletter.components import _common
-
-    # The Python constant: "newsletter-vN.N-YYYY-MM-DD"
-    pattern = re.compile(r"^newsletter-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
-    m = pattern.match(_common.TEMPLATE_VERSION)
-    assert m, (
-        f"TEMPLATE_VERSION isn't in 'newsletter-vN.N-YYYY-MM-DD' form: "
-        f"{_common.TEMPLATE_VERSION!r}"
-    )
-    py_version, py_date = m.group(1), m.group(2)
-
-    # Pull the widget's TEMPLATE_VERSIONS literal.
     src = _WIDGET_PATH.read_text(encoding="utf-8")
-    widget_map_match = re.search(
-        r'const\s+TEMPLATE_VERSIONS\s*=\s*\{([\s\S]*?)\};',
+    # If a `TEMPLATE_VERSIONS = { … }` const declaration ever reappears
+    # at module scope with a literal version + date pair, fail.
+    suspicious = re.search(
+        r'const\s+TEMPLATE_VERSIONS\s*=\s*\{[\s\S]*?'
+        r'version\s*:\s*[\'"]v\d+\.\d+[\'"][\s\S]*?'
+        r'lastUpdated\s*:\s*[\'"]\d{4}-\d{2}-\d{2}[\'"]',
         src,
     )
-    assert widget_map_match, (
-        "Couldn't find `const TEMPLATE_VERSIONS = { … }` in the widget — "
-        "the surrounding declaration shape may have changed and this "
-        "regex needs updating."
+    assert suspicious is None, (
+        "Found a hardcoded `const TEMPLATE_VERSIONS = { version: 'vN.N', "
+        "lastUpdated: 'YYYY-MM-DD' }` block in the widget. This mirror "
+        "was deliberately removed in v4.4 — versions are now fetched "
+        "from /api/admin/newsletter/template-version at runtime. Don't "
+        "reintroduce the mirror; use the fetch path instead."
     )
-    block = widget_map_match.group(1)
-    # Each entry has shape: "<id>": { version: "vN.N", lastUpdated: "YYYY-MM-DD" }
-    entry_re = re.compile(
-        r'[\'"]([a-z0-9][a-z0-9\-]*)[\'"]\s*:\s*\{\s*'
-        r'version\s*:\s*[\'"]([^\'\"]+)[\'"]\s*,\s*'
-        r'lastUpdated\s*:\s*[\'"]([^\'\"]+)[\'"]\s*\}'
-    )
-    widget_entries = {m.group(1): (m.group(2), m.group(3)) for m in entry_re.finditer(block)}
-
-    assert "pulpo-pro-general" in widget_entries, (
-        "Widget TEMPLATE_VERSIONS map is missing the canonical "
-        "`pulpo-pro-general` entry."
-    )
-    widget_version, widget_date = widget_entries["pulpo-pro-general"]
-    assert widget_version == py_version, (
-        f"Widget version for pulpo-pro-general ({widget_version!r}) "
-        f"doesn't match Python TEMPLATE_VERSION ({py_version!r}). "
-        f"Update both — Python is the source of truth."
-    )
-    assert widget_date == py_date, (
-        f"Widget lastUpdated for pulpo-pro-general ({widget_date!r}) "
-        f"doesn't match Python TEMPLATE_VERSION date ({py_date!r}). "
-        f"Update both — Python is the source of truth."
+    # And the runtime consumer should read from state, not a constant.
+    assert "templateVersions[" in src, (
+        "Widget no longer references `templateVersions[...]` — the "
+        "useState-backed lookup may have been refactored out. The "
+        "operator-facing template chrome needs to render the fetched "
+        "version somewhere."
     )
 
 
