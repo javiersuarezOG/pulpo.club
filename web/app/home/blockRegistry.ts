@@ -23,7 +23,9 @@ export type BlockId =
   // so when hero_v5 is on the registry suppresses those two slots.
   | "hero_v5"
   | "featured"
-  | "usps"
+  // `usps` (the in-page USPBand "For subscribers only" 3-card band)
+  // was eliminated in Wave-6 — content moved to the standalone
+  // UspPopup modal. Do NOT re-add here without restoring USPBand.jsx.
   | "shoreline"
   // Phase 3 — six type-specific Top 10 shelves replacing the single
   // top_10 / price_drops / new_this_week trio. NEW + PRICE-DROP signals
@@ -49,7 +51,6 @@ const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
   hero:               { anonymous: true,  free: true,  pro: true,  agency: true  }, // CTA gated in component for paid
   hero_v5:            { anonymous: true,  free: true,  pro: true,  agency: true  }, // Wave-6: replaces hero + shoreline when flag on
   featured:           { anonymous: true,  free: true,  pro: false, agency: false },
-  usps:               { anonymous: true,  free: false, pro: false, agency: false }, // signed-in users (free OR paid) skip the marketing band
   shoreline:          { anonymous: true,  free: true,  pro: false, agency: false }, // post-Wave-5: upsell surface, hidden from paid
   // Phase 3: each shelf renders only when ≥5 listings qualify (the
   // hero_v4 hideShelf gate inside HomeShelf). Visible to every tier.
@@ -65,11 +66,12 @@ const VISIBILITY: Record<BlockId, Record<Tier, boolean>> = {
 // Keep this in sync with VISIBILITY's key order. Phase 3 puts the
 // Beach × types first (Beach is the volume category — terrenos/condos/
 // homes ascending by entry price), then Lake.
-const BLOCK_ORDER: readonly BlockId[] = [
+// Exported so the versions ↔ registry sync test can iterate it; also
+// useful for any future tooling that needs the canonical block list.
+export const BLOCK_ORDER: readonly BlockId[] = [
   "hero",
   "hero_v5",
   "featured",
-  "usps",
   "shoreline",
   "top_beach_terrenos",
   "top_beach_condos",
@@ -85,8 +87,10 @@ const BLOCK_ORDER: readonly BlockId[] = [
 export type RegistryFlags = {
   // Wave 4: filter by tier (paid users skip upsell blocks).
   paid_home_variant_v1: boolean;
-  // Wave 5#8: remove the usps block from the homepage (it migrates to
-  // a triggered popup mounted at the page root).
+  // Wave 5#8 → Wave 6: the in-page USPBand was eliminated; this flag
+  // now only controls whether the standalone UspPopup modal arms its
+  // scroll / exit-intent triggers. Kept on RegistryFlags for shape
+  // stability; the registry no longer filters on it.
   usp_popup_v1: boolean;
   // Wave 5#7+#9: white photo-led hero. The new hero "owns" the
   // featured listing visually, so the standalone `featured` block is
@@ -145,21 +149,18 @@ export function visibleBlocksFor(
       if (!VISIBILITY[blockId][tier]) return false;
     }
     // Wave 5 flag-driven exclusions, applied after tier filtering.
-    if (flags.usp_popup_v1 && blockId === "usps") return false;
     if (flags.hero_v4 && blockId === "featured") return false;
     // Wave 6: hero_v5 replaces both the legacy hero AND shoreline.
     // When the flag is on:
     //   * hero_v5 is the rendered hero
     //   * hero is suppressed (legacy v2/v4 hero would double up)
     //   * shoreline is suppressed (the 5 destination cards absorb it)
-    //   * usps is suppressed for ALL tiers (matches what Pro users
-    //     already see — HeroV5's H1 + destination cards carry the
-    //     value prop, no need for a 3-card "Why Pulpo Pro?" band).
     // When the flag is off, hero_v5 itself is suppressed.
+    // `usps` was eliminated entirely in Wave 6 (USPBand.jsx deleted);
+    // no filtering needed — there's no block to filter.
     if (flags.hero_v5) {
       if (blockId === "hero") return false;
       if (blockId === "shoreline") return false;
-      if (blockId === "usps") return false;
     } else {
       if (blockId === "hero_v5") return false;
     }
