@@ -1481,30 +1481,48 @@ export function NewsletterWidget() {
                     )}
                   </p>
                   {isLive && (
-                    <div className="nl-upcoming-actions" style={{ marginTop: 10 }}>
-                      <button
-                        type="button"
-                        className="nl-send-button"
-                        onClick={() => trigger({ newsletterId: nl.id })}
-                        disabled={busy}
-                      >
-                        Send test welcome to me →
-                      </button>
+                    <>
+                      <div className="nl-upcoming-actions" style={{ marginTop: 12 }}>
+                        <button
+                          type="button"
+                          className="nl-upcoming-btn"
+                          onClick={() => trigger({ newsletterId: nl.id })}
+                          disabled={busy}
+                          title="Send a test welcome email to the address above — bypasses the Clerk idempotency stamp so you can re-test against the same user." // i18n-allow: admin-only widget
+                        >
+                          Send test welcome to me →
+                        </button>
+                      </div>
                       {cardStatus.kind === "pending" && (
-                        <p className="nl-row-status pending">⌛ Dispatching…</p>
-                      )}
-                      {cardStatus.kind === "error" && (
-                        <p className="nl-row-status error">⚠ {cardStatus.message}</p>
-                      )}
-                      {cardStatus.kind === "success" && (
-                        <p className="nl-row-status success">
-                          ✓ Dispatched to <strong>{cardStatus.recipient}</strong> · arrives in ~30–60s
-                          {cardStatus.runsUrl && (
-                            <> · <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">View run →</a></>
-                          )}
+                        <p className="nl-result pending" style={{ marginTop: 8 }}>
+                          <span className="nl-status-icon" aria-hidden="true" />
+                          Dispatching test welcome…
                         </p>
                       )}
-                    </div>
+                      {cardStatus.kind === "error" && (
+                        <p className="nl-result error" style={{ marginTop: 8 }}>
+                          ⚠ {cardStatus.message}
+                        </p>
+                      )}
+                      {cardStatus.kind === "success" && (
+                        <div className="nl-success-card" style={{ marginTop: 8 }}>
+                          <p className="nl-success-head">
+                            <span className="nl-success-check" aria-hidden="true">✓</span>
+                            Dispatched · welcome on the way
+                          </p>
+                          <p className="nl-success-body">
+                            Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds. Look for the subject <strong>Welcome to Pulpo Pro — your first 10</strong>.
+                          </p>
+                          {cardStatus.runsUrl && (
+                            <p className="nl-success-footer">
+                              <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">
+                                View workflow run on GitHub →
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </article>
               );
