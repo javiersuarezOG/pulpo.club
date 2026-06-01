@@ -6033,6 +6033,12 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Wave-6: titles like "Top 10 condos · Coatepeque + Ilopango" can
+     exceed the 320px viewport. Allow icon + text to wrap to a new
+     line and constrain to parent width so the heading doesn't push
+     the document past the viewport. */
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 .homepage-v2 .hp-shelf-h2-icon {
   color: var(--color-clay-primary);
