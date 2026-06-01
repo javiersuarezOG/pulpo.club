@@ -1,13 +1,34 @@
-# Python pipeline runs in GitHub Actions only — Vercel runtime is static + Node.
-pulpo/
-automation/
+# Python sources at the project root — needed by the Vercel Python
+# function at api/internal/welcome-send.py (instant Pulpo Pro Welcome
+# dispatch). The function imports `automation.newsletter.*` + `pulpo.*`
+# so those trees MUST ship to the deployment. Vercel's Python runtime
+# traces explicit imports and bundles only what's reachable, so the
+# heavy non-welcome modules (aesthetic_*, ai_enrichment_*, photo_quality,
+# scrapers) stay out of the function bundle automatically — no
+# per-module excludes needed here.
+#
+# Node functions (api/*.js) don't touch Python at runtime, so a few MB
+# of uploaded .py files is invisible to their per-function bundles.
+#
+# Only the heaviest non-source artifacts stay excluded.
+__pycache__/
+*.pyc
 fixtures/
 samples/
 tests/
-requirements.txt
-*.py
-__pycache__/
-*.pyc
+
+# Root requirements.txt is GH-Actions-only — it carries heavy deps
+# (selectolax, curl_cffi, Pillow, pytesseract, openai) needed by the
+# scrape + enrichment pipeline but irrelevant at Vercel runtime.
+# Vercel's Python runtime auto-installs the project-root requirements,
+# so leaving it uploaded would force the function bundle through
+# 100+ MB of CC compilation (selectolax against Python 3.14 even
+# breaks compilation outright). The function-local
+# api/internal/requirements.txt below is re-included via negation
+# and carries only the welcome path's actual runtime deps (httpx,
+# posthog).
+/requirements.txt
+!api/internal/requirements.txt
 
 # Local artifacts
 .env

@@ -17,6 +17,12 @@
     },
     "api/social/card.js": {
       "excludeFiles": "web/photos/**,web/photos-hires/**,web/data/**"
+    },
+    "api/internal/welcome-send.py": {
+      "memory": 1024,
+      "maxDuration": 30,
+      "includeFiles": "pulpo/countries/*.json,web/data/ranked.json",
+      "excludeFiles": "web/photos*/**"
     }
   },
   "rewrites": [
