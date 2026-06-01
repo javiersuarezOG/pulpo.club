@@ -1,0 +1,17 @@
+{
+  "_doc": "Per-block version registry for the home page. Single source of truth read by both /api/home/version (api/home/version.js, CommonJS require) and the frontend. Bump a block's version whenever its rendered output changes — analytics + drift-detection use these strings to identify which UX a user saw.",
+  "layout": "v1",
+  "blocks": {
+    "hero": "v4",
+    "hero_v5": "v5",
+    "featured": "v1",
+    "usps": "v1",
+    "shoreline": "v2",
+    "top_beach_terrenos": "v1",
+    "top_beach_condos": "v1",
+    "top_beach_homes": "v1",
+    "top_lake_terrenos": "v1",
+    "top_lake_condos": "v1",
+    "top_lake_homes": "v1"
+  }
+}
