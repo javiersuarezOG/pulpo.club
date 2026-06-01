@@ -1,0 +1,25 @@
+# Per-function requirements for api/internal/welcome-send.py.
+#
+# Vercel's Python runtime uses requirements.txt co-located with the
+# function file as the dep manifest — keeping it function-scoped lets
+# us avoid bundling the heavy root-level deps (Pillow, pytesseract,
+# selectolax, curl_cffi, openai) that the welcome-send path never
+# touches at request time. Bundle stays <20MB instead of >150MB.
+#
+# The runtime path imports:
+#   • automation/newsletter/welcome_dispatch  → httpx
+#   • automation/newsletter/build_issue       → pure Python (commentary,
+#                                                favorites, segments are
+#                                                pure Python; llm_*
+#                                                modules lazy-import
+#                                                openai and gracefully
+#                                                no-op without it)
+#   • automation/newsletter/send              → httpx
+#   • automation/newsletter/render_html       → pure Python (html.escape)
+#   • automation/posthog_client               → posthog (optional;
+#                                                silent no-op without it)
+#
+# Pinning to the same versions the root requirements.txt uses so dev
+# and Vercel runtime behave identically. Bump in lockstep.
+httpx==0.27.2
+posthog>=3.0,<4.0

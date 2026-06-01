@@ -17,7 +17,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { dispatchProWelcomeWorkflow } from "../../api/stripe/webhook.js";
+import {
+  callInternalWelcomeSend,
+  dispatchProWelcome,
+  dispatchProWelcomeWorkflow,
+} from "../../api/stripe/webhook.js";
 
 function mockClerk({ publicMetadata = {}, getUserThrows = false } = {}) {
   return {
@@ -156,5 +160,217 @@ describe("dispatchProWelcomeWorkflow", () => {
     });
     expect(result).toBe("dispatched");
     expect(fetchImpl).toHaveBeenCalledOnce();
+  });
+});
+
+
+// ─────────────────────────────────────────────────────────────────────
+// callInternalWelcomeSend — the HTTP wrapper around /api/internal/welcome-send.
+// Covers timeout handling, header shape, response parsing.
+// ─────────────────────────────────────────────────────────────────────
+
+describe("callInternalWelcomeSend", () => {
+  it("POSTs JSON body with Bearer auth + parses response", async () => {
+    const fetchImpl = vi.fn(async () => ({
+      status: 200,
+      json: async () => ({ status: "sent", message_id: "re_abc", latency_ms: 1500 }),
+    }));
+    const result = await callInternalWelcomeSend({
+      baseUrl: "https://pulpo.club",
+      token: "internal_token_xyz",
+      payload: { email: "user@pulpo.club", source: "stripe", force: false },
+      fetchImpl,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.status).toBe(200);
+    expect(result.body.status).toBe("sent");
+    const [url, opts] = fetchImpl.mock.calls[0];
+    expect(url).toBe("https://pulpo.club/api/internal/welcome-send");
+    expect(opts.method).toBe("POST");
+    expect(opts.headers.Authorization).toBe("Bearer internal_token_xyz");
+    expect(opts.headers["Content-Type"]).toBe("application/json");
+    expect(JSON.parse(opts.body)).toEqual({
+      email: "user@pulpo.club", source: "stripe", force: false,
+    });
+  });
+
+  it("returns ok=false on fetch error", async () => {
+    const fetchImpl = vi.fn(async () => { throw new Error("ENOTFOUND"); });
+    const result = await callInternalWelcomeSend({
+      baseUrl: "https://pulpo.club",
+      token: "t",
+      payload: { email: "u@p.club" },
+      fetchImpl,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toContain("fetch_failed");
+  });
+
+  it("returns ok=false with reason=timeout on abort signal", async () => {
+    // Simulate a fetch that throws an AbortError when the controller
+    // fires. The 50ms timeout should beat the 200ms fake fetch.
+    const fetchImpl = vi.fn(async (url, opts) => {
+      return new Promise((_, reject) => {
+        const onAbort = () => {
+          const err = new Error("aborted");
+          err.name = "AbortError";
+          reject(err);
+        };
+        if (opts.signal) opts.signal.addEventListener("abort", onAbort);
+        // Resolve later than the timeout so the abort wins.
+        setTimeout(() => {}, 200);
+      });
+    });
+    const result = await callInternalWelcomeSend({
+      baseUrl: "https://pulpo.club",
+      token: "t",
+      payload: { email: "u@p.club" },
+      fetchImpl,
+      timeoutMs: 50,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe("timeout");
+  });
+
+  it("tolerates a response that isn't JSON-parseable", async () => {
+    const fetchImpl = vi.fn(async () => ({
+      status: 502,
+      json: async () => { throw new Error("invalid JSON"); },
+    }));
+    const result = await callInternalWelcomeSend({
+      baseUrl: "https://pulpo.club",
+      token: "t",
+      payload: { email: "u@p.club" },
+      fetchImpl,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.status).toBe(502);
+    expect(result.body).toBeNull();
+  });
+});
+
+
+// ─────────────────────────────────────────────────────────────────────
+// dispatchProWelcome — orchestrator that tries Python primary, falls
+// back to GH Actions when Python is unreachable.
+// ─────────────────────────────────────────────────────────────────────
+
+describe("dispatchProWelcome orchestrator", () => {
+  const ORIGINAL_INTERNAL_TOKEN = process.env.PULPO_INTERNAL_TOKEN;
+  const ORIGINAL_GH_TOKEN = process.env.GITHUB_DISPATCH_TOKEN;
+
+  beforeEach(() => {
+    process.env.PULPO_INTERNAL_TOKEN = "internal_test";
+    process.env.GITHUB_DISPATCH_TOKEN = "ghp_test_token";
+  });
+  afterEach(() => {
+    if (ORIGINAL_INTERNAL_TOKEN === undefined) delete process.env.PULPO_INTERNAL_TOKEN;
+    else process.env.PULPO_INTERNAL_TOKEN = ORIGINAL_INTERNAL_TOKEN;
+    if (ORIGINAL_GH_TOKEN === undefined) delete process.env.GITHUB_DISPATCH_TOKEN;
+    else process.env.GITHUB_DISPATCH_TOKEN = ORIGINAL_GH_TOKEN;
+  });
+
+  it("returns internal:sent when Python responds 200 with status=sent", async () => {
+    const clerk = mockClerk({ publicMetadata: {} });
+    // fetchImpl is shared between the internal call AND the GH fallback.
+    // First call (to internal) returns success; we assert GH is NOT called.
+    const fetchImpl = vi.fn(async (url) => {
+      if (url.endsWith("/api/internal/welcome-send")) {
+        return {
+          status: 200,
+          json: async () => ({ status: "sent", message_id: "re_xyz", latency_ms: 1800 }),
+        };
+      }
+      throw new Error("unexpected fetch: " + url);
+    });
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "user@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("internal:sent");
+    // Exactly ONE fetch — to the Python endpoint. GH was not invoked.
+    expect(fetchImpl).toHaveBeenCalledOnce();
+  });
+
+  it("returns internal:skipped:<reason> when Python responds 200 with status=skipped", async () => {
+    const clerk = mockClerk({ publicMetadata: {} });
+    const fetchImpl = vi.fn(async () => ({
+      status: 200,
+      json: async () => ({ status: "skipped", reason: "already_sent" }),
+    }));
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "user@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("internal:skipped:already_sent");
+  });
+
+  it("falls back to GH Actions when Python fetch throws", async () => {
+    const clerk = mockClerk({ publicMetadata: {} });
+    let calls = 0;
+    const fetchImpl = vi.fn(async (url) => {
+      calls += 1;
+      if (calls === 1) {
+        // First call: internal endpoint — simulate network failure.
+        throw new Error("ECONNREFUSED");
+      }
+      // Second call: GH Actions dispatch (the fallback).
+      return { status: 204, text: async () => "" };
+    });
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "user@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("dispatched");
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    // Verify the second call hit GitHub.
+    expect(fetchImpl.mock.calls[1][0]).toContain("api.github.com");
+  });
+
+  it("does NOT fall back when Python returns 500 (dispatcher attempted)", async () => {
+    // If Python's dispatcher returned status=failed, the send was
+    // attempted — a GH retry would risk a duplicate Resend call.
+    const clerk = mockClerk({ publicMetadata: {} });
+    const fetchImpl = vi.fn(async () => ({
+      status: 500,
+      json: async () => ({ status: "failed", reason: "send_failed" }),
+    }));
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "user@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("internal:http_500");
+    expect(fetchImpl).toHaveBeenCalledOnce();  // No fallback fired.
+  });
+
+  it("skips Python entirely + uses GH directly when PULPO_INTERNAL_TOKEN is unset", async () => {
+    delete process.env.PULPO_INTERNAL_TOKEN;
+    const clerk = mockClerk({ publicMetadata: {} });
+    const fetchImpl = vi.fn(async () => ({ status: 204, text: async () => "" }));
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "user@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("dispatched");
+    // Only GH was called.
+    expect(fetchImpl).toHaveBeenCalledOnce();
+    expect(fetchImpl.mock.calls[0][0]).toContain("api.github.com");
+  });
+
+  it("returns skipped:missing_input without calling either path when email is empty", async () => {
+    const clerk = mockClerk({ publicMetadata: {} });
+    const fetchImpl = vi.fn();
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(result).toBe("skipped:missing_input");
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });
