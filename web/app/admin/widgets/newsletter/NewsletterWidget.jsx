@@ -93,16 +93,17 @@ const NEWSLETTERS = [
     id: "pro-welcome",
     tier: "pro",
     title: "Pro · Welcome",
-    description: "Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.",
+    description: "Single onboarding email sent on first Pro payment. <5s for existing users (Stripe webhook → Vercel Python). For new users via /start, fires after Clerk signup completes (~5s post-password). Hourly reconcile cron catches any silent failures.",
     template: "pulpo-pro-welcome",
     templateLabel: "Pulpo Pro Welcome",
     cadenceMode: "onetime",
-    // status="draft" until the Stripe webhook trigger lands in a follow-up
-    // PR. The admin Test-send-to-me surface
-    // (POST /api/admin/newsletter/trigger-welcome-test) already works
-    // against this template — operators can preview the welcome end-to-end
-    // before production wiring goes live.
-    status: "draft",
+    // status="live" as of 2026-06-01 — end-to-end verified in prod:
+    //   • PULPO_INTERNAL_TOKEN set in Vercel env (Vercel Python instant path active)
+    //   • Clerk user.created webhook subscribed (Path C wired)
+    //   • Filter fix #607 deployed (stripeCustomerId, not invitation_id)
+    //   • Resend send + Clerk publicMetadata stamp confirmed working
+    //   • Reconcile cron at :15 * * * * provides safety net for orphans
+    status: "live",
   },
   {
     id: "free-welcome",
