@@ -38,6 +38,7 @@ const crypto = require("crypto");
 const { verifySvixSignature, readRawBody } = require("../_svix");
 const { capture, emailDistinctId, flush } = require("../_posthog");
 const { auditEnvOverridesOnce } = require("../_env_audit");
+const { clerkClient } = require("../stripe/_stripe");
 
 const SVIX_SECRET_ENV = "CLERK_WEBHOOK_SECRET";
 
@@ -137,6 +138,96 @@ function distinctIdFor(props) {
   return "server:clerk_webhook";
 }
 
+
+// ─────────────────────────────────────────────────────────────────────
+// Phase 2 — Pulpo Pro Welcome dispatch for Path C users.
+//
+// Path A (auth_gated) and Path B (anonymous_existing_user) of the
+// Stripe webhook fire the welcome immediately on checkout.session.completed
+// because a Clerk user already exists there. Path C
+// (anonymous_invitation_created) cannot — at checkout time only an
+// invitation exists; the Clerk user record is minted later when the
+// user accepts the invitation and completes signup. That moment is
+// THIS handler's `user.created` event.
+//
+// Filter: only fire when the user came from a Stripe-paid invitation.
+// The Stripe webhook (api/stripe/webhook.js Path C) creates the
+// invitation with `publicMetadata: { plan: "pro" }` + `privateMetadata:
+// { stripeCustomerId, stripeSubscriptionId, ... }`. When the
+// invitation is accepted those metadata fields propagate to the new
+// User record — so `data.public_metadata.plan === "pro"` AND
+// `data.private_metadata.invitation_id` is the unambiguous marker.
+//
+// Direct-signup users (no invitation, no plan metadata) and OAuth
+// signups stay out — they're not Pro-paid yet.
+//
+// Idempotency: dispatchProWelcome reads
+// `publicMetadata.welcome_newsletter_sent_at` and short-circuits if
+// already set. Stripe-side Paths A/B set it; a Clerk-webhook retry
+// can't double-send.
+function shouldDispatchWelcomeForUserCreated(body) {
+  const data = (body && body.data) || {};
+  const pub = data.public_metadata || {};
+  const priv = data.private_metadata || {};
+  // plan="pro" is set by the Stripe webhook on the invitation —
+  // the user is born Pro the moment they complete invitation signup.
+  if (pub.plan !== "pro") return false;
+  // Confirm it came via invitation, not some other path that
+  // happened to land plan="pro" via Stripe metadata pre-population.
+  if (!priv.invitation_id) return false;
+  // Re-send guard. Belt-and-suspenders: dispatchProWelcome also checks.
+  if (pub.welcome_newsletter_sent_at) return false;
+  return true;
+}
+
+function primaryEmailFromUserCreated(data) {
+  if (!data) return null;
+  const primaryId = data.primary_email_address_id || null;
+  const emails = Array.isArray(data.email_addresses) ? data.email_addresses : [];
+  const primary = emails.find(e => e && e.id === primaryId) || emails[0] || null;
+  return (primary && primary.email_address) || null;
+}
+
+async function maybeDispatchWelcomeForNewUser({ body, distinctId, t0 }) {
+  if (!shouldDispatchWelcomeForUserCreated(body)) {
+    return { fired: false, reason: "filter_skipped" };
+  }
+  const data = body.data || {};
+  const userId = data.id || "";
+  const email = primaryEmailFromUserCreated(data);
+  if (!userId || !email) {
+    capture(distinctId, "newsletter.welcome_skipped", {
+      reason: "user_created_missing_email",
+      source: "clerk.user_created",
+      clerk_user_id: userId,
+      ms: Date.now() - t0,
+    });
+    return { fired: false, reason: "missing_email" };
+  }
+  // Lazy require — avoids loading the Stripe webhook module (which
+  // pulls in stripe + clerk clients + posthog wrapper) on every Clerk
+  // event. Only Path-C invitation acceptances pay the cost.
+  const { dispatchProWelcome } = require("../stripe/webhook");
+  // clerkClient is a FACTORY function (see api/_clerk.js); call it to
+  // get the instance with users.getUser / users.updateUserMetadata.
+  // Passing the factory itself produces "Cannot read properties of
+  // undefined (reading 'getUser')" deep in the dispatcher.
+  const outcome = await dispatchProWelcome({
+    clerk: clerkClient(),
+    clerkUserId: userId,
+    email,
+    source: "clerk.user_created",
+    distinctId,
+    t0,
+  });
+  logApi({
+    reason: "welcome_dispatched_from_user_created",
+    clerk_user_id: userId,
+    welcome: outcome,
+  });
+  return { fired: true, outcome };
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
   await auditEnvOverridesOnce();
@@ -212,12 +303,37 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true, telemetry: "failed" });
   }
 
+  // Phase 2 — Path C welcome dispatch. Fires the Pulpo Pro Welcome
+  // when a brand-new Clerk user is minted from a Stripe-paid
+  // invitation. No-op for direct signups / OAuth / non-invitation
+  // user.created events. Never throws — Svix retries on 5xx and a
+  // failed welcome must NOT block the activation funnel.
+  let welcomeOutcome = "skipped:not_user_created";
+  if (eventType === "user.created") {
+    try {
+      const result = await maybeDispatchWelcomeForNewUser({ body, distinctId, t0 });
+      welcomeOutcome = result.fired ? (result.outcome || "fired") : `skipped:${result.reason}`;
+    } catch (err) {
+      logApi({
+        reason: "welcome_dispatch_threw",
+        event: phEvent, error: (err && err.message) || "(no message)",
+      });
+      capture(distinctId, "newsletter.welcome_failed", {
+        reason: "clerk_webhook_dispatch_threw",
+        source: "clerk.user_created",
+        error: (err && err.message) || "(no message)",
+      });
+      welcomeOutcome = "error:dispatch_threw";
+    }
+  }
+
   logApi({
     status: 200, ms: Date.now() - t0,
     event: phEvent,
     email_hash: props.email_hash || "none",
     invitation_id: props.invitation_id || "none",
     delivered_by_clerk: typeof props.delivered_by_clerk === "boolean" ? props.delivered_by_clerk : "n/a",
+    welcome: welcomeOutcome,
   });
   return res.status(200).json({ ok: true });
 };
@@ -231,3 +347,6 @@ module.exports.EVENT_MAP = EVENT_MAP;
 module.exports.pickPostHogProps = pickPostHogProps;
 module.exports.distinctIdFor = distinctIdFor;
 module.exports.hashEmail = hashEmail;
+module.exports.shouldDispatchWelcomeForUserCreated = shouldDispatchWelcomeForUserCreated;
+module.exports.primaryEmailFromUserCreated = primaryEmailFromUserCreated;
+module.exports.maybeDispatchWelcomeForNewUser = maybeDispatchWelcomeForNewUser;

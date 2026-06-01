@@ -11,6 +11,8 @@ import handler, {
   pickPostHogProps,
   distinctIdFor,
   hashEmail,
+  shouldDispatchWelcomeForUserCreated,
+  primaryEmailFromUserCreated,
 } from "../../api/clerk/webhook.js";
 
 // Mirror Svix's signing: HMAC-SHA256 over `${id}.${ts}.${body}` using the
@@ -336,5 +338,197 @@ describe("handler", () => {
   it("config.api.bodyParser is false (Svix needs raw bytes)", () => {
     expect(handler.config).toBeDefined();
     expect(handler.config.api.bodyParser).toBe(false);
+  });
+});
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Phase 2 — Path C welcome dispatch from user.created
+//
+// Pure filter tests (no dispatch yet). The dispatch itself flows
+// through dispatchProWelcome which has its own test suite in
+// stripe_webhook_welcome_dispatch.test.js — keeping these tests
+// scoped to the new helpers' surface so they don't require mocking
+// the full dispatch chain.
+// ─────────────────────────────────────────────────────────────────────
+
+describe("shouldDispatchWelcomeForUserCreated", () => {
+  it("returns true for a Stripe-paid invitation acceptance", () => {
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_abc",
+        public_metadata: { plan: "pro" },
+        private_metadata: { invitation_id: "inv_123", stripeCustomerId: "cus_x" },
+        email_addresses: [{ id: "ea_1", email_address: "buyer@example.com" }],
+        primary_email_address_id: "ea_1",
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(true);
+  });
+
+  it("returns false for a direct signup (no invitation, no plan)", () => {
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_direct",
+        public_metadata: {},
+        private_metadata: {},
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
+  });
+
+  it("returns false when plan='pro' but no invitation_id (edge case — pre-stamped publicMetadata, not from /start)", () => {
+    // Defensive: someone could conceivably stamp plan=pro on a user
+    // through a different path (admin tool, manual update). We only
+    // want to fire the welcome for genuine Stripe-paid invitations.
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_mystery",
+        public_metadata: { plan: "pro" },
+        private_metadata: {},
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
+  });
+
+  it("returns false when invitation_id present but plan != 'pro' (non-paid invitation)", () => {
+    // Future-proofing: if Clerk invitations are ever used for non-Pro
+    // flows (admin invites, beta access, etc.), they won't carry
+    // plan=pro and shouldn't trigger the welcome.
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_admin_invite",
+        public_metadata: { plan: "free" },
+        private_metadata: { invitation_id: "inv_xyz" },
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
+  });
+
+  it("returns false when welcome_newsletter_sent_at is already set (idempotency)", () => {
+    // Belt-and-suspenders: dispatchProWelcome also checks. This is a
+    // pre-filter that saves a function call on retries.
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_dup",
+        public_metadata: {
+          plan: "pro",
+          welcome_newsletter_sent_at: "2026-06-01T10:00:00Z",
+        },
+        private_metadata: { invitation_id: "inv_dup" },
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
+  });
+
+  it("returns false when body is malformed (missing data)", () => {
+    expect(shouldDispatchWelcomeForUserCreated({})).toBe(false);
+    expect(shouldDispatchWelcomeForUserCreated({ type: "user.created" })).toBe(false);
+    expect(shouldDispatchWelcomeForUserCreated(null)).toBe(false);
+  });
+});
+
+describe("primaryEmailFromUserCreated", () => {
+  it("returns the primary email when primary_email_address_id matches", () => {
+    const data = {
+      id: "user_1",
+      primary_email_address_id: "ea_2",
+      email_addresses: [
+        { id: "ea_1", email_address: "secondary@example.com" },
+        { id: "ea_2", email_address: "primary@example.com" },
+      ],
+    };
+    expect(primaryEmailFromUserCreated(data)).toBe("primary@example.com");
+  });
+
+  it("falls back to the first email when primary_email_address_id is null", () => {
+    const data = {
+      id: "user_2",
+      primary_email_address_id: null,
+      email_addresses: [{ id: "ea_x", email_address: "only@example.com" }],
+    };
+    expect(primaryEmailFromUserCreated(data)).toBe("only@example.com");
+  });
+
+  it("returns null when there are no emails", () => {
+    expect(primaryEmailFromUserCreated({ id: "u", email_addresses: [] })).toBeNull();
+    expect(primaryEmailFromUserCreated({ id: "u" })).toBeNull();
+    expect(primaryEmailFromUserCreated(null)).toBeNull();
+  });
+});
+
+describe("user.created handler integration — welcome dispatch path", () => {
+  // The handler invokes maybeDispatchWelcomeForNewUser which lazily
+  // requires `../stripe/webhook` to call dispatchProWelcome. Without
+  // GITHUB_DISPATCH_TOKEN AND without PULPO_INTERNAL_TOKEN, the
+  // dispatcher returns early ("skipped:no_github_token"); no Resend
+  // or Clerk-write side effects happen. The handler still 200s.
+  //
+  // This is the same path Vercel takes when both tokens are unset in
+  // a preview environment — proving the handler degrades gracefully
+  // is enough for the unit test surface.
+
+  beforeEach(() => {
+    delete process.env.PULPO_INTERNAL_TOKEN;
+    delete process.env.GITHUB_DISPATCH_TOKEN;
+  });
+
+  it("200s on a user.created event from a Stripe-paid invitation (welcome path triggers, dispatcher gracefully skips)", async () => {
+    const body = JSON.stringify({
+      type: "user.created",
+      data: {
+        id: "user_paid",
+        public_metadata: { plan: "pro" },
+        private_metadata: { invitation_id: "inv_paid", stripeCustomerId: "cus_x" },
+        email_addresses: [{ id: "ea_1", email_address: "newpro@example.com" }],
+        primary_email_address_id: "ea_1",
+      },
+    });
+    const ts = Math.floor(Date.now() / 1000).toString();
+    const req = {
+      method: "POST",
+      headers: {
+        "svix-id": "msg_paid",
+        "svix-timestamp": ts,
+        "svix-signature": makeSignature(TEST_SECRET, "msg_paid", ts, body),
+      },
+      body,
+    };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.ok).toBe(true);
+  });
+
+  it("200s on a direct-signup user.created (filter rejects, no dispatch attempt)", async () => {
+    const body = JSON.stringify({
+      type: "user.created",
+      data: {
+        id: "user_direct",
+        public_metadata: {},
+        private_metadata: {},
+        email_addresses: [{ id: "ea_1", email_address: "direct@example.com" }],
+        primary_email_address_id: "ea_1",
+      },
+    });
+    const ts = Math.floor(Date.now() / 1000).toString();
+    const req = {
+      method: "POST",
+      headers: {
+        "svix-id": "msg_direct",
+        "svix-timestamp": ts,
+        "svix-signature": makeSignature(TEST_SECRET, "msg_direct", ts, body),
+      },
+      body,
+    };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.ok).toBe(true);
   });
 });
