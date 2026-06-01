@@ -30,6 +30,12 @@ from ..types import Issue
 # <meta name="x-pulpo-template"> tag in the rendered HTML <head>.
 #
 # Revision history (most recent first):
+#   v4.4 (2026-06-01) — unified rank label across all 10 picks
+#       ("Top deal · NN" / "Mejor oferta · NN" everywhere; the
+#       white-vs-sage card surface still telegraphs hero-vs-shortlist
+#       editorial weight). Title widow guard: post-escape &nbsp;
+#       between last short word + preceding word, plus inline
+#       text-wrap: balance for modern email clients.
 #   v4.3 (2026-05-31) — hard photo-eligibility filter (no broker-logo
 #       placeholders) · chrome alignment (header/hero/footer flush at
 #       24px horizontal) · inline-SVG brand mark replaced with hosted
@@ -43,13 +49,13 @@ from ..types import Issue
 #   v4.0 (2026-05-30) — locked card component · section intros ·
 #       Weekly News Spotlight · Your Pulpo cream cards · footer pill
 #       buttons · skip + next-issue blocks removed
-TEMPLATE_VERSION = "newsletter-v4.3-2026-05-31"
+TEMPLATE_VERSION = "newsletter-v4.4-2026-06-01"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-05-31"
+LAST_UPDATED = "2026-06-01"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }

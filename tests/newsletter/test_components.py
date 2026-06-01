@@ -156,6 +156,75 @@ def test_pro_general_footer_carries_postal_address(rendered_pro_general_html):
     assert "San Salvador, El Salvador" in html
 
 
+def test_pro_general_rank_labels_are_unified(rendered_pro_general_html):
+    """v4.4: every pick (01–10) carries the same rank label text —
+    `Top deal · NN`. The white-vs-sage background + pill chrome
+    still telegraph hero-vs-shortlist editorial weight; the text is
+    the same. Regression guard against the old `Pick · NN` /
+    `Selección · NN` split that confused readers."""
+    html = rendered_pro_general_html
+    # Top-3 picks carry "Top deal · 01..03" — at least pick 01 present.
+    assert "Top deal · 01" in html
+    # Shortlist picks (04+) ALSO carry "Top deal · NN" — at least pick 04.
+    assert "Top deal · 04" in html
+    # The old split labels must NEVER reappear in EN render.
+    assert "Pick · 04" not in html
+    assert "Pick · 05" not in html
+    assert "Selección" not in html  # Spanish label has no place in EN render
+
+
+def test_pro_general_title_carries_widow_guard_styling(rendered_pro_general_html):
+    """Title h2 must carry the `text-wrap:balance` inline style so the
+    modern email clients (Apple Mail Sonoma+ / Gmail web Chromium /
+    Outlook web) avoid orphan-word wraps. Universal-client &nbsp;
+    fallback is asserted by the helper's own unit tests below."""
+    html = rendered_pro_general_html
+    assert "text-wrap:balance" in html
+
+
+# ── _title_with_widow_guard helper ────────────────────────────────────
+
+
+def test_widow_guard_joins_short_trailing_word():
+    """Three-word title where the last word is 3 chars: the last
+    space becomes `&nbsp;` so the short word can't widow on mobile."""
+    from automation.newsletter.render_html import _title_with_widow_guard
+    out = _title_with_widow_guard("Cerromar El Sunzal Lot")
+    assert out == "Cerromar El Sunzal&nbsp;Lot"
+
+
+def test_widow_guard_boundary_at_five_chars():
+    """Threshold is `<= 5`. 4 chars glues, 6 chars left alone."""
+    from automation.newsletter.render_html import _title_with_widow_guard
+    # 4 words, last 4 chars → glued
+    assert _title_with_widow_guard("La Casa de Playa") == "La Casa de&nbsp;Playa"
+    # 4 words, last 6 chars → unchanged
+    assert _title_with_widow_guard("Beachfront Home El Sunzal") == "Beachfront Home El Sunzal"
+
+
+def test_widow_guard_skips_two_word_titles():
+    """A 2-word title would force overflow if we glued (Casa Lot would
+    become an 8-char single unit forcing horizontal scroll on narrow
+    viewports). Skip."""
+    from automation.newsletter.render_html import _title_with_widow_guard
+    assert _title_with_widow_guard("Casa Lot") == "Casa Lot"
+
+
+def test_widow_guard_handles_empty_and_single_word():
+    from automation.newsletter.render_html import _title_with_widow_guard
+    assert _title_with_widow_guard("") == ""
+    assert _title_with_widow_guard("Listing") == "Listing"
+
+
+def test_widow_guard_skips_when_last_word_is_long():
+    """A long trailing word doesn't widow — it consumes a full line
+    on its own. No glue needed."""
+    from automation.newsletter.render_html import _title_with_widow_guard
+    src = "Propiedad frente al mar en acantilado de Playa El Obispo"
+    # Obispo is 6 chars → no glue
+    assert _title_with_widow_guard(src) == src
+
+
 def test_pro_general_renders_locked_v4_markers(rendered_pro_general_html):
     html = rendered_pro_general_html
     # Pro branding (the gold pill next to the wordmark)

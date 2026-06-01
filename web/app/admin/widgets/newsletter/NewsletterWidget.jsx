@@ -121,16 +121,16 @@ const NEWSLETTERS = [
   },
 ];
 
-// v4.3 (2026-05-31) — surface the locked template's version + last
+// v4.4 (2026-06-01) — surface the locked template's version + last
 // revision date on every newsletter card. The values here are the
 // human-readable form of `TEMPLATE_VERSION` + `LAST_UPDATED` in
 // `automation/newsletter/components/_common.py`. The Python-side
 // values are the source of truth; this map mirrors them for display.
-// `tests/newsletter/test_templates.py::test_template_version_in_widget_matches_python`
+// `tests/newsletter/test_templates.py::test_widget_template_version_matches_python_constant`
 // enforces alignment in CI — if the operator bumps TEMPLATE_VERSION
 // in Python but forgets to bump this map (or vice versa), CI fails.
 const TEMPLATE_VERSIONS = {
-  "pulpo-pro-general": { version: "v4.3", lastUpdated: "2026-05-31" },
+  "pulpo-pro-general": { version: "v4.4", lastUpdated: "2026-06-01" },
 };
 
 const PRO_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "pro");

@@ -24,6 +24,32 @@ from .components._common import TEMPLATE_VERSION as _TEMPLATE_VERSION_SHARED
 from .types import Issue, IssuePick, Locale
 
 
+def _title_with_widow_guard(escaped_title: str) -> str:
+    """Replace the LAST inter-word space with a non-breaking space when
+    the trailing word is short enough to widow on mobile wrap.
+
+    Operates on the HTML-escaped title (post `_e(...)`) so the inserted
+    `&nbsp;` entity is literal, not re-escaped. Conservative heuristic:
+    only fires when the title is 3+ words AND the last word is 5 chars
+    or fewer. That covers the real failure modes ("Cerromar El Sunzal Lot",
+    "Beachfront Home El Sunzal") without forcing overflow on already-
+    short titles like "Casa Lot" or single-word headlines.
+
+    Email clients all render `&nbsp;` correctly; this is the universal
+    fallback for the modern `text-wrap: balance` CSS we also stamp inline
+    (which only Apple Mail Sonoma+ / Chromium-based webmail honor).
+    """
+    if not escaped_title:
+        return escaped_title
+    words = escaped_title.split(" ")
+    if len(words) < 3:
+        return escaped_title
+    if len(words[-1]) > 5:
+        return escaped_title
+    # Re-join all-but-last with " ", glue the last with &nbsp;
+    return " ".join(words[:-1]) + "&nbsp;" + words[-1]
+
+
 # Bumped whenever the renderer's CSS or layout changes in a way we'd want
 # to slice in PostHog (audience tests, regression hunts, A/B pre-bake).
 # Stays in sync with docs/newsletter-audit.md. Exposed via
@@ -1471,10 +1497,12 @@ def _pick_card_html(
     """The single locked listing-card component for all 10 picks.
 
     Top-deal variant (ranks 01–03): sage `#DDE9DC` background +
-    forest "TOP DEAL · NN" pill. Regular variant (ranks 04–10):
-    white background + sand "PICK · NN" pill. Every other slot —
-    photo, title, spec strip, price, "Why we picked it" card,
-    See-on-Pulpo + Save CTAs — renders identically across both.
+    forest "Top deal · NN" pill. Regular variant (ranks 04–10):
+    white background + sand "Top deal · NN" pill. v4.4 (2026-06-01)
+    — the label TEXT is unified across all 10 picks; only the card
+    surface + pill chrome differ. Every other slot — photo, title,
+    spec strip, price, "Why we picked it" card, See-on-Pulpo + Save
+    CTAs — renders identically across both.
 
     All visual rules are duplicated as inline `style=""` on each
     element so Gmail / Outlook / Yahoo (which strip `<style>` for
@@ -1490,16 +1518,23 @@ def _pick_card_html(
     en = locale == "en"
     rank = pick.rank
 
+    # The rank LABEL is the same for every pick — "Top deal · NN" /
+    # "Mejor oferta · NN" — because the numbering already tells the
+    # ranking story (01 outranks 04 outranks 10). What still telegraphs
+    # the editorial split between hero + shortlist is the card surface:
+    # top-3 stay sage with a forest pill (visually loud), picks 4-10
+    # stay white with a sand pill (visually calm). Two labels (Pick vs
+    # Top deal) was confusing — readers asked "what's the difference?"
+    # when there isn't a product difference, just a typographic one.
+    rank_label = "Top deal" if en else "Mejor oferta"
     if is_top_deal:
         card_bg = "#DDE9DC"
         rank_pill_bg = "#1F3D31"
         rank_pill_color = "#F4EFE6"
-        rank_label = "Top deal" if en else "Mejor oferta"
     else:
         card_bg = "#FFFFFF"
         rank_pill_bg = "#E8DFC6"
         rank_pill_color = "#5A5650"
-        rank_label = "Pick" if en else "Selección"
 
     state_pill = _pick_state_pill_html(pick, locale)
 
@@ -1552,10 +1587,16 @@ def _pick_card_html(
         save_label = i18n.t("pick.cta_save", locale)
         primary_url = pick.pulpo_url or pick.listing_url or paywall_url
         save_url = pick.save_url or (primary_url + ("&save=1" if "?" in primary_url else "?save=1"))
+        title_html = _title_with_widow_guard(_e(pick.title or ""))
         body_html = (
             f'<h2 class="pick-title" style="font-family:\'Instrument Serif\','
             f'Georgia,serif;font-size:30px;line-height:1.06;letter-spacing:-0.01em;'
-            f'font-weight:400;margin:0 0 4px;color:#1A1916;">{_e(pick.title or "")}</h2>'
+            f'font-weight:400;margin:0 0 4px;color:#1A1916;'
+            # text-wrap: balance is honoured by Apple Mail Sonoma+, Gmail
+            # web (Chromium), Outlook web; older clients silently fall
+            # back to the default greedy wrap. The &nbsp; in title_html
+            # is the universal-client fallback for short-word widows.
+            f'text-wrap:balance;">{title_html}</h2>'
             f'<p style="margin:0 0 12px;font-size:12.5px;color:#5A5650;'
             f'letter-spacing:0.02em;text-transform:uppercase;font-weight:500;">'
             f'{_e(pick.location_line or "")}</p>'

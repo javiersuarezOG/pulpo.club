@@ -43,7 +43,7 @@ Operator-driven polish + hard data-quality gate:
 | [`brand`](brand.py) | Header strip + footer | Pulpo octopus + gold `PRO` pill + wordmark · Footer pill buttons (Change filters / Change cadence / Unsubscribe) |
 | [`hero`](hero.py) | Hero block | Eyebrow + serif H1 + 2-sentence lede + filter chip |
 | [`favorites`](favorites.py) | Saved-listings cards | Cream block · numeric headline · editorial summary · per-save cards · "Open all favorites →" |
-| [`picks`](picks.py) | THE listing card + section intros | One `pick_card_html` for all 10 picks. Only background color (sage vs white) + rank pill ("TOP DEAL · NN" vs "PICK · NN") differ between top 3 and next 7. Section intros are big serif H2s |
+| [`picks`](picks.py) | THE listing card + section intros | One `pick_card_html` for all 10 picks. Rank label unified: "Top deal · NN" (EN) / "Mejor oferta · NN" (ES) on all 10. Only background color (sage vs white) + pill chrome (forest-on-cream vs sand-on-grey) differ between top 3 and next 7. Title carries `text-wrap: balance` + post-escape `&nbsp;` widow guard to keep trailing short words glued to their preceding word. Section intros are big serif H2s |
 | [`editorial`](editorial.py) | Market context + Weekly News Spotlight | Market = 3 numbered editorial mini-blocks (01/02/03) · Spotlight = Pulpo icon + eyebrow + "Reported by …" + H2 + body |
 | [`personal`](personal.py) | "Pick up where you left off" | Up to 4 stacked cream action cards (saved / filter / browse / welcome) |
 | [`paywall`](paywall.py) | Pro upsell band | Free-cohort only · forest green band · "Go Pro — $9.99/month →" CTA |
