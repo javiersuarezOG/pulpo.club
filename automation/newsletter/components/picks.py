@@ -7,12 +7,17 @@ section headers above each block).
 
 Locked contract for v4:
   • `pick_card_html(pick, locale, is_top_deal, paywall_url)` — THE
-    single listing component. Renders every pick. Only two things
-    differ between top-3 and next-7 variants: card background
-    (sage `#DDE9DC` vs white) and rank pill copy ("TOP DEAL · NN"
-    vs "PICK · NN"). Photo, title, spec strip, price, "Why we
-    picked it" card, and the paired See-on-Pulpo + ♥ Save CTA pair
-    are IDENTICAL across both variants.
+    single listing component. Renders every pick. Two things differ
+    between top-3 and next-7 variants: card background (sage `#DDE9DC`
+    vs white) and rank pill chrome (forest-on-cream pill for top-3,
+    sand-on-grey for picks 4–10). v4.4 (2026-06-01) — the rank pill
+    LABEL is unified: "Top deal · NN" (EN) / "Mejor oferta · NN" (ES)
+    across all 10 picks. The numbering does the ranking work; having
+    two labels (Top deal vs Pick) was confusing readers who asked
+    what the product difference was when there isn't one. Photo,
+    title, spec strip, price, "Why we picked it" card, and the
+    paired See-on-Pulpo + ♥ Save CTA pair are IDENTICAL across both
+    variants.
   • `section_intro_top3_html(locale)` — big serif H2 ("Top 3 this
     week.") + subtitle. Sits above pick 01.
   • `section_intro_rest_html(locale, n_rest)` — same shape, "{n}
