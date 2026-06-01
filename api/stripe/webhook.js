@@ -890,19 +890,18 @@ module.exports = async (req, res) => {
           // retry redoes the work, which is the tolerated failure mode.
           await markStripeEventProcessed(stripe, subscriptionId, event.id);
 
-          // NOTE: the Pulpo Pro Welcome is INTENTIONALLY NOT
-          // dispatched on this path. At this point no Clerk user
-          // exists yet for this email — the dispatcher's Clerk
-          // lookup would return null and the welcome would skip with
-          // reason=clerk_lookup_failed. The right trigger surface for
-          // anonymous-invitation users is the post-invitation
-          // user.created hook (Clerk webhook, separate file). The
-          // activation email itself already carries the warm
-          // "set up your Pulpo Pro account" framing; layering the
-          // Pro Welcome on top of an unaccepted invitation would
-          // also be premature — the user hasn't onboarded yet. Saved
-          // in `project_pro_welcome_anonymous_path` memory as a
-          // follow-up item.
+          // Pulpo Pro Welcome dispatch — DEFERRED to invitation
+          // acceptance time, not fired here. At this point no Clerk
+          // user exists yet (only an invitation row), so the
+          // dispatcher's Clerk lookup would skip with
+          // reason=clerk_lookup_failed. Phase 2 wired the welcome
+          // to the Clerk `user.created` webhook handler at
+          // api/clerk/webhook.js — when the user accepts the
+          // invitation and Clerk mints the user record, that hook
+          // sees `publicMetadata.plan === "pro"` (set on the
+          // invitation here, line 854) and dispatches the welcome
+          // through the same `dispatchProWelcome` orchestrator.
+          // No follow-up needed — the gap is closed.
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
             path: "anonymous_invitation_created", session_id: session.id,
@@ -911,7 +910,7 @@ module.exports = async (req, res) => {
             resend_ok: sendResult.ok,
             resend_message_id: sendResult.message_id || "",
             resend_error: sendResult.error || "",
-            welcome: "deferred:anonymous_invitation",
+            welcome: "pending:awaits_invitation_acceptance",
           });
           // invitation_sent: true means we ASKED Resend to send. The
           // truer delivered/bounced signal comes from api/resend-webhook
