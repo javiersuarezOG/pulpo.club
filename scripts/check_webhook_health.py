@@ -71,6 +71,17 @@ FAMILIES = {
         "where": "event = 'webhook.received'",
         "max_age_hours": 48.0,
     },
+    # Welcome reconcile cron — fires hourly per the workflow's
+    # `15 * * * *` schedule. Each tick captures
+    # `newsletter.welcome_reconcile_completed` exactly once. A gap >
+    # 2h means GH Actions stopped honoring the cron OR the script
+    # threw before the capture — both are operator-visible failures
+    # that need investigation. 2h = 1 hourly tick + 1 cron grace.
+    "welcome_reconcile": {
+        "label": "Welcome reconcile cron (newsletter.welcome_reconcile_completed)",
+        "where": "event = 'newsletter.welcome_reconcile_completed'",
+        "max_age_hours": 2.0,
+    },
 }
 
 
@@ -117,6 +128,113 @@ RATE_CHECKS = {
         "window_hours": 720.0,
         "threshold": 0.001,              # 0.1%
         "min_denominator": 50,
+    },
+    # ── Welcome dispatch failure rate ────────────────────────────────
+    # Welcome dispatches that returned `status=failed` from the Python
+    # dispatcher. Numerator is `newsletter.welcome_failed`; denominator
+    # is `newsletter.welcome_sent` (successful dispatches).
+    #
+    # 24h window — welcomes fire on signups, so the volume scales with
+    # daily new-Pro signups (currently ~1-10/day). min_denominator=5
+    # avoids alarming when a single failure on a 2-recipient day
+    # produces 50% failure rate.
+    #
+    # 10% threshold — failures should be rare; sustained > 10% over
+    # a day points at a real upstream issue (Resend outage, Clerk
+    # auth broken, ranked.json missing). Lower than the newsletter
+    # bounce-rate threshold (2%) because welcome failures include
+    # dispatcher errors, not just delivery — we want to know about
+    # both. Tighten as volume grows.
+    "welcome_failure_rate": {
+        "label": "Welcome dispatch failure rate",
+        "numerator_where": "event = 'newsletter.welcome_failed'",
+        "denominator_where": "event = 'newsletter.welcome_sent'",
+        "window_hours": 24.0,
+        "threshold": 0.10,               # 10%
+        "min_denominator": 5,
+    },
+    # ── Vercel Python fallback rate ──────────────────────────────────
+    # When the Vercel Python instant path is unreachable (timeout,
+    # 5xx, fetch fail), the webhook falls back to GH Actions
+    # (`newsletter.welcome_internal_unreachable`). Healthy state: the
+    # primary handles ~all welcomes, fallback is < 5%.
+    #
+    # 6h window for fast detection — a Vercel Python outage that
+    # lasts hours means every welcome takes 30-75s instead of <5s.
+    # Customer-visible degradation worth alerting on.
+    #
+    # 25% threshold — set high enough that occasional cold-start
+    # timeouts don't cry wolf; low enough that a real Vercel
+    # function outage fires. min_denominator=4 = need ~one welcome
+    # every 90 min before the rate is meaningful.
+    "welcome_internal_fallback_rate": {
+        "label": "Welcome Vercel Python fallback rate (instant path unreachable)",
+        "numerator_where": "event = 'newsletter.welcome_internal_unreachable'",
+        "denominator_where": (
+            "event IN ("
+            "'newsletter.welcome_internal_responded', "
+            "'newsletter.welcome_internal_unreachable'"
+            ")"
+        ),
+        "window_hours": 6.0,
+        "threshold": 0.25,               # 25%
+        "min_denominator": 4,
+    },
+    # ── Unsubscribe rate (audience-fit signal) ───────────────────────
+    # Healthy newsletter unsubscribe rate per send is 0.2-0.5%;
+    # cumulative over 30 days settles around 1-2%. Sustained > 2%
+    # over 30 days = audience-fit issue (wrong content, wrong
+    # frequency, or audience drift). Alert on that signal.
+    #
+    # Numerator: `newsletter.unsubscribed` from api/unsubscribe.js
+    # (one-click List-Unsubscribe + the manual /unsubscribe page).
+    # Denominator: `newsletter.delivered` from the Resend webhook.
+    # Both filter to email_type=newsletter so activation-email
+    # unsubscribes (rare; activation has its own unsub flow) don't
+    # mix into the rate.
+    #
+    # min_denominator=50 matches the bounce/complaint rate checks —
+    # below that, the rate is too noisy to act on (one unsub on a
+    # 30-recipient send = 3% but proves nothing).
+    "newsletter_unsubscribe_rate": {
+        "label": "Newsletter unsubscribe rate (audience-fit signal)",
+        "numerator_where": (
+            "event = 'newsletter.unsubscribed'"
+        ),
+        "denominator_where": (
+            "event = 'newsletter.delivered' "
+            "AND JSONExtractString(properties, 'email_type') = 'newsletter'"
+        ),
+        "window_hours": 720.0,           # 30 days
+        "threshold": 0.02,               # 2%
+        "min_denominator": 50,
+    },
+    # ── Weekly Pro digest send failure rate ──────────────────────────
+    # Same shape as the welcome failure rate but for the weekly cron
+    # (Sunday 10 AM SV). Numerator = `newsletter.send_failed`,
+    # denominator = `newsletter.send_succeeded`, both filtered to
+    # non-dry-run sends.
+    #
+    # 192h (8-day) window covers one full Sunday send cycle + 1 day
+    # of grace. min_denominator=20 because the Pro audience is
+    # typically > 50 recipients per send.
+    #
+    # 5% threshold — a Sunday send that fails for >5% of recipients
+    # is a real reliability issue (likely a domain reputation hit or
+    # ranked.json corruption, not a one-off bounce).
+    "weekly_send_failure_rate": {
+        "label": "Weekly Pro digest send failure rate (non-dry-run)",
+        "numerator_where": (
+            "event = 'newsletter.send_failed' "
+            "AND JSONExtractBool(properties, 'dry_run') = false"
+        ),
+        "denominator_where": (
+            "event = 'newsletter.send_succeeded' "
+            "AND JSONExtractBool(properties, 'dry_run') = false"
+        ),
+        "window_hours": 192.0,
+        "threshold": 0.05,               # 5%
+        "min_denominator": 20,
     },
 }
 

@@ -1003,6 +1003,18 @@ function buildFiltersForCategory(category) {
     gated:        () => { f.discovery_tags.add("gated"); },
     waterfront:   () => { f.discovery_tags.add("waterfront"); },
     top_10:       () => { f.rank_max = 10; },
+    // Wave-6: HeroV5 destination cards. Each region lands on the broad
+    // master_category view for now — the page is useful immediately
+    // (Beach / Lake catalogue) even when the user clicks a specific
+    // Surf City I or Coatepeque card. Zone-level filtering (slug-set
+    // expansion to el-tunco/sunzal/zonte for Surf City I, etc.) is a
+    // follow-up: the existing `zones` filter checks `zone_name`, which
+    // is currently null on every listing — fixing that to read `zone`
+    // is its own scope and shouldn't gate the HeroV5 ship.
+    surf_city_1:  () => { f.master_category = "beach"; },
+    surf_city_2:  () => { f.master_category = "beach"; },
+    coatepeque:   () => { f.master_category = "lake"; },
+    ilopango:     () => { f.master_category = "lake"; },
   };
   map[category]?.();
   return f;

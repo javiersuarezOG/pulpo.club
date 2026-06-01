@@ -83,7 +83,7 @@ const NEWSLETTERS = [
     id: "pro-weekly",
     tier: "pro",
     title: "Pro · Weekly digest",
-    description: "Sundays 9 AM · 10 curated picks per recipient, personalised to their discover_filters.",
+    description: "Sundays 10 AM SV · 10 curated picks per recipient, personalised to their discover_filters.",
     template: "pulpo-pro-general",
     templateLabel: "Pulpo Pro General",
     cadenceMode: "scheduled",
@@ -93,16 +93,17 @@ const NEWSLETTERS = [
     id: "pro-welcome",
     tier: "pro",
     title: "Pro · Welcome",
-    description: "Single onboarding email sent when a Free user upgrades to Pro. Lands ~30s after the Stripe checkout completes.",
+    description: "Single onboarding email sent on first Pro payment. <5s for existing users (Stripe webhook → Vercel Python). For new users via /start, fires after Clerk signup completes (~5s post-password). Hourly reconcile cron catches any silent failures.",
     template: "pulpo-pro-welcome",
     templateLabel: "Pulpo Pro Welcome",
     cadenceMode: "onetime",
-    // status="draft" until the Stripe webhook trigger lands in a follow-up
-    // PR. The admin Test-send-to-me surface
-    // (POST /api/admin/newsletter/trigger-welcome-test) already works
-    // against this template — operators can preview the welcome end-to-end
-    // before production wiring goes live.
-    status: "draft",
+    // status="live" as of 2026-06-01 — end-to-end verified in prod:
+    //   • PULPO_INTERNAL_TOKEN set in Vercel env (Vercel Python instant path active)
+    //   • Clerk user.created webhook subscribed (Path C wired)
+    //   • Filter fix #607 deployed (stripeCustomerId, not invitation_id)
+    //   • Resend send + Clerk publicMetadata stamp confirmed working
+    //   • Reconcile cron at :15 * * * * provides safety net for orphans
+    status: "live",
   },
   {
     id: "free-welcome",
@@ -1083,10 +1084,18 @@ export function NewsletterWidget() {
 
   // Shared trigger for the per-row "Send test →" buttons in the
   // Upcoming Sends panel. `issueNumber=null` keeps the legacy default
-  // ("1" server-side). `newsletterId` defaults to "pro-weekly" for
-  // back-compat with callers that don't thread it (today every live
-  // trigger is Pro Weekly — Pro Welcome / Free Weekly will pass their
-  // own IDs when they ship; the server allow-list already accepts them).
+  // ("1" server-side). `newsletterId` routes per-newsletter to the
+  // correct admin endpoint:
+  //   • pro-weekly → /api/admin/newsletter/trigger-preview (dispatches
+  //     the weekly digest workflow with preview_cohorts=<email>)
+  //   • pro-welcome → /api/admin/newsletter/trigger-welcome-test
+  //     (dispatches the welcome workflow with force=yes so the
+  //     operator can re-test against Clerk users who already have
+  //     the welcome_newsletter_sent_at stamp)
+  //   • free-* → not yet live; will route to their own endpoints
+  //     when those templates ship.
+  // The endpoint shapes differ (body fields, headers) so we branch
+  // here rather than hiding the routing in the server-side allow-list.
   const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly" } = {}) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
@@ -1096,14 +1105,32 @@ export function NewsletterWidget() {
     setBusy(true);
     setStatusFor(newsletterId, { kind: "pending", when });
     const operatorEmail = readOperatorEmail();
+    // Per-newsletter endpoint routing. Each card's trigger goes to
+    // the admin endpoint that drives its specific dispatch pipeline
+    // — there's no shared one-size-fits-all "send test" route.
+    const endpoint = newsletterId === "pro-welcome"
+      ? "/api/admin/newsletter/trigger-welcome-test"
+      : "/api/admin/newsletter/trigger-preview";
     try {
       // `by` lets the server-side audit trail attribute the dispatch
       // to a specific operator on the cross-device log. Spoofable
       // (the endpoint is intentionally auth-light) but useful for
       // the legitimate-traffic happy path.
-      const payload = { email: value, locale, by: operatorEmail || undefined, newsletter_id: newsletterId };
-      if (issueNumber != null) payload.issue_number = issueNumber;
-      const r = await fetch("/api/admin/newsletter/trigger-preview", {
+      const payload = { email: value, by: operatorEmail || undefined };
+      // The weekly endpoint accepts locale + newsletter_id +
+      // issue_number; the welcome endpoint accepts force (and
+      // defaults to force=true server-side). Conditionally attach
+      // fields based on which endpoint we're calling so the
+      // payload matches each endpoint's schema cleanly.
+      if (newsletterId === "pro-welcome") {
+        // No additional payload — welcome endpoint reads everything
+        // (locale, plan, email) from the recipient's Clerk record.
+      } else {
+        payload.locale = locale;
+        payload.newsletter_id = newsletterId;
+        if (issueNumber != null) payload.issue_number = issueNumber;
+      }
+      const r = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
@@ -1423,22 +1450,83 @@ export function NewsletterWidget() {
               </div>
             </article>
 
-            {/* Pro · Welcome — COMING SOON */}
-            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => (
-              <article key={nl.id} className="nl-newsletter-card coming-soon">
-                <div className="nl-newsletter-head">
-                  <h3 className="nl-newsletter-title">{nl.title}</h3>
-                  <span className="nl-newsletter-status coming-soon">◌ Coming soon</span>
-                </div>
-                <p className="nl-newsletter-desc">{nl.description}</p>
-                <p className="nl-newsletter-template">
-                  Template · <strong>{nl.templateLabel}</strong>
-                  {templateVersions[nl.template] && (
-                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+            {/* Pro · Welcome (+ any future non-weekly Pro newsletter).
+                Status comes from the NEWSLETTERS registry — when a
+                card flips status: "live" the render here picks it up
+                automatically. The previous version hardcoded "Coming
+                soon" for every non-weekly card, missing the 2026-06-01
+                Pro Welcome go-live.
+
+                Live cards get a "Send test welcome to me" button that
+                dispatches via /api/admin/newsletter/trigger-welcome-test
+                (the trigger() helper routes by newsletterId). Status
+                feedback renders inline below the button using the same
+                statusFor() store the weekly card uses. */}
+            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => {
+              const isLive = nl.status === "live";
+              const cardStatus = statusFor(nl.id);
+              return (
+                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
+                  <div className="nl-newsletter-head">
+                    <h3 className="nl-newsletter-title">{nl.title}</h3>
+                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
+                      {isLive ? "● Live" : "◌ Coming soon"}
+                    </span>
+                  </div>
+                  <p className="nl-newsletter-desc">{nl.description}</p>
+                  <p className="nl-newsletter-template">
+                    Template · <strong>{nl.templateLabel}</strong>
+                    {templateVersions[nl.template] && (
+                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+                    )}
+                  </p>
+                  {isLive && (
+                    <>
+                      <div className="nl-upcoming-actions" style={{ marginTop: 12 }}>
+                        <button
+                          type="button"
+                          className="nl-upcoming-btn"
+                          onClick={() => trigger({ newsletterId: nl.id })}
+                          disabled={busy}
+                          title="Send a test welcome email to the address above — bypasses the Clerk idempotency stamp so you can re-test against the same user." // i18n-allow: admin-only widget
+                        >
+                          Send test welcome to me →
+                        </button>
+                      </div>
+                      {cardStatus.kind === "pending" && (
+                        <p className="nl-result pending" style={{ marginTop: 8 }}>
+                          <span className="nl-status-icon" aria-hidden="true" />
+                          Dispatching test welcome…
+                        </p>
+                      )}
+                      {cardStatus.kind === "error" && (
+                        <p className="nl-result error" style={{ marginTop: 8 }}>
+                          ⚠ {cardStatus.message}
+                        </p>
+                      )}
+                      {cardStatus.kind === "success" && (
+                        <div className="nl-success-card" style={{ marginTop: 8 }}>
+                          <p className="nl-success-head">
+                            <span className="nl-success-check" aria-hidden="true">✓</span>
+                            Dispatched · welcome on the way
+                          </p>
+                          <p className="nl-success-body">
+                            Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds. Look for the subject <strong>Welcome to Pulpo Pro — your first 10</strong>.
+                          </p>
+                          {cardStatus.runsUrl && (
+                            <p className="nl-success-footer">
+                              <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">
+                                View workflow run on GitHub →
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
-                </p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* ── FREE section ────────────────────────────────────── */}

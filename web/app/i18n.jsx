@@ -326,6 +326,85 @@ const UI_STRINGS = {
   "home.hero.new_badge":         { en: "NEW",
                                    es: "NUEVO" },
 
+  // ── HeroV5 (Wave-6) — "Sunday morning, coffee, your top 10 properties."
+  // Renders when the `hero_v5` feature flag is on, replacing HeroV4 and
+  // PickShoreline (the 5 destination cards absorb the shoreline picker).
+  // Copy was iterated on with Javier in the Pulpo mockup at
+  // /tmp/pulpo-home-hero-v2.html; tweaks below should keep the editorial
+  // newsletter voice intact ("Domingo en la mañana, café, …").
+  "home.hero.v5.h1_a":           { en: "Sunday morning, coffee, and…",
+                                   es: "Domingo en la mañana, café, y…" },
+  "home.hero.v5.h1_b":           { en: "your top 10 properties.",
+                                   es: "tu top 10 propiedades." },
+  "home.hero.v5.sub":            { en: "We watch every property site in El Salvador so you don't have to — top picks ranked, in your inbox, every Sunday.",
+                                   es: "Revisamos cada sitio de propiedades en El Salvador por vos — los mejores ranqueados, en tu inbox, cada domingo." },
+
+  // "Where to start" subsection above the 5 destination cards.
+  "home.hero.v5.section_title":  { en: "Where to start",
+                                   es: "Por dónde empezar" },
+  "home.hero.v5.section_sub":    { en: "Or keep scrolling for more.",
+                                   es: "O seguí bajando para ver más." },
+
+  // 5 destination cards. Slugs (surf_city_1 / surf_city_2 / coatepeque /
+  // ilopango) are recognized by pages.jsx#buildFiltersForCategory.
+  "home.hero.v5.dest.all.label": { en: "All listings",
+                                   es: "Todo el catálogo" },
+  "home.hero.v5.dest.all.tag":   { en: "The full catalogue",
+                                   es: "Las cuatro regiones" },
+  "home.hero.v5.dest.s1.label":  { en: "Surf City I",
+                                   es: "Surf City I" },
+  "home.hero.v5.dest.s1.tag":    { en: "El Tunco · Sunzal · Zonte",
+                                   es: "El Tunco · Sunzal · Zonte" },
+  "home.hero.v5.dest.s2.label":  { en: "Surf City II",
+                                   es: "Surf City II" },
+  "home.hero.v5.dest.s2.tag":    { en: "Las Flores · Punta Mango",
+                                   es: "Las Flores · Punta Mango" },
+  "home.hero.v5.dest.cp.label":  { en: "Lago Coatepeque",
+                                   es: "Lago Coatepeque" },
+  "home.hero.v5.dest.cp.tag":    { en: "Santa Ana",
+                                   es: "Santa Ana" },
+  "home.hero.v5.dest.il.label":  { en: "Lago Ilopango",
+                                   es: "Lago Ilopango" },
+  "home.hero.v5.dest.il.tag":    { en: "San Salvador",
+                                   es: "San Salvador" },
+
+  // Newsletter postcard preview (right column). Editorial format
+  // mirroring the Sunday newsletter "MARKET CONTEXT" section. Static —
+  // updated by hand alongside the newsletter cadence.
+  "home.hero.v5.pc.brand":            { en: "pulpo",
+                                        es: "pulpo" },
+  "home.hero.v5.pc.issue":            { en: "Issue Nº 47",
+                                        es: "Edición Nº 47" },
+  "home.hero.v5.pc.date":             { en: "Sunday · June 1, 2026",
+                                        es: "Domingo · 1 de junio, 2026" },
+  "home.hero.v5.pc.market_eyebrow":   { en: "Market context",
+                                        es: "Contexto de mercado" },
+  "home.hero.v5.pc.market_title_a":   { en: "What's moving",
+                                        es: "Qué se está" },
+  "home.hero.v5.pc.market_title_b":   { en: "this week.",
+                                        es: "moviendo." },
+  // Three numbered insights. `body` allows inline <strong> bolding for
+  // place names — rendered with dangerouslySetInnerHTML (i18n-trusted
+  // strings only; never user input).
+  "home.hero.v5.pc.insight_0_lead":   { en: "Biggest mover:",
+                                        es: "Mayor movimiento:" },
+  "home.hero.v5.pc.insight_0_body":   { en: "76,259m² lot in <strong>Chiltiupán</strong> cut its ask — developer-scale.",
+                                        es: "Lote de 76,259m² en <strong>Chiltiupán</strong> bajó su precio — escala desarrollador." },
+  "home.hero.v5.pc.insight_1_lead":   { en: "Second mover:",
+                                        es: "Segundo movimiento:" },
+  "home.hero.v5.pc.insight_1_body":   { en: "Beachfront home in <strong>Tamanique</strong> dropped $40K — no project tag.",
+                                        es: "Casa frente al mar en <strong>Tamanique</strong> bajó $40K — sin tag de proyecto." },
+  "home.hero.v5.pc.insight_2_lead":   { en: "The take:",
+                                        es: "La toma:" },
+  "home.hero.v5.pc.insight_2_body":   { en: "Both moves on Surf City I. Western coast sellers are open to negotiating.",
+                                        es: "Ambos movimientos en Surf City I. Los vendedores de la costa oeste están abiertos a negociar." },
+  "home.hero.v5.pc.more":             { en: "Read full edition →",
+                                        es: "Leé la edición completa →" },
+  "home.hero.v5.pc.foot_left":        { en: "Delivered Sundays · 7am",
+                                        es: "Cada domingo · 7am" },
+  "home.hero.v5.pc.foot_right":       { en: "pulpo.club",
+                                        es: "pulpo.club" },
+
   "home.featured.eyebrow":       { en: "FEATURED DEAL",
                                    es: "OFERTA DESTACADA" },
   // Wave-5b: when featured_deal_real_v1 flag is on, the card renders a
@@ -393,30 +472,35 @@ const UI_STRINGS = {
   // when ≥5 listings qualify; otherwise the section is hidden. NEW
   // and PRICE-DROP signals now ride on per-card chips (PR #421) so
   // no dedicated shelves for those any more.
-  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 beach land",
-                                          es: "Top 10 terrenos de playa" },
-  "home.shelf.top_beach_terrenos.sub": { en: "Best-priced land along the Pacific coast.",
-                                          es: "Los mejores terrenos en la costa del Pacífico." },
-  "home.shelf.top_beach_condos.h2":    { en: "Top 10 beach condos",
-                                          es: "Top 10 apartamentos de playa" },
-  "home.shelf.top_beach_condos.sub":   { en: "Turn-key apartments by the ocean.",
-                                          es: "Apartamentos listos para habitar junto al mar." },
-  "home.shelf.top_beach_homes.h2":     { en: "Top 10 beach homes",
-                                          es: "Top 10 casas de playa" },
-  "home.shelf.top_beach_homes.sub":    { en: "Single-family beachfront and beach-walk residences.",
-                                          es: "Casas frente al mar y a pasos de la playa." },
-  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lake land",
-                                          es: "Top 10 terrenos de lago" },
-  "home.shelf.top_lake_terrenos.sub":  { en: "Best-ranked lakefront land, El Salvador-wide.",
-                                          es: "Los mejores terrenos frente al lago en El Salvador." },
-  "home.shelf.top_lake_condos.h2":     { en: "Top 10 lake condos",
-                                          es: "Top 10 apartamentos de lago" },
-  "home.shelf.top_lake_condos.sub":    { en: "Move-in-ready apartments with lake access.",
-                                          es: "Apartamentos listos para habitar con acceso al lago." },
-  "home.shelf.top_lake_homes.h2":      { en: "Top 10 lake homes",
-                                          es: "Top 10 casas de lago" },
-  "home.shelf.top_lake_homes.sub":     { en: "Single-family residences on the lake.",
-                                          es: "Casas familiares en el lago." },
+  // Wave-6: titles name the actual regions (Surf City I + II,
+  // Coatepeque + Ilopango) instead of generic "beach"/"lake". Subs
+  // lead with geographic spread + a value-add so each shelf answers
+  // "is this for me?". Spanish uses SV "vos"-form ("construí",
+  // "mudarte") and "apartamentos" (not "condos") for the unit type.
+  "home.shelf.top_beach_terrenos.h2":  { en: "Top 10 lots · Surf City I + II",
+                                          es: "Top 10 terrenos · Surf City I + II" },
+  "home.shelf.top_beach_terrenos.sub": { en: "El Tunco to Punta Mango — build your own beach place.",
+                                          es: "Desde El Tunco hasta Punta Mango — construí tu casa de playa." },
+  "home.shelf.top_beach_condos.h2":    { en: "Top 10 condos · Surf City I + II",
+                                          es: "Top 10 apartamentos · Surf City I + II" },
+  "home.shelf.top_beach_condos.sub":   { en: "Walk-to-surf apartments, low maintenance.",
+                                          es: "Apartamentos a la playa caminando, bajo mantenimiento." },
+  "home.shelf.top_beach_homes.h2":     { en: "Top 10 homes · Surf City I + II",
+                                          es: "Top 10 casas · Surf City I + II" },
+  "home.shelf.top_beach_homes.sub":    { en: "Move-in-ready beach houses across both coasts.",
+                                          es: "Casas de playa listas para mudarte, en ambas costas." },
+  "home.shelf.top_lake_terrenos.h2":   { en: "Top 10 lots · Coatepeque + Ilopango",
+                                          es: "Top 10 terrenos · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_terrenos.sub":  { en: "Lake-rim land in Santa Ana and San Salvador.",
+                                          es: "Terrenos frente al lago, en Santa Ana y San Salvador." },
+  "home.shelf.top_lake_condos.h2":     { en: "Top 10 condos · Coatepeque + Ilopango",
+                                          es: "Top 10 apartamentos · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_condos.sub":    { en: "Turn-key lakeside weekenders on both lakes.",
+                                          es: "Escapadas al lago, llave en mano — en ambos lagos." },
+  "home.shelf.top_lake_homes.h2":      { en: "Top 10 homes · Coatepeque + Ilopango",
+                                          es: "Top 10 casas · Coatepeque e Ilopango" },
+  "home.shelf.top_lake_homes.sub":     { en: "Lake-view houses, cooler than the coast — 30–60 min from the capital.",
+                                          es: "Casas con vista al lago, más fresco que la costa — a 30–60 min de la capital." },
   "home.shelf.prev":             { en: "Show previous listings",
                                    es: "Ver propiedades anteriores" },
   "home.shelf.next":             { en: "Show next listings",
