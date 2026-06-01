@@ -180,6 +180,35 @@ RATE_CHECKS = {
         "threshold": 0.25,               # 25%
         "min_denominator": 4,
     },
+    # ── Unsubscribe rate (audience-fit signal) ───────────────────────
+    # Healthy newsletter unsubscribe rate per send is 0.2-0.5%;
+    # cumulative over 30 days settles around 1-2%. Sustained > 2%
+    # over 30 days = audience-fit issue (wrong content, wrong
+    # frequency, or audience drift). Alert on that signal.
+    #
+    # Numerator: `newsletter.unsubscribed` from api/unsubscribe.js
+    # (one-click List-Unsubscribe + the manual /unsubscribe page).
+    # Denominator: `newsletter.delivered` from the Resend webhook.
+    # Both filter to email_type=newsletter so activation-email
+    # unsubscribes (rare; activation has its own unsub flow) don't
+    # mix into the rate.
+    #
+    # min_denominator=50 matches the bounce/complaint rate checks —
+    # below that, the rate is too noisy to act on (one unsub on a
+    # 30-recipient send = 3% but proves nothing).
+    "newsletter_unsubscribe_rate": {
+        "label": "Newsletter unsubscribe rate (audience-fit signal)",
+        "numerator_where": (
+            "event = 'newsletter.unsubscribed'"
+        ),
+        "denominator_where": (
+            "event = 'newsletter.delivered' "
+            "AND JSONExtractString(properties, 'email_type') = 'newsletter'"
+        ),
+        "window_hours": 720.0,           # 30 days
+        "threshold": 0.02,               # 2%
+        "min_denominator": 50,
+    },
     # ── Weekly Pro digest send failure rate ──────────────────────────
     # Same shape as the welcome failure rate but for the weekly cron
     # (Sunday 10 AM SV). Numerator = `newsletter.send_failed`,

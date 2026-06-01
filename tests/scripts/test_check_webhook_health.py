@@ -141,6 +141,25 @@ def test_welcome_rate_checks_share_window_consistency():
     assert health.RATE_CHECKS["welcome_internal_fallback_rate"]["window_hours"] >= 1.0
 
 
+def test_unsubscribe_rate_check_registered():
+    """Unsubscribe rate > 2% over 30 days = audience-fit signal.
+    Per-event notification lives in scripts/notify_unsubscribes.py;
+    this rate check is the slower backstop for sustained drift."""
+    assert "newsletter_unsubscribe_rate" in health.RATE_CHECKS
+    cfg = health.RATE_CHECKS["newsletter_unsubscribe_rate"]
+    assert "newsletter.unsubscribed" in cfg["numerator_where"]
+    # Denominator filters to email_type=newsletter so activation-email
+    # unsubscribes (rare; they have their own unsub flow) don't
+    # pollute the newsletter rate.
+    assert "newsletter.delivered" in cfg["denominator_where"]
+    assert "email_type" in cfg["denominator_where"]
+    assert cfg["threshold"] == 0.02              # 2% — matches bounce rate threshold
+    assert cfg["window_hours"] == 720.0          # 30 days
+    # Same min_denominator floor as bounce/complaint — one unsub on
+    # a 30-recipient send is 3% but proves nothing.
+    assert cfg["min_denominator"] >= 50
+
+
 # ── query_count_window ────────────────────────────────────────────────
 
 
