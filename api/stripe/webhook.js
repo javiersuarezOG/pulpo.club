@@ -154,7 +154,162 @@ async function patchPrivateMetadata(clerk, userId, patch) {
   await clerk.users.updateUserMetadata(userId, { privateMetadata: next });
 }
 
-// Pulpo Pro Welcome — one-shot dispatch helper.
+// Pulpo Pro Welcome — instant dispatcher (Vercel Python) with
+// GitHub-Actions fallback.
+//
+// Hot path (default): POST to /api/internal/welcome-send, a Vercel
+// Python serverless function that runs `dispatch_welcome` in-process
+// and returns in ~1-3s. End-to-end welcome latency from Stripe
+// payment to inbox: <5s.
+//
+// Fallback path: if the Python function is unreachable (deploy in
+// progress, Vercel outage, env misconfig), dispatch the
+// `pulpo-pro-welcome.yml` GitHub Actions workflow instead. Same
+// Python dispatcher runs there; latency 15-75s but reliable across
+// Vercel-only outages.
+//
+// Both paths share the same Clerk idempotency stamp
+// (`publicMetadata.welcome_newsletter_sent_at`), so a fallback that
+// races with a slow primary is safe — whichever wins the Clerk
+// lookup wins the send; the other no-ops with reason=already_sent.
+//
+// Telemetry surfaces `dispatch_path: "internal" | "github_fallback"`
+// so dashboards can track how often the fallback fires (which would
+// signal a Vercel Python reliability issue worth investigating).
+
+const WELCOME_INTERNAL_URL_PATH = "/api/internal/welcome-send";
+// Vercel function timeout = 30s (configured in vercel.json). We give
+// the fetch a tight margin under that so the webhook can still fall
+// back inside Stripe's own 30s budget if the Python function hangs.
+const WELCOME_INTERNAL_TIMEOUT_MS = 25_000;
+
+// Internal-call helper. Returns:
+//   • { ok: true, status, body }   — Python responded (any status code)
+//   • { ok: false, reason }         — fetch failed / aborted / timed out
+async function callInternalWelcomeSend({
+  baseUrl,
+  token,
+  payload,
+  fetchImpl,
+  timeoutMs,
+}) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), timeoutMs || WELCOME_INTERNAL_TIMEOUT_MS);
+  try {
+    const r = await (fetchImpl || fetch)(`${baseUrl}${WELCOME_INTERNAL_URL_PATH}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "pulpo-stripe-webhook-welcome-primary",
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    let body = null;
+    try { body = await r.json(); } catch { /* best-effort */ }
+    return { ok: true, status: r.status, body };
+  } catch (err) {
+    const reason = (err && err.name === "AbortError")
+      ? "timeout"
+      : `fetch_failed:${(err && err.message) || "unknown"}`;
+    return { ok: false, reason };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+// Orchestrator: tries the Vercel Python primary, falls back to GH on
+// any "Python unreachable" signal (network error, timeout). A Python
+// response with status=200 OR 4xx OR 500-with-our-JSON is FINAL —
+// the dispatcher attempted send, we trust its outcome and don't
+// double-dispatch via GH (which would risk a duplicate Resend call
+// when the first send half-succeeded).
+async function dispatchProWelcome(args) {
+  const {
+    clerk, clerkUserId, email, source, distinctId, t0,
+    fetchImpl, internalBaseUrl, // injectable for tests
+  } = args;
+  if (!clerk || !clerkUserId || !email) {
+    return "skipped:missing_input";
+  }
+  const token = process.env.PULPO_INTERNAL_TOKEN || "";
+  // When the internal-call token isn't set, we have no choice but
+  // GH fallback — the Python endpoint would 401 every call. Common
+  // in dev environments where only the GH PAT is configured.
+  if (!token) {
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_no_internal_token_skipping_primary",
+      clerk_user_id: clerkUserId,
+    });
+    return await dispatchProWelcomeWorkflow(args);
+  }
+  // Internal-call base URL. In Vercel functions, calling our own
+  // /api/* path requires an absolute URL. VERCEL_URL is the
+  // current deployment's hostname (e.g. pulpo-club.vercel.app);
+  // PULPO_SITE_ROOT overrides in prod (https://pulpo.club).
+  const baseUrl = internalBaseUrl
+    || process.env.PULPO_SITE_ROOT
+    || (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`)
+    || "https://pulpo.club";
+
+  const result = await callInternalWelcomeSend({
+    baseUrl,
+    token,
+    payload: { email, source: source || "stripe", force: false },
+    fetchImpl,
+    timeoutMs: WELCOME_INTERNAL_TIMEOUT_MS,
+  });
+
+  if (!result.ok) {
+    // Python unreachable — fall back to GH so the welcome still
+    // delivers (just slower). Tag the telemetry so dashboards
+    // surface the fallback rate.
+    posthog.capture(distinctId, "newsletter.welcome_internal_unreachable", {
+      reason: result.reason,
+      source: source || "stripe.checkout",
+      clerk_user_id: clerkUserId,
+      ms: Date.now() - t0,
+    });
+    logApi("stripe.webhook", {
+      status: 200, reason: "welcome_internal_unreachable_falling_back",
+      clerk_user_id: clerkUserId, internal_reason: result.reason,
+    });
+    return await dispatchProWelcomeWorkflow(args);
+  }
+
+  // Python responded. status=200 = sent OR skipped; status=500 =
+  // dispatcher returned status="failed". Either way, the dispatcher
+  // attempted send and the outcome is final — DO NOT fall back, the
+  // Clerk stamp may have been set or the Resend call may have
+  // partially completed and a second attempt would risk a duplicate.
+  posthog.capture(distinctId, "newsletter.welcome_internal_responded", {
+    http_status: result.status,
+    dispatcher_status: result.body && result.body.status,
+    dispatcher_reason: result.body && result.body.reason,
+    source: source || "stripe.checkout",
+    clerk_user_id: clerkUserId,
+    latency_ms: result.body && result.body.latency_ms,
+    ms: Date.now() - t0,
+  });
+  logApi("stripe.webhook", {
+    status: 200, reason: "welcome_internal_responded",
+    clerk_user_id: clerkUserId, http_status: result.status,
+    dispatcher_status: (result.body && result.body.status) || "(none)",
+    dispatcher_reason: (result.body && result.body.reason) || "-",
+    latency_ms: (result.body && result.body.latency_ms) || 0,
+  });
+  if (result.status === 200) {
+    const body = result.body || {};
+    if (body.status === "sent") return "internal:sent";
+    if (body.status === "skipped") return `internal:skipped:${body.reason || "unknown"}`;
+    return "internal:ok";
+  }
+  return `internal:http_${result.status}`;
+}
+
+
+// Pulpo Pro Welcome — GitHub-Actions fallback dispatcher.
 //
 // Fires the `pulpo-pro-welcome.yml` GitHub Actions workflow against
 // the recipient who just completed first-checkout. The Python
@@ -534,10 +689,12 @@ module.exports = async (req, res) => {
               source: "stripe.checkout.auth_gated",
             });
           }
-          // Pulpo Pro Welcome — fire the one-shot onboarding email.
-          // Best-effort: never blocks the payment. Idempotent —
-          // Clerk publicMetadata stamp prevents re-send on retries.
-          const welcomeOutcome = email ? await dispatchProWelcomeWorkflow({
+          // Pulpo Pro Welcome — fire the one-shot onboarding email
+          // through the instant Vercel-Python path with GH-Actions
+          // fallback. Best-effort: never blocks the payment.
+          // Idempotent — Clerk publicMetadata stamp prevents re-send
+          // on retries.
+          const welcomeOutcome = email ? await dispatchProWelcome({
             clerk, clerkUserId: explicitUserId, email,
             source: "stripe.checkout.auth_gated",
             distinctId, t0,
@@ -589,9 +746,10 @@ module.exports = async (req, res) => {
             source: "stripe.checkout.anonymous_existing_user",
           });
           // Pulpo Pro Welcome — same one-shot send as the auth-gated
-          // path. Idempotent: the Clerk publicMetadata stamp prevents
-          // duplicate sends across Stripe retries.
-          const welcomeOutcome = await dispatchProWelcomeWorkflow({
+          // path. Instant Vercel-Python primary with GH-Actions
+          // fallback. Idempotent: the Clerk publicMetadata stamp
+          // prevents duplicate sends across Stripe retries.
+          const welcomeOutcome = await dispatchProWelcome({
             clerk, clerkUserId: existing.id, email,
             source: "stripe.checkout.anonymous_existing_user",
             distinctId, t0,
@@ -1145,3 +1303,5 @@ module.exports.config = { api: { bodyParser: false } };
 module.exports.isStripeEventAlreadyProcessed = isStripeEventAlreadyProcessed;
 module.exports.markStripeEventProcessed = markStripeEventProcessed;
 module.exports.dispatchProWelcomeWorkflow = dispatchProWelcomeWorkflow;
+module.exports.dispatchProWelcome = dispatchProWelcome;
+module.exports.callInternalWelcomeSend = callInternalWelcomeSend;
