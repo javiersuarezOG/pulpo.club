@@ -53,6 +53,9 @@ jobs:
       # graduation PR alongside the active-mode script changes —
       # principle of least privilege over upfront convenience.
       issues: write
+      # Required by actions/download-artifact@v4 to fetch the
+      # nightly-diagnostics-* artifact across workflow boundaries.
+      actions: read
     steps:
       - uses: actions/checkout@v6.0.2
 
@@ -67,6 +70,29 @@ jobs:
           # Anthropic SDK — pinned to a tested major. Pulpo doesn't use
           # this elsewhere yet, so we install it in this workflow only.
           pip install 'anthropic>=0.40,<1.0'
+
+      - name: Download nightly diagnostics artifact
+        # Only runs on the `workflow_run` trigger (when this job was
+        # fired by a completed pulpo-nightly). Pulls the fresh
+        # source_health_history.jsonl + scraper_failures/ from the
+        # triggering nightly — including rows from a canary-blocked
+        # run that never reached main. On manual dispatch + on any
+        # download failure we fall through to committed main via
+        # AUTOREPAIR_DATA_DIR being unset (see scraper_autorepair.py
+        # _resolve_data_dir).
+        if: github.event_name == 'workflow_run'
+        id: artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nightly-diagnostics-${{ github.event.workflow_run.id }}
+          path: ${{ runner.temp }}/nightly-diagnostics
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          # Don't fail the whole job if the artifact isn't there (older
+          # nightly runs predate the upload step; the script's fallback
+          # to committed main keeps autorepair useful for those).
+          if-no-files-found: warn
+        continue-on-error: true
 
       - name: Run auto-repair (shadow mode)
         env:
@@ -88,5 +114,9 @@ jobs:
           AUTOREPAIR_MODEL: ${{ vars.AUTOREPAIR_MODEL || 'claude-opus-4-7' }}
           AUTOREPAIR_TARGETS: ${{ github.event.inputs.targets || '' }}
           AUTOREPAIR_DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '' }}
+          # When the artifact download succeeded, point the script at
+          # the unpacked diagnostics dir; otherwise unset → script falls
+          # back to web/data on committed main.
+          AUTOREPAIR_DATA_DIR: ${{ steps.artifact.outcome == 'success' && format('{0}/nightly-diagnostics', runner.temp) || '' }}
         run: |
           python3 scripts/scraper_autorepair.py

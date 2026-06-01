@@ -59,8 +59,37 @@ sys.path.insert(0, str(REPO))
 
 from pulpo.scrapers._policy import get_policy  # noqa: E402
 
-HEALTH_PATH    = REPO / "web" / "data" / "source_health_history.jsonl"
-FAILURES_DIR   = REPO / "web" / "data" / "scraper_failures"
+
+def _resolve_data_dir() -> Path:
+    """Return the directory autorepair should read source_health_history
+    and scraper_failures from.
+
+    Priority order:
+      1. ``AUTOREPAIR_DATA_DIR`` env var (set by the workflow's
+         download-artifact step). This is the diagnostics artifact
+         emitted by the triggering nightly — fresher than committed
+         main, and crucially CONTAINS rows from a canary-blocked run
+         that never reached main.
+      2. ``<REPO>/web/data`` — committed main. Used on manual dispatch
+         and as a fallback when the artifact download failed.
+
+    Resolution is logged so a failed-artifact / fallback path is
+    obvious in the run log without grepping for env vars.
+    """
+    override = os.environ.get("AUTOREPAIR_DATA_DIR", "").strip()
+    if override:
+        p = Path(override)
+        if p.exists():
+            print(f"[autorepair] using AUTOREPAIR_DATA_DIR={p} (nightly artifact)")
+            return p
+        print(f"[autorepair] AUTOREPAIR_DATA_DIR={p} not found — falling back to web/data")
+    print(f"[autorepair] using committed main data: {REPO / 'web' / 'data'}")
+    return REPO / "web" / "data"
+
+
+_DATA_DIR     = _resolve_data_dir()
+HEALTH_PATH    = _DATA_DIR / "source_health_history.jsonl"
+FAILURES_DIR   = _DATA_DIR / "scraper_failures"
 SCRAPERS_DIR   = REPO / "pulpo" / "scrapers"
 CALIBRATION    = REPO / "samples" / "calibration"
 COOLDOWN_DAYS  = 7

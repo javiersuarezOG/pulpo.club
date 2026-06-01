@@ -47,6 +47,43 @@ def test_latest_health_per_source_missing_file(tmp_path):
     assert autorepair.latest_health_per_source(p) == {}
 
 
+# ── _resolve_data_dir (PR-NR-D autorepair input plumbing) ─────────────
+
+def test_resolve_data_dir_uses_artifact_when_present(tmp_path, monkeypatch, capsys):
+    """When the workflow's download-artifact step writes a path that
+    exists, AUTOREPAIR_DATA_DIR points at it and the resolver returns
+    that path. The print line lands in the workflow log so the
+    artifact-vs-fallback decision is auditable."""
+    artifact = tmp_path / "nightly-diagnostics"
+    artifact.mkdir()
+    monkeypatch.setenv("AUTOREPAIR_DATA_DIR", str(artifact))
+    out = autorepair._resolve_data_dir()
+    assert out == artifact
+    log = capsys.readouterr().out
+    assert "nightly artifact" in log
+
+
+def test_resolve_data_dir_falls_back_when_artifact_missing(tmp_path, monkeypatch, capsys):
+    """A non-existent AUTOREPAIR_DATA_DIR path (download-artifact failed,
+    older nightly without the upload step) falls back to web/data and
+    logs the reason."""
+    monkeypatch.setenv("AUTOREPAIR_DATA_DIR", str(tmp_path / "does-not-exist"))
+    out = autorepair._resolve_data_dir()
+    assert out == autorepair.REPO / "web" / "data"
+    log = capsys.readouterr().out
+    assert "falling back" in log
+
+
+def test_resolve_data_dir_empty_env_means_committed_main(monkeypatch, capsys):
+    """Manual dispatch path: AUTOREPAIR_DATA_DIR unset / empty → use
+    committed main data."""
+    monkeypatch.delenv("AUTOREPAIR_DATA_DIR", raising=False)
+    out = autorepair._resolve_data_dir()
+    assert out == autorepair.REPO / "web" / "data"
+    log = capsys.readouterr().out
+    assert "committed main" in log
+
+
 def test_red_sources_filters_by_status():
     rows = {
         "alpha": {"status": "green"},

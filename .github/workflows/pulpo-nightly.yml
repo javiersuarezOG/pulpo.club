@@ -280,6 +280,24 @@ jobs:
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
 
+      - name: Source-health Slack alert (pre-canary)
+        # Pulpo's scheduled watchdog (pulpo-watchdog.yml) reads
+        # source_health_history.jsonl from `main`. The data PR commit
+        # only lands AFTER the canaries pass; when a canary fails (the
+        # exact mode that froze ranked.json 2026-05-27 → 2026-05-31)
+        # today's red rows never reach main and the watchdog can't
+        # see them. Reading the working tree here closes that blind
+        # spot and posts a Slack message naming the red source(s).
+        # Best-effort: alerting failures never block the deploy path.
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 scripts/check_source_health.py \
+            --data-dir web/data \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            || echo "::warning::source-health alert script failed (non-blocking)"
+
       - name: PA count canary (soft — logs only, never fails)
         continue-on-error: true
         run: |
@@ -754,3 +772,49 @@ jobs:
         run: |
           npm install -g vercel@latest
           vercel deploy --prod --yes
+
+      - name: Upload nightly diagnostics
+        # Runs on success AND failure so the auto-repair workflow + a
+        # human looking at the run page can always grab the working-tree
+        # state, even when the data commit didn't land. Without this the
+        # source_health_history.jsonl + validation_log.jsonl from a
+        # failed-canary run disappear with the runner.
+        #
+        # The downstream auto-repair workflow (pulpo-scraper-autorepair.yml)
+        # consumes this artifact by name. Bumping the artifact name needs
+        # a matching change there or the consumer falls back to committed
+        # main.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-diagnostics-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: ignore
+          path: |
+            web/data/source_health_history.jsonl
+            web/data/validation_log.jsonl
+            web/data/scraper_failures/
+            web/data/last_updated.json
+            web/data/run_history.json
+            web/data/hires_pipeline_metrics.jsonl
+
+      - name: Slack on failure
+        # Final-line alert: any failed step in this job sends a Slack
+        # ping with the run URL. The pre-canary source-health alert
+        # above covers the per-source detail; this is the "something
+        # blocked the deploy and you should look" trip wire. Best-
+        # effort: a Slack outage must not mask the underlying failure
+        # so we exit 0 regardless.
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping failure Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo nightly FAILED* — <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"

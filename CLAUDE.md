@@ -408,6 +408,30 @@ There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
 Upstash instance. If a future feature genuinely needs one, the PR that
 adds it must also add the backup posture to this section.
 
+## DLQ semantics — listing vs source (post-2026-06-01)
+
+The pipeline carries two reject channels and they answer different
+questions. Use the right one or future-you will misread an incident:
+
+1. **`web/data/validation_log.jsonl`** — **per-listing** reject log.
+   One row per listing per nightly: `{source_id, source, url, title,
+   property_type, disposition: PASS|FLAG|DROP, reasons: [...]}`. This
+   is the listing-level DLQ surface: a listing dropped at validation
+   (placeholder photo, out-of-country URL, bound violation) lands here
+   with a `reasons` array. Overwritten every nightly.
+
+2. **`web/data/scraper_failures/`** — **per-source** exception capture.
+   One JSON file per failure, named
+   `<source>_<iso-ts>_<failure-id>.json`. Carries response body /
+   headers / traceback for a scraper-level event (HTTP error, exception,
+   empty yield with cause). Linked from `source_health_history.jsonl`
+   via the `failure_id` field. Append-only; never overwritten.
+
+   **Do NOT generate a `scraper_failures/` snapshot for every
+   listing-level reject** — those go in `validation_log.jsonl`.
+   `scraper_failures/` is for the source-level "what went wrong with
+   the scrape itself" question.
+
 ## "Shipped" means the user-visible surface renders the change (post-2026-05-26)
 
 **PR-MC-PA-1 wrap-up overclaimed.** The smoke run exited 0, wrote
