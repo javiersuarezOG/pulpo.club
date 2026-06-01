@@ -106,7 +106,10 @@ import "./styles/index.css";
 // Dev-panel-only: per-block override controls. Reads + writes
 // localStorage key `pulpo-block-overrides`. Production traffic never
 // hits this panel (gated by __PULPO_DEV_PANEL__).
-const HOME_BLOCK_IDS = ["hero", "featured", "usps", "shoreline", "top_10", "price_drops", "new_this_week"];
+// Includes legacy ids (top_10 / price_drops / new_this_week / usps) so
+// existing dev-panel localStorage entries still resolve cleanly. New
+// blocks should be added here AND to BLOCK_ORDER in blockRegistry.ts.
+const HOME_BLOCK_IDS = ["hero", "hero_v5", "featured", "shoreline", "top_10", "price_drops", "new_this_week", "usps"];
 const BLOCK_OVERRIDE_VALUES = ["auto", "force_show", "force_hide"];
 
 function HomeBlockOverridesPanel() {
