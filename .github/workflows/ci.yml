@@ -78,6 +78,25 @@ jobs:
             BASE_SHA="$(git rev-parse HEAD^)"
           fi
           node scripts/diff_csp_allowlist.mjs "$BASE_SHA"
+      # Version-bump guards — mandatory for any PR touching home block
+      # components OR newsletter template modules. Without these, the
+      # /api/home/version and /api/admin/newsletter/template-version
+      # endpoints quietly serve stale version strings for experiences
+      # that already shipped a change. See the scripts for the policy.
+      - name: home versions.json bump guard
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          node scripts/diff_home_version.mjs "$BASE_SHA"
+      - name: newsletter TEMPLATE_VERSION bump guard
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          node scripts/diff_newsletter_version.mjs "$BASE_SHA"
       - run: npm run test --if-present
       - run: npm run build
 
