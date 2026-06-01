@@ -21,8 +21,7 @@
     "api/internal/welcome-send.py": {
       "memory": 1024,
       "maxDuration": 30,
-      "includeFiles": "automation/newsletter/**,automation/posthog_client.py,pulpo/__init__.py,pulpo/countries/**,web/data/ranked.json",
-      "excludeFiles": "web/photos/**,web/photos-hires/**,web/dist/**,web/data/*.jsonl,web/data/llm_*.json,web/data/picker_excluded.json,web/data/featured.json,web/data/run_history.json,web/data/source_health_history.jsonl,web/data/zone_medians_history.jsonl,web/data/unmapped_beaches_history.jsonl,web/data/ig_assets/**,web/legacy*.html,web/dashboard*.html,web/newsletter-*.html,web/account-newsletter-mockup.html,newsletter-drafts/**"
+      "includeFiles": "pulpo/countries/*.json,web/data/ranked.json"
     }
   },
   "rewrites": [

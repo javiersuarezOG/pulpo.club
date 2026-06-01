@@ -46,30 +46,29 @@ import traceback
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 
-# Ensure the `automation` + `pulpo` packages are importable. On Vercel,
-# the function's CWD is the function's directory (api/internal/), not
-# the repo root. The deployed bundle includes the whole repo, so we
-# walk up to find it.
-_ROOT = Path(__file__).resolve().parents[2]
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
-
-# Module-level import — runs once per cold start. dispatch_welcome
-# pulls in build_issue, render_html, send, subscribers — all pure
-# Python except for httpx (which the requirements.txt in this dir
-# pins). Cold-start cost: ~500ms. Warm calls: <50ms.
-from automation.newsletter.welcome_dispatch import dispatch_welcome  # noqa: E402
+# Vercel's Python runtime adds the deployment root to sys.path
+# automatically — `from automation.newsletter.welcome_dispatch import …`
+# resolves through the import tracer without any sys.path manipulation
+# here. (A manual `sys.path.insert` would defeat the static-analysis
+# bundler: the tracer can't follow dynamic path edits, so it would
+# fail to detect the import chain and skip bundling the modules.)
+#
+# Module-level import — runs once per cold start. Cold-start cost:
+# ~500ms (httpx + posthog + automation/newsletter source). Warm: <50ms.
+from automation.newsletter.welcome_dispatch import dispatch_welcome
 
 # Absolute path to web/data/ranked.json. The default in
 # `welcome_dispatch.dispatch_welcome` is the relative form
 # "web/data/ranked.json" which resolves against CWD — fine on the GH
 # Actions runner (CWD = repo root) but NOT in the Vercel function
 # (CWD differs). Resolving once at module load lets every per-request
-# call pass the absolute path without re-stat'ing.
+# call pass the absolute path.
 #
-# `ranked.json` must be included in the function bundle via
-# `includeFiles` in vercel.json. Without it the dispatcher exits
-# cleanly with reason=ranked_missing.
+# `ranked.json` must be pinned in the function bundle via
+# `includeFiles` in vercel.json — the import tracer doesn't see it
+# (it's a JSON read, not a Python import). Without that pin, the
+# dispatcher exits cleanly with reason=ranked_missing.
+_ROOT = Path(__file__).resolve().parents[2]
 _RANKED_JSON = str(_ROOT / "web" / "data" / "ranked.json")
 
 
