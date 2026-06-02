@@ -46,6 +46,12 @@ on:
         type: choice
         default: "welcome"
         options: ["welcome", "welcome_back"]
+      locale:
+        description: "Locale override (admin preview). Empty = use the recipient's Clerk locale (production behavior)."
+        required: false
+        type: choice
+        default: ""
+        options: ["", "en", "es"]
 
 concurrency:
   # Per-recipient concurrency so a Stripe retry storm can't race a
@@ -109,8 +115,14 @@ jobs:
           SOURCE="${{ github.event.inputs.source || 'admin' }}"
           FORCE="${{ github.event.inputs.force || 'no' }}"
           VARIANT="${{ github.event.inputs.variant || 'welcome' }}"
+          LOCALE="${{ github.event.inputs.locale }}"
           ARGS=(--newsletter pulpo-pro-welcome --welcome-single-email "$EMAIL" --welcome-source "$SOURCE" --welcome-variant "$VARIANT")
           if [ "$FORCE" = "yes" ]; then
             ARGS+=(--welcome-force)
+          fi
+          # Empty LOCALE → omit the flag so the dispatcher uses the
+          # recipient's Clerk locale (production behavior).
+          if [ -n "$LOCALE" ]; then
+            ARGS+=(--welcome-locale "$LOCALE")
           fi
           python3 scripts/send_newsletter.py "${ARGS[@]}"

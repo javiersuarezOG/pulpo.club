@@ -77,10 +77,14 @@ def _run_welcome(args) -> int:
 
     email = args.welcome_single_email.strip().lower()
     variant = getattr(args, "welcome_variant", "welcome") or "welcome"
+    # Optional locale override (admin preview). None → dispatcher uses the
+    # recipient's Clerk locale (production behavior).
+    locale = getattr(args, "welcome_locale", None) or None
     print(f"[welcome] dispatching email={email} source={args.welcome_source} "
-          f"force={args.welcome_force} variant={variant}")
+          f"force={args.welcome_force} variant={variant} locale={locale or 'clerk'}")
     result = dispatch_welcome(
         email=email,
+        locale=locale,
         source=args.welcome_source,
         ranked_path=args.ranked,
         force=args.welcome_force,
@@ -169,6 +173,17 @@ def main() -> int:
             "same template, 'welcome back' hero). Admin Test-send-to-me "
             "passes welcome_back to preview the returning-user email "
             "without a Stripe resubscribe."
+        ),
+    )
+    p.add_argument(
+        "--welcome-locale",
+        default=None,
+        choices=("en", "es"),
+        help=(
+            "Welcome-template locale override (admin preview / the tool's "
+            "Language toggle). When omitted the dispatcher uses the "
+            "recipient's Clerk publicMetadata.profile.locale — the "
+            "production behavior."
         ),
     )
     p.add_argument(

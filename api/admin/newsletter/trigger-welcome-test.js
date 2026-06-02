@@ -1,6 +1,7 @@
 // POST /api/admin/newsletter/trigger-welcome-test
 //
-// Body: { email, by?, force?: boolean, variant?: "welcome"|"welcome_back" }
+// Body: { email, by?, force?: boolean, variant?: "welcome"|"welcome_back",
+//         locale?: "en"|"es" }
 //
 // Operator surface for the Pulpo Pro Welcome template. Dispatches the
 // `pulpo-pro-welcome` GitHub Actions workflow with send_mode=yes,
@@ -26,8 +27,10 @@
 //
 // What's different from trigger-preview:
 //   • The welcome workflow targets a single recipient (no cohort fan-out).
-//   • No locale input — the dispatcher reads locale from the recipient's
-//     Clerk publicMetadata.profile.locale.
+//   • `locale` is an optional override for the admin test-send (the
+//     tool's Language toggle). When absent the dispatcher falls back to
+//     the recipient's Clerk publicMetadata.profile.locale — the
+//     production behavior.
 //   • No issue_number — the welcome is always "issue 1" in its own
 //     telemetry namespace.
 //   • `force` defaults to TRUE for this endpoint specifically. The
@@ -119,6 +122,11 @@ module.exports = async (req, res) => {
   // resubscribe email without a Stripe checkout. Anything unrecognized
   // falls back to the first-time welcome.
   const variant = body.variant === "welcome_back" ? "welcome_back" : "welcome";
+  // Locale override for the admin test-send: the tool's Language toggle
+  // decides EN/ES so an operator can preview either language. Absent /
+  // unrecognized → empty, and the dispatcher falls back to the
+  // recipient's Clerk locale (the production behavior).
+  const locale = (body.locale === "en" || body.locale === "es") ? body.locale : "";
 
   const token = process.env.GITHUB_DISPATCH_TOKEN || "";
   if (!token) {
@@ -156,6 +164,7 @@ module.exports = async (req, res) => {
           source: "admin",
           force: force ? "yes" : "no",
           variant,
+          locale,
         },
       }),
     });
