@@ -18,6 +18,36 @@ POSTHOG_HOST_DEFAULT = "https://eu.posthog.com"
 POSTHOG_INGEST_DEFAULT = "https://eu.i.posthog.com"
 RUNBOOK_DEFAULT = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
 
+# Per-monitor status sidecar — written by each check_* script before exit and
+# consumed by scripts/check_webhook_health.py's heartbeat to compose
+# monitor.webhook_health_completed { clerk_status, resend_status, stripe_status }.
+# Path is intentionally /tmp so it never touches the repo and survives only
+# inside a single workflow run.
+MONITOR_STATUS_DIR_DEFAULT = "/tmp/pulpo_monitor_status"
+
+
+def _write_monitor_status(monitor: str, status: str, extra: dict | None = None) -> None:
+    """Drop a `{monitor}.json` sidecar with `{status, ts, ...}` for the heartbeat.
+
+    Never raises — the heartbeat treats a missing sidecar as `unknown`, so
+    monitor-script failure modes are observable rather than silenced.
+    """
+    out_dir = env("MONITOR_STATUS_DIR", MONITOR_STATUS_DIR_DEFAULT)
+    try:
+        os.makedirs(out_dir, exist_ok=True)
+        payload = {
+            "monitor": monitor,
+            "status": status,
+            "ts": dt.datetime.now(dt.timezone.utc).isoformat(),
+        }
+        if extra:
+            payload.update(extra)
+        with open(os.path.join(out_dir, f"{monitor}.json"), "w", encoding="utf-8") as fh:
+            json.dump(payload, fh)
+    except OSError:
+        # Sidecar IO failure does not block the monitor itself.
+        pass
+
 
 def env(name: str, default: str = "") -> str:
     value = os.environ.get(name)
@@ -179,10 +209,31 @@ def main() -> int:
                 f"Runbook: {args.runbook_url}",
                 file=sys.stderr,
             )
+            # Slack on monitor unavailability per PRD P0-1: a downgrade-into-silence
+            # is itself the incident class we are guarding against. The heartbeat
+            # in scripts/check_webhook_health.py also picks this up as
+            # `clerk_status=unavailable`; the Slack message here lets oncall see
+            # the cause immediately without opening PostHog.
+            slack(
+                slack_url,
+                f":warning: Clerk stuck-invitation monitor unavailable "
+                f"({exc.status} from /v1/invitations). "
+                f"Stuck-invitation alerting paused until CLERK_SECRET_KEY is re-scoped "
+                f"or the monitor moves off the GH runner. {args.runbook_url}",
+                args.dry_run,
+            )
+            _write_monitor_status("clerk", "unavailable", {
+                "reason": f"clerk_{exc.status}",
+                "endpoint": "/v1/invitations",
+            })
             # Exit 0 so the workflow stays green for the upstream heartbeat
             # step. The silent gap is observable via the PostHog event above.
             return 0
         raise
+
+    _write_monitor_status("clerk", "ok", {
+        "pending_invitations": len(invitations),
+    })
 
     stuck: list[dict] = []
     for inv in invitations:
@@ -213,6 +264,10 @@ def main() -> int:
             f"{args.threshold_hours:.0f}h. Oldest {max_age:.1f}h. Sample {sample}. {args.runbook_url}",
             args.dry_run,
         )
+        _write_monitor_status("clerk", "degraded", {
+            "stuck_count": len(stuck),
+            "max_age_hours": max_age,
+        })
         return 1
 
     print("No stuck invitations over threshold.")

@@ -30,12 +30,17 @@ def _required_env() -> dict[str, str]:
     }
 
 
-def test_clerk_403_exits_zero_and_captures_telemetry(capsys, monkeypatch):
+def test_clerk_403_exits_zero_and_captures_telemetry(capsys, monkeypatch, tmp_path):
     """The workflow had been silent for 6 days because every cron tick
-    crashed on the Clerk 403. Confirm the fix exits 0 instead and
-    emits the observability event."""
+    crashed on the Clerk 403. Confirm the fix exits 0 instead, emits the
+    observability event, fires a Slack alert (PRD P0-1: a downgrade-into-
+    silence is itself the incident class) and drops a `clerk.json`
+    sidecar with status=unavailable so the heartbeat step can compose it.
+    """
     for k, v in _required_env().items():
         monkeypatch.setenv(k, v)
+    monkeypatch.setenv("SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/test")
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
 
     monkeypatch.setattr(sys, "argv", ["check_stuck_invitations.py"])
 
@@ -47,12 +52,17 @@ def test_clerk_403_exits_zero_and_captures_telemetry(capsys, monkeypatch):
     )
 
     captured: list[tuple[str, dict]] = []
+    slack_messages: list[tuple[str, str, bool]] = []
 
     def fake_capture(event: str, properties: dict) -> None:
         captured.append((event, properties))
 
+    def fake_slack(webhook_url: str, text: str, dry_run: bool) -> None:
+        slack_messages.append((webhook_url, text, dry_run))
+
     with patch.object(stuck, "list_pending_invitations", side_effect=err), \
-         patch.object(stuck, "capture_posthog", side_effect=fake_capture):
+         patch.object(stuck, "capture_posthog", side_effect=fake_capture), \
+         patch.object(stuck, "slack", side_effect=fake_slack):
         rc = stuck.main()
 
     assert rc == 0, "Workflow must stay green so the heartbeat step's signal isn't eclipsed"
@@ -66,6 +76,21 @@ def test_clerk_403_exits_zero_and_captures_telemetry(capsys, monkeypatch):
     err_output = capsys.readouterr().err
     assert "Clerk" in err_output and "403" in err_output
     assert "Runbook" in err_output
+
+    # PRD P0-1 acceptance: forced Clerk failure posts to Slack with runbook URL.
+    assert slack_messages, "Slack must fire on Clerk auth failure — PRD P0-1"
+    _, slack_text, _ = slack_messages[0]
+    assert "Clerk stuck-invitation monitor unavailable" in slack_text
+    assert "403" in slack_text
+    assert "workflows/pulpo-webhook-health" in slack_text  # runbook URL
+
+    # Sidecar feeds the heartbeat composer.
+    import json
+    sidecar = tmp_path / "clerk.json"
+    assert sidecar.exists(), "clerk.json sidecar must exist for the heartbeat step"
+    payload = json.loads(sidecar.read_text())
+    assert payload["status"] == "unavailable"
+    assert payload["reason"] == "clerk_403"
 
 
 def test_clerk_401_exits_zero_and_captures_telemetry(monkeypatch):
