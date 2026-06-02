@@ -1139,10 +1139,14 @@ export function NewsletterWidget() {
       // fields based on which endpoint we're calling so the
       // payload matches each endpoint's schema cleanly.
       if (isWelcome) {
-        // Welcome endpoint reads everything (locale, plan, email) from
-        // the recipient's Clerk record. Only the sub-version varies:
-        // pro-welcome-back renders the resubscribe "welcome back" email
-        // (force=yes server-side, so no Stripe resubscribe needed).
+        // The welcome endpoint reads plan + email from the recipient's
+        // Clerk record, but the LANGUAGE follows the tool's toggle (an
+        // override) so an operator can preview EN or ES on demand — not
+        // whatever locale sits on the Clerk profile. Production sends
+        // (Stripe webhook) don't pass locale and keep using Clerk's.
+        payload.locale = locale;
+        // Sub-version: pro-welcome-back renders the resubscribe "welcome
+        // back" email (force=yes server-side, so no Stripe resubscribe).
         if (newsletterId === "pro-welcome-back") payload.variant = "welcome_back";
       } else {
         payload.locale = locale;
