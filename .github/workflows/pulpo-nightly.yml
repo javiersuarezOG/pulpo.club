@@ -449,10 +449,23 @@ jobs:
           EOF
 
       - name: Data-quality canaries
-        # Enforcing: violations fail the workflow.  Set LOG_ONLY="true" to
+        # Enforcing: violations fail the workflow. Set LOG_ONLY="true" to
         # temporarily downgrade to log-only while recalibrating thresholds.
+        #
+        # Repo variable escape hatch (PR-NR-H, 2026-06-02): when a real
+        # listing trips a canary that you trust the underlying validation
+        # layer to handle correctly (today's case: a $7666/m² premium
+        # beachfront micro-lot at Jaltepeque tripped PPM_RANGE on
+        # nightly 26774794593), set the repo variable
+        # `DATA_QUALITY_LOG_ONLY=true` via Settings → Variables → Actions
+        # and the next nightly ships without a code change. Flip back to
+        # `false` once the canary threshold is properly recalibrated in
+        # a follow-up PR — leaving log-only forever is how silent data
+        # corruption ships. The default below is `false` (enforce), so
+        # the canary continues to gate fresh data unless explicitly
+        # disabled.
         env:
-          LOG_ONLY: "false"
+          LOG_ONLY: ${{ vars.DATA_QUALITY_LOG_ONLY || 'false' }}
         run: |
           python3 - <<'EOF'
           import json, re, sys, os
