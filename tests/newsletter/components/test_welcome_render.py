@@ -54,7 +54,7 @@ def test_welcome_render_en_includes_named_blocks(ranked_pool, pro_with_prefs):
     # Welcome hero
     assert "Welcome to Pulpo Pro" in html
     assert "Welcome, Javier." in html              # first-name personalization
-    assert "Pulpo covers the coast and the volcanic lakes" in html
+    assert "Pulpo covers the coast and the lakes" in html
     # "How Pulpo works" — 3 numbered editorial beats
     assert "How Pulpo works" in html
     assert "We scan every supplier" in html        # step 01
@@ -80,7 +80,7 @@ def test_welcome_render_es_uses_spanish_copy(ranked_pool, pro_with_prefs):
     html = render_welcome_html(issue)
     assert "Bienvenido a Pulpo Pro" in html
     assert "Bienvenido, Javier." in html
-    assert "Pulpo cubre la costa y los lagos volcánicos" in html
+    assert "Pulpo cubre la costa y los lagos" in html
     assert "Cómo funciona Pulpo" in html
     assert "Revisamos a cada proveedor" in html
     assert "Tus primeras 10 selecciones." in html

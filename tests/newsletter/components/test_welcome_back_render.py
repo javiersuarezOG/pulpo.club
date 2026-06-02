@@ -50,8 +50,11 @@ def test_welcome_back_render_en_includes_named_blocks(ranked_pool, pro_with_pref
     assert "Welcome back to Pulpo Pro" in html
     assert "Good to have you back, Javier." in html      # first-name personalization
     assert "Your Pulpo Pro access is live again" in html
+    # Salvadoran grounding (surf strip + lakes by name); never "volcanic"
+    assert "El Tunco to El Cuco, Coatepeque, Ilopango" in html
+    assert "volcanic" not in html.lower()
     # Picks section intro (resubscribe framing)
-    assert "Your fresh 10." in html
+    assert "Your next 10." in html
     # Re-engagement cards (saved first)
     assert "Pick up where you left off" in html
     assert "Your saved listings" in html
@@ -73,12 +76,14 @@ def test_welcome_back_render_es_uses_spanish_copy(ranked_pool, pro_with_prefs):
     assert "Bienvenido de nuevo a Pulpo Pro" in html
     assert "Qué bueno tenerte de vuelta, Javier." in html
     assert "Tu acceso a Pulpo Pro está activo otra vez" in html
-    assert "Tus 10 frescas." in html
+    assert "Tus próximas 10." in html
+    assert "Acá tenés las diez mejores" in html        # Salvadoran voseo
+    assert "volcánico" not in html.lower()
     assert "Retomá donde lo dejaste" in html
     assert "Abrir guardadas" in html
     # Canary check — bare English block titles must NOT leak through.
     assert "Welcome back to Pulpo Pro" not in html
-    assert "Your fresh 10." not in html
+    assert "Your next 10." not in html
     assert "Pick up where you left off" not in html
 
 
@@ -136,8 +141,8 @@ def test_welcome_back_subject_localized():
     """Subject must localize. The dispatcher reads this i18n key before
     handing off to send_issue for the welcome-back variant."""
     from automation.newsletter import i18n
-    assert i18n.t("welcome_back.email.subject", "en") == "Welcome back to Pulpo Pro — your fresh 10"
-    assert i18n.t("welcome_back.email.subject", "es") == "Bienvenido de nuevo a Pulpo Pro — tus 10 frescas"
+    assert i18n.t("welcome_back.email.subject", "en") == "Welcome back to Pulpo Pro — your next 10"
+    assert i18n.t("welcome_back.email.subject", "es") == "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"
 
 
 def test_welcome_back_meta_tag_uses_welcome_back_version_constant(ranked_pool, pro_with_prefs):

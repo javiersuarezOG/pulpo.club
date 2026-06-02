@@ -185,8 +185,8 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "welcome.hero.eyebrow":        {"en": "Welcome to Pulpo Pro",                         "es": "Bienvenido a Pulpo Pro"},
     "welcome.hero.headline.named": {"en": "Welcome, {name}.",                              "es": "Bienvenido, {name}."},
     "welcome.hero.headline.unnamed": {"en": "Welcome aboard.",                             "es": "Bienvenido a bordo."},
-    "welcome.hero.lede":           {"en": "Pulpo covers the coast and the volcanic lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your first 10 are below; same shape every Sunday from here.",
-                                     "es": "Pulpo cubre la costa y los lagos volcánicos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo; mismo formato cada domingo."},
+    "welcome.hero.lede":           {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your first 10 are below; same shape every Sunday from here.",
+                                     "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo; mismo formato cada domingo."},
     # "How Pulpo works" — 3 numbered editorial beats (same component as
     # market context on the weekly digest). Each beat ends with a hard fact
     # about what Pulpo does or what the reader can do, not a vague promise.
@@ -231,16 +231,16 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # hero + a "Pick up where you left off" block. Cadence note + picks
     # are reused verbatim from the first-time welcome. See
     # `project_resubscribe_welcome_funnel` memory for the funnel rationale.
-    "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your fresh 10",     "es": "Bienvenido de nuevo a Pulpo Pro — tus 10 frescas"},
+    "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your next 10",      "es": "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"},
     # Hero
     "welcome_back.hero.eyebrow":   {"en": "Welcome back to Pulpo Pro",                     "es": "Bienvenido de nuevo a Pulpo Pro"},
     "welcome_back.hero.headline.named":   {"en": "Good to have you back, {name}.",         "es": "Qué bueno tenerte de vuelta, {name}."},
     "welcome_back.hero.headline.unnamed": {"en": "Good to have you back.",                 "es": "Qué bueno tenerte de vuelta."},
-    "welcome_back.hero.lede":      {"en": "Your Pulpo Pro access is live again. We never stopped ranking the coast and the volcanic lakes — here are the ten best matches on the market right now, and your Sunday digest picks up right where it left off.",
-                                     "es": "Tu acceso a Pulpo Pro está activo otra vez. No dejamos de clasificar la costa y los lagos volcánicos — acá están los diez mejores matches en el mercado ahora mismo, y tu resumen de los domingos retoma justo donde lo dejaste."},
-    # Section intro above the picks block — "fresh" framing instead of
-    # "your first batch" so the returning reader feels the inventory moved.
-    "welcome_back.section.picks.title": {"en": "Your fresh 10.",                           "es": "Tus 10 frescas."},
+    "welcome_back.hero.lede":      {"en": "Your Pulpo Pro access is live again. We never stopped ranking the coast and the lakes — El Tunco to El Cuco, Coatepeque, Ilopango. Here are the ten best on the market right now, and your Sunday digest picks up right where it left off.",
+                                     "es": "Tu acceso a Pulpo Pro está activo otra vez. No dejamos de clasificar la costa y los lagos — de El Tunco a El Cuco, Coatepeque, Ilopango. Acá tenés las diez mejores del mercado ahora mismo, y tu resumen de los domingos retoma justo donde lo dejaste."},
+    # Section intro above the picks block — "your next batch" framing so
+    # the returning reader feels the inventory moved while they were away.
+    "welcome_back.section.picks.title": {"en": "Your next 10.",                            "es": "Tus próximas 10."},
     "welcome_back.section.picks.body":  {"en": "Re-ranked this week — the Top 3 are the highest-value matches right now; the next 7 fit other buyer profiles. Anything you saved before is still in your account. Hit ♥ on new finds and we'll track price moves for you.",
                                      "es": "Reclasificadas esta semana — las primeras 3 son los matches de mayor valor ahora mismo; las 7 siguientes calzan a otros perfiles. Lo que guardaste antes sigue en tu cuenta. Hacé ♥ en lo nuevo y seguimos los cambios de precio por vos."},
     # "Pick up where you left off" — replaces the first-time "Start here"
