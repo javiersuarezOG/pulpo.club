@@ -138,6 +138,116 @@ function failedSourcesLastRun(lastUpdated, sourceHealthRows) {
   return failures;
 }
 
+// PRD P1-9 — surface brownout-state sources alongside the binary
+// `failed_sources_last_run`. The Python nightly's
+// scripts/check_source_health.py computes the authoritative state via
+// pulpo.source_health.compute_brownout_states; this endpoint mirrors
+// the calculation client-side from the same `source_health_history.jsonl`
+// data so JS callers (admin/sources widget, ops dashboards) don't need
+// a separate sidecar fetch.
+//
+// Thresholds:
+//   green       — kept-count ≥ 90% of rolling 7-run median.
+//   degraded    — kept-count < 50% of median for the latest run.
+//   red         — kept-count < 50% of median for two+ consecutive runs.
+//   recovering  — previous run was degraded/red AND current ratio
+//                 sits in 50%-90% (climbing back).
+const SRC_DEGRADED = 0.5;
+const SRC_RECOVERING_CEIL = 0.9;
+const SRC_ROLLING_WINDOW = 7;
+const SRC_MIN_HISTORY = 3;
+
+function _keptCount(row) {
+  const raw = row && (row.kept != null ? row.kept : row.scraped);
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+}
+
+function _median(values) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function _statusToBrownout(status) {
+  if (status === "green") return "green";
+  if (status === "red") return "red";
+  if (status === "skipped") return "skipped";
+  return "unknown";
+}
+
+function degradedSources(rows) {
+  if (!Array.isArray(rows)) return [];
+  // Group by source, sort chronologically.
+  const bySource = new Map();
+  for (const r of rows) {
+    if (!r || typeof r !== "object") continue;
+    const src = r.source || "?";
+    if (!bySource.has(src)) bySource.set(src, []);
+    bySource.get(src).push(r);
+  }
+
+  const out = [];
+  for (const [source, history] of bySource) {
+    history.sort((a, b) => String(a.ts || "").localeCompare(String(b.ts || "")));
+    if (!history.length) continue;
+    const latest = history[history.length - 1];
+    const latestCount = _keptCount(latest);
+    const window = history.slice(-(SRC_ROLLING_WINDOW + 1), -1);
+    const historical = window.map(_keptCount).filter((n) => n > 0);
+
+    if (historical.length < SRC_MIN_HISTORY) continue;
+
+    const median = _median(historical);
+    const ratio = median > 0 ? latestCount / median : 0;
+    const previousStatus = history.length > 1
+      ? _statusToBrownout(history[history.length - 2].status)
+      : null;
+
+    // Walk back to count consecutive runs <50% of their own prior window.
+    let consecutive = 0;
+    for (let i = history.length - 1; i >= 0; i--) {
+      const row = history[i];
+      const count = _keptCount(row);
+      const priorWindow = history
+        .slice(Math.max(0, i - SRC_ROLLING_WINDOW), i)
+        .map(_keptCount)
+        .filter((n) => n > 0);
+      if (priorWindow.length < SRC_MIN_HISTORY) break;
+      const priorMedian = _median(priorWindow);
+      const priorRatio = priorMedian > 0 ? count / priorMedian : 0;
+      if (priorRatio < SRC_DEGRADED) consecutive += 1;
+      else break;
+    }
+
+    let status;
+    if (ratio < SRC_DEGRADED) {
+      status = consecutive >= 2 ? "red" : "degraded";
+    } else if (ratio < SRC_RECOVERING_CEIL
+               && (previousStatus === "red" || previousStatus === "degraded")) {
+      status = "recovering";
+    } else {
+      status = "green";
+    }
+
+    if (status === "green") continue;
+    out.push({
+      source,
+      status,
+      count: latestCount,
+      rolling_median_7: Number(median.toFixed(2)),
+      ratio: Number(ratio.toFixed(4)),
+      consecutive_degraded_runs: consecutive,
+      previous_status: previousStatus,
+      failure_id: typeof latest.failure_id === "string" ? latest.failure_id : null,
+      error_class: typeof latest.error_class === "string" ? latest.error_class : null,
+    });
+  }
+  out.sort((a, b) => a.source.localeCompare(b.source));
+  return out;
+}
+
 function vlmBudgetToday(rows) {
   if (!Array.isArray(rows)) {
     return { spend_usd: 0, pct_used: 0, success_rate_24h: null, call_count_24h: 0 };
@@ -190,6 +300,7 @@ function buildHealth() {
     },
     last_7_runs: buildLast7Runs(runHistory),
     failed_sources_last_run: failedSourcesLastRun(lastUpdated, sourceHealthRows),
+    degraded_sources: degradedSources(sourceHealthRows),
     vlm_budget_today: vlmBudgetToday(vlmRows),
     // Phase A follow-on (separate PR) will populate these from
     // nightly_progress.json + phase_durations.jsonl.
@@ -224,6 +335,7 @@ module.exports.__testing__ = {
   buildLast7Runs,
   failedSourcesLastRun,
   vlmBudgetToday,
+  degradedSources,
   hoursSince,
   STALE_THRESHOLD_H,
   VLM_DAILY_BUDGET_USD,

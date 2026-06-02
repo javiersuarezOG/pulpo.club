@@ -52,6 +52,10 @@ from typing import Optional
 # rule lives in one place.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from automation.watchdog import _read_source_history  # noqa: E402
+from pulpo.source_health import (  # noqa: E402
+    SourceBrownoutResult,
+    compute_brownout_states,
+)
 
 
 # Stale-row cutoff. A red row older than this is silently ignored — it
@@ -139,6 +143,32 @@ def _post_slack(webhook_url: str, text: str) -> None:
         print(f"[source-health] Slack POST failed: {e}", file=sys.stderr)
 
 
+def brownout_alert_lines(results: list[SourceBrownoutResult]) -> list[str]:
+    """One Slack line per non-green source. PRD P1-9 — count, median,
+    ratio, latest failure id all live in the message body so oncall
+    can act without opening the dashboard."""
+    out: list[str] = []
+    for r in sorted(results, key=lambda x: x.source):
+        if r.status in {"green", "skipped", "unknown"}:
+            continue
+        median_str = (
+            f"{r.rolling_median_7:.0f}" if r.rolling_median_7 is not None else "?"
+        )
+        ratio_str = f"{(r.ratio or 0) * 100:.0f}%" if r.ratio is not None else "?"
+        suffix_parts: list[str] = []
+        if r.failure_id:
+            suffix_parts.append(f"failure_id={r.failure_id}")
+        if r.error_class:
+            suffix_parts.append(f"err={r.error_class}")
+        suffix = (" " + " ".join(suffix_parts)) if suffix_parts else ""
+        out.append(
+            f"• `{r.source}` {r.status} "
+            f"count={r.count} median={median_str} ratio={ratio_str}"
+            f"{suffix}"
+        )
+    return out
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Pre-canary source-health Slack alert.")
     parser.add_argument(
@@ -162,11 +192,26 @@ def main(argv: Optional[list[str]] = None) -> int:
     latest = latest_row_per_source(rows)
     red = fresh_red_rows(latest)
 
-    if not red:
+    # PRD P1-9 — extend the alert to brownout states. Existing red-row
+    # behaviour is preserved; degraded/red/recovering sources land as
+    # additional lines in the same Slack message.
+    brownouts = compute_brownout_states(rows)
+    brownout_lines = brownout_alert_lines(brownouts)
+
+    if not red and not brownout_lines:
         print("[source-health] OK — no red sources in current run.")
         return 0
 
-    text = build_message(red, run_url=args.run_url)
+    text_parts: list[str] = []
+    if red:
+        text_parts.append(build_message(red, run_url=args.run_url))
+    if brownout_lines:
+        text_parts.append(
+            "*Pulpo nightly: source brownouts*\n" + "\n".join(brownout_lines)
+        )
+        if args.run_url:
+            text_parts.append(f"<{args.run_url}|Open Actions run>")
+    text = "\n".join(text_parts)
     print(text)
 
     if args.dry_run:
