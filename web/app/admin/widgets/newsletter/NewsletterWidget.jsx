@@ -492,6 +492,30 @@ const WIDGET_STYLES = `
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
+.nl-preview-widget .nl-locale-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+/* Per-card language toggle, sits inline with the card's send button.
+   Wraps on narrow viewports (mobile-first). */
+.nl-preview-widget .nl-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.nl-preview-widget .nl-card-locale {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.nl-preview-widget .nl-card-locale-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
 
 /* ── PR-NL-7a · Upcoming sends panel ────────────────────────────── */
 .nl-preview-widget .nl-upcoming {
@@ -921,7 +945,12 @@ function formatLogWhen(iso, now = new Date()) {
 
 export function NewsletterWidget() {
   const [email, setEmail] = useState(DEFAULT_EMAIL);
-  const [locale, setLocale] = useState(DEFAULT_LOCALE);
+  // Per-newsletter language. Each card has its own EN/ES toggle so an
+  // operator can fire an EN welcome and an ES welcome-back without
+  // flipping a shared control. Defaults to DEFAULT_LOCALE per card.
+  const [localeByNl, setLocaleByNl] = useState({});
+  const localeFor = (id) => localeByNl[id] || DEFAULT_LOCALE;
+  const setLocaleFor = (id, loc) => setLocaleByNl((m) => ({ ...m, [id]: loc }));
   const [busy, setBusy] = useState(false);
   // statusByNewsletterId — per-card status, so the success/pending/
   // error confirmation lands INSIDE the card the operator triggered
@@ -1109,7 +1138,7 @@ export function NewsletterWidget() {
   //     when those templates ship.
   // The endpoint shapes differ (body fields, headers) so we branch
   // here rather than hiding the routing in the server-side allow-list.
-  const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly" } = {}) => {
+  const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly", locale = DEFAULT_LOCALE } = {}) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
       setStatusFor(newsletterId, { kind: "error", message: "Enter a valid email address." });
@@ -1118,38 +1147,26 @@ export function NewsletterWidget() {
     setBusy(true);
     setStatusFor(newsletterId, { kind: "pending", when });
     const operatorEmail = readOperatorEmail();
-    // Per-newsletter endpoint routing. Each card's trigger goes to
-    // the admin endpoint that drives its specific dispatch pipeline
-    // — there's no shared one-size-fits-all "send test" route.
-    // Both welcome sub-versions (first-time + resubscribe welcome-back)
-    // route to the welcome-test endpoint; they differ only by `variant`.
+    // Both welcome sub-versions route to the welcome-test endpoint, which
+    // runs the dispatcher SYNCHRONOUSLY and returns the real outcome.
     const isWelcome = newsletterId === "pro-welcome" || newsletterId === "pro-welcome-back";
     const endpoint = isWelcome
       ? "/api/admin/newsletter/trigger-welcome-test"
       : "/api/admin/newsletter/trigger-preview";
+    const baseEntry = {
+      at: new Date().toISOString(),
+      to: value,
+      locale,
+      by: operatorEmail,
+      newsletter_id: newsletterId,
+    };
     try {
-      // `by` lets the server-side audit trail attribute the dispatch
-      // to a specific operator on the cross-device log. Spoofable
-      // (the endpoint is intentionally auth-light) but useful for
-      // the legitimate-traffic happy path.
-      const payload = { email: value, by: operatorEmail || undefined };
-      // The weekly endpoint accepts locale + newsletter_id +
-      // issue_number; the welcome endpoint accepts force (and
-      // defaults to force=true server-side). Conditionally attach
-      // fields based on which endpoint we're calling so the
-      // payload matches each endpoint's schema cleanly.
+      // `locale` follows THIS card's toggle. The welcome endpoint treats
+      // it as an override; production sends (Stripe webhook) keep Clerk's.
+      const payload = { email: value, by: operatorEmail || undefined, locale };
       if (isWelcome) {
-        // The welcome endpoint reads plan + email from the recipient's
-        // Clerk record, but the LANGUAGE follows the tool's toggle (an
-        // override) so an operator can preview EN or ES on demand — not
-        // whatever locale sits on the Clerk profile. Production sends
-        // (Stripe webhook) don't pass locale and keep using Clerk's.
-        payload.locale = locale;
-        // Sub-version: pro-welcome-back renders the resubscribe "welcome
-        // back" email (force=yes server-side, so no Stripe resubscribe).
         if (newsletterId === "pro-welcome-back") payload.variant = "welcome_back";
       } else {
-        payload.locale = locale;
         payload.newsletter_id = newsletterId;
         if (issueNumber != null) payload.issue_number = issueNumber;
       }
@@ -1159,13 +1176,32 @@ export function NewsletterWidget() {
         body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
-      const baseEntry = {
-        at: new Date().toISOString(),
-        to: value,
-        locale,
-        by: operatorEmail,
-        newsletter_id: newsletterId,
-      };
+
+      if (isWelcome) {
+        // Synchronous real outcome — only confirm "Sent" when it sent.
+        const st = body.status;
+        if (st === "sent") {
+          setStatusFor(newsletterId, {
+            kind: "sent", recipient: value, dryRun: !!body.dry_run,
+            messageId: body.message_id || null, locale, when,
+          });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: body.dry_run ? "dry_run" : "ok" }));
+        } else if (st === "skipped") {
+          setStatusFor(newsletterId, { kind: "skipped", recipient: value, reason: body.reason || "skipped", locale });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: "skipped", detail: body.reason || "" }));
+        } else if (st === "failed") {
+          setStatusFor(newsletterId, { kind: "failed", recipient: value, reason: body.reason || "failed", locale });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: "failed", detail: body.reason || "" }));
+        } else {
+          const detail = body.reason || body.error || `HTTP ${r.status}`;
+          const hint = body.hint ? ` — ${body.hint}` : "";
+          setStatusFor(newsletterId, { kind: "error", message: `${detail}${hint}` });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: `${detail}${hint}` }));
+        }
+        return;
+      }
+
+      // Weekly (async cohort preview) — dispatch semantics unchanged.
       if (!r.ok) {
         const detail = body.error || `HTTP ${r.status}`;
         const hint = body.hint ? ` — ${body.hint}` : "";
@@ -1211,6 +1247,44 @@ export function NewsletterWidget() {
     setLocalEntries([]);
   };
 
+  // Per-card EN/ES toggle — rendered next to each card's send button so
+  // the language is chosen per newsletter, not via a shared control.
+  const localeToggle = (nlId) => (
+    <div className="nl-card-locale">
+      <span className="nl-card-locale-label">Lang</span>
+      <div className="nl-locale-toggle">
+        {LOCALE_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            className="nl-locale-btn"
+            aria-pressed={localeFor(nlId) === opt.value}
+            onClick={() => setLocaleFor(nlId, opt.value)}
+            disabled={busy}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Honest copy for the welcome test-send outcomes (admin-only).
+  // i18n-allow: admin-only widget
+  const WELCOME_SKIP_TEXT = {
+    not_pro: "that email isn't a Pro account — the welcome only sends to Pro users.",
+    clerk_lookup_failed: "no Clerk account exists for that email.",
+    ranked_missing: "listings data is unavailable right now.",
+    no_picks_available: "no listings were available to include.",
+    already_sent: "already sent (idempotency stamp) — re-send forces past it.",
+    already_sent_for_subscription: "already sent for this subscription.",
+  };
+  const welcomeReasonText = (reason) => WELCOME_SKIP_TEXT[reason] || reason || "unknown reason";
+  const welcomeSubject = (nlId, loc) =>
+    nlId === "pro-welcome-back"
+      ? (loc === "es" ? "Bienvenido de nuevo a Pulpo Pro — tus próximas 10" : "Welcome back to Pulpo Pro — your next 10")
+      : (loc === "es" ? "Bienvenido a Pulpo Pro — tus primeras 10" : "Welcome to Pulpo Pro — your first 10");
+
   return (
     <>
       <style>{WIDGET_STYLES}</style>
@@ -1235,23 +1309,8 @@ export function NewsletterWidget() {
             />
           </div>
 
-          <div className="nl-locale">
-            <label htmlFor="nl-preview-locale-en">Language</label>
-            <div className="nl-locale-toggle">
-              {LOCALE_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  id={`nl-preview-locale-${opt.value}`}
-                  type="button"
-                  className="nl-locale-btn"
-                  aria-pressed={locale === opt.value}
-                  onClick={() => setLocale(opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Language is now a per-newsletter toggle rendered next to each
+              card's send button (localeToggle below) — no shared control. */}
 
           {/* ── PRO section ─────────────────────────────────────── */}
           <div className="nl-tier-section">
@@ -1302,12 +1361,13 @@ export function NewsletterWidget() {
                         <span className="nl-upcoming-issue">{humanIssue}</span>
                         <span className="nl-upcoming-when">{label}</span>
                       </div>
-                      <div className="nl-upcoming-actions">
+                      <div className="nl-upcoming-actions nl-card-actions">
+                        {localeToggle("pro-weekly")}
                         <button
                           type="button"
                           className="nl-upcoming-btn"
                           disabled={busy || !!audienceConfirm}
-                          onClick={() => trigger({ issueNumber: issueNum, when: label, newsletterId: "pro-weekly" })}
+                          onClick={() => trigger({ issueNumber: issueNum, when: label, newsletterId: "pro-weekly", locale: localeFor("pro-weekly") })}
                           title="Send a test copy to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
                         >
                           Send test →
@@ -1505,13 +1565,14 @@ export function NewsletterWidget() {
                   </p>
                   {isLive && (
                     <>
-                      <div className="nl-upcoming-actions" style={{ marginTop: 12 }}>
+                      <div className="nl-upcoming-actions nl-card-actions" style={{ marginTop: 12 }}>
+                        {localeToggle(nl.id)}
                         <button
                           type="button"
                           className="nl-upcoming-btn"
-                          onClick={() => trigger({ newsletterId: nl.id })}
+                          onClick={() => trigger({ newsletterId: nl.id, locale: localeFor(nl.id) })}
                           disabled={busy}
-                          title="Send a test welcome email to the address above — bypasses the Clerk idempotency stamp so you can re-test against the same user." // i18n-allow: admin-only widget
+                          title="Sends the real email synchronously and reports the actual outcome — only confirms Sent when it sent." // i18n-allow: admin-only widget
                         >
                           {nl.id === "pro-welcome-back" ? "Send test welcome-back to me →" : "Send test welcome to me →"}
                         </button>
@@ -1519,7 +1580,7 @@ export function NewsletterWidget() {
                       {cardStatus.kind === "pending" && (
                         <p className="nl-result pending" style={{ marginTop: 8 }}>
                           <span className="nl-status-icon" aria-hidden="true" />
-                          Dispatching test welcome…
+                          Sending…
                         </p>
                       )}
                       {cardStatus.kind === "error" && (
@@ -1527,22 +1588,29 @@ export function NewsletterWidget() {
                           ⚠ {cardStatus.message}
                         </p>
                       )}
-                      {cardStatus.kind === "success" && (
+                      {cardStatus.kind === "failed" && (
+                        <p className="nl-result error" style={{ marginTop: 8 }}>
+                          ✗ Not sent — {welcomeReasonText(cardStatus.reason)}
+                        </p>
+                      )}
+                      {cardStatus.kind === "skipped" && (
+                        <p className="nl-result error" style={{ marginTop: 8 }}>
+                          ⊘ Not sent — {welcomeReasonText(cardStatus.reason)}
+                        </p>
+                      )}
+                      {cardStatus.kind === "sent" && (
                         <div className="nl-success-card" style={{ marginTop: 8 }}>
                           <p className="nl-success-head">
                             <span className="nl-success-check" aria-hidden="true">✓</span>
-                            Dispatched · welcome on the way
+                            {cardStatus.dryRun ? "Rendered OK · dry-run (no email sent)" : "Sent ✓"}
                           </p>
                           <p className="nl-success-body">
-                            Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds. Look for the subject <strong>{nl.id === "pro-welcome-back" ? "Welcome back to Pulpo Pro — your next 10" : "Welcome to Pulpo Pro — your first 10"}</strong>.
+                            {cardStatus.dryRun ? (
+                              <>The dispatcher ran in <strong>DRY-RUN</strong>, so no real email went out. Set <strong>PULPO_NEWSLETTER_DRY_RUN=0</strong> in the Vercel env to send for real.</>
+                            ) : (
+                              <>Sent to <strong>{cardStatus.recipient}</strong> in <strong>{cardStatus.locale === "es" ? "Spanish" : "English"}</strong>. Subject: <strong>{welcomeSubject(nl.id, cardStatus.locale)}</strong>.{cardStatus.messageId ? <> · id <code>{cardStatus.messageId}</code></> : null}</>
+                            )}
                           </p>
-                          {cardStatus.runsUrl && (
-                            <p className="nl-success-footer">
-                              <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">
-                                View workflow run on GitHub →
-                              </a>
-                            </p>
-                          )}
                         </div>
                       )}
                     </>
