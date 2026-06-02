@@ -42,8 +42,23 @@ DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflow
 # global override for the workflow-dispatch test-fire path.
 FAMILIES = {
     "resend": {
-        "label": "Resend newsletter.*",
-        "where": "startsWith(event, 'newsletter.')",
+        # Audit 2026-06-02 (PRD P0-4): the old `startsWith(event,
+        # 'newsletter.')` matched internal cron events
+        # (newsletter.commentary_generated, newsletter.issue_built,
+        # newsletter.welcome_reconcile_completed, newsletter.send_succeeded)
+        # which kept the Resend heartbeat green even when the actual
+        # /api/resend-webhook stopped firing. Pin the heartbeat to real
+        # Resend lifecycle webhook events (and the dedicated
+        # resend.webhook_received heartbeat emitted by the handler).
+        "label": "Resend lifecycle webhook",
+        "where": (
+            "event = 'resend.webhook_received' "
+            "OR event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ")"
+        ),
         "max_age_hours": 12.0,
     },
     # Cadence drift specifically for the newsletter SEND pipeline.
@@ -235,6 +250,36 @@ RATE_CHECKS = {
         "window_hours": 192.0,
         "threshold": 0.05,               # 5%
         "min_denominator": 20,
+    },
+    # ── Resend lifecycle classification health ───────────────────────
+    # Audit 2026-06-02 (PRD P0-3): live PostHog showed nearly every
+    # newsletter.delivered row with email_type='unknown' because
+    # api/contact.js sent untagged emails. With the PR-1A contact-form
+    # fix in place, this rate should drop to near-zero. Alert when >5%
+    # of lifecycle events arrive without a recognisable email_type —
+    # that's the smoking gun for "a new sender shipped without tags".
+    #
+    # 24h window for fast feedback. min_denominator=10 to avoid
+    # alarming on a single contact-form-burst weekend.
+    "resend_unknown_email_type_rate": {
+        "label": "Resend lifecycle events with email_type='unknown'",
+        "numerator_where": (
+            "event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ") AND JSONExtractString(properties, 'email_type') = 'unknown'"
+        ),
+        "denominator_where": (
+            "event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ")"
+        ),
+        "window_hours": 24.0,
+        "threshold": 0.05,               # 5%
+        "min_denominator": 10,
     },
 }
 
