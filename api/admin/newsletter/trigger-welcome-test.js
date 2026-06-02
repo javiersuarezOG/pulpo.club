@@ -3,51 +3,48 @@
 // Body: { email, by?, force?: boolean, variant?: "welcome"|"welcome_back",
 //         locale?: "en"|"es" }
 //
-// Operator surface for the Pulpo Pro Welcome template. Dispatches the
-// `pulpo-pro-welcome` GitHub Actions workflow with send_mode=yes,
-// source=admin, and (by default) force=yes so the operator can
-// re-render the welcome to themselves without manually clearing the
-// recipient's Clerk publicMetadata.welcome_newsletter_sent_at.
+// Operator surface for the Pulpo Pro Welcome / Welcome-back templates.
 //
-// `variant` selects the sub-version to render: "welcome" (first-time,
-// default) or "welcome_back" (resubscribe re-acquisition). This lets an
-// operator preview the welcome-back email in their inbox WITHOUT going
-// through a Stripe resubscribe — force=yes renders it regardless of the
-// recipient's stamps.
+// This calls the SYNCHRONOUS internal dispatcher
+// (`/api/internal/welcome-send`) and returns its REAL outcome — so the
+// admin widget only ever confirms "Sent" when the email actually sent.
+// It used to fire a GitHub Actions workflow and return 202 ("dispatch
+// accepted") which looked like success even when the send then silently
+// skipped (e.g. the recipient wasn't a Clerk Pro user). The internal
+// endpoint runs `dispatch_welcome` in-process (~1-3s) and reports
+// sent / skipped:<reason> / failed:<reason>.
 //
-// Mirrors the architecture of trigger-preview.js (the weekly's
-// per-cohort preview surface):
-//   • Same GITHUB_DISPATCH_TOKEN, repo, ref.
-//   • Same rate limiter (5/hr/IP — paid CI run + real Resend send).
-//   • Same _verify_dispatch.js poll for "did GitHub actually create
-//     a run?" — guards against the silent-drop failure documented in
-//     trigger-preview.js's preamble.
-//   • Same PostHog `admin.newsletter_test_triggered` event so the
-//     cross-device audit log shows welcome tests alongside weekly ones.
+//   • `variant`  — "welcome" (first-time) | "welcome_back" (resubscribe).
+//   • `locale`   — EN/ES override (the tool's Language toggle). Empty →
+//     the dispatcher uses the recipient's Clerk locale (prod behavior).
+//   • `force`    — defaults TRUE for admin (re-render past the idempotency
+//     stamp). Pass false to exercise the idempotency path.
 //
-// What's different from trigger-preview:
-//   • The welcome workflow targets a single recipient (no cohort fan-out).
-//   • `locale` is an optional override for the admin test-send (the
-//     tool's Language toggle). When absent the dispatcher falls back to
-//     the recipient's Clerk publicMetadata.profile.locale — the
-//     production behavior.
-//   • No issue_number — the welcome is always "issue 1" in its own
-//     telemetry namespace.
-//   • `force` defaults to TRUE for this endpoint specifically. The
-//     idempotency stamp is there to protect production (Stripe retries
-//     etc.); the admin Test-send-to-me surface is for QA, where
-//     re-rendering is the whole point.
+// Response (always HTTP 200 so the widget can read the body): {
+//   status: "sent" | "skipped" | "failed" | "error",
+//   reason: string | null, message_id: string | null,
+//   dry_run: bool, variant, locale }
+//
+// Auth to the internal endpoint: Bearer PULPO_INTERNAL_TOKEN (shared with
+// the Stripe webhook). When it's unset we return status:"error" — never a
+// false "sent".
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
-const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
-const DEFAULT_REF = "main";
-const WORKFLOW_FILE = "pulpo-pro-welcome.yml";
+const INTERNAL_PATH = "/api/internal/welcome-send";
+const INTERNAL_TIMEOUT_MS = 25_000;
 
-async function emitTriggerEvent({ to, by, force, variant, result, detail }) {
+function internalBaseUrl() {
+  return (
+    process.env.PULPO_SITE_ROOT ||
+    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+    "https://pulpo.club"
+  );
+}
+
+async function emitTriggerEvent({ to, by, force, variant, locale, result, reason }) {
   try {
     posthog.capture(
       posthog.emailDistinctId(by || to),
@@ -57,9 +54,10 @@ async function emitTriggerEvent({ to, by, force, variant, result, detail }) {
         by: by || null,
         newsletter_id: variant === "welcome_back" ? "pro-welcome-back" : "pro-welcome",
         variant: variant || "welcome",
+        locale: locale || null,
         force,
         result,
-        detail: detail || null,
+        detail: reason || null,
         dispatched_at: new Date().toISOString(),
       },
     );
@@ -88,13 +86,41 @@ async function readJsonBody(req) {
   }
 }
 
-function logApi(name, fields) {
-  const parts = ["[api]", name];
+function logApi(fields) {
+  const parts = ["[api]", "admin.newsletter_trigger_welcome_test"];
   for (const [k, v] of Object.entries(fields)) parts.push(`${k}=${v}`);
   console.log(parts.join(" "));
 }
 
-module.exports = async (req, res) => {
+// Exported for unit tests — injectable fetch.
+async function callInternalWelcomeSend({ baseUrl, token, payload, fetchImpl, timeoutMs }) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), timeoutMs || INTERNAL_TIMEOUT_MS);
+  try {
+    const r = await (fetchImpl || fetch)(`${baseUrl}${INTERNAL_PATH}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "pulpo-admin-welcome-test",
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    let body = null;
+    try { body = await r.json(); } catch { /* best-effort */ }
+    return { ok: true, httpStatus: r.status, body };
+  } catch (err) {
+    const reason = err && err.name === "AbortError"
+      ? "timeout"
+      : `fetch_failed:${(err && err.message) || "unknown"}`;
+    return { ok: false, reason };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+async function handler(req, res, { fetchImpl } = {}) {
   const t0 = Date.now();
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -103,164 +129,76 @@ module.exports = async (req, res) => {
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
-    logApi("admin.newsletter_trigger_welcome_test", { status: 429, ms: Date.now() - t0 });
+    logApi({ status: 429, ms: Date.now() - t0 });
     return send429(res, rl, "admin_newsletter_trigger_welcome_test");
   }
 
   const body = await readJsonBody(req);
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!email || !EMAIL_RE.test(email)) {
-    return res.status(400).json({ error: "invalid_email" });
+    return res.status(400).json({ status: "error", reason: "invalid_email" });
   }
   const by = typeof body.by === "string" && EMAIL_RE.test(body.by.trim().toLowerCase())
     ? body.by.trim().toLowerCase()
     : null;
-  // Default to forcing the re-send for admin tests. Operator can pass
-  // `force: false` to actually exercise the idempotency path.
   const force = body.force === false ? false : true;
-  // Welcome sub-version. "welcome_back" lets the operator preview the
-  // resubscribe email without a Stripe checkout. Anything unrecognized
-  // falls back to the first-time welcome.
   const variant = body.variant === "welcome_back" ? "welcome_back" : "welcome";
-  // Locale override for the admin test-send: the tool's Language toggle
-  // decides EN/ES so an operator can preview either language. Absent /
-  // unrecognized → empty, and the dispatcher falls back to the
-  // recipient's Clerk locale (the production behavior).
   const locale = (body.locale === "en" || body.locale === "es") ? body.locale : "";
 
-  const token = process.env.GITHUB_DISPATCH_TOKEN || "";
+  const token = process.env.PULPO_INTERNAL_TOKEN || "";
   if (!token) {
-    logApi("admin.newsletter_trigger_welcome_test", {
-      status: 503, ms: Date.now() - t0, reason: "github_token_missing",
-    });
-    return res.status(503).json({
-      error: "github_dispatch_not_configured",
-      hint: "Set GITHUB_DISPATCH_TOKEN in Vercel env (fine-grained PAT, actions:write on this repo).",
-    });
-  }
-
-  const repo = process.env.GITHUB_DISPATCH_REPO || DEFAULT_REPO;
-  const ref = process.env.GITHUB_DISPATCH_REF || DEFAULT_REF;
-  const url = `https://api.github.com/repos/${repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`;
-
-  const baselineRunId = await getLatestRunId({ repo, workflowFile: WORKFLOW_FILE, token });
-
-  let gh;
-  try {
-    gh = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "pulpo-admin-newsletter-welcome-test",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ref,
-        inputs: {
-          recipient_email: email,
-          send_mode: "yes",
-          source: "admin",
-          force: force ? "yes" : "no",
-          variant,
-          locale,
-        },
-      }),
-    });
-  } catch (err) {
-    logApi("admin.newsletter_trigger_welcome_test", {
-      status: 502, ms: Date.now() - t0, reason: "github_fetch_failed",
-      error: (err && err.message) || "(no message)",
-    });
-    await emitTriggerEvent({
-      to: email, by, force, variant,
-      result: "error",
-      detail: `github_dispatch_failed: ${(err && err.message) || "(no message)"}`,
-    });
-    return res.status(502).json({
-      error: "github_dispatch_failed",
-      detail: (err && err.message) || "(no message)",
+    // Honest failure — never pretend the email sent.
+    logApi({ status: 503, ms: Date.now() - t0, reason: "internal_token_missing" });
+    await emitTriggerEvent({ to: email, by, force, variant, locale, result: "error", reason: "internal_token_missing" });
+    return res.status(200).json({
+      status: "error",
+      reason: "internal_endpoint_not_configured",
+      hint: "Set PULPO_INTERNAL_TOKEN in Vercel env so the admin test can run the real dispatcher.",
     });
   }
 
-  if (gh.status !== 204) {
-    const detail = await gh.text().catch(() => "");
-    logApi("admin.newsletter_trigger_welcome_test", {
-      status: gh.status, ms: Date.now() - t0, reason: "github_non_204",
-    });
-    await emitTriggerEvent({
-      to: email, by, force, variant,
-      result: "error",
-      detail: `github_status_${gh.status}: ${detail.slice(0, 200)}`,
-    });
-    return res.status(gh.status === 404 ? 404 : 502).json({
-      error: "github_dispatch_rejected",
-      github_status: gh.status,
-      detail: detail.slice(0, 500),
-    });
-  }
+  const payload = { email, source: "admin", force, variant };
+  if (locale) payload.locale = locale;
 
-  if (baselineRunId !== null) {
-    const newRun = await pollForNewerRun({
-      repo, workflowFile: WORKFLOW_FILE, token, baselineId: baselineRunId,
-    });
-    if (!newRun) {
-      logApi("admin.newsletter_trigger_welcome_test", {
-        status: 502, ms: Date.now() - t0, reason: "dispatch_accepted_but_no_run_created",
-        baseline_run_id: baselineRunId,
-      });
-      await emitTriggerEvent({
-        to: email, by, force, variant,
-        result: "error",
-        detail: "dispatch_accepted_but_no_run_created: GitHub returned 204 but no workflow run appeared within poll window",
-      });
-      return res.status(502).json({
-        error: "dispatch_accepted_but_no_run_created",
-        hint: "GitHub accepted the dispatch but no workflow run materialized within ~8s. This is usually a transient GitHub Actions issue — retry in ~30s. If it persists, check https://www.githubstatus.com.",
-      });
-    }
-    logApi("admin.newsletter_trigger_welcome_test", {
-      status: 202, ms: Date.now() - t0,
-      repo, ref, email_domain: email.split("@")[1] || "",
-      run_id: newRun.id, verified: true, force,
-    });
-    await emitTriggerEvent({
-      to: email, by, force, variant,
-      result: "ok",
-    });
-    return res.status(202).json({
-      ok: true,
-      repo,
-      ref,
-      workflow: WORKFLOW_FILE,
-      runs_url: newRun.html_url || `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}`,
-      run_id: newRun.id,
-      verified: true,
-      hint: variant === "welcome_back"
-        ? "Welcome-back arrives in ~30–60s once the workflow finishes. Subject: 'Welcome back to Pulpo Pro — your next 10'."
-        : "Welcome arrives in ~30–60s once the workflow finishes. Subject: 'Welcome to Pulpo Pro — your first 10'.",
-    });
-  }
-
-  logApi("admin.newsletter_trigger_welcome_test", {
-    status: 202, ms: Date.now() - t0,
-    repo, ref, email_domain: email.split("@")[1] || "",
-    verified: false, reason: "baseline_unavailable", force,
+  const result = await callInternalWelcomeSend({
+    baseUrl: internalBaseUrl(),
+    token,
+    payload,
+    fetchImpl,
+    timeoutMs: INTERNAL_TIMEOUT_MS,
   });
 
-  await emitTriggerEvent({
-    to: email, by, force,
-    result: "ok",
-  });
+  if (!result.ok) {
+    logApi({ status: 502, ms: Date.now() - t0, reason: result.reason });
+    await emitTriggerEvent({ to: email, by, force, variant, locale, result: "error", reason: result.reason });
+    return res.status(200).json({ status: "error", reason: result.reason });
+  }
 
-  return res.status(202).json({
-    ok: true,
-    repo,
-    ref,
-    workflow: WORKFLOW_FILE,
-    runs_url: `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}`,
-    verified: false,
-    hint: "Dispatch accepted; couldn't verify the run was created (GitHub runs API was unavailable). Watch the workflow page directly to confirm.",
+  // Internal endpoint: 200 = sent|skipped, 500 = failed, 4xx = bad request.
+  const b = result.body || {};
+  let status = b.status;
+  if (status !== "sent" && status !== "skipped" && status !== "failed") {
+    status = "error";
+  }
+  const reason = b.reason || (status === "error" ? (b.error || `http_${result.httpStatus}`) : null);
+
+  logApi({
+    status: 200, ms: Date.now() - t0, result: status, reason: reason || "-",
+    variant, locale: locale || "clerk", dry_run: !!b.dry_run,
   });
-};
+  await emitTriggerEvent({ to: email, by, force, variant, locale, result: status, reason });
+
+  return res.status(200).json({
+    status,
+    reason,
+    message_id: b.message_id || null,
+    dry_run: !!b.dry_run,
+    variant,
+    locale: locale || null,
+    latency_ms: typeof b.latency_ms === "number" ? b.latency_ms : Date.now() - t0,
+  });
+}
+
+module.exports = (req, res) => handler(req, res);
+module.exports.handler = handler;
+module.exports.callInternalWelcomeSend = callInternalWelcomeSend;
