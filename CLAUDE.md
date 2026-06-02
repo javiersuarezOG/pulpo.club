@@ -408,6 +408,118 @@ There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
 Upstash instance. If a future feature genuinely needs one, the PR that
 adds it must also add the backup posture to this section.
 
+## NEVER let the nightly freeze data without a Slack page (post-2026-06-02)
+
+The 2026-05-26 → 2026-06-01 six-day data freeze was discovered by
+Sebastian noticing stale listings on `pulpo.club`, not by any alert.
+The hero canary blocked the nightly's commit step for 5+ consecutive
+runs; the existing watchdog correctly detected stale `last_updated`
+every day at 14:00 UTC and opened GitHub issues — a surface that
+nobody actively watches. Issues piled up. Site stayed stale.
+
+Mandatory rules:
+
+1. **The pulpo-watchdog must Slack-page on every failure.** GitHub
+   issues are the system of record; Slack is the human-visible trip
+   wire. Both run from the same `if: failure()` block in
+   `.github/workflows/pulpo-watchdog.yml`; do not silently disable
+   either path. If `SLACK_WEBHOOK_URL` is unset locally that's fine
+   — the curl exits 0 with a "skipping" breadcrumb — but a production
+   rotation that drops the secret is a sev-2.
+2. **The nightly's `Slack on failure` step (`if: failure()` + final
+   step) is the same contract** for the nightly itself.
+   `scripts/check_source_health.py` runs pre-canary and Slacks any
+   red source. Together with the watchdog's freshness check + Slack
+   ping, the time-to-discovery on a future freeze drops from 6 days
+   to under 30 hours.
+3. **The end-of-run summary step is observability, not validation.**
+   Lives at the bottom of `pulpo-nightly.yml`'s job log. Do not
+   migrate it into a canary or make it fail the workflow on missing
+   data — its purpose is to tell the story of what happened, even
+   on a failed run.
+
+## NEVER let a nightly silent-freeze via canary-vs-validation drift (post-2026-06-02)
+
+Nightly 26774794593 (2026-06-01) cleared the pipeline + 6 earlier
+canaries + recovered all 3 broken sources (956 fresh listings) and
+then died at the data-quality canary on ONE listing: a $7,666/m²
+premium beachfront micro-lot at Jaltepeque. The canary's PPM ceiling
+was `5_000`, identical to `automation/validation_bounds.PPM_FLAG_MAX`
+— meaning the validation layer kept + flagged listings in the
+5k-10k band while the workflow canary hard-failed on the same band.
+Every legitimate flagged listing in that range froze the data PR.
+
+Mandatory rules:
+
+1. **Canary upper bounds in `.github/workflows/pulpo-nightly.yml`
+   must match `automation/validation_bounds.<METRIC>_DROP_MAX`**,
+   not `FLAG_MAX`. The canary is a defensive backup for
+   unit-conversion bugs — it should fire only on listings the
+   validation layer would have dropped as structurally broken, and
+   never on flagged-but-kept legitimate data.
+2. **Canary lower bounds (where applicable) follow the same rule
+   against `_DROP_MIN`**, with the agricultural-cohort floor being
+   the only documented exception (looser by design).
+3. **`tests/test_canary_validation_alignment.py` enforces this
+   contract.** It parses the workflow YAML, extracts the canary
+   thresholds, and asserts each one against the matching
+   `validation_bounds.py` constant. A drift on either side fails the
+   test with a message pointing at the precedent (PR #618). When
+   updating a threshold, update BOTH sides intentionally; do not
+   silence the test.
+4. **Repo-variable escape hatch for incident response:** the data-
+   quality canary reads `LOG_ONLY` from
+   `${{ vars.DATA_QUALITY_LOG_ONLY || 'false' }}`. Flip the variable
+   to `true` in `Settings → Variables → Actions` to ship a nightly
+   while recalibrating thresholds in a follow-up PR. **Do not leave
+   it on `true`** — that ships silent data corruption. Always flip
+   back the same day and open the recalibration PR.
+
+## NEVER ship a nightly commit step that can't handle mid-run main movement (post-2026-06-02)
+
+Two distinct failure modes in the same week:
+
+- **PAT-scope race (nightly 26758631085, 2026-06-01).** The runner
+  checked out main at 13:42 UTC. PR #602 landed at 14:27 UTC with
+  changes under `.github/workflows/`. At 15:20 UTC pulpo-bot tried
+  to push the data branch, GitHub compared its workflow blobs to
+  current main, saw divergence, and rejected the push because
+  `PULPO_BOT_TOKEN` intentionally lacks `workflow` scope.
+- **Rebase-blocked-by-byproducts (nightly 26781987375).** PR #606
+  added `git rebase origin/main` before push to fix the PAT race.
+  That rebase failed with "cannot rebase: You have unstaged changes"
+  because the pipeline writes several files
+  (`unmapped_beaches_history.jsonl`, `repick_summary.jsonl`,
+  working-tree byproducts) that are intentionally NOT in the data
+  commit's `git add` list.
+
+Both fixed (#606 then #625) — the current invariant is:
+
+```yaml
+git fetch origin main
+git rebase --autostash origin/main || {
+    echo "::warning::rebase ... failed; aborting and pushing as-is"
+    git rebase --abort || true
+}
+git push origin "$BRANCH"
+```
+
+Mandatory rules:
+
+1. **`PULPO_BOT_TOKEN` MUST remain least-privilege.** Specifically,
+   no `workflow` scope. Adding that scope means a compromised bot
+   key could rewrite CI to leak secrets / disable canaries. The
+   rebase invariant above is the correct fix surface.
+2. **The data commit's `git add` list is incomplete by design.** The
+   pipeline writes files we don't want to ship to main (working-tree
+   logs, debug breadcrumbs). `--autostash` handles this without
+   broadening the `git add` list — those byproducts are intentionally
+   discarded on runner shutdown.
+3. **Never add `--no-verify` or `-c commit.gpgsign=false`** to the
+   commit step to "make the push work." The PAT-scope check is the
+   safety contract; if you're tempted to bypass it, the right fix is
+   the rebase invariant, not weakening the gate.
+
 ## DLQ semantics — listing vs source (post-2026-06-01)
 
 The pipeline carries two reject channels and they answer different
