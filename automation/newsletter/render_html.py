@@ -2011,15 +2011,16 @@ def _welcome_hero_html(issue: Issue, variant: str = "welcome") -> str:
     "Welcome, Sebastian." not "Welcome, Sebastian García."
     """
     locale = issue.locale
-    prefix = "welcome_back" if variant == "welcome_back" else "welcome"
-    eyebrow = i18n.t(f"{prefix}.hero.eyebrow", locale)
+    # Copy derives from welcome.* via welcome_text(); variant flips the
+    # greeting to "welcome back". No separate welcome_back.* strings.
+    eyebrow = i18n.welcome_text("hero.eyebrow", locale, variant=variant)
     name = (issue.recipient.display_name or "").strip()
     if name:
         first = name.split()[0]
-        headline = i18n.t(f"{prefix}.hero.headline.named", locale, name=first)
+        headline = i18n.welcome_text("hero.headline.named", locale, variant=variant, name=first)
     else:
-        headline = i18n.t(f"{prefix}.hero.headline.unnamed", locale)
-    lede = i18n.t(f"{prefix}.hero.lede", locale)
+        headline = i18n.welcome_text("hero.headline.unnamed", locale, variant=variant)
+    lede = i18n.welcome_text("hero.lede", locale, variant=variant)
     return f"""
     <tr><td style="padding:28px 24px 20px;">
       <div class="eyebrow">{_e(eyebrow)}</div>
@@ -2142,10 +2143,9 @@ def _welcome_picks_intro_html(locale: Locale, variant: str = "welcome") -> str:
     second weekly already recognizes the chrome.
 
     Only the title flips by `variant` ("Your first 10 picks." →
-    "Your next 10 picks." for the welcome-back sub-version); the body
-    is shared."""
-    prefix = "welcome_back" if variant == "welcome_back" else "welcome"
-    title = i18n.t(f"{prefix}.section.picks.title", locale)
+    "Your next 10 picks." for the welcome-back sub-version, derived via
+    welcome_text); the body is shared verbatim."""
+    title = i18n.welcome_text("section.picks.title", locale, variant=variant)
     body = i18n.t("welcome.section.picks.body", locale)
     return f"""
     <tr><td class="pad-h" style="padding:26px 24px 14px;">
@@ -2239,9 +2239,8 @@ def render_welcome_html(issue: Issue, *, now=None, variant: str = "welcome") -> 
     """
     locale = issue.locale
     is_back = variant == "welcome_back"
-    hero_prefix = "welcome_back" if is_back else "welcome"
     template_version = WELCOME_BACK_TEMPLATE_VERSION if is_back else WELCOME_TEMPLATE_VERSION
-    head_title = i18n.t(f"{hero_prefix}.hero.eyebrow", locale)
+    head_title = i18n.welcome_text("hero.eyebrow", locale, variant=variant)
     issue_strip = i18n.t(
         "header.issue", locale, n=f"{issue.issue_number:02d}", date=issue.issue_date_human.upper()
     )

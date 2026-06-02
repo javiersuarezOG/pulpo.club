@@ -12,6 +12,7 @@ for that lives in tests/newsletter/test_render.py.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 from pulpo.countries import active as _active_country
@@ -224,26 +225,15 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "welcome.start.account.cta":   {"en": "Open your account",                            "es": "Abrir tu cuenta"},
 
     # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
-    # The welcome-back is the SAME email as the first-time welcome — a
-    # sub-version toggled by `variant="welcome_back"` in render_welcome_html.
-    # ONLY these keys override their `welcome.*` counterparts: the hero
-    # (eyebrow + headline say "welcome back") + the picks-intro title
-    # ("first 10" → "next 10"). Every other block (how-it-works, cadence,
-    # picks body, start-here, footer) renders from the shared `welcome.*`
-    # keys, so the two emails cannot drift. See
-    # `project_resubscribe_welcome_funnel` for the funnel rationale.
-    "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your next 10",      "es": "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"},
-    # Hero — the one block that says "welcome back". Mirrors welcome.hero.*
-    # shape exactly (eyebrow + named/unnamed headline + lede); the lede is
-    # the welcome lede with "first 10" → "next 10".
-    "welcome_back.hero.eyebrow":   {"en": "Welcome back to Pulpo Pro",                     "es": "Bienvenido de nuevo a Pulpo Pro"},
-    "welcome_back.hero.headline.named":   {"en": "Welcome back, {name}.",                  "es": "Bienvenido de nuevo, {name}."},
-    "welcome_back.hero.headline.unnamed": {"en": "Welcome back.",                          "es": "Bienvenido de nuevo."},
-    "welcome_back.hero.lede":      {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your next 10 are below; same shape every Sunday from here.",
-                                     "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus próximas 10 están abajo; mismo formato cada domingo."},
-    # Picks section intro — the welcome's "Your first 10 picks." reworded
-    # for a returning reader. Body is inherited from welcome.section.picks.body.
-    "welcome_back.section.picks.title": {"en": "Your next 10 picks.",                      "es": "Tus próximas 10 selecciones."},
+    # NO stored welcome_back.* copy. The welcome-back email is the SAME
+    # email as the first-time welcome (one shared template, toggled by
+    # `variant="welcome_back"`) AND its copy is DERIVED from the `welcome.*`
+    # strings at render time by `welcome_text()` below — never hand-kept in
+    # parallel. Editing any `welcome.*` string automatically flows to the
+    # welcome-back; the two are identical save the "welcome → welcome back"
+    # (and "first 10 → next 10") rewrite. They cannot drift because there
+    # is one source of copy, not two. See `welcome_text` + the parity test
+    # in tests/newsletter/components/test_welcome_back_render.py.
 }
 
 
@@ -258,6 +248,59 @@ def t(key: str, locale: Locale = DEFAULT_LOCALE, **fmt) -> str:
         except (KeyError, IndexError, ValueError):
             return text
     return text
+
+
+# ── Welcome → Welcome-back copy derivation ────────────────────────────────
+# The resubscribe "welcome-back" email is the first-time welcome with the
+# greeting reworded. Rather than store a parallel set of welcome_back.*
+# strings (which would silently drift the moment someone edits one side),
+# the welcome-back copy is DERIVED from the `welcome.*` strings at render
+# time: exactly two locale-aware rewrites turn a welcome string into its
+# welcome-back form. One source of copy → the two emails are guaranteed
+# identical save these rewrites.
+#
+# The rewrites are deliberately narrow so they touch ONLY the greeting +
+# the "first 10" framing and never mangle body copy:
+#   1. Leading greeting word → its "back" form (anchored at string start,
+#      so a mid-sentence "welcome"/"bienvenido" is never touched).
+#   2. The literal "first 10" / "primeras 10" count → "next 10" /
+#      "próximas 10".
+# `welcome_text` is applied ONLY to the hero strings + picks-intro title +
+# subject — the surgical set where "welcome"/"first 10" can appear. Shared
+# blocks (how-it-works, cadence, picks body, start-here, footer) render
+# through plain `t()`, untouched, so they're byte-identical in both emails.
+_WELCOMEBACK_REWRITES: dict[str, list] = {
+    "en": [
+        (re.compile(r"^Welcome\b"), "Welcome back"),
+        ("first 10", "next 10"),
+    ],
+    "es": [
+        (re.compile(r"^Bienvenido\b"), "Bienvenido de nuevo"),
+        ("primeras 10", "próximas 10"),
+    ],
+}
+
+
+def welcome_text(key_suffix: str, locale: Locale = DEFAULT_LOCALE, *,
+                 variant: str = "welcome", **fmt) -> str:
+    """Resolve a `welcome.<key_suffix>` string, applying the welcome-back
+    rewrite when `variant == "welcome_back"`.
+
+    This is the single entry point for welcome / welcome-back hero +
+    subject + picks-title copy. There is no separate welcome_back.* table —
+    the welcome-back string is a pure function of the welcome string, so
+    the two emails can never diverge beyond the documented rewrite."""
+    base = t(f"welcome.{key_suffix}", locale, **fmt)
+    if variant != "welcome_back":
+        return base
+    rules = _WELCOMEBACK_REWRITES.get(locale) or _WELCOMEBACK_REWRITES[DEFAULT_LOCALE]
+    out = base
+    for pattern, repl in rules:
+        if isinstance(pattern, str):
+            out = out.replace(pattern, repl)
+        else:
+            out = pattern.sub(repl, out, count=1)
+    return out
 
 
 def filter_summary(pref, locale: Locale = DEFAULT_LOCALE) -> str:

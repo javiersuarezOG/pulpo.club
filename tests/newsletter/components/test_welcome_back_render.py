@@ -60,13 +60,16 @@ def test_welcome_back_is_welcome_with_only_hero_and_title_swapped(ranked_pool, p
     welcome = render_welcome_html(issue, now=_NOW)
     welcome_back = render_welcome_back_html(issue, now=_NOW)
 
-    # The complete set of strings that may differ between the two.
+    # The complete set of strings that may differ between the two — each is
+    # the welcome string vs its welcome_text()-derived welcome-back form.
     swaps = [
-        (i18n.t("welcome_back.hero.eyebrow", lc), i18n.t("welcome.hero.eyebrow", lc)),
-        (i18n.t("welcome_back.hero.headline.named", lc, name="Javier"),
+        (i18n.welcome_text("hero.eyebrow", lc, variant="welcome_back"),
+         i18n.t("welcome.hero.eyebrow", lc)),
+        (i18n.welcome_text("hero.headline.named", lc, variant="welcome_back", name="Javier"),
          i18n.t("welcome.hero.headline.named", lc, name="Javier")),
-        (i18n.t("welcome_back.hero.lede", lc), i18n.t("welcome.hero.lede", lc)),
-        (i18n.t("welcome_back.section.picks.title", lc),
+        (i18n.welcome_text("hero.lede", lc, variant="welcome_back"),
+         i18n.t("welcome.hero.lede", lc)),
+        (i18n.welcome_text("section.picks.title", lc, variant="welcome_back"),
          i18n.t("welcome.section.picks.title", lc)),
         (WELCOME_BACK_TEMPLATE_VERSION, WELCOME_TEMPLATE_VERSION),
     ]
@@ -136,23 +139,47 @@ def test_welcome_back_es_uses_spanish_copy(ranked_pool, pro_with_prefs):
 
 
 def test_welcome_back_falls_back_when_display_name_missing(ranked_pool, pro_with_prefs):
-    """No first name on Clerk → 'Welcome back.' fallback (mirrors the
-    first-time welcome's 'Welcome aboard.'). Never 'Welcome back, .'."""
+    """No first name → the welcome's 'Welcome aboard.' fallback, derived to
+    'Welcome back aboard.'. Pure derivation (no special-case), so never the
+    first-time 'Welcome aboard.' and never 'Welcome back, .'."""
     anon = pro_with_prefs.__class__(
         **{**pro_with_prefs.__dict__, "display_name": None}
     )
     issue = _issue(ranked=ranked_pool, recipient=anon)
     html = render_welcome_back_html(issue, now=_NOW)
-    assert "Welcome back." in html
+    assert "Welcome back aboard." in html
+    assert "Welcome aboard." not in html
     assert "Welcome back, ." not in html
-    assert "Welcome back, None" not in html
+
+
+def test_welcome_text_derives_back_copy_from_welcome():
+    """The invariant: welcome-back copy is a pure function of the welcome
+    copy (welcome_text), so editing a welcome.* string flows to the
+    welcome-back automatically — they can't drift. Locks the two rewrites
+    (greeting → 'back' form, 'first 10' → 'next 10') in EN + ES."""
+    wt = i18n.welcome_text
+    # variant defaults to welcome → untouched
+    assert wt("hero.eyebrow", "en") == i18n.t("welcome.hero.eyebrow", "en")
+    # EN derivations
+    assert wt("hero.eyebrow", "en", variant="welcome_back") == "Welcome back to Pulpo Pro"
+    assert wt("hero.headline.named", "en", variant="welcome_back", name="Ana") == "Welcome back, Ana."
+    assert wt("hero.headline.unnamed", "en", variant="welcome_back") == "Welcome back aboard."
+    assert wt("section.picks.title", "en", variant="welcome_back") == "Your next 10 picks."
+    assert wt("email.subject", "en", variant="welcome_back") == "Welcome back to Pulpo Pro — your next 10"
+    assert "Your next 10 are below" in wt("hero.lede", "en", variant="welcome_back")
+    assert "first 10" not in wt("hero.lede", "en", variant="welcome_back")
+    # ES derivations (Salvadoran voseo intact)
+    assert wt("hero.eyebrow", "es", variant="welcome_back") == "Bienvenido de nuevo a Pulpo Pro"
+    assert wt("hero.headline.named", "es", variant="welcome_back", name="Ana") == "Bienvenido de nuevo, Ana."
+    assert wt("section.picks.title", "es", variant="welcome_back") == "Tus próximas 10 selecciones."
+    assert wt("email.subject", "es", variant="welcome_back") == "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"
 
 
 def test_welcome_back_subject_localized():
-    """Subject must localize. The dispatcher reads this for the
-    welcome-back variant."""
-    assert i18n.t("welcome_back.email.subject", "en") == "Welcome back to Pulpo Pro — your next 10"
-    assert i18n.t("welcome_back.email.subject", "es") == "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"
+    """Subject derives from welcome.email.subject via welcome_text. The
+    dispatcher reads it for the welcome-back variant."""
+    assert i18n.welcome_text("email.subject", "en", variant="welcome_back") == "Welcome back to Pulpo Pro — your next 10"
+    assert i18n.welcome_text("email.subject", "es", variant="welcome_back") == "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"
 
 
 def test_welcome_back_meta_tag_uses_welcome_back_version_constant(ranked_pool, pro_with_prefs):
