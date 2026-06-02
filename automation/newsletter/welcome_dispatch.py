@@ -321,6 +321,11 @@ def dispatch_welcome(
             "recipient": email,
             "reason": "clerk_lookup_failed",
             "source": source,
+            # Intent tags — effective_variant can't be resolved without a
+            # user, so carry the requested variant + resubscribe flag so a
+            # welcome-back skip funnel is still sliceable at this gate.
+            "variant": variant,
+            "allow_resubscribe": allow_resubscribe,
         })
         return WelcomeDispatchResult(status="skipped", reason="clerk_lookup_failed")
 
@@ -329,6 +334,8 @@ def dispatch_welcome(
             "recipient_hash": email_hash(email),
             "reason": "not_pro",
             "source": source,
+            "variant": variant,
+            "allow_resubscribe": allow_resubscribe,
         })
         return WelcomeDispatchResult(status="skipped", reason="not_pro",
                                       recipient_hash=email_hash(email))
@@ -365,6 +372,7 @@ def dispatch_welcome(
             "reason": "already_sent",
             "source": source,
             "previous_sent_at": user.welcome_sent_at,
+            "variant": effective_variant,
         })
         return WelcomeDispatchResult(status="skipped", reason="already_sent",
                                       recipient_hash=email_hash(email))
@@ -376,6 +384,7 @@ def dispatch_welcome(
             "reason": "ranked_missing",
             "source": source,
             "ranked_path": ranked_path,
+            "variant": effective_variant,
         })
         return WelcomeDispatchResult(status="skipped", reason="ranked_missing",
                                       recipient_hash=email_hash(email))
@@ -393,6 +402,7 @@ def dispatch_welcome(
             "recipient_hash": recipient.email_hash,
             "reason": "no_picks_available",
             "source": source,
+            "variant": effective_variant,
         })
         return WelcomeDispatchResult(status="skipped", reason="no_picks_available",
                                       recipient_hash=recipient.email_hash)
