@@ -40,6 +40,12 @@ on:
         type: choice
         default: "no"
         options: ["no", "yes"]
+      variant:
+        description: "Welcome sub-version: welcome (first-time) or welcome_back (resubscribe re-acquisition)"
+        required: false
+        type: choice
+        default: "welcome"
+        options: ["welcome", "welcome_back"]
 
 concurrency:
   # Per-recipient concurrency so a Stripe retry storm can't race a
@@ -102,7 +108,8 @@ jobs:
           EMAIL="${{ github.event.inputs.recipient_email }}"
           SOURCE="${{ github.event.inputs.source || 'admin' }}"
           FORCE="${{ github.event.inputs.force || 'no' }}"
-          ARGS=(--newsletter pulpo-pro-welcome --welcome-single-email "$EMAIL" --welcome-source "$SOURCE")
+          VARIANT="${{ github.event.inputs.variant || 'welcome' }}"
+          ARGS=(--newsletter pulpo-pro-welcome --welcome-single-email "$EMAIL" --welcome-source "$SOURCE" --welcome-variant "$VARIANT")
           if [ "$FORCE" = "yes" ]; then
             ARGS+=(--welcome-force)
           fi

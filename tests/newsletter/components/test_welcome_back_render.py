@@ -1,29 +1,38 @@
-"""Snapshot guards for the Pulpo Pro Welcome-back (resubscribe) render.
+"""Guards for the Pulpo Pro Welcome-back (resubscribe) render.
 
-Locks the shape of the resubscribe re-acquisition email so a future
-renderer edit can't silently drift it. Mirrors the assertion style of
-`test_welcome_render.py`: not byte-for-byte HTML diffing (too brittle),
-but per-named-block copy presence, the right cadence variant, locale
-coverage, and the blocks welcome-back explicitly drops vs. the
-first-time welcome.
+The welcome-back is NOT a separate template — it's `render_welcome_html`
+with `variant="welcome_back"`. So the headline guarantee here is
+*parity*: the welcome-back must be byte-identical to the first-time
+welcome EXCEPT the hero copy, the picks-intro title, and the version
+stamp. `test_welcome_back_is_welcome_with_only_hero_and_title_swapped`
+proves exactly that — swap the welcome-back-specific strings back to
+their `welcome.*` counterparts and the two renders must be equal.
 
-Companion to `tests/newsletter/components/test_welcome_render.py`
-(first-time welcome) and `tests/newsletter/test_templates.py`
-(registry-alignment CI guard).
+Companion to `test_welcome_render.py` (the first-time welcome) and
+`tests/newsletter/test_templates.py` (registry-alignment CI guard).
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from html import escape as _e
 
+from automation.newsletter import i18n
+from automation.newsletter.components._common import (
+    WELCOME_TEMPLATE_VERSION,
+    WELCOME_BACK_TEMPLATE_VERSION,
+)
 from automation.newsletter import build_issue
-from automation.newsletter.render_html import render_welcome_back_html
+from automation.newsletter.render_html import (
+    render_welcome_html,
+    render_welcome_back_html,
+)
 from automation.newsletter.templates import TEMPLATES, pulpo_pro_welcome_back
+
+_NOW = datetime(2026, 6, 1, 18, 0, 0, tzinfo=timezone.utc)  # Mon → future cadence
 
 
 def _issue(*, ranked, recipient):
-    """Build an Issue for the welcome-back path. issue_number=1 by the
-    same convention as the first-time welcome (own telemetry namespace)."""
     return build_issue(
         recipient=recipient,
         ranked_listings=ranked,
@@ -40,127 +49,116 @@ def test_template_registry_exposes_welcome_back():
     assert TEMPLATES["pulpo-pro-welcome-back"] is pulpo_pro_welcome_back.render
 
 
-def test_welcome_back_render_en_includes_named_blocks(ranked_pool, pro_with_prefs):
-    """The welcome-back's editorial top: re-entry hero, cadence note,
-    "Your fresh 10" intro, and the "Pick up where you left off"
-    re-engagement cards. Each must surface in the EN render."""
+def test_welcome_back_is_welcome_with_only_hero_and_title_swapped(ranked_pool, pro_with_prefs):
+    """THE parity guarantee. The welcome-back render, with its hero copy +
+    picks-intro title + version stamp swapped back to the first-time
+    welcome's, must be EXACTLY equal to the first-time welcome render. If
+    anyone adds a welcome-back-only block (or the two render paths drift),
+    this fails. One template, one sub-version — they can't diverge."""
     issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
-    html = render_welcome_back_html(issue)
-    # Re-entry hero
-    assert "Welcome back to Pulpo Pro" in html
-    assert "Good to have you back, Javier." in html      # first-name personalization
-    assert "Your Pulpo Pro access is live again" in html
-    # Salvadoran grounding (surf strip + lakes by name); never "volcanic"
-    assert "El Tunco to El Cuco, Coatepeque, Ilopango" in html
+    lc = "en"  # pro_with_prefs is en, display_name "Javier"
+    welcome = render_welcome_html(issue, now=_NOW)
+    welcome_back = render_welcome_back_html(issue, now=_NOW)
+
+    # The complete set of strings that may differ between the two.
+    swaps = [
+        (i18n.t("welcome_back.hero.eyebrow", lc), i18n.t("welcome.hero.eyebrow", lc)),
+        (i18n.t("welcome_back.hero.headline.named", lc, name="Javier"),
+         i18n.t("welcome.hero.headline.named", lc, name="Javier")),
+        (i18n.t("welcome_back.hero.lede", lc), i18n.t("welcome.hero.lede", lc)),
+        (i18n.t("welcome_back.section.picks.title", lc),
+         i18n.t("welcome.section.picks.title", lc)),
+        (WELCOME_BACK_TEMPLATE_VERSION, WELCOME_TEMPLATE_VERSION),
+    ]
+    normalized = welcome_back
+    for back, first in swaps:
+        # The strings land in the HTML html.escape()'d (the lede carries an
+        # apostrophe + em-dash), so swap the escaped forms.
+        normalized = normalized.replace(_e(back), _e(first))
+    assert normalized == welcome, (
+        "welcome-back diverges from the first-time welcome beyond the hero "
+        "copy + picks title + version stamp. The welcome-back is meant to be "
+        "the SAME template (variant='welcome_back') — a new welcome-back-only "
+        "block, or a structural edit to only one path, broke parity."
+    )
+
+
+def test_welcome_back_hero_says_welcome_back(ranked_pool, pro_with_prefs):
+    """The one block that changes: the hero greeting."""
+    issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
+    html = render_welcome_back_html(issue, now=_NOW)
+    assert "Welcome back to Pulpo Pro" in html        # eyebrow + <title>
+    assert "Welcome back, Javier." in html            # first-name personalization
+    assert "Your next 10 are below" in html           # lede reworded (first → next)
+    assert "Your next 10 picks." in html              # picks-intro title
+    # The first-time greeting must NOT survive into the welcome-back.
+    assert "Welcome to Pulpo Pro" not in html
+    assert "Welcome, Javier." not in html
+    assert "Your first 10 picks." not in html
+    # Brand voice: never "volcanic".
     assert "volcanic" not in html.lower()
-    # Picks section intro (resubscribe framing)
-    assert "Your next 10." in html
-    # Re-engagement cards (saved first)
-    assert "Pick up where you left off" in html
-    assert "Your saved listings" in html
-    assert "Open saved" in html
+
+
+def test_welcome_back_keeps_the_shared_welcome_blocks(ranked_pool, pro_with_prefs):
+    """Everything below the hero is the SAME as the first-time welcome —
+    how-it-works, cadence, start-here onboarding cards, footer. This is the
+    'identical end-to-end' requirement spelled out as presence checks."""
+    issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
+    html = render_welcome_back_html(issue, now=_NOW)
+    # How Pulpo works (3 beats) — shared
+    assert "How Pulpo works" in html
+    assert "We scan every supplier" in html
+    # Cadence note — shared (future variant for a Monday `now`)
+    assert "Sunday, June 7" in html
+    # Start-here onboarding cards — shared
+    assert "Start here" in html
+    assert "Set your filter" in html
     assert "Browse all listings" in html
     assert "Open your account" in html
-    # Saved card links to /saved (the strongest re-engagement hook)
-    assert "/saved?ref=newsletter_pro_welcome_back" in html
 
 
-def test_welcome_back_render_es_uses_spanish_copy(ranked_pool, pro_with_prefs):
-    """ES locale must localize the entire welcome-back surface. Canary
-    English strings must NOT appear when locale='es'."""
+def test_welcome_back_es_uses_spanish_copy(ranked_pool, pro_with_prefs):
+    """ES locale localizes the welcome-back hero too, with Salvadoran
+    voseo inherited from the shared blocks. No English canary leaks."""
     es_recipient = pro_with_prefs.__class__(
         **{**pro_with_prefs.__dict__, "locale": "es"}
     )
     issue = _issue(ranked=ranked_pool, recipient=es_recipient)
-    html = render_welcome_back_html(issue)
+    html = render_welcome_back_html(issue, now=_NOW)
     assert "Bienvenido de nuevo a Pulpo Pro" in html
-    assert "Qué bueno tenerte de vuelta, Javier." in html
-    assert "Tu acceso a Pulpo Pro está activo otra vez" in html
-    assert "Tus próximas 10." in html
-    assert "Acá tenés las diez mejores" in html        # Salvadoran voseo
+    assert "Bienvenido de nuevo, Javier." in html
+    assert "Tus próximas 10 están abajo" in html
+    assert "Tus próximas 10 selecciones." in html
     assert "volcánico" not in html.lower()
-    assert "Retomá donde lo dejaste" in html
-    assert "Abrir guardadas" in html
-    # Canary check — bare English block titles must NOT leak through.
+    # Canary — English greeting must NOT leak through.
     assert "Welcome back to Pulpo Pro" not in html
-    assert "Your next 10." not in html
-    assert "Pick up where you left off" not in html
-
-
-def test_welcome_back_drops_first_time_onboarding_blocks(ranked_pool, pro_with_prefs):
-    """Welcome-back explicitly drops the first-time welcome's tutorial +
-    onboarding steps — the returning reader already knows the ropes. A
-    regression where those leak back in surfaces here."""
-    issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
-    html = render_welcome_back_html(issue)
-    # "How Pulpo works" tutorial — dropped
-    assert "How Pulpo works" not in html
-    assert "We scan every supplier" not in html
-    # First-time "Start here" 3-step onboarding — dropped
-    assert "Start here" not in html
-    assert "Step 1 · Tune what you see" not in html
-    # First-time hero/intro copy — must NOT appear
-    assert "Welcome to Pulpo Pro" not in html             # first-time eyebrow
-    assert "Your first 10 picks." not in html
-
-
-def test_welcome_back_cadence_same_day_variant(ranked_pool, pro_with_prefs):
-    """Welcome-back reuses the shared cadence note. Sunday before 10:00
-    SV → same-day variant (2026-05-31 14:00 UTC == 08:00 SV)."""
-    issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
-    sunday_before_send = datetime(2026, 5, 31, 14, 0, 0, tzinfo=timezone.utc)
-    html = render_welcome_back_html(issue, now=sunday_before_send)
-    assert "lands today at 10 AM SV" in html
-    assert "Sunday, June 7" not in html
-
-
-def test_welcome_back_cadence_future_variant(ranked_pool, pro_with_prefs):
-    """Mid-week `now` → cadence note names the upcoming Sunday. 2026-06-01
-    (Mon) → next Sunday 2026-06-07."""
-    issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
-    monday = datetime(2026, 6, 1, 18, 0, 0, tzinfo=timezone.utc)
-    html = render_welcome_back_html(issue, now=monday)
-    assert "Sunday, June 7" in html
-    assert "lands today at 10 AM SV" not in html
+    assert "Your next 10 picks." not in html
 
 
 def test_welcome_back_falls_back_when_display_name_missing(ranked_pool, pro_with_prefs):
-    """No first name on Clerk → 'Good to have you back.' fallback. Never
-    render 'Good to have you back, .' or '…, None.'."""
+    """No first name on Clerk → 'Welcome back.' fallback (mirrors the
+    first-time welcome's 'Welcome aboard.'). Never 'Welcome back, .'."""
     anon = pro_with_prefs.__class__(
         **{**pro_with_prefs.__dict__, "display_name": None}
     )
     issue = _issue(ranked=ranked_pool, recipient=anon)
-    html = render_welcome_back_html(issue)
-    assert "Good to have you back." in html
-    assert "Good to have you back, ." not in html
-    assert "Good to have you back, None" not in html
+    html = render_welcome_back_html(issue, now=_NOW)
+    assert "Welcome back." in html
+    assert "Welcome back, ." not in html
+    assert "Welcome back, None" not in html
 
 
 def test_welcome_back_subject_localized():
-    """Subject must localize. The dispatcher reads this i18n key before
-    handing off to send_issue for the welcome-back variant."""
-    from automation.newsletter import i18n
+    """Subject must localize. The dispatcher reads this for the
+    welcome-back variant."""
     assert i18n.t("welcome_back.email.subject", "en") == "Welcome back to Pulpo Pro — your next 10"
     assert i18n.t("welcome_back.email.subject", "es") == "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"
 
 
 def test_welcome_back_meta_tag_uses_welcome_back_version_constant(ranked_pool, pro_with_prefs):
-    """The welcome-back's `<meta name="x-pulpo-template">` must carry the
-    welcome-back-specific version, NOT the General's or the first-time
-    welcome's. This is the discriminator PostHog uses to slice
-    re-acquisition renders from first-time welcomes and weeklies."""
-    from automation.newsletter.components._common import (
-        TEMPLATE_VERSION as GENERAL_VERSION,
-        WELCOME_TEMPLATE_VERSION,
-        WELCOME_BACK_TEMPLATE_VERSION,
-    )
+    """The welcome-back stamps its own version so PostHog can slice
+    re-acquisition renders from first-time welcomes."""
     issue = _issue(ranked=ranked_pool, recipient=pro_with_prefs)
-    html = render_welcome_back_html(issue)
-    assert f'<meta name="x-pulpo-template" content="{WELCOME_BACK_TEMPLATE_VERSION}"' in html, (
-        f"welcome-back render should stamp WELCOME_BACK_TEMPLATE_VERSION "
-        f"({WELCOME_BACK_TEMPLATE_VERSION!r}) into the x-pulpo-template meta tag"
-    )
-    # Neither the General nor the first-time welcome version may leak in.
-    assert f'content="{GENERAL_VERSION}"' not in html
+    html = render_welcome_back_html(issue, now=_NOW)
+    assert f'<meta name="x-pulpo-template" content="{WELCOME_BACK_TEMPLATE_VERSION}"' in html
     assert f'content="{WELCOME_TEMPLATE_VERSION}"' not in html

@@ -224,35 +224,26 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "welcome.start.account.cta":   {"en": "Open your account",                            "es": "Abrir tu cuenta"},
 
     # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
-    # Fires when a previously-welcomed user resubscribes to Pro after a
-    # lapse. Re-acquisition framing, NOT onboarding: the reader already
-    # knows how Pulpo works, so the "How Pulpo works" tutorial + the
-    # 3-step "Start here" block are dropped in favor of a warm re-entry
-    # hero + a "Pick up where you left off" block. Cadence note + picks
-    # are reused verbatim from the first-time welcome. See
-    # `project_resubscribe_welcome_funnel` memory for the funnel rationale.
+    # The welcome-back is the SAME email as the first-time welcome — a
+    # sub-version toggled by `variant="welcome_back"` in render_welcome_html.
+    # ONLY these keys override their `welcome.*` counterparts: the hero
+    # (eyebrow + headline say "welcome back") + the picks-intro title
+    # ("first 10" → "next 10"). Every other block (how-it-works, cadence,
+    # picks body, start-here, footer) renders from the shared `welcome.*`
+    # keys, so the two emails cannot drift. See
+    # `project_resubscribe_welcome_funnel` for the funnel rationale.
     "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your next 10",      "es": "Bienvenido de nuevo a Pulpo Pro — tus próximas 10"},
-    # Hero
+    # Hero — the one block that says "welcome back". Mirrors welcome.hero.*
+    # shape exactly (eyebrow + named/unnamed headline + lede); the lede is
+    # the welcome lede with "first 10" → "next 10".
     "welcome_back.hero.eyebrow":   {"en": "Welcome back to Pulpo Pro",                     "es": "Bienvenido de nuevo a Pulpo Pro"},
-    "welcome_back.hero.headline.named":   {"en": "Good to have you back, {name}.",         "es": "Qué bueno tenerte de vuelta, {name}."},
-    "welcome_back.hero.headline.unnamed": {"en": "Good to have you back.",                 "es": "Qué bueno tenerte de vuelta."},
-    "welcome_back.hero.lede":      {"en": "Your Pulpo Pro access is live again. We never stopped ranking the coast and the lakes — El Tunco to El Cuco, Coatepeque, Ilopango. Here are the ten best on the market right now, and your Sunday digest picks up right where it left off.",
-                                     "es": "Tu acceso a Pulpo Pro está activo otra vez. No dejamos de clasificar la costa y los lagos — de El Tunco a El Cuco, Coatepeque, Ilopango. Acá tenés las diez mejores del mercado ahora mismo, y tu resumen de los domingos retoma justo donde lo dejaste."},
-    # Section intro above the picks block — "your next batch" framing so
-    # the returning reader feels the inventory moved while they were away.
-    "welcome_back.section.picks.title": {"en": "Your next 10.",                            "es": "Tus próximas 10."},
-    "welcome_back.section.picks.body":  {"en": "Re-ranked this week — the Top 3 are the highest-value matches right now; the next 7 fit other buyer profiles. Anything you saved before is still in your account. Hit ♥ on new finds and we'll track price moves for you.",
-                                     "es": "Reclasificadas esta semana — las primeras 3 son los matches de mayor valor ahora mismo; las 7 siguientes calzan a otros perfiles. Lo que guardaste antes sigue en tu cuenta. Hacé ♥ en lo nuevo y seguimos los cambios de precio por vos."},
-    # "Pick up where you left off" — replaces the first-time "Start here"
-    # onboarding cards with re-engagement cards (saved first, the hook).
-    "welcome_back.resume.eyebrow": {"en": "Pick up where you left off",                    "es": "Retomá donde lo dejaste"},
-    "welcome_back.resume.title":   {"en": "Jump back in.",                                 "es": "Volvé a entrar."},
-    "welcome_back.resume.saved.label":   {"en": "Your saved listings",                     "es": "Tus propiedades guardadas"},
-    "welcome_back.resume.saved.cta":     {"en": "Open saved",                              "es": "Abrir guardadas"},
-    "welcome_back.resume.browse.label":  {"en": "The full inventory",                      "es": "Todo el inventario"},
-    "welcome_back.resume.browse.cta":    {"en": "Browse all listings",                     "es": "Verlas todas"},
-    "welcome_back.resume.account.label": {"en": "Filters, cadence, billing",               "es": "Filtros, cadencia, facturación"},
-    "welcome_back.resume.account.cta":   {"en": "Open your account",                       "es": "Abrir tu cuenta"},
+    "welcome_back.hero.headline.named":   {"en": "Welcome back, {name}.",                  "es": "Bienvenido de nuevo, {name}."},
+    "welcome_back.hero.headline.unnamed": {"en": "Welcome back.",                          "es": "Bienvenido de nuevo."},
+    "welcome_back.hero.lede":      {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your next 10 are below; same shape every Sunday from here.",
+                                     "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus próximas 10 están abajo; mismo formato cada domingo."},
+    # Picks section intro — the welcome's "Your first 10 picks." reworded
+    # for a returning reader. Body is inherited from welcome.section.picks.body.
+    "welcome_back.section.picks.title": {"en": "Your next 10 picks.",                      "es": "Tus próximas 10 selecciones."},
 }
 
 
