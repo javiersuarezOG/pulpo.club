@@ -31,6 +31,7 @@ const cache = {
   vlmBudget: { rows: null, mtime: 0 },
   sourceHealth: { rows: null, mtime: 0 },
   featured: { json: null, mtime: 0 },
+  photoContract: { json: null, mtime: 0 },
 };
 
 function resolveDataPath(filename) {
@@ -267,6 +268,41 @@ function degradedSources(rows) {
   return out;
 }
 
+// PRD P1-2 — `web/data/photo_contract.json` is written by
+// `pulpo.photo_contract.enforce_photo_contract` after every nightly.
+// Surface the key fields so /api/nightly/health is the single
+// observability surface for "do listings actually have a working photo
+// today?". `null` when the sidecar is missing (legacy data, brand-new
+// install) so callers can render "absent" explicitly.
+function summarizePhotoContract(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const safeNum = (v) => (typeof v === "number" ? v : null);
+  return {
+    ranked_total: safeNum(raw.ranked_total),
+    with_local_path: safeNum(raw.with_local_path),
+    local_path_exists: safeNum(raw.local_path_exists),
+    local_path_missing: safeNum(raw.local_path_missing),
+    missing_rate: safeNum(raw.missing_rate),
+    top_browse: raw.top_browse && typeof raw.top_browse === "object"
+      ? {
+        n: safeNum(raw.top_browse.n),
+        present: safeNum(raw.top_browse.present),
+        missing: safeNum(raw.top_browse.missing),
+        coverage: safeNum(raw.top_browse.coverage),
+      }
+      : null,
+    top_hero: raw.top_hero && typeof raw.top_hero === "object"
+      ? {
+        n: safeNum(raw.top_hero.n),
+        present: safeNum(raw.top_hero.present),
+        missing: safeNum(raw.top_hero.missing),
+        coverage: safeNum(raw.top_hero.coverage),
+      }
+      : null,
+    evaluated_at: typeof raw.evaluated_at === "string" ? raw.evaluated_at : null,
+  };
+}
+
 function vlmBudgetToday(rows) {
   if (!Array.isArray(rows)) {
     return { spend_usd: 0, pct_used: 0, success_rate_24h: null, call_count_24h: 0 };
@@ -301,6 +337,7 @@ function buildHealth() {
   const vlmRows = loadJsonlCached("vlmBudget", "llm_vision_budget.jsonl");
   const sourceHealthRows = loadJsonlCached("sourceHealth", "source_health_history.jsonl");
   const featured = loadJsonCached("featured", "featured.json");
+  const photoContract = loadJsonCached("photoContract", "photo_contract.json");
 
   const lastDataCommitAt = lastUpdated ? lastUpdated.last_updated ?? null : null;
   const lastTotalListings = lastUpdated ? lastUpdated.total_listings ?? null : null;
@@ -323,6 +360,7 @@ function buildHealth() {
     degraded_sources: degradedSources(sourceHealthRows),
     vlm_budget_today: vlmBudgetToday(vlmRows),
     featured: featuredFreshness(featured),
+    photo_contract: summarizePhotoContract(photoContract),
     // Phase A follow-on (separate PR) will populate these from
     // nightly_progress.json + phase_durations.jsonl.
     current_progress: null,
@@ -358,6 +396,7 @@ module.exports.__testing__ = {
   vlmBudgetToday,
   featuredFreshness,
   degradedSources,
+  summarizePhotoContract,
   hoursSince,
   STALE_THRESHOLD_H,
   VLM_DAILY_BUDGET_USD,
