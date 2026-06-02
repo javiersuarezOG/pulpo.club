@@ -24,6 +24,17 @@ def env(name: str, default: str = "") -> str:
     return value.strip() if value and value.strip() else default
 
 
+class HTTPCallError(RuntimeError):
+    """request_json failure carrying the HTTP status separately from the message."""
+
+    def __init__(self, method: str, url: str, status: int, detail: str) -> None:
+        super().__init__(f"{method} {url} failed: {status} {detail}")
+        self.method = method
+        self.url = url
+        self.status = status
+        self.detail = detail
+
+
 def request_json(method: str, url: str, headers: dict[str, str] | None = None, payload: dict | None = None) -> dict:
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(
@@ -38,7 +49,7 @@ def request_json(method: str, url: str, headers: dict[str, str] | None = None, p
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"{method} {url} failed: {exc.code} {detail}") from exc
+        raise HTTPCallError(method, url, exc.code, detail) from exc
 
 
 def email_hash(email: str) -> str:
@@ -141,8 +152,40 @@ def main() -> int:
 
     now = dt.datetime.now(dt.timezone.utc)
     cutoff = now - dt.timedelta(hours=args.threshold_hours)
+
+    # The Clerk REST API for `/v1/invitations` requires backend-secret scope
+    # that the current GH-Actions secret doesn't carry — `/v1/users` works
+    # (welcome_reconcile.py proves it), but listing invitations returns 403.
+    # Until the key is re-scoped or the script switches to the users-based
+    # detection path, we want this workflow to stay green so the upstream
+    # heartbeat step (check_webhook_health.py) remains observable, AND we
+    # want the silent gap itself to surface in PostHog so dashboards can
+    # raise it. Hard-failing every 6h reverts both signals to noise.
+    try:
+        invitations = list_pending_invitations(clerk_secret)
+    except HTTPCallError as exc:
+        if exc.status in (401, 403):
+            capture_posthog("invitation.stuck_check_unavailable", {
+                "reason": f"clerk_{exc.status}",
+                "endpoint": "/v1/invitations",
+                "detail": exc.detail[:500],  # cap so PostHog payload stays small
+                "runbook": args.runbook_url,
+            })
+            print(
+                f"[stuck-invitations] Clerk /v1/invitations returned {exc.status}. "
+                "CLERK_SECRET_KEY likely lacks invitation-list scope (other endpoints "
+                "like /v1/users still work — see welcome_reconcile cron). "
+                "Stuck-invitation alerting paused until the key is re-scoped. "
+                f"Runbook: {args.runbook_url}",
+                file=sys.stderr,
+            )
+            # Exit 0 so the workflow stays green for the upstream heartbeat
+            # step. The silent gap is observable via the PostHog event above.
+            return 0
+        raise
+
     stuck: list[dict] = []
-    for inv in list_pending_invitations(clerk_secret):
+    for inv in invitations:
         email = inv.get("email_address") or inv.get("emailAddress") or ""
         created = parse_time(inv.get("created_at") or inv.get("createdAt"))
         if not email or not created or created > cutoff:
