@@ -229,6 +229,7 @@ async function dispatchProWelcome(args) {
   const {
     clerk, clerkUserId, email, source, distinctId, t0,
     fetchImpl, internalBaseUrl, // injectable for tests
+    subscriptionId, allowResubscribe, // resubscribe welcome-back inputs
   } = args;
   if (!clerk || !clerkUserId || !email) {
     return "skipped:missing_input";
@@ -256,7 +257,17 @@ async function dispatchProWelcome(args) {
   const result = await callInternalWelcomeSend({
     baseUrl,
     token,
-    payload: { email, source: source || "stripe", force: false },
+    payload: {
+      email,
+      source: source || "stripe",
+      force: false,
+      // Resubscribe re-acquisition: when the recipient already carries a
+      // welcome stamp, the Python dispatcher auto-routes to the
+      // welcome-back template and dedups on subscription_id. First-time
+      // buyers (no stamp) get the first-time welcome regardless.
+      allow_resubscribe: !!allowResubscribe,
+      subscription_id: subscriptionId || undefined,
+    },
     fetchImpl,
     timeoutMs: WELCOME_INTERNAL_TIMEOUT_MS,
   });
@@ -347,6 +358,7 @@ async function dispatchProWelcomeWorkflow({
   distinctId,
   t0,
   fetchImpl,
+  allowResubscribe,
 }) {
   // Anything missing here is a "skip" outcome, not a webhook failure.
   // Stripe still gets a 200 — the user has paid; their welcome is a
@@ -375,6 +387,22 @@ async function dispatchProWelcomeWorkflow({
   }
 
   if (alreadySent) {
+    // A returning subscriber whose welcome-back fell to the GH fallback
+    // (Vercel-Python was unreachable). The GH workflow renders only the
+    // first-time welcome, so we correctly skip here rather than mail a
+    // "Welcome to Pulpo Pro — your first 10" to someone who's been here
+    // before. The welcome-back is intentionally NOT sent on this rare
+    // fallback path — surface it so the gap is observable (a reconcile
+    // backstop can pick these up later if the rate warrants it).
+    if (allowResubscribe) {
+      posthog.capture(distinctId, "newsletter.welcome_back_fallback_skipped", {
+        reason: "gh_fallback_cannot_send_welcome_back",
+        source: source || "stripe.checkout",
+        clerk_user_id: clerkUserId,
+        ms: Date.now() - t0,
+      });
+      return "skipped:welcome_back_unsupported_on_gh_fallback";
+    }
     posthog.capture(distinctId, "newsletter.welcome_skipped", {
       reason: "already_sent",
       source: source || "stripe.checkout",
@@ -698,6 +726,9 @@ module.exports = async (req, res) => {
             clerk, clerkUserId: explicitUserId, email,
             source: "stripe.checkout.auth_gated",
             distinctId, t0,
+            // Returning subscriber → welcome-back; first-timer → welcome.
+            // The dispatcher decides based on the existing welcome stamp.
+            allowResubscribe: true, subscriptionId,
           }) : "skipped:no_email";
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,
@@ -753,6 +784,9 @@ module.exports = async (req, res) => {
             clerk, clerkUserId: existing.id, email,
             source: "stripe.checkout.anonymous_existing_user",
             distinctId, t0,
+            // Returning subscriber → welcome-back; first-timer → welcome.
+            // The dispatcher decides based on the existing welcome stamp.
+            allowResubscribe: true, subscriptionId,
           });
           logApi("stripe.webhook", {
             status: 200, ms: Date.now() - t0, type: event.type,

@@ -23,6 +23,18 @@ ops dashboards work with no schema changes):
   • `newsletter.welcome_sent`     — Resend 2xx (or dry-run success).
   • `newsletter.welcome_skipped`  — pre-flight idempotency / gate fail.
   • `newsletter.welcome_failed`   — Resend non-2xx or render exception.
+
+Resubscribe re-acquisition (welcome-back) variant — fires when a
+previously-welcomed user resubscribes to Pro (the Stripe checkout path
+passes `allow_resubscribe=True`). Mirror event family so dashboards can
+slice first-time onboarding from re-acquisition:
+  • `newsletter.welcome_back_sent`    — Resend 2xx (or dry-run success).
+  • `newsletter.welcome_back_skipped` — same-subscription dedup hit.
+  • `newsletter.welcome_back_failed`  — Resend non-2xx or render error.
+Idempotency for welcome-back is keyed on the Stripe subscription id
+(`publicMetadata.resubscribe_welcome_subscription_id`), NOT the
+permanent first-time stamp — so it fires once per genuine
+resubscription while a webhook retry (same sub id) no-ops.
 """
 
 from __future__ import annotations
@@ -46,14 +58,23 @@ from .subscribers import (
     _preference_source_from_profile,
     _locale_for,
 )
-from .templates import pulpo_pro_welcome
+from .templates import pulpo_pro_welcome, pulpo_pro_welcome_back
 from .types import Locale, Recipient, SavedListing
+
+
+# Variants this dispatcher can render. "welcome" is the first-time
+# onboarding email; "welcome_back" is the resubscribe re-acquisition
+# email. The Stripe checkout path passes `allow_resubscribe=True` so a
+# recipient who already carries a `welcome_newsletter_sent_at` stamp
+# auto-routes to "welcome_back" instead of skipping `already_sent`.
+VARIANTS = ("welcome", "welcome_back")
 
 
 # Skip reasons surfaced in PostHog so dashboards can break down the
 # funnel: how many welcome dispatches dropped at which gate.
 SKIP_REASONS = (
     "already_sent",
+    "already_sent_for_subscription",   # welcome-back: same Stripe sub id
     "not_pro",
     "unsubscribed",
     "clerk_lookup_failed",
@@ -153,6 +174,61 @@ def _stamp_welcome_sent_at(user_id: str, iso_ts: str) -> bool:
         return False
 
 
+def _stamp_resubscribe_welcome(user_id: str, iso_ts: str, subscription_id: Optional[str]) -> bool:
+    """Write the welcome-back dedup stamps on the Clerk user via the same
+    read-merge-write pattern as `_stamp_welcome_sent_at`.
+
+    Stamps three keys in one PATCH:
+      • `resubscribe_welcome_subscription_id` — the dedup key; a future
+        webhook retry for this same subscription reads it back and skips.
+      • `resubscribe_welcome_sent_at` — audit/debug timestamp of the last
+        welcome-back send.
+      • `welcome_newsletter_sent_at` — REFRESHED to `iso_ts`. This keeps
+        the first-time welcome's permanent stamp set (so it never
+        re-fires) AND re-arms the weekly cron's 24h same-day-collision
+        skip, so a resubscriber doesn't get welcome-back + the Sunday
+        weekly with the same 10 picks inside a day.
+
+    Returns True on 2xx; False (with stderr log) on any failure. A failed
+    stamp doesn't unwind the send — the PostHog event still fires so
+    dashboards catch the divergence (and the next retry may double-send,
+    which is the acceptable failure mode vs. stranding the email)."""
+    secret = (os.environ.get("CLERK_SECRET_KEY") or "").strip()
+    if not secret or not user_id:
+        return False
+    headers = {
+        "Authorization": f"Bearer {secret}",
+        "Content-Type": "application/json",
+    }
+    try:
+        import httpx                                                     # noqa: PLC0415
+        r = httpx.get(f"{CLERK_API_BASE}/users/{user_id}", headers=headers, timeout=10.0)
+        r.raise_for_status()
+        current = r.json()
+        existing = current.get("public_metadata") or current.get("publicMetadata") or {}
+        if not isinstance(existing, dict):
+            existing = {}
+        merged = {
+            **existing,
+            "welcome_newsletter_sent_at": iso_ts,
+            "resubscribe_welcome_sent_at": iso_ts,
+        }
+        if subscription_id:
+            merged["resubscribe_welcome_subscription_id"] = subscription_id
+        patch_url = f"{CLERK_API_BASE}/users/{user_id}/metadata"
+        r2 = httpx.patch(
+            patch_url,
+            headers=headers,
+            json={"public_metadata": merged},
+            timeout=10.0,
+        )
+        r2.raise_for_status()
+        return True
+    except Exception as exc:                                             # noqa: BLE001
+        print(f"[welcome] clerk resubscribe stamp failed: {exc}", file=sys.stderr)
+        return False
+
+
 def _build_recipient_from_clerk(user: ClerkUser, *, locale_hint: Optional[Locale]) -> Recipient:
     """Mirror what `join_recipients()` does for a single Clerk user
     without going through Resend audience enumeration. The welcome
@@ -202,22 +278,43 @@ def dispatch_welcome(
     source: str = "admin",
     ranked_path: str = "web/data/ranked.json",
     force: bool = False,
+    variant: str = "welcome",
+    allow_resubscribe: bool = False,
+    subscription_id: Optional[str] = None,
 ) -> WelcomeDispatchResult:
-    """Send the Pulpo Pro Welcome to a single recipient (or skip with a
-    structured reason).
+    """Send the Pulpo Pro Welcome (or Welcome-back) to a single recipient
+    (or skip with a structured reason).
 
     Args:
         email: Recipient address. Used for Clerk lookup + Resend `to`.
         locale: Optional override. When unset, reads locale from the
             Clerk user (publicMetadata.profile.locale → "en" fallback).
         source: Telemetry tag — "stripe", "admin", "test", etc.
-        ranked_path: Path to the current ranked.json. The welcome's
-            10 picks come from the same source as the weekly digest.
-        force: Bypass the welcome-already-sent idempotency check. The
-            admin "Test send to me" surface uses this so an operator
-            can re-render the welcome without manually clearing the
-            Clerk metadata. PROD path leaves force=False.
+        ranked_path: Path to the current ranked.json. The picks come
+            from the same source as the weekly digest.
+        force: Bypass the already-sent idempotency check. The admin
+            "Test send to me" surface uses this so an operator can
+            re-render without manually clearing the Clerk metadata.
+            PROD path leaves force=False.
+        variant: "welcome" (first-time onboarding) or "welcome_back"
+            (resubscribe re-acquisition). Admin/test surfaces may pin a
+            variant explicitly; the production path leaves it "welcome"
+            and relies on `allow_resubscribe` to auto-route returning
+            subscribers (see below).
+        allow_resubscribe: When True AND the recipient already carries a
+            `welcome_newsletter_sent_at` stamp (i.e. they were welcomed
+            before), auto-route to the "welcome_back" variant instead of
+            skipping `already_sent`. The Stripe checkout path sets this;
+            admin/clerk paths leave it False. No effect under `force`
+            (force always renders the requested `variant`).
+        subscription_id: The Stripe subscription id this send is for.
+            Used as the welcome-back dedup key — a webhook retry carries
+            the same id (skip `already_sent_for_subscription`); a future
+            churn→resub creates a new id (fire again).
     """
+    if variant not in VARIANTS:
+        variant = "welcome"
+
     user = find_clerk_user_by_email(email)
     if user is None:
         _capture("newsletter.welcome_skipped", {
@@ -236,7 +333,33 @@ def dispatch_welcome(
         return WelcomeDispatchResult(status="skipped", reason="not_pro",
                                       recipient_hash=email_hash(email))
 
-    if user.welcome_sent_at and not force:
+    # ── Variant resolution + idempotency ──────────────────────────────
+    # A returning subscriber (already has the first-time welcome stamp)
+    # who hits a resubscribe-aware path auto-routes to welcome_back.
+    effective_variant = variant
+    if (variant == "welcome" and allow_resubscribe
+            and user.welcome_sent_at and not force):
+        effective_variant = "welcome_back"
+
+    if effective_variant == "welcome_back":
+        # Dedup on the Stripe subscription id. Same id as the last
+        # welcome-back → it's a webhook retry → skip. New id (or no
+        # prior welcome-back) → genuine resubscription → send.
+        prior_sub = user.resubscribe_welcome_subscription_id
+        if (subscription_id and prior_sub and prior_sub == subscription_id
+                and not force):
+            _capture("newsletter.welcome_back_skipped", {
+                "recipient_hash": email_hash(email),
+                "reason": "already_sent_for_subscription",
+                "source": source,
+                "subscription_id": subscription_id,
+            })
+            return WelcomeDispatchResult(
+                status="skipped", reason="already_sent_for_subscription",
+                recipient_hash=email_hash(email))
+    elif user.welcome_sent_at and not force:
+        # First-time welcome already sent and this isn't a resubscribe
+        # path — the original permanent-stamp skip.
         _capture("newsletter.welcome_skipped", {
             "recipient_hash": email_hash(email),
             "reason": "already_sent",
@@ -274,8 +397,21 @@ def dispatch_welcome(
         return WelcomeDispatchResult(status="skipped", reason="no_picks_available",
                                       recipient_hash=recipient.email_hash)
 
-    html = pulpo_pro_welcome.render(issue)
-    subject = i18n.t("welcome.email.subject", recipient.locale)
+    # Variant-specific render + chrome. The welcome-back reuses the same
+    # pick cards / cadence note / footer but swaps the hero, the section
+    # intro, and the onboarding block (see render_welcome_back_html).
+    if effective_variant == "welcome_back":
+        html = pulpo_pro_welcome_back.render(issue)
+        subject = i18n.t("welcome_back.email.subject", recipient.locale)
+        newsletter_id = "pulpo-pro-welcome-back"
+        flow = "newsletter_welcome_back"
+        ev = "newsletter.welcome_back"
+    else:
+        html = pulpo_pro_welcome.render(issue)
+        subject = i18n.t("welcome.email.subject", recipient.locale)
+        newsletter_id = "pulpo-pro-welcome"
+        flow = "newsletter_welcome"
+        ev = "newsletter.welcome"
 
     result = send_issue(
         to_email=email,
@@ -284,30 +420,31 @@ def dispatch_welcome(
         subject=subject,
         html=html,
         tags={
-            "newsletter": "pulpo-pro-welcome",
+            "newsletter": newsletter_id,
             "recipient_hash": recipient.email_hash,
             "locale": recipient.locale,
             "source": source,
             "email_type": "newsletter",
         },
         headers_extra={
-            "X-Pulpo-Newsletter": "pulpo-pro-welcome",
+            "X-Pulpo-Newsletter": newsletter_id,
             "X-Pulpo-Recipient": recipient.email_hash,
             "X-Pulpo-Email-Type": "newsletter",
         },
     )
 
     if not result.ok:
-        _capture("newsletter.welcome_failed", {
+        _capture(f"{ev}_failed", {
             "recipient_hash": recipient.email_hash,
             "error": result.error,
             "error_detail": result.error_detail,
             "attempt": result.attempt,
             "latency_ms": result.latency_ms,
             "source": source,
+            "variant": effective_variant,
         })
         _capture("email.send.failed", {
-            "flow": "newsletter_welcome",
+            "flow": flow,
             "error_code": result.error or "",
             "error_message": result.error_detail or "",
             "recipient": recipient.email_hash,
@@ -324,11 +461,16 @@ def dispatch_welcome(
     iso_ts = datetime.now(timezone.utc).isoformat()
     # Only stamp Clerk on LIVE sends — a dry-run shouldn't burn the
     # idempotency stamp (otherwise the next real attempt would skip).
+    # welcome_back stamps the resubscribe dedup key (+ refreshes the
+    # welcome stamp); welcome stamps the permanent first-time stamp.
     stamped = False
     if not result.dry_run:
-        stamped = _stamp_welcome_sent_at(user.id, iso_ts)
+        if effective_variant == "welcome_back":
+            stamped = _stamp_resubscribe_welcome(user.id, iso_ts, subscription_id)
+        else:
+            stamped = _stamp_welcome_sent_at(user.id, iso_ts)
 
-    _capture("newsletter.welcome_sent", {
+    _capture(f"{ev}_sent", {
         "recipient_hash": recipient.email_hash,
         "locale": recipient.locale,
         "tier": recipient.tier,
@@ -338,6 +480,8 @@ def dispatch_welcome(
         "attempt": result.attempt,
         "source": source,
         "stamped_clerk": stamped,
+        "variant": effective_variant,
+        "subscription_id": subscription_id,
     })
 
     return WelcomeDispatchResult(

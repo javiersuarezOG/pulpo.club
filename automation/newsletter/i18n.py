@@ -222,6 +222,37 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "welcome.start.browse.cta":    {"en": "Browse all listings",                          "es": "Verlas todas"},
     "welcome.start.account.label": {"en": "Step 3 · Manage profile, cadence, billing",    "es": "Paso 3 · Perfil, cadencia, facturación"},
     "welcome.start.account.cta":   {"en": "Open your account",                            "es": "Abrir tu cuenta"},
+
+    # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
+    # Fires when a previously-welcomed user resubscribes to Pro after a
+    # lapse. Re-acquisition framing, NOT onboarding: the reader already
+    # knows how Pulpo works, so the "How Pulpo works" tutorial + the
+    # 3-step "Start here" block are dropped in favor of a warm re-entry
+    # hero + a "Pick up where you left off" block. Cadence note + picks
+    # are reused verbatim from the first-time welcome. See
+    # `project_resubscribe_welcome_funnel` memory for the funnel rationale.
+    "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your fresh 10",     "es": "Bienvenido de nuevo a Pulpo Pro — tus 10 frescas"},
+    # Hero
+    "welcome_back.hero.eyebrow":   {"en": "Welcome back to Pulpo Pro",                     "es": "Bienvenido de nuevo a Pulpo Pro"},
+    "welcome_back.hero.headline.named":   {"en": "Good to have you back, {name}.",         "es": "Qué bueno tenerte de vuelta, {name}."},
+    "welcome_back.hero.headline.unnamed": {"en": "Good to have you back.",                 "es": "Qué bueno tenerte de vuelta."},
+    "welcome_back.hero.lede":      {"en": "Your Pulpo Pro access is live again. We never stopped ranking the coast and the volcanic lakes — here are the ten best matches on the market right now, and your Sunday digest picks up right where it left off.",
+                                     "es": "Tu acceso a Pulpo Pro está activo otra vez. No dejamos de clasificar la costa y los lagos volcánicos — acá están los diez mejores matches en el mercado ahora mismo, y tu resumen de los domingos retoma justo donde lo dejaste."},
+    # Section intro above the picks block — "fresh" framing instead of
+    # "your first batch" so the returning reader feels the inventory moved.
+    "welcome_back.section.picks.title": {"en": "Your fresh 10.",                           "es": "Tus 10 frescas."},
+    "welcome_back.section.picks.body":  {"en": "Re-ranked this week — the Top 3 are the highest-value matches right now; the next 7 fit other buyer profiles. Anything you saved before is still in your account. Hit ♥ on new finds and we'll track price moves for you.",
+                                     "es": "Reclasificadas esta semana — las primeras 3 son los matches de mayor valor ahora mismo; las 7 siguientes calzan a otros perfiles. Lo que guardaste antes sigue en tu cuenta. Hacé ♥ en lo nuevo y seguimos los cambios de precio por vos."},
+    # "Pick up where you left off" — replaces the first-time "Start here"
+    # onboarding cards with re-engagement cards (saved first, the hook).
+    "welcome_back.resume.eyebrow": {"en": "Pick up where you left off",                    "es": "Retomá donde lo dejaste"},
+    "welcome_back.resume.title":   {"en": "Jump back in.",                                 "es": "Volvé a entrar."},
+    "welcome_back.resume.saved.label":   {"en": "Your saved listings",                     "es": "Tus propiedades guardadas"},
+    "welcome_back.resume.saved.cta":     {"en": "Open saved",                              "es": "Abrir guardadas"},
+    "welcome_back.resume.browse.label":  {"en": "The full inventory",                      "es": "Todo el inventario"},
+    "welcome_back.resume.browse.cta":    {"en": "Browse all listings",                     "es": "Verlas todas"},
+    "welcome_back.resume.account.label": {"en": "Filters, cadence, billing",               "es": "Filtros, cadencia, facturación"},
+    "welcome_back.resume.account.cta":   {"en": "Open your account",                       "es": "Abrir tu cuenta"},
 }
 
 
