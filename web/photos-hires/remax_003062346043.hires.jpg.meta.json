@@ -1,0 +1,26 @@
+{
+  "width": 1620,
+  "height": 2175,
+  "aspect_ratio": 1.343,
+  "file_size_kb": 399.2,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-06-02T08:24:08.887117+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003063275001/v3/HDPhotos/Terreno El Zacamil con marca de agua.png",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003063275001/v3/HDPhotos/Terreno El Zacamil con marca de agua.png",
+  "transform_used": "none",
+  "fetched_at": "2026-06-02T08:24:09.378075+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 38,
+  "resdet_detected_height": 52,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.6,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.202 color_entropy=0.511"
+  }
+}
