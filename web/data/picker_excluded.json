@@ -2597,6 +2597,12 @@
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T12:57:00.426840+00:00"
   },
+  "8c5f98810dfffbe1": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-06-02T17:30:28.781537+00:00"
+  },
   "8cd1e1d1eae424d4": {
     "cheap_score": 0,
     "floor": 40,
@@ -3844,6 +3850,12 @@
     "floor": 40,
     "reason": "cheap_score_below_floor",
     "ts": "2026-05-19T12:28:29.341670+00:00"
+  },
+  "cf10dfdc84a04747": {
+    "cheap_score": 0,
+    "floor": 40,
+    "reason": "cheap_score_below_floor",
+    "ts": "2026-06-02T17:30:22.434140+00:00"
   },
   "cf70e4aad01e2d98": {
     "cheap_score": 0,

@@ -76,13 +76,18 @@ LAST_UPDATED = "2026-06-01"
 # constant pair + one more regex row in the API.
 #
 # Revision history (most recent first):
+#   welcome-v2.0 (2026-06-02) — MAJOR restructure. The welcome is now
+#       the General weekly master with ONLY the hero swapped
+#       (render_html variant="welcome"): it carries the full weekly body
+#       (favorites, market context, 10 picks, news spotlight, Your Pulpo,
+#       footer) and drops the bespoke onboarding blocks (how-it-works,
+#       cadence note, "your first 10" intro, "Start here" cards). The
+#       rendered HTML changed end-to-end vs v1.0, hence the major bump.
 #   welcome-v1.0 (2026-06-01) — initial ship. Welcome hero + "How
 #       Pulpo works" 3-beat block + cadence note + "Your first 10
 #       picks" section intro + "Start here" onboarding cards.
-#       Drops favorites / market_context / paywall / news_spotlight /
-#       returning-user Your Pulpo block vs. the General weekly.
-WELCOME_TEMPLATE_VERSION = "welcome-v1.0-2026-06-01"
-WELCOME_LAST_UPDATED = "2026-06-01"
+WELCOME_TEMPLATE_VERSION = "welcome-v2.0-2026-06-02"
+WELCOME_LAST_UPDATED = "2026-06-02"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -96,11 +101,12 @@ WELCOME_LAST_UPDATED = "2026-06-01"
 # welcome-back renders cleanly from first-time welcomes and weeklies.
 #
 # Revision history (most recent first):
-#   welcome-back-v1.0 (2026-06-02) — initial ship. Re-entry hero
-#       ("Good to have you back") + reused cadence note + "Your fresh
-#       10" section intro + "Pick up where you left off" re-engagement
-#       cards (saved / browse / account). Drops the first-time
-#       welcome's "How Pulpo works" tutorial + 3-step "Start here".
+#   welcome-back-v1.0 (2026-06-02) — initial ship. The General weekly
+#       master with ONLY the hero swapped to a "Welcome back" greeting
+#       (render_html variant="welcome_back"). Hero copy DERIVES from the
+#       welcome.* strings via i18n.welcome_text, so it can't drift from
+#       the first-time welcome beyond the greeting. Same full weekly body
+#       as the General + first-time welcome.
 WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.0-2026-06-02"
 WELCOME_BACK_LAST_UPDATED = "2026-06-02"
 
