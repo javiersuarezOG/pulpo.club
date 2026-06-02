@@ -373,4 +373,88 @@ describe("dispatchProWelcome orchestrator", () => {
     expect(result).toBe("skipped:missing_input");
     expect(fetchImpl).not.toHaveBeenCalled();
   });
+
+  it("threads allow_resubscribe + subscription_id into the internal payload", async () => {
+    // The resubscribe re-acquisition path: the webhook passes these so
+    // the Python dispatcher can auto-route a returning subscriber to the
+    // welcome-back template and dedup on the Stripe subscription id.
+    const clerk = mockClerk({ publicMetadata: {} });
+    let capturedBody = null;
+    const fetchImpl = vi.fn(async (url, opts) => {
+      if (url.endsWith("/api/internal/welcome-send")) {
+        capturedBody = JSON.parse(opts.body);
+        return { status: 200, json: async () => ({ status: "sent", message_id: "re_rb" }) };
+      }
+      throw new Error("unexpected fetch: " + url);
+    });
+    const result = await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "back@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+      allowResubscribe: true, subscriptionId: "sub_42",
+    });
+    expect(result).toBe("internal:sent");
+    expect(capturedBody.allow_resubscribe).toBe(true);
+    expect(capturedBody.subscription_id).toBe("sub_42");
+  });
+
+  it("defaults allow_resubscribe=false when not a resubscribe path", async () => {
+    const clerk = mockClerk({ publicMetadata: {} });
+    let capturedBody = null;
+    const fetchImpl = vi.fn(async (url, opts) => {
+      capturedBody = JSON.parse(opts.body);
+      return { status: 200, json: async () => ({ status: "sent" }) };
+    });
+    await dispatchProWelcome({
+      clerk, clerkUserId: "user_123", email: "first@pulpo.club",
+      source: "clerk.user_created", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, internalBaseUrl: "https://pulpo.club",
+    });
+    expect(capturedBody.allow_resubscribe).toBe(false);
+    expect(capturedBody.subscription_id).toBeUndefined();
+  });
+});
+
+
+// ─────────────────────────────────────────────────────────────────────
+// GH fallback + welcome-back interaction. When the Vercel-Python path is
+// unreachable for a RETURNING subscriber, the GH workflow renders only
+// the first-time welcome — so it must NOT mail "your first 10" to someone
+// who's been here before. The already-sent stamp makes it skip; with
+// allowResubscribe set we surface a distinct, observable skip reason.
+// ─────────────────────────────────────────────────────────────────────
+
+describe("dispatchProWelcomeWorkflow + welcome-back gap", () => {
+  const ORIGINAL_TOKEN = process.env.GITHUB_DISPATCH_TOKEN;
+  beforeEach(() => { process.env.GITHUB_DISPATCH_TOKEN = "ghp_test_token"; });
+  afterEach(() => {
+    if (ORIGINAL_TOKEN === undefined) delete process.env.GITHUB_DISPATCH_TOKEN;
+    else process.env.GITHUB_DISPATCH_TOKEN = ORIGINAL_TOKEN;
+  });
+
+  it("returns the welcome-back-specific skip (not a wrong first-time send) for a returning subscriber", async () => {
+    const clerk = mockClerk({ publicMetadata: { welcome_newsletter_sent_at: "2026-01-01T00:00:00Z" } });
+    const fetchImpl = mockFetch({ status: 204 });
+    const result = await dispatchProWelcomeWorkflow({
+      clerk, clerkUserId: "user_123", email: "back@pulpo.club",
+      source: "stripe.checkout.auth_gated", distinctId: "user_123", t0: Date.now(),
+      fetchImpl, allowResubscribe: true,
+    });
+    expect(result).toBe("skipped:welcome_back_unsupported_on_gh_fallback");
+    // Critically: NO GH dispatch fired — we did not mail a first-time
+    // welcome to a returning user.
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("still skips already_sent (not the welcome-back reason) when allowResubscribe is absent", async () => {
+    const clerk = mockClerk({ publicMetadata: { welcome_newsletter_sent_at: "2026-01-01T00:00:00Z" } });
+    const fetchImpl = mockFetch({ status: 204 });
+    const result = await dispatchProWelcomeWorkflow({
+      clerk, clerkUserId: "user_123", email: "back@pulpo.club",
+      source: "admin", distinctId: "user_123", t0: Date.now(),
+      fetchImpl,
+    });
+    expect(result).toBe("skipped:already_sent");
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
 });

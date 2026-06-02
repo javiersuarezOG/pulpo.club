@@ -85,6 +85,26 @@ WELCOME_TEMPLATE_VERSION = "welcome-v1.0-2026-06-01"
 WELCOME_LAST_UPDATED = "2026-06-01"
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo Pro Welcome BACK (resubscribe) — own version line.
+#
+# The resubscribe re-acquisition email ships on its own cadence too:
+# a copy tweak to the "Good to have you back" hero or the "Pick up
+# where you left off" cards bumps THIS version without touching the
+# first-time welcome or the weekly General. Same parallel-version
+# rationale as WELCOME_TEMPLATE_VERSION above — lets PostHog slice
+# welcome-back renders cleanly from first-time welcomes and weeklies.
+#
+# Revision history (most recent first):
+#   welcome-back-v1.0 (2026-06-02) — initial ship. Re-entry hero
+#       ("Good to have you back") + reused cadence note + "Your fresh
+#       10" section intro + "Pick up where you left off" re-engagement
+#       cards (saved / browse / account). Drops the first-time
+#       welcome's "How Pulpo works" tutorial + 3-step "Start here".
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.0-2026-06-02"
+WELCOME_BACK_LAST_UPDATED = "2026-06-02"
+
+
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
 # block below also defines CSS vars for clients that support them, but
 # the source-of-truth values are hex because Outlook desktop + parts of
@@ -281,6 +301,8 @@ __all__ = [
     "LAST_UPDATED",
     "WELCOME_TEMPLATE_VERSION",
     "WELCOME_LAST_UPDATED",
+    "WELCOME_BACK_TEMPLATE_VERSION",
+    "WELCOME_BACK_LAST_UPDATED",
     "CSS",
     "escape",
     "site_root_from_issue",

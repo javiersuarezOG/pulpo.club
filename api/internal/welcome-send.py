@@ -163,6 +163,21 @@ class handler(BaseHTTPRequestHandler):
 
         force = bool(body.get("force", False))
 
+        # Resubscribe re-acquisition (welcome-back) inputs. `variant`
+        # lets an admin/test caller pin the welcome-back template;
+        # `allow_resubscribe` lets the Stripe checkout path auto-route a
+        # returning subscriber to welcome-back; `subscription_id` is the
+        # welcome-back dedup key. All optional — absent = first-time
+        # welcome behavior, unchanged.
+        variant = body.get("variant") or "welcome"
+        if not isinstance(variant, str) or variant not in ("welcome", "welcome_back"):
+            return self._reject(400, "invalid_variant",
+                                hint="variant must be 'welcome' or 'welcome_back'")
+        allow_resubscribe = bool(body.get("allow_resubscribe", False))
+        subscription_id = body.get("subscription_id")
+        if subscription_id is not None and not isinstance(subscription_id, str):
+            return self._reject(400, "invalid_subscription_id")
+
         # ── Dispatch ──────────────────────────────────────────────────
         # dispatch_welcome handles its own Clerk lookup, idempotency
         # check, render, send, stamp, telemetry. We just translate
@@ -174,6 +189,9 @@ class handler(BaseHTTPRequestHandler):
                 source=source,
                 force=force,
                 ranked_path=_RANKED_JSON,
+                variant=variant,
+                allow_resubscribe=allow_resubscribe,
+                subscription_id=subscription_id,
             )
         except Exception as exc:                                     # noqa: BLE001
             # Unhandled dispatcher exception. Log the traceback for
