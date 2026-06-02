@@ -18,8 +18,13 @@
 // SiteHeader, footer, BottomNav, locale routing all unchanged — covered
 // by responsive-smoke.spec at the same viewports.
 
+import { readFileSync } from "node:fs";
 import { test, expect, type Page } from "@playwright/test";
 import { attachErrorRecorder, TOLERATED, isTolerated } from "./_helpers";
+
+const versions = JSON.parse(
+  readFileSync(new URL("../../web/app/home/versions.json", import.meta.url), "utf8"),
+) as { blocks: { hero_v5: string } };
 
 type CapturedEvent = { name: string; props: Record<string, unknown>; ts: number };
 
@@ -72,7 +77,14 @@ test.describe("hero_v5 — flag on", () => {
     await expect(page.locator(".hp-hero-v5-postcard")).toBeVisible();
 
     const events = await getEvents(page);
-    expect(events.find((e) => e.name === "hero_v5_viewed")).toBeDefined();
+    expect(events.find((e) => e.name === "hero_v5_viewed")?.props.version)
+      .toBe(versions.blocks.hero_v5);
+    expect(events.find((e) => e.name === "paid_home_rendered")?.props.hero_v5_version)
+      .toBe(versions.blocks.hero_v5);
+    expect(events.find((e) => (
+      e.name === "homepage.section_viewed"
+      && e.props.section === "hero_v5"
+    ))).toBeDefined();
 
     expect(errors.filter((e) => !isTolerated(e, TOLERATED))).toEqual([]);
   });

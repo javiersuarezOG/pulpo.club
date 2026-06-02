@@ -15,7 +15,7 @@
 // legacy `hero` slot AND `shoreline` (HeroV5 absorbs both).
 //
 // VERSION SOURCE OF TRUTH: this component's version lives in
-// `web/app/home/versions.json` under `blocks.hero`. Bump it there when
+// `web/app/home/versions.json` under `blocks.hero_v5`. Bump it there when
 // the rendered output changes; the /api/home/version endpoint reads
 // that file directly.
 
@@ -150,7 +150,10 @@ export function HeroV5({ app, locale }) {
   // Mount telemetry — fire once per page load so dashboards can split
   // hero_v5 sessions from legacy hero_v4 sessions.
   React.useEffect(() => {
-    try { track("hero_v5_viewed", { version: HERO_V5_VERSION }); } catch { /* ignore */ }
+    try {
+      track("hero_v5_viewed", { version: HERO_V5_VERSION });
+      track("homepage.section_viewed", { section: "hero_v5" });
+    } catch { /* ignore */ }
   }, []);
 
   const onNavigate = useCallback(

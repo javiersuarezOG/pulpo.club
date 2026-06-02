@@ -411,6 +411,7 @@ export type EventMap = {
     user_state: "anonymous" | "free" | "pro" | "agency";
     blocks_visible: string[];
     flag_enabled: boolean;
+    hero_v5_version: string;
   };
 
   // Wave-5 USP popup. Replaces the inline USPBand surface with a
