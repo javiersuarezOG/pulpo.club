@@ -32,7 +32,10 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-const DEFAULT_EMAIL = "javier@suarez.ventures";
+// Empty by default — every test send goes to whatever the operator types
+// into the "Send test to" field. No prefilled recipient, so a test can
+// never silently fire at a stale hardcoded address.
+const DEFAULT_EMAIL = "";
 const DEFAULT_LOCALE = "en";
 const LOCALE_OPTIONS = [
   { value: "en", label: "EN" },
@@ -93,7 +96,7 @@ const NEWSLETTERS = [
     id: "pro-welcome",
     tier: "pro",
     title: "Pro · Welcome",
-    description: "Single onboarding email sent on first Pro payment. <5s for existing users (Stripe webhook → Vercel Python). For new users via /start, fires after Clerk signup completes (~5s post-password). Hourly reconcile cron catches any silent failures.",
+    description: "The weekly digest body with a 'Welcome to Pulpo Pro' hero — the SAME master template as Pro · Weekly, only the top hero differs. Fired on first Pro payment: <5s for existing users (Stripe webhook → Vercel Python), or after Clerk signup (~5s) for /start. Hourly reconcile cron catches silent failures.",
     template: "pulpo-pro-welcome",
     templateLabel: "Pulpo Pro Welcome",
     cadenceMode: "onetime",
@@ -103,6 +106,16 @@ const NEWSLETTERS = [
     //   • Filter fix #607 deployed (stripeCustomerId, not invitation_id)
     //   • Resend send + Clerk publicMetadata stamp confirmed working
     //   • Reconcile cron at :15 * * * * provides safety net for orphans
+    status: "live",
+  },
+  {
+    id: "pro-welcome-back",
+    tier: "pro",
+    title: "Pro · Welcome-back",
+    description: "Resubscribe re-acquisition email — the SAME master template as Pro · Weekly / Pro · Welcome, only the hero differs ('Welcome back' + 'your next 10'), derived from the Welcome copy so they never drift. Fires on every resubscribe (deduped on Stripe subscription id). Test-send renders the welcome_back variant to your inbox — no Stripe resubscribe needed.",
+    template: "pulpo-pro-welcome-back",
+    templateLabel: "Pulpo Pro Welcome-back",
+    cadenceMode: "onetime",
     status: "live",
   },
   {
@@ -1108,7 +1121,10 @@ export function NewsletterWidget() {
     // Per-newsletter endpoint routing. Each card's trigger goes to
     // the admin endpoint that drives its specific dispatch pipeline
     // — there's no shared one-size-fits-all "send test" route.
-    const endpoint = newsletterId === "pro-welcome"
+    // Both welcome sub-versions (first-time + resubscribe welcome-back)
+    // route to the welcome-test endpoint; they differ only by `variant`.
+    const isWelcome = newsletterId === "pro-welcome" || newsletterId === "pro-welcome-back";
+    const endpoint = isWelcome
       ? "/api/admin/newsletter/trigger-welcome-test"
       : "/api/admin/newsletter/trigger-preview";
     try {
@@ -1122,9 +1138,16 @@ export function NewsletterWidget() {
       // defaults to force=true server-side). Conditionally attach
       // fields based on which endpoint we're calling so the
       // payload matches each endpoint's schema cleanly.
-      if (newsletterId === "pro-welcome") {
-        // No additional payload — welcome endpoint reads everything
-        // (locale, plan, email) from the recipient's Clerk record.
+      if (isWelcome) {
+        // The welcome endpoint reads plan + email from the recipient's
+        // Clerk record, but the LANGUAGE follows the tool's toggle (an
+        // override) so an operator can preview EN or ES on demand — not
+        // whatever locale sits on the Clerk profile. Production sends
+        // (Stripe webhook) don't pass locale and keep using Clerk's.
+        payload.locale = locale;
+        // Sub-version: pro-welcome-back renders the resubscribe "welcome
+        // back" email (force=yes server-side, so no Stripe resubscribe).
+        if (newsletterId === "pro-welcome-back") payload.variant = "welcome_back";
       } else {
         payload.locale = locale;
         payload.newsletter_id = newsletterId;
@@ -1490,7 +1513,7 @@ export function NewsletterWidget() {
                           disabled={busy}
                           title="Send a test welcome email to the address above — bypasses the Clerk idempotency stamp so you can re-test against the same user." // i18n-allow: admin-only widget
                         >
-                          Send test welcome to me →
+                          {nl.id === "pro-welcome-back" ? "Send test welcome-back to me →" : "Send test welcome to me →"}
                         </button>
                       </div>
                       {cardStatus.kind === "pending" && (
@@ -1511,7 +1534,7 @@ export function NewsletterWidget() {
                             Dispatched · welcome on the way
                           </p>
                           <p className="nl-success-body">
-                            Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds. Look for the subject <strong>Welcome to Pulpo Pro — your first 10</strong>.
+                            Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds. Look for the subject <strong>{nl.id === "pro-welcome-back" ? "Welcome back to Pulpo Pro — your next 10" : "Welcome to Pulpo Pro — your first 10"}</strong>.
                           </p>
                           {cardStatus.runsUrl && (
                             <p className="nl-success-footer">

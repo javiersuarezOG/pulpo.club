@@ -76,13 +76,19 @@ def _run_welcome(args) -> int:
         return 2
 
     email = args.welcome_single_email.strip().lower()
+    variant = getattr(args, "welcome_variant", "welcome") or "welcome"
+    # Optional locale override (admin preview). None → dispatcher uses the
+    # recipient's Clerk locale (production behavior).
+    locale = getattr(args, "welcome_locale", None) or None
     print(f"[welcome] dispatching email={email} source={args.welcome_source} "
-          f"force={args.welcome_force}")
+          f"force={args.welcome_force} variant={variant} locale={locale or 'clerk'}")
     result = dispatch_welcome(
         email=email,
+        locale=locale,
         source=args.welcome_source,
         ranked_path=args.ranked,
         force=args.welcome_force,
+        variant=variant,
     )
     print(
         f"[welcome] status={result.status} reason={result.reason or '-'} "
@@ -155,6 +161,29 @@ def main() -> int:
             "Welcome-template: bypass the already_sent idempotency "
             "check (admin Test-send-to-me uses this so an operator can "
             "re-render the welcome without manually clearing Clerk)."
+        ),
+    )
+    p.add_argument(
+        "--welcome-variant",
+        default="welcome",
+        choices=("welcome", "welcome_back"),
+        help=(
+            "Welcome sub-version: \"welcome\" (first-time onboarding, "
+            "default) or \"welcome_back\" (resubscribe re-acquisition — "
+            "same template, 'welcome back' hero). Admin Test-send-to-me "
+            "passes welcome_back to preview the returning-user email "
+            "without a Stripe resubscribe."
+        ),
+    )
+    p.add_argument(
+        "--welcome-locale",
+        default=None,
+        choices=("en", "es"),
+        help=(
+            "Welcome-template locale override (admin preview / the tool's "
+            "Language toggle). When omitted the dispatcher uses the "
+            "recipient's Clerk publicMetadata.profile.locale — the "
+            "production behavior."
         ),
     )
     p.add_argument(

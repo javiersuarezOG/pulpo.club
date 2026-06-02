@@ -140,6 +140,13 @@ class ClerkUser:
     # locked 2026-06-01; see `project_resubscribe_welcome_funnel` memory
     # for why this stamp is permanent (no re-send on resubscribe).
     welcome_sent_at: Optional[str] = None
+    # Resubscribe welcome-back dedup key — the Stripe subscription id the
+    # last welcome-back was sent for. The resubscribe re-acquisition email
+    # (welcome-back) fires on EVERY genuine resubscription, deduped on this
+    # id: a Stripe webhook retry carries the same subscription id (skip),
+    # a future churn→resub creates a NEW subscription id (fire again).
+    # Set by welcome_dispatch alongside `welcome_sent_at` on a 2xx send.
+    resubscribe_welcome_subscription_id: Optional[str] = None
 
 
 def list_clerk_users(
@@ -200,6 +207,12 @@ def _parse_clerk_user(u: dict) -> Optional[ClerkUser]:
     # accept both snake_case + camelCase, drop anything non-string.
     raw_wsa = public_md.get("welcome_newsletter_sent_at") or public_md.get("welcomeNewsletterSentAt")
     welcome_sent_at = raw_wsa if isinstance(raw_wsa, str) and raw_wsa else None
+    # Resubscribe welcome-back dedup key — same permissive snake/camel read.
+    raw_rwsi = (public_md.get("resubscribe_welcome_subscription_id")
+                or public_md.get("resubscribeWelcomeSubscriptionId"))
+    resubscribe_welcome_subscription_id = (
+        raw_rwsi if isinstance(raw_rwsi, str) and raw_rwsi else None
+    )
     return ClerkUser(
         id=str(u.get("id") or ""),
         email=email,
@@ -209,6 +222,7 @@ def _parse_clerk_user(u: dict) -> Optional[ClerkUser]:
         saved_count=len(saves),
         saves=saves,
         welcome_sent_at=welcome_sent_at,
+        resubscribe_welcome_subscription_id=resubscribe_welcome_subscription_id,
     )
 
 
