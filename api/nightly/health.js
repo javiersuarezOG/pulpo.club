@@ -30,6 +30,7 @@ const cache = {
   runHistory: { json: null, mtime: 0 },
   vlmBudget: { rows: null, mtime: 0 },
   sourceHealth: { rows: null, mtime: 0 },
+  featured: { json: null, mtime: 0 },
 };
 
 function resolveDataPath(filename) {
@@ -136,6 +137,24 @@ function failedSourcesLastRun(lastUpdated, sourceHealthRows) {
     failures.push({ source, status: st, last_ok_at: lastOkAt, error: errorMsg });
   }
   return failures;
+}
+
+// PRD P1-1 — surface featured.json freshness so a stale pick is
+// detectable from /api/nightly/health without opening the file. Returns
+// `null` when the file is missing (PA-only run, file-not-yet-generated)
+// so dashboards can render an explicit "absent" rather than guessing.
+function featuredFreshness(featured) {
+  if (!featured || typeof featured !== "object") return null;
+  const pickedAt = typeof featured.picked_at === "string" ? featured.picked_at : null;
+  const expiresAt = typeof featured.expires_at === "string" ? featured.expires_at : null;
+  const expiresMs = expiresAt ? Date.parse(expiresAt) : NaN;
+  const fresh = Number.isFinite(expiresMs) ? expiresMs > Date.now() : false;
+  return {
+    picked_at: pickedAt,
+    expires_at: expiresAt,
+    fresh,
+    age_hours: pickedAt ? Number((hoursSince(pickedAt) ?? 0).toFixed(2)) : null,
+  };
 }
 
 // PRD P1-9 — surface brownout-state sources alongside the binary
@@ -281,6 +300,7 @@ function buildHealth() {
   const runHistory = loadJsonCached("runHistory", "run_history.json");
   const vlmRows = loadJsonlCached("vlmBudget", "llm_vision_budget.jsonl");
   const sourceHealthRows = loadJsonlCached("sourceHealth", "source_health_history.jsonl");
+  const featured = loadJsonCached("featured", "featured.json");
 
   const lastDataCommitAt = lastUpdated ? lastUpdated.last_updated ?? null : null;
   const lastTotalListings = lastUpdated ? lastUpdated.total_listings ?? null : null;
@@ -302,6 +322,7 @@ function buildHealth() {
     failed_sources_last_run: failedSourcesLastRun(lastUpdated, sourceHealthRows),
     degraded_sources: degradedSources(sourceHealthRows),
     vlm_budget_today: vlmBudgetToday(vlmRows),
+    featured: featuredFreshness(featured),
     // Phase A follow-on (separate PR) will populate these from
     // nightly_progress.json + phase_durations.jsonl.
     current_progress: null,
@@ -335,6 +356,7 @@ module.exports.__testing__ = {
   buildLast7Runs,
   failedSourcesLastRun,
   vlmBudgetToday,
+  featuredFreshness,
   degradedSources,
   hoursSince,
   STALE_THRESHOLD_H,
