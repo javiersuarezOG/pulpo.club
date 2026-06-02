@@ -769,7 +769,18 @@ jobs:
           # First observed: nightly 26758631085 on 2026-06-01, blocked by
           # PR #602 landing mid-run.
           git fetch origin main
-          git rebase origin/main || {
+          # --autostash is required: the pipeline writes several files
+          # NOT included in the data-PR commit (most notably
+          # web/data/unmapped_beaches_history.jsonl, repick_summary.jsonl,
+          # and various working-tree byproducts). Without --autostash the
+          # rebase aborts with "cannot rebase: You have unstaged changes",
+          # the fallback push runs against a stale base, and the PAT-scope
+          # check rejects the push when origin/main has moved into
+          # .github/workflows/. Observed live in nightly 26781987375 after
+          # PRs #618 + #620 landed mid-run on 2026-06-01.
+          # The auto-stashed working-tree changes are intentionally
+          # discarded with the runner — they were never destined for main.
+          git rebase --autostash origin/main || {
               echo "::warning::rebase onto origin/main failed; aborting and pushing as-is — push may be PAT-scope rejected if main moved."
               git rebase --abort || true
           }
