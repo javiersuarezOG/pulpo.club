@@ -62,6 +62,52 @@ def test_rate_thresholds_match_industry_norms():
     assert health.RATE_CHECKS["newsletter_complaint_rate"]["threshold"] == 0.001
 
 
+# ── PRD P0-3 — resend_unknown_email_type_rate ───────────────────────
+
+
+def test_resend_unknown_email_type_rate_registered():
+    """The classifier-health rate must exist so the heartbeat catches
+    the regression class where a new sender ships without tags. The
+    audit found 100% of contact-form lifecycle events landing as
+    `email_type='unknown'`."""
+    assert "resend_unknown_email_type_rate" in health.RATE_CHECKS
+    cfg = health.RATE_CHECKS["resend_unknown_email_type_rate"]
+    assert "'unknown'" in cfg["numerator_where"]
+    assert "email_type" in cfg["numerator_where"]
+    # Denominator is the same set of lifecycle events — no email_type
+    # filter so the rate measures classification health, not delivery.
+    assert "newsletter.delivered" in cfg["denominator_where"]
+    assert cfg["window_hours"] == 24.0
+    assert cfg["threshold"] == 0.05
+    assert cfg["min_denominator"] == 10
+
+
+# ── PRD P0-4 — Resend heartbeat is lifecycle-only ───────────────────
+
+
+def test_resend_family_does_not_match_internal_cron_events():
+    """Pre-2026-06-02 the Resend heartbeat matched every event
+    starting with `newsletter.`, including internal cron rows like
+    newsletter.commentary_generated / .issue_built. Lock down the
+    restricted where clause so the heartbeat detects the actual
+    `/api/resend-webhook` going silent."""
+    where = health.FAMILIES["resend"]["where"]
+    assert "startsWith(event, 'newsletter.')" not in where
+    # Must accept resend.webhook_received (the dedicated heartbeat).
+    assert "'resend.webhook_received'" in where
+    # Must enumerate the seven Resend lifecycle event names directly.
+    for ev in (
+        "'newsletter.sent'", "'newsletter.delivered'", "'newsletter.opened'",
+        "'newsletter.clicked'", "'newsletter.bounced'",
+        "'newsletter.complained'", "'newsletter.delivery_delayed'",
+    ):
+        assert ev in where
+    # Must NOT accept the internal cron-progress events.
+    assert "send_succeeded" not in where
+    assert "commentary_generated" not in where
+    assert "welcome_reconcile_completed" not in where
+
+
 def test_rate_checks_have_min_denominator_floor():
     """Without min_denominator, one bounce on 3 sends = 33% rate and
     a false alarm. Both checks need a floor."""

@@ -168,3 +168,42 @@ comes from Clerk's `first_name`), so the side-channel is safe.
 
 Backwards-compat: existing contacts without the prefix continue to
 default to `"en"`, identical to pre-PR behavior.
+
+---
+
+## Update 2026-06-02 — classifier truthfulness (PRD #638)
+
+The 2026-06-02 system-health audit (`docs/prds/system-health-audit-2026-06-02.md`)
+found that most lifecycle events in PostHog were classifying as
+`email_type="unknown"` with `recipient_hash=null`. Three sender/parser
+gaps were the cause; all closed in `fix/resend-lifecycle-classifier`:
+
+1. **Contact-form sends were untagged.** `api/contact.js` posted to
+   Resend with no `tags` and no `headers`, so contact-form lifecycle
+   events landed without an `email_type` axis. Fix: stamp
+   `tags: [{ email_type: "contact" }, { topic }]` and the
+   `X-Pulpo-Email-Type: contact` header on every contact-form send.
+2. **Header lookup was case-sensitive.** Resend preserves the casing of
+   header keys from the sender. The newsletter dispatcher stamps
+   `X-Pulpo-Recipient` capitalized but `pickPostHogProps` in
+   `api/resend-webhook.js` only read `headers["x-pulpo-recipient"]`,
+   so the header fallback never resolved when the tag was missing. Fix:
+   lowercase all header keys once before lookup.
+3. **Heartbeat matched internal cron events.** `scripts/check_webhook_health.py`
+   defined the Resend family as `startsWith(event, 'newsletter.')`,
+   which matched `newsletter.commentary_generated`,
+   `newsletter.issue_built`, `newsletter.welcome_reconcile_completed`,
+   and `newsletter.send_succeeded` — none of which originate from the
+   Resend lifecycle webhook. Fix: pin the family to the seven concrete
+   lifecycle event names plus the new dedicated
+   `resend.webhook_received` heartbeat that
+   `/api/resend-webhook` emits on every verified webhook delivery.
+
+A new rate check `resend_unknown_email_type_rate` (24h window, 5%
+threshold, min_denominator 10) alerts on the regression class: if a
+new sender ships without tags, the unknown-rate spike triggers Slack
+within hours rather than escaping until the next audit.
+
+Lifecycle events also carry a `classification_source` prop now —
+`tags | headers | mixed | unknown` — so dashboards can audit *how*
+each row was classified.
