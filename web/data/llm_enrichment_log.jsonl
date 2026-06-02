@@ -11336,3 +11336,1132 @@
 {"ts": "2026-05-26T07:24:38.169824+00:00", "key": "remax|001463138091", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2549, "tokens_out": 617, "cost_usd": 0.00136693, "latency_ms": 7913, "decision": "enriched"}
 {"ts": "2026-05-26T07:24:38.180022+00:00", "key": "bienesraices|1417", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2680, "tokens_out": 685, "cost_usd": 0.0014771, "latency_ms": 7924, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
 {"ts": "2026-05-26T07:24:38.409152+00:00", "key": "bienesraices|2217", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2660, "tokens_out": 797, "cost_usd": 0.0015949, "latency_ms": 8153, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:10:49.220576+00:00", "key": "bienesraices|2358", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.220759+00:00", "key": "bienesraices|2357", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.220925+00:00", "key": "bienesraices|2355", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221010+00:00", "key": "bienesraices|2353", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221090+00:00", "key": "bienesraices|2352", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221193+00:00", "key": "bienesraices|2351", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221277+00:00", "key": "bienesraices|2343", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221355+00:00", "key": "bienesraices|2342", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221430+00:00", "key": "bienesraices|2341", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221503+00:00", "key": "bienesraices|2340", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221576+00:00", "key": "bienesraices|2339", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221650+00:00", "key": "bienesraices|2338", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221725+00:00", "key": "bienesraices|2334", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221798+00:00", "key": "bienesraices|2329", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221872+00:00", "key": "bienesraices|2324", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.221944+00:00", "key": "bienesraices|2323", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222019+00:00", "key": "bienesraices|2319", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222093+00:00", "key": "bienesraices|2317", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222188+00:00", "key": "bienesraices|2316", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222279+00:00", "key": "bienesraices|2315", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222353+00:00", "key": "bienesraices|2313", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222425+00:00", "key": "bienesraices|2311", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222495+00:00", "key": "bienesraices|2309", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222567+00:00", "key": "bienesraices|2308", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222639+00:00", "key": "bienesraices|2306", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222709+00:00", "key": "bienesraices|2305", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222789+00:00", "key": "bienesraices|2303", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222862+00:00", "key": "bienesraices|2302", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.222935+00:00", "key": "bienesraices|2299", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223006+00:00", "key": "bienesraices|2298", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223077+00:00", "key": "bienesraices|2296", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223166+00:00", "key": "bienesraices|2295", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223245+00:00", "key": "bienesraices|2294", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223317+00:00", "key": "bienesraices|2293", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223387+00:00", "key": "bienesraices|2292", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223459+00:00", "key": "bienesraices|2288", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223529+00:00", "key": "bienesraices|2287", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223599+00:00", "key": "bienesraices|2281", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223670+00:00", "key": "bienesraices|2279", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223741+00:00", "key": "bienesraices|2271", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223812+00:00", "key": "bienesraices|2265", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223882+00:00", "key": "bienesraices|2263", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.223952+00:00", "key": "bienesraices|2262", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224022+00:00", "key": "bienesraices|2258", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224091+00:00", "key": "bienesraices|2257", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224180+00:00", "key": "bienesraices|2252", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224259+00:00", "key": "bienesraices|2251", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224329+00:00", "key": "bienesraices|2250", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224400+00:00", "key": "bienesraices|2249", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224469+00:00", "key": "bienesraices|2247", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224537+00:00", "key": "bienesraices|2246", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224606+00:00", "key": "bienesraices|2244", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224685+00:00", "key": "bienesraices|2235", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224758+00:00", "key": "bienesraices|2230", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224829+00:00", "key": "bienesraices|2229", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224900+00:00", "key": "bienesraices|2227", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.224971+00:00", "key": "bienesraices|2226", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225040+00:00", "key": "bienesraices|2225", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225114+00:00", "key": "bienesraices|2223", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225220+00:00", "key": "bienesraices|2215", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225296+00:00", "key": "bienesraices|2210", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225369+00:00", "key": "bienesraices|2206", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225440+00:00", "key": "bienesraices|2205", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225510+00:00", "key": "bienesraices|2204", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225581+00:00", "key": "bienesraices|2203", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225651+00:00", "key": "bienesraices|2202", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225722+00:00", "key": "bienesraices|2201", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225791+00:00", "key": "bienesraices|2200", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225860+00:00", "key": "bienesraices|2198", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.225930+00:00", "key": "bienesraices|2191", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226001+00:00", "key": "bienesraices|2183", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226070+00:00", "key": "bienesraices|2180", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226140+00:00", "key": "bienesraices|2179", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226235+00:00", "key": "bienesraices|2176", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226306+00:00", "key": "bienesraices|2173", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226376+00:00", "key": "bienesraices|2169", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226446+00:00", "key": "bienesraices|2168", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226523+00:00", "key": "bienesraices|2167", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226594+00:00", "key": "bienesraices|2164", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226664+00:00", "key": "bienesraices|2161", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226734+00:00", "key": "bienesraices|2160", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226803+00:00", "key": "bienesraices|2159", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226872+00:00", "key": "bienesraices|2157", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.226942+00:00", "key": "bienesraices|2156", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227013+00:00", "key": "bienesraices|2155", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227081+00:00", "key": "bienesraices|2151", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227177+00:00", "key": "bienesraices|2149", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227267+00:00", "key": "bienesraices|2148", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227350+00:00", "key": "bienesraices|2136", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227419+00:00", "key": "bienesraices|2135", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227487+00:00", "key": "bienesraices|2129", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227556+00:00", "key": "bienesraices|2128", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227625+00:00", "key": "bienesraices|2124", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227693+00:00", "key": "bienesraices|2112", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227762+00:00", "key": "bienesraices|2104", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227830+00:00", "key": "bienesraices|2102", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227900+00:00", "key": "bienesraices|2101", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.227969+00:00", "key": "bienesraices|2100", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228038+00:00", "key": "bienesraices|2099", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228108+00:00", "key": "bienesraices|2091", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228198+00:00", "key": "bienesraices|2087", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228273+00:00", "key": "bienesraices|2086", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228353+00:00", "key": "bienesraices|2085", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228424+00:00", "key": "bienesraices|2084", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228494+00:00", "key": "bienesraices|2074", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228564+00:00", "key": "bienesraices|2071", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228634+00:00", "key": "bienesraices|2068", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228703+00:00", "key": "bienesraices|2062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228772+00:00", "key": "bienesraices|2061", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228842+00:00", "key": "bienesraices|2059", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228910+00:00", "key": "bienesraices|2058", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.228979+00:00", "key": "bienesraices|2056", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229048+00:00", "key": "bienesraices|2055", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229119+00:00", "key": "bienesraices|2052", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229213+00:00", "key": "bienesraices|2050", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229286+00:00", "key": "bienesraices|2047", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229357+00:00", "key": "bienesraices|2046", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229427+00:00", "key": "bienesraices|2045", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229497+00:00", "key": "bienesraices|2044", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229566+00:00", "key": "bienesraices|2042", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229649+00:00", "key": "bienesraices|2041", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229721+00:00", "key": "bienesraices|2036", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229791+00:00", "key": "bienesraices|2030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229861+00:00", "key": "bienesraices|2029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229930+00:00", "key": "bienesraices|2026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.229998+00:00", "key": "bienesraices|2022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230067+00:00", "key": "bienesraices|2021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230136+00:00", "key": "bienesraices|2018", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230232+00:00", "key": "bienesraices|2016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230302+00:00", "key": "bienesraices|2015", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230371+00:00", "key": "bienesraices|2014", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230440+00:00", "key": "bienesraices|2013", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230508+00:00", "key": "bienesraices|2012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230578+00:00", "key": "bienesraices|2011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230645+00:00", "key": "bienesraices|2010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230713+00:00", "key": "bienesraices|2009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230782+00:00", "key": "bienesraices|2008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230852+00:00", "key": "bienesraices|2007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230922+00:00", "key": "bienesraices|2006", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.230991+00:00", "key": "bienesraices|2005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231061+00:00", "key": "bienesraices|2004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231130+00:00", "key": "bienesraices|1999", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231225+00:00", "key": "bienesraices|1997", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231296+00:00", "key": "bienesraices|1996", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231367+00:00", "key": "bienesraices|1992", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231437+00:00", "key": "bienesraices|1991", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231507+00:00", "key": "bienesraices|1990", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231576+00:00", "key": "bienesraices|1989", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231645+00:00", "key": "bienesraices|1987", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231715+00:00", "key": "bienesraices|1986", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231783+00:00", "key": "bienesraices|1983", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231852+00:00", "key": "bienesraices|1982", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231921+00:00", "key": "bienesraices|1981", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.231996+00:00", "key": "bienesraices|1980", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232067+00:00", "key": "bienesraices|1978", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232136+00:00", "key": "bienesraices|1977", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232232+00:00", "key": "bienesraices|1976", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232302+00:00", "key": "bienesraices|1975", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232370+00:00", "key": "bienesraices|1973", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232440+00:00", "key": "bienesraices|1971", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232511+00:00", "key": "bienesraices|1970", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232579+00:00", "key": "bienesraices|1969", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232648+00:00", "key": "bienesraices|1965", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232716+00:00", "key": "bienesraices|1964", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232783+00:00", "key": "bienesraices|1962", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232849+00:00", "key": "bienesraices|1959", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232917+00:00", "key": "bienesraices|1956", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.232987+00:00", "key": "bienesraices|1954", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233058+00:00", "key": "bienesraices|1953", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233125+00:00", "key": "bienesraices|1951", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233220+00:00", "key": "bienesraices|1948", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233291+00:00", "key": "bienesraices|1944", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233360+00:00", "key": "bienesraices|1940", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233430+00:00", "key": "bienesraices|1935", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233498+00:00", "key": "bienesraices|1932", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233566+00:00", "key": "bienesraices|1931", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233637+00:00", "key": "bienesraices|1927", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233705+00:00", "key": "bienesraices|1926", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233774+00:00", "key": "bienesraices|1924", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233843+00:00", "key": "bienesraices|1923", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233912+00:00", "key": "bienesraices|1919", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.233979+00:00", "key": "bienesraices|1918", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234048+00:00", "key": "bienesraices|1917", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234117+00:00", "key": "bienesraices|1916", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234211+00:00", "key": "bienesraices|1915", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234286+00:00", "key": "bienesraices|1913", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234355+00:00", "key": "bienesraices|1911", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234431+00:00", "key": "bienesraices|1910", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234513+00:00", "key": "bienesraices|1909", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234584+00:00", "key": "bienesraices|1908", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234652+00:00", "key": "bienesraices|1906", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234720+00:00", "key": "bienesraices|1905", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234788+00:00", "key": "bienesraices|1904", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234858+00:00", "key": "bienesraices|1903", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234926+00:00", "key": "bienesraices|1901", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.234995+00:00", "key": "bienesraices|1899", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235063+00:00", "key": "bienesraices|1898", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235131+00:00", "key": "bienesraices|1897", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235225+00:00", "key": "bienesraices|1896", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235297+00:00", "key": "bienesraices|1894", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235366+00:00", "key": "bienesraices|1892", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235434+00:00", "key": "bienesraices|1891", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235514+00:00", "key": "bienesraices|1890", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235584+00:00", "key": "bienesraices|1886", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235653+00:00", "key": "bienesraices|1884", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235723+00:00", "key": "bienesraices|1882", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235793+00:00", "key": "bienesraices|1880", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235901+00:00", "key": "bienesraices|1879", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.235995+00:00", "key": "bienesraices|1876", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236069+00:00", "key": "bienesraices|1875", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236142+00:00", "key": "bienesraices|1870", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236239+00:00", "key": "bienesraices|1867", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236308+00:00", "key": "bienesraices|1865", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236377+00:00", "key": "bienesraices|1864", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236447+00:00", "key": "bienesraices|1859", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236523+00:00", "key": "bienesraices|1851", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236591+00:00", "key": "bienesraices|1846", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236659+00:00", "key": "bienesraices|1845", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236728+00:00", "key": "bienesraices|1844", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236798+00:00", "key": "bienesraices|1842", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236875+00:00", "key": "bienesraices|1836", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.236946+00:00", "key": "bienesraices|1830", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237018+00:00", "key": "bienesraices|1825", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237088+00:00", "key": "bienesraices|1824", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237177+00:00", "key": "bienesraices|1823", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237253+00:00", "key": "bienesraices|1817", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237324+00:00", "key": "bienesraices|1808", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237394+00:00", "key": "bienesraices|1806", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237463+00:00", "key": "bienesraices|1803", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237530+00:00", "key": "bienesraices|1800", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237598+00:00", "key": "bienesraices|1798", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237668+00:00", "key": "bienesraices|1797", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237736+00:00", "key": "bienesraices|1794", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237804+00:00", "key": "bienesraices|1793", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237875+00:00", "key": "bienesraices|1792", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.237945+00:00", "key": "bienesraices|1788", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238013+00:00", "key": "bienesraices|1783", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238082+00:00", "key": "bienesraices|1782", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238170+00:00", "key": "bienesraices|1781", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238247+00:00", "key": "bienesraices|1780", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238316+00:00", "key": "bienesraices|1778", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238384+00:00", "key": "bienesraices|1769", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238452+00:00", "key": "bienesraices|1764", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238520+00:00", "key": "bienesraices|1761", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238590+00:00", "key": "bienesraices|1760", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238659+00:00", "key": "bienesraices|1756", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238729+00:00", "key": "bienesraices|1744", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238797+00:00", "key": "bienesraices|1742", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238867+00:00", "key": "bienesraices|1739", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.238934+00:00", "key": "bienesraices|1732", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239002+00:00", "key": "bienesraices|1731", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239071+00:00", "key": "bienesraices|1724", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239139+00:00", "key": "bienesraices|1723", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239233+00:00", "key": "bienesraices|1720", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239308+00:00", "key": "bienesraices|1718", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239377+00:00", "key": "bienesraices|1713", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239448+00:00", "key": "bienesraices|1710", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239517+00:00", "key": "bienesraices|1698", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239587+00:00", "key": "bienesraices|1695", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239657+00:00", "key": "bienesraices|1694", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239725+00:00", "key": "bienesraices|1692", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239794+00:00", "key": "bienesraices|1691", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239864+00:00", "key": "bienesraices|1690", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.239933+00:00", "key": "bienesraices|1689", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240002+00:00", "key": "bienesraices|1688", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240072+00:00", "key": "bienesraices|1687", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240141+00:00", "key": "bienesraices|1686", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240238+00:00", "key": "bienesraices|1684", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240307+00:00", "key": "bienesraices|1682", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240375+00:00", "key": "bienesraices|1677", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240444+00:00", "key": "bienesraices|1676", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240513+00:00", "key": "bienesraices|1674", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240591+00:00", "key": "bienesraices|1671", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240658+00:00", "key": "bienesraices|1668", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240726+00:00", "key": "bienesraices|1667", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240793+00:00", "key": "bienesraices|1664", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240860+00:00", "key": "bienesraices|1658", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.240930+00:00", "key": "bienesraices|1656", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241000+00:00", "key": "bienesraices|1646", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241069+00:00", "key": "bienesraices|1638", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241137+00:00", "key": "bienesraices|1637", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241232+00:00", "key": "bienesraices|1636", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241301+00:00", "key": "bienesraices|1630", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241369+00:00", "key": "bienesraices|1627", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241436+00:00", "key": "bienesraices|1626", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241504+00:00", "key": "bienesraices|1623", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241573+00:00", "key": "bienesraices|1622", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241648+00:00", "key": "bienesraices|1621", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241719+00:00", "key": "bienesraices|1620", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241786+00:00", "key": "bienesraices|1616", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241854+00:00", "key": "bienesraices|1614", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241922+00:00", "key": "bienesraices|1613", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.241990+00:00", "key": "bienesraices|1612", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242058+00:00", "key": "bienesraices|1608", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242125+00:00", "key": "bienesraices|1607", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242223+00:00", "key": "bienesraices|1605", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242294+00:00", "key": "bienesraices|1598", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242364+00:00", "key": "bienesraices|1597", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242432+00:00", "key": "bienesraices|1595", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242503+00:00", "key": "bienesraices|1593", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242571+00:00", "key": "bienesraices|1590", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.242640+00:00", "key": "bienesraices|1586", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243432+00:00", "key": "bienesraices|1585", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243511+00:00", "key": "bienesraices|1584", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243583+00:00", "key": "bienesraices|1582", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243655+00:00", "key": "bienesraices|1580", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243724+00:00", "key": "bienesraices|1579", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243795+00:00", "key": "bienesraices|1578", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243864+00:00", "key": "bienesraices|1572", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.243933+00:00", "key": "bienesraices|1571", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244003+00:00", "key": "bienesraices|1567", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244073+00:00", "key": "bienesraices|1566", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244142+00:00", "key": "bienesraices|1562", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244237+00:00", "key": "bienesraices|1561", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244307+00:00", "key": "bienesraices|1560", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244376+00:00", "key": "bienesraices|1559", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244445+00:00", "key": "bienesraices|1554", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244514+00:00", "key": "bienesraices|1553", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244583+00:00", "key": "bienesraices|1550", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244652+00:00", "key": "bienesraices|1549", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244721+00:00", "key": "bienesraices|1548", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244794+00:00", "key": "bienesraices|1547", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244865+00:00", "key": "bienesraices|1546", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.244933+00:00", "key": "bienesraices|1541", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245001+00:00", "key": "bienesraices|1533", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245069+00:00", "key": "bienesraices|1532", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245137+00:00", "key": "bienesraices|1531", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245233+00:00", "key": "bienesraices|1530", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245303+00:00", "key": "bienesraices|1529", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245371+00:00", "key": "bienesraices|1528", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245438+00:00", "key": "bienesraices|1527", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245507+00:00", "key": "bienesraices|1526", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245574+00:00", "key": "bienesraices|1523", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245645+00:00", "key": "bienesraices|1515", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245713+00:00", "key": "bienesraices|1511", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245783+00:00", "key": "bienesraices|1507", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245851+00:00", "key": "bienesraices|1504", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245920+00:00", "key": "bienesraices|1500", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.245987+00:00", "key": "bienesraices|1499", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246054+00:00", "key": "bienesraices|1498", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246122+00:00", "key": "bienesraices|1496", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246217+00:00", "key": "bienesraices|1494", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246289+00:00", "key": "bienesraices|1493", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246359+00:00", "key": "bienesraices|1488", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246428+00:00", "key": "bienesraices|1487", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246503+00:00", "key": "bienesraices|1486", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246574+00:00", "key": "bienesraices|1484", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246643+00:00", "key": "bienesraices|1483", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246714+00:00", "key": "bienesraices|1480", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246782+00:00", "key": "bienesraices|1475", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246848+00:00", "key": "bienesraices|1473", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246918+00:00", "key": "bienesraices|1472", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.246986+00:00", "key": "bienesraices|1471", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247053+00:00", "key": "bienesraices|1469", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247122+00:00", "key": "bienesraices|1459", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247220+00:00", "key": "bienesraices|1457", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247295+00:00", "key": "bienesraices|1452", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247364+00:00", "key": "bienesraices|1451", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247434+00:00", "key": "bienesraices|1450", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247503+00:00", "key": "bienesraices|1449", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247571+00:00", "key": "bienesraices|1448", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247640+00:00", "key": "bienesraices|1447", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247708+00:00", "key": "bienesraices|1446", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247777+00:00", "key": "bienesraices|1443", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247846+00:00", "key": "bienesraices|1441", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247915+00:00", "key": "bienesraices|1440", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.247984+00:00", "key": "bienesraices|1439", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248052+00:00", "key": "bienesraices|1437", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248121+00:00", "key": "bienesraices|1436", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248215+00:00", "key": "bienesraices|1434", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248287+00:00", "key": "bienesraices|1433", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248355+00:00", "key": "bienesraices|1432", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248425+00:00", "key": "bienesraices|1425", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248494+00:00", "key": "bienesraices|1424", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248564+00:00", "key": "bienesraices|1422", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248632+00:00", "key": "bienesraices|1419", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248711+00:00", "key": "bienesraices|1411", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248781+00:00", "key": "bienesraices|1410", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248850+00:00", "key": "bienesraices|1408", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248921+00:00", "key": "bienesraices|1407", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.248990+00:00", "key": "bienesraices|1404", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249058+00:00", "key": "bienesraices|1402", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249127+00:00", "key": "bienesraices|1399", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249221+00:00", "key": "bienesraices|1397", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249292+00:00", "key": "bienesraices|1387", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249359+00:00", "key": "bienesraices|1380", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249427+00:00", "key": "bienesraices|1377", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249494+00:00", "key": "bienesraices|1366", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249570+00:00", "key": "bienesraices|1359", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249641+00:00", "key": "bienesraices|1349", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249710+00:00", "key": "bienesraices|1346", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249779+00:00", "key": "bienesraices|1339", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249848+00:00", "key": "bienesraices|1338", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249915+00:00", "key": "bienesraices|1337", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.249985+00:00", "key": "bienesraices|1334", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250053+00:00", "key": "bienesraices|1333", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250123+00:00", "key": "bienesraices|1324", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250216+00:00", "key": "bienesraices|1322", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250287+00:00", "key": "bienesraices|1319", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250356+00:00", "key": "bienesraices|1318", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250423+00:00", "key": "bienesraices|1317", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250491+00:00", "key": "bienesraices|1315", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250569+00:00", "key": "bienesraices|1314", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250638+00:00", "key": "bienesraices|1313", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250707+00:00", "key": "bienesraices|1312", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250775+00:00", "key": "bienesraices|1311", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250844+00:00", "key": "bienesraices|1307", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250922+00:00", "key": "bienesraices|1304", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.250989+00:00", "key": "bienesraices|1300", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251058+00:00", "key": "bienesraices|1299", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251126+00:00", "key": "bienesraices|1298", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251308+00:00", "key": "bienesraices|1286", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251401+00:00", "key": "bienesraices|1284", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251473+00:00", "key": "bienesraices|1282", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251544+00:00", "key": "bienesraices|1280", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251616+00:00", "key": "bienesraices|1279", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251686+00:00", "key": "bienesraices|1276", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251755+00:00", "key": "bienesraices|1275", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251824+00:00", "key": "bienesraices|1272", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251895+00:00", "key": "bienesraices|1268", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.251965+00:00", "key": "bienesraices|1265", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252034+00:00", "key": "bienesraices|1263", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252110+00:00", "key": "bienesraices|1260", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252225+00:00", "key": "bienesraices|1258", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252304+00:00", "key": "bienesraices|1256", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252387+00:00", "key": "bienesraices|1251", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252457+00:00", "key": "bienesraices|1249", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252527+00:00", "key": "bienesraices|1246", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252598+00:00", "key": "bienesraices|1245", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252669+00:00", "key": "bienesraices|1244", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252740+00:00", "key": "bienesraices|1243", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252808+00:00", "key": "bienesraices|1242", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252878+00:00", "key": "bienesraices|1234", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.252948+00:00", "key": "bienesraices|1232", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253019+00:00", "key": "bienesraices|1229", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253086+00:00", "key": "bienesraices|1228", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253175+00:00", "key": "bienesraices|1212", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253251+00:00", "key": "bienesraices|1209", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253330+00:00", "key": "bienesraices|1205", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253399+00:00", "key": "bienesraices|1201", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253468+00:00", "key": "bienesraices|1195", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253536+00:00", "key": "bienesraices|1184", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253603+00:00", "key": "bienesraices|1180", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253673+00:00", "key": "bienesraices|1178", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253742+00:00", "key": "bienesraices|1176", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253810+00:00", "key": "bienesraices|1172", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253878+00:00", "key": "bienesraices|1170", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.253946+00:00", "key": "bienesraices|1158", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254016+00:00", "key": "bienesraices|1152", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254086+00:00", "key": "bienesraices|1149", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254173+00:00", "key": "bienesraices|1145", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254249+00:00", "key": "bienesraices|1142", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254318+00:00", "key": "bienesraices|1135", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254388+00:00", "key": "bienesraices|1132", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254457+00:00", "key": "bienesraices|1131", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254532+00:00", "key": "bienesraices|1128", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254603+00:00", "key": "bienesraices|1125", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254674+00:00", "key": "bienesraices|1124", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254744+00:00", "key": "bienesraices|1122", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254812+00:00", "key": "bienesraices|1118", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254882+00:00", "key": "bienesraices|1117", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.254952+00:00", "key": "bienesraices|1113", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255021+00:00", "key": "bienesraices|1112", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255090+00:00", "key": "bienesraices|1108", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255177+00:00", "key": "bienesraices|1106", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255254+00:00", "key": "bienesraices|1105", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255323+00:00", "key": "bienesraices|1103", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255393+00:00", "key": "bienesraices|1102", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255461+00:00", "key": "bienesraices|1099", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255532+00:00", "key": "bienesraices|1093", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255601+00:00", "key": "bienesraices|1079", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255669+00:00", "key": "bienesraices|1073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255738+00:00", "key": "bienesraices|1071", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255805+00:00", "key": "bienesraices|1070", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255874+00:00", "key": "bienesraices|1069", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.255944+00:00", "key": "bienesraices|1068", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256012+00:00", "key": "bienesraices|1067", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256080+00:00", "key": "bienesraices|1064", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256169+00:00", "key": "bienesraices|1062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256246+00:00", "key": "bienesraices|1061", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256315+00:00", "key": "bienesraices|1060", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256383+00:00", "key": "bienesraices|1059", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256452+00:00", "key": "bienesraices|1044", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256529+00:00", "key": "bienesraices|1042", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256599+00:00", "key": "bienesraices|1041", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256668+00:00", "key": "bienesraices|1032", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256735+00:00", "key": "bienesraices|1020", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256804+00:00", "key": "bienesraices|1019", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256871+00:00", "key": "bienesraices|1018", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.256944+00:00", "key": "bienesraices|1015", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257014+00:00", "key": "bienesraices|1014", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257083+00:00", "key": "bienesraices|1013", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257173+00:00", "key": "bienesraices|1008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257250+00:00", "key": "bienesraices|1007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257318+00:00", "key": "bienesraices|1003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257389+00:00", "key": "century21|935694", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257458+00:00", "key": "century21|976159", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257527+00:00", "key": "century21|738070", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257596+00:00", "key": "century21|888677", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257666+00:00", "key": "century21|893495", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257734+00:00", "key": "century21|888678", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257805+00:00", "key": "century21|940116", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257885+00:00", "key": "century21|1065393", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.257957+00:00", "key": "century21|688998", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258027+00:00", "key": "century21|629260", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258096+00:00", "key": "century21|669349", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258185+00:00", "key": "century21|669350", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258261+00:00", "key": "century21|668974", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258330+00:00", "key": "century21|669346", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258399+00:00", "key": "century21|669347", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.258459+00:00", "key": "citymax|159728", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258519+00:00", "key": "citymax|159268", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258576+00:00", "key": "citymax|157424", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258644+00:00", "key": "citymax|156748", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258697+00:00", "key": "citymax|156276", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258763+00:00", "key": "citymax|155293", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258816+00:00", "key": "citymax|154462", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258869+00:00", "key": "citymax|153786", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258922+00:00", "key": "citymax|153782", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.258975+00:00", "key": "citymax|153723", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259028+00:00", "key": "citymax|153690", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259081+00:00", "key": "citymax|153153", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259140+00:00", "key": "citymax|153112", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259222+00:00", "key": "citymax|153020", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259276+00:00", "key": "citymax|152909", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259330+00:00", "key": "citymax|152836", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259393+00:00", "key": "citymax|152807", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259446+00:00", "key": "citymax|152766", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259510+00:00", "key": "citymax|150964", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259563+00:00", "key": "citymax|150873", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259616+00:00", "key": "citymax|150420", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259668+00:00", "key": "citymax|149144", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259720+00:00", "key": "citymax|148107", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259772+00:00", "key": "citymax|148105", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259825+00:00", "key": "citymax|146898", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259877+00:00", "key": "citymax|145401", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259930+00:00", "key": "citymax|145280", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.259983+00:00", "key": "citymax|145174", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.260036+00:00", "key": "citymax|141699", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.260088+00:00", "key": "citymax|140836", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.260141+00:00", "key": "citymax|135211", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.260244+00:00", "key": "encuentra24|32324408", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260317+00:00", "key": "encuentra24|31886564", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260390+00:00", "key": "encuentra24|32474181", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260459+00:00", "key": "encuentra24|31979477", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260530+00:00", "key": "encuentra24|32474127", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260599+00:00", "key": "encuentra24|32417847", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260669+00:00", "key": "encuentra24|32416675", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260738+00:00", "key": "encuentra24|29223430", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260810+00:00", "key": "encuentra24|30661994", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260878+00:00", "key": "encuentra24|28765642", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.260946+00:00", "key": "encuentra24|32250988", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261015+00:00", "key": "encuentra24|31315517", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261085+00:00", "key": "encuentra24|29319737", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261173+00:00", "key": "encuentra24|32123935", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261254+00:00", "key": "encuentra24|30454827", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261324+00:00", "key": "encuentra24|28843470", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261392+00:00", "key": "encuentra24|32416837", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261460+00:00", "key": "encuentra24|32217515", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261530+00:00", "key": "encuentra24|31305818", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261599+00:00", "key": "encuentra24|32417384", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261669+00:00", "key": "encuentra24|32014708", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261736+00:00", "key": "encuentra24|30595921", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261805+00:00", "key": "encuentra24|31052892", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261875+00:00", "key": "encuentra24|31514556", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.261944+00:00", "key": "encuentra24|30520708", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.262012+00:00", "key": "encuentra24|31794200", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.262081+00:00", "key": "encuentra24|30735451", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.262137+00:00", "key": "essurf|4769", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262217+00:00", "key": "essurf|2718", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262273+00:00", "key": "essurf|3616", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262327+00:00", "key": "essurf|3572", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262380+00:00", "key": "essurf|4097", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262434+00:00", "key": "essurf|4128", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262486+00:00", "key": "essurf|3764", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262539+00:00", "key": "essurf|3826", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262591+00:00", "key": "essurf|3461", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262643+00:00", "key": "essurf|3730", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262695+00:00", "key": "essurf|3720", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262748+00:00", "key": "essurf|4999", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262800+00:00", "key": "essurf|5318", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262851+00:00", "key": "essurf|5154", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262903+00:00", "key": "essurf|5247", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.262955+00:00", "key": "essurf|1795", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263007+00:00", "key": "essurf|2871", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263060+00:00", "key": "essurf|3766", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263112+00:00", "key": "essurf|3539", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263187+00:00", "key": "essurf|4069", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263244+00:00", "key": "essurf|3617", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263303+00:00", "key": "essurf|4280", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263357+00:00", "key": "essurf|4574", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263410+00:00", "key": "essurf|4584", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263463+00:00", "key": "essurf|4610", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263515+00:00", "key": "essurf|2667", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263567+00:00", "key": "essurf|4716", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263619+00:00", "key": "essurf|4390", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263671+00:00", "key": "essurf|3974", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263723+00:00", "key": "essurf|4444", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263791+00:00", "key": "essurf|4888", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.263847+00:00", "key": "essurf|4760", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263901+00:00", "key": "essurf|4348", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.263954+00:00", "key": "essurf|4987", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264006+00:00", "key": "essurf|5138", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264059+00:00", "key": "essurf|5179", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264140+00:00", "key": "essurf|5305", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264258+00:00", "key": "essurf|5366", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264357+00:00", "key": "essurf|5268", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264427+00:00", "key": "essurf|5385", "decision": "skipped", "reason": "already_has_latlong"}
+{"ts": "2026-06-02T08:10:49.264503+00:00", "key": "goodlife|lots-available-at-las-luces-community", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264577+00:00", "key": "goodlife|land-in-el-zonte-bitcoin-beach", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264650+00:00", "key": "goodlife|land-in-complejo-el-mirador-surf-city-1", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264723+00:00", "key": "goodlife|house-land-at-ilopango-lake", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264794+00:00", "key": "goodlife|second-row-land-in-el-zonte-bitcoin-beach", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264866+00:00", "key": "goodlife|beautiful-new-modern-house-in-costa-del-sol", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.264937+00:00", "key": "goodlife|vacant-lot-in-mizata-el-salvador", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265006+00:00", "key": "goodlife|vacant-lot-in-santa-ana", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265076+00:00", "key": "goodlife|two-oceanview-lands-in-shalpa", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265168+00:00", "key": "goodlife|beachfront-house-in-el-cocal", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265270+00:00", "key": "goodlife|beach-house-in-cabo-del-sol-costa-del-sol", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265346+00:00", "key": "goodlife|two-lots-in-comasagua", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265426+00:00", "key": "goodlife|vacant-land-in-apaneca", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265499+00:00", "key": "goodlife|vacant-land-in-canarias-surf-city-1", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265570+00:00", "key": "goodlife|two-oceanview-lots-in-el-zonte-hills", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265640+00:00", "key": "goodlife|4-bedroom-beach-house-in-costa-del-sol", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265712+00:00", "key": "goodlife|8-acres-of-oceanview-land-near-km59", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265784+00:00", "key": "goodlife|712-8-m2-of-land-in-xanadu-gated-community-175000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265856+00:00", "key": "goodlife|3-bedroom-house-in-atami-gated-community-450000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265927+00:00", "key": "goodlife|new-ocean-view-home-in-gated-community-cerromar-el-sunzal", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.265997+00:00", "key": "goodlife|5-bedroom-beach-house-in-costa-del-sol", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266066+00:00", "key": "goodlife|400-m2-of-ocean-view-land-in-surf-city-1-140000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266136+00:00", "key": "goodlife|1-04-acres-of-land-in-chiltiupan-240000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266235+00:00", "key": "goodlife|2201-97m2-lot-with-panoramic-view-in-chiltiupan-195000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266305+00:00", "key": "goodlife|hotel-opportunity-in-santa-tecla", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266376+00:00", "key": "goodlife|349-45-m2-of-land-in-canarias-gated-community-surf-city-1-115000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266457+00:00", "key": "goodlife|two-oceanview-lots-in-solymar", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266534+00:00", "key": "goodlife|available-land-in-mizata-la-libertad-1-34-acres-525000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266604+00:00", "key": "goodlife|land-in-taquillo-surf-city-1-3203-51-m2-120000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266675+00:00", "key": "goodlife|three-cliffside-lots-near-el-zonte-399-1-1m", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266747+00:00", "key": "goodlife|oceanview-lot-in-puerto-de-la-libertad-110000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266817+00:00", "key": "goodlife|new-ocean-view-house-in-solymar-el-sunzal-75500", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266888+00:00", "key": "goodlife|7-bedroom-mansion-in-costa-del-sol-950000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.266957+00:00", "key": "goodlife|3-bedroom-house-in-el-zonte-850000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267027+00:00", "key": "goodlife|oceanview-land-near-el-tunco-3-63-acres-980000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267096+00:00", "key": "goodlife|1-bed-ocean-view-condominium-at-zonset-el-zonte-345150", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267187+00:00", "key": "goodlife|2-bed-condominium-at-zonset-el-zonte-445694", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267265+00:00", "key": "goodlife|beautiful-oceanview-condominium-at-zonset-el-zonte-340000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267341+00:00", "key": "goodlife|newly-built-condo-with-partial-ocean-view-at-zonset-el-zonte-340000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267432+00:00", "key": "oceanside|15443", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267503+00:00", "key": "oceanside|15402", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267573+00:00", "key": "oceanside|13544", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267644+00:00", "key": "oceanside|13536", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267713+00:00", "key": "oceanside|13509", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267783+00:00", "key": "oceanside|13290", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267854+00:00", "key": "oceanside|12955", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267924+00:00", "key": "oceanside|12809", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.267995+00:00", "key": "oceanside|12706", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268065+00:00", "key": "oceanside|12639", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268133+00:00", "key": "oceanside|11079", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268229+00:00", "key": "oceanside|11041", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268301+00:00", "key": "oceanside|11000", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268370+00:00", "key": "oceanside|15463", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268442+00:00", "key": "oceanside|13638", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268511+00:00", "key": "oceanside|12657", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268579+00:00", "key": "oceanside|12566", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268649+00:00", "key": "oceanside|12482", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268718+00:00", "key": "oceanside|12451", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268796+00:00", "key": "oceanside|12288", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268865+00:00", "key": "oceanside|11468", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.268935+00:00", "key": "oceanside|10382", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269004+00:00", "key": "oceanside|9163", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269458+00:00", "key": "remax|001463138091", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269544+00:00", "key": "remax|003113372030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269615+00:00", "key": "remax|003093518030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269687+00:00", "key": "remax|003093475009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269757+00:00", "key": "remax|002284528002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269825+00:00", "key": "remax|002522430084", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269894+00:00", "key": "remax|00146162249", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.269965+00:00", "key": "remax|003063705009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270034+00:00", "key": "remax|001462845091", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270109+00:00", "key": "remax|002282623033", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270207+00:00", "key": "remax|002684004014", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270281+00:00", "key": "remax|003284449003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270351+00:00", "key": "remax|003284449002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270421+00:00", "key": "remax|002283543021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270491+00:00", "key": "remax|003093245048", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270558+00:00", "key": "remax|002522781116", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270628+00:00", "key": "remax|2523089030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270697+00:00", "key": "remax|001464215009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270765+00:00", "key": "remax|001464215008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270832+00:00", "key": "remax|001464215007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270903+00:00", "key": "remax|001464215006", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.270978+00:00", "key": "remax|003093850009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271046+00:00", "key": "remax|001462660073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271115+00:00", "key": "remax|002523950003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271212+00:00", "key": "remax|002523950002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271286+00:00", "key": "remax|002522781115", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271357+00:00", "key": "remax|002522781114", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271425+00:00", "key": "remax|002522781113", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271495+00:00", "key": "remax|001463160062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271564+00:00", "key": "remax|001463160061", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271631+00:00", "key": "remax|001463160060", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271699+00:00", "key": "remax|001463160059", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271765+00:00", "key": "remax|001463160058", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271833+00:00", "key": "remax|002523229005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271902+00:00", "key": "remax|002284078031", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.271969+00:00", "key": "remax|001463159128", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272038+00:00", "key": "remax|003094333002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272107+00:00", "key": "remax|002523392029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272202+00:00", "key": "remax|002523392028", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272277+00:00", "key": "remax|001461172173", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272347+00:00", "key": "remax|002472976044", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272416+00:00", "key": "remax|001461172172", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272485+00:00", "key": "remax|002874265002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272560+00:00", "key": "remax|002682423227", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272631+00:00", "key": "remax|001461165132", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272699+00:00", "key": "remax|001464057016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272768+00:00", "key": "remax|001464217036", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272836+00:00", "key": "remax|001464217035", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272906+00:00", "key": "remax|001464217034", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.272975+00:00", "key": "remax|001464217033", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273042+00:00", "key": "remax|001464217032", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273111+00:00", "key": "remax|001464217031", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273232+00:00", "key": "remax|001464217030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273312+00:00", "key": "remax|001464217029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273383+00:00", "key": "remax|001464217028", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273454+00:00", "key": "remax|001464217027", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273522+00:00", "key": "remax|001464217026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273590+00:00", "key": "remax|001464217025", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273660+00:00", "key": "remax|001464217024", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273727+00:00", "key": "remax|001464217023", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273795+00:00", "key": "remax|001464217022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273863+00:00", "key": "remax|002282685115", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.273933+00:00", "key": "remax|003093245045", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274002+00:00", "key": "remax|002522430078", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274071+00:00", "key": "remax|002874022010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274140+00:00", "key": "remax|002682423225", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274246+00:00", "key": "remax|001463594047", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274328+00:00", "key": "remax|003063760008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274396+00:00", "key": "remax|003284290010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274465+00:00", "key": "remax|001462660068", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274533+00:00", "key": "remax|001461172171", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274601+00:00", "key": "remax|002283140048", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274669+00:00", "key": "remax|002472129090", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274738+00:00", "key": "remax|002472129089", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274808+00:00", "key": "remax|002472129088", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274877+00:00", "key": "remax|002472129087", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.274952+00:00", "key": "remax|002472129086", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275023+00:00", "key": "remax|002874232011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275091+00:00", "key": "remax|001463594046", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275179+00:00", "key": "remax|002284071017", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275255+00:00", "key": "remax|002684494001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275324+00:00", "key": "remax|002873917008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275390+00:00", "key": "remax|002873917007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275458+00:00", "key": "remax|003093518028", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275526+00:00", "key": "remax|003093518027", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275594+00:00", "key": "remax|003093518026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275662+00:00", "key": "remax|003093518025", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275731+00:00", "key": "remax|001461165130", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275802+00:00", "key": "remax|002473227035", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275899+00:00", "key": "remax|001461165129", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.275969+00:00", "key": "remax|002684464002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276038+00:00", "key": "remax|001464215005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276122+00:00", "key": "remax|001461440067", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276222+00:00", "key": "remax|001461962087", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276296+00:00", "key": "remax|002522473064", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276365+00:00", "key": "remax|001463699017", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276434+00:00", "key": "remax|002524180001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276507+00:00", "key": "remax|001462656029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276577+00:00", "key": "remax|001463696022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276645+00:00", "key": "remax|001463696021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276714+00:00", "key": "remax|001463696020", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276783+00:00", "key": "remax|001462660065", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276852+00:00", "key": "remax|001464215003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276920+00:00", "key": "remax|003094257014", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.276988+00:00", "key": "remax|002284078027", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277056+00:00", "key": "remax|001463159122", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277124+00:00", "key": "remax|003094257013", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277251+00:00", "key": "remax|003094257012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277329+00:00", "key": "remax|003094257011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277405+00:00", "key": "remax|003094257010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277477+00:00", "key": "remax|002472129085", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277549+00:00", "key": "remax|002472129079", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277620+00:00", "key": "remax|002472129078", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277692+00:00", "key": "remax|003093331038", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277759+00:00", "key": "remax|2282685112", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277828+00:00", "key": "remax|003093331037", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277897+00:00", "key": "remax|003114271001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.277968+00:00", "key": "remax|003094034002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278038+00:00", "key": "remax|002282621042", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278105+00:00", "key": "remax|003093456021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278197+00:00", "key": "remax|003294293003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278273+00:00", "key": "remax|002522473062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278342+00:00", "key": "remax|002472129076", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278411+00:00", "key": "remax|002472129073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278480+00:00", "key": "remax|003063958002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278550+00:00", "key": "remax|00146927221", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278619+00:00", "key": "remax|00146927220", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278689+00:00", "key": "remax|00146927219", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278756+00:00", "key": "remax|00146927218", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278824+00:00", "key": "remax|003064259005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278892+00:00", "key": "remax|002282685111", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.278961+00:00", "key": "remax|002282621040", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279029+00:00", "key": "remax|003114311002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279098+00:00", "key": "remax|001463696019", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279192+00:00", "key": "remax|001461172166", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279269+00:00", "key": "remax|001461172165", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279340+00:00", "key": "remax|002683373065", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279407+00:00", "key": "remax|001463696017", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279478+00:00", "key": "remax|00146927215", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279547+00:00", "key": "remax|002282623028", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279616+00:00", "key": "remax|003093245041", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279683+00:00", "key": "remax|003093245040", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279752+00:00", "key": "remax|002522430074", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279825+00:00", "key": "remax|002522430073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279898+00:00", "key": "remax|002522430072", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.279967+00:00", "key": "remax|002522430071", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280034+00:00", "key": "remax|002522430070", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280102+00:00", "key": "remax|002522430069", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280192+00:00", "key": "remax|002522430068", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280266+00:00", "key": "remax|003093245039", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280335+00:00", "key": "remax|002522430067", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280403+00:00", "key": "remax|002522430066", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280471+00:00", "key": "remax|002522430065", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280540+00:00", "key": "remax|002522430064", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280608+00:00", "key": "remax|002522430063", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280676+00:00", "key": "remax|002522430062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280761+00:00", "key": "remax|002522430061", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280855+00:00", "key": "remax|002874232010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280926+00:00", "key": "remax|002874232009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.280994+00:00", "key": "remax|002874232008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281063+00:00", "key": "remax|002874232007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281130+00:00", "key": "remax|002874232006", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281224+00:00", "key": "remax|002874232005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281296+00:00", "key": "remax|002874232004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281365+00:00", "key": "remax|002682806035", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281432+00:00", "key": "remax|002874232003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281500+00:00", "key": "remax|002683373060", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281569+00:00", "key": "remax|001463696016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281637+00:00", "key": "remax|003093820003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281704+00:00", "key": "remax|002473870012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281773+00:00", "key": "remax|002683373059", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281859+00:00", "key": "remax|002684004008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.281962+00:00", "key": "remax|002284071012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282034+00:00", "key": "remax|001461440065", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282103+00:00", "key": "remax|001461694378", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282195+00:00", "key": "remax|001461694377", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282283+00:00", "key": "remax|003093331030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282355+00:00", "key": "remax|002472155041", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282425+00:00", "key": "remax|002283543017", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282494+00:00", "key": "remax|002473535015", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282563+00:00", "key": "remax|002284078023", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282634+00:00", "key": "remax|001461165123", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282702+00:00", "key": "remax|001461694375", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282770+00:00", "key": "remax|003094257005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282839+00:00", "key": "remax|003094257004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282906+00:00", "key": "remax|00146927214", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.282974+00:00", "key": "remax|003113915005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283041+00:00", "key": "remax|003094257003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283110+00:00", "key": "remax|003094257002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283199+00:00", "key": "remax|002472129063", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283281+00:00", "key": "remax|002472129062", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283351+00:00", "key": "remax|002472129061", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283421+00:00", "key": "remax|002472129060", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283490+00:00", "key": "remax|002472129058", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283560+00:00", "key": "remax|003094257001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283631+00:00", "key": "remax|002683373054", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283701+00:00", "key": "remax|002284071009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283768+00:00", "key": "remax|00146927209", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283837+00:00", "key": "remax|001461165120", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283906+00:00", "key": "remax|003093761027", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.283974+00:00", "key": "remax|003093761026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284042+00:00", "key": "remax|003093761025", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284111+00:00", "key": "remax|003093761024", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284200+00:00", "key": "remax|003093761023", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284271+00:00", "key": "remax|003093761022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284340+00:00", "key": "remax|003093761021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284409+00:00", "key": "remax|003093761020", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284479+00:00", "key": "remax|003093761019", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284548+00:00", "key": "remax|003093761018", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284622+00:00", "key": "remax|003093761017", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284694+00:00", "key": "remax|003093761016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284761+00:00", "key": "remax|003093761015", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284828+00:00", "key": "remax|003093761014", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284896+00:00", "key": "remax|003093761012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.284965+00:00", "key": "remax|003093761011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285035+00:00", "key": "remax|003093761010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285103+00:00", "key": "remax|002284078018", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285193+00:00", "key": "remax|002682423202", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285270+00:00", "key": "remax|002682806030", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285339+00:00", "key": "remax|002684004004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285409+00:00", "key": "remax|001461165119", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285480+00:00", "key": "remax|002284078016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285550+00:00", "key": "remax|002284078015", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285618+00:00", "key": "remax|002284175001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285687+00:00", "key": "remax|002282685104", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285755+00:00", "key": "remax|002282685103", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285823+00:00", "key": "remax|002682423197", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285893+00:00", "key": "remax|003093966002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.285963+00:00", "key": "remax|003093706013", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286032+00:00", "key": "remax|002284078010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286102+00:00", "key": "remax|002523429011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286193+00:00", "key": "remax|003063506012", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286269+00:00", "key": "remax|001463695016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286339+00:00", "key": "remax|003093969003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286408+00:00", "key": "remax|002682423184", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286479+00:00", "key": "remax|002522781100", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286556+00:00", "key": "remax|002522781099", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286626+00:00", "key": "remax|002522781098", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286695+00:00", "key": "remax|002522781097", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286764+00:00", "key": "remax|002524082005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286832+00:00", "key": "remax|002873194024", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286901+00:00", "key": "remax|002522781094", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.286971+00:00", "key": "remax|002873194023", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287045+00:00", "key": "remax|002873194022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287116+00:00", "key": "remax|002523429010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287209+00:00", "key": "remax|002522696019", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287283+00:00", "key": "remax|002682423180", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287353+00:00", "key": "remax|002472155037", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287424+00:00", "key": "remax|002472155036", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287494+00:00", "key": "remax|002472155035", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287564+00:00", "key": "remax|003093974003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287633+00:00", "key": "remax|003093974002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287702+00:00", "key": "remax|002522473053", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287772+00:00", "key": "remax|002284078003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287839+00:00", "key": "remax|002522781087", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287907+00:00", "key": "remax|002522781085", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.287986+00:00", "key": "remax|002282685092", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288054+00:00", "key": "remax|002474020010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288123+00:00", "key": "remax|002474020009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288218+00:00", "key": "remax|002872910010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288290+00:00", "key": "remax|002682423175", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288360+00:00", "key": "remax|002523864001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288429+00:00", "key": "remax|002474020005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288498+00:00", "key": "remax|003093761004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288568+00:00", "key": "remax|002474020003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288638+00:00", "key": "remax|002282621034", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288707+00:00", "key": "remax|002873194020", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288777+00:00", "key": "remax|002282685082", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288847+00:00", "key": "remax|002522817008", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288917+00:00", "key": "remax|003093597004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.288987+00:00", "key": "remax|002282685079", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289057+00:00", "key": "remax|002682423164", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289127+00:00", "key": "remax|002472041026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289221+00:00", "key": "remax|002522781082", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289293+00:00", "key": "remax|002522781081", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289363+00:00", "key": "remax|002522781079", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289437+00:00", "key": "remax|002522781078", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289508+00:00", "key": "remax|002522781077", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289576+00:00", "key": "remax|002522781076", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289645+00:00", "key": "remax|002522781074", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289714+00:00", "key": "remax|002522781073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289804+00:00", "key": "remax|002522781072", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289872+00:00", "key": "remax|003093357011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.289942+00:00", "key": "remax|00146166093", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290012+00:00", "key": "remax|002873194019", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290082+00:00", "key": "remax|002472155033", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290169+00:00", "key": "remax|002682423163", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290246+00:00", "key": "remax|002282685071", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290316+00:00", "key": "remax|002523316006", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290385+00:00", "key": "remax|003133381007", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290465+00:00", "key": "remax|002873194016", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290536+00:00", "key": "remax|002473227021", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290607+00:00", "key": "remax|003133553005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290676+00:00", "key": "remax|003133331005", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290744+00:00", "key": "remax|002282685057", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290812+00:00", "key": "remax|003133553004", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290881+00:00", "key": "remax|002282685055", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.290951+00:00", "key": "remax|001463160024", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291021+00:00", "key": "remax|002682423126", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291091+00:00", "key": "remax|002682423122", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291180+00:00", "key": "remax|003113372003", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291256+00:00", "key": "remax|002472041022", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291326+00:00", "key": "remax|2682769010", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291396+00:00", "key": "remax|002473227002", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291466+00:00", "key": "remax|002473227001", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291535+00:00", "key": "remax|002284078029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291604+00:00", "key": "remax|001461962090", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291674+00:00", "key": "remax|002522430077", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291742+00:00", "key": "remax|003093761029", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291826+00:00", "key": "remax|001461172169", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291897+00:00", "key": "remax|002284078026", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.291966+00:00", "key": "remax|001461331186", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.292036+00:00", "key": "remax|002873194031", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.292104+00:00", "key": "remax|002521693073", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.292194+00:00", "key": "remax|003093761028", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.292269+00:00", "key": "remax|002474020011", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:49.292338+00:00", "key": "remax|003133456009", "decision": "cache_hit", "model": "deepseek-chat"}
+{"ts": "2026-06-02T08:10:53.024685+00:00", "key": "nexo|P-VE-TER-15-000-2C8A2633", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2374, "tokens_out": 426, "cost_usd": 0.00110958, "latency_ms": 3730, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:53.308453+00:00", "key": "nexo|C-VE-TER-15-082-08B21201", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2411, "tokens_out": 498, "cost_usd": 0.00119877, "latency_ms": 4014, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:53.537735+00:00", "key": "elagente|rancho-de-playa-frente-al-estero-jaltepeque", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2314, "tokens_out": 456, "cost_usd": 0.00112638, "latency_ms": 4244, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:54.011733+00:00", "key": "nexo|C-VE-TER-15-000-57812510", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2405, "tokens_out": 564, "cost_usd": 0.00126975, "latency_ms": 4718, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:54.470671+00:00", "key": "nexo|P-VE-TER-17-108-EA6B80D7", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2376, "tokens_out": 511, "cost_usd": 0.00120362, "latency_ms": 5176, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:54.659450+00:00", "key": "elagente|complejo-bahia-dorada-la-libertad", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2355, "tokens_out": 595, "cost_usd": 0.00129035, "latency_ms": 5366, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:55.085298+00:00", "key": "bienesraices|1417", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2680, "tokens_out": 736, "cost_usd": 0.0015332, "latency_ms": 5792, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:10:55.289216+00:00", "key": "bienesraices|2217", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2660, "tokens_out": 676, "cost_usd": 0.0014618, "latency_ms": 5997, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:10:56.937309+00:00", "key": "nexo|P-VE-TER-17-223-64F47815", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2374, "tokens_out": 519, "cost_usd": 0.00121188, "latency_ms": 3912, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:57.825783+00:00", "key": "realtyelsalvador|14460", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2391, "tokens_out": 577, "cost_usd": 0.00128027, "latency_ms": 4517, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:57.902137+00:00", "key": "realtyelsalvador|14405", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2380, "tokens_out": 461, "cost_usd": 0.0011497, "latency_ms": 3431, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:58.153023+00:00", "key": "realtyelsalvador|14439", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2393, "tokens_out": 590, "cost_usd": 0.00129511, "latency_ms": 4615, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:58.393738+00:00", "key": "realtyelsalvador|14421", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2370, "tokens_out": 498, "cost_usd": 0.0011877, "latency_ms": 4382, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:58.702508+00:00", "key": "realtyelsalvador|14388", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2376, "tokens_out": 525, "cost_usd": 0.00121902, "latency_ms": 4043, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:58.827822+00:00", "key": "realtyelsalvador|14373", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2374, "tokens_out": 454, "cost_usd": 0.00114038, "latency_ms": 3742, "decision": "enriched"}
+{"ts": "2026-06-02T08:10:59.992106+00:00", "key": "realtyelsalvador|14207", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2384, "tokens_out": 611, "cost_usd": 0.00131578, "latency_ms": 4703, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:00.867346+00:00", "key": "realtyelsalvador|14194", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2398, "tokens_out": 537, "cost_usd": 0.00123816, "latency_ms": 3930, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:01.835855+00:00", "key": "realtyelsalvador|14113", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2388, "tokens_out": 538, "cost_usd": 0.00123656, "latency_ms": 3933, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:01.927830+00:00", "key": "realtyelsalvador|13852", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 473, "cost_usd": 0.00116479, "latency_ms": 3774, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:01.980293+00:00", "key": "realtyelsalvador|14153", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2374, "tokens_out": 494, "cost_usd": 0.00118438, "latency_ms": 4154, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:02.297365+00:00", "key": "realtyelsalvador|13741", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2390, "tokens_out": 518, "cost_usd": 0.0012151, "latency_ms": 3903, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:02.764238+00:00", "key": "realtyelsalvador|13717", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2401, "tokens_out": 548, "cost_usd": 0.00125107, "latency_ms": 4061, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:03.279232+00:00", "key": "realtyelsalvador|13559", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2381, "tokens_out": 528, "cost_usd": 0.00122367, "latency_ms": 4451, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:04.072006+00:00", "key": "realtyelsalvador|13512", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2392, "tokens_out": 533, "cost_usd": 0.00123214, "latency_ms": 4079, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:05.773740+00:00", "key": "realtyelsalvador|13456", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2389, "tokens_out": 522, "cost_usd": 0.00121923, "latency_ms": 3845, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:05.841538+00:00", "key": "realtyelsalvador|13437", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2397, "tokens_out": 521, "cost_usd": 0.00122029, "latency_ms": 3861, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:05.924704+00:00", "key": "realtyelsalvador|13498", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2398, "tokens_out": 613, "cost_usd": 0.00132176, "latency_ms": 5057, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:06.678072+00:00", "key": "realtyelsalvador|13470", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2401, "tokens_out": 585, "cost_usd": 0.00129177, "latency_ms": 4842, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:06.869354+00:00", "key": "realtyelsalvador|13392", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2399, "tokens_out": 466, "cost_usd": 0.00116033, "latency_ms": 3590, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:06.986662+00:00", "key": "realtyelsalvador|13426", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2396, "tokens_out": 605, "cost_usd": 0.00131242, "latency_ms": 4689, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:07.791212+00:00", "key": "realtyelsalvador|13412", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2390, "tokens_out": 590, "cost_usd": 0.0012943, "latency_ms": 5027, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:08.469560+00:00", "key": "realtyelsalvador|13307", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2406, "tokens_out": 607, "cost_usd": 0.00131732, "latency_ms": 4397, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:09.854406+00:00", "key": "realtyelsalvador|10226", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 526, "cost_usd": 0.00122309, "latency_ms": 3929, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:09.926297+00:00", "key": "realtyelsalvador|13282", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2386, "tokens_out": 560, "cost_usd": 0.00126022, "latency_ms": 4152, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:11.136278+00:00", "key": "realtyelsalvador|13166", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2411, "tokens_out": 588, "cost_usd": 0.00129777, "latency_ms": 4458, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:11.238639+00:00", "key": "realtyelsalvador|12966", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2375, "tokens_out": 537, "cost_usd": 0.00123195, "latency_ms": 4252, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:11.809421+00:00", "key": "realtyelsalvador|13094", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2390, "tokens_out": 586, "cost_usd": 0.0012899, "latency_ms": 4940, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:11.985562+00:00", "key": "realtyelsalvador|11652", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2401, "tokens_out": 717, "cost_usd": 0.00143697, "latency_ms": 6144, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:12.057460+00:00", "key": "realtyelsalvador|12957", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2385, "tokens_out": 551, "cost_usd": 0.00125005, "latency_ms": 4266, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:13.252373+00:00", "key": "realtyelsalvador|12945", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2383, "tokens_out": 576, "cost_usd": 0.00127701, "latency_ms": 4782, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:14.243062+00:00", "key": "realtyelsalvador|12894", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 491, "cost_usd": 0.00118459, "latency_ms": 4316, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:14.453775+00:00", "key": "realtyelsalvador|12921", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2377, "tokens_out": 558, "cost_usd": 0.00125559, "latency_ms": 4599, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:15.627104+00:00", "key": "realtyelsalvador|12857", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2376, "tokens_out": 550, "cost_usd": 0.00124652, "latency_ms": 4490, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:15.752055+00:00", "key": "realtyelsalvador|12817", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 536, "cost_usd": 0.00123166, "latency_ms": 4513, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:15.844372+00:00", "key": "realtyelsalvador|12762", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2382, "tokens_out": 488, "cost_usd": 0.00117994, "latency_ms": 4034, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:16.211410+00:00", "key": "realtyelsalvador|12731", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2381, "tokens_out": 533, "cost_usd": 0.00122917, "latency_ms": 4225, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:16.457471+00:00", "key": "realtyelsalvador|12715", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2371, "tokens_out": 523, "cost_usd": 0.00121547, "latency_ms": 4400, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:17.337457+00:00", "key": "realtyelsalvador|12687", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2372, "tokens_out": 518, "cost_usd": 0.00121024, "latency_ms": 4085, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:17.867776+00:00", "key": "realtyelsalvador|12678", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 458, "cost_usd": 0.00114586, "latency_ms": 3624, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:18.564906+00:00", "key": "realtyelsalvador|12662", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2396, "tokens_out": 542, "cost_usd": 0.00124312, "latency_ms": 4111, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:19.736911+00:00", "key": "realtyelsalvador|12612", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2370, "tokens_out": 515, "cost_usd": 0.0012064, "latency_ms": 4109, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:20.298617+00:00", "key": "realtyelsalvador|12546", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2386, "tokens_out": 551, "cost_usd": 0.00125032, "latency_ms": 4546, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:20.592220+00:00", "key": "realtyelsalvador|12527", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2385, "tokens_out": 637, "cost_usd": 0.00134465, "latency_ms": 4747, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:20.673738+00:00", "key": "realtyelsalvador|12509", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2384, "tokens_out": 582, "cost_usd": 0.00128388, "latency_ms": 4462, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:20.693360+00:00", "key": "realtyelsalvador|12495", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2375, "tokens_out": 541, "cost_usd": 0.00123635, "latency_ms": 4235, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:21.912135+00:00", "key": "realtyelsalvador|12474", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2373, "tokens_out": 518, "cost_usd": 0.00121051, "latency_ms": 4044, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:22.197415+00:00", "key": "realtyelsalvador|12484", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2373, "tokens_out": 613, "cost_usd": 0.00131501, "latency_ms": 4860, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:22.770734+00:00", "key": "realtyelsalvador|12381", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2372, "tokens_out": 521, "cost_usd": 0.00121354, "latency_ms": 4205, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:24.071562+00:00", "key": "realtyelsalvador|12337", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2382, "tokens_out": 472, "cost_usd": 0.00116234, "latency_ms": 3772, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:24.189000+00:00", "key": "realtyelsalvador|12348", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2395, "tokens_out": 563, "cost_usd": 0.00126595, "latency_ms": 4452, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:24.726632+00:00", "key": "realtyelsalvador|12321", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2386, "tokens_out": 535, "cost_usd": 0.00123272, "latency_ms": 4134, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:24.861882+00:00", "key": "realtyelsalvador|12305", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2377, "tokens_out": 539, "cost_usd": 0.00123469, "latency_ms": 4188, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:25.848116+00:00", "key": "realtyelsalvador|12265", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2396, "tokens_out": 602, "cost_usd": 0.00130912, "latency_ms": 5154, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:26.599476+00:00", "key": "realtyelsalvador|12190", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2376, "tokens_out": 607, "cost_usd": 0.00130922, "latency_ms": 4687, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:26.807437+00:00", "key": "realtyelsalvador|12178", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2376, "tokens_out": 590, "cost_usd": 0.00129052, "latency_ms": 4610, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:26.893628+00:00", "key": "realtyelsalvador|12165", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2382, "tokens_out": 530, "cost_usd": 0.00122614, "latency_ms": 4122, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:28.110660+00:00", "key": "realtyelsalvador|12095", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2406, "tokens_out": 543, "cost_usd": 0.00124692, "latency_ms": 3921, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:28.338212+00:00", "key": "realtyelsalvador|12081", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2368, "tokens_out": 463, "cost_usd": 0.00114866, "latency_ms": 3611, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:28.659806+00:00", "key": "realtyelsalvador|12150", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2412, "tokens_out": 594, "cost_usd": 0.00130464, "latency_ms": 4588, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:29.229696+00:00", "key": "realtyelsalvador|12069", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2412, "tokens_out": 565, "cost_usd": 0.00127274, "latency_ms": 4367, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:30.014496+00:00", "key": "realtyelsalvador|12056", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2392, "tokens_out": 567, "cost_usd": 0.00126954, "latency_ms": 4166, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:31.146323+00:00", "key": "realtyelsalvador|11998", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2380, "tokens_out": 527, "cost_usd": 0.0012223, "latency_ms": 4252, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:31.503699+00:00", "key": "realtyelsalvador|12014", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 581, "cost_usd": 0.00128116, "latency_ms": 4696, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:31.696438+00:00", "key": "realtyelsalvador|12043", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2379, "tokens_out": 642, "cost_usd": 0.00134853, "latency_ms": 5096, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:32.275021+00:00", "key": "realtyelsalvador|11979", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2388, "tokens_out": 542, "cost_usd": 0.00124096, "latency_ms": 4164, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:32.348119+00:00", "key": "realtyelsalvador|11840", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2382, "tokens_out": 482, "cost_usd": 0.00117334, "latency_ms": 3688, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:33.236789+00:00", "key": "realtyelsalvador|11763", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2400, "tokens_out": 530, "cost_usd": 0.001231, "latency_ms": 4007, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:33.845836+00:00", "key": "realtyelsalvador|11871", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2389, "tokens_out": 678, "cost_usd": 0.00139083, "latency_ms": 5507, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:34.522892+00:00", "key": "realtyelsalvador|11713", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2384, "tokens_out": 564, "cost_usd": 0.00126408, "latency_ms": 4508, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:35.341220+00:00", "key": "realtyelsalvador|11704", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 526, "cost_usd": 0.00122066, "latency_ms": 4194, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:35.694715+00:00", "key": "realtyelsalvador|11684", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2382, "tokens_out": 527, "cost_usd": 0.00122284, "latency_ms": 4191, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:35.879541+00:00", "key": "realtyelsalvador|11659", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 572, "cost_usd": 0.00127126, "latency_ms": 4183, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:36.390997+00:00", "key": "realtyelsalvador|11540", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2388, "tokens_out": 545, "cost_usd": 0.00124426, "latency_ms": 4042, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:36.393310+00:00", "key": "realtyelsalvador|11578", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 521, "cost_usd": 0.00121759, "latency_ms": 4118, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:36.811869+00:00", "key": "realtyelsalvador|11527", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2378, "tokens_out": 485, "cost_usd": 0.00117556, "latency_ms": 3575, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:38.606336+00:00", "key": "realtyelsalvador|11492", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2384, "tokens_out": 554, "cost_usd": 0.00125308, "latency_ms": 4083, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:38.848217+00:00", "key": "realtyelsalvador|11513", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2391, "tokens_out": 623, "cost_usd": 0.00133087, "latency_ms": 5002, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:39.208800+00:00", "key": "realtyelsalvador|11475", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2373, "tokens_out": 459, "cost_usd": 0.00114561, "latency_ms": 3867, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:39.247988+00:00", "key": "realtyelsalvador|11459", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2371, "tokens_out": 463, "cost_usd": 0.00114947, "latency_ms": 3553, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:40.030261+00:00", "key": "realtyelsalvador|11325", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2367, "tokens_out": 472, "cost_usd": 0.00115829, "latency_ms": 3637, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:40.155008+00:00", "key": "realtyelsalvador|11348", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2364, "tokens_out": 447, "cost_usd": 0.00112998, "latency_ms": 3764, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:40.608849+00:00", "key": "realtyelsalvador|11426", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2394, "tokens_out": 633, "cost_usd": 0.00134268, "latency_ms": 4729, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:40.862828+00:00", "key": "realtyelsalvador|11316", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2381, "tokens_out": 540, "cost_usd": 0.00123687, "latency_ms": 4050, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:42.644560+00:00", "key": "realtyelsalvador|11298", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2394, "tokens_out": 522, "cost_usd": 0.00122058, "latency_ms": 4038, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:43.015343+00:00", "key": "realtyelsalvador|11283", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2373, "tokens_out": 500, "cost_usd": 0.00119071, "latency_ms": 4167, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:43.700621+00:00", "key": "realtyelsalvador|11209", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2370, "tokens_out": 541, "cost_usd": 0.001235, "latency_ms": 4452, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:44.200117+00:00", "key": "realtyelsalvador|11254", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2381, "tokens_out": 599, "cost_usd": 0.00130177, "latency_ms": 4991, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:44.276705+00:00", "key": "realtyelsalvador|11189", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 541, "cost_usd": 0.00123959, "latency_ms": 4246, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:44.593109+00:00", "key": "realtyelsalvador|11172", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2386, "tokens_out": 562, "cost_usd": 0.00126242, "latency_ms": 4438, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:44.750496+00:00", "key": "realtyelsalvador|10893", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2398, "tokens_out": 499, "cost_usd": 0.00119636, "latency_ms": 3887, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:45.315800+00:00", "key": "realtyelsalvador|11151", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2387, "tokens_out": 550, "cost_usd": 0.00124949, "latency_ms": 4706, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:45.790032+00:00", "key": "realtyelsalvador|10869", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2338, "tokens_out": 399, "cost_usd": 0.00107016, "latency_ms": 3145, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:46.583868+00:00", "key": "realtyelsalvador|10856", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2339, "tokens_out": 444, "cost_usd": 0.00111993, "latency_ms": 3568, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:47.902271+00:00", "key": "realtyelsalvador|10811", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2390, "tokens_out": 489, "cost_usd": 0.0011832, "latency_ms": 3702, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:48.213606+00:00", "key": "realtyelsalvador|10842", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2386, "tokens_out": 564, "cost_usd": 0.00126462, "latency_ms": 4513, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:48.409414+00:00", "key": "realtyelsalvador|10774", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2333, "tokens_out": 506, "cost_usd": 0.00118651, "latency_ms": 4132, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:49.316978+00:00", "key": "realtyelsalvador|10738", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2397, "tokens_out": 625, "cost_usd": 0.00133469, "latency_ms": 4723, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:49.843733+00:00", "key": "remax|002524485002", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2458, "tokens_out": 583, "cost_usd": 0.00130496, "latency_ms": 4053, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:50.062796+00:00", "key": "remax|002524497001", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2574, "tokens_out": 658, "cost_usd": 0.00141878, "latency_ms": 5312, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:50.302962+00:00", "key": "remax|003113372033", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2501, "tokens_out": 605, "cost_usd": 0.00134077, "latency_ms": 4987, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:50.942845+00:00", "key": "remax|001462656031", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2420, "tokens_out": 585, "cost_usd": 0.0012969, "latency_ms": 4358, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:53.124927+00:00", "key": "remax|001462660075", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2511, "tokens_out": 632, "cost_usd": 0.00137317, "latency_ms": 5222, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:53.554659+00:00", "key": "remax|003062346043", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2600, "tokens_out": 623, "cost_usd": 0.0013873, "latency_ms": 5145, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:53.676205+00:00", "key": "remax|002684399003", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2462, "tokens_out": 588, "cost_usd": 0.00131154, "latency_ms": 4359, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:54.207803+00:00", "key": "remax|001464216007", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2411, "tokens_out": 567, "cost_usd": 0.00127467, "latency_ms": 4145, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:54.366439+00:00", "key": "remax|002683373071", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2680, "tokens_out": 801, "cost_usd": 0.0016047, "latency_ms": 6152, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:54.597396+00:00", "key": "remax|001464216006", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2413, "tokens_out": 560, "cost_usd": 0.00126751, "latency_ms": 4294, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:54.971231+00:00", "key": "remax|002473870017", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2753, "tokens_out": 628, "cost_usd": 0.00143411, "latency_ms": 5127, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:57.137342+00:00", "key": "remax|001461172174", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2547, "tokens_out": 760, "cost_usd": 0.00152369, "latency_ms": 6194, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:57.427691+00:00", "key": "remax|001463594050", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2381, "tokens_out": 507, "cost_usd": 0.00120057, "latency_ms": 3873, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:58.210206+00:00", "key": "remax|003093331045", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2570, "tokens_out": 677, "cost_usd": 0.0014386, "latency_ms": 5085, "decision": "enriched"}
+{"ts": "2026-06-02T08:11:58.703441+00:00", "key": "remax|002873194033", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 2804, "tokens_out": 612, "cost_usd": 0.00143028, "latency_ms": 5027, "decision": "enriched"}
+{"ts": "2026-06-02T08:35:50.142337+00:00", "key": "encuentra24|31812515", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1604, "tokens_out": 645, "cost_usd": 0.00114258, "latency_ms": 9079, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:50.343408+00:00", "key": "encuentra24|30458301", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1799, "tokens_out": 707, "cost_usd": 0.00126343, "latency_ms": 9279, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:50.378679+00:00", "key": "encuentra24|32384296", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1628, "tokens_out": 608, "cost_usd": 0.00110836, "latency_ms": 9314, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:50.678899+00:00", "key": "encuentra24|32423211", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1682, "tokens_out": 660, "cost_usd": 0.00118014, "latency_ms": 9615, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:50.749459+00:00", "key": "encuentra24|32212991", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1690, "tokens_out": 693, "cost_usd": 0.0012186, "latency_ms": 9684, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:51.192522+00:00", "key": "encuentra24|31981452", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1669, "tokens_out": 783, "cost_usd": 0.00131193, "latency_ms": 10128, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:51.731856+00:00", "key": "encuentra24|32428616", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1845, "tokens_out": 975, "cost_usd": 0.00157065, "latency_ms": 10669, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:51.742692+00:00", "key": "encuentra24|32411310", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1771, "tokens_out": 923, "cost_usd": 0.00149347, "latency_ms": 10679, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:54.932813+00:00", "key": "encuentra24|31701824", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1557, "tokens_out": 612, "cost_usd": 0.00109359, "latency_ms": 4790, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:55.259139+00:00", "key": "encuentra24|32201049", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1549, "tokens_out": 525, "cost_usd": 0.00099573, "latency_ms": 4066, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:55.974711+00:00", "key": "encuentra24|32310168", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1814, "tokens_out": 705, "cost_usd": 0.00126528, "latency_ms": 5295, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:56.153662+00:00", "key": "encuentra24|32414461", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1666, "tokens_out": 735, "cost_usd": 0.00125832, "latency_ms": 5404, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:56.383436+00:00", "key": "encuentra24|31910416", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1857, "tokens_out": 757, "cost_usd": 0.00133409, "latency_ms": 6004, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:56.520571+00:00", "key": "encuentra24|32401910", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1828, "tokens_out": 811, "cost_usd": 0.00138566, "latency_ms": 6177, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:56.837824+00:00", "key": "encuentra24|24665686", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1641, "tokens_out": 688, "cost_usd": 0.00119987, "latency_ms": 5106, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:35:58.090672+00:00", "key": "encuentra24|32334787", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1840, "tokens_out": 957, "cost_usd": 0.0015495, "latency_ms": 6348, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:36:00.266623+00:00", "key": "encuentra24|31701694", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1570, "tokens_out": 557, "cost_usd": 0.0010366, "latency_ms": 4292, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:36:00.600386+00:00", "key": "encuentra24|32348706", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1683, "tokens_out": 768, "cost_usd": 0.00129921, "latency_ms": 5341, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:36:01.412423+00:00", "key": "encuentra24|31931412", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1668, "tokens_out": 652, "cost_usd": 0.00116756, "latency_ms": 5258, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}
+{"ts": "2026-06-02T08:36:01.849965+00:00", "key": "encuentra24|25635420", "model": "deepseek-chat", "finish_reason": "stop", "tokens_in": 1794, "tokens_out": 875, "cost_usd": 0.00144688, "latency_ms": 6917, "decision": "failed", "reason": "schema_invalid:invalid:latlong"}

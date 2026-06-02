@@ -1,0 +1,72 @@
+{
+  "criteria": {
+    "elite": {
+      "min_rank": 75.0,
+      "min_photos": 8,
+      "min_quality": 80,
+      "max_days": 30
+    },
+    "soft": {
+      "min_rank": 65.0,
+      "min_photos": 5,
+      "max_days": 30
+    },
+    "proof_row": {
+      "min_rank_strict": 75.0,
+      "min_rank_relaxed": 50.0,
+      "max_days": 60,
+      "pick_count": 3
+    }
+  },
+  "picked_at": "2026-06-02T08:37:00.265264+00:00",
+  "expires_at": "2026-06-03T00:00:00+00:00",
+  "tier": "soft",
+  "listing_id": "encuentra24|32401910",
+  "rank_score": 69.3,
+  "hero_photo_quality_score": 80,
+  "fallback": true,
+  "pool": [
+    {
+      "listing_id": "encuentra24|32401910",
+      "rank_score": 69.3,
+      "hero_photo_quality_score": 80,
+      "photos_count": 14
+    },
+    {
+      "listing_id": "encuentra24|31812515",
+      "rank_score": 68.25,
+      "hero_photo_quality_score": 50,
+      "photos_count": 19
+    }
+  ],
+  "picks_for_proof_row": [
+    {
+      "listing_id": "encuentra24|32401910",
+      "rank_score": 69.3,
+      "master_category": "beach",
+      "subcategory": "condos",
+      "star_rating": 3.5,
+      "hero_eligible": false,
+      "card_eligible": true
+    },
+    {
+      "listing_id": "encuentra24|31812515",
+      "rank_score": 68.25,
+      "master_category": "beach",
+      "subcategory": "homes",
+      "star_rating": 3.5,
+      "hero_eligible": false,
+      "card_eligible": true
+    },
+    {
+      "listing_id": "encuentra24|32411310",
+      "rank_score": 56.15,
+      "master_category": null,
+      "subcategory": "homes",
+      "star_rating": 3.0,
+      "hero_eligible": false,
+      "card_eligible": true
+    }
+  ],
+  "proof_row_tier": "relaxed_eligibility"
+}
