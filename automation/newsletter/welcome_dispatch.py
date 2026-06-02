@@ -402,7 +402,7 @@ def dispatch_welcome(
     # intro, and the onboarding block (see render_welcome_back_html).
     if effective_variant == "welcome_back":
         html = pulpo_pro_welcome_back.render(issue)
-        subject = i18n.t("welcome_back.email.subject", recipient.locale)
+        subject = i18n.welcome_text("email.subject", recipient.locale, variant="welcome_back")
         newsletter_id = "pulpo-pro-welcome-back"
         flow = "newsletter_welcome_back"
         ev = "newsletter.welcome_back"

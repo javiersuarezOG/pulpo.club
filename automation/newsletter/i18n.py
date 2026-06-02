@@ -12,6 +12,7 @@ for that lives in tests/newsletter/test_render.py.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 from pulpo.countries import active as _active_country
@@ -185,74 +186,25 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "welcome.hero.eyebrow":        {"en": "Welcome to Pulpo Pro",                         "es": "Bienvenido a Pulpo Pro"},
     "welcome.hero.headline.named": {"en": "Welcome, {name}.",                              "es": "Bienvenido, {name}."},
     "welcome.hero.headline.unnamed": {"en": "Welcome aboard.",                             "es": "Bienvenido a bordo."},
-    "welcome.hero.lede":           {"en": "Pulpo covers the coast and the volcanic lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your first 10 are below; same shape every Sunday from here.",
-                                     "es": "Pulpo cubre la costa y los lagos volcánicos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo; mismo formato cada domingo."},
-    # "How Pulpo works" — 3 numbered editorial beats (same component as
-    # market context on the weekly digest). Each beat ends with a hard fact
-    # about what Pulpo does or what the reader can do, not a vague promise.
-    "welcome.how.eyebrow":         {"en": "How Pulpo works",                              "es": "Cómo funciona Pulpo"},
-    "welcome.how.headline":        {"en": "The short version.",                           "es": "La versión corta."},
-    "welcome.how.step1":           {"en": f"<strong style=\"color:#1A1916;\">We scan every supplier in {_country_en}.</strong> Local brokers, MLS feeds, classifieds, agency sites — checked by people on the ground who know the market. You don't have to open ten tabs.",
-                                     "es": f"<strong style=\"color:#1A1916;\">Revisamos a cada proveedor en {_country_es}.</strong> Corredores locales, MLS, clasificados, sitios de agencias — revisado por gente local que conoce el mercado. No tenés que abrir diez pestañas."},
-    "welcome.how.step2":           {"en": "<strong style=\"color:#1A1916;\">We rank them on value, location, and momentum.</strong> The Top 10 against your filter land in your inbox every Sunday.",
-                                     "es": "<strong style=\"color:#1A1916;\">Las clasificamos por valor, ubicación y momentum.</strong> Las Top 10 contra tu filtro te llegan cada domingo."},
-    "welcome.how.step3":           {"en": "<strong style=\"color:#1A1916;\">You filter and save.</strong> Tighten the filter in settings to match what you actually want. Hit ♥ on anything that catches your eye — we'll tell you when the price moves.",
-                                     "es": "<strong style=\"color:#1A1916;\">Vos filtrás y guardás.</strong> Ajustá el filtro en configuración para que calce con lo que querés. Hacé ♥ en lo que te llame la atención — te avisamos cuando el precio se mueva."},
-    # Cadence note — short editorial line beneath the how-it-works block.
-    # Two variants depending on whether the next weekly digest lands later
-    # today or on a future Sunday. The renderer picks one at render time
-    # based on `now()` vs the next Sunday 10:00 SV.
-    "welcome.cadence.same_day":    {"en": "Your first weekly digest lands today at 10 AM SV time. If you're reading this after 10 AM, it's already in your inbox.",
-                                     "es": "Tu primera edición semanal sale hoy a las 10 AM (hora SV). Si estás leyendo esto después de las 10 AM, ya está en tu bandeja."},
-    "welcome.cadence.future":      {"en": "Your first weekly digest lands {date} at 10 AM SV time. Same shape, refreshed picks, every Sunday.",
-                                     "es": "Tu primera edición semanal sale {date} a las 10 AM (hora SV). Mismo formato, selecciones renovadas, cada domingo."},
-    # Section intro above the picks block. Different copy from the weekly's
-    # `section.top3.title` so the reader feels a clear "your first batch" framing.
-    "welcome.section.picks.title": {"en": "Your first 10 picks.",                          "es": "Tus primeras 10 selecciones."},
-    "welcome.section.picks.body":  {"en": "Same ranking we'll send every Sunday. Top 3 are the highest-value matches this week; the next 7 fit different buyer profiles. Hit ♥ on anything that fits — we'll track price moves for you.",
-                                     "es": "El mismo ranking que mandaremos cada domingo. Las primeras 3 son los matches de mayor valor esta semana; las 7 siguientes calzan a perfiles de comprador distintos. Hacé ♥ en lo que te calce — vamos a seguir los cambios de precio por vos."},
-    # "Start here" — replaces the weekly's "Your Pulpo / Pick up where you
-    # left off" block. Three cards tuned for first-time onboarding instead
-    # of returning-user re-engagement.
-    "welcome.start.eyebrow":       {"en": "Start here",                                   "es": "Empezá acá"},
-    "welcome.start.title":         {"en": "Three things to set up.",                       "es": "Tres cosas para configurar."},
-    "welcome.start.filter.label":  {"en": "Step 1 · Tune what you see",                    "es": "Paso 1 · Ajustá lo que ves"},
-    "welcome.start.filter.cta":    {"en": "Set your filter",                              "es": "Configurá tu filtro"},
-    "welcome.start.browse.label":  {"en": "Step 2 · Explore the full inventory",          "es": "Paso 2 · Explorá todo el inventario"},
-    "welcome.start.browse.cta":    {"en": "Browse all listings",                          "es": "Verlas todas"},
-    "welcome.start.account.label": {"en": "Step 3 · Manage profile, cadence, billing",    "es": "Paso 3 · Perfil, cadencia, facturación"},
-    "welcome.start.account.cta":   {"en": "Open your account",                            "es": "Abrir tu cuenta"},
+    "welcome.hero.lede":           {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco — and that's all we cover. Ranked by value, refreshed weekly. Your first 10 are below; same shape every Sunday from here.",
+                                     "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco — y nada más. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo; mismo formato cada domingo."},
+    # NOTE: the welcome is the General master with ONLY the hero swapped
+    # (render_html variant="welcome"), so the body's editorial blocks come
+    # from the shared `section.*` / `spotlight.*` / `yp.*` keys — there are
+    # no welcome-only how-it-works / cadence / start-here / picks-intro
+    # strings anymore. Only welcome.email.subject + welcome.hero.* above are
+    # welcome-specific; the welcome-back derives from them via welcome_text.
 
     # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
-    # Fires when a previously-welcomed user resubscribes to Pro after a
-    # lapse. Re-acquisition framing, NOT onboarding: the reader already
-    # knows how Pulpo works, so the "How Pulpo works" tutorial + the
-    # 3-step "Start here" block are dropped in favor of a warm re-entry
-    # hero + a "Pick up where you left off" block. Cadence note + picks
-    # are reused verbatim from the first-time welcome. See
-    # `project_resubscribe_welcome_funnel` memory for the funnel rationale.
-    "welcome_back.email.subject":  {"en": "Welcome back to Pulpo Pro — your fresh 10",     "es": "Bienvenido de nuevo a Pulpo Pro — tus 10 frescas"},
-    # Hero
-    "welcome_back.hero.eyebrow":   {"en": "Welcome back to Pulpo Pro",                     "es": "Bienvenido de nuevo a Pulpo Pro"},
-    "welcome_back.hero.headline.named":   {"en": "Good to have you back, {name}.",         "es": "Qué bueno tenerte de vuelta, {name}."},
-    "welcome_back.hero.headline.unnamed": {"en": "Good to have you back.",                 "es": "Qué bueno tenerte de vuelta."},
-    "welcome_back.hero.lede":      {"en": "Your Pulpo Pro access is live again. We never stopped ranking the coast and the volcanic lakes — here are the ten best matches on the market right now, and your Sunday digest picks up right where it left off.",
-                                     "es": "Tu acceso a Pulpo Pro está activo otra vez. No dejamos de clasificar la costa y los lagos volcánicos — acá están los diez mejores matches en el mercado ahora mismo, y tu resumen de los domingos retoma justo donde lo dejaste."},
-    # Section intro above the picks block — "fresh" framing instead of
-    # "your first batch" so the returning reader feels the inventory moved.
-    "welcome_back.section.picks.title": {"en": "Your fresh 10.",                           "es": "Tus 10 frescas."},
-    "welcome_back.section.picks.body":  {"en": "Re-ranked this week — the Top 3 are the highest-value matches right now; the next 7 fit other buyer profiles. Anything you saved before is still in your account. Hit ♥ on new finds and we'll track price moves for you.",
-                                     "es": "Reclasificadas esta semana — las primeras 3 son los matches de mayor valor ahora mismo; las 7 siguientes calzan a otros perfiles. Lo que guardaste antes sigue en tu cuenta. Hacé ♥ en lo nuevo y seguimos los cambios de precio por vos."},
-    # "Pick up where you left off" — replaces the first-time "Start here"
-    # onboarding cards with re-engagement cards (saved first, the hook).
-    "welcome_back.resume.eyebrow": {"en": "Pick up where you left off",                    "es": "Retomá donde lo dejaste"},
-    "welcome_back.resume.title":   {"en": "Jump back in.",                                 "es": "Volvé a entrar."},
-    "welcome_back.resume.saved.label":   {"en": "Your saved listings",                     "es": "Tus propiedades guardadas"},
-    "welcome_back.resume.saved.cta":     {"en": "Open saved",                              "es": "Abrir guardadas"},
-    "welcome_back.resume.browse.label":  {"en": "The full inventory",                      "es": "Todo el inventario"},
-    "welcome_back.resume.browse.cta":    {"en": "Browse all listings",                     "es": "Verlas todas"},
-    "welcome_back.resume.account.label": {"en": "Filters, cadence, billing",               "es": "Filtros, cadencia, facturación"},
-    "welcome_back.resume.account.cta":   {"en": "Open your account",                       "es": "Abrir tu cuenta"},
+    # NO stored welcome_back.* copy. The welcome-back email is the SAME
+    # email as the first-time welcome (one shared template, toggled by
+    # `variant="welcome_back"`) AND its copy is DERIVED from the `welcome.*`
+    # strings at render time by `welcome_text()` below — never hand-kept in
+    # parallel. Editing any `welcome.*` string automatically flows to the
+    # welcome-back; the two are identical save the "welcome → welcome back"
+    # (and "first 10 → next 10") rewrite. They cannot drift because there
+    # is one source of copy, not two. See `welcome_text` + the parity test
+    # in tests/newsletter/components/test_welcome_back_render.py.
 }
 
 
@@ -267,6 +219,59 @@ def t(key: str, locale: Locale = DEFAULT_LOCALE, **fmt) -> str:
         except (KeyError, IndexError, ValueError):
             return text
     return text
+
+
+# ── Welcome → Welcome-back copy derivation ────────────────────────────────
+# The resubscribe "welcome-back" email is the first-time welcome with the
+# greeting reworded. Rather than store a parallel set of welcome_back.*
+# strings (which would silently drift the moment someone edits one side),
+# the welcome-back copy is DERIVED from the `welcome.*` strings at render
+# time: exactly two locale-aware rewrites turn a welcome string into its
+# welcome-back form. One source of copy → the two emails are guaranteed
+# identical save these rewrites.
+#
+# The rewrites are deliberately narrow so they touch ONLY the greeting +
+# the "first 10" framing and never mangle body copy:
+#   1. Leading greeting word → its "back" form (anchored at string start,
+#      so a mid-sentence "welcome"/"bienvenido" is never touched).
+#   2. The literal "first 10" / "primeras 10" count → "next 10" /
+#      "próximas 10".
+# `welcome_text` is applied ONLY to the hero strings + picks-intro title +
+# subject — the surgical set where "welcome"/"first 10" can appear. Shared
+# blocks (how-it-works, cadence, picks body, start-here, footer) render
+# through plain `t()`, untouched, so they're byte-identical in both emails.
+_WELCOMEBACK_REWRITES: dict[str, list] = {
+    "en": [
+        (re.compile(r"^Welcome\b"), "Welcome back"),
+        ("first 10", "next 10"),
+    ],
+    "es": [
+        (re.compile(r"^Bienvenido\b"), "Bienvenido de nuevo"),
+        ("primeras 10", "próximas 10"),
+    ],
+}
+
+
+def welcome_text(key_suffix: str, locale: Locale = DEFAULT_LOCALE, *,
+                 variant: str = "welcome", **fmt) -> str:
+    """Resolve a `welcome.<key_suffix>` string, applying the welcome-back
+    rewrite when `variant == "welcome_back"`.
+
+    This is the single entry point for welcome / welcome-back hero +
+    subject + picks-title copy. There is no separate welcome_back.* table —
+    the welcome-back string is a pure function of the welcome string, so
+    the two emails can never diverge beyond the documented rewrite."""
+    base = t(f"welcome.{key_suffix}", locale, **fmt)
+    if variant != "welcome_back":
+        return base
+    rules = _WELCOMEBACK_REWRITES.get(locale) or _WELCOMEBACK_REWRITES[DEFAULT_LOCALE]
+    out = base
+    for pattern, repl in rules:
+        if isinstance(pattern, str):
+            out = out.replace(pattern, repl)
+        else:
+            out = pattern.sub(repl, out, count=1)
+    return out
 
 
 def filter_summary(pref, locale: Locale = DEFAULT_LOCALE) -> str:

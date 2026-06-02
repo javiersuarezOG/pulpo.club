@@ -1,12 +1,18 @@
 // POST /api/admin/newsletter/trigger-welcome-test
 //
-// Body: { email, by?, force?: boolean }
+// Body: { email, by?, force?: boolean, variant?: "welcome"|"welcome_back" }
 //
 // Operator surface for the Pulpo Pro Welcome template. Dispatches the
 // `pulpo-pro-welcome` GitHub Actions workflow with send_mode=yes,
 // source=admin, and (by default) force=yes so the operator can
 // re-render the welcome to themselves without manually clearing the
 // recipient's Clerk publicMetadata.welcome_newsletter_sent_at.
+//
+// `variant` selects the sub-version to render: "welcome" (first-time,
+// default) or "welcome_back" (resubscribe re-acquisition). This lets an
+// operator preview the welcome-back email in their inbox WITHOUT going
+// through a Stripe resubscribe — force=yes renders it regardless of the
+// recipient's stamps.
 //
 // Mirrors the architecture of trigger-preview.js (the weekly's
 // per-cohort preview surface):
@@ -38,7 +44,7 @@ const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
 const DEFAULT_REF = "main";
 const WORKFLOW_FILE = "pulpo-pro-welcome.yml";
 
-async function emitTriggerEvent({ to, by, force, result, detail }) {
+async function emitTriggerEvent({ to, by, force, variant, result, detail }) {
   try {
     posthog.capture(
       posthog.emailDistinctId(by || to),
@@ -46,7 +52,8 @@ async function emitTriggerEvent({ to, by, force, result, detail }) {
       {
         to,
         by: by || null,
-        newsletter_id: "pro-welcome",
+        newsletter_id: variant === "welcome_back" ? "pro-welcome-back" : "pro-welcome",
+        variant: variant || "welcome",
         force,
         result,
         detail: detail || null,
@@ -108,6 +115,10 @@ module.exports = async (req, res) => {
   // Default to forcing the re-send for admin tests. Operator can pass
   // `force: false` to actually exercise the idempotency path.
   const force = body.force === false ? false : true;
+  // Welcome sub-version. "welcome_back" lets the operator preview the
+  // resubscribe email without a Stripe checkout. Anything unrecognized
+  // falls back to the first-time welcome.
+  const variant = body.variant === "welcome_back" ? "welcome_back" : "welcome";
 
   const token = process.env.GITHUB_DISPATCH_TOKEN || "";
   if (!token) {
@@ -144,6 +155,7 @@ module.exports = async (req, res) => {
           send_mode: "yes",
           source: "admin",
           force: force ? "yes" : "no",
+          variant,
         },
       }),
     });
@@ -153,7 +165,7 @@ module.exports = async (req, res) => {
       error: (err && err.message) || "(no message)",
     });
     await emitTriggerEvent({
-      to: email, by, force,
+      to: email, by, force, variant,
       result: "error",
       detail: `github_dispatch_failed: ${(err && err.message) || "(no message)"}`,
     });
@@ -169,7 +181,7 @@ module.exports = async (req, res) => {
       status: gh.status, ms: Date.now() - t0, reason: "github_non_204",
     });
     await emitTriggerEvent({
-      to: email, by, force,
+      to: email, by, force, variant,
       result: "error",
       detail: `github_status_${gh.status}: ${detail.slice(0, 200)}`,
     });
@@ -190,7 +202,7 @@ module.exports = async (req, res) => {
         baseline_run_id: baselineRunId,
       });
       await emitTriggerEvent({
-        to: email, by, force,
+        to: email, by, force, variant,
         result: "error",
         detail: "dispatch_accepted_but_no_run_created: GitHub returned 204 but no workflow run appeared within poll window",
       });
@@ -205,7 +217,7 @@ module.exports = async (req, res) => {
       run_id: newRun.id, verified: true, force,
     });
     await emitTriggerEvent({
-      to: email, by, force,
+      to: email, by, force, variant,
       result: "ok",
     });
     return res.status(202).json({
@@ -216,7 +228,9 @@ module.exports = async (req, res) => {
       runs_url: newRun.html_url || `https://github.com/${repo}/actions/workflows/${WORKFLOW_FILE}`,
       run_id: newRun.id,
       verified: true,
-      hint: "Welcome arrives in ~30–60s once the workflow finishes. Subject: 'Welcome to Pulpo Pro — your first 10'.",
+      hint: variant === "welcome_back"
+        ? "Welcome-back arrives in ~30–60s once the workflow finishes. Subject: 'Welcome back to Pulpo Pro — your next 10'."
+        : "Welcome arrives in ~30–60s once the workflow finishes. Subject: 'Welcome to Pulpo Pro — your first 10'.",
     });
   }
 
