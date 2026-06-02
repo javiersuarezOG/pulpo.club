@@ -496,20 +496,21 @@ test.describe("New app boots cleanly on key routes", () => {
       "Change in Security",                           // account.profile.email_change_link (read-only email row CTA)
       "fortnightly newsletter",                       // account.notif.cadence_note (Pro notifications intro)
       "Monday mornings",                              // account.notif.cadence_note (Pro notifications intro)
-      // Homepage v3 (dark hero redesign) — every CTA, label, or section
+      // Homepage HeroV5 + regional shelves — every label or section
       // heading visible to a cold ES visitor on /. Trips when hardcoded
       // EN strings sneak in instead of t() lookups.
-      "Try a free month",                             // hero primary + header CTA
-      "Your top deals",                               // hero_v4 subhead opener
-      "in your inbox",                                // hero_v4 subhead — newsletter channel signature
-      "every Sunday",                                 // hero_v4 subhead — weekly cadence anchor
-      "See this week's top 10",                       // hero secondary CTA
-      "Scanning",                                     // hero pre-label "SCANNING N SOURCES"
-      "Just in",                                      // hero Just In pill
-      "Live now",                                     // hero LIVE NOW counter
-      "Pick your shoreline", "Featured deal",         // section headings
-      "Built by locals", "For subscribers only",      // USP band
-      "Top 10 deals", "Price drops", "New this week", // shelf headings
+      "Sunday morning",                               // home.hero.v5.h1_a
+      "your top 10 properties",                       // home.hero.v5.h1_b
+      "in your inbox",                                // home.hero.v5.sub — newsletter channel signature
+      "every Sunday",                                 // home.hero.v5.sub — weekly cadence anchor
+      "Where to start",                               // home.hero.v5.section_title
+      "All listings", "The full catalogue",           // home.hero.v5.dest.all.*
+      "build your own",                               // top_beach_terrenos subtitle
+      "Walk-to-surf apartments",                      // top_beach_condos subtitle
+      "Move-in-ready",                                // top_beach_homes subtitle
+      "Lake-rim land",                                // top_lake_terrenos subtitle
+      "Turn-key lakeside",                            // top_lake_condos subtitle
+      "cooler than the coast",                        // top_lake_homes subtitle
       "View all",                                     // shelf "View all" links
       "Sign in",                                      // header "Sign in" link
       "How it works", "Pricing",                      // header nav

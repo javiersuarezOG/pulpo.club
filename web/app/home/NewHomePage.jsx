@@ -22,8 +22,11 @@
 // fires on scroll/exit-intent and is gated by `usp_popup_v1`.
 //
 // Wave-3a: HomepageHeader removed — SiteHeader (mounted at the app
-// level) is the single header for every route. The hero still owns the
-// "Try a free month" CTA so the home page's conversion path is intact.
+// level) is the single header for every route. Under hero_v5 the home
+// page is discovery-led: the 5 destination cards route to /browse with
+// a category pre-filter; Pro conversion happens downstream (paywall,
+// detail-panel upsell) or via URL-param-triggered ProUpsellModal. There
+// is no in-hero Pro CTA on home.
 //
 // Each section is wrapped in an ErrorBoundary so a render failure in
 // one shelf doesn't blank the whole page. The boundary's onError
@@ -54,6 +57,9 @@ import { tierFor } from "../lib/gating";
 import { track } from "../telemetry/hook";
 import { UspPopup } from "../components/UspPopup.jsx";
 import { decideArm, armPassiveTriggers } from "../lib/usp-popup-trigger";
+import versions from "./versions.json";
+
+const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
 
 /**
  * @param {object} props
@@ -119,6 +125,7 @@ export function NewHomePage({ app }) {
         user_state: tierFor(app.user),
         blocks_visible: [...blocks],
         flag_enabled: paidHomeFlag,
+        hero_v5_version: HERO_V5_VERSION,
       });
     } catch { /* never crash a render on telemetry */ }
     // Mount-only — don't re-fire on locale flips or block-list
