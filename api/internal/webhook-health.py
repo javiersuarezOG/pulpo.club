@@ -16,10 +16,12 @@ Two upstream calls per invocation:
      reports unverified DNS records / risky sender overrides.
 
 Auth: shared secret via `Authorization: Bearer ${PULPO_CRON_SECRET}`.
-Vercel cron triggers carry the project's `CRON_SECRET` in the
-`Authorization` header automatically when the route is registered in
-`vercel.json`'s `crons:` array; this function accepts either env name
-for forward-compat.
+The companion GH Actions workflow (`.github/workflows/pulpo-webhook-health.yml`)
+GETs this endpoint every 6h and surfaces a red workflow badge on
+`unavailable` / unreachable. A Vercel cron pointing at this route can
+also be wired manually via the Vercel dashboard (Pro plan); the
+`CRON_SECRET` env name is accepted as a forward-compat alias for the
+day that gets enabled.
 
 Response shape:
 

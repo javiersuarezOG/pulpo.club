@@ -30,12 +30,6 @@
       "excludeFiles": "web/photos*/**,web/data/**"
     }
   },
-  "crons": [
-    {
-      "path": "/api/internal/webhook-health",
-      "schedule": "0 */6 * * *"
-    }
-  ],
   "rewrites": [
     { "source": "/",                        "destination": "/web/dist/index.html" },
     { "source": "/legacy",                  "destination": "/web/legacy.html" },
