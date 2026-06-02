@@ -1863,9 +1863,51 @@ def _favorites_editorial_summary(favorites: list, locale: str) -> str:
         )
 
 
-def render_html(issue: Issue) -> str:
+def _general_hero_html(issue: Issue) -> str:
+    """The General weekly's commentary-driven hero — eyebrow + headline +
+    lede + filter chips, all from `issue.commentary`. The General's half
+    of the master template's one variant point (the welcome half is
+    `_welcome_hero_html`)."""
+    return f"""
+    <tr><td style="padding:28px 24px 20px;">
+      <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
+      <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
+      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{issue.commentary.lede_hero}</p>
+      {_filter_chips_html(issue.commentary.filter_chips)}
+    </td></tr>
+    """
+
+
+def render_html(issue: Issue, *, variant: str = "general") -> str:
+    """Master Pulpo Pro email template. `variant` controls ONLY the top
+    hero block (+ the <title> and the <meta> version stamp):
+
+      • "general"      — the weekly digest (default): commentary-driven
+        hero (eyebrow / headline / lede / filter chips).
+      • "welcome"      — first-time onboarding: static welcome hero.
+      • "welcome_back" — resubscribe: the welcome hero with the greeting
+        reworded (derived from welcome copy, see i18n.welcome_text).
+
+    EVERYTHING below the hero — favorites, market context, the 10 picks,
+    paywall (free only), weekly news spotlight, Your Pulpo, footer —
+    renders identically for all three. The welcome and welcome-back are
+    the General with only the hero swapped, so a change to any shared
+    block lands on all three automatically and they cannot drift. The
+    weekly-only blocks self-gate for a Pro welcome reader: paywall is
+    off (Pro), favorites no-ops when nothing's saved.
+    """
     locale = issue.locale
-    head_title = f"Pulpo — Issue {issue.issue_number:02d} · {issue.issue_date_human}"
+    is_welcome = variant in ("welcome", "welcome_back")
+    head_title = (
+        i18n.welcome_text("hero.eyebrow", locale, variant=variant)
+        if is_welcome
+        else f"Pulpo — Issue {issue.issue_number:02d} · {issue.issue_date_human}"
+    )
+    template_version = (
+        WELCOME_BACK_TEMPLATE_VERSION if variant == "welcome_back"
+        else WELCOME_TEMPLATE_VERSION if variant == "welcome"
+        else TEMPLATE_VERSION
+    )
     issue_strip = i18n.t(
         "header.issue", locale, n=f"{issue.issue_number:02d}", date=issue.issue_date_human.upper()
     )
@@ -1891,14 +1933,13 @@ def render_html(issue: Issue) -> str:
         _section_intro_top3_html(locale) if issue.picks_top else ""
     )
 
-    hero_block = f"""
-    <tr><td style="padding:28px 24px 20px;">
-      <div class="eyebrow">{_e(issue.commentary.eyebrow_hero)}</div>
-      <h1 class="h-hero">{_e(issue.commentary.headline_hero)}</h1>
-      <p class="lede" style="margin: 4px 0 14px; max-width: 540px;">{issue.commentary.lede_hero}</p>
-      {_filter_chips_html(issue.commentary.filter_chips)}
-    </td></tr>
-    """
+    # The ONLY block that varies by variant. General = commentary-driven
+    # hero; welcome / welcome_back = the static welcome hero (greeting
+    # reworded for welcome_back). Everything below is shared.
+    hero_block = (
+        _welcome_hero_html(issue, variant=variant) if is_welcome
+        else _general_hero_html(issue)
+    )
 
     # Brand mark: hosted PNG so every email client renders it. Inline
     # SVGs are stripped by Gmail iOS app, Outlook desktop, Yahoo, AOL —
@@ -1944,7 +1985,7 @@ def render_html(issue: Issue) -> str:
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="x-pulpo-template" content="{_e(TEMPLATE_VERSION)}" />
+<meta name="x-pulpo-template" content="{_e(template_version)}" />
 <title>{_e(head_title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1975,40 +2016,40 @@ def render_html(issue: Issue) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────
-# Pulpo Pro Welcome — one-shot onboarding email fired after first Stripe
-# payment.
+# Pulpo Pro Welcome / Welcome-back — fired after first Stripe payment
+# (welcome) or on resubscribe (welcome-back).
 #
-# Composition reuses the General template's chrome (header, picks card,
-# footer) and swaps the editorial top:
+# These are NOT separate templates. Each is the General weekly master
+# (`render_html`) with ONLY the hero swapped:
 #
-#   header_strip → welcome_hero → how_pulpo_works → cadence_note
-#               → welcome_picks_intro → picks 01-10
-#               → welcome_start_here → footer
+#   render_welcome_html(issue)      = render_html(issue, variant="welcome")
+#   render_welcome_back_html(issue) = render_html(issue, variant="welcome_back")
 #
-# DROPPED from General: favorites (nothing saved yet), market_context
-# (replaced by how_pulpo_works), paywall_banner (Pro reader),
-# news_spotlight (welcome is heavy enough), your_pulpo (replaced by
-# welcome_start_here onboarding cards).
-#
-# All shared visuals (CSS, brand chrome, pick cards, section intro
-# component, footer) come from the same private helpers the weekly
-# digest uses — so a future v4.5 bump to the pick card lands on both
-# templates automatically.
+# The full weekly body (favorites, market context, the 10 picks, weekly
+# news spotlight, Your Pulpo, footer) renders identically for all three —
+# all three are Pro emails, so the paywall block never shows. The hero is
+# the single variant point: `_welcome_hero_html` vs `_general_hero_html`.
+# The welcome-back hero copy DERIVES from the welcome copy via
+# i18n.welcome_text, so a change to any welcome.* string (or any shared
+# master block) lands on all the right emails automatically — they cannot
+# drift. `_welcome_hero_html` is the only welcome-specific render code left.
 # ─────────────────────────────────────────────────────────────────────────
 
 
 def _welcome_hero_html(issue: Issue, variant: str = "welcome") -> str:
     """Welcome hero — eyebrow + first-name H1 + 2-sentence lede.
 
-    `variant` selects the i18n key prefix: "welcome" (first-time) or
-    "welcome_back" (resubscribe). The hero is the ONLY block that differs
-    between the two emails — everything downstream (how-it-works, cadence,
-    picks, start-here, footer) is shared verbatim, so the two can't drift.
+    This is the master template's hero variant — the ONE block that
+    differs between General / Welcome / Welcome-back. `variant` is
+    "welcome" or "welcome_back"; the copy derives from the welcome.*
+    strings via i18n.welcome_text (welcome_back reword applied), so the
+    two welcome variants can't drift. Everything below the hero renders
+    from the shared master body.
 
-    Falls back to "Welcome aboard." / "Welcome back." when `display_name`
-    is empty (Clerk's first-name field is optional). First-name only —
-    strips any trailing surname so "Sebastian García" reads as
-    "Welcome, Sebastian." not "Welcome, Sebastian García."
+    Falls back to "Welcome aboard." / "Welcome back aboard." when
+    `display_name` is empty (Clerk's first-name field is optional).
+    First-name only — strips any trailing surname so "Sebastian García"
+    reads as "Welcome, Sebastian." not "Welcome, Sebastian García."
     """
     locale = issue.locale
     # Copy derives from welcome.* via welcome_text(); variant flips the
@@ -2030,300 +2071,23 @@ def _welcome_hero_html(issue: Issue, variant: str = "welcome") -> str:
     """
 
 
-def _how_pulpo_works_html(locale: Locale) -> str:
-    """3 numbered editorial beats explaining the Pulpo value chain.
+def render_welcome_html(issue: Issue, *, now=None) -> str:
+    """Render the Pulpo Pro Welcome email — the master template with only
+    the hero swapped (`render_html(variant="welcome")`).
 
-    Reuses the visual treatment of `_market_html` (big serif 01/02/03
-    numerals + forest green) so the reader sees the same chrome they'll
-    get on every weekly digest. The bold tags inside each step survive
-    the no-escape pass — they're hand-authored in i18n.STRINGS and have
-    no LLM provenance, so escaping is unnecessary and would hide the
-    intentional emphasis.
-    """
-    eb = i18n.t("welcome.how.eyebrow", locale)
-    hl = i18n.t("welcome.how.headline", locale)
-    steps = [
-        i18n.t("welcome.how.step1", locale),
-        i18n.t("welcome.how.step2", locale),
-        i18n.t("welcome.how.step3", locale),
-    ]
-
-    block_html_parts: list[str] = []
-    for idx, block in enumerate(steps, start=1):
-        is_last = idx == len(steps)
-        block_margin = "0" if is_last else "0 0 18px"
-        block_html_parts.append(
-            f'<table width="100%" role="presentation" cellpadding="0" cellspacing="0" style="margin:{block_margin};">'
-            f'<tr>'
-            f'<td width="44" valign="top" style="width:44px;padding:0 12px 0 0;vertical-align:top;">'
-            f'<div style="font-family:\'Instrument Serif\',Georgia,serif;font-size:32px;line-height:1;color:#1F3D31;font-weight:400;letter-spacing:-0.02em;">{idx:02d}</div>'
-            f'</td>'
-            f'<td valign="top" style="vertical-align:top;">'
-            f'<p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0;">{block}</p>'
-            f'</td>'
-            f'</tr></table>'
-        )
-    blocks_html = "".join(block_html_parts)
-
-    return f"""
-    <tr><td class="pad-h" style="padding:18px 24px 16px;">
-      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:600;margin-bottom:6px;">{_e(eb)}</div>
-      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 16px;color:#1A1916;">{_e(hl)}</h2>
-      {blocks_html}
-    </td></tr>
-    """
-
-
-def _format_cadence_date(d, locale: Locale) -> str:
-    """Format a date for the cadence note. EN: "Sunday, June 7" /
-    ES: "el domingo 7 de junio". Locale-aware so we don't ship English
-    month names into a Spanish email."""
-    months_en = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December",
-    ]
-    months_es = [
-        "enero", "febrero", "marzo", "abril", "mayo", "junio",
-        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-    ]
-    if locale == "es":
-        return f"el domingo {d.day} de {months_es[d.month - 1]}"
-    return f"Sunday, {months_en[d.month - 1]} {d.day}"
-
-
-def _cadence_note_html(issue: Issue, now=None) -> str:
-    """Editorial line setting the reader's expectation for the first
-    weekly digest. `now` is a `datetime` (UTC) — defaults to actual
-    wall-clock; tests pass an explicit value for reproducible output.
-
-    Two variants:
-      • Today IS Sunday before 10:00 SV → same-day variant ("lands today
-        at 10 AM SV"). Welcome and the week's digest will collide; the
-        reader is forewarned.
-      • Otherwise → future variant ("lands Sunday, June 7"). Computes
-        the next Sunday 10:00 SV after `now`.
-
-    SV is UTC-6, no DST — single offset, no zoneinfo dependency.
-    """
-    from datetime import datetime, timedelta, timezone
-    locale = issue.locale
-    sv_offset = timezone(timedelta(hours=-6))
-    if now is None:
-        now = datetime.now(timezone.utc)
-    if now.tzinfo is None:
-        now = now.replace(tzinfo=timezone.utc)
-    now_sv = now.astimezone(sv_offset)
-    weekday = now_sv.weekday()  # Mon=0 … Sun=6
-    days_until_sun = (6 - weekday) % 7
-
-    if days_until_sun == 0 and now_sv.hour < 10:
-        # Welcome lands on a Sunday morning — same-day collision with
-        # this week's digest. Tell the reader directly.
-        note = i18n.t("welcome.cadence.same_day", locale)
-    else:
-        if days_until_sun == 0:
-            # Sunday after 10am — next send is 7 days out.
-            days_until_sun = 7
-        next_sun = (now_sv + timedelta(days=days_until_sun)).replace(
-            hour=10, minute=0, second=0, microsecond=0
-        )
-        date_str = _format_cadence_date(next_sun, locale)
-        note = i18n.t("welcome.cadence.future", locale, date=date_str)
-
-    return f"""
-    <tr><td class="pad-h" style="padding:0 24px 22px;">
-      <p style="font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.55;color:#5A5650;margin:0;border-left:3px solid #1F3D31;padding-left:14px;">{_e(note)}</p>
-    </td></tr>
-    """
-
-
-def _welcome_picks_intro_html(locale: Locale, variant: str = "welcome") -> str:
-    """Section header above pick 01 in the welcome. Mirrors the
-    visual weight of `_section_intro_top3_html` so the reader's
-    second weekly already recognizes the chrome.
-
-    Only the title flips by `variant` ("Your first 10 picks." →
-    "Your next 10 picks." for the welcome-back sub-version, derived via
-    welcome_text); the body is shared verbatim."""
-    title = i18n.welcome_text("section.picks.title", locale, variant=variant)
-    body = i18n.t("welcome.section.picks.body", locale)
-    return f"""
-    <tr><td class="pad-h" style="padding:26px 24px 14px;">
-      <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
-      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1.04;letter-spacing:-0.015em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
-      <p style="font-family:'Instrument Serif',Georgia,serif;font-size:17px;line-height:1.45;color:#5A5650;margin:0;max-width:560px;">{_e(body)}</p>
-    </td></tr>
-    """
-
-
-def _welcome_start_here_html(issue: Issue) -> str:
-    """3 stacked cream onboarding cards. Replaces the General's
-    "Pick up where you left off" block (returning-user) with a
-    "Start here" block (first-time user). Always renders all 3 —
-    no conditional visibility, because every brand-new Pro user
-    benefits from each of these actions."""
-    locale = issue.locale
-    site = _site_root_from_issue(issue)
-    ref = "?ref=newsletter_pro_welcome"
-    eb = i18n.t("welcome.start.eyebrow", locale)
-    title = i18n.t("welcome.start.title", locale)
-
-    filter_url = f"{site}/account/newsletter{ref}"
-    browse_url = f"{site}/browse{ref}"
-    account_url = f"{site}/account{ref}"
-
-    def _card(href: str, eyebrow: str, action: str) -> str:
-        return (
-            f'<a href="{_e(href)}" style="display:block;background:#F8F4EC;'
-            f'border:1px solid rgba(0,0,0,0.08);border-radius:8px;'
-            f'padding:14px 16px;margin:0 0 10px;color:#1A1916;'
-            f'text-decoration:none;">'
-            f'<table width="100%" role="presentation"><tr>'
-            f'<td>'
-            f'<p style="margin:0 0 2px;font-size:11px;letter-spacing:0.10em;'
-            f'text-transform:uppercase;color:#888780;font-weight:600;">'
-            f'{_e(eyebrow)}</p>'
-            f'<p style="margin:0;font-size:16px;font-weight:600;'
-            f'color:#1A1916;">{_e(action)}</p>'
-            f'</td>'
-            f'<td align="right" style="font-size:18px;color:#1A1916;'
-            f'font-weight:600;">&rarr;</td>'
-            f'</tr></table></a>'
-        )
-
-    cards = [
-        _card(filter_url,
-              i18n.t("welcome.start.filter.label", locale),
-              i18n.t("welcome.start.filter.cta", locale)),
-        _card(browse_url,
-              i18n.t("welcome.start.browse.label", locale),
-              i18n.t("welcome.start.browse.cta", locale)),
-        _card(account_url,
-              i18n.t("welcome.start.account.label", locale),
-              i18n.t("welcome.start.account.cta", locale)),
-    ]
-
-    return f"""
-    <tr><td class="pad-h" style="padding:18px 24px 8px;">
-      <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#1F3D31;font-weight:700;margin-bottom:4px;">{_e(eb)}</div>
-      <h2 class="yp-title" style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 16px;color:#1A1916;">{_e(title)}</h2>
-      {"".join(cards)}
-    </td></tr>
-    """
-
-
-def render_welcome_html(issue: Issue, *, now=None, variant: str = "welcome") -> str:
-    """Render the Pulpo Pro Welcome email.
-
-    `now` is an optional datetime override for the cadence-note
-    computation — tests pin a known wall-clock so the same-day vs
-    future variant is deterministic.
-
-    `variant` selects the sub-version:
-      • "welcome"      — first-time onboarding (default).
-      • "welcome_back" — resubscribe re-acquisition. IDENTICAL email
-        end-to-end; the ONLY differences are the hero copy (eyebrow +
-        headline say "welcome back"), the picks-intro title
-        ("first 10" → "next 10"), and the <meta>/title version stamp.
-        Every other block (how-it-works, cadence, picks, start-here,
-        footer) renders from the exact same code, so the two emails
-        cannot structurally drift.
-
-    Composition order (mirrors General where chrome is shared):
-      header → welcome_hero → how_pulpo_works → cadence_note
-            → welcome_picks_intro → picks 01-10
-            → welcome_start_here → footer
-
-    Dropped vs General: favorites, market_context, paywall_banner,
-    news_spotlight, your_pulpo (replaced with welcome_start_here).
-    """
-    locale = issue.locale
-    is_back = variant == "welcome_back"
-    template_version = WELCOME_BACK_TEMPLATE_VERSION if is_back else WELCOME_TEMPLATE_VERSION
-    head_title = i18n.welcome_text("hero.eyebrow", locale, variant=variant)
-    issue_strip = i18n.t(
-        "header.issue", locale, n=f"{issue.issue_number:02d}", date=issue.issue_date_human.upper()
-    )
-
-    # Picks render through the SAME `_pick_card_html` the weekly uses.
-    # Top 3 = sage background ("Top deal · NN"); next 7 = white ("Pick · NN").
-    top_html = "".join(
-        _pick_card_html(p, locale=locale, is_top_deal=True, paywall_url=issue.paywall_target_url)
-        for p in issue.picks_top
-    )
-    rest_html = ""
-    section_intro_rest_html = ""
-    if issue.picks_shortlist:
-        rest_html = "".join(
-            _pick_card_html(p, locale=locale, is_top_deal=False, paywall_url=issue.paywall_target_url)
-            for p in issue.picks_shortlist
-        )
-        section_intro_rest_html = _section_intro_rest_html(locale, len(issue.picks_shortlist))
-
-    # Header strip — duplicated from `render_html` so the welcome
-    # template is fully self-contained. If the brand chrome ever
-    # refactors into a shared helper, both templates can swap to it.
-    header_strip = f"""
-    <tr><td style="padding:14px 24px;border-bottom: 1px solid var(--line);">
-      <table width="100%" role="presentation"><tr>
-        <td style="vertical-align: middle;">
-          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-            <td style="vertical-align: middle; padding-right: 10px; line-height: 0;">
-              <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="26" height="26" alt="Pulpo" style="display:block;width:26px;height:26px;border:0;" />
-            </td>
-            <td style="vertical-align: middle;">
-              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span><span style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.14em;padding:2px 6px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:6px;vertical-align:middle;line-height:1;">PRO</span>
-            </td>
-          </tr></table>
-        </td>
-        <td align="right" style="vertical-align: middle;">
-          <span class="mono" style="font-size: 11px; color: var(--ink-3); letter-spacing: 0.08em;">{_e(issue_strip)}</span>
-        </td>
-      </tr></table>
-    </td></tr>
-    """
-
-    return f"""<!doctype html>
-<html lang="{locale}">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="x-pulpo-template" content="{_e(template_version)}" />
-<title>{_e(head_title)}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-<style>{_CSS}</style>
-</head>
-<body>
-{_preheader_html(issue)}
-<div class="wrap">
-  <table class="frame" role="presentation" cellpadding="0" cellspacing="0" width="680">
-    {header_strip}
-    {_welcome_hero_html(issue, variant=variant)}
-    {_how_pulpo_works_html(locale)}
-    {_cadence_note_html(issue, now=now)}
-    {_welcome_picks_intro_html(locale, variant=variant)}
-    {top_html}
-    {section_intro_rest_html}
-    {rest_html}
-    {_welcome_start_here_html(issue)}
-    {_footer_html(issue)}
-  </table>
-</div>
-</body>
-</html>
-"""
+    The welcome IS the weekly digest with a static welcome hero in place of
+    the commentary hero; everything below (favorites, market context, the
+    10 picks, weekly news spotlight, Your Pulpo, footer) is byte-identical
+    to the General. `now` is accepted for backward compatibility and
+    ignored (the welcome no longer carries a cadence note)."""
+    return render_html(issue, variant="welcome")
 
 
 def render_welcome_back_html(issue: Issue, *, now=None) -> str:
-    """Render the Pulpo Pro Welcome-back (resubscribe) email.
-
-    This is the SAME template as the first-time welcome — `render_welcome_
-    html` with `variant="welcome_back"`. The only differences are the hero
-    copy (eyebrow + headline say "welcome back"), the picks-intro title
-    ("first 10" → "next 10"), and the version stamp. Every other block is
-    byte-identical, by construction: there is one template, not two, so a
-    future edit to the welcome chrome lands on both automatically and they
-    cannot drift. See `render_welcome_html`'s `variant` arg."""
-    return render_welcome_html(issue, now=now, variant="welcome_back")
+    """Render the Pulpo Pro Welcome-back (resubscribe) email — the master
+    template with only the hero swapped (`render_html(variant="welcome_
+    back")`), and the hero greeting derived from the welcome copy via
+    i18n.welcome_text. Identical to the first-time welcome save the
+    "welcome → welcome back" wording, and identical to the General save
+    the hero. `now` is accepted for compatibility and ignored."""
+    return render_html(issue, variant="welcome_back")
