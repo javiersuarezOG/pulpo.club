@@ -43,10 +43,20 @@ test.describe("/admin", () => {
     // Title now carries the widget label.
     await expect(page).toHaveTitle(/Newsletter preview/i);
 
-    // The widget renders its tiny form — email field prefilled with the
-    // admin owner's address + the single trigger button.
-    await expect(page.getByLabel(/preview recipient/i)).toHaveValue("javier@suarez.ventures");
-    await expect(page.getByRole("button", { name: /send next 3 cohort variants/i })).toBeVisible();
+    // The widget renders the "Send test to" preview-email input
+    // (empty by default since DEFAULT_EMAIL = "" — the operator types
+    // a recipient each iteration so a stale hardcoded address can
+    // never silently fire). Per-newsletter cards live below; at least
+    // one Pro newsletter card is in the live state on production.
+    //
+    // Earlier shape ("preview recipient" label + "send next 3 cohort
+    // variants" button + prefilled javier@suarez.ventures) was
+    // retired across PR-NL-9 → #560 → #566 → #578 → #583 → #634 as
+    // the widget moved from a single-cohort trigger to the per-
+    // newsletter registry with tier sections.
+    await expect(page.getByLabel(/send test to/i)).toHaveValue("");
+    await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
+    await expect(page.locator(".nl-tier-label.pro").first()).toBeVisible();
 
     expect(errors).toEqual([]);
   });

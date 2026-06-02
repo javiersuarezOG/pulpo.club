@@ -11,6 +11,12 @@
 //   * Flag on + click hero CTA → opens FreeMonthModal (post-#262 routing).
 //   * Flag on + click hero photo → opens listing detail (Wave-1
 //     featured_deal passthrough).
+//
+// Since 2026-06-01 hero_v5 is default-on and wins over hero_v4 in
+// blockRegistry (when hero_v5 is on, the `hero` block — which renders
+// HeroV4/V2 — is suppressed entirely). Every URL in this spec pins
+// `ff_hero_v5=0` so the hero_v4 path is actually reachable; without
+// it the spec asserts against a HeroV5 surface and silently fails.
 
 import { test, expect, type Page } from "@playwright/test";
 import { attachErrorRecorder, seedUser, seedProUser } from "./_helpers";
@@ -29,7 +35,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag off (rollback path)", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=0",
+      "/?posthog_capture=1&ff_hero_v4=0&ff_hero_v5=0",
       { waitUntil: "networkidle" },
     );
 
@@ -56,7 +62,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=1",
+      "/?posthog_capture=1&ff_hero_v4=1&ff_hero_v5=0",
       { waitUntil: "networkidle" },
     );
 
@@ -87,7 +93,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=1",
+      "/?posthog_capture=1&ff_hero_v4=1&ff_hero_v5=0",
       { waitUntil: "networkidle" },
     );
 
@@ -115,7 +121,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     await seedProUser(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=1",
+      "/?posthog_capture=1&ff_hero_v4=1&ff_hero_v5=0",
       { waitUntil: "networkidle" },
     );
 
@@ -140,7 +146,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     const errors = attachErrorRecorder(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=1",
+      "/?posthog_capture=1&ff_hero_v4=1&ff_hero_v5=0",
       { waitUntil: "networkidle" },
     );
 
@@ -213,7 +219,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
       });
     });
 
-    await page.goto("/?ff_hero_v4=1", { waitUntil: "networkidle" });
+    await page.goto("/?ff_hero_v4=1&ff_hero_v5=0", { waitUntil: "networkidle" });
 
     // Wait for the hero photo wrapper, then for an <img> inside it whose
     // currentSrc is non-empty (loaded or in-flight with a resolved URL).
@@ -262,7 +268,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
     await seedProUser(page);
 
     await page.goto(
-      "/?posthog_capture=1&ff_hero_v4=1&ff_paid_home_variant_v1=1",
+      "/?posthog_capture=1&ff_hero_v4=1&ff_hero_v5=0&ff_paid_home_variant_v1=1",
       { waitUntil: "networkidle" },
     );
 
