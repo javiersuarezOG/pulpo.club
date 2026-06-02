@@ -32,7 +32,10 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 
-const DEFAULT_EMAIL = "javier@suarez.ventures";
+// Empty by default — every test send goes to whatever the operator types
+// into the "Send test to" field. No prefilled recipient, so a test can
+// never silently fire at a stale hardcoded address.
+const DEFAULT_EMAIL = "";
 const DEFAULT_LOCALE = "en";
 const LOCALE_OPTIONS = [
   { value: "en", label: "EN" },

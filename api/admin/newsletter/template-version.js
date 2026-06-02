@@ -38,8 +38,9 @@ const path = require("path");
 
 // Single source of truth. Each named template here gets one Python
 // constant pair in `automation/newsletter/components/_common.py`:
-//   • TEMPLATE_VERSION + LAST_UPDATED          → pulpo-pro-general
-//   • WELCOME_TEMPLATE_VERSION + WELCOME_LAST_UPDATED → pulpo-pro-welcome
+//   • TEMPLATE_VERSION + LAST_UPDATED                          → pulpo-pro-general
+//   • WELCOME_TEMPLATE_VERSION + WELCOME_LAST_UPDATED          → pulpo-pro-welcome
+//   • WELCOME_BACK_TEMPLATE_VERSION + WELCOME_BACK_LAST_UPDATED → pulpo-pro-welcome-back
 // Adding a future template (free-weekly, free-welcome, …) = one more
 // constant pair in _common.py + one more `TEMPLATES` row below.
 const COMMON_PY_PATH = path.join(
@@ -65,6 +66,15 @@ const TEMPLATES = [
     id: "pulpo-pro-welcome",
     versionRe: /^WELCOME_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
     lastUpdatedRe: /^WELCOME_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
+  {
+    // The welcome-back is the welcome template's resubscribe sub-version,
+    // but it carries its own version line so PostHog can slice it. The
+    // `_BACK_` infix keeps the line-anchored regexes disjoint from the
+    // plain WELCOME_* ones above (no accidental cross-match).
+    id: "pulpo-pro-welcome-back",
+    versionRe: /^WELCOME_BACK_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^WELCOME_BACK_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
   },
 ];
 
@@ -148,6 +158,7 @@ module.exports = async (req, res) => {
     templates: Object.keys(out).join(","),
     general_version: out["pulpo-pro-general"].version,
     welcome_version: (out["pulpo-pro-welcome"] && out["pulpo-pro-welcome"].version) || "missing",
+    welcome_back_version: (out["pulpo-pro-welcome-back"] && out["pulpo-pro-welcome-back"].version) || "missing",
   });
   return res.status(200).json(out);
 };

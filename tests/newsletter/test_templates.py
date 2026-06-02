@@ -139,6 +139,16 @@ def test_python_template_version_shape():
         f"{_common.WELCOME_TEMPLATE_VERSION!r}"
     )
 
+    # Welcome-back carries its own pair too — the admin template-version
+    # API extracts it for the "Pro · Welcome-back" card chip, and
+    # SHORT_VERSION_RE (`-vN.N-`) must be able to pull the short form.
+    welcome_back_pattern = re.compile(r"^welcome-back-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_welcome_back = welcome_back_pattern.match(_common.WELCOME_BACK_TEMPLATE_VERSION)
+    assert m_welcome_back, (
+        f"WELCOME_BACK_TEMPLATE_VERSION isn't in 'welcome-back-vN.N-YYYY-MM-DD' "
+        f"form: {_common.WELCOME_BACK_TEMPLATE_VERSION!r}"
+    )
+
     iso_date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     assert iso_date.match(_common.LAST_UPDATED), (
         f"LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: {_common.LAST_UPDATED!r}"
@@ -146,6 +156,10 @@ def test_python_template_version_shape():
     assert iso_date.match(_common.WELCOME_LAST_UPDATED), (
         f"WELCOME_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
         f"{_common.WELCOME_LAST_UPDATED!r}"
+    )
+    assert iso_date.match(_common.WELCOME_BACK_LAST_UPDATED), (
+        f"WELCOME_BACK_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
+        f"{_common.WELCOME_BACK_LAST_UPDATED!r}"
     )
 
     assert m_general.group(2) == _common.LAST_UPDATED, (
@@ -157,6 +171,12 @@ def test_python_template_version_shape():
         f"WELCOME_TEMPLATE_VERSION date ({m_welcome.group(2)!r}) doesn't "
         f"match WELCOME_LAST_UPDATED ({_common.WELCOME_LAST_UPDATED!r}). "
         f"Bump both — Python is the source of truth."
+    )
+    assert m_welcome_back.group(2) == _common.WELCOME_BACK_LAST_UPDATED, (
+        f"WELCOME_BACK_TEMPLATE_VERSION date ({m_welcome_back.group(2)!r}) "
+        f"doesn't match WELCOME_BACK_LAST_UPDATED "
+        f"({_common.WELCOME_BACK_LAST_UPDATED!r}). Bump both — Python is "
+        f"the source of truth."
     )
 
 
