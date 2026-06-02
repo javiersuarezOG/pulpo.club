@@ -20,7 +20,15 @@ sys.path.insert(0, str(REPO / "scripts"))
 import check_source_health as csh  # type: ignore[import-not-found]  # noqa: E402
 
 
-NOW = datetime(2026, 6, 1, 12, 0, 0, tzinfo=timezone.utc)
+# Originally a fixed `datetime(2026, 6, 1, 12, 0, 0)`. `csh.main()`
+# calls `fresh_red_rows()` without `now=`, which defaults to
+# `datetime.now(timezone.utc)`; rows whose ts is >36h old
+# (STALE_CUTOFF_HOURS) get filtered out. Once wall-clock UTC moved past
+# 2026-06-02 ~16:00 the integration tests below started reporting "no
+# red sources" instead of the expected alert text, because every fixture
+# row built off the constant was now stale by the script's own clock.
+# Anchor on the actual wall clock so the tests track forward in time.
+NOW = datetime.now(timezone.utc)
 
 
 def _row(source: str, ts: str, status: str = "green",
