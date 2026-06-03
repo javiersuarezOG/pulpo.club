@@ -86,7 +86,8 @@ const SECTIONS = [
   // widget form stays full-width below 900px and side-by-side above.
   { path: "/admin",            surface: ".page-admin", gated: false },
   // Selector tracks the redesigned widget (post-2026-05 admin newsletter
-  // refresh): `.nl-widget` was renamed `.nl-preview-widget` when the
+    // stale-selector-allowed: documents the prior selector name only.
+    // refresh): `.nl-widget` was renamed `.nl-preview-widget` when the
   // newsletter v3 redesign shipped. The audit (PRD P2-3) caught this
   // drift — full E2E sweep was failing across all 5 viewports because
   // the surface never resolved.

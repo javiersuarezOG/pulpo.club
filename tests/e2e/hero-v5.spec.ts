@@ -43,7 +43,7 @@ const VIEWPORTS = [
   { name: "1280×800 desktop",       width: 1280, height: 800  },
 ];
 
-test.describe("hero_v5 — flag off (kill-switch path)", () => {
+test.describe("@legacy hero_v5 — flag off (kill-switch path)", () => {
   test("HeroV5 absent, legacy hero + shoreline render", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await page.goto("/?ff_hero_v5=0", { waitUntil: "networkidle" });
@@ -90,7 +90,7 @@ test.describe("hero_v5 — flag on", () => {
   });
 
   for (const vp of VIEWPORTS) {
-    test(`HeroV5 renders without horizontal overflow @ ${vp.name}`, async ({ page }) => {
+    test(`@critical HeroV5 renders without horizontal overflow @ ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
       await expect(page.locator(".hp-hero-v5")).toBeVisible();
@@ -110,13 +110,13 @@ test.describe("hero_v5 — flag on", () => {
     });
   }
 
-  test("clicking 'All listings' card navigates to /browse with no filter", async ({ page }) => {
+  test("@critical clicking 'All listings' card navigates to /browse with no filter", async ({ page }) => {
     await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
     await page.locator(".hp-hero-v5-dest-all").click();
     await expect(page).toHaveURL(/\/browse/);
   });
 
-  test("clicking 'Surf City I' card navigates to /browse with beach filter", async ({ page }) => {
+  test("@critical clicking 'Surf City I' card navigates to /browse with beach filter", async ({ page }) => {
     await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
     await page.locator(".hp-hero-v5-dest-s1").click();
     await expect(page).toHaveURL(/\/browse/);

@@ -42,7 +42,7 @@ function findCtaRouted(events: CapturedEvent[], ctaId: string) {
   );
 }
 
-test.describe("CTA routing — hero primary CTA branches per user state", () => {
+test.describe("@legacy CTA routing — hero primary CTA branches per user state", () => {
   test("anonymous user → cta_routed branch=free_month_modal; FreeMonthModal opens", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
@@ -123,7 +123,7 @@ test.describe("CTA routing — hero primary CTA branches per user state", () => 
   });
 });
 
-test.describe("CTA routing (Wave 1) — FeaturedDeal no longer opens signup for paid users", () => {
+test.describe("@legacy CTA routing (Wave 1) — FeaturedDeal no longer opens signup for paid users", () => {
   test("pro user clicking FeaturedDeal fires cta_routed=passthrough with no signup modal", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);
@@ -149,7 +149,7 @@ test.describe("CTA routing (Wave 1) — FeaturedDeal no longer opens signup for 
   });
 });
 
-test.describe("CTA routing (Wave 1) — rollback flag", () => {
+test.describe("@legacy CTA routing (Wave 1) — rollback flag", () => {
   test("anon user with cta_routing_v2 forced OFF falls back to old behavior (signup modal opens)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
