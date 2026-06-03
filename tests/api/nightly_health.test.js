@@ -7,6 +7,7 @@ const {
   buildLast7Runs,
   failedSourcesLastRun,
   vlmBudgetToday,
+  featuredFreshness,
   degradedSources,
   hoursSince,
   STALE_THRESHOLD_H,
@@ -148,6 +149,49 @@ function mockRes() {
   };
   return res;
 }
+
+// ── PRD P1-1 — featuredFreshness ─────────────────────────────────────
+//
+// `featured.json` had been stale since 2026-05-08 because the nightly
+// commit step never staged the file. `/api/nightly/health` now surfaces
+// `picked_at`, `expires_at`, `fresh` so dashboards detect the regression
+// without opening the JSON.
+
+describe("featuredFreshness", () => {
+  it("returns null when the file is missing", () => {
+    expect(featuredFreshness(null)).toBe(null);
+    expect(featuredFreshness(undefined)).toBe(null);
+    expect(featuredFreshness("not-an-object")).toBe(null);
+  });
+
+  it("reports fresh=true when expires_at is in the future", () => {
+    const future = new Date(Date.now() + 6 * 3600 * 1000).toISOString();
+    const out = featuredFreshness({
+      picked_at: new Date().toISOString(),
+      expires_at: future,
+    });
+    expect(out.fresh).toBe(true);
+    expect(out.expires_at).toBe(future);
+  });
+
+  it("reports fresh=false when expires_at is in the past", () => {
+    const past = new Date(Date.now() - 1).toISOString();
+    const out = featuredFreshness({
+      picked_at: "2026-05-07T00:00:00Z",
+      expires_at: past,
+    });
+    expect(out.fresh).toBe(false);
+    expect(out.picked_at).toBe("2026-05-07T00:00:00Z");
+  });
+
+  it("reports fresh=false when expires_at is unparseable", () => {
+    const out = featuredFreshness({
+      picked_at: "2026-05-07T00:00:00Z",
+      expires_at: "not-a-date",
+    });
+    expect(out.fresh).toBe(false);
+  });
+});
 
 // ── PRD P1-9 — degradedSources (JS-side brownout classifier) ────────
 //

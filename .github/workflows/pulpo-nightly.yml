@@ -719,6 +719,12 @@ jobs:
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
                   samples/ranked.csv
+          # PRD P1-1 — featured.json had been stale since 2026-05-08 because
+          # `pulpo.featured_listing.write_featured_json` writes a fresh pick
+          # every nightly but this commit step never staged the file. PA's
+          # `featured.PA.json` is covered in the multi-country block below;
+          # SV's gets the same treatment.
+          git add web/data/featured.json 2>/dev/null || true
           # PR-MC-PA-3 — multi-country outputs from the PA pipeline
           # run. Best-effort: PA file absence does not block the commit
           # (continue-on-error on the PA pipeline step above means PA
