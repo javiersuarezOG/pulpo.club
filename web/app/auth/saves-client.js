@@ -11,7 +11,16 @@
 // having to ask Sebastian to dig through Vercel runtime logs.
 
 import { track } from "../telemetry/hook";
-import { timedApiFetch } from "../telemetry/perf";
+
+// telemetry/perf is dynamic-imported from 5+ sites (HeroV2/V4, LiveStats,
+// listings/featured data adapters). A static import here would mix the
+// two graphs and force Vite to bundle telemetry/perf into the entry
+// chunk instead of splitting it. Wrap behind a lazy loader so each
+// call resolves the module from whatever chunk Vite chose.
+async function timedApiFetch(...args) {
+  const mod = await import("../telemetry/perf");
+  return mod.timedApiFetch(...args);
+}
 
 async function parseJsonOrNull(res) {
   try { return await res.json(); } catch { return null; }
