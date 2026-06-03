@@ -101,6 +101,7 @@ jobs:
           node scripts/diff_newsletter_version.mjs "$BASE_SHA"
       - run: npm run test --if-present
       - run: npm run build
+      - run: npm run check:size
 
   e2e-critical:
     name: e2e critical
