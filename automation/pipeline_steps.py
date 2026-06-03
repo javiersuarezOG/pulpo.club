@@ -182,13 +182,14 @@ def phase_write_outputs(
 
     # run_history.json stays single-file (audit log spans countries).
     # When multiple countries run in the PR-MC-5 matrix, each shard
-    # appends its row to this same file with the country code in the
-    # row payload (a follow-up will add the field).
+    # appends its row to this same file. Stamping country_code (PRD
+    # P2-1, 2026-06-03) lets api/nightly/health.js scope last_7_runs
+    # without inferring from per_source_raw keys.
     _append_run_history(
         web_data_dir / "run_history.json",
         finished=finished, ranked_count=len(ranked), dropped=dropped,
         started=started, errors=errors, per_source_count=per_source_count,
-        source_status=source_status,
+        source_status=source_status, country_code=active_cc,
     )
     return meta
 
@@ -431,13 +432,21 @@ def _build_meta(*, ranked, ranked_dicts, sources, per_source_count, source_meta,
 
 
 def _append_run_history(path: Path, *, finished, ranked_count, dropped,
-                        started, errors, per_source_count, source_status) -> None:
-    """Append one entry to run_history.json, capped at last 60 runs."""
+                        started, errors, per_source_count, source_status,
+                        country_code: str | None = None) -> None:
+    """Append one entry to run_history.json, capped at last 60 runs.
+
+    ``country_code`` (PRD P2-1, 2026-06-03) is the ISO alpha-2 of the
+    active country, propagated from ``pulpo.countries.active().code``.
+    Optional so legacy callers + tests don't break; the read side in
+    ``api/nightly/health.js`` falls back to per_source_raw inference
+    when the field is absent.
+    """
     try:
         history = json.loads(path.read_text()) if path.exists() else []
     except Exception:
         history = []
-    history.append({
+    row = {
         "ts":             finished.isoformat(),
         "total":          ranked_count,
         "dropped":        dropped,
@@ -445,7 +454,10 @@ def _append_run_history(path: Path, *, finished, ranked_count, dropped,
         "error_count":    len(errors),
         "per_source_raw": per_source_count,
         "source_status":  source_status,
-    })
+    }
+    if country_code:
+        row["country_code"] = country_code
+    history.append(row)
     history = history[-60:]
     atomic_write_json(path, history)
 
