@@ -27,7 +27,7 @@
     "api/cron/webhook-health.py": {
       "memory": 512,
       "maxDuration": 30,
-      "excludeFiles": "web/**,samples/**,docs/**,tests/**,automation/**,pulpo/**,scripts/**,node_modules/**,.git/**"
+      "excludeFiles": "{web,samples,docs,tests,automation,pulpo,scripts,node_modules}/**"
     }
   },
   "rewrites": [
