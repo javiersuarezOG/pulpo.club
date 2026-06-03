@@ -1625,9 +1625,6 @@ function DebugPanel({ app }) {
 (() => {
   const path = typeof window !== "undefined" ? window.location.pathname : "/";
   const root = ReactDOM.createRoot(document.getElementById("root"));
-  // Initialize web-vitals RUM reporting. Lazy-loads web-vitals after
-  // mount so first-paint cost is unaffected (PRD P2-6, PR-5B-B).
-  import("./telemetry/rum").then((mod) => mod.initRUM()).catch(() => {});
   if (path === "/start" || path === "/start/") {
     import("./start.jsx").then((mod) => {
       const StartPage = mod.default;
