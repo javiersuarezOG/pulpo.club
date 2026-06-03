@@ -1290,6 +1290,10 @@ const UI_STRINGS = {
   // Login link → opens Clerk hosted sign-in modal (PR-B.4). Keep wording
   // identical to the in-app TopNav so the user sees a consistent "Log in"
   // across surfaces.
+  "start.meta.title":        { en: "Pulpo — Beach and lake homes in El Salvador, ranked by value",
+                                es: "Pulpo — Casas de playa y de lago en El Salvador, ordenadas por valor" },
+  "start.meta.description":  { en: "Get unlimited access to ranked listings across El Salvador. One-time setup, monthly access, cancel anytime.",
+                                es: "Acceso ilimitado a propiedades ordenadas en El Salvador. Configuración única, acceso mensual, cancela cuando quieras." },
   "start.hero.eyebrow":       { en: "Real estate in El Salvador",
                                 es: "Bienes raíces en El Salvador" },
   "start.hero.h1":            { en: "Property in El Salvador, before the rest of the internet sees it.",
