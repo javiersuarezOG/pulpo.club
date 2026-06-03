@@ -9,11 +9,27 @@ if (!base) {
 }
 
 function readBaseVercel(ref) {
+  // Primary: the supplied base SHA. After `gh pr update-branch --rebase`
+  // (or any force-push to a PR), the workflow's
+  // `github.event.before` points at the orphan pre-rebase commit which
+  // is NOT in the fetched history — `git show <orphan>:vercel.json`
+  // exits 128 with "exists on disk, but not in <sha>". The script then
+  // exit(2)'d and false-failed CI on PRs that never touched vercel.json
+  // (caught on #663 — HeroV5 readout). Fall back to origin/main so the
+  // diff still anchors at a reachable, sensible base.
   try {
     return execFileSync("git", ["show", `${ref}:vercel.json`], { encoding: "utf8" });
-  } catch (err) {
-    console.error(`Could not read vercel.json at ${ref}: ${err.message}`);
-    process.exit(2);
+  } catch (primaryErr) {
+    try {
+      const fallback = execFileSync("git", ["show", "origin/main:vercel.json"], { encoding: "utf8" });
+      console.error(`Base SHA ${ref} unreachable (${String(primaryErr.message).split("\n")[0]}); falling back to origin/main.`);
+      return fallback;
+    } catch (fallbackErr) {
+      console.error(`Could not read vercel.json at ${ref} or origin/main.`);
+      console.error(`  primary  : ${primaryErr.message}`);
+      console.error(`  fallback : ${fallbackErr.message}`);
+      process.exit(2);
+    }
   }
 }
 
