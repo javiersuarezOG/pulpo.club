@@ -15,10 +15,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check Resend deliverability recommendations
+      # PRD P0-2 — Cloudflare 1010 blocks api.resend.com from the GH
+      # runner. The provider call now happens on the Vercel cron at
+      # /api/internal/webhook-health (same handler that backs the
+      # stuck-invitation check). This poll keeps the weekly cadence as
+      # an additional surface — the Vercel cron already runs every 6h.
+      - name: Poll Vercel-cron webhook-health endpoint (Resend block)
         env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          PULPO_ACTIVATION_FROM_EMAIL: ${{ secrets.PULPO_ACTIVATION_FROM_EMAIL }}
-          RESEND_FROM_NOREPLY: ${{ secrets.RESEND_FROM_NOREPLY }}
+          PULPO_HEALTH_URL: ${{ secrets.PULPO_HEALTH_URL }}
+          PULPO_CRON_SECRET: ${{ secrets.PULPO_CRON_SECRET }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: python3 scripts/check_email_deliverability_recommendations.py
+        run: python3 scripts/poll_webhook_health_endpoint.py

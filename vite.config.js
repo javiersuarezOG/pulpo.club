@@ -34,6 +34,7 @@ export default defineConfig(() => ({
   build: {
     outDir: path.resolve(here, "web/dist"),
     emptyOutDir: true,
+    manifest: true,
     // `build/` (not `assets/`) so the rewrite for /assets/:file →
     // /web/assets/:file (brand assets) doesn't collide with Vite's
     // hashed output. /build/:file rewrites to /web/dist/build/:file in

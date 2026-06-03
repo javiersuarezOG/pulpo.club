@@ -54,6 +54,21 @@ describe("trigger-welcome-test → internal endpoint", () => {
     expect(res.body.dry_run).toBe(false);
   });
 
+  it("trims a whitespace-padded PULPO_INTERNAL_TOKEN before sending the bearer (the http_401 bug)", async () => {
+    // A trailing newline on the Vercel env var must NOT reach the bearer —
+    // the internal endpoint strips its side, so an un-trimmed bearer 401s.
+    process.env.PULPO_INTERNAL_TOKEN = "secret_tok\n";
+    let authHeader = null;
+    const fetchImpl = vi.fn(async (url, opts) => {
+      authHeader = opts.headers.Authorization;
+      return { status: 200, json: async () => ({ status: "sent" }) };
+    });
+    const res = mockRes();
+    await handler(mockReq({ email: "me@pulpo.club" }), res, { fetchImpl });
+    expect(authHeader).toBe("Bearer secret_tok");
+    expect(res.body.status).toBe("sent");
+  });
+
   it("passes through a skip with its reason (NOT a false 'sent')", async () => {
     const fetchImpl = vi.fn(async () => ({ status: 200, json: async () => ({ status: "skipped", reason: "not_pro" }) }));
     const res = mockRes();

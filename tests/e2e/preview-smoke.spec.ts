@@ -368,6 +368,7 @@ test.describe("New app boots cleanly on key routes", () => {
     await page.goto("/?ff_paid_home_variant_v1=0", { waitUntil: "networkidle" });
 
     // Click the Beach shoreline card to navigate to /browse.
+    // stale-selector-allowed: non-critical historical section-url sweep still exercises legacy shoreline nav.
     await page.locator(".hp-shoreline-card-beach").click();
     await page.waitForFunction(() => window.location.pathname === "/browse", null, {
       timeout: 5_000,
@@ -717,7 +718,7 @@ test.describe("New app boots cleanly on key routes", () => {
   // PR-C — /start ES canary. Same guardrail as the home-page canary
   // above but for the public marketing surface. Every t()-able string
   // on /start must render in Spanish when localStorage says ES.
-  test("/start in Spanish — no English canary words leak", async ({ page }) => {
+  test("@critical /start in Spanish — no English canary words leak", async ({ page }) => {
     const START_CANARIES = [
       // Hero
       "Property in El Salvador",         // start.hero.h1
@@ -978,7 +979,7 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(txt).not.toContain("couldn't read your email");
   });
 
-  test("welcome modal status: user_exists swaps to 'sign in' copy with new CTA", async ({ page }) => {
+  test("@critical welcome modal status: user_exists swaps to 'sign in' copy with new CTA", async ({ page }) => {
     await page.addInitScript(() => {
       try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }
       localStorage.setItem("pulpo-locale", "en");
