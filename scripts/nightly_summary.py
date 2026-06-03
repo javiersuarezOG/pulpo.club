@@ -52,6 +52,8 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Optional
 
@@ -63,6 +65,7 @@ from automation.watchdog import _read_source_history  # noqa: E402
 
 # Status order, worst → best, for the per-source mark column.
 _STATUS_MARK = {"green": "✓", "red": "✗", "skipped": "·"}
+PROD_HEALTH_URL = "https://pulpo.club/api/nightly/health"
 
 
 def _read_json(path: Path) -> Optional[object]:
@@ -93,6 +96,16 @@ def count_listings(ranked_path: Path) -> Optional[int]:
     if isinstance(obj, list):
         return len(obj)
     return None
+
+
+def fetch_remote_health(url: str = PROD_HEALTH_URL, timeout: float = 8.0) -> tuple[Optional[dict], Optional[str]]:
+    """Fetch production nightly health for local checkout summaries."""
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as res:  # nosec B310 - fixed production health URL
+            obj = json.loads(res.read().decode("utf-8"))
+    except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+        return None, str(exc)
+    return (obj if isinstance(obj, dict) else None), None
 
 
 def _sort_sources(rows_by_src: dict[str, dict]) -> list[tuple[str, dict]]:
@@ -133,12 +146,16 @@ def format_summary(
     deploy_outcome: Optional[str],
     run_url: Optional[str],
     today_iso: str,
+    mode: str = "workflow",
+    remote_health: Optional[dict] = None,
+    remote_health_error: Optional[str] = None,
 ) -> str:
     """Pure: assemble the final summary block from the resolved inputs."""
     lines: list[str] = []
     bar = "=" * 70
     lines.append(bar)
     lines.append(f"NIGHTLY SUMMARY — {today_iso}")
+    lines.append(f"Mode: {mode}")
     if run_url:
         lines.append(f"Run: {run_url}")
     lines.append(bar)
@@ -164,38 +181,65 @@ def format_summary(
     lines.append("")
 
     # Commit + deploy
-    lines.append("POST-CANARY OUTCOME")
-    if committed == "true":
-        lines.append("  Commit:  ✓ COMMITTED")
-    elif committed == "false":
-        lines.append("  Commit:  ✗ NO COMMIT  (commit step ran but found nothing to push)")
+    if mode == "local":
+        lines.append("PRODUCTION HEALTH")
+        if remote_health:
+            prod_ts = remote_health.get("last_updated") or remote_health.get("last_data_commit_at")
+            prod_count = remote_health.get("listing_count") or remote_health.get("total_listings")
+            lines.append(f"  Health endpoint: ✓ {PROD_HEALTH_URL}")
+            if prod_ts:
+                lines.append(f"  pulpo.club currently reports: {prod_ts}")
+            if prod_count is not None:
+                lines.append(f"  pulpo.club listing count: {prod_count}")
+        else:
+            lines.append(f"  Health endpoint: ? unavailable ({remote_health_error or 'unknown error'})")
+        lines.append("")
     else:
-        lines.append("  Commit:  ✗ NOT REACHED  (an earlier step failed)")
+        lines.append("POST-CANARY OUTCOME")
+        if committed == "true":
+            lines.append("  Commit:  ✓ COMMITTED")
+        elif committed == "false":
+            lines.append("  Commit:  ✗ NO COMMIT  (commit step ran but found nothing to push)")
+        else:
+            lines.append("  Commit:  ✗ NOT REACHED  (an earlier step failed)")
 
-    if deploy_outcome == "success":
-        lines.append("  Deploy:  ✓ DEPLOYED to Vercel")
-    elif deploy_outcome == "failure":
-        lines.append("  Deploy:  ✗ DEPLOY FAILED")
-    elif deploy_outcome == "skipped":
-        lines.append("  Deploy:  ✗ SKIPPED  (commit didn't run, deploy gated on it)")
-    else:
-        lines.append("  Deploy:  ? UNKNOWN  (step not reached)")
-    lines.append("")
+        if deploy_outcome == "success":
+            lines.append("  Deploy:  ✓ DEPLOYED to Vercel")
+        elif deploy_outcome == "failure":
+            lines.append("  Deploy:  ✗ DEPLOY FAILED")
+        elif deploy_outcome == "skipped":
+            lines.append("  Deploy:  ✗ SKIPPED  (commit didn't run, deploy gated on it)")
+        else:
+            lines.append("  Deploy:  ? UNKNOWN  (step not reached)")
+        lines.append("")
 
     # Site state
     lines.append("SITE STATE")
-    if committed == "true" and deploy_outcome == "success":
-        if pipeline_ts:
-            lines.append(f"  pulpo.club will show: {pipeline_ts}")
+    if mode == "local":
+        if remote_health:
+            prod_ts = remote_health.get("last_updated") or remote_health.get("last_data_commit_at")
+            if prod_ts:
+                lines.append(f"  pulpo.club is serving data timestamp: {prod_ts}")
+            else:
+                lines.append("  pulpo.club health is reachable, but no data timestamp was present.")
         else:
-            lines.append("  pulpo.club will show: today's pipeline output (timestamp unavailable)")
+            lines.append("  pulpo.club state unknown — production health endpoint was unavailable.")
     else:
-        lines.append("  pulpo.club will NOT refresh this run — still showing the last")
-        lines.append("  successfully-deployed nightly.")
+        if committed == "true" and deploy_outcome == "success":
+            if pipeline_ts:
+                lines.append(f"  pulpo.club will show: {pipeline_ts}")
+            else:
+                lines.append("  pulpo.club will show: today's pipeline output (timestamp unavailable)")
+        else:
+            lines.append("  pulpo.club will NOT refresh this run — still showing the last")
+            lines.append("  successfully-deployed nightly.")
     lines.append("")
     lines.append(bar)
 
-    return "\n".join(lines) + "\n"
+    summary = "\n".join(lines) + "\n"
+    if mode == "local":
+        return "\n".join(f"[mode=local] {line}" if line else "[mode=local]" for line in summary.splitlines()) + "\n"
+    return summary
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -224,10 +268,17 @@ def main(argv: Optional[list[str]] = None) -> int:
     rows = _read_source_history(data_dir)
     rows_by_src = latest_row_per_source(rows)
 
-    # Workflow-passed env signals
+    # Workflow-passed env signals. If absent, this is a local checkout
+    # invocation; read production health rather than inventing a failed
+    # commit/deploy story from missing workflow-only env vars.
     committed = os.environ.get("NIGHTLY_COMMITTED")
     deploy_outcome = os.environ.get("NIGHTLY_DEPLOY_OUTCOME")
     run_url = os.environ.get("NIGHTLY_RUN_URL")
+    mode = "workflow" if run_url else "local"
+    remote_health = None
+    remote_health_error = None
+    if mode == "local":
+        remote_health, remote_health_error = fetch_remote_health()
 
     # Use today's UTC date as a label so the summary header reads cleanly
     # even when the pipeline timestamp is missing.
@@ -242,6 +293,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         deploy_outcome=deploy_outcome,
         run_url=run_url,
         today_iso=today_iso,
+        mode=mode,
+        remote_health=remote_health,
+        remote_health_error=remote_health_error,
     )
 
     # Always print to stdout — this is the operator-facing surface.

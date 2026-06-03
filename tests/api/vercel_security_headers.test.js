@@ -86,15 +86,17 @@ describe("vercel.json security headers", () => {
   // future allowlist addition needs to soak first, add a parallel
   // Content-Security-Policy-Report-Only with the candidate value; don't
   // downgrade this header back to report-only without a strong reason.
+  //
+  // Active soak (PRD P3-3, 2026-06-03): parallel Report-Only header
+  // tests removal of 'unsafe-eval' from script-src. After 48h of zero
+  // eval-related csp.violation events in PostHog, drop 'unsafe-eval'
+  // from the enforced header AND remove the Report-Only header in the
+  // same Phase-2 PR.
   describe("Content-Security-Policy", () => {
     const csp = headerValue(catchAll, "Content-Security-Policy");
 
-    it("is present and enforced (not report-only)", () => {
+    it("is present and enforced", () => {
       expect(csp).toBeTruthy();
-      // Belt-and-braces: ensure we didn't ALSO leave a Report-Only
-      // header hanging around, which would mean two CSPs in flight and
-      // double-reporting in browser DevTools.
-      expect(headerValue(catchAll, "Content-Security-Policy-Report-Only")).toBeNull();
     });
 
     it("declares default-src 'self' (baseline lockdown)", () => {
@@ -145,6 +147,45 @@ describe("vercel.json security headers", () => {
     it("reports CSP violations to /api/csp-report", () => {
       expect(csp).toMatch(/report-to csp-endpoint/);
       expect(csp).toMatch(/report-uri \/api\/csp-report/);
+    });
+  });
+
+  // PRD P3-3 soak (2026-06-03): test the candidate enforcement (CSP
+  // without 'unsafe-eval'). If zero eval-related csp.violation events
+  // land in PostHog over 48h, Phase 2 removes the Report-Only header
+  // AND drops 'unsafe-eval' from the enforced header in one PR. The
+  // Report-Only header MUST otherwise mirror the enforced shape so the
+  // soak measures only the candidate change.
+  describe("Content-Security-Policy-Report-Only (unsafe-eval removal soak)", () => {
+    const ro = headerValue(catchAll, "Content-Security-Policy-Report-Only");
+
+    it("is present during the soak window", () => {
+      expect(ro).toBeTruthy();
+    });
+
+    it("does NOT contain 'unsafe-eval' (the candidate enforcement)", () => {
+      expect(ro).not.toMatch(/'unsafe-eval'/);
+    });
+
+    it("matches the enforced policy on every other allowance", () => {
+      // Same Stripe + Clerk + Turnstile + PostHog + Fonts allowances.
+      // If one drifts here the soak measures noise instead of the
+      // unsafe-eval-only delta.
+      expect(ro).toMatch(/frame-src[^;]*js\.stripe\.com/);
+      expect(ro).toMatch(/frame-src[^;]*hooks\.stripe\.com/);
+      expect(ro).toMatch(/frame-src[^;]*\*\.clerk\.com/);
+      expect(ro).toMatch(/script-src[^;]*\*\.clerk\.com/);
+      expect(ro).toMatch(/script-src[^;]*challenges\.cloudflare\.com/);
+      expect(ro).toMatch(/frame-src[^;]*challenges\.cloudflare\.com/);
+      expect(ro).toMatch(/connect-src[^;]*eu\.i\.posthog\.com/);
+      expect(ro).toMatch(/script-src[^;]*eu\.i\.posthog\.com/);
+      expect(ro).toMatch(/style-src[^;]*fonts\.googleapis\.com/);
+      expect(ro).toMatch(/font-src[^;]*fonts\.gstatic\.com/);
+      expect(ro).toMatch(/object-src 'none'/);
+      expect(ro).toMatch(/base-uri 'self'/);
+      expect(ro).toMatch(/upgrade-insecure-requests/);
+      expect(ro).toMatch(/report-to csp-endpoint/);
+      expect(ro).toMatch(/report-uri \/api\/csp-report/);
     });
   });
 });
