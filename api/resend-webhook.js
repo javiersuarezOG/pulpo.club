@@ -250,3 +250,9 @@ module.exports = async (req, res) => {
 module.exports.verifySvixSignature = verifySvixSignature;
 module.exports.pickPostHogProps = pickPostHogProps;
 module.exports.EVENT_MAP = EVENT_MAP;
+// KNOWN_EMAIL_TYPES is the single source of truth for the discriminator
+// allowlist. The producer-tag contract test (tests/api/email_type_contract.test.js)
+// imports this and asserts every literal stamped by an outbound sender
+// is in the set, so a new sender can't silently land with an unmapped
+// email_type that downstream dashboards then bucket as "unknown".
+module.exports.KNOWN_EMAIL_TYPES = KNOWN_EMAIL_TYPES;

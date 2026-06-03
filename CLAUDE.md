@@ -161,6 +161,60 @@ Mandatory rules:
    The 2026-05-27 Resend outage was invisible for 7 days because there
    was no positive heartbeat.
 
+## NEVER ship a producer tag without naming its consumer (post-2026-06-02)
+
+PR #522 (the email audit) traced a months-long silent observability bug
+to exactly this pattern: `api/_activation_email.js` had been stamping
+`email_type=activation` on every outbound Resend payload since the
+activation pipeline launched. The consumer
+(`api/resend-webhook.js#pickPostHogProps`) never read the field. Activation
+lifecycle events landed in PostHog as `newsletter.delivered` /
+`.bounced` /etc. and contaminated newsletter deliverability dashboards
+for the entire window. The fix at the wire was 6 lines; the cost of
+discovering it was an audit.
+
+The root cause is generic: stamping a producer field with no consumer
+in the same PR is a silent failure mode that takes a deliberate audit
+to surface.
+
+**Mandatory rules for any PR that adds a tag, header, metadata field,
+custom property, or similar discriminator on an outbound third-party
+payload (Resend, Stripe, Clerk, PostHog Person properties, anything):**
+
+1. **The PR must reference the consumer file by path.** Either link
+   the line that reads the field, or — if the consumer doesn't exist
+   yet — open a stub PR for the consumer FIRST and reference it. A
+   producer landing alone is a tombstone.
+
+2. **If the value is from a closed set, the consumer must own the
+   allowlist and a contract test must enforce the producer side.**
+   The reference implementation is `KNOWN_EMAIL_TYPES` in
+   [api/resend-webhook.js](api/resend-webhook.js) and the test at
+   [tests/api/email_type_contract.test.js](tests/api/email_type_contract.test.js)
+   — the test greps every outbound sender for `email_type` literals
+   and asserts each is in the allowlist exported by the consumer.
+   Adopt the same pattern for any new closed-set discriminator:
+   single source of truth on the consumer + grep-based contract test
+   on the producers.
+
+3. **A new value going into the closed set is two edits in the same
+   PR:** add the literal at the producer site, add it to the
+   allowlist + extend `PRODUCER_FILES` in the contract test if the
+   sender file is new. The test failing on a producer-only edit is
+   the guardrail working.
+
+4. **The forward-compat exception is allowed.** A producer can land
+   *with* an entry already in `KNOWN_EMAIL_TYPES` even if no consumer
+   dashboard yet reads it — what's NOT allowed is a producer with no
+   allowlist entry. The contract test enforces this asymmetry on
+   purpose (see comment header in the test file).
+
+The contract test is the cheapest possible enforcement: it runs in
+the same vitest pass as everything else, takes ~3ms, and the failure
+message names the offending file. It does NOT prevent every silent
+producer/consumer drift — only the closed-set case — but that's the
+exact bug class that took an audit to find.
+
 ## Stripe return_url must be section-aware (post-2026-05-27)
 
 Stripe handoffs must return the user to the exact surface they came
