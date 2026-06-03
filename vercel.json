@@ -27,7 +27,7 @@
     "api/internal/webhook-health.py": {
       "memory": 512,
       "maxDuration": 30,
-      "excludeFiles": "web/photos*/**,web/data/**"
+      "excludeFiles": "web/**,samples/**,docs/**,tests/**,automation/**,pulpo/**,scripts/**,node_modules/**,.git/**"
     }
   },
   "rewrites": [
