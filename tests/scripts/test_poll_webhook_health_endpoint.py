@@ -41,7 +41,7 @@ def test_exits_one_when_token_missing(monkeypatch, capsys):
 
 def test_green_when_both_providers_ok(monkeypatch):
     monkeypatch.setenv("PULPO_CRON_SECRET", "secret")
-    monkeypatch.setenv("PULPO_HEALTH_URL", "https://pulpo.club/api/internal/webhook-health")
+    monkeypatch.setenv("PULPO_HEALTH_URL", "https://pulpo.club/api/cron/webhook-health")
     with patch("urllib.request.urlopen", return_value=_ok_response({
         "clerk": {"status": "ok"},
         "resend": {"status": "ok"},
@@ -78,11 +78,11 @@ def test_slack_fires_on_http_error(monkeypatch):
     the runtime that's misbehaving."""
     monkeypatch.setenv("PULPO_CRON_SECRET", "secret")
     monkeypatch.setenv("SLACK_WEBHOOK_URL", "https://hooks.slack.test/x")
-    monkeypatch.setenv("PULPO_HEALTH_URL", "https://pulpo.club/api/internal/webhook-health")
+    monkeypatch.setenv("PULPO_HEALTH_URL", "https://pulpo.club/api/cron/webhook-health")
 
     import urllib.error
     err = urllib.error.HTTPError(
-        url="https://pulpo.club/api/internal/webhook-health",
+        url="https://pulpo.club/api/cron/webhook-health",
         code=502, msg="Bad Gateway", hdrs={},  # type: ignore[arg-type]
         fp=io.BytesIO(b"upstream timeout"),
     )

@@ -1,4 +1,11 @@
-"""GET /api/internal/webhook-health — Vercel Python serverless function.
+"""GET /api/cron/webhook-health — Vercel Python serverless function.
+
+Lives at `api/cron/` (not `api/internal/`) so it does NOT share
+`api/internal/welcome-send.py`'s requirements.txt — that pulls in
+httpx + posthog which together inflated the function bundle past
+Vercel's 500MB Lambda ephemeral-storage limit. This function uses
+only stdlib (`urllib`, `json`, `datetime`, `http.server`), so it
+needs no requirements.txt at all.
 
 Provider-API monitor that runs from the Vercel runtime instead of the
 GitHub Actions runner. PRD P0-1 + P0-2: `api.clerk.com/v1/invitations`

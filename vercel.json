@@ -24,7 +24,7 @@
       "includeFiles": "pulpo/countries/*.json,web/data/ranked.json",
       "excludeFiles": "web/photos*/**"
     },
-    "api/internal/webhook-health.py": {
+    "api/cron/webhook-health.py": {
       "memory": 512,
       "maxDuration": 30,
       "excludeFiles": "web/**,samples/**,docs/**,tests/**,automation/**,pulpo/**,scripts/**,node_modules/**,.git/**"

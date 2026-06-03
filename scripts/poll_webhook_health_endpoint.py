@@ -19,7 +19,7 @@ import urllib.error
 import urllib.request
 
 
-DEFAULT_URL = "https://pulpo.club/api/internal/webhook-health"
+DEFAULT_URL = "https://pulpo.club/api/cron/webhook-health"
 
 
 def env(name: str, default: str = "") -> str:

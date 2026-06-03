@@ -1,5 +1,5 @@
 """Tests for the Vercel Python serverless handler at
-api/internal/webhook-health.py.
+api/cron/webhook-health.py.
 
 The handler routes around the Cloudflare 1010 block (PRD P0-1/P0-2) by
 running provider-API checks from the Vercel runtime. Tests cover the
@@ -21,7 +21,7 @@ sys.path.insert(0, str(REPO))
 
 # The Vercel module is named `webhook-health.py` (Vercel route names use
 # hyphens), so a regular `import` doesn't work — load it by path.
-_module_path = REPO / "api" / "internal" / "webhook-health.py"
+_module_path = REPO / "api" / "cron" / "webhook-health.py"
 _spec = importlib.util.spec_from_file_location("webhook_health", _module_path)
 assert _spec is not None and _spec.loader is not None
 wh = importlib.util.module_from_spec(_spec)
