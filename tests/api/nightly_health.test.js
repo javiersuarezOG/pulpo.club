@@ -53,9 +53,81 @@ describe("buildLast7Runs", () => {
     const out = buildLast7Runs([
       { ts: "2026-05-11T15:51:53Z", total: 910, dropped: 149, duration: 3471.83, error_count: 0, extra: "ignored" },
     ]);
+    // country_code is inferred from per_source_raw (absent here → SV
+    // default). New field added by PRD P2-1.
     expect(out).toEqual([
-      { ts: "2026-05-11T15:51:53Z", total: 910, dropped: 149, duration_s: 3471.83, error_count: 0 },
+      { ts: "2026-05-11T15:51:53Z", total: 910, dropped: 149, duration_s: 3471.83, error_count: 0, country_code: "SV" },
     ]);
+  });
+});
+
+// PRD P2-1 — country split coverage. Two failure modes guarded here:
+//  1. Without filter, an SV operator looking at last_7_runs sees a PA
+//     scaffold run (total=20, encuentra24-only) and misreads it as an
+//     SV collapse.
+//  2. After filter is wired, a future PA-source addition must not
+//     bleed into SV's view (the inferCountry heuristic is conservative
+//     — see PA_ONLY_SOURCES comment in health.js).
+describe("inferCountry + buildLast7Runs(countryFilter)", () => {
+  const { inferCountry } = require("../../api/nightly/health.js").__testing__;
+
+  it("prefers explicit country_code over the heuristic", () => {
+    expect(inferCountry({ country_code: "PA", per_source_raw: { goodlife: 80 } })).toBe("PA");
+    expect(inferCountry({ country_code: "SV", per_source_raw: { encuentra24: 5 } })).toBe("SV");
+    expect(inferCountry({ country_code: "sv" })).toBe("SV");
+  });
+
+  it("infers PA from encuentra24-only per_source_raw", () => {
+    expect(inferCountry({ per_source_raw: { encuentra24: 21 } })).toBe("PA");
+  });
+
+  it("infers SV from multi-source per_source_raw (even if encuentra24 is one of them)", () => {
+    expect(inferCountry({ per_source_raw: { encuentra24: 28, goodlife: 71, remax: 354 } })).toBe("SV");
+  });
+
+  it("defaults to SV when row lacks country_code AND per_source_raw is empty/missing", () => {
+    expect(inferCountry({ per_source_raw: {} })).toBe("SV");
+    expect(inferCountry({})).toBe("SV");
+    expect(inferCountry(null)).toBe("SV");
+  });
+
+  it("filters last_7_runs by country", () => {
+    const rows = [
+      { ts: "2026-06-02T08:24Z", total: 959, per_source_raw: { goodlife: 71, encuentra24: 28 }, country_code: "SV" },
+      { ts: "2026-06-02T08:37Z", total: 20, per_source_raw: { encuentra24: 21 }, country_code: "PA" },
+      { ts: "2026-06-03T08:00Z", total: 970, per_source_raw: { goodlife: 80 } },
+    ];
+    const sv = buildLast7Runs(rows, "SV");
+    expect(sv.map((r) => r.total)).toEqual([970, 959]);
+    expect(sv.every((r) => r.country_code === "SV")).toBe(true);
+
+    const pa = buildLast7Runs(rows, "PA");
+    expect(pa.map((r) => r.total)).toEqual([20]);
+    expect(pa[0].country_code).toBe("PA");
+
+    const all = buildLast7Runs(rows, "all");
+    expect(all.length).toBe(3);
+  });
+});
+
+describe("resolveCountryFilter", () => {
+  const { resolveCountryFilter, activeCountryFromEnv } = require("../../api/nightly/health.js").__testing__;
+
+  it("returns the active country when no query is given", () => {
+    expect(resolveCountryFilter(undefined)).toBe(activeCountryFromEnv());
+    expect(resolveCountryFilter({})).toBe(activeCountryFromEnv());
+  });
+
+  it("accepts SV/PA/all (case-insensitive)", () => {
+    expect(resolveCountryFilter({ country: "SV" })).toBe("SV");
+    expect(resolveCountryFilter({ country: "pa" })).toBe("PA");
+    expect(resolveCountryFilter({ country: "all" })).toBe("all");
+    expect(resolveCountryFilter({ country: "ALL" })).toBe("all");
+  });
+
+  it("falls back to active country on unknown values", () => {
+    expect(resolveCountryFilter({ country: "BR" })).toBe(activeCountryFromEnv());
+    expect(resolveCountryFilter({ country: "" })).toBe(activeCountryFromEnv());
   });
 });
 

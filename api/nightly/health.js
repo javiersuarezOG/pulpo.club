@@ -95,9 +95,50 @@ function hoursSince(isoString) {
   return (Date.now() - t) / 3_600_000;
 }
 
-function buildLast7Runs(runHistory) {
+// PRD P2-1 — run_history.json is intentionally single-file across
+// countries (per-country last_updated/ranked are split; the audit log
+// stays unified). Operators looking at `last_7_runs` need country
+// scoping so a PA scaffold run with total=20 doesn't get misread as an
+// SV collapse from total=959.
+//
+// Resolution order per row:
+//   1. row.country_code (stamped at write time going forward, see
+//      automation/pipeline_steps.py:_append_run_history).
+//   2. Heuristic from per_source_raw — keys ⊆ PA_ONLY_SOURCES → "PA";
+//      anything else → "SV". The heuristic is intentionally conservative
+//      so a partial SV run (encuentra24-only after a brownout) does not
+//      flip identity. PA's scaffold runs only use encuentra24 today.
+//
+// PA_ONLY_SOURCES is a hardcoded set, not read from the country
+// manifest, because the manifest doesn't list sources yet (PR-MC-PA-1
+// shipped a minimum-viable scaffold; reference data lands in
+// PR-MC-PA-2+). When the manifest gains a `sources` array, replace
+// this set by reading the manifest.
+const PA_ONLY_SOURCES = new Set(["encuentra24"]);
+
+function inferCountry(row) {
+  if (row && typeof row.country_code === "string") {
+    const cc = row.country_code.toUpperCase();
+    if (cc === "SV" || cc === "PA") return cc;
+  }
+  const per = row && typeof row.per_source_raw === "object" ? row.per_source_raw : null;
+  if (!per) return "SV";
+  const keys = Object.keys(per);
+  if (keys.length === 0) return "SV";
+  // PA only if every key is in the PA-only set AND the set is small
+  // (single-key today — multi-source PA in the future will need the
+  // manifest-driven solution above).
+  if (keys.every((k) => PA_ONLY_SOURCES.has(k))) return "PA";
+  return "SV";
+}
+
+function buildLast7Runs(runHistory, countryFilter = null) {
   if (!Array.isArray(runHistory)) return [];
-  return runHistory
+  let rows = runHistory;
+  if (countryFilter && countryFilter !== "all") {
+    rows = rows.filter((r) => inferCountry(r) === countryFilter);
+  }
+  return rows
     .slice(-RUN_HISTORY_LIMIT)
     .map((r) => ({
       ts: r.ts ?? null,
@@ -105,6 +146,7 @@ function buildLast7Runs(runHistory) {
       dropped: r.dropped ?? null,
       duration_s: r.duration ?? null,
       error_count: r.error_count ?? null,
+      country_code: inferCountry(r),
     }))
     .reverse();
 }
@@ -331,7 +373,30 @@ function vlmBudgetToday(rows) {
   };
 }
 
-function buildHealth() {
+// Default country from env (Vercel deploys set PULPO_ACTIVE_COUNTRY for
+// the active manifest). Falls back to "SV" so localdev + tests don't
+// require the env to be set.
+function activeCountryFromEnv() {
+  const raw = (process.env.PULPO_ACTIVE_COUNTRY || "SV").toUpperCase();
+  return raw === "PA" ? "PA" : "SV";
+}
+
+// Resolve the country filter from request query. Accepts:
+//   ?country=SV   → SV-only last_7_runs (default)
+//   ?country=PA   → PA-only last_7_runs
+//   ?country=all  → unfiltered (operators inspecting cross-country runs)
+//   omitted       → active country from env
+// Anything else falls back to active country.
+function resolveCountryFilter(query) {
+  if (!query || typeof query.country !== "string") return activeCountryFromEnv();
+  const raw = query.country.toUpperCase();
+  if (raw === "SV" || raw === "PA" || raw === "ALL") {
+    return raw === "ALL" ? "all" : raw;
+  }
+  return activeCountryFromEnv();
+}
+
+function buildHealth(countryFilter = null) {
   const lastUpdated = loadJsonCached("lastUpdated", "last_updated.json");
   const runHistory = loadJsonCached("runHistory", "run_history.json");
   const vlmRows = loadJsonlCached("vlmBudget", "llm_vision_budget.jsonl");
@@ -345,9 +410,11 @@ function buildHealth() {
 
   const ageHours = hoursSince(lastDataCommitAt);
   const isStale = ageHours == null || ageHours > STALE_THRESHOLD_H;
+  const filter = countryFilter ?? activeCountryFromEnv();
 
   return {
     status: isStale ? "stale" : "ok",
+    country: filter,
     last_data_commit_at: lastDataCommitAt,
     last_data_commit_age_hours: ageHours == null ? null : Number(ageHours.toFixed(2)),
     last_run: {
@@ -355,7 +422,7 @@ function buildHealth() {
       dropped: lastUpdated ? lastUpdated.dropped ?? null : null,
       duration_s: lastDurationS,
     },
-    last_7_runs: buildLast7Runs(runHistory),
+    last_7_runs: buildLast7Runs(runHistory, filter),
     failed_sources_last_run: failedSourcesLastRun(lastUpdated, sourceHealthRows),
     degraded_sources: degradedSources(sourceHealthRows),
     vlm_budget_today: vlmBudgetToday(vlmRows),
@@ -375,7 +442,8 @@ function buildHealth() {
 
 module.exports = async (req, res) => {
   try {
-    const body = buildHealth();
+    const filter = resolveCountryFilter(req && req.query);
+    const body = buildHealth(filter);
     const httpStatus = body.status === "stale" ? 503 : 200;
     res.setHeader("Cache-Control", "public, max-age=60");
     return res.status(httpStatus).json(body);
@@ -398,6 +466,9 @@ module.exports.__testing__ = {
   degradedSources,
   summarizePhotoContract,
   hoursSince,
+  inferCountry,
+  resolveCountryFilter,
+  activeCountryFromEnv,
   STALE_THRESHOLD_H,
   VLM_DAILY_BUDGET_USD,
 };
