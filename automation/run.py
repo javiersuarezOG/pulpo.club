@@ -1953,6 +1953,31 @@ def main() -> int:
     _download_hires_photos(ranked_pre, REPO)
     ranked = ranked_pre
 
+    # PRD P1-2 — enforce the card-photo contract: every listing whose
+    # `hero_photo_path` is set must point at a present root file. The
+    # audit found 884/959 stale references after the prune sweep
+    # archived the old root files. Listings whose root path is missing
+    # have `hero_photo_path` nulled (UI's Photo component falls back
+    # gracefully). Stats land in web/data/photo_contract.json + an
+    # append-only audit log; the nightly Slack alert (caller's call)
+    # can hard-fail on threshold violations.
+    try:
+        from pulpo.photo_contract import enforce_photo_contract
+        photo_contract_stats = enforce_photo_contract(
+            ranked,
+            REPO / "web" / "photos",
+            data_dir=REPO / "web" / "data",
+        )
+        print(f"[photo_contract] ranked={photo_contract_stats.ranked_total} "
+              f"with_path={photo_contract_stats.with_local_path} "
+              f"exists={photo_contract_stats.local_path_exists} "
+              f"missing={photo_contract_stats.local_path_missing} "
+              f"nulled={photo_contract_stats.nulled}")
+        for violation in photo_contract_stats.fails_threshold():
+            print(f"[photo_contract] WARNING: {violation}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[photo_contract] failed (non-fatal): {_e!r}")
+
     # IA-axis derives — master_category × subcategory + discovery_tags
     # + star_rating. Runs AFTER rank() so star_rating + the top_rated
     # discovery tag can read rank_score, and AFTER the second

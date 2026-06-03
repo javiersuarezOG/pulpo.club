@@ -864,6 +864,18 @@ export type EventMap = {
     age_hours: number;
     oldest_created_at?: string;
   };
+  /** Server-side: fired by scripts/check_stuck_invitations.py when the
+   *  Clerk /v1/invitations call returns 4xx (currently 403 against the
+   *  GH-Actions CLERK_SECRET_KEY). The stuck-invitation alerting path is
+   *  paused until the secret is re-scoped — this event is the observable
+   *  surface so PostHog dashboards can raise the silent gap even while
+   *  the workflow exits 0 to preserve the upstream heartbeat signal. */
+  "invitation.stuck_check_unavailable": {
+    reason: string;       // e.g. "clerk_403", "clerk_401"
+    endpoint: string;     // "/v1/invitations"
+    detail?: string;      // capped Clerk error body (first 500 chars)
+    runbook?: string;
+  };
   "csp.violation": {
     blocked_uri?: string;
     violated_directive?: string;

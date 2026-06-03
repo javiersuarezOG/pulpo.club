@@ -47,7 +47,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
     expect(errors).toEqual([]);
   });
 
-  test("/?utm_source=reddit → modal renders", async ({ page }) => {
+  test("@critical /?utm_source=reddit → modal renders", async ({ page }) => {
     await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
     await page.locator(MODAL).waitFor({ state: "visible", timeout: 5_000 });
     // Three USPs visible inside the modal.
@@ -57,25 +57,25 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
     await expect(page.locator(".pro-upsell-cta-dismiss")).toBeVisible();
   });
 
-  test("/?code=REDDIT01 → modal + discount note", async ({ page }) => {
+  test("@critical /?code=REDDIT01 → modal + discount note", async ({ page }) => {
     await page.goto("/?code=REDDIT01", { waitUntil: "networkidle" });
     await page.locator(MODAL).waitFor({ state: "visible", timeout: 5_000 });
     await expect(page.locator(".pro-upsell-code-note")).toBeVisible();
   });
 
-  test("/?upsell=1 → modal (explicit force-on)", async ({ page }) => {
+  test("@critical /?upsell=1 → modal (explicit force-on)", async ({ page }) => {
     await page.goto("/?upsell=1", { waitUntil: "networkidle" });
     await page.locator(MODAL).waitFor({ state: "visible", timeout: 5_000 });
   });
 
-  test("/?utm_source=reddit&upsell=0 → no modal (force-off wins)", async ({ page }) => {
+  test("@critical /?utm_source=reddit&upsell=0 → no modal (force-off wins)", async ({ page }) => {
     await page.goto("/?utm_source=reddit&upsell=0", { waitUntil: "networkidle" });
     await page.locator(".homepage-v2, .new-homepage, .new-hero").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.waitForTimeout(800);
     await expect(page.locator(MODAL)).toHaveCount(0);
   });
 
-  test("Pro signed-in user → no modal even with utm", async ({ page }) => {
+  test("@critical Pro signed-in user → no modal even with utm", async ({ page }) => {
     await seedProUser(page);
     await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
     await page.locator(".homepage-v2, .new-homepage, .new-hero").first().waitFor({ state: "visible", timeout: 10_000 });
@@ -83,7 +83,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
     await expect(page.locator(MODAL)).toHaveCount(0);
   });
 
-  test("Dismiss → reload within suppression window → no modal", async ({ page }) => {
+  test("@critical Dismiss → reload within suppression window → no modal", async ({ page }) => {
     await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
     await page.locator(MODAL).waitFor({ state: "visible", timeout: 5_000 });
 
@@ -102,7 +102,7 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
 });
 
 test.describe("Home upsell modal — CTA wiring", () => {
-  test("Click 'Get access' → POST /api/stripe/start-checkout → redirect", async ({ page }) => {
+  test("@critical Click 'Get access' → POST /api/stripe/start-checkout → redirect", async ({ page }) => {
     await page.route("**/api/stripe/start-checkout", (route) => {
       return route.fulfill({
         status: 200,

@@ -100,3 +100,32 @@ jobs:
               --label "$LABEL" \
               --body "$BODY"
           fi
+
+      - name: Slack alert on watchdog failure
+        # The 2026-05-26 → 2026-06-01 6-day data freeze was invisible
+        # for that long because the watchdog only opened GitHub Issues
+        # — a surface nobody actively watches. The site served stale
+        # data while a watchdog issue accumulated comments daily.
+        #
+        # Slack alerts on the same failure surface turn the silent
+        # accumulation into a visible page. The existing GitHub issue
+        # remains the system of record; this is the human-visible
+        # trip wire. Best-effort: a Slack outage must not mask the
+        # underlying watchdog failure.
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping watchdog Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          # First line of the watchdog output usually carries the
+          # leading FAIL reason — include it so the Slack ping is
+          # actionable on its own without clicking through.
+          REASON=$(grep -m1 -E '^FAIL ' /tmp/watchdog_output.txt 2>/dev/null || echo "see run")
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo watchdog FAILED* — %s\\n<%s|view run>"}' "$REASON" "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"

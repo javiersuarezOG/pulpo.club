@@ -247,6 +247,22 @@ module.exports = withTiming(async (req, res) => {
       subject: built.subject,
       html: built.html,
       text: built.text,
+      // Audit 2026-06-02 (PRD P0-3): every Resend send must stamp
+      // `email_type` so /api/resend-webhook can classify lifecycle
+      // events. Untagged contact-form sends were the largest source of
+      // `email_type=unknown` in PostHog dashboards.
+      // No recipient_hash here: the user is the *sender*, the recipient
+      // is the operator inbox. We attach the topic instead so the
+      // operator can split contact-form lifecycle from newsletter
+      // lifecycle on the same Resend dashboard.
+      tags: [
+        { name: "email_type", value: "contact" },
+        { name: "topic", value: topic },
+      ],
+      headers: {
+        "X-Pulpo-Email-Type": "contact",
+        "X-Pulpo-Topic": topic,
+      },
     });
   } catch (err) {
     logApi("contact", {

@@ -161,6 +161,60 @@ Mandatory rules:
    The 2026-05-27 Resend outage was invisible for 7 days because there
    was no positive heartbeat.
 
+## NEVER ship a producer tag without naming its consumer (post-2026-06-02)
+
+PR #522 (the email audit) traced a months-long silent observability bug
+to exactly this pattern: `api/_activation_email.js` had been stamping
+`email_type=activation` on every outbound Resend payload since the
+activation pipeline launched. The consumer
+(`api/resend-webhook.js#pickPostHogProps`) never read the field. Activation
+lifecycle events landed in PostHog as `newsletter.delivered` /
+`.bounced` /etc. and contaminated newsletter deliverability dashboards
+for the entire window. The fix at the wire was 6 lines; the cost of
+discovering it was an audit.
+
+The root cause is generic: stamping a producer field with no consumer
+in the same PR is a silent failure mode that takes a deliberate audit
+to surface.
+
+**Mandatory rules for any PR that adds a tag, header, metadata field,
+custom property, or similar discriminator on an outbound third-party
+payload (Resend, Stripe, Clerk, PostHog Person properties, anything):**
+
+1. **The PR must reference the consumer file by path.** Either link
+   the line that reads the field, or — if the consumer doesn't exist
+   yet — open a stub PR for the consumer FIRST and reference it. A
+   producer landing alone is a tombstone.
+
+2. **If the value is from a closed set, the consumer must own the
+   allowlist and a contract test must enforce the producer side.**
+   The reference implementation is `KNOWN_EMAIL_TYPES` in
+   [api/resend-webhook.js](api/resend-webhook.js) and the test at
+   [tests/api/email_type_contract.test.js](tests/api/email_type_contract.test.js)
+   — the test greps every outbound sender for `email_type` literals
+   and asserts each is in the allowlist exported by the consumer.
+   Adopt the same pattern for any new closed-set discriminator:
+   single source of truth on the consumer + grep-based contract test
+   on the producers.
+
+3. **A new value going into the closed set is two edits in the same
+   PR:** add the literal at the producer site, add it to the
+   allowlist + extend `PRODUCER_FILES` in the contract test if the
+   sender file is new. The test failing on a producer-only edit is
+   the guardrail working.
+
+4. **The forward-compat exception is allowed.** A producer can land
+   *with* an entry already in `KNOWN_EMAIL_TYPES` even if no consumer
+   dashboard yet reads it — what's NOT allowed is a producer with no
+   allowlist entry. The contract test enforces this asymmetry on
+   purpose (see comment header in the test file).
+
+The contract test is the cheapest possible enforcement: it runs in
+the same vitest pass as everything else, takes ~3ms, and the failure
+message names the offending file. It does NOT prevent every silent
+producer/consumer drift — only the closed-set case — but that's the
+exact bug class that took an audit to find.
+
 ## Stripe return_url must be section-aware (post-2026-05-27)
 
 Stripe handoffs must return the user to the exact surface they came
@@ -407,6 +461,118 @@ All Pulpo persistence lives in one of two places:
 There is NO self-hosted Postgres, Supabase, Neon, Vercel KV, or
 Upstash instance. If a future feature genuinely needs one, the PR that
 adds it must also add the backup posture to this section.
+
+## NEVER let the nightly freeze data without a Slack page (post-2026-06-02)
+
+The 2026-05-26 → 2026-06-01 six-day data freeze was discovered by
+Sebastian noticing stale listings on `pulpo.club`, not by any alert.
+The hero canary blocked the nightly's commit step for 5+ consecutive
+runs; the existing watchdog correctly detected stale `last_updated`
+every day at 14:00 UTC and opened GitHub issues — a surface that
+nobody actively watches. Issues piled up. Site stayed stale.
+
+Mandatory rules:
+
+1. **The pulpo-watchdog must Slack-page on every failure.** GitHub
+   issues are the system of record; Slack is the human-visible trip
+   wire. Both run from the same `if: failure()` block in
+   `.github/workflows/pulpo-watchdog.yml`; do not silently disable
+   either path. If `SLACK_WEBHOOK_URL` is unset locally that's fine
+   — the curl exits 0 with a "skipping" breadcrumb — but a production
+   rotation that drops the secret is a sev-2.
+2. **The nightly's `Slack on failure` step (`if: failure()` + final
+   step) is the same contract** for the nightly itself.
+   `scripts/check_source_health.py` runs pre-canary and Slacks any
+   red source. Together with the watchdog's freshness check + Slack
+   ping, the time-to-discovery on a future freeze drops from 6 days
+   to under 30 hours.
+3. **The end-of-run summary step is observability, not validation.**
+   Lives at the bottom of `pulpo-nightly.yml`'s job log. Do not
+   migrate it into a canary or make it fail the workflow on missing
+   data — its purpose is to tell the story of what happened, even
+   on a failed run.
+
+## NEVER let a nightly silent-freeze via canary-vs-validation drift (post-2026-06-02)
+
+Nightly 26774794593 (2026-06-01) cleared the pipeline + 6 earlier
+canaries + recovered all 3 broken sources (956 fresh listings) and
+then died at the data-quality canary on ONE listing: a $7,666/m²
+premium beachfront micro-lot at Jaltepeque. The canary's PPM ceiling
+was `5_000`, identical to `automation/validation_bounds.PPM_FLAG_MAX`
+— meaning the validation layer kept + flagged listings in the
+5k-10k band while the workflow canary hard-failed on the same band.
+Every legitimate flagged listing in that range froze the data PR.
+
+Mandatory rules:
+
+1. **Canary upper bounds in `.github/workflows/pulpo-nightly.yml`
+   must match `automation/validation_bounds.<METRIC>_DROP_MAX`**,
+   not `FLAG_MAX`. The canary is a defensive backup for
+   unit-conversion bugs — it should fire only on listings the
+   validation layer would have dropped as structurally broken, and
+   never on flagged-but-kept legitimate data.
+2. **Canary lower bounds (where applicable) follow the same rule
+   against `_DROP_MIN`**, with the agricultural-cohort floor being
+   the only documented exception (looser by design).
+3. **`tests/test_canary_validation_alignment.py` enforces this
+   contract.** It parses the workflow YAML, extracts the canary
+   thresholds, and asserts each one against the matching
+   `validation_bounds.py` constant. A drift on either side fails the
+   test with a message pointing at the precedent (PR #618). When
+   updating a threshold, update BOTH sides intentionally; do not
+   silence the test.
+4. **Repo-variable escape hatch for incident response:** the data-
+   quality canary reads `LOG_ONLY` from
+   `${{ vars.DATA_QUALITY_LOG_ONLY || 'false' }}`. Flip the variable
+   to `true` in `Settings → Variables → Actions` to ship a nightly
+   while recalibrating thresholds in a follow-up PR. **Do not leave
+   it on `true`** — that ships silent data corruption. Always flip
+   back the same day and open the recalibration PR.
+
+## NEVER ship a nightly commit step that can't handle mid-run main movement (post-2026-06-02)
+
+Two distinct failure modes in the same week:
+
+- **PAT-scope race (nightly 26758631085, 2026-06-01).** The runner
+  checked out main at 13:42 UTC. PR #602 landed at 14:27 UTC with
+  changes under `.github/workflows/`. At 15:20 UTC pulpo-bot tried
+  to push the data branch, GitHub compared its workflow blobs to
+  current main, saw divergence, and rejected the push because
+  `PULPO_BOT_TOKEN` intentionally lacks `workflow` scope.
+- **Rebase-blocked-by-byproducts (nightly 26781987375).** PR #606
+  added `git rebase origin/main` before push to fix the PAT race.
+  That rebase failed with "cannot rebase: You have unstaged changes"
+  because the pipeline writes several files
+  (`unmapped_beaches_history.jsonl`, `repick_summary.jsonl`,
+  working-tree byproducts) that are intentionally NOT in the data
+  commit's `git add` list.
+
+Both fixed (#606 then #625) — the current invariant is:
+
+```yaml
+git fetch origin main
+git rebase --autostash origin/main || {
+    echo "::warning::rebase ... failed; aborting and pushing as-is"
+    git rebase --abort || true
+}
+git push origin "$BRANCH"
+```
+
+Mandatory rules:
+
+1. **`PULPO_BOT_TOKEN` MUST remain least-privilege.** Specifically,
+   no `workflow` scope. Adding that scope means a compromised bot
+   key could rewrite CI to leak secrets / disable canaries. The
+   rebase invariant above is the correct fix surface.
+2. **The data commit's `git add` list is incomplete by design.** The
+   pipeline writes files we don't want to ship to main (working-tree
+   logs, debug breadcrumbs). `--autostash` handles this without
+   broadening the `git add` list — those byproducts are intentionally
+   discarded on runner shutdown.
+3. **Never add `--no-verify` or `-c commit.gpgsign=false`** to the
+   commit step to "make the push work." The PAT-scope check is the
+   safety contract; if you're tempted to bypass it, the right fix is
+   the rebase invariant, not weakening the gate.
 
 ## DLQ semantics — listing vs source (post-2026-06-01)
 

@@ -449,10 +449,23 @@ jobs:
           EOF
 
       - name: Data-quality canaries
-        # Enforcing: violations fail the workflow.  Set LOG_ONLY="true" to
+        # Enforcing: violations fail the workflow. Set LOG_ONLY="true" to
         # temporarily downgrade to log-only while recalibrating thresholds.
+        #
+        # Repo variable escape hatch (PR-NR-H, 2026-06-02): when a real
+        # listing trips a canary that you trust the underlying validation
+        # layer to handle correctly (today's case: a $7666/m² premium
+        # beachfront micro-lot at Jaltepeque tripped PPM_RANGE on
+        # nightly 26774794593), set the repo variable
+        # `DATA_QUALITY_LOG_ONLY=true` via Settings → Variables → Actions
+        # and the next nightly ships without a code change. Flip back to
+        # `false` once the canary threshold is properly recalibrated in
+        # a follow-up PR — leaving log-only forever is how silent data
+        # corruption ships. The default below is `false` (enforce), so
+        # the canary continues to gate fresh data unless explicitly
+        # disabled.
         env:
-          LOG_ONLY: "false"
+          LOG_ONLY: ${{ vars.DATA_QUALITY_LOG_ONLY || 'false' }}
         run: |
           python3 - <<'EOF'
           import json, re, sys, os
@@ -706,6 +719,12 @@ jobs:
                   web/data/last_updated.json web/data/run_history.json \
                   web/data/parser_errors.log web/data/validation_log.jsonl \
                   samples/ranked.csv
+          # PRD P1-1 — featured.json had been stale since 2026-05-08 because
+          # `pulpo.featured_listing.write_featured_json` writes a fresh pick
+          # every nightly but this commit step never staged the file. PA's
+          # `featured.PA.json` is covered in the multi-country block below;
+          # SV's gets the same treatment.
+          git add web/data/featured.json 2>/dev/null || true
           # PR-MC-PA-3 — multi-country outputs from the PA pipeline
           # run. Best-effort: PA file absence does not block the commit
           # (continue-on-error on the PA pipeline step above means PA
@@ -729,6 +748,11 @@ jobs:
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
           git add web/data/zone_medians_history.jsonl 2>/dev/null || true
           git add web/data/distance_fields_history.jsonl 2>/dev/null || true
+          # PRD P1-2 — photo contract sidecar + append-only audit log.
+          # `photo_contract.json` carries the latest run's stats and is
+          # consumed by /api/nightly/health.
+          git add web/data/photo_contract.json 2>/dev/null || true
+          git add web/data/photo_contract_log.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures

@@ -173,6 +173,68 @@ describe("pickPostHogProps", () => {
     });
     expect(out.email_type).toBe("unknown");
   });
+
+  // ── PRD P0-3 — header casing fix + classification_source ──────────
+  //
+  // Resend preserves header key casing from the sender. The newsletter
+  // dispatcher stamps `X-Pulpo-Recipient` capitalized; previously the
+  // parser only matched the lowercase variant so the header fallback
+  // never resolved. Audit caught this — fixture covers the capitalized
+  // header path now.
+
+  it("resolves recipient_hash from capitalized X-Pulpo-Recipient header", () => {
+    const out = pickPostHogProps("email.delivered", {
+      data: {
+        email_id: "msg_cap",
+        headers: {
+          "X-Pulpo-Recipient": "deadbeef0123abcd",
+          "X-Pulpo-Email-Type": "newsletter",
+        },
+      },
+    });
+    expect(out.recipient_hash).toBe("deadbeef0123abcd");
+    expect(out.email_type).toBe("newsletter");
+    expect(out.classification_source).toBe("headers");
+  });
+
+  it("classification_source='tags' when tags carry the values", () => {
+    const out = pickPostHogProps("email.delivered", {
+      data: {
+        email_id: "msg_tags",
+        tags: [
+          { name: "recipient_hash", value: "abc" },
+          { name: "email_type", value: "activation" },
+        ],
+      },
+    });
+    expect(out.classification_source).toBe("tags");
+  });
+
+  it("classification_source='unknown' when nothing is stamped", () => {
+    const out = pickPostHogProps("email.delivered", {
+      data: { email_id: "msg_naked" },
+    });
+    expect(out.classification_source).toBe("unknown");
+    expect(out.recipient_hash).toBeNull();
+    expect(out.email_type).toBe("unknown");
+  });
+
+  it("accepts 'contact' as a valid email_type for contact-form sends", () => {
+    // PRD P0-3 — api/contact.js now stamps email_type=contact + topic
+    // so lifecycle events from the contact form land with a real axis
+    // instead of polluting the unknown bucket.
+    const out = pickPostHogProps("email.sent", {
+      data: {
+        email_id: "msg_contact",
+        tags: [
+          { name: "email_type", value: "contact" },
+          { name: "topic", value: "billing" },
+        ],
+      },
+    });
+    expect(out.email_type).toBe("contact");
+    expect(out.classification_source).toBe("tags");
+  });
 });
 
 describe("EVENT_MAP", () => {

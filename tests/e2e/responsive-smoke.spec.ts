@@ -85,7 +85,13 @@ const SECTIONS = [
   // a single-column stack at <640px, two columns above; the newsletter
   // widget form stays full-width below 900px and side-by-side above.
   { path: "/admin",            surface: ".page-admin", gated: false },
-  { path: "/admin/newsletter", surface: ".nl-widget",  gated: false },
+  // Selector tracks the redesigned widget (post-2026-05 admin newsletter
+    // stale-selector-allowed: documents the prior selector name only.
+    // refresh): `.nl-widget` was renamed `.nl-preview-widget` when the
+  // newsletter v3 redesign shipped. The audit (PRD P2-3) caught this
+  // drift — full E2E sweep was failing across all 5 viewports because
+  // the surface never resolved.
+  { path: "/admin/newsletter", surface: ".nl-preview-widget", gated: false },
 ] as const;
 
 // Returns { overflowPx, culpritOuter } for the current page.

@@ -73,8 +73,28 @@ function pickPostHogProps(event, body) {
     const row = tags.find(t => t && t.name === name);
     return row && typeof row.value === "string" ? row.value : null;
   };
-  const headers = (data.headers && typeof data.headers === "object") ? data.headers : {};
-  const recipient_hash = tag("recipient_hash") || headers["x-pulpo-recipient"] || null;
+  // Audit 2026-06-02 (PRD P0-3): Resend preserves the casing of header
+  // keys as the sender stamped them. The newsletter dispatcher stamps
+  // `X-Pulpo-Recipient` capitalized but the parser was reading the
+  // lowercase variant, so the header fallback never matched. Normalize
+  // all header keys to lowercase before lookup — keeps the lookup form
+  // ergonomic and tolerant of both casings.
+  const rawHeaders = (data.headers && typeof data.headers === "object") ? data.headers : {};
+  const headers = {};
+  for (const [k, v] of Object.entries(rawHeaders)) {
+    if (typeof k === "string") headers[k.toLowerCase()] = v;
+  }
+  // classification_source lets dashboards distinguish "stamped via tags"
+  // from "stamped via headers" from "unstamped/unknown". Useful for
+  // catching senders that forgot one branch (the contact-form bug class).
+  let recipientSource = null;
+  let recipient_hash = tag("recipient_hash");
+  if (recipient_hash != null) {
+    recipientSource = "tags";
+  } else if (typeof headers["x-pulpo-recipient"] === "string") {
+    recipient_hash = headers["x-pulpo-recipient"];
+    recipientSource = "headers";
+  }
   const issue_raw = tag("issue_number") || headers["x-pulpo-issue"] || null;
   const issue_number = issue_raw ? Number.parseInt(issue_raw, 10) : null;
   const message_id = data.email_id || data.id || null;
@@ -83,16 +103,41 @@ function pickPostHogProps(event, body) {
   // dispatcher (newsletter). Filterable downstream in PostHog so existing
   // newsletter.* dashboards can exclude activation pollution without
   // event renames. See docs/email-audit.md for the full audit.
-  const email_type_raw = tag("email_type") || headers["x-pulpo-email-type"] || null;
+  let emailTypeSource = null;
+  const tagEmailType = tag("email_type");
+  const headerEmailType = headers["x-pulpo-email-type"];
+  let email_type_raw = null;
+  if (tagEmailType != null) {
+    email_type_raw = tagEmailType;
+    emailTypeSource = "tags";
+  } else if (typeof headerEmailType === "string") {
+    email_type_raw = headerEmailType;
+    emailTypeSource = "headers";
+  }
   const email_type = email_type_raw && KNOWN_EMAIL_TYPES.has(email_type_raw)
     ? email_type_raw
     : "unknown";
+  // classification_source surfaces *why* the parser could/couldn't infer
+  // a value. "tags" beats "headers" beats "unknown"; if both axes were
+  // present but disagreed, the tag wins (most senders agree, this is
+  // belt-and-suspenders for the few that don't).
+  let classification_source = "unknown";
+  if (emailTypeSource && recipientSource) {
+    classification_source = emailTypeSource === recipientSource
+      ? emailTypeSource
+      : "mixed";
+  } else if (emailTypeSource) {
+    classification_source = emailTypeSource;
+  } else if (recipientSource) {
+    classification_source = recipientSource;
+  }
   const props = {
     resend_event: event,
     message_id,
     recipient_hash,
     issue_number: Number.isFinite(issue_number) ? issue_number : null,
     email_type,
+    classification_source,
   };
   if (event === "email.clicked") {
     const click = (data.click && typeof data.click === "object") ? data.click : {};
@@ -147,16 +192,39 @@ module.exports = async (req, res) => {
   }
 
   const eventType = typeof body.type === "string" ? body.type : "";
+  const props = pickPostHogProps(eventType, body);
+  const distinctId = props.recipient_hash ? `user:${props.recipient_hash}` : "server:resend_webhook";
+
+  // Audit 2026-06-02 (PRD P0-4): emit a dedicated, always-on heartbeat
+  // event for *every* verified Resend webhook delivery, independent of
+  // EVENT_MAP. This is the denominator the webhook-health heartbeat
+  // should rely on — `startsWith(event, 'newsletter.')` was matching
+  // internal cron events (newsletter.commentary_generated etc.) and
+  // keeping the Resend heartbeat green when the actual webhook stopped.
+  const heartbeatProps = {
+    resend_event: eventType,
+    mapped: Boolean(EVENT_MAP[eventType]),
+    email_type: props.email_type,
+    classification_source: props.classification_source,
+  };
+
   const phEvent = EVENT_MAP[eventType];
   if (!phEvent) {
-    // Resend may add new event types we haven't mapped — ack but skip.
+    // Resend may add new event types we haven't mapped — ack but skip
+    // the lifecycle capture. The heartbeat still fires so an unmapped
+    // event doesn't masquerade as a webhook outage.
+    try {
+      capture(distinctId, "resend.webhook_received", heartbeatProps);
+      await flush();
+    } catch (_err) {
+      // Telemetry must not block the webhook.
+    }
     logApi({ status: 200, ms: Date.now() - t0, reason: "unmapped_event", type: eventType });
     return res.status(200).json({ ok: true, ignored: true });
   }
 
-  const props = pickPostHogProps(eventType, body);
-  const distinctId = props.recipient_hash ? `user:${props.recipient_hash}` : "server:resend_webhook";
   try {
+    capture(distinctId, "resend.webhook_received", heartbeatProps);
     capture(distinctId, phEvent, props);
     await flush();
   } catch (err) {
@@ -173,6 +241,7 @@ module.exports = async (req, res) => {
     event: phEvent, recipient_hash: props.recipient_hash || "anon",
     issue_number: props.issue_number != null ? props.issue_number : "?",
     email_type: props.email_type,
+    classification_source: props.classification_source,
   });
   return res.status(200).json({ ok: true });
 };
@@ -181,3 +250,9 @@ module.exports = async (req, res) => {
 module.exports.verifySvixSignature = verifySvixSignature;
 module.exports.pickPostHogProps = pickPostHogProps;
 module.exports.EVENT_MAP = EVENT_MAP;
+// KNOWN_EMAIL_TYPES is the single source of truth for the discriminator
+// allowlist. The producer-tag contract test (tests/api/email_type_contract.test.js)
+// imports this and asserts every literal stamped by an outbound sender
+// is in the set, so a new sender can't silently land with an unmapped
+// email_type that downstream dashboards then bucket as "unknown".
+module.exports.KNOWN_EMAIL_TYPES = KNOWN_EMAIL_TYPES;

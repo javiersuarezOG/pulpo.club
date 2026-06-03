@@ -5,6 +5,14 @@ on:
     - cron: "0 */6 * * *"
   workflow_dispatch: {}
 
+# Post-2026-06-02 (PRD P0-1 + P0-2): the heavy Clerk/Resend API calls
+# now run from the Vercel serverless function at
+# /api/internal/webhook-health so they survive Cloudflare 1010 from
+# the GH-Actions runner. This workflow stays as a thin poller that
+# pings the endpoint AND keeps the PostHog-side heartbeat composer
+# (which queries event timelines, not provider APIs) as an independent
+# observability surface.
+
 jobs:
   health:
     runs-on: ubuntu-latest
@@ -15,14 +23,25 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check webhook family heartbeats
+      # PRD P0-1/P0-2 — Cloudflare 1010 blocks api.clerk.com and
+      # api.resend.com from the GH-Actions runner. The provider-side
+      # checks now run on the Vercel serverless function at
+      # /api/internal/webhook-health; this poll proves the endpoint is
+      # alive AND surfaces a red badge when the per-monitor status is
+      # `unavailable`.
+      - name: Poll Vercel webhook-health endpoint
         env:
-          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
-          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
-          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          PULPO_HEALTH_URL: ${{ secrets.PULPO_HEALTH_URL }}
+          PULPO_CRON_SECRET: ${{ secrets.PULPO_CRON_SECRET }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: python3 scripts/check_webhook_health.py
+        run: python3 scripts/poll_webhook_health_endpoint.py
 
+      # Run the per-provider PostHog-based monitors FIRST so they drop
+      # their status sidecars in $MONITOR_STATUS_DIR. The heartbeat step
+      # below reads those sidecars to compose
+      # `monitor.webhook_health_completed` with `{clerk_status,
+      # resend_status, stripe_status}`. Missing sidecar → status="unknown"
+      # so a crashed monitor is observable.
       - name: Check stuck activation invitations
         env:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -32,4 +51,16 @@ jobs:
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
         run: python3 scripts/check_stuck_invitations.py
+
+      - name: Check webhook family heartbeats (composes monitor.webhook_health_completed)
+        env:
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          POSTHOG_INGEST_HOST: ${{ secrets.POSTHOG_INGEST_HOST }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
+        run: python3 scripts/check_webhook_health.py

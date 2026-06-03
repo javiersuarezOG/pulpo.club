@@ -14,6 +14,9 @@
     "lint:css": "stylelint 'web/app/**/*.css'",
     "check:contrast": "node web/app/styles/check-contrast.mjs",
     "check:size": "node web/app/styles/check-bundle-size.mjs",
+    "e2e:critical": "playwright test --project=chromium --grep \"@critical\"",
+    "e2e:responsive": "playwright test --project=chromium tests/e2e/responsive-smoke.spec.ts",
+    "e2e:legacy": "playwright test --project=chromium --grep \"@legacy\"",
     "e2e:smoke": "playwright test --project=chromium",
     "e2e:authed": "playwright test --project=authed tests/e2e/account-authed.spec.ts"
   },

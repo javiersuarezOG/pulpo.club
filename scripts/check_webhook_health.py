@@ -17,7 +17,15 @@ import urllib.request
 
 
 DEFAULT_HOST = "https://eu.posthog.com"
+DEFAULT_INGEST_HOST = "https://eu.i.posthog.com"
 DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
+
+# Sidecar dir read at heartbeat time — `scripts/check_stuck_invitations.py`
+# and (Phase 1B) the Vercel-cron-backed monitors drop `{monitor}.json` files
+# here with `{status, ts, ...}`. Missing files surface as `unknown` so a
+# crashed monitor produces a `monitor.webhook_health_completed` row with
+# `clerk_status="unknown"` rather than a green-by-omission heartbeat.
+MONITOR_STATUS_DIR_DEFAULT = "/tmp/pulpo_monitor_status"
 
 # `webhook.received` is captured exclusively by api/stripe/webhook.js. The
 # `provider: "stripe"` tag was added alongside this script in the same PR
@@ -42,8 +50,23 @@ DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflow
 # global override for the workflow-dispatch test-fire path.
 FAMILIES = {
     "resend": {
-        "label": "Resend newsletter.*",
-        "where": "startsWith(event, 'newsletter.')",
+        # Audit 2026-06-02 (PRD P0-4): the old `startsWith(event,
+        # 'newsletter.')` matched internal cron events
+        # (newsletter.commentary_generated, newsletter.issue_built,
+        # newsletter.welcome_reconcile_completed, newsletter.send_succeeded)
+        # which kept the Resend heartbeat green even when the actual
+        # /api/resend-webhook stopped firing. Pin the heartbeat to real
+        # Resend lifecycle webhook events (and the dedicated
+        # resend.webhook_received heartbeat emitted by the handler).
+        "label": "Resend lifecycle webhook",
+        "where": (
+            "event = 'resend.webhook_received' "
+            "OR event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ")"
+        ),
         "max_age_hours": 12.0,
     },
     # Cadence drift specifically for the newsletter SEND pipeline.
@@ -236,6 +259,36 @@ RATE_CHECKS = {
         "threshold": 0.05,               # 5%
         "min_denominator": 20,
     },
+    # ── Resend lifecycle classification health ───────────────────────
+    # Audit 2026-06-02 (PRD P0-3): live PostHog showed nearly every
+    # newsletter.delivered row with email_type='unknown' because
+    # api/contact.js sent untagged emails. With the PR-1A contact-form
+    # fix in place, this rate should drop to near-zero. Alert when >5%
+    # of lifecycle events arrive without a recognisable email_type —
+    # that's the smoking gun for "a new sender shipped without tags".
+    #
+    # 24h window for fast feedback. min_denominator=10 to avoid
+    # alarming on a single contact-form-burst weekend.
+    "resend_unknown_email_type_rate": {
+        "label": "Resend lifecycle events with email_type='unknown'",
+        "numerator_where": (
+            "event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ") AND JSONExtractString(properties, 'email_type') = 'unknown'"
+        ),
+        "denominator_where": (
+            "event IN ("
+            "'newsletter.sent','newsletter.delivered','newsletter.opened',"
+            "'newsletter.clicked','newsletter.bounced','newsletter.complained',"
+            "'newsletter.delivery_delayed'"
+            ")"
+        ),
+        "window_hours": 24.0,
+        "threshold": 0.05,               # 5%
+        "min_denominator": 10,
+    },
 }
 
 
@@ -318,6 +371,50 @@ def slack(webhook_url: str, text: str, dry_run: bool) -> None:
         print(text)
         return
     post_json(webhook_url, {}, {"text": text}, parse_response=False)
+
+
+def read_monitor_status(monitor: str) -> dict | None:
+    """Return the per-monitor sidecar dict, or None if absent/malformed.
+
+    The heartbeat treats `None` as `unknown`. Never raises.
+    """
+    out_dir = env("MONITOR_STATUS_DIR", MONITOR_STATUS_DIR_DEFAULT)
+    path = os.path.join(out_dir, f"{monitor}.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def capture_posthog_event(event: str, properties: dict) -> None:
+    """Emit a single PostHog event via the ingest API.
+
+    Mirrors scripts/check_stuck_invitations.py's capture_posthog. Used for
+    the monitor.webhook_health_completed heartbeat; bails silently when
+    `POSTHOG_PROJECT_TOKEN` is unset (the dry-run/local-debug case).
+    """
+    token = env("POSTHOG_PROJECT_TOKEN")
+    if not token:
+        return
+    host = env("POSTHOG_INGEST_HOST", DEFAULT_INGEST_HOST)
+    try:
+        post_json(
+            f"{host.rstrip('/')}/capture/",
+            {},
+            {
+                "api_key": token,
+                "event": event,
+                "distinct_id": "server:webhook_health",
+                "properties": properties,
+            },
+            parse_response=False,
+        )
+    except RuntimeError:
+        # Telemetry must not block the workflow — same posture as the
+        # Slack helper above.
+        pass
 
 
 def main() -> int:
@@ -406,6 +503,26 @@ def main() -> int:
 
     for failure in failures:
         slack(slack_url, f":warning: {failure}. {args.runbook_url}", args.dry_run)
+
+    # PRD P0-1 — positive heartbeat. Composes per-monitor status from the
+    # `/tmp/pulpo_monitor_status/` sidecars written by sibling scripts.
+    # Missing sidecar → `unknown`, so a monitor that died before writing
+    # its status still surfaces on dashboards.
+    def _status_for(monitor: str) -> str:
+        row = read_monitor_status(monitor)
+        if row is None:
+            return "unknown"
+        return str(row.get("status") or "unknown")
+
+    heartbeat_props = {
+        "clerk_status": _status_for("clerk"),
+        "resend_status": _status_for("resend"),
+        "stripe_status": _status_for("stripe"),
+        "failures_count": len(failures),
+        "runbook": args.runbook_url,
+    }
+    print(f"heartbeat: {json.dumps(heartbeat_props)}")
+    capture_posthog_event("monitor.webhook_health_completed", heartbeat_props)
 
     return 1 if failures else 0
 

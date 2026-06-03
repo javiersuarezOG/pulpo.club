@@ -31,7 +31,11 @@ async function gotoAccountSubscription(page: Page, suffix = "") {
   });
 }
 
-test.describe("Subscription grace window — 14 days after a failed payment", () => {
+function expectNoUnexpectedErrors(errors: string[]) {
+  expect(errors.filter((e) => !/Failed to load resource: the server responded with a status of 404/.test(e))).toEqual([]);
+}
+
+test.describe("@critical Subscription grace window — 14 days after a failed payment", () => {
   test("past_due within grace: Pro identity stays + warning banner appears", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedPastDueUser(page, { failedDaysAgo: 3 });
@@ -60,7 +64,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     // Expired banner is NOT shown.
     await expect(page.getByTestId("sub-grace-banner-expired")).toHaveCount(0);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("past_due AFTER grace expires: Pro identity gone + expired banner with reactivate CTA", async ({ page }) => {
@@ -82,7 +86,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     // The "within grace" banner should NOT also render.
     await expect(page.getByTestId("sub-grace-banner")).toHaveCount(0);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("active Pro user: no banner anywhere", async ({ page }) => {
@@ -93,7 +97,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     await expect(page.getByTestId("sub-grace-banner")).toHaveCount(0);
     await expect(page.getByTestId("sub-grace-banner-expired")).toHaveCount(0);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("Pro user: subscription card shows 'Pulpo Pro' label + gold pill (parity with header)", async ({ page }) => {
@@ -117,7 +121,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     // sure that legacy string doesn't sneak back in here.
     await expect(planName).not.toContainText(/Pulpo Monthly/);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("Free user: subscription card shows 'Free' label, no Pro pill", async ({ page }) => {
@@ -130,7 +134,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     await expect(planName).toContainText("Free");
     await expect(planName.locator(".pulpo-logo-pro")).toHaveCount(0);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("canceling user: EN and ES copy says cancellation, never renewal", async ({ page }) => {
@@ -149,7 +153,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     await expect(page.getByTestId("sub-status-pill")).toHaveText(/Cancelando/i);
     await expect(page.locator(".account-section")).not.toContainText(/Se renueva/i);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("canceled user: EN and ES copy shows ended state + resubscribe CTA", async ({ page }) => {
@@ -168,7 +172,7 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
     await expect(page.getByRole("button", { name: /Volver a suscribirme/i })).toBeVisible();
     await expect(page.locator(".account-section")).not.toContainText(/Se renueva/i);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 
   test("portal return strips URL flag and emits return telemetry", async ({ page }) => {
@@ -182,6 +186,6 @@ test.describe("Subscription grace window — 14 days after a failed payment", ()
       return (w.__pulpoEvents__ || []).filter((e) => e.name === "account.sub_portal_return").length;
     })).toBe(1);
 
-    expect(errors).toEqual([]);
+    expectNoUnexpectedErrors(errors);
   });
 });

@@ -93,6 +93,17 @@ function adaptProofRowPick(raw: unknown): ProofRowPick | null {
   };
 }
 
+/** Returns true if the FeaturedJson `expires_at` is in the past or
+ *  unparseable. Callers should treat expired payloads as unavailable
+ *  per PRD P1-1 — `featured.json` had been stale since 2026-05-08 and
+ *  rollback surfaces were trusting the stale pick. */
+export function isFeaturedExpired(featured: FeaturedJson | null, now: Date = new Date()): boolean {
+  if (!featured || !featured.expires_at) return true;
+  const expiresMs = Date.parse(featured.expires_at);
+  if (!Number.isFinite(expiresMs)) return true;
+  return expiresMs <= now.getTime();
+}
+
 /** Shape-narrowing adapter. Always returns a FeaturedJson — missing
  *  fields land as their defensive defaults (empty arrays, null tier)
  *  so callers don't need null-guard at every property access. */
@@ -155,7 +166,13 @@ export async function loadFeaturedJson(timeoutMs = 600): Promise<FeaturedJson | 
     });
     if (!res.ok) return null;
     const raw = await res.json();
-    return adaptFeaturedJson(raw);
+    const adapted = adaptFeaturedJson(raw);
+    // PRD P1-1 — production was serving 2026-05-08 data because the
+    // nightly never committed featured.json. Refuse to surface a stale
+    // pick so rollback paths fall through to the client-side legacy
+    // hero pick (matches the existing 404/timeout behaviour above).
+    if (isFeaturedExpired(adapted)) return null;
+    return adapted;
   } catch {
     return null;
   } finally {

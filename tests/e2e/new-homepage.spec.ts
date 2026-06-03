@@ -20,13 +20,14 @@ import { test, expect } from "@playwright/test";
 import { attachErrorRecorder } from "./_helpers";
 
 // Legacy hero-v3 surface — these tests assert section landmarks +
-// behaviors that live on the dark-forest HeroV2 path. Hero v4 became
-// the default-on visual in production (the readFeatureFlag fallback
-// is `true`); opt out here so the V3 surface is exercised. Coverage
-// of the v4 surface lives in tests/e2e/hero-v4.spec.ts.
-const URL_HOME = "/?ff_hero_v4=0";
+// behaviors that live on the dark-forest HeroV2 path. Both hero_v4
+// AND hero_v5 became default-on (hero_v5 wins over hero_v4 in
+// blockRegistry); opt out of BOTH so the V3 surface is exercised.
+// Coverage of the v4 surface lives in tests/e2e/hero-v4.spec.ts,
+// and the v5 surface in tests/e2e/hero-v5.spec.ts.
+const URL_HOME = "/?ff_hero_v4=0&ff_hero_v5=0";
 
-test.describe("Homepage v2 — redesign smoke", () => {
+test.describe("@legacy Homepage v2 — redesign smoke", () => {
   test("boots cleanly with the rewrite title", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await page.goto(URL_HOME, { waitUntil: "networkidle" });

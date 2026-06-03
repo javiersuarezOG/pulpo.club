@@ -30,6 +30,8 @@ const cache = {
   runHistory: { json: null, mtime: 0 },
   vlmBudget: { rows: null, mtime: 0 },
   sourceHealth: { rows: null, mtime: 0 },
+  featured: { json: null, mtime: 0 },
+  photoContract: { json: null, mtime: 0 },
 };
 
 function resolveDataPath(filename) {
@@ -138,6 +140,169 @@ function failedSourcesLastRun(lastUpdated, sourceHealthRows) {
   return failures;
 }
 
+// PRD P1-1 — surface featured.json freshness so a stale pick is
+// detectable from /api/nightly/health without opening the file. Returns
+// `null` when the file is missing (PA-only run, file-not-yet-generated)
+// so dashboards can render an explicit "absent" rather than guessing.
+function featuredFreshness(featured) {
+  if (!featured || typeof featured !== "object") return null;
+  const pickedAt = typeof featured.picked_at === "string" ? featured.picked_at : null;
+  const expiresAt = typeof featured.expires_at === "string" ? featured.expires_at : null;
+  const expiresMs = expiresAt ? Date.parse(expiresAt) : NaN;
+  const fresh = Number.isFinite(expiresMs) ? expiresMs > Date.now() : false;
+  return {
+    picked_at: pickedAt,
+    expires_at: expiresAt,
+    fresh,
+    age_hours: pickedAt ? Number((hoursSince(pickedAt) ?? 0).toFixed(2)) : null,
+  };
+}
+
+// PRD P1-9 — surface brownout-state sources alongside the binary
+// `failed_sources_last_run`. The Python nightly's
+// scripts/check_source_health.py computes the authoritative state via
+// pulpo.source_health.compute_brownout_states; this endpoint mirrors
+// the calculation client-side from the same `source_health_history.jsonl`
+// data so JS callers (admin/sources widget, ops dashboards) don't need
+// a separate sidecar fetch.
+//
+// Thresholds:
+//   green       — kept-count ≥ 90% of rolling 7-run median.
+//   degraded    — kept-count < 50% of median for the latest run.
+//   red         — kept-count < 50% of median for two+ consecutive runs.
+//   recovering  — previous run was degraded/red AND current ratio
+//                 sits in 50%-90% (climbing back).
+const SRC_DEGRADED = 0.5;
+const SRC_RECOVERING_CEIL = 0.9;
+const SRC_ROLLING_WINDOW = 7;
+const SRC_MIN_HISTORY = 3;
+
+function _keptCount(row) {
+  const raw = row && (row.kept != null ? row.kept : row.scraped);
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+}
+
+function _median(values) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function _statusToBrownout(status) {
+  if (status === "green") return "green";
+  if (status === "red") return "red";
+  if (status === "skipped") return "skipped";
+  return "unknown";
+}
+
+function degradedSources(rows) {
+  if (!Array.isArray(rows)) return [];
+  // Group by source, sort chronologically.
+  const bySource = new Map();
+  for (const r of rows) {
+    if (!r || typeof r !== "object") continue;
+    const src = r.source || "?";
+    if (!bySource.has(src)) bySource.set(src, []);
+    bySource.get(src).push(r);
+  }
+
+  const out = [];
+  for (const [source, history] of bySource) {
+    history.sort((a, b) => String(a.ts || "").localeCompare(String(b.ts || "")));
+    if (!history.length) continue;
+    const latest = history[history.length - 1];
+    const latestCount = _keptCount(latest);
+    const window = history.slice(-(SRC_ROLLING_WINDOW + 1), -1);
+    const historical = window.map(_keptCount).filter((n) => n > 0);
+
+    if (historical.length < SRC_MIN_HISTORY) continue;
+
+    const median = _median(historical);
+    const ratio = median > 0 ? latestCount / median : 0;
+    const previousStatus = history.length > 1
+      ? _statusToBrownout(history[history.length - 2].status)
+      : null;
+
+    // Walk back to count consecutive runs <50% of their own prior window.
+    let consecutive = 0;
+    for (let i = history.length - 1; i >= 0; i--) {
+      const row = history[i];
+      const count = _keptCount(row);
+      const priorWindow = history
+        .slice(Math.max(0, i - SRC_ROLLING_WINDOW), i)
+        .map(_keptCount)
+        .filter((n) => n > 0);
+      if (priorWindow.length < SRC_MIN_HISTORY) break;
+      const priorMedian = _median(priorWindow);
+      const priorRatio = priorMedian > 0 ? count / priorMedian : 0;
+      if (priorRatio < SRC_DEGRADED) consecutive += 1;
+      else break;
+    }
+
+    let status;
+    if (ratio < SRC_DEGRADED) {
+      status = consecutive >= 2 ? "red" : "degraded";
+    } else if (ratio < SRC_RECOVERING_CEIL
+               && (previousStatus === "red" || previousStatus === "degraded")) {
+      status = "recovering";
+    } else {
+      status = "green";
+    }
+
+    if (status === "green") continue;
+    out.push({
+      source,
+      status,
+      count: latestCount,
+      rolling_median_7: Number(median.toFixed(2)),
+      ratio: Number(ratio.toFixed(4)),
+      consecutive_degraded_runs: consecutive,
+      previous_status: previousStatus,
+      failure_id: typeof latest.failure_id === "string" ? latest.failure_id : null,
+      error_class: typeof latest.error_class === "string" ? latest.error_class : null,
+    });
+  }
+  out.sort((a, b) => a.source.localeCompare(b.source));
+  return out;
+}
+
+// PRD P1-2 — `web/data/photo_contract.json` is written by
+// `pulpo.photo_contract.enforce_photo_contract` after every nightly.
+// Surface the key fields so /api/nightly/health is the single
+// observability surface for "do listings actually have a working photo
+// today?". `null` when the sidecar is missing (legacy data, brand-new
+// install) so callers can render "absent" explicitly.
+function summarizePhotoContract(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const safeNum = (v) => (typeof v === "number" ? v : null);
+  return {
+    ranked_total: safeNum(raw.ranked_total),
+    with_local_path: safeNum(raw.with_local_path),
+    local_path_exists: safeNum(raw.local_path_exists),
+    local_path_missing: safeNum(raw.local_path_missing),
+    missing_rate: safeNum(raw.missing_rate),
+    top_browse: raw.top_browse && typeof raw.top_browse === "object"
+      ? {
+        n: safeNum(raw.top_browse.n),
+        present: safeNum(raw.top_browse.present),
+        missing: safeNum(raw.top_browse.missing),
+        coverage: safeNum(raw.top_browse.coverage),
+      }
+      : null,
+    top_hero: raw.top_hero && typeof raw.top_hero === "object"
+      ? {
+        n: safeNum(raw.top_hero.n),
+        present: safeNum(raw.top_hero.present),
+        missing: safeNum(raw.top_hero.missing),
+        coverage: safeNum(raw.top_hero.coverage),
+      }
+      : null,
+    evaluated_at: typeof raw.evaluated_at === "string" ? raw.evaluated_at : null,
+  };
+}
+
 function vlmBudgetToday(rows) {
   if (!Array.isArray(rows)) {
     return { spend_usd: 0, pct_used: 0, success_rate_24h: null, call_count_24h: 0 };
@@ -171,6 +336,8 @@ function buildHealth() {
   const runHistory = loadJsonCached("runHistory", "run_history.json");
   const vlmRows = loadJsonlCached("vlmBudget", "llm_vision_budget.jsonl");
   const sourceHealthRows = loadJsonlCached("sourceHealth", "source_health_history.jsonl");
+  const featured = loadJsonCached("featured", "featured.json");
+  const photoContract = loadJsonCached("photoContract", "photo_contract.json");
 
   const lastDataCommitAt = lastUpdated ? lastUpdated.last_updated ?? null : null;
   const lastTotalListings = lastUpdated ? lastUpdated.total_listings ?? null : null;
@@ -190,7 +357,10 @@ function buildHealth() {
     },
     last_7_runs: buildLast7Runs(runHistory),
     failed_sources_last_run: failedSourcesLastRun(lastUpdated, sourceHealthRows),
+    degraded_sources: degradedSources(sourceHealthRows),
     vlm_budget_today: vlmBudgetToday(vlmRows),
+    featured: featuredFreshness(featured),
+    photo_contract: summarizePhotoContract(photoContract),
     // Phase A follow-on (separate PR) will populate these from
     // nightly_progress.json + phase_durations.jsonl.
     current_progress: null,
@@ -224,6 +394,9 @@ module.exports.__testing__ = {
   buildLast7Runs,
   failedSourcesLastRun,
   vlmBudgetToday,
+  featuredFreshness,
+  degradedSources,
+  summarizePhotoContract,
   hoursSince,
   STALE_THRESHOLD_H,
   VLM_DAILY_BUDGET_USD,
