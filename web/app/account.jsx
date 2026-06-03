@@ -5,7 +5,14 @@
 import React, { useState as aUseState, useEffect as aUseEffect, useMemo as aUseMemo } from "react";
 import { t, tr } from "./i18n.jsx";
 import { Icon, PulpoLogo, formatPrice, currentLocale } from "./components.jsx";
-import { startStripeCheckout } from "./auth/stripe-checkout.js";
+// stripe-checkout is dynamic-imported from app.jsx + lib/cta-routing.ts;
+// keep it dynamic here too so Vite splits it into its own chunk instead
+// of bundling the Stripe redirect logic into the account entry. Wrapper
+// keeps the call sites a single `startStripeCheckout({...})` invocation.
+async function startStripeCheckout(opts) {
+  const mod = await import("./auth/stripe-checkout.js");
+  return mod.startStripeCheckout(opts);
+}
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
 import { COUNTRIES } from "./lib/countries.js";

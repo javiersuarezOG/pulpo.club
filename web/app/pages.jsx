@@ -62,7 +62,13 @@ import {
 } from "./components.jsx";
 import { LiveStats } from "./components/LiveStats.jsx";
 import { useUnits } from "./i18n.jsx";
-import { startStripeCheckout } from "./auth/stripe-checkout.js";
+// Dynamic-imported elsewhere (app.jsx + lib/cta-routing.ts); keep
+// dynamic here too so Vite splits stripe-checkout into its own chunk
+// instead of bundling it into the pages entry.
+async function startStripeCheckout(opts) {
+  const mod = await import("./auth/stripe-checkout.js");
+  return mod.startStripeCheckout(opts);
+}
 import { resolvePinFromParam } from "./lib/share";
 import {
   uspsVisibleFor,

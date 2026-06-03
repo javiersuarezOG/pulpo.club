@@ -100,7 +100,12 @@ jobs:
           fi
           node scripts/diff_newsletter_version.mjs "$BASE_SHA"
       - run: npm run test --if-present
-      - run: npm run build
+      - name: Build (capture log for mixed-import check)
+        run: npm run build 2>&1 | tee /tmp/pulpo-build.log
+      # Mixed static+dynamic imports defeat Vite chunk splitting (PR-5B
+      # caught stripe-checkout.js + telemetry/perf.ts). This gate fails
+      # CI if the regression returns.
+      - run: node scripts/check_mixed_imports.mjs /tmp/pulpo-build.log
       - run: npm run check:size
 
   e2e-critical:
