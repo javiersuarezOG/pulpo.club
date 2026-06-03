@@ -1,6 +1,6 @@
 """
-Post-crawl audit. Reads web/data/ranked.json + last_updated.json and writes a
-human-readable summary to samples/last_run_audit.txt covering:
+Post-crawl audit. Reads web/data/ranked.json + last_updated.json and prints a
+human-readable summary covering:
 
   - record count, source split, dropped count
   - dedup confirmation (unique URLs vs total records)
@@ -15,6 +15,7 @@ Exits non-zero if any hard invariants fail (dedup not enforced, SOLD leaks,
 fixture_fallback_active true on a live run).
 """
 from __future__ import annotations
+import argparse
 import json
 import re
 import statistics
@@ -26,7 +27,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 RANKED = REPO / "web" / "data" / "ranked.json"
 META = REPO / "web" / "data" / "last_updated.json"
-OUT = REPO / "samples" / "last_run_audit.txt"
+DEFAULT_OUT = REPO / "samples" / "last_run_audit.txt"
 
 # Mirror the relaxed pattern from pulpo.normalize._SOLD_RE — see comment there.
 # No trailing \b, because DOM-blob text often runs words together.
@@ -36,7 +37,20 @@ SOLD_RE = re.compile(
 )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Audit the latest ranked.json crawl output.")
+    parser.add_argument(
+        "--write",
+        metavar="PATH",
+        help=f"Write the audit report to PATH. Old default path: {DEFAULT_OUT}",
+    )
+    parser.add_argument(
+        "--stdout",
+        action="store_true",
+        help="Print the full audit to stdout. This is the default when --write is omitted.",
+    )
+    args = parser.parse_args(argv)
+
     if not RANKED.exists():
         print(f"FAIL: {RANKED} missing", file=sys.stderr)
         return 1
@@ -173,10 +187,18 @@ def main() -> int:
     else:
         w("VERDICT: OK")
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"audit written to {OUT}")
-    print("\n".join(lines[-12:]))  # echo verdict block
+    report = "\n".join(lines) + "\n"
+
+    if args.write:
+        out = Path(args.write)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(report, encoding="utf-8")
+        print(f"audit written to {out}")
+
+    if args.stdout or not args.write:
+        print(report, end="")
+    else:
+        print("\n".join(lines[-12:]))  # echo verdict block
 
     return 1 if failures else 0
 
