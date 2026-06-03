@@ -30,7 +30,7 @@ async function getEvents(page: Page): Promise<CapturedEvent[]> {
   });
 }
 
-test.describe("hero_v4 (Wave 5#7+#9) — flag off (rollback path)", () => {
+test.describe("@legacy hero_v4 (Wave 5#7+#9) — flag off (rollback path)", () => {
   test("HeroV3 renders, FeaturedDeal block present, .hp-hero-v4 absent", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
@@ -51,7 +51,7 @@ test.describe("hero_v4 (Wave 5#7+#9) — flag off (rollback path)", () => {
   });
 });
 
-test.describe("hero_v4 (Wave 5#7+#9) — flag on", () => {
+test.describe("@legacy hero_v4 (Wave 5#7+#9) — flag on", () => {
   // SKIPPED 2026-05-25 — the `.hp-hero-v4` selector + the
   // hero_v4_viewed event payload have drifted from this spec since
   // Wave 5#7+#9 shipped. The other tests in this describe block still

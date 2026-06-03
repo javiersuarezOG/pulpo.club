@@ -24,7 +24,7 @@ async function getEvents(page: Page): Promise<CapturedEvent[]> {
   });
 }
 
-test.describe("USP popup (Wave 5) — flag off (rollback path)", () => {
+test.describe("@legacy USP popup (Wave 5) — flag off (rollback path)", () => {
   test("USPBand renders inline; no popup", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
@@ -43,7 +43,7 @@ test.describe("USP popup (Wave 5) — flag off (rollback path)", () => {
   });
 });
 
-test.describe("USP popup (Wave 5) — flag on", () => {
+test.describe("@legacy USP popup (Wave 5) — flag on", () => {
   test("?upsell=1 fires the popup with trigger=url_param", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 
@@ -107,7 +107,7 @@ test.describe("USP popup (Wave 5) — flag on", () => {
   });
 });
 
-test.describe("USP popup (Wave 5) — dismiss + suppression", () => {
+test.describe("@legacy USP popup (Wave 5) — dismiss + suppression", () => {
   test("Maybe-later stamps the 7-day cap; second visit shows nothing", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedUser(page, "free");
@@ -148,7 +148,7 @@ test.describe("USP popup (Wave 5) — dismiss + suppression", () => {
   });
 });
 
-test.describe("USP popup (Wave 5) — CTA wiring", () => {
+test.describe("@legacy USP popup (Wave 5) — CTA wiring", () => {
   test("anon CTA click → opens FreeMonthModal (post-#262 routing)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
 

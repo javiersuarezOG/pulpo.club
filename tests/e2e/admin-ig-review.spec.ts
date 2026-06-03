@@ -95,7 +95,7 @@ async function assertNoHorizontalOverflow(page: import("@playwright/test").Page)
   ).toBeLessThanOrEqual(overflow.innerWidth + 1);
 }
 
-test.describe("/admin/ig-review", () => {
+test.describe("@legacy /admin/ig-review", () => {
   for (const vp of VIEWPORTS) {
     test(`empty state · ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });

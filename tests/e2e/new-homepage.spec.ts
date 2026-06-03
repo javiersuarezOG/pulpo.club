@@ -27,7 +27,7 @@ import { attachErrorRecorder } from "./_helpers";
 // and the v5 surface in tests/e2e/hero-v5.spec.ts.
 const URL_HOME = "/?ff_hero_v4=0&ff_hero_v5=0";
 
-test.describe("Homepage v2 — redesign smoke", () => {
+test.describe("@legacy Homepage v2 — redesign smoke", () => {
   test("boots cleanly with the rewrite title", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await page.goto(URL_HOME, { waitUntil: "networkidle" });

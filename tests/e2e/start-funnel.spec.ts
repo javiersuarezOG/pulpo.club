@@ -44,7 +44,7 @@ async function mockCheckoutEndpoint(page: import("@playwright/test").Page) {
   });
 }
 
-test.describe("/start — content + interactions", () => {
+test.describe("@critical /start — content + interactions", () => {
   for (const vp of VIEWPORTS) {
     for (const lc of LOCALES) {
       test(`renders cleanly @ ${vp.name} · ${lc.code}`, async ({ page }) => {

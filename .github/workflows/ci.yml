@@ -72,6 +72,7 @@ jobs:
       # web/app/. ~1s, runs before the heavier checks. See
       # scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
       - run: node scripts/i18n_lint.mjs
+      - run: node scripts/check_e2e_stale_selectors.mjs
       - name: CSP allowlist drop guard
         run: |
           BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
@@ -101,7 +102,33 @@ jobs:
       - run: npm run test --if-present
       - run: npm run build
 
-  # The e2e (Playwright smoke) job was REMOVED from PR-triggered CI on
+  e2e-critical:
+    name: e2e critical
+    runs-on: ubuntu-latest
+    needs: frontend
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install chromium
+      - run: npm run build
+      - name: Start Vite preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 5173 > /tmp/pulpo-preview.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/pulpo-preview.log
+          exit 1
+      - run: npm run e2e:critical
+
+  # The full e2e (Playwright smoke) job was REMOVED from PR-triggered CI on
   # 2026-05-25. Rationale: the suite spent more time red on PR pages
   # than green — selector drift across surfaces that evolved faster
   # than tests were maintained kept failing PRs that touched
@@ -111,10 +138,13 @@ jobs:
   # arms race wasn't sustainable for a small team.
   #
   # The tests themselves still live under `tests/e2e/` and the npm
-  # script `e2e:smoke` still works locally:
+  # scripts still work locally:
   #
   #     npm run dev    # in one terminal
-  #     npm run e2e:smoke
+  #     npm run e2e:critical    # PR gate subset
+  #     npm run e2e:responsive  # visual/responsive sweep before UI PRs
+  #     npm run e2e:legacy      # quarantined retired surfaces
+  #     npm run e2e:smoke       # full local sweep
   #
   # Anyone investigating a UI regression can run them on demand. The
   # responsive-smoke spec specifically (the 5-viewport overflow guard)
