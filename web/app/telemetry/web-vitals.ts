@@ -51,21 +51,41 @@ function currentRoute(): string {
   return window.location.pathname || "/";
 }
 
+// PostHog auto-segments by geo + device. `locale` is the one axis
+// that's authoritative client-side and that ops needs for SLO splits —
+// ES readers commonly hit Spanish-only surfaces (ES newsletter, ES
+// landing) where the perf profile differs from the EN-default render
+// path. Read from the same localStorage key the i18n module uses;
+// fall back to "en" so dashboards aren't poisoned by null.
+function currentLocale(): "en" | "es" {
+  try {
+    if (typeof localStorage !== "undefined") {
+      const stored = localStorage.getItem("pulpo-locale");
+      if (stored === "en" || stored === "es") return stored;
+    }
+  } catch {
+    // SecurityError on some Safari private-mode contexts — ignore.
+  }
+  return "en";
+}
+
 function emit(metric: Metric) {
   const r = rating(metric.name, metric.value);
+  const route = currentRoute();
+  const locale = currentLocale();
   switch (metric.name) {
     case "LCP":
-      track("web_vitals.lcp", { value: metric.value, rating: r, route: currentRoute() });
+      track("web_vitals.lcp", { value: metric.value, rating: r, route, locale });
       emitLcpAttribution(metric as LCPMetricWithAttribution);
       return;
     case "INP":
-      track("web_vitals.inp", { value: metric.value, rating: r, route: currentRoute() });
+      track("web_vitals.inp", { value: metric.value, rating: r, route, locale });
       return;
     case "CLS":
-      track("web_vitals.cls", { value: metric.value, rating: r, route: currentRoute() });
+      track("web_vitals.cls", { value: metric.value, rating: r, route, locale });
       return;
     case "TTFB":
-      track("web_vitals.ttfb", { value: metric.value, rating: r, route: currentRoute() });
+      track("web_vitals.ttfb", { value: metric.value, rating: r, route, locale });
       return;
   }
 }

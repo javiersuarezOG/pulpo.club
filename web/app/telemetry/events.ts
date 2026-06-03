@@ -909,10 +909,15 @@ export type EventMap = {
   "data.fetch.failed": { stage: string; error_class: string };
 
   // ───── Web Vitals ─────
-  "web_vitals.lcp": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string };
-  "web_vitals.inp": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string };
-  "web_vitals.cls": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string };
-  "web_vitals.ttfb": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string };
+  // `locale` was added 2026-06-03 so dashboards can split EN vs ES P75
+  // when the rendering path differs (e.g. ES newsletter, ES landing).
+  // PostHog auto-segments by geo + device; locale is the one axis
+  // that's authoritative client-side. Older events (pre-2026-06-03)
+  // have `locale` absent — dashboards filter them as "unknown".
+  "web_vitals.lcp": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string; locale: "en" | "es" };
+  "web_vitals.inp": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string; locale: "en" | "es" };
+  "web_vitals.cls": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string; locale: "en" | "es" };
+  "web_vitals.ttfb": { value: number; rating: "good" | "needs-improvement" | "poor"; route: string; locale: "en" | "es" };
 
   // ───── Performance — app-specific (PR-photo-nav-perf) ─────
   // Broad UX perf signals beyond the standard Web Vitals. Each event
