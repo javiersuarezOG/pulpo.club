@@ -869,7 +869,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--paper);
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.01em;
-  box-shadow: 0 1px 4px oklch(0 0 0 / 0.18);
+  box-shadow: 0 1px 4px oklch(0% 0 0 / 0.18);
   pointer-events: none;
 }
 .card-signal-chip svg { width: 12px; height: 12px; }
@@ -1352,7 +1352,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border-radius: 12px;
 }
 .filter-panel .filter-primary .filter-group {
-  border-bottom: 1px solid oklch(0.86 0.03 165);
+  border-bottom: 1px solid oklch(86% 0.03 165);
   padding: 10px 0;
 }
 .filter-panel .filter-primary .filter-group:last-child { border-bottom: none; }
@@ -2508,18 +2508,18 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  color: oklch(1 0 0);
+  color: oklch(100% 0 0);
 }
 /* Channel brand colors. These are external platform brand identifiers
    (WhatsApp green, Facebook blue) and need to render at the published
    hex/oklch — substituting Pulpo tokens would misrepresent the brand.
    token-exception: external platform brand colors */
-.share-opt-wa    { background: oklch(0.73 0.20 145); } /* WhatsApp green */
-.share-opt-sms   { background: oklch(0.70 0.20 145); } /* iOS Messages green */
+.share-opt-wa    { background: oklch(73% 0.20 145); } /* WhatsApp green */
+.share-opt-sms   { background: oklch(70% 0.20 145); } /* iOS Messages green */
 .share-opt-copy  { background: var(--ink); }
 .share-opt-email { background: var(--ink-2); }
-.share-opt-fb    { background: oklch(0.50 0.20 260); } /* Facebook blue */
-.share-opt-tt    { background: oklch(0.20 0.02 280); } /* TikTok black */
+.share-opt-fb    { background: oklch(50% 0.20 260); } /* Facebook blue */
+.share-opt-tt    { background: oklch(20% 0.02 280); } /* TikTok black */
 .share-opt-label { line-height: 1.2; }
 
 /* ============== Welcome modal (PR-B.4b) ==============
@@ -3270,7 +3270,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   background: var(--paper);
   border: 1px solid var(--line-2);
   border-radius: 8px;
-  box-shadow: 0 8px 24px oklch(0 0 0 / 0.10);
+  box-shadow: 0 8px 24px oklch(0% 0 0 / 0.10);
 }
 .country-combobox-option {
   padding: 8px 12px;
@@ -4219,7 +4219,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
    ============================================================ */
 
 /* Visually-hidden helper for screen-reader-only labels. WCAG-safe
-   technique (positioning + clip rather than display:none which
+   technique (positioning + clip-path rather than display:none which
    removes from a11y tree). */
 .sr-only {
   position: absolute;
@@ -4228,7 +4228,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -4435,7 +4435,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 }
 .proof-row-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* token-exception: hover shadow alpha not in token system */
+  box-shadow: 0 4px 16px rgb(0, 0, 0, 0.06); /* token-exception: hover shadow alpha not in token system */
 }
 .proof-row-card-skeleton {
   background: var(--paper-2);
@@ -4711,7 +4711,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   gap: 4px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.65); /* token-exception: photo overlay needs literal alpha */
+  background: rgb(0, 0, 0, 0.65); /* token-exception: photo overlay needs literal alpha */
   color: var(--paper);
   font-family: var(--font-sans);
   font-size: 13px;
@@ -6483,9 +6483,9 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   height: 45%;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.32) 35%,
-    rgba(0, 0, 0, 0) 100%
+    rgb(0, 0, 0, 0.62) 0%,
+    rgb(0, 0, 0, 0.32) 35%,
+    rgb(0, 0, 0, 0) 100%
   );
   pointer-events: none;
   z-index: 1;
@@ -6549,17 +6549,17 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   color: var(--color-bg-white);
   letter-spacing: -0.01em;
   line-height: 1.2;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 2px rgb(0, 0, 0, 0.35);
 }
 .homepage-v2.hero-v4 .hp-hero-v4-brief-meta {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgb(255, 255, 255, 0.92);
   letter-spacing: -0.005em;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 2px rgb(0, 0, 0, 0.35);
 }
 @media (min-width: 481px) {
   .homepage-v2.hero-v4 .hp-hero-v4-brief {
@@ -6696,7 +6696,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   border: 1px solid var(--color-bg-pebble);
   border-radius: 16px;
   padding: 22px 22px 18px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 24px 60px rgb(0,0,0,0.18), 0 4px 12px rgb(0,0,0,0.06);
   transform: rotate(1.5deg);
   transition: transform var(--dur-slow) var(--ease-out);
   position: relative;
@@ -7010,17 +7010,17 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   background: var(--color-forest-bg);
 }
 .homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-mark {
-  background: rgba(255, 255, 255, 0.10); /* token-exception: inverse mark bg */
+  background: rgb(255, 255, 255, 0.10); /* token-exception: inverse mark bg */
   color: var(--gold);
 }
 .homepage-v2 .hp-hero-v5-dest-all:hover .hp-hero-v5-dest-mark {
-  background: rgba(255, 255, 255, 0.18); /* token-exception: inverse hover bg */
+  background: rgb(255, 255, 255, 0.18); /* token-exception: inverse hover bg */
 }
 .homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-label {
   color: var(--color-bg-white);
 }
 .homepage-v2 .hp-hero-v5-dest-all .hp-hero-v5-dest-tag {
-  color: rgba(255, 255, 255, 0.65); /* token-exception: inverse muted tagline */
+  color: rgb(255, 255, 255, 0.65); /* token-exception: inverse muted tagline */
 }
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -7338,7 +7338,6 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   border-radius: 999px;
   box-shadow: var(--shadow-1);
   /* override gradient/colored kinds with the Airbnb white pill */
-  background-color: var(--color-bg-white) !important;
 }
 .app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge-left { left: 10px; }
 .app.hero-v4 .hp-shelf-card-real .hp-shelf-card-badge-right { right: 10px; }
@@ -7525,7 +7524,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%);
+  background: linear-gradient(to bottom, rgb(0,0,0,0.28) 0%, rgb(0,0,0,0) 50%, rgb(0,0,0,0.55) 100%);
   z-index: 1;
   border-radius: 20px;
 }
@@ -7576,7 +7575,7 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 
 /* Modal infrastructure */
 .app.hero-v4 .modal-backdrop {
-  background: rgba(20, 12, 5, 0.45);
+  background: rgb(20, 12, 5, 0.45);
 }
 .app.hero-v4 .modal {
   border-radius: 20px;
@@ -7843,10 +7842,8 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
    the peek lands naturally against the screen edge. */
 .app.hero-v4 .hp-shelf-list {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  flex-flow: row nowrap;
+  overflow: auto hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   gap: 16px;
