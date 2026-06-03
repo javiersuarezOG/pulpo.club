@@ -16,7 +16,11 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
 
   use: {
-    baseURL: "http://localhost:5173",
+    // E2E_BASE_URL lets CI run against an already-started server (the
+    // built preview) instead of Playwright's own dev webServer — and binds
+    // to the exact host the preview uses (127.0.0.1), not bare "localhost"
+    // (which can resolve to ::1 and miss a 127.0.0.1-bound server).
+    baseURL: process.env.E2E_BASE_URL || "http://localhost:5173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

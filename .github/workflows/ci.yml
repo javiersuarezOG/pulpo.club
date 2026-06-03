@@ -127,7 +127,15 @@ jobs:
           done
           cat /tmp/pulpo-preview.log
           exit 1
-      - run: npm run e2e:critical
+      - name: e2e critical (against the built preview)
+        # E2E_BASE_URL points Playwright at the preview server started
+        # above. Per playwright.config.ts this ALSO disables Playwright's
+        # own `webServer` (npm run dev) — which otherwise raced for port
+        # 5173 against the preview and failed every run with
+        # "http://localhost:5173 is already used". One server, one port.
+        env:
+          E2E_BASE_URL: http://127.0.0.1:5173
+        run: npm run e2e:critical
 
   # The full e2e (Playwright smoke) job was REMOVED from PR-triggered CI on
   # 2026-05-25. Rationale: the suite spent more time red on PR pages
