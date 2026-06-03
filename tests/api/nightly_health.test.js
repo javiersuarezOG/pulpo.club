@@ -7,6 +7,7 @@ const {
   buildLast7Runs,
   failedSourcesLastRun,
   vlmBudgetToday,
+  degradedSources,
   hoursSince,
   STALE_THRESHOLD_H,
 } = handler.__testing__;
@@ -147,6 +148,87 @@ function mockRes() {
   };
   return res;
 }
+
+// ── PRD P1-9 — degradedSources (JS-side brownout classifier) ────────
+//
+// Mirrors pulpo.source_health.compute_brownout_states. Both
+// implementations consume the same source_health_history.jsonl rows
+// and must agree on which sources are in brownout.
+
+describe("degradedSources", () => {
+  function _seed(source, kept, days = 8) {
+    return Array.from({ length: days }, (_, i) => ({
+      source,
+      ts: `2026-05-${String(20 + i).padStart(2, "0")}T00:00:00+00:00`,
+      kept,
+      status: "green",
+    }));
+  }
+
+  it("returns an empty list when every source is at baseline", () => {
+    const rows = _seed("remax", 100);
+    expect(degradedSources(rows)).toEqual([]);
+  });
+
+  it("marks a single-run dip as degraded, not red", () => {
+    const rows = _seed("nexo", 100);
+    rows[rows.length - 1].kept = 30; // 30% of 100
+    const result = degradedSources(rows);
+    expect(result).toHaveLength(1);
+    expect(result[0].source).toBe("nexo");
+    expect(result[0].status).toBe("degraded");
+    expect(result[0].ratio).toBeCloseTo(0.3, 4);
+    expect(result[0].rolling_median_7).toBe(100);
+    expect(result[0].consecutive_degraded_runs).toBe(1);
+  });
+
+  it("escalates to red after two consecutive sub-50% runs", () => {
+    const rows = _seed("nexo", 100);
+    rows[rows.length - 2].kept = 10;
+    rows[rows.length - 1].kept = 10;
+    const result = degradedSources(rows);
+    expect(result[0].status).toBe("red");
+    expect(result[0].consecutive_degraded_runs).toBeGreaterThanOrEqual(2);
+  });
+
+  it("reports recovering when previous run was red and current is 50-90%", () => {
+    const rows = _seed("elagente", 100);
+    rows[rows.length - 3].kept = 10;
+    rows[rows.length - 3].status = "red";
+    rows[rows.length - 2].kept = 10;
+    rows[rows.length - 2].status = "red";
+    rows[rows.length - 1].kept = 70;
+    const result = degradedSources(rows);
+    expect(result[0].status).toBe("recovering");
+    expect(result[0].previous_status).toBe("red");
+  });
+
+  it("falls back to kept=scraped when kept is absent (legacy schema)", () => {
+    const rows = _seed("kazu", 100).map((r) => ({
+      source: r.source, ts: r.ts, scraped: r.kept, status: r.status,
+    }));
+    rows[rows.length - 1].scraped = 20;
+    const result = degradedSources(rows);
+    expect(result).toHaveLength(1);
+    expect(result[0].count).toBe(20);
+  });
+
+  it("carries failure_id + error_class onto the brownout payload", () => {
+    const rows = _seed("kazu", 100);
+    rows[rows.length - 1].kept = 5;
+    rows[rows.length - 1].failure_id = "abc123";
+    rows[rows.length - 1].error_class = "HTTPError";
+    const result = degradedSources(rows);
+    expect(result[0].failure_id).toBe("abc123");
+    expect(result[0].error_class).toBe("HTTPError");
+  });
+
+  it("returns an empty list when sourceHealthRows is not an array", () => {
+    expect(degradedSources(null)).toEqual([]);
+    expect(degradedSources(undefined)).toEqual([]);
+    expect(degradedSources("not-an-array")).toEqual([]);
+  });
+});
 
 describe("handler", () => {
   it("returns 200 with a valid envelope when data is present", async () => {
