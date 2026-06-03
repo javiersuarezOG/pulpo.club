@@ -6,12 +6,23 @@
 //                             consistent header with back-to-grid link
 //
 // The frontend gate is currently OFF — /admin and /admin/sources are
-// open by design for the launch window. Write endpoints under
-// /api/admin/* (newsletter send/preview/options, stripe-session-debug)
-// remain gated server-side by `requireAdminAuth`, and the adminFetch
-// helper still threads the bearer for any widget that needs them.
-// To re-enable the entry gate, restore the `if (!tokenOk) return …`
-// branch removed alongside this comment.
+// open by design for the launch window.
+//
+// AUTH REALITY (corrected 2026-06-03): the newsletter WRITE endpoints
+// (`api/admin/newsletter/trigger-welcome-test|trigger-audience-send|
+// trigger-preview`) are NOT gated — they call no auth, only a rate
+// limiter. So anyone reaching /admin can trigger a real send, including
+// the audience blast to every Pro subscriber. `requireAdminAuth`
+// (api/_admin_auth.js, shared secret PULPO_ADMIN_DEBUG_TOKEN) exists but
+// is used ONLY by stripe-session-debug.js. This is a known, accepted
+// exposure for the launch window — do not assume these endpoints are
+// protected.
+//
+// To actually close it: call requireAdminAuth() at the top of the three
+// trigger endpoints, have the widget thread the bearer (it uses plain
+// fetch today), and re-enable the `/admin` token prompt
+// (`if (!tokenOk) return …`). Confirm PULPO_ADMIN_DEBUG_TOKEN is set in
+// Vercel first, or requireAdminAuth 503s and breaks the tool.
 //
 // Widgets that need state/coordination across pages can use sessionStorage
 // or React context — this shell intentionally passes nothing in.
@@ -207,9 +218,10 @@ export function AdminPage({ app }) {
             <h1 id="admin-title" className="admin-title">{widget.label}</h1>
             <p className="admin-subhead">{widget.description}</p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> open at /admin with no login. Write
-              endpoints (e.g. newsletter send) still require the server-side
-              bearer token; read-only widgets are unrestricted.
+              <strong>Heads up —</strong> open at /admin with no login, and the
+              newsletter send/preview endpoints are NOT gated either — anyone
+              who reaches this page can trigger a real send (incl. “Send to
+              everyone”). Rate-limited only. Left open for the launch window.
             </div>
             <widget.Component />
           </>
@@ -220,9 +232,10 @@ export function AdminPage({ app }) {
               Internal Pulpo tools. Pick a widget below to get started.
             </p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> open at /admin with no login. Each
-              widget guards its own blast radius (e.g. the newsletter send
-              endpoint still requires a bearer token server-side).
+              <strong>Heads up —</strong> open at /admin with no login, and the
+              newsletter write endpoints (send/preview) are NOT auth-gated —
+              only rate-limited. Anyone reaching this page can trigger a real
+              send. Left open for the launch window.
             </div>
             {ADMIN_WIDGETS.length === 0 ? (
               <div className="widget-empty">No widgets registered yet.</div>
