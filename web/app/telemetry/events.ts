@@ -1155,42 +1155,6 @@ export type EventMap = {
    *  subscription block. Pairs with start_checkout.session_created to
    *  build a re-acquisition funnel. */
   "account.sub_resubscribe_clicked": Record<string, never>;
-
-  // ───── Real-user monitoring (PRD P2-6 — PR-5B-B) ─────
-  /** Largest Contentful Paint. Fires once per pageload from
-   *  web/app/telemetry/rum.ts via the web-vitals library. `route` is
-   *  the path category (/, /browse, /start, /account, /listing, /plans,
-   *  /admin, other) so dashboards split by entry surface. `rating` is
-   *  the Core Web Vitals bucket (good ≤ 2.5s, needs-improvement
-   *  2.5-4.0s, poor > 4.0s). `id` is a stable per-pageload identifier
-   *  from web-vitals so we can dedupe re-deliveries from late LCP
-   *  candidates. */
-  "rum.lcp": {
-    value: number;
-    rating: "good" | "needs-improvement" | "poor";
-    route: string;
-    locale: string;
-    id: string;
-  };
-  /** Cumulative Layout Shift. Same shape as rum.lcp. Buckets: good
-   *  ≤ 0.1, needs-improvement 0.1-0.25, poor > 0.25. */
-  "rum.cls": {
-    value: number;
-    rating: "good" | "needs-improvement" | "poor";
-    route: string;
-    locale: string;
-    id: string;
-  };
-  /** Interaction to Next Paint. Captures the worst interaction
-   *  responsiveness during the page session. Buckets: good ≤ 200ms,
-   *  needs-improvement 200-500ms, poor > 500ms. */
-  "rum.inp": {
-    value: number;
-    rating: "good" | "needs-improvement" | "poor";
-    route: string;
-    locale: string;
-    id: string;
-  };
 };
 
 export type EventName = keyof EventMap;
