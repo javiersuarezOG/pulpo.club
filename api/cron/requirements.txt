@@ -1,0 +1,9 @@
+# Intentionally empty.
+#
+# `api/cron/webhook-health.py` uses only Python stdlib (urllib, json,
+# datetime, http.server, os, time, traceback). Without this file,
+# Vercel's Python runtime falls back to the root `requirements.txt`
+# which installs Pillow + curl_cffi + openai + selectolax — pushing
+# the function bundle past Vercel's 500MB Lambda ephemeral-storage
+# limit. Co-locating this empty requirements.txt shadows the root one
+# so no deps get installed for this function.
