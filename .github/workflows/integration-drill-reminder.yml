@@ -1,0 +1,59 @@
+name: Integration drill reminder
+
+on:
+  schedule:
+    - cron: "0 12 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Check drill freshness
+        id: drill
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from __future__ import annotations
+          from datetime import date, datetime
+          from pathlib import Path
+          import re
+
+          path = Path("docs/runbooks/integration-drill.md")
+          text = path.read_text(encoding="utf-8")
+          m = re.search(r"^last_drill_date:\s*(\d{4}-\d{2}-\d{2})\s*$", text, re.M)
+          if not m:
+              print("due=true")
+              print("age_days=unknown")
+              print("last_drill_date=missing")
+              raise SystemExit(0)
+          last = datetime.strptime(m.group(1), "%Y-%m-%d").date()
+          age = (date.today() - last).days
+          print(f"due={'true' if age > 35 else 'false'}")
+          print(f"age_days={age}")
+          print(f"last_drill_date={last.isoformat()}")
+          PY
+
+      - name: File reminder issue
+        if: steps.drill.outputs.due == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AGE_DAYS: ${{ steps.drill.outputs.age_days }}
+          LAST_DRILL_DATE: ${{ steps.drill.outputs.last_drill_date }}
+        run: |
+          month="$(date -u +'%Y-%m')"
+          title="Integration drill due — ${month}"
+          existing="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            echo "Issue already open: #$existing"
+            exit 0
+          fi
+          gh issue create \
+            --title "$title" \
+            --assignee "shonores" \
+            --body "The monthly Stripe/Clerk/Resend integration drill is due. Last recorded drill: ${LAST_DRILL_DATE} (${AGE_DAYS} days ago).\n\nRunbook: docs/runbooks/integration-drill.md\n\nPlease walk the checklist, attach screenshots, update last_drill_date / next_drill_due, and close this issue."
