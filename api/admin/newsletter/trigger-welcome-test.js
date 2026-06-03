@@ -145,7 +145,10 @@ async function handler(req, res, { fetchImpl } = {}) {
   const variant = body.variant === "welcome_back" ? "welcome_back" : "welcome";
   const locale = (body.locale === "en" || body.locale === "es") ? body.locale : "";
 
-  const token = process.env.PULPO_INTERNAL_TOKEN || "";
+  // .trim() to match the internal endpoint's stripped token — a trailing
+  // newline on the env var otherwise mismatches → 401 (the http_401 the
+  // admin tool surfaced; the Stripe webhook hit the same bug).
+  const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
   if (!token) {
     // Honest failure — never pretend the email sent.
     logApi({ status: 503, ms: Date.now() - t0, reason: "internal_token_missing" });

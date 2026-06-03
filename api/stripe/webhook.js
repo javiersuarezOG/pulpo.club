@@ -234,7 +234,10 @@ async function dispatchProWelcome(args) {
   if (!clerk || !clerkUserId || !email) {
     return "skipped:missing_input";
   }
-  const token = process.env.PULPO_INTERNAL_TOKEN || "";
+  // .trim() — the internal endpoint (welcome-send.py) strips its expected
+  // token, so a trailing newline/space on the Vercel env var would make an
+  // un-trimmed bearer mismatch → 401 → silent no-welcome. Normalize both ends.
+  const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
   // When the internal-call token isn't set, we have no choice but
   // GH fallback — the Python endpoint would 401 every call. Common
   // in dev environments where only the GH PAT is configured.
