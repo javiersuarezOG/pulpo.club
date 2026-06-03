@@ -37,11 +37,11 @@ const INTERNAL_PATH = "/api/internal/welcome-send";
 const INTERNAL_TIMEOUT_MS = 25_000;
 
 function internalBaseUrl() {
-  return (
-    process.env.PULPO_SITE_ROOT ||
-    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
-    "https://pulpo.club"
-  );
+  // PUBLIC domain only — never VERCEL_URL. The *.vercel.app deployment
+  // URL is gated by Vercel Deployment Protection (HTML 401), which made
+  // this admin call (and the Stripe-webhook welcome) surface as http_401.
+  // The custom domain reaches the same function, unprotected.
+  return process.env.PULPO_SITE_ROOT || "https://pulpo.club";
 }
 
 async function emitTriggerEvent({ to, by, force, variant, locale, result, reason }) {

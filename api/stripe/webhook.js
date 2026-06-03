@@ -248,13 +248,16 @@ async function dispatchProWelcome(args) {
     });
     return await dispatchProWelcomeWorkflow(args);
   }
-  // Internal-call base URL. In Vercel functions, calling our own
-  // /api/* path requires an absolute URL. VERCEL_URL is the
-  // current deployment's hostname (e.g. pulpo-club.vercel.app);
-  // PULPO_SITE_ROOT overrides in prod (https://pulpo.club).
+  // Internal-call base URL. MUST be the PUBLIC production domain, never
+  // VERCEL_URL: the *.vercel.app deployment hostname is gated by Vercel
+  // Deployment Protection (HTTP 401 with an HTML body), so routing the
+  // internal welcome call through it silently 401'd every send — no
+  // email, no fallback (a 401 isn't treated as "unreachable"). The
+  // public custom domain (pulpo.club) is unprotected and reaches the
+  // same function. PULPO_SITE_ROOT (a public domain) wins; else
+  // pulpo.club. `internalBaseUrl` stays injectable for tests.
   const baseUrl = internalBaseUrl
     || process.env.PULPO_SITE_ROOT
-    || (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`)
     || "https://pulpo.club";
 
   const result = await callInternalWelcomeSend({
