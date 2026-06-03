@@ -28,7 +28,10 @@ wh = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(wh)
 
 
-from automation.monitors import HTTPCallError  # noqa: E402
+# The handler now inlines HTTPCallError so Vercel can bundle it
+# without needing to trace `automation.monitors`. Use the handler's
+# local class so synthetic errors match its `except` clause.
+HTTPCallError = wh.HTTPCallError
 
 
 # ── _check_clerk ────────────────────────────────────────────────────

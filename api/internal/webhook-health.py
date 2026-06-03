@@ -46,21 +46,114 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import time
 import traceback
+import urllib.error
 import urllib.parse
+import urllib.request
 from http.server import BaseHTTPRequestHandler
 
-# Vercel's Python runtime adds the deployment root to sys.path
-# automatically — `from automation.monitors import ...` resolves through
-# the import tracer. Module-level import: runs once per cold start.
-from automation.monitors import (  # noqa: E402
-    HTTPCallError,
-    capture_posthog,
-    env,
-    post_slack,
-    request_json,
-)
+# Inlined HTTP / Slack / PostHog helpers. Originally lived in
+# `automation/monitors/__init__.py`, but Vercel's Python bundler
+# could not trace the cross-package import reliably for this function
+# (preview deploys failed in PR #642 first roll); inlining trades a
+# few duplicated lines for a self-contained, deploy-able module. The
+# canonical shared helpers still live at automation/monitors for the
+# GH-Actions side; if they diverge, the next audit pass will surface it.
+
+POSTHOG_INGEST_DEFAULT = "https://eu.i.posthog.com"
+
+
+class HTTPCallError(RuntimeError):
+    def __init__(self, method: str, url: str, status: int, detail: str) -> None:
+        super().__init__(f"{method} {url} failed: {status} {detail}")
+        self.method = method
+        self.url = url
+        self.status = status
+        self.detail = detail
+
+
+def env(name: str, default: str = "") -> str:
+    value = os.environ.get(name)
+    return value.strip() if value and value.strip() else default
+
+
+def request_json(method: str, url: str,
+                 headers: dict | None = None,
+                 payload: dict | None = None,
+                 timeout: float = 25.0) -> dict:
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            **(headers or {}),
+            **({"Content-Type": "application/json"} if payload is not None else {}),
+        },
+        method=method,
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            body = r.read().decode("utf-8")
+            return json.loads(body) if body else {}
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise HTTPCallError(method, url, exc.code, detail) from exc
+
+
+def _post_json(url: str, headers: dict, payload: dict,
+               parse_response: bool = True, timeout: float = 20.0) -> dict:
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={**headers, "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            body = r.read().decode("utf-8")
+            if not parse_response:
+                return {}
+            return json.loads(body) if body else {}
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise HTTPCallError("POST", url, exc.code, detail) from exc
+
+
+def post_slack(webhook_url: str, text: str) -> None:
+    if not webhook_url:
+        print(text)
+        return
+    try:
+        _post_json(webhook_url, {}, {"text": text}, parse_response=False)
+    except HTTPCallError as exc:
+        print(f"[slack] post failed: {exc.status} {exc.detail[:200]}")
+
+
+def capture_posthog(event: str, properties: dict,
+                    distinct_id: str = "server:webhook_health") -> None:
+    token = env("POSTHOG_PROJECT_TOKEN")
+    if not token:
+        return
+    host = env("POSTHOG_INGEST_HOST", POSTHOG_INGEST_DEFAULT)
+    try:
+        _post_json(
+            f"{host.rstrip('/')}/capture/",
+            {},
+            {
+                "api_key": token,
+                "event": event,
+                "distinct_id": distinct_id,
+                "properties": {
+                    **properties,
+                    "captured_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+                },
+            },
+            parse_response=False,
+        )
+    except HTTPCallError:
+        pass
 
 
 RUNBOOK = (
