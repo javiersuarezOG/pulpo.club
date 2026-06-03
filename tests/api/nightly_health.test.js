@@ -9,6 +9,7 @@ const {
   vlmBudgetToday,
   featuredFreshness,
   degradedSources,
+  summarizePhotoContract,
   hoursSince,
   STALE_THRESHOLD_H,
 } = handler.__testing__;
@@ -190,6 +191,54 @@ describe("featuredFreshness", () => {
       expires_at: "not-a-date",
     });
     expect(out.fresh).toBe(false);
+  });
+});
+
+// ── PRD P1-2 — summarizePhotoContract ────────────────────────────────
+//
+// `web/data/photo_contract.json` is written by the Python pipeline's
+// pulpo.photo_contract.enforce_photo_contract. The summarizer must
+// hand it back to dashboards verbatim (modulo defensive type narrowing)
+// so /api/nightly/health is the single ops surface for "do listings
+// actually have a working photo?".
+
+describe("summarizePhotoContract", () => {
+  it("returns null when the sidecar is missing", () => {
+    expect(summarizePhotoContract(null)).toBe(null);
+    expect(summarizePhotoContract(undefined)).toBe(null);
+    expect(summarizePhotoContract("not-an-object")).toBe(null);
+  });
+
+  it("surfaces the full PRD shape when the sidecar is present", () => {
+    const out = summarizePhotoContract({
+      ranked_total: 959,
+      with_local_path: 884,
+      local_path_exists: 880,
+      local_path_missing: 4,
+      missing_rate: 0.0045,
+      top_browse: { n: 50, present: 50, missing: 0, coverage: 1.0 },
+      top_hero: { n: 10, present: 10, missing: 0, coverage: 1.0 },
+      evaluated_at: "2026-06-03T00:00:00+00:00",
+    });
+    expect(out.ranked_total).toBe(959);
+    expect(out.local_path_missing).toBe(4);
+    expect(out.missing_rate).toBe(0.0045);
+    expect(out.top_browse.coverage).toBe(1.0);
+    expect(out.top_hero.present).toBe(10);
+    expect(out.evaluated_at).toBe("2026-06-03T00:00:00+00:00");
+  });
+
+  it("narrows non-number fields to null defensively", () => {
+    const out = summarizePhotoContract({
+      ranked_total: "bad",
+      with_local_path: 100,
+      top_browse: { n: "bad", present: 50, missing: 0, coverage: 1.0 },
+      top_hero: null,
+    });
+    expect(out.ranked_total).toBe(null);
+    expect(out.with_local_path).toBe(100);
+    expect(out.top_browse.n).toBe(null);
+    expect(out.top_hero).toBe(null);
   });
 });
 

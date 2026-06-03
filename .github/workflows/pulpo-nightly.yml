@@ -748,6 +748,11 @@ jobs:
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
           git add web/data/zone_medians_history.jsonl 2>/dev/null || true
           git add web/data/distance_fields_history.jsonl 2>/dev/null || true
+          # PRD P1-2 — photo contract sidecar + append-only audit log.
+          # `photo_contract.json` carries the latest run's stats and is
+          # consumed by /api/nightly/health.
+          git add web/data/photo_contract.json 2>/dev/null || true
+          git add web/data/photo_contract_log.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
