@@ -734,6 +734,7 @@ test.describe("New app boots cleanly on key routes", () => {
       "Try a free month",                // CTA labels
       "First month free",                // default promo note
       "Log in",                          // start.nav.login_link
+      "Beach and lake homes",            // start.meta.title
     ];
 
     await page.addInitScript(() => localStorage.setItem("pulpo-locale", "es"));
@@ -748,6 +749,22 @@ test.describe("New app boots cleanly on key routes", () => {
         `Spanish /start leaked English text: "${word}". Wire via t() against an i18n.jsx key.`,
       ).not.toContain(word);
     }
+  });
+
+  test("/start document metadata follows locale", async ({ page }) => {
+    await page.goto("/start?lang=es", { waitUntil: "networkidle" });
+    await expect(page).toHaveTitle("Pulpo — Casas de playa y de lago en El Salvador, ordenadas por valor");
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      "Acceso ilimitado a propiedades ordenadas en El Salvador. Configuración única, acceso mensual, cancela cuando quieras.",
+    );
+
+    await page.goto("/start?lang=en", { waitUntil: "networkidle" });
+    await expect(page).toHaveTitle("Pulpo — Beach and lake homes in El Salvador, ranked by value");
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      "Get unlimited access to ranked listings across El Salvador. One-time setup, monthly access, cancel anytime.",
+    );
   });
 
   // PR-C — Home-page Pro upsell modal ES canary. The modal mounts when

@@ -66,6 +66,18 @@ export default function StartPage() {
   const heroPhoto = useMemo(() => pickHeroPhoto("random"), []);
 
   useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.title = t("start.meta.title", lc);
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", t("start.meta.description", lc));
+  }, [lc]);
+
+  useEffect(() => {
     track("start.viewed", {
       has_code: checkoutPromoCode.length > 0,
       explicit_code: urlCode.length > 0,
