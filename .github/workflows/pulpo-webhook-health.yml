@@ -15,14 +15,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check webhook family heartbeats
-        env:
-          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
-          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
-          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: python3 scripts/check_webhook_health.py
-
+      # Run the per-provider monitors FIRST so they drop their status
+      # sidecars in $MONITOR_STATUS_DIR. The heartbeat step below reads
+      # those sidecars to compose `monitor.webhook_health_completed`
+      # with `{clerk_status, resend_status, stripe_status}`. Missing
+      # sidecar → status="unknown" so a crashed monitor is observable.
       - name: Check stuck activation invitations
         env:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -32,4 +29,16 @@ jobs:
           POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
         run: python3 scripts/check_stuck_invitations.py
+
+      - name: Check webhook family heartbeats (composes monitor.webhook_health_completed)
+        env:
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          POSTHOG_INGEST_HOST: ${{ secrets.POSTHOG_INGEST_HOST }}
+          POSTHOG_PROJECT_ID: ${{ secrets.POSTHOG_PROJECT_ID }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
+        run: python3 scripts/check_webhook_health.py

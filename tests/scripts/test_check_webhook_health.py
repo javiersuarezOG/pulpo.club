@@ -259,3 +259,110 @@ def test_query_count_window_injects_window_filter():
         )
     assert "toIntervalHour(720)" in captured["query"]
     assert "now() -" in captured["query"]
+
+
+# ── PRD P0-1 — monitor.webhook_health_completed heartbeat ───────────────
+#
+# The heartbeat composer reads per-monitor status sidecars from
+# `MONITOR_STATUS_DIR` (written by check_stuck_invitations.py + the
+# Phase-1B Vercel-cron-backed monitors). Missing sidecar must surface
+# as status="unknown" so a crashed monitor is observable rather than
+# silently green.
+
+
+def test_read_monitor_status_returns_dict_when_sidecar_present(monkeypatch, tmp_path):
+    (tmp_path / "clerk.json").write_text(json.dumps({
+        "monitor": "clerk", "status": "ok", "ts": "2026-06-03T00:00:00+00:00",
+        "pending_invitations": 0,
+    }))
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
+    row = health.read_monitor_status("clerk")
+    assert row is not None
+    assert row["status"] == "ok"
+    assert row["pending_invitations"] == 0
+
+
+def test_read_monitor_status_missing_sidecar_is_none(monkeypatch, tmp_path):
+    """Absence of the sidecar surfaces as None so the heartbeat composer
+    can translate it to status='unknown' — the explicit 'monitor never
+    ran' signal we want on dashboards."""
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
+    assert health.read_monitor_status("clerk") is None
+
+
+def test_read_monitor_status_malformed_json_is_none(monkeypatch, tmp_path):
+    """A broken JSON sidecar must not crash the composer (defensive)."""
+    (tmp_path / "clerk.json").write_text("not json {")
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
+    assert health.read_monitor_status("clerk") is None
+
+
+def _stub_env(monkeypatch):
+    for k, v in {
+        "POSTHOG_PROJECT_ID": "1",
+        "POSTHOG_PERSONAL_API_KEY": "phc_dummy",
+    }.items():
+        monkeypatch.setenv(k, v)
+
+
+def test_main_emits_heartbeat_with_three_statuses(monkeypatch, tmp_path, capsys):
+    """End-to-end heartbeat: composer fires `monitor.webhook_health_completed`
+    with clerk/resend/stripe statuses derived from sidecars. PRD P0-1
+    requires this event to be present regardless of whether families
+    are alerting, so failures_count=0 must still emit a heartbeat."""
+    (tmp_path / "clerk.json").write_text(json.dumps({"status": "ok"}))
+    (tmp_path / "resend.json").write_text(json.dumps({"status": "ok"}))
+    # No stripe sidecar → status='unknown'.
+
+    _stub_env(monkeypatch)
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
+    monkeypatch.setenv("POSTHOG_PROJECT_TOKEN", "phc_capture_dummy")
+    monkeypatch.setattr(sys, "argv", ["check_webhook_health.py", "--dry-run"])
+
+    import datetime as dt
+    fresh = dt.datetime.now(dt.timezone.utc)
+    captured: list[tuple[str, dict]] = []
+
+    with patch.object(health, "query_last_seen", return_value=fresh), \
+         patch.object(health, "query_count_window", return_value=0), \
+         patch.object(health, "capture_posthog_event",
+                      side_effect=lambda e, p: captured.append((e, p))):
+        rc = health.main()
+
+    assert rc == 0
+    assert captured, "heartbeat must fire — PRD P0-1"
+    event, props = captured[0]
+    assert event == "monitor.webhook_health_completed"
+    assert props["clerk_status"] == "ok"
+    assert props["resend_status"] == "ok"
+    assert props["stripe_status"] == "unknown"
+    assert props["failures_count"] == 0
+    assert "runbook" in props
+
+    # Heartbeat dict is printed to stdout so the GH log has the composed
+    # status without requiring PostHog access at debug time.
+    out = capsys.readouterr().out
+    assert "heartbeat:" in out
+
+
+def test_heartbeat_carries_failures_count_when_family_silent(monkeypatch, tmp_path):
+    """When `query_last_seen` returns None (family never seen), the
+    heartbeat must surface failures_count >= 1 so the alert and the
+    observability event are coupled."""
+    (tmp_path / "clerk.json").write_text(json.dumps({"status": "ok"}))
+
+    _stub_env(monkeypatch)
+    monkeypatch.setenv("MONITOR_STATUS_DIR", str(tmp_path))
+    monkeypatch.setenv("POSTHOG_PROJECT_TOKEN", "phc_capture_dummy")
+    monkeypatch.setattr(sys, "argv", ["check_webhook_health.py", "--dry-run"])
+
+    captured: list[tuple[str, dict]] = []
+    with patch.object(health, "query_last_seen", return_value=None), \
+         patch.object(health, "query_count_window", return_value=0), \
+         patch.object(health, "capture_posthog_event",
+                      side_effect=lambda e, p: captured.append((e, p))):
+        rc = health.main()
+
+    assert rc == 1
+    _, props = captured[0]
+    assert props["failures_count"] >= 1

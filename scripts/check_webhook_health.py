@@ -17,7 +17,15 @@ import urllib.request
 
 
 DEFAULT_HOST = "https://eu.posthog.com"
+DEFAULT_INGEST_HOST = "https://eu.i.posthog.com"
 DEFAULT_RUNBOOK = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
+
+# Sidecar dir read at heartbeat time — `scripts/check_stuck_invitations.py`
+# and (Phase 1B) the Vercel-cron-backed monitors drop `{monitor}.json` files
+# here with `{status, ts, ...}`. Missing files surface as `unknown` so a
+# crashed monitor produces a `monitor.webhook_health_completed` row with
+# `clerk_status="unknown"` rather than a green-by-omission heartbeat.
+MONITOR_STATUS_DIR_DEFAULT = "/tmp/pulpo_monitor_status"
 
 # `webhook.received` is captured exclusively by api/stripe/webhook.js. The
 # `provider: "stripe"` tag was added alongside this script in the same PR
@@ -365,6 +373,50 @@ def slack(webhook_url: str, text: str, dry_run: bool) -> None:
     post_json(webhook_url, {}, {"text": text}, parse_response=False)
 
 
+def read_monitor_status(monitor: str) -> dict | None:
+    """Return the per-monitor sidecar dict, or None if absent/malformed.
+
+    The heartbeat treats `None` as `unknown`. Never raises.
+    """
+    out_dir = env("MONITOR_STATUS_DIR", MONITOR_STATUS_DIR_DEFAULT)
+    path = os.path.join(out_dir, f"{monitor}.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def capture_posthog_event(event: str, properties: dict) -> None:
+    """Emit a single PostHog event via the ingest API.
+
+    Mirrors scripts/check_stuck_invitations.py's capture_posthog. Used for
+    the monitor.webhook_health_completed heartbeat; bails silently when
+    `POSTHOG_PROJECT_TOKEN` is unset (the dry-run/local-debug case).
+    """
+    token = env("POSTHOG_PROJECT_TOKEN")
+    if not token:
+        return
+    host = env("POSTHOG_INGEST_HOST", DEFAULT_INGEST_HOST)
+    try:
+        post_json(
+            f"{host.rstrip('/')}/capture/",
+            {},
+            {
+                "api_key": token,
+                "event": event,
+                "distinct_id": "server:webhook_health",
+                "properties": properties,
+            },
+            parse_response=False,
+        )
+    except RuntimeError:
+        # Telemetry must not block the workflow — same posture as the
+        # Slack helper above.
+        pass
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check webhook event heartbeats in PostHog.")
     parser.add_argument("--dry-run", action="store_true")
@@ -451,6 +503,26 @@ def main() -> int:
 
     for failure in failures:
         slack(slack_url, f":warning: {failure}. {args.runbook_url}", args.dry_run)
+
+    # PRD P0-1 — positive heartbeat. Composes per-monitor status from the
+    # `/tmp/pulpo_monitor_status/` sidecars written by sibling scripts.
+    # Missing sidecar → `unknown`, so a monitor that died before writing
+    # its status still surfaces on dashboards.
+    def _status_for(monitor: str) -> str:
+        row = read_monitor_status(monitor)
+        if row is None:
+            return "unknown"
+        return str(row.get("status") or "unknown")
+
+    heartbeat_props = {
+        "clerk_status": _status_for("clerk"),
+        "resend_status": _status_for("resend"),
+        "stripe_status": _status_for("stripe"),
+        "failures_count": len(failures),
+        "runbook": args.runbook_url,
+    }
+    print(f"heartbeat: {json.dumps(heartbeat_props)}")
+    capture_posthog_event("monitor.webhook_health_completed", heartbeat_props)
 
     return 1 if failures else 0
 

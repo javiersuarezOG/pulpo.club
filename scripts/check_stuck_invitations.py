@@ -18,10 +18,51 @@ POSTHOG_HOST_DEFAULT = "https://eu.posthog.com"
 POSTHOG_INGEST_DEFAULT = "https://eu.i.posthog.com"
 RUNBOOK_DEFAULT = "https://github.com/javiersuarezOG/pulpo.club/actions/workflows/pulpo-webhook-health.yml"
 
+# Per-monitor status sidecar — written by each check_* script before exit and
+# consumed by scripts/check_webhook_health.py's heartbeat to compose
+# monitor.webhook_health_completed { clerk_status, resend_status, stripe_status }.
+# Path is intentionally /tmp so it never touches the repo and survives only
+# inside a single workflow run.
+MONITOR_STATUS_DIR_DEFAULT = "/tmp/pulpo_monitor_status"
+
+
+def _write_monitor_status(monitor: str, status: str, extra: dict | None = None) -> None:
+    """Drop a `{monitor}.json` sidecar with `{status, ts, ...}` for the heartbeat.
+
+    Never raises — the heartbeat treats a missing sidecar as `unknown`, so
+    monitor-script failure modes are observable rather than silenced.
+    """
+    out_dir = env("MONITOR_STATUS_DIR", MONITOR_STATUS_DIR_DEFAULT)
+    try:
+        os.makedirs(out_dir, exist_ok=True)
+        payload = {
+            "monitor": monitor,
+            "status": status,
+            "ts": dt.datetime.now(dt.timezone.utc).isoformat(),
+        }
+        if extra:
+            payload.update(extra)
+        with open(os.path.join(out_dir, f"{monitor}.json"), "w", encoding="utf-8") as fh:
+            json.dump(payload, fh)
+    except OSError:
+        # Sidecar IO failure does not block the monitor itself.
+        pass
+
 
 def env(name: str, default: str = "") -> str:
     value = os.environ.get(name)
     return value.strip() if value and value.strip() else default
+
+
+class HTTPCallError(RuntimeError):
+    """request_json failure carrying the HTTP status separately from the message."""
+
+    def __init__(self, method: str, url: str, status: int, detail: str) -> None:
+        super().__init__(f"{method} {url} failed: {status} {detail}")
+        self.method = method
+        self.url = url
+        self.status = status
+        self.detail = detail
 
 
 def request_json(method: str, url: str, headers: dict[str, str] | None = None, payload: dict | None = None) -> dict:
@@ -38,7 +79,7 @@ def request_json(method: str, url: str, headers: dict[str, str] | None = None, p
             return json.loads(body) if body else {}
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"{method} {url} failed: {exc.code} {detail}") from exc
+        raise HTTPCallError(method, url, exc.code, detail) from exc
 
 
 def email_hash(email: str) -> str:
@@ -141,8 +182,61 @@ def main() -> int:
 
     now = dt.datetime.now(dt.timezone.utc)
     cutoff = now - dt.timedelta(hours=args.threshold_hours)
+
+    # The Clerk REST API for `/v1/invitations` requires backend-secret scope
+    # that the current GH-Actions secret doesn't carry — `/v1/users` works
+    # (welcome_reconcile.py proves it), but listing invitations returns 403.
+    # Until the key is re-scoped or the script switches to the users-based
+    # detection path, we want this workflow to stay green so the upstream
+    # heartbeat step (check_webhook_health.py) remains observable, AND we
+    # want the silent gap itself to surface in PostHog so dashboards can
+    # raise it. Hard-failing every 6h reverts both signals to noise.
+    try:
+        invitations = list_pending_invitations(clerk_secret)
+    except HTTPCallError as exc:
+        if exc.status in (401, 403):
+            capture_posthog("invitation.stuck_check_unavailable", {
+                "reason": f"clerk_{exc.status}",
+                "endpoint": "/v1/invitations",
+                "detail": exc.detail[:500],  # cap so PostHog payload stays small
+                "runbook": args.runbook_url,
+            })
+            print(
+                f"[stuck-invitations] Clerk /v1/invitations returned {exc.status}. "
+                "CLERK_SECRET_KEY likely lacks invitation-list scope (other endpoints "
+                "like /v1/users still work — see welcome_reconcile cron). "
+                "Stuck-invitation alerting paused until the key is re-scoped. "
+                f"Runbook: {args.runbook_url}",
+                file=sys.stderr,
+            )
+            # Slack on monitor unavailability per PRD P0-1: a downgrade-into-silence
+            # is itself the incident class we are guarding against. The heartbeat
+            # in scripts/check_webhook_health.py also picks this up as
+            # `clerk_status=unavailable`; the Slack message here lets oncall see
+            # the cause immediately without opening PostHog.
+            slack(
+                slack_url,
+                f":warning: Clerk stuck-invitation monitor unavailable "
+                f"({exc.status} from /v1/invitations). "
+                f"Stuck-invitation alerting paused until CLERK_SECRET_KEY is re-scoped "
+                f"or the monitor moves off the GH runner. {args.runbook_url}",
+                args.dry_run,
+            )
+            _write_monitor_status("clerk", "unavailable", {
+                "reason": f"clerk_{exc.status}",
+                "endpoint": "/v1/invitations",
+            })
+            # Exit 0 so the workflow stays green for the upstream heartbeat
+            # step. The silent gap is observable via the PostHog event above.
+            return 0
+        raise
+
+    _write_monitor_status("clerk", "ok", {
+        "pending_invitations": len(invitations),
+    })
+
     stuck: list[dict] = []
-    for inv in list_pending_invitations(clerk_secret):
+    for inv in invitations:
         email = inv.get("email_address") or inv.get("emailAddress") or ""
         created = parse_time(inv.get("created_at") or inv.get("createdAt"))
         if not email or not created or created > cutoff:
@@ -170,6 +264,10 @@ def main() -> int:
             f"{args.threshold_hours:.0f}h. Oldest {max_age:.1f}h. Sample {sample}. {args.runbook_url}",
             args.dry_run,
         )
+        _write_monitor_status("clerk", "degraded", {
+            "stuck_count": len(stuck),
+            "max_age_hours": max_age,
+        })
         return 1
 
     print("No stuck invitations over threshold.")
