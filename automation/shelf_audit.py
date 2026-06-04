@@ -70,6 +70,7 @@ from typing import Any, Iterable
 
 from automation._atomic import atomic_write_json
 from pulpo.derived_rules import _g
+from pulpo.filter_config import STRICTNESS_LEVELS as LEVELS
 
 
 SHELF_KEYS: tuple[str, ...] = (
@@ -80,16 +81,6 @@ SHELF_KEYS: tuple[str, ...] = (
     "lake_condos",
     "lake_land",
 )
-
-
-# Strictness levels mirror the upcoming pulpo/filter_config.py (PR A2). Until
-# A2 lands they're defined locally so A1 ships independently. A2 will replace
-# these dicts with imports from pulpo.filter_config.
-LEVELS: dict[str, dict[str, Any]] = {
-    "strict":   {"required": ("price_usd", "url", "property_type", "zone", "area_m2"), "min_photos": 1},
-    "moderate": {"required": ("price_usd", "url", "property_type", "zone"),            "min_photos": 0},
-    "lenient":  {"required": ("price_usd", "url", "property_type"),                    "min_photos": 0},
-}
 
 
 def _shelf_key(li: Any) -> str | None:

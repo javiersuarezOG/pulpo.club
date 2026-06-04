@@ -1700,14 +1700,27 @@ def main() -> int:
     print(f"[pr-8] beachfront_tier={dict(pr8_beach_tier_counts)} "
           f"land_type={dict(pr8_land_type_counts)}")
 
-    # Quality gate — flag listings where the broker hasn't shared price
-    # or area. Runs before rank() so the ranker can hard-floor these.
+    # Quality gate — flag listings the active strictness level (set by
+    # PULPO_FILTER_STRICTNESS) considers incomplete. PRD default is
+    # ``moderate`` (type+zone+price). Runs before rank() so the ranker
+    # can hard-floor these. Per-row reasons stamped onto
+    # ``incomplete_reasons`` so the FE + audit can break out per-gate
+    # counts without recomputing the predicate.
+    from pulpo.filter_config import (
+        active_level as _active_level,
+        derive_incomplete_reasons as _derive_incomplete_reasons,
+    )
+    _level = _active_level()
     incomplete_count = 0
     for li in listings:
-        if _derive_is_incomplete(li):
+        reasons = _derive_incomplete_reasons(li)
+        if reasons:
             li.is_incomplete = True
+            li.incomplete_reasons = reasons
             incomplete_count += 1
-    print(f"[incomplete] total={incomplete_count}/{len(listings)}")
+        else:
+            li.incomplete_reasons = []
+    print(f"[incomplete] level={_level} total={incomplete_count}/{len(listings)}")
 
     # PRD §FR-7.5 — zone median price batch. Computes median price_per_m2
     # per (zone, property_type) bucket from current listings, then sets
