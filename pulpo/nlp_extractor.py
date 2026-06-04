@@ -82,10 +82,26 @@ def load_dictionaries(base: Path = KEYWORDS_DIR) -> list[CompiledDict]:
         `{"positive_en": [...], "positive_es": [...],
           "negative_en": [...], "negative_es": [...]}`
       - or a mix of both (legacy keys merged with the bilingual ones).
+
+    PR D2 — the ``is_agricultural`` field can ALSO be defined in the
+    active country manifest under the ``agricultural_keywords`` key.
+    When the manifest carries that section, it takes precedence over
+    the corresponding ``nlp_keywords/is_agricultural.json`` file (the
+    legacy file remains as a fallback for countries that haven't been
+    migrated yet). Removing ``is_agricultural.json`` is safe once every
+    active country manifest carries the section.
     """
     if not base.exists():
         return []
     out: list[CompiledDict] = []
+    # PR D2 — manifest override only applies when the caller is using
+    # the production KEYWORDS_DIR. Tests that pass a custom `base` are
+    # isolating the dict-loading logic and shouldn't pick up the global
+    # manifest state.
+    use_manifest = base == KEYWORDS_DIR
+    manifest_overrides = _agricultural_keywords_from_manifest() if use_manifest else None
+    if manifest_overrides is not None:
+        out.append(manifest_overrides)
     for path in sorted(base.glob("*.json")):
         try:
             spec = json.loads(path.read_text(encoding="utf-8"))
@@ -93,6 +109,10 @@ def load_dictionaries(base: Path = KEYWORDS_DIR) -> list[CompiledDict]:
             print(f"[nlp_extractor] WARN: bad JSON in {path}: {e}", file=sys.stderr)
             continue
         field    = spec.get("field") or path.stem
+        # PR D2 — when the manifest provided is_agricultural, skip the
+        # legacy file's compiled copy so we don't double-fire patterns.
+        if manifest_overrides is not None and field == "is_agricultural":
+            continue
         type_    = spec.get("type") or "boolean"
         pos      = _collect_patterns(spec, "positive")
         neg      = _collect_patterns(spec, "negative")
@@ -103,6 +123,40 @@ def load_dictionaries(base: Path = KEYWORDS_DIR) -> list[CompiledDict]:
         out.append(CompiledDict(field=field, type_=type_,
                                 positive=pos_rx, negative=neg_rx))
     return out
+
+
+def _agricultural_keywords_from_manifest() -> CompiledDict | None:
+    """Return the manifest-defined ``is_agricultural`` CompiledDict, or
+    None when the active country doesn't carry the section.
+
+    Lazy import + tolerant fallbacks: if pulpo.countries can't be
+    imported (e.g. circular dep in a future refactor) or the active
+    manifest doesn't exist (e.g. test fixtures with no manifest dir),
+    the function returns None and the legacy file path is used.
+    """
+    try:
+        from pulpo.countries import active as _active_country
+    except Exception:  # noqa: BLE001
+        return None
+    try:
+        manifest = _active_country()
+    except Exception:  # noqa: BLE001
+        return None
+    spec = manifest.agricultural_keywords()
+    if not spec:
+        return None
+    pos = _collect_patterns(spec, "positive")
+    neg = _collect_patterns(spec, "negative")
+    if not pos:
+        return None
+    pos_rx = re.compile("|".join(pos), re.IGNORECASE)
+    neg_rx = re.compile("|".join(neg), re.IGNORECASE) if neg else None
+    return CompiledDict(
+        field="is_agricultural",
+        type_="boolean",
+        positive=pos_rx,
+        negative=neg_rx,
+    )
 
 
 def _text_blob(li: Any) -> str:
