@@ -213,11 +213,18 @@ export interface Listing {
     discovery_tags: ("top_rated" | "under_250k" | "gated" | "waterfront")[];
     star_rating: number;  // 0.0..5.0 in 0.5 increments; 0.0 = no rank_score
 
-    // Quality gate — true when the broker hasn't shared price OR area_m2.
-    // Excluded from Discover shelves + the default Browse view; users opt
-    // in via the Browse "Show missing details" chip. The ranker hard-floors
-    // these so they always sort below complete listings.
+    // Quality gate — true when the broker hasn't shared the fields the
+    // active strictness level requires (PR A2). Default `moderate`
+    // requires type+zone+price; `strict` adds area+photo; `lenient`
+    // drops zone. Excluded from Discover shelves + the default Browse
+    // view; users opt in via the Browse "Show missing details" chip.
+    // The ranker hard-floors these so they always sort below complete
+    // listings.
     is_incomplete: boolean;
+    // Diagnostic companion to is_incomplete — which gate(s) failed.
+    // Populated by automation/run.py via filter_config.derive_incomplete_reasons.
+    // Empty list when the listing passes the active strictness level.
+    incomplete_reasons: string[];
 
     // ── Image-enrichment protocol (hero rewrite Phase 2) ────────────
     // <file>.hero.jpg meets 1600×1200 + aspect 1.4–1.85 + ≤ 5MB; <file>.jpg
