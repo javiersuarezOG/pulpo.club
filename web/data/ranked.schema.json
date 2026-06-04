@@ -101,6 +101,7 @@
       "discovery_tags",
       "star_rating",
       "is_incomplete",
+      "quality_score",
       "data_quality_score",
       "investment_signal",
       "readiness_score",
@@ -687,6 +688,12 @@
       },
       "is_incomplete": {
         "type": "boolean"
+      },
+      "quality_score": {
+        "type": [
+          "integer",
+          "null"
+        ]
       },
       "data_quality_score": {
         "type": [
