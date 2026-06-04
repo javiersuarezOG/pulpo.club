@@ -86,7 +86,13 @@ function useShelfScrolled(shelfKey, listRef) {
 // ────────────────────────────────────────────────────────────────────
 // Real-listing pickers — Wave 5 polish
 
-const MIN_REAL_LISTINGS = 5;
+// PRD A5 — raised 5 → 10 per the PRD's shelf-rendering threshold.
+// Gated on A3 (shelf-aware photo waiver) being live: without the
+// loose-eligible top-up, every shelf with 7-8 strict-eligible listings
+// would disappear under the higher threshold. With A3, shelves fill to
+// 10 — trailing positions render the "Foto aún no disponible"
+// placeholder when the broker hasn't shared a photo yet.
+const MIN_REAL_LISTINGS = 10;
 
 // Curated shelves only surface complete listings. A listing missing
 // price or area never qualifies regardless of how strong its other
