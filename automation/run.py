@@ -2033,6 +2033,37 @@ def main() -> int:
         print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
               f"(built structures retained) — {len(ranked)} remain")
 
+    # PRD "Inventory Expansion & Listing Quality Filter" — emit per-shelf
+    # eligibility audit + KPI dashboard. Read-only telemetry; does not
+    # change which listings are visible. Phase A2 will wire the strictness
+    # slider into derive_is_incomplete; until then the audit reports what
+    # each level would produce against today's data.
+    try:
+        from automation.shelf_audit import write_audit as _write_shelf_audit
+        shelf_audit_payload = _write_shelf_audit(ranked, web_data_dir)
+        agg = shelf_audit_payload.get("aggregate", {})
+        print(f"[shelf_audit] active_level={shelf_audit_payload['active_level']} "
+              f"total={shelf_audit_payload['total_in_dataset']} "
+              f"eligible_strict={agg.get('eligible_strict')} "
+              f"eligible_moderate={agg.get('eligible_moderate')} "
+              f"eligible_lenient={agg.get('eligible_lenient')}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[shelf_audit] failed (non-fatal): {_e!r}")
+
+    try:
+        from automation.kpi_dashboard import write as _write_kpi
+        kpi_payload = _write_kpi(
+            ranked,
+            web_data_dir,
+            registered_sources=list(REGISTRY.keys()),
+        )
+        kpi = kpi_payload.get("kpi", {})
+        print(f"[kpi] visible={kpi.get('total_visible_listings')} "
+              f"shelves_rendering={kpi.get('shelves_rendering')}/{kpi.get('shelves_total')} "
+              f"active_sources={kpi.get('active_sources')}/{kpi.get('registered_sources')}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[kpi] failed (non-fatal): {_e!r}")
+
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
     # population rates against the new ones, and fail the run if any
