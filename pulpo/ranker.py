@@ -41,6 +41,7 @@ from .models import Listing
 import pulpo.ranker_legs.value     # noqa: F401 — triggers registration
 import pulpo.ranker_legs.location  # noqa: F401
 import pulpo.ranker_legs.momentum  # noqa: F401
+import pulpo.ranker_legs.quality_score  # noqa: F401  (PRD A6 — soft quality nudge)
 from pulpo.agents import RANKER_LEGS
 
 
