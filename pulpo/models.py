@@ -217,6 +217,13 @@ class Listing:
     # default, and to surface "Not shared" copy on the detail page.
     is_incomplete: bool = False
 
+    # PRD A6 — soft quality score (0..9). Computed by
+    # pulpo.quality_score.compute and stamped in automation/run.py
+    # before ranker.rank(). Consumed by pulpo.ranker_legs.quality_score
+    # as a rank nudge. RANK-ONLY: never read by shelf eligibility,
+    # filters, or any visibility predicate.
+    quality_score: Optional[int] = None
+
     # PRD §FR-7 derived signals (Phase 1)
     data_quality_score: Optional[float] = None  # 0..1, populated_fields / scoreable_total
     investment_signal: Optional[str] = None     # 'deal'|'hot'|'stale'|'new'|None
