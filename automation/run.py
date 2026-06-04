@@ -1721,6 +1721,29 @@ def main() -> int:
             li.incomplete_reasons = []
     print(f"[incomplete] level={_level} total={incomplete_count}/{len(listings)}")
 
+    # PRD A6 — soft quality score (0..9) stamped on every listing.
+    # Consumed by pulpo.ranker_legs.quality_score as a rank nudge
+    # (weight 0.05 → renormalizes the existing 3 legs to ~95% of their
+    # current weight). RANK-ONLY — never read by shelf eligibility or
+    # any visibility predicate.
+    try:
+        from pulpo.quality_score import MAX_SCORE as _Q_MAX, compute as _quality_score_compute
+        _q_total = 0
+        _q_count = 0
+        _q_max_seen = 0
+        for li in listings:
+            q = _quality_score_compute(li)
+            li.quality_score = q
+            _q_total += q
+            _q_count += 1
+            if q > _q_max_seen:
+                _q_max_seen = q
+        if _q_count:
+            print(f"[quality_score] mean={_q_total / _q_count:.2f} "
+                  f"max={_q_max_seen}/{_Q_MAX} count={_q_count}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[quality_score] failed (non-fatal): {_e!r}")
+
     # PRD §FR-7.5 — zone median price batch. Computes median price_per_m2
     # per (zone, property_type) bucket from current listings, then sets
     # price_vs_zone_median + price_vs_zone_pct on each scored listing.
