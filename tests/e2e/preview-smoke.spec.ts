@@ -557,6 +557,10 @@ test.describe("New app boots cleanly on key routes", () => {
       // but always renders on /browse?pin= and is sweep-able on the
       // detail-page step of this test (which navigates to /browse).
       "Shared with you",                              // card.shared_pill
+      // PRD A3 — shelf-aware photo placeholder. Renders when the photo
+      // waiver tops up a thin shelf with loose-eligible listings
+      // (no photo). Card is fully clickable; only the visual differs.
+      "Photo pending",                                // home.shelf.photo_pending
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
