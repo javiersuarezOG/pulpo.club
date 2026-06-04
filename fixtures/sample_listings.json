@@ -544,5 +544,75 @@
     "bedrooms": 3,
     "bathrooms": 2.0,
     "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "xitios",
+    "source_id": "xitios-coatepeque-001",
+    "url": "https://www.xitios.com.sv/propiedad/casa-coatepeque-001",
+    "title": "Casa en Lago Coatepeque (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Replace with real Xitios HTML capture during the C1 calibration pass.",
+    "price_usd": 350000,
+    "area_m2": 700,
+    "photo_urls": [
+      "https://www.xitios.com.sv/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "700 m²",
+    "property_type": "house"
+  },
+  {
+    "source": "xitios",
+    "source_id": "xitios-coatepeque-002",
+    "url": "https://www.xitios.com.sv/propiedad/terreno-coatepeque-002",
+    "title": "Terreno en Lago Coatepeque (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.xitios.com.sv/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land"
+  },
+  {
+    "source": "xitios",
+    "source_id": "xitios-eltunco-003",
+    "url": "https://www.xitios.com.sv/propiedad/casa-tunco-003",
+    "title": "Casa en El Tunco (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test.",
+    "price_usd": 425000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.xitios.com.sv/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house"
+  },
+  {
+    "source": "xitios",
+    "source_id": "xitios-zonte-004",
+    "url": "https://www.xitios.com.sv/propiedad/condo-zonte-004",
+    "title": "Condo en El Zonte (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.xitios.com.sv/static/placeholder-4.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo"
+  },
+  {
+    "source": "xitios",
+    "source_id": "xitios-ilopango-005",
+    "url": "https://www.xitios.com.sv/propiedad/terreno-ilopango-005",
+    "title": "Terreno en Lago Ilopango (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test.",
+    "price_usd": 85000,
+    "area_m2": 2200,
+    "photo_urls": [
+      "https://www.xitios.com.sv/static/placeholder-5.jpg"
+    ],
+    "raw_size_text": "2200 m²",
+    "property_type": "land"
   }
 ]
