@@ -202,5 +202,70 @@
       "bedrooms":       [0.0,          10.0,        0.0,       6.0],
       "hoa_fee_usd_monthly": [0.0,     5000.0,      0.0,       2000.0]
     }
+  },
+
+  "_agricultural_keywords_comment": "PR D2 — moved from nlp_keywords/is_agricultural.json (which remains as a fallback with a DEPRECATED header). PR-8 bilingual schema. SV-specific cues: cafetalera, ganadera, milpa, potrero, manzanas (Salvadoran traditional area unit). Highest signal: 'finca' alone is very strong. Word boundaries (\\b) on bare single-word patterns are LOAD-BEARING per the 2026-05-24 audit — without them, English 'ranch' substring-matches Spanish 'rancho' (Salvadoran beach-pavilion, NOT a working ranch) and 'finca' substring-matches development names like 'Finca Brava'. Keep the \\b convention when adding patterns.",
+  "agricultural_keywords": {
+    "positive_en": [
+      "\\bagricultural\\b",
+      "agricultural use",
+      "agricultural land",
+      "agricultural zoning",
+      "\\bfarm\\b",
+      "\\bfarmland\\b",
+      "\\branch\\b",
+      "coffee farm",
+      "coffee plantation",
+      "cattle ranch",
+      "\\blivestock\\b",
+      "crop production",
+      "for crops",
+      "fruit trees",
+      "fruit orchard",
+      "sugar cane field",
+      "rice field",
+      "irrigated land",
+      "arable land"
+    ],
+    "positive_es": [
+      "uso agr[ií]cola",
+      "\\bagropecuario\\b",
+      "\\bagroindustrial\\b",
+      "\\bfinca\\b",
+      "finca cafetalera",
+      "finca de caf[eé]",
+      "finca ganadera",
+      "\\bganader[ií]a\\b",
+      "para ganado",
+      "para sembrar",
+      "\\bcultivable\\b",
+      "\\bcultivos?\\b",
+      "siembra de",
+      "\\bca[nñ]al\\b",
+      "ca[nñ]a de az[uú]car",
+      "\\bmilpa\\b",
+      "\\bpotrero\\b",
+      "\\bpastizal\\b",
+      "[aá]rboles frutales",
+      "huerto frutal",
+      "frutales en producci[oó]n",
+      "tierra f[eé]rtil",
+      "tierra agr[ií]cola",
+      "para cultivo",
+      "ideal para cultivo",
+      "manzanas? de tierra",
+      "irrigaci[oó]n",
+      "sistema de riego"
+    ],
+    "negative_en": [
+      "former farm",
+      "no longer agricultural",
+      "agricultural-zoned but"
+    ],
+    "negative_es": [
+      "antigua finca",
+      "ex-finca",
+      "ya no es agr[ií]cola"
+    ]
   }
 }
