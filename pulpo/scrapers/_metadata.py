@@ -158,8 +158,21 @@ SCRAPER_METADATA: dict[str, dict] = {
         "target_discovered": None,
     },
     # ── Phase C scrapers — entries added when each scraper PR lands ──
-    # Forward-looking placeholders. Each Phase C PR replaces its entry
-    # with concrete metadata on merge.
+    "xitios": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "html_cards + jsonld_residence (DRAFT)",
+        "strengths": ["SV-native portal", "possible Coatepeque inventory"],
+        "failure_modes": [
+            "DRAFT skeleton — selectors are placeholders pending real HTML capture",
+        ],
+        "owner_module": "pulpo.scrapers.xitios",
+        "target_prd": None,
+        "target_discovered": None,
+    },
+    # Remaining Phase C placeholders below get filled in when each
+    # scraper PR lands.
 }
 
 
