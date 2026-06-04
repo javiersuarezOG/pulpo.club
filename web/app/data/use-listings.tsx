@@ -20,6 +20,27 @@ import type { Listing } from "./types";
 import { track } from "../telemetry/hook";
 import { LISTINGS as MOCK_LISTINGS } from "../data.jsx";
 
+// Agricultural-purge runtime defense. The pipeline filter in
+// automation/run.py ("[purge]") drops agricultural-LAND before
+// ranked.json, but this guards against stale cached data and any
+// non-land agricultural classification leaking through. Agricultural
+// is out-of-scope for Pulpo's beach + lake marketplace.
+//
+// CONTRACT: this is the canonical FE exclusion surface for the
+// agricultural pool. Every reader of useListings() inherits the filter.
+// Direct readers of ranked.json (not via this hook) must apply the
+// same filter — the producer/consumer contract is enforced in
+// tests/test_agricultural_exclusion.py.
+//
+// `is_agricultural` is not in the canonical Listing type — it's a
+// pipeline-derived flag that ranked.json may or may not carry. Cast
+// internally so callers pass Listing[] without per-call assertions.
+export function excludeAgricultural(listings: Listing[]): Listing[] {
+  return listings.filter(
+    (l) => (l as Listing & { is_agricultural?: boolean }).is_agricultural !== true,
+  );
+}
+
 type State =
   | { status: "loading" }
   | { status: "ready"; listings: Listing[] }
@@ -48,15 +69,7 @@ export function ListingsProvider({ children }: { children: React.ReactNode }) {
     loadListings()
       .then((listings) => {
         if (cancelled) return;
-        // Agricultural-purge runtime defense. The pipeline filter in
-        // automation/run.py ("[purge]") drops agricultural listings
-        // before ranked.json, but this guards against stale cached
-        // data shipping an agricultural listing through. Agricultural
-        // is out-of-scope for Pulpo's beach + lake marketplace.
-        const filtered = listings.filter(
-          (l) => (l as { is_agricultural?: boolean }).is_agricultural !== true,
-        );
-        setState({ status: "ready", listings: filtered });
+        setState({ status: "ready", listings: excludeAgricultural(listings) });
       })
       .catch((err: Error) => {
         if (cancelled) return;

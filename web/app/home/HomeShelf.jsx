@@ -441,6 +441,12 @@ export function HomeShelf({
 // PR #421 — no more dedicated shelves for those.
 
 // Pick the best-ranked listings for a (master, sub) cohort.
+// The agricultural filter is the canonical FE exclusion from
+// `web/app/data/use-listings.tsx::excludeAgricultural`, but this
+// shelf-level guard is defense-in-depth: any caller that bypasses
+// the data hook still has agricultural inventory removed before it
+// surfaces on a curated shelf. The contract test at
+// `tests/test_agricultural_exclusion.py` enforces both layers.
 function pickTopByMasterAndSub(listings, master, sub, n) {
   return [...listings]
     .filter(
@@ -448,6 +454,7 @@ function pickTopByMasterAndSub(listings, master, sub, n) {
         l.master_category === master &&
         l.subcategory === sub &&
         l.rank_score != null &&
+        l.is_agricultural !== true &&
         isShelfEligible(l),
     )
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
