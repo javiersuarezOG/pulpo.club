@@ -753,6 +753,12 @@ jobs:
           # consumed by /api/nightly/health.
           git add web/data/photo_contract.json 2>/dev/null || true
           git add web/data/photo_contract_log.jsonl 2>/dev/null || true
+          # PRD "Inventory Expansion & Listing Quality Filter" — per-shelf
+          # eligibility audit + KPI dashboard. Read-only telemetry; the
+          # before/after diff between two nightly snapshots is the
+          # acceptance deliverable for the inventory-expansion workstream.
+          git add web/data/shelf_audit.json 2>/dev/null || true
+          git add web/data/kpi_dashboard.json 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
