@@ -22,7 +22,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from pulpo.agents import RANKER_LEGS, register
-from pulpo.quality_score import MAX_SCORE, compute
+from pulpo.quality_score import MAX_SCORE
 
 if TYPE_CHECKING:
     from pulpo.models import Listing
