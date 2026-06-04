@@ -511,6 +511,15 @@ const UI_STRINGS = {
                                    es: "○ ○ ○  desliza para ver {n} más" },
   "home.shelf.aria":             { en: "Homepage activity shelves",
                                    es: "Secciones de la página de inicio" },
+  // PRD A3 — placeholder copy for shelf cards whose listing didn't ship
+  // a photo yet. The shelf-aware photo waiver tops up thin shelves with
+  // loose-eligible listings (no photo) and stamps `_needs_photo_placeholder`
+  // so the card renders this copy in place of <Photo>. Card is still
+  // fully clickable; only the visual differs.
+  "home.shelf.photo_pending":      { en: "Photo pending",
+                                     es: "Foto aún no disponible" },
+  "home.shelf.photo_pending_aria": { en: "Photo not yet shared by the listing agent",
+                                     es: "El agente aún no ha compartido fotos" },
 
   "home.badge.today":            { en: "today",
                                    es: "hoy" },
