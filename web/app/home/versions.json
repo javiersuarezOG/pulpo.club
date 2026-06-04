@@ -6,11 +6,11 @@
     "hero_v5": "v5.4",
     "featured": "v1",
     "shoreline": "v2",
-    "top_beach_terrenos": "v2",
-    "top_beach_condos": "v2",
-    "top_beach_homes": "v2",
-    "top_lake_terrenos": "v2",
-    "top_lake_condos": "v2",
-    "top_lake_homes": "v2"
+    "top_beach_terrenos": "v3",
+    "top_beach_condos": "v3",
+    "top_beach_homes": "v3",
+    "top_lake_terrenos": "v3",
+    "top_lake_condos": "v3",
+    "top_lake_homes": "v3"
   }
 }
