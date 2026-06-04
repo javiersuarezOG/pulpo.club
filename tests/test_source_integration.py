@@ -52,7 +52,7 @@ TESTS_DIR    = REPO / "tests" / "scrapers"
 # scraper-file glob below.
 KNOWN_HELPERS = {
     "_base", "_policy", "_runtime", "_type_classifier", "_photo_url_upgrade",
-    "_scrape_cache", "__init__",
+    "_scrape_cache", "_metadata", "__init__",
 }
 
 
@@ -158,6 +158,42 @@ def test_policy_entries_or_graceful_fallback():
 
 
 # ── PULPO_SOURCES override (when set) must be a subset ────────────────
+
+
+def test_every_registered_source_has_metadata_entry():
+    """PR B1 — every registered scraper must have a matching entry in
+    ``pulpo/scrapers/_metadata.SCRAPER_METADATA`` with the required keys.
+
+    The metadata is the ToolSpec-shaped seam: today nobody reads it,
+    tomorrow's recommender retrofit lifts it directly into a registry.
+    Forcing every scraper to declare its metadata at landing time keeps
+    the seam evergreen so the retrofit doesn't require an audit pass.
+    """
+    import pulpo.scrapers  # noqa: F401  — fires autodiscovery
+    from pulpo.agents import SOURCES
+    from pulpo.scrapers._metadata import REQUIRED_KEYS, SCRAPER_METADATA
+
+    missing_entries = [
+        slug for slug in sorted(SOURCES.keys())
+        if slug not in SCRAPER_METADATA
+    ]
+    assert not missing_entries, (
+        f"Registered scrapers missing SCRAPER_METADATA entry: "
+        f"{missing_entries}. Add a dict to pulpo/scrapers/_metadata.py "
+        f"with the required keys: {sorted(REQUIRED_KEYS)}."
+    )
+
+    incomplete_entries: dict[str, set[str]] = {}
+    for slug, meta in SCRAPER_METADATA.items():
+        if slug not in SOURCES:
+            continue  # entry for an unregistered slug; harmless
+        missing_keys = REQUIRED_KEYS - set(meta.keys())
+        if missing_keys:
+            incomplete_entries[slug] = missing_keys
+    assert not incomplete_entries, (
+        f"SCRAPER_METADATA entries missing required keys: "
+        f"{incomplete_entries}"
+    )
 
 
 def test_pulpo_sources_override_if_present_is_subset_of_registry():

@@ -753,6 +753,10 @@ jobs:
           # consumed by /api/nightly/health.
           git add web/data/photo_contract.json 2>/dev/null || true
           git add web/data/photo_contract_log.jsonl 2>/dev/null || true
+          # PRD B1 — per-scrape coverage log (kept / target_discovered /
+          # status). Phase C scrapers consume this via lib/coverage_logger
+          # to track stated-vs-actual inventory each nightly.
+          git add web/data/scraper_coverage_history.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
