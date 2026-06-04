@@ -210,12 +210,19 @@ class Listing:
                                               # subset of {top_rated, under_250k, gated, waterfront}
     star_rating: float = 0.0                 # 0.0..5.0 in 0.5 steps; 0.0 when rank_score missing
 
-    # Quality gate — True when the source broker hasn't shared price OR
-    # area. Set by pulpo.derived_rules.derive_is_incomplete before
+    # Quality gate — True when the broker hasn't shared the fields the
+    # active strictness level requires. Set by
+    # pulpo.derived_rules.derive_is_incomplete (delegates to
+    # pulpo.filter_config under PULPO_FILTER_STRICTNESS) before
     # ranker.rank() so the ranker can hard-floor the score; consumed by
     # the FE to hide these listings from Discover shelves + Browse
     # default, and to surface "Not shared" copy on the detail page.
     is_incomplete: bool = False
+    # Diagnostic companion to is_incomplete — which gate(s) failed.
+    # Populated by automation/run.py after derive_is_incomplete fires,
+    # written into ranked.json so the audit + ops dashboards can break
+    # out per-reason counts without recomputing the predicate.
+    incomplete_reasons: list[str] = field(default_factory=list)
 
     # PRD §FR-7 derived signals (Phase 1)
     data_quality_score: Optional[float] = None  # 0..1, populated_fields / scoreable_total

@@ -521,7 +521,21 @@ def test_is_incomplete_true_when_price_missing():
     assert derive_is_incomplete(li) is True
 
 
-def test_is_incomplete_true_when_area_missing():
+def test_is_incomplete_false_when_only_area_missing_under_moderate(monkeypatch):
+    """PR A2 — under the PRD-default moderate level, area is a soft signal,
+    not a hard gate. A listing missing area passes is_incomplete and
+    becomes visible. This is the load-bearing change of the strictness
+    slider; ~80-120 hidden listings recover per nightly per the PRD audit."""
+    monkeypatch.setenv("PULPO_FILTER_STRICTNESS", "moderate")
+    li = _li(price_usd=150_000.0)
+    li["area_m2"] = None
+    assert derive_is_incomplete(li) is False
+
+
+def test_is_incomplete_true_when_area_missing_under_strict(monkeypatch):
+    """Strict still requires area. Operators who want the old behavior
+    flip PULPO_FILTER_STRICTNESS=strict."""
+    monkeypatch.setenv("PULPO_FILTER_STRICTNESS", "strict")
     li = _li(price_usd=150_000.0)
     li["area_m2"] = None
     assert derive_is_incomplete(li) is True

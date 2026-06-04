@@ -337,20 +337,21 @@ def derive_land_type(li: Any) -> Optional[str]:
 
 
 def derive_is_incomplete(li: Any) -> bool:
-    """Quality gate: True when the broker hasn't shared price or area.
+    """Quality gate: True when the broker hasn't shared the fields the
+    active strictness level requires.
 
-    Used by the ranker to hard-floor `rank_score` so a complete listing
-    always sorts above an incomplete one, and by the FE to exclude
-    incomplete listings from Discover shelves + the default Browse
-    view. Users opt back in via a filter chip; the detail page always
-    renders (direct links must work) and surfaces a "broker hasn't
-    shared full info" note plus per-field "Not shared" copy.
+    Delegates to ``pulpo.filter_config.derive_is_incomplete`` (PR A2)
+    which reads ``PULPO_FILTER_STRICTNESS`` (strict | moderate | lenient).
+    The PRD default is ``moderate`` — type+zone+price (area is a soft
+    signal, not a hard gate). Existing callers (ranker hard-floor, FE
+    shelf eligibility via the data hook) are unaffected by the rename.
 
     Runs *before* ranker.rank() in automation/run.py.
     """
-    price = _g(li, "price_usd")
-    area = _g(li, "area_m2")
-    return price is None or area is None
+    # Lazy import to avoid a circular reference: filter_config imports
+    # ``_g`` from this module.
+    from pulpo.filter_config import derive_is_incomplete as _derive
+    return _derive(li)
 
 
 # ─────────────────────────────────────────────────────────────────────
