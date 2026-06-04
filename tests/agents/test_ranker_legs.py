@@ -7,6 +7,7 @@ from pulpo.models import Listing
 import pulpo.ranker_legs.value     # noqa: F401
 import pulpo.ranker_legs.location  # noqa: F401
 import pulpo.ranker_legs.momentum  # noqa: F401
+import pulpo.ranker_legs.quality_score  # noqa: F401  (PR A6 — soft quality nudge)
 from pulpo.agents import RANKER_LEGS
 
 
@@ -19,13 +20,14 @@ def _make_listing(**kwargs) -> Listing:
     return Listing(**defaults)
 
 
-def test_only_three_legs_registered():
-    """Locks in the Value / Location / Momentum consolidation. A regression
-    that re-adds Liquidity, or restores the old "quality" / "upside" slugs,
-    needs to update this assertion explicitly — silent re-introduction is
-    exactly the kind of drift this is here to catch.
+def test_four_legs_registered():
+    """Locks in the post-PR A6 leg roster: Value / Location / Momentum +
+    the new soft Quality Score nudge (weight 0.05). A regression that
+    silently re-adds Liquidity, restores the old "upside" slug, or drops
+    quality_score needs to update this assertion explicitly — silent
+    drift is exactly what this is here to catch.
     """
-    assert set(RANKER_LEGS.keys()) == {"value", "location", "momentum"}
+    assert set(RANKER_LEGS.keys()) == {"value", "location", "momentum", "quality_score"}
 
 
 def test_location_beachfront_bonus():
