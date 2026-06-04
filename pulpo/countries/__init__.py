@@ -204,6 +204,42 @@ class CountryManifest:
                     out.append((entry[0], float(entry[1]), float(entry[2])))
         return tuple(out)
 
+    def agricultural_keywords(self) -> dict[str, list[str]]:
+        """Per-country agricultural-classification keyword lists (PR D2).
+
+        Shape::
+
+            {
+              "positive_en": ["\\bfarm\\b", "\\branch\\b", ...],
+              "positive_es": ["\\bfinca\\b", "\\bganader[ií]a\\b", ...],
+              "negative_en": ["former farm", ...],
+              "negative_es": ["antigua finca", ...]
+            }
+
+        Consumed by ``pulpo.nlp_extractor`` which prefers this section
+        over the legacy ``nlp_keywords/is_agricultural.json`` file. The
+        legacy file remains as a fallback (deprecation comment in its
+        header) until every active country manifest carries this key.
+
+        Word boundaries (``\\b``) in the regex strings are LOAD-BEARING
+        per the 2026-05-24 audit — preserve them when editing. Without
+        them, English ``ranch`` substring-matches Spanish ``rancho``
+        (beach pavilion) and triggers ~40 false-positive purges/night.
+
+        Returns empty dict when the manifest doesn't carry this key —
+        the consumer treats that as "no keywords; classifier inert for
+        this country."
+        """
+        v = self.raw.get("agricultural_keywords") or {}
+        if not isinstance(v, dict):
+            return {}
+        out: dict[str, list[str]] = {}
+        for key in ("positive_en", "positive_es", "negative_en", "negative_es"):
+            lst = v.get(key) or []
+            if isinstance(lst, (list, tuple)):
+                out[key] = [str(p) for p in lst if isinstance(p, str)]
+        return out
+
     def validation_bounds(self) -> dict[str, dict[str, tuple[float, float, float, float]]]:
         """Per-property-type validation bounds.
 
