@@ -49,7 +49,6 @@ from pulpo.derived_rules import (   # type: ignore  # noqa: E402
     derive_previous_price as _derive_previous_price,
     derive_beachfront_tier as _derive_beachfront_tier,
     derive_land_type as _derive_land_type,
-    derive_is_incomplete as _derive_is_incomplete,
 )
 from automation.pipeline_steps import (  # noqa: E402
     phase_normalize, phase_validate, phase_write_outputs, phase_print_summary,
