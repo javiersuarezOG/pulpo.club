@@ -225,6 +225,11 @@ export interface Listing {
     // Populated by automation/run.py via filter_config.derive_incomplete_reasons.
     // Empty list when the listing passes the active strictness level.
     incomplete_reasons: string[];
+    // PRD A6 — soft quality score (0..9). Computed by
+    // pulpo.quality_score.compute, stamped before ranker.rank(). Consumed
+    // by pulpo.ranker_legs.quality_score as a rank nudge (weight 0.05).
+    // RANK-ONLY: never read by shelf eligibility or visibility predicates.
+    quality_score: number | null;
 
     // ── Image-enrichment protocol (hero rewrite Phase 2) ────────────
     // <file>.hero.jpg meets 1600×1200 + aspect 1.4–1.85 + ≤ 5MB; <file>.jpg

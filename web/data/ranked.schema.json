@@ -102,6 +102,7 @@
       "star_rating",
       "is_incomplete",
       "incomplete_reasons",
+      "quality_score",
       "data_quality_score",
       "investment_signal",
       "readiness_score",
@@ -694,6 +695,12 @@
         "items": {
           "type": "string"
         }
+      },
+      "quality_score": {
+        "type": [
+          "integer",
+          "null"
+        ]
       },
       "data_quality_score": {
         "type": [
