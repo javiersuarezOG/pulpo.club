@@ -218,6 +218,11 @@ export interface Listing {
     // in via the Browse "Show missing details" chip. The ranker hard-floors
     // these so they always sort below complete listings.
     is_incomplete: boolean;
+    // PRD A6 — soft quality score (0..9). Computed by
+    // pulpo.quality_score.compute, stamped before ranker.rank(). Consumed
+    // by pulpo.ranker_legs.quality_score as a rank nudge (weight 0.05).
+    // RANK-ONLY: never read by shelf eligibility or visibility predicates.
+    quality_score: number | null;
 
     // ── Image-enrichment protocol (hero rewrite Phase 2) ────────────
     // <file>.hero.jpg meets 1600×1200 + aspect 1.4–1.85 + ≤ 5MB; <file>.jpg
