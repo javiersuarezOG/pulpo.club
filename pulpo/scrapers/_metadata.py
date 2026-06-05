@@ -307,6 +307,25 @@ SCRAPER_METADATA: dict[str, dict] = {
         "target_discovered": None,
         "health_probe_url": "https://www.jamesedition.com/es/real_estate/house-lago-de-coatepeque-el-salvador",
     },
+    "xitios": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "og:meta detail extraction (no JSON-LD on xitios) + ?page=N catalog walk; varas² → m² area conversion",
+        "strengths": [
+            "SV-native portal",
+            "coastal + Coatepeque + Suchitlán inventory",
+            "preserves URL-encoded VEN+RAN filter across pagination",
+        ],
+        "failure_modes": [
+            "no JSON-LD anywhere — purely og:meta + regex over og:description for price/area",
+            "area unit mix: m² + varas cuadradas; conversion applied inline (factor 0.6989)",
+        ],
+        "owner_module": "pulpo.scrapers.xitios",
+        "target_prd": None,
+        "target_discovered": None,
+        "health_probe_url": "https://www.xitios.com.sv/propiedades/buscar?categoria%5B%5D=VEN&tipo%5B%5D=RAN",
+    },
 }
 
 
