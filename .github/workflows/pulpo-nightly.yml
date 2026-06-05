@@ -763,6 +763,10 @@ jobs:
           # status). Phase C scrapers consume this via lib/coverage_logger
           # to track stated-vs-actual inventory each nightly.
           git add web/data/scraper_coverage_history.jsonl 2>/dev/null || true
+          # PRD D1 — per-source dedup audit. Content-fingerprint based;
+          # complementary to the phone/coord pair detector. Drives the
+          # PRD acceptance criterion "dedup rate documented per source."
+          git add web/data/dedup_audit.json 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
