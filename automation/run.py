@@ -1596,6 +1596,62 @@ def main() -> int:
         li.first_seen_at = first_seen[key]
     _atomic_write_json(listings_history_path, first_seen)
 
+    # PR-S4b — existence ledger (parallel to listings_history.json).
+    # The legacy file keeps its {key: iso_string} contract for the
+    # existing test_first_seen.py + downstream readers. The new
+    # ledger at web/data/listings_ledger.json carries the richer
+    # state: first_seen_at, last_seen_at, consecutive_seen_count,
+    # missing_since, existence_status. Future PR-S4c will hook the
+    # ranker to filter `stale`; today we observe-only.
+    #
+    # Best-effort: a ledger failure must not lose the run. The
+    # legacy first_seen update above is the authoritative source
+    # for li.first_seen_at; this block only adds the ledger sidecar.
+    try:
+        from automation.listing_ledger import (
+            load_ledger, save_ledger, update_ledger,
+        )
+        ledger_path = web_data_dir / "listings_ledger.json"
+        ledger = load_ledger(ledger_path)
+        present_keys_by_source: dict[str, set[str]] = {}
+        for li in listings:
+            present_keys_by_source.setdefault(li.source, set()).add(str(li.source_id))
+        # A source "succeeded" if it isn't in source_errors. Sources
+        # that never registered (typos, kazu-style unknown_source) are
+        # naturally absent from REGISTRY and so aren't in succeeded_sources
+        # either — their listings carry forward unchanged per the
+        # source_succeeded=False semantics.
+        succeeded_sources = {
+            slug for slug in REGISTRY.keys() if slug not in source_errors
+        }
+        ledger = update_ledger(
+            ledger=ledger,
+            present_keys_by_source=present_keys_by_source,
+            succeeded_sources=succeeded_sources,
+            tick_iso=started_iso,
+        )
+        # Stamp existence_status onto each listing for downstream
+        # consumers. The ranker doesn't read this yet (PR-S4c) but
+        # the operator dashboard + telemetry can.
+        for li in listings:
+            key = f"{li.source}|{li.source_id}"
+            entry = ledger.get(key)
+            if entry is not None:
+                setattr(li, "existence_status", entry.existence_status)
+        save_ledger(ledger, ledger_path)
+        # Telemetry breadcrumb — one print per nightly so the summary
+        # captures the ledger health.
+        stale_count = sum(
+            1 for v in ledger.values() if v.existence_status == "stale"
+        )
+        missing_count = sum(
+            1 for v in ledger.values() if v.existence_status == "missing_recently"
+        )
+        print(f"[listing_ledger] tracked={len(ledger)} "
+              f"missing_recently={missing_count} stale={stale_count}")
+    except Exception as _ledger_err:  # noqa: BLE001 — never crash on ledger
+        print(f"[listing_ledger] update failed (non-fatal): {_ledger_err!r}")
+
     # Price history (PRD §FR-3). Sets is_repriced before derived rules and
     # AI run, so downstream fields reflect cross-run price comparison.
     PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
