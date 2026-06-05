@@ -53,12 +53,22 @@ jobs:
     runs-on: ubuntu-latest
     # Hard ceiling. A healthy run finishes in ~30 min; the LLM enrichment
     # leg can stretch to ~50 min on cold-cache nightlies (~900 listings ×
-    # ~3.5s/call serial DeepSeek). Bumped to 120 to survive cold-cache
-    # nightlies until enrichment is parallelised. Past 120 min something
-    # is genuinely hung (typically photo download or detail-page fetch);
-    # better to fail the job and have watchdog page than burn Actions
-    # minutes silently.
-    timeout-minutes: 120
+    # ~3.5s/call serial DeepSeek). Past the ceiling something is genuinely
+    # hung (typically photo download or detail-page fetch); better to fail
+    # the job and have watchdog page than burn Actions minutes silently.
+    #
+    # 2026-06-05 (PR-S0): bumped 120 → 180 after a multi-day silent freeze
+    # (2026-06-02 → 2026-06-05). The 120 ceiling was firing AFTER SV
+    # pipeline (~110 min with encuent24 Playwright + LLM enrichment) and
+    # DURING PA pipeline, cancelling downstream canaries + commit step.
+    # Cancellation is NOT `failure()`, so the Slack-on-failure step did not
+    # fire (CLAUDE.md post-2026-06-02 rule was bypassed). Adding 60 min of
+    # buffer for PA + canaries + commit; the watchdog still pages if a
+    # single nightly genuinely runs over 24h. Paired with the
+    # `if: failure() || cancelled()` change on the Slack step below so the
+    # next timeout-driven cancellation pages Sebas instead of silently
+    # freezing the data.
+    timeout-minutes: 180
     permissions:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
@@ -906,14 +916,23 @@ jobs:
             web/data/hires_pipeline_metrics.jsonl
             web/data/nightly_summary.md
 
-      - name: Slack on failure
-        # Final-line alert: any failed step in this job sends a Slack
-        # ping with the run URL. The pre-canary source-health alert
-        # above covers the per-source detail; this is the "something
-        # blocked the deploy and you should look" trip wire. Best-
-        # effort: a Slack outage must not mask the underlying failure
-        # so we exit 0 regardless.
-        if: failure()
+      - name: Slack on failure or cancellation
+        # Final-line alert: any failed OR cancelled step in this job sends
+        # a Slack ping with the run URL. The pre-canary source-health
+        # alert above covers the per-source detail; this is the "something
+        # blocked the deploy and you should look" trip wire. Best-effort:
+        # a Slack outage must not mask the underlying failure so we exit 0
+        # regardless.
+        #
+        # 2026-06-05 (PR-S0): added `|| cancelled()` after a multi-day
+        # silent freeze where the 120-min job timeout fired mid-PA-
+        # pipeline. Cancellation registers as `cancelled()`, not
+        # `failure()` — so this step was silently skipped for 3+ nightlies
+        # in a row, exactly the failure mode CLAUDE.md "NEVER let the
+        # nightly freeze without a Slack page" (post-2026-06-02) was meant
+        # to prevent. Pair with the timeout-minutes bump above so timeouts
+        # are now rare AND audible when they happen.
+        if: failure() || cancelled()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
@@ -921,8 +940,15 @@ jobs:
             echo "SLACK_WEBHOOK_URL unset; skipping failure Slack ping."
             exit 0
           fi
+          # Distinguish failure vs cancellation in the message body so
+          # the responder knows whether to look for a stuck step or a
+          # genuinely broken step.
+          STATUS_TEXT="FAILED"
+          if [ "${{ job.status }}" = "cancelled" ]; then
+            STATUS_TEXT="CANCELLED (likely timeout — look at last in-progress step)"
+          fi
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -sS -X POST -H 'Content-Type: application/json' \
             "$SLACK_WEBHOOK_URL" \
-            -d "$(printf '{"text":"*Pulpo nightly FAILED* — <%s|view run>"}' "$RUN_URL")" \
+            -d "$(printf '{"text":"*Pulpo nightly %s* — <%s|view run>"}' "$STATUS_TEXT" "$RUN_URL")" \
             >/dev/null || echo "Slack POST failed (non-blocking)"
