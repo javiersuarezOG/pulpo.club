@@ -145,6 +145,12 @@ export interface Listing {
      *  omitted the field, or legacy cache row predates the field). */
     has_marketing_overlay: boolean | null;
     first_seen_at: string | null;       // ISO8601 UTC
+    /** PR-S4b — existence ledger output. One of
+     *  "confirmed_current" | "missing_recently" | "stale", or null
+     *  when the ledger hasn't been computed yet. Stamped by the
+     *  nightly pipeline; consumers include the ranker (PR-S4c flag)
+     *  and the operator dashboard. */
+    existence_status: string | null;
 
     // ── Broker ──────────────────────────────────────────────────────
     broker_name: string | null;

@@ -76,6 +76,7 @@
       "hires_resdet_upscaled",
       "hires_quarantined",
       "first_seen_at",
+      "existence_status",
       "broker_name",
       "broker_phone",
       "broker_email",
@@ -483,6 +484,12 @@
         ]
       },
       "first_seen_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "existence_status": {
         "type": [
           "string",
           "null"
