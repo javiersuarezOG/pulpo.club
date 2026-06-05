@@ -67,12 +67,19 @@ ARCHIVE_FIRST = f"{BASE}/tipo-de-propiedad/terrenos/"
 FIXTURE_FILE = "sample_listings.json"
 
 # Bounds — kept conservative on purpose. The archive serves 6 listings/
-# page and currently spans ~21 pages (~126 land listings total). We cap
-# at 100 to be a polite citizen and to keep the request budget bounded
-# if the site grows fast. Pagination cap is its own ceiling — protects
-# against the WP archive looping infinitely when our page indexer
-# overflows the real last page.
-MAX_LISTINGS = 100
+# page and currently spans ~21 pages (~126 land listings total). The
+# cap is a polite-citizen ceiling and a budget bound; pagination_exhausted
+# should fire on real source exhaustion before we hit the cap.
+#
+# 2026-06-05 (PR-S2): bumped 100 → 200 after audit confirmed terrenos
+# archive is ~126. The 100 ceiling was leaving real inventory on the
+# floor — recent runs returned 87 (close to cap minus dedup/validation),
+# suggesting the archive grew or our prior counting was off. PR-S1's
+# crawl_stop_reason will make the new ceiling observable: if we see
+# `max_pages_hit` after the bump, the source genuinely has >200; if
+# `pagination_exhausted` fires earlier, ~126 was correct and the cap
+# is now never-binding.
+MAX_LISTINGS = 200
 MAX_PAGES    = 25
 
 # Detail-page URL pattern. The archive links every listing as
