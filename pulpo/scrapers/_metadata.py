@@ -137,7 +137,19 @@ SCRAPER_METADATA: dict[str, dict] = {
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards",
         "strengths": ["SV native", "broad listings"],
-        "failure_modes": ["placeholder photo URL pattern (filtered at validation)"],
+        "failure_modes": [
+            "placeholder photo URL pattern (filtered at validation)",
+            # 2026-06-05 (PR-S2): the parser intentionally narrows to
+            # listing_type.category=='terrenos' + sale_rent=='venta'
+            # (see pulpo/scrapers/nexo.py:247). Per the docstring,
+            # ~1% of nexo's catalogue meets that filter — so single-
+            # digit yields are EXPECTED, not a bleed. PR-S1's
+            # degradation detection should treat the historic floor
+            # (currently ~5) as the median; further "degraded"
+            # alerts would mean the filter dropped to 0, which IS
+            # actionable.
+            "intentional-narrow-filter (terrenos-venta only)",
+        ],
         "owner_module": "pulpo.scrapers.nexo",
         "target_prd": None,
         "target_discovered": None,
