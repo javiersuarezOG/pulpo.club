@@ -1,0 +1,114 @@
+name: pulpo url-drift sentinel
+
+# PR-D1 — every 6h, HEAD-probe each source's canonical landing page.
+# Catches silent URL structure changes (path moves, redirect-to-error,
+# WAF block) BEFORE the next nightly returns zero listings. Detail in
+# automation/url_drift_sentinel.py.
+#
+# Why 6h and not daily: the 2026-05-26 → 2026-06-01 freeze taught us
+# that the watchdog's 24h surface is too slow when a single source
+# goes down. 6h ticks bound the time-to-discovery to ~3h average.
+# Costs: 4 runs/day × <30s each = ~2 min/day of Actions minutes.
+
+on:
+  schedule:
+    # Every 6 hours, offset 17 min off the top of the hour to avoid
+    # the global cron stampede at :00.
+    - cron: "17 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write       # commit refreshed url_drift/*.json baselines
+  pull-requests: write  # gh pr create for the baseline-refresh PR
+
+concurrency:
+  group: pulpo-url-drift
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install httpx
+
+      - name: Probe source URLs
+        # --fail-on-drift makes the step exit 1 if any source has a
+        # non-ok state, triggering the Slack-on-failure step below.
+        # Per-source state is written to web/data/url_drift/<source>.json
+        # regardless of state (the JSON is the durable signal; the step's
+        # exit code is the alerting signal).
+        id: probe
+        run: |
+          python3 scripts/check_source_urls.py --fail-on-drift
+        continue-on-error: true
+
+      - name: Commit refreshed baselines (best-effort)
+        # Only the per-source state files. No code touched. Best-effort:
+        # a commit-step failure (rebase conflict, etc.) must NOT mask
+        # the drift alert.
+        if: always()
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+          if [ -z "$(git status --porcelain web/data/url_drift/)" ]; then
+            echo "No baseline changes to commit."
+            exit 0
+          fi
+          git add web/data/url_drift/
+          git commit -m "chore(url-drift): refresh baselines ($(date -u +%Y-%m-%dT%H:%MZ))" || true
+          git fetch origin main
+          git rebase --autostash origin/main || {
+            echo "::warning::rebase failed; aborting baseline commit"
+            git rebase --abort || true
+            exit 0
+          }
+          git push origin HEAD:main || echo "::warning::push failed; baselines kept locally only"
+
+      - name: Slack on drift detected
+        # Fires whenever the probe step exited non-zero (i.e. some
+        # source is in a non-ok drift state). Per CLAUDE.md
+        # post-2026-06-02 silent-freeze rule: every alertable surface
+        # gets a Slack page, not a GitHub Issue.
+        if: steps.probe.outcome == 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo URL drift detected* — at least one source is in a non-ok state. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"
+
+      - name: Slack on probe job failure
+        # Distinct from drift detection — fires only if the job itself
+        # crashed (Python import error, network library missing, etc.).
+        # Catches the "alerting system silently broken" case.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo URL drift JOB CRASHED* — alerting system is silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true
