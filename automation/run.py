@@ -1596,6 +1596,62 @@ def main() -> int:
         li.first_seen_at = first_seen[key]
     _atomic_write_json(listings_history_path, first_seen)
 
+    # PR-S4b — existence ledger (parallel to listings_history.json).
+    # The legacy file keeps its {key: iso_string} contract for the
+    # existing test_first_seen.py + downstream readers. The new
+    # ledger at web/data/listings_ledger.json carries the richer
+    # state: first_seen_at, last_seen_at, consecutive_seen_count,
+    # missing_since, existence_status. Future PR-S4c will hook the
+    # ranker to filter `stale`; today we observe-only.
+    #
+    # Best-effort: a ledger failure must not lose the run. The
+    # legacy first_seen update above is the authoritative source
+    # for li.first_seen_at; this block only adds the ledger sidecar.
+    try:
+        from automation.listing_ledger import (
+            load_ledger, save_ledger, update_ledger,
+        )
+        ledger_path = web_data_dir / "listings_ledger.json"
+        ledger = load_ledger(ledger_path)
+        present_keys_by_source: dict[str, set[str]] = {}
+        for li in listings:
+            present_keys_by_source.setdefault(li.source, set()).add(str(li.source_id))
+        # A source "succeeded" if it isn't in source_errors. Sources
+        # that never registered (typos, kazu-style unknown_source) are
+        # naturally absent from REGISTRY and so aren't in succeeded_sources
+        # either — their listings carry forward unchanged per the
+        # source_succeeded=False semantics.
+        succeeded_sources = {
+            slug for slug in REGISTRY.keys() if slug not in source_errors
+        }
+        ledger = update_ledger(
+            ledger=ledger,
+            present_keys_by_source=present_keys_by_source,
+            succeeded_sources=succeeded_sources,
+            tick_iso=started_iso,
+        )
+        # Stamp existence_status onto each listing for downstream
+        # consumers. The ranker doesn't read this yet (PR-S4c) but
+        # the operator dashboard + telemetry can.
+        for li in listings:
+            key = f"{li.source}|{li.source_id}"
+            entry = ledger.get(key)
+            if entry is not None:
+                setattr(li, "existence_status", entry.existence_status)
+        save_ledger(ledger, ledger_path)
+        # Telemetry breadcrumb — one print per nightly so the summary
+        # captures the ledger health.
+        stale_count = sum(
+            1 for v in ledger.values() if v.existence_status == "stale"
+        )
+        missing_count = sum(
+            1 for v in ledger.values() if v.existence_status == "missing_recently"
+        )
+        print(f"[listing_ledger] tracked={len(ledger)} "
+              f"missing_recently={missing_count} stale={stale_count}")
+    except Exception as _ledger_err:  # noqa: BLE001 — never crash on ledger
+        print(f"[listing_ledger] update failed (non-fatal): {_ledger_err!r}")
+
     # Price history (PRD §FR-3). Sets is_repriced before derived rules and
     # AI run, so downstream fields reflect cross-run price comparison.
     PRICE_HISTORY_MAX_ENTRIES = 365   # ~1 year of daily nightlies
@@ -2040,6 +2096,50 @@ def main() -> int:
             print("[unmapped_beaches] suspects=0 (no coastal-claim listings far from named beaches)")
     except Exception as _e:
         print(f"[unmapped_beaches] failed (non-fatal): {_e!r}")
+
+    # PR-S4c — ranker-side stale filter (flag-gated, default OFF).
+    # PR-S4b stamps `existence_status` onto every listing from the
+    # parallel ledger at web/data/listings_ledger.json. When this flag
+    # is on, listings whose ledger state is "stale" (missing for
+    # ≥STALE_THRESHOLD_RUNS=3 consecutive nightlies, source-success-
+    # aware) are dropped before ranking → never reach ranked.json,
+    # never reach the UI.
+    #
+    # Default OFF for two reasons:
+    #   1. The ledger needs ≥3 consecutive nightlies of state before
+    #      any listing flips to "stale" — flipping the flag too early
+    #      would do nothing useful.
+    #   2. Lets us measure how many listings actually go stale per
+    #      week from production data before committing to the
+    #      behavior change. Operator dashboard PR-S7 reads the
+    #      ledger and shows the distribution.
+    #
+    # To activate after the ledger has accumulated data, set
+    # PULPO_RANKER_DROP_STALE=1 in .github/workflows/pulpo-nightly.yml
+    # env block. Reverting is a one-line config flip.
+    drop_stale = os.environ.get("PULPO_RANKER_DROP_STALE", "").strip().lower() in ("1", "true", "yes")
+    if drop_stale:
+        before_count = len(listings)
+        listings = [
+            li for li in listings
+            if getattr(li, "existence_status", None) != "stale"
+        ]
+        stale_dropped = before_count - len(listings)
+        print(
+            f"[ranker_stale_filter] drop_stale=on dropped={stale_dropped} "
+            f"kept={len(listings)} (of {before_count})"
+        )
+    else:
+        # Telemetry-only: count stale candidates we WOULD have dropped.
+        # Useful for tuning the threshold before flipping the flag.
+        stale_candidates = sum(
+            1 for li in listings
+            if getattr(li, "existence_status", None) == "stale"
+        )
+        print(
+            f"[ranker_stale_filter] drop_stale=off stale_candidates={stale_candidates} "
+            f"(would_drop_if_flag_on)"
+        )
 
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
