@@ -1825,8 +1825,70 @@ def main() -> int:
         print(f"[dedup_audit] total={_dedup_audit['total_in_dataset']} "
               f"unique_fingerprints={_dedup_audit['total_unique_fingerprints']} "
               f"sources={len(_dedup_audit['per_source'])}")
+        # PRD D1 follow-up — high-overlap warning. Any source pair where
+        # the overlap accounts for >=50% of the smaller source's unique
+        # fingerprint pool is flagged as potentially redundant — operator
+        # decides whether to deprecate one of them. Print-only; never
+        # fails the run.
+        _high_overlap_threshold = 0.5
+        _flagged_pairs: list[str] = []
+        _per_source = _dedup_audit.get("per_source", {})
+        _matrix = _dedup_audit.get("overlap_matrix", {})
+        for _a, _row in _matrix.items():
+            for _b, _overlap in _row.items():
+                if _a >= _b:
+                    continue  # symmetric — only walk one triangle
+                _a_uniq = _per_source.get(_a, {}).get("unique_in_source", 0)
+                _b_uniq = _per_source.get(_b, {}).get("unique_in_source", 0)
+                _denom = min(_a_uniq, _b_uniq) or 1
+                _ratio = _overlap / _denom
+                if _ratio >= _high_overlap_threshold:
+                    _flagged_pairs.append(
+                        f"{_a}↔{_b}: {_overlap}/{_denom} ({_ratio:.0%})"
+                    )
+        if _flagged_pairs:
+            print(f"[dedup_audit] WARN high overlap (>= {_high_overlap_threshold:.0%}): "
+                  + "; ".join(_flagged_pairs))
     except Exception as _e:  # noqa: BLE001
         print(f"[dedup_audit] failed (non-fatal): {_e!r}")
+
+    # PRD B2 — per-source coverage backfill. For each registered source,
+    # log a coverage row to web/data/scraper_coverage_history.jsonl using
+    # lib.coverage_logger. raw_count = pre-validation per-source count;
+    # kept_count = post-validation (and post-agricultural-purge) count.
+    # target_prd is pulled from pulpo/scrapers/_metadata.SCRAPER_METADATA
+    # so every source — existing + Phase C — populates the per_source
+    # coverage matrix in kpi_dashboard.json from the next nightly forward.
+    # Non-fatal on exception.
+    try:
+        from pulpo.scrapers.lib.coverage_logger import log_coverage as _log_coverage
+        from pulpo.scrapers._metadata import SCRAPER_METADATA as _METADATA
+        _post_validate_per_source: dict[str, int] = {}
+        for _li in listings:
+            _src = getattr(_li, "source", None) or (
+                _li.get("source") if isinstance(_li, dict) else None
+            )
+            if isinstance(_src, str):
+                _post_validate_per_source[_src] = _post_validate_per_source.get(_src, 0) + 1
+        _coverage_warn = 0
+        for _src, _raw in per_source_count.items():
+            _kept = _post_validate_per_source.get(_src, 0)
+            _meta = _METADATA.get(_src, {})
+            _target_prd = _meta.get("target_prd")
+            _row = _log_coverage(
+                _src,
+                raw_count=_raw,
+                kept_count=_kept,
+                target_prd=_target_prd if isinstance(_target_prd, int) else None,
+                target_discovered=None,  # populated by Phase C scrapers' own
+                                         # crawl()-time discover_target call
+            )
+            if _row.get("status") == "warn":
+                _coverage_warn += 1
+        print(f"[coverage_log] sources={len(per_source_count)} "
+              f"warn={_coverage_warn}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[coverage_log] failed (non-fatal): {_e!r}")
 
     # PRD WS2 — single-call DeepSeek enrichment. ONE LLM call per eligible
     # listing returns title + description + usps + latlong together (replacing
