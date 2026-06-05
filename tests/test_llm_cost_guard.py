@@ -108,7 +108,7 @@ def test_record_cost_creates_file(tmp_path: Path):
         now=dt.datetime(2026, 6, 5, tzinfo=dt.timezone.utc),
     )
     assert p.exists()
-    rows = [json.loads(l) for l in p.read_text().splitlines()]
+    rows = [json.loads(line) for line in p.read_text().splitlines()]
     assert len(rows) == 1
     assert rows[0]["cost_usd"] == 0.001
     assert rows[0]["purpose"] == "enrichment"
