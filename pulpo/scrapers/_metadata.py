@@ -276,12 +276,12 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "jamesedition": {
         "layer": "extraction",
-        "fetch_kind": "static_http",
+        "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
-        "extraction_kind": "jsonld_residence (DRAFT) — luxury Coatepeque",
+        "extraction_kind": "jsonld_listing (case-insensitive @type) — Coatepeque luxury",
         "strengths": ["luxury inventory", "Coatepeque-specific gap-fill"],
         "failure_modes": [
-            "DRAFT skeleton — calibration pass required",
+            "DRAFT — Cloudflare JS challenge blocks both httpx and curl_cffi (chrome131, chrome124, safari17_0, safari18_0, edge101 all return HTTP 403 + 'Just a moment...' on 2026-06-05). Selectors + policy are calibrated for the moment the challenge relaxes OR a follow-up adds Playwright transport to the skeleton helper (encuentra24's pattern).",
             "low volume but high-value; some listings exceed PRICE_FLAG_MAX ($20M) and will be FLAGGED (kept + warned)",
         ],
         "owner_module": "pulpo.scrapers.jamesedition",
