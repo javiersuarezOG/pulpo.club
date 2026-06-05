@@ -205,9 +205,15 @@ class SkeletonScraper(OfflineFixtureMixin):
                         body, list(self.CONFIG.target_discovery_patterns)
                     )
                 page_urls = self._extract_detail_urls_from_catalog_page(body, page_num)
-                fresh = [u for u in page_urls if u not in seen]
-                for u in fresh:
+                # Dedup within the page AND across pages — the catalog
+                # often repeats the same listing URL across photo / title
+                # / "view details" hrefs.
+                fresh: list[str] = []
+                for u in page_urls:
+                    if u in seen:
+                        continue
                     seen.add(u)
+                    fresh.append(u)
                     detail_urls.append(u)
                 if not fresh:
                     break
