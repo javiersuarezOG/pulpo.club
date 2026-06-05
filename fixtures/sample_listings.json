@@ -544,5 +544,320 @@
     "bedrooms": 3,
     "bathrooms": 2.0,
     "scraped_at": "2026-05-25T00:00:00Z"
+  },
+  {
+    "source": "agentiz",
+    "source_id": "agentiz-skeleton-001",
+    "url": "https://sv.agentiz.com/en/property/skeleton-001",
+    "title": "Land en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://sv.agentiz.com/en/property/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "agentiz",
+    "source_id": "agentiz-skeleton-002",
+    "url": "https://sv.agentiz.com/en/property/skeleton-002",
+    "title": "House en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://sv.agentiz.com/en/property/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "agentiz",
+    "source_id": "agentiz-skeleton-003",
+    "url": "https://sv.agentiz.com/en/property/skeleton-003",
+    "title": "Condo en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://sv.agentiz.com/en/property/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "santizo",
+    "source_id": "santizo-skeleton-001",
+    "url": "https://santizorealestate.com/p/skeleton-001",
+    "title": "Land en Playa El Zonte con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://santizorealestate.com/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "el-zonte"
+  },
+  {
+    "source": "santizo",
+    "source_id": "santizo-skeleton-002",
+    "url": "https://santizorealestate.com/p/skeleton-002",
+    "title": "House en Playa El Zonte con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://santizorealestate.com/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "el-zonte"
+  },
+  {
+    "source": "santizo",
+    "source_id": "santizo-skeleton-003",
+    "url": "https://santizorealestate.com/p/skeleton-003",
+    "title": "Condo en Playa El Zonte con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://santizorealestate.com/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "el-zonte"
+  },
+  {
+    "source": "citymax_sc",
+    "source_id": "citymax_sc-skeleton-001",
+    "url": "https://www.citymax-sc.com/p/skeleton-001",
+    "title": "Land en Playa El Sunzal con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.citymax-sc.com/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "el-sunzal"
+  },
+  {
+    "source": "citymax_sc",
+    "source_id": "citymax_sc-skeleton-002",
+    "url": "https://www.citymax-sc.com/p/skeleton-002",
+    "title": "House en Playa El Sunzal con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.citymax-sc.com/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "el-sunzal"
+  },
+  {
+    "source": "citymax_sc",
+    "source_id": "citymax_sc-skeleton-003",
+    "url": "https://www.citymax-sc.com/p/skeleton-003",
+    "title": "Condo en Playa El Sunzal con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.citymax-sc.com/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "el-sunzal"
+  },
+  {
+    "source": "vivolatam",
+    "source_id": "vivolatam-skeleton-001",
+    "url": "https://www.vivolatam.com/sv/p/skeleton-001",
+    "title": "Land en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.vivolatam.com/sv/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "vivolatam",
+    "source_id": "vivolatam-skeleton-002",
+    "url": "https://www.vivolatam.com/sv/p/skeleton-002",
+    "title": "House en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.vivolatam.com/sv/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "vivolatam",
+    "source_id": "vivolatam-skeleton-003",
+    "url": "https://www.vivolatam.com/sv/p/skeleton-003",
+    "title": "Condo en Playa El Tunco con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.vivolatam.com/sv/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "el-tunco"
+  },
+  {
+    "source": "csbr",
+    "source_id": "csbr-skeleton-001",
+    "url": "https://www.camarabienesraices.com.sv/p/skeleton-001",
+    "title": "Land en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.camarabienesraices.com.sv/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "lago-coatepeque"
+  },
+  {
+    "source": "csbr",
+    "source_id": "csbr-skeleton-002",
+    "url": "https://www.camarabienesraices.com.sv/p/skeleton-002",
+    "title": "House en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.camarabienesraices.com.sv/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "lago-coatepeque"
+  },
+  {
+    "source": "csbr",
+    "source_id": "csbr-skeleton-003",
+    "url": "https://www.camarabienesraices.com.sv/p/skeleton-003",
+    "title": "Condo en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.camarabienesraices.com.sv/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "lago-coatepeque"
+  },
+  {
+    "source": "realtor_intl_sv",
+    "source_id": "realtor_intl_sv-skeleton-001",
+    "url": "https://www.realtor.com/intl/sv/p/skeleton-001",
+    "title": "Land en Playa Atami con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.realtor.com/intl/sv/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "atami"
+  },
+  {
+    "source": "realtor_intl_sv",
+    "source_id": "realtor_intl_sv-skeleton-002",
+    "url": "https://www.realtor.com/intl/sv/p/skeleton-002",
+    "title": "House en Playa Atami con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.realtor.com/intl/sv/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "atami"
+  },
+  {
+    "source": "realtor_intl_sv",
+    "source_id": "realtor_intl_sv-skeleton-003",
+    "url": "https://www.realtor.com/intl/sv/p/skeleton-003",
+    "title": "Condo en Playa Atami con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.realtor.com/intl/sv/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "atami"
+  },
+  {
+    "source": "jamesedition",
+    "source_id": "jamesedition-skeleton-001",
+    "url": "https://www.jamesedition.com/p/skeleton-001",
+    "title": "Land en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 120000,
+    "area_m2": 1500,
+    "photo_urls": [
+      "https://www.jamesedition.com/static/placeholder-1.jpg"
+    ],
+    "raw_size_text": "1500 m²",
+    "property_type": "land",
+    "zone": "lago-coatepeque"
+  },
+  {
+    "source": "jamesedition",
+    "source_id": "jamesedition-skeleton-002",
+    "url": "https://www.jamesedition.com/p/skeleton-002",
+    "title": "House en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 350000,
+    "area_m2": 600,
+    "photo_urls": [
+      "https://www.jamesedition.com/static/placeholder-2.jpg"
+    ],
+    "raw_size_text": "600 m²",
+    "property_type": "house",
+    "zone": "lago-coatepeque"
+  },
+  {
+    "source": "jamesedition",
+    "source_id": "jamesedition-skeleton-003",
+    "url": "https://www.jamesedition.com/p/skeleton-003",
+    "title": "Condo en Lago de Coatepeque con vista al mar (skeleton fixture)",
+    "description": "SKELETON FIXTURE — synthesized for offline-mode contract test. Frente al mar (test waterfront kw). Replace with real HTML capture during calibration.",
+    "price_usd": 225000,
+    "area_m2": 90,
+    "photo_urls": [
+      "https://www.jamesedition.com/static/placeholder-3.jpg"
+    ],
+    "raw_size_text": "90 m²",
+    "property_type": "condo",
+    "zone": "lago-coatepeque"
   }
 ]
