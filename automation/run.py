@@ -2097,6 +2097,50 @@ def main() -> int:
     except Exception as _e:
         print(f"[unmapped_beaches] failed (non-fatal): {_e!r}")
 
+    # PR-S4c — ranker-side stale filter (flag-gated, default OFF).
+    # PR-S4b stamps `existence_status` onto every listing from the
+    # parallel ledger at web/data/listings_ledger.json. When this flag
+    # is on, listings whose ledger state is "stale" (missing for
+    # ≥STALE_THRESHOLD_RUNS=3 consecutive nightlies, source-success-
+    # aware) are dropped before ranking → never reach ranked.json,
+    # never reach the UI.
+    #
+    # Default OFF for two reasons:
+    #   1. The ledger needs ≥3 consecutive nightlies of state before
+    #      any listing flips to "stale" — flipping the flag too early
+    #      would do nothing useful.
+    #   2. Lets us measure how many listings actually go stale per
+    #      week from production data before committing to the
+    #      behavior change. Operator dashboard PR-S7 reads the
+    #      ledger and shows the distribution.
+    #
+    # To activate after the ledger has accumulated data, set
+    # PULPO_RANKER_DROP_STALE=1 in .github/workflows/pulpo-nightly.yml
+    # env block. Reverting is a one-line config flip.
+    drop_stale = os.environ.get("PULPO_RANKER_DROP_STALE", "").strip().lower() in ("1", "true", "yes")
+    if drop_stale:
+        before_count = len(listings)
+        listings = [
+            li for li in listings
+            if getattr(li, "existence_status", None) != "stale"
+        ]
+        stale_dropped = before_count - len(listings)
+        print(
+            f"[ranker_stale_filter] drop_stale=on dropped={stale_dropped} "
+            f"kept={len(listings)} (of {before_count})"
+        )
+    else:
+        # Telemetry-only: count stale candidates we WOULD have dropped.
+        # Useful for tuning the threshold before flipping the flag.
+        stale_candidates = sum(
+            1 for li in listings
+            if getattr(li, "existence_status", None) == "stale"
+        )
+        print(
+            f"[ranker_stale_filter] drop_stale=off stale_candidates={stale_candidates} "
+            f"(would_drop_if_flag_on)"
+        )
+
     # Hero photo download — fetch + resize the first photo URL for each listing.
     # Skips listings with no photo_urls; skips re-download when URL unchanged.
     # Non-fatal: any error is logged and the listing keeps hero_photo_path=None.
