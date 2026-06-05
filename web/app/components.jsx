@@ -373,10 +373,25 @@ function Photo({
   // resolution. The two were combined before, which surfaced the same
   // image twice in the carousel (the thumb at slot 0 alongside the
   // broker-native version a click away).
+  //
+  // Local-404 fallback chain: when the local /photos/* URL 404s (e.g.
+  // on a Vercel preview deploy where the nightly bot's photo commits
+  // haven't propagated, or on prod after a hero file gets pruned by
+  // accident), the first onerror fires `setLocalUrlFailed(true)` and
+  // this memo re-evaluates to the broker URL instead. The legacy
+  // category-fallback path (errored=true) still fires only after BOTH
+  // the local AND the broker URL fail — preserves the "surface always
+  // lands on a real image" guarantee while keeping us off the
+  // generic stock visual when a real photo exists upstream.
+  const [localUrlFailed, setLocalUrlFailed] = useState(false);
   const url = heroSrc
     ? heroSrc
     : thumbnail
-      ? (listing.thumbnail_url ?? listing.photos[0] ?? null)
+      ? (
+          !localUrlFailed && listing.thumbnail_url
+            ? listing.thumbnail_url
+            : (listing.photos[0] ?? null)
+        )
       : listing.photos[idx];
 
   // PR-perf-4 — image optimization v2 (feature-flag-gated). When the
@@ -441,6 +456,13 @@ function Photo({
       if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
     });
   }, [url]);
+  // Reset the local-URL-failed flag when the listing changes — a
+  // sibling Photo instance reusing the same DOM position (carousel
+  // virtualization) shouldn't inherit the previous listing's broker-
+  // fallback state.
+  useEffect(() => {
+    setLocalUrlFailed(false);
+  }, [listing.id]);
 
   // Stuck-image handling — if the image neither loaded nor errored
   // after 12 s, treat it as failed and engage the category fallback.
@@ -588,7 +610,24 @@ function Photo({
           }
         }}
         onError={() => {
-          setErrored(true);
+          // Local-404 fallback chain: if the failing URL is a local
+          // /photos/* path AND the listing carries a broker URL we
+          // haven't tried yet, swap to the broker URL before going to
+          // the category fallback. Same listing → real photo from the
+          // broker's CDN. Catches the Vercel-preview-deploy case where
+          // /photos/ isn't included in the build, and the prod-hero-
+          // pruned case where the local file got removed.
+          const isLocalUrl = String(url || "").startsWith("/photos/");
+          const hasBrokerFallback =
+            thumbnail &&
+            Array.isArray(listing.photos) &&
+            listing.photos.length > 0 &&
+            listing.photos[0] !== url;
+          if (isLocalUrl && hasBrokerFallback && !localUrlFailed) {
+            setLocalUrlFailed(true);
+          } else {
+            setErrored(true);
+          }
           // Telemetry — see events.ts "image.error". Wrapped in try/catch
           // so a telemetry hiccup never breaks the placeholder fallback.
           try {
@@ -597,7 +636,8 @@ function Photo({
               listing_id: listing.id,
               idx,
               source: source || "unknown",
-              is_local: String(url || "").startsWith("/photos/"),
+              is_local: isLocalUrl,
+              attempted_broker_fallback: isLocalUrl && hasBrokerFallback && !localUrlFailed,
             });
           } catch { /* ignore */ }
         }}
