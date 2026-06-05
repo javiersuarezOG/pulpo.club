@@ -478,12 +478,39 @@ def enrich_listings(listings: list[Any],
         "deadline_skipped":   0,
         "skipped_no_token":   False,
         "skipped_no_package": False,
+        "skipped_budget_blocked": False,  # PR-D4b: cost cap hit
         "global_error_seen":  None,
         "cost_usd":           0.0,
+        "budget_verdict":     "ok",       # PR-D4b: snapshot at phase start
         "skip_reasons":       {},
         "failure_reasons":    {},
         "latency_ms":         [],
     }
+
+    # PR-D4b — LLM cost guardrail. Snapshot the budget BEFORE the
+    # enrichment phase. If the monthly or daily cap is already at
+    # 100%+, skip the entire phase rather than make any new calls.
+    # Below-100% verdicts (ok/warn/critical) are logged but don't
+    # block — the cap is a hard stop, not a soft warning.
+    try:
+        from automation.llm_cost_guard import check_budget
+        budget_snap = check_budget()
+        metrics["budget_verdict"] = budget_snap.verdict
+        if budget_snap.verdict in ("warn", "critical"):
+            print(
+                f"[llm_enrich] budget verdict={budget_snap.verdict} "
+                f"mtd=${budget_snap.month_to_date_usd:.4f}/{budget_snap.monthly_cap_usd:.2f} "
+                f"today=${budget_snap.today_usd:.4f}/{budget_snap.daily_cap_usd:.2f}"
+            )
+        if budget_snap.verdict == "blocked":
+            print(
+                f"[llm_enrich] BUDGET BLOCKED — {budget_snap.blocking_reason}; "
+                f"skipping enrichment phase entirely"
+            )
+            metrics["skipped_budget_blocked"] = True
+            return metrics
+    except Exception as _budget_err:  # noqa: BLE001 — defensive; never crash on cost-guard
+        print(f"[llm_enrich] cost guard check failed (non-fatal): {_budget_err!r}")
 
     sidecar = _load_sidecar(sidecar_path)
 
@@ -572,10 +599,25 @@ def enrich_listings(listings: list[Any],
             _append_log(log_path, event)
         if decision == "enriched" and entry is not None:
             metrics["enriched"] += 1
-            metrics["cost_usd"] += float(event.get("cost_usd") or 0.0)
+            call_cost = float(event.get("cost_usd") or 0.0)
+            metrics["cost_usd"] += call_cost
             if "latency_ms" in event:
                 metrics["latency_ms"].append(int(event["latency_ms"]))
             sidecar[key] = entry
+            # PR-D4b — record this call into the cost ledger so the
+            # budget check at the start of the next nightly's phase
+            # sees today's accumulated spend. Best-effort: a write
+            # failure here must not lose the enrichment.
+            if call_cost > 0:
+                try:
+                    from automation.llm_cost_guard import record_cost
+                    record_cost(
+                        cost_usd=call_cost,
+                        purpose="enrichment",
+                        model=schema.model,
+                    )
+                except Exception as _cost_err:  # noqa: BLE001
+                    print(f"[llm_enrich] cost ledger write failed (non-fatal): {_cost_err!r}")
             print(f"[llm_enrich] key={key} decision=enriched "
                   f"model={schema.model} "
                   f"tokens_in={event.get('tokens_in')} "
