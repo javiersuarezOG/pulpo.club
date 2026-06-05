@@ -86,13 +86,29 @@ function useShelfScrolled(shelfKey, listRef) {
 // ────────────────────────────────────────────────────────────────────
 // Real-listing pickers — Wave 5 polish
 
-const MIN_REAL_LISTINGS = 5;
+// PRD A5 — raised 5 → 10 per the PRD's shelf-rendering threshold.
+// Gated on A3 (shelf-aware photo waiver) being live: without the
+// loose-eligible top-up, every shelf with 7-8 strict-eligible listings
+// would disappear under the higher threshold. With A3, shelves fill to
+// 10 — trailing positions render the "Foto aún no disponible"
+// placeholder when the broker hasn't shared a photo yet.
+const MIN_REAL_LISTINGS = 10;
 
 // Curated shelves only surface complete listings. A listing missing
 // price or area never qualifies regardless of how strong its other
 // signals are — the shelf is a quality promise, not a recall surface.
 function isShelfEligible(l) {
   return !l.is_incomplete && l.photos && l.photos.length > 0;
+}
+
+// PRD A3 — shelf-aware photo gate. When a shelf has < MIN_REAL_LISTINGS
+// strict-eligible listings, the picker tops up with loose-eligible
+// listings (no photo) so the shelf still renders at full capacity.
+// Loose-eligible cards stamp `_needs_photo_placeholder=true` (FE-only,
+// not persisted to the Listing type) so ShelfCard renders the
+// "Foto aún no disponible" placeholder in place of <Photo>.
+function isShelfEligibleLoose(l) {
+  return !l.is_incomplete;
 }
 
 // Top 10: rank_score-sorted, must have at least one photo.
@@ -123,7 +139,7 @@ function badgeForListing(_listing, _shelfKey) {
 // Real listings get a `<Photo>` + heart + computed badge + real
 // price/meta. Hardcoded cards keep their static layout.
 
-function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank }) {
+function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank, locale }) {
   const isReal = !!listing;
   const id = isReal ? listing.id : (card?.id || `placeholder-${shelfKey}-${position}`);
 
@@ -168,18 +184,37 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
     const isTopTen = shelfKey === "top_10";
     const badge = isTopTen ? null : badgeForListing(listing, shelfKey);
     const showRank = isTopTen && rank != null;
+    // PRD A3 — shelf-aware photo waiver. When the shelf is thin and
+    // we topped up with loose-eligible listings, the card carries a
+    // `_needs_photo_placeholder` stamp and renders the "Foto aún no
+    // disponible" placeholder in place of <Photo>. The card is still
+    // clickable; only the visual differs.
+    const needsPlaceholder = listing._needs_photo_placeholder === true;
     return (
       <article className="hp-shelf-card hp-shelf-card-real" onClick={onClick}>
         <div className="hp-shelf-card-art">
-          <Photo
-            listing={listing}
-            idx={0}
-            ratio="4/3"
-            className="hp-shelf-card-img"
-            eager={eager}
-            source="home_shelf"
-            thumbnail
-          />
+          {needsPlaceholder ? (
+            <div
+              className="hp-shelf-card-photo-placeholder"
+              aria-label={t("home.shelf.photo_pending_aria", locale)}
+              role="img"
+            >
+              <Icon name="camera" size={36} strokeWidth={1.4} aria-hidden="true" />
+              <span className="hp-shelf-card-photo-placeholder-text">
+                {t("home.shelf.photo_pending", locale)}
+              </span>
+            </div>
+          ) : (
+            <Photo
+              listing={listing}
+              idx={0}
+              ratio="4/3"
+              className="hp-shelf-card-img"
+              eager={eager}
+              source="home_shelf"
+              thumbnail
+            />
+          )}
           {showRank && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
               <span className="pulpo-rank-star" aria-hidden="true">
@@ -413,6 +448,7 @@ export function HomeShelf({
                   app={app}
                   heroV4={heroV4}
                   eager={i < 4}
+                  locale={locale}
                 />
               ) : (
                 <ShelfCard
@@ -421,6 +457,7 @@ export function HomeShelf({
                   shelfKey={shelfKey}
                   app={app}
                   heroV4={heroV4}
+                  locale={locale}
                 />
               )}
             </div>
@@ -441,24 +478,43 @@ export function HomeShelf({
 // PR #421 — no more dedicated shelves for those.
 
 // Pick the best-ranked listings for a (master, sub) cohort.
-// The agricultural filter is the canonical FE exclusion from
-// `web/app/data/use-listings.tsx::excludeAgricultural`, but this
-// shelf-level guard is defense-in-depth: any caller that bypasses
-// the data hook still has agricultural inventory removed before it
-// surfaces on a curated shelf. The contract test at
-// `tests/test_agricultural_exclusion.py` enforces both layers.
+// PRD A3 — shelf-aware photo waiver. First pass picks strict-eligible
+// listings (have at least one photo). If we don't have enough to fill
+// the shelf, top up with loose-eligible listings (no photo) and stamp
+// `_needs_photo_placeholder=true` so the card renders the placeholder
+// in place of <Photo>. The placeholder card is fully clickable; only
+// the visual differs.
+//
+// PR A4 defense-in-depth: the cohort also excludes is_agricultural
+// listings so direct-data callers that bypass the
+// excludeAgricultural data hook still get the exclusion before
+// listings hit a curated shelf. Enforced by the contract test at
+// tests/test_agricultural_exclusion.py.
 function pickTopByMasterAndSub(listings, master, sub, n) {
-  return [...listings]
-    .filter(
-      (l) =>
-        l.master_category === master &&
-        l.subcategory === sub &&
-        l.rank_score != null &&
-        l.is_agricultural !== true &&
-        isShelfEligible(l),
-    )
+  const cohort = [...listings].filter(
+    (l) =>
+      l.master_category === master &&
+      l.subcategory === sub &&
+      l.rank_score != null &&
+      l.is_agricultural !== true,
+  );
+
+  const strict = cohort
+    .filter(isShelfEligible)
+    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0));
+
+  if (strict.length >= n) {
+    return strict.slice(0, n);
+  }
+
+  const loose = cohort
+    .filter((l) => isShelfEligibleLoose(l) && !(l.photos && l.photos.length > 0))
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
-    .slice(0, n);
+    .map((l) => ({ ...l, _needs_photo_placeholder: true }));
+
+  // Concat strict + loose; truncate to n. Strict listings always sort
+  // ahead of loose ones because they already have a photo.
+  return [...strict, ...loose].slice(0, n);
 }
 
 // Map subcategory → its icon name. Trophy is universal; the
