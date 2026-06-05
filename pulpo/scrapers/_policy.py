@@ -163,6 +163,25 @@ POLICIES: dict[str, Policy] = {
         rate_limit_rps=0.5,
         auto_repair=False,
     ),
+
+    # jamesedition: luxury portal sitting behind Cloudflare's
+    # JS-challenge interstitial. 2026-06-05 live probe with httpx
+    # returned HTTP 403 + "Just a moment..." HTML. curl_cffi with
+    # chrome124 impersonation clears the challenge. Rate-limit kept
+    # conservative (0.3 rps + 500-1500ms jitter) because luxury
+    # portals tend to escalate fast on flooding. auto_repair False:
+    # WAF state isn't fixable by an LLM.
+    "jamesedition": Policy(
+        transport="curl_cffi",
+        rate_limit_rps=0.3,
+        jitter_ms=(500, 1500),
+        user_agent_pool="safari_macos",
+        # Match TLS fingerprint to the UA: chrome124 (the default)
+        # against a Safari UA tripped the Cloudflare challenge.
+        # safari17_0 keeps the handshake + UA aligned.
+        curl_cffi_impersonate="safari17_0",
+        auto_repair=False,
+    ),
 }
 
 

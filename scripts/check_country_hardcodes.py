@@ -53,6 +53,21 @@ ALLOWED_FILES: tuple[str, ...] = (
     "pulpo/scrapers/oceanside.py",
     "pulpo/scrapers/realtyelsalvador.py",
     "pulpo/scrapers/remax.py",
+    # Phase C scrapers — single-country SV sources (santizo, citymax_sc,
+    # csbr, jamesedition, agentiz, realestate_au_sv, vivolatam). Same
+    # rationale as the rest of this list: `country = "SV"` class attr
+    # + addressCountry-based filtering.
+    "pulpo/scrapers/agentiz.py",
+    "pulpo/scrapers/citymax_sc.py",
+    "pulpo/scrapers/csbr.py",
+    "pulpo/scrapers/jamesedition.py",
+    "pulpo/scrapers/realestate_au_sv.py",
+    "pulpo/scrapers/santizo.py",
+    "pulpo/scrapers/vivolatam.py",
+    "pulpo/scrapers/xitios.py",
+    # Shared skeleton scaffold for Phase C — `country = "SV"` default on
+    # SkeletonScraper mirrors every existing scraper's class attr above.
+    "pulpo/scrapers/_skeleton_helper.py",
     # The country manifest files themselves carry their own code/name.
     "pulpo/countries/sv.json",
     "pulpo/countries/pa.json",
