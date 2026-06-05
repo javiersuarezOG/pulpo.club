@@ -16,9 +16,10 @@ The parser is tolerant:
 """
 from __future__ import annotations
 
+import html
 import json
 import re
-from typing import Optional
+from typing import Iterable, Optional
 
 
 _SCRIPT_RE = re.compile(
@@ -56,6 +57,58 @@ def find_jsonld(html: str, schema_type: Optional[str] = None) -> list[dict]:
             if schema_type is None or _type_matches(entry, schema_type):
                 out.append(entry)
     return out
+
+
+def find_jsonld_ci(
+    html_body: str,
+    schema_types: Iterable[str],
+    *,
+    unescape: bool = False,
+) -> list[dict]:
+    """Case-insensitive ``@type`` variant of :func:`find_jsonld`.
+
+    Three accommodations vs the strict version:
+
+    - ``schema_types`` is an iterable of accepted types; a block matches
+      if its ``@type`` (case-folded) equals any folded entry. Santizo
+      emits ``@type="house"`` (lowercase) where schema.org canonicalises
+      to ``"House"`` / ``"Residence"`` — the strict matcher misses it.
+    - ``unescape=True`` runs each script body through
+      ``html.unescape`` before ``json.loads``. realestate.com.au's
+      Next.js SSR ships JSON-LD with ``&quot;`` quotes inside the
+      ``<script>`` tag; without unescape every block fails to parse.
+    - Empty / whitespace-only scripts and JSON errors are silently
+      skipped, same as :func:`find_jsonld`.
+    """
+    if not html_body:
+        return []
+    wanted = {t.lower() for t in schema_types}
+    out: list[dict] = []
+    for raw in _SCRIPT_RE.findall(html_body):
+        block = (raw or "").strip()
+        if not block:
+            continue
+        if unescape:
+            block = html.unescape(block)
+        try:
+            parsed = json.loads(block)
+        except (json.JSONDecodeError, ValueError):
+            continue
+        for entry in _flatten(parsed):
+            if not isinstance(entry, dict):
+                continue
+            if not wanted or _type_matches_ci(entry, wanted):
+                out.append(entry)
+    return out
+
+
+def _type_matches_ci(entry: dict, wanted_lower: set[str]) -> bool:
+    t = entry.get("@type")
+    if isinstance(t, str):
+        return t.lower() in wanted_lower
+    if isinstance(t, list):
+        return any(isinstance(x, str) and x.lower() in wanted_lower for x in t)
+    return False
 
 
 def _flatten(payload: object) -> list[object]:
