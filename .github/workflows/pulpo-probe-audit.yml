@@ -1,0 +1,184 @@
+name: pulpo probe audit
+
+# PR-S3c — weekly probe audit. Runs the matcher from PR-S3a against
+# the seed probes in config/probes/<country>.json and the current
+# committed ranked.json. Emits:
+#   * web/data/probe_audit_history.jsonl (append-only)
+#   * web/data/probe_audit_latest.json    (latest summary snapshot)
+# Slack-pages when:
+#   * match_rate drops >= MATCH_RATE_REGRESSION_THRESHOLD vs prior
+#     week (calibrated to 0.20 = 20-point absolute drop)
+#   * the audit job itself crashes (alerting-system silence canary)
+#
+# Why weekly: probe matching is a "what's in the wild we don't carry"
+# audit, not a real-time alert. Today's seed probes are static so the
+# match-rate doesn't change between nightlies — only when probes
+# or ranked.json change meaningfully. Weekly cron is the right
+# cadence to ride above the noise floor without missing real
+# regressions.
+
+on:
+  schedule:
+    # Sunday 10:00 UTC = Sunday 04:00 El Salvador. After the weekly
+    # data has stabilized (last nightly landed by 09:00 UTC), before
+    # the workday so a Slack page can be triaged Monday.
+    - cron: "0 10 * * 0"
+  workflow_dispatch:
+    inputs:
+      country:
+        description: "Country code (default sv)"
+        required: false
+        default: "sv"
+
+permissions:
+  contents: write       # commit refreshed audit history
+  pull-requests: write  # rebase + push back
+
+concurrency:
+  group: pulpo-probe-audit
+  cancel-in-progress: true
+
+env:
+  MATCH_RATE_REGRESSION_THRESHOLD: "0.20"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Read previous match_rate (for regression detection)
+        id: prev
+        run: |
+          PREV_PATH="web/data/probe_audit_latest.json"
+          if [ -f "$PREV_PATH" ]; then
+            PREV_RATE=$(python3 -c "import json,sys; print(json.load(open('$PREV_PATH'))['match_rate'])" 2>/dev/null || echo "")
+            echo "prev_match_rate=${PREV_RATE:-}" >> "$GITHUB_OUTPUT"
+            echo "Previous match_rate: ${PREV_RATE:-<none>}"
+          else
+            echo "prev_match_rate=" >> "$GITHUB_OUTPUT"
+            echo "No prior audit; this is the first run."
+          fi
+
+      - name: Run probe audit
+        # --fail-on-low-match exits 1 if match_rate < 50%. Combined
+        # with the Slack-on-failure step below, this surfaces a hard
+        # drop without ALSO requiring the regression detector to fire.
+        id: audit
+        run: |
+          COUNTRY="${{ github.event.inputs.country || 'sv' }}"
+          python3 scripts/run_probe_audit.py --country "$COUNTRY" --fail-on-low-match
+        continue-on-error: true
+
+      - name: Detect match-rate regression vs prior week
+        # Independent of the absolute-threshold check above — this
+        # one fires on relative degradation (e.g. went from 95% → 70%
+        # in a week, still above 50% absolute floor). Both signals
+        # are useful; both feed the same Slack alert step.
+        id: regression
+        if: always()
+        env:
+          PREV_RATE: ${{ steps.prev.outputs.prev_match_rate }}
+        run: |
+          LATEST="web/data/probe_audit_latest.json"
+          if [ ! -f "$LATEST" ] || [ -z "$PREV_RATE" ]; then
+            echo "No prior rate or no latest file — skipping regression check."
+            echo "regressed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 << 'PYEOF'
+          import json, os
+          prev = float(os.environ["PREV_RATE"])
+          latest = json.load(open("web/data/probe_audit_latest.json"))
+          cur = float(latest["match_rate"])
+          delta = prev - cur  # positive = regression
+          threshold = float(os.environ["MATCH_RATE_REGRESSION_THRESHOLD"])
+          regressed = delta >= threshold
+          print(f"prev={prev:.1%} cur={cur:.1%} delta={delta:+.1%} threshold={threshold:.1%} regressed={regressed}")
+          # GITHUB_OUTPUT echoes for the next step.
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"regressed={'true' if regressed else 'false'}\n")
+              f.write(f"prev_rate={prev}\n")
+              f.write(f"cur_rate={cur}\n")
+              f.write(f"delta={delta}\n")
+          PYEOF
+
+      - name: Commit refreshed audit history (best-effort)
+        if: always()
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+          ADDED=0
+          for p in web/data/probe_audit_history.jsonl web/data/probe_audit_latest.json; do
+            if [ -n "$(git status --porcelain "$p" 2>/dev/null)" ]; then
+              git add "$p"
+              ADDED=1
+            fi
+          done
+          if [ "$ADDED" = "0" ]; then
+            echo "No audit changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(probe): weekly audit snapshot ($(date -u +%Y-%m-%d))" || true
+          git fetch origin main
+          git rebase --autostash origin/main || {
+            echo "::warning::rebase failed; aborting audit commit"
+            git rebase --abort || true
+            exit 0
+          }
+          git push origin HEAD:main || echo "::warning::push failed; audit kept locally only"
+
+      - name: Slack on low match-rate or regression
+        # Fires on either:
+        #   1. The audit step itself exited non-zero (low-match-rate
+        #      threshold trip — match_rate < 50%)
+        #   2. The regression detector flagged a >= 20-point drop
+        if: |
+          steps.audit.outcome == 'failure' ||
+          steps.regression.outputs.regressed == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          REASON="low-match-rate"
+          if [ "${{ steps.regression.outputs.regressed }}" = "true" ]; then
+            CUR=${{ steps.regression.outputs.cur_rate }}
+            PREV=${{ steps.regression.outputs.prev_rate }}
+            REASON="match_rate regression: ${PREV} → ${CUR}"
+          fi
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo probe-audit ALERT* — %s\\n<%s|view run>"}' "$REASON" "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"
+
+      - name: Slack on job failure (alerting-system silence canary)
+        # Distinct from match-rate alerts — fires only if the job
+        # itself crashed. Catches the case where the audit's own
+        # alerting plumbing breaks silently.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo probe-audit JOB CRASHED* — alerting system is silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true

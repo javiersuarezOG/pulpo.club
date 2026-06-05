@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Beachfront 5,000 m² lot in El Tunco",
+    "price_usd": 240000,
+    "location": "El Tunco",
+    "source_url": "https://elsalvadorsurfrealestate.com/listing/example-1",
+    "probe_kind": "seed_list",
+    "_comment": "Beach lot — we should have inventory like this from essurf + oceanside."
+  },
+  {
+    "title": "Casa moderna en Lago de Coatepeque vista al lago",
+    "price_usd": 450000,
+    "location": "Lago de Coatepeque",
+    "source_url": "https://www.xitios.com.sv/propiedad/example",
+    "probe_kind": "seed_list",
+    "_comment": "Lake-zone seed. Today's audit reveals lake.homes inventory is thin — this probe surfaces whether new sources are reaching that segment."
+  },
+  {
+    "title": "Terreno con vista al mar en Atami La Libertad",
+    "price_usd": 95000,
+    "location": "Atami La Libertad",
+    "source_url": "https://oceansideelsalvador.com/listing/example-3",
+    "probe_kind": "seed_list",
+    "_comment": "Oceanside specialist — checks we're carrying their inventory."
+  },
+  {
+    "title": "Lote residencial Surf City zona privada",
+    "price_usd": 165000,
+    "location": "Surf City",
+    "source_url": "https://www.citymax-sc.com/listing/example",
+    "probe_kind": "seed_list",
+    "_comment": "Phase-C source (citymax-sc) — once Javi's #701 lands and citymax-sc has nightly yield, this should match."
+  },
+  {
+    "title": "Apartamento frente al mar El Zonte",
+    "price_usd": 320000,
+    "location": "El Zonte",
+    "source_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices/example",
+    "probe_kind": "seed_list",
+    "_comment": "Beach condo — currently the thinnest shelf per the PRD audit. A miss here is a 'beach.condos still under-served' signal."
+  },
+  {
+    "title": "Casa colonial San Salvador zona rosa",
+    "price_usd": 280000,
+    "location": "San Salvador",
+    "source_url": "https://www.unknown-broker.com.sv/listing/example",
+    "probe_kind": "seed_list",
+    "_comment": "Deliberate source_not_configured probe — domain isn't in our registry. Validates the miss classifier."
+  },
+  {
+    "title": "Lago de Ilopango terreno acceso al lago",
+    "price_usd": 75000,
+    "location": "Lago de Ilopango",
+    "source_url": "https://santizorealestate.com/listing/example",
+    "probe_kind": "seed_list",
+    "_comment": "Ilopango lake. Today's coverage of Ilopango is near-zero — match-rate here is a 'are we covering Ilopango yet?' signal."
+  }
+]
