@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Beachfront 5,000 m² lot in El Tunco",
+    "price_usd": 240000,
+    "location": "El Tunco",
+    "source_url": "https://elsalvadorsurfrealestate.com/listing/example-1",
+    "probe_kind": "seed_list",
+    "_comment": "Starter seed entry. Replace with real probes harvested from Google site-searches / broker sitemaps / curated lists. PR-S3c will add live probe sources."
+  },
+  {
+    "title": "Casa moderna en Lago de Coatepeque",
+    "price_usd": 450000,
+    "location": "Lago de Coatepeque",
+    "source_url": "https://www.xitios.com.sv/propiedad/example",
+    "probe_kind": "seed_list",
+    "_comment": "Lake-zone seed — currently we have zero lake.homes inventory. Any match would mean we've onboarded xitios."
+  },
+  {
+    "title": "Terreno con vista al mar en Atami",
+    "price_usd": 95000,
+    "location": "Atami, La Libertad",
+    "source_url": "https://oceansideelsalvador.com/listing/example-3",
+    "probe_kind": "seed_list",
+    "_comment": "Oceanside specialist — checks we're carrying their inventory."
+  }
+]
