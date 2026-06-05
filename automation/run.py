@@ -1813,6 +1813,21 @@ def main() -> int:
         )[:5]
         print(f"[duplicate_detection] top_pairs={dict(top)}")
 
+    # PRD D1 — per-source dedup audit emitted as a one-row JSON. Uses the
+    # content fingerprint from pulpo.scrapers.lib.dedup_hasher to identify
+    # the same physical listing across sources — complementary to the
+    # phone/coord pair matching that runs in duplicate_detection above.
+    # Non-fatal on exception (the rest of the nightly is unaffected).
+    try:
+        from automation.dedup_audit import write_audit as _write_dedup_audit
+        web_data_dir = REPO / "web" / "data"
+        _dedup_audit = _write_dedup_audit(listings, web_data_dir)
+        print(f"[dedup_audit] total={_dedup_audit['total_in_dataset']} "
+              f"unique_fingerprints={_dedup_audit['total_unique_fingerprints']} "
+              f"sources={len(_dedup_audit['per_source'])}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[dedup_audit] failed (non-fatal): {_e!r}")
+
     # PRD WS2 — single-call DeepSeek enrichment. ONE LLM call per eligible
     # listing returns title + description + usps + latlong together (replacing
     # the previous 3-call OpenAI flow + Mapbox geocoding pass). Idempotent
