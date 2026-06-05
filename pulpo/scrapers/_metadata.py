@@ -240,14 +240,17 @@ SCRAPER_METADATA: dict[str, dict] = {
     "vivolatam": {
         "layer": "extraction",
         "fetch_kind": "static_http",
-        "discovery_kind": "html_pagination",
-        "extraction_kind": "jsonld_residence (DRAFT) — multi-country site filtered to SV",
-        "strengths": ["regional portal", "verified seller ecosystem"],
-        "failure_modes": ["DRAFT skeleton — calibration pass required", "multi-country site requires SV-scope filtering"],
+        "discovery_kind": "sitemap",
+        "extraction_kind": "sitemap-driven (catalog is client-rendered) → per-detail RealEstateListing JSON-LD",
+        "strengths": ["regional portal", "verified seller ecosystem", "sitemap-driven discovery (no SSR-dependence)"],
+        "failure_modes": [
+            "multi-country site — sitemap_url_filter forces /<active-country>/ + for-sale tokens (rents excluded)",
+            "sitemap-only discovery means catalog UI is not the URL source — if vivolatam restructures the sitemap path, we re-discover the new feed",
+        ],
         "owner_module": "pulpo.scrapers.vivolatam",
         "target_prd": 400,
         "target_discovered": None,
-        "health_probe_url": "https://www.vivolatam.com/es/el-salvador/real-estate",
+        "health_probe_url": "https://www.vivolatam.com/sitemap/property_listings.xml",
     },
     "csbr": {
         "layer": "extraction",

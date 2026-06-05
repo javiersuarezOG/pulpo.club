@@ -114,7 +114,9 @@ class SkeletonConfig:
     sitemap_url: Optional[str] = None
     # Optional path-substring filter applied to sitemap URLs (e.g.
     # require ``/el-salvador/`` so a multi-country sitemap stays scoped).
-    sitemap_url_filter: Optional[str] = None
+    # Accepts a single substring OR a tuple of substrings — when a
+    # tuple, ALL substrings must appear in the URL (AND semantics).
+    sitemap_url_filter: Optional[object] = None
     # og-meta extractors — regex patterns over og:description.
     og_price_patterns: tuple[str, ...] = field(default_factory=tuple)
     og_area_patterns: tuple[str, ...] = field(default_factory=tuple)
@@ -248,8 +250,11 @@ class SkeletonScraper(OfflineFixtureMixin):
             resp = get(client, self.CONFIG.sitemap_url)
             body = getattr(resp, "text", "") if resp is not None else ""
             urls = extract_loc_urls(body)
-            if self.CONFIG.sitemap_url_filter:
-                urls = [u for u in urls if self.CONFIG.sitemap_url_filter in u]
+            needles = self.CONFIG.sitemap_url_filter
+            if isinstance(needles, str):
+                urls = [u for u in urls if needles in u]
+            elif isinstance(needles, (tuple, list)):
+                urls = [u for u in urls if all(n in u for n in needles)]
             raw_records = self._fetch_detail_batch(
                 client, get, urls[:limit], strategy="detail_jsonld",
             )
