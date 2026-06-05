@@ -1,0 +1,101 @@
+name: pulpo row-count sentinel
+
+# PR-D2 — every 6h, snapshot per-source ranked counts + classify
+# delta vs 7-tick history. Slack-pages on CRIT drops.
+#
+# Why 6h not nightly: ranked.json only changes once per nightly,
+# but a 6h cadence catches the case where the nightly itself ran
+# but a specific source dropped. The first tick after the nightly
+# lands is the moneymaker; the other 3 are cheap "still ok"
+# heartbeats.
+#
+# Detail in automation/row_count_sentinel.py.
+
+on:
+  schedule:
+    # Offset 23 minutes off the hour to avoid the global cron stampede
+    # AND avoid colliding with pulpo-url-drift.yml's :17 offset.
+    - cron: "23 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pulpo-row-count
+  cancel-in-progress: true
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Run row-count sentinel
+        # --fail-on-crit makes the step exit 1 if any source is at
+        # level=critical, triggering Slack-on-failure below.
+        id: tick
+        run: |
+          python3 scripts/run_row_count_sentinel.py --fail-on-crit
+        continue-on-error: true
+
+      - name: Commit refreshed history (best-effort)
+        # Only the history JSONL. Best-effort: a commit failure must
+        # not mask the CRIT alert.
+        if: always()
+        run: |
+          git config user.name "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+          if [ -z "$(git status --porcelain web/data/row_count_history.jsonl)" ]; then
+            echo "No history changes to commit."
+            exit 0
+          fi
+          git add web/data/row_count_history.jsonl
+          git commit -m "chore(row-count): append tick ($(date -u +%Y-%m-%dT%H:%MZ))" || true
+          git fetch origin main
+          git rebase --autostash origin/main || {
+            echo "::warning::rebase failed; aborting history commit"
+            git rebase --abort || true
+            exit 0
+          }
+          git push origin HEAD:main || echo "::warning::push failed; tick kept locally"
+
+      - name: Slack on critical drop
+        if: steps.tick.outcome == 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo row-count CRITICAL* — a source dropped sharply. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"
+
+      - name: Slack on job failure
+        # Distinct from CRIT detection — fires only if the job itself
+        # crashed. Catches the "alerting system silently broken" case.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo row-count sentinel JOB CRASHED* — alerting system is silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true
