@@ -771,7 +771,7 @@
     "zone": "lago-coatepeque"
   },
   {
-    "source": "realtor_intl_sv",
+    "source": "realestate_au_sv",
     "source_id": "realtor_intl_sv-skeleton-001",
     "url": "https://www.realtor.com/intl/sv/p/skeleton-001",
     "title": "Land en Playa Atami con vista al mar (skeleton fixture)",
@@ -786,7 +786,7 @@
     "zone": "atami"
   },
   {
-    "source": "realtor_intl_sv",
+    "source": "realestate_au_sv",
     "source_id": "realtor_intl_sv-skeleton-002",
     "url": "https://www.realtor.com/intl/sv/p/skeleton-002",
     "title": "House en Playa Atami con vista al mar (skeleton fixture)",
@@ -801,7 +801,7 @@
     "zone": "atami"
   },
   {
-    "source": "realtor_intl_sv",
+    "source": "realestate_au_sv",
     "source_id": "realtor_intl_sv-skeleton-003",
     "url": "https://www.realtor.com/intl/sv/p/skeleton-003",
     "title": "Condo en Playa Atami con vista al mar (skeleton fixture)",

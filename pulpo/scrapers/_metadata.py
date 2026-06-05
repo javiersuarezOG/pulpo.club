@@ -270,21 +270,24 @@ SCRAPER_METADATA: dict[str, dict] = {
         "target_discovered": None,
         "health_probe_url": "https://www.camarabienesraices.com.sv/resultado-busqueda/?keyword=&type%5B0%5D=fincas&type%5B1%5D=playa&type%5B2%5D=terrenos",
     },
-    "realtor_intl_sv": {
+    "realestate_au_sv": {
         "layer": "extraction",
-        "fetch_kind": "curl_cffi",
+        "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
-        "extraction_kind": "jsonld_residence (DRAFT) — US-based portal, anti-bot expected",
-        "strengths": ["international aggregator", "broad gap-fill coverage"],
-        "failure_modes": [
-            "DRAFT skeleton — calibration pass required",
-            "ToS clearance required before live runs (US-based franchise)",
-            "anti-bot — likely needs residential proxy or curl_cffi",
+        "extraction_kind": "constructed pagination → per-detail JSON-LD RealEstateListing (HTML-entity-unescaped)",
+        "strengths": [
+            "international aggregator",
+            "broad rural-land gap-fill (314 listings under the rural+land filter alone)",
         ],
-        "owner_module": "pulpo.scrapers.realtor_intl_sv",
-        "target_prd": 633,
+        "failure_modes": [
+            "in-page pagination hrefs DROP /sv/ country scope + searchtypes filter — must construct URLs from url_pattern, not follow",
+            "JSON-LD is HTML-entity-encoded inside Next.js SSR <script> tags — requires html.unescape before json.loads",
+            "ToS clearance recommended before broad nightly runs; this commit ships against public catalog only",
+        ],
+        "owner_module": "pulpo.scrapers.realestate_au_sv",
+        "target_prd": 314,
         "target_discovered": None,
-        "health_probe_url": "https://www.realestate.com.au/international/sv",
+        "health_probe_url": "https://www.realestate.com.au/international/sv?searchtypes=rural+land",
     },
     "jamesedition": {
         "layer": "extraction",
