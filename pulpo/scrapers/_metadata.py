@@ -26,10 +26,21 @@ Schema:
         "target_discovered":  int | None,     # populated each nightly by
                                               # lib.coverage_logger; runtime
                                               # field, NOT a static value
+        "health_probe_url":   str | None,     # canonical landing/listing URL
+                                              # the URL drift sentinel HEAD-
+                                              # probes daily; None = source
+                                              # has no single landing surface
+                                              # (e.g., sitemap-XML-only)
     }
 
 The `target_discovered` field starts None — the coverage_logger updates
 it after the first nightly run.
+
+The `health_probe_url` field is consumed by
+``automation/url_drift_sentinel.py`` (PR-D1). Drift states `unreachable`
+or persistent `redirect_drift` page Slack via the watchdog — catches a
+source going down one layer earlier than waiting for the next nightly
+to return zero listings.
 """
 from __future__ import annotations
 
@@ -46,6 +57,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.bienesraices",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://secure.alterestate.com/api/v1/properties/sitemap/",
     },
     "century21": {
         "layer": "extraction",
@@ -57,6 +69,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.century21",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://www.century21elsalvador.com",
     },
     "citymax": {
         "layer": "extraction",
@@ -68,6 +81,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.citymax",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://www.citymax-sv.com",
     },
     "elagente": {
         "layer": "extraction",
@@ -79,6 +93,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.elagente",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://www.elagenteinmobiliario.com",
     },
     "encuentra24": {
         "layer": "extraction",
@@ -90,6 +105,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.encuentra24",
         "target_prd": 2947,
         "target_discovered": None,
+        "health_probe_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
     },
     "essurf": {
         "layer": "extraction",
@@ -101,6 +117,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.essurf",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://elsalvadorsurfrealestate.com",
     },
     "goodlife": {
         "layer": "extraction",
@@ -112,6 +129,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.goodlife",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://goodlifeelsalvador.com/",
     },
     "nexo": {
         "layer": "extraction",
@@ -123,6 +141,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.nexo",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://nexo.com.sv",
     },
     "oceanside": {
         "layer": "extraction",
@@ -134,6 +153,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.oceanside",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://oceansideelsalvador.com/",
     },
     "realtyelsalvador": {
         "layer": "extraction",
@@ -145,6 +165,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.realtyelsalvador",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://realtyelsalvador.com",
     },
     "remax": {
         "layer": "extraction",
@@ -156,6 +177,7 @@ SCRAPER_METADATA: dict[str, dict] = {
         "owner_module": "pulpo.scrapers.remax",
         "target_prd": None,
         "target_discovered": None,
+        "health_probe_url": "https://www.remax-elsalvador.com",
     },
     # ── Phase C scrapers — entries added when each scraper PR lands ──
     # Forward-looking placeholders. Each Phase C PR replaces its entry
@@ -167,4 +189,5 @@ REQUIRED_KEYS: frozenset[str] = frozenset({
     "layer", "fetch_kind", "discovery_kind", "extraction_kind",
     "strengths", "failure_modes", "owner_module",
     "target_prd", "target_discovered",
+    "health_probe_url",
 })

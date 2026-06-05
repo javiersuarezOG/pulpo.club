@@ -196,6 +196,35 @@ def test_every_registered_source_has_metadata_entry():
     )
 
 
+def test_health_probe_url_is_well_formed_when_set():
+    """PR-D1 — the URL drift sentinel consumes ``health_probe_url`` from
+    every metadata entry. A typo (missing scheme, bare host) would
+    cause every nightly drift probe to error out, defeating the
+    sentinel's purpose. Lock the contract: when set, it must be a
+    fully-qualified http(s) URL. None is allowed (some sources have no
+    single landing surface)."""
+    import pulpo.scrapers  # noqa: F401  — fires autodiscovery
+    from pulpo.agents import SOURCES
+    from pulpo.scrapers._metadata import SCRAPER_METADATA
+
+    bad: dict[str, str] = {}
+    for slug, meta in SCRAPER_METADATA.items():
+        if slug not in SOURCES:
+            continue
+        url = meta.get("health_probe_url")
+        if url is None:
+            continue  # explicit "no landing surface" is allowed
+        if not isinstance(url, str):
+            bad[slug] = f"not a string: {url!r}"
+            continue
+        if not (url.startswith("http://") or url.startswith("https://")):
+            bad[slug] = f"missing scheme: {url!r}"
+    assert not bad, (
+        f"SCRAPER_METADATA health_probe_url malformed: {bad}. "
+        f"Each must be a fully-qualified http(s) URL or None."
+    )
+
+
 def test_pulpo_sources_override_if_present_is_subset_of_registry():
     """The nightly workflow's optional PULPO_SOURCES env var is for
     debugging / temporary subset crawls (e.g., disable one noisy source).
