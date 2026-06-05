@@ -151,6 +151,11 @@ class Listing:
     hires_resdet_upscaled: Optional[bool] = None     # resdet detected upscale fraud
     hires_quarantined: Optional[bool] = None         # True when .quarantine marker is present
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
+    # PR-S4b — existence ledger output (see automation/listing_ledger.py).
+    # One of KNOWN_EXISTENCE_STATUSES: confirmed_current | missing_recently | stale.
+    # Stamped by automation/run.py's ledger-update block; None when the
+    # ledger hasn't been computed yet (e.g. legacy fixtures, smoke tests).
+    existence_status: Optional[str] = None
 
     # Broker
     broker_name: Optional[str] = None

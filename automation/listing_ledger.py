@@ -63,7 +63,13 @@ distribution; "new this week" UI checks ``first_seen_at + 7d``."""
 # (still in ranked.json but UI/ranker may de-emphasise).
 STALE_THRESHOLD_RUNS = 3
 
-DEFAULT_LEDGER_PATH = Path("web/data/listings_history.json")
+# PR-S4b: write to a PARALLEL file rather than overwriting the
+# pre-existing ``listings_history.json``. The old file has a
+# stable {key: iso_string} contract that other code paths (and
+# tests/test_first_seen.py) depend on. The ledger lives at a new
+# path with the richer schema; both files coexist until a future
+# migration deprecates listings_history.json.
+DEFAULT_LEDGER_PATH = Path("web/data/listings_ledger.json")
 
 
 # ---------- Data model ----------
