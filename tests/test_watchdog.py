@@ -75,6 +75,38 @@ def test_freshness_missing_file(tmp_path):
     assert "missing" in msg
 
 
+def test_freshness_threshold_is_24h():
+    """PR-S0c anchor: the watchdog freshness threshold is 24h after the
+    multi-day 2026-06 freeze. Pre-PR-S0c this was 36h, which gave one
+    cushion night before paging. With the Slack-on-cancelled fix in
+    PR-S0a covering the "single nightly broke" case, the watchdog now
+    targets the "two scheduled runs in a row failed silently" case —
+    which is exactly 24h+ of staleness. Changing this constant is a
+    deliberate calibration; the test failing is the intended guardrail."""
+    assert FRESHNESS_HOURS == 24
+
+
+def test_freshness_24h_5min_is_stale(tmp_path):
+    """At 24h+5min old, the watchdog must fire."""
+    d = _write_meta(
+        tmp_path,
+        datetime.now(timezone.utc) - timedelta(hours=24, minutes=5),
+    )
+    ok, msg = check_freshness(d)
+    assert not ok
+    assert "FAIL" in msg
+
+
+def test_freshness_23h_55min_is_ok(tmp_path):
+    """At 23h55m, the watchdog must NOT fire (boundary case)."""
+    d = _write_meta(
+        tmp_path,
+        datetime.now(timezone.utc) - timedelta(hours=23, minutes=55),
+    )
+    ok, _ = check_freshness(d)
+    assert ok
+
+
 # ── Volume ─────────────────────────────────────────────────────────────
 
 def test_volume_within_tolerance(tmp_path):

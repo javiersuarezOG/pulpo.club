@@ -19,7 +19,17 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 
 # Thresholds
-FRESHNESS_HOURS   = 36
+#
+# 2026-06-05 (PR-S0c): tightened 36 → 24 after the 3-day silent freeze.
+# The plan was for FRESHNESS_HOURS=36 to give one cushion night before
+# paging — but with the 6-day 2026-05-26 freeze still fresh, time-to-
+# discovery matters more than alert volume. A nightly is supposed to
+# land every 24h; data older than 24h means the most recent scheduled
+# run did NOT commit. That's actionable immediately. The next-cycle
+# Slack-on-failure (from the nightly itself, PR-S0a) covers the
+# "single nightly broke" case; this 24h watchdog covers the "two
+# scheduled runs in a row failed and no Slack page fired" case.
+FRESHNESS_HOURS   = 24
 # ±30% from the 7-day rolling median.
 #
 # Temporarily widened from 0.20 to 0.30 after PR #418 (2026-05-22) added
