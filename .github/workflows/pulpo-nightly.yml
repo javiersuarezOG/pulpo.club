@@ -68,7 +68,19 @@ jobs:
     # `if: failure() || cancelled()` change on the Slack step below so the
     # next timeout-driven cancellation pages Sebas instead of silently
     # freezing the data.
-    timeout-minutes: 180
+    #
+    # 2026-06-06 bump 180 → 240: post-Phase-C nightly (run 27045998651)
+    # showed SV crawl alone takes ≈180 min once the 6 new working sources
+    # (xitios, santizo, citymax_sc, vivolatam, csbr, realestate_au_sv)
+    # are walking detail pages at the polite 0.5 rps default. SV finished
+    # cleanly at the timeout boundary, but the run cancelled before PA +
+    # canaries + commit could fire — 800+ fresh listings landed in the
+    # runner working tree and nowhere else. 240 min restores the
+    # 60-min PA+canary+commit+deploy budget the prior bump targeted,
+    # measured from the new (slower) SV duration. If the next post-bump
+    # nightly still cancels, the next move is per-source rate-limit
+    # tuning, not another timeout bump.
+    timeout-minutes: 240
     permissions:
       contents: write       # commit refreshed web/data/ back
       pull-requests: write  # gh pr create — main is PR-protected (#29's flow)
