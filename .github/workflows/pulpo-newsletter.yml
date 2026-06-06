@@ -61,8 +61,17 @@ on:
         options: ["no", "yes"]
 
 concurrency:
-  group: pulpo-newsletter
-  cancel-in-progress: true
+  # Admin PREVIEW test-sends (workflow_dispatch + preview_cohorts set) get
+  # a UNIQUE per-run group, so firing several test-sends in quick
+  # succession no longer cancels each other mid-run (the bug: two weekly
+  # tests → one cancelled → only one email arrived). Everything else — the
+  # real audience send, scheduled runs — shares one `…-audience` group with
+  # cancel-in-progress, so two live blasts can never overlap.
+  group: >-
+    ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.preview_cohorts != '')
+        && format('pulpo-newsletter-preview-{0}', github.run_id)
+        || 'pulpo-newsletter-audience' }}
+  cancel-in-progress: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.preview_cohorts != '') }}
 
 jobs:
   build:

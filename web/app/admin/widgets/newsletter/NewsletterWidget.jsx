@@ -1215,7 +1215,12 @@ export function NewsletterWidget() {
         runsUrl: body.runs_url || null,
         when,
       });
-      setLocalEntries(appendLogEntry({ ...baseEntry, result: "ok" }));
+      // The weekly goes through an async GitHub-Actions workflow — we only
+      // know the run was DISPATCHED, not that Resend actually delivered.
+      // Log it as "dispatched" (not "ok"/"Sent") so the log doesn't claim a
+      // delivery it can't confirm. (The Welcome path IS synchronous, so it
+      // logs the real sent/skipped/failed outcome above.)
+      setLocalEntries(appendLogEntry({ ...baseEntry, result: "dispatched" }));
     } catch (err) {
       const msg = String(err && err.message || err);
       setStatusFor(newsletterId, { kind: "error", message: msg });
@@ -1702,9 +1707,25 @@ export function NewsletterWidget() {
                         <td className="nl-log-to" title={entry.to}>{entry.to}</td>
                         <td className="nl-log-locale">{entry.locale}</td>
                         <td className="nl-log-by" title={entry.by || ""}>{entry.by || "—"}</td>
-                        <td className={`nl-log-result ${entry.result === "ok" ? "ok" : "err"}`} title={entry.detail || ""}>
-                          {entry.result === "ok" ? "✓ Sent" : "✗ Failed"}
-                        </td>
+                        {(() => {
+                          // Accurate per-result label — not just ok-vs-Failed.
+                          // "dispatched" = weekly async (queued, not confirmed);
+                          // dry_run/skipped are NOT failures.
+                          const map = {
+                            ok:         ["✓ Sent", "ok"],
+                            dispatched: ["↗ Dispatched", ""],
+                            dry_run:    ["○ Dry-run", ""],
+                            skipped:    ["⊘ Skipped", ""],
+                            failed:     ["✗ Failed", "err"],
+                            error:      ["✗ Error", "err"],
+                          };
+                          const [label, cls] = map[entry.result] || [`✗ ${entry.result || "?"}`, "err"];
+                          return (
+                            <td className={`nl-log-result ${cls}`} title={entry.detail || ""}>
+                              {label}
+                            </td>
+                          );
+                        })()}
                       </tr>
                     );
                   })}
