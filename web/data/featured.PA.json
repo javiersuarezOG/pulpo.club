@@ -18,23 +18,23 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-02T08:37:00.265264+00:00",
-  "expires_at": "2026-06-03T00:00:00+00:00",
+  "picked_at": "2026-06-06T20:32:42.883851+00:00",
+  "expires_at": "2026-06-07T00:00:00+00:00",
   "tier": "soft",
   "listing_id": "encuentra24|32401910",
-  "rank_score": 69.3,
+  "rank_score": 68.65,
   "hero_photo_quality_score": 80,
   "fallback": true,
   "pool": [
     {
       "listing_id": "encuentra24|32401910",
-      "rank_score": 69.3,
+      "rank_score": 68.65,
       "hero_photo_quality_score": 80,
       "photos_count": 14
     },
     {
       "listing_id": "encuentra24|31812515",
-      "rank_score": 68.25,
+      "rank_score": 67.65,
       "hero_photo_quality_score": 50,
       "photos_count": 19
     }
@@ -42,7 +42,7 @@
   "picks_for_proof_row": [
     {
       "listing_id": "encuentra24|32401910",
-      "rank_score": 69.3,
+      "rank_score": 68.65,
       "master_category": "beach",
       "subcategory": "condos",
       "star_rating": 3.5,
@@ -51,7 +51,7 @@
     },
     {
       "listing_id": "encuentra24|31812515",
-      "rank_score": 68.25,
+      "rank_score": 67.65,
       "master_category": "beach",
       "subcategory": "homes",
       "star_rating": 3.5,
@@ -60,7 +60,7 @@
     },
     {
       "listing_id": "encuentra24|32411310",
-      "rank_score": 56.15,
+      "rank_score": 59.3,
       "master_category": null,
       "subcategory": "homes",
       "star_rating": 3.0,

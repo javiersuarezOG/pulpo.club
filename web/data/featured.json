@@ -1,5 +1,4 @@
 {
-  "tier": "elite",
   "criteria": {
     "elite": {
       "min_rank": 75.0,
@@ -11,86 +10,99 @@
       "min_rank": 65.0,
       "min_photos": 5,
       "max_days": 30
+    },
+    "proof_row": {
+      "min_rank_strict": 75.0,
+      "min_rank_relaxed": 50.0,
+      "max_days": 60,
+      "pick_count": 3
     }
   },
-  "picked_at": "2026-05-07T14:56:29.233690+00:00",
-  "expires_at": "2026-05-08T00:00:00+00:00",
-  "listing_id": "bienesraices|1399",
-  "rank_score": 87.5,
+  "picked_at": "2026-06-06T20:21:57.391574+00:00",
+  "expires_at": "2026-06-07T00:00:00+00:00",
+  "tier": "elite",
+  "listing_id": "encuentra24|32426908",
+  "rank_score": 84.31,
   "hero_photo_quality_score": null,
   "fallback": false,
   "pool": [
     {
-      "listing_id": "bienesraices|1399",
-      "rank_score": 87.5,
+      "listing_id": "encuentra24|32426908",
+      "rank_score": 84.31,
       "hero_photo_quality_score": null,
-      "photos_count": 28
-    },
-    {
-      "listing_id": "goodlife|apartments-in-el-zonte",
-      "rank_score": 87.5,
-      "hero_photo_quality_score": null,
-      "photos_count": 8
-    },
-    {
-      "listing_id": "goodlife|oceanview-land-near-el-tunco-3-63-acres-980000",
-      "rank_score": 82.89,
-      "hero_photo_quality_score": null,
-      "photos_count": 9
-    },
-    {
-      "listing_id": "bienesraices|2059",
-      "rank_score": 82.71,
-      "hero_photo_quality_score": null,
-      "photos_count": 24
-    },
-    {
-      "listing_id": "bienesraices|1349",
-      "rank_score": 82.41,
-      "hero_photo_quality_score": null,
-      "photos_count": 9
+      "photos_count": 12
     },
     {
       "listing_id": "bienesraices|1529",
-      "rank_score": 80.04,
+      "rank_score": 80.93,
+      "hero_photo_quality_score": 100,
+      "photos_count": 24
+    },
+    {
+      "listing_id": "bienesraices|1424",
+      "rank_score": 79.9,
+      "hero_photo_quality_score": 90,
+      "photos_count": 8
+    },
+    {
+      "listing_id": "bienesraices|2059",
+      "rank_score": 79.86,
       "hero_photo_quality_score": null,
       "photos_count": 24
     },
     {
-      "listing_id": "bienesraices|1875",
-      "rank_score": 79.74,
-      "hero_photo_quality_score": null,
-      "photos_count": 29
-    },
-    {
-      "listing_id": "bienesraices|1424",
-      "rank_score": 79.45,
-      "hero_photo_quality_score": null,
-      "photos_count": 8
-    },
-    {
-      "listing_id": "bienesraices|1559",
-      "rank_score": 79.39,
-      "hero_photo_quality_score": null,
-      "photos_count": 29
-    },
-    {
-      "listing_id": "goodlife|2201-97m2-lot-with-panoramic-view-in-chiltiupan-195000",
-      "rank_score": 76.86,
-      "hero_photo_quality_score": null,
-      "photos_count": 9
-    },
-    {
       "listing_id": "bienesraices|1783",
-      "rank_score": 75.72,
-      "hero_photo_quality_score": null,
+      "rank_score": 77.29,
+      "hero_photo_quality_score": 100,
       "photos_count": 20
     },
     {
-      "listing_id": "bienesraices|1158",
-      "rank_score": 75.36,
-      "hero_photo_quality_score": null,
-      "photos_count": 35
+      "listing_id": "bienesraices|2191",
+      "rank_score": 76.42,
+      "hero_photo_quality_score": 100,
+      "photos_count": 18
+    },
+    {
+      "listing_id": "bienesraices|1875",
+      "rank_score": 76.17,
+      "hero_photo_quality_score": 100,
+      "photos_count": 29
+    },
+    {
+      "listing_id": "bienesraices|2258",
+      "rank_score": 75.35,
+      "hero_photo_quality_score": 100,
+      "photos_count": 18
     }
-  ]
+  ],
+  "picks_for_proof_row": [
+    {
+      "listing_id": "xitios|venta-de-casa-playa-xanadu",
+      "rank_score": 83.78,
+      "master_category": "beach",
+      "subcategory": "homes",
+      "star_rating": 4.5,
+      "hero_eligible": true,
+      "card_eligible": true
+    },
+    {
+      "listing_id": "citymax|152836",
+      "rank_score": 81.68,
+      "master_category": null,
+      "subcategory": "land",
+      "star_rating": 4.5,
+      "hero_eligible": true,
+      "card_eligible": true
+    },
+    {
+      "listing_id": "remax|002282623028",
+      "rank_score": 79.35,
+      "master_category": "beach",
+      "subcategory": "land",
+      "star_rating": 4.5,
+      "hero_eligible": true,
+      "card_eligible": true
+    }
+  ],
+  "proof_row_tier": "strict"
 }
