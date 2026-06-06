@@ -118,7 +118,10 @@ def find_clerk_user_by_email(email: str) -> Optional[ClerkUser]:
     if not secret or not email:
         return None
     email_norm = email.strip().lower()
-    url = f"{CLERK_API_BASE}/users?email_address[]={email_norm}&limit=1"
+    # URL-encode the email value so special characters can't break the
+    # filter; keep the literal `email_address[]` array-param name.
+    from urllib.parse import quote                                       # noqa: PLC0415
+    url = f"{CLERK_API_BASE}/users?email_address[]={quote(email_norm, safe='')}&limit=1"
     headers = {"Authorization": f"Bearer {secret}"}
     try:
         import httpx                                                     # noqa: PLC0415
@@ -131,6 +134,15 @@ def find_clerk_user_by_email(email: str) -> Optional[ClerkUser]:
     if not isinstance(rows, list) or not rows:
         return None
     user = _parse_clerk_user(rows[0])
+    # SECURITY / correctness: only proceed if the returned user's email is
+    # EXACTLY the one we queried. Clerk's email filter has been observed to
+    # return the first user (not a real match) for a non-existent address,
+    # which let the dispatcher send a welcome to an arbitrary email
+    # (personalised to a random user). The exact-match guard makes a
+    # bogus/unmatched address resolve to None → clerk_lookup_failed → no
+    # send, regardless of what the filter returns.
+    if user is None or (user.email or "").strip().lower() != email_norm:
+        return None
     return user
 
 
