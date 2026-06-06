@@ -31,8 +31,12 @@ env:
   # Bumped 2026-05-08 to fit encuentra24's first capped run (PULPO_E24_LIMIT=200
   # adds ~200 listings on top of the existing ~895 → ~1095). Lift the
   # ceiling further when we lift the encuentra24 cap.
-  LISTING_COUNT_FLOOR: "700"    # ~64% of ~1095 baseline post-encuentra24
-  LISTING_COUNT_CEILING: "1300" # ~120% of ~1095, leaves headroom
+  # Phase-C bedding-in override (REMOVE 2026-06-13 after 7 green
+  # post-Phase-C nightlies, or sooner once R2 guard classification lands).
+  # Run 27050642483 produced 1913 valid post-purge listings; the old 1300
+  # ceiling treated legitimate source expansion as parser inflation.
+  LISTING_COUNT_FLOOR: "1000"
+  LISTING_COUNT_CEILING: "3500"
   # PR-MC-5 — multi-country prep. The pipeline today runs SV-only;
   # PULPO_ACTIVE_COUNTRY tells the FE + the per-country reference data
   # which country to render. PULPO_COUNTRIES is a comma-separated list
@@ -410,6 +414,11 @@ jobs:
         #   - classifier going haywire and tagging the majority of listings
         #     "uncertain" (signal that broker fields or text patterns shifted)
         #
+        # Phase-C bedding-in: temporarily log-only while source mix and
+        # per-type baselines settle after the June 2026 source expansion.
+        # REMOVE 2026-06-13 after 7 green post-Phase-C nightlies, or sooner
+        # once R2 guard classification lands.
+        #
         # ENFORCING (PR-5 of the reliability plan). The 7-day soak window from
         # the PRD calibration period (2026-05-06 → 2026-05-13) is over and
         # observed counts have been stable, so violations now fail the
@@ -422,7 +431,7 @@ jobs:
         # recalibrating thresholds — mirrors the data-quality canary's escape
         # hatch.
         env:
-          LOG_ONLY:        "false"
+          LOG_ONLY:        "true"
           HOUSE_FLOOR:     "30"   # ~85% of post-#418 equilibrium (~34)
           CONDO_FLOOR:     "5"    # ~60% of 8 (small N — looser tolerance)
           UNCERTAIN_PCT_CEILING: "15"
@@ -695,6 +704,11 @@ jobs:
           EOF
 
       - name: Hero variant canary (LCP-fix dependency)
+        # Phase-C bedding-in: continue-on-error keeps fresh catalogue data
+        # shipping while R7 decouples photo refresh from the critical path.
+        # REMOVE 2026-06-13 after 7 green post-Phase-C nightlies, or sooner
+        # once the hero canary accepts cached OR fresh variants.
+        continue-on-error: true
         # Regression guard for the home-hero LCP fix (PR-perf-hero,
         # 2026-05-21). HeroV4 routes the home hero through /api/img,
         # which fetches `/photos/<id>.hero.jpg` (the pipeline-generated

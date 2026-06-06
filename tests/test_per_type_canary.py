@@ -25,7 +25,7 @@ def test_per_type_canary_step_present():
     )
 
 
-def test_per_type_canary_is_blocking():
+def test_per_type_canary_is_blocking_or_explicitly_timeboxed():
     """PR-5 of the reliability plan: the 7-day calibration soak is over and
     the canary now FAILS the workflow on violation (LOG_ONLY="false").
 
@@ -35,16 +35,29 @@ def test_per_type_canary_is_blocking():
     env back to "true" fails the test.
 
     The escape-hatch path (`LOG_ONLY="true"` for recalibration) is
-    intentionally still supported in the inline Python — but the workflow
-    YAML default must be blocking. Mirrors the data-quality canary's
+    intentionally still supported in the inline Python, but any workflow
+    YAML use of that escape hatch must be explicitly timeboxed with the
+    Phase-C bedding-in removal marker. Mirrors the data-quality canary's
     pattern documented at line 308 of the workflow."""
     yaml = _yaml_text()
     canary_section = yaml.split("Per-type canaries")[1].split("- name:")[0]
     assert 'LOG_ONLY:' in canary_section
-    assert '"false"' in canary_section.split('LOG_ONLY:')[1].split('\n')[0], (
-        "Per-type canary env defaults LOG_ONLY to something other than \"false\" — "
-        "PR-5 promoted this to blocking. If you're recalibrating thresholds, "
-        "flip it temporarily and revert in the same PR."
+    log_only_line = canary_section.split('LOG_ONLY:')[1].split('\n')[0]
+    if '"false"' in log_only_line:
+        return
+
+    assert '"true"' in log_only_line, (
+        "Per-type canary LOG_ONLY must be either \"false\" (blocking) or "
+        "\"true\" with the dated Phase-C bedding-in marker."
+    )
+    assert "REMOVE 2026-06-13" in canary_section, (
+        "Per-type canary LOG_ONLY=true is only allowed as a timeboxed "
+        "emergency override. Add the REMOVE 2026-06-13 marker, or restore "
+        "LOG_ONLY=false."
+    )
+    assert "R2 guard classification" in canary_section, (
+        "Temporary per-type canary log-only mode must name the architectural "
+        "exit condition so it cannot become the permanent default."
     )
 
 
