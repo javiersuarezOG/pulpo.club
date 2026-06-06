@@ -67,8 +67,8 @@
       "children": ["Lago de Ilopango"]
     }
   ],
-  "listing_count_floor": 700,
-  "listing_count_ceiling": 1300,
+  "listing_count_floor": 1000,
+  "listing_count_ceiling": 3500,
   "newsletter_audience_segment": "sv",
   "_data_provenance": "PR-MC-1b — reference data lifted as-is from pulpo/normalize.py (_DEPT_CANONICAL), pulpo/ranker_legs/location.py (ZONE_TIER), automation/property_types.py (VACATION_ZONES), automation/distance_fields.py (NAMED_BEACHES, AIRPORTS_LAT_LNG), pulpo/airports.py (ZONE_AIRPORT_DISTANCES_KM), automation/validation_bounds.py (BOUNDS_BY_TYPE + COASTAL_ZONES). Parity tests in tests/test_country_manifest.py enforce no drift. PR-MC-1c will switch consumers to read from this manifest.",
   "departments": {
