@@ -1,0 +1,22 @@
+{
+  "en": {
+    "candidates_seen": 0,
+    "llm_cost_usd": 0.0,
+    "paragraph": "El Salvador is widening the CA-2 coast highway by 8.2 km from Xanadú to El Zonte, going from two lanes to four. The $65M plan adds sidewalks, bike paths, three bridges over the Huiza River, wastewater treatment for six beaches, and smart traffic monitoring. If you're eyeing a lot near El Zonte or El Sunzal, easier access and new sanitation tend to lift both day-to-day livability and resale value.",
+    "picked_at": "2026-06-06",
+    "source_date": "7 Oct 2025",
+    "source_name": "El Diario de Hoy",
+    "source_url": "https://www.elsalvador.com/noticias/nacional/surf-city-2-el-salvador-playas-construccion-de-carreteras/1245633/2025/",
+    "title": "Surf City II widens the El Zonte coast road"
+  },
+  "es": {
+    "candidates_seen": 0,
+    "llm_cost_usd": 0.0,
+    "paragraph": "El Salvador amplía 8.2 km de la carretera CA-2 entre Xanadú y El Zonte, pasando de dos a cuatro carriles. El plan de $65 millones suma aceras, ciclovías, tres puentes sobre el río Huiza, plantas de tratamiento para seis playas y monitoreo inteligente del tráfico. Si estás viendo un lote cerca de El Zonte o El Sunzal, mejor acceso y nuevo saneamiento suelen subir tanto la habitabilidad como el valor de reventa.",
+    "picked_at": "2026-06-06",
+    "source_date": "7 oct 2025",
+    "source_name": "El Diario de Hoy",
+    "source_url": "https://www.elsalvador.com/noticias/nacional/surf-city-2-el-salvador-playas-construccion-de-carreteras/1245633/2025/",
+    "title": "Surf City II amplía la carretera hacia El Zonte"
+  }
+}

@@ -49,13 +49,18 @@ from ..types import Issue
 #   v4.0 (2026-05-30) — locked card component · section intros ·
 #       Weekly News Spotlight · Your Pulpo cream cards · footer pill
 #       buttons · skip + next-issue blocks removed
-TEMPLATE_VERSION = "newsletter-v4.4-2026-06-01"
+#   v4.5 (2026-06-06) — Weekly News Spotlight now READS from the committed
+#       artifact (web/data/news_spotlight.json, nightly carry-forward) so
+#       every Pro email cites a real outlet article; the source-less
+#       "Pulpo Pro coastal scan" filler is retired and the section is
+#       omitted entirely on a cold start. Spotlight HTML changed.
+TEMPLATE_VERSION = "newsletter-v4.5-2026-06-06"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-01"
+LAST_UPDATED = "2026-06-06"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -86,8 +91,11 @@ LAST_UPDATED = "2026-06-01"
 #   welcome-v1.0 (2026-06-01) — initial ship. Welcome hero + "How
 #       Pulpo works" 3-beat block + cadence note + "Your first 10
 #       picks" section intro + "Start here" onboarding cards.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.0-2026-06-02"
-WELCOME_LAST_UPDATED = "2026-06-02"
+#   welcome-v2.1 (2026-06-06) — inherits the v4.5 Weekly News Spotlight
+#       change (real-article artifact read, filler retired). Welcome body
+#       carries the spotlight, so its HTML changed.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.1-2026-06-06"
+WELCOME_LAST_UPDATED = "2026-06-06"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -107,8 +115,11 @@ WELCOME_LAST_UPDATED = "2026-06-02"
 #       welcome.* strings via i18n.welcome_text, so it can't drift from
 #       the first-time welcome beyond the greeting. Same full weekly body
 #       as the General + first-time welcome.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.0-2026-06-02"
-WELCOME_BACK_LAST_UPDATED = "2026-06-02"
+#   welcome-back-v1.1 (2026-06-06) — inherits the v4.5 Weekly News
+#       Spotlight change (real-article artifact read, filler retired).
+#       Welcome-back body carries the spotlight, so its HTML changed.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.1-2026-06-06"
+WELCOME_BACK_LAST_UPDATED = "2026-06-06"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }

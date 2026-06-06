@@ -331,6 +331,64 @@ jobs:
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
 
+      - name: Refresh Weekly News Spotlight artifact
+        # Single writer of web/data/news_spotlight.json. Picks a fresh,
+        # cited article per locale; on a slow news week it carries forward
+        # the most recent real pick (no age cap) so EVERY Pro email — incl.
+        # the Vercel welcome emails that have no DeepSeek key — keeps citing
+        # a real outlet. Best-effort: a flaky fetch must never block the
+        # data PR (the script always exits 0; the freshness canary pages on
+        # a cold-start "no_seed"). Needs the token + network, so it runs
+        # after the pipeline scrape, before the commit.
+        continue-on-error: true
+        env:
+          DEEPSEEK_API_TOKEN: ${{ secrets.DEEPSEEK_API_TOKEN }}
+        run: |
+          python3 scripts/refresh_news_spotlight.py --locales en,es \
+            || echo "::warning::news-spotlight refresh failed (non-blocking; carry-forward holds)"
+
+      - name: News spotlight freshness canary (Slack)
+        # Carry-forward means this should never fire once the artifact is
+        # seeded. A locale with no real spotlight = cold start or a
+        # corrupted artifact — page so a Pro email never silently ships
+        # without its news block. Best-effort + never blocks the deploy.
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys, urllib.request
+          REQUIRED = ("en", "es")
+          path = "web/data/news_spotlight.json"
+          missing = []
+          try:
+              data = json.load(open(path, encoding="utf-8"))
+          except (FileNotFoundError, json.JSONDecodeError):
+              data = {}
+          for lc in REQUIRED:
+              e = data.get(lc) if isinstance(data, dict) else None
+              if not (isinstance(e, dict) and e.get("title") and e.get("paragraph") and e.get("source_url")):
+                  missing.append(lc)
+          if not missing:
+              print(f"news-spotlight canary OK — {', '.join(REQUIRED)} all carry a cited article")
+              sys.exit(0)
+          msg = (f":rotating_light: Pulpo news-spotlight EMPTY for locale(s): "
+                 f"{', '.join(missing)} — Pro emails will ship without a news block. "
+                 f"Run scripts/refresh_news_spotlight.py with DEEPSEEK_API_TOKEN to seed.")
+          print(f"::warning::{msg}")
+          hook = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+          if not hook:
+              print("SLACK_WEBHOOK_URL unset; skipping Slack page.")
+              sys.exit(0)
+          try:
+              req = urllib.request.Request(
+                  hook, data=json.dumps({"text": msg}).encode("utf-8"),
+                  headers={"Content-Type": "application/json"})
+              urllib.request.urlopen(req, timeout=10)
+          except Exception as exc:  # noqa: BLE001
+              print(f"Slack page failed (non-blocking): {exc!r}")
+          EOF
+
       - name: Source-health Slack alert (pre-canary)
         # Pulpo's scheduled watchdog (pulpo-watchdog.yml) reads
         # source_health_history.jsonl from `main`. The data PR commit
@@ -835,6 +893,11 @@ jobs:
           # they can be debugged without re-running the pipeline.
           git add web/data/llm_enrichment.json 2>/dev/null || true
           git add web/data/llm_enrichment_log.jsonl 2>/dev/null || true
+          # Weekly News Spotlight carry-forward artifact — refreshed above
+          # by scripts/refresh_news_spotlight.py. Read by every Pro email
+          # (build_issue._make_news_spotlight); committing it nightly is
+          # what makes carry-forward survive across runs.
+          git add web/data/news_spotlight.json 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           # Plan v2 — hires derivatives + sidecars + quarantine markers + hash cache
           git add "web/photos-hires/" 2>/dev/null || true
