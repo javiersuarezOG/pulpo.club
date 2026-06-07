@@ -68,7 +68,7 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 
-from automation._atomic import atomic_write_json
+from automation.country_sidecars import write_json_sidecar
 from pulpo.derived_rules import _g
 from pulpo.filter_config import STRICTNESS_LEVELS as LEVELS
 
@@ -253,5 +253,5 @@ def write_audit(
         level = "moderate"
     audit = compute_audit(listings, active_level=level)
     out_path = Path(web_data_dir) / "shelf_audit.json"
-    atomic_write_json(out_path, audit, indent=2, sort_keys=True, trailing_newline=True)
+    write_json_sidecar(out_path, audit)
     return audit
