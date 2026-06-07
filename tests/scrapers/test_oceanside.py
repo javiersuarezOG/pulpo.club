@@ -273,3 +273,62 @@ def test_map_land_path_unchanged_no_type_specific_fields():
     assert out["property_type"] == "land"
     assert "bedrooms" not in out
     assert "bathrooms" not in out
+
+
+# ── _PRICE_RE: trailing-comma regression (PR #760 audit follow-up) ─────
+
+
+def _rec_with_content(content_html: str, _id: int = 11000) -> dict:
+    """Synthetic listing record carrying just the content blob we want
+    to exercise the price regex against. Other fields are minimal."""
+    return {
+        "id": _id,
+        "title":   {"rendered": "OCEAN VIEW LOT"},
+        "content": {"rendered": content_html},
+        "link":    f"https://oceansideelsalvador.com/rental-details/lot-{_id}/",
+        "modified": "2026-04-20T12:00:00",
+        "class_list": ["location-la-libertad"],
+        "property-type": [122],
+        "featured_media": 12347,
+    }
+
+
+def test_price_regex_does_not_end_on_trailing_comma():
+    """Real bug surfaced by the field-audit acceptance gate (PR #760)
+    on 2026-06-07: source_id=11000 ("OCEAN VIEW LOT IN CERROMAR") had
+    `raw_price_text='$60,'` — the pre-fix `_PRICE_RE = [\\d,]+` greedily
+    matched the trailing thousands separator when no further digits
+    followed. The fix requires the captured group to end on a digit."""
+    rec = _rec_with_content("<p>Priced at $60, beautiful lot for sale.</p>")
+    out = _map(rec, land_term_id=122, broker_type="land")
+    assert out is not None
+    # The fix MUST not capture the trailing comma. Before the fix
+    # raw_price_text was literally "$60,".
+    assert out["raw_price_text"] in {"$60", "$6"}
+    assert not out["raw_price_text"].endswith(",")
+
+
+def test_price_regex_still_captures_thousands_separators():
+    """Regression guard: the bug fix must NOT break the normal
+    "$60,000" / "$187,916.80" path that the existing
+    test_map_produces_price already exercises in a coarser form."""
+    rec = _rec_with_content("<p>Lot for $187,916.80 today.</p>")
+    out = _map(rec, land_term_id=122, broker_type="land")
+    assert out is not None
+    assert out["raw_price_text"] == "$187,916.80"
+
+
+def test_price_regex_handles_plain_integer():
+    """No commas → just digits."""
+    rec = _rec_with_content("<p>Asking $60.</p>")
+    out = _map(rec, land_term_id=122, broker_type="land")
+    assert out is not None
+    assert out["raw_price_text"] == "$60"
+
+
+def test_price_regex_handles_multi_thousand_separators():
+    """Multiple commas in a row, e.g. $1,250,000."""
+    rec = _rec_with_content("<p>Listed at $1,250,000 today.</p>")
+    out = _map(rec, land_term_id=122, broker_type="land")
+    assert out is not None
+    assert out["raw_price_text"] == "$1,250,000"
