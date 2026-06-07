@@ -50,7 +50,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
-from automation._atomic import atomic_write_json
+from automation.country_sidecars import write_json_sidecar
 from pulpo.scrapers.lib.dedup_hasher import listing_fingerprint
 
 
@@ -128,11 +128,5 @@ def write_audit(
     """
     audit = compute_audit(listings)
     out_path = Path(web_data_dir) / "dedup_audit.json"
-    atomic_write_json(
-        out_path,
-        audit,
-        indent=2,
-        sort_keys=True,
-        trailing_newline=True,
-    )
+    write_json_sidecar(out_path, audit)
     return audit
