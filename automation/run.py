@@ -1611,19 +1611,16 @@ def main() -> int:
         from automation.listing_ledger import (
             load_ledger, save_ledger, update_ledger,
         )
+        from automation.source_run_state import succeeded_sources_for_ledger
         ledger_path = web_data_dir / "listings_ledger.json"
         ledger = load_ledger(ledger_path)
         present_keys_by_source: dict[str, set[str]] = {}
         for li in listings:
             present_keys_by_source.setdefault(li.source, set()).add(str(li.source_id))
-        # A source "succeeded" if it isn't in source_errors. Sources
-        # that never registered (typos, kazu-style unknown_source) are
-        # naturally absent from REGISTRY and so aren't in succeeded_sources
-        # either — their listings carry forward unchanged per the
-        # source_succeeded=False semantics.
-        succeeded_sources = {
-            slug for slug in REGISTRY.keys() if slug not in source_errors
-        }
+        # A source "succeeded" only if this run actually attempted it and
+        # it did not error. Scoped dev runs (PULPO_SOURCES=nexo) must not
+        # mark every other registered source as successful-but-absent.
+        succeeded_sources = succeeded_sources_for_ledger(sources, source_errors)
         ledger = update_ledger(
             ledger=ledger,
             present_keys_by_source=present_keys_by_source,
