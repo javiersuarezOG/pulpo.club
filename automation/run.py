@@ -2273,6 +2273,62 @@ def main() -> int:
     except Exception as _e:  # noqa: BLE001
         print(f"[kpi] failed (non-fatal): {_e!r}")
 
+    # R1 — durable candidate bundle BEFORE the guards.
+    #
+    # Write a self-contained snapshot of the candidate to
+    # web/data/.staging/<run_id>/ so a downstream guard failure cannot
+    # strand fresh inventory. If the population guard below fires, the
+    # bundle still exists on disk and the workflow uploads it as
+    # candidate_bundle_<run_id>; a human can then promote it manually
+    # via scripts/promote_candidate.py.
+    #
+    # Flag-gated for one-toggle revert without a code change:
+    #   PULPO_R1_BUNDLE_ENABLED=0  →  skip the bundle write (legacy behavior)
+    # See docs/RESILIENCE-AUDIT-PRD.md § R1.
+    if os.environ.get("PULPO_R1_BUNDLE_ENABLED", "1") == "1":
+        try:
+            from automation import candidate_bundle as _cbund
+
+            _cb_run_id = _cbund.resolve_run_id()
+            _cb_staging = _cbund.staging_dir_for(web_data_dir, run_id=_cb_run_id)
+            _cb_ranked_dicts = [li.to_dict() for li in ranked]
+            _cb_meta_stub = {
+                "schema_version": _cbund.BUNDLE_SCHEMA_VERSION,
+                "run_id":         _cb_run_id,
+                "candidate":      True,
+                "visible_count":  len(_cb_ranked_dicts),
+                "started_at":     started.isoformat(),
+                "candidate_generated_at": datetime.now(timezone.utc).isoformat(),
+                "offline":        offline,
+            }
+            _cb_manifest = _cbund.write_candidate_bundle(
+                _cb_staging,
+                run_id=_cb_run_id,
+                ranked_dicts=_cb_ranked_dicts,
+                meta=_cb_meta_stub,
+                sidecars={
+                    "shelf_audit.json":               web_data_dir / "shelf_audit.json",
+                    "kpi_dashboard.json":             web_data_dir / "kpi_dashboard.json",
+                    "dedup_audit.json":               web_data_dir / "dedup_audit.json",
+                    "photo_contract.json":            web_data_dir / "photo_contract.json",
+                    "source_health_history.jsonl":   web_data_dir / "source_health_history.jsonl",
+                    "run_history.json":               web_data_dir / "run_history.json",
+                },
+            )
+            print(f"[candidate] written run_id={_cb_manifest.run_id} "
+                  f"files={len(_cb_manifest.files)} visible={_cb_manifest.visible_count} "
+                  f"path={_cb_staging}")
+            _ph_capture("nightly_candidate_written", {
+                "run_id":        _cb_manifest.run_id,
+                "visible_count": _cb_manifest.visible_count,
+                "file_count":    len(_cb_manifest.files),
+                "staging_path":  str(_cb_staging.relative_to(REPO)),
+            })
+        except Exception as _e:  # noqa: BLE001 — bundle write must never fail the run
+            print(f"[candidate] bundle write FAILED (non-fatal): {_e!r}", file=sys.stderr)
+    else:
+        print("[candidate] skipped (PULPO_R1_BUNDLE_ENABLED=0)")
+
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
     # population rates against the new ones, and fail the run if any
