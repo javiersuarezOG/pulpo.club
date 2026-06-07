@@ -22,6 +22,7 @@ from pulpo.cli import _row, CSV_FIELDS
 from automation.validation import validate as _validate
 from automation.field_audit import build_completeness_block
 from automation._atomic import atomic_write_json
+from automation.country_sidecars import country_path
 from pulpo.countries import active as _active_country, data_filename as _data_filename
 
 
@@ -93,12 +94,18 @@ def phase_validate(
             bucket["pass"] += 1
             kept.append(li)
 
-    # Write validation log
+    # Write validation log. Keep the legacy filename for current readers
+    # and a country-scoped sibling so PA/SV shards do not overwrite each
+    # other's operator diagnostics.
     web_data_dir.mkdir(parents=True, exist_ok=True)
     val_log_path = web_data_dir / "validation_log.jsonl"
-    with val_log_path.open("w", encoding="utf-8") as f:
-        for entry in val_log_entries:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    val_lines = "".join(
+        json.dumps(entry, ensure_ascii=False) + "\n"
+        for entry in val_log_entries
+    )
+    for path in {val_log_path, country_path(val_log_path)}:
+        with path.open("w", encoding="utf-8") as f:
+            f.write(val_lines)
 
     # Legacy price-outlier log stub (kept so the commit step's git add
     # doesn't fail — file existed before validation_log.jsonl took over).
