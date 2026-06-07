@@ -6,6 +6,7 @@ import { uspsVisibleFor } from "./lib/gating.ts";
 import { categoryImageForListing } from "./assets/categories";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { buildSrcSet } from "./lib/img-url";
+import { deriveLocationPrecision } from "./lib/location-precision";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -92,6 +93,54 @@ function formatDistanceKm(km, listing) {
   const step = (!hasLatLng || conf === "low") ? 10 : 5;
   const rounded = Math.max(step, Math.round(km / step) * step);
   return { n: rounded, approx: true };
+}
+
+// Location-precision note rendered inside the detail-page Location
+// section. Driven by deriveLocationPrecision (see ./lib/location-
+// precision.ts) — the FE was previously blind to ranked.json's
+// `geocoding_source` and showed all coordinates as if they were
+// broker-precise. The "approximate" variant carries the visit-time
+// warning so users planning a trip know to confirm the address.
+// Renders nothing when no geocoding ran at all — the surface should
+// not claim precision it does not have.
+export function LocationPrecisionNote({ listing }) {
+  if (!listing) return null;
+  const tier = deriveLocationPrecision(listing);
+  if (tier === "unknown") return null;
+  const lc = currentLocale();
+  if (tier === "precise") {
+    return (
+      <p
+        className="location-precision-note location-precision-note--precise"
+        data-precision="precise"
+      >
+        <Icon name="check" size={13} strokeWidth={1.8} />
+        <span>{t("detail.location.precision.precise.title", lc)}</span>
+      </p>
+    );
+  }
+  // Approximate — show the body warning + the geocoder's anchor when
+  // present (e.g. "Near Playa El Tunco, Tamanique..."). The anchor is
+  // optional; older listings can have a null reference.
+  const reference = (listing.geocoding_reference || "").trim();
+  return (
+    <p
+      className="location-precision-note location-precision-note--approximate"
+      data-precision="approximate"
+    >
+      <Icon name="info" size={13} strokeWidth={1.8} />
+      <span>
+        <strong>{t("detail.location.precision.approximate.title", lc)}.</strong>{" "}
+        {t("detail.location.precision.approximate.body", lc)}
+        {reference && (
+          <>
+            {" "}
+            <span className="location-precision-note__reference">{reference}</span>
+          </>
+        )}
+      </span>
+    </p>
+  );
 }
 
 // ===== Icons (inline SVG, Lucide-style) =====
