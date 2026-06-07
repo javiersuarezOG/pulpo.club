@@ -149,6 +149,36 @@ def test_parse_extracts_photos_from_real_alterestate_shape():
     ], "featured_image must come first, gallery_image follows in order"
 
 
+def test_parse_prepends_og_image_when_missing_from_next_data():
+    """Regression: AlterEstate can expose the broker cover photo only in
+    og:image, while __NEXT_DATA__.gallery_image starts at the second gallery
+    photo. The intended cover must still be photo_urls[0]."""
+    import json
+    s = BienesRaicesScraper()
+    payload = {"props": {"pageProps": {"property": {
+        "name": "Terreno Playa Torola",
+        "category": {"name": "Terreno"},
+        "cid": "1404",
+        "agents": [],
+        "description": "",
+        "gallery_image": [
+            {"image": "https://assets.easybroker.com/property_images/5156957/88570576/EB-SU6957.jpg"},
+            {"image": "https://assets.easybroker.com/property_images/5156957/88570588/EB-SU6957.jpg"},
+        ],
+    }}}}
+    html = (
+        '<meta property="og:image" content="https://assets.easybroker.com/property_images/5156957/88570575/EB-SU6957.jpg"/>'
+        f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(payload)}</script>'
+    )
+    result = s._parse(html, "https://example.com")
+    assert result is not None
+    assert result["photo_urls"][:3] == [
+        "https://assets.easybroker.com/property_images/5156957/88570575/EB-SU6957.jpg",
+        "https://assets.easybroker.com/property_images/5156957/88570576/EB-SU6957.jpg",
+        "https://assets.easybroker.com/property_images/5156957/88570588/EB-SU6957.jpg",
+    ]
+
+
 def test_parse_dedupes_when_featured_appears_in_gallery():
     """If featured_image URL also appears in gallery_image, it should not
     appear twice — dedup by exact URL."""
