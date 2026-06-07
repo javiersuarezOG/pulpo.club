@@ -202,16 +202,32 @@ def _detect_zone_desc(text: str) -> tuple[Optional[str], Optional[str], Optional
 # a placeholder like "Contact us" (which the oceanside scraper produces ~26%
 # of the time), and even then we strip future-use phrases first.
 
-# Built-structure keywords: explicit "this is a building" vocabulary. Plurals
-# are required because broker headlines pluralize freely ("Cliffside apartments
-# in El Zonte", "Two Lofts in Tuscania") and missing the trailing `s` silently
+# Condo-specific keywords: apartment / condominium / penthouse / loft / studio
+# vocabulary. These describe shared-amenity built structures that the homepage
+# shelves treat as a distinct cohort (top_beach_condos, top_lake_condos) from
+# detached houses. Checked BEFORE _BUILT_RE because every condo keyword is also
+# matched by _BUILT_RE — if we let _BUILT_RE win, every condo collapses to
+# 'house' and the *_condos shelves never reach the 10-listing activation
+# threshold. ``departamento`` / ``depa`` are common in Central America;
+# ``apartamento`` covers Spain/Mexico-style copy.
+_CONDO_RE = re.compile(
+    r"\b("
+    r"condos?|condominiums?|condominios?|"
+    r"apartments?|apartamentos?|departamentos?|depas?|"
+    r"lofts?|penthouses?|pent[\s-]?house|studios?|studio[\s-]?apartments?"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Built-structure keywords: explicit "this is a building" vocabulary, minus the
+# condo-specific terms (those live in _CONDO_RE and are checked first). Plurals
+# are required because broker headlines pluralize freely ("Cliffside villas in
+# El Zonte", "Two Cabins in Tuscania") and missing the trailing `s` silently
 # drops them into the land pool.
 _BUILT_RE = re.compile(
     r"\b("
     r"houses?|homes?|villas?|mansions?|cabins?|cottages?|bungalows?|"
     r"casas?|chalets?|residencias?|"
-    r"apartments?|apartamentos?|condos?|condominiums?|condominios?|"
-    r"lofts?|penthouses?|studios?|"
     r"hotels?|b&b|"
     r"\d+[\s-]*bed(?:room)?s?|"
     r"\d+[\s-]*dormitorios?|"
@@ -257,12 +273,20 @@ _FUTURE_USE_RE = re.compile(
 _PLACEHOLDER_TITLES = {"", "contact us", "contact", "(untitled)", "untitled"}
 
 def _classify(text: str) -> Optional[str]:
-    """Return 'house' / 'land' / None for a single piece of text."""
+    """Return 'condo' / 'house' / 'land' / None for a single piece of text."""
     if not text:
         return None
-    # Quantity-of-land takes precedence over built keywords in the same string.
+    # Quantity-of-land takes precedence over every built-structure keyword in
+    # the same string — "30 manzanas beachfront El Cuco, suitable for boutique
+    # hotel" is a 30-manzana parcel, not a hotel.
     if _LAND_QTY_RE.search(text):
         return "land"
+    # Condo wins over generic built-structure: every condo keyword is also
+    # matched by _BUILT_RE, so if we checked _BUILT_RE first we'd never emit
+    # 'condo' and the *_condos shelves stay stranded below the 10-listing
+    # activation threshold.
+    if _CONDO_RE.search(text):
+        return "condo"
     if _BUILT_RE.search(text):
         return "house"
     if _LAND_RE.search(text):
@@ -270,7 +294,7 @@ def _classify(text: str) -> Optional[str]:
     return None
 
 def detect_property_type(title: str = "", description: str = "", location_text: str = "") -> str:
-    """Classify a listing as `house` (built structure) or `land` (lot/raw).
+    """Classify a listing as `condo` / `house` / `land`.
 
     Title-first: the title is a terse claim about what the listing IS.
     Description is consulted only when the title is empty / a placeholder,
