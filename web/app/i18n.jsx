@@ -698,6 +698,20 @@ const UI_STRINGS = {
   "detail.reasons":          { en: "Reasons to buy",      es: "Razones para comprar" },
   "detail.key_facts":        { en: "Key facts",           es: "Datos clave" },
   "detail.location":         { en: "Location",            es: "Ubicación" },
+  // Location-precision note rendered next to the zone label on the
+  // detail page. Drives off ranked.json's `geocoding_source` field via
+  // web/app/lib/location-precision.ts. The "approximate" copy carries
+  // the visit-time warning explicitly because the FE has been silently
+  // plotting zone-centroid coordinates as if they were exact.
+  "detail.location.precision.precise.title":
+    { en: "Exact location from broker",
+      es: "Ubicación exacta confirmada por el corredor" },
+  "detail.location.precision.approximate.title":
+    { en: "Approximate location",
+      es: "Ubicación aproximada" },
+  "detail.location.precision.approximate.body":
+    { en: "Based on the broker's published area. Confirm the exact address before visiting.",
+      es: "Basada en la zona publicada por el corredor. Confirma la dirección exacta antes de visitar." },
   "detail.price":            { en: "Price",               es: "Precio" },
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
