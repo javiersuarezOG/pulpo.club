@@ -349,8 +349,13 @@ jobs:
           SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
         run: |
           # Snapshot SV's legacy files; the PA run will dual-write them.
+          # Operator sidecars are included too: PA writes its own
+          # *.PA.* variants, but the legacy filenames must continue to
+          # describe the SV apex deployment.
           mkdir -p /tmp/sv-legacy
-          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+          for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   validation_log.jsonl dedup_audit.json \
+                   shelf_audit.json kpi_dashboard.json; do
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
           done
 
@@ -359,7 +364,9 @@ jobs:
           # Restore SV's legacy files so the apex (pulpo.club) keeps
           # serving SV data. PA-specific outputs (`ranked.PA.json` etc.)
           # are untouched by this restore.
-          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+          for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   validation_log.jsonl dedup_audit.json \
+                   shelf_audit.json kpi_dashboard.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
 
@@ -846,7 +853,9 @@ jobs:
           # data may be missing some nights). When pa.pulpo.club is
           # provisioned, these files become its source of truth.
           for f in ranked.PA.json ranked.list.PA.json \
-                   last_updated.PA.json featured.PA.json; do
+                   last_updated.PA.json featured.PA.json \
+                   validation_log.PA.jsonl dedup_audit.PA.json \
+                   shelf_audit.PA.json kpi_dashboard.PA.json; do
             git add "web/data/$f" 2>/dev/null || true
           done
           # Optional files — only add if they exist
@@ -873,7 +882,9 @@ jobs:
           # before/after diff between two nightly snapshots is the
           # acceptance deliverable for the inventory-expansion workstream.
           git add web/data/shelf_audit.json 2>/dev/null || true
+          git add web/data/shelf_audit.SV.json 2>/dev/null || true
           git add web/data/kpi_dashboard.json 2>/dev/null || true
+          git add web/data/kpi_dashboard.SV.json 2>/dev/null || true
           # PRD B1 — per-scrape coverage log (kept / target_discovered /
           # status). Phase C scrapers consume this via lib/coverage_logger
           # to track stated-vs-actual inventory each nightly.
@@ -882,6 +893,8 @@ jobs:
           # complementary to the phone/coord pair detector. Drives the
           # PRD acceptance criterion "dedup rate documented per source."
           git add web/data/dedup_audit.json 2>/dev/null || true
+          git add web/data/dedup_audit.SV.json 2>/dev/null || true
+          git add web/data/validation_log.SV.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
