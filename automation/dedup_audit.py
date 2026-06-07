@@ -62,10 +62,30 @@ def _source_of(li: Any) -> str:
     return v if isinstance(v, str) and v else "_unknown"
 
 
+def _field(li: Any, name: str) -> Any:
+    if isinstance(li, dict):
+        return li.get(name)
+    return getattr(li, name, None)
+
+
+def _cluster_sample(li: Any) -> dict[str, Any]:
+    """Small listing projection for duplicate-cluster inspection."""
+    return {
+        "source": _source_of(li),
+        "source_id": _field(li, "source_id"),
+        "title": _field(li, "title"),
+        "price_usd": _field(li, "price_usd"),
+        "area_m2": _field(li, "area_m2"),
+        "zone": _field(li, "zone"),
+        "url": _field(li, "url"),
+    }
+
+
 def compute_audit(listings: Iterable[Any]) -> dict[str, Any]:
     """Pure compute — no I/O. Mirrors the JSON shape ``write_audit`` writes."""
     fingerprints_by_source: dict[str, list[str]] = defaultdict(list)
     source_per_fp: dict[str, set[str]] = defaultdict(set)
+    listings_by_fp: dict[str, list[Any]] = defaultdict(list)
     total = 0
 
     for li in listings:
@@ -74,6 +94,7 @@ def compute_audit(listings: Iterable[Any]) -> dict[str, Any]:
         src = _source_of(li)
         fingerprints_by_source[src].append(fp)
         source_per_fp[fp].add(src)
+        listings_by_fp[fp].append(li)
 
     per_source: dict[str, dict[str, int]] = {}
     for source, fps in fingerprints_by_source.items():
@@ -109,12 +130,29 @@ def compute_audit(listings: Iterable[Any]) -> dict[str, Any]:
         for a in sorted(matrix.keys())
     }
 
+    duplicate_clusters = []
+    for fp, rows in listings_by_fp.items():
+        srcs = sorted({_source_of(row) for row in rows})
+        if len(rows) < 2:
+            continue
+        duplicate_clusters.append({
+            "fingerprint": fp,
+            "count": len(rows),
+            "sources": srcs,
+            "cross_source": len(srcs) > 1,
+            "samples": [_cluster_sample(row) for row in rows[:5]],
+        })
+    duplicate_clusters.sort(
+        key=lambda c: (not c["cross_source"], -int(c["count"]), c["fingerprint"])
+    )
+
     return {
         "computed_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "total_in_dataset": total,
         "total_unique_fingerprints": len(source_per_fp),
         "per_source": {k: per_source[k] for k in sorted(per_source.keys())},
         "overlap_matrix": overlap_matrix,
+        "duplicate_clusters": duplicate_clusters,
     }
 
 
@@ -129,4 +167,7 @@ def write_audit(
     audit = compute_audit(listings)
     out_path = Path(web_data_dir) / "dedup_audit.json"
     write_json_sidecar(out_path, audit)
+    clusters = audit.get("duplicate_clusters", [])
+    clusters_path = Path(web_data_dir) / "duplicate_clusters.json"
+    write_json_sidecar(clusters_path, clusters)
     return audit

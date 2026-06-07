@@ -354,7 +354,7 @@ jobs:
           # describe the SV apex deployment.
           mkdir -p /tmp/sv-legacy
           for f in ranked.json ranked.list.json last_updated.json featured.json \
-                   validation_log.jsonl dedup_audit.json \
+                   validation_log.jsonl dedup_audit.json duplicate_clusters.json \
                    shelf_audit.json kpi_dashboard.json; do
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
           done
@@ -365,7 +365,7 @@ jobs:
           # serving SV data. PA-specific outputs (`ranked.PA.json` etc.)
           # are untouched by this restore.
           for f in ranked.json ranked.list.json last_updated.json featured.json \
-                   validation_log.jsonl dedup_audit.json \
+                   validation_log.jsonl dedup_audit.json duplicate_clusters.json \
                    shelf_audit.json kpi_dashboard.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
@@ -855,6 +855,7 @@ jobs:
           for f in ranked.PA.json ranked.list.PA.json \
                    last_updated.PA.json featured.PA.json \
                    validation_log.PA.jsonl dedup_audit.PA.json \
+                   duplicate_clusters.PA.json \
                    shelf_audit.PA.json kpi_dashboard.PA.json; do
             git add "web/data/$f" 2>/dev/null || true
           done
@@ -894,6 +895,11 @@ jobs:
           # PRD acceptance criterion "dedup rate documented per source."
           git add web/data/dedup_audit.json 2>/dev/null || true
           git add web/data/dedup_audit.SV.json 2>/dev/null || true
+          # Cross-source duplicate clusters sidecar — operator-readable
+          # group view of fingerprint matches (see automation/dedup_audit.py).
+          # PA equivalents land via the PA-snapshot block above.
+          git add web/data/duplicate_clusters.json 2>/dev/null || true
+          git add web/data/duplicate_clusters.SV.json 2>/dev/null || true
           git add web/data/validation_log.SV.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
