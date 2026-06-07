@@ -27,7 +27,7 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 
-from automation._atomic import atomic_write_json
+from automation.country_sidecars import write_json_sidecar
 from automation.shelf_audit import SHELF_KEYS, _shelf_key
 from pulpo.derived_rules import _g
 
@@ -259,11 +259,5 @@ def write(
         registered_sources=registered_sources,
         active_level=level,
     )
-    atomic_write_json(
-        Path(web_data_dir) / "kpi_dashboard.json",
-        payload,
-        indent=2,
-        sort_keys=True,
-        trailing_newline=True,
-    )
+    write_json_sidecar(Path(web_data_dir) / "kpi_dashboard.json", payload)
     return payload
