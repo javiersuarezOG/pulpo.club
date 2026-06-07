@@ -22,6 +22,7 @@ from pulpo.agents.html_crawler import (
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
+from pulpo.scrapers.lib.og_meta import prepend_og_images
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if SELECTOLAX_OK:
@@ -132,7 +133,8 @@ class GoodLifeScraper:
         desc_node = tree.css_first("div.wpb_text_column")
         description = desc_node.text(strip=True) if desc_node else ""
 
-        # Photos — try gallery containers first, then Open Graph hero as fallback
+        # Photos — try gallery containers first, but still prepend Open Graph
+        # because it is the broker's explicit cover-photo signal.
         photo_urls: list[str] = []
         seen: set[str] = set()
         for img in tree.css(
@@ -144,12 +146,7 @@ class GoodLifeScraper:
             if u.startswith("http") and u not in seen:
                 seen.add(u)
                 photo_urls.append(u)
-        if not photo_urls:
-            og = tree.css_first('meta[property="og:image"]')
-            if og:
-                u = og.attributes.get("content") or ""
-                if u.startswith("http"):
-                    photo_urls.append(u)
+        photo_urls = prepend_og_images(html, photo_urls)
         photo_urls = upgrade_photo_urls("goodlife", photo_urls)
 
         # Multi-signal classifier — supersedes the previous hardcode of
