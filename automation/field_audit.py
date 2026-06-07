@@ -128,29 +128,61 @@ def hard_gate_pct(listings: list[dict]) -> dict[str, float]:
     return pct
 
 
+def _is_shelf_eligible(li: dict) -> bool:
+    """True iff the listing is part of the shelf-eligible cohort the
+    PRD acceptance gate cares about.
+
+    The PRD's acceptance criterion ("each listing answers What / Where /
+    How much?") is about listings that can serve a buyer. Listings
+    already excluded from shelves — ``is_incomplete=True`` (the
+    derive_is_incomplete pipeline already decided this listing can't
+    be placed) and ``is_agricultural=True`` (tagged but not rendered) —
+    should not be counted against a source's coverage, because the
+    data layer has already correctly identified them as unviable.
+
+    Without this filter the gate over-flags luxury brokers like
+    oceanside whose normal pattern includes "consultar" / contact-for-
+    pricing listings that the data layer already hides. Investigated
+    in PR #760's first audit run (7 of 22 oceanside listings missing
+    price; all 7 already ``is_incomplete=True``).
+    """
+    if li.get("is_incomplete") is True:
+        return False
+    if li.get("is_agricultural") is True:
+        return False
+    return True
+
+
 def acceptance_check(
     all_listings: list[dict],
     *,
     threshold: float = ACCEPTANCE_HARD_GATE_THRESHOLD,
     sample_size: int = ACCEPTANCE_SAMPLE_SIZE,
+    include_hidden: bool = False,
 ) -> tuple[int, list[dict]]:
     """Pure acceptance evaluation per PRD.
 
     Returns ``(exit_code, per_source_reports)``. Exit 1 when any source
     has fewer than ``threshold`` × 100% coverage on any HARD_GATE field
-    within the first ``sample_size`` listings of that source (or all
-    its listings if fewer than ``sample_size``). Exit 0 when every
-    source clears the gate, or when no listings exist (no data is not
-    a CI failure on its own — that's a different signal handled
-    upstream).
+    within the first ``sample_size`` SHELF-ELIGIBLE listings of that
+    source. Exit 0 when every source clears the gate, or when no
+    listings exist (no data is not a CI failure on its own — that's
+    a different signal handled upstream).
+
+    ``include_hidden=True`` reverts to the legacy behavior of
+    evaluating every listing regardless of ``is_incomplete`` /
+    ``is_agricultural`` — useful for forensic audits ("why did the
+    data layer exclude these?") but NOT what CI should use.
 
     The ``per_source_reports`` list contains one dict per source with
-    ``source, n_sample, hard_gate_pct, failures`` where ``failures``
-    is the list of hard-gate fields that fell below the threshold.
+    ``source, n_sample, n_eligible, hard_gate_pct, failures`` where
+    ``failures`` is the list of hard-gate fields that fell below the
+    threshold.
     """
     by_source: dict[str, list[dict]] = defaultdict(list)
     for li in all_listings:
-        by_source[li.get("source", "unknown")].append(li)
+        if include_hidden or _is_shelf_eligible(li):
+            by_source[li.get("source", "unknown")].append(li)
 
     reports: list[dict] = []
     failed = False
@@ -296,6 +328,17 @@ def main(argv: list[str] | None = None) -> int:
         default=ACCEPTANCE_SAMPLE_SIZE,
         help="Override the acceptance sample size per source. Default 50.",
     )
+    parser.add_argument(
+        "--include-hidden",
+        action="store_true",
+        help=(
+            "Forensic mode: evaluate every listing including "
+            "is_incomplete=True and is_agricultural=True. Default is "
+            "shelf-eligible only (matches the PRD's 'serves a buyer' "
+            "framing). Useful for diagnosing why the data layer "
+            "excluded specific listings; not what CI should use."
+        ),
+    )
     args = parser.parse_args(argv)
 
     data_path = Path(args.path) if args.path else REPO / "web" / "data" / "ranked.json"
@@ -311,6 +354,7 @@ def main(argv: list[str] | None = None) -> int:
             all_listings,
             threshold=args.threshold,
             sample_size=args.sample_size,
+            include_hidden=args.include_hidden,
         )
         print_acceptance_report(reports)
         if exit_code != 0:

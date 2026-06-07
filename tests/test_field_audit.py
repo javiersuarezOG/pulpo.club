@@ -207,6 +207,92 @@ def test_acceptance_check_returns_per_source_pct_for_log_visibility():
     assert pct["price_usd"] == 1.0
 
 
+# ── shelf-eligible filter (oceanside-class luxury sources) ─────────────
+
+
+def test_acceptance_check_excludes_is_incomplete_by_default():
+    """The 2026-06-07 audit run flagged oceanside at 68% price coverage.
+    Investigation showed all 7 missing-price listings were already
+    marked is_incomplete=True (luxury "consultar" patterns the data
+    layer already hides). The PRD asks "can this listing serve a
+    buyer?" — is_incomplete=True is the data layer's "no", and the
+    gate should respect that."""
+    visible = [_li(source="oceanside") for _ in range(15)]
+    hidden_no_price = [
+        {"source": "oceanside", "property_type": "land",
+         "location_text": "El Tunco", "is_incomplete": True}
+        for _ in range(7)
+    ]
+    code, reports = acceptance_check(visible + hidden_no_price)
+    assert code == 0
+    # n_sample should only count the 15 shelf-eligible listings.
+    assert reports[0]["n_sample"] == 15
+    assert reports[0]["hard_gate_pct"]["price_usd"] == 1.0
+
+
+def test_acceptance_check_excludes_is_agricultural_by_default():
+    """Agricultural listings are tagged-but-not-shelved per the PRD
+    update. They shouldn't count against price/location coverage."""
+    visible = [_li(source="src") for _ in range(20)]
+    hidden_agri = [
+        {"source": "src", "property_type": "land",
+         "location_text": "Apaneca", "is_agricultural": True}
+        for _ in range(5)
+    ]
+    code, reports = acceptance_check(visible + hidden_agri)
+    assert code == 0
+    assert reports[0]["n_sample"] == 20
+
+
+def test_acceptance_check_still_fails_when_visible_listings_are_below_threshold():
+    """The filter only excludes already-hidden listings. A source whose
+    VISIBLE inventory has a real coverage gap must still fail — otherwise
+    the gate would be useless."""
+    bad_visible = [
+        {"source": "broken", "property_type": "land",
+         "location_text": "El Tunco"}  # missing price
+        for _ in range(15)
+    ]
+    code, reports = acceptance_check(bad_visible)
+    assert code == 1
+    assert reports[0]["hard_gate_pct"]["price_usd"] == 0.0
+
+
+def test_acceptance_check_include_hidden_reverts_to_legacy_behavior():
+    """Forensic mode: ``include_hidden=True`` counts every listing.
+    Useful for diagnosing why the data layer excluded specific
+    listings, but NOT what CI should use."""
+    visible = [_li(source="oceanside") for _ in range(15)]
+    hidden_no_price = [
+        {"source": "oceanside", "property_type": "land",
+         "location_text": "El Tunco", "is_incomplete": True}
+        for _ in range(7)
+    ]
+    code_default, _ = acceptance_check(visible + hidden_no_price)
+    code_forensic, reports_forensic = acceptance_check(
+        visible + hidden_no_price, include_hidden=True
+    )
+    assert code_default == 0
+    assert code_forensic == 1
+    # Forensic mode includes ALL 22 in n_sample.
+    assert reports_forensic[0]["n_sample"] == 22
+    # And price coverage shows the real 15/22 ≈ 68%.
+    assert reports_forensic[0]["hard_gate_pct"]["price_usd"] < 0.7
+
+
+def test_acceptance_check_treats_is_incomplete_false_as_eligible():
+    """Explicit False is NOT the same as True — only True excludes.
+    A listing with is_incomplete=False or no is_incomplete key counts
+    toward the gate."""
+    explicit_false = [
+        dict(_li(source="src"), is_incomplete=False) for _ in range(5)
+    ]
+    no_key = [_li(source="src") for _ in range(5)]
+    code, reports = acceptance_check(explicit_false + no_key)
+    assert code == 0
+    assert reports[0]["n_sample"] == 10
+
+
 # ── threshold + constants ──────────────────────────────────────────────
 
 
