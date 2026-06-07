@@ -126,6 +126,28 @@ def test_parse_detail_uses_og_image_fallback():
     assert result["photo_urls"] == ["https://remax.com/og-hero.jpg"]
 
 
+def test_parse_detail_prepends_og_image_before_gallery():
+    """og:image is the broker's cover-photo signal, not just a fallback."""
+    html = """<html><head>
+      <meta property="og:image" content="https://remax.com/og-hero.jpg"/>
+    </head><body><h3>Terreno. For Sale</h3>
+      <ul><li>Lot size: <span class="det">200 m²</span></li></ul>
+      <section><p>Test.</p></section>
+      <div class="property-gallery">
+        <img src="https://remax.com/gallery-1.jpg"/>
+        <img src="https://remax.com/gallery-2.jpg"/>
+      </div>
+    </body></html>"""
+    partial = {"source_id": "1", "url": "https://remax.com/1/x", "title": "", "raw_price_text": ""}
+    result = _parse_detail(html, partial)
+    assert result is not None
+    assert result["photo_urls"] == [
+        "https://remax.com/og-hero.jpg",
+        "https://remax.com/gallery-1.jpg",
+        "https://remax.com/gallery-2.jpg",
+    ]
+
+
 # ── Phase C: house + condo ingestion ────────────────────────────────────
 # Test the broadened crawl path. The remax detail page exposes
 # bedrooms / bathrooms / built area / parking via labelled <li><span class="det">

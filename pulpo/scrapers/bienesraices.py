@@ -23,6 +23,7 @@ from pulpo.agents.html_crawler import HTTPX_OK, is_offline, load_fixtures, make_
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._type_classifier import classify_property_type
 from pulpo.scrapers._photo_url_upgrade import upgrade_photo_urls
+from pulpo.scrapers.lib.og_meta import prepend_og_images
 from automation.property_types import VACATION_ZONES, WATERFRONT_KEYWORDS
 
 if HTTPX_OK:
@@ -195,8 +196,10 @@ class BienesRaicesScraper:
         description = re.sub(r"<[^>]+>", " ", desc_html).strip()[:1500]
 
         # Photos — AlterEstate's __NEXT_DATA__ exposes:
-        #   featured_image: single string URL (the hero, used as photos[0])
+        #   featured_image: optional single string URL
         #   gallery_image:  list of {image, image_wm, external_url, ...} dicts
+        # The broker's og:image is the strongest cover-photo signal and can
+        # be absent from __NEXT_DATA__, so prepend it after gallery extraction.
         photo_urls: list[str] = []
         seen: set[str] = set()
         def _add(u: str) -> None:
@@ -212,6 +215,7 @@ class BienesRaicesScraper:
             elif isinstance(img, str):
                 _add(img)
         photo_urls = upgrade_photo_urls("bienesraices", photo_urls, payload=prop)
+        photo_urls = prepend_og_images(html, photo_urls)
 
         # Build the base record. The lot-area field (`terrain_area`) is the
         # `area_m2` for ALL types: for land it's THE area; for houses it's
