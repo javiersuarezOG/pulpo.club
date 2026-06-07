@@ -322,6 +322,16 @@ export function adaptListing(raw: any): Listing {
       raw.geocoding_confidence === "low"
         ? raw.geocoding_confidence
         : null,
+    geocoding_source:
+      raw.geocoding_source === "extracted" ||
+      raw.geocoding_source === "estimated" ||
+      raw.geocoding_source === "nominatim"
+        ? raw.geocoding_source
+        : null,
+    geocoding_reference:
+      typeof raw.geocoding_reference === "string" && raw.geocoding_reference.trim().length > 0
+        ? raw.geocoding_reference
+        : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
     rank: typeof raw.rank === "number" ? raw.rank : null,
