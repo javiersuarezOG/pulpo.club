@@ -57,6 +57,7 @@ import {
   daysListedTone,
   landTypeLabel,
   formatDistanceKm,
+  LocationPrecisionNote,
   currentLocale,
   currentUnits,
 } from "./components.jsx";
@@ -2341,6 +2342,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 return <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t(key, lc, { n: town.n })}</span>;
               })()}
             </div>
+            <LocationPrecisionNote listing={listing} />
             {/* Real interactive map deferred — see plan followup. We
                 used to render a CSS .static-map illustration here, but
                 a fake map mislead users (no real coords behind it).
