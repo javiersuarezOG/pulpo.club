@@ -225,6 +225,25 @@ def test_health_probe_url_is_well_formed_when_set():
     )
 
 
+def test_lifecycle_is_known_value():
+    """Source lifecycle drives smoke semantics and alert routing."""
+    import pulpo.scrapers  # noqa: F401  — fires autodiscovery
+    from pulpo.agents import SOURCES
+    from pulpo.scrapers._metadata import KNOWN_LIFECYCLES, SCRAPER_METADATA
+
+    bad: dict[str, str] = {}
+    for slug, meta in SCRAPER_METADATA.items():
+        if slug not in SOURCES:
+            continue
+        lifecycle = meta.get("lifecycle")
+        if lifecycle not in KNOWN_LIFECYCLES:
+            bad[slug] = repr(lifecycle)
+    assert not bad, (
+        f"SCRAPER_METADATA lifecycle must be one of "
+        f"{sorted(KNOWN_LIFECYCLES)}; got {bad}"
+    )
+
+
 def test_pulpo_sources_override_if_present_is_subset_of_registry():
     """The nightly workflow's optional PULPO_SOURCES env var is for
     debugging / temporary subset crawls (e.g., disable one noisy source).
