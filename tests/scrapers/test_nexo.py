@@ -136,6 +136,41 @@ def test_parse_listing_canonical():
     assert rec["photo_urls"][1].endswith("secondary.jpeg")
 
 
+def test_parse_listing_varas_round_trips_through_normalize_to_metric_m2():
+    """End-to-end pin: Nexo's "<N> v²" raw_size_text MUST land as a
+    numeric `area_m2` after the normalize step, with the canonical
+    Salvadoran 1 v² = 0.698896 m² factor.
+
+    The 2026-06 scraper audit hypothesized that Nexo's varas-unit area
+    broke cross-source dedup because other sources emit m². Confirmed
+    NOT a bug at the unit-conversion layer: `pulpo/units.py` already
+    recognizes `v²` and converts. After dedup PR #753 dropped URL from
+    the property fingerprint, Nexo's 583 v² listing now collides
+    correctly with the same physical lot listed at ~407 m² on
+    Encuentra24 / Santizo.
+
+    This test exists as the regression pin so a future refactor of
+    `pulpo/units.py` that drops `v²` recognition would fail loudly
+    here rather than silently re-introducing the cross-source dedup
+    gap. Do NOT skip or relax this test without filing a follow-up to
+    re-audit cross-source overlap."""
+    from pulpo.normalize import normalize
+
+    rec = parse_listing(_VALID_API_LISTING)
+    assert rec is not None
+    li = normalize(rec, source="nexo")
+    assert li is not None, "nexo listing should survive normalize"
+    # 583.00 v² × 0.698896 m²/v² ≈ 407.46 m² (rounded by normalize.py).
+    assert li.area_m2 is not None, "varas raw_size_text must yield numeric area_m2"
+    assert 405.0 < li.area_m2 < 410.0, (
+        f"expected ~407 m² from 583 v², got {li.area_m2} — has units.py "
+        "dropped the v² regex or the SV M2_PER_VARA2 constant?"
+    )
+    # raw_size_text is preserved verbatim so the public UI can show the
+    # original Salvadoran-customary string alongside the metric value.
+    assert li.raw_size_text == "583.00 v²"
+
+
 def test_parse_listing_skips_non_terreno_categories():
     """Apartamentos, casas, oficinas, etc. must not slip through."""
     payload = {**_VALID_API_LISTING}
