@@ -561,6 +561,14 @@ test.describe("New app boots cleanly on key routes", () => {
       // waiver tops up a thin shelf with loose-eligible listings
       // (no photo). Card is fully clickable; only the visual differs.
       "Photo pending",                                // home.shelf.photo_pending
+      // Location-precision note on the detail page. Drives off
+      // ranked.json's `geocoding_source` field via
+      // web/app/lib/location-precision.ts. The "approximate" variant
+      // renders for 95%+ of listings (estimated/nominatim), so a stuck
+      // EN string here would leak on essentially every detail page.
+      "Approximate location",                         // detail.location.precision.approximate.title
+      "Exact location from broker",                   // detail.location.precision.precise.title
+      "Confirm the exact address",                    // detail.location.precision.approximate.body (anchor phrase)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
