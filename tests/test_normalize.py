@@ -323,16 +323,46 @@ def test_classifier_title_land_qty_in_acres_or_vrs():
 def test_classifier_handles_plurals():
     """Cliffside apartments / Two Lofts / 3-Bedroom Houses all read as built.
     Plural handling regression — a missing trailing s in the regex would
-    silently drop these into the land pool."""
-    assert detect_property_type(title="Cliffside apartments in El Zonte") == "house"
-    assert detect_property_type(title="Two Lofts in Tuscania") == "house"
+    silently drop these into the land pool. Note: apartment/loft are now
+    condo-specific (see test_classifier_emits_condo_for_condo_specific_keywords)
+    so we use detached-house vocabulary here to keep the assertion on 'house'."""
+    assert detect_property_type(title="Cliffside villas in El Zonte") == "house"
+    assert detect_property_type(title="Two cabins in Tuscania") == "house"
     assert detect_property_type(title="3-Bedroom Houses in Surf City") == "house"
 
 
 def test_classifier_explicit_built_keywords_in_title():
+    """Detached-house vocabulary maps to 'house'. Apartment / condo / loft /
+    penthouse / studio land in test_classifier_emits_condo_*; that's the
+    PRD-mandated 3-type split (terreno | casa | condo)."""
     assert detect_property_type(title="3-Bedroom Beach House at Xanadu") == "house"
-    assert detect_property_type(title="Beautiful Oceanview Condominium at Zonset") == "house"
-    assert detect_property_type(title="Two-story Loft in Tuscania") == "house"
+    assert detect_property_type(title="Charming Cottage at Zonset") == "house"
+    assert detect_property_type(title="Two-story Chalet in Tuscania") == "house"
+
+
+def test_classifier_emits_condo_for_condo_specific_keywords():
+    """PRD: 3 property types — terreno (land), casa (house), condo (condo).
+    Apartment / condominium / penthouse / loft / studio all map to 'condo' so
+    the top_beach_condos / top_lake_condos shelves can reach the 10-listing
+    activation threshold. Without this, condos collapsed into 'house' and
+    those shelves stayed dark."""
+    assert detect_property_type(title="Beautiful Oceanview Condominium at Zonset") == "condo"
+    assert detect_property_type(title="Cliffside apartments in El Zonte") == "condo"
+    assert detect_property_type(title="Two-story Loft in Tuscania") == "condo"
+    assert detect_property_type(title="Penthouse with terrace in Surf City") == "condo"
+    assert detect_property_type(title="Apartamento moderno en Lago Coatepeque") == "condo"
+    assert detect_property_type(title="Condominios frente al mar en El Tunco") == "condo"
+    assert detect_property_type(title="Departamento de 2 hab en San Salvador") == "condo"
+    # Mixed signal: condo keyword wins over generic built-structure.
+    assert detect_property_type(title="Casa-condominio en Costa del Sol") == "condo"
+
+
+def test_classifier_land_quantity_still_beats_condo():
+    """Quantity-of-land remains the highest-precedence signal: a parcel
+    marketed as condo-suitable must classify as land, not condo."""
+    assert detect_property_type(
+        title="30 manzanas en El Cuco — suitable for condominium development",
+    ) == "land"
 
 
 def test_classifier_explicit_land_keywords_in_title():
