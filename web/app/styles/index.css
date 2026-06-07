@@ -2126,6 +2126,41 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border-radius: 999px;
   color: var(--ink-2);
 }
+/* Detail-page location-precision note. Sits between the distance pills
+   and the (currently absent) static map. The approximate variant is the
+   load-bearing one — gives users a one-line "trust signal" so a
+   zone-centroid pin doesn't read as a precise address. */
+.location-precision-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.location-precision-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.location-precision-note--precise {
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--ink-3);
+}
+.location-precision-note--approximate {
+  background: var(--paper-3);
+  color: var(--ink-2);
+}
+.location-precision-note__reference {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 11.5px;
+}
 .static-map {
   height: 220px;
   border-radius: var(--radius);
