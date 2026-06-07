@@ -11,6 +11,7 @@ and the body is treated as a string of HTML, no DOM parser required.
 from __future__ import annotations
 
 import re
+from html import unescape
 from typing import Optional
 
 
@@ -55,6 +56,42 @@ def extract_og(html: str) -> dict:
     for match in _META_RE_REVERSE.findall(html):
         content, sub = match
         _stash(out, sub.lower(), content)
+    return out
+
+
+def og_images(html: str) -> list[str]:
+    """Return de-duplicated ``og:image`` URLs in page order."""
+    images = extract_og(html).get("image") or []
+    out: list[str] = []
+    seen: set[str] = set()
+    for image in images:
+        if not isinstance(image, str):
+            continue
+        url = unescape(image).strip()
+        if url.startswith("http") and url not in seen:
+            seen.add(url)
+            out.append(url)
+    return out
+
+
+def prepend_og_images(html: str, urls: list[str]) -> list[str]:
+    """Prepend Open Graph image URLs ahead of scraper gallery URLs.
+
+    Social-card metadata is the broker's explicit cover-photo signal. Some
+    CMS/SaaS stacks omit that first image from their gallery payload, so
+    treating ``og:image`` as just a fallback can make Pulpo miss the intended
+    hero. This helper preserves gallery order after the OG image(s) and
+    de-duplicates by exact URL.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for url in [*og_images(html), *(urls or [])]:
+        if not isinstance(url, str):
+            continue
+        clean = unescape(url).strip()
+        if clean.startswith("http") and clean not in seen:
+            seen.add(clean)
+            out.append(clean)
     return out
 
 
