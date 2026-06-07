@@ -364,6 +364,28 @@ jobs:
             --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             || echo "::warning::source-health alert script failed (non-blocking)"
 
+      - name: Stranded-inventory alert (R6)
+        # R6 of docs/RESILIENCE-AUDIT-PRD.md. Reads R1's candidate
+        # bundle at web/data/.staging/<run_id>/ and fires Slack + opens
+        # a persistent GitHub Issue iff visible_count > 0 AND
+        # promotion did not happen this run (canonical last_updated.json
+        # is older than / missing relative to the candidate). Always
+        # exits 0 — alerting must not block the workflow. Runs at the
+        # same pre-canary point as the source-health alert so an
+        # operator paged at 02:30 UTC can correlate the two signals
+        # against a single Actions run.
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 scripts/check_stranded_inventory.py \
+            --data-dir web/data \
+            --run-id "${{ github.run_id }}" \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --artifact-hint "candidate_bundle_${{ github.run_id }} (Artifacts tab on the Actions run)" \
+            || echo "::warning::stranded-inventory alert script failed (non-blocking)"
+
       - name: PA count canary (soft — logs only, never fails)
         continue-on-error: true
         run: |
