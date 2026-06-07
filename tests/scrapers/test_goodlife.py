@@ -31,6 +31,39 @@ def test_index_page_extracts_urls(load_sample):
     assert all(p.get("source_id") for p in partials)
 
 
+def test_detail_page_prepends_og_image_before_gallery():
+    html = """<html><head>
+        <meta property="og:image" content="https://goodlife.test/cover.jpg"/>
+    </head><body>
+        <h1 class="entry-title">Rare Find Lot in El Zonte</h1>
+        <div class="vc_toggle">
+          <div class="vc_toggle_title">Asking Price</div>
+          <div class="vc_toggle_content">$350,000</div>
+        </div>
+        <div class="vc_toggle">
+          <div class="vc_toggle_title">Location</div>
+          <div class="vc_toggle_content">El Zonte</div>
+        </div>
+        <div class="vc_toggle">
+          <div class="vc_toggle_title">Area</div>
+          <div class="vc_toggle_content">700 m2</div>
+        </div>
+        <div class="wpb_text_column">Beach access.</div>
+        <div class="gallery">
+          <img src="https://goodlife.test/gallery-1.jpg"/>
+          <img src="https://goodlife.test/gallery-2.jpg"/>
+        </div>
+    </body></html>"""
+    scraper = GoodLifeScraper(offline=True)
+    result = scraper.parse_detail_page(html, {"url": "https://goodlife.test/rare-find-lot"})
+    assert result is not None
+    assert result["photo_urls"] == [
+        "https://goodlife.test/cover.jpg",
+        "https://goodlife.test/gallery-1.jpg",
+        "https://goodlife.test/gallery-2.jpg",
+    ]
+
+
 # ── Phase C: house + condo ingestion ──────────────────────────────────
 
 
