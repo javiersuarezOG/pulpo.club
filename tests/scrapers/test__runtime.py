@@ -360,3 +360,86 @@ def test_polite_get_for_dispatches_to_curl_cffi_for_curl_policy(monkeypatch):
     resp = get(client=None, url="https://x.test/")
     assert resp.status_code == 200
     assert fake.get.call_count == 1
+
+
+# ── browser-realistic headers (Port A from events-discovery) ───────────
+
+
+def test_browser_realistic_headers_includes_user_agent():
+    ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_2) AppleWebKit/605.1.15 "\
+         "(KHTML, like Gecko) Version/17.2 Safari/605.1.15"
+    h = _runtime.browser_realistic_headers(ua)
+    assert h["User-Agent"] == ua
+
+
+def test_browser_realistic_headers_includes_sec_fetch_family():
+    """Sec-Fetch-* are the cheapest unlock for Cloudflare fingerprint
+    gates — they MUST always be present regardless of UA family."""
+    h = _runtime.browser_realistic_headers("Mozilla/5.0 (any)")
+    assert h["Sec-Fetch-Site"] == "none"
+    assert h["Sec-Fetch-Mode"] == "navigate"
+    assert h["Sec-Fetch-User"] == "?1"
+    assert h["Sec-Fetch-Dest"] == "document"
+
+
+def test_browser_realistic_headers_includes_sv_accept_language():
+    """es-SV locale is a meaningful signal to local broker WAFs — the
+    default Pulpo locale should look like a Salvadoran reader, not a
+    Dutch tourist (events-discovery ships nl-NL; we mirror with es-SV)."""
+    h = _runtime.browser_realistic_headers("Mozilla/5.0 (any)")
+    assert h["Accept-Language"].startswith("es-SV")
+
+
+def test_browser_realistic_headers_emits_chrome_client_hints_for_chrome_ua():
+    """Chrome UA → Sec-CH-UA family should appear with the matching
+    major version. Pins the UA-to-hints binding so a UA pool refresh
+    doesn't silently drift to wrong client hints."""
+    chrome_ua = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+    )
+    h = _runtime.browser_realistic_headers(chrome_ua)
+    assert "sec-ch-ua" in h
+    assert "121" in h["sec-ch-ua"]
+    assert h["sec-ch-ua-mobile"] == "?0"
+    assert h["sec-ch-ua-platform"] == '"Windows"'
+
+
+def test_browser_realistic_headers_omits_client_hints_for_safari_ua():
+    """Safari does not send Sec-CH-UA. Emitting them on a Safari UA
+    would make the request MORE suspicious, not less — missing the
+    headers is part of the realistic fingerprint."""
+    safari_ua = (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_2) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.2 Safari/605.1.15"
+    )
+    h = _runtime.browser_realistic_headers(safari_ua)
+    assert "sec-ch-ua" not in h
+    assert "sec-ch-ua-mobile" not in h
+    assert "sec-ch-ua-platform" not in h
+
+
+def test_browser_realistic_headers_handles_chrome_on_macos_and_linux():
+    """Platform string must match the UA's OS — not always 'Windows'."""
+    for ua_os, expected in [
+        ("Windows NT 10.0; Win64; x64", '"Windows"'),
+        ("Macintosh; Intel Mac OS X 14_2", '"macOS"'),
+        ("X11; Linux x86_64", '"Linux"'),
+    ]:
+        ua = (
+            f"Mozilla/5.0 ({ua_os}) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+        )
+        h = _runtime.browser_realistic_headers(ua)
+        assert h["sec-ch-ua-platform"] == expected, f"{ua_os} → {h.get('sec-ch-ua-platform')}"
+
+
+def test_browser_realistic_headers_safe_on_empty_ua():
+    """Defensive: an empty UA must NOT raise — at worst we emit a
+    minimal set so the surrounding polite_get keeps working."""
+    h = _runtime.browser_realistic_headers("")
+    assert isinstance(h, dict)
+    # Sec-Fetch-* are universal so they still appear
+    assert "Sec-Fetch-Dest" in h
+    # No client hints for a UA that isn't recognizably Chrome
+    assert "sec-ch-ua" not in h
