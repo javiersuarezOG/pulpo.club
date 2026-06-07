@@ -1,0 +1,11 @@
+{
+  "ts": "2026-06-07T11:56:23.371511+00:00",
+  "country": "sv",
+  "total_probed": 7,
+  "matched": 2,
+  "match_rate": 0.2857,
+  "by_miss_classification": {
+    "source_configured_but_zero": 4,
+    "source_not_configured": 1
+  }
+}
