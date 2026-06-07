@@ -16,7 +16,7 @@ pulpo-sv/
 │   ├── normalize.py      # raw scrape dict → Listing (with zone snapping)
 │   ├── ranker.py         # multi-factor composite + 1-based position rank
 │   ├── cli.py            # python -m pulpo.cli
-│   └── scrapers/         # base + per-site (goodlife, oceanside, kazu, century21, remax)
+│   └── scrapers/         # base + per-site (goodlife, oceanside, century21, remax, etc.)
 ├── automation/
 │   ├── run.py            # single-command pipeline runner (cron / GHA entrypoint)
 │   ├── add_user.js       # bcrypt user-line generator for the USERS env var
@@ -52,7 +52,7 @@ python3 -m pulpo.cli --offline
 pip install -r requirements.txt
 python3 -m pulpo.cli --source goodlife --limit 20
 
-# Or any single source — registry: goodlife, oceanside, kazu, century21, remax
+# Or any single source — registered slugs live in `pulpo/scrapers/__init__.py`.
 python3 -m pulpo.cli --source century21 --limit 20
 
 # Full pipeline (writes web/data/*.json + samples/ranked.csv)
@@ -165,7 +165,7 @@ The scrapers in `pulpo/scrapers/*.py` are **scaffolding, not validated**. They u
 
 Before treating the live numbers as trustworthy, this work is required (tracked as task #28):
 
-1. **Selector calibration** — for each of `goodlife`, `oceanside`, `kazu`, `century21`, `remax`: save 3–5 detail-page HTML snapshots, iterate `DETAIL_*_SEL` constants until ≥95% field coverage on title, area, price, location, photos, broker. `goodlife` and `oceanside` are calibrated (2026-04-28); the other three are scaffolding pending samples.
+1. **Selector calibration** — for each scraper in `pulpo/scrapers/`, save 3–5 detail-page HTML snapshots and iterate selectors until ≥95% field coverage on title, area, price, location, photos, broker. The Phase-C wave landed mid-2026; calibration status per source is in `web/data/source_health_history.jsonl`.
 2. **Health check** — daily smoke test that fails CI if any source returns 0 listings; alert on degradation.
 3. **JS-rendered fallback** — if any of the three sites use client-side rendering, swap to Playwright headless. The `BaseScraper` interface is designed so this is a single-module change.
 4. **Anti-bot graceful failure** — backoff on 429/403; never spam.
