@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pulpo.scrapers.lib import extract_og, find_first
+from pulpo.scrapers.lib.og_meta import og_images, prepend_og_images
 
 
 def test_extract_og_basic_tags():
@@ -25,6 +26,33 @@ def test_extract_og_multiple_images_dedup_and_order():
     assert extract_og(html)["image"] == [
         "https://example.test/1.jpg",
         "https://example.test/2.jpg",
+    ]
+
+
+def test_og_images_returns_http_urls_only():
+    html = (
+        '<meta property="og:image" content="https://example.test/1.jpg"/>'
+        '<meta property="og:image" content="notaurl"/>'
+        '<meta property="og:image" content="https://example.test/2.jpg"/>'
+    )
+    assert og_images(html) == [
+        "https://example.test/1.jpg",
+        "https://example.test/2.jpg",
+    ]
+
+
+def test_prepend_og_images_puts_cover_before_gallery_and_dedupes():
+    html = (
+        '<meta property="og:image" content="https://example.test/cover.jpg"/>'
+        '<meta property="og:image" content="https://example.test/gallery-1.jpg"/>'
+    )
+    assert prepend_og_images(html, [
+        "https://example.test/gallery-1.jpg",
+        "https://example.test/gallery-2.jpg",
+    ]) == [
+        "https://example.test/cover.jpg",
+        "https://example.test/gallery-1.jpg",
+        "https://example.test/gallery-2.jpg",
     ]
 
 
