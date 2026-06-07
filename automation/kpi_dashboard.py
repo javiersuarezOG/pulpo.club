@@ -32,9 +32,10 @@ from automation.shelf_audit import SHELF_KEYS, _shelf_key
 from pulpo.derived_rules import _g
 
 
-# Mirror of MIN_REAL_LISTINGS in web/app/home/HomeShelf.jsx. Kept in sync
-# manually until PR A5 raises both sides to 10.
-MIN_REAL_LISTINGS = 5
+# Mirror of MIN_REAL_LISTINGS in web/app/home/HomeShelf.jsx (=10 since PR
+# #724 / c57c1134). Both sides must agree or the KPI dashboard reports a
+# shelf as renders=true while the UI hides it.
+MIN_REAL_LISTINGS = 10
 
 
 # PRD-stated inventory hints per source (the PRD's "stated number to aim
