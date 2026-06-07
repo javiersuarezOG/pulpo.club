@@ -1187,6 +1187,65 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .browse-layout { grid-template-columns: 1fr; }
   .filter-desktop { display: none; }
 }
+/* /browse exact-lookup search bar (PR-S1). Sits above the results
+   header. Mobile-first: full width of the results column. On wider
+   viewports it caps at a comfortable reading width so the bar doesn't
+   stretch the full results column. */
+.browse-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 560px;
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease;
+}
+.browse-search:focus-within {
+  border-color: var(--ink-3);
+}
+.browse-search__icon {
+  flex-shrink: 0;
+  color: var(--ink-3);
+}
+.browse-search__input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+}
+.browse-search__input::placeholder {
+  color: var(--ink-4);
+}
+.browse-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+.browse-search__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.browse-search__clear:hover {
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
 .results-header {
   display: flex; justify-content: space-between; align-items: center;
   gap: 16px;
@@ -2125,6 +2184,41 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background: var(--paper-2);
   border-radius: 999px;
   color: var(--ink-2);
+}
+/* Detail-page location-precision note. Sits between the distance pills
+   and the (currently absent) static map. The approximate variant is the
+   load-bearing one — gives users a one-line "trust signal" so a
+   zone-centroid pin doesn't read as a precise address. */
+.location-precision-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.location-precision-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.location-precision-note--precise {
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--ink-3);
+}
+.location-precision-note--approximate {
+  background: var(--paper-3);
+  color: var(--ink-2);
+}
+.location-precision-note__reference {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 11.5px;
 }
 .static-map {
   height: 220px;

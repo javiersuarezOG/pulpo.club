@@ -93980,5 +93980,143 @@
     "cost_usd": 0.00171079,
     "finish_reason": "stop",
     "latency_ms": 8299
+  },
+  "remax|002473535020": {
+    "ts": "2026-06-07T08:35:10.457189+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Ranch at Playa Las Flores, La Libertad",
+      "es": "Rancho frente al mar en Playa Las Flores, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover this stunning oceanfront ranch located at Playa Las Flores, one of El Salvador's most exclusive and touristic areas along the Surf City I corridor. The property offers a perfect blend of spaciousness, comfort, and privileged natural surroundings. Ideal as a luxury family residence or a high-return tourism investment, it boasts easy access and proximity to top beach destinations. The 1,190 m² lot features a 380 m² construction with 5 air-conditioned bedrooms, 4 full bathrooms, a guest bathroom, spacious living and dining areas, a fully equipped kitchen, and a laundry area. Enjoy spectacular ocean views from the lookout, relax by the family pool and jacuzzi, and park up to 10 vehicles. Located just 5 minutes from Puerto de La Libertad and 40-45 minutes from San Salvador, this property is a rare gem in a high-appreciation area with strong tourist flow.",
+      "es": "Descubra este impresionante rancho frente al mar ubicado en Playa Las Flores, una de las zonas más exclusivas y turísticas de El Salvador a lo largo del corredor Surf City I. La propiedad ofrece una combinación perfecta de amplitud, comodidad y entorno natural privilegiado. Ideal como residencia familiar de lujo o inversión turística de alto rendimiento, cuenta con fácil acceso y proximidad a los mejores destinos playeros. El terreno de 1,190 m² cuenta con una construcción de 380 m² con 5 habitaciones con aire acondicionado, 4 baños completos, un baño de visitas, amplias salas de estar y comedor, cocina totalmente equipada y área de lavandería. Disfrute de espectaculares vistas al mar desde el mirador, relájese en la piscina familiar y jacuzzi, y estacione hasta 10 vehículos. Ubicado a solo 5 minutos de Puerto de La Libertad y a 40-45 minutos de San Salvador, esta propiedad es una joya poco común en una zona de alta plusvalía con fuerte flujo turístico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Oceanfront with spectacular views",
+        "es": "Frente al mar con vistas espectaculares"
+      },
+      {
+        "en": "5 bedrooms, 4.5 bathrooms, 380 m² construction",
+        "es": "5 habitaciones, 4.5 baños, 380 m² de construcción"
+      },
+      {
+        "en": "Family pool and jacuzzi",
+        "es": "Piscina familiar y jacuzzi"
+      },
+      {
+        "en": "Parking for 10 vehicles",
+        "es": "Estacionamiento para 10 vehículos"
+      },
+      {
+        "en": "Prime location in Surf City I corridor",
+        "es": "Ubicación privilegiada en el corredor Surf City I"
+      }
+    ],
+    "lat": 13.181,
+    "lng": -88.355,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Las Flores, La Libertad, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2733,
+    "tokens_out": 753,
+    "cost_usd": 0.00156621,
+    "finish_reason": "stop",
+    "latency_ms": 6077
+  },
+  "remax|002522430087": {
+    "ts": "2026-06-07T08:35:10.890434+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Luxury Estate in Costa del Sol",
+      "es": "Lujosa Propiedad Frente al Mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover the ultimate blend of luxury and scale in the heart of Costa del Sol. This stunning property spans 1.76 manzanas (approximately 12,320 m²), offering an unparalleled combination of residential elegance, sprawling green spaces, and direct access to the warm waters of the Pacific Ocean. The two-story main residence features an open-concept living and dining area, a full kitchen, two spacious bedrooms with private bathrooms on the first level, and a cozy family room plus three additional bedrooms with private bathrooms and terraces on the second level. An independent guest house includes a living-dining area, kitchen with breakfast bar, and four bedrooms. Outdoor amenities include two expansive terraces, a BBQ area, a full outdoor kitchen, and manicured gardens leading directly to the beach. Over half of the property remains undeveloped, offering a blank canvas for future expansions, sports courts, or additional luxury villas. Located on Boulevard Costa del Sol at Km 75.7, within a high-growth tourism corridor featuring luxury hotels and restaurants.",
+      "es": "Descubra la combinación definitiva de lujo y amplitud en el corazón de Costa del Sol. Esta impresionante propiedad abarca 1.76 manzanas (aproximadamente 12,320 m²), ofreciendo una combinación inigualable de elegancia residencial, amplios espacios verdes y acceso directo a las cálidas aguas del Océano Pacífico. La residencia principal de dos niveles cuenta con una sala y comedor de concepto abierto, cocina completa, dos amplios dormitorios con baño privado en la planta baja, y una acogedora sala familiar más tres dormitorios adicionales con baño privado y terraza en el segundo nivel. Una casa de huéspedes independiente incluye sala-comedor, cocina con barra de desayuno y cuatro dormitorios. Las amenidades exteriores incluyen dos terrazas amplias, área de barbacoa, cocina exterior completa y jardines cuidados que llevan directamente a la playa. Más de la mitad de la propiedad permanece sin desarrollar, ofreciendo un lienzo en blanco para futuras expansiones, canchas deportivas o villas de lujo adicionales. Ubicada en el Boulevard Costa del Sol, Km 75.7, dentro de un corredor turístico de alto crecimiento con hoteles y restaurantes de lujo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access on Costa del Sol",
+        "es": "Acceso directo a la playa en Costa del Sol"
+      },
+      {
+        "en": "1.76 manzanas (approx. 12,320 m²) of prime oceanfront land",
+        "es": "1.76 manzanas (aprox. 12,320 m²) de terreno frente al mar"
+      },
+      {
+        "en": "Two-story main residence with 5 bedrooms, each with private bath",
+        "es": "Residencia principal de dos niveles con 5 dormitorios, cada uno con baño privado"
+      },
+      {
+        "en": "Independent guest house with 4 bedrooms",
+        "es": "Casa de huéspedes independiente con 4 dormitorios"
+      },
+      {
+        "en": "Over half of the property undeveloped for future expansion",
+        "es": "Más de la mitad de la propiedad sin desarrollar para futura expansión"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "tokens_in": 2626,
+    "tokens_out": 858,
+    "cost_usd": 0.00165282,
+    "finish_reason": "stop",
+    "latency_ms": 6510
+  },
+  "encuentra24|32519758": {
+    "ts": "2026-06-07T08:35:11.169883+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Ocean View Home in Costa Verde, Zaragoza",
+      "es": "Casa con Vista al Mar en Costa Verde, Zaragoza"
+    },
+    "short_description_canonical": {
+      "en": "Live between the city and the beach in one of the most exclusive, secure, and high-appreciation residential communities in the area. Located at Km 18.5 on the Highway to Puerto de La Libertad, this multilevel home offers a covered garage for 3 vehicles and pre-installation for an elevator, adding future convenience and value. The second level features an elegant entrance hall, air-conditioned living room, dining room, kitchen with pantry, a large private garden, full service area, cistern, hot water system, and a study with full bathroom that can serve as a guest room. The third level includes a spacious family room with balcony and beautiful ocean views, a master bedroom with air conditioning, walk-in closet, and private full bathroom, plus two secondary bedrooms with air conditioning, closets, and a shared bathroom. The residential community offers private security, controlled access, a recreational park, children's play areas, and a family-friendly exclusive environment. Ideal for living or investing in one of the country's fastest-growing and most in-demand areas. Schedule your visit today!",
+      "es": "Vive entre la ciudad y la playa en una de las residenciales más exclusivas, seguras y con mayor plusvalía de la zona. Ubicada en el Km 18.5 de la Carretera al Puerto de La Libertad, esta casa multinivel cuenta con cochera techada para 3 vehículos y espacio previsto para instalación de ascensor, brindando mayor comodidad y valorización futura. El segundo nivel ofrece un elegante vestíbulo de ingreso, sala principal con aire acondicionado, comedor, cocina con pantry, amplio jardín privado, área de servicio completa, cisterna, sistema de agua caliente y un estudio con baño completo que puede funcionar como habitación de visitas. El tercer nivel incluye una amplia sala familiar con balcón y hermosa vista al mar, una habitación principal con aire acondicionado, walking closet y baño completo privado, más dos habitaciones secundarias con aire acondicionado, clósets y baño compartido. La residencial cuenta con seguridad privada, acceso controlado, parque recreativo, áreas de juegos infantiles y un ambiente familiar y exclusivo. Ideal para vivir o invertir en una de las zonas con mayor crecimiento y demanda del país. ¡Agenda tu visita!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Pre-installation for elevator adds future value",
+        "es": "Espacio previsto para ascensor que agrega valor futuro"
+      },
+      {
+        "en": "Ocean views from the family room balcony",
+        "es": "Vistas al mar desde el balcón de la sala familiar"
+      },
+      {
+        "en": "Exclusive gated community with security and parks",
+        "es": "Residencial exclusiva con seguridad y parques"
+      },
+      {
+        "en": "Located on the Highway to Puerto de La Libertad",
+        "es": "Ubicada en la Carretera al Puerto de La Libertad"
+      },
+      {
+        "en": "Multilevel design with spacious rooms and garden",
+        "es": "Diseño multinivel con amplios espacios y jardín"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "tokens_in": 2699,
+    "tokens_out": 824,
+    "cost_usd": 0.00163513,
+    "finish_reason": "stop",
+    "latency_ms": 6790
   }
 }

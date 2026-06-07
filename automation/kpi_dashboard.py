@@ -27,14 +27,15 @@ import os
 from pathlib import Path
 from typing import Any, Iterable
 
-from automation._atomic import atomic_write_json
+from automation.country_sidecars import write_json_sidecar
 from automation.shelf_audit import SHELF_KEYS, _shelf_key
 from pulpo.derived_rules import _g
 
 
-# Mirror of MIN_REAL_LISTINGS in web/app/home/HomeShelf.jsx. Kept in sync
-# manually until PR A5 raises both sides to 10.
-MIN_REAL_LISTINGS = 5
+# Mirror of MIN_REAL_LISTINGS in web/app/home/HomeShelf.jsx (=10 since PR
+# #724 / c57c1134). Both sides must agree or the KPI dashboard reports a
+# shelf as renders=true while the UI hides it.
+MIN_REAL_LISTINGS = 10
 
 
 # PRD-stated inventory hints per source (the PRD's "stated number to aim
@@ -258,11 +259,5 @@ def write(
         registered_sources=registered_sources,
         active_level=level,
     )
-    atomic_write_json(
-        Path(web_data_dir) / "kpi_dashboard.json",
-        payload,
-        indent=2,
-        sort_keys=True,
-        trailing_newline=True,
-    )
+    write_json_sidecar(Path(web_data_dir) / "kpi_dashboard.json", payload)
     return payload
