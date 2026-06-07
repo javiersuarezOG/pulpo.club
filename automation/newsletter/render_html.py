@@ -24,6 +24,7 @@ from .components._common import (
     TEMPLATE_VERSION as _TEMPLATE_VERSION_SHARED,
     WELCOME_TEMPLATE_VERSION as _WELCOME_TEMPLATE_VERSION_SHARED,
     WELCOME_BACK_TEMPLATE_VERSION as _WELCOME_BACK_TEMPLATE_VERSION_SHARED,
+    FREE_GENERAL_TEMPLATE_VERSION as _FREE_GENERAL_TEMPLATE_VERSION_SHARED,
 )
 from .types import Issue, IssuePick, Locale
 
@@ -76,6 +77,11 @@ WELCOME_TEMPLATE_VERSION = _WELCOME_TEMPLATE_VERSION_SHARED
 # the "Your fresh 10" intro change. Lets PostHog slice resubscribe
 # re-acquisition renders from first-time welcomes and weeklies.
 WELCOME_BACK_TEMPLATE_VERSION = _WELCOME_BACK_TEMPLATE_VERSION_SHARED
+# Free general (free-tier weekly) carries its own version line so PostHog
+# can slice free weeklies from Pro weeklies. Bumped whenever the masthead
+# treatment, the ranks 04-10 "Sign up to Pro" CTA, or the Pro-locked
+# Weekly News Spotlight change.
+FREE_GENERAL_TEMPLATE_VERSION = _FREE_GENERAL_TEMPLATE_VERSION_SHARED
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -1245,7 +1251,7 @@ def _one_number_html(issue: Issue) -> str:
     """
 
 
-def _footer_html(issue: Issue) -> str:
+def _footer_html(issue: Issue, *, free: bool = False) -> str:
     """v4 (2026-05-31) — branded footer matching the locked mockup.
 
     Layout (top to bottom inside the cream `footer-strip` cell):
@@ -1293,7 +1299,7 @@ def _footer_html(issue: Issue) -> str:
           <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="20" height="20" alt="Pulpo" style="display:block;width:20px;height:20px;border:0;" />
         </td>
         <td style="vertical-align:middle;">
-          <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span><span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.14em;padding:2px 5px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:5px;vertical-align:middle;line-height:1;">PRO</span>
+          <span style="font-size:16px;font-weight:700;letter-spacing:-0.03em;color:#1F3D31;">pulpo</span>{'' if free else '<span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.14em;padding:2px 5px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:5px;vertical-align:middle;line-height:1;">PRO</span>'}
         </td>
       </tr></table>
       <p style="margin:10px 0 0;font-size:13px;line-height:1.55;color:#1A1916;font-weight:500;">{_e(tagline)}</p>
@@ -1507,6 +1513,7 @@ def _pick_card_html(
     locale: Locale,
     is_top_deal: bool,
     paywall_url: str,
+    free: bool = False,
 ) -> str:
     """The single locked listing-card component for all 10 picks.
 
@@ -1575,7 +1582,7 @@ def _pick_card_html(
     )
 
     # Price line — "$900,000" + optional " · $621/m²" inline.
-    ppm = _pick_ppm_from_keytable(pick) if not pick.paywalled else ""
+    ppm = _pick_ppm_from_keytable(pick)
     price_text = _e(pick.price_text or "—")
     if ppm:
         price_line = (
@@ -1587,9 +1594,16 @@ def _pick_card_html(
         price_line = price_text
 
     # Paywalled picks hide the body + CTAs — the paywall banner upsells.
+    # EXCEPT in the free-tier weekly (`free=True`): there every pick — top 3
+    # AND ranks 04-10 — renders the FULL listing card (photo, title,
+    # location, price, why-block); the value gate is the CTA, not hidden
+    # content. Top 3 keep "See on Pulpo" (the listing link); ranks 04-10
+    # swap to "Sign up to Pro" (the paywall target). The build still stamps
+    # `paywalled=True` on the free shortlist, so `and not free` is what
+    # makes those cards render full here.
     body_html = ""
     cta_html = ""
-    if pick.paywalled:
+    if pick.paywalled and not free:
         teaser = _e(i18n.t("pick.paywall_blurb", locale))
         body_html = (
             f'<p style="margin:0 0 14px;font-family:\'Inter\',sans-serif;'
@@ -1597,9 +1611,15 @@ def _pick_card_html(
         )
     else:
         why_html = _why_block_html(pick, locale)
-        cta_label = i18n.t("pick.cta_open", locale)
         save_label = i18n.t("pick.cta_save", locale)
-        primary_url = pick.pulpo_url or pick.listing_url or paywall_url
+        if free and not is_top_deal:
+            # ranks 04-10 of the free weekly — sign-up ask, points at the
+            # paywall / checkout target rather than the listing page.
+            cta_label = i18n.t("pick.cta_signup", locale)
+            primary_url = paywall_url or pick.pulpo_url or pick.listing_url
+        else:
+            cta_label = i18n.t("pick.cta_open", locale)
+            primary_url = pick.pulpo_url or pick.listing_url or paywall_url
         save_url = pick.save_url or (primary_url + ("&save=1" if "?" in primary_url else "?save=1"))
         title_html = _title_with_widow_guard(_e(pick.title or ""))
         body_html = (
@@ -1732,7 +1752,7 @@ def _section_intro_rest_html(locale: Locale, n_rest: int) -> str:
     """
 
 
-def _weekly_news_spotlight_html(issue: Issue) -> str:
+def _weekly_news_spotlight_html(issue: Issue, *, free: bool = False) -> str:
     """The "Weekly News Spotlight" block — one curated regional-news
     story per issue, sourced from a whitelist of El Salvador outlets
     (El Diario de Hoy, La Prensa Gráfica, El Mundo, Diario El Salvador,
@@ -1792,6 +1812,41 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
             f'<p style="font-size:11.5px;color:#5A5650;letter-spacing:0.04em;'
             f'margin:0 0 12px;font-weight:500;">{reported_by} {src_html}{date_html}</p>'
         )
+
+    # Free-tier weekly: the spotlight is Pro-LOCKED. Show the real
+    # eyebrow (+ Pro badge), source citation, headline, and the opening
+    # sentence of the real article — all from the committed artifact, no
+    # fabricated copy — then withhold the rest of the read behind a single
+    # sign-up panel. The body paragraph is plain text from the artifact;
+    # take the first sentence as the visible tease.
+    if free:
+        pro_badge = i18n.t("spotlight.pro_badge", locale)
+        locked_label = i18n.t("spotlight.locked_label", locale)
+        locked_body = i18n.t("spotlight.locked_body", locale)
+        locked_cta = i18n.t("spotlight.locked_cta", locale)
+        signup_url = issue.paywall_target_url or "https://pulpo.club/start"
+        teaser_sentence = paragraph.split(". ", 1)[0].strip().rstrip(".") + "."
+        return f"""
+    <tr><td class="pad-h" style="padding:28px 24px 22px;">
+      <div style="height:1px;background:#1A1916;margin-bottom:20px;"></div>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:6px;"><tr>
+        <td style="line-height:0;padding-right:8px;vertical-align:middle;">
+          <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="18" height="18" alt="Pulpo" style="display:block;width:18px;height:18px;border:0;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#1F3D31;font-weight:700;">{_e(eyebrow)}<span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.12em;padding:2px 6px;margin-left:8px;background:#1F3D31;color:#EAE5D8;border-radius:3px;vertical-align:middle;">&#128274; {_e(pro_badge)}</span></div>
+        </td>
+      </tr></table>
+      {source_line_html}
+      <h2 style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;line-height:1.08;letter-spacing:-0.012em;font-weight:400;margin:0 0 10px;color:#1A1916;">{_e(title)}</h2>
+      <p style="font-size:15.5px;line-height:1.6;color:#1A1916;margin:0 0 16px;max-width:580px;">{teaser_sentence}</p>
+      <div style="background:#1F3D31;border-radius:8px;padding:20px 22px;max-width:580px;">
+        <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#9DB8A6;font-weight:700;margin-bottom:8px;">&#128274; {_e(locked_label)}</div>
+        <p style="font-size:15px;line-height:1.55;color:#EAE5D8;margin:0 0 16px;">{_e(locked_body)}</p>
+        <a href="{_e(signup_url)}" style="display:inline-block;font-size:13px;font-weight:600;padding:11px 18px;background:#D4A04A;color:#1F3D31;border-radius:999px;text-decoration:none;white-space:nowrap;">{_e(locked_cta)}</a>
+      </div>
+    </td></tr>
+    """
 
     # Pulpo brand-mark icon next to the eyebrow — signals this is a
     # recurring Pulpo institutional section.
@@ -1870,26 +1925,53 @@ def _general_hero_html(issue: Issue) -> str:
     """
 
 
+def _header_pro_badge(free: bool) -> str:
+    """The gold "PRO" chip next to the `pulpo` masthead wordmark.
+
+    Dropped entirely for the free-tier weekly (`variant="free_general"`):
+    a free reader is not a Pro member, so the masthead reads plain `pulpo`.
+    Every other variant (Pro general / welcome / welcome-back) keeps the
+    badge. Operator rule: free emails never wear Pro chrome.
+    """
+    if free:
+        return ""
+    return (
+        '<span style="display:inline-block;font-size:10px;font-weight:700;'
+        'letter-spacing:0.14em;padding:2px 6px;background:#D4A04A;color:#1F3D31;'
+        'border-radius:3px;margin-left:6px;vertical-align:middle;line-height:1;">PRO</span>'
+    )
+
+
 def render_html(issue: Issue, *, variant: str = "general") -> str:
-    """Master Pulpo Pro email template. `variant` controls ONLY the top
-    hero block (+ the <title> and the <meta> version stamp):
+    """Master Pulpo email template. `variant` controls the top hero block
+    (+ the <title> and the <meta> version stamp), and for "free_general"
+    also the masthead chrome, the ranks 04-10 CTA, and the spotlight lock:
 
       • "general"      — the weekly digest (default): commentary-driven
         hero (eyebrow / headline / lede / filter chips).
       • "welcome"      — first-time onboarding: static welcome hero.
       • "welcome_back" — resubscribe: the welcome hero with the greeting
         reworded (derived from welcome copy, see i18n.welcome_text).
+      • "free_general" — the free-tier weekly. General hero + body, but:
+        plain `pulpo` masthead (no PRO badge), ranks 04-10 swap "See on
+        Pulpo" for "Sign up to Pro" (top 3 keep the listing link, every
+        card stays a full listing card), and the Weekly News Spotlight is
+        Pro-locked (real headline + source + opening sentence show, the
+        read sits behind a sign-up panel).
 
     EVERYTHING below the hero — favorites, market context, the 10 picks,
-    paywall (free only), weekly news spotlight, Your Pulpo, footer —
-    renders identically for all three. The welcome and welcome-back are
-    the General with only the hero swapped, so a change to any shared
-    block lands on all three automatically and they cannot drift. The
-    weekly-only blocks self-gate for a Pro welcome reader: paywall is
-    off (Pro), favorites no-ops when nothing's saved.
+    weekly news spotlight, Your Pulpo, footer — renders from the same
+    shared blocks; welcome / welcome-back / free-general are the General
+    with targeted, variant-gated changes, so they cannot silently drift.
+    The weekly-only blocks self-gate for a Pro welcome reader: favorites
+    no-ops when nothing's saved.
     """
     locale = issue.locale
     is_welcome = variant in ("welcome", "welcome_back")
+    # Free-tier weekly: same master body as the General, three cohort
+    # changes (plain masthead, ranks 04-10 "Sign up to Pro", Pro-locked
+    # spotlight) all gated on this flag so the Pro path is untouched.
+    is_free = variant == "free_general"
     head_title = (
         i18n.welcome_text("hero.eyebrow", locale, variant=variant)
         if is_welcome
@@ -1898,6 +1980,7 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     template_version = (
         WELCOME_BACK_TEMPLATE_VERSION if variant == "welcome_back"
         else WELCOME_TEMPLATE_VERSION if variant == "welcome"
+        else FREE_GENERAL_TEMPLATE_VERSION if variant == "free_general"
         else TEMPLATE_VERSION
     )
     issue_strip = i18n.t(
@@ -1909,14 +1992,14 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     # rank-pill copy differ. The v3 split between `_rich_pick` and
     # `_short_pick` is dead.
     top3_html = "".join(
-        _pick_card_html(p, locale=locale, is_top_deal=True, paywall_url=issue.paywall_target_url)
+        _pick_card_html(p, locale=locale, is_top_deal=True, paywall_url=issue.paywall_target_url, free=is_free)
         for p in issue.picks_top
     )
     rest_html = ""
     section_intro_rest_html = ""
     if issue.picks_shortlist:
         rest_html = "".join(
-            _pick_card_html(p, locale=locale, is_top_deal=False, paywall_url=issue.paywall_target_url)
+            _pick_card_html(p, locale=locale, is_top_deal=False, paywall_url=issue.paywall_target_url, free=is_free)
             for p in issue.picks_shortlist
         )
         section_intro_rest_html = _section_intro_rest_html(locale, len(issue.picks_shortlist))
@@ -1952,7 +2035,7 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
               <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="26" height="26" alt="Pulpo" style="display:block;width:26px;height:26px;border:0;" />
             </td>
             <td style="vertical-align: middle;">
-              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span><span style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.14em;padding:2px 6px;background:#D4A04A;color:#1F3D31;border-radius:3px;margin-left:6px;vertical-align:middle;line-height:1;">PRO</span>
+              <span class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.035em; color: #1F3D31; line-height: 1; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">pulpo</span>{_header_pro_badge(is_free)}
             </td>
           </tr></table>
         </td>
@@ -1997,9 +2080,9 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     {_paywall_banner_html(issue)}
     {section_intro_rest_html}
     {rest_html}
-    {_weekly_news_spotlight_html(issue)}
+    {_weekly_news_spotlight_html(issue, free=is_free)}
     {_your_pulpo_html(issue)}
-    {_footer_html(issue)}
+    {_footer_html(issue, free=is_free)}
   </table>
 </div>
 </body>
@@ -2073,6 +2156,16 @@ def render_welcome_html(issue: Issue, *, now=None) -> str:
     to the General. `now` is accepted for backward compatibility and
     ignored (the welcome no longer carries a cadence note)."""
     return render_html(issue, variant="welcome")
+
+
+def render_free_general_html(issue: Issue) -> str:
+    """Render the Pulpo FREE General weekly — the master template with
+    `variant="free_general"`. Same hero + body as the Pro General, with
+    three free-cohort changes (plain `pulpo` masthead, ranks 04-10
+    "Sign up to Pro" CTA, Pro-locked Weekly News Spotlight), all gated
+    on the variant inside `render_html`. See FREE_GENERAL_TEMPLATE_VERSION.
+    """
+    return render_html(issue, variant="free_general")
 
 
 def render_welcome_back_html(issue: Issue, *, now=None) -> str:

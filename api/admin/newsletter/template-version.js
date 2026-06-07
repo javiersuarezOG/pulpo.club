@@ -76,7 +76,19 @@ const TEMPLATES = [
     versionRe: /^WELCOME_BACK_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
     lastUpdatedRe: /^WELCOME_BACK_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
   },
+  {
+    // Free-tier weekly. The `FREE_GENERAL_` prefix keeps these
+    // line-anchored regexes disjoint from the General TEMPLATE_VERSION /
+    // LAST_UPDATED ones (which would otherwise substring-match).
+    id: "pulpo-free-general",
+    versionRe: /^FREE_GENERAL_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^FREE_GENERAL_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
 ];
+
+// Short-version extractor handles both `-v4.4-` (pro) and
+// `free-general-v1.0-` (free). The `SHORT_VERSION_RE` below pulls the
+// `vN.N` token regardless of prefix.
 
 // Extract the "v4.4" / "v1.0" portion from the full Python constant
 // string so the widget can render the short form.
@@ -159,6 +171,7 @@ module.exports = async (req, res) => {
     general_version: out["pulpo-pro-general"].version,
     welcome_version: (out["pulpo-pro-welcome"] && out["pulpo-pro-welcome"].version) || "missing",
     welcome_back_version: (out["pulpo-pro-welcome-back"] && out["pulpo-pro-welcome-back"].version) || "missing",
+    free_general_version: (out["pulpo-free-general"] && out["pulpo-free-general"].version) || "missing",
   });
   return res.status(200).json(out);
 };

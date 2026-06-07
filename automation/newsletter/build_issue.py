@@ -868,18 +868,14 @@ def _to_pick(
     pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
     story_html, story_source = ("", "")
-    why_bullets: list[str] = []
     shortlist_frame_html = ""
+    # Why-bullets describe EVERY pick's opportunity — including the locked
+    # ranks 04-10 (Free cohort). Those cards render the full listing
+    # component as a tease (title, location, price, "Why we picked it")
+    # behind a single "Sign up to Pro" CTA, so the why-block must be
+    # populated regardless of paywall.
+    why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
     if not paywalled:
-        # v4 (2026-05-30): the locked `_pick_card_html` component
-        # renders ALL 10 picks through the same Why-block — top 3 and
-        # picks 04-10 alike. Generating why_bullets only for heroes (the
-        # v3 split) left picks 04-10 with an EMPTY why-block in v4 — the
-        # cards looked dramatically less informative than the top 3 and
-        # broke the "all cards identical except background color"
-        # contract the redesign locked in. Fix: populate why_bullets for
-        # every non-paywalled pick.
-        why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
         if is_hero:
             # `story_html` and `shortlist_frame_html` are dead code in
             # v4 (only the legacy `_rich_pick` / `_short_pick` renderers
@@ -1020,7 +1016,11 @@ def build_issue(
             listing,
             rank=i + 1,
             locale=locale,
-            paywalled=paywall_all and i > 0,
+            # Top 3 are open (See on Pulpo) for every cohort, Free included.
+            # The Free paywall starts at rank 04 (the "7 more" shortlist),
+            # which renders the full listing card behind a "Sign up to Pro"
+            # CTA.
+            paywalled=False,
             site_root=site_root,
             issue_number=issue_number,
             is_hero=True,                          # PR-NL-6 — generate story_html

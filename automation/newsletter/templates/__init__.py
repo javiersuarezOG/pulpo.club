@@ -23,7 +23,12 @@ from __future__ import annotations
 from typing import Callable
 
 from ..types import Issue
-from . import pulpo_pro_general, pulpo_pro_welcome, pulpo_pro_welcome_back
+from . import (
+    pulpo_pro_general,
+    pulpo_pro_welcome,
+    pulpo_pro_welcome_back,
+    pulpo_free_general,
+)
 
 # template_id  →  render function
 # Every value MUST be a callable taking exactly one `Issue` argument
@@ -33,6 +38,7 @@ TEMPLATES: dict[str, Callable[[Issue], str]] = {
     "pulpo-pro-general": pulpo_pro_general.render,
     "pulpo-pro-welcome": pulpo_pro_welcome.render,
     "pulpo-pro-welcome-back": pulpo_pro_welcome_back.render,
+    "pulpo-free-general": pulpo_free_general.render,
 }
 
 __all__ = [
@@ -40,4 +46,5 @@ __all__ = [
     "pulpo_pro_general",
     "pulpo_pro_welcome",
     "pulpo_pro_welcome_back",
+    "pulpo_free_general",
 ]

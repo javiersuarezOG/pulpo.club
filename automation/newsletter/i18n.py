@@ -61,6 +61,12 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # source-aware `cta_view_on` / `cta_view` from v2.2 are deleted —
     # the rich-pick CTA now points at pulpo_url, not listing_url.
     "pick.cta_open":               {"en": "See on Pulpo →",                               "es": "Ver en Pulpo →"},
+    # Free general template only — the ranks 04-10 ("7 more") CTA. The card
+    # renders identically to the Pro card (photo, title, location, price,
+    # "Why we picked it"); only the CTA changes from "See on Pulpo" to a
+    # sign-up ask. Rendered by `_pick_card_html` when variant="free_general"
+    # and the pick is NOT a top-3 deal.
+    "pick.cta_signup":             {"en": "Sign up to Pro →",                              "es": "Regístrate en Pro →"},
     # v4 (2026-05-31): shortened from "Save to favorites" / "Guardar en
     # favoritos" — the long Spanish form was overflowing the card width
     # on mobile (375px in Gmail's narrow rendering) and breaking the
@@ -101,6 +107,18 @@ STRINGS: dict[str, dict[Locale, str]] = {
                                      "es": "Después del top 3. Cada una calza en un segmento — Bitcoin Beach lista para mudarse, frente al mar trofeo, lotes a escala de desarrollador, sitios de construcción de rango medio. Hojeá los puntos de \"por qué la elegimos\" y parate en la que te calza a vos."},
     # ── Weekly News Spotlight (v4) ────────────────────────────────────
     "spotlight.eyebrow":           {"en": "Weekly News Spotlight",                         "es": "Noticia de la semana"},
+    # ── Free general template: the spotlight is Pro-LOCKED ────────────
+    # The free edition shows the REAL headline, source citation and the
+    # opening sentence of the real article (all from the committed
+    # news_spotlight.json artifact — no fabricated copy), then withholds
+    # the rest of the read behind a single sign-up panel. These strings are
+    # the generic upsell wrapper around that real content; they must NOT
+    # claim article-specific analysis that doesn't exist in the artifact.
+    "spotlight.pro_badge":         {"en": "Pro",                                          "es": "Pro"},
+    "spotlight.locked_label":      {"en": "The Pulpo read · Pro",                          "es": "El análisis de Pulpo · Pro"},
+    "spotlight.locked_body":      {"en": "Pulpo Pro carries the full read — what the story means for prices and which of this week's picks it touches.",
+                                     "es": "Pulpo Pro lleva el análisis completo — qué significa la noticia para los precios y a cuáles de las selecciones de esta semana les afecta."},
+    "spotlight.locked_cta":        {"en": "Sign up to Pro to read the take →",             "es": "Regístrate en Pro para leer el análisis →"},
     # DEPRECATED (kept for parity; no longer rendered). The spotlight now
     # reads from the committed artifact (web/data/news_spotlight.json) with
     # nightly carry-forward, so a real cited article is always available —
