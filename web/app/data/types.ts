@@ -119,6 +119,18 @@ export type Listing = {
    *  case any populated dist_*_km comes from a zone-table fallback and is
    *  itself approximate). The FE uses this to soften distance displays. */
   geocoding_confidence: "high" | "medium" | "low" | null;
+  /** How the lat/lng was obtained. 'extracted' = parsed from the broker's
+   *  own structured payload (precise). 'estimated' = DeepSeek inferred
+   *  from zone/landmark cues (approximate). 'nominatim' = OSM fallback
+   *  geocoder (approximate). null when no geocoding ran at all. Drives
+   *  the location-precision note rendered next to the zone label on the
+   *  detail page — see web/app/lib/location-precision.ts. */
+  geocoding_source: "extracted" | "estimated" | "nominatim" | null;
+  /** Human-readable description of what the geocoder anchored on
+   *  (e.g. "Near Playa El Tunco, Tamanique, La Libertad, El Salvador").
+   *  Surfaced under the approximate-location note so users see WHICH
+   *  area the broker actually published. null when no geocoding ran. */
+  geocoding_reference: string | null;
   is_sold: boolean;
   original_url: string | null;
   // Position-rank from pulpo/ranker.py (1 = best opportunity). Distinct
