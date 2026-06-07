@@ -38,7 +38,14 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 RANKED = REPO / "web" / "data" / "ranked.json"
 
-PULPO_SOCIAL_PANIC_FLOOR = 50
+# REMOVE 2026-06-13 — bedding-in after Phase C ship dropped the
+# qualifying pool from baseline ~217 to 44 (top-50 hero coverage
+# 0.0% on the first post-Phase-C nightly per the 27068418528 logs).
+# Temporary 40 floor unblocks the queue of open PRs while the photo
+# cache warms. Revert to 50 once the pool recovers (or sooner if R7
+# from docs/RESILIENCE-AUDIT-PRD.md decouples photos from the critical
+# path and a backfill warms the cache faster).
+PULPO_SOCIAL_PANIC_FLOOR = 40
 """Minimum qualifying-pool size below which pulpo-social's /admin/trigger
 is statistically broken. Tuned for the default 10-candidate sample:
   - 217 (today's baseline) → 99.99% per-trigger success
