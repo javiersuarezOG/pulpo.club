@@ -79,6 +79,101 @@ def pick_user_agent(pool: str = "default", rng: Optional[random.Random] = None) 
     return r.choice(bucket)
 
 
+# ── Browser-realistic headers ─────────────────────────────────────────
+#
+# Several WAFs (Cloudflare fingerprint rules + a few SiteGround / Sucuri
+# bot pages) 403 plain httpx because the request lacks the Sec-Fetch /
+# Sec-CH-UA family that a real browser sends on a top-level navigation.
+# Sending them universally is free for compliant sites and unblocks
+# fingerprint-based gates without needing Playwright. Pattern lifted from
+# events-discovery's http_client (post-2026-05-25 recovery work) and
+# adapted to Pulpo's SV locale + multi-UA pool.
+#
+# Two pieces:
+#   • _UNIVERSAL_BROWSER_HEADERS — Accept / Accept-Language / Sec-Fetch-*
+#     identical across all UAs.
+#   • _client_hints_for_ua(ua)  — Sec-CH-UA + Sec-CH-UA-Platform that ONLY
+#     fire when the UA looks like Chrome / Edge / Chromium. Safari and
+#     Firefox don't send client hints; matching that absence is part of
+#     the realism.
+#
+# The combined set is applied automatically inside polite_get /
+# polite_curl_cffi_get / polite_playwright_goto — no per-scraper wiring
+# needed.
+
+_UNIVERSAL_BROWSER_HEADERS: dict[str, str] = {
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "image/avif,image/webp,image/apng,*/*;q=0.8"
+    ),
+    # SV-leaning locale — broker sites localize content where they can,
+    # and "es-SV" reads more native than "en-US" to a Salvadoran WAF
+    # rule tuned for tourist-bot traffic.
+    "Accept-Language": "es-SV,es;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-User": "?1",
+    "Sec-Fetch-Dest": "document",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+
+def _client_hints_for_ua(user_agent: str) -> dict[str, str]:
+    """Return Sec-CH-UA + Sec-CH-UA-Platform + Sec-CH-UA-Mobile for the
+    given UA.
+
+    Only Chromium-family browsers (Chrome / Edge / Opera) actually send
+    these headers. Returning an empty dict for Safari / Firefox keeps
+    the fingerprint coherent — a Safari UA paired with Sec-CH-UA
+    headers would be more suspicious than no client hints at all.
+    """
+    if not isinstance(user_agent, str) or not user_agent:
+        return {}
+    if "Chrome/" not in user_agent or "Chromium" in user_agent:
+        # The "Chromium" check is for the bare-bones Linux Chromium UA
+        # which some sites flag separately. Safari / Firefox / Edge
+        # (which include "Chrome/" historically) — we only emit hints
+        # when the UA looks like vanilla Chrome.
+        pass
+    is_chrome = "Chrome/" in user_agent and "Safari/537.36" in user_agent
+    if not is_chrome:
+        return {}
+    # Extract major version from "Chrome/121.0.0.0".
+    import re as _re
+    m = _re.search(r"Chrome/(\d+)", user_agent)
+    if not m:
+        return {}
+    major = m.group(1)
+    if "Windows" in user_agent:
+        platform = '"Windows"'
+    elif "Macintosh" in user_agent:
+        platform = '"macOS"'
+    elif "Linux" in user_agent:
+        platform = '"Linux"'
+    else:
+        platform = '"Unknown"'
+    return {
+        "sec-ch-ua": (
+            f'"Chromium";v="{major}", "Not?A_Brand";v="24", '
+            f'"Google Chrome";v="{major}"'
+        ),
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": platform,
+    }
+
+
+def browser_realistic_headers(user_agent: str) -> dict[str, str]:
+    """Compose the universal + UA-specific headers a real desktop browser
+    would send on a top-level navigation. Includes ``User-Agent`` so the
+    caller can dict-merge in one step.
+    """
+    headers = {"User-Agent": user_agent}
+    headers.update(_UNIVERSAL_BROWSER_HEADERS)
+    headers.update(_client_hints_for_ua(user_agent))
+    return headers
+
+
 # ── Jitter ────────────────────────────────────────────────────────────
 
 
@@ -260,7 +355,15 @@ def polite_get(
         limiter.acquire()
         jitter_sleep(p, rng)
 
-        headers = {"User-Agent": pick_user_agent(p.user_agent_pool, rng)}
+        # Browser-realistic headers (Sec-Fetch-*, Accept-Language es-SV,
+        # Sec-CH-UA when the UA is Chrome) — unblocks Cloudflare /
+        # SiteGround fingerprint gates without needing a real browser.
+        # Pre-2026-06 we sent only `User-Agent` here, which trips a
+        # surprising number of cheap WAFs. extra_headers wins over the
+        # defaults so a caller can still pin e.g. a custom Referer.
+        headers = browser_realistic_headers(
+            pick_user_agent(p.user_agent_pool, rng)
+        )
         if extra_headers:
             headers.update(extra_headers)
 
@@ -418,7 +521,14 @@ def polite_curl_cffi_get(
         limiter.acquire()
         jitter_sleep(p, rng)
 
-        headers = {"User-Agent": pick_user_agent(p.user_agent_pool, rng)}
+        # Same browser-realistic header set as polite_get. curl_cffi's
+        # TLS-impersonation handles JA3 fingerprint gates; these headers
+        # handle the *application*-layer fingerprint gates (Cloudflare's
+        # "Just a moment", SiteGround pages, etc.). Wearing both is what
+        # closes the realistic-browser gap.
+        headers = browser_realistic_headers(
+            pick_user_agent(p.user_agent_pool, rng)
+        )
         if extra_headers:
             headers.update(extra_headers)
 
