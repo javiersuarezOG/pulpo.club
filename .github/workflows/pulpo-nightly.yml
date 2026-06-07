@@ -357,10 +357,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           python3 - <<'EOF'
-          import json, os, sys, urllib.request
+          import datetime, json, os, sys, urllib.request
           REQUIRED = ("en", "es")
+          STALE_DAYS = 21  # carry-forward older than this = fresh news has stopped
           path = "web/data/news_spotlight.json"
-          missing = []
+          today = datetime.date.today()
+          missing, stale = [], []
           try:
               data = json.load(open(path, encoding="utf-8"))
           except (FileNotFoundError, json.JSONDecodeError):
@@ -369,12 +371,25 @@ jobs:
               e = data.get(lc) if isinstance(data, dict) else None
               if not (isinstance(e, dict) and e.get("title") and e.get("paragraph") and e.get("source_url")):
                   missing.append(lc)
-          if not missing:
-              print(f"news-spotlight canary OK — {', '.join(REQUIRED)} all carry a cited article")
+                  continue
+              # Staleness: how long since the nightly last wrote a FRESH pick.
+              picked = e.get("picked_at")
+              try:
+                  age = (today - datetime.date.fromisoformat(picked)).days
+              except (TypeError, ValueError):
+                  age = None
+              if age is not None and age > STALE_DAYS:
+                  stale.append(f"{lc} ({age}d old)")
+          if not missing and not stale:
+              print(f"news-spotlight canary OK — {', '.join(REQUIRED)} all carry a fresh cited article")
               sys.exit(0)
-          msg = (f":rotating_light: Pulpo news-spotlight EMPTY for locale(s): "
-                 f"{', '.join(missing)} — Pro emails will ship without a news block. "
-                 f"Run scripts/refresh_news_spotlight.py with DEEPSEEK_API_TOKEN to seed.")
+          parts = []
+          if missing:
+              parts.append(f"EMPTY for locale(s): {', '.join(missing)} (Pro emails will ship without a news block)")
+          if stale:
+              parts.append(f"STALE (no fresh pick in >{STALE_DAYS}d): {', '.join(stale)} — the nightly news fetch may have silently stopped")
+          msg = (":rotating_light: Pulpo news-spotlight " + "; ".join(parts) +
+                 ". Check DEEPSEEK_API_TOKEN + the refresh step in this run.")
           print(f"::warning::{msg}")
           hook = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
           if not hook:
