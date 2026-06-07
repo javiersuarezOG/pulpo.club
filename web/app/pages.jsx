@@ -37,6 +37,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
+import { tokenize, matchesQuery } from "./lib/search-match";
 import {
   Icon,
   RankTrophy,
@@ -869,6 +870,11 @@ function makeDefaultFilters() {
     // surfaces them at the bottom of the result set (ranker already
     // hard-floored them, so the order is correct without extra work).
     include_incomplete: false,
+    // Free-text exact-lookup search (web/app/lib/search-match.ts). The
+    // user types a Pulpo id, broker URL, zone, or title fragment;
+    // every whitespace-separated token must hit somewhere in the
+    // listing's haystack. Empty = match-all (no-op).
+    query: "",
   };
 }
 
@@ -906,6 +912,10 @@ function buildTopRankMap(listings, n = 10) {
 }
 
 function applyFilters(listings, f) {
+  // Tokenize once for the whole filter pass — matchesQuery is a hot
+  // path (runs per-listing per-render) and re-splitting + re-folding
+  // the same query string per row is wasteful.
+  const queryTokens = tokenize(f && f.query);
   return listings.filter(l => {
     if (l.is_sold) return false;
     // Quality gate — incomplete listings are hidden by default.
@@ -943,6 +953,10 @@ function applyFilters(listings, f) {
         if (!tags.includes(required)) return false;
       }
     }
+    // Free-text exact-lookup search. Done last because (a) it's the
+    // most expensive predicate per row (string concat + substring),
+    // and (b) most filtered-out rows never reach this check.
+    if (queryTokens.length > 0 && !matchesQuery(l, queryTokens)) return false;
     // rank_max is intentionally NOT applied here — it operates on a
     // position rank that only makes sense AFTER every other predicate
     // has narrowed the set. Callers compute the cap via applyRankCap.
@@ -1381,6 +1395,12 @@ function BrowsePage({ app }) {
           <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
         </div>
         <div className="results-col">
+          <BrowseSearchBar
+            value={filters.query || ""}
+            onChange={(next) => setFiltersWithPinClear({ ...filters, query: next })}
+            resultCount={results.length}
+            locale={app.locale}
+          />
           <div className="results-header">
             <div className="results-count">
               {(() => {
@@ -2875,6 +2895,81 @@ function ToastHost({ app }) {
     <div className="toast">
       <Icon name="check" size={16} strokeWidth={2.4}/>
       <span>{app.toast.message}</span>
+    </div>
+  );
+}
+
+// ====== Browse search bar ======
+// PR-S1 — /browse exact-lookup search. Tokenized substring match against
+// id / source_id / URL / zone / title / source_label / province_state via
+// web/app/lib/search-match.ts::matchesQuery. No fuzzy ranking yet (Fuse.js
+// + scoring queued for PR-S2). Submit-side telemetry — we emit
+// `browse.search_submitted` on Enter / blur (not on every keystroke) so
+// the PostHog stream stays consumable.
+function BrowseSearchBar({ value, onChange, resultCount, locale }) {
+  const lc = locale || currentLocale();
+  // Local input mirrors `value` (the URL/filter state) so paint stays
+  // synchronous with typing. Sync back to filters on every change — the
+  // applyFilters debounce (300ms) handles the heavy work.
+  const inputRef = pUseRef(null);
+  const handleChange = pUseCallback((e) => onChange(e.target.value), [onChange]);
+  // Submit telemetry — fires once per "intent." Pressing Enter while
+  // typing counts as a submit; tabbing/blurring with a non-empty value
+  // also counts. Avoids per-keystroke spam.
+  const lastEmittedRef = pUseRef("");
+  const emitSubmit = pUseCallback(() => {
+    const v = (value || "").trim();
+    if (!v) return;
+    if (v === lastEmittedRef.current) return;
+    lastEmittedRef.current = v;
+    track("browse.search_submitted", {
+      q_length: v.length,
+      token_count: v.split(/\s+/).filter(Boolean).length,
+      result_count: resultCount,
+    });
+  }, [value, resultCount]);
+  const handleKeyDown = pUseCallback((e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      emitSubmit();
+      inputRef.current?.blur();
+    } else if (e.key === "Escape" && value) {
+      e.preventDefault();
+      onChange("");
+    }
+  }, [emitSubmit, onChange, value]);
+  const handleClear = pUseCallback(() => {
+    onChange("");
+    inputRef.current?.focus();
+  }, [onChange]);
+  return (
+    <div className="browse-search">
+      <Icon name="search" size={16} className="browse-search__icon" />
+      <input
+        ref={inputRef}
+        type="search"
+        className="browse-search__input"
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onBlur={emitSubmit}
+        placeholder={t("browse.search.placeholder", lc)}
+        aria-label={t("browse.search.aria_label", lc)}
+        maxLength={200}
+        autoComplete="off"
+        spellCheck={false}
+      />
+      {value && (
+        <button
+          type="button"
+          className="browse-search__clear"
+          onClick={handleClear}
+          aria-label={t("browse.search.clear_aria", lc)}
+          title={t("browse.search.clear_aria", lc)}
+        >
+          <Icon name="close" size={14} strokeWidth={2} />
+        </button>
+      )}
     </div>
   );
 }
