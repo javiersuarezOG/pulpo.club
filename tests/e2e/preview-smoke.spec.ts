@@ -569,6 +569,11 @@ test.describe("New app boots cleanly on key routes", () => {
       "Approximate location",                         // detail.location.precision.approximate.title
       "Exact location from broker",                   // detail.location.precision.precise.title
       "Confirm the exact address",                    // detail.location.precision.approximate.body (anchor phrase)
+      // /browse search bar (PR-S1). Renders on every /browse load — a
+      // stuck EN string here is visible to every Spanish-locale visitor.
+      "Search by id",                                 // browse.search.placeholder (first half)
+      "Search listings",                              // browse.search.aria_label
+      "Clear search",                                 // browse.search.clear_aria
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
