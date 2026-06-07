@@ -79,6 +79,10 @@ jobs:
           if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
             BASE_SHA="$(git rev-parse HEAD^)"
           fi
+          if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
           node scripts/diff_csp_allowlist.mjs "$BASE_SHA"
       # Version-bump guards — mandatory for any PR touching home block
       # components OR newsletter template modules. Without these, the
@@ -91,11 +95,19 @@ jobs:
           if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
             BASE_SHA="$(git rev-parse HEAD^)"
           fi
+          if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
           node scripts/diff_home_version.mjs "$BASE_SHA"
       - name: newsletter TEMPLATE_VERSION bump guard
         run: |
           BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
           if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"
             BASE_SHA="$(git rev-parse HEAD^)"
           fi
           node scripts/diff_newsletter_version.mjs "$BASE_SHA"

@@ -3,57 +3,135 @@
   "version": 1,
   "sources": {
     "bienesraices": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "citymax": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "century21": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "elagente": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "encuentra24": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "essurf": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "goodlife": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "nexo": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "oceanside": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "realtyelsalvador": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     },
     "remax": {
-      "full_res": { "strategy": "noop" },
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "agentiz": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "santizo": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "citymax_sc": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "vivolatam": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "csbr": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "realestate_au_sv": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "jamesedition": {
+      "full_res": {
+        "strategy": "noop"
+      },
+      "min_source_long_side_px": 1080,
+      "deprioritize_weight": 1.0
+    },
+    "xitios": {
+      "full_res": {
+        "strategy": "noop"
+      },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
     }

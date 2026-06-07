@@ -191,9 +191,141 @@ SCRAPER_METADATA: dict[str, dict] = {
         "target_discovered": None,
         "health_probe_url": "https://www.remax-elsalvador.com",
     },
-    # ── Phase C scrapers — entries added when each scraper PR lands ──
-    # Forward-looking placeholders. Each Phase C PR replaces its entry
-    # with concrete metadata on merge.
+    # ── Phase C scrapers — DRAFT skeletons (PRs C2-C8) ──
+    # All seven entries land in the same PR as their scraper files.
+    # Each remains DRAFT in failure_modes until the per-source
+    # calibration pass replaces placeholder selectors with real ones.
+    "agentiz": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "static_urls",
+        "extraction_kind": "5 hardcoded type-slot URLs → per-detail JSON-LD RealEstateListing",
+        "strengths": ["agency-sourced JSON-LD", "low-noise inventory"],
+        "failure_modes": [
+            "very low volume (~5 listings) — watchdog floor is 5, not a degradation signal",
+            "if agentiz expands the SV catalog, static_urls list must be updated; the static-urls strategy is fragile by design",
+        ],
+        "owner_module": "pulpo.scrapers.agentiz",
+        "target_prd": 5,
+        "target_discovered": None,
+        "health_probe_url": "https://sv.agentiz.com/en",
+    },
+    "santizo": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "jsonld_listing (case-insensitive @type) + ?page=N catalog walk → per-detail JSON-LD",
+        "strengths": ["#1 SV agency per their own marketing", "high data completeness"],
+        "failure_modes": [
+            "carries cross-country inventory (DR) — filtered by URL slug + addressCountry",
+            "expect overlap with encuentra24",
+        ],
+        "owner_module": "pulpo.scrapers.santizo",
+        "target_prd": 150,
+        "target_discovered": None,
+        "health_probe_url": "https://santizorealestate.com/s/ventas",
+    },
+    "citymax_sc": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "catalog ItemList JSON-LD → per-detail RealEstateListing JSON-LD",
+        "strengths": ["coastal/Surf City focus", "catalog JSON-LD ItemList = clean URL discovery"],
+        "failure_modes": [
+            "?in=terrenos,fincas filter is non-functional — page returns all types regardless; rely on downstream type classifier",
+            "may share inventory with citymax (verify via dedup_audit overlap matrix after first nightly)",
+        ],
+        "owner_module": "pulpo.scrapers.citymax_sc",
+        "target_prd": 300,
+        "target_discovered": None,
+        "health_probe_url": "https://www.citymax-sc.com/inmuebles/venta/el-salvador",
+    },
+    "vivolatam": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "sitemap",
+        "extraction_kind": "sitemap-driven (catalog is client-rendered) → per-detail RealEstateListing JSON-LD",
+        "strengths": ["regional portal", "verified seller ecosystem", "sitemap-driven discovery (no SSR-dependence)"],
+        "failure_modes": [
+            "multi-country site — sitemap_url_filter forces /<active-country>/ + for-sale tokens (rents excluded)",
+            "sitemap-only discovery means catalog UI is not the URL source — if vivolatam restructures the sitemap path, we re-discover the new feed",
+        ],
+        "owner_module": "pulpo.scrapers.vivolatam",
+        "target_prd": 400,
+        "target_discovered": None,
+        "health_probe_url": "https://www.vivolatam.com/sitemap/property_listings.xml",
+    },
+    "csbr": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "WordPress /page/N/ walk → JSON-LD RealEstateListing (@graph) + Houzez li.item-price for price",
+        "strengths": [
+            "official industry guild (institutional source — +1 quality_score nudge)",
+            "type-filtered catalog (fincas+playa+terrenos) — pre-narrowed inventory",
+        ],
+        "failure_modes": [
+            "JSON-LD RealEstateListing lacks `offers` — price scraped from Houzez <li class='item-price'> instead",
+            "URL-encoded type[]=fincas+playa+terrenos filter MUST be preserved across pagination",
+        ],
+        "owner_module": "pulpo.scrapers.csbr",
+        "target_prd": 293,
+        "target_discovered": None,
+        "health_probe_url": "https://www.camarabienesraices.com.sv/resultado-busqueda/?keyword=&type%5B0%5D=fincas&type%5B1%5D=playa&type%5B2%5D=terrenos",
+    },
+    "realestate_au_sv": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "constructed pagination → per-detail JSON-LD RealEstateListing (HTML-entity-unescaped)",
+        "strengths": [
+            "international aggregator",
+            "broad rural-land gap-fill (314 listings under the rural+land filter alone)",
+        ],
+        "failure_modes": [
+            "in-page pagination hrefs DROP /sv/ country scope + searchtypes filter — must construct URLs from url_pattern, not follow",
+            "JSON-LD is HTML-entity-encoded inside Next.js SSR <script> tags — requires html.unescape before json.loads",
+            "ToS clearance recommended before broad nightly runs; this commit ships against public catalog only",
+        ],
+        "owner_module": "pulpo.scrapers.realestate_au_sv",
+        "target_prd": 314,
+        "target_discovered": None,
+        "health_probe_url": "https://www.realestate.com.au/international/sv?searchtypes=rural+land",
+    },
+    "jamesedition": {
+        "layer": "extraction",
+        "fetch_kind": "curl_cffi",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "jsonld_listing (case-insensitive @type) — Coatepeque luxury",
+        "strengths": ["luxury inventory", "Coatepeque-specific gap-fill"],
+        "failure_modes": [
+            "DRAFT — Cloudflare JS challenge blocks both httpx and curl_cffi (chrome131, chrome124, safari17_0, safari18_0, edge101 all return HTTP 403 + 'Just a moment...' on 2026-06-05). Selectors + policy are calibrated for the moment the challenge relaxes OR a follow-up adds Playwright transport to the skeleton helper (encuentra24's pattern).",
+            "low volume but high-value; some listings exceed PRICE_FLAG_MAX ($20M) and will be FLAGGED (kept + warned)",
+        ],
+        "owner_module": "pulpo.scrapers.jamesedition",
+        "target_prd": 50,
+        "target_discovered": None,
+        "health_probe_url": "https://www.jamesedition.com/es/real_estate/house-lago-de-coatepeque-el-salvador",
+    },
+    "xitios": {
+        "layer": "extraction",
+        "fetch_kind": "static_http",
+        "discovery_kind": "html_pagination",
+        "extraction_kind": "og:meta detail extraction (no JSON-LD on xitios) + ?page=N catalog walk; varas² → m² area conversion",
+        "strengths": [
+            "SV-native portal",
+            "coastal + Coatepeque + Suchitlán inventory",
+            "preserves URL-encoded VEN+RAN filter across pagination",
+        ],
+        "failure_modes": [
+            "no JSON-LD anywhere — purely og:meta + regex over og:description for price/area",
+            "area unit mix: m² + varas cuadradas; conversion applied inline (factor 0.6989)",
+        ],
+        "owner_module": "pulpo.scrapers.xitios",
+        "target_prd": None,
+        "target_discovered": None,
+        "health_probe_url": "https://www.xitios.com.sv/propiedades/buscar?categoria%5B%5D=VEN&tipo%5B%5D=RAN",
+    },
 }
 
 

@@ -1,0 +1,14 @@
+{
+  "computed_at": "2026-06-06T20:31:56.499546+00:00",
+  "overlap_matrix": {},
+  "per_source": {
+    "encuentra24": {
+      "kept_as_unique": 18,
+      "raw": 18,
+      "shared_with_others": 0,
+      "unique_in_source": 18
+    }
+  },
+  "total_in_dataset": 18,
+  "total_unique_fingerprints": 18
+}
