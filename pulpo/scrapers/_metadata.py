@@ -49,6 +49,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     # ── Existing scrapers (11) — populated by reading code, not behavior change ──
     "bienesraices": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards (house + condo only)",
@@ -61,6 +62,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "century21": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards (franchise template)",
@@ -73,6 +75,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "citymax": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards + force_vacation_gate",
@@ -85,6 +88,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "elagente": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards via GCP scrape-shim",
@@ -97,6 +101,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "encuentra24": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "playwright",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards + jsonld_residence",
@@ -109,6 +114,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "essurf": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards (coastal specialist)",
@@ -121,6 +127,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "goodlife": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards + multi-signal type classifier",
@@ -133,6 +140,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "nexo": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards",
@@ -157,6 +165,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "oceanside": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards (beach-lot specialist)",
@@ -169,6 +178,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "realtyelsalvador": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards via GCP scrape-shim",
@@ -181,6 +191,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "remax": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards (franchise template) + jsonld_residence",
@@ -197,6 +208,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     # calibration pass replaces placeholder selectors with real ones.
     "agentiz": {
         "layer": "extraction",
+        "lifecycle": "experimental",
         "fetch_kind": "static_http",
         "discovery_kind": "static_urls",
         "extraction_kind": "5 hardcoded type-slot URLs → per-detail JSON-LD RealEstateListing",
@@ -212,6 +224,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "santizo": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "jsonld_listing (case-insensitive @type) + ?page=N catalog walk → per-detail JSON-LD",
@@ -227,6 +240,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "citymax_sc": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "catalog ItemList JSON-LD → per-detail RealEstateListing JSON-LD",
@@ -242,6 +256,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "vivolatam": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "sitemap",
         "extraction_kind": "sitemap-driven (catalog is client-rendered) → per-detail RealEstateListing JSON-LD",
@@ -257,6 +272,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "csbr": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "WordPress /page/N/ walk → JSON-LD RealEstateListing (@graph) + Houzez li.item-price for price",
@@ -275,6 +291,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "realestate_au_sv": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "constructed pagination → per-detail JSON-LD RealEstateListing (HTML-entity-unescaped)",
@@ -294,6 +311,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "jamesedition": {
         "layer": "extraction",
+        "lifecycle": "experimental",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "jsonld_listing (case-insensitive @type) — Coatepeque luxury",
@@ -309,6 +327,7 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "xitios": {
         "layer": "extraction",
+        "lifecycle": "active",
         "fetch_kind": "static_http",
         "discovery_kind": "html_pagination",
         "extraction_kind": "og:meta detail extraction (no JSON-LD on xitios) + ?page=N catalog walk; varas² → m² area conversion",
@@ -330,8 +349,15 @@ SCRAPER_METADATA: dict[str, dict] = {
 
 
 REQUIRED_KEYS: frozenset[str] = frozenset({
-    "layer", "fetch_kind", "discovery_kind", "extraction_kind",
+    "layer", "lifecycle", "fetch_kind", "discovery_kind", "extraction_kind",
     "strengths", "failure_modes", "owner_module",
     "target_prd", "target_discovered",
     "health_probe_url",
+})
+
+KNOWN_LIFECYCLES: frozenset[str] = frozenset({
+    "active",
+    "experimental",
+    "paused",
+    "deprecated",
 })

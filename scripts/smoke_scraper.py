@@ -32,9 +32,28 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 
-def smoke_one(slug: str, limit: int, offline: bool) -> dict:
+def source_lifecycle(slug: str) -> str:
+    """Return source lifecycle; defaults to active for legacy metadata."""
+    try:
+        from pulpo.scrapers._metadata import SCRAPER_METADATA
+        value = SCRAPER_METADATA.get(slug, {}).get("lifecycle")
+        if isinstance(value, str) and value:
+            return value
+    except Exception:
+        pass
+    return "active"
+
+
+def smoke_one(
+    slug: str,
+    limit: int,
+    offline: bool,
+    allow_empty: bool = False,
+) -> dict:
     """Run one scraper, return a summary dict.
 
     Returns:
@@ -59,12 +78,14 @@ def smoke_one(slug: str, limit: int, offline: bool) -> dict:
                 "ok": False,
                 "duration_s": time.monotonic() - start,
                 "raw_count": 0,
+                "lifecycle": source_lifecycle(slug),
                 "error": f"module {slug!r} has no crawl() function",
                 "sample": [],
             }
         listings = mod.crawl(limit=limit, offline=offline)
         if listings is None:
             listings = []
+        lifecycle = source_lifecycle(slug)
         sample = []
         for li in listings[:5]:
             if isinstance(li, dict):
@@ -75,12 +96,23 @@ def smoke_one(slug: str, limit: int, offline: bool) -> dict:
                     "property_type": li.get("property_type"),
                     "source_id": li.get("source_id"),
                 })
+        raw_count = len(listings)
+        zero_is_failure = (
+            raw_count == 0
+            and not allow_empty
+            and lifecycle == "active"
+        )
         return {
             "slug": slug,
-            "ok": True,
+            "ok": not zero_is_failure,
             "duration_s": time.monotonic() - start,
-            "raw_count": len(listings),
-            "error": None,
+            "raw_count": raw_count,
+            "lifecycle": lifecycle,
+            "error": (
+                "active source returned zero listings; pass --allow-empty "
+                "only for an expected empty smoke"
+                if zero_is_failure else None
+            ),
             "sample": sample,
         }
     except Exception as e:  # noqa: BLE001 — diagnostic, don't crash
@@ -89,6 +121,7 @@ def smoke_one(slug: str, limit: int, offline: bool) -> dict:
             "ok": False,
             "duration_s": time.monotonic() - start,
             "raw_count": 0,
+            "lifecycle": source_lifecycle(slug),
             "error": f"{e.__class__.__name__}: {e}\n{traceback.format_exc()[-600:]}",
             "sample": [],
         }
@@ -110,6 +143,8 @@ def print_report(result: dict) -> None:
     ok_str = "OK" if result["ok"] else "ERR"
     print(f"\n=== {result['slug']:<22} {ok_str} ({result['duration_s']:.1f}s) ===")
     print(f"  raw_count: {result['raw_count']}")
+    if result.get("lifecycle"):
+        print(f"  lifecycle: {result['lifecycle']}")
     if result["error"]:
         # Only first 3 lines + last line of traceback.
         err_lines = result["error"].splitlines()
@@ -148,6 +183,11 @@ def main() -> int:
         action="store_true",
         help="Emit machine-readable JSON to stdout (one object per source).",
     )
+    parser.add_argument(
+        "--allow-empty",
+        action="store_true",
+        help="Treat zero listings as OK for expected-empty diagnostics.",
+    )
     args = parser.parse_args()
 
     if args.source == "all":
@@ -157,7 +197,12 @@ def main() -> int:
 
     results = []
     for slug in slugs:
-        result = smoke_one(slug, limit=args.limit, offline=args.offline)
+        result = smoke_one(
+            slug,
+            limit=args.limit,
+            offline=args.offline,
+            allow_empty=args.allow_empty,
+        )
         results.append(result)
         if not args.json:
             print_report(result)
