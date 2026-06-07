@@ -38,6 +38,7 @@ from automation.newsletter import (                                        # noq
     build_issue,
     render_html,
 )
+from automation.newsletter.templates import TEMPLATES                      # noqa: E402
 from automation.newsletter.issue_state import next_issue_number            # noqa: E402
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
@@ -123,14 +124,16 @@ def main() -> int:
     p.add_argument(
         "--newsletter",
         default="pulpo-pro-general",
-        choices=("pulpo-pro-general", "pulpo-pro-welcome"),
+        choices=("pulpo-pro-general", "pulpo-pro-welcome", "pulpo-free-general"),
         help=(
             "Which template to route this run through. Default is the "
-            "weekly digest (`pulpo-pro-general`). `pulpo-pro-welcome` is "
-            "the one-shot welcome — REQUIRES --welcome-single-email and "
-            "no other audience flag. The two paths share send.py + the "
-            "Resend send mechanics but the audience and idempotency model "
-            "differ entirely."
+            "weekly digest (`pulpo-pro-general`). `pulpo-free-general` is "
+            "the free-tier weekly — same master body, plain `pulpo` "
+            "masthead, ranks 04-10 'Sign up to Pro', Pro-locked news "
+            "spotlight. `pulpo-pro-welcome` is the one-shot welcome — "
+            "REQUIRES --welcome-single-email and no other audience flag. "
+            "All paths share send.py + the Resend send mechanics but the "
+            "audience and idempotency model differ."
         ),
     )
     p.add_argument(
@@ -361,7 +364,13 @@ def main() -> int:
             issue_date=issue_date,
             history_rows=None,
         )
-        html = render_html(issue)
+        # Route the render through the templates registry so
+        # `--newsletter pulpo-free-general` produces the free-tier weekly
+        # (plain masthead, "Sign up to Pro" on ranks 04-10, Pro-locked
+        # spotlight). Default + any unknown id falls back to the Pro
+        # General master, preserving the prior behaviour.
+        _render = TEMPLATES.get(args.newsletter) or render_html
+        html = _render(issue)
         subject = _subject_for(issue, recipient.locale, preview=preview_mode)
 
         if out_dir:

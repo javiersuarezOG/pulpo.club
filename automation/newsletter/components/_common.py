@@ -122,6 +122,33 @@ WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.1-2026-06-06"
 WELCOME_BACK_LAST_UPDATED = "2026-06-06"
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo FREE General — own version line.
+#
+# The free-tier weekly digest. It IS the General weekly master
+# (render_html variant="free_general") with three free-cohort changes,
+# all gated on the variant so the Pro path never sees them:
+#   1. masthead drops the gold "PRO" badge -> plain `pulpo`.
+#   2. ranks 04-10 swap the "See on Pulpo" CTA for "Sign up to Pro"
+#      (top 3 keep "See on Pulpo"); every card still renders the full
+#      listing component (photo, title, location, price, why-block).
+#   3. the Weekly News Spotlight is Pro-LOCKED: real headline + source +
+#      opening sentence show, the rest of the read sits behind a sign-up
+#      panel.
+# Same parallel-version rationale as the welcome lines above — lets
+# PostHog slice free-weekly renders from Pro weeklies, and the admin
+# widget surface the right version chip. The regex in
+# api/admin/newsletter/template-version.js reads this at line-start.
+#
+# Revision history (most recent first):
+#   free-general-v1.0 (2026-06-07) — initial ship. Plain `pulpo`
+#       masthead, top-3 "See on Pulpo" + ranks 04-10 "Sign up to Pro",
+#       Pro-locked Weekly News Spotlight. Built on the v4.5 master body
+#       (real-article spotlight artifact).
+FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.0-2026-06-07"
+FREE_GENERAL_LAST_UPDATED = "2026-06-07"
+
+
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
 # block below also defines CSS vars for clients that support them, but
 # the source-of-truth values are hex because Outlook desktop + parts of
@@ -320,6 +347,8 @@ __all__ = [
     "WELCOME_LAST_UPDATED",
     "WELCOME_BACK_TEMPLATE_VERSION",
     "WELCOME_BACK_LAST_UPDATED",
+    "FREE_GENERAL_TEMPLATE_VERSION",
+    "FREE_GENERAL_LAST_UPDATED",
     "CSS",
     "escape",
     "site_root_from_issue",

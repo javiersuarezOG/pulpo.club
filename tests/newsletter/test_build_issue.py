@@ -54,7 +54,14 @@ def test_pro_with_prefs_uses_recipient_preference(pro_with_prefs, ranked_pool):
     assert issue.paywall_banner is False  # Pro tier never sees the banner
 
 
-def test_free_with_prefs_paywalls_after_pick_one(free_with_prefs, ranked_pool):
+def test_free_with_prefs_paywalls_after_top3(free_with_prefs, ranked_pool):
+    """Free cohort: the Top 3 (picks_top) are OPEN for every cohort,
+    Free included — they render "See on Pulpo". The paywall flag starts
+    at rank 04 (picks_shortlist), which the free-general template renders
+    as a full listing card behind a "Sign up to Pro" CTA. (Pre-2026-06-07
+    the gate started at rank 02; opening the Top 3 is the free-weekly
+    design — see automation/newsletter/templates/pulpo_free_general.py.)
+    """
     issue = build_issue(
         recipient=free_with_prefs,
         ranked_listings=ranked_pool,
@@ -63,10 +70,10 @@ def test_free_with_prefs_paywalls_after_pick_one(free_with_prefs, ranked_pool):
         history_rows=[],
     )
     assert issue.paywall_banner is True
-    # First top pick stays unlocked; everything else is paywalled
-    assert issue.picks_top[0].paywalled is False
-    if len(issue.picks_top) > 1:
-        assert issue.picks_top[1].paywalled is True
+    # All of the Top 3 are open now.
+    for p in issue.picks_top:
+        assert p.paywalled is False
+    # The paywall flag begins at rank 04.
     for p in issue.picks_shortlist:
         assert p.paywalled is True
 
