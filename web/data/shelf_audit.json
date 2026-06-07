@@ -11,10 +11,10 @@
     "hidden_by_no_type": 0,
     "hidden_by_no_zone": 17
   },
-  "computed_at": "2026-06-06T20:32:42.699672+00:00",
+  "computed_at": "2026-06-07T09:41:32.843276+00:00",
   "shelves": {
     "beach_condos": {
-      "eligible_lenient": 6,
+      "eligible_lenient": 9,
       "eligible_moderate": 0,
       "eligible_strict": 0,
       "hidden_by_is_agricultural": 0,
@@ -22,11 +22,11 @@
       "hidden_by_no_photos": 0,
       "hidden_by_no_price": 0,
       "hidden_by_no_type": 0,
-      "hidden_by_no_zone": 6,
-      "total_in_cohort": 6
+      "hidden_by_no_zone": 9,
+      "total_in_cohort": 9
     },
     "beach_homes": {
-      "eligible_lenient": 3,
+      "eligible_lenient": 4,
       "eligible_moderate": 0,
       "eligible_strict": 0,
       "hidden_by_is_agricultural": 0,
@@ -34,8 +34,8 @@
       "hidden_by_no_photos": 0,
       "hidden_by_no_price": 0,
       "hidden_by_no_type": 0,
-      "hidden_by_no_zone": 3,
-      "total_in_cohort": 3
+      "hidden_by_no_zone": 4,
+      "total_in_cohort": 4
     },
     "beach_land": {
       "eligible_lenient": 0,

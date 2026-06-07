@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T20:32:42.719054+00:00",
+  "generated_at": "2026-06-07T09:41:32.864971+00:00",
   "total_listings": 18,
   "ui_gate_pct": 15,
   "existing": [
@@ -60,13 +60,13 @@
     },
     {
       "field": "is_beachfront",
-      "hits": 8,
-      "pct": 44.4
+      "hits": 11,
+      "pct": 61.1
     },
     {
       "field": "is_in_development",
-      "hits": 7,
-      "pct": 38.9
+      "hits": 6,
+      "pct": 33.3
     },
     {
       "field": "zone",
@@ -130,16 +130,16 @@
     },
     {
       "field": "has_ocean_view",
-      "hits": 7,
-      "pct": 38.9,
+      "hits": 8,
+      "pct": 44.4,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "has_paved_access",
-      "hits": 1,
-      "pct": 5.6,
+      "hits": 2,
+      "pct": 11.1,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -162,11 +162,11 @@
     },
     {
       "field": "has_water_body",
-      "hits": 5,
-      "pct": 27.8,
+      "hits": 2,
+      "pct": 11.1,
       "prd_target": 0,
-      "verdict": "GREEN",
-      "verdict_label": "🟢 surface-eligible"
+      "verdict": "AMBER",
+      "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_agricultural",
@@ -178,8 +178,8 @@
     },
     {
       "field": "is_beachfront",
-      "hits": 8,
-      "pct": 44.4,
+      "hits": 11,
+      "pct": 61.1,
       "prd_target": 15,
       "verdict": "GREEN",
       "verdict_label": "🟢 meets PRD target"
@@ -194,51 +194,51 @@
     },
     {
       "field": "is_flat",
-      "hits": 4,
-      "pct": 22.2,
+      "hits": 2,
+      "pct": 11.1,
       "prd_target": 0,
-      "verdict": "GREEN",
-      "verdict_label": "🟢 surface-eligible"
+      "verdict": "AMBER",
+      "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_motivated",
-      "hits": 4,
-      "pct": 22.2,
+      "hits": 3,
+      "pct": 16.7,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_on_beach",
-      "hits": 8,
-      "pct": 44.4,
+      "hits": 11,
+      "pct": 61.1,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_on_lake",
-      "hits": 1,
-      "pct": 5.6,
+      "hits": 0,
+      "pct": 0.0,
       "prd_target": 0,
-      "verdict": "AMBER",
-      "verdict_label": "🟡 computed only, below UI gate"
+      "verdict": "RED",
+      "verdict_label": "🔴 below 5% — needs scraper depth"
     },
     {
       "field": "is_tourist",
-      "hits": 1,
-      "pct": 5.6,
+      "hits": 2,
+      "pct": 11.1,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_walk_to_beach",
-      "hits": 2,
-      "pct": 11.1,
+      "hits": 3,
+      "pct": 16.7,
       "prd_target": 0,
-      "verdict": "AMBER",
-      "verdict_label": "🟡 computed only, below UI gate"
+      "verdict": "GREEN",
+      "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "has_sewage",
@@ -258,8 +258,8 @@
     },
     {
       "field": "zoning_residential",
-      "hits": 4,
-      "pct": 22.2,
+      "hits": 3,
+      "pct": 16.7,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -308,28 +308,28 @@
       },
       {
         "bucket": "200-500",
-        "count": 2,
-        "pct": 11.1
+        "count": 3,
+        "pct": 16.7
       },
       {
         "bucket": ">=500",
-        "count": 16,
-        "pct": 88.9
+        "count": 15,
+        "pct": 83.3
       }
     ],
     "per_source": [
       {
         "source": "encuentra24",
         "n": 18,
-        "avg_chars": 1089,
+        "avg_chars": 1085,
         "pct_short_lt50": 0.0
       }
     ]
   },
   "us01_cohort": {
     "any_one_signal": {
-      "hits": 5,
-      "pct": 27.8
+      "hits": 6,
+      "pct": 33.3
     },
     "all_three_signals": {
       "hits": 0,
