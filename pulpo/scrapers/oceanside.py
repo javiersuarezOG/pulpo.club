@@ -84,7 +84,19 @@ _AREA_PLAIN_RE = re.compile(
     re.IGNORECASE,
 )
 
-_PRICE_RE = re.compile(r"\$\s*([\d,]+(?:\.\d{2})?)")
+# Price match must START and END on a digit so a trailing thousands-
+# separator comma is never captured as part of the price. Pre-2026-06-07
+# the pattern was `[\d,]+` which let `$60,` capture as the literal
+# "60," — landed in raw_price_text and broke downstream price parsing
+# (one such listing: source_id=11000, "OCEAN VIEW LOT IN CERROMAR").
+# The shape below matches:
+#   "$60"          → "60"
+#   "$60,000"      → "60,000"
+#   "$60,000.50"   → "60,000.50"
+#   "$60, ..."     → "60"
+# i.e. a digit, optionally followed by a (digit|comma)* run that must
+# itself end on a digit, optionally followed by a `.DD` cents tail.
+_PRICE_RE = re.compile(r"\$\s*(\d(?:[\d,]*\d)?(?:\.\d{2})?)")
 _TAG_RE   = re.compile(r"<[^>]+>")
 
 
