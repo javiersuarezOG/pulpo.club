@@ -28,6 +28,7 @@ from pulpo.agents.html_crawler import (
 )
 from pulpo.agents import SOURCES, register
 from pulpo.scrapers._base import OfflineFixtureMixin, finalize_record
+from pulpo.scrapers.lib.og_meta import prepend_og_images
 
 if HTTPX_OK:
     import httpx  # noqa: F401
@@ -246,7 +247,9 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         description = desc_el.text(strip=True)[:1500] if desc_el else ""
 
     # Photos — RE/MAX typically uses an image gallery with data-src lazy loading.
-    # finalize_record() handles the upgrade_photo_urls call below.
+    # The broker's og:image is the explicit cover-photo signal, so it is
+    # prepended even when the gallery exists. finalize_record() handles the
+    # upgrade_photo_urls call below.
     photo_urls: list[str] = []
     seen: set[str] = set()
     for img in tree.css(
@@ -258,12 +261,7 @@ def _parse_detail(html: str, partial: dict) -> Optional[dict]:
         if u.startswith("http") and u not in seen:
             seen.add(u)
             photo_urls.append(u)
-    if not photo_urls:
-        og = tree.css_first('meta[property="og:image"]')
-        if og:
-            u = og.attributes.get("content") or ""
-            if u.startswith("http"):
-                photo_urls.append(u)
+    photo_urls = prepend_og_images(html, photo_urls)
 
     if not title:
         return None
