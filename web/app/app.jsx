@@ -48,6 +48,7 @@ const AdminPage = React.lazy(() =>
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
+import { isPaid } from "./lib/gating";
 import { deriveSubscriptionState } from "./lib/subscription";
 
 // Resolves the hydrated user object's `plan` field to the effective
@@ -927,6 +928,18 @@ function App() {
 
   const openListing = useCallback((id) => {
     if (!id) return;
+    // Two-state model (2026-06-08): opening a listing's detail is a Pro
+    // capability. A non-paid viewer — anonymous ("Free"), or a canceled /
+    // ever-paid user off an active plan — does NOT open the panel; the
+    // subscribe-to-Pro modal shows instead. The URL stays put (no
+    // /listing/<id> push), so the panel never mounts. `setFreeMonthModal`
+    // is the conversion surface (→ Stripe checkout). A deep-link backstop
+    // effect below covers cold-loads straight to /listing/<id>.
+    if (!isPaid(user)) {
+      track("paywall.shown", { kind: "listing_click", listing_id: id });
+      setFreeMonthModal({ trigger: "browse_card" });
+      return;
+    }
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
       : "";
@@ -948,7 +961,7 @@ function App() {
       }
     }
     _measure("perf.detail_open", { listing_id: id });
-  }, [_measure]);
+  }, [_measure, user]);
 
   const closeListing = useCallback(() => {
     if (closingRef.current) return;
@@ -1317,6 +1330,21 @@ function App() {
     setFreeMonthModal(cfg);
   }, []);
   const closeFreeMonthModal = useCallback(() => setFreeMonthModal(null), []);
+
+  // Two-state deep-link backstop: a non-paid user landing directly on
+  // /listing/<id> (shared link, bookmark, cold reload) gets the subscribe
+  // modal instead of the panel — symmetric with the openListing click
+  // gate. We clear openListingId so the panel never mounts and strip the
+  // URL back to /browse so refresh/back doesn't replay the listing path.
+  useEffect(() => {
+    if (!openListingId || isPaid(user)) return;
+    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId });
+    setFreeMonthModal({ trigger: "browse_card" });
+    setOpenListingId(null);
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
+      window.history.replaceState({ pulpo: true }, "", "/browse");
+    }
+  }, [openListingId, user]);
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //
