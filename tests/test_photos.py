@@ -463,6 +463,44 @@ def test_hero_download_picks_best_of_multiple(tmp_repo):
     assert sidecar_data["candidate_count"] == 3
 
 
+def test_winning_logo_url_forces_card_ineligible(tmp_repo):
+    """P5 — a logo/placeholder that wins the pick (structurally ≥800×600)
+    must be forced card_eligible=False so the homepage gate excludes it."""
+    pytest.importorskip("PIL")
+    from pulpo.models import Listing
+    from automation.run import _download_hero_photos
+
+    # A structurally card-eligible (1920×1080) image served at the known
+    # xitios logo URL — the exact 19-listing case from 2026-06-08.
+    logo_bytes = _make_jpeg(size=(1920, 1080))
+    logo_url = "https://www.xitios.com.sv/img/icon.jpeg"
+
+    li = Listing(
+        source="xitios", source_id="logo-001",
+        url="https://example.com/listing",
+        scraped_at="2026-01-01T00:00:00Z",
+        title="Listing whose hero is a logo",
+        photo_urls=[logo_url],
+    )
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = logo_bytes
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        _download_hero_photos([li], tmp_repo)
+
+    assert li.card_eligible is False, "logo winner must not be card_eligible"
+    assert li.hero_eligible is False, "logo winner must not be hero_eligible"
+    # The sidecar records the rejection for forensics.
+    sidecar = tmp_repo / "web" / "photos" / "xitios_logo-001.hero.jpg.meta.json"
+    meta = json.loads(sidecar.read_text())
+    assert meta.get("logo_placeholder_rejected") is True
+    assert meta["card_eligible"] is False
+
+
 def test_no_photo_listing_skipped(tmp_repo):
     """Listings with empty photo_urls are not attempted."""
     pytest.importorskip("PIL")
