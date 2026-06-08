@@ -273,3 +273,45 @@ describe("buildSuggestions", () => {
     expect(withThumb).toBeTruthy();
   });
 });
+
+describe("description + usps in haystack (PR-4)", () => {
+  it("matches a token that only appears in the description (either locale)", () => {
+    const l = L({
+      title: { en: "Lot", es: "Lote" },
+      description: { en: "clear titled deed available", es: "escritura registrada" },
+    });
+    expect(matchesQueryString(l, "titled")).toBe(true);
+    expect(matchesQueryString(l, "escritura")).toBe(true);
+  });
+
+  it("matches a token that only appears in a usp", () => {
+    const l = L({
+      title: { en: "Lot", es: "Lote" },
+      usps: [{ en: "river frontage", es: "frente al rio" }],
+    });
+    expect(matchesQueryString(l, "frontage")).toBe(true);
+    expect(matchesQueryString(l, "frente")).toBe(true);
+  });
+
+  it("a description-only hit ranks below a title hit", () => {
+    const titleHit = L({ title: { en: "riverfront lot", es: "lote riverfront" }, description: { en: "", es: "" }, usps: [] });
+    const descHit = L({
+      title: { en: "lot", es: "lote" },
+      zone_name: "z",
+      province_state: "p",
+      original_url: "",
+      description: { en: "riverfront access", es: "" },
+      usps: [],
+    });
+    const toks = tokenize("riverfront");
+    expect(scoreListing(titleHit, toks)).toBeGreaterThan(scoreListing(descHit, toks));
+    expect(scoreListing(descHit, toks)).toBeGreaterThan(0);
+  });
+
+  it("is null-safe when description / usps are null", () => {
+    const l = L({ description: null as unknown as Listing["description"], usps: null as unknown as Listing["usps"] });
+    expect(() => matchesQueryString(l, "tunco")).not.toThrow();
+    expect(matchesQueryString(l, "tunco")).toBe(true);
+    expect(() => scoreListing(l, tokenize("tunco"))).not.toThrow();
+  });
+});
