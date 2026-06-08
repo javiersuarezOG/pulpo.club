@@ -91,4 +91,25 @@ test.describe("Browse map view", () => {
       expect(overflow, `horizontal overflow at ${size.w}px`).toBeLessThanOrEqual(1);
     }
   });
+
+  test("mobile: bottom sheet + Filters pill (PR-10)", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    // Desktop card panel is hidden; the bottom sheet + Filters pill show.
+    await expect(page.locator(".map-split__cards")).toBeHidden();
+    const sheet = page.locator(".map-sheet");
+    await expect(sheet).toBeVisible();
+    expect(await sheet.locator(".listing-card").count()).toBeGreaterThan(0);
+
+    // Sheet starts collapsed; tapping the handle expands it.
+    await expect(sheet).toHaveClass(/map-sheet--collapsed/);
+    await page.locator(".map-sheet__handle").click();
+    await expect(sheet).toHaveClass(/map-sheet--expanded/);
+
+    // Filters pill opens the existing filter drawer.
+    await page.locator(".map-filters-pill").click();
+    await page.locator(".filter-drawer").waitFor({ state: "visible", timeout: 3_000 });
+  });
 });

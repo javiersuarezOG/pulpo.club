@@ -86,6 +86,9 @@ import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/c
 // PR-7/WS4 — map view, lazy so Leaflet + markercluster land in their own
 // Vite chunk and never touch the Browse entry bundle.
 const LazyMapView = React.lazy(() => import("./components/MapView.jsx"));
+// PR-10 — mobile map bottom sheet (reuses ListingCard; lazy to keep it
+// out of the entry bundle, it only renders in map view).
+const LazyMapBottomSheet = React.lazy(() => import("./components/MapBottomSheet.jsx"));
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1643,6 +1646,26 @@ function BrowsePage({ app }) {
                   onBoundsChange={handleMapBounds}
                   searchAsIMove={searchAsIMove}
                   onToggleSearchAsIMove={handleToggleSearchAsIMove}
+                />
+              </React.Suspense>
+              {/* Mobile-only (CSS): floating Filters pill + bottom sheet
+                  with the result cards. Desktop uses the split-pane panel. */}
+              <button
+                className="map-filters-pill"
+                onClick={() => setFilterDrawerOpen(true)}
+                aria-label={t("view.filters", app.locale)}
+              >
+                <Icon name="sliders" size={16} /> {t("view.filters", app.locale)}
+                {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
+              </button>
+              <React.Suspense fallback={null}>
+                <LazyMapBottomSheet
+                  listings={mapResults}
+                  app={app}
+                  lc={app.locale}
+                  onOpenListing={handleMapOpenListing}
+                  onHover={handleCardHover}
+                  hoveredId={hoveredId}
                 />
               </React.Suspense>
             </div>
