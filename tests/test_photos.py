@@ -462,6 +462,11 @@ def test_hero_download_picks_best_of_multiple(tmp_repo):
         "Picker should have chosen the full-HD candidate over the 600x400 first"
     assert sidecar_data["candidate_count"] == 3
 
+    # P2 — the winning URL is persisted onto the listing so the FE can
+    # reorder the gallery to match the card thumbnail.
+    assert li.selected_photo_url == "https://example.com/great_second.jpg", \
+        "selected_photo_url must equal the picker's winning_url"
+
 
 def test_winning_logo_url_forces_card_ineligible(tmp_repo):
     """P5 — a logo/placeholder that wins the pick (structurally ≥800×600)

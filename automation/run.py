@@ -564,10 +564,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 # because 600×400 thumbs never clear the 800×600 floor).
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
                 li.card_eligible = bool(hero_meta.get("card_eligible", False))
-                # P5 — cached-skip path: also reject a logo/placeholder
-                # winner so the 19 existing xitios-icon listings self-heal
-                # on the next nightly without a forced repick. Reads the
-                # winning URL persisted in the sidecar.
+                # Cached-skip path: recover the picker's winning URL from
+                # the sidecar so selected_photo_url is populated even when
+                # we don't re-run the pick (P2 consumer: listings.ts).
+                if hero_meta.get("winning_url"):
+                    li.selected_photo_url = hero_meta["winning_url"]
+                # P5 — also reject a logo/placeholder winner so the 19
+                # existing xitios-icon listings self-heal on the next
+                # nightly without a forced repick.
                 from automation.photo_quality import is_logo_or_placeholder_url
                 if is_logo_or_placeholder_url(hero_meta.get("winning_url")):
                     li.card_eligible = False
@@ -795,6 +799,10 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
+            # Persist the picker's winning broker URL so the FE can put the
+            # same image first in the detail gallery (P2). Consumer:
+            # web/app/data/listings.ts::buildPhotos.
+            li.selected_photo_url = winning_url
             if li.card_eligible:
                 card_eligible_count += 1
             if li.hero_eligible:

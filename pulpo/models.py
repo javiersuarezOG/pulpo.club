@@ -90,6 +90,13 @@ class Listing:
     photos_count: int = 0
     photo_urls: list[str] = field(default_factory=list)   # broker-hosted; [0] is hero
     hero_photo_path: Optional[str] = None                  # local /photos/<source>_<id>.jpg
+    # The broker URL the hero picker SELECTED as the winning image
+    # (winning_url in the .hero.jpg.meta.json sidecar). Persisted to
+    # ranked.json so the FE can reorder `photo_urls` to show the same
+    # image the card thumbnail used as photos[0] on the detail page.
+    # Consumer: web/app/data/listings.ts::buildPhotos. None = not picked
+    # (offline, no candidates, or pre-P2 record).
+    selected_photo_url: Optional[str] = None
     # PR-7.6 — heuristic quality score (0..100) for hero_photo_path.
     # None = not yet scored (offline mode, OpenCV unavailable, or
     # download failed). Featured-listing picker filters on this.
