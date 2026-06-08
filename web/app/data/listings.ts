@@ -333,6 +333,10 @@ export function adaptListing(raw: any): Listing {
     dist_nearest_town_km:
       typeof raw.dist_nearest_town_km === "number" ? raw.dist_nearest_town_km : null,
     has_lat_lng: typeof raw.lat === "number" && typeof raw.lng === "number",
+    // PR-5/WS4 — pass the raw coordinates through for the map view.
+    // Clamp non-numbers to null so map read-sites can guard with hasCoords().
+    lat: typeof raw.lat === "number" ? raw.lat : null,
+    lng: typeof raw.lng === "number" ? raw.lng : null,
     geocoding_confidence:
       raw.geocoding_confidence === "high" ||
       raw.geocoding_confidence === "medium" ||
