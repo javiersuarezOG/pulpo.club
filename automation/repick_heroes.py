@@ -240,6 +240,9 @@ def _repick_one_listing(
     # source_height) come from the sidecar's overwritten top-level
     # fields, which now reflect the SOURCE bytes per the fix above.
     listing["hero_photo_path"] = f"/photos/{fname}"
+    # P2 — persist the picker's winning broker URL so the FE reorders the
+    # detail gallery to match the card. Consumer: listings.ts::buildPhotos.
+    listing["selected_photo_url"] = winning_url
     listing["hero_photo_quality_score"] = winning_score
     listing["has_text_overlay"] = winning_has_text
     listing["has_marketing_overlay"] = winning_has_marketing
