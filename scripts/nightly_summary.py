@@ -68,6 +68,24 @@ _STATUS_MARK = {"green": "✓", "red": "✗", "skipped": "·"}
 PROD_HEALTH_URL = "https://pulpo.club/api/nightly/health"
 
 
+# R5 of docs/RESILIENCE-AUDIT-PRD.md — candidate-bundle awareness.
+#
+# Without R5, this script reports ``ranked.json`` counts from the
+# checked-in (== committed) data, which on a guard-failed run is the
+# PREVIOUS successful nightly. The operator reads "PIPELINE OUTPUT: 1912
+# listings" and concludes the run shipped, when in fact today's 1912
+# never reached main and the live site is still serving the old set.
+#
+# R5 layers a CANDIDATE STATUS block on top: when R1's bundle exists at
+# web/data/.staging/<run_id>/, read its manifest and report the
+# this-run state explicitly (count, generated_at, files, recovery
+# command). Pre-R1 pipelines and runs with PULPO_R1_BUNDLE_ENABLED=0
+# fall through to the legacy summary — no behavior change there.
+PROMOTION_PROMOTED = "promoted"
+PROMOTION_STRANDED = "stranded"
+PROMOTION_NO_BUNDLE = "no_bundle"
+
+
 def _read_json(path: Path) -> Optional[object]:
     """Read a JSON file, tolerating missing / malformed inputs."""
     if not path.exists():
@@ -121,6 +139,121 @@ def _sort_sources(rows_by_src: dict[str, dict]) -> list[tuple[str, dict]]:
     return sorted(rows_by_src.items(), key=keyfn)
 
 
+# ── R5: candidate-bundle awareness ─────────────────────────────────────
+
+
+def resolve_run_id(explicit: Optional[str] = None) -> str:
+    """Mirror R1's run_id resolution. Same priority order so this
+    script lands the same bundle the writer used.
+
+    Priority: explicit > GITHUB_RUN_ID > PULPO_RUN_ID > "" (empty).
+    Empty run_id disables R5 awareness — summary falls back to legacy
+    behavior, which matches pre-R1 runs.
+    """
+    if explicit:
+        return explicit
+    return os.environ.get("GITHUB_RUN_ID") or os.environ.get("PULPO_RUN_ID") or ""
+
+
+def read_candidate_bundle(data_dir: Path, run_id: str) -> Optional[dict]:
+    """Return the bundle manifest dict for ``run_id`` if it exists,
+    augmented with ``candidate_meta`` (the parsed
+    ``last_updated.candidate.json``) when present.
+
+    None when the bundle is absent (pre-R1 run, R1 disabled, or the
+    pipeline never reached the bundle write).
+    """
+    if not run_id:
+        return None
+    staging = data_dir / ".staging" / run_id
+    manifest = _read_json(staging / "bundle_manifest.json")
+    if not isinstance(manifest, dict):
+        return None
+    candidate_meta = _read_json(staging / "last_updated.candidate.json")
+    return {
+        "manifest": manifest,
+        "candidate_meta": candidate_meta if isinstance(candidate_meta, dict) else None,
+        "staging_dir": str(staging),
+    }
+
+
+def classify_promotion(
+    *,
+    bundle: Optional[dict],
+    canonical_meta: Optional[dict],
+) -> str:
+    """Return one of ``promoted`` / ``stranded`` / ``no_bundle``.
+
+    - ``no_bundle``: R1 didn't run for this run_id; legacy summary
+      behavior is the right answer.
+    - ``stranded``: bundle exists with visible_count > 0 and the
+      canonical last_updated.json is missing or older than the
+      candidate's generated_at.
+    - ``promoted``: bundle exists and the canonical is at or ahead.
+
+    The PRD's full state machine (degraded_promoted, quarantined) is
+    R4's job; R5 ships with the three minimum states needed to make
+    the summary honest.
+    """
+    if bundle is None:
+        return PROMOTION_NO_BUNDLE
+    manifest = bundle.get("manifest") or {}
+    visible = int(manifest.get("visible_count") or 0)
+    if visible <= 0:
+        # An empty candidate is not "stranded" — there's nothing to
+        # promote. Legacy behavior captures it as a degenerate run.
+        return PROMOTION_NO_BUNDLE
+    candidate_meta = bundle.get("candidate_meta") or {}
+    bundle_ts = candidate_meta.get("generated_at") or manifest.get("generated_at")
+    canonical = canonical_meta or {}
+    canonical_ts = canonical.get("generated_at") or canonical.get("last_updated")
+    if not (bundle_ts and canonical_ts):
+        return PROMOTION_STRANDED
+    return PROMOTION_PROMOTED if canonical_ts >= bundle_ts else PROMOTION_STRANDED
+
+
+def format_candidate_block(
+    bundle: Optional[dict],
+    promotion: str,
+) -> list[str]:
+    """Render the CANDIDATE STATUS block. Empty list when no bundle —
+    legacy summary doesn't need a placeholder section."""
+    if bundle is None or promotion == PROMOTION_NO_BUNDLE:
+        return []
+    manifest = bundle.get("manifest") or {}
+    visible = manifest.get("visible_count", 0)
+    generated_at = (
+        (bundle.get("candidate_meta") or {}).get("generated_at")
+        or manifest.get("generated_at")
+        or "?"
+    )
+    run_id = manifest.get("run_id") or "?"
+    files = manifest.get("files") or []
+    files_summary = ", ".join(
+        sorted(f.get("path", "?") for f in files if isinstance(f, dict))
+    ) or "(empty)"
+
+    lines = ["CANDIDATE STATUS (R1/R5 — resilience PRD)"]
+    if promotion == PROMOTION_PROMOTED:
+        mark = "✓"
+        verdict = "PROMOTED  (canonical files reflect this run)"
+    else:
+        mark = "✗"
+        verdict = "STRANDED  (candidate generated but not promoted)"
+    lines.append(f"  {mark} {verdict}")
+    lines.append(f"    run_id:            {run_id}")
+    lines.append(f"    visible_count:     {visible}")
+    lines.append(f"    candidate_ts:      {generated_at}")
+    lines.append(f"    bundle_files:      {files_summary}")
+    if promotion == PROMOTION_STRANDED:
+        lines.append(
+            f"    recovery:          python scripts/promote_candidate.py "
+            f"--run-id {run_id} --dry-run"
+        )
+    lines.append("")
+    return lines
+
+
 def format_source_line(src: str, row: dict) -> str:
     """One line per source for the PER-SOURCE HEALTH block."""
     status = row.get("status", "?")
@@ -149,6 +282,8 @@ def format_summary(
     mode: str = "workflow",
     remote_health: Optional[dict] = None,
     remote_health_error: Optional[str] = None,
+    candidate_bundle: Optional[dict] = None,
+    promotion_status: str = PROMOTION_NO_BUNDLE,
 ) -> str:
     """Pure: assemble the final summary block from the resolved inputs."""
     lines: list[str] = []
@@ -179,6 +314,12 @@ def format_summary(
     else:
         lines.append("  (no source rows captured — telemetry write failed?)")
     lines.append("")
+
+    # R5: candidate-bundle awareness. Emits CANDIDATE STATUS only when
+    # R1's bundle exists for this run; otherwise legacy summary flows
+    # through unchanged so pre-R1 pipelines see no surprise sections.
+    candidate_lines = format_candidate_block(candidate_bundle, promotion_status)
+    lines.extend(candidate_lines)
 
     # Commit + deploy
     if mode == "local":
@@ -233,6 +374,18 @@ def format_summary(
         else:
             lines.append("  pulpo.club will NOT refresh this run — still showing the last")
             lines.append("  successfully-deployed nightly.")
+            # R5 truthful refinement: if the candidate bundle exists
+            # but didn't promote, that's a recoverable incident, not a
+            # silent failure. Tell the operator where the data IS.
+            if promotion_status == PROMOTION_STRANDED and candidate_bundle is not None:
+                manifest = candidate_bundle.get("manifest") or {}
+                visible = manifest.get("visible_count", 0)
+                run_id = manifest.get("run_id") or "?"
+                lines.append(
+                    f"  A candidate bundle WAS generated this run "
+                    f"({visible} listings, run_id={run_id}); see CANDIDATE STATUS"
+                )
+                lines.append("  above to promote it manually.")
     lines.append("")
     lines.append(bar)
 
@@ -280,6 +433,18 @@ def main(argv: Optional[list[str]] = None) -> int:
     if mode == "local":
         remote_health, remote_health_error = fetch_remote_health()
 
+    # R5: detect R1's candidate bundle and classify the promotion
+    # outcome so the summary distinguishes "stranded inventory" from
+    # "nothing changed today" — the two were indistinguishable in the
+    # pre-R5 summary, and reading the difference cost the operator a
+    # 2026-06-06-class incident.
+    run_id = resolve_run_id(os.environ.get("PULPO_RUN_ID"))
+    candidate_bundle = read_candidate_bundle(data_dir, run_id)
+    promotion_status = classify_promotion(
+        bundle=candidate_bundle,
+        canonical_meta=last_updated if isinstance(last_updated, dict) else None,
+    )
+
     # Use today's UTC date as a label so the summary header reads cleanly
     # even when the pipeline timestamp is missing.
     from datetime import datetime, timezone as _tz
@@ -296,6 +461,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         mode=mode,
         remote_health=remote_health,
         remote_health_error=remote_health_error,
+        candidate_bundle=candidate_bundle,
+        promotion_status=promotion_status,
     )
 
     # Always print to stdout — this is the operator-facing surface.

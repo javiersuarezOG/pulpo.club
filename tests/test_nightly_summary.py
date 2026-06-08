@@ -284,3 +284,219 @@ def test_main_dedupes_two_rows_per_nightly(tmp_path, monkeypatch, capsys):
     # the post_validation collapse, not the green crawl row.
     assert "✗ nexo" in out
     assert "red" in out
+
+
+# ── R5: candidate-bundle awareness ─────────────────────────────────────
+
+
+def _write_candidate_bundle(
+    data_dir: Path,
+    run_id: str,
+    *,
+    visible_count: int,
+    generated_at: str,
+    files: list[dict] | None = None,
+):
+    staging = data_dir / ".staging" / run_id
+    staging.mkdir(parents=True, exist_ok=True)
+    manifest = {
+        "schema_version": 1,
+        "run_id": run_id,
+        "generated_at": generated_at,
+        "visible_count": visible_count,
+        "files": files or [{"path": "ranked.json"}, {"path": "bundle_manifest.json"}],
+    }
+    (staging / "bundle_manifest.json").write_text(json.dumps(manifest))
+    (staging / "last_updated.candidate.json").write_text(
+        json.dumps({"generated_at": generated_at})
+    )
+
+
+def test_classify_promotion_no_bundle_is_no_bundle():
+    """Pre-R1 pipeline path: no bundle present → legacy summary."""
+    assert ns.classify_promotion(bundle=None, canonical_meta=None) == ns.PROMOTION_NO_BUNDLE
+
+
+def test_classify_promotion_empty_candidate_is_no_bundle():
+    """Empty candidate is degenerate — treat as no_bundle so summary
+    falls through to the legacy "nothing changed today" copy rather
+    than scaring the operator with a 0-listing STRANDED line."""
+    bundle = {
+        "manifest": {"visible_count": 0, "generated_at": "2026-06-07T01:00:00Z"},
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    assert ns.classify_promotion(bundle=bundle, canonical_meta=None) == ns.PROMOTION_NO_BUNDLE
+
+
+def test_classify_promotion_stranded_when_canonical_missing():
+    bundle = {
+        "manifest": {"visible_count": 1912, "generated_at": "2026-06-07T01:00:00Z"},
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    assert ns.classify_promotion(bundle=bundle, canonical_meta=None) == ns.PROMOTION_STRANDED
+
+
+def test_classify_promotion_stranded_when_canonical_older():
+    bundle = {
+        "manifest": {"visible_count": 1912, "generated_at": "2026-06-07T01:00:00Z"},
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    canonical = {"generated_at": "2026-06-02T08:00:00Z"}
+    assert ns.classify_promotion(bundle=bundle, canonical_meta=canonical) == ns.PROMOTION_STRANDED
+
+
+def test_classify_promotion_promoted_when_canonical_fresher():
+    bundle = {
+        "manifest": {"visible_count": 1912, "generated_at": "2026-06-07T01:00:00Z"},
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    canonical = {"generated_at": "2026-06-07T02:00:00Z"}
+    assert ns.classify_promotion(bundle=bundle, canonical_meta=canonical) == ns.PROMOTION_PROMOTED
+
+
+def test_format_candidate_block_empty_when_no_bundle():
+    """Legacy summary has no placeholder section."""
+    assert ns.format_candidate_block(None, ns.PROMOTION_NO_BUNDLE) == []
+
+
+def test_format_candidate_block_promoted_states_run_id_and_count():
+    bundle = {
+        "manifest": {
+            "run_id": "42",
+            "visible_count": 1912,
+            "generated_at": "2026-06-07T01:00:00Z",
+            "files": [{"path": "ranked.json"}],
+        },
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    lines = ns.format_candidate_block(bundle, ns.PROMOTION_PROMOTED)
+    body = "\n".join(lines)
+    assert "PROMOTED" in body
+    assert "1912" in body
+    assert "42" in body
+    # No recovery hint on the promoted path — the bundle did its job.
+    assert "promote_candidate.py" not in body
+
+
+def test_format_candidate_block_stranded_includes_recovery_command():
+    bundle = {
+        "manifest": {
+            "run_id": "42",
+            "visible_count": 1912,
+            "generated_at": "2026-06-07T01:00:00Z",
+            "files": [{"path": "ranked.json"}],
+        },
+        "candidate_meta": {"generated_at": "2026-06-07T01:00:00Z"},
+    }
+    lines = ns.format_candidate_block(bundle, ns.PROMOTION_STRANDED)
+    body = "\n".join(lines)
+    assert "STRANDED" in body
+    assert "promote_candidate.py --run-id 42 --dry-run" in body
+
+
+def test_read_candidate_bundle_returns_manifest_when_present(tmp_path):
+    _write_candidate_bundle(tmp_path, "RUN-X", visible_count=1912, generated_at="2026-06-07T01:00:00Z")
+    bundle = ns.read_candidate_bundle(tmp_path, "RUN-X")
+    assert bundle is not None
+    assert bundle["manifest"]["visible_count"] == 1912
+    assert bundle["candidate_meta"]["generated_at"] == "2026-06-07T01:00:00Z"
+
+
+def test_read_candidate_bundle_returns_none_for_unknown_run(tmp_path):
+    bundle = ns.read_candidate_bundle(tmp_path, "DOES-NOT-EXIST")
+    assert bundle is None
+
+
+def test_read_candidate_bundle_returns_none_for_empty_run_id(tmp_path):
+    assert ns.read_candidate_bundle(tmp_path, "") is None
+
+
+def test_resolve_run_id_priority(monkeypatch):
+    """explicit > GITHUB_RUN_ID > PULPO_RUN_ID > ''."""
+    monkeypatch.setenv("GITHUB_RUN_ID", "from-gh")
+    monkeypatch.setenv("PULPO_RUN_ID", "from-pulpo")
+    assert ns.resolve_run_id("explicit") == "explicit"
+    assert ns.resolve_run_id(None) == "from-gh"
+    monkeypatch.delenv("GITHUB_RUN_ID")
+    assert ns.resolve_run_id(None) == "from-pulpo"
+    monkeypatch.delenv("PULPO_RUN_ID")
+    assert ns.resolve_run_id(None) == ""
+
+
+def test_main_summary_reports_stranded_when_canonical_stale(tmp_path, monkeypatch, capsys):
+    """End-to-end: candidate bundle exists with 1912 listings but the
+    canonical last_updated.json is 5 days old → summary names the
+    incident + tells the operator how to recover."""
+    # Stale canonical (the actual 2026-06-06-class symptom).
+    (tmp_path / "ranked.json").write_text(json.dumps([{"id": i} for i in range(1000)]))
+    (tmp_path / "last_updated.json").write_text(
+        json.dumps({"last_updated": "2026-06-02T08:00:00Z", "generated_at": "2026-06-02T08:00:00Z"})
+    )
+    _write_candidate_bundle(tmp_path, "RUN-STRANDED", visible_count=1912,
+                            generated_at="2026-06-07T01:00:00Z")
+
+    # Workflow-mode env: commit/deploy didn't happen (canary blocked promotion).
+    monkeypatch.setenv("NIGHTLY_COMMITTED", "false")
+    monkeypatch.setenv("NIGHTLY_DEPLOY_OUTCOME", "skipped")
+    monkeypatch.setenv("NIGHTLY_RUN_URL", "https://github.com/x/y/runs/RUN-STRANDED")
+    monkeypatch.setenv("PULPO_RUN_ID", "RUN-STRANDED")
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
+
+    rc = ns.main(["--data-dir", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "CANDIDATE STATUS" in out
+    assert "STRANDED" in out
+    assert "1912" in out
+    assert "RUN-STRANDED" in out
+    assert "promote_candidate.py" in out
+    # The legacy SITE STATE block should still say pulpo.club won't
+    # refresh — but now with a pointer to CANDIDATE STATUS.
+    assert "pulpo.club will NOT refresh" in out
+
+
+def test_main_summary_reports_promoted_normally(tmp_path, monkeypatch, capsys):
+    """Promoted path: bundle exists, canonical is fresher → CANDIDATE
+    STATUS shows PROMOTED, SITE STATE uses the normal copy."""
+    (tmp_path / "ranked.json").write_text(json.dumps([{"id": i} for i in range(1912)]))
+    (tmp_path / "last_updated.json").write_text(
+        json.dumps({"last_updated": "2026-06-07T02:00:00Z", "generated_at": "2026-06-07T02:00:00Z"})
+    )
+    _write_candidate_bundle(tmp_path, "RUN-OK", visible_count=1912,
+                            generated_at="2026-06-07T01:00:00Z")
+
+    monkeypatch.setenv("NIGHTLY_COMMITTED", "true")
+    monkeypatch.setenv("NIGHTLY_DEPLOY_OUTCOME", "success")
+    monkeypatch.setenv("NIGHTLY_RUN_URL", "https://github.com/x/y/runs/RUN-OK")
+    monkeypatch.setenv("PULPO_RUN_ID", "RUN-OK")
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
+
+    rc = ns.main(["--data-dir", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "CANDIDATE STATUS" in out
+    assert "PROMOTED" in out
+    # Recovery hint must not appear on the promoted path.
+    assert "promote_candidate.py" not in out
+    assert "pulpo.club will show" in out
+
+
+def test_main_summary_pre_r1_run_falls_through_to_legacy(tmp_path, monkeypatch, capsys):
+    """No candidate bundle present (pre-R1 pipeline OR R1 disabled this
+    run): CANDIDATE STATUS section must NOT appear. Pure regression
+    guard against breaking the legacy summary contract."""
+    (tmp_path / "ranked.json").write_text(json.dumps([{"id": 1}]))
+    (tmp_path / "last_updated.json").write_text(
+        json.dumps({"last_updated": "2026-06-07T02:00:00Z"})
+    )
+    monkeypatch.setenv("NIGHTLY_COMMITTED", "true")
+    monkeypatch.setenv("NIGHTLY_DEPLOY_OUTCOME", "success")
+    monkeypatch.setenv("NIGHTLY_RUN_URL", "https://github.com/x/y/runs/RUN-NO-BUNDLE")
+    monkeypatch.setenv("PULPO_RUN_ID", "RUN-NO-BUNDLE")
+    monkeypatch.delenv("GITHUB_RUN_ID", raising=False)
+    rc = ns.main(["--data-dir", str(tmp_path)])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "CANDIDATE STATUS" not in out
+    # The pre-R5 NIGHTLY SUMMARY contract still holds.
+    assert "NIGHTLY SUMMARY" in out
