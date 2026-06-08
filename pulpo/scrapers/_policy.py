@@ -164,6 +164,24 @@ POLICIES: dict[str, Policy] = {
         auto_repair=False,
     ),
 
+    # agentiz: SV agency site with 5 hardcoded detail-page URLs (no
+    # catalog grid). The pages return 200 + JSON-LD from a residential
+    # Mac IP but the GitHub Actions runner gets empty bodies — same
+    # symptom class as elagente/realtyelsalvador prior to their
+    # curl_cffi switch (TLS-fingerprint gate, not IP-only). Failure id
+    # 6e981b52 (2026-06-06 nightly empty_yield) was the trigger.
+    # Transport switched to curl_cffi with default chrome124 + the
+    # safari_macos UA pool so the UA the WAF logs alongside the JA3
+    # matches the typical regional visitor profile. Rate limit and
+    # jitter stay at scraper defaults — only 5 requests per run.
+    # auto_repair stays False: LLMs can't talk past a WAF.
+    "agentiz":          Policy(
+        transport="curl_cffi",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+        auto_repair=False,
+    ),
+
     # jamesedition: luxury portal sitting behind Cloudflare's
     # JS-challenge interstitial. 2026-06-05 live probe with httpx
     # returned HTTP 403 + "Just a moment..." HTML. curl_cffi with

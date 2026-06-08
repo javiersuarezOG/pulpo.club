@@ -44,6 +44,18 @@ def test_realtyelsalvador_auto_repair_disabled():
     assert p.auto_repair is False
 
 
+def test_agentiz_uses_curl_cffi_transport():
+    """Reason: 2026-06-06 nightly failure id 6e981b52 — 5 static URLs
+    return 200 from a residential Mac IP but empty bodies from the
+    GitHub Actions runner. Same TLS-fingerprint gate as elagente /
+    realtyelsalvador. curl_cffi's Chrome handshake impersonation slips
+    through. auto_repair False for the same WAF-class reason."""
+    p = get_policy("agentiz")
+    assert p.transport == "curl_cffi"
+    assert p.user_agent_pool == "safari_macos"
+    assert p.auto_repair is False
+
+
 def test_with_override_does_not_mutate_registry():
     original = get_policy("encuentra24")
     modified = with_override("encuentra24", rate_limit_rps=99.0)
