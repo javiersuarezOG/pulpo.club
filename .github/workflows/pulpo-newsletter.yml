@@ -53,6 +53,12 @@ on:
         type: choice
         default: "en"
         options: ["en", "es"]
+      newsletter_template:
+        description: "Which template to route through (TEMPLATES registry id). Default is the Pro weekly master."
+        required: false
+        type: choice
+        default: "pulpo-pro-general"
+        options: ["pulpo-pro-general", "pulpo-free-general"]
       allow_all_subscribers:
         description: "LAUNCH SEND — bypass the Pro/Agency gate; send to ALL audience contacts (anonymous, free, Pro). Default no."
         required: false
@@ -171,7 +177,8 @@ jobs:
           PREVIEW_LOCALE="${{ github.event.inputs.preview_locale || 'en' }}"
           ISSUE_NUMBER="${{ github.event.inputs.issue_number || '' }}"
           ALLOW_ALL="${{ github.event.inputs.allow_all_subscribers || 'no' }}"
-          ARGS=(--write-html-to newsletter-drafts/sent)
+          NEWSLETTER_TEMPLATE="${{ github.event.inputs.newsletter_template || 'pulpo-pro-general' }}"
+          ARGS=(--write-html-to newsletter-drafts/sent --newsletter "$NEWSLETTER_TEMPLATE")
           if [ -n "$ISSUE_NUMBER" ]; then
             ARGS+=(--issue-number "$ISSUE_NUMBER")
           fi

@@ -60,6 +60,10 @@ def test_free_general_ctas_top3_vs_rest(free_with_prefs, ranked_pool):
     # The free shortlist is built paywalled=True, but free render shows it
     # full — so the locked teaser blurb must be absent.
     assert "Pulpo Pro reveals the address" not in html
+    # Save (ghost) button appears on the top 3 ONLY — the ranks 04-10
+    # sign-up cards drop it (no "save before sign-up" dead end, and it
+    # keeps the longer sign-up CTA from overflowing 320px in ES).
+    assert html.count("&hearts;&#xfe0e; Save") == len(issue.picks_top)
 
 
 def test_free_general_has_no_paywall_banner(free_with_prefs, ranked_pool):

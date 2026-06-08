@@ -1650,6 +1650,22 @@ def _pick_card_html(
         #      glyph as text, not emoji. Cross-client safe.
         # Same nowrap on the filled CTA so the right-arrow can't wrap
         # away from the label on tight viewports.
+        #
+        # The free-tier ranks 04-10 show ONLY the sign-up CTA — no "Save"
+        # ghost button. Two reasons: (1) "Save" before sign-up is a dead
+        # end (you can't save without an account), and (2) the longer
+        # "Sign up to Pro" / "Regístrate en Pro" label paired with Save
+        # overflowed the 320px viewport in ES. Top 3 (and all Pro picks)
+        # keep the See-on-Pulpo + Save pair.
+        show_save = not (free and not is_top_deal)
+        save_td = (
+            f'<td><a class="btn-ghost" href="{_e(save_url)}" '
+            f'style="display:inline-block;font-size:13px;font-weight:600;'
+            f'padding:10px 16px;color:#1A1916;border:1px solid #1A1916;'
+            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
+            f'white-space:nowrap;">'
+            f'&hearts;&#xfe0e; {_e(save_label)}</a></td>'
+        ) if show_save else ""
         cta_html = (
             f'<table role="presentation"><tr>'
             f'<td style="padding-right:8px;">'
@@ -1659,12 +1675,7 @@ def _pick_card_html(
             f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
             f'white-space:nowrap;">'
             f'{_e(cta_label)}</a></td>'
-            f'<td><a class="btn-ghost" href="{_e(save_url)}" '
-            f'style="display:inline-block;font-size:13px;font-weight:600;'
-            f'padding:10px 16px;color:#1A1916;border:1px solid #1A1916;'
-            f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
-            f'white-space:nowrap;">'
-            f'&hearts;&#xfe0e; {_e(save_label)}</a></td>'
+            f'{save_td}'
             f'</tr></table>'
         )
 

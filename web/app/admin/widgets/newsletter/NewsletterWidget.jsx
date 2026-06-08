@@ -136,7 +136,11 @@ const NEWSLETTERS = [
     template: "pulpo-free-general",
     templateLabel: "Pulpo Free General",
     cadenceMode: "scheduled",
-    status: "coming-soon",
+    // Template is built + test-sendable from admin (routes the
+    // pulpo-free-general template through the same preview pipeline as
+    // Pro · Weekly). Scheduled free-tier audience routing is a separate
+    // follow-up; the card offers a TEST send only for now.
+    status: "live",
   },
 ];
 
@@ -1632,26 +1636,49 @@ export function NewsletterWidget() {
               <hr />
               <span className="nl-tier-count">{FREE_NEWSLETTERS.length} newsletters</span>
             </div>
-            {FREE_NEWSLETTERS.map((nl) => (
-              <article key={nl.id} className={`nl-newsletter-card ${nl.status === "live" ? "" : "coming-soon"}`}>
-                <div className="nl-newsletter-head">
-                  <h3 className="nl-newsletter-title">{nl.title}</h3>
-                  <span className={`nl-newsletter-status ${nl.status === "live" ? "live" : "coming-soon"}`}>
-                    {nl.status === "live" ? "● Live" : "◌ Coming soon"}
-                  </span>
-                </div>
-                <p className="nl-newsletter-desc">{nl.description}</p>
-                <p className="nl-newsletter-template">
-                  Template · <strong>{nl.templateLabel}</strong>
-                  {templateVersions[nl.template] && (
-                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+            {FREE_NEWSLETTERS.map((nl) => {
+              const isLive = nl.status === "live";
+              // free-weekly routes through the SAME weekly preview path as
+              // pro-weekly (trigger() → /api/admin/newsletter/trigger-preview
+              // → workflow with newsletter_template=pulpo-free-general). It
+              // offers a TEST send only — the free-tier audience routing
+              // isn't wired yet, so no "Send to everyone" here.
+              const canTest = isLive && nl.cadenceMode === "scheduled";
+              return (
+                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
+                  <div className="nl-newsletter-head">
+                    <h3 className="nl-newsletter-title">{nl.title}</h3>
+                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
+                      {isLive ? "● Live" : "◌ Coming soon"}
+                    </span>
+                  </div>
+                  <p className="nl-newsletter-desc">{nl.description}</p>
+                  <p className="nl-newsletter-template">
+                    Template · <strong>{nl.templateLabel}</strong>
+                    {templateVersions[nl.template] && (
+                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+                    )}
+                    {isLive && (
+                      <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
+                    )}
+                  </p>
+                  {canTest && (
+                    <div className="nl-upcoming-actions nl-card-actions" style={{ marginTop: 12 }}>
+                      {localeToggle(nl.id)}
+                      <button
+                        type="button"
+                        className="nl-upcoming-btn"
+                        disabled={busy || !!audienceConfirm}
+                        onClick={() => trigger({ issueNumber: 1, newsletterId: nl.id, locale: localeFor(nl.id) })}
+                        title="Send a test copy of the free-tier weekly to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
+                      >
+                        Send test →
+                      </button>
+                    </div>
                   )}
-                  {nl.status === "live" && (
-                    <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
-                  )}
-                </p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* Per-browser log of trigger attempts (localStorage). Cap at
