@@ -61,6 +61,7 @@
       "photos_count",
       "photo_urls",
       "hero_photo_path",
+      "selected_photo_url",
       "hero_photo_quality_score",
       "has_text_overlay",
       "has_marketing_overlay",
@@ -77,6 +78,8 @@
       "hires_quarantined",
       "first_seen_at",
       "existence_status",
+      "last_seen_at",
+      "missing_since",
       "broker_name",
       "broker_phone",
       "broker_email",
@@ -405,6 +408,12 @@
           "null"
         ]
       },
+      "selected_photo_url": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
       "hero_photo_quality_score": {
         "type": [
           "integer",
@@ -490,6 +499,18 @@
         ]
       },
       "existence_status": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "last_seen_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "missing_since": {
         "type": [
           "string",
           "null"

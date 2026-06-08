@@ -320,6 +320,9 @@ function Badge({ listing }) {
 // is 7 days, matching the home shelf's "new this week" definition.
 function signalForListing(listing) {
   if (!listing) return null;
+  if (listing.existence_status === "missing_recently" || listing.existence_status === "stale") {
+    return { kind: "stale", labelKey: "badge.stale", icon: "info" };
+  }
   if (listing.is_repriced) {
     return { kind: "drop", labelKey: "badge.price_drop", icon: "cat_price_drop" };
   }

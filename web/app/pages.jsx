@@ -72,6 +72,7 @@ async function startStripeCheckout(opts) {
   return mod.startStripeCheckout(opts);
 }
 import { resolvePinFromParam } from "./lib/share";
+import { buildLocalImgUrl } from "./lib/img-url";
 import {
   uspsVisibleFor,
   galleryThumbsUnlockedFor,
@@ -1938,9 +1939,25 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // listing change so the head doesn't grow unboundedly across
   // navigations. fetchpriority="high" matches the <img> hint so the
   // browser doesn't downgrade the preload mid-stream.
+  // P3 — prefer the local hero derivative (/photos/<id>.hero.jpg) as the
+  // detail LCP image, routed through /api/img for WebP. This is the same
+  // winning image the card thumbnail paints, so the detail main now
+  // matches the card AND drops the broker-CDN LCP long-tail (the home
+  // hero's broker fallback measured P95=14.5s). Broker photos[0] stays
+  // the onError fallback + the gallery/lightbox source. Mirrors the
+  // HeroV4 heroSrc derivation.
+  const detailLocalHeroUrl = pUseMemo(() => {
+    const tn = listing.thumbnail_url;
+    if (typeof tn !== "string" || !tn.startsWith("/photos/")) return null;
+    return buildLocalImgUrl(tn.replace(/\.jpg$/i, ".hero.jpg"), 1600);
+  }, [listing.thumbnail_url]);
+
   pUseEffect(() => {
     if (typeof document === "undefined") return;
-    const lcp = listing.photos && listing.photos[0];
+    // Preload the SAME URL the gallery-main <img> will request so the
+    // <link rel=preload> matches the LCP element (a mismatch double-
+    // fetches). Local hero when available; broker photos[0] otherwise.
+    const lcp = detailLocalHeroUrl || (listing.photos && listing.photos[0]);
     if (!lcp) return;
     const link = document.createElement("link");
     link.rel = "preload";
@@ -1951,7 +1968,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
     return () => {
       try { document.head.removeChild(link); } catch { /* already gone — fine */ }
     };
-  }, [listing.id, listing.photos && listing.photos[0]]);
+  }, [listing.id, detailLocalHeroUrl, listing.photos && listing.photos[0]]);
 
   // Paywall telemetry. Fires once per listing+lock transition when the
   // off-market hard paywall renders. Bypass events fire on the buttons
@@ -2121,21 +2138,37 @@ function ListingDetail({ listing, app, asPanel = true }) {
             onClick={() => listing.photos.length && !needsSignup && openLightbox(0)}
             aria-label={listing.photos.length ? t("detail.gallery.open", lc) : undefined}
           >
-            {listing.photos[0] ? (
+            {(detailLocalHeroUrl || listing.photos[0]) ? (
               <img
-                src={listing.photos[0]}
+                src={detailLocalHeroUrl || listing.photos[0]}
                 alt={tr(listing.title, app.locale)}
                 loading="eager"
                 decoding="async"
                 fetchpriority="high"
-                onError={() => {
+                onError={(e) => {
+                  // Local hero 404 (e.g. preview deploy before the bot's
+                  // photo commit propagates) → fall back to the broker
+                  // photos[0] once. The flag guards against an infinite
+                  // onError loop if the broker URL also fails.
+                  const img = e.currentTarget;
+                  const broker = listing.photos[0];
+                  if (
+                    detailLocalHeroUrl &&
+                    broker &&
+                    !img.dataset.brokerFallback &&
+                    img.src.indexOf("/api/img") !== -1
+                  ) {
+                    img.dataset.brokerFallback = "1";
+                    img.src = broker;
+                    return;
+                  }
                   try {
                     track("image.error", {
-                      url: String(listing.photos[0] ?? "").slice(0, 200),
+                      url: String(img.src ?? "").slice(0, 200),
                       listing_id: listing.id,
                       idx: 0,
                       source: "detail_main",
-                      is_local: String(listing.photos[0] ?? "").startsWith("/photos/"),
+                      is_local: String(img.src ?? "").indexOf("/api/img") !== -1,
                     });
                   } catch { /* never let telemetry break the render */ }
                 }}

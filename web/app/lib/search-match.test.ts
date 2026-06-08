@@ -66,6 +66,7 @@ function L(overrides: Partial<Listing>): Listing {
     geocoding_confidence: "high",
     geocoding_source: "extracted",
     geocoding_reference: null,
+    existence_status: null,
     is_sold: false,
     original_url: "https://www.remax.com.sv/sv/property/lote-1404?referer=abc",
     rank: null,

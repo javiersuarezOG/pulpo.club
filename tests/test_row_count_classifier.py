@@ -21,6 +21,7 @@ from automation.row_count_sentinel import (
     append_tick,
     classify_drop,
     count_listings_by_source,
+    downgrade_experimental,
     format_slack_message,
     load_history,
     prior_counts_for,
@@ -390,6 +391,64 @@ def test_run_tick_records_tick_even_when_ok(tmp_path: Path):
     assert {t.source for t in ticks} == {"remax", "__total__"}
 
 
+def test_run_tick_record_false_does_not_append(tmp_path: Path):
+    ranked = tmp_path / "ranked.json"
+    ranked.write_text(json.dumps([{"source": "remax"}]))
+    history = tmp_path / "history.jsonl"
+    _seed_history(history, [
+        ("2026-01-01T00:00:00+00:00", "remax", 10, "sv"),
+        ("2026-01-01T00:00:00+00:00", "__total__", 10, "sv"),
+    ])
+    before = history.read_bytes()
+
+    verdicts = run_tick(
+        ranked_paths={"sv": ranked},
+        history_path=history,
+        now_iso="2026-01-02T00:00:00+00:00",
+        record=False,
+    )
+
+    assert verdicts
+    assert history.read_bytes() == before
+
+
+def test_run_tick_classifies_zero_yield_source_absent_today(tmp_path: Path):
+    """Regression (2026-06-08): a source that zero-yields is ABSENT from
+    today's ranked.json, so iterating today's counts alone never classifies
+    it. The gate must union today's sources with history-known sources and
+    classify the missing one at count=0 — a 100% drop = CRIT — even when
+    another source grows to keep the platform total flat (masking the total
+    canary). Without this the per-source gate adds nothing over the total
+    floor for the most common failure mode.
+    """
+    ranked = tmp_path / "ranked.json"
+    # citymax_sc zero-yielded; remax grew to 444 so __total__ stays flat.
+    ranked.write_text(json.dumps([{"source": "remax"} for _ in range(444)]))
+    history = tmp_path / "history.jsonl"
+    _seed_history(history, [
+        ("2026-06-01T00:00:00+00:00", "citymax_sc", 162, "sv"),
+        ("2026-06-02T00:00:00+00:00", "citymax_sc", 162, "sv"),
+        ("2026-06-01T00:00:00+00:00", "remax", 282, "sv"),
+        ("2026-06-02T00:00:00+00:00", "remax", 282, "sv"),
+        ("2026-06-01T00:00:00+00:00", "__total__", 444, "sv"),
+        ("2026-06-02T00:00:00+00:00", "__total__", 444, "sv"),
+    ])
+
+    verdicts = run_tick(
+        ranked_paths={"sv": ranked},
+        history_path=history,
+        now_iso="2026-06-03T00:00:00+00:00",
+        record=False,
+    )
+
+    by_source = {v.source: v for v in verdicts}
+    assert "citymax_sc" in by_source, "zero-yield source must still be classified"
+    assert by_source["citymax_sc"].level == "critical"   # 162 → 0 = 100% drop
+    assert by_source["citymax_sc"].curr_count == 0
+    assert by_source["__total__"].level == "ok"          # total masked the drop
+    assert any_critical(verdicts)
+
+
 # ---------- any_critical + format_slack_message ----------
 
 def test_any_critical_detects_one_in_many():
@@ -407,6 +466,24 @@ def test_any_critical_returns_false_when_none():
         DropVerdict("a", "sv", 100, 99, -1, -0.01, "ok", "", 100),
     ]
     assert any_critical(verdicts) is False
+
+
+def test_downgrade_experimental_demotes_critical_to_warn():
+    from automation.row_count_sentinel import DropVerdict
+    verdicts = [
+        DropVerdict("jamesedition", "sv", 100, 0, -100, -1.0, "critical", "pct=100%", 100),
+        DropVerdict("__total__", "sv", 100, 0, -100, -1.0, "critical", "pct=100%", 100),
+    ]
+
+    out = downgrade_experimental(
+        verdicts,
+        {"jamesedition": {"lifecycle": "experimental"}},
+    )
+    by_source = {v.source: v for v in out}
+
+    assert by_source["jamesedition"].level == "warn"
+    assert "experimental_lifecycle_log_only" in by_source["jamesedition"].reason
+    assert by_source["__total__"].level == "critical"
 
 
 def test_format_slack_message_lists_critical_first():

@@ -131,6 +131,7 @@ export interface Listing {
     photos_count: number;
     photo_urls: string[];               // [0] is hero
     hero_photo_path: string | null;     // local /photos/<source>_<id>.jpg
+    selected_photo_url: string | null;  // picker's winning broker URL; FE reorders photos[0] to match the card
     /** PR-7.6 — heuristic quality score (0..100) for hero_photo_path. null when not scored. */
     hero_photo_quality_score: number | null;
     /** OCR-based text-overlay flag for hero photos. True = brochure-style image
@@ -151,6 +152,8 @@ export interface Listing {
      *  nightly pipeline; consumers include the ranker (PR-S4c flag)
      *  and the operator dashboard. */
     existence_status: string | null;
+    last_seen_at: string | null;       // ISO8601 UTC, from existence ledger
+    missing_since: string | null;      // ISO8601 UTC when absence streak began
 
     // ── Broker ──────────────────────────────────────────────────────
     broker_name: string | null;

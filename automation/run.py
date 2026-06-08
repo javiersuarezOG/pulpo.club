@@ -564,6 +564,18 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 # because 600×400 thumbs never clear the 800×600 floor).
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
                 li.card_eligible = bool(hero_meta.get("card_eligible", False))
+                # Cached-skip path: recover the picker's winning URL from
+                # the sidecar so selected_photo_url is populated even when
+                # we don't re-run the pick (P2 consumer: listings.ts).
+                if hero_meta.get("winning_url"):
+                    li.selected_photo_url = hero_meta["winning_url"]
+                # P5 — also reject a logo/placeholder winner so the 19
+                # existing xitios-icon listings self-heal on the next
+                # nightly without a forced repick.
+                from automation.photo_quality import is_logo_or_placeholder_url
+                if is_logo_or_placeholder_url(hero_meta.get("winning_url")):
+                    li.card_eligible = False
+                    li.hero_eligible = False
                 if hero_meta.get("width") is not None:
                     li.source_width = int(hero_meta["width"])
                 if hero_meta.get("height") is not None:
@@ -732,7 +744,10 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # ≥ 1200 — the threshold is unreachable. See the upstream-gate
             # diagnostic at pulpo-social/admin/trigger (2026-05-19) where
             # 10/10 candidates rejected with `upstream_hero_ineligible`.
-            from automation.photo_quality import compute_image_metadata as _cim
+            from automation.photo_quality import (
+                compute_image_metadata as _cim,
+                is_logo_or_placeholder_url,
+            )
             source_meta = _cim(winning_content, file_size_bytes=len(winning_content))
 
             if hero_meta is not None:
@@ -760,6 +775,15 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # P5 — a logo/icon/placeholder that wins the pick (structural
+                # gates can't tell a big logo from a real photo) must never be
+                # card/hero eligible. Override BEFORE the sidecar write so both
+                # the sidecar and the listing reflect it. Consumer of
+                # card_eligible: web/app/home/HomeShelf.jsx homepage gate.
+                if is_logo_or_placeholder_url(winning_url):
+                    hero_meta["card_eligible"] = False
+                    hero_meta["hero_eligible"] = False
+                    hero_meta["logo_placeholder_rejected"] = True
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
@@ -775,6 +799,10 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
+            # Persist the picker's winning broker URL so the FE can put the
+            # same image first in the detail gallery (P2). Consumer:
+            # web/app/data/listings.ts::buildPhotos.
+            li.selected_photo_url = winning_url
             if li.card_eligible:
                 card_eligible_count += 1
             if li.hero_eligible:
@@ -2161,6 +2189,60 @@ def main() -> int:
     # never break the rest of the nightly.
     _download_hires_photos(ranked_pre, REPO)
     ranked = ranked_pre
+
+    # P0/P2 inventory-resilience invariant: write a fresh-only snapshot
+    # before any carry-forward merge. The pre-commit row-count gate reads
+    # this file when present so stale carry-forward cannot mask a source
+    # delta. The file is intentionally not staged by the workflow.
+    try:
+        _atomic_write_json(
+            web_data_dir / "ranked.fresh.json",
+            [li.to_dict() for li in ranked_pre],
+        )
+    except Exception as _e:  # noqa: BLE001
+        print(f"[carry_forward] fresh snapshot failed (non-fatal): {_e!r}")
+
+    try:
+        from automation.carry_forward import (
+            load_previous_ranked_from_git,
+            merge_carry_forward,
+            preview_carry_forward_count,
+        )
+        from automation.listing_ledger import load_ledger as _cf_load_ledger
+        failed_sources_for_carry = {
+            src.strip()
+            for src in sources
+            if src.strip()
+            and (src.strip() in source_errors or per_source_count.get(src.strip(), 0) == 0)
+        }
+        previous_ranked = load_previous_ranked_from_git(REPO)
+        cf_ledger = _cf_load_ledger(web_data_dir / "listings_ledger.json")
+        if not previous_ranked:
+            print("[carry_forward] no origin/main ranked.json available — carry_count=0")
+        if _env_bool("PULPO_CARRY_FORWARD", False):
+            ranked, cf_metrics = merge_carry_forward(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] enabled carried={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+        else:
+            cf_metrics = preview_carry_forward_count(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] disabled would_carry={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[carry_forward] failed (non-fatal): {_e!r}")
 
     # PRD P1-2 — enforce the card-photo contract: every listing whose
     # `hero_photo_path` is set must point at a present root file. The

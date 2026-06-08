@@ -120,6 +120,24 @@ def test_fresh_red_rows_ignores_skipped_status():
     assert csh.fresh_red_rows(latest, now=NOW) == []
 
 
+def test_fresh_red_rows_ignores_experimental_sources(monkeypatch):
+    monkeypatch.setattr(
+        csh,
+        "SCRAPER_METADATA",
+        {"jamesedition": {"lifecycle": "experimental"}},
+    )
+    latest = {
+        "jamesedition": _row(
+            "jamesedition",
+            _ts(2),
+            "red",
+            scraped=0,
+            error_class="HTTPError",
+        ),
+    }
+    assert csh.fresh_red_rows(latest, now=NOW) == []
+
+
 # ── build_message ─────────────────────────────────────────────────────
 
 def test_build_message_includes_each_red_source():

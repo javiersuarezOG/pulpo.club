@@ -131,6 +131,7 @@ export type Listing = {
    *  Surfaced under the approximate-location note so users see WHICH
    *  area the broker actually published. null when no geocoding ran. */
   geocoding_reference: string | null;
+  existence_status: "confirmed_current" | "missing_recently" | "stale" | null;
   is_sold: boolean;
   original_url: string | null;
   // Position-rank from pulpo/ranker.py (1 = best opportunity). Distinct

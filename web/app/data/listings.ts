@@ -152,6 +152,23 @@ function buildPhotos(raw: any): string[] {
     if (typeof u !== "string") continue;
     if (out.length === 0 || u !== out[out.length - 1]) out.push(u);
   }
+  // P2 — surface the hero picker's SELECTED image first so the detail
+  // gallery's primary photo matches the card thumbnail (which paints the
+  // same winning image via thumbnail_url). The picker writes the chosen
+  // broker URL to `selected_photo_url` (ranked.json); reorder so it's
+  // photos[0]. Null-safe no-op when absent (pre-P2 records) or not found
+  // among photo_urls — older records keep today's order and still render.
+  const selected =
+    typeof raw.selected_photo_url === "string" && raw.selected_photo_url.length > 0
+      ? raw.selected_photo_url
+      : null;
+  if (selected) {
+    const idx = out.indexOf(selected);
+    if (idx > 0) {
+      out.splice(idx, 1);
+      out.unshift(selected);
+    }
+  }
   return out;
 }
 
@@ -331,6 +348,12 @@ export function adaptListing(raw: any): Listing {
     geocoding_reference:
       typeof raw.geocoding_reference === "string" && raw.geocoding_reference.trim().length > 0
         ? raw.geocoding_reference
+        : null,
+    existence_status:
+      raw.existence_status === "confirmed_current" ||
+      raw.existence_status === "missing_recently" ||
+      raw.existence_status === "stale"
+        ? raw.existence_status
         : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
