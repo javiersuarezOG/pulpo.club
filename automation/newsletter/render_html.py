@@ -1738,45 +1738,37 @@ def _weekly_news_spotlight_html(issue: Issue) -> str:
     (El Diario de Hoy, La Prensa Gráfica, El Mundo, Diario El Salvador,
     La Página).
 
-    v4.0 ships a DETERMINISTIC placeholder so the block renders today.
-    The LLM news-search pipeline is the follow-up (separate PR): it
-    will populate `issue.news_spotlight` with `{title, paragraph,
-    source_name, source_url, source_date}` each Sunday before the
-    Monday send. When that field is empty, the deterministic fallback
-    below renders — no fake news, no fabricated citations.
+    `issue.news_spotlight` is read from the committed artifact
+    (web/data/news_spotlight.json), refreshed nightly by
+    scripts/refresh_news_spotlight.py with carry-forward — so it always
+    carries a REAL, cited article. Every shipped spotlight names an outlet
+    and links the specific story; there is no source-less filler. The only
+    empty case is a cold start (artifact not yet seeded), where the section
+    is omitted entirely rather than fabricating a citation.
     """
     locale = issue.locale
     en = locale == "en"
     eyebrow = i18n.t("spotlight.eyebrow", locale)
 
     spot = getattr(issue, "news_spotlight", None)
-    if spot:
-        # Accept either the `NewsSpotlight` dataclass or a plain dict —
-        # keeps the renderer testable without a build_issue round-trip.
-        def _g(key: str) -> str:
-            val = getattr(spot, key, None)
-            if val is None and isinstance(spot, dict):
-                val = spot.get(key)
-            return val or ""
-        title = _g("title")
-        paragraph = _g("paragraph")
-        source_name = _g("source_name")
-        source_url = _g("source_url")
-        source_date = _g("source_date")
-    else:
-        # Deterministic fallback — generic editorial frame keyed off
-        # the issue's data. Honest, no LLM-curated article. We DO
-        # attribute it to Pulpo's own coastal market scan so the
-        # spotlight block has a complete "Reported by …" line at the
-        # top (otherwise the section looks unbranded — operator
-        # feedback, 2026-05-30). The attribution is sourceless (no
-        # URL), which the renderer below handles by emitting the
-        # citation text without a link.
-        title = i18n.t("spotlight.fallback.title", locale)
-        paragraph = i18n.t("spotlight.fallback.body", locale)
-        source_name = "Pulpo Pro coastal scan" if en else "Escaneo costero de Pulpo Pro"
-        source_url = ""
-        source_date = _e(issue.issue_date_human) if getattr(issue, "issue_date_human", "") else ""
+    if not spot:
+        # Cold start only — no carry-forward article yet. Omit the section
+        # rather than ship a source-less placeholder. The nightly freshness
+        # canary pages when a locale stays unseeded.
+        return ""
+
+    # Accept either the `NewsSpotlight` dataclass or a plain dict — keeps
+    # the renderer testable without a build_issue round-trip.
+    def _g(key: str) -> str:
+        val = getattr(spot, key, None)
+        if val is None and isinstance(spot, dict):
+            val = spot.get(key)
+        return val or ""
+    title = _g("title")
+    paragraph = _g("paragraph")
+    source_name = _g("source_name")
+    source_url = _g("source_url")
+    source_date = _g("source_date")
 
     if not title or not paragraph:
         return ""

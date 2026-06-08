@@ -101,10 +101,11 @@ STRINGS: dict[str, dict[Locale, str]] = {
                                      "es": "Después del top 3. Cada una calza en un segmento — Bitcoin Beach lista para mudarse, frente al mar trofeo, lotes a escala de desarrollador, sitios de construcción de rango medio. Hojeá los puntos de \"por qué la elegimos\" y parate en la que te calza a vos."},
     # ── Weekly News Spotlight (v4) ────────────────────────────────────
     "spotlight.eyebrow":           {"en": "Weekly News Spotlight",                         "es": "Noticia de la semana"},
-    # Deterministic fallback that ships when the LLM news-search pipeline
-    # returns no relevant article (slow news week or pre-pipeline ship).
-    # No fake source citation — the renderer only attaches a citation
-    # line when `issue.news_spotlight` carries a real `source_url`.
+    # DEPRECATED (kept for parity; no longer rendered). The spotlight now
+    # reads from the committed artifact (web/data/news_spotlight.json) with
+    # nightly carry-forward, so a real cited article is always available —
+    # the renderer omits the section entirely on a cold start rather than
+    # ship this source-less filler. Safe to delete once no tooling reads it.
     "spotlight.fallback.title":    {"en": "What we're watching on the coast.",             "es": "Lo que estamos viendo en la costa."},
     "spotlight.fallback.body":     {"en": "No single headline drove the market this week. Surf City 1 (the La Libertad stretch) remains the most active corridor by listing volume; Surf City 2 (the eastern coast) is quieter. We'll surface a sourced story in next week's edition when one earns it.",
                                      "es": "Ningún titular en particular movió al mercado esta semana. Surf City 1 (la franja de La Libertad) sigue siendo el corredor más activo por volumen de listados; Surf City 2 (la costa este) está más tranquila. Sacaremos una historia con fuente en la próxima edición cuando se la gane."},

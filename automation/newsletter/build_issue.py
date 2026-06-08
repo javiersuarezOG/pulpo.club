@@ -1171,11 +1171,13 @@ def build_issue(
         issue_id=issue_id,
     )
 
-    # Weekly News Spotlight (v4.0) — LLM-curated regional news story.
-    # Cached per-issue across recipients via `_make_news_spotlight` so
-    # 1000 recipients in a single cron run share one LLM call. None →
-    # renderer falls back to the deterministic "What we're watching"
-    # copy; never fabricates a citation.
+    # Weekly News Spotlight — regional news story READ from the committed
+    # artifact (web/data/news_spotlight.json), refreshed nightly by
+    # scripts/refresh_news_spotlight.py. No live LLM call on the send path,
+    # so the Stripe-webhook welcome emails (Vercel, no DeepSeek key) get the
+    # same real, attributed article the weekly cron does. Cached per-issue
+    # across recipients via `_make_news_spotlight`. None only at cold start
+    # (artifact not yet seeded) → renderer omits the section.
     news_spotlight = _make_news_spotlight(
         locale=locale,
         issue_id=issue_id,
@@ -1205,43 +1207,37 @@ def build_issue(
     )
 
 
-# ── Weekly News Spotlight — LLM news pipeline ────────────────────────
+# ── Weekly News Spotlight — committed-artifact read ──────────────────
 
-# Per-process cache so a single cron run that builds N issues hits the
-# news fetch + LLM ONCE per (issue_id, locale). Cleared between processes
-# by being module-level state. Keyed on (issue_id, locale) so EN and ES
-# sends in the same run each get one call.
+# Per-process cache so a single cron run that builds N issues reads the
+# spotlight artifact ONCE per (issue_id, locale) instead of re-parsing the
+# JSON for every recipient. Module-level state, fresh per process. Keyed on
+# (issue_id, locale) so EN and ES sends in the same run each resolve once.
 _NEWS_SPOTLIGHT_CACHE: dict[tuple[str, str], object] = {}
 
 
 def _make_news_spotlight(*, locale: str, issue_id: str, issue_number: int):
-    """Fetch + LLM-pick the Weekly News Spotlight for this issue.
+    """Load the carried-forward Weekly News Spotlight for this issue.
 
-    Returns a `NewsSpotlight` (truthy) when the LLM picked an article,
-    `None` for: LLM toggle off, no DEEPSEEK_API_TOKEN, no candidates
-    surfaced this week, LLM picked `{"pick": null}` (slow week), or
-    any exception. Renderer handles None via deterministic fallback.
+    Reads the committed artifact (web/data/news_spotlight.json) via
+    `news_store.load_spotlight`. The artifact has a single writer —
+    scripts/refresh_news_spotlight.py in the nightly pipeline — so EVERY
+    Pro email, including the Stripe-webhook welcome / welcome-back emails
+    that run on Vercel without a DeepSeek key, renders the same real,
+    attributed article. No live RSS fetch or LLM call on the send path.
 
-    Cached per-process by (issue_id, locale) — a cron with N recipients
-    in the same locale fires the LLM exactly once.
+    Returns a `NewsSpotlight`, or `None` only at cold start (artifact not
+    yet seeded) — the renderer then omits the section rather than ship
+    source-less filler. Cached per (issue_id, locale).
     """
-    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
-    if not use_llm:
-        return None
-    # Skip the RSS fetch + LLM call entirely when no DeepSeek key is
-    # available. Avoids burning 5×10s network timeouts in tests / dev
-    # environments that toggle USE_LLM on but don't have a token wired.
-    if not os.environ.get("DEEPSEEK_API_TOKEN", "").strip():
-        return None
-
     cache_key = (issue_id, locale)
     if cache_key in _NEWS_SPOTLIGHT_CACHE:
         return _NEWS_SPOTLIGHT_CACHE[cache_key]
 
     try:
-        from . import llm_news as llm_news_mod
-        spotlight = llm_news_mod.fetch_pick_and_summarize(locale=locale)
-    except Exception:  # noqa: BLE001
+        from . import news_store
+        spotlight = news_store.load_spotlight(locale)
+    except Exception:  # noqa: BLE001 — a bad artifact must omit the section, never crash a send
         spotlight = None
 
     _NEWS_SPOTLIGHT_CACHE[cache_key] = spotlight
@@ -1249,7 +1245,7 @@ def _make_news_spotlight(*, locale: str, issue_id: str, issue_number: int):
         "issue_id": issue_id,
         "issue_number": issue_number,
         "locale": locale,
-        "source": "llm" if spotlight else "fallback",
+        "source": "artifact" if spotlight else "missing",
         "outlet": getattr(spotlight, "source_name", None),
         "article_url": getattr(spotlight, "source_url", None),
         "candidates_seen": getattr(spotlight, "candidates_seen", 0),
