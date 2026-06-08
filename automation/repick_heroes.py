@@ -207,6 +207,14 @@ def _repick_one_listing(
             hero_meta["candidate_count"] = len(candidates)
             hero_meta["picker_excluded_count"] = n_excluded
             hero_meta["repicked_at"] = datetime.now(timezone.utc).isoformat()
+            # P5 — reject logo/placeholder winners (mirrors run.py). Override
+            # before the write so both the sidecar and the listing dict
+            # (read from hero_meta below) reflect card/hero ineligibility.
+            from automation.photo_quality import is_logo_or_placeholder_url
+            if is_logo_or_placeholder_url(winning_url):
+                hero_meta["card_eligible"] = False
+                hero_meta["hero_eligible"] = False
+                hero_meta["logo_placeholder_rejected"] = True
             hero_meta_path.write_text(
                 json.dumps(hero_meta, indent=2) + "\n", encoding="utf-8"
             )

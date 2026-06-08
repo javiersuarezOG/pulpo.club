@@ -374,6 +374,18 @@ jobs:
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
           done
 
+          # Snapshot SV's SERVED photos (root level only; _archive is the
+          # 30-day backup and need not be copied). PA and SV share this
+          # un-scoped directory, so automation/run.py::_prune_orphan_photos
+          # in the PA context treats every SV photo as an orphan and moves
+          # it to _archive/. Without this snapshot+restore the SV apex
+          # serves HTTP 404 on every hero (root cause of the 1,037-file
+          # freeze fixed in #781). TODO: country-scoped web/photos/SV|PA
+          # per DEPLOY.md when PA gets its own deploy — then this can go.
+          rm -rf /tmp/sv-photos && mkdir -p /tmp/sv-photos
+          rsync -a --exclude='_archive/' web/photos/ /tmp/sv-photos/
+          SV_PHOTO_COUNT=$(find web/photos -maxdepth 1 -name '*.jpg' | wc -l | tr -d ' ')
+
           python automation/run.py || echo "PA pipeline exited non-zero (continue-on-error)"
 
           # Restore SV's legacy files so the apex (pulpo.club) keeps
@@ -384,6 +396,17 @@ jobs:
                    shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
+
+          # ADDITIVELY restore SV's served photos. No --delete: PA wrote its
+          # own *.jpg into web/photos/ this run and those must survive
+          # alongside the SV files we bring back. The PA prune's _archive/
+          # copies are harmless duplicates (30-day pruned later).
+          rsync -a /tmp/sv-photos/ web/photos/
+          POST_PHOTO_COUNT=$(find web/photos -maxdepth 1 -name '*.jpg' | wc -l | tr -d ' ')
+          echo "[photo-isolation] SV served photos: pre-PA=$SV_PHOTO_COUNT post-restore=$POST_PHOTO_COUNT"
+          if [ "$POST_PHOTO_COUNT" -lt "$SV_PHOTO_COUNT" ]; then
+            echo "::error::web/photos root jpg count dropped $SV_PHOTO_COUNT -> $POST_PHOTO_COUNT after PA run; SV photo restore failed. The photo-contract truth canary downstream will hard-fail the commit."
+          fi
 
       - name: Refresh Weekly News Spotlight artifact
         # Single writer of web/data/news_spotlight.json. Picks a fresh,
@@ -555,6 +578,21 @@ jobs:
               sys.exit(1)
           print(f"CANARY OK [{cc}]: {n} listings in [{floor}, {ceiling}]")
           EOF
+
+      - name: Delta decision (Slack runbook record)
+        # Runs BEFORE the gate so the operational decision posts whether
+        # or not the gate blocks the commit. Best-effort: classifies each
+        # per-source delta into a runbook bucket (source_failed /
+        # source_partial / validation_collapse / expected_change /
+        # unknown) and posts to Slack. Consumer of automation/delta_decision
+        # (CLAUDE.md producer/consumer rule). Never fails the job; logs the
+        # decision even when SLACK_WEBHOOK_URL is unset.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 scripts/run_delta_decision.py || \
+            echo "::warning::delta-decision step errored (non-blocking)"
 
       - name: Per-source row-count delta gate
         env:
@@ -913,6 +951,23 @@ jobs:
         run: |
           python3 -m pulpo.cli check-hero-variants --top-only 10 \
             || { echo "::error::hero variant canary FAILED — see logs above"; exit 1; }
+
+      - name: Photo-contract truth canary (committed SV state)
+        # Independent of how/where enforce_photo_contract ran. Reads the
+        # COMMITTED ranked.json + photo_contract.json AFTER the SV/PA
+        # restore block, so it sees the SV apex state that actually ships.
+        # Asserts every hero_photo_path resolves to a real file AND that
+        # photo_contract.json's ranked_total matches ranked.json.
+        #
+        # Catches the 2026-06-08 PA-overwrite: the sidecar described 17 PA
+        # listings (/api/nightly/health read "all good") while SV's 1,037
+        # committed hero paths 404'd in production. A green per-listing
+        # contract pass does not prove the sidecar describes the shipping
+        # dataset — this canary does. Hard-fail by design: a missing top
+        # photo or a wrong-dataset sidecar must block the commit.
+        run: |
+          python3 scripts/check_photo_contract_truth.py \
+            || { echo "::error::photo-contract truth canary FAILED — see logs above"; exit 1; }
 
       - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)
         # PR-8 of the reliability plan — durable backup of every nightly's
