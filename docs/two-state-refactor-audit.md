@@ -102,6 +102,24 @@
 
 ---
 
+## 5b. Phase 2 — implemented (branch `feat/two-state-model`)
+
+**FE (done):**
+- `openListing` + deep-link effect → non-paid opens the **subscribe modal**, the listing panel never mounts (URL stays put / strips to `/browse`).
+- `openSignup` → any signup intent routes to the subscribe modal; only `mode:"login"` opens sign-in. One chokepoint kills every free-signup CTA (heart, hero, paywall).
+- `toggleSave` → gated on `isPaid`; non-paid save → subscribe modal (no anon-stash, no free cap).
+- `/saved` gate → subscribe modal (Pro feature); `/account` gate → login.
+- `LegacySignupModal` (Clerk-OFF dev/CI fallback) → **login-only**; "Create account" replaced with "Get Pulpo Pro" → subscribe modal.
+- `FreeMonthModal` copy rewritten plain/clear (EN+ES).
+
+**BE (done):**
+- `/api/saves` `add` → Pro-only (`pro`/`agency`), else `403 pro_required`. Free 10-cap retired. `remove`/`GET` stay open for canceled members. 382 API tests green.
+
+**CONFIG — operator action required (cannot set from code):**
+- **Clerk → invitation-only sign-up.** Clerk Dashboard → **Configure → Restrictions → Sign-up modes → "Restricted"**. This blocks public sign-up (no new never-paid accounts) while still allowing **ticket/invitation** sign-ups — so the post-Stripe Pro activation flow (`clerk.invitations.createInvitation` → `__clerk_ticket`) keeps working. This is the prod parity of the dev login-only modal fix. Verify after: hitting Clerk's hosted sign-in shows no "Sign up" option; the activation email link still completes a Pro sign-up.
+
+**Kept by design (decision #1):** the Stripe `customer.subscription.updated/deleted` → `plan:"free"` write stays — it marks a canceled member non-active (features gated) while `stripeCustomerId` + `subscription_status` + `current_period_end` preserve their login + billing + resubscribe (`everPaid`). No never-paid account is created by it.
+
 ## 6. Dependency / sequencing
 
 1. **Phase 1 audit** — this document. ✅
