@@ -63,6 +63,8 @@ function L(overrides: Partial<Listing>): Listing {
     dist_airport_km: null,
     dist_nearest_town_km: null,
     has_lat_lng: true,
+    lat: 13.49,
+    lng: -89.61,
     geocoding_confidence: "high",
     geocoding_source: "extracted",
     geocoding_reference: null,

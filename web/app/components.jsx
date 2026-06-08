@@ -57,6 +57,17 @@ function formatPpm(n) {
 function ppmSuffix() {
   return currentUnits() === "vrs2" ? "/vr²" : "/m²";
 }
+// PR-5/WS4 — the single guards every map read-site uses. `hasCoords`
+// gates whether a listing can be a map pin at all (~0.5% lack coords);
+// `isLowConfidenceGeo` flags the pins the map softens + can hide
+// (low/None geocoding_confidence — the only quality signal available,
+// since ~97% of coords share the 'estimated' source).
+function hasCoords(l) {
+  return l != null && typeof l.lat === "number" && typeof l.lng === "number";
+}
+function isLowConfidenceGeo(l) {
+  return l == null || l.geocoding_confidence === "low" || l.geocoding_confidence == null;
+}
 function daysListedTone(d) {
   if (d == null) return "muted";
   if (d < 30) return "muted";
@@ -1056,4 +1067,5 @@ export {
   Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, DealGradeChip, dealGradeForListing, signalForListing, Photo, HeartButton, ShareButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
+  hasCoords, isLowConfidenceGeo,
 };
