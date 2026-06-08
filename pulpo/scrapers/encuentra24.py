@@ -507,8 +507,21 @@ class Encuentra24Scraper:
     PAGE_TIMEOUT_MS = 45_000   # 45s — encuentra24 detail pages take ~7s
                                 # plus JSON-LD must hydrate; 45s is safe
 
+    # Per-category pagination cap. Each category URL is walked page 1, 2, 3,
+    # ... up to this many pages, stopping early when a page returns 0 new
+    # URLs (the source's natural exhaustion signal). Pre-2026-06 behavior
+    # was "fetch only page 1 of each category", which left ~99% of
+    # Encuentra24's ~2,947 SV inventory on the table (PRD audit). Setting
+    # default to 20 caps a worst-case crawl at 18 categories × 20 pages ×
+    # ~7s/page ≈ 42 minutes of Playwright time per country — comfortably
+    # within the nightly budget. Override via PULPO_E24_MAX_PAGES_PER_CATEGORY
+    # for incident recovery (lower it) or future-proofing (raise it once
+    # inventory growth makes 20 too small).
+    MAX_PAGES_PER_CATEGORY = 20
+
     def __init__(self, offline: Optional[bool] = None):
         self.offline = offline
+        self._last_max_pages_hit = False  # set by _crawl_live for crawl_with_meta
 
     def crawl(self, limit: int = 30, offline: Optional[bool] = None) -> list[dict]:
         # Honor PULPO_E24_LIMIT for capped first-runs without changing
@@ -540,6 +553,34 @@ class Encuentra24Scraper:
                 pass
         return limit
 
+    def _max_pages_per_category(self) -> int:
+        """Return the per-category page cap. Default is the class
+        constant; PULPO_E24_MAX_PAGES_PER_CATEGORY overrides for
+        incident response (lower it to short-circuit a runaway crawl)
+        or future-proofing (raise it when inventory growth makes the
+        default too small). Garbage env value falls back to the
+        constant — better than capping to 0 silently."""
+        env = os.environ.get("PULPO_E24_MAX_PAGES_PER_CATEGORY")
+        if env and env.strip():
+            try:
+                v = int(env)
+                if v >= 1:
+                    return v
+            except ValueError:
+                pass
+        return self.MAX_PAGES_PER_CATEGORY
+
+    @staticmethod
+    def _with_page_param(url: str, page_num: int) -> str:
+        """Append `page=<N>` to a category URL. Defensive against URLs
+        that already carry a query string (PA / future-country subpaths
+        may add `?type=foo` parameters). Encuentra24's pagination is
+        1-indexed; the loop in `_crawl_live` only calls this for
+        page_num >= 2 so page 1 always hits the canonical base URL the
+        site treats as the default."""
+        sep = "&" if "?" in url else "?"
+        return f"{url}{sep}page={page_num}"
+
     def crawl_with_meta(
         self,
         limit: int = 30,
@@ -549,7 +590,12 @@ class Encuentra24Scraper:
         records = self.crawl(limit, offline)
         return {
             "records":        records,
-            "max_pages_hit":  False,
+            # `_last_max_pages_hit` is set by _crawl_live when any
+            # category walked all MAX_PAGES_PER_CATEGORY pages and was
+            # STILL returning new URLs — actionable signal that the cap
+            # should be raised. Stays False on the offline fixture path
+            # (no pagination there).
+            "max_pages_hit":  self._last_max_pages_hit,
             "limit_hit":      len(records) >= limit,
         }
 
@@ -605,34 +651,73 @@ class Encuentra24Scraper:
 
             try:
                 # ── Phase 1: harvest listing URLs from each category ──
+                # Per-category pagination loop (added 2026-06 — PRD audit
+                # showed pre-loop behavior captured only page 1 of each
+                # category, leaving ~99% of Encuentra24's claimed inventory
+                # unfetched). Walks ?page=1..N per category, stopping early
+                # when a page returns 0 new URLs (exhaustion signal) or the
+                # global `limit` is hit. `max_pages_hit` is recorded so
+                # crawl_with_meta can surface it in observability — a
+                # category that always hits the cap means MAX_PAGES_PER_CATEGORY
+                # is set too low for current inventory and the operator
+                # should tune the env var.
                 listing_urls: list[str] = []
+                max_pages_cap = self._max_pages_per_category()
+                self._last_max_pages_hit = False
                 for cat_url in CATEGORY_URLS:
                     if len(listing_urls) >= limit:
                         break
-                    try:
-                        polite_playwright_goto(
-                            page, cat_url,
-                            source=self.slug, policy=policy,
-                            wait_until="networkidle",
-                            timeout_ms=self.PAGE_TIMEOUT_MS,
-                        )
-                        page.wait_for_timeout(2500)
-                    except Exception as e:
-                        print(f"[encuentra24] category fetch failed "
-                              f"{cat_url}: {type(e).__name__}: {e}")
-                        continue
-                    cat_html = page.content()
-                    new_in_cat = 0
-                    for url in parse_index_html(cat_html):
-                        if url in seen_urls:
-                            continue
-                        seen_urls.add(url)
-                        listing_urls.append(url)
-                        new_in_cat += 1
+                    cat_label = cat_url.rsplit("/", 1)[-1] or cat_url
+                    new_in_cat_total = 0
+                    pages_walked = 0
+                    for page_num in range(1, max_pages_cap + 1):
                         if len(listing_urls) >= limit:
                             break
-                    print(f"[encuentra24] {cat_url.rsplit('/', 1)[-1]}: "
-                          f"+{new_in_cat} unique URLs")
+                        paged_url = (
+                            cat_url
+                            if page_num == 1
+                            else self._with_page_param(cat_url, page_num)
+                        )
+                        try:
+                            polite_playwright_goto(
+                                page, paged_url,
+                                source=self.slug, policy=policy,
+                                wait_until="networkidle",
+                                timeout_ms=self.PAGE_TIMEOUT_MS,
+                            )
+                            page.wait_for_timeout(2500)
+                        except Exception as e:
+                            print(f"[encuentra24] category fetch failed "
+                                  f"{paged_url}: {type(e).__name__}: {e}")
+                            # Don't break the category here — try the next
+                            # page. A transient timeout on page 3 shouldn't
+                            # cost us pages 4-20.
+                            continue
+                        pages_walked = page_num
+                        cat_html = page.content()
+                        new_this_page = 0
+                        for url in parse_index_html(cat_html):
+                            if url in seen_urls:
+                                continue
+                            seen_urls.add(url)
+                            listing_urls.append(url)
+                            new_in_cat_total += 1
+                            new_this_page += 1
+                            if len(listing_urls) >= limit:
+                                break
+                        if new_this_page == 0:
+                            # Exhausted this category — page exists but
+                            # returns no new URLs (either we've seen them
+                            # all from earlier dept subpaths, or the source
+                            # has no more inventory).
+                            break
+                        if page_num == max_pages_cap:
+                            # Hit the page cap with NEW URLs still arriving —
+                            # there's likely more inventory we're leaving
+                            # behind. Signal so the operator can tune.
+                            self._last_max_pages_hit = True
+                    print(f"[encuentra24] {cat_label}: +{new_in_cat_total} "
+                          f"unique URLs across {pages_walked} page(s)")
 
                 print(f"[encuentra24] harvested {len(listing_urls)} "
                       f"listing URLs across {len(CATEGORY_URLS)} categories")
