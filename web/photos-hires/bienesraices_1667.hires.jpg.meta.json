@@ -1,0 +1,26 @@
+{
+  "width": 1200,
+  "height": 1200,
+  "aspect_ratio": 1.0,
+  "file_size_kb": 360.6,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-06-08T09:14:41.112406+00:00",
+  "source_url": "https://assets.easybroker.com/property_images/4585000/77009994/EB-QP5000.jpg?rasterize=true&version=1720018206",
+  "original_url": "https://assets.easybroker.com/property_images/4585000/77009994/EB-QP5000.jpg?rasterize=true&version=1720018206",
+  "transform_used": "none",
+  "fetched_at": "2026-06-08T09:14:41.302376+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 1050,
+  "resdet_detected_height": 1050,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 7.2,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.263 color_entropy=0.485"
+  }
+}

@@ -94118,5 +94118,319 @@
     "cost_usd": 0.00163513,
     "finish_reason": "stop",
     "latency_ms": 6790
+  },
+  "realestate_au_sv|cantones-san-jose-y-el-rosario-el-rosario-metapan-santa-ana-norte-metapan-santa-ana-metapan-santa-ana-310108595120": {
+    "ts": "2026-06-08T08:36:39.106454+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Land in Metapan, Santa Ana",
+      "es": "Terreno Privilegiado en Metapán, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Discover a unique opportunity to own a versatile plot of land in the tranquil cantons of San José and El Rosario, within the municipality of Metapán, Santa Ana. This property offers a blank canvas for your dream project, whether it be a private residence, agricultural venture, or investment. Surrounded by the natural beauty of northern Santa Ana, the land provides a peaceful retreat while still being accessible to local amenities. Ideal for those seeking space and serenity in El Salvador's countryside.",
+      "es": "Descubra una oportunidad única para poseer un terreno versátil en los tranquilos cantones de San José y El Rosario, dentro del municipio de Metapán, Santa Ana. Esta propiedad ofrece un lienzo en blanco para su proyecto soñado, ya sea una residencia privada, una empresa agrícola o una inversión. Rodeado por la belleza natural del norte de Santa Ana, el terreno brinda un retiro pacífico mientras mantiene acceso a servicios locales. Ideal para quienes buscan espacio y serenidad en el campo salvadoreño."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in the scenic Metapán region",
+        "es": "Ubicado en la pintoresca región de Metapán"
+      },
+      {
+        "en": "Versatile land for residential or agricultural use",
+        "es": "Terreno versátil para uso residencial o agrícola"
+      },
+      {
+        "en": "Peaceful countryside setting",
+        "es": "Entorno campestre tranquilo"
+      },
+      {
+        "en": "Close to local amenities in Santa Ana",
+        "es": "Cerca de servicios locales en Santa Ana"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Metapán, Santa Ana, El Salvador",
+    "url_language": "en",
+    "tokens_in": 2348,
+    "tokens_out": 483,
+    "cost_usd": 0.00116526,
+    "finish_reason": "stop",
+    "latency_ms": 5248
+  },
+  "realestate_au_sv|calle-del-litoral-cangrejera-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108595103": {
+    "ts": "2026-06-08T08:36:39.765514+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Prime Land on Calle del Litoral, La Libertad",
+      "es": "Terreno Privilegiado en Calle del Litoral, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover an exceptional opportunity to own land along the scenic Calle del Litoral in La Libertad, one of El Salvador's most sought-after coastal areas. This property offers direct access to the renowned beaches of the region, making it ideal for residential development, vacation homes, or commercial ventures. Surrounded by the vibrant surf culture and stunning Pacific views, this lot provides a blank canvas for your dream project. With easy access to local amenities and the capital city, this is a rare chance to invest in prime real estate on the Salvadoran coast.",
+      "es": "Descubra una oportunidad excepcional para poseer un terreno a lo largo de la pintoresca Calle del Litoral en La Libertad, una de las zonas costeras más codiciadas de El Salvador. Esta propiedad ofrece acceso directo a las renombradas playas de la región, ideal para desarrollo residencial, casas de vacaciones o proyectos comerciales. Rodeado por la vibrante cultura del surf y las impresionantes vistas del Pacífico, este lote proporciona un lienzo en blanco para su proyecto soñado. Con fácil acceso a servicios locales y la capital, es una oportunidad única para invertir en bienes raíces de primera en la costa salvadoreña."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Prime location on Calle del Litoral",
+        "es": "Ubicación privilegiada en Calle del Litoral"
+      },
+      {
+        "en": "Close to renowned surf beaches",
+        "es": "Cerca de famosas playas de surf"
+      },
+      {
+        "en": "Ideal for residential or commercial development",
+        "es": "Ideal para desarrollo residencial o comercial"
+      },
+      {
+        "en": "Easy access to La Libertad and San Salvador",
+        "es": "Fácil acceso a La Libertad y San Salvador"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "tokens_in": 2335,
+    "tokens_out": 538,
+    "cost_usd": 0.00122225,
+    "finish_reason": "stop",
+    "latency_ms": 5907
+  },
+  "encuentra24|32540719": {
+    "ts": "2026-06-08T08:36:39.870399+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Spacious Beachfront Home in Costa del Sol",
+      "es": "Amplia Casa Frente al Mar en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Discover this expansive and functional home in an exclusive residential community on Costa del Sol, offering 266 m² of construction on a 645 v² lot. Designed for comfort, privacy, and a relaxed lifestyle, it features five air-conditioned bedrooms, four full bathrooms, a living and dining room with A/C, a fully equipped kitchen, four parking spaces, a private 9×6 m pool with its own pump house, and a service area. The property is delivered fully furnished with appliances included. The gated community provides controlled vehicle access, Delsur electricity, water, drainage, cable, and internet. Residential use and Airbnb rentals are permitted, making it an excellent choice for living or investment. Free of mortgage and ready to move in.",
+      "es": "Descubre esta amplia y funcional casa en una exclusiva residencial de la Costa del Sol, con 266 m² de construcción y 645 v² de terreno. Diseñada para disfrutar comodidad, privacidad y un estilo de vida relajado, cuenta con cinco habitaciones climatizadas, cuatro baños completos, sala y comedor con A/C, cocina equipada, cuatro estacionamientos, piscina privada de 9×6 m con caseta de bombeo propia, y área de servicio. Se entrega completamente amueblada y con electrodomésticos incluidos. La residencial ofrece acceso vehicular controlado, servicios de luz Delsur, agua, drenaje, cable e internet, y permite uso residencial y alquiler Airbnb. Libre de hipoteca y lista para habitar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Costa del Sol",
+        "es": "Ubicación frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Five air-conditioned bedrooms and four full bathrooms",
+        "es": "Cinco habitaciones climatizadas y cuatro baños completos"
+      },
+      {
+        "en": "Private 9×6 m pool with dedicated pump house",
+        "es": "Piscina privada de 9×6 m con caseta de bombeo propia"
+      },
+      {
+        "en": "Fully furnished with appliances included",
+        "es": "Totalmente amueblada con electrodomésticos incluidos"
+      },
+      {
+        "en": "Ideal for residential use or Airbnb investment",
+        "es": "Ideal para uso residencial o inversión Airbnb"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 2504,
+    "tokens_out": 645,
+    "cost_usd": 0.00138558,
+    "finish_reason": "stop",
+    "latency_ms": 6012
+  },
+  "remax|003284449007": {
+    "ts": "2026-06-08T08:36:40.238521+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "5.8 MZ Ocean View Lot in Punta Mango, Surf City 2",
+      "es": "5.8 MZ con Vistas al Mar en Punta Mango, Surf City 2"
+    },
+    "short_description_canonical": {
+      "en": "Prime investment opportunity in El Salvador's Surf City 2 corridor. This 5.8 manzana (10.09 acres) property offers breathtaking panoramic ocean views from its elevated position in Punta Mango. Located just 34 km from the new Pacific Airport in La Unión and 51 km from San Miguel, it boasts extensive frontage along the new Surf City 2 highway and sits opposite the renowned Hotel Los Mangos. Ideal for residential resorts, hotels, or commercial developments, this land is in the heart of a world-class surfing destination. Join the growth of El Salvador's coastal tourism—invest now!",
+      "es": "Oportunidad de inversión privilegiada en el corredor Surf City 2 de El Salvador. Esta propiedad de 5.8 manzanas (10.09 acres) ofrece impresionantes vistas panorámicas al océano desde su ubicación elevada en Punta Mango. Ubicada a solo 34 km del nuevo Aeropuerto del Pacífico en La Unión y a 51 km de San Miguel, cuenta con un extenso frente a la nueva autopista Surf City 2 y se sitúa frente al reconocido Hotel Los Mangos. Ideal para complejos residenciales, hoteles o desarrollos comerciales, este terreno está en el corazón de un destino de surf de clase mundial. ¡Sea parte del crecimiento del turismo costero de El Salvador e invierta ahora!"
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5.8 manzanas (10.09 acres) with ocean views",
+        "es": "5.8 manzanas (10.09 acres) con vistas al mar"
+      },
+      {
+        "en": "Frontage on Surf City 2 highway",
+        "es": "Frente a la autopista Surf City 2"
+      },
+      {
+        "en": "Across from famous Hotel Los Mangos",
+        "es": "Frente al famoso Hotel Los Mangos"
+      },
+      {
+        "en": "34 km from Pacific Airport, 51 km from San Miguel",
+        "es": "34 km del Aeropuerto del Pacífico, 51 km de San Miguel"
+      },
+      {
+        "en": "Ideal for resort, hotel, or commercial development",
+        "es": "Ideal para desarrollo hotelero, residencial o comercial"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Mango, Intipucá, La Unión",
+    "url_language": "es",
+    "tokens_in": 2672,
+    "tokens_out": 652,
+    "cost_usd": 0.00143864,
+    "finish_reason": "stop",
+    "latency_ms": 6379
+  },
+  "remax|351189520": {
+    "ts": "2026-06-08T08:36:40.822363+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Oceanfront Ranch at Playa Las Flores, La Libertad",
+      "es": "Rancho frente al mar en Playa Las Flores, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Discover an extraordinary oceanfront ranch in the heart of El Salvador's Surf City I corridor, Playa Las Flores. This prime property offers direct beach access, breathtaking ocean views, and a luxurious lifestyle. With 1,190 m² of land and 380 m² of construction, the home features 5 air-conditioned bedrooms, 4 full bathrooms, a guest bath, spacious living and dining areas, a fully equipped kitchen, and a laundry area. Enjoy the oceanfront lookout, family pool, and jacuzzi. Parking for 10 vehicles. Located just 5 minutes from Puerto de La Libertad and 35 km from San Salvador, this is an ideal luxury residence or high-return tourism investment. Strong tourist flow and easy highway access make it a standout opportunity.",
+      "es": "Descubra un extraordinario rancho frente al mar en el corazón del corredor Surf City I, Playa Las Flores. Esta propiedad privilegiada ofrece acceso directo al océano, impresionantes vistas al mar y un estilo de vida lujoso. Con 1,190 m² de terreno y 380 m² de construcción, la casa cuenta con 5 habitaciones con aire acondicionado, 4 baños completos, un baño de visitas, amplias salas de estar y comedor, cocina totalmente equipada y área de lavandería. Disfrute del mirador frente al mar, piscina familiar y jacuzzi. Estacionamiento para 10 vehículos. Ubicado a solo 5 minutos de Puerto de La Libertad y a 35 km de San Salvador, es ideal como residencia de lujo o inversión turística de alto rendimiento. El fuerte flujo turístico y el fácil acceso por carretera lo convierten en una oportunidad destacada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct oceanfront with private lookout and pool",
+        "es": "Frente al mar directo con mirador y piscina privados"
+      },
+      {
+        "en": "Prime location in Surf City I corridor",
+        "es": "Ubicación privilegiada en el corredor Surf City I"
+      },
+      {
+        "en": "5 minutes from Puerto de La Libertad",
+        "es": "A 5 minutos de Puerto de La Libertad"
+      },
+      {
+        "en": "Ideal for luxury residence or high-return Airbnb",
+        "es": "Ideal para residencia de lujo o Airbnb de alto rendimiento"
+      },
+      {
+        "en": "Easy access from main highway, 35 km from San Salvador",
+        "es": "Fácil acceso desde la carretera principal, a 35 km de San Salvador"
+      }
+    ],
+    "lat": 13.181,
+    "lng": -88.355,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Las Flores, La Libertad",
+    "url_language": "en",
+    "tokens_in": 2604,
+    "tokens_out": 709,
+    "cost_usd": 0.00148298,
+    "finish_reason": "stop",
+    "latency_ms": 6963
+  },
+  "encuentra24|32471121": {
+    "ts": "2026-06-08T08:36:41.236019+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Modern Home in Cumbres de Peñaflor - 15 min to Surf City",
+      "es": "Casa Moderna en Cumbres de Peñaflor - 15 min de Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Experience luxury living in this stunning contemporary residence, built just one year ago in the prestigious Cumbres de Peñaflor residential community. Located on the road to Puerto de La Libertad, this property offers a privileged climate and an enviable location. The home features a spacious 400 v² lot with 220 m² of modern construction, including 4 bedrooms (master with A/C), 3.5 high-quality bathrooms, a gourmet kitchen with quartz countertops, and a functional storage room. One bedroom is completely independent, perfect for guests or a home office. Enjoy outdoor living on the terrace and garden, ideal for social gatherings. Just 15 minutes from Surf City and 10 minutes from Santa Tecla, this home combines tranquility with easy access to shopping and entertainment.",
+      "es": "Vive una experiencia de lujo en esta impresionante residencia de diseño contemporáneo, construida hace apenas un año en la prestigiosa Residencial Cumbres de Peñaflor. Ubicada sobre la carretera hacia Puerto de La Libertad, esta propiedad ofrece un clima privilegiado y una ubicación envidiable. La casa cuenta con un amplio terreno de 400 v² y 220 m² de construcción moderna, incluyendo 4 dormitorios (principal con A/C), 3.5 baños de alta calidad, cocina gourmet con topes de cuarzo y bodega funcional. Un dormitorio es totalmente independiente, ideal para visitas u oficina. Disfruta de la terraza y el jardín para reuniones al aire libre. A solo 15 minutos de Surf City y 10 minutos de Santa Tecla, este hogar combina tranquilidad con fácil acceso a centros comerciales y entretenimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand new contemporary home built just one year ago",
+        "es": "Casa contemporánea nueva construida hace solo un año"
+      },
+      {
+        "en": "Prime location 15 min from Surf City and 10 min from Santa Tecla",
+        "es": "Ubicación privilegiada a 15 min de Surf City y 10 min de Santa Tecla"
+      },
+      {
+        "en": "Gourmet kitchen with quartz countertops and storage room",
+        "es": "Cocina gourmet con topes de cuarzo y bodega"
+      },
+      {
+        "en": "Independent bedroom ideal for guests or home office",
+        "es": "Dormitorio independiente ideal para visitas u oficina"
+      },
+      {
+        "en": "Terrace and garden for outdoor living in a privileged climate",
+        "es": "Terraza y jardín para vida al aire libre en clima privilegiado"
+      }
+    ],
+    "lat": 13.586,
+    "lng": -89.322,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "es",
+    "tokens_in": 2729,
+    "tokens_out": 733,
+    "cost_usd": 0.00154313,
+    "finish_reason": "stop",
+    "latency_ms": 7378
+  },
+  "xitios|venta-de-apartamento-en-costa-real-playa-costa-del-sol-sc": {
+    "ts": "2026-06-08T08:36:47.314535+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 3,
+    "title_canonical": {
+      "en": "Luxury Beachfront Apartment at Costa Real Resort",
+      "es": "Exclusivo Apartamento Frente al Mar en Costa Real Resort"
+    },
+    "short_description_canonical": {
+      "en": "Discover this premium 263 m² apartment at Costa Real Resort, one of El Salvador's most exclusive beachfront communities on Costa del Sol. With 4 bedrooms, 4 bathrooms, and a terrace overlooking the ocean, this property is perfect as a vacation home or high-yield investment. Enjoy resort-style amenities including a clubhouse, 4 pools, restaurant, and direct access to a wide, pristine beach. Located just 50 minutes from the International Airport and 1 hour 45 minutes from San Salvador, this is coastal living at its finest. Priced at $650,000.",
+      "es": "Descubre este exclusivo apartamento de 263 m² en Costa Real Resort, uno de los complejos frente al mar más exclusivos de El Salvador en la Costa del Sol. Con 4 habitaciones, 4 baños y terraza con vista al océano, esta propiedad es ideal como casa de descanso o inversión de alta rentabilidad. Disfruta de amenidades tipo resort: casa club, 4 piscinas, restaurante y acceso directo a una amplia y limpia playa. Ubicado a solo 50 minutos del Aeropuerto Internacional y a 1 hora 45 minutos de San Salvador. Precio: $650,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "263 m² of luxury living with ocean-view terrace",
+        "es": "263 m² de lujo con terraza con vista al mar"
+      },
+      {
+        "en": "Resort-style amenities: 4 pools, clubhouse, restaurant",
+        "es": "Amenidades tipo resort: 4 piscinas, casa club, restaurante"
+      },
+      {
+        "en": "Direct access to Costa del Sol's wide, sandy beach",
+        "es": "Acceso directo a la amplia playa de arena de Costa del Sol"
+      },
+      {
+        "en": "Prime location near airport and San Salvador",
+        "es": "Ubicación privilegiada cerca del aeropuerto y San Salvador"
+      },
+      {
+        "en": "High-end investment in a gated community",
+        "es": "Inversión de alta gama en comunidad cerrada"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "tokens_in": 3193,
+    "tokens_out": 595,
+    "cost_usd": 0.00151661,
+    "finish_reason": "stop",
+    "latency_ms": 6005
   }
 }

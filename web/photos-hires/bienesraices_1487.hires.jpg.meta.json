@@ -1,28 +1,28 @@
 {
   "width": 1080,
-  "height": 1208,
-  "aspect_ratio": 1.119,
-  "file_size_kb": 216.9,
-  "hero_eligible": false,
+  "height": 1123,
+  "aspect_ratio": 1.04,
+  "file_size_kb": 186.2,
+  "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-05-19T13:57:52.509901+00:00",
-  "source_url": "https://assets.easybroker.com/property_images/4998369/85409286/EB-SE8369.jpg?rasterize=true&version=1738255174",
-  "original_url": "https://assets.easybroker.com/property_images/4998369/85409286/EB-SE8369.jpg?rasterize=true&version=1738255174",
+  "computed_at": "2026-06-08T09:13:11.904437+00:00",
+  "source_url": "https://assets.easybroker.com/property_images/4998369/85409285/EB-SE8369.jpg?rasterize=true&version=1738255174",
+  "original_url": "https://assets.easybroker.com/property_images/4998369/85409285/EB-SE8369.jpg?rasterize=true&version=1738255174",
   "transform_used": "none",
-  "fetched_at": "2026-05-19T13:57:52.989102+00:00",
-  "hires_photo_quality_score": 90,
-  "resdet_detected_width": 810,
-  "resdet_detected_height": 23,
+  "fetched_at": "2026-06-08T09:13:14.233678+00:00",
+  "hires_photo_quality_score": 80,
+  "resdet_detected_width": 945,
+  "resdet_detected_height": 19,
   "resdet_upscaled": true,
   "quarantined": true,
   "aesthetic": {
-    "visual_appeal": 6.4,
+    "visual_appeal": 5.6,
     "issues": [
       "low_quality"
     ],
     "provider": "deterministic",
     "prompt_version": "2026-05-15.det-v1.py",
-    "rationale": "edge_gini=0.221 color_entropy=0.363"
+    "rationale": "edge_gini=0.153 color_entropy=0.346"
   }
 }
