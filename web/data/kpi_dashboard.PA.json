@@ -1,0 +1,175 @@
+{
+  "computed_at": "2026-06-08T09:28:12.187533+00:00",
+  "filter_strictness": "moderate",
+  "kpi": {
+    "active_sources": 1,
+    "per_shelf_visible": {
+      "beach_condos": {
+        "count": 1,
+        "renders_on_homepage": false
+      },
+      "beach_homes": {
+        "count": 0,
+        "renders_on_homepage": false
+      },
+      "beach_land": {
+        "count": 0,
+        "renders_on_homepage": false
+      },
+      "lake_condos": {
+        "count": 0,
+        "renders_on_homepage": false
+      },
+      "lake_homes": {
+        "count": 0,
+        "renders_on_homepage": false
+      },
+      "lake_land": {
+        "count": 0,
+        "renders_on_homepage": false
+      }
+    },
+    "per_source_coverage": {
+      "agentiz": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "skipped",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "bienesraices": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "century21": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "citymax": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "skipped",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "citymax_sc": {
+        "coverage_pct_vs_discovered": 0.0,
+        "kept": 0,
+        "status": "skipped",
+        "target_discovered": null,
+        "target_prd": 300
+      },
+      "csbr": {
+        "coverage_pct_vs_discovered": 0.0,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": 100
+      },
+      "elagente": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "encuentra24": {
+        "coverage_pct_vs_discovered": 0.6,
+        "kept": 17,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": 2947
+      },
+      "essurf": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "goodlife": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "jamesedition": {
+        "coverage_pct_vs_discovered": 0.0,
+        "kept": 0,
+        "status": "skipped",
+        "target_discovered": null,
+        "target_prd": 50
+      },
+      "nexo": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "oceanside": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "realestate_au_sv": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "realtyelsalvador": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "remax": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      },
+      "santizo": {
+        "coverage_pct_vs_discovered": 0.0,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": 150
+      },
+      "vivolatam": {
+        "coverage_pct_vs_discovered": 0.0,
+        "kept": 0,
+        "status": "skipped",
+        "target_discovered": null,
+        "target_prd": 400
+      },
+      "xitios": {
+        "coverage_pct_vs_discovered": null,
+        "kept": 0,
+        "status": "green",
+        "target_discovered": null,
+        "target_prd": null
+      }
+    },
+    "recovered_from_hidden": null,
+    "registered_sources": 19,
+    "shelves_rendering": 0,
+    "shelves_total": 6,
+    "total_in_dataset": 17,
+    "total_visible_listings": 2
+  },
+  "min_real_listings": 10
+}
