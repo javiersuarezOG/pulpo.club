@@ -995,13 +995,15 @@ function App() {
   const toggleSave = useCallback((id) => {
     const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
 
-    // Anon click while flag-on → stash intent, open SignupModal. The
-    // hydration effect picks up `pulpo-pending-save` after Clerk
-    // sign-in completes and posts it server-side.
-    if (clerkEnabled() && !clerkUserId) {
-      try { localStorage.setItem("pulpo-pending-save", id); } catch {}
-      setSignupModal({ mode: "signup", pendingSave: id });
+    // Two-state model (2026-06-08): saving is a Pro-only capability. A
+    // non-paid user — anonymous, or a canceled/ever-paid user off an
+    // active plan — gets the Pro subscribe modal instead. No more
+    // anonymous-stash + sign-up, no free 10-save cap; you save once you're
+    // Pro. (The /api/saves cap is now dead for this path — backend cleanup
+    // is a follow-up; saving simply can't be reached by a non-paid user.)
+    if (!isPaid(user)) {
       track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
+      setFreeMonthModal({ trigger: "favorites_action" });
       return;
     }
 
@@ -1051,7 +1053,7 @@ function App() {
         showToast("Couldn't save — try again.");
       }
     });
-  }, [clerkUserId, showToast, locale]);
+  }, [clerkUserId, showToast, locale, user]);
 
   // ── PR-NL-8 — auto-save from email "♥ Save to favorites" links ────────
   //
@@ -1103,10 +1105,18 @@ function App() {
     if (cfg.pendingSave) trigger = "heart";
     else if (cfg.pendingAction === "checkout") trigger = "checkout";
     else if (cfg.pendingListing) trigger = "pendingListing";
-    track("signup_modal.shown", {
-      trigger,
-      mode: cfg.mode === "login" ? "login" : "signup",
-    });
+    // Two-state model (2026-06-08): free-account creation is removed. Any
+    // signup intent (save, hero CTA, paywall) now opens the Pro subscribe
+    // modal (FreeMonthModal → Stripe checkout). Only an explicit
+    // mode:"login" opens Clerk sign-in — login is Pro-only, accounts exist
+    // only for payers. This single chokepoint neutralizes every old
+    // free-signup entry point at once.
+    if (cfg.mode !== "login") {
+      track("signup_modal.shown", { trigger, mode: "signup", routed_to: "subscribe_modal" });
+      setFreeMonthModal({ trigger: cfg.pendingSave ? "favorites_action" : "browse_card" });
+      return;
+    }
+    track("signup_modal.shown", { trigger, mode: "login" });
     setSignupModal(cfg);
   }, []);
   const closeSignup = useCallback(() => setSignupModal(null), []);
