@@ -37,7 +37,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
-import { tokenize, matchesQuery } from "./lib/search-match";
+import { tokenize, matchesQuery, scoreListing } from "./lib/search-match";
 import {
   Icon,
   RankTrophy,
@@ -1253,6 +1253,18 @@ function BrowsePage({ app }) {
     // last set to.
     const r = applyRankCap(filtered, debouncedFilters.rank_max);
     const rankActive = debouncedFilters.rank_max != null && debouncedFilters.rank_max > 0;
+    // Keyword relevance: when a search query is active, order by
+    // scoreListing desc (title > zone > id/url, +1 word-boundary boost),
+    // tie-broken by rank_score. rank_max still wins over relevance so
+    // "Top 10 + query" stays best-first. This is keyword ranking, not
+    // natural-language/semantic search — no intent parsing.
+    const qTokens = tokenize(debouncedFilters.query);
+    const queryActive = qTokens.length > 0;
+    const relevanceSorter = (a, b) => {
+      const d = scoreListing(b, qTokens) - scoreListing(a, qTokens);
+      if (d !== 0) return d;
+      return (b.rank_score ?? 0) - (a.rank_score ?? 0);
+    };
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
       price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
@@ -1273,7 +1285,13 @@ function BrowsePage({ app }) {
         recomputeComposite(b, debouncedFilters.weights) -
         recomputeComposite(a, debouncedFilters.weights),
     };
-    const sorted = [...r].sort(rankActive ? sorters.stars_desc : (sorters[sort] || sorters.recent));
+    const sorted = [...r].sort(
+      rankActive
+        ? sorters.stars_desc
+        : queryActive
+          ? relevanceSorter
+          : (sorters[sort] || sorters.recent),
+    );
     // Emit perf telemetry for the full filter+sort cycle.
     if (_perf_t0 > 0 && typeof performance !== "undefined" && performance.now) {
       const ms = Math.round(performance.now() - _perf_t0);
@@ -1293,6 +1311,13 @@ function BrowsePage({ app }) {
   }, [debouncedFilters, sort, LISTINGS]);
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+
+  // When a search query is active, results are ordered by keyword
+  // relevance (see the results memo) so the sort dropdown no longer
+  // applies — swap it for a static "Best match" label. rank_max still
+  // overrides relevance, so keep the dropdown visible in that case.
+  const rankActive = filters.rank_max != null && filters.rank_max > 0;
+  const showRelevanceLabel = tokenize(filters.query).length > 0 && !rankActive;
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1461,17 +1486,21 @@ function BrowsePage({ app }) {
                   sort KEYS are unchanged so saved URLs (?sort=stars_desc
                   etc.) keep working; only the visible labels move. The
                   legacy options stay below for power-user access. */}
-              <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
-                <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
-                <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
-                <option value="days_asc">{t("sort.newest", app.locale)}</option>
-                <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
-                <option value="recent">{t("sort.recent", app.locale)}</option>
-                <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
-                <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
-                <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
-                <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
-              </select>
+              {showRelevanceLabel ? (
+                <span className="sort-relevance-label">{t("browse.sort.by_relevance", app.locale)}</span>
+              ) : (
+                <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
+                  <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
+                  <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
+                  <option value="days_asc">{t("sort.newest", app.locale)}</option>
+                  <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
+                  <option value="recent">{t("sort.recent", app.locale)}</option>
+                  <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
+                  <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
+                  <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
+                  <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
+                </select>
+              )}
               <div className="view-toggle">
                 <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label={t("view.table", app.locale)}>
                   <Icon name="list" size={16}/>

@@ -1311,6 +1311,17 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
+/* Replaces .sort-select when a search query is active — results are
+   ordered by keyword relevance, so we show a static "Best match" label
+   in the same control slot rather than an inert dropdown. */
+.sort-relevance-label {
+  display: inline-flex; align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper-2);
+  font-size: 13px; color: var(--ink-2);
+  white-space: nowrap;
+}
 .view-toggle {
   display: flex; gap: 0; border: 1px solid var(--line); border-radius: 999px;
   padding: 3px; background: var(--paper);

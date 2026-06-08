@@ -560,6 +560,9 @@ const UI_STRINGS = {
   "sort.lowest_price":           { en: "Lowest price",    es: "Menor precio" },
   "sort.newest":                 { en: "Newest",          es: "Más recientes" },
   "sort.largest_plot":           { en: "Largest plot",    es: "Lote más grande" },
+  // Shown in place of the sort dropdown when a search query is active —
+  // results are ordered by keyword relevance, not the chosen sort.
+  "browse.sort.by_relevance":    { en: "Best match",      es: "Mejor coincidencia" },
 
   // Map view placeholder — disabled toggle next to cards/table view.
   "view.map_coming_soon":        { en: "Map (coming soon)",
