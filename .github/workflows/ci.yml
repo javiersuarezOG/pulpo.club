@@ -102,9 +102,15 @@ jobs:
           node scripts/diff_home_version.mjs "$BASE_SHA"
       - name: newsletter TEMPLATE_VERSION bump guard
         run: |
-          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            BASE_SHA="$(git rev-parse HEAD^)"
+          # PR events carry the real base. Push events on a multi-commit
+          # branch must diff against the merge-base with main — NOT
+          # `github.event.before`/HEAD^, which only sees the last commit and
+          # false-fails when an earlier commit in the branch did the version
+          # bump (the version guard is a whole-branch contract, not per-commit).
+          BASE_SHA="${{ github.event.pull_request.base.sha || '' }}"
+          if [ -z "$BASE_SHA" ]; then
+            git fetch --no-tags --depth=200 origin main >/dev/null 2>&1 || true
+            BASE_SHA="$(git merge-base origin/main HEAD 2>/dev/null || git rev-parse HEAD^)"
           fi
           if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"

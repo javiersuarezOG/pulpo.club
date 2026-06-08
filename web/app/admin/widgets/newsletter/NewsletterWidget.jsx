@@ -122,9 +122,19 @@ const NEWSLETTERS = [
     id: "free-welcome",
     tier: "free",
     title: "Free · Welcome",
-    description: "Sent once when an anonymous email subscribes via the homepage form. Sets the audience expectation and surfaces a Pro upgrade CTA.",
-    template: "pulpo-pro-general",
-    templateLabel: "Pulpo Pro General",
+    description: "Sent once when a free reader subscribes via the homepage form. The free weekly body (plain 'pulpo' masthead, top-3 'See on Pulpo', ranks 04-10 'Sign up to Pro', Pro-locked news) under a 'Welcome to Pulpo' hero. Template built; the subscribe-trigger dispatch is a follow-up.",
+    template: "pulpo-free-welcome",
+    templateLabel: "Pulpo Free Welcome",
+    cadenceMode: "onetime",
+    status: "coming-soon",
+  },
+  {
+    id: "free-welcome-back",
+    tier: "free",
+    title: "Free · Welcome-back",
+    description: "Re-acquisition email for a returning free reader (a churned Pro who drops to free, or a resubscribing free subscriber). Same free body + a 'Welcome back' hero derived from the Free Welcome copy. Template built; the trigger dispatch is a follow-up.",
+    template: "pulpo-free-welcome-back",
+    templateLabel: "Pulpo Free Welcome-back",
     cadenceMode: "onetime",
     status: "coming-soon",
   },
@@ -132,11 +142,15 @@ const NEWSLETTERS = [
     id: "free-weekly",
     tier: "free",
     title: "Free · Weekly",
-    description: "Lightweight Free-tier digest. Same Sunday cadence as Pro, fewer picks, no personalisation, upgrade nudge baked in.",
-    template: "pulpo-pro-general",
-    templateLabel: "Pulpo Pro General",
+    description: "Free-tier digest. Same Sunday cadence + same 10 full listing cards as Pro, but: plain 'pulpo' masthead (no Pro badge), ranks 04-10 swap 'See on Pulpo' for a 'Sign up to Pro' CTA, and the Weekly News Spotlight is Pro-locked (real headline + source show, the read sits behind a sign-up panel). The SAME master body as Pro · Weekly — only the variant differs.",
+    template: "pulpo-free-general",
+    templateLabel: "Pulpo Free General",
     cadenceMode: "scheduled",
-    status: "coming-soon",
+    // Template is built + test-sendable from admin (routes the
+    // pulpo-free-general template through the same preview pipeline as
+    // Pro · Weekly). Scheduled free-tier audience routing is a separate
+    // follow-up; the card offers a TEST send only for now.
+    status: "live",
   },
 ];
 
@@ -1632,26 +1646,53 @@ export function NewsletterWidget() {
               <hr />
               <span className="nl-tier-count">{FREE_NEWSLETTERS.length} newsletters</span>
             </div>
-            {FREE_NEWSLETTERS.map((nl) => (
-              <article key={nl.id} className={`nl-newsletter-card ${nl.status === "live" ? "" : "coming-soon"}`}>
-                <div className="nl-newsletter-head">
-                  <h3 className="nl-newsletter-title">{nl.title}</h3>
-                  <span className={`nl-newsletter-status ${nl.status === "live" ? "live" : "coming-soon"}`}>
-                    {nl.status === "live" ? "● Live" : "◌ Coming soon"}
-                  </span>
-                </div>
-                <p className="nl-newsletter-desc">{nl.description}</p>
-                <p className="nl-newsletter-template">
-                  Template · <strong>{nl.templateLabel}</strong>
-                  {templateVersions[nl.template] && (
-                    <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+            {FREE_NEWSLETTERS.map((nl) => {
+              const isLive = nl.status === "live";
+              // EVERY free template is preview-testable: it routes through
+              // the SAME preview path as pro-weekly (trigger() →
+              // /api/admin/newsletter/trigger-preview → workflow with the
+              // matching newsletter_template). The free onboarding pair are
+              // render-only variants (welcome hero on the free body), so a
+              // test-send is just rendering that template to the inbox — no
+              // Clerk-coupled welcome dispatch needed. The status badge still
+              // distinguishes Live (weekly) from Coming soon (the real
+              // welcome trigger is the follow-up). TEST only — no audience send.
+              const canTest = true;
+              return (
+                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
+                  <div className="nl-newsletter-head">
+                    <h3 className="nl-newsletter-title">{nl.title}</h3>
+                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
+                      {isLive ? "● Live" : "◌ Coming soon"}
+                    </span>
+                  </div>
+                  <p className="nl-newsletter-desc">{nl.description}</p>
+                  <p className="nl-newsletter-template">
+                    Template · <strong>{nl.templateLabel}</strong>
+                    {templateVersions[nl.template] && (
+                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
+                    )}
+                    {canTest && (
+                      <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
+                    )}
+                  </p>
+                  {canTest && (
+                    <div className="nl-upcoming-actions nl-card-actions" style={{ marginTop: 12 }}>
+                      {localeToggle(nl.id)}
+                      <button
+                        type="button"
+                        className="nl-upcoming-btn"
+                        disabled={busy || !!audienceConfirm}
+                        onClick={() => trigger({ issueNumber: 1, newsletterId: nl.id, locale: localeFor(nl.id) })}
+                        title="Send a test copy of this free-tier email to your address only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
+                      >
+                        Send test →
+                      </button>
+                    </div>
                   )}
-                  {nl.status === "live" && (
-                    <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
-                  )}
-                </p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           {/* Per-browser log of trigger attempts (localStorage). Cap at

@@ -149,6 +149,31 @@ def test_python_template_version_shape():
         f"form: {_common.WELCOME_BACK_TEMPLATE_VERSION!r}"
     )
 
+    # Free general (free-tier weekly) carries its own pair so the admin
+    # template-version API can chip the "Free · Weekly" card, and
+    # SHORT_VERSION_RE (`-vN.N-`) must pull the short form from the
+    # `free-general-vN.N-YYYY-MM-DD` line.
+    free_general_pattern = re.compile(r"^free-general-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_general = free_general_pattern.match(_common.FREE_GENERAL_TEMPLATE_VERSION)
+    assert m_free_general, (
+        f"FREE_GENERAL_TEMPLATE_VERSION isn't in 'free-general-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_GENERAL_TEMPLATE_VERSION!r}"
+    )
+
+    # Free onboarding pair — own version lines, same shape contract.
+    free_welcome_pattern = re.compile(r"^free-welcome-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_welcome = free_welcome_pattern.match(_common.FREE_WELCOME_TEMPLATE_VERSION)
+    assert m_free_welcome, (
+        f"FREE_WELCOME_TEMPLATE_VERSION isn't in 'free-welcome-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_WELCOME_TEMPLATE_VERSION!r}"
+    )
+    free_welcome_back_pattern = re.compile(r"^free-welcome-back-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_welcome_back = free_welcome_back_pattern.match(_common.FREE_WELCOME_BACK_TEMPLATE_VERSION)
+    assert m_free_welcome_back, (
+        f"FREE_WELCOME_BACK_TEMPLATE_VERSION isn't in 'free-welcome-back-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_WELCOME_BACK_TEMPLATE_VERSION!r}"
+    )
+
     iso_date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     assert iso_date.match(_common.LAST_UPDATED), (
         f"LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: {_common.LAST_UPDATED!r}"
@@ -160,6 +185,24 @@ def test_python_template_version_shape():
     assert iso_date.match(_common.WELCOME_BACK_LAST_UPDATED), (
         f"WELCOME_BACK_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
         f"{_common.WELCOME_BACK_LAST_UPDATED!r}"
+    )
+    assert iso_date.match(_common.FREE_GENERAL_LAST_UPDATED), (
+        f"FREE_GENERAL_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
+        f"{_common.FREE_GENERAL_LAST_UPDATED!r}"
+    )
+    assert m_free_general.group(2) == _common.FREE_GENERAL_LAST_UPDATED, (
+        f"FREE_GENERAL_TEMPLATE_VERSION date ({m_free_general.group(2)!r}) "
+        f"doesn't match FREE_GENERAL_LAST_UPDATED "
+        f"({_common.FREE_GENERAL_LAST_UPDATED!r}). Bump both — Python is "
+        f"the source of truth."
+    )
+    assert iso_date.match(_common.FREE_WELCOME_LAST_UPDATED)
+    assert iso_date.match(_common.FREE_WELCOME_BACK_LAST_UPDATED)
+    assert m_free_welcome.group(2) == _common.FREE_WELCOME_LAST_UPDATED, (
+        "FREE_WELCOME_TEMPLATE_VERSION date doesn't match FREE_WELCOME_LAST_UPDATED."
+    )
+    assert m_free_welcome_back.group(2) == _common.FREE_WELCOME_BACK_LAST_UPDATED, (
+        "FREE_WELCOME_BACK_TEMPLATE_VERSION date doesn't match FREE_WELCOME_BACK_LAST_UPDATED."
     )
 
     assert m_general.group(2) == _common.LAST_UPDATED, (

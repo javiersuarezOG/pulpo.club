@@ -10,7 +10,16 @@ Dry-run only: nothing in this module talks to Resend.
 
 from .types import Recipient, Preference, IssuePick, Issue, Commentary, Cohort
 from .build_issue import build_issue
-from .render_html import render_html, TEMPLATE_VERSION
+from .render_html import (
+    render_html,
+    render_free_general_html,
+    render_free_welcome_html,
+    render_free_welcome_back_html,
+    TEMPLATE_VERSION,
+    FREE_GENERAL_TEMPLATE_VERSION,
+    FREE_WELCOME_TEMPLATE_VERSION,
+    FREE_WELCOME_BACK_TEMPLATE_VERSION,
+)
 
 __all__ = [
     "Recipient",
@@ -21,5 +30,11 @@ __all__ = [
     "Cohort",
     "build_issue",
     "render_html",
+    "render_free_general_html",
+    "render_free_welcome_html",
+    "render_free_welcome_back_html",
     "TEMPLATE_VERSION",
+    "FREE_GENERAL_TEMPLATE_VERSION",
+    "FREE_WELCOME_TEMPLATE_VERSION",
+    "FREE_WELCOME_BACK_TEMPLATE_VERSION",
 ]

@@ -197,6 +197,44 @@ def test_join_drops_anonymous_resend_only_contacts():
     assert recipients == []
 
 
+# ── free_only audience (free weekly) ──────────────────────────────────────
+def test_free_only_includes_free_and_anon_excludes_pro():
+    """The free-tier audience is the inverse of the default: free Clerk
+    users + anonymous contacts are IN, Pro/Agency are OUT."""
+    contacts = [
+        subs.ResendContact(id="c1", email="free@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="pro@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="anon@example.com", unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users, free_only=True)
+    tiers = sorted(r.tier for r in recipients)
+    emails = {r.email_hash for r in recipients}
+    assert tiers == ["free", "free"]                          # free Clerk + anon (synth free)
+    assert subs.email_hash("pro@pulpo.club") not in emails    # Pro excluded
+    assert subs.email_hash("anon@example.com") in emails      # anon included
+    assert subs.email_hash("free@pulpo.club") in emails
+
+
+def test_default_audience_still_pro_only():
+    """Regression guard: with neither flag, the Pro/Agency gate holds."""
+    contacts = [
+        subs.ResendContact(id="c1", email="free@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="pro@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="anon@example.com", unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users)
+    assert len(recipients) == 1
+    assert recipients[0].tier == "pro"
+
+
 def test_join_keeps_agency_tier():
     """Agency tier is also part of the Pro audience."""
     contacts = [
