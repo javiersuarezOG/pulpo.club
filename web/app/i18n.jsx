@@ -624,6 +624,7 @@ const UI_STRINGS = {
   "badge.price_drop":        { en: "Price drop",          es: "Bajó de precio" },
   "badge.off_market":        { en: "Off-market",          es: "Off-market" },
   "badge.new":               { en: "New",                 es: "Nuevo" },
+  "badge.stale":             { en: "Recently missing",    es: "No visto recientemente" },
   "badge.build_ready":       { en: "Build-ready",         es: "Listo para construir" },
   "badge.motivated":         { en: "Motivated seller",    es: "Vendedor motivado" },
   "badge.ocean_view":        { en: "Ocean view",          es: "Vista al mar" },

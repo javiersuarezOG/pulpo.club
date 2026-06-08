@@ -20,6 +20,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 DEFAULT_DRIFT_DIR = REPO_ROOT / "web" / "data" / "url_drift"
 
 

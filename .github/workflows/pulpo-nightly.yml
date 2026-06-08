@@ -370,7 +370,7 @@ jobs:
           mkdir -p /tmp/sv-legacy
           for f in ranked.json ranked.list.json last_updated.json featured.json \
                    validation_log.jsonl dedup_audit.json duplicate_clusters.json \
-                   shelf_audit.json kpi_dashboard.json; do
+                   shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
           done
 
@@ -381,7 +381,7 @@ jobs:
           # are untouched by this restore.
           for f in ranked.json ranked.list.json last_updated.json featured.json \
                    validation_log.jsonl dedup_audit.json duplicate_clusters.json \
-                   shelf_audit.json kpi_dashboard.json; do
+                   shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
 
@@ -555,6 +555,31 @@ jobs:
               sys.exit(1)
           print(f"CANARY OK [{cc}]: {n} listings in [{floor}, {ceiling}]")
           EOF
+
+      - name: Per-source row-count delta gate
+        env:
+          ROW_COUNT_GATE_LOG_ONLY: ${{ vars.ROW_COUNT_GATE_LOG_ONLY || 'false' }}
+        run: |
+          ranked_arg="web/data/ranked.json"
+          if [ -s web/data/ranked.fresh.json ]; then
+            ranked_arg="web/data/ranked.fresh.json"
+          fi
+          echo "Row-count gate using $ranked_arg"
+          set +e
+          python3 scripts/run_row_count_sentinel.py \
+            --sv-ranked "$ranked_arg" \
+            --fail-on-crit \
+            --no-append
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if [ "${ROW_COUNT_GATE_LOG_ONLY,,}" = "true" ]; then
+              echo "::warning::row-count gate would fail, but ROW_COUNT_GATE_LOG_ONLY=true; continuing. Flip back the same day."
+              exit 0
+            fi
+            echo "::error::row-count gate failed. Candidate data was not appended to row_count_history.jsonl."
+            exit "$rc"
+          fi
 
       - name: Per-type canaries (floor + classification confidence)
         # Per-type ingestion floors + classifier-confidence guard. Catches:
@@ -956,6 +981,7 @@ jobs:
           git add web/data/prd_feasibility.json 2>/dev/null || true
           git add web/data/prd_feasibility.md 2>/dev/null || true
           git add web/data/source_health_history.jsonl 2>/dev/null || true
+          git add web/data/scraper_failures/ 2>/dev/null || true
           git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
@@ -965,6 +991,7 @@ jobs:
           # `photo_contract.json` carries the latest run's stats and is
           # consumed by /api/nightly/health.
           git add web/data/photo_contract.json 2>/dev/null || true
+          git add web/data/photo_contract.*.json 2>/dev/null || true
           git add web/data/photo_contract_log.jsonl 2>/dev/null || true
           # PRD "Inventory Expansion & Listing Quality Filter" — per-shelf
           # eligibility audit + KPI dashboard. Read-only telemetry; the

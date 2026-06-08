@@ -77,6 +77,8 @@
       "hires_quarantined",
       "first_seen_at",
       "existence_status",
+      "last_seen_at",
+      "missing_since",
       "broker_name",
       "broker_phone",
       "broker_email",
@@ -490,6 +492,18 @@
         ]
       },
       "existence_status": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "last_seen_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "missing_since": {
         "type": [
           "string",
           "null"

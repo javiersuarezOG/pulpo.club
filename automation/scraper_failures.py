@@ -59,6 +59,34 @@ BODY_SNIPPET_BYTES = 4096
 # watchdog trend analysis without unbounded disk growth.
 RETAIN_PER_SOURCE = 30
 
+SENSITIVE_HEADER_NAMES = frozenset({
+    "authorization",
+    "cookie",
+    "set-cookie",
+    "proxy-authorization",
+    "x-api-key",
+    "x-auth-token",
+    "x-csrf-token",
+})
+
+
+def _clean_headers(raw_headers: Any, *, max_key: int = 128, max_value: int = 512) -> dict[str, str]:
+    """Return a JSON-safe header dict with sensitive values redacted."""
+    headers: dict[str, str] = {}
+    if raw_headers is None:
+        return headers
+    try:
+        items = dict(raw_headers).items()
+    except Exception:
+        return headers
+    for k, v in items:
+        key = str(k)[:max_key]
+        if str(k).lower() in SENSITIVE_HEADER_NAMES:
+            headers[key] = "<redacted>"
+        else:
+            headers[key] = str(v)[:max_value]
+    return headers
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -102,13 +130,7 @@ def _serialize_response(response: Any) -> Optional[dict]:
         raw_headers = getattr(response, "headers", None)
         if callable(raw_headers):
             raw_headers = raw_headers()
-        headers: dict[str, str] = {}
-        if raw_headers is not None:
-            try:
-                for k, v in dict(raw_headers).items():
-                    headers[str(k)[:128]] = str(v)[:512]
-            except Exception:
-                pass
+        headers = _clean_headers(raw_headers)
         # Body via .text (httpx) or .text() coroutine (Playwright is async,
         # we don't await — Playwright callers pass body separately if needed).
         body_snippet: Optional[str] = None
@@ -199,18 +221,11 @@ def write_failure_snapshot(
         }
 
         if request_url:
-            req_headers_clean: dict[str, str] = {}
-            if request_headers:
-                try:
-                    for k, v in dict(request_headers).items():
-                        # Don't leak auth / cookie material in artifacts.
-                        kl = str(k).lower()
-                        if kl in ("authorization", "cookie", "x-api-key"):
-                            req_headers_clean[str(k)[:64]] = "<redacted>"
-                        else:
-                            req_headers_clean[str(k)[:64]] = str(v)[:256]
-                except Exception:
-                    pass
+            req_headers_clean = _clean_headers(
+                request_headers,
+                max_key=64,
+                max_value=256,
+            )
             req_block: dict = {
                 "method":  request_method,
                 "url":     request_url[:2048],

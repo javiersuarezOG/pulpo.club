@@ -80,6 +80,7 @@
   --badge-drop: oklch(0.58 0.18 25);
   --badge-off: oklch(0.46 0.10 290);
   --badge-new: oklch(0.55 0.12 145);
+  --badge-stale: oklch(0.50 0.08 250);
   --badge-ready: oklch(0.55 0.12 240);
   --badge-motivated: oklch(0.65 0.15 60);
 
