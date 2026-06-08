@@ -952,6 +952,23 @@ jobs:
           python3 -m pulpo.cli check-hero-variants --top-only 10 \
             || { echo "::error::hero variant canary FAILED — see logs above"; exit 1; }
 
+      - name: Photo-contract truth canary (committed SV state)
+        # Independent of how/where enforce_photo_contract ran. Reads the
+        # COMMITTED ranked.json + photo_contract.json AFTER the SV/PA
+        # restore block, so it sees the SV apex state that actually ships.
+        # Asserts every hero_photo_path resolves to a real file AND that
+        # photo_contract.json's ranked_total matches ranked.json.
+        #
+        # Catches the 2026-06-08 PA-overwrite: the sidecar described 17 PA
+        # listings (/api/nightly/health read "all good") while SV's 1,037
+        # committed hero paths 404'd in production. A green per-listing
+        # contract pass does not prove the sidecar describes the shipping
+        # dataset — this canary does. Hard-fail by design: a missing top
+        # photo or a wrong-dataset sidecar must block the commit.
+        run: |
+          python3 scripts/check_photo_contract_truth.py \
+            || { echo "::error::photo-contract truth canary FAILED — see logs above"; exit 1; }
+
       - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)
         # PR-8 of the reliability plan — durable backup of every nightly's
         # canary-validated ranked.json. Lives AFTER the canaries pass but
