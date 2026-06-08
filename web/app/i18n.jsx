@@ -567,6 +567,23 @@ const UI_STRINGS = {
   // Map view placeholder — disabled toggle next to cards/table view.
   "view.map_coming_soon":        { en: "Map (coming soon)",
                                    es: "Mapa (próximamente)" },
+  // Map view (WS4 PR-7).
+  "view.map":                    { en: "Map view",      es: "Vista en mapa" },
+  "map.aria":                    { en: "Property listings map", es: "Mapa de propiedades" },
+  "map.skeleton.loading":        { en: "Loading map…",   es: "Cargando mapa…" },
+  "map.approx_legend":           { en: "Locations are approximate",
+                                   es: "Las ubicaciones son aproximadas" },
+  "map.mapped_count":            { en: "{shown} of {total} listings mapped",
+                                   es: "{shown} de {total} propiedades en el mapa" },
+  "map.hide_approx":             { en: "Hide approximate ({n})",
+                                   es: "Ocultar aproximadas ({n})" },
+  "map.unavailable_for_filter":  { en: "Map unavailable — no mapped listings for this filter.",
+                                   es: "Mapa no disponible — no hay propiedades ubicadas para este filtro." },
+  "map.marker.aria":             { en: "{price} · {zone} — press Enter to preview",
+                                   es: "{price} · {zone} — presiona Enter para ver" },
+  "map.popup.approx_location":   { en: "Approximate location",
+                                   es: "Ubicación aproximada" },
+  "map.popup.view_listing":      { en: "View listing →", es: "Ver propiedad →" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },

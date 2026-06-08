@@ -173,10 +173,23 @@ export function readSortFromURL(search: string, fallback: string): string {
   return p.get("sort") || fallback;
 }
 
+// View state (cards | table | map) lives in the URL so `?view=map` is
+// shareable and survives back/forward. Deliberately kept OUT of
+// FILTER_URL_KEYS so a bare `?view=map` does NOT suppress the
+// Clerk-persisted filter seed — view is orthogonal to "what to find".
+const VALID_VIEWS: ReadonlySet<string> = new Set(["cards", "table", "map"]);
+
+export function readViewFromURL(search: string, fallback: string): string {
+  const p = new URLSearchParams(search);
+  const v = p.get("view");
+  return v && VALID_VIEWS.has(v) ? v : fallback;
+}
+
 export function writeFilterToURL(
   filters: FilterShape,
   category: string | null,
   sort: string,
+  view: string = "cards",
   history: History = window.history
 ) {
   const p = new URLSearchParams(window.location.search);
@@ -217,6 +230,8 @@ export function writeFilterToURL(
   setOrRemove("rmax",   filters.rank_max != null && filters.rank_max > 0 ? String(filters.rank_max) : "");
   setOrRemove("inc",    filters.include_incomplete ? "1" : "");
   setOrRemove("q",      (filters.query ?? "").trim());
+  // View — omitted when "cards" (the default) so plain links stay clean.
+  setOrRemove("view",   view && view !== "cards" ? view : "");
   const qs = p.toString();
   const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
   history.replaceState({}, "", url);

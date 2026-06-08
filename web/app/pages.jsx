@@ -24,6 +24,7 @@ import {
   hasFilterParamsInURL,
   readFilterFromURL,
   readSortFromURL,
+  readViewFromURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import {
@@ -79,6 +80,10 @@ import {
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
 import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/cta-routing";
+
+// PR-7/WS4 — map view, lazy so Leaflet + markercluster land in their own
+// Vite chunk and never touch the Browse entry bundle.
+const LazyMapView = React.lazy(() => import("./components/MapView.jsx"));
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1132,7 +1137,13 @@ function BrowsePage({ app }) {
   // weekly newsletter pipeline in P3). Debounced + skip-if-equal; no
   // write for anonymous users.
   useDiscoverFilterPersist(app, filters);
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
+  // View seeds from the URL first (`?view=map` is shareable), then falls
+  // back to the localStorage default. Cards remains the default.
+  const [view, setView] = pUseState(() => {
+    if (typeof window === "undefined") return "cards";
+    const ls = localStorage.getItem("pulpo-view") || "cards";
+    return readViewFromURL(window.location.search, ls);
+  });
   const [sort, setSort] = pUseState(() =>
     typeof window !== "undefined"
       ? readSortFromURL(window.location.search, "recent")
@@ -1183,6 +1194,7 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
+      setView(readViewFromURL(window.location.search, localStorage.getItem("pulpo-view") || "cards"));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
     window.addEventListener("popstate", onPop);
@@ -1220,8 +1232,8 @@ function BrowsePage({ app }) {
   // Persist filter + sort + category to URLSearchParams (replaceState
   // — no new history entries on every chip toggle).
   pUseEffect(() => {
-    writeFilterToURL(filters, app.routeParams.category ?? null, sort);
-  }, [filters, sort, app.routeParams.category]);
+    writeFilterToURL(filters, app.routeParams.category ?? null, sort, view);
+  }, [filters, sort, app.routeParams.category, view]);
 
   pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
 
@@ -1318,6 +1330,17 @@ function BrowsePage({ app }) {
   // overrides relevance, so keep the dropdown visible in that case.
   const rankActive = filters.rank_max != null && filters.rank_max > 0;
   const showRelevanceLabel = tokenize(filters.query).length > 0 && !rankActive;
+
+  // Map popup "View listing" — routes through the SAME CTA matrix as a
+  // card click so anon/free hit the FreeMonthModal and paid users open
+  // the detail panel (never a silent bypass).
+  const handleMapOpenListing = pUseCallback((id) => {
+    track("card.clicked", { listing_id: id, source_view: "map" });
+    const branch = routeCtaForState("shelf_card", app?.user);
+    trackCtaRouted("shelf_card", app?.user, branch, true);
+    if (branch === "passthrough") { app.openListing(id); return; }
+    void dispatchCentralBranch(branch, app, { trigger: "map_pin", pendingListing: id });
+  }, [app]);
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1511,14 +1534,12 @@ function BrowsePage({ app }) {
                 <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label={t("view.cards", app.locale)}>
                   <Icon name="grid" size={16}/>
                 </button>
-                {/* Map view placeholder per rewrite plan step 6. Disabled
-                    until the map prototype lands; the tooltip explains
-                    that to users who try clicking. */}
+                {/* Map view (WS4 PR-7) — third view option. */}
                 <button
-                  disabled
-                  className="map-view-placeholder"
-                  aria-label={t("view.map_coming_soon", app.locale)}
-                  title={t("view.map_coming_soon", app.locale)}
+                  className={view === "map" ? "active" : ""}
+                  onClick={() => setViewTelemeter("map")}
+                  aria-label={t("view.map", app.locale)}
+                  title={t("view.map", app.locale)}
                 >
                   <Icon name="map_pin" size={16}/>
                 </button>
@@ -1545,6 +1566,10 @@ function BrowsePage({ app }) {
               listings={LISTINGS}
               setFilters={setFiltersWithPinClear}
             />
+          ) : view === "map" ? (
+            <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
+              <LazyMapView results={results} app={app} onOpenListing={handleMapOpenListing} />
+            </React.Suspense>
           ) : view === "cards" ? (
             <>
               <div className="card-grid">
