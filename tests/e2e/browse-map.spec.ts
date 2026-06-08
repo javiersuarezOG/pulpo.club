@@ -35,6 +35,19 @@ test.describe("Browse map view", () => {
     expect(uncaught, "uncaught JS exceptions in map view").toEqual([]);
   });
 
+  test("clusters are size-stepped by count (PR-8)", async ({ page }) => {
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".pulpo-cluster").first().waitFor({ state: "visible", timeout: 10_000 });
+    // Every cluster carries exactly one size-step modifier.
+    const stepped = await page.locator(
+      ".pulpo-cluster--sm, .pulpo-cluster--md, .pulpo-cluster--lg",
+    ).count();
+    const total = await page.locator(".pulpo-cluster").count();
+    expect(stepped).toBe(total);
+    expect(total).toBeGreaterThan(0);
+  });
+
   test("?view=map cold-load restores the map directly", async ({ page }) => {
     const uncaught: string[] = [];
     page.on("pageerror", (err) => uncaught.push(err.message));
