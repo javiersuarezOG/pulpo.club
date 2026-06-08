@@ -8,7 +8,7 @@
 // province_state / title.en / title.es / original_url.
 
 import { describe, it, expect } from "vitest";
-import { tokenize, matchesQuery, matchesQueryString } from "./search-match";
+import { tokenize, matchesQuery, matchesQueryString, scoreListing } from "./search-match";
 import type { Listing } from "../data/types";
 
 function L(overrides: Partial<Listing>): Listing {
@@ -161,5 +161,63 @@ describe("matchesQuery", () => {
     expect(matchesQueryString(stripped, "tunco")).toBe(true);
     // remax appears nowhere in this stripped fixture.
     expect(matchesQueryString(stripped, "remax")).toBe(false);
+  });
+});
+
+describe("scoreListing", () => {
+  it("returns 0 for empty tokens or null listing (non-query path untouched)", () => {
+    expect(scoreListing(L({}), [])).toBe(0);
+    expect(scoreListing(L({}), tokenize(""))).toBe(0);
+    expect(scoreListing(null, ["tunco"])).toBe(0);
+    expect(scoreListing(undefined, ["tunco"])).toBe(0);
+  });
+
+  it("title hit outranks a zone-only hit outranks an id/url-only hit", () => {
+    // "playa" appears only in the title here.
+    const titleHit = L({
+      title: { en: "Playa lot", es: "Lote playa" },
+      zone_name: "Mizata",
+      province_state: "La Libertad",
+      id: "x__1",
+      source_id: "1",
+      source_label: "X",
+      original_url: "https://x.com/a",
+    });
+    // "playa" appears only in the zone label.
+    const zoneHit = L({
+      title: { en: "Lot", es: "Lote" },
+      zone_name: "Playa El Zonte",
+      province_state: "La Libertad",
+      id: "x__2",
+      source_id: "2",
+      source_label: "X",
+      original_url: "https://x.com/b",
+    });
+    // "playa" appears only in the URL slug.
+    const urlHit = L({
+      title: { en: "Lot", es: "Lote" },
+      zone_name: "Mizata",
+      province_state: "La Libertad",
+      id: "x__3",
+      source_id: "3",
+      source_label: "X",
+      original_url: "https://x.com/playa-lot",
+    });
+    const toks = tokenize("playa");
+    expect(scoreListing(titleHit, toks)).toBeGreaterThan(scoreListing(zoneHit, toks));
+    expect(scoreListing(zoneHit, toks)).toBeGreaterThan(scoreListing(urlHit, toks));
+  });
+
+  it("gives a word-boundary boost over a mid-substring hit", () => {
+    const wholeWord = L({ title: { en: "tunco lot", es: "" }, zone_name: "z", province_state: "p", original_url: "" });
+    const midWord = L({ title: { en: "xtuncox lot", es: "" }, zone_name: "z", province_state: "p", original_url: "" });
+    const toks = tokenize("tunco");
+    expect(scoreListing(wholeWord, toks)).toBeGreaterThan(scoreListing(midWord, toks));
+  });
+
+  it("is null-safe on stripped fields", () => {
+    const stripped = L({ title: { en: "" } as Listing["title"], original_url: null, source_label: "" });
+    expect(() => scoreListing(stripped, tokenize("tunco"))).not.toThrow();
+    expect(scoreListing(stripped, tokenize("tunco"))).toBeGreaterThan(0);
   });
 });
