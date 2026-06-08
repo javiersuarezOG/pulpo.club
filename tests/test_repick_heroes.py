@@ -156,6 +156,8 @@ def test_execute_writes_hero_and_mutates_ranked(fake_ranked: Path, tmp_path: Pat
     remax_abc = next(li for li in data if li["source_id"] == "abc123")
     assert remax_abc["hero_photo_path"] == "/photos/remax_abc123.jpg"
     assert remax_abc["hero_photo_quality_score"] is not None
+    # P2 — repick persists the winning URL so the FE can reorder the gallery.
+    assert remax_abc["selected_photo_url"] == hero_meta["winning_url"]
 
     # Summary log written.
     lines = summary.read_text().strip().splitlines()
