@@ -1648,12 +1648,16 @@ export function NewsletterWidget() {
             </div>
             {FREE_NEWSLETTERS.map((nl) => {
               const isLive = nl.status === "live";
-              // free-weekly routes through the SAME weekly preview path as
-              // pro-weekly (trigger() → /api/admin/newsletter/trigger-preview
-              // → workflow with newsletter_template=pulpo-free-general). It
-              // offers a TEST send only — the free-tier audience routing
-              // isn't wired yet, so no "Send to everyone" here.
-              const canTest = isLive && nl.cadenceMode === "scheduled";
+              // EVERY free template is preview-testable: it routes through
+              // the SAME preview path as pro-weekly (trigger() →
+              // /api/admin/newsletter/trigger-preview → workflow with the
+              // matching newsletter_template). The free onboarding pair are
+              // render-only variants (welcome hero on the free body), so a
+              // test-send is just rendering that template to the inbox — no
+              // Clerk-coupled welcome dispatch needed. The status badge still
+              // distinguishes Live (weekly) from Coming soon (the real
+              // welcome trigger is the follow-up). TEST only — no audience send.
+              const canTest = true;
               return (
                 <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
                   <div className="nl-newsletter-head">
@@ -1668,7 +1672,7 @@ export function NewsletterWidget() {
                     {templateVersions[nl.template] && (
                       <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
                     )}
-                    {isLive && (
+                    {canTest && (
                       <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
                     )}
                   </p>
@@ -1680,7 +1684,7 @@ export function NewsletterWidget() {
                         className="nl-upcoming-btn"
                         disabled={busy || !!audienceConfirm}
                         onClick={() => trigger({ issueNumber: 1, newsletterId: nl.id, locale: localeFor(nl.id) })}
-                        title="Send a test copy of the free-tier weekly to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
+                        title="Send a test copy of this free-tier email to your address only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
                       >
                         Send test →
                       </button>

@@ -70,6 +70,7 @@ const KNOWN_NEWSLETTER_IDS = new Set([
   "pro-welcome",     // coming soon — kept in the allowlist so the
   "free-welcome",    // future trigger doesn't need an API redeploy.
   "free-weekly",
+  "free-welcome-back",
 ]);
 const DEFAULT_NEWSLETTER_ID = "pro-weekly";
 
@@ -82,6 +83,13 @@ const DEFAULT_NEWSLETTER_ID = "pro-weekly";
 const TEMPLATE_FOR_NEWSLETTER = {
   "pro-weekly": "pulpo-pro-general",
   "free-weekly": "pulpo-free-general",
+  // The free onboarding pair are render-only variants (welcome hero on the
+  // free body), so a test-send is just rendering that template to the test
+  // inbox via the same preview pipeline — no Clerk-coupled welcome dispatch
+  // needed. (Their REAL trigger — homepage subscribe / Stripe / Resend —
+  // is still a follow-up; this is the preview affordance only.)
+  "free-welcome": "pulpo-free-welcome",
+  "free-welcome-back": "pulpo-free-welcome-back",
 };
 const DEFAULT_TEMPLATE = "pulpo-pro-general";
 

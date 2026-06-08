@@ -58,7 +58,7 @@ on:
         required: false
         type: choice
         default: "pulpo-pro-general"
-        options: ["pulpo-pro-general", "pulpo-free-general"]
+        options: ["pulpo-pro-general", "pulpo-free-general", "pulpo-free-welcome", "pulpo-free-welcome-back"]
       free_audience:
         description: "Send to the FREE audience (free Clerk + anonymous, Pro excluded). Pair with newsletter_template=pulpo-free-general. Staged: dry-run unless send_mode=yes."
         required: false
