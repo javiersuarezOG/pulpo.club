@@ -48,6 +48,7 @@ const AdminPage = React.lazy(() =>
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
+import { isPaid } from "./lib/gating";
 import { deriveSubscriptionState } from "./lib/subscription";
 
 // Resolves the hydrated user object's `plan` field to the effective
@@ -927,6 +928,18 @@ function App() {
 
   const openListing = useCallback((id) => {
     if (!id) return;
+    // Two-state model (2026-06-08): opening a listing's detail is a Pro
+    // capability. A non-paid viewer — anonymous ("Free"), or a canceled /
+    // ever-paid user off an active plan — does NOT open the panel; the
+    // subscribe-to-Pro modal shows instead. The URL stays put (no
+    // /listing/<id> push), so the panel never mounts. `setFreeMonthModal`
+    // is the conversion surface (→ Stripe checkout). A deep-link backstop
+    // effect below covers cold-loads straight to /listing/<id>.
+    if (!isPaid(user)) {
+      track("paywall.shown", { kind: "listing_click", listing_id: id });
+      setFreeMonthModal({ trigger: "browse_card" });
+      return;
+    }
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
       : "";
@@ -948,7 +961,7 @@ function App() {
       }
     }
     _measure("perf.detail_open", { listing_id: id });
-  }, [_measure]);
+  }, [_measure, user]);
 
   const closeListing = useCallback(() => {
     if (closingRef.current) return;
@@ -982,13 +995,15 @@ function App() {
   const toggleSave = useCallback((id) => {
     const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
 
-    // Anon click while flag-on → stash intent, open SignupModal. The
-    // hydration effect picks up `pulpo-pending-save` after Clerk
-    // sign-in completes and posts it server-side.
-    if (clerkEnabled() && !clerkUserId) {
-      try { localStorage.setItem("pulpo-pending-save", id); } catch {}
-      setSignupModal({ mode: "signup", pendingSave: id });
+    // Two-state model (2026-06-08): saving is a Pro-only capability. A
+    // non-paid user — anonymous, or a canceled/ever-paid user off an
+    // active plan — gets the Pro subscribe modal instead. No more
+    // anonymous-stash + sign-up, no free 10-save cap; you save once you're
+    // Pro. (The /api/saves cap is now dead for this path — backend cleanup
+    // is a follow-up; saving simply can't be reached by a non-paid user.)
+    if (!isPaid(user)) {
       track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
+      setFreeMonthModal({ trigger: "favorites_action" });
       return;
     }
 
@@ -1038,7 +1053,7 @@ function App() {
         showToast("Couldn't save — try again.");
       }
     });
-  }, [clerkUserId, showToast, locale]);
+  }, [clerkUserId, showToast, locale, user]);
 
   // ── PR-NL-8 — auto-save from email "♥ Save to favorites" links ────────
   //
@@ -1090,10 +1105,18 @@ function App() {
     if (cfg.pendingSave) trigger = "heart";
     else if (cfg.pendingAction === "checkout") trigger = "checkout";
     else if (cfg.pendingListing) trigger = "pendingListing";
-    track("signup_modal.shown", {
-      trigger,
-      mode: cfg.mode === "login" ? "login" : "signup",
-    });
+    // Two-state model (2026-06-08): free-account creation is removed. Any
+    // signup intent (save, hero CTA, paywall) now opens the Pro subscribe
+    // modal (FreeMonthModal → Stripe checkout). Only an explicit
+    // mode:"login" opens Clerk sign-in — login is Pro-only, accounts exist
+    // only for payers. This single chokepoint neutralizes every old
+    // free-signup entry point at once.
+    if (cfg.mode !== "login") {
+      track("signup_modal.shown", { trigger, mode: "signup", routed_to: "subscribe_modal" });
+      setFreeMonthModal({ trigger: cfg.pendingSave ? "favorites_action" : "browse_card" });
+      return;
+    }
+    track("signup_modal.shown", { trigger, mode: "login" });
     setSignupModal(cfg);
   }, []);
   const closeSignup = useCallback(() => setSignupModal(null), []);
@@ -1207,6 +1230,15 @@ function App() {
       : undefined;
     const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
+      // Two-state model: /saved (Favorites) is a Pro feature. A non-paid
+      // visitor clicking it should be sold Pro, not shown a "welcome back"
+      // login — they're a prospect, not a returning member. /account keeps
+      // the login modal (returning members manage billing/resubscribe; the
+      // header also carries a sign-in entry).
+      if (route === "saved") {
+        setFreeMonthModal({ trigger: "favorites_action" });
+        return;
+      }
       // Already in a signup/login flow? Don't re-fire.
       if (signupModal && (signupModal.mode === "login" || signupModal.mode === "signup")) {
         return;
@@ -1317,6 +1349,21 @@ function App() {
     setFreeMonthModal(cfg);
   }, []);
   const closeFreeMonthModal = useCallback(() => setFreeMonthModal(null), []);
+
+  // Two-state deep-link backstop: a non-paid user landing directly on
+  // /listing/<id> (shared link, bookmark, cold reload) gets the subscribe
+  // modal instead of the panel — symmetric with the openListing click
+  // gate. We clear openListingId so the panel never mounts and strip the
+  // URL back to /browse so refresh/back doesn't replay the listing path.
+  useEffect(() => {
+    if (!openListingId || isPaid(user)) return;
+    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId });
+    setFreeMonthModal({ trigger: "browse_card" });
+    setOpenListingId(null);
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
+      window.history.replaceState({ pulpo: true }, "", "/browse");
+    }
+  }, [openListingId, user]);
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //

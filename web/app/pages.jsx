@@ -2991,7 +2991,12 @@ function SignupModal({ app }) {
 // is off — extracted so its useState hooks don't clash with the parent
 // component's lone useEffect on flag-on renders.
 function LegacySignupModal({ app, m }) {
-  const [mode, setMode] = pUseState(m.mode || "signup");
+  // Two-state model (2026-06-08): login-only. Free-account creation is
+  // removed — every signup intent routes to the Pro subscribe modal, so
+  // this fallback (rendered only when Clerk is OFF) never shows a signup
+  // form. Prospects get a "Get Pulpo Pro" link instead of "Create account".
+  // (Prod: the same is enforced by Clerk invitation-only sign-up config.)
+  const mode = "login";
   const [email, setEmail] = pUseState(m.email || "");
   const [password, setPassword] = pUseState("");
   const [error, setError] = pUseState("");
@@ -3051,13 +3056,9 @@ function LegacySignupModal({ app, m }) {
           </button>
         </form>
         <div className="modal-foot">
-          {mode === "signup" ? (
-            <>Already have an account? <button className="link-btn" onClick={() => setMode("login")}>Log in</button></>
-          ) : (
-            <>New here? <button className="link-btn" onClick={() => setMode("signup")}>Create account</button></>
-          )}
+          {/* i18n-allow: LegacySignupModal only renders when Clerk is OFF (dev/CI) */}
+          Not a member yet? <button className="link-btn" onClick={() => { app.closeSignup(); app.openFreeMonthModal?.({ trigger: "browse_card" }); }}>Get Pulpo Pro</button>
         </div>
-        <div className="modal-fine">By signing up you agree to the <a>Terms of Service</a>. You'll get weekly deal alerts — unsubscribe anytime.</div>
       </div>
     </div>
   );
