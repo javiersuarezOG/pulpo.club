@@ -61,6 +61,7 @@
       "photos_count",
       "photo_urls",
       "hero_photo_path",
+      "selected_photo_url",
       "hero_photo_quality_score",
       "has_text_overlay",
       "has_marketing_overlay",
@@ -402,6 +403,12 @@
         }
       },
       "hero_photo_path": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "selected_photo_url": {
         "type": [
           "string",
           "null"
