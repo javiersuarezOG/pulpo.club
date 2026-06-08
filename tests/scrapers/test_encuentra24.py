@@ -401,3 +401,73 @@ def test_resolve_limit_offline_ignores_env_var(monkeypatch):
     monkeypatch.setenv("PULPO_E24_LIMIT", "1")
     sc = Encuentra24Scraper(offline=True)
     assert sc._resolve_limit(50, offline=True) == 50
+
+
+# ── Per-category pagination (2026-06 PRD audit follow-up) ─────────────
+
+
+def test_with_page_param_appends_when_no_existing_query():
+    """Page 2+ URL construction. The base category URLs in
+    CATEGORY_URLS don't carry query strings, so the typical case is
+    `?page=N`."""
+    out = Encuentra24Scraper._with_page_param(
+        "https://www.encuentra24.com/el-salvador-es/casas/la-libertad", 2
+    )
+    assert out == (
+        "https://www.encuentra24.com/el-salvador-es/casas/la-libertad?page=2"
+    )
+
+
+def test_with_page_param_uses_ampersand_when_url_already_has_query():
+    """Defensive: future PA / multi-country subpaths may add `?type=…`
+    parameters. We must not stomp them with `?page=N`."""
+    out = Encuentra24Scraper._with_page_param(
+        "https://www.encuentra24.com/el-salvador-es/casas?type=residential",
+        3,
+    )
+    assert "type=residential" in out
+    assert out.endswith("&page=3")
+
+
+def test_max_pages_per_category_default_matches_class_constant():
+    """No env var → class constant wins. Lock the default in so a
+    silent change to the constant requires updating this test."""
+    sc = Encuentra24Scraper(offline=True)
+    assert sc._max_pages_per_category() == Encuentra24Scraper.MAX_PAGES_PER_CATEGORY
+    assert Encuentra24Scraper.MAX_PAGES_PER_CATEGORY >= 5  # sanity floor
+
+
+def test_max_pages_per_category_honours_env_var(monkeypatch):
+    """Operator-set lower cap takes effect (incident response: cut a
+    runaway crawl short)."""
+    monkeypatch.setenv("PULPO_E24_MAX_PAGES_PER_CATEGORY", "3")
+    sc = Encuentra24Scraper(offline=True)
+    assert sc._max_pages_per_category() == 3
+
+
+def test_max_pages_per_category_garbage_env_fails_open(monkeypatch):
+    """Same fail-open contract as PULPO_E24_LIMIT — bad value must not
+    silently cap pagination to 0."""
+    monkeypatch.setenv("PULPO_E24_MAX_PAGES_PER_CATEGORY", "not-a-number")
+    sc = Encuentra24Scraper(offline=True)
+    assert sc._max_pages_per_category() == Encuentra24Scraper.MAX_PAGES_PER_CATEGORY
+
+
+def test_max_pages_per_category_zero_env_falls_back(monkeypatch):
+    """Zero / negative env values fall back to the default. A 0-cap
+    would skip every category's page 1 too — definitely not what an
+    operator intends when they set the variable."""
+    monkeypatch.setenv("PULPO_E24_MAX_PAGES_PER_CATEGORY", "0")
+    sc = Encuentra24Scraper(offline=True)
+    assert sc._max_pages_per_category() == Encuentra24Scraper.MAX_PAGES_PER_CATEGORY
+
+
+def test_crawl_with_meta_max_pages_hit_defaults_false_offline():
+    """Offline fixture path never paginates, so max_pages_hit is False.
+    Regression guard: the field shape stays stable for the run-history
+    consumer in automation/run.py."""
+    sc = Encuentra24Scraper(offline=True)
+    meta = sc.crawl_with_meta(limit=5, offline=True)
+    assert meta["max_pages_hit"] is False
+    assert "records" in meta
+    assert "limit_hit" in meta
