@@ -7229,34 +7229,6 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   border-radius: 16px;
 }
 
-/* PRD A3 — shelf-aware photo placeholder. Renders when the shelf-
-   aware photo waiver tops up a thin shelf with loose-eligible listings
-   (no photo). Aspect ratio matches <Photo ratio="4/3"> so the card
-   layout doesn't shift between strict and loose entries on the same
-   shelf. Mobile-first: tokens only, no hex/rgb literals. */
-.homepage-v2.hero-v4 .hp-shelf-card-photo-placeholder {
-  border-radius: 16px;
-  aspect-ratio: 4 / 3;
-  width: 100%;
-  background: var(--color-surface-muted, var(--color-bg-muted));
-  color: var(--color-ink-secondary, var(--color-ink-primary));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  text-align: center;
-}
-.homepage-v2.hero-v4 .hp-shelf-card-photo-placeholder-text {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  line-height: 1.3;
-  opacity: 0.8;
-}
-
 /* White pill badges (overlay on photo) */
 .homepage-v2.hero-v4 .hp-shelf-card-badge {
   background: var(--color-bg-white);
