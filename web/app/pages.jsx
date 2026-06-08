@@ -1760,6 +1760,103 @@ function BrowsePage({ app }) {
 }
 
 // ====== Results table ======
+function listingForIntentionalFallback(listing) {
+  return {
+    ...listing,
+    thumbnail_url: null,
+    photos: [],
+  };
+}
+
+function localThumbnailLooksLikeBrokerLogo(listing) {
+  const thumb = String(listing?.thumbnail_url || "").toLowerCase();
+  if (!thumb) return false;
+  if (thumb.includes("logo") || thumb.includes("placeholder") || thumb.includes("icon")) return true;
+  const photos = Array.isArray(listing?.photos) ? listing.photos : [];
+  return (
+    thumb.startsWith("/photos/xitios_") &&
+    photos.some((u) => String(u || "").toLowerCase().includes("xitios.com.sv/img/icon"))
+  );
+}
+
+function listingForCompactPhoto(listing) {
+  if (!localThumbnailLooksLikeBrokerLogo(listing)) return listing;
+  return {
+    ...listing,
+    thumbnail_url: null,
+  };
+}
+
+function listingForSuggestionThumb(listing) {
+  const suitable =
+    listing &&
+    typeof listing.thumbnail_url === "string" &&
+    listing.thumbnail_url.length > 0 &&
+    listing.card_eligible === true &&
+    listing.has_text_overlay !== true;
+  if (!suitable) return listingForIntentionalFallback(listing);
+  if (localThumbnailLooksLikeBrokerLogo(listing)) return listingForIntentionalFallback(listing);
+  return listing;
+}
+
+function MobileListRow({ listing: l, app, topRank }) {
+  const open = () => app.openListing(l.id);
+  const onKeyDown = (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    open();
+  };
+  const daysCompact = typeof l.days_listed === "number" ? `${l.days_listed}d` : null;
+  const ppm = formatPpm(l.price_per_m2);
+  const ppmText = ppm === "—" ? ppm : `${ppm}${ppmSuffix()}`;
+  const typeLabel = landTypeLabel(l.land_type);
+
+  return (
+    <article
+      className="mobile-list-row"
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={onKeyDown}
+    >
+      <div className="mobile-list-row__thumb">
+        <Photo listing={listingForCompactPhoto(l)} thumbnail ratio="1/1" className="mobile-list-row__photo" source="browse_mobile_list" />
+        {topRank != null && (
+          <span className="mobile-list-row__rank" aria-label={`Pulpo ranked ${topRank}`}>
+            <RankTrophy />
+            <span>{topRank}</span>
+          </span>
+        )}
+      </div>
+      <div className="mobile-list-row__main">
+        <div className="mobile-list-row__title">
+          {tr(l.title, app.locale)}
+        </div>
+        <div className="mobile-list-row__place">
+          <span>{l.zone_name}</span>
+          {typeLabel && <span>{typeLabel}</span>}
+        </div>
+        <div className="mobile-list-row__facts" aria-label={t("browse.list.facts_aria", app.locale)}>
+          <span className="mobile-list-row__price">{formatPrice(l.price)}</span>
+          <span>{formatSize(l.size_m2)}</span>
+          <span>{ppmText}</span>
+        </div>
+        <div className="mobile-list-row__meta">
+          <Badge listing={l}/>
+          {daysCompact && l.days_listed > 0 && (
+            <span className={`mobile-list-row__days tone-${daysListedTone(l.days_listed)}`}>
+              {daysCompact}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mobile-list-row__heart" onClick={(e) => e.stopPropagation()}>
+        <HeartButton listingId={l.id} app={app} variant="inline" size={16}/>
+      </div>
+    </article>
+  );
+}
+
 function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   const headerSortable = (key, label) => {
     const map = { price: "price_asc", days: "days_asc", size: "size_desc", ppm: "ppm_asc" };
@@ -1772,6 +1869,16 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   };
   return (
     <div className="results-table-wrap">
+      <div className="results-mobile-list" aria-label={t("view.table", app.locale)}>
+        {results.map(l => (
+          <MobileListRow
+            key={l.id}
+            listing={l}
+            app={app}
+            topRank={topRankMap ? topRankMap.get(l.id) : null}
+          />
+        ))}
+      </div>
       <table className="results-table">
         <thead>
           <tr>
@@ -1791,31 +1898,7 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
           {results.map(l => (
             <tr key={l.id} onClick={() => app.openListing(l.id)}>
               <td className="thumb-cell">
-                {(() => {
-                  const _thumbUrl = l.thumbnail_url ?? l.photos[0];
-                  if (!_thumbUrl) return <div className="thumb-placeholder"/>;
-                  return (
-                    <img
-                      src={_thumbUrl}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      width={56}
-                      height={56}
-                      onError={() => {
-                        try {
-                          track("image.error", {
-                            url: String(_thumbUrl).slice(0, 200),
-                            listing_id: l.id,
-                            idx: 0,
-                            source: "browse_table",
-                            is_local: String(_thumbUrl).startsWith("/photos/"),
-                          });
-                        } catch { /* never let telemetry break the render */ }
-                      }}
-                    />
-                  );
-                })()}
+                <Photo listing={listingForCompactPhoto(l)} thumbnail ratio="1/1" className="results-table-thumb" source="browse_table" />
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
@@ -3097,6 +3180,19 @@ function ToastHost({ app }) {
 // the PostHog stream stays consumable.
 const SEARCH_SUGGEST_LISTBOX_ID = "browse-search-suggest";
 
+function AutocompleteThumb({ listing }) {
+  return (
+    <Photo
+      listing={listingForSuggestionThumb(listing)}
+      thumbnail
+      ratio="1/1"
+      className="browse-search__suggest-thumb"
+      lazy={false}
+      source="browse_autocomplete"
+    />
+  );
+}
+
 function BrowseSearchBar({ value, onChange, resultCount, locale, listings, filters, onApplyFilters }) {
   const lc = locale || currentLocale();
   // Local input mirrors `value` (the URL/filter state) so paint stays
@@ -3256,8 +3352,8 @@ function BrowseSearchBar({ value, onChange, resultCount, locale, listings, filte
               onMouseEnter={() => setActiveIndex(i)}
               onClick={() => selectSuggestion(s)}
             >
-              {s.kind === "title" && s.thumb ? (
-                <img className="browse-search__suggest-thumb" src={s.thumb} alt="" loading="lazy" />
+              {s.kind === "title" ? (
+                <AutocompleteThumb listing={s.listing} />
               ) : (
                 <span className="browse-search__suggest-icon">
                   <Icon name={kindIcon[s.kind]} size={14} />

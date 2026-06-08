@@ -27,6 +27,20 @@ test.describe("Browse map view", () => {
     // Leaflet mounts + at least one cluster or pin renders.
     await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
     await page.locator(".pulpo-cluster, .pulpo-pin").first().waitFor({ state: "visible", timeout: 10_000 });
+    const clusterCount = page.locator(".pulpo-cluster__count").first();
+    await expect(clusterCount).toBeVisible();
+    const clusterAlignment = await clusterCount.evaluate((countEl) => {
+      const clusterEl = countEl.closest(".pulpo-cluster");
+      if (!clusterEl) return null;
+      const count = countEl.getBoundingClientRect();
+      const cluster = clusterEl.getBoundingClientRect();
+      return {
+        dx: Math.abs(count.left + count.width / 2 - (cluster.left + cluster.width / 2)),
+        dy: Math.abs(count.top + count.height / 2 - (cluster.top + cluster.height / 2)),
+      };
+    });
+    expect(clusterAlignment?.dx ?? 999, "cluster count x-center").toBeLessThanOrEqual(1);
+    expect(clusterAlignment?.dy ?? 999, "cluster count y-center").toBeLessThanOrEqual(1);
 
     // Honesty affordances: "X of Y mapped" count + "approximate" legend.
     await expect(page.locator(".map-view__count")).toContainText(/of .* listings mapped/);
