@@ -587,6 +587,8 @@ const UI_STRINGS = {
   "map.search_as_i_move":        { en: "Search as I move", es: "Buscar al mover" },
   "map.search_as_i_move.aria":   { en: "Search as I move the map",
                                    es: "Buscar mientras muevo el mapa" },
+  "map.sheet.handle_aria":       { en: "Drag to expand the listings",
+                                   es: "Arrastra para ver las propiedades" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
