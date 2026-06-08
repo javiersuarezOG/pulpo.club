@@ -6,10 +6,63 @@ so tests don't depend on the live web/data/ranked.json snapshot.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from automation.newsletter.store import email_hash
 from automation.newsletter.types import Preference, Recipient
+
+
+@pytest.fixture(autouse=True)
+def _news_spotlight_artifact(tmp_path_factory, monkeypatch):
+    """Point the news-spotlight store at a deterministic temp artifact for
+    every newsletter test, and clear the per-process build cache.
+
+    Decouples build_issue / render tests from the committed
+    web/data/news_spotlight.json: they read THIS fixture's en + es entries,
+    so the "Weekly News Spotlight" block renders predictably. Tests that
+    need a missing/empty artifact override PULPO_NEWS_SPOTLIGHT_PATH (env)
+    or pass an explicit ``path=`` to news_store directly.
+    """
+    import importlib
+    import sys
+
+    # The package re-exports the build_issue *function*, shadowing the
+    # submodule attribute — reach the module via sys.modules.
+    importlib.import_module("automation.newsletter.build_issue")
+    _bi = sys.modules["automation.newsletter.build_issue"]
+
+    _bi._NEWS_SPOTLIGHT_CACHE.clear()
+
+    en_entry = {
+        "title": "New coastal road reaches El Zonte",
+        "paragraph": "The widened stretch trims the airport drive, which "
+                     "matters if you're weighing a lot on the western coast.",
+        "source_name": "La Prensa Gráfica",
+        "source_url": "https://www.laprensagrafica.com/elsalvador/test-fixture-article",
+        "source_date": "1 Jun 2026",
+        "candidates_seen": 9,
+        "llm_cost_usd": 0.003,
+        "picked_at": "2026-06-01",
+    }
+    es_entry = {
+        **en_entry,
+        "title": "Nueva carretera costera llega a El Zonte",
+        "paragraph": "El tramo ampliado recorta el viaje al aeropuerto, lo "
+                     "cual importa si estás evaluando un lote en la costa oeste.",
+        "source_date": "1 jun 2026",
+    }
+    art = tmp_path_factory.mktemp("news_spotlight") / "news_spotlight.json"
+    art.write_text(
+        json.dumps({"en": en_entry, "es": es_entry}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("PULPO_NEWS_SPOTLIGHT_PATH", str(art))
+
+    yield
+
+    _bi._NEWS_SPOTLIGHT_CACHE.clear()
 
 
 def _listing(
