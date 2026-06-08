@@ -12,13 +12,20 @@
 // match every listing (the search is treated as off).
 //
 // Fields included (order doesn't matter — substring on the union):
-//   id                  — Pulpo composite "<source>__<source_id>"
-//   source_id           — raw broker id (paste-from-listing-card)
-//   source_label        — pretty broker name ("RE/MAX", "Goodlife")
-//   zone_name           — pretty zone label ("Playa El Tunco")
-//   province_state      — region label
-//   title.en / title.es — both locales so cross-locale search works
-//   original_url        — broker URL (with ?referer= etc. still intact)
+//   id                        — Pulpo composite "<source>__<source_id>"
+//   source_id                 — raw broker id (paste-from-listing-card)
+//   source_label              — pretty broker name ("RE/MAX", "Goodlife")
+//   zone_name                 — pretty zone label ("Playa El Tunco")
+//   province_state            — region label
+//   title.en / title.es       — both locales so cross-locale search works
+//   description.en / .es      — NLP-enriched prose (PR-4): recall for
+//                               phrases like "titled deed", "river frontage"
+//   usps[].en / usps[].es     — the bullet selling points (PR-4)
+//   original_url              — broker URL (with ?referer= etc. still intact)
+//
+// description + usps are weighted lowest (source-tier) so a prose hit
+// never outranks a title or zone hit — they add recall, not noise, since
+// id/url tokens are numeric/ASCII and won't collide with prose.
 //
 // Capped at 200 chars on the URL-read side. Empty array of tokens
 // means no-op match-all. ASCII-folding (Configurable) so that
@@ -76,6 +83,14 @@ function haystackFields(
     { weight: FIELD_WEIGHTS.source, text: listing.source_id },
     { weight: FIELD_WEIGHTS.source, text: listing.source_label },
     { weight: FIELD_WEIGHTS.source, text: listing.original_url },
+    // PR-4 — prose recall, weighted lowest so it never outranks a title
+    // or zone hit. usps is an array of Localized; flatten both locales.
+    { weight: FIELD_WEIGHTS.source, text: listing.description?.en },
+    { weight: FIELD_WEIGHTS.source, text: listing.description?.es },
+    ...(Array.isArray(listing.usps) ? listing.usps : []).flatMap((u) => [
+      { weight: FIELD_WEIGHTS.source, text: u?.en },
+      { weight: FIELD_WEIGHTS.source, text: u?.es },
+    ]),
   ];
 }
 
