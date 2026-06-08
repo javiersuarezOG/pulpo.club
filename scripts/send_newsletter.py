@@ -38,6 +38,7 @@ from automation.newsletter import (                                        # noq
     build_issue,
     render_html,
 )
+from automation.newsletter.templates import TEMPLATES                      # noqa: E402
 from automation.newsletter.issue_state import next_issue_number            # noqa: E402
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
@@ -100,6 +101,54 @@ def _run_welcome(args) -> int:
     return 0
 
 
+def _run_free_welcome(args) -> int:
+    """Free welcome / welcome-back route. DB-free + Clerk-free dispatch
+    (free subscribers can be anonymous). Same exit-code contract as
+    _run_welcome. The CLI/admin surface forces the send (is_new_contact +
+    force) so an operator can always render a test; the production trigger
+    decides idempotency from the Resend new-contact signal."""
+    from automation.newsletter.free_welcome_dispatch import dispatch_free_welcome  # noqa: PLC0415
+
+    if not args.welcome_single_email:
+        print(
+            f"[send] --newsletter={args.newsletter} requires "
+            "--welcome-single-email <email>",
+            file=sys.stderr,
+        )
+        return 2
+    if args.only_email or args.preview_cohorts or args.allow_all_subscribers:
+        print(
+            "[send] --welcome-single-email is mutually exclusive with "
+            "--only-email / --preview-cohorts / --allow-all-subscribers",
+            file=sys.stderr,
+        )
+        return 2
+
+    email = args.welcome_single_email.strip().lower()
+    variant = ("free_welcome_back" if args.newsletter == "pulpo-free-welcome-back"
+               else "free_welcome")
+    locale = getattr(args, "welcome_locale", None) or "en"
+    print(f"[free-welcome] dispatching email={email} source={args.welcome_source} "
+          f"variant={variant} locale={locale}")
+    result = dispatch_free_welcome(
+        email=email,
+        variant=variant,
+        locale=locale,
+        source=args.welcome_source,
+        ranked_path=args.ranked,
+        is_new_contact=True,
+        force=args.welcome_force,
+    )
+    print(
+        f"[free-welcome] status={result.status} reason={result.reason or '-'} "
+        f"message_id={result.message_id or '-'} dry_run={result.dry_run} "
+        f"latency_ms={result.latency_ms}"
+    )
+    if result.status == "failed":
+        return 1
+    return 0
+
+
 def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
     # Tag-style subject: "{Brand} {Tier} · Issue NN". The brand-only
     # prefix was redundant with the From column ("Pulpo · ...") so we
@@ -123,14 +172,17 @@ def main() -> int:
     p.add_argument(
         "--newsletter",
         default="pulpo-pro-general",
-        choices=("pulpo-pro-general", "pulpo-pro-welcome"),
+        choices=("pulpo-pro-general", "pulpo-pro-welcome", "pulpo-free-general",
+                 "pulpo-free-welcome", "pulpo-free-welcome-back"),
         help=(
             "Which template to route this run through. Default is the "
-            "weekly digest (`pulpo-pro-general`). `pulpo-pro-welcome` is "
-            "the one-shot welcome — REQUIRES --welcome-single-email and "
-            "no other audience flag. The two paths share send.py + the "
-            "Resend send mechanics but the audience and idempotency model "
-            "differ entirely."
+            "weekly digest (`pulpo-pro-general`). `pulpo-free-general` is "
+            "the free-tier weekly. `pulpo-free-welcome` / "
+            "`pulpo-free-welcome-back` are the free one-shot onboarding "
+            "emails (DB-free + Clerk-free dispatch) — REQUIRE "
+            "--welcome-single-email. `pulpo-pro-welcome` is the Pro "
+            "one-shot welcome. All paths share send.py + the Resend send "
+            "mechanics but the audience and idempotency model differ."
         ),
     )
     p.add_argument(
@@ -249,6 +301,17 @@ def main() -> int:
         ),
     )
     p.add_argument(
+        "--free-audience",
+        action="store_true",
+        help=(
+            "Build the FREE-tier audience instead of the Pro one: free "
+            "Clerk users + anonymous Resend contacts, with Pro/Agency "
+            "EXCLUDED. Pair with `--newsletter pulpo-free-general` for the "
+            "free weekly. Staged: the Sunday cron stays Pro-only; this is "
+            "run via workflow_dispatch and is dry-run unless send_mode=yes."
+        ),
+    )
+    p.add_argument(
         "--limit",
         type=int,
         default=None,
@@ -269,6 +332,8 @@ def main() -> int:
     # touching ranked.json twice.
     if args.newsletter == "pulpo-pro-welcome":
         return _run_welcome(args)
+    if args.newsletter in ("pulpo-free-welcome", "pulpo-free-welcome-back"):
+        return _run_free_welcome(args)
 
     ranked_path = Path(args.ranked)
     if not ranked_path.exists():
@@ -301,10 +366,13 @@ def main() -> int:
             # non-Pro recipients are in this run. PR review + post-mortem
             # should grep for this exact string.
             print("[send] ⚠️  --allow-all-subscribers ON — Pro/Agency gate BYPASSED")
+        if args.free_audience:
+            print("[send] FREE AUDIENCE — free Clerk users + anonymous contacts; Pro/Agency excluded")
         queue = build_recipient_queue(
             only_emails=only,
             include_unsubscribed=args.include_unsubscribed,
             allow_non_pro=args.allow_all_subscribers,
+            free_only=args.free_audience,
         )
     if args.limit:
         queue = queue[: args.limit]
@@ -361,7 +429,13 @@ def main() -> int:
             issue_date=issue_date,
             history_rows=None,
         )
-        html = render_html(issue)
+        # Route the render through the templates registry so
+        # `--newsletter pulpo-free-general` produces the free-tier weekly
+        # (plain masthead, "Sign up to Pro" on ranks 04-10, Pro-locked
+        # spotlight). Default + any unknown id falls back to the Pro
+        # General master, preserving the prior behaviour.
+        _render = TEMPLATES.get(args.newsletter) or render_html
+        html = _render(issue)
         subject = _subject_for(issue, recipient.locale, preview=preview_mode)
 
         if out_dir:
