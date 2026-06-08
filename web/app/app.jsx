@@ -1230,6 +1230,15 @@ function App() {
       : undefined;
     const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
+      // Two-state model: /saved (Favorites) is a Pro feature. A non-paid
+      // visitor clicking it should be sold Pro, not shown a "welcome back"
+      // login — they're a prospect, not a returning member. /account keeps
+      // the login modal (returning members manage billing/resubscribe; the
+      // header also carries a sign-in entry).
+      if (route === "saved") {
+        setFreeMonthModal({ trigger: "favorites_action" });
+        return;
+      }
       // Already in a signup/login flow? Don't re-fire.
       if (signupModal && (signupModal.mode === "login" || signupModal.mode === "signup")) {
         return;
