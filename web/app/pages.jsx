@@ -3208,6 +3208,45 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
     return candidates[0] || null;
   }, [filters, listings]);
 
+  // PR-3 — query-specific empty state. When a search query is active and
+  // nothing matched, echo the query (via t(), plain text) and offer
+  // category-pill shortcuts that clear the query and apply a preset.
+  // Distinct from the filter-based empty state below.
+  const queryActive = filters && tokenize(filters.query).length > 0;
+  if (queryActive) {
+    const q = (filters.query || "").slice(0, 200);
+    const PILLS = [
+      { key: "beachfront", labelKey: "browse.search.pill.beachfront" },
+      { key: "under_100k", labelKey: "browse.search.pill.under_100k" },
+      { key: "new_this_week", labelKey: "browse.search.pill.new_this_week" },
+      { key: "price_drops", labelKey: "browse.search.pill.price_drops" },
+      { key: "build_ready", labelKey: "browse.search.pill.build_ready" },
+    ];
+    return (
+      <div className="empty-state">
+        <div className="empty-illus" aria-hidden="true">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="35" cy="35" r="20" stroke="var(--ink-3)" strokeWidth="2"/>
+            <line x1="50" y1="50" x2="65" y2="65" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <h3>{t("browse.search.no_results", lc, { q })}</h3>
+        <p>{t("browse.search.no_results.try", lc)}</p>
+        <div className="empty-pills">
+          {PILLS.map((p) => (
+            <button
+              key={p.key}
+              className="empty-pill"
+              onClick={() => setFilters && setFilters(buildFiltersForCategory(p.key))}
+            >
+              {t(p.labelKey, lc)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="empty-state">
       <div className="empty-illus" aria-hidden="true">

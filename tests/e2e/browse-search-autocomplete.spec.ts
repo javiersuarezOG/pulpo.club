@@ -48,6 +48,28 @@ test.describe("Browse search autocomplete", () => {
     expect(errors, "console errors during autocomplete interaction").toEqual([]);
   });
 
+  test("a no-match query shows the query-specific empty state + category pills", async ({ page }) => {
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    const search = page.locator(".browse-search__input");
+    await search.waitFor({ state: "visible", timeout: 10_000 });
+
+    // Gibberish that matches no listing → query-specific empty state.
+    await search.fill("zzzqqqxyz");
+    const empty = page.locator(".empty-state");
+    await empty.waitFor({ state: "visible", timeout: 5_000 });
+    await expect(empty).toContainText("zzzqqqxyz");
+
+    // At least three category-pill shortcuts.
+    const pills = page.locator(".empty-pill");
+    expect(await pills.count()).toBeGreaterThanOrEqual(3);
+
+    // Clicking a pill clears the query (?q= gone) and surfaces results.
+    await pills.first().click();
+    await page.waitForFunction(() => !/[?&]q=/.test(window.location.search), { timeout: 3_000 });
+    await expect(search).toHaveJSProperty("value", "");
+    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 5_000 });
+  });
+
   test("Escape dismisses the dropdown before clearing the query", async ({ page }) => {
     await page.goto("/browse", { waitUntil: "networkidle" });
     const search = page.locator(".browse-search__input");

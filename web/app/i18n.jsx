@@ -608,6 +608,23 @@ const UI_STRINGS = {
   "browse.search.suggest.count":
     { en: "{n} listings",
       es: "{n} propiedades" },
+  // No-results-for-query empty state (PR-3) + category-pill shortcuts.
+  "browse.search.no_results":
+    { en: "No listings matched “{q}”.",
+      es: "Ninguna propiedad coincide con “{q}”." },
+  "browse.search.no_results.try":
+    { en: "Try a category:",
+      es: "Prueba una categoría:" },
+  "browse.search.pill.beachfront":
+    { en: "Beachfront",        es: "Frente al mar" },
+  "browse.search.pill.under_100k":
+    { en: "Under $100k",       es: "Menos de $100k" },
+  "browse.search.pill.new_this_week":
+    { en: "New this week",     es: "Nuevas esta semana" },
+  "browse.search.pill.price_drops":
+    { en: "Price drops",       es: "Rebajas de precio" },
+  "browse.search.pill.build_ready":
+    { en: "Build-ready",       es: "Listo para construir" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /
