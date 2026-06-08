@@ -25,6 +25,8 @@ import {
   readFilterFromURL,
   readSortFromURL,
   readViewFromURL,
+  readBboxFromURL,
+  writeBboxToURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import {
@@ -1151,6 +1153,15 @@ function BrowsePage({ app }) {
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
 
+  // PR-9/WS4 — map split-pane sync + "search as I move".
+  const [hoveredId, setHoveredId] = pUseState(null);
+  const [searchAsIMove, setSearchAsIMove] = pUseState(true);
+  const [mapBbox, setMapBbox] = pUseState(() =>
+    typeof window !== "undefined" ? readBboxFromURL(window.location.search) : null,
+  );
+  const hoverSourceRef = pUseRef(null); // "card" | "map" — gates scroll-into-view
+  const cardPanelRef = pUseRef(null);
+
   // Share-pin state — recipient landed via /l/<token> OR the canonical
   // /browse?pin=<token> share URL. We seed from ?pin so the pinned card
   // renders at the top of the grid with a "Shared with you" tag.
@@ -1195,6 +1206,7 @@ function BrowsePage({ app }) {
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
       setView(readViewFromURL(window.location.search, localStorage.getItem("pulpo-view") || "cards"));
+      setMapBbox(readBboxFromURL(window.location.search));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
     window.addEventListener("popstate", onPop);
@@ -1341,6 +1353,45 @@ function BrowsePage({ app }) {
     if (branch === "passthrough") { app.openListing(id); return; }
     void dispatchCentralBranch(branch, app, { trigger: "map_pin", pendingListing: id });
   }, [app]);
+
+  // PR-9 — "search as I move" narrows the map + card panel to the
+  // viewport, CLIENT-SIDE (every listing is already in the browser).
+  // Map-branch-only post-filter — never touches applyFilters, so the
+  // cards/table views are unaffected.
+  const mapResults = pUseMemo(() => {
+    if (view !== "map" || !searchAsIMove || !mapBbox) return results;
+    return results.filter(
+      (l) =>
+        l.lat != null && l.lng != null &&
+        l.lat >= mapBbox.minLat && l.lat <= mapBbox.maxLat &&
+        l.lng >= mapBbox.minLng && l.lng <= mapBbox.maxLng,
+    );
+  }, [results, view, searchAsIMove, mapBbox]);
+
+  const handleMapBounds = pUseCallback((bbox) => {
+    setMapBbox(bbox);
+    writeBboxToURL(bbox);
+  }, []);
+  const handleToggleSearchAsIMove = pUseCallback((on) => {
+    setSearchAsIMove(on);
+    if (!on) { setMapBbox(null); writeBboxToURL(null); }
+  }, []);
+  const handleMarkerHover = pUseCallback((id) => { hoverSourceRef.current = "map"; setHoveredId(id); }, []);
+  const handleCardHover = pUseCallback((id) => { hoverSourceRef.current = "card"; setHoveredId(id); }, []);
+
+  // Marker-hover → scroll the matching card into the panel (only when
+  // the hover originated on the map, so card-hover doesn't self-scroll).
+  pUseEffect(() => {
+    if (view !== "map" || hoverSourceRef.current !== "map" || !hoveredId) return;
+    const panel = cardPanelRef.current;
+    const card = panel && panel.querySelector(`[data-listing-id="${(window.CSS && CSS.escape) ? CSS.escape(hoveredId) : hoveredId}"]`);
+    if (card) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [hoveredId, view]);
+
+  // bbox is map-only — clear it (and the URL param) when leaving map view.
+  pUseEffect(() => {
+    if (view !== "map" && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+  }, [view]);
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1567,9 +1618,34 @@ function BrowsePage({ app }) {
               setFilters={setFiltersWithPinClear}
             />
           ) : view === "map" ? (
-            <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
-              <LazyMapView results={results} app={app} onOpenListing={handleMapOpenListing} />
-            </React.Suspense>
+            <div className="map-split">
+              <div className="map-split__cards" ref={cardPanelRef}>
+                {mapResults.map((l) => (
+                  <ListingCard
+                    key={l.id}
+                    listing={l}
+                    app={app}
+                    compact
+                    source="map"
+                    highlighted={l.id === hoveredId}
+                    onHover={handleCardHover}
+                    onOpen={() => handleMapOpenListing(l.id)}
+                  />
+                ))}
+              </div>
+              <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
+                <LazyMapView
+                  results={mapResults}
+                  app={app}
+                  onOpenListing={handleMapOpenListing}
+                  hoveredId={hoveredId}
+                  onHoverMarker={handleMarkerHover}
+                  onBoundsChange={handleMapBounds}
+                  searchAsIMove={searchAsIMove}
+                  onToggleSearchAsIMove={handleToggleSearchAsIMove}
+                />
+              </React.Suspense>
+            </div>
           ) : view === "cards" ? (
             <>
               <div className="card-grid">

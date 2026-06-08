@@ -9,6 +9,7 @@ import {
   readFilterFromURL,
   readSortFromURL,
   readViewFromURL,
+  readBboxFromURL,
   type FilterShape,
 } from "./filter-url";
 
@@ -105,5 +106,36 @@ describe("URL param coexistence (cat + sort + q + filters + view)", () => {
     const search = "?q=beachfront";
     expect(readFilterFromURL(search, baseFilters()).query).toBe("beachfront");
     expect(readViewFromURL(search, "cards")).toBe("cards");
+  });
+});
+
+describe("readBboxFromURL (PR-9)", () => {
+  it("parses a valid 4-dp bbox", () => {
+    expect(readBboxFromURL("?bbox=13.1000,-89.5000,13.9000,-88.1000")).toEqual({
+      minLat: 13.1, minLng: -89.5, maxLat: 13.9, maxLng: -88.1,
+    });
+  });
+
+  it("returns null for missing / malformed / inverted bbox", () => {
+    expect(readBboxFromURL("")).toBeNull();
+    expect(readBboxFromURL("?bbox=1,2,3")).toBeNull(); // too few parts
+    expect(readBboxFromURL("?bbox=a,b,c,d")).toBeNull(); // non-numeric
+    expect(readBboxFromURL("?bbox=14,2,13,3")).toBeNull(); // minLat > maxLat
+  });
+
+  it("is not a filter key (bare ?bbox doesn't trigger the filter seed)", () => {
+    expect(hasFilterParamsInURL("?bbox=13.1,-89.5,13.9,-88.1")).toBe(false);
+    expect(FILTER_URL_KEYS).not.toContain("bbox");
+  });
+
+  it("coexists with cat + sort + q + filters + view (full WS4 URL)", () => {
+    const search =
+      "?cat=beach&sort=price_asc&q=tunco&pmax=100000&zones=El%20Tunco&view=map&bbox=13.1000,-89.5000,13.9000,-88.1000";
+    const f = readFilterFromURL(search, baseFilters());
+    expect(f.price_max).toBe(100000);
+    expect(f.query).toBe("tunco");
+    expect(readSortFromURL(search, "recent")).toBe("price_asc");
+    expect(readViewFromURL(search, "cards")).toBe("map");
+    expect(readBboxFromURL(search)).toEqual({ minLat: 13.1, minLng: -89.5, maxLat: 13.9, maxLng: -88.1 });
   });
 });

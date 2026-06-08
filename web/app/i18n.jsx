@@ -584,6 +584,9 @@ const UI_STRINGS = {
   "map.popup.approx_location":   { en: "Approximate location",
                                    es: "Ubicación aproximada" },
   "map.popup.view_listing":      { en: "View listing →", es: "Ver propiedad →" },
+  "map.search_as_i_move":        { en: "Search as I move", es: "Buscar al mover" },
+  "map.search_as_i_move.aria":   { en: "Search as I move the map",
+                                   es: "Buscar mientras muevo el mapa" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },

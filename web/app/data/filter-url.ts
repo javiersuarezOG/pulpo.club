@@ -185,6 +185,34 @@ export function readViewFromURL(search: string, fallback: string): string {
   return v && VALID_VIEWS.has(v) ? v : fallback;
 }
 
+// Map viewport bbox — "minLat,minLng,maxLat,maxLng" (4 dp). Only set in
+// map view with "search as I move" on, so the viewport is shareable.
+// Like `view`, kept out of FILTER_URL_KEYS (it's not a "what to find"
+// axis). Malformed values parse to null rather than throwing.
+export type Bbox = { minLat: number; minLng: number; maxLat: number; maxLng: number };
+
+export function readBboxFromURL(search: string): Bbox | null {
+  const raw = new URLSearchParams(search).get("bbox");
+  if (!raw) return null;
+  const parts = raw.split(",").map((s) => Number(s));
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return null;
+  const [minLat, minLng, maxLat, maxLng] = parts;
+  if (minLat > maxLat || minLng > maxLng) return null;
+  return { minLat, minLng, maxLat, maxLng };
+}
+
+export function writeBboxToURL(bbox: Bbox | null, history: History = window.history) {
+  const p = new URLSearchParams(window.location.search);
+  if (bbox) {
+    const r = (n: number) => n.toFixed(4);
+    p.set("bbox", `${r(bbox.minLat)},${r(bbox.minLng)},${r(bbox.maxLat)},${r(bbox.maxLng)}`);
+  } else {
+    p.delete("bbox");
+  }
+  const qs = p.toString();
+  history.replaceState({}, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+}
+
 export function writeFilterToURL(
   filters: FilterShape,
   category: string | null,
