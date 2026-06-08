@@ -31,6 +31,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable
 
+from automation.country_sidecars import write_json_sidecar
+
 
 CONTRACT_FILENAME = "photo_contract.json"
 LOG_FILENAME = "photo_contract_log.jsonl"
@@ -235,7 +237,6 @@ def enforce_photo_contract(
 
     if write_sidecars and data_dir is not None:
         out = data_dir / CONTRACT_FILENAME
-        out.write_text(json.dumps(stats.to_dict(), indent=2) + "\n",
-                       encoding="utf-8")
+        write_json_sidecar(out, stats.to_dict(), indent=2, sort_keys=False)
 
     return stats

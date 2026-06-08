@@ -151,6 +151,8 @@ export interface Listing {
      *  nightly pipeline; consumers include the ranker (PR-S4c flag)
      *  and the operator dashboard. */
     existence_status: string | null;
+    last_seen_at: string | null;       // ISO8601 UTC, from existence ledger
+    missing_since: string | null;      // ISO8601 UTC when absence streak began
 
     // ── Broker ──────────────────────────────────────────────────────
     broker_name: string | null;

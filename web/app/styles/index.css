@@ -875,6 +875,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .card-signal-chip svg { width: 12px; height: 12px; }
 .card-signal-chip-drop { color: var(--badge-drop); }
 .card-signal-chip-new  { color: var(--badge-new); }
+.card-signal-chip-stale { color: var(--badge-stale); }
 /* Share-pin tag — reuses the white-pill design system but anchors
    top-left so it doesn't collide with the new/drop signal chip at
    bottom-left and so the "this is the listing your friend shared"

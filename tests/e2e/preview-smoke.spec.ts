@@ -486,6 +486,7 @@ test.describe("New app boots cleanly on key routes", () => {
     const ENGLISH_CANARIES = [
       "Paved", "Gravel", "Dirt",                      // road_access_type enum (the report)
       "On beach", "Walk to beach", "Near beach",      // beachfront_tier enum
+      "Recently missing",                             // badge.stale (carry-forward stale chip)
       "Back to results",                              // detail-panel back link
       "Save listing", "Remove from saved",            // heart-button aria
       "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)

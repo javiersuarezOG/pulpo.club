@@ -2162,6 +2162,60 @@ def main() -> int:
     _download_hires_photos(ranked_pre, REPO)
     ranked = ranked_pre
 
+    # P0/P2 inventory-resilience invariant: write a fresh-only snapshot
+    # before any carry-forward merge. The pre-commit row-count gate reads
+    # this file when present so stale carry-forward cannot mask a source
+    # delta. The file is intentionally not staged by the workflow.
+    try:
+        _atomic_write_json(
+            web_data_dir / "ranked.fresh.json",
+            [li.to_dict() for li in ranked_pre],
+        )
+    except Exception as _e:  # noqa: BLE001
+        print(f"[carry_forward] fresh snapshot failed (non-fatal): {_e!r}")
+
+    try:
+        from automation.carry_forward import (
+            load_previous_ranked_from_git,
+            merge_carry_forward,
+            preview_carry_forward_count,
+        )
+        from automation.listing_ledger import load_ledger as _cf_load_ledger
+        failed_sources_for_carry = {
+            src.strip()
+            for src in sources
+            if src.strip()
+            and (src.strip() in source_errors or per_source_count.get(src.strip(), 0) == 0)
+        }
+        previous_ranked = load_previous_ranked_from_git(REPO)
+        cf_ledger = _cf_load_ledger(web_data_dir / "listings_ledger.json")
+        if not previous_ranked:
+            print("[carry_forward] no origin/main ranked.json available — carry_count=0")
+        if _env_bool("PULPO_CARRY_FORWARD", False):
+            ranked, cf_metrics = merge_carry_forward(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] enabled carried={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+        else:
+            cf_metrics = preview_carry_forward_count(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] disabled would_carry={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[carry_forward] failed (non-fatal): {_e!r}")
+
     # PRD P1-2 — enforce the card-photo contract: every listing whose
     # `hero_photo_path` is set must point at a present root file. The
     # audit found 884/959 stale references after the prune sweep

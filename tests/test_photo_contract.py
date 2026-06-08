@@ -83,6 +83,21 @@ def test_writes_sidecar_and_audit_log(tmp_path):
     assert log_rows[0]["source_id"] == "x"
 
 
+def test_writes_country_specific_photo_contract_sidecar(tmp_path):
+    photos_dir = tmp_path / "photos"
+    data_dir = tmp_path / "data"
+    photos_dir.mkdir()
+
+    l1 = _FakeListing(source_id="x", hero_photo_path="/photos/essurf_x.jpg")
+    enforce_photo_contract([l1], photos_dir, data_dir=data_dir)
+
+    legacy = data_dir / "photo_contract.json"
+    country = data_dir / "photo_contract.SV.json"
+    assert legacy.exists()
+    assert country.exists()
+    assert json.loads(legacy.read_text()) == json.loads(country.read_text())
+
+
 def test_audit_log_is_append_only(tmp_path):
     """Two consecutive nightlies must keep both rows so dashboards can
     bucket by run."""

@@ -156,6 +156,8 @@ class Listing:
     # Stamped by automation/run.py's ledger-update block; None when the
     # ledger hasn't been computed yet (e.g. legacy fixtures, smoke tests).
     existence_status: Optional[str] = None
+    last_seen_at: Optional[str] = None
+    missing_since: Optional[str] = None
 
     # Broker
     broker_name: Optional[str] = None

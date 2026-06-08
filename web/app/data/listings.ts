@@ -332,6 +332,12 @@ export function adaptListing(raw: any): Listing {
       typeof raw.geocoding_reference === "string" && raw.geocoding_reference.trim().length > 0
         ? raw.geocoding_reference
         : null,
+    existence_status:
+      raw.existence_status === "confirmed_current" ||
+      raw.existence_status === "missing_recently" ||
+      raw.existence_status === "stale"
+        ? raw.existence_status
+        : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
     rank: typeof raw.rank === "number" ? raw.rank : null,
