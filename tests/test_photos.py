@@ -529,3 +529,99 @@ def test_storage_canary_fails_over_limit(tmp_repo):
     total = sum(f.stat().st_size for f in photos_dir.rglob("*.jpg") if "_archive" not in f.parts)
     mb = total / (1024 * 1024)
     assert mb > 100, f"Expected > 100 MB, got {mb:.2f} MB"
+
+
+# ── Archived-photo restore (PR-P0a) ─────────────────────────────────────
+
+def _load_restore_module():
+    """Import scripts/restore_archived_photos.py as a module."""
+    import importlib.util
+    path = REPO / "scripts" / "restore_archived_photos.py"
+    spec = importlib.util.spec_from_file_location("restore_archived_photos", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _seed_archive(photos_dir, date, base, *, content=b"jpg", siblings=True):
+    """Write a `<base>.jpg` (+ siblings) into _archive/<date>/."""
+    d = photos_dir / "_archive" / date
+    d.mkdir(parents=True, exist_ok=True)
+    (d / f"{base}.jpg").write_bytes(content)
+    if siblings:
+        (d / f"{base}.hero.jpg").write_bytes(content + b"-hero")
+        (d / f"{base}.jpg.meta.json").write_text("{}")
+        (d / f"{base}.hero.jpg.meta.json").write_text("{}")
+        (d / f"{base}.jpg.hash").write_text("deadbeef")
+
+
+def _write_ranked(tmp_repo, basenames):
+    ranked = [{"source": b.split("_")[0], "hero_photo_path": f"/photos/{b}.jpg"}
+              for b in basenames]
+    p = tmp_repo / "web" / "data" / "ranked.json"
+    p.write_text(json.dumps(ranked))
+    return p
+
+
+def _run_restore(mod, ranked, photos_dir, *extra):
+    """Invoke the script's main() with a controlled argv."""
+    import sys as _sys
+    argv = ["restore", "--ranked", str(ranked), "--photos-dir", str(photos_dir), *extra]
+    old = _sys.argv
+    _sys.argv = argv
+    try:
+        return mod.main()
+    finally:
+        _sys.argv = old
+
+
+def test_restore_picks_newest_dated_copy(tmp_repo):
+    """When the same basename exists under two dated archive dirs, the
+    newest dated copy is the one restored."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-05-01", "remax_001", content=b"OLD")
+    _seed_archive(photos_dir, "2026-06-08", "remax_001", content=b"NEW")
+    ranked = _write_ranked(tmp_repo, ["remax_001"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    assert (photos_dir / "remax_001.jpg").read_bytes() == b"NEW", \
+        "newest dated archive copy must win"
+
+
+def test_restore_brings_sibling_set(tmp_repo):
+    """All five sibling files are restored together."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-06-08", "goodlife_x")
+    ranked = _write_ranked(tmp_repo, ["goodlife_x"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    for suffix in (".jpg", ".hero.jpg", ".jpg.meta.json",
+                   ".hero.jpg.meta.json", ".jpg.hash"):
+        assert (photos_dir / f"goodlife_x{suffix}").exists(), f"missing {suffix}"
+
+
+def test_restore_is_idempotent_and_keeps_archive(tmp_repo):
+    """A second run is a no-op, and the archive copy is never removed."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-06-08", "essurf_5")
+    ranked = _write_ranked(tmp_repo, ["essurf_5"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    assert _run_restore(mod, ranked, photos_dir) == 0  # idempotent
+    assert (photos_dir / "essurf_5.jpg").exists()
+    assert (photos_dir / "_archive" / "2026-06-08" / "essurf_5.jpg").exists(), \
+        "archive must remain intact (copy, not move)"
+
+
+def test_restore_fails_when_top_listing_unrecoverable(tmp_repo):
+    """A top-N ranked listing with no archive copy → exit 1."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    ranked = _write_ranked(tmp_repo, ["nexo_missing", "remax_present"])
+    _seed_archive(photos_dir, "2026-06-08", "remax_present")
+
+    assert _run_restore(mod, ranked, photos_dir, "--top-required", "5") == 1, \
+        "unrecoverable top-N listing must fail the canary"
