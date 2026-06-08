@@ -37,7 +37,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
-import { tokenize, matchesQuery, scoreListing } from "./lib/search-match";
+import { tokenize, matchesQuery, scoreListing, buildSuggestions } from "./lib/search-match";
 import {
   Icon,
   RankTrophy,
@@ -1426,6 +1426,9 @@ function BrowsePage({ app }) {
             onChange={(next) => setFiltersWithPinClear({ ...filters, query: next })}
             resultCount={results.length}
             locale={app.locale}
+            listings={LISTINGS}
+            filters={filters}
+            onApplyFilters={setFiltersWithPinClear}
           />
           <div className="results-header">
             <div className="results-count">
@@ -2968,13 +2971,41 @@ function ToastHost({ app }) {
 // + scoring queued for PR-S2). Submit-side telemetry — we emit
 // `browse.search_submitted` on Enter / blur (not on every keystroke) so
 // the PostHog stream stays consumable.
-function BrowseSearchBar({ value, onChange, resultCount, locale }) {
+const SEARCH_SUGGEST_LISTBOX_ID = "browse-search-suggest";
+
+function BrowseSearchBar({ value, onChange, resultCount, locale, listings, filters, onApplyFilters }) {
   const lc = locale || currentLocale();
   // Local input mirrors `value` (the URL/filter state) so paint stays
   // synchronous with typing. Sync back to filters on every change — the
   // applyFilters debounce (300ms) handles the heavy work.
   const inputRef = pUseRef(null);
-  const handleChange = pUseCallback((e) => onChange(e.target.value), [onChange]);
+
+  // PR-2 — autocomplete dropdown. Suggestions (zones / land-types / up
+  // to 5 titles) are computed off a 150ms debounce of `value`. `closed`
+  // lets Escape / selection dismiss the panel without losing focus;
+  // typing reopens it. `open` is the render-time truth.
+  const [suggestions, setSuggestions] = pUseState([]);
+  const [activeIndex, setActiveIndex] = pUseState(-1);
+  const [hasFocus, setHasFocus] = pUseState(false);
+  const [closed, setClosed] = pUseState(false);
+  const open = hasFocus && !closed && suggestions.length > 0;
+
+  pUseEffect(() => {
+    const q = value || "";
+    if (q.trim().length < 2) { setSuggestions([]); return; }
+    const id = setTimeout(() => {
+      setSuggestions(buildSuggestions(q, listings, { max: 8, locale: lc, landTypeLabel }));
+    }, 150);
+    return () => clearTimeout(id);
+  }, [value, listings, lc]);
+
+  // Reset the keyboard cursor whenever the suggestion set changes.
+  pUseEffect(() => { setActiveIndex(-1); }, [suggestions]);
+
+  const handleChange = pUseCallback((e) => {
+    setClosed(false);
+    onChange(e.target.value);
+  }, [onChange]);
   // Submit telemetry — fires once per "intent." Pressing Enter while
   // typing counts as a submit; tabbing/blurring with a non-empty value
   // also counts. Avoids per-keystroke spam.
@@ -2990,20 +3021,63 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
       result_count: resultCount,
     });
   }, [value, resultCount]);
-  const handleKeyDown = pUseCallback((e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      emitSubmit();
-      inputRef.current?.blur();
-    } else if (e.key === "Escape" && value) {
-      e.preventDefault();
-      onChange("");
+
+  // Apply a suggestion: zone / land-type set a structured facet and
+  // clear the query; a title sets the query to the exact listing title.
+  const selectSuggestion = pUseCallback((s) => {
+    if (!s) return;
+    setClosed(true);
+    setActiveIndex(-1);
+    if (s.kind === "zone" && filters && onApplyFilters) {
+      const zones = new Set(filters.zones); zones.add(s.value);
+      onApplyFilters({ ...filters, zones, query: "" });
+      track("browse.search_suggest_selected", { kind: "zone" });
+    } else if (s.kind === "land_type" && filters && onApplyFilters) {
+      const land_types = new Set(filters.land_types); land_types.add(s.value);
+      onApplyFilters({ ...filters, land_types, query: "" });
+      track("browse.search_suggest_selected", { kind: "land_type" });
+    } else {
+      onChange(s.value);
+      track("browse.search_suggest_selected", { kind: "title" });
     }
-  }, [emitSubmit, onChange, value]);
+    inputRef.current?.blur();
+  }, [filters, onApplyFilters, onChange]);
+
+  const handleKeyDown = pUseCallback((e) => {
+    if (e.key === "ArrowDown" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (open && activeIndex >= 0) {
+        selectSuggestion(suggestions[activeIndex]);
+      } else {
+        emitSubmit();
+        inputRef.current?.blur();
+      }
+    } else if (e.key === "Escape") {
+      // Escape closes the panel first; a second press clears the query.
+      if (open) {
+        e.preventDefault();
+        setClosed(true);
+        setActiveIndex(-1);
+      } else if (value) {
+        e.preventDefault();
+        onChange("");
+      }
+    }
+  }, [open, suggestions, activeIndex, selectSuggestion, emitSubmit, onChange, value]);
+
   const handleClear = pUseCallback(() => {
     onChange("");
+    setClosed(false);
     inputRef.current?.focus();
   }, [onChange]);
+
+  const kindIcon = { zone: "map_pin", land_type: "sliders", title: "search" };
   return (
     <div className="browse-search">
       <Icon name="search" size={16} className="browse-search__icon" />
@@ -3014,9 +3088,15 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onBlur={emitSubmit}
+        onFocus={() => setHasFocus(true)}
+        onBlur={() => { setHasFocus(false); emitSubmit(); }}
         placeholder={t("browse.search.placeholder", lc)}
         aria-label={t("browse.search.aria_label", lc)}
+        role="combobox"
+        aria-expanded={open}
+        aria-controls={SEARCH_SUGGEST_LISTBOX_ID}
+        aria-autocomplete="list"
+        aria-activedescendant={open && activeIndex >= 0 ? `${SEARCH_SUGGEST_LISTBOX_ID}-opt-${activeIndex}` : undefined}
         maxLength={200}
         autoComplete="off"
         spellCheck={false}
@@ -3031,6 +3111,45 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
         >
           <Icon name="close" size={14} strokeWidth={2} />
         </button>
+      )}
+      {open && (
+        <ul
+          className="browse-search__suggest"
+          id={SEARCH_SUGGEST_LISTBOX_ID}
+          role="listbox"
+          aria-label={t("browse.search.suggest.aria", lc)}
+        >
+          {suggestions.map((s, i) => (
+            <li
+              key={`${s.kind}-${s.value}-${i}`}
+              id={`${SEARCH_SUGGEST_LISTBOX_ID}-opt-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              className={`browse-search__suggest-item${i === activeIndex ? " active" : ""}`}
+              // preventDefault on mousedown so the input doesn't blur
+              // (and close the panel) before the click selects the item.
+              onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => selectSuggestion(s)}
+            >
+              {s.kind === "title" && s.thumb ? (
+                <img className="browse-search__suggest-thumb" src={s.thumb} alt="" loading="lazy" />
+              ) : (
+                <span className="browse-search__suggest-icon">
+                  <Icon name={kindIcon[s.kind]} size={14} />
+                </span>
+              )}
+              <span className="browse-search__suggest-label">
+                {s.kind === "land_type" ? s.label : s.value}
+              </span>
+              {(s.kind === "zone" || s.kind === "land_type") && (
+                <span className="browse-search__suggest-meta">
+                  {t("browse.search.suggest.count", lc, { n: s.count })}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

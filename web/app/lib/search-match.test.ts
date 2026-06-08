@@ -8,7 +8,7 @@
 // province_state / title.en / title.es / original_url.
 
 import { describe, it, expect } from "vitest";
-import { tokenize, matchesQuery, matchesQueryString, scoreListing } from "./search-match";
+import { tokenize, matchesQuery, matchesQueryString, scoreListing, buildSuggestions } from "./search-match";
 import type { Listing } from "../data/types";
 
 function L(overrides: Partial<Listing>): Listing {
@@ -219,5 +219,57 @@ describe("scoreListing", () => {
     const stripped = L({ title: { en: "" } as Listing["title"], original_url: null, source_label: "" });
     expect(() => scoreListing(stripped, tokenize("tunco"))).not.toThrow();
     expect(scoreListing(stripped, tokenize("tunco"))).toBeGreaterThan(0);
+  });
+});
+
+describe("buildSuggestions", () => {
+  // A small mixed catalog: two El Tunco zones, one Mizata, mixed types.
+  const catalog: Listing[] = [
+    L({ id: "a__1", zone_name: "El Tunco", land_type: "residential", title: { en: "Tunco beach lot", es: "Lote playa Tunco" }, thumbnail_url: "https://x/a.jpg" }),
+    L({ id: "a__2", zone_name: "El Tunco", land_type: "tourist", title: { en: "Tunco hotel plot", es: "Hotel Tunco" } }),
+    L({ id: "a__3", zone_name: "El Tunco Norte", land_type: "residential", title: { en: "North Tunco parcel", es: "Parcela Tunco norte" } }),
+    L({ id: "a__4", zone_name: "Mizata", land_type: "commercial", title: { en: "Mizata point", es: "Punta Mizata" } }),
+  ];
+
+  it("returns [] below the 2-char gate", () => {
+    expect(buildSuggestions("t", catalog)).toEqual([]);
+    expect(buildSuggestions("", catalog)).toEqual([]);
+    expect(buildSuggestions(null, catalog)).toEqual([]);
+    expect(buildSuggestions("tu", null)).toEqual([]);
+  });
+
+  it("dedups zones and ranks them by listing count", () => {
+    const sugs = buildSuggestions("tunco", catalog, { max: 8 });
+    const zones = sugs.filter((s) => s.kind === "zone");
+    // "El Tunco" (2 listings) and "El Tunco Norte" (1) — deduped, El Tunco first.
+    expect(zones.map((z) => z.value)).toEqual(["El Tunco", "El Tunco Norte"]);
+    const elTunco = zones.find((z) => z.value === "El Tunco");
+    expect(elTunco && "count" in elTunco && elTunco.count).toBe(2);
+  });
+
+  it("matches land types via the injected localized label", () => {
+    const sugs = buildSuggestions("resid", catalog, {
+      landTypeLabel: (k) => (k === "residential" ? "Residential" : k),
+    });
+    const lt = sugs.find((s) => s.kind === "land_type");
+    expect(lt && lt.kind === "land_type" && lt.value).toBe("residential");
+  });
+
+  it("caps total at max and titles at 5", () => {
+    const many = Array.from({ length: 20 }, (_, i) =>
+      L({ id: `z__${i}`, zone_name: `Zone ${i}`, title: { en: `Tunco listing ${i}`, es: "" } }),
+    );
+    const sugs = buildSuggestions("tunco", many, { max: 8 });
+    expect(sugs.length).toBeLessThanOrEqual(8);
+    expect(sugs.filter((s) => s.kind === "title").length).toBeLessThanOrEqual(5);
+  });
+
+  it("title suggestions carry the locale-correct display + thumb", () => {
+    const sugs = buildSuggestions("tunco", catalog, { locale: "es", max: 8 });
+    const title = sugs.find((s) => s.kind === "title");
+    expect(title && title.kind === "title" && title.value.startsWith("Lote playa")).toBe(true);
+    // The first catalog entry carries a thumbnail.
+    const withThumb = sugs.find((s) => s.kind === "title" && s.thumb);
+    expect(withThumb).toBeTruthy();
   });
 });
