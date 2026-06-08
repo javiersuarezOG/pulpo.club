@@ -152,10 +152,16 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "yp.welcome.label":            {"en": "No filter set yet",                            "es": "Aún no configuraste tu filtro"},
     "yp.welcome.cta":              {"en": "Set your filter",                              "es": "Configurá tu filtro"},
     # ── Paywall (free tier) ──
+    # v1.1 (2026-06-07): rewritten for the free-general design. Free
+    # readers now see all 10 FULL picks (photo, title, price, why), so the
+    # old "you're seeing the public cut / photo and headline / eight times
+    # the depth" framing contradicted what's on screen. The honest upsell:
+    # you see the picks; Pro adds the address/broker/underwriting + the
+    # full news read. Banner only renders for the free cohort.
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
-    "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},
-    "paywall.body":                {"en": "Pulpo Pro lifts the curtain on every pick — address, broker contact, full underwriting, and the negotiation lever the seller doesn't know we know about. Same weekly cadence, eight times the depth.",
-                                     "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia semanal, ocho veces la profundidad."},
+    "paywall.headline":            {"en": "Pro goes deeper on every pick.",               "es": "Pro profundiza en cada selección."},
+    "paywall.body":                {"en": "You're seeing all 10 picks, ranked. Pulpo Pro adds what closes a deal — the address, the broker contact, the full underwriting, the negotiation lever the seller doesn't know we know about, plus the full read on this week's news. Same weekly cadence, the complete file.",
+                                     "es": "Estás viendo las 10 selecciones, clasificadas. Pulpo Pro suma lo que cierra un trato — la dirección, el contacto del corredor, el análisis completo, la palanca de negociación que el vendedor no sabe que conocemos, y el análisis completo de la noticia de la semana. Misma cadencia semanal, el archivo completo."},
     # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
     # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
     # $19/month which was stale drift — fixed in v2.2.
