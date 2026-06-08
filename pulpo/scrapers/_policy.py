@@ -108,10 +108,45 @@ POLICIES: dict[str, Policy] = {
     # CityMax: SSR-parse the Next.js Flight payload, 12 listings per page.
     # Public site so the safari_macos UA pool matches the typical visitor
     # fingerprint and avoids the bot-pool path.
+    #
+    # Transport switched to curl_cffi 2026-06-08 after the 2026-06-08
+    # nightly (run committed at 35338b1a0) had citymax + citymax_sc +
+    # vivolatam (all CityMax-family) flip green→red simultaneously
+    # (source_health_history.jsonl: failure_ids 963c2914 / d26d0d05 /
+    # 3eafc7bd at 06:44 UTC). Local smoke from a residential Mac IP
+    # yielded 3 listings cleanly under httpx; the GitHub Actions runner
+    # IP returned empty bodies. Identical symptom class to elagente /
+    # realtyelsalvador / nexo / agentiz pre-curl_cffi — TLS-fingerprint
+    # WAF gate, not IP-only. Same fix: chrome124 handshake + safari_macos
+    # UA so the JA3 and UA the WAF logs are aligned. auto_repair stays
+    # False: an LLM can't talk past a WAF.
     "citymax":          Policy(
-        transport="httpx",
+        transport="curl_cffi",
         rate_limit_rps=0.5,
         user_agent_pool="safari_macos",
+        auto_repair=False,
+    ),
+    # citymax_sc (Santa Cruz / regional CityMax variant): same CityMax
+    # CMS as `citymax` above, same WAF event, same fix. Previously had
+    # no explicit policy entry — was running under DEFAULT_POLICY which
+    # implies httpx. Adding explicitly so the fingerprint switch is
+    # visible. failure_id d26d0d05 (2026-06-08 nightly).
+    "citymax_sc":       Policy(
+        transport="curl_cffi",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+        auto_repair=False,
+    ),
+    # vivolatam: built on the same CityMax CMS — same WAF rule caught
+    # it in the 2026-06-08 outage (failure_id 3eafc7bd). Local smoke
+    # yielded 3 fresh listings in 7.5s; runner IP returns empty.
+    # Largest yield of the three (148 listings on 2026-06-07's nightly),
+    # so a same-day fix is worth it.
+    "vivolatam":        Policy(
+        transport="curl_cffi",
+        rate_limit_rps=0.5,
+        user_agent_pool="safari_macos",
+        auto_repair=False,
     ),
     # essurf (El Salvador Surf Real Estate): WordPress AgentFire v3 IDX,
     # POST to /wp-json/agentfire/v2/listing3/listings, 9 listings per
