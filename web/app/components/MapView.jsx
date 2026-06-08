@@ -98,15 +98,22 @@ export default function MapView({ results, app, onOpenListing }) {
       // so every stacked listing stays reachable.
       spiderfyOnMaxZoom: true,
       zoomToBoundsOnClick: true,
+      // PR-8 — tuned for El Salvador zone density: a tighter radius
+      // than the 80px default so adjacent-but-distinct zones don't
+      // over-merge; a wider spiderfy so a 100-listing stack fans out
+      // legibly.
+      maxClusterRadius: 50,
+      spiderfyDistanceMultiplier: 1.6,
       iconCreateFunction: (cl) => {
         const n = cl.getChildCount();
+        // Size-step the bubble by count (sm/md/lg) so a 3-listing
+        // cluster reads differently from a 100-listing one.
+        const step = n < 10 ? "sm" : n < 100 ? "md" : "lg";
+        const px = step === "sm" ? 34 : step === "md" ? 44 : 54;
         return L.divIcon({
           html: `<span>${n}</span>`,
-          className: "pulpo-cluster",
-          iconSize: L.point(40, 40),
-          // a11y: count clusters announce how many listings they hold.
-          // (aria added on the element after creation isn't supported
-          // by divIcon; the title attr below is the reachable surface.)
+          className: `pulpo-cluster pulpo-cluster--${step}`,
+          iconSize: L.point(px, px),
         });
       },
     });
@@ -118,6 +125,14 @@ export default function MapView({ results, app, onOpenListing }) {
       const id = e.popup?._source?._pulpoId;
       const btn = e.popup.getElement()?.querySelector(".pulpo-popup__cta");
       if (btn && id) btn.addEventListener("click", () => onOpenRef.current?.(id));
+      // PR-8 — selected marker state (1.15× / raised) while its popup
+      // is open. Toggle a class on the pin span inside the marker icon.
+      const pin = e.popup?._source?._icon?.querySelector(".pulpo-pin");
+      if (pin) pin.classList.add("pulpo-pin--selected");
+    });
+    map.on("popupclose", (e) => {
+      const pin = e.popup?._source?._icon?.querySelector(".pulpo-pin");
+      if (pin) pin.classList.remove("pulpo-pin--selected");
     });
 
     mapRef.current = map;
