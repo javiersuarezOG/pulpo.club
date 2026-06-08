@@ -564,6 +564,14 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 # because 600×400 thumbs never clear the 800×600 floor).
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
                 li.card_eligible = bool(hero_meta.get("card_eligible", False))
+                # P5 — cached-skip path: also reject a logo/placeholder
+                # winner so the 19 existing xitios-icon listings self-heal
+                # on the next nightly without a forced repick. Reads the
+                # winning URL persisted in the sidecar.
+                from automation.photo_quality import is_logo_or_placeholder_url
+                if is_logo_or_placeholder_url(hero_meta.get("winning_url")):
+                    li.card_eligible = False
+                    li.hero_eligible = False
                 if hero_meta.get("width") is not None:
                     li.source_width = int(hero_meta["width"])
                 if hero_meta.get("height") is not None:
@@ -732,7 +740,10 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # ≥ 1200 — the threshold is unreachable. See the upstream-gate
             # diagnostic at pulpo-social/admin/trigger (2026-05-19) where
             # 10/10 candidates rejected with `upstream_hero_ineligible`.
-            from automation.photo_quality import compute_image_metadata as _cim
+            from automation.photo_quality import (
+                compute_image_metadata as _cim,
+                is_logo_or_placeholder_url,
+            )
             source_meta = _cim(winning_content, file_size_bytes=len(winning_content))
 
             if hero_meta is not None:
@@ -760,6 +771,15 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # P5 — a logo/icon/placeholder that wins the pick (structural
+                # gates can't tell a big logo from a real photo) must never be
+                # card/hero eligible. Override BEFORE the sidecar write so both
+                # the sidecar and the listing reflect it. Consumer of
+                # card_eligible: web/app/home/HomeShelf.jsx homepage gate.
+                if is_logo_or_placeholder_url(winning_url):
+                    hero_meta["card_eligible"] = False
+                    hero_meta["hero_eligible"] = False
+                    hero_meta["logo_placeholder_rejected"] = True
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
