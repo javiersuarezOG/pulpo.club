@@ -88,11 +88,11 @@ function useShelfScrolled(shelfKey, listRef) {
 
 // Floor for the "show fewer cards, keep the shelf visible" behavior after
 // the photo-placeholder top-up was removed (homepage hard rule). A shelf
-// with ≥ MIN_SHELF_CARDS photo-eligible listings renders that many real
+// with ≥ MIN_REAL_LISTINGS photo-eligible listings renders that many real
 // cards (fewer than the full 10 is fine); below it the shelf hides rather
 // than show a degenerate 1-2 card carousel. Tunable — bump toward 10 to
 // favor full rows, drop toward 1 to never hide.
-const MIN_SHELF_CARDS = 4;
+const MIN_REAL_LISTINGS = 4;
 
 // Curated shelves only surface complete listings WITH a suitable picture.
 // HARD RULE (2026-06-08): a homepage listing must have a locally-served
@@ -286,7 +286,7 @@ export function HomeShelf({
                    //   beach terrenos shelf. Each entry can be {name, tone?} for color
                    //   override (trophy=gold, lake=blue, beach=green, type=ink).
   cards,
-  listings,        // Wave-5 polish: when present + length >= MIN_SHELF_CARDS, replaces cards
+  listings,        // Wave-5 polish: when present + length >= MIN_REAL_LISTINGS, replaces cards
   heroV4 = false,  // gates the new card markup
   onViewAll,
 }) {
@@ -298,15 +298,15 @@ export function HomeShelf({
   // HARD-RULE consequence (2026-06-08): with the photo-placeholder top-up
   // removed, a thin cohort yields fewer eligible listings. Per the chosen
   // behavior — "show fewer cards, keep the shelf visible" — render the real
-  // listings whenever the shelf has at least MIN_SHELF_CARDS eligible ones
+  // listings whenever the shelf has at least MIN_REAL_LISTINGS eligible ones
   // (a thin shelf shows e.g. 4-9 cards instead of the full 10), and only
   // hide a shelf that can't even meet that small floor (a 1-2 card carousel
   // reads as broken). Post-restore most cohorts clear 10 easily; this floor
   // only bites rare sparse cohorts (e.g. lake condos).
-  const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_SHELF_CARDS;
+  const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
   const items = useReal ? listings : cards;
 
-  const hideShelf = heroV4 && Array.isArray(listings) && listings.length < MIN_SHELF_CARDS;
+  const hideShelf = heroV4 && Array.isArray(listings) && listings.length < MIN_REAL_LISTINGS;
 
   // Carousel state for the prev/next arrows (desktop ≥768px). Track
   // whether we can scroll further in each direction so the arrows can
@@ -461,7 +461,7 @@ export function HomeShelf({
 // Phase 3 — Six type-specific Top 10 shelves replacing the single
 // Top 10 / Price Drops / New This Week trio. Each shelf is the
 // best-ranked listings within one (master_category, subcategory)
-// pair. A shelf only renders when ≥ MIN_SHELF_CARDS qualify;
+// pair. A shelf only renders when ≥ MIN_REAL_LISTINGS qualify;
 // otherwise the section is silently hidden (the hero_v4 hideShelf
 // branch). NEW + PRICE-DROP signals migrated to per-card chips in
 // PR #421 — no more dedicated shelves for those.
