@@ -116,6 +116,9 @@ export function FreeMonthModal({ app, trigger, onClose }) {
       locale: lc,
       utms,
       urlCode,
+      // Return to where they were (listing / browse) if they cancel on
+      // Stripe, instead of the generic /start page.
+      cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
     });
 
     if (result.kind === "redirect") {

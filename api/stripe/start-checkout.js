@@ -200,6 +200,18 @@ module.exports = async (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const origin = `${proto}://${host}`;
 
+  // Cancel destination: return the visitor to where they started checkout
+  // (the listing / browse page they were on), not the generic /start. The
+  // client passes its current path; we accept ONLY a same-origin relative
+  // path — must start with a single "/" (not a scheme-relative "//host"),
+  // no scheme, no whitespace — else fall back to /start. This guards
+  // against an open-redirect via a forged cancel_path.
+  const rawCancelPath = safeStr(body.cancel_path);
+  const safeCancelPath =
+    /^\/(?!\/)\S*$/.test(rawCancelPath) && !rawCancelPath.includes("://")
+      ? rawCancelPath
+      : "/start?cancelled=1";
+
   const sessionMetadata = {
     source: "start",
     country: country || "",
@@ -236,7 +248,7 @@ module.exports = async (req, res) => {
     // redirects back to the same /account?welcome=1 URL — the modal
     // re-renders in its signed-in variant.
     success_url: `${origin}/account?welcome=1&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${origin}/start?cancelled=1`,
+    cancel_url:  `${origin}${safeCancelPath}`,
     // Audit P0-5 — Stripe Checkout must render a mandatory Terms of
     // Service checkbox before the Pay button when we collect any
     // subscription. Resolves against the Terms URL configured in

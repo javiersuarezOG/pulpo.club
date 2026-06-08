@@ -4276,6 +4276,8 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
       locale: lc,
       utms,
       urlCode,
+      // Return to where they were if they cancel on Stripe (not /start).
+      cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
     });
 
     if (result.kind === "redirect") {
