@@ -61,6 +61,21 @@ env:
   # listing_count_floor / listing_count_ceiling; the canary-check step
   # later in this workflow prefers those when set. Adding a country =
   # set country_count_floor / country_count_ceiling in its <cc>.json.
+  #
+  # PR-S4c — activate the ranker's stale-listing filter. Listings whose
+  # existence-ledger state (web/data/listings_ledger.json, populated
+  # by automation/run.py via PR-S4b) is "stale" are dropped before
+  # ranking. "Stale" requires missing for >=STALE_THRESHOLD_RUNS=3
+  # consecutive nightlies AND the source must have succeeded each of
+  # those nightlies (a scraper-failure absence is NOT counted as
+  # missing). So this flag is effectively a no-op for the first ~3
+  # nightlies after PR-S4b lands, then auto-activates as the ledger
+  # accumulates state. The OFF branch still emits a
+  # `[ranker_stale_filter] stale_candidates=N would_drop_if_flag_on`
+  # telemetry line, so flipping back is straightforward if N is ever
+  # larger than expected. To deactivate: comment this line out or
+  # set to "0".
+  PULPO_RANKER_DROP_STALE: "1"
 
 jobs:
   run:
