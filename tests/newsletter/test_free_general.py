@@ -125,6 +125,55 @@ def test_free_general_renders_through_registry(free_with_prefs, ranked_pool):
     assert via_registry == via_variant
 
 
+def test_free_welcome_hero_is_plain_pulpo_on_free_body(free_with_prefs, ranked_pool):
+    """Free Welcome = free body + a plain-Pulpo welcome hero. NOT 'Pulpo
+    Pro' (a free reader isn't a Pro member). Body is the free weekly: no
+    PRO badge, top-3 'See on Pulpo', ranks 04-10 'Sign up to Pro', locked
+    spotlight."""
+    issue = _free_issue(free_with_prefs, ranked_pool)
+    html = render_html(issue, variant="free_welcome")
+    assert ">PRO</span>" not in html                       # plain masthead
+    assert "Welcome to Pulpo Pro" not in html              # not the Pro hero
+    assert "Welcome to Pulpo<" in html or "Welcome to Pulpo</div>" in html
+    assert "Welcome, Sofía." in html                       # first-name greeting
+    assert html.count("See on Pulpo →") == len(issue.picks_top)
+    assert html.count("Sign up to Pro →") == len(issue.picks_shortlist)
+    assert "Pro analysis" in html                          # spotlight still locked
+    assert 'name="x-pulpo-template" content="free-welcome-v1.0' in html
+
+
+def test_free_welcome_back_derives_greeting(free_with_prefs, ranked_pool):
+    """Free Welcome-back = Free Welcome with the 'Welcome → Welcome back' /
+    'first 10 → next 10' rewrite (same derivation as the Pro pair). Body is
+    byte-identical to the Free Welcome below the hero."""
+    issue = _free_issue(free_with_prefs, ranked_pool)
+    html = render_html(issue, variant="free_welcome_back")
+    assert "Welcome back, Sofía." in html
+    assert "next 10" in html                               # 'first 10' rewritten
+    assert "first 10" not in html
+    assert ">PRO</span>" not in html
+    assert html.count("Sign up to Pro →") == len(issue.picks_shortlist)
+    assert 'name="x-pulpo-template" content="free-welcome-back-v1.0' in html
+
+
+def test_free_welcome_pair_renders_through_registry(free_with_prefs, ranked_pool):
+    issue = _free_issue(free_with_prefs, ranked_pool)
+    assert TEMPLATES["pulpo-free-welcome"](issue) == render_html(issue, variant="free_welcome")
+    assert TEMPLATES["pulpo-free-welcome-back"](issue) == render_html(issue, variant="free_welcome_back")
+
+
+def test_free_welcome_es_localizes_hero(free_with_prefs, ranked_pool):
+    es = replace(free_with_prefs, locale="es")
+    issue = _free_issue(es, ranked_pool)
+    wel = render_html(issue, variant="free_welcome")
+    back = render_html(issue, variant="free_welcome_back")
+    assert "Bienvenido a Pulpo" in wel
+    assert "Bienvenido a Pulpo Pro" not in wel             # not the Pro hero
+    assert "Bienvenido, Sofía." in wel
+    assert "Bienvenido de nuevo, Sofía." in back           # ES welcome-back rewrite
+    assert "Regístrate en Pro →" in wel                    # free body localized
+
+
 def test_free_general_es_no_english_cta_leak(free_with_prefs, ranked_pool):
     """Spanish render: the free CTAs localize and no English canary leaks."""
     es_recipient = replace(free_with_prefs, locale="es")

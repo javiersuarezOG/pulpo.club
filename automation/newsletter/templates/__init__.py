@@ -28,6 +28,8 @@ from . import (
     pulpo_pro_welcome,
     pulpo_pro_welcome_back,
     pulpo_free_general,
+    pulpo_free_welcome,
+    pulpo_free_welcome_back,
 )
 
 # template_id  →  render function
@@ -39,6 +41,8 @@ TEMPLATES: dict[str, Callable[[Issue], str]] = {
     "pulpo-pro-welcome": pulpo_pro_welcome.render,
     "pulpo-pro-welcome-back": pulpo_pro_welcome_back.render,
     "pulpo-free-general": pulpo_free_general.render,
+    "pulpo-free-welcome": pulpo_free_welcome.render,
+    "pulpo-free-welcome-back": pulpo_free_welcome_back.render,
 }
 
 __all__ = [
@@ -47,4 +51,6 @@ __all__ = [
     "pulpo_pro_welcome",
     "pulpo_pro_welcome_back",
     "pulpo_free_general",
+    "pulpo_free_welcome",
+    "pulpo_free_welcome_back",
 ]

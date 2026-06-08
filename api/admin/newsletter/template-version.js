@@ -84,6 +84,18 @@ const TEMPLATES = [
     versionRe: /^FREE_GENERAL_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
     lastUpdatedRe: /^FREE_GENERAL_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
   },
+  {
+    // Free onboarding pair. `FREE_WELCOME_` / `FREE_WELCOME_BACK_` prefixes
+    // are disjoint at line-start (BACK_ never matches the plain one).
+    id: "pulpo-free-welcome",
+    versionRe: /^FREE_WELCOME_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^FREE_WELCOME_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
+  {
+    id: "pulpo-free-welcome-back",
+    versionRe: /^FREE_WELCOME_BACK_TEMPLATE_VERSION\s*=\s*["']([^"']+)["']/m,
+    lastUpdatedRe: /^FREE_WELCOME_BACK_LAST_UPDATED\s*=\s*["']([^"']+)["']/m,
+  },
 ];
 
 // Short-version extractor handles both `-v4.4-` (pro) and

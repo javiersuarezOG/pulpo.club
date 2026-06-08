@@ -149,6 +149,31 @@ FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.0-2026-06-07"
 FREE_GENERAL_LAST_UPDATED = "2026-06-07"
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo FREE Welcome + Welcome-back — own version lines.
+#
+# The free-tier onboarding pair. Each is the free-general master
+# (render_html variant="free_welcome" / "free_welcome_back") with ONLY
+# the hero swapped — same plain-`pulpo` masthead, "Sign up to Pro" ranks
+# 04-10, and Pro-locked spotlight as the free weekly. The welcome-back
+# hero DERIVES from the free welcome copy via i18n.welcome_text (same
+# "Welcome → Welcome back" / "first 10 → next 10" rewrite as the Pro
+# pair), so the two free onboarding emails cannot drift. Parallel version
+# lines let PostHog slice free welcome / welcome-back renders from the
+# free weekly and from the Pro onboarding pair.
+#
+# Revision history (most recent first):
+#   free-welcome-v1.0 (2026-06-07) — initial ship. Free welcome hero
+#       ("Welcome to Pulpo", plain — not "Pulpo Pro") on the free-general
+#       body.
+#   free-welcome-back-v1.0 (2026-06-07) — initial ship. The free welcome
+#       with the "Welcome back" / "next 10" rewrite.
+FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.0-2026-06-07"
+FREE_WELCOME_LAST_UPDATED = "2026-06-07"
+FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.0-2026-06-07"
+FREE_WELCOME_BACK_LAST_UPDATED = "2026-06-07"
+
+
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
 # block below also defines CSS vars for clients that support them, but
 # the source-of-truth values are hex because Outlook desktop + parts of
@@ -349,6 +374,10 @@ __all__ = [
     "WELCOME_BACK_LAST_UPDATED",
     "FREE_GENERAL_TEMPLATE_VERSION",
     "FREE_GENERAL_LAST_UPDATED",
+    "FREE_WELCOME_TEMPLATE_VERSION",
+    "FREE_WELCOME_LAST_UPDATED",
+    "FREE_WELCOME_BACK_TEMPLATE_VERSION",
+    "FREE_WELCOME_BACK_LAST_UPDATED",
     "CSS",
     "escape",
     "site_root_from_issue",

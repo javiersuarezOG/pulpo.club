@@ -25,6 +25,8 @@ from .components._common import (
     WELCOME_TEMPLATE_VERSION as _WELCOME_TEMPLATE_VERSION_SHARED,
     WELCOME_BACK_TEMPLATE_VERSION as _WELCOME_BACK_TEMPLATE_VERSION_SHARED,
     FREE_GENERAL_TEMPLATE_VERSION as _FREE_GENERAL_TEMPLATE_VERSION_SHARED,
+    FREE_WELCOME_TEMPLATE_VERSION as _FREE_WELCOME_TEMPLATE_VERSION_SHARED,
+    FREE_WELCOME_BACK_TEMPLATE_VERSION as _FREE_WELCOME_BACK_TEMPLATE_VERSION_SHARED,
 )
 from .types import Issue, IssuePick, Locale
 
@@ -82,6 +84,9 @@ WELCOME_BACK_TEMPLATE_VERSION = _WELCOME_BACK_TEMPLATE_VERSION_SHARED
 # treatment, the ranks 04-10 "Sign up to Pro" CTA, or the Pro-locked
 # Weekly News Spotlight change.
 FREE_GENERAL_TEMPLATE_VERSION = _FREE_GENERAL_TEMPLATE_VERSION_SHARED
+# Free onboarding pair — same free body, welcome / welcome-back hero.
+FREE_WELCOME_TEMPLATE_VERSION = _FREE_WELCOME_TEMPLATE_VERSION_SHARED
+FREE_WELCOME_BACK_TEMPLATE_VERSION = _FREE_WELCOME_BACK_TEMPLATE_VERSION_SHARED
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -1978,11 +1983,13 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     no-ops when nothing's saved.
     """
     locale = issue.locale
-    is_welcome = variant in ("welcome", "welcome_back")
-    # Free-tier weekly: same master body as the General, three cohort
-    # changes (plain masthead, ranks 04-10 "Sign up to Pro", Pro-locked
-    # spotlight) all gated on this flag so the Pro path is untouched.
-    is_free = variant == "free_general"
+    # Welcome family = a swapped hero (general body otherwise). Both the Pro
+    # pair and the free pair are "welcome" for hero purposes.
+    is_welcome = variant in ("welcome", "welcome_back", "free_welcome", "free_welcome_back")
+    # Free-tier chrome: plain masthead, ranks 04-10 "Sign up to Pro",
+    # Pro-locked spotlight. Applies to the free weekly AND the free
+    # onboarding pair; all gated on this flag so the Pro path is untouched.
+    is_free = variant in ("free_general", "free_welcome", "free_welcome_back")
     head_title = (
         i18n.welcome_text("hero.eyebrow", locale, variant=variant)
         if is_welcome
@@ -1991,6 +1998,8 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     template_version = (
         WELCOME_BACK_TEMPLATE_VERSION if variant == "welcome_back"
         else WELCOME_TEMPLATE_VERSION if variant == "welcome"
+        else FREE_WELCOME_BACK_TEMPLATE_VERSION if variant == "free_welcome_back"
+        else FREE_WELCOME_TEMPLATE_VERSION if variant == "free_welcome"
         else FREE_GENERAL_TEMPLATE_VERSION if variant == "free_general"
         else TEMPLATE_VERSION
     )
@@ -2177,6 +2186,21 @@ def render_free_general_html(issue: Issue) -> str:
     on the variant inside `render_html`. See FREE_GENERAL_TEMPLATE_VERSION.
     """
     return render_html(issue, variant="free_general")
+
+
+def render_free_welcome_html(issue: Issue, *, now=None) -> str:
+    """Render the Pulpo FREE Welcome — the free-general master with the
+    welcome hero (`variant="free_welcome"`). Identity is plain Pulpo (not
+    Pulpo Pro). `now` accepted for signature parity with the Pro welcome
+    helpers; ignored (the welcome carries no cadence note)."""
+    return render_html(issue, variant="free_welcome")
+
+
+def render_free_welcome_back_html(issue: Issue, *, now=None) -> str:
+    """Render the Pulpo FREE Welcome-back — the free-general master with the
+    welcome-back hero (`variant="free_welcome_back"`), greeting derived from
+    the free welcome copy via i18n.welcome_text. `now` ignored."""
+    return render_html(issue, variant="free_welcome_back")
 
 
 def render_welcome_back_html(issue: Issue, *, now=None) -> str:
