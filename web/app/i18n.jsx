@@ -630,6 +630,27 @@ const UI_STRINGS = {
   "browse.search.suggest.count":
     { en: "{n} listings",
       es: "{n} propiedades" },
+  "browse.list.use":
+    { en: "Use",
+      es: "Uso" },
+  "browse.list.size":
+    { en: "Size",
+      es: "Tamaño" },
+  "browse.list.price":
+    { en: "Price",
+      es: "Precio" },
+  "browse.list.ppm":
+    { en: "{suffix}",
+      es: "{suffix}" },
+  "browse.list.listed":
+    { en: "Listed",
+      es: "Publicado" },
+  "browse.list.signal":
+    { en: "Signal",
+      es: "Señal" },
+  "browse.list.facts_aria":
+    { en: "Listing facts",
+      es: "Datos de la propiedad" },
   // No-results-for-query empty state (PR-3) + category-pill shortcuts.
   "browse.search.no_results":
     { en: "No listings matched “{q}”.",

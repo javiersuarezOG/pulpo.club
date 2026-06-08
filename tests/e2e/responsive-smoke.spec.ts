@@ -159,6 +159,55 @@ test.describe("responsive — section sweep (anonymous)", () => {
   }
 });
 
+test.describe("responsive — /browse list view", () => {
+  for (const vp of VIEWPORTS.filter((v) => v.width < 768)) {
+    test(`/browse mobile list rows stay compact @ ${vp.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      const errors = attachErrorRecorder(page);
+
+      await page.goto("/browse", { waitUntil: "networkidle" });
+      await page.getByLabel("Table view").click();
+      const row = page.locator(".mobile-list-row").first();
+      await row.waitFor({ state: "visible", timeout: 10_000 });
+
+      await expect(row.locator(".mobile-list-row__title")).toBeVisible();
+      await expect(row.locator(".mobile-list-row__place")).toBeVisible();
+      await expect(row.locator(".mobile-list-row__facts")).toContainText("$");
+      await expect(row.locator("text=Listed")).toHaveCount(0);
+      await expect(row.locator("text=Signal")).toHaveCount(0);
+      await expect(row.locator(".mobile-list-row__photo img").first()).toBeVisible();
+      const rowHeight = await row.evaluate((el) => el.getBoundingClientRect().height);
+      expect(rowHeight, "mobile list rows should stay dense enough to scan").toBeLessThanOrEqual(96);
+
+      assertNoOverflow(
+        await measureOverflow(page),
+        `/browse list view @ ${vp.name}`,
+      );
+      expect(errors, `console errors on /browse list view @ ${vp.name}`).toEqual([]);
+    });
+  }
+
+  test("/browse desktop keeps the real table layout", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const errors = attachErrorRecorder(page);
+
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.getByLabel("Table view").click();
+    await page.locator(".results-table tbody tr").first().waitFor({ state: "visible", timeout: 10_000 });
+
+    await expect(page.locator(".results-table")).toBeVisible();
+    await expect(page.locator(".results-mobile-list")).toBeHidden();
+    await expect(page.locator(".results-table th", { hasText: "Listing" })).toBeVisible();
+    await expect(page.locator(".results-table th", { hasText: "Price" })).toBeVisible();
+
+    assertNoOverflow(
+      await measureOverflow(page),
+      "/browse desktop list table @ 1280×800",
+    );
+    expect(errors, "console errors on /browse desktop list table").toEqual([]);
+  });
+});
+
 // 2. Account deep-dive — every sub-section at every viewport, both auth
 // content paths (free / pro). Clerk-on path is the legacy seed path
 // flipped via env or fixture; in CI today the publishable key is unset
