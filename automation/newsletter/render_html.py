@@ -2077,7 +2077,7 @@ def render_html(issue: Issue, *, variant: str = "general") -> str:
     {_market_html(issue)}
     {section_intro_top3_html}
     {top3_html}
-    {_paywall_banner_html(issue)}
+    {'' if is_free else _paywall_banner_html(issue)}
     {section_intro_rest_html}
     {rest_html}
     {_weekly_news_spotlight_html(issue, free=is_free)}

@@ -115,10 +115,10 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # the generic upsell wrapper around that real content; they must NOT
     # claim article-specific analysis that doesn't exist in the artifact.
     "spotlight.pro_badge":         {"en": "Pro",                                          "es": "Pro"},
-    "spotlight.locked_label":      {"en": "The Pulpo read · Pro",                          "es": "El análisis de Pulpo · Pro"},
-    "spotlight.locked_body":      {"en": "Pulpo Pro carries the full read — what the story means for prices and which of this week's picks it touches.",
-                                     "es": "Pulpo Pro lleva el análisis completo — qué significa la noticia para los precios y a cuáles de las selecciones de esta semana les afecta."},
-    "spotlight.locked_cta":        {"en": "Sign up to Pro to read the take →",             "es": "Regístrate en Pro para leer el análisis →"},
+    "spotlight.locked_label":      {"en": "Pro analysis",                                  "es": "Análisis Pro"},
+    "spotlight.locked_body":      {"en": "You're reading the headline. Pulpo Pro adds the analysis — what this news actually means for property prices on the coast.",
+                                     "es": "Estás leyendo el titular. Pulpo Pro suma el análisis — lo que esta noticia significa de verdad para los precios en la costa."},
+    "spotlight.locked_cta":        {"en": "Get the analysis with Pro →",                   "es": "Obtené el análisis con Pro →"},
     # DEPRECATED (kept for parity; no longer rendered). The spotlight now
     # reads from the committed artifact (web/data/news_spotlight.json) with
     # nightly carry-forward, so a real cited article is always available —

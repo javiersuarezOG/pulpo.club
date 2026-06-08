@@ -62,6 +62,19 @@ def test_free_general_ctas_top3_vs_rest(free_with_prefs, ranked_pool):
     assert "Pulpo Pro reveals the address" not in html
 
 
+def test_free_general_has_no_paywall_banner(free_with_prefs, ranked_pool):
+    """The mid-email 'Free edition / Pro goes deeper' banner is suppressed
+    in the free weekly — the per-card 'Sign up to Pro' CTAs + the locked
+    spotlight carry the upgrade ask. (The build still sets
+    paywall_banner=True for the cohort; the free_general variant just
+    doesn't render the block.)"""
+    issue = _free_issue(free_with_prefs, ranked_pool)
+    assert issue.paywall_banner is True              # build flag unchanged
+    html = render_html(issue, variant="free_general")
+    assert '<div class="paywall-banner">' not in html
+    assert "Pro goes deeper on every pick" not in html
+
+
 def test_free_general_version_stamp(free_with_prefs, ranked_pool):
     issue = _free_issue(free_with_prefs, ranked_pool)
     html = render_html(issue, variant="free_general")
@@ -79,8 +92,8 @@ def test_free_general_spotlight_is_pro_locked_real_data(free_with_prefs, ranked_
     assert "New coastal road reaches El Zonte" in html   # fixture headline
     assert "La Prensa Gráfica" in html                   # fixture source
     # The lock wrapper + sign-up CTA.
-    assert "The Pulpo read" in html
-    assert "Sign up to Pro to read the take" in html
+    assert "Pro analysis" in html
+    assert "Get the analysis with Pro" in html
 
 
 def test_free_general_spotlight_withholds_the_tail(free_with_prefs, ranked_pool):
@@ -115,5 +128,5 @@ def test_free_general_es_no_english_cta_leak(free_with_prefs, ranked_pool):
     html = render_html(issue, variant="free_general")
     assert "Regístrate en Pro →" in html
     assert "Sign up to Pro" not in html
-    assert "The Pulpo read" not in html       # locked label localizes
-    assert "El análisis de Pulpo" in html
+    assert "Pro analysis" not in html         # locked label localizes
+    assert "Análisis Pro" in html
