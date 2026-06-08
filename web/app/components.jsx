@@ -57,6 +57,17 @@ function formatPpm(n) {
 function ppmSuffix() {
   return currentUnits() === "vrs2" ? "/vr²" : "/m²";
 }
+// PR-5/WS4 — the single guards every map read-site uses. `hasCoords`
+// gates whether a listing can be a map pin at all (~0.5% lack coords);
+// `isLowConfidenceGeo` flags the pins the map softens + can hide
+// (low/None geocoding_confidence — the only quality signal available,
+// since ~97% of coords share the 'estimated' source).
+function hasCoords(l) {
+  return l != null && typeof l.lat === "number" && typeof l.lng === "number";
+}
+function isLowConfidenceGeo(l) {
+  return l == null || l.geocoding_confidence === "low" || l.geocoding_confidence == null;
+}
 function daysListedTone(d) {
   if (d == null) return "muted";
   if (d < 30) return "muted";
@@ -816,6 +827,11 @@ const PHOTO_PRELOAD_MAX = 5;
 function ListingCard({
   listing, app, compact = false, onOpen, variant = "default",
   priority = false, source, topRank, sharedPin = false,
+  // PR-9/WS4 — map↔card sync. `highlighted` draws the sync ring;
+  // `onHover` reports hover (id | null) so the map can highlight the
+  // matching marker. data-listing-id lets the card panel scroll a card
+  // into view when its marker is hovered.
+  highlighted = false, onHover,
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -887,10 +903,11 @@ function ListingCard({
 
   return (
     <article
-      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""}`}
+      data-listing-id={listing.id}
+      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""} ${highlighted ? "listing-card-highlighted" : ""}`}
       onClick={handleClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => { setHovered(true); onHover?.(listing.id); }}
+      onMouseLeave={() => { setHovered(false); onHover?.(null); }}
     >
       {/* SEO + middle-click anchor. aria-hidden + tabIndex=-1 keep it
           out of the keyboard tab order — the card itself stays the
@@ -1056,4 +1073,5 @@ export {
   Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, DealGradeChip, dealGradeForListing, signalForListing, Photo, HeartButton, ShareButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
+  hasCoords, isLowConfidenceGeo,
 };

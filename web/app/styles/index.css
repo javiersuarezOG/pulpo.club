@@ -1193,6 +1193,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
    viewports it caps at a comfortable reading width so the bar doesn't
    stretch the full results column. */
 .browse-search {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -1246,6 +1247,61 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .browse-search__clear:hover {
   background: var(--paper-2);
   color: var(--ink-2);
+}
+/* PR-2 — autocomplete dropdown. Anchored to the search box, clamped to
+   its width so it never causes horizontal scroll at 320px. */
+.browse-search__suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+}
+.browse-search__suggest-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--ink);
+}
+.browse-search__suggest-item.active {
+  background: var(--paper-2);
+}
+.browse-search__suggest-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--ink-3);
+}
+.browse-search__suggest-thumb {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+.browse-search__suggest-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.browse-search__suggest-meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .results-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -1311,6 +1367,17 @@ h1,h2,h3,h4,h5 { margin: 0; }
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
+/* Replaces .sort-select when a search query is active — results are
+   ordered by keyword relevance, so we show a static "Best match" label
+   in the same control slot rather than an inert dropdown. */
+.sort-relevance-label {
+  display: inline-flex; align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper-2);
+  font-size: 13px; color: var(--ink-2);
+  white-space: nowrap;
+}
 .view-toggle {
   display: flex; gap: 0; border: 1px solid var(--line); border-radius: 999px;
   padding: 3px; background: var(--paper);
@@ -1322,6 +1389,183 @@ h1,h2,h3,h4,h5 { margin: 0; }
   transition: all 160ms;
 }
 .view-toggle button.active { background: var(--ink); color: var(--paper); }
+
+/* ====== Map view (WS4 PR-7) ====== */
+/* PR-9 — desktop split-pane: scrollable card panel ↔ map. Mobile keeps
+   the map full-width (the bottom sheet lands in PR-10). */
+.map-split { display: block; }
+.map-split__cards { display: none; }
+@media (min-width: 768px) {
+  .map-split { display: flex; align-items: flex-start; gap: var(--space-4); }
+  .map-split__cards {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    width: 380px; flex-shrink: 0;
+    height: 70vh; min-height: 420px; overflow-y: auto;
+    padding-right: var(--space-2);
+  }
+  .map-split > .map-view,
+  .map-split > .map-view--loading { flex: 1; min-width: 0; }
+}
+.map-view__saim {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--paper-2);
+  font-size: 12px; color: var(--ink-2); cursor: pointer;
+}
+.map-view__saim.active { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.listing-card-highlighted { box-shadow: 0 0 0 2px var(--accent); border-radius: var(--radius-sm); }
+
+/* PR-10 — mobile: full-bleed map + floating Filters pill + draggable
+   bottom sheet of cards. All hidden on desktop (the split-pane panel is
+   used there). */
+.map-filters-pill { display: none; }
+.map-sheet { display: none; }
+@media (max-width: 767px) {
+  .map-split { position: relative; }
+  .map-filters-pill {
+    display: inline-flex; align-items: center; gap: var(--space-2);
+    position: fixed; top: 64px; right: 12px; z-index: 60;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--accent); color: var(--paper); border: none;
+    font-size: 13px; font-weight: 600; box-shadow: var(--shadow-2); cursor: pointer;
+  }
+  .map-sheet {
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+    background: var(--paper); border-top: 1px solid var(--line);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: var(--shadow-2);
+    transition: height 0.22s ease;
+  }
+  .map-sheet--collapsed { height: 200px; }
+  .map-sheet--expanded { height: 60vh; }
+  .map-sheet__handle {
+    display: grid; place-items: center;
+    width: 100%; height: 28px; flex-shrink: 0;
+    background: transparent; border: none; cursor: grab; touch-action: none;
+  }
+  .map-sheet__grip { width: 40px; height: 4px; border-radius: 999px; background: var(--line-2); }
+  .map-sheet__cards { padding: 0 var(--space-4) var(--space-4); min-height: 0; }
+  .map-sheet--collapsed .map-sheet__cards {
+    display: flex; gap: var(--space-3); overflow: auto hidden;
+  }
+  .map-sheet--collapsed .map-sheet__cards .listing-card { flex: 0 0 78%; }
+  .map-sheet--expanded .map-sheet__cards {
+    display: flex; flex-direction: column; gap: var(--space-3); overflow-y: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-sheet { transition: none; }
+}
+.map-view { display: flex; flex-direction: column; gap: var(--space-3); }
+.map-view__bar {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: var(--space-3); font-size: 13px; color: var(--ink-2);
+}
+.map-view__count { font-weight: 600; color: var(--ink); }
+.map-view__legend {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  color: var(--ink-3);
+}
+.map-view__legend::before {
+  content: ""; width: 8px; height: 8px; border-radius: 999px;
+  background: var(--ink-3); flex-shrink: 0;
+}
+.map-view__hide-approx {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  margin-left: auto; cursor: pointer;
+}
+.map-view__canvas {
+  width: 100%; height: 70vh; min-height: 420px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  overflow: hidden; background: var(--paper-2);
+}
+.map-view--loading, .map-view--unavailable {
+  display: grid; place-items: center;
+  height: 70vh; min-height: 420px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  color: var(--ink-3); font-size: 14px; text-align: center; padding: var(--space-6);
+}
+
+/* Price pins — HTML/CSS overlays (L.divIcon). The wrap is zero-size and
+   anchored on the point; the pill centers on it via translate. */
+.pulpo-pin-wrap { width: 0; height: 0; }
+.pulpo-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.pulpo-pin--drop { background: var(--tone-urgent); color: var(--paper); border-color: var(--tone-urgent); }
+.pulpo-pin--off { background: var(--badge-off); color: var(--paper); border-color: var(--badge-off); }
+.pulpo-pin--approx { background: var(--paper-2); color: var(--ink-3); border-style: dashed; opacity: 0.75; }
+/* PR-8 — hover (1.1×, primary) + selected (1.15×, ink) pin states. */
+.pulpo-pin:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--accent); color: var(--paper); border-color: var(--accent);
+  z-index: 1000;
+}
+.pulpo-pin--selected {
+  transform: translate(-50%, -50%) scale(1.15);
+  background: var(--ink); color: var(--paper); border-color: var(--ink);
+  z-index: 1001;
+}
+/* PR-9 — card-hover → marker sync highlight (same affordance as hover). */
+.pulpo-pin--synced {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--accent); color: var(--paper); border-color: var(--accent);
+  z-index: 1000;
+}
+
+/* Count clusters — never show a single price (would misrepresent the
+   stacked listings). Size-stepped by child count (PR-8). */
+.pulpo-cluster {
+  display: grid; place-items: center;
+  width: 100%; height: 100%; border-radius: 999px;
+  background: var(--accent); color: var(--paper);
+  font-weight: 700;
+  box-shadow: var(--shadow-1);
+}
+.pulpo-cluster--sm { font-size: 12px; }
+.pulpo-cluster--md { font-size: 13px; }
+.pulpo-cluster--lg { font-size: 15px; }
+
+/* Popup preview. */
+.pulpo-popup__img {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  border-radius: var(--radius-sm); margin-bottom: var(--space-2);
+}
+.pulpo-popup__title { font-weight: 600; color: var(--ink); font-size: 14px; }
+.pulpo-popup__meta { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+.pulpo-popup__approx { color: var(--ink-3); font-size: 12px; margin-top: var(--space-2); }
+.pulpo-popup__cta {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  width: 100%;
+  background: var(--accent); color: var(--paper);
+  border: none; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Color-only feedback — no scale animation. */
+  .pulpo-pin,
+  .pulpo-pin:hover,
+  .pulpo-pin--selected,
+  .pulpo-pin--synced {
+    transform: translate(-50%, -50%);
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+}
 .filter-mobile-btn {
   display: none;
   padding: 8px 14px;
@@ -4106,6 +4350,28 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 12px;
+}
+/* PR-3 — category-pill shortcuts on the no-results-for-query state. */
+.empty-state .empty-pills {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+.empty-state .empty-pill {
+  padding: var(--space-2) var(--space-4);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.empty-state .empty-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* PR-4b — Advanced ranking group (collapsed by default) + methodology modal */

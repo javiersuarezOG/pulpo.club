@@ -560,10 +560,35 @@ const UI_STRINGS = {
   "sort.lowest_price":           { en: "Lowest price",    es: "Menor precio" },
   "sort.newest":                 { en: "Newest",          es: "Más recientes" },
   "sort.largest_plot":           { en: "Largest plot",    es: "Lote más grande" },
+  // Shown in place of the sort dropdown when a search query is active —
+  // results are ordered by keyword relevance, not the chosen sort.
+  "browse.sort.by_relevance":    { en: "Best match",      es: "Mejor coincidencia" },
 
   // Map view placeholder — disabled toggle next to cards/table view.
   "view.map_coming_soon":        { en: "Map (coming soon)",
                                    es: "Mapa (próximamente)" },
+  // Map view (WS4 PR-7).
+  "view.map":                    { en: "Map view",      es: "Vista en mapa" },
+  "map.aria":                    { en: "Property listings map", es: "Mapa de propiedades" },
+  "map.skeleton.loading":        { en: "Loading map…",   es: "Cargando mapa…" },
+  "map.approx_legend":           { en: "Locations are approximate",
+                                   es: "Las ubicaciones son aproximadas" },
+  "map.mapped_count":            { en: "{shown} of {total} listings mapped",
+                                   es: "{shown} de {total} propiedades en el mapa" },
+  "map.hide_approx":             { en: "Hide approximate ({n})",
+                                   es: "Ocultar aproximadas ({n})" },
+  "map.unavailable_for_filter":  { en: "Map unavailable — no mapped listings for this filter.",
+                                   es: "Mapa no disponible — no hay propiedades ubicadas para este filtro." },
+  "map.marker.aria":             { en: "{price} · {zone} — press Enter to preview",
+                                   es: "{price} · {zone} — presiona Enter para ver" },
+  "map.popup.approx_location":   { en: "Approximate location",
+                                   es: "Ubicación aproximada" },
+  "map.popup.view_listing":      { en: "View listing →", es: "Ver propiedad →" },
+  "map.search_as_i_move":        { en: "Search as I move", es: "Buscar al mover" },
+  "map.search_as_i_move.aria":   { en: "Search as I move the map",
+                                   es: "Buscar mientras muevo el mapa" },
+  "map.sheet.handle_aria":       { en: "Drag to expand the listings",
+                                   es: "Arrastra para ver las propiedades" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
@@ -598,6 +623,30 @@ const UI_STRINGS = {
   "browse.search.clear_aria":
     { en: "Clear search",
       es: "Borrar búsqueda" },
+  // Autocomplete dropdown (PR-2) — listbox aria + per-suggestion count.
+  "browse.search.suggest.aria":
+    { en: "Search suggestions",
+      es: "Sugerencias de búsqueda" },
+  "browse.search.suggest.count":
+    { en: "{n} listings",
+      es: "{n} propiedades" },
+  // No-results-for-query empty state (PR-3) + category-pill shortcuts.
+  "browse.search.no_results":
+    { en: "No listings matched “{q}”.",
+      es: "Ninguna propiedad coincide con “{q}”." },
+  "browse.search.no_results.try":
+    { en: "Try a category:",
+      es: "Prueba una categoría:" },
+  "browse.search.pill.beachfront":
+    { en: "Beachfront",        es: "Frente al mar" },
+  "browse.search.pill.under_100k":
+    { en: "Under $100k",       es: "Menos de $100k" },
+  "browse.search.pill.new_this_week":
+    { en: "New this week",     es: "Nuevas esta semana" },
+  "browse.search.pill.price_drops":
+    { en: "Price drops",       es: "Rebajas de precio" },
+  "browse.search.pill.build_ready":
+    { en: "Build-ready",       es: "Listo para construir" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /

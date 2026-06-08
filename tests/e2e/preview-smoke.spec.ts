@@ -181,6 +181,30 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(errors, "console errors during histogram interaction").toEqual([]);
   });
 
+  // PR-1 (WS4) — keyword relevance. When a search query is active,
+  // results re-order by keyword relevance, so the sort dropdown is
+  // swapped for a static "Best match" label. Asserts the swap both ways.
+  test("browse search swaps sort dropdown for the Best-match relevance label", async ({ page }) => {
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    const search = page.locator(".browse-search__input");
+    await search.waitFor({ state: "visible", timeout: 10_000 });
+
+    // No query → sort dropdown present, relevance label absent.
+    await expect(page.locator(".sort-select")).toBeVisible();
+    await expect(page.locator(".sort-relevance-label")).toHaveCount(0);
+
+    // Type a query → dropdown hides, "Best match" label shows.
+    await search.fill("tunco");
+    await expect(page.locator(".sort-relevance-label")).toBeVisible({ timeout: 3_000 });
+    await expect(page.locator(".sort-relevance-label")).toHaveText("Best match");
+    await expect(page.locator(".sort-select")).toHaveCount(0);
+
+    // Clear the query → dropdown returns.
+    await search.fill("");
+    await expect(page.locator(".sort-select")).toBeVisible({ timeout: 3_000 });
+    await expect(page.locator(".sort-relevance-label")).toHaveCount(0);
+  });
+
   // PR upgrade-flow-polish — verifies the Pro CTA on /plans actually
   // POSTs to /api/stripe/create-checkout-session. We mock the endpoint
   // (no real Stripe roundtrip in CI) and assert the click triggers a
@@ -575,6 +599,7 @@ test.describe("New app boots cleanly on key routes", () => {
       "Search by id",                                 // browse.search.placeholder (first half)
       "Search listings",                              // browse.search.aria_label
       "Clear search",                                 // browse.search.clear_aria
+      "Best match",                                   // browse.sort.by_relevance (relevance label, query-active)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would

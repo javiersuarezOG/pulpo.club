@@ -113,6 +113,13 @@ export type Listing = {
   dist_airport_km: number | null;
   dist_nearest_town_km: number | null;
   has_lat_lng: boolean;
+  /** Raw geocoded coordinates (PR-5/WS4). Exposed for the /browse map
+   *  view. ~99.5% populated, but ~97% are 'estimated' (zone-level) — see
+   *  geocoding_confidence / geocoding_source before trusting precision.
+   *  null when the listing has no coordinates (~0.5%); guard every read
+   *  with hasCoords() (web/app/components.jsx). */
+  lat: number | null;
+  lng: number | null;
   /** DeepSeek's self-reported confidence on the lat/lng. 'high' = within
    *  ~2km, 'medium' = within municipality, 'low' = department-level guess.
    *  null when DeepSeek didn't run OR the listing has no lat/lng (in which

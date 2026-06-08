@@ -24,6 +24,9 @@ import {
   hasFilterParamsInURL,
   readFilterFromURL,
   readSortFromURL,
+  readViewFromURL,
+  readBboxFromURL,
+  writeBboxToURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import {
@@ -37,7 +40,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
-import { tokenize, matchesQuery } from "./lib/search-match";
+import { tokenize, matchesQuery, scoreListing, buildSuggestions } from "./lib/search-match";
 import {
   Icon,
   RankTrophy,
@@ -79,6 +82,13 @@ import {
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
 import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/cta-routing";
+
+// PR-7/WS4 — map view, lazy so Leaflet + markercluster land in their own
+// Vite chunk and never touch the Browse entry bundle.
+const LazyMapView = React.lazy(() => import("./components/MapView.jsx"));
+// PR-10 — mobile map bottom sheet (reuses ListingCard; lazy to keep it
+// out of the entry bundle, it only renders in map view).
+const LazyMapBottomSheet = React.lazy(() => import("./components/MapBottomSheet.jsx"));
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -1132,13 +1142,28 @@ function BrowsePage({ app }) {
   // weekly newsletter pipeline in P3). Debounced + skip-if-equal; no
   // write for anonymous users.
   useDiscoverFilterPersist(app, filters);
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
+  // View seeds from the URL first (`?view=map` is shareable), then falls
+  // back to the localStorage default. Cards remains the default.
+  const [view, setView] = pUseState(() => {
+    if (typeof window === "undefined") return "cards";
+    const ls = localStorage.getItem("pulpo-view") || "cards";
+    return readViewFromURL(window.location.search, ls);
+  });
   const [sort, setSort] = pUseState(() =>
     typeof window !== "undefined"
       ? readSortFromURL(window.location.search, "recent")
       : "recent"
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
+
+  // PR-9/WS4 — map split-pane sync + "search as I move".
+  const [hoveredId, setHoveredId] = pUseState(null);
+  const [searchAsIMove, setSearchAsIMove] = pUseState(true);
+  const [mapBbox, setMapBbox] = pUseState(() =>
+    typeof window !== "undefined" ? readBboxFromURL(window.location.search) : null,
+  );
+  const hoverSourceRef = pUseRef(null); // "card" | "map" — gates scroll-into-view
+  const cardPanelRef = pUseRef(null);
 
   // Share-pin state — recipient landed via /l/<token> OR the canonical
   // /browse?pin=<token> share URL. We seed from ?pin so the pinned card
@@ -1183,6 +1208,8 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
+      setView(readViewFromURL(window.location.search, localStorage.getItem("pulpo-view") || "cards"));
+      setMapBbox(readBboxFromURL(window.location.search));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
     window.addEventListener("popstate", onPop);
@@ -1220,8 +1247,8 @@ function BrowsePage({ app }) {
   // Persist filter + sort + category to URLSearchParams (replaceState
   // — no new history entries on every chip toggle).
   pUseEffect(() => {
-    writeFilterToURL(filters, app.routeParams.category ?? null, sort);
-  }, [filters, sort, app.routeParams.category]);
+    writeFilterToURL(filters, app.routeParams.category ?? null, sort, view);
+  }, [filters, sort, app.routeParams.category, view]);
 
   pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
 
@@ -1253,6 +1280,18 @@ function BrowsePage({ app }) {
     // last set to.
     const r = applyRankCap(filtered, debouncedFilters.rank_max);
     const rankActive = debouncedFilters.rank_max != null && debouncedFilters.rank_max > 0;
+    // Keyword relevance: when a search query is active, order by
+    // scoreListing desc (title > zone > id/url, +1 word-boundary boost),
+    // tie-broken by rank_score. rank_max still wins over relevance so
+    // "Top 10 + query" stays best-first. This is keyword ranking, not
+    // natural-language/semantic search — no intent parsing.
+    const qTokens = tokenize(debouncedFilters.query);
+    const queryActive = qTokens.length > 0;
+    const relevanceSorter = (a, b) => {
+      const d = scoreListing(b, qTokens) - scoreListing(a, qTokens);
+      if (d !== 0) return d;
+      return (b.rank_score ?? 0) - (a.rank_score ?? 0);
+    };
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
       price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
@@ -1273,7 +1312,13 @@ function BrowsePage({ app }) {
         recomputeComposite(b, debouncedFilters.weights) -
         recomputeComposite(a, debouncedFilters.weights),
     };
-    const sorted = [...r].sort(rankActive ? sorters.stars_desc : (sorters[sort] || sorters.recent));
+    const sorted = [...r].sort(
+      rankActive
+        ? sorters.stars_desc
+        : queryActive
+          ? relevanceSorter
+          : (sorters[sort] || sorters.recent),
+    );
     // Emit perf telemetry for the full filter+sort cycle.
     if (_perf_t0 > 0 && typeof performance !== "undefined" && performance.now) {
       const ms = Math.round(performance.now() - _perf_t0);
@@ -1293,6 +1338,63 @@ function BrowsePage({ app }) {
   }, [debouncedFilters, sort, LISTINGS]);
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+
+  // When a search query is active, results are ordered by keyword
+  // relevance (see the results memo) so the sort dropdown no longer
+  // applies — swap it for a static "Best match" label. rank_max still
+  // overrides relevance, so keep the dropdown visible in that case.
+  const rankActive = filters.rank_max != null && filters.rank_max > 0;
+  const showRelevanceLabel = tokenize(filters.query).length > 0 && !rankActive;
+
+  // Map popup "View listing" — routes through the SAME CTA matrix as a
+  // card click so anon/free hit the FreeMonthModal and paid users open
+  // the detail panel (never a silent bypass).
+  const handleMapOpenListing = pUseCallback((id) => {
+    track("card.clicked", { listing_id: id, source_view: "map" });
+    const branch = routeCtaForState("shelf_card", app?.user);
+    trackCtaRouted("shelf_card", app?.user, branch, true);
+    if (branch === "passthrough") { app.openListing(id); return; }
+    void dispatchCentralBranch(branch, app, { trigger: "map_pin", pendingListing: id });
+  }, [app]);
+
+  // PR-9 — "search as I move" narrows the map + card panel to the
+  // viewport, CLIENT-SIDE (every listing is already in the browser).
+  // Map-branch-only post-filter — never touches applyFilters, so the
+  // cards/table views are unaffected.
+  const mapResults = pUseMemo(() => {
+    if (view !== "map" || !searchAsIMove || !mapBbox) return results;
+    return results.filter(
+      (l) =>
+        l.lat != null && l.lng != null &&
+        l.lat >= mapBbox.minLat && l.lat <= mapBbox.maxLat &&
+        l.lng >= mapBbox.minLng && l.lng <= mapBbox.maxLng,
+    );
+  }, [results, view, searchAsIMove, mapBbox]);
+
+  const handleMapBounds = pUseCallback((bbox) => {
+    setMapBbox(bbox);
+    writeBboxToURL(bbox);
+  }, []);
+  const handleToggleSearchAsIMove = pUseCallback((on) => {
+    setSearchAsIMove(on);
+    if (!on) { setMapBbox(null); writeBboxToURL(null); }
+  }, []);
+  const handleMarkerHover = pUseCallback((id) => { hoverSourceRef.current = "map"; setHoveredId(id); }, []);
+  const handleCardHover = pUseCallback((id) => { hoverSourceRef.current = "card"; setHoveredId(id); }, []);
+
+  // Marker-hover → scroll the matching card into the panel (only when
+  // the hover originated on the map, so card-hover doesn't self-scroll).
+  pUseEffect(() => {
+    if (view !== "map" || hoverSourceRef.current !== "map" || !hoveredId) return;
+    const panel = cardPanelRef.current;
+    const card = panel && panel.querySelector(`[data-listing-id="${(window.CSS && CSS.escape) ? CSS.escape(hoveredId) : hoveredId}"]`);
+    if (card) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [hoveredId, view]);
+
+  // bbox is map-only — clear it (and the URL param) when leaving map view.
+  pUseEffect(() => {
+    if (view !== "map" && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+  }, [view]);
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1401,6 +1503,9 @@ function BrowsePage({ app }) {
             onChange={(next) => setFiltersWithPinClear({ ...filters, query: next })}
             resultCount={results.length}
             locale={app.locale}
+            listings={LISTINGS}
+            filters={filters}
+            onApplyFilters={setFiltersWithPinClear}
           />
           <div className="results-header">
             <div className="results-count">
@@ -1461,17 +1566,21 @@ function BrowsePage({ app }) {
                   sort KEYS are unchanged so saved URLs (?sort=stars_desc
                   etc.) keep working; only the visible labels move. The
                   legacy options stay below for power-user access. */}
-              <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
-                <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
-                <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
-                <option value="days_asc">{t("sort.newest", app.locale)}</option>
-                <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
-                <option value="recent">{t("sort.recent", app.locale)}</option>
-                <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
-                <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
-                <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
-                <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
-              </select>
+              {showRelevanceLabel ? (
+                <span className="sort-relevance-label">{t("browse.sort.by_relevance", app.locale)}</span>
+              ) : (
+                <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
+                  <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
+                  <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
+                  <option value="days_asc">{t("sort.newest", app.locale)}</option>
+                  <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
+                  <option value="recent">{t("sort.recent", app.locale)}</option>
+                  <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
+                  <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
+                  <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
+                  <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
+                </select>
+              )}
               <div className="view-toggle">
                 <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label={t("view.table", app.locale)}>
                   <Icon name="list" size={16}/>
@@ -1479,14 +1588,12 @@ function BrowsePage({ app }) {
                 <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label={t("view.cards", app.locale)}>
                   <Icon name="grid" size={16}/>
                 </button>
-                {/* Map view placeholder per rewrite plan step 6. Disabled
-                    until the map prototype lands; the tooltip explains
-                    that to users who try clicking. */}
+                {/* Map view (WS4 PR-7) — third view option. */}
                 <button
-                  disabled
-                  className="map-view-placeholder"
-                  aria-label={t("view.map_coming_soon", app.locale)}
-                  title={t("view.map_coming_soon", app.locale)}
+                  className={view === "map" ? "active" : ""}
+                  onClick={() => setViewTelemeter("map")}
+                  aria-label={t("view.map", app.locale)}
+                  title={t("view.map", app.locale)}
                 >
                   <Icon name="map_pin" size={16}/>
                 </button>
@@ -1513,6 +1620,55 @@ function BrowsePage({ app }) {
               listings={LISTINGS}
               setFilters={setFiltersWithPinClear}
             />
+          ) : view === "map" ? (
+            <div className="map-split">
+              <div className="map-split__cards" ref={cardPanelRef}>
+                {mapResults.map((l) => (
+                  <ListingCard
+                    key={l.id}
+                    listing={l}
+                    app={app}
+                    compact
+                    source="map"
+                    highlighted={l.id === hoveredId}
+                    onHover={handleCardHover}
+                    onOpen={() => handleMapOpenListing(l.id)}
+                  />
+                ))}
+              </div>
+              <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
+                <LazyMapView
+                  results={mapResults}
+                  app={app}
+                  onOpenListing={handleMapOpenListing}
+                  hoveredId={hoveredId}
+                  onHoverMarker={handleMarkerHover}
+                  onBoundsChange={handleMapBounds}
+                  searchAsIMove={searchAsIMove}
+                  onToggleSearchAsIMove={handleToggleSearchAsIMove}
+                />
+              </React.Suspense>
+              {/* Mobile-only (CSS): floating Filters pill + bottom sheet
+                  with the result cards. Desktop uses the split-pane panel. */}
+              <button
+                className="map-filters-pill"
+                onClick={() => setFilterDrawerOpen(true)}
+                aria-label={t("view.filters", app.locale)}
+              >
+                <Icon name="sliders" size={16} /> {t("view.filters", app.locale)}
+                {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
+              </button>
+              <React.Suspense fallback={null}>
+                <LazyMapBottomSheet
+                  listings={mapResults}
+                  app={app}
+                  lc={app.locale}
+                  onOpenListing={handleMapOpenListing}
+                  onHover={handleCardHover}
+                  hoveredId={hoveredId}
+                />
+              </React.Suspense>
+            </div>
           ) : view === "cards" ? (
             <>
               <div className="card-grid">
@@ -2940,13 +3096,41 @@ function ToastHost({ app }) {
 // + scoring queued for PR-S2). Submit-side telemetry — we emit
 // `browse.search_submitted` on Enter / blur (not on every keystroke) so
 // the PostHog stream stays consumable.
-function BrowseSearchBar({ value, onChange, resultCount, locale }) {
+const SEARCH_SUGGEST_LISTBOX_ID = "browse-search-suggest";
+
+function BrowseSearchBar({ value, onChange, resultCount, locale, listings, filters, onApplyFilters }) {
   const lc = locale || currentLocale();
   // Local input mirrors `value` (the URL/filter state) so paint stays
   // synchronous with typing. Sync back to filters on every change — the
   // applyFilters debounce (300ms) handles the heavy work.
   const inputRef = pUseRef(null);
-  const handleChange = pUseCallback((e) => onChange(e.target.value), [onChange]);
+
+  // PR-2 — autocomplete dropdown. Suggestions (zones / land-types / up
+  // to 5 titles) are computed off a 150ms debounce of `value`. `closed`
+  // lets Escape / selection dismiss the panel without losing focus;
+  // typing reopens it. `open` is the render-time truth.
+  const [suggestions, setSuggestions] = pUseState([]);
+  const [activeIndex, setActiveIndex] = pUseState(-1);
+  const [hasFocus, setHasFocus] = pUseState(false);
+  const [closed, setClosed] = pUseState(false);
+  const open = hasFocus && !closed && suggestions.length > 0;
+
+  pUseEffect(() => {
+    const q = value || "";
+    if (q.trim().length < 2) { setSuggestions([]); return; }
+    const id = setTimeout(() => {
+      setSuggestions(buildSuggestions(q, listings, { max: 8, locale: lc, landTypeLabel }));
+    }, 150);
+    return () => clearTimeout(id);
+  }, [value, listings, lc]);
+
+  // Reset the keyboard cursor whenever the suggestion set changes.
+  pUseEffect(() => { setActiveIndex(-1); }, [suggestions]);
+
+  const handleChange = pUseCallback((e) => {
+    setClosed(false);
+    onChange(e.target.value);
+  }, [onChange]);
   // Submit telemetry — fires once per "intent." Pressing Enter while
   // typing counts as a submit; tabbing/blurring with a non-empty value
   // also counts. Avoids per-keystroke spam.
@@ -2962,20 +3146,63 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
       result_count: resultCount,
     });
   }, [value, resultCount]);
-  const handleKeyDown = pUseCallback((e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      emitSubmit();
-      inputRef.current?.blur();
-    } else if (e.key === "Escape" && value) {
-      e.preventDefault();
-      onChange("");
+
+  // Apply a suggestion: zone / land-type set a structured facet and
+  // clear the query; a title sets the query to the exact listing title.
+  const selectSuggestion = pUseCallback((s) => {
+    if (!s) return;
+    setClosed(true);
+    setActiveIndex(-1);
+    if (s.kind === "zone" && filters && onApplyFilters) {
+      const zones = new Set(filters.zones); zones.add(s.value);
+      onApplyFilters({ ...filters, zones, query: "" });
+      track("browse.search_suggest_selected", { kind: "zone" });
+    } else if (s.kind === "land_type" && filters && onApplyFilters) {
+      const land_types = new Set(filters.land_types); land_types.add(s.value);
+      onApplyFilters({ ...filters, land_types, query: "" });
+      track("browse.search_suggest_selected", { kind: "land_type" });
+    } else {
+      onChange(s.value);
+      track("browse.search_suggest_selected", { kind: "title" });
     }
-  }, [emitSubmit, onChange, value]);
+    inputRef.current?.blur();
+  }, [filters, onApplyFilters, onChange]);
+
+  const handleKeyDown = pUseCallback((e) => {
+    if (e.key === "ArrowDown" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (open && activeIndex >= 0) {
+        selectSuggestion(suggestions[activeIndex]);
+      } else {
+        emitSubmit();
+        inputRef.current?.blur();
+      }
+    } else if (e.key === "Escape") {
+      // Escape closes the panel first; a second press clears the query.
+      if (open) {
+        e.preventDefault();
+        setClosed(true);
+        setActiveIndex(-1);
+      } else if (value) {
+        e.preventDefault();
+        onChange("");
+      }
+    }
+  }, [open, suggestions, activeIndex, selectSuggestion, emitSubmit, onChange, value]);
+
   const handleClear = pUseCallback(() => {
     onChange("");
+    setClosed(false);
     inputRef.current?.focus();
   }, [onChange]);
+
+  const kindIcon = { zone: "map_pin", land_type: "sliders", title: "search" };
   return (
     <div className="browse-search">
       <Icon name="search" size={16} className="browse-search__icon" />
@@ -2986,9 +3213,15 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onBlur={emitSubmit}
+        onFocus={() => setHasFocus(true)}
+        onBlur={() => { setHasFocus(false); emitSubmit(); }}
         placeholder={t("browse.search.placeholder", lc)}
         aria-label={t("browse.search.aria_label", lc)}
+        role="combobox"
+        aria-expanded={open}
+        aria-controls={SEARCH_SUGGEST_LISTBOX_ID}
+        aria-autocomplete="list"
+        aria-activedescendant={open && activeIndex >= 0 ? `${SEARCH_SUGGEST_LISTBOX_ID}-opt-${activeIndex}` : undefined}
         maxLength={200}
         autoComplete="off"
         spellCheck={false}
@@ -3003,6 +3236,45 @@ function BrowseSearchBar({ value, onChange, resultCount, locale }) {
         >
           <Icon name="close" size={14} strokeWidth={2} />
         </button>
+      )}
+      {open && (
+        <ul
+          className="browse-search__suggest"
+          id={SEARCH_SUGGEST_LISTBOX_ID}
+          role="listbox"
+          aria-label={t("browse.search.suggest.aria", lc)}
+        >
+          {suggestions.map((s, i) => (
+            <li
+              key={`${s.kind}-${s.value}-${i}`}
+              id={`${SEARCH_SUGGEST_LISTBOX_ID}-opt-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              className={`browse-search__suggest-item${i === activeIndex ? " active" : ""}`}
+              // preventDefault on mousedown so the input doesn't blur
+              // (and close the panel) before the click selects the item.
+              onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => selectSuggestion(s)}
+            >
+              {s.kind === "title" && s.thumb ? (
+                <img className="browse-search__suggest-thumb" src={s.thumb} alt="" loading="lazy" />
+              ) : (
+                <span className="browse-search__suggest-icon">
+                  <Icon name={kindIcon[s.kind]} size={14} />
+                </span>
+              )}
+              <span className="browse-search__suggest-label">
+                {s.kind === "land_type" ? s.label : s.value}
+              </span>
+              {(s.kind === "zone" || s.kind === "land_type") && (
+                <span className="browse-search__suggest-meta">
+                  {t("browse.search.suggest.count", lc, { n: s.count })}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
@@ -3060,6 +3332,45 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
     candidates.sort((a, b) => b.count - a.count);
     return candidates[0] || null;
   }, [filters, listings]);
+
+  // PR-3 — query-specific empty state. When a search query is active and
+  // nothing matched, echo the query (via t(), plain text) and offer
+  // category-pill shortcuts that clear the query and apply a preset.
+  // Distinct from the filter-based empty state below.
+  const queryActive = filters && tokenize(filters.query).length > 0;
+  if (queryActive) {
+    const q = (filters.query || "").slice(0, 200);
+    const PILLS = [
+      { key: "beachfront", labelKey: "browse.search.pill.beachfront" },
+      { key: "under_100k", labelKey: "browse.search.pill.under_100k" },
+      { key: "new_this_week", labelKey: "browse.search.pill.new_this_week" },
+      { key: "price_drops", labelKey: "browse.search.pill.price_drops" },
+      { key: "build_ready", labelKey: "browse.search.pill.build_ready" },
+    ];
+    return (
+      <div className="empty-state">
+        <div className="empty-illus" aria-hidden="true">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="35" cy="35" r="20" stroke="var(--ink-3)" strokeWidth="2"/>
+            <line x1="50" y1="50" x2="65" y2="65" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <h3>{t("browse.search.no_results", lc, { q })}</h3>
+        <p>{t("browse.search.no_results.try", lc)}</p>
+        <div className="empty-pills">
+          {PILLS.map((p) => (
+            <button
+              key={p.key}
+              className="empty-pill"
+              onClick={() => setFilters && setFilters(buildFiltersForCategory(p.key))}
+            >
+              {t(p.labelKey, lc)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="empty-state">

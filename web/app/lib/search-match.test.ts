@@ -8,7 +8,7 @@
 // province_state / title.en / title.es / original_url.
 
 import { describe, it, expect } from "vitest";
-import { tokenize, matchesQuery, matchesQueryString } from "./search-match";
+import { tokenize, matchesQuery, matchesQueryString, scoreListing, buildSuggestions } from "./search-match";
 import type { Listing } from "../data/types";
 
 function L(overrides: Partial<Listing>): Listing {
@@ -63,6 +63,8 @@ function L(overrides: Partial<Listing>): Listing {
     dist_airport_km: null,
     dist_nearest_town_km: null,
     has_lat_lng: true,
+    lat: 13.49,
+    lng: -89.61,
     geocoding_confidence: "high",
     geocoding_source: "extracted",
     geocoding_reference: null,
@@ -161,5 +163,157 @@ describe("matchesQuery", () => {
     expect(matchesQueryString(stripped, "tunco")).toBe(true);
     // remax appears nowhere in this stripped fixture.
     expect(matchesQueryString(stripped, "remax")).toBe(false);
+  });
+});
+
+describe("scoreListing", () => {
+  it("returns 0 for empty tokens or null listing (non-query path untouched)", () => {
+    expect(scoreListing(L({}), [])).toBe(0);
+    expect(scoreListing(L({}), tokenize(""))).toBe(0);
+    expect(scoreListing(null, ["tunco"])).toBe(0);
+    expect(scoreListing(undefined, ["tunco"])).toBe(0);
+  });
+
+  it("title hit outranks a zone-only hit outranks an id/url-only hit", () => {
+    // "playa" appears only in the title here.
+    const titleHit = L({
+      title: { en: "Playa lot", es: "Lote playa" },
+      zone_name: "Mizata",
+      province_state: "La Libertad",
+      id: "x__1",
+      source_id: "1",
+      source_label: "X",
+      original_url: "https://x.com/a",
+    });
+    // "playa" appears only in the zone label.
+    const zoneHit = L({
+      title: { en: "Lot", es: "Lote" },
+      zone_name: "Playa El Zonte",
+      province_state: "La Libertad",
+      id: "x__2",
+      source_id: "2",
+      source_label: "X",
+      original_url: "https://x.com/b",
+    });
+    // "playa" appears only in the URL slug.
+    const urlHit = L({
+      title: { en: "Lot", es: "Lote" },
+      zone_name: "Mizata",
+      province_state: "La Libertad",
+      id: "x__3",
+      source_id: "3",
+      source_label: "X",
+      original_url: "https://x.com/playa-lot",
+    });
+    const toks = tokenize("playa");
+    expect(scoreListing(titleHit, toks)).toBeGreaterThan(scoreListing(zoneHit, toks));
+    expect(scoreListing(zoneHit, toks)).toBeGreaterThan(scoreListing(urlHit, toks));
+  });
+
+  it("gives a word-boundary boost over a mid-substring hit", () => {
+    const wholeWord = L({ title: { en: "tunco lot", es: "" }, zone_name: "z", province_state: "p", original_url: "" });
+    const midWord = L({ title: { en: "xtuncox lot", es: "" }, zone_name: "z", province_state: "p", original_url: "" });
+    const toks = tokenize("tunco");
+    expect(scoreListing(wholeWord, toks)).toBeGreaterThan(scoreListing(midWord, toks));
+  });
+
+  it("is null-safe on stripped fields", () => {
+    const stripped = L({ title: { en: "" } as Listing["title"], original_url: null, source_label: "" });
+    expect(() => scoreListing(stripped, tokenize("tunco"))).not.toThrow();
+    expect(scoreListing(stripped, tokenize("tunco"))).toBeGreaterThan(0);
+  });
+});
+
+describe("buildSuggestions", () => {
+  // A small mixed catalog: two El Tunco zones, one Mizata, mixed types.
+  const catalog: Listing[] = [
+    L({ id: "a__1", zone_name: "El Tunco", land_type: "residential", title: { en: "Tunco beach lot", es: "Lote playa Tunco" }, thumbnail_url: "https://x/a.jpg" }),
+    L({ id: "a__2", zone_name: "El Tunco", land_type: "tourist", title: { en: "Tunco hotel plot", es: "Hotel Tunco" } }),
+    L({ id: "a__3", zone_name: "El Tunco Norte", land_type: "residential", title: { en: "North Tunco parcel", es: "Parcela Tunco norte" } }),
+    L({ id: "a__4", zone_name: "Mizata", land_type: "commercial", title: { en: "Mizata point", es: "Punta Mizata" } }),
+  ];
+
+  it("returns [] below the 2-char gate", () => {
+    expect(buildSuggestions("t", catalog)).toEqual([]);
+    expect(buildSuggestions("", catalog)).toEqual([]);
+    expect(buildSuggestions(null, catalog)).toEqual([]);
+    expect(buildSuggestions("tu", null)).toEqual([]);
+  });
+
+  it("dedups zones and ranks them by listing count", () => {
+    const sugs = buildSuggestions("tunco", catalog, { max: 8 });
+    const zones = sugs.filter((s) => s.kind === "zone");
+    // "El Tunco" (2 listings) and "El Tunco Norte" (1) — deduped, El Tunco first.
+    expect(zones.map((z) => z.value)).toEqual(["El Tunco", "El Tunco Norte"]);
+    const elTunco = zones.find((z) => z.value === "El Tunco");
+    expect(elTunco && "count" in elTunco && elTunco.count).toBe(2);
+  });
+
+  it("matches land types via the injected localized label", () => {
+    const sugs = buildSuggestions("resid", catalog, {
+      landTypeLabel: (k) => (k === "residential" ? "Residential" : k),
+    });
+    const lt = sugs.find((s) => s.kind === "land_type");
+    expect(lt && lt.kind === "land_type" && lt.value).toBe("residential");
+  });
+
+  it("caps total at max and titles at 5", () => {
+    const many = Array.from({ length: 20 }, (_, i) =>
+      L({ id: `z__${i}`, zone_name: `Zone ${i}`, title: { en: `Tunco listing ${i}`, es: "" } }),
+    );
+    const sugs = buildSuggestions("tunco", many, { max: 8 });
+    expect(sugs.length).toBeLessThanOrEqual(8);
+    expect(sugs.filter((s) => s.kind === "title").length).toBeLessThanOrEqual(5);
+  });
+
+  it("title suggestions carry the locale-correct display + thumb", () => {
+    const sugs = buildSuggestions("tunco", catalog, { locale: "es", max: 8 });
+    const title = sugs.find((s) => s.kind === "title");
+    expect(title && title.kind === "title" && title.value.startsWith("Lote playa")).toBe(true);
+    // The first catalog entry carries a thumbnail.
+    const withThumb = sugs.find((s) => s.kind === "title" && s.thumb);
+    expect(withThumb).toBeTruthy();
+  });
+});
+
+describe("description + usps in haystack (PR-4)", () => {
+  it("matches a token that only appears in the description (either locale)", () => {
+    const l = L({
+      title: { en: "Lot", es: "Lote" },
+      description: { en: "clear titled deed available", es: "escritura registrada" },
+    });
+    expect(matchesQueryString(l, "titled")).toBe(true);
+    expect(matchesQueryString(l, "escritura")).toBe(true);
+  });
+
+  it("matches a token that only appears in a usp", () => {
+    const l = L({
+      title: { en: "Lot", es: "Lote" },
+      usps: [{ en: "river frontage", es: "frente al rio" }],
+    });
+    expect(matchesQueryString(l, "frontage")).toBe(true);
+    expect(matchesQueryString(l, "frente")).toBe(true);
+  });
+
+  it("a description-only hit ranks below a title hit", () => {
+    const titleHit = L({ title: { en: "riverfront lot", es: "lote riverfront" }, description: { en: "", es: "" }, usps: [] });
+    const descHit = L({
+      title: { en: "lot", es: "lote" },
+      zone_name: "z",
+      province_state: "p",
+      original_url: "",
+      description: { en: "riverfront access", es: "" },
+      usps: [],
+    });
+    const toks = tokenize("riverfront");
+    expect(scoreListing(titleHit, toks)).toBeGreaterThan(scoreListing(descHit, toks));
+    expect(scoreListing(descHit, toks)).toBeGreaterThan(0);
+  });
+
+  it("is null-safe when description / usps are null", () => {
+    const l = L({ description: null as unknown as Listing["description"], usps: null as unknown as Listing["usps"] });
+    expect(() => matchesQueryString(l, "tunco")).not.toThrow();
+    expect(matchesQueryString(l, "tunco")).toBe(true);
+    expect(() => scoreListing(l, tokenize("tunco"))).not.toThrow();
   });
 });
