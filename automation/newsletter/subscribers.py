@@ -501,8 +501,17 @@ def join_recipients(
     include_unsubscribed: bool = False,
     only_emails: Optional[set[str]] = None,
     allow_non_pro: bool = False,
+    free_only: bool = False,
 ) -> list[Recipient]:
     """Build the cron's per-recipient queue.
+
+    `free_only=True` is the inverse audience of the default: include the
+    FREE tier (free Clerk users + anonymous Resend contacts) and EXCLUDE
+    Pro/Agency. This is the audience for the free-tier weekly
+    (pulpo-free-general) — the staged, dry-run-gated Sunday send that
+    complements the Pro weekly. Mutually exclusive in intent with the
+    default Pro audience; `allow_non_pro` (everyone) takes precedence if
+    both are somehow set.
 
     PR-NL-9 (audience scope): by default only Pro + Agency recipients
     land in the queue. Free-tier Clerk users and anonymous (no Clerk
@@ -540,11 +549,15 @@ def join_recipients(
         if only is not None and c.email not in only:
             continue
         user = by_email.get(c.email)
+        # `include_non_pro` admits free Clerk users + anonymous contacts.
+        # Default audience (Pro weekly) keeps them out; `allow_non_pro`
+        # (everyone) and `free_only` (free audience) both let them in.
+        include_non_pro = allow_non_pro or free_only
         # Pro / Agency gate. Anonymous (no Clerk record) is filtered
         # here; free-tier Clerk users are filtered by the tier check
-        # right after. Both are bypassed when allow_non_pro=True.
+        # right after. Both are admitted when include_non_pro.
         if user is None:
-            if not allow_non_pro:
+            if not include_non_pro:
                 continue
             # Anonymous synthesis: locale from Resend first_name
             # side-channel, everything else nominal. The build_issue
@@ -562,7 +575,12 @@ def join_recipients(
             )
             out.append(recipient)
             continue
-        if user.plan not in PRO_AUDIENCE_TIERS and not allow_non_pro:
+        is_pro = user.plan in PRO_AUDIENCE_TIERS
+        # free_only audience: drop Pro/Agency (they get the Pro weekly).
+        if free_only and is_pro:
+            continue
+        # default Pro audience: drop free Clerk users (unless admitted above).
+        if not is_pro and not include_non_pro:
             continue
         # Welcome-vs-weekly collision skip. Pro users whose welcome
         # newsletter shipped within the past 24h are dropped from the
@@ -722,6 +740,7 @@ def build_recipient_queue(
     only_emails: Optional[set[str]] = None,
     include_unsubscribed: bool = False,
     allow_non_pro: bool = False,
+    free_only: bool = False,
 ) -> list[tuple[Recipient, str]]:
     """End-to-end helper: fetch + join + return (recipient, raw_email) tuples.
 
@@ -731,6 +750,7 @@ def build_recipient_queue(
 
     `allow_non_pro` is the launch escape hatch — see join_recipients
     docstring. Default False keeps the Pro/Agency gate in force.
+    `free_only` builds the inverse (free-tier) audience for the free weekly.
     """
     contacts = list_audience()
     users = list_clerk_users()
@@ -740,6 +760,7 @@ def build_recipient_queue(
         include_unsubscribed=include_unsubscribed,
         only_emails=only_emails,
         allow_non_pro=allow_non_pro,
+        free_only=free_only,
     )
     # Pair each Recipient with its raw email — rely on positional order
     # being stable inside join_recipients (it iterates contacts in input

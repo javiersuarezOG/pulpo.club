@@ -301,6 +301,17 @@ def main() -> int:
         ),
     )
     p.add_argument(
+        "--free-audience",
+        action="store_true",
+        help=(
+            "Build the FREE-tier audience instead of the Pro one: free "
+            "Clerk users + anonymous Resend contacts, with Pro/Agency "
+            "EXCLUDED. Pair with `--newsletter pulpo-free-general` for the "
+            "free weekly. Staged: the Sunday cron stays Pro-only; this is "
+            "run via workflow_dispatch and is dry-run unless send_mode=yes."
+        ),
+    )
+    p.add_argument(
         "--limit",
         type=int,
         default=None,
@@ -355,10 +366,13 @@ def main() -> int:
             # non-Pro recipients are in this run. PR review + post-mortem
             # should grep for this exact string.
             print("[send] ⚠️  --allow-all-subscribers ON — Pro/Agency gate BYPASSED")
+        if args.free_audience:
+            print("[send] FREE AUDIENCE — free Clerk users + anonymous contacts; Pro/Agency excluded")
         queue = build_recipient_queue(
             only_emails=only,
             include_unsubscribed=args.include_unsubscribed,
             allow_non_pro=args.allow_all_subscribers,
+            free_only=args.free_audience,
         )
     if args.limit:
         queue = queue[: args.limit]
