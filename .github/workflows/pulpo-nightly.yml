@@ -556,6 +556,21 @@ jobs:
           print(f"CANARY OK [{cc}]: {n} listings in [{floor}, {ceiling}]")
           EOF
 
+      - name: Delta decision (Slack runbook record)
+        # Runs BEFORE the gate so the operational decision posts whether
+        # or not the gate blocks the commit. Best-effort: classifies each
+        # per-source delta into a runbook bucket (source_failed /
+        # source_partial / validation_collapse / expected_change /
+        # unknown) and posts to Slack. Consumer of automation/delta_decision
+        # (CLAUDE.md producer/consumer rule). Never fails the job; logs the
+        # decision even when SLACK_WEBHOOK_URL is unset.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 scripts/run_delta_decision.py || \
+            echo "::warning::delta-decision step errored (non-blocking)"
+
       - name: Per-source row-count delta gate
         env:
           ROW_COUNT_GATE_LOG_ONLY: ${{ vars.ROW_COUNT_GATE_LOG_ONLY || 'false' }}
