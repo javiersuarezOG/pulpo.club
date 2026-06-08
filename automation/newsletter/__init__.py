@@ -13,8 +13,12 @@ from .build_issue import build_issue
 from .render_html import (
     render_html,
     render_free_general_html,
+    render_free_welcome_html,
+    render_free_welcome_back_html,
     TEMPLATE_VERSION,
     FREE_GENERAL_TEMPLATE_VERSION,
+    FREE_WELCOME_TEMPLATE_VERSION,
+    FREE_WELCOME_BACK_TEMPLATE_VERSION,
 )
 
 __all__ = [
@@ -27,6 +31,10 @@ __all__ = [
     "build_issue",
     "render_html",
     "render_free_general_html",
+    "render_free_welcome_html",
+    "render_free_welcome_back_html",
     "TEMPLATE_VERSION",
     "FREE_GENERAL_TEMPLATE_VERSION",
+    "FREE_WELCOME_TEMPLATE_VERSION",
+    "FREE_WELCOME_BACK_TEMPLATE_VERSION",
 ]

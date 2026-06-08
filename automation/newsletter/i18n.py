@@ -220,6 +220,20 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # strings anymore. Only welcome.email.subject + welcome.hero.* above are
     # welcome-specific; the welcome-back derives from them via welcome_text.
 
+    # ── Pulpo FREE Welcome (one-shot, fires when a free reader subscribes) ──
+    # The free-welcome is the free-general master with ONLY the hero swapped
+    # (render_html variant="free_welcome"): plain `pulpo` masthead, top-3
+    # "See on Pulpo" + ranks 04-10 "Sign up to Pro", Pro-locked spotlight.
+    # The identity is plain Pulpo (NOT "Pulpo Pro") — a free reader isn't a
+    # Pro member. Free welcome-back derives from these via welcome_text, same
+    # "Welcome → Welcome back" / "first 10 → next 10" rewrite as the Pro pair.
+    "free_welcome.email.subject":       {"en": "Welcome to Pulpo — your first 10",            "es": "Bienvenido a Pulpo — tus primeras 10"},
+    "free_welcome.hero.eyebrow":        {"en": "Welcome to Pulpo",                            "es": "Bienvenido a Pulpo"},
+    "free_welcome.hero.headline.named": {"en": "Welcome, {name}.",                            "es": "Bienvenido, {name}."},
+    "free_welcome.hero.headline.unnamed": {"en": "Welcome aboard.",                           "es": "Bienvenido a bordo."},
+    "free_welcome.hero.lede":           {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco. Ranked by value, refreshed weekly. Your first 10 are below — the top 3 open, the rest a tap away when you go Pro.",
+                                         "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo — las 3 mejores abiertas, el resto a un toque cuando pasés a Pro."},
+
     # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
     # NO stored welcome_back.* copy. The welcome-back email is the SAME
     # email as the first-time welcome (one shared template, toggled by
@@ -279,15 +293,24 @@ _WELCOMEBACK_REWRITES: dict[str, list] = {
 
 def welcome_text(key_suffix: str, locale: Locale = DEFAULT_LOCALE, *,
                  variant: str = "welcome", **fmt) -> str:
-    """Resolve a `welcome.<key_suffix>` string, applying the welcome-back
-    rewrite when `variant == "welcome_back"`.
+    """Resolve a welcome-hero string, applying the welcome-back rewrite for
+    the resubscribe variant.
 
-    This is the single entry point for welcome / welcome-back hero +
-    subject + picks-title copy. There is no separate welcome_back.* table —
-    the welcome-back string is a pure function of the welcome string, so
-    the two emails can never diverge beyond the documented rewrite."""
-    base = t(f"welcome.{key_suffix}", locale, **fmt)
-    if variant != "welcome_back":
+    Two parallel string families share this one entry point:
+      • Pro welcome     → reads `welcome.<suffix>`     (variants "welcome" /
+        "welcome_back").
+      • Free welcome    → reads `free_welcome.<suffix>` (variants
+        "free_welcome" / "free_welcome_back").
+    The "back" variant of either family applies the SAME locale-aware
+    rewrites ("Welcome" → "Welcome back", "first 10" → "next 10"), so a
+    free welcome-back can't drift from the free welcome any more than the
+    Pro pair can. There is no stored *_back.* table on either side."""
+    if variant in ("free_welcome", "free_welcome_back"):
+        prefix, is_back = "free_welcome", variant == "free_welcome_back"
+    else:
+        prefix, is_back = "welcome", variant == "welcome_back"
+    base = t(f"{prefix}.{key_suffix}", locale, **fmt)
+    if not is_back:
         return base
     rules = _WELCOMEBACK_REWRITES.get(locale) or _WELCOMEBACK_REWRITES[DEFAULT_LOCALE]
     out = base
