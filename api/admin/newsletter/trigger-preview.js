@@ -73,6 +73,18 @@ const KNOWN_NEWSLETTER_IDS = new Set([
 ]);
 const DEFAULT_NEWSLETTER_ID = "pro-weekly";
 
+// Newsletter id → Python template id (the `--newsletter` value routed
+// through automation/newsletter/templates::TEMPLATES). Passed to the
+// workflow as `newsletter_template` so the same preview pipeline renders
+// the right template — without this map every preview rendered as the Pro
+// General master regardless of which card the operator clicked. Any id
+// not listed falls back to the Pro General default in the workflow.
+const TEMPLATE_FOR_NEWSLETTER = {
+  "pro-weekly": "pulpo-pro-general",
+  "free-weekly": "pulpo-free-general",
+};
+const DEFAULT_TEMPLATE = "pulpo-pro-general";
+
 // Fire a PostHog event so /api/admin/newsletter/recent-triggers can
 // read the cross-device + cross-operator audit log back via HogQL.
 // Best-effort + never blocks the response — the GitHub dispatch is the
@@ -238,6 +250,7 @@ module.exports = async (req, res) => {
           preview_cohorts: email,
           issue_number: issueNumberStr,
           preview_locale: locale,
+          newsletter_template: TEMPLATE_FOR_NEWSLETTER[newsletterId] || DEFAULT_TEMPLATE,
         },
       }),
     });
