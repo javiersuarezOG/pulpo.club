@@ -601,6 +601,13 @@ const UI_STRINGS = {
   "browse.search.clear_aria":
     { en: "Clear search",
       es: "Borrar búsqueda" },
+  // Autocomplete dropdown (PR-2) — listbox aria + per-suggestion count.
+  "browse.search.suggest.aria":
+    { en: "Search suggestions",
+      es: "Sugerencias de búsqueda" },
+  "browse.search.suggest.count":
+    { en: "{n} listings",
+      es: "{n} propiedades" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /

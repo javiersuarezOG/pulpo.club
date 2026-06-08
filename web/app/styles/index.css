@@ -1193,6 +1193,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
    viewports it caps at a comfortable reading width so the bar doesn't
    stretch the full results column. */
 .browse-search {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -1246,6 +1247,61 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .browse-search__clear:hover {
   background: var(--paper-2);
   color: var(--ink-2);
+}
+/* PR-2 — autocomplete dropdown. Anchored to the search box, clamped to
+   its width so it never causes horizontal scroll at 320px. */
+.browse-search__suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+}
+.browse-search__suggest-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--ink);
+}
+.browse-search__suggest-item.active {
+  background: var(--paper-2);
+}
+.browse-search__suggest-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--ink-3);
+}
+.browse-search__suggest-thumb {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+.browse-search__suggest-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.browse-search__suggest-meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .results-header {
   display: flex; justify-content: space-between; align-items: center;

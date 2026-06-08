@@ -120,6 +120,95 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// ====== Autocomplete suggestions ======
+// Pure, deterministic suggestion builder for the /browse search
+// dropdown. Returns up to `max` (default 8) entries: zone-name matches
+// (apply a zone facet), land-type matches (apply a land_type facet),
+// and up to 5 listing-title matches (set the query). Gated at ≥2 chars.
+// Display strings are resolved here so the render site stays dumb —
+// `locale` picks the title language and `landTypeLabel` localizes the
+// land-type facet label (both injected so this module stays i18n-free).
+
+export type Suggestion =
+  | { kind: "zone"; value: string; count: number }
+  | { kind: "land_type"; value: string; label: string; count: number }
+  | { kind: "title"; value: string; listingId: string; thumb: string | null };
+
+export function buildSuggestions(
+  query: string | null | undefined,
+  listings: Listing[] | null | undefined,
+  opts?: {
+    max?: number;
+    locale?: "en" | "es";
+    landTypeLabel?: (key: string) => string;
+  },
+): Suggestion[] {
+  const max = opts?.max ?? 8;
+  const locale = opts?.locale ?? "en";
+  const folded = query ? foldAscii(query.trim()) : "";
+  // ≥2-char gate — single characters match almost everything and the
+  // dropdown would be noise.
+  if (folded.length < 2) return [];
+  if (!Array.isArray(listings) || listings.length === 0) return [];
+  const tokens = tokenize(query);
+
+  // Zone-name matches, deduped, ranked by how many listings they hold.
+  const zoneCounts = new Map<string, number>();
+  const ltCounts = new Map<string, number>();
+  for (const l of listings) {
+    if (!l) continue;
+    const zn = l.zone_name;
+    if (zn && foldAscii(zn).includes(folded)) {
+      zoneCounts.set(zn, (zoneCounts.get(zn) ?? 0) + 1);
+    }
+    const lt = l.land_type;
+    if (lt) {
+      const label = opts?.landTypeLabel ? opts.landTypeLabel(lt) : lt;
+      if (foldAscii(label).includes(folded) || foldAscii(lt).includes(folded)) {
+        ltCounts.set(lt, (ltCounts.get(lt) ?? 0) + 1);
+      }
+    }
+  }
+  const zoneSugs: Suggestion[] = [...zoneCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([value, count]) => ({ kind: "zone", value, count }));
+  const ltSugs: Suggestion[] = [...ltCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([value, count]) => ({
+      kind: "land_type",
+      value,
+      label: opts?.landTypeLabel ? opts.landTypeLabel(value) : value,
+      count,
+    }));
+
+  // Up to 5 title matches, ranked by relevance, deduped by display title.
+  const titleSugs: Suggestion[] = [];
+  if (tokens.length > 0) {
+    const scored = listings
+      .map((l) => ({ l, s: scoreListing(l, tokens) }))
+      .filter((x) => x.s > 0)
+      .sort((a, b) => b.s - a.s);
+    const seen = new Set<string>();
+    for (const { l } of scored) {
+      if (titleSugs.length >= 5) break;
+      const title = (l.title?.[locale] || l.title?.en || l.title?.es || "").trim();
+      if (!title) continue;
+      const key = foldAscii(title);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      titleSugs.push({
+        kind: "title",
+        value: title,
+        listingId: l.id,
+        thumb: l.thumbnail_url ?? null,
+      });
+    }
+  }
+
+  // Order: zones → land types → titles, capped at `max` total.
+  return [...zoneSugs, ...ltSugs, ...titleSugs].slice(0, max);
+}
+
 // Lowercase + strip diacritics. We use the same fold on both sides so
 // "Conchagua" matches "Conchaguá" and "EL TUNCO" matches "el tunco".
 // Anything else we leave alone — numeric ids and URL slugs are
