@@ -225,20 +225,19 @@ module.exports = withTiming(async (req, res) => {
       let next = Array.isArray(saves) ? [...saves] : [];
 
       if (action === "add") {
+        // Two-state model (2026-06-08): saving is a Pro capability. The
+        // never-paid free account is gone; a non-Pro `plan` here is a
+        // canceled/ever-paid member. They cannot ADD saves — the UI gates
+        // this, and we enforce it server-side too (defense in depth against
+        // a direct POST). `remove` stays open below so a canceled member
+        // can still tidy listings they saved while active. The old
+        // free-tier 10-cap is retired: Pro is uncapped, non-Pro is blocked.
+        const isActivePro = plan === "pro" || plan === "agency";
+        if (!isActivePro) {
+          logApi("saves", { status: 403, ms: Date.now() - t0, op: "add", reason: "pro_required", plan });
+          return res.status(403).json({ error: "pro_required", plan });
+        }
         if (!_hasId(next, listingId)) {
-          // Cap check against the dedup'd ID count, not raw array length,
-          // so a legacy duplicate doesn't burn one of the user's slots.
-          const currentCount = _extractIds(next).length;
-          if (plan === "free" && currentCount >= FREE_SAVE_CAP) {
-            logApi("saves", {
-              status: 402, ms: Date.now() - t0, op: "add", reason: "cap_reached", count: currentCount,
-            });
-            return res.status(402).json({
-              error: "save_cap_reached",
-              cap: FREE_SAVE_CAP,
-              plan,
-            });
-          }
           // Server-side enrichment: look up ranked.json so the saved
           // entry carries price_at_save_usd + saved_at. The newsletter
           // pipeline uses these to compute "↓ Price dropped $X" deltas.
