@@ -50,14 +50,28 @@ function escapeHtml(s) {
   );
 }
 
-export default function MapView({ results, app, onOpenListing }) {
+export default function MapView({
+  results, app, onOpenListing,
+  // PR-9 — card↔marker sync + search-as-I-move.
+  hoveredId = null, onHoverMarker, onBoundsChange,
+  searchAsIMove = true, onToggleSearchAsIMove,
+}) {
   const lc = app?.locale || currentLocale();
   const elRef = useRef(null);
   const mapRef = useRef(null);
   const clusterRef = useRef(null);
+  const markerByIdRef = useRef(new Map());
   const onOpenRef = useRef(onOpenListing);
+  const onHoverRef = useRef(onHoverMarker);
+  const onBoundsRef = useRef(onBoundsChange);
+  const searchAsIMoveRef = useRef(searchAsIMove);
+  const moveTimerRef = useRef(null);
+  const readyRef = useRef(false); // suppress the init-triggered moveend
   const lcRef = useRef(lc);
   useEffect(() => { onOpenRef.current = onOpenListing; }, [onOpenListing]);
+  useEffect(() => { onHoverRef.current = onHoverMarker; }, [onHoverMarker]);
+  useEffect(() => { onBoundsRef.current = onBoundsChange; }, [onBoundsChange]);
+  useEffect(() => { searchAsIMoveRef.current = searchAsIMove; }, [searchAsIMove]);
   useEffect(() => { lcRef.current = lc; }, [lc]);
 
   const [hideApprox, setHideApprox] = useState(false);
@@ -135,9 +149,28 @@ export default function MapView({ results, app, onOpenListing }) {
       if (pin) pin.classList.remove("pulpo-pin--selected");
     });
 
+    // PR-9 — "search as I move": debounce 400ms after a pan/zoom, then
+    // report the viewport bbox so the card panel + URL narrow to it.
+    // Only report viewport changes the USER caused — skip the
+    // programmatic moveend(s) from the initial setView.
+    const readyTimer = setTimeout(() => { readyRef.current = true; }, 600);
+    map.on("moveend", () => {
+      if (!searchAsIMoveRef.current || !readyRef.current) return;
+      if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+      moveTimerRef.current = setTimeout(() => {
+        const b = map.getBounds();
+        onBoundsRef.current?.({
+          minLat: b.getSouth(), minLng: b.getWest(),
+          maxLat: b.getNorth(), maxLng: b.getEast(),
+        });
+      }, 400);
+    });
+
     mapRef.current = map;
     clusterRef.current = cluster;
     return () => {
+      clearTimeout(readyTimer);
+      if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       map.remove();
       mapRef.current = null;
       clusterRef.current = null;
@@ -156,6 +189,7 @@ export default function MapView({ results, app, onOpenListing }) {
     if (shown.length > MAX_MARKERS) {
       track("map.markers_truncated", { shown: shown.length, cap: MAX_MARKERS });
     }
+    const byId = new Map();
     const markers = slice.map((l) => {
       const low = isLowConfidenceGeo(l);
       const price = low ? "" : formatPinPrice(l.price);
@@ -182,10 +216,27 @@ export default function MapView({ results, app, onOpenListing }) {
         maxWidth: 280,
         className: "pulpo-popup-wrap",
       });
+      // PR-9 — hovering a marker highlights its card in the panel.
+      m.on("mouseover", () => onHoverRef.current?.(l.id));
+      m.on("mouseout", () => onHoverRef.current?.(null));
+      byId.set(l.id, m);
       return m;
     });
+    markerByIdRef.current = byId;
     cluster.addLayers(markers);
   }, [shown]);
+
+  // PR-9 — reflect an externally-hovered card onto its marker (add the
+  // sync highlight class to the matching pin, if it's currently in the
+  // DOM — markers inside an un-expanded cluster have no element yet).
+  useEffect(() => {
+    const m = hoveredId ? markerByIdRef.current.get(hoveredId) : null;
+    const pin = m?._icon?.querySelector(".pulpo-pin");
+    if (pin) pin.classList.add("pulpo-pin--synced");
+    return () => {
+      if (pin) pin.classList.remove("pulpo-pin--synced");
+    };
+  }, [hoveredId]);
 
   if (unavailable) {
     return (
@@ -202,6 +253,17 @@ export default function MapView({ results, app, onOpenListing }) {
           {t("map.mapped_count", lc, { shown: mappable.length, total: results?.length ?? 0 })}
         </span>
         <span className="map-view__legend">{t("map.approx_legend", lc)}</span>
+        {onToggleSearchAsIMove && (
+          <button
+            type="button"
+            className={`map-view__saim${searchAsIMove ? " active" : ""}`}
+            aria-pressed={searchAsIMove}
+            aria-label={t("map.search_as_i_move.aria", lc)}
+            onClick={() => onToggleSearchAsIMove(!searchAsIMove)}
+          >
+            {t("map.search_as_i_move", lc)}
+          </button>
+        )}
         {approxCount > 0 && (
           <label className="map-view__hide-approx">
             <input

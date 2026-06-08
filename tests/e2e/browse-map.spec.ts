@@ -58,6 +58,28 @@ test.describe("Browse map view", () => {
     expect(uncaught, "uncaught JS exceptions on ?view=map cold-load").toEqual([]);
   });
 
+  test("desktop split-pane: card panel + search-as-I-move pill (PR-9)", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    // Card panel renders alongside the map with cards in it.
+    const panel = page.locator(".map-split__cards");
+    await expect(panel).toBeVisible();
+    expect(await panel.locator(".listing-card").count()).toBeGreaterThan(0);
+
+    // "Search as I move" pill is present, ON by default, and toggles.
+    const pill = page.locator(".map-view__saim");
+    await expect(pill).toHaveAttribute("aria-pressed", "true");
+    await pill.click();
+    await expect(pill).toHaveAttribute("aria-pressed", "false");
+
+    // Hovering a card draws the sync highlight on it.
+    const firstCard = panel.locator(".listing-card").first();
+    await firstCard.hover();
+    await expect(firstCard).toHaveClass(/listing-card-highlighted/);
+  });
+
   test("map view holds layout at mobile + desktop (no horizontal scroll)", async ({ page }) => {
     for (const size of [{ w: 320, h: 568 }, { w: 1280, h: 800 }]) {
       await page.setViewportSize({ width: size.w, height: size.h });
