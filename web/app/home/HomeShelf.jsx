@@ -86,29 +86,29 @@ function useShelfScrolled(shelfKey, listRef) {
 // ────────────────────────────────────────────────────────────────────
 // Real-listing pickers — Wave 5 polish
 
-// PRD A5 — raised 5 → 10 per the PRD's shelf-rendering threshold.
-// Gated on A3 (shelf-aware photo waiver) being live: without the
-// loose-eligible top-up, every shelf with 7-8 strict-eligible listings
-// would disappear under the higher threshold. With A3, shelves fill to
-// 10 — trailing positions render the "Foto aún no disponible"
-// placeholder when the broker hasn't shared a photo yet.
-const MIN_REAL_LISTINGS = 10;
+// Floor for the "show fewer cards, keep the shelf visible" behavior after
+// the photo-placeholder top-up was removed (homepage hard rule). A shelf
+// with ≥ MIN_REAL_LISTINGS photo-eligible listings renders that many real
+// cards (fewer than the full 10 is fine); below it the shelf hides rather
+// than show a degenerate 1-2 card carousel. Tunable — bump toward 10 to
+// favor full rows, drop toward 1 to never hide.
+const MIN_REAL_LISTINGS = 4;
 
-// Curated shelves only surface complete listings. A listing missing
-// price or area never qualifies regardless of how strong its other
-// signals are — the shelf is a quality promise, not a recall surface.
+// Curated shelves only surface complete listings WITH a suitable picture.
+// HARD RULE (2026-06-08): a homepage listing must have a locally-served
+// thumbnail that the pipeline judged card-suitable. `thumbnail_url != null`
+// = a /photos derivative exists; `card_eligible === true` = the source met
+// the 800×600 floor AND isn't a logo/placeholder (P5 forces card_eligible
+// False for those). `photos.length > 0` is NOT the gate — a broker-URL
+// array is not proof of a renderable, non-404, non-logo card image (the
+// exact failure that put 1,037 broken heroes + 19 xitios logos on the
+// homepage). Discovery/Browse stays EXEMPT and shows full inventory.
 function isShelfEligible(l) {
-  return !l.is_incomplete && l.photos && l.photos.length > 0;
-}
-
-// PRD A3 — shelf-aware photo gate. When a shelf has < MIN_REAL_LISTINGS
-// strict-eligible listings, the picker tops up with loose-eligible
-// listings (no photo) so the shelf still renders at full capacity.
-// Loose-eligible cards stamp `_needs_photo_placeholder=true` (FE-only,
-// not persisted to the Listing type) so ShelfCard renders the
-// "Foto aún no disponible" placeholder in place of <Photo>.
-function isShelfEligibleLoose(l) {
-  return !l.is_incomplete;
+  return (
+    !l.is_incomplete &&
+    l.thumbnail_url != null &&
+    l.card_eligible === true
+  );
 }
 
 // Top 10: rank_score-sorted, must have at least one photo.
@@ -184,37 +184,21 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
     const isTopTen = shelfKey === "top_10";
     const badge = isTopTen ? null : badgeForListing(listing, shelfKey);
     const showRank = isTopTen && rank != null;
-    // PRD A3 — shelf-aware photo waiver. When the shelf is thin and
-    // we topped up with loose-eligible listings, the card carries a
-    // `_needs_photo_placeholder` stamp and renders the "Foto aún no
-    // disponible" placeholder in place of <Photo>. The card is still
-    // clickable; only the visual differs.
-    const needsPlaceholder = listing._needs_photo_placeholder === true;
+    // HARD RULE (2026-06-08): every homepage shelf card has a suitable
+    // picture (isShelfEligible gates on thumbnail_url + card_eligible), so
+    // there is no placeholder branch — always render the real <Photo>.
     return (
       <article className="hp-shelf-card hp-shelf-card-real" onClick={onClick}>
         <div className="hp-shelf-card-art">
-          {needsPlaceholder ? (
-            <div
-              className="hp-shelf-card-photo-placeholder"
-              aria-label={t("home.shelf.photo_pending_aria", locale)}
-              role="img"
-            >
-              <Icon name="camera" size={36} strokeWidth={1.4} aria-hidden="true" />
-              <span className="hp-shelf-card-photo-placeholder-text">
-                {t("home.shelf.photo_pending", locale)}
-              </span>
-            </div>
-          ) : (
-            <Photo
-              listing={listing}
-              idx={0}
-              ratio="4/3"
-              className="hp-shelf-card-img"
-              eager={eager}
-              source="home_shelf"
-              thumbnail
-            />
-          )}
+          <Photo
+            listing={listing}
+            idx={0}
+            ratio="4/3"
+            className="hp-shelf-card-img"
+            eager={eager}
+            source="home_shelf"
+            thumbnail
+          />
           {showRank && (
             <span className="pulpo-rank hp-shelf-card-rank" aria-label={`Pulpo ranked ${rank}`}>
               <span className="pulpo-rank-star" aria-hidden="true">
@@ -311,12 +295,17 @@ export function HomeShelf({
   useSectionViewed(sectionKey, sectionRef);
   useShelfScrolled(shelfKey, listRef);
 
+  // HARD-RULE consequence (2026-06-08): with the photo-placeholder top-up
+  // removed, a thin cohort yields fewer eligible listings. Per the chosen
+  // behavior — "show fewer cards, keep the shelf visible" — render the real
+  // listings whenever the shelf has at least MIN_REAL_LISTINGS eligible ones
+  // (a thin shelf shows e.g. 4-9 cards instead of the full 10), and only
+  // hide a shelf that can't even meet that small floor (a 1-2 card carousel
+  // reads as broken). Post-restore most cohorts clear 10 easily; this floor
+  // only bites rare sparse cohorts (e.g. lake condos).
   const useReal = heroV4 && Array.isArray(listings) && listings.length >= MIN_REAL_LISTINGS;
   const items = useReal ? listings : cards;
 
-  // hero_v4: a shelf with too few real listings is hidden entirely rather
-  // than falling back to editorial cards — the user explicitly asked for
-  // shelves to disappear when there's not enough real data behind them.
   const hideShelf = heroV4 && Array.isArray(listings) && listings.length < MIN_REAL_LISTINGS;
 
   // Carousel state for the prev/next arrows (desktop ≥768px). Track
@@ -478,12 +467,12 @@ export function HomeShelf({
 // PR #421 — no more dedicated shelves for those.
 
 // Pick the best-ranked listings for a (master, sub) cohort.
-// PRD A3 — shelf-aware photo waiver. First pass picks strict-eligible
-// listings (have at least one photo). If we don't have enough to fill
-// the shelf, top up with loose-eligible listings (no photo) and stamp
-// `_needs_photo_placeholder=true` so the card renders the placeholder
-// in place of <Photo>. The placeholder card is fully clickable; only
-// the visual differs.
+// HARD RULE (2026-06-08): no photo-placeholder top-up. Only listings with
+// a suitable picture (isShelfEligible) appear on the homepage. When a
+// cohort has fewer than `n` eligible listings the shelf simply renders
+// FEWER cards — it never backfills a "Foto aún no disponible" placeholder
+// and never hides the shelf. Discovery/Browse remains exempt (full
+// inventory) — this gate is homepage-only.
 //
 // PR A4 defense-in-depth: the cohort also excludes is_agricultural
 // listings so direct-data callers that bypass the
@@ -499,22 +488,10 @@ function pickTopByMasterAndSub(listings, master, sub, n) {
       l.is_agricultural !== true,
   );
 
-  const strict = cohort
+  return cohort
     .filter(isShelfEligible)
-    .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0));
-
-  if (strict.length >= n) {
-    return strict.slice(0, n);
-  }
-
-  const loose = cohort
-    .filter((l) => isShelfEligibleLoose(l) && !(l.photos && l.photos.length > 0))
     .sort((a, b) => (b.rank_score ?? 0) - (a.rank_score ?? 0))
-    .map((l) => ({ ...l, _needs_photo_placeholder: true }));
-
-  // Concat strict + loose; truncate to n. Strict listings always sort
-  // ahead of loose ones because they already have a photo.
-  return [...strict, ...loose].slice(0, n);
+    .slice(0, n);
 }
 
 // Map subcategory → its icon name. Trophy is universal; the
