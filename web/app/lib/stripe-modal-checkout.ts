@@ -22,6 +22,11 @@ export type StartCheckoutInput = {
   // promotion code on the Stripe session via discounts:[]. If invalid,
   // we soft-retry without the code so the visitor still reaches Stripe.
   urlCode?: string | null;
+  // Same-origin relative path to return to if the visitor cancels on
+  // Stripe (back button). Defaults server-side to /start?cancelled=1.
+  // Pass the current location so "back" lands where they started, not on
+  // a generic page. The server validates it's a relative path.
+  cancelPath?: string | null;
 };
 
 export type StartCheckoutResult =
@@ -36,6 +41,7 @@ async function postCheckout(input: StartCheckoutInput, includeCode: boolean): Pr
     body: JSON.stringify({
       promoCode: includeCode && input.urlCode ? input.urlCode : null,
       locale: input.locale,
+      cancel_path: input.cancelPath || null,
       // posthog_anon_id stitches the anon session → email-derived
       // person_id on the server side (webhook.js calls posthog.alias()
       // with this value). Without it, the funnel breaks at checkout
