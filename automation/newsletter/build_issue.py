@@ -1107,9 +1107,16 @@ def build_issue(
     UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
     _unsub_secret = os.environ.get(UNSUBSCRIBE_SECRET_ENV, "")
     _unsub_t = _unsub_token(recipient.email_hash, issue_number, _unsub_secret) if _unsub_secret else ""
+    # `e` (edition) + `l` (locale) are cosmetic params the /api/unsubscribe
+    # confirmation page reads to pick free-vs-pro copy and EN/ES. They are
+    # NOT part of the HMAC (which signs r|i only) — a tampered `e`/`l` can
+    # only change which confirmation text renders, never forge the unsub.
+    # Pro readers get the retention page; everyone else the free upsell page.
+    _unsub_edition = "pro" if recipient.tier == "pro" else "free"
     unsubscribe_url = (
         f"{site_root.rstrip('/')}/api/unsubscribe"
         f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
+        f"&e={_unsub_edition}&l={locale}"
     )
     paywall_url = (
         f"{site_root.rstrip('/')}/api/stripe/start-checkout?ref=newsletter_issue_{issue_number}"

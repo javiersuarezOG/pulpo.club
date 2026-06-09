@@ -107,6 +107,51 @@ describe("handler", () => {
     expect(res.body).toContain("You're unsubscribed.");
   });
 
+  it("defaults to the FREE edition (upsell copy, no PRO badge) when e is absent", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.body).toContain("You're unsubscribed.");
+    expect(res.body).toContain("The full shortlist lives in Pulpo Pro.");
+    // No gold PRO chip rendered on the free masthead (the .pro-pill CSS
+    // class lives in the shared <style> block; assert on the element).
+    expect(res.body).not.toContain('<span class="pro-pill">PRO</span>');
+  });
+
+  it("renders the PRO retention page (no upsell) for e=pro", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t, e: "pro" }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.body).toContain("You're off the weekly.");
+    expect(res.body).toContain("membership</strong> is still active");
+    expect(res.body).toContain('<span class="pro-pill">PRO</span>'); // gold PRO badge present
+    // Pro page is retention, not upsell — it must NOT pitch Pro.
+    expect(res.body).not.toContain("The full shortlist lives in Pulpo Pro.");
+  });
+
+  it("renders Spanish copy for l=es (free + pro)", async () => {
+    const t = expectedToken("abc", 1);
+    const freeRes = mockRes();
+    await handler({ method: "GET", query: { r: "abc", i: "1", t, l: "es" }, headers: {} }, freeRes);
+    expect(freeRes.body).toContain("Cancelaste tu suscripción.");
+    expect(freeRes.body).toContain('lang="es"');
+
+    const proRes = mockRes();
+    await handler({ method: "GET", query: { r: "abc", i: "1", t, e: "pro", l: "es" }, headers: {} }, proRes);
+    expect(proRes.body).toContain("Saliste del resumen semanal.");
+  });
+
+  it("falls back to free/en on a garbage e/l (cosmetic params, never trusted)", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t, e: "../etc", l: "fr" }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.body).toContain("You're unsubscribed.");
+    expect(res.body).toContain('lang="en"');
+  });
+
   it("200s with JSON on valid POST (RFC 8058 one-click)", async () => {
     const t = expectedToken("xyz", 7);
     const req = {
