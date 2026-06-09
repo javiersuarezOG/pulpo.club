@@ -25,13 +25,8 @@
 // how many. Returns { run_url_hint, dispatched_at } so the UI can
 // link the operator to the workflow run.
 //
-// Auth: deliberately none beyond rate-limiting + the SEND gate. The
-// real security perimeter is the GITHUB_DISPATCH_TOKEN (fine-grained,
-// scoped `actions:write` on this repo). An attacker who bypasses the
-// rate limit + types SEND can at worst trigger one extra audience
-// send per hour — bad, but bounded. If that turns out to matter, add
-// an admin bearer-token check here (the PULPO_ADMIN_DEBUG_TOKEN
-// pattern from earlier preview-endpoint versions).
+// Auth: PULPO_ADMIN_DEBUG_TOKEN bearer via requireAdminAuth(), plus the
+// SEND gate and 1/hour rate-limit. The GitHub PAT stays server-side.
 //
 // Dispatch verification: GitHub's workflow_dispatch POST returns 204
 // on accepted payload, but the run is created async and can be
@@ -44,6 +39,7 @@
 // error instead of "Sent Issue N to X readers."
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
+const { requireAdminAuth } = require("../../_admin_auth");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
@@ -110,6 +106,7 @@ module.exports = async (req, res) => {
     logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  if (!requireAdminAuth(req, res)) return;
 
   // Validation FIRST, rate-limit AFTER. The rate-limiter exists to
   // prevent runaway REAL sends (one per hour cap); it should only
