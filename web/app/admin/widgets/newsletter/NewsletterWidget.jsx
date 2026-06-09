@@ -1207,20 +1207,27 @@ export function NewsletterWidget() {
           setStatusFor(newsletterId, { kind: "failed", recipient: value, reason: body.reason || "failed", locale });
           setLocalEntries(appendLogEntry({ ...baseEntry, result: "failed", detail: body.reason || "" }));
         } else {
-          const detail = body.reason || body.error || `HTTP ${r.status}`;
-          const hint = body.hint ? ` — ${body.hint}` : "";
-          setStatusFor(newsletterId, { kind: "error", message: `${detail}${hint}` });
-          setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: `${detail}${hint}` }));
+          const rawCode = body.reason || body.error || `HTTP ${r.status}`;
+          const friendly = body.reason
+            ? welcomeReasonText(body.reason)
+            : (body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`);
+          setStatusFor(newsletterId, { kind: "error", message: friendly });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: rawCode }));
         }
         return;
       }
 
-      // Weekly (async cohort preview) — dispatch semantics unchanged.
+      // Weekly + free (async cohort preview) — dispatch semantics unchanged.
       if (!r.ok) {
-        const detail = body.error || `HTTP ${r.status}`;
-        const hint = body.hint ? ` — ${body.hint}` : "";
-        setStatusFor(newsletterId, { kind: "error", message: `${detail}${hint}` });
-        setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: `${detail}${hint}` }));
+        const rawCode = body.error || `HTTP ${r.status}`;
+        let friendly = body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`;
+        // The 429 carries retry_after_s — surface the actual wait.
+        if (body.error === "rate_limited" && body.retry_after_s) {
+          const mins = Math.max(1, Math.ceil(body.retry_after_s / 60));
+          friendly = `Test-send limit reached (5 per hour) — try again in ~${mins} min.`;
+        }
+        setStatusFor(newsletterId, { kind: "error", message: friendly });
+        setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: rawCode }));
         return;
       }
       setStatusFor(newsletterId, {
@@ -1288,17 +1295,30 @@ export function NewsletterWidget() {
     </div>
   );
 
-  // Honest copy for the welcome test-send outcomes (admin-only).
+  // Honest, actionable copy for the welcome test-send outcomes (admin-only).
   // i18n-allow: admin-only widget
   const WELCOME_SKIP_TEXT = {
-    not_pro: "that email isn't a Pro account — the welcome only sends to Pro users.",
-    clerk_lookup_failed: "no Clerk account exists for that email.",
-    ranked_missing: "listings data is unavailable right now.",
+    not_pro: "that email's account isn't Pro — the Pro welcome only renders for a Pro member. Use an existing Pro member's email.",
+    clerk_lookup_failed: "no Clerk member for that email — the Pro welcome renders from a member's profile, so test it with an existing Pro member's email (a fresh address can't be used here).",
+    ranked_missing: "listings data is unavailable right now — try again shortly.",
     no_picks_available: "no listings were available to include.",
     already_sent: "already sent (idempotency stamp) — re-send forces past it.",
     already_sent_for_subscription: "already sent for this subscription.",
   };
   const welcomeReasonText = (reason) => WELCOME_SKIP_TEXT[reason] || reason || "unknown reason";
+
+  // Honest copy for the async preview/dispatch path (weekly + free cards).
+  // These are the codes /api/admin/newsletter/trigger-preview can return.
+  // i18n-allow: admin-only widget
+  const DISPATCH_ERROR_TEXT = {
+    rate_limited: "Test-send limit reached (5 per hour) — give it a bit and try again.",
+    github_dispatch_not_configured: "Server can't dispatch the run (GITHUB_DISPATCH_TOKEN missing in env).",
+    github_dispatch_not_configured_repo: "Server can't dispatch the run (dispatch repo/ref not configured).",
+    invalid_newsletter_id: "That newsletter id isn't recognized by the dispatcher.",
+    invalid_email: "Enter a valid email address.",
+    method_not_allowed: "Unexpected request — refresh and try again.",
+  };
+  const dispatchErrorText = (code) => DISPATCH_ERROR_TEXT[code] || code || "unknown error";
   const welcomeSubject = (nlId, loc) =>
     nlId === "pro-welcome-back"
       ? (loc === "es" ? "Bienvenido de nuevo a Pulpo Pro — tus próximas 10" : "Welcome back to Pulpo Pro — your next 10")
