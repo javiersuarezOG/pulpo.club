@@ -275,7 +275,7 @@ export function AdminPage({ app }) {
                     type="password"
                     value={tokenDraft}
                     onChange={(e) => setTokenDraft(e.target.value)}
-                    placeholder="Admin token"
+                    placeholder="Admin token" // i18n-allow: admin-only widget, operator surface, never shown to end users
                     autoComplete="off"
                   />
                   <button type="submit">Unlock</button>
