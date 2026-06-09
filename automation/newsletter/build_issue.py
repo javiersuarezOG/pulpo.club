@@ -1107,16 +1107,19 @@ def build_issue(
     UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
     _unsub_secret = os.environ.get(UNSUBSCRIBE_SECRET_ENV, "")
     _unsub_t = _unsub_token(recipient.email_hash, issue_number, _unsub_secret) if _unsub_secret else ""
-    # `e` (edition) + `l` (locale) are cosmetic params the /api/unsubscribe
-    # confirmation page reads to pick free-vs-pro copy and EN/ES. They are
-    # NOT part of the HMAC (which signs r|i only) — a tampered `e`/`l` can
-    # only change which confirmation text renders, never forge the unsub.
-    # Pro readers get the retention page; everyone else the free upsell page.
-    _unsub_edition = "pro" if recipient.tier == "pro" else "free"
+    # Base unsubscribe URL: r|i|t only. The `&e=<edition>&l=<locale>`
+    # cosmetic params that pick the free-vs-pro confirmation page are
+    # appended at RENDER time by `_footer_html`, NOT here — because the
+    # edition the reader should see must match the edition they were
+    # actually sent, which is the renderer's `free` flag (variant-driven),
+    # not `recipient.tier`. The two can diverge: a free-tier reader can be
+    # rendered into a Pro-variant template (paywall_all path), and `agency`
+    # tier is a paid edition that is NOT "free". Deriving the stamp from the
+    # same `free` flag that draws the masthead keeps page == email by
+    # construction. (e/l are outside the HMAC, which signs r|i only.)
     unsubscribe_url = (
         f"{site_root.rstrip('/')}/api/unsubscribe"
         f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
-        f"&e={_unsub_edition}&l={locale}"
     )
     paywall_url = (
         f"{site_root.rstrip('/')}/api/stripe/start-checkout?ref=newsletter_issue_{issue_number}"
