@@ -7407,6 +7407,189 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   }
 }
 
+/* Identity line — niche bolded so the eye catches it. */
+.homepage-v2 .hp-hero-v5-sub strong {
+  color: var(--color-ink-primary);
+  font-weight: 700;
+}
+
+/* Deliverable line — the payoff, slightly larger + darker than identity. */
+.homepage-v2 .hp-hero-v5-sub2 {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--color-ink-secondary);
+  margin: 8px 0 0;
+}
+.homepage-v2 .hp-hero-v5-sub2 strong {
+  color: var(--color-ink-primary);
+  font-weight: 700;
+}
+@media (min-width: 1024px) {
+  .homepage-v2 .hp-hero-v5-sub2 { font-size: 18px; }
+}
+
+/* Free-vs-Pro clarifier — two short rows, bold labels for skimming. */
+.homepage-v2 .hp-hero-v5-tiers {
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 540px;
+}
+.homepage-v2 .hp-hero-v5-tiers > div {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-ink-secondary);
+}
+.homepage-v2 .hp-hero-v5-tiers dt {
+  display: inline;
+  font-weight: 700;
+  color: var(--color-ink-primary);
+}
+.homepage-v2 .hp-hero-v5-tiers dt.is-pro { color: var(--color-clay-dark); }
+.homepage-v2 .hp-hero-v5-tiers dd { display: inline; margin: 0; }
+
+/* Two-state hero CTAs — free newsletter (forest, primary) + a clear Pro
+   secondary button carrying the PRO badge. Stacked; mobile-first
+   full-width, sized to content at 520px. Email capture lives in a modal
+   so the hero stays clean. */
+.homepage-v2 .hp-hero-v5-cta {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.homepage-v2 .hp-hero-v5-cta-free,
+.homepage-v2 .hp-hero-v5-cta-pro {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  line-height: 1;
+}
+.homepage-v2 .hp-hero-v5-cta-free {
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  border: none;
+  text-align: center;
+}
+.homepage-v2 .hp-hero-v5-cta-free:hover { background: var(--color-forest-mid); }
+.homepage-v2 .hp-hero-v5-cta-pro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--color-clay-dark);
+  border: 1px solid var(--color-clay-primary);
+}
+.homepage-v2 .hp-hero-v5-cta-pro:hover { background: var(--color-bg-peach); }
+.homepage-v2 .hp-hero-v5-cta-pro-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  border: 1px solid var(--color-clay-primary);
+  color: var(--color-clay-dark);
+  padding: 2px 6px;
+  border-radius: 6px;
+  line-height: 1.1;
+}
+.homepage-v2 .hp-hero-v5-cta-pro-arrow { color: var(--color-clay-primary); }
+@media (min-width: 520px) {
+  .homepage-v2 .hp-hero-v5-cta { flex-direction: row; align-items: center; }
+  .homepage-v2 .hp-hero-v5-cta-free,
+  .homepage-v2 .hp-hero-v5-cta-pro { flex: 0 0 auto; }
+}
+/* USP list — what your agent does for you. */
+.homepage-v2 .hp-hero-v5-usps {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.homepage-v2 .hp-hero-v5-usps li {
+  position: relative;
+  padding-left: 26px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-ink-secondary);
+}
+.homepage-v2 .hp-hero-v5-usps li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  font-weight: 700;
+  color: var(--color-forest-deep);
+}
+
+/* Free-newsletter capture modal (uses the global .modal / .modal-backdrop
+   for the card + backdrop; these add the centered editorial layout). */
+.hp-nl-modal {
+  max-width: 420px;
+  text-align: center;
+  padding: 34px 28px 28px;
+}
+.hp-nl-modal-mark { display: flex; justify-content: center; margin-bottom: 14px; }
+.hp-nl-modal-title {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  color: var(--color-ink-primary);
+}
+.hp-nl-modal-body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink-secondary);
+  margin: 0 auto 20px;
+  max-width: 340px;
+}
+.hp-nl-modal-form { display: flex; flex-direction: column; gap: 10px; }
+.hp-nl-modal-input {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  padding: 13px 15px;
+  border: 1px solid var(--color-line-soft);
+  border-radius: 10px;
+  background: var(--color-bg-white);
+  color: var(--color-ink-primary);
+  text-align: center;
+}
+.hp-nl-modal-input::placeholder { color: var(--color-ink-muted); }
+.hp-nl-modal-input:focus { outline: none; border-color: var(--color-forest-deep); }
+.hp-nl-modal-btn {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px 22px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-forest-deep);
+  color: var(--color-button-text);
+  cursor: pointer;
+}
+.hp-nl-modal-btn:hover { background: var(--color-forest-mid); }
+.hp-nl-modal-btn:disabled { opacity: 0.6; cursor: default; }
+.hp-nl-modal-err {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-burgundy-text);
+  margin: 0;
+}
+
 /* ── Newsletter postcard preview (right column) ───────────────────── */
 .homepage-v2 .hp-hero-v5-postcard-wrap {
   display: flex;
