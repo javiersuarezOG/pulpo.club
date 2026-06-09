@@ -48,6 +48,24 @@ test.describe("Browse search autocomplete", () => {
     expect(errors, "console errors during autocomplete interaction").toEqual([]);
   });
 
+  test("title suggestions render resilient thumbnails", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    const search = page.locator(".browse-search__input");
+    await search.waitFor({ state: "visible", timeout: 10_000 });
+
+    await search.fill("playa");
+    const listbox = page.locator(".browse-search__suggest[role='listbox']");
+    await listbox.waitFor({ state: "visible", timeout: 3_000 });
+
+    const thumbs = page.locator(".browse-search__suggest-thumb img");
+    expect(await thumbs.count()).toBeGreaterThan(0);
+    const broken = await thumbs.evaluateAll((imgs) =>
+      imgs.filter((img) => !(img instanceof HTMLImageElement) || img.naturalWidth <= 0).length,
+    );
+    expect(broken, "autocomplete thumbnails should not render broken images").toBe(0);
+  });
+
   test("a no-match query shows the query-specific empty state + category pills", async ({ page }) => {
     await page.goto("/browse", { waitUntil: "networkidle" });
     const search = page.locator(".browse-search__input");

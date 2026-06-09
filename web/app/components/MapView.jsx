@@ -50,6 +50,14 @@ function escapeHtml(s) {
   );
 }
 
+// Compact cluster label so a 1,200-listing cluster reads "1.2k" instead
+// of overflowing the bubble. The count renders inside a centered
+// `.pulpo-cluster__count` span (CSS centers it within the bubble).
+function formatClusterCount(n) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
 export default function MapView({
   results, app, onOpenListing,
   // PR-9 — card↔marker sync + search-as-I-move.
@@ -125,7 +133,9 @@ export default function MapView({
         const step = n < 10 ? "sm" : n < 100 ? "md" : "lg";
         const px = step === "sm" ? 34 : step === "md" ? 44 : 54;
         return L.divIcon({
-          html: `<span>${n}</span>`,
+          // Count lives in a centered span so it stays optically centred
+          // in the bubble at every tier; k-formatted so big clusters fit.
+          html: `<span class="pulpo-cluster__count">${formatClusterCount(n)}</span>`,
           className: `pulpo-cluster pulpo-cluster--${step}`,
           iconSize: L.point(px, px),
         });
@@ -168,9 +178,22 @@ export default function MapView({
 
     mapRef.current = map;
     clusterRef.current = cluster;
+
+    // Leaflet caches the container size at init. On mobile the map view
+    // mounts into a container whose final size isn't settled yet (the
+    // view toggle/layout switch, lazy mount), so without this the tiles
+    // render gray/blank and panning "rocks". Recompute once on the next
+    // frame, and again whenever the viewport changes (rotate/resize).
+    requestAnimationFrame(() => map.invalidateSize());
+    const handleResize = () => map.invalidateSize();
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
     return () => {
       clearTimeout(readyTimer);
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
       map.remove();
       mapRef.current = null;
       clusterRef.current = null;
