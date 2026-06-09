@@ -58,13 +58,18 @@ from ..types import Issue
 #       + `&l=<locale>` so /api/unsubscribe can render the in-brand
 #       free-vs-pro confirmation page. Cosmetic params only (not in the
 #       HMAC); rendered footer HTML changed, hence the bump.
-TEMPLATE_VERSION = "newsletter-v4.6-2026-06-09"
+#   v4.7 (2026-06-10) — footer Unsubscribe link's edition/locale params
+#       (`&e=`/`&l=`) now derive from the renderer's `free` flag in
+#       _footer_html (variant-driven) instead of recipient.tier, so the
+#       /api/unsubscribe confirmation page always matches the edition
+#       sent. Standard-send output byte-identical; logic changed.
+TEMPLATE_VERSION = "newsletter-v4.7-2026-06-10"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-09"
+LAST_UPDATED = "2026-06-10"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -101,8 +106,10 @@ LAST_UPDATED = "2026-06-09"
 #   welcome-v2.2 (2026-06-09) — inherits the v4.6 footer Unsubscribe-link
 #       edition/locale params. Welcome body carries the footer, so its
 #       HTML changed.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.2-2026-06-09"
-WELCOME_LAST_UPDATED = "2026-06-09"
+#   welcome-v2.3 (2026-06-10) — inherits the v4.7 footer edition-stamp
+#       change (page == email edition). Welcome body carries the footer.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.3-2026-06-10"
+WELCOME_LAST_UPDATED = "2026-06-10"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -128,8 +135,10 @@ WELCOME_LAST_UPDATED = "2026-06-09"
 #   welcome-back-v1.2 (2026-06-09) — inherits the v4.6 footer
 #       Unsubscribe-link edition/locale params. Welcome-back body carries
 #       the footer, so its HTML changed.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.2-2026-06-09"
-WELCOME_BACK_LAST_UPDATED = "2026-06-09"
+#   welcome-back-v1.3 (2026-06-10) — inherits the v4.7 footer edition-
+#       stamp change. Welcome-back body carries the footer.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.3-2026-06-10"
+WELCOME_BACK_LAST_UPDATED = "2026-06-10"
 
 
 # ─────────────────────────────────────────────────────────────────────
