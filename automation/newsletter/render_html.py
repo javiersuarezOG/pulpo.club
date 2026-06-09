@@ -1297,6 +1297,21 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
             f'{_e(label)}</a>'
         )
 
+    # Stamp the unsubscribe link's edition + locale from the SAME `free`
+    # flag that decides the masthead PRO badge below — so the
+    # /api/unsubscribe confirmation page the reader lands on always matches
+    # the edition they were sent (free upsell page vs Pro retention page).
+    # `free` is variant-driven (is_free), the single source of truth for
+    # this email's edition; deriving the stamp from it keeps page == email
+    # even when `recipient.tier` would disagree (free reader in a Pro
+    # template via paywall_all, or `agency` tier). e/l are cosmetic params,
+    # outside the HMAC (which signs r|i only).
+    _unsub_sep = "&" if "?" in issue.unsubscribe_url else "?"
+    unsubscribe_href = (
+        f"{issue.unsubscribe_url}{_unsub_sep}"
+        f"e={'free' if free else 'pro'}&l={locale}"
+    )
+
     return f"""
     <tr><td class="pad footer-strip" style="padding:24px 24px 28px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);">
       <table role="presentation" cellpadding="0" cellspacing="0"><tr>
@@ -1312,7 +1327,7 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
       <div style="margin:18px 0 14px;height:1px;background:rgba(0,0,0,0.08);"></div>
       <p style="margin:0 0 10px;font-size:12px;color:#888780;letter-spacing:0.04em;">{_e(you_line)}</p>
       <div>
-        {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(issue.unsubscribe_url, unsubscribe_label)}
+        {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(unsubscribe_href, unsubscribe_label)}
       </div>
       <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">{_e(copyright_line)} · pulpo.club</p>
       <p style="margin:4px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">Pulpo · San Salvador, El Salvador</p>
