@@ -1224,7 +1224,7 @@ export function NewsletterWidget() {
         // The 429 carries retry_after_s — surface the actual wait.
         if (body.error === "rate_limited" && body.retry_after_s) {
           const mins = Math.max(1, Math.ceil(body.retry_after_s / 60));
-          friendly = `Test-send limit reached (5 per hour) — try again in ~${mins} min.`;
+          friendly = `Test-send limit reached (20 per hour) — try again in ~${mins} min.`;
         }
         setStatusFor(newsletterId, { kind: "error", message: friendly });
         setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: rawCode }));
@@ -1311,7 +1311,7 @@ export function NewsletterWidget() {
   // These are the codes /api/admin/newsletter/trigger-preview can return.
   // i18n-allow: admin-only widget
   const DISPATCH_ERROR_TEXT = {
-    rate_limited: "Test-send limit reached (5 per hour) — give it a bit and try again.",
+    rate_limited: "Test-send limit reached (20 per hour) — give it a bit and try again.",
     github_dispatch_not_configured: "Server can't dispatch the run (GITHUB_DISPATCH_TOKEN missing in env).",
     github_dispatch_not_configured_repo: "Server can't dispatch the run (dispatch repo/ref not configured).",
     invalid_newsletter_id: "That newsletter id isn't recognized by the dispatcher.",
