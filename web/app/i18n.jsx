@@ -630,6 +630,27 @@ const UI_STRINGS = {
   "browse.search.suggest.count":
     { en: "{n} listings",
       es: "{n} propiedades" },
+  "browse.list.use":
+    { en: "Use",
+      es: "Uso" },
+  "browse.list.size":
+    { en: "Size",
+      es: "Tamaño" },
+  "browse.list.price":
+    { en: "Price",
+      es: "Precio" },
+  "browse.list.ppm":
+    { en: "{suffix}",
+      es: "{suffix}" },
+  "browse.list.listed":
+    { en: "Listed",
+      es: "Publicado" },
+  "browse.list.signal":
+    { en: "Signal",
+      es: "Señal" },
+  "browse.list.facts_aria":
+    { en: "Listing facts",
+      es: "Datos de la propiedad" },
   // No-results-for-query empty state (PR-3) + category-pill shortcuts.
   "browse.search.no_results":
     { en: "No listings matched “{q}”.",
@@ -1582,6 +1603,15 @@ const UI_STRINGS = {
   // per line, concrete benefits. Shared by every Pro-conversion CTA
   // (listing gate, hero, USP, etc.), so it stays generic to the value,
   // not to one entry point.
+  // ── Auth chooser (logged-out avatar / account click) ───────────────
+  // Two-state model: the account icon offers two clear paths — log in
+  // (existing Pro members) or go Pro (new visitors). No free signup.
+  "auth_choice.headline":              { en: "Welcome to Pulpo.",                            es: "Bienvenido a Pulpo." },
+  "auth_choice.body":                  { en: "Log in to your account, or go Pro to unlock every listing.",
+                                          es: "Inicia sesión en tu cuenta, o pasá a Pro para desbloquear cada propiedad." },
+  "auth_choice.login":                 { en: "Log in",                                       es: "Iniciar sesión" },
+  "auth_choice.get_pro":               { en: "Get Pulpo Pro",                                es: "Obtené Pulpo Pro" },
+
   "free_month_modal.headline":         { en: "Unlock every listing with Pulpo Pro.",
                                           es: "Desbloquea cada propiedad con Pulpo Pro." },
   "free_month_modal.body":             { en: "See full details, all photos, the price, and how to contact the seller. Plus the 10 best new listings in your inbox each week.",

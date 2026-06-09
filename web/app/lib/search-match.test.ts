@@ -266,13 +266,12 @@ describe("buildSuggestions", () => {
     expect(sugs.filter((s) => s.kind === "title").length).toBeLessThanOrEqual(5);
   });
 
-  it("title suggestions carry the locale-correct display + thumb", () => {
+  it("title suggestions carry the locale-correct display + listing payload", () => {
     const sugs = buildSuggestions("tunco", catalog, { locale: "es", max: 8 });
     const title = sugs.find((s) => s.kind === "title");
     expect(title && title.kind === "title" && title.value.startsWith("Lote playa")).toBe(true);
-    // The first catalog entry carries a thumbnail.
-    const withThumb = sugs.find((s) => s.kind === "title" && s.thumb);
-    expect(withThumb).toBeTruthy();
+    const withListing = sugs.find((s) => s.kind === "title" && s.listing.thumbnail_url);
+    expect(withListing && withListing.kind === "title" && withListing.listing.id).toBe("a__1");
   });
 });
 

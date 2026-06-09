@@ -1288,6 +1288,11 @@ h1,h2,h3,h4,h5 { margin: 0; }
   width: 32px;
   height: 32px;
   border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.browse-search__suggest-thumb img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 .browse-search__suggest-label {
@@ -1479,6 +1484,13 @@ h1,h2,h3,h4,h5 { margin: 0; }
   width: 100%; height: 70vh; min-height: 420px;
   border: 1px solid var(--line); border-radius: var(--radius-sm);
   overflow: hidden; background: var(--paper-2);
+  /* Contain Leaflet's internal pane z-indices (markerPane=600,
+     popupPane=700) in their own stacking context. Without this they
+     bubble into the root context and paint ABOVE the mobile bottom
+     sheet (z=55) and Filters pill (z=60), so a cluster sitting over the
+     sheet handle steals the tap. Isolation keeps the whole map below
+     those bottom-fixed controls. */
+  isolation: isolate;
 }
 .map-view--loading, .map-view--unavailable {
   display: grid; place-items: center;
@@ -1538,6 +1550,21 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .pulpo-cluster--sm { font-size: 12px; }
 .pulpo-cluster--md { font-size: 13px; }
 .pulpo-cluster--lg { font-size: 15px; }
+/* Count centring. Leaflet's `.leaflet-marker-icon` rule (loaded as the
+   lazy MapView chunk, after this file, same specificity) forces the
+   bubble element to `display:block`, so the parent's grid/place-items is
+   ignored. Centre the count independently: the marker-icon is
+   position:absolute (Leaflet), so an absolutely-filled flex span centres
+   the text regardless of the parent's display. k-formatted in MapView. */
+.pulpo-cluster__count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
 
 /* Popup preview. */
 .pulpo-popup__img {
@@ -2026,11 +2053,169 @@ h1,h2,h3,h4,h5 { margin: 0; }
 
 /* ============== Results table ============== */
 .results-table-wrap {
-  overflow-x: auto;
+  overflow: hidden;
   border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--paper);
 }
+.results-mobile-list {
+  display: grid;
+  gap: 0;
+}
+.mobile-list-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 30px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  background: var(--paper);
+  align-items: center;
+}
+.mobile-list-row:first-child { border-top: 0; }
+.mobile-list-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.mobile-list-row__thumb {
+  position: relative;
+  width: 58px;
+  height: 58px;
+}
+.mobile-list-row__photo,
+.results-table-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.mobile-list-row__rank {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  max-width: calc(100% - 8px);
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgb(255,255,255,0.94);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgb(0,0,0,0.18);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.mobile-list-row__rank svg {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  color: var(--gold);
+}
+.mobile-list-row__main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.mobile-list-row__title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.18;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.mobile-list-row__place {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mobile-list-row__place > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-list-row__place > span:first-child {
+  flex: 0 1 auto;
+}
+.mobile-list-row__place > span:not(:first-child) {
+  flex: 1 1 auto;
+}
+.mobile-list-row__place > span:not(:first-child)::before {
+  content: "·";
+  margin-right: 5px;
+  color: var(--ink-4);
+}
+.mobile-list-row__facts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  align-items: baseline;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mobile-list-row__facts > span:not(:first-child)::before {
+  content: "·";
+  margin: 0 6px;
+  color: var(--ink-4);
+}
+.mobile-list-row__facts > span {
+  flex: 0 0 auto;
+}
+.mobile-list-row__facts > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-list-row__price {
+  color: var(--ink);
+  font-weight: 700;
+}
+.mobile-list-row__meta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+.mobile-list-row__meta:empty {
+  display: none;
+}
+.mobile-list-row__meta .pulpo-badge {
+  padding: 2px 6px;
+  font-size: 10px;
+  line-height: 1.1;
+  box-shadow: none;
+  white-space: nowrap;
+}
+.mobile-list-row__days {
+  font-size: 10px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.mobile-list-row__heart {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 .results-table {
+  display: none;
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
@@ -2056,16 +2241,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
   transition: background 120ms;
 }
 .results-table tbody tr:hover { background: var(--paper-2); }
-.thumb-cell img {
+.thumb-cell .photo-wrap {
   width: 56px; height: 56px;
   border-radius: 8px;
-  object-fit: cover;
-  display: block;
-}
-.thumb-placeholder {
-  width: 56px; height: 56px;
-  border-radius: 8px;
-  background: var(--paper-3);
+  overflow: hidden;
 }
 .title-cell { font-weight: 500; max-width: 280px; }
 .results-table .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -2082,20 +2261,10 @@ h1,h2,h3,h4,h5 { margin: 0; }
 .type-pill.type-commercial { background: oklch(92% 0.04 240); color: oklch(40% 0.1 240); }
 .type-pill.type-tourist { background: oklch(92% 0.04 40); color: oklch(40% 0.12 40); }
 
-@media (max-width: 767px) {
-  .results-table thead { display: none; }
-  .results-table, .results-table tbody, .results-table tr, .results-table td { display: block; }
-  .results-table tr {
-    display: grid;
-    grid-template-columns: 64px 1fr;
-    grid-template-areas: "thumb title" "thumb meta" "stats stats";
-    gap: 4px 12px;
-    padding: 12px;
-    border-top: 1px solid var(--line);
-  }
-  .results-table td { padding: 0; border: none; }
-  .results-table .thumb-cell { grid-area: thumb; }
-  .results-table .title-cell { grid-area: title; font-weight: 500; }
+@media (min-width: 768px) {
+  .results-table-wrap { overflow-x: auto; }
+  .results-mobile-list { display: none; }
+  .results-table { display: table; }
 }
 
 /* ============== Empty states ============== */
@@ -4339,8 +4508,25 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+    max-height: calc(100vh - 96px - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 96px - env(safe-area-inset-bottom));
+    overflow-y: auto;
   }
   .consent-actions { justify-content: flex-end; }
+}
+
+/* The mobile map view has its own bottom-fixed UI (the draggable card
+   sheet, collapsed ~200px). The cookie banner is also bottom-fixed at a
+   higher z-index, so on the map view it covers the sheet's drag handle
+   and the handle can't be tapped. Lift the banner above the collapsed
+   sheet whenever the sheet is present. Progressive enhancement: browsers
+   without :has() fall back to the existing position (no regression). */
+@media (max-width: 767px) {
+  body:has(.map-sheet) .consent-banner {
+    bottom: calc(212px + env(safe-area-inset-bottom));
+  }
 }
 
 /* PR-4 — empty-state cross-suggest action row */

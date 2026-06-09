@@ -147,7 +147,7 @@ function escapeRegExp(s: string): string {
 export type Suggestion =
   | { kind: "zone"; value: string; count: number }
   | { kind: "land_type"; value: string; label: string; count: number }
-  | { kind: "title"; value: string; listingId: string; thumb: string | null };
+  | { kind: "title"; value: string; listingId: string; listing: Listing };
 
 export function buildSuggestions(
   query: string | null | undefined,
@@ -215,7 +215,7 @@ export function buildSuggestions(
         kind: "title",
         value: title,
         listingId: l.id,
-        thumb: l.thumbnail_url ?? null,
+        listing: l,
       });
     }
   }

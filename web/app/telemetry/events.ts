@@ -1073,6 +1073,8 @@ export type EventMap = {
       // PR-perf-2: granular surfaces. Previously bare <img>s, now
       // inline-augmented with priority hints + this telemetry.
       | "browse_table"
+      | "browse_mobile_list"
+      | "browse_autocomplete"
       | "detail_main"
       | "detail_thumb"
       | "lightbox";
@@ -1097,6 +1099,8 @@ export type EventMap = {
       | "detail"
       | "unknown"
       | "browse_table"
+      | "browse_mobile_list"
+      | "browse_autocomplete"
       | "detail_main"
       | "detail_thumb"
       | "lightbox";
