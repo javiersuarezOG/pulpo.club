@@ -336,8 +336,51 @@ const UI_STRINGS = {
                                    es: "Domingo en la mañana, café, y…" },
   "home.hero.v5.h1_b":           { en: "your top 10 properties.",
                                    es: "tu top 10 propiedades." },
-  "home.hero.v5.sub":            { en: "We watch every property site in El Salvador so you don't have to — top picks ranked, in your inbox, every Sunday.",
-                                   es: "Revisamos cada sitio de propiedades en El Salvador por vos — los mejores ranqueados, en tu inbox, cada domingo." },
+  // Identity line — niche emphasized for skimming.
+  "home.hero.v5.sub_pre":        { en: "Pulpo is your personal real estate agent for ", es: "Pulpo es tu agente inmobiliario personal para " },
+  "home.hero.v5.sub_em":         { en: "beach & lake property",                es: "propiedades de playa y lago" },
+  "home.hero.v5.sub_post":       { en: " in El Salvador.",                     es: " en El Salvador." },
+  // Deliverable line — the payoff, "Your top 10" emphasized.
+  "home.hero.v5.sub2_em":        { en: "Your top 10",                          es: "Tu top 10" },
+  "home.hero.v5.sub2_post":      { en: " straight to your inbox, every Sunday.", es: " directo a tu correo, cada domingo." },
+  // Free-vs-Pro clarifier under the buttons (bold labels for skimming).
+  "home.hero.v5.tier_free_label":{ en: "Free",                                 es: "Gratis" },
+  "home.hero.v5.tier_free":      { en: " — a weekly email with your top 3.",
+                                   es: " — un correo semanal con tu top 3." },
+  "home.hero.v5.tier_pro_label": { en: "Pro",                                  es: "Pro" },
+  "home.hero.v5.tier_pro":       { en: " — a weekly email with your top 10, plus the full listings catalogue unlocked.",
+                                   es: " — un correo semanal con tu top 10, más el catálogo completo desbloqueado." },
+
+  // Hero CTAs (two-state): primary = free newsletter ("Your property
+  // tracker", email captured in a modal — no account, Resend only),
+  // secondary = Go Pro.
+  // Free = "your property tracker": a tool that watches every property
+  // site for you and sends the best new listings weekly. Framed as a
+  // tracker you start (a utility), not a "Sunday edition" (a magazine).
+  "home.hero.v5.cta_free":       { en: "Try Pulpo for free",                   es: "Prueba Pulpo gratis" },
+  // Pro CTA — short, with the PRO badge supplying the "Pro" (renders
+  // "Get Pulpo [PRO]"). Pro filters to your preferences + unlocks all.
+  "home.hero.v5.cta_pro":        { en: "Get Pulpo",                            es: "Consigue Pulpo" },
+  // Newsletter capture modal.
+  "home.hero.v5.nl_modal_title": { en: "Meet Pulpo, your property agent",      es: "Conoce a Pulpo, tu agente inmobiliario" },
+  "home.hero.v5.nl_modal_body":  { en: "Pulpo finds the best properties for sale in El Salvador and emails them to you each week. Free — no account needed.",
+                                   es: "Pulpo encuentra las mejores propiedades en venta en El Salvador y te las envía por correo cada semana. Gratis — sin cuenta." },
+  "home.hero.v5.nl_placeholder": { en: "you@email.com",                        es: "tu@email.com" },
+  "home.hero.v5.nl_cta":         { en: "Put Pulpo to work",                    es: "Pon a Pulpo a trabajar" },
+  "home.hero.v5.nl_cta_loading": { en: "Setting it up…",                       es: "Activando…" },
+  "home.hero.v5.nl_success_title": { en: "Pulpo's on it.",                     es: "Pulpo está en ello." },
+  "home.hero.v5.nl_success":     { en: "Check your inbox to confirm — your first picks land this Sunday.",
+                                   es: "Revisa tu inbox para confirmar — tus primeras propiedades llegan este domingo." },
+  "home.hero.v5.nl_already":     { en: "You're already on the list — see you Sunday.",
+                                   es: "Ya estás en la lista — nos vemos el domingo." },
+  "home.hero.v5.nl_error":       { en: "Couldn't sign you up — try again in a moment.",
+                                   es: "No pudimos suscribirte — inténtalo de nuevo en un momento." },
+  "home.hero.v5.nl_invalid":     { en: "Enter a valid email address.",         es: "Ingresa un correo válido." },
+  "home.hero.v5.nl_aria":        { en: "Email address for the free weekly property tracker",
+                                   es: "Correo para el rastreador semanal de propiedades gratis" },
+  "home.hero.v5.nl_modal_aria":  { en: "Subscribe to the free weekly property tracker",
+                                   es: "Suscríbete al rastreador semanal gratis" },
+  "home.hero.v5.nl_close":       { en: "Close",                                es: "Cerrar" },
 
   // "Where to start" subsection above the 5 destination cards.
   "home.hero.v5.section_title":  { en: "Where to start",

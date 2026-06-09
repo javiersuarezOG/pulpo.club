@@ -1,52 +1,25 @@
-// POST /api/admin/newsletter/trigger-welcome-test
+// POST /api/admin/newsletter/trigger-free-welcome-test
 //
-// Body: { email, by?, force?: boolean, variant?: "welcome"|"welcome_back",
+// Body: { email, by?, variant?: "free_welcome"|"free_welcome_back",
 //         locale?: "en"|"es" }
 //
-// Operator surface for the Pulpo Pro Welcome / Welcome-back templates.
-//
-// This calls the SYNCHRONOUS internal dispatcher
-// (`/api/internal/welcome-send`) and returns its REAL outcome — so the
-// admin widget only ever confirms "Sent" when the email actually sent.
-// It used to fire a GitHub Actions workflow and return 202 ("dispatch
-// accepted") which looked like success even when the send then silently
-// skipped (e.g. the recipient wasn't a Clerk Pro user). The internal
-// endpoint runs `dispatch_welcome` in-process (~1-3s) and reports
-// sent / skipped:<reason> / failed:<reason>.
-//
-//   • `variant`  — "welcome" (first-time) | "welcome_back" (resubscribe).
-//   • `locale`   — EN/ES override (the tool's Language toggle). Empty →
-//     the dispatcher uses the recipient's Clerk locale (prod behavior).
-//   • `force`    — defaults TRUE for admin (re-render past the idempotency
-//     stamp). Pass false to exercise the idempotency path.
-//
-// Response (always HTTP 200 so the widget can read the body): {
-//   status: "sent" | "skipped" | "failed" | "error",
-//   reason: string | null, message_id: string | null,
-//   dry_run: bool, variant, locale }
-//
-// Auth: the public admin wrapper requires PULPO_ADMIN_DEBUG_TOKEN via
-// requireAdminAuth(). Auth to the internal endpoint uses Bearer
-// PULPO_INTERNAL_TOKEN (shared with the Stripe webhook). When it's unset
-// we return status:"error" — never a false "sent".
+// Operator surface for the DB-free Pulpo Free Welcome / Welcome-back
+// templates. Calls /api/internal/free-welcome-send synchronously and
+// returns the real sent / skipped / failed outcome.
 
-const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const { requireAdminAuth } = require("../../_admin_auth");
+const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const INTERNAL_PATH = "/api/internal/welcome-send";
+const INTERNAL_PATH = "/api/internal/free-welcome-send";
 const INTERNAL_TIMEOUT_MS = 25_000;
 
 function internalBaseUrl() {
-  // PUBLIC domain only — never VERCEL_URL. The *.vercel.app deployment
-  // URL is gated by Vercel Deployment Protection (HTML 401), which made
-  // this admin call (and the Stripe-webhook welcome) surface as http_401.
-  // The custom domain reaches the same function, unprotected.
   return process.env.PULPO_SITE_ROOT || "https://pulpo.club";
 }
 
-async function emitTriggerEvent({ to, by, force, variant, locale, result, reason }) {
+async function emitTriggerEvent({ to, by, variant, locale, result, reason }) {
   try {
     posthog.capture(
       posthog.emailDistinctId(by || to),
@@ -54,10 +27,10 @@ async function emitTriggerEvent({ to, by, force, variant, locale, result, reason
       {
         to,
         by: by || null,
-        newsletter_id: variant === "welcome_back" ? "pro-welcome-back" : "pro-welcome",
-        variant: variant || "welcome",
+        newsletter_id: variant === "free_welcome_back" ? "free-welcome-back" : "free-welcome",
+        variant: variant || "free_welcome",
         locale: locale || null,
-        force,
+        force: true,
         result,
         detail: reason || null,
         dispatched_at: new Date().toISOString(),
@@ -72,7 +45,7 @@ async function emitTriggerEvent({ to, by, force, variant, locale, result, reason
 const limiter = makeRateLimiter({
   windowMs: 60 * 60 * 1000,
   maxAttempts: 5,
-  name: "admin_newsletter_trigger_welcome_test",
+  name: "admin_newsletter_trigger_free_welcome_test",
 });
 
 async function readJsonBody(req) {
@@ -89,13 +62,12 @@ async function readJsonBody(req) {
 }
 
 function logApi(fields) {
-  const parts = ["[api]", "admin.newsletter_trigger_welcome_test"];
+  const parts = ["[api]", "admin.newsletter_trigger_free_welcome_test"];
   for (const [k, v] of Object.entries(fields)) parts.push(`${k}=${v}`);
   console.log(parts.join(" "));
 }
 
-// Exported for unit tests — injectable fetch.
-async function callInternalWelcomeSend({ baseUrl, token, payload, fetchImpl, timeoutMs }) {
+async function callInternalFreeWelcomeSend({ baseUrl, token, payload, fetchImpl, timeoutMs }) {
   const controller = new AbortController();
   const tid = setTimeout(() => controller.abort(), timeoutMs || INTERNAL_TIMEOUT_MS);
   try {
@@ -104,7 +76,7 @@ async function callInternalWelcomeSend({ baseUrl, token, payload, fetchImpl, tim
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        "User-Agent": "pulpo-admin-welcome-test",
+        "User-Agent": "pulpo-admin-free-welcome-test",
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
@@ -133,7 +105,7 @@ async function handler(req, res, { fetchImpl } = {}) {
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
     logApi({ status: 429, ms: Date.now() - t0 });
-    return send429(res, rl, "admin_newsletter_trigger_welcome_test");
+    return send429(res, rl, "admin_newsletter_trigger_free_welcome_test");
   }
 
   const body = await readJsonBody(req);
@@ -144,18 +116,13 @@ async function handler(req, res, { fetchImpl } = {}) {
   const by = typeof body.by === "string" && EMAIL_RE.test(body.by.trim().toLowerCase())
     ? body.by.trim().toLowerCase()
     : null;
-  const force = body.force === false ? false : true;
-  const variant = body.variant === "welcome_back" ? "welcome_back" : "welcome";
-  const locale = (body.locale === "en" || body.locale === "es") ? body.locale : "";
+  const variant = body.variant === "free_welcome_back" ? "free_welcome_back" : "free_welcome";
+  const locale = (body.locale === "en" || body.locale === "es") ? body.locale : "en";
 
-  // .trim() to match the internal endpoint's stripped token — a trailing
-  // newline on the env var otherwise mismatches → 401 (the http_401 the
-  // admin tool surfaced; the Stripe webhook hit the same bug).
   const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
   if (!token) {
-    // Honest failure — never pretend the email sent.
     logApi({ status: 503, ms: Date.now() - t0, reason: "internal_token_missing" });
-    await emitTriggerEvent({ to: email, by, force, variant, locale, result: "error", reason: "internal_token_missing" });
+    await emitTriggerEvent({ to: email, by, variant, locale, result: "error", reason: "internal_token_missing" });
     return res.status(200).json({
       status: "error",
       reason: "internal_endpoint_not_configured",
@@ -163,24 +130,20 @@ async function handler(req, res, { fetchImpl } = {}) {
     });
   }
 
-  const payload = { email, source: "admin", force, variant };
-  if (locale) payload.locale = locale;
-
-  const result = await callInternalWelcomeSend({
+  const result = await callInternalFreeWelcomeSend({
     baseUrl: internalBaseUrl(),
     token,
-    payload,
+    payload: { email, source: "admin", force: true, is_new_contact: true, variant, locale },
     fetchImpl,
     timeoutMs: INTERNAL_TIMEOUT_MS,
   });
 
   if (!result.ok) {
     logApi({ status: 502, ms: Date.now() - t0, reason: result.reason });
-    await emitTriggerEvent({ to: email, by, force, variant, locale, result: "error", reason: result.reason });
+    await emitTriggerEvent({ to: email, by, variant, locale, result: "error", reason: result.reason });
     return res.status(200).json({ status: "error", reason: result.reason });
   }
 
-  // Internal endpoint: 200 = sent|skipped, 500 = failed, 4xx = bad request.
   const b = result.body || {};
   let status = b.status;
   if (status !== "sent" && status !== "skipped" && status !== "failed") {
@@ -190,9 +153,9 @@ async function handler(req, res, { fetchImpl } = {}) {
 
   logApi({
     status: 200, ms: Date.now() - t0, result: status, reason: reason || "-",
-    variant, locale: locale || "clerk", dry_run: !!b.dry_run,
+    variant, locale, dry_run: !!b.dry_run,
   });
-  await emitTriggerEvent({ to: email, by, force, variant, locale, result: status, reason });
+  await emitTriggerEvent({ to: email, by, variant, locale, result: status, reason });
 
   return res.status(200).json({
     status,
@@ -200,11 +163,11 @@ async function handler(req, res, { fetchImpl } = {}) {
     message_id: b.message_id || null,
     dry_run: !!b.dry_run,
     variant,
-    locale: locale || null,
+    locale,
     latency_ms: typeof b.latency_ms === "number" ? b.latency_ms : Date.now() - t0,
   });
 }
 
 module.exports = (req, res) => handler(req, res);
 module.exports.handler = handler;
-module.exports.callInternalWelcomeSend = callInternalWelcomeSend;
+module.exports.callInternalFreeWelcomeSend = callInternalFreeWelcomeSend;

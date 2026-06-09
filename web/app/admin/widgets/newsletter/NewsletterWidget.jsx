@@ -23,14 +23,12 @@
 // iteration-level QA loop — the iteration itself happens in code, not
 // in this widget.
 //
-// Auth: deliberately none on this endpoint beyond rate-limiting. The
-// real security perimeter is GITHUB_DISPATCH_TOKEN (fine-grained PAT,
-// actions:write on this repo only). Worst-case abuse is preview-
-// subjected email spam capped at 15 emails/hr/IP. The bearer-token
-// gate was removed after the env-var friction kept blocking the
-// operator every iteration — see api/admin/newsletter/trigger-preview.js.
+// Auth: write calls use adminFetch(), which attaches the
+// PULPO_ADMIN_DEBUG_TOKEN bearer. The server-side endpoints also keep
+// their rate limits and the high-blast audience send keeps its SEND gate.
 
 import React, { useState, useEffect, useCallback } from "react";
+import { adminFetch } from "../../lib/admin-token.ts";
 
 // Empty by default — every test send goes to whatever the operator types
 // into the "Send test to" field. No prefilled recipient, so a test can
@@ -122,21 +120,21 @@ const NEWSLETTERS = [
     id: "free-welcome",
     tier: "free",
     title: "Free · Welcome",
-    description: "Sent once when a free reader subscribes via the homepage form. The free weekly body (plain 'pulpo' masthead, top-3 'See on Pulpo', ranks 04-10 'Sign up to Pro', Pro-locked news) under a 'Welcome to Pulpo' hero. Template built; the subscribe-trigger dispatch is a follow-up.",
+    description: "Sent once when a free reader subscribes via the homepage form. The free weekly body (plain 'pulpo' masthead, top-3 'See on Pulpo', ranks 04-10 'Sign up to Pro', Pro-locked news) under a 'Welcome to Pulpo' hero. Test-send renders the free_welcome variant synchronously to your inbox — DB-free, no Clerk account needed. The production subscribe-trigger dispatch is a follow-up.",
     template: "pulpo-free-welcome",
     templateLabel: "Pulpo Free Welcome",
     cadenceMode: "onetime",
-    status: "coming-soon",
+    status: "live",
   },
   {
     id: "free-welcome-back",
     tier: "free",
     title: "Free · Welcome-back",
-    description: "Re-acquisition email for a returning free reader (a churned Pro who drops to free, or a resubscribing free subscriber). Same free body + a 'Welcome back' hero derived from the Free Welcome copy. Template built; the trigger dispatch is a follow-up.",
+    description: "Re-acquisition email for a returning free reader (a churned Pro who drops to free, or a resubscribing free subscriber). Same free body + a 'Welcome back' hero derived from the Free Welcome copy. Test-send renders the free_welcome_back variant synchronously to your inbox — DB-free, no Clerk account needed. The production trigger dispatch is a follow-up.",
     template: "pulpo-free-welcome-back",
     templateLabel: "Pulpo Free Welcome-back",
     cadenceMode: "onetime",
-    status: "coming-soon",
+    status: "live",
   },
   {
     id: "free-weekly",
@@ -1099,7 +1097,7 @@ export function NewsletterWidget() {
     const snapshot = audienceConfirm;
     if (!snapshot) return;
     try {
-      const r = await fetch("/api/admin/newsletter/trigger-audience-send", {
+      const r = await adminFetch("/api/admin/newsletter/trigger-audience-send", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -1148,8 +1146,9 @@ export function NewsletterWidget() {
   //     (dispatches the welcome workflow with force=yes so the
   //     operator can re-test against Clerk users who already have
   //     the welcome_newsletter_sent_at stamp)
-  //   • free-* → not yet live; will route to their own endpoints
-  //     when those templates ship.
+  //   • free-welcome / free-welcome-back → /api/admin/newsletter/
+  //     trigger-free-welcome-test (synchronous DB-free dispatcher)
+  //   • free-weekly → /api/admin/newsletter/trigger-preview
   // The endpoint shapes differ (body fields, headers) so we branch
   // here rather than hiding the routing in the server-side allow-list.
   const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly", locale = DEFAULT_LOCALE } = {}) => {
@@ -1161,11 +1160,15 @@ export function NewsletterWidget() {
     setBusy(true);
     setStatusFor(newsletterId, { kind: "pending", when });
     const operatorEmail = readOperatorEmail();
-    // Both welcome sub-versions route to the welcome-test endpoint, which
-    // runs the dispatcher SYNCHRONOUSLY and returns the real outcome.
+    // One-shot welcome variants route to synchronous endpoints that return
+    // the real send/skip/fail result. Weekly variants route to the async
+    // GitHub workflow preview.
     const isWelcome = newsletterId === "pro-welcome" || newsletterId === "pro-welcome-back";
+    const isFreeWelcome = newsletterId === "free-welcome" || newsletterId === "free-welcome-back";
     const endpoint = isWelcome
       ? "/api/admin/newsletter/trigger-welcome-test"
+      : isFreeWelcome
+        ? "/api/admin/newsletter/trigger-free-welcome-test"
       : "/api/admin/newsletter/trigger-preview";
     const baseEntry = {
       at: new Date().toISOString(),
@@ -1180,18 +1183,20 @@ export function NewsletterWidget() {
       const payload = { email: value, by: operatorEmail || undefined, locale };
       if (isWelcome) {
         if (newsletterId === "pro-welcome-back") payload.variant = "welcome_back";
+      } else if (isFreeWelcome) {
+        payload.variant = newsletterId === "free-welcome-back" ? "free_welcome_back" : "free_welcome";
       } else {
         payload.newsletter_id = newsletterId;
         if (issueNumber != null) payload.issue_number = issueNumber;
       }
-      const r = await fetch(endpoint, {
+      const r = await adminFetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
 
-      if (isWelcome) {
+      if (isWelcome || isFreeWelcome) {
         // Synchronous real outcome — only confirm "Sent" when it sent.
         const st = body.status;
         if (st === "sent") {
@@ -1217,7 +1222,7 @@ export function NewsletterWidget() {
         return;
       }
 
-      // Weekly + free (async cohort preview) — dispatch semantics unchanged.
+      // Weekly (async cohort preview) — dispatch semantics unchanged.
       if (!r.ok) {
         const rawCode = body.error || `HTTP ${r.status}`;
         let friendly = body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`;
@@ -1319,10 +1324,17 @@ export function NewsletterWidget() {
     method_not_allowed: "Unexpected request — refresh and try again.",
   };
   const dispatchErrorText = (code) => DISPATCH_ERROR_TEXT[code] || code || "unknown error";
-  const welcomeSubject = (nlId, loc) =>
-    nlId === "pro-welcome-back"
+  const welcomeSubject = (nlId, loc) => {
+    if (nlId === "free-welcome-back") {
+      return loc === "es" ? "Bienvenido de nuevo a Pulpo — tus próximas 10" : "Welcome back to Pulpo — your next 10";
+    }
+    if (nlId === "free-welcome") {
+      return loc === "es" ? "Bienvenido a Pulpo — tus primeras 10" : "Welcome to Pulpo — your first 10";
+    }
+    return nlId === "pro-welcome-back"
       ? (loc === "es" ? "Bienvenido de nuevo a Pulpo Pro — tus próximas 10" : "Welcome back to Pulpo Pro — your next 10")
       : (loc === "es" ? "Bienvenido a Pulpo Pro — tus primeras 10" : "Welcome to Pulpo Pro — your first 10");
+  };
 
   return (
     <>
@@ -1668,15 +1680,16 @@ export function NewsletterWidget() {
             </div>
             {FREE_NEWSLETTERS.map((nl) => {
               const isLive = nl.status === "live";
-              // EVERY free template is preview-testable: it routes through
-              // the SAME preview path as pro-weekly (trigger() →
-              // /api/admin/newsletter/trigger-preview → workflow with the
-              // matching newsletter_template). The free onboarding pair are
-              // render-only variants (welcome hero on the free body), so a
-              // test-send is just rendering that template to the inbox — no
-              // Clerk-coupled welcome dispatch needed. The status badge still
-              // distinguishes Live (weekly) from Coming soon (the real
-              // welcome trigger is the follow-up). TEST only — no audience send.
+              const cardStatus = statusFor(nl.id);
+              // EVERY free template is test-sendable, but via TWO different
+              // paths (trigger() routes by id):
+              //   • free-weekly → /api/admin/newsletter/trigger-preview
+              //     (async GitHub workflow → kind "success" = dispatched).
+              //   • free-welcome / free-welcome-back →
+              //     /api/admin/newsletter/trigger-free-welcome-test
+              //     (synchronous DB-free dispatcher → kind sent/skipped/
+              //     failed). No Clerk account needed — the free recipient
+              //     is synthesized. TEST only — no audience send.
               const canTest = true;
               return (
                 <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
@@ -1710,41 +1723,59 @@ export function NewsletterWidget() {
                       </button>
                     </div>
                   )}
-                  {/* Inline test-send confirmation — mirrors the Pro cards
-                      (the free Send-test routes through the same async
-                      trigger-preview path, so statusFor(nl.id) carries
-                      pending → success/error). Without this the operator
-                      got no feedback below the button. */}
-                  {statusFor(nl.id).kind === "pending" && (
-                    <p className="nl-status pending" aria-live="polite" style={{ marginTop: 12 }}>
+                  {/* Inline test-send feedback. The free section previously
+                      had a Send-test button but rendered NO status below it,
+                      so the operator got zero confirmation. free-welcome /
+                      welcome-back return synchronous sent/skipped/failed;
+                      free-weekly returns an async "dispatched" success. */}
+                  {cardStatus.kind === "pending" && (
+                    <p className="nl-result pending" style={{ marginTop: 8 }}>
                       <span className="nl-status-icon" aria-hidden="true" />
-                      Dispatching workflow…
+                      {nl.cadenceMode === "scheduled" ? "Dispatching workflow…" : "Sending…"}
                     </p>
                   )}
-                  {statusFor(nl.id).kind === "error" && (
-                    <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: 12 }}>
-                      <span className="nl-status-icon" aria-hidden="true">!</span>
-                      {statusFor(nl.id).message}
+                  {cardStatus.kind === "error" && (
+                    <p className="nl-result error" style={{ marginTop: 8 }}>
+                      ⚠ {cardStatus.message}
                     </p>
                   )}
-                  {(statusFor(nl.id).kind === "skipped" || statusFor(nl.id).kind === "failed") && (
-                    <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: 12 }}>
-                      <span className="nl-status-icon" aria-hidden="true">!</span>
-                      Not sent — {statusFor(nl.id).reason}
+                  {cardStatus.kind === "failed" && (
+                    <p className="nl-result error" style={{ marginTop: 8 }}>
+                      ✗ Not sent — {welcomeReasonText(cardStatus.reason)}
                     </p>
                   )}
-                  {statusFor(nl.id).kind === "success" && (
-                    <div className="nl-success" role="status" aria-live="polite" style={{ marginTop: 12 }}>
+                  {cardStatus.kind === "skipped" && (
+                    <p className="nl-result error" style={{ marginTop: 8 }}>
+                      ⊘ Not sent — {welcomeReasonText(cardStatus.reason)}
+                    </p>
+                  )}
+                  {cardStatus.kind === "sent" && (
+                    <div className="nl-success-card" style={{ marginTop: 8 }}>
+                      <p className="nl-success-head">
+                        <span className="nl-success-check" aria-hidden="true">✓</span>
+                        {cardStatus.dryRun ? "Rendered OK · dry-run (no email sent)" : "Sent ✓"}
+                      </p>
+                      <p className="nl-success-body">
+                        {cardStatus.dryRun ? (
+                          <>The dispatcher ran in <strong>DRY-RUN</strong>, so no real email went out. Set <strong>PULPO_NEWSLETTER_DRY_RUN=0</strong> in the Vercel env to send for real.</>
+                        ) : (
+                          <>Sent to <strong>{cardStatus.recipient}</strong> in <strong>{cardStatus.locale === "es" ? "Spanish" : "English"}</strong>. Subject: <strong>{welcomeSubject(nl.id, cardStatus.locale)}</strong>.{cardStatus.messageId ? <> · id <code>{cardStatus.messageId}</code></> : null}</>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  {cardStatus.kind === "success" && (
+                    <div className="nl-success-card" style={{ marginTop: 8 }}>
                       <p className="nl-success-head">
                         <span className="nl-success-check" aria-hidden="true">✓</span>
                         Dispatched · test on the way
                       </p>
                       <p className="nl-success-body">
-                        Sending to <strong>{statusFor(nl.id).recipient}</strong>. Should land in ~30–60 seconds.
+                        Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds.
                       </p>
-                      {statusFor(nl.id).runsUrl && (
+                      {cardStatus.runsUrl && (
                         <p className="nl-success-footer">
-                          <a href={statusFor(nl.id).runsUrl} target="_blank" rel="noreferrer">
+                          <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">
                             View workflow run on GitHub →
                           </a>
                         </p>

@@ -22,6 +22,7 @@
 import React, { useCallback } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
+import { Icon, PulpoMark } from "../components.jsx";
 import versions from "./versions.json";
 
 // Compile-time import of the version registry — Vite inlines this so
@@ -146,6 +147,102 @@ function NewsletterPostcard({ locale }) {
   );
 }
 
+// Free-newsletter capture modal — the Free on-ramp. Email-only → POST
+// /api/newsletter (Resend, no account). Self-contained: own email +
+// status state, Esc/backdrop/close dismiss. Opened from the hero's
+// "Get the free Sunday edition" button.
+const NL_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function NewsletterModal({ locale, onClose }) {
+  const [email, setEmail] = React.useState("");
+  // kind: idle | loading | success | already | error | invalid
+  const [status, setStatus] = React.useState({ kind: "idle" });
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const submit = useCallback(async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const value = email.trim();
+    if (!NL_EMAIL_RE.test(value)) { setStatus({ kind: "invalid" }); return; }
+    setStatus({ kind: "loading" });
+    const domain = value.split("@")[1] || "";
+    try {
+      const r = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: value, source: "homepage_hero_v5", locale }),
+      });
+      const body = await r.json().catch(() => ({}));
+      let result;
+      if (r.ok) { setStatus({ kind: body.resubscribed ? "already" : "success" }); result = body.resubscribed ? "already_subscribed" : "success"; }
+      else if (r.status === 429) { setStatus({ kind: "error" }); result = "rate_limited"; }
+      else if (body && body.error === "invalid_email") { setStatus({ kind: "invalid" }); result = "validation_failed"; }
+      else { setStatus({ kind: "error" }); result = "error"; }
+      try { track("hero.email_submitted", { source: "homepage_hero", email_domain_only: domain, result }); } catch { /* ignore */ }
+    } catch {
+      setStatus({ kind: "error" });
+      try { track("hero.email_submitted", { source: "homepage_hero", email_domain_only: domain, result: "error" }); } catch { /* ignore */ }
+    }
+  }, [email, locale]);
+
+  const done = status.kind === "success" || status.kind === "already";
+
+  return (
+    <div className="modal-backdrop" role="presentation" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal hp-nl-modal" role="dialog" aria-modal="true" aria-label={t("home.hero.v5.nl_modal_aria", locale)}>
+        <button type="button" className="modal-close" onClick={onClose} aria-label={t("home.hero.v5.nl_close", locale)}>
+          <Icon name="close" size={18} />
+        </button>
+        <div className="hp-nl-modal-mark" style={{ color: "var(--color-forest-deep)" }}>
+          <PulpoMark size={34} />
+        </div>
+        {done ? (
+          <>
+            <h2 className="hp-nl-modal-title">{t("home.hero.v5.nl_success_title", locale)}</h2>
+            <p className="hp-nl-modal-body">
+              {t(status.kind === "already" ? "home.hero.v5.nl_already" : "home.hero.v5.nl_success", locale)}
+            </p>
+            <button type="button" className="hp-nl-modal-btn" onClick={onClose}>
+              {t("home.hero.v5.nl_close", locale)}
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 className="hp-nl-modal-title">{t("home.hero.v5.nl_modal_title", locale)}</h2>
+            <p className="hp-nl-modal-body">{t("home.hero.v5.nl_modal_body", locale)}</p>
+            <form className="hp-nl-modal-form" onSubmit={submit} noValidate>
+              <input
+                ref={inputRef}
+                type="email"
+                className="hp-nl-modal-input"
+                placeholder={t("home.hero.v5.nl_placeholder", locale)}
+                aria-label={t("home.hero.v5.nl_aria", locale)}
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (status.kind !== "idle") setStatus({ kind: "idle" }); }}
+                disabled={status.kind === "loading"}
+              />
+              <button type="submit" className="hp-nl-modal-btn" disabled={status.kind === "loading"}>
+                {t(status.kind === "loading" ? "home.hero.v5.nl_cta_loading" : "home.hero.v5.nl_cta", locale)}
+              </button>
+              {(status.kind === "invalid" || status.kind === "error") && (
+                <p className="hp-nl-modal-err" role="alert">
+                  {t(status.kind === "invalid" ? "home.hero.v5.nl_invalid" : "home.hero.v5.nl_error", locale)}
+                </p>
+              )}
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function HeroV5({ app, locale }) {
   // Mount telemetry — fire once per page load so dashboards can split
   // hero_v5 sessions from legacy hero_v4 sessions.
@@ -155,6 +252,23 @@ export function HeroV5({ app, locale }) {
       track("homepage.section_viewed", { section: "hero_v5" });
     } catch { /* ignore */ }
   }, []);
+
+  // ── Two-state CTAs ─────────────────────────────────────────────────
+  // Primary = free newsletter (email captured in NewsletterModal — no
+  // account, Resend only). Secondary = Go Pro (subscribe modal).
+  const [nlOpen, setNlOpen] = React.useState(false);
+
+  const onGetFree = useCallback(() => {
+    try { track("homepage.cta_clicked", { location: "hero_v5_newsletter" }); } catch { /* ignore */ }
+    setNlOpen(true);
+  }, []);
+
+  const onGoPro = useCallback(() => {
+    try { track("homepage.cta_clicked", { location: "hero_v5_pro" }); } catch { /* ignore */ }
+    if (app && typeof app.openFreeMonthModal === "function") {
+      app.openFreeMonthModal({ trigger: "browse_card" });
+    }
+  }, [app]);
 
   const onNavigate = useCallback(
     (slug) => {
@@ -184,7 +298,38 @@ export function HeroV5({ app, locale }) {
               <span className="hp-hero-v5-h1-line">{t("home.hero.v5.h1_a", locale)}</span>{" "}
               <em className="hp-hero-v5-h1-italic">{t("home.hero.v5.h1_b", locale)}</em>
             </h1>
-            <p className="hp-hero-v5-sub">{t("home.hero.v5.sub", locale)}</p>
+            <p className="hp-hero-v5-sub">
+              {t("home.hero.v5.sub_pre", locale)}
+              <strong>{t("home.hero.v5.sub_em", locale)}</strong>
+              {t("home.hero.v5.sub_post", locale)}
+            </p>
+            <p className="hp-hero-v5-sub2">
+              <strong>{t("home.hero.v5.sub2_em", locale)}</strong>
+              {t("home.hero.v5.sub2_post", locale)}
+            </p>
+
+            {/* Two-state CTAs — free newsletter is the primary; Pro is a
+                clear secondary button carrying the PRO badge. Email
+                capture happens in NewsletterModal. */}
+            <div className="hp-hero-v5-cta">
+              <button type="button" className="hp-hero-v5-cta-free" onClick={onGetFree}>
+                {t("home.hero.v5.cta_free", locale)}
+              </button>
+              <button type="button" className="hp-hero-v5-cta-pro" onClick={onGoPro}>
+                <span className="hp-hero-v5-cta-pro-text">{t("home.hero.v5.cta_pro", locale)}</span>
+                <span className="hp-hero-v5-cta-pro-badge" aria-hidden="true">Pro</span>
+              </button>
+            </div>
+            <dl className="hp-hero-v5-tiers">
+              <div>
+                <dt>{t("home.hero.v5.tier_free_label", locale)}</dt>
+                <dd>{t("home.hero.v5.tier_free", locale)}</dd>
+              </div>
+              <div>
+                <dt className="is-pro">{t("home.hero.v5.tier_pro_label", locale)}</dt>
+                <dd>{t("home.hero.v5.tier_pro", locale)}</dd>
+              </div>
+            </dl>
           </div>
           <NewsletterPostcard locale={locale} />
         </div>
@@ -208,6 +353,7 @@ export function HeroV5({ app, locale }) {
         </div>
 
       </div>
+      {nlOpen && <NewsletterModal locale={locale} onClose={() => setNlOpen(false)} />}
     </section>
   );
 }
