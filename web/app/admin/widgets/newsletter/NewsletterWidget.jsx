@@ -1690,6 +1690,47 @@ export function NewsletterWidget() {
                       </button>
                     </div>
                   )}
+                  {/* Inline test-send confirmation — mirrors the Pro cards
+                      (the free Send-test routes through the same async
+                      trigger-preview path, so statusFor(nl.id) carries
+                      pending → success/error). Without this the operator
+                      got no feedback below the button. */}
+                  {statusFor(nl.id).kind === "pending" && (
+                    <p className="nl-status pending" aria-live="polite" style={{ marginTop: 12 }}>
+                      <span className="nl-status-icon" aria-hidden="true" />
+                      Dispatching workflow…
+                    </p>
+                  )}
+                  {statusFor(nl.id).kind === "error" && (
+                    <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: 12 }}>
+                      <span className="nl-status-icon" aria-hidden="true">!</span>
+                      {statusFor(nl.id).message}
+                    </p>
+                  )}
+                  {(statusFor(nl.id).kind === "skipped" || statusFor(nl.id).kind === "failed") && (
+                    <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: 12 }}>
+                      <span className="nl-status-icon" aria-hidden="true">!</span>
+                      Not sent — {statusFor(nl.id).reason}
+                    </p>
+                  )}
+                  {statusFor(nl.id).kind === "success" && (
+                    <div className="nl-success" role="status" aria-live="polite" style={{ marginTop: 12 }}>
+                      <p className="nl-success-head">
+                        <span className="nl-success-check" aria-hidden="true">✓</span>
+                        Dispatched · test on the way
+                      </p>
+                      <p className="nl-success-body">
+                        Sending to <strong>{statusFor(nl.id).recipient}</strong>. Should land in ~30–60 seconds.
+                      </p>
+                      {statusFor(nl.id).runsUrl && (
+                        <p className="nl-success-footer">
+                          <a href={statusFor(nl.id).runsUrl} target="_blank" rel="noreferrer">
+                            View workflow run on GitHub →
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </article>
               );
             })}
