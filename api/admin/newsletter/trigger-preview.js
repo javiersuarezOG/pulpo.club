@@ -32,13 +32,15 @@
 // scoped `actions:write` on this repo only — cannot trigger arbitrary
 // workflows or read anything). The worst an attacker can do is spam
 // `[PULPO PREVIEW · <cohort>]`-subjected emails to the address they
-// supply, capped by the rate limit at 15 emails/hr/IP. The bearer-token
+// supply, capped by the rate limit at ~60 emails/hr/IP. The bearer-token
 // gate (PULPO_ADMIN_DEBUG_TOKEN) was removed after env-var-not-deployed
 // friction kept blocking the operator on every iteration; the security
 // trade was explicit and minor.
 //
-// Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
-// AND a real Resend send — cheap insurance against a stuck-button loop).
+// Rate limit: 20 dispatches per IP per hour (bumped from 5 — heavy
+// operator testing kept hitting the cap; each still triggers a paid CI
+// run + a real Resend send, so it stays bounded against a stuck-button
+// loop, just with more headroom for a real testing session).
 //
 // Dispatch verification: GitHub's `workflow_dispatch` POST returns 204
 // once the payload is accepted, but the actual run is created
@@ -128,7 +130,7 @@ async function emitTriggerEvent({ to, locale, by, issueNumber, newsletterId, res
 
 const limiter = makeRateLimiter({
   windowMs: 60 * 60 * 1000,
-  maxAttempts: 5,
+  maxAttempts: 20,
   name: "admin_newsletter_trigger_preview",
 });
 
