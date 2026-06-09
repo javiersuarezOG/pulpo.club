@@ -3018,56 +3018,112 @@ function PlansPage({ app }) {
 }
 
 // ====== Sign-up modal ======
+// Two-state auth chooser. The logged-out account/avatar click (and the
+// /account route gate) land here: two clear paths — Log in (existing Pro
+// members) or Get Pulpo Pro (new visitors). NO free "Sign up". "Log in"
+// hands off to Clerk's hosted sign-in in prod (or the legacy login form
+// when Clerk is OFF in dev/CI). "Get Pulpo Pro" opens the subscribe modal.
+function AuthChoiceModal({ app, onLogin }) {
+  const lc = app.locale;
+  return (
+    <div className="modal-backdrop" onClick={() => app.closeSignup()}>
+      <div className="modal modal-signup" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={() => app.closeSignup()} aria-label={t("common.close", lc)}>
+          <Icon name="close" size={18}/>
+        </button>
+        <div className="modal-head">
+          <PulpoLogo />
+          <h2>{t("auth_choice.headline", lc)}</h2>
+          <p>{t("auth_choice.body", lc)}</p>
+        </div>
+        <button type="button" className="btn-primary block lg" onClick={onLogin}>
+          {t("auth_choice.login", lc)}
+        </button>
+        <button
+          type="button"
+          className="btn-ghost block lg"
+          style={{ marginTop: 10 }}
+          onClick={() => {
+            app.closeSignup();
+            if (app.openFreeMonthModal) app.openFreeMonthModal({ trigger: "browse_card" });
+          }}
+        >
+          {t("auth_choice.get_pro", lc)}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SignupModal({ app }) {
   const m = app.signupModal;
+  // Dev/CI (Clerk OFF) fallback: after "Log in" on the chooser we swap to
+  // the legacy email/password form. Reset whenever the modal closes.
+  const [showLoginForm, setShowLoginForm] = pUseState(false);
+  pUseEffect(() => { if (!m) setShowLoginForm(false); }, [m]);
 
-  // Flag-on hand-off to Clerk. Trigger the hosted modal imperatively
-  // via app.clerkActions (wired by ClerkActionsBinder once the SDK
-  // chunk has loaded) — no click-time Suspense, so React #426 doesn't
-  // fire. If clerkActions isn't ready yet (cold first paint), we wait;
-  // the effect re-runs when it lands.
-  //
-  // Hook is at the top so order is stable across renders, regardless
-  // of whether `m` or `clerkEnabled()` flip the early returns below.
+  // Flag-on defensive close + stray-signup hand-off. Hook at the top so
+  // order is stable across renders regardless of the early returns below.
   pUseEffect(() => {
     if (!m) return;
     if (!clerkEnabled()) return;
     if (!app.clerkActions) return;
-    // Defensive: Clerk's hosted SignIn/SignUp throws
-    // `cannot_render_single_session_enabled` when the user is already
-    // signed in — and we have a race where consumers (e.g. the topnav
-    // sign-in icon mid-Clerk-boot, or AccountPage redirects) can call
-    // openSignup before ClerkUserSync has committed user state. Both
-    // checks below are needed: `app.user` covers the legacy auth path
-    // and the post-sync window; `clerkActions.isSignedIn()` covers the
-    // boot-race window where Clerk's session is hydrated from cookies
-    // but app.user hasn't synced yet. In either case, close the modal
-    // silently and let app.jsx's post-signin effect process any
-    // pendingAction once ClerkUserSync catches up.
+    // Already signed in (boot-race / double-call)? Close silently and let
+    // app.jsx's post-signin effect handle any pendingAction.
     const clerkSays = typeof app.clerkActions.isSignedIn === "function"
       && app.clerkActions.isSignedIn();
     if (app.user || clerkSays) {
       app.closeSignup();
       return;
     }
-    const target = m.mode === "login" ? "openSignIn" : "openSignUp";
-    try {
-      app.clerkActions[target]();
-    } catch (err) {
-      // Belt-and-braces: if Clerk still throws (e.g. its error code
-      // changes between versions), don't blank the page via the
-      // ErrorBoundary — silently close the modal. The user can retry
-      // on the next render once state catches up.
-      if (typeof console !== "undefined" && console.warn) {
-        console.warn("[pulpo] clerk." + target + " failed:", err);
+    // Two-state: login mode renders the Pulpo chooser below (no auto
+    // hand-off to Clerk). Only a stray signup mode auto-opens Clerk's
+    // hosted signup — which shouldn't occur, since signup intent is
+    // diverted to the subscribe modal upstream (openSignup); kept as a
+    // defensive fallback.
+    if (m.mode !== "login") {
+      try {
+        app.clerkActions.openSignUp();
+      } catch (err) {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("[pulpo] clerk.openSignUp failed:", err);
+        }
       }
+      app.closeSignup();
     }
-    app.closeSignup();
   }, [m, app.clerkActions, app.user]);
 
   if (!m) return null;
-  if (clerkEnabled()) return null;
-  return <LegacySignupModal app={app} m={m} />;
+
+  // Login mode → the Pulpo "Log in / Get Pulpo Pro" chooser. (The
+  // explicit login links — /start "Log in" via ?login=1, WelcomeModal
+  // "sign in existing" — call clerk.openSignIn directly and never reach
+  // SignupModal, so they still go straight to sign-in.)
+  if (m.mode === "login" && !showLoginForm) {
+    return (
+      <AuthChoiceModal
+        app={app}
+        onLogin={() => {
+          if (clerkEnabled() && app.clerkActions && typeof app.clerkActions.openSignIn === "function") {
+            try {
+              app.clerkActions.openSignIn();
+            } catch (err) {
+              if (typeof console !== "undefined" && console.warn) {
+                console.warn("[pulpo] clerk.openSignIn failed:", err);
+              }
+            }
+            app.closeSignup();
+          } else {
+            // Clerk OFF (dev/CI): show the legacy email/password login form.
+            setShowLoginForm(true);
+          }
+        }}
+      />
+    );
+  }
+
+  if (!clerkEnabled()) return <LegacySignupModal app={app} m={m} />;
+  return null;
 }
 
 // Legacy email/password sign-in form. Only renders when VITE_USE_CLERK
