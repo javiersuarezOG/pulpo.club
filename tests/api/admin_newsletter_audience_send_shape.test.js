@@ -23,9 +23,21 @@ const COUNT_HANDLER = path.resolve(
 const SEND_HANDLER = path.resolve(
   __dirname, "../../api/admin/newsletter/trigger-audience-send.js",
 );
+const PREVIEW_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-preview.js",
+);
+const WELCOME_TEST_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-welcome-test.js",
+);
+const FREE_WELCOME_TEST_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-free-welcome-test.js",
+);
 
 const countSrc = fs.readFileSync(COUNT_HANDLER, "utf8");
 const sendSrc = fs.readFileSync(SEND_HANDLER, "utf8");
+const previewSrc = fs.readFileSync(PREVIEW_HANDLER, "utf8");
+const welcomeTestSrc = fs.readFileSync(WELCOME_TEST_HANDLER, "utf8");
+const freeWelcomeTestSrc = fs.readFileSync(FREE_WELCOME_TEST_HANDLER, "utf8");
 
 describe("api/admin/newsletter/audience-count", () => {
   it("is GET-only", () => {
@@ -125,5 +137,20 @@ describe("api/admin/newsletter/trigger-audience-send", () => {
     // Three failure exits all hit emitAuditEvent before returning
     const auditCalls = (sendSrc.match(/await emitAuditEvent\(/g) || []).length;
     expect(auditCalls).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("api/admin/newsletter write endpoints auth", () => {
+  it("requires admin bearer auth on all newsletter write triggers", () => {
+    for (const src of [sendSrc, previewSrc, welcomeTestSrc, freeWelcomeTestSrc]) {
+      expect(src).toMatch(/requireAdminAuth/);
+      expect(src).toMatch(/if \(!requireAdminAuth\(req, res\)\) return/);
+    }
+  });
+
+  it("free welcome tests use the dedicated synchronous endpoint, not the weekly preview workflow", () => {
+    expect(freeWelcomeTestSrc).toMatch(/INTERNAL_PATH\s*=\s*"\/api\/internal\/free-welcome-send"/);
+    expect(freeWelcomeTestSrc).toMatch(/variant === "free_welcome_back"/);
+    expect(freeWelcomeTestSrc).toMatch(/is_new_contact:\s*true/);
   });
 });

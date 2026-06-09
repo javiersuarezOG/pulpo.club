@@ -5,30 +5,16 @@
 //   - `/admin/<slug>`       → the matching widget's Component, wrapped in a
 //                             consistent header with back-to-grid link
 //
-// The frontend gate is currently OFF — /admin and /admin/sources are
-// open by design for the launch window.
-//
-// AUTH REALITY (corrected 2026-06-03): the newsletter WRITE endpoints
-// (`api/admin/newsletter/trigger-welcome-test|trigger-audience-send|
-// trigger-preview`) are NOT gated — they call no auth, only a rate
-// limiter. So anyone reaching /admin can trigger a real send, including
-// the audience blast to every Pro subscriber. `requireAdminAuth`
-// (api/_admin_auth.js, shared secret PULPO_ADMIN_DEBUG_TOKEN) exists but
-// is used ONLY by stripe-session-debug.js. This is a known, accepted
-// exposure for the launch window — do not assume these endpoints are
-// protected.
-//
-// To actually close it: call requireAdminAuth() at the top of the three
-// trigger endpoints, have the widget thread the bearer (it uses plain
-// fetch today), and re-enable the `/admin` token prompt
-// (`if (!tokenOk) return …`). Confirm PULPO_ADMIN_DEBUG_TOKEN is set in
-// Vercel first, or requireAdminAuth 503s and breaks the tool.
+// /admin is browseable, but write tools are bearer-gated. The operator
+// enters PULPO_ADMIN_DEBUG_TOKEN once; adminFetch threads it to the
+// /api/admin/* write endpoints where requireAdminAuth() checks it.
 //
 // Widgets that need state/coordination across pages can use sessionStorage
 // or React context — this shell intentionally passes nothing in.
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ADMIN_WIDGETS, findWidget } from "./widgets/registry.ts";
+import { clearAdminToken, hasAdminToken, setAdminToken } from "./lib/admin-token.ts";
 
 const SHELL_STYLES = `
 .page-admin {
@@ -73,6 +59,45 @@ const SHELL_STYLES = `
   margin: 0 0 32px;
 }
 .page-admin .admin-banner strong { color: var(--ink); }
+.page-admin .admin-token-card {
+  max-width: 460px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 18px;
+}
+.page-admin .admin-token-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.page-admin .admin-token-row input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font: inherit;
+  padding: 9px 10px;
+}
+.page-admin .admin-token-row button,
+.page-admin .admin-token-clear {
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-weight: 600;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+.page-admin .admin-token-clear {
+  margin-top: 10px;
+  background: transparent;
+  color: var(--ink-2);
+  border-color: var(--line-2);
+}
 
 .page-admin .widget-grid {
   display: grid;
@@ -146,6 +171,8 @@ const SHELL_STYLES = `
 export function AdminPage({ app }) {
   const adminWidget = app?.routeParams?.adminWidget ?? null;
   const widget = findWidget(adminWidget);
+  const [tokenOk, setTokenOkState] = useState(() => hasAdminToken());
+  const [tokenDraft, setTokenDraft] = useState("");
 
   // Belt-and-braces noindex — `robots.txt` already disallows /admin
   // for compliant crawlers; this meta tag covers anyone who skips it.
@@ -205,6 +232,24 @@ export function AdminPage({ app }) {
     // popstate dispatch above triggers the app's existing listener.
   }, []);
 
+  useEffect(() => {
+    const onInvalid = () => setTokenOkState(false);
+    window.addEventListener("pulpo:admin-token-invalid", onInvalid);
+    return () => window.removeEventListener("pulpo:admin-token-invalid", onInvalid);
+  }, []);
+
+  const saveToken = (e) => {
+    e.preventDefault();
+    setAdminToken(tokenDraft);
+    setTokenOkState(hasAdminToken());
+    setTokenDraft("");
+  };
+
+  const forgetToken = () => {
+    clearAdminToken();
+    setTokenOkState(false);
+  };
+
   return (
     <>
       <style>{SHELL_STYLES}</style>
@@ -218,12 +263,32 @@ export function AdminPage({ app }) {
             <h1 id="admin-title" className="admin-title">{widget.label}</h1>
             <p className="admin-subhead">{widget.description}</p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> open at /admin with no login, and the
-              newsletter send/preview endpoints are NOT gated either — anyone
-              who reaches this page can trigger a real send (incl. “Send to
-              everyone”). Rate-limited only. Left open for the launch window.
+              <strong>Protected actions —</strong> newsletter send/preview calls
+              require the admin bearer token. Keep it private; it unlocks real
+              email sends from this browser.
             </div>
-            <widget.Component />
+            {!tokenOk ? (
+              <form className="admin-token-card" onSubmit={saveToken}>
+                <p className="wc-desc">Enter the admin token to use write tools.</p>
+                <div className="admin-token-row">
+                  <input
+                    type="password"
+                    value={tokenDraft}
+                    onChange={(e) => setTokenDraft(e.target.value)}
+                    placeholder="Admin token" // i18n-allow: admin-only widget, operator surface, never shown to end users
+                    autoComplete="off"
+                  />
+                  <button type="submit">Unlock</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <button type="button" className="admin-token-clear" onClick={forgetToken}>
+                  Lock admin actions
+                </button>
+                <widget.Component />
+              </>
+            )}
           </>
         ) : (
           <>
@@ -232,10 +297,9 @@ export function AdminPage({ app }) {
               Internal Pulpo tools. Pick a widget below to get started.
             </p>
             <div className="admin-banner">
-              <strong>Heads up —</strong> open at /admin with no login, and the
-              newsletter write endpoints (send/preview) are NOT auth-gated —
-              only rate-limited. Anyone reaching this page can trigger a real
-              send. Left open for the launch window.
+              <strong>Heads up —</strong> write actions require the admin token.
+              Browsing this page is open, but sends and publishing tools are
+              bearer-gated server-side.
             </div>
             {ADMIN_WIDGETS.length === 0 ? (
               <div className="widget-empty">No widgets registered yet.</div>

@@ -27,20 +27,12 @@
 // workflow real subscribers receive guarantees the preview matches the
 // production cut byte-for-byte.
 //
-// Auth: deliberately none beyond rate-limiting. The real security
-// perimeter is the GitHub PAT (`GITHUB_DISPATCH_TOKEN`, fine-grained,
-// scoped `actions:write` on this repo only — cannot trigger arbitrary
-// workflows or read anything). The worst an attacker can do is spam
-// `[PULPO PREVIEW · <cohort>]`-subjected emails to the address they
-// supply, capped by the rate limit at ~60 emails/hr/IP. The bearer-token
-// gate (PULPO_ADMIN_DEBUG_TOKEN) was removed after env-var-not-deployed
-// friction kept blocking the operator on every iteration; the security
-// trade was explicit and minor.
+// Auth: PULPO_ADMIN_DEBUG_TOKEN bearer via requireAdminAuth(), plus a
+// rate-limit. The GitHub PAT stays server-side and only dispatches this
+// workflow; the admin bearer is the operator-facing gate.
 //
-// Rate limit: 20 dispatches per IP per hour (bumped from 5 — heavy
-// operator testing kept hitting the cap; each still triggers a paid CI
-// run + a real Resend send, so it stays bounded against a stuck-button
-// loop, just with more headroom for a real testing session).
+// Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
+// AND a real Resend send — cheap insurance against a stuck-button loop).
 //
 // Dispatch verification: GitHub's `workflow_dispatch` POST returns 204
 // once the payload is accepted, but the actual run is created
@@ -53,6 +45,7 @@
 // the widget surfaces a real error and the operator can retry.
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
+const { requireAdminAuth } = require("../../_admin_auth");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
@@ -130,7 +123,7 @@ async function emitTriggerEvent({ to, locale, by, issueNumber, newsletterId, res
 
 const limiter = makeRateLimiter({
   windowMs: 60 * 60 * 1000,
-  maxAttempts: 20,
+  maxAttempts: 5,
   name: "admin_newsletter_trigger_preview",
 });
 
@@ -159,6 +152,7 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  if (!requireAdminAuth(req, res)) return;
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
