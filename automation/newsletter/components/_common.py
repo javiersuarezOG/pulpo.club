@@ -54,13 +54,17 @@ from ..types import Issue
 #       every Pro email cites a real outlet article; the source-less
 #       "Pulpo Pro coastal scan" filler is retired and the section is
 #       omitted entirely on a cold start. Spotlight HTML changed.
-TEMPLATE_VERSION = "newsletter-v4.5-2026-06-06"
+#   v4.6 (2026-06-09) — footer Unsubscribe link now carries `&e=<edition>`
+#       + `&l=<locale>` so /api/unsubscribe can render the in-brand
+#       free-vs-pro confirmation page. Cosmetic params only (not in the
+#       HMAC); rendered footer HTML changed, hence the bump.
+TEMPLATE_VERSION = "newsletter-v4.6-2026-06-09"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-06"
+LAST_UPDATED = "2026-06-09"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -94,8 +98,11 @@ LAST_UPDATED = "2026-06-06"
 #   welcome-v2.1 (2026-06-06) — inherits the v4.5 Weekly News Spotlight
 #       change (real-article artifact read, filler retired). Welcome body
 #       carries the spotlight, so its HTML changed.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.1-2026-06-06"
-WELCOME_LAST_UPDATED = "2026-06-06"
+#   welcome-v2.2 (2026-06-09) — inherits the v4.6 footer Unsubscribe-link
+#       edition/locale params. Welcome body carries the footer, so its
+#       HTML changed.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.2-2026-06-09"
+WELCOME_LAST_UPDATED = "2026-06-09"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -118,8 +125,11 @@ WELCOME_LAST_UPDATED = "2026-06-06"
 #   welcome-back-v1.1 (2026-06-06) — inherits the v4.5 Weekly News
 #       Spotlight change (real-article artifact read, filler retired).
 #       Welcome-back body carries the spotlight, so its HTML changed.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.1-2026-06-06"
-WELCOME_BACK_LAST_UPDATED = "2026-06-06"
+#   welcome-back-v1.2 (2026-06-09) — inherits the v4.6 footer
+#       Unsubscribe-link edition/locale params. Welcome-back body carries
+#       the footer, so its HTML changed.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.2-2026-06-09"
+WELCOME_BACK_LAST_UPDATED = "2026-06-09"
 
 
 # ─────────────────────────────────────────────────────────────────────
