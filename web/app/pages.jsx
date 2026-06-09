@@ -1396,6 +1396,31 @@ function BrowsePage({ app }) {
     if (view !== "map" && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
   }, [view]);
 
+  // Mobile map mode is a viewport surface, not a long Browse document.
+  // Toggle a body class only while the mobile media query matches so
+  // desktop split-pane behavior remains unchanged.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return undefined;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const cls = "map-xp-mobile-active";
+    const sync = () => {
+      document.body.classList.toggle(cls, view === "map" && mq.matches);
+    };
+    sync();
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", sync);
+      return () => {
+        mq.removeEventListener("change", sync);
+        document.body.classList.remove(cls);
+      };
+    }
+    mq.addListener(sync);
+    return () => {
+      mq.removeListener(sync);
+      document.body.classList.remove(cls);
+    };
+  }, [view]);
+
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
   pUseEffect(() => {
@@ -1491,7 +1516,7 @@ function BrowsePage({ app }) {
   }
 
   return (
-    <div className="page page-browse">
+    <div className={`page page-browse${view === "map" ? " page-browse--map" : ""}`}>
       <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">

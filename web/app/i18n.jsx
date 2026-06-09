@@ -589,6 +589,10 @@ const UI_STRINGS = {
                                    es: "Buscar mientras muevo el mapa" },
   "map.sheet.handle_aria":       { en: "Drag to expand the listings",
                                    es: "Arrastra para ver las propiedades" },
+  "map.sheet.results_aria":      { en: "Map listing results",
+                                   es: "Resultados del mapa" },
+  "map.sheet.row_aria":          { en: "{title}, {price}. Open listing",
+                                   es: "{title}, {price}. Abrir propiedad" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },

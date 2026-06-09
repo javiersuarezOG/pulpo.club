@@ -9,6 +9,25 @@
 // only fail on uncaught JS exceptions.
 
 import { test, expect } from "@playwright/test";
+import { seedConsent, seedProUser } from "./_helpers";
+
+async function topElementAtCenter(page, selector: string) {
+  return page.locator(selector).evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    const x = Math.round(rect.left + rect.width / 2);
+    const y = Math.round(rect.top + rect.height / 2);
+    const top = document.elementFromPoint(x, y);
+    return {
+      tag: top?.tagName ?? "",
+      className: String(top?.className ?? ""),
+      inDetail: !!top?.closest(".detail-overlay"),
+      inDrawer: !!top?.closest(".filter-drawer-backdrop"),
+      inModal: !!top?.closest(".modal-backdrop"),
+      inConsent: !!top?.closest(".consent-banner"),
+      inSheet: !!top?.closest(".map-sheet"),
+    };
+  });
+}
 
 test.describe("Browse map view", () => {
   test("toggling to map renders clusters, the mapped-count, and ?view=map", async ({ page }) => {
@@ -29,18 +48,23 @@ test.describe("Browse map view", () => {
     await page.locator(".pulpo-cluster, .pulpo-pin").first().waitFor({ state: "visible", timeout: 10_000 });
     const clusterCount = page.locator(".pulpo-cluster__count").first();
     await expect(clusterCount).toBeVisible();
-    const clusterAlignment = await clusterCount.evaluate((countEl) => {
-      const clusterEl = countEl.closest(".pulpo-cluster");
-      if (!clusterEl) return null;
-      const count = countEl.getBoundingClientRect();
-      const cluster = clusterEl.getBoundingClientRect();
-      return {
-        dx: Math.abs(count.left + count.width / 2 - (cluster.left + cluster.width / 2)),
-        dy: Math.abs(count.top + count.height / 2 - (cluster.top + cluster.height / 2)),
-      };
-    });
-    expect(clusterAlignment?.dx ?? 999, "cluster count x-center").toBeLessThanOrEqual(1);
-    expect(clusterAlignment?.dy ?? 999, "cluster count y-center").toBeLessThanOrEqual(1);
+    const clusterAlignments = await page.locator(".pulpo-cluster").evaluateAll((clusters) =>
+      clusters.map((clusterEl) => {
+        const countEl = clusterEl.querySelector(".pulpo-cluster__count");
+        const count = countEl?.getBoundingClientRect();
+        const cluster = clusterEl.getBoundingClientRect();
+        return {
+          text: countEl?.textContent ?? "",
+          dx: count ? Math.abs(count.left + count.width / 2 - (cluster.left + cluster.width / 2)) : 999,
+          dy: count ? Math.abs(count.top + count.height / 2 - (cluster.top + cluster.height / 2)) : 999,
+        };
+      }),
+    );
+    expect(clusterAlignments.length, "visible cluster count").toBeGreaterThan(0);
+    for (const alignment of clusterAlignments) {
+      expect(alignment.dx, `cluster ${alignment.text} x-center`).toBeLessThanOrEqual(1);
+      expect(alignment.dy, `cluster ${alignment.text} y-center`).toBeLessThanOrEqual(1);
+    }
 
     // Honesty affordances: "X of Y mapped" count + "approximate" legend.
     await expect(page.locator(".map-view__count")).toContainText(/of .* listings mapped/);
@@ -107,23 +131,77 @@ test.describe("Browse map view", () => {
   });
 
   test("mobile: bottom sheet + Filters pill (PR-10)", async ({ page }) => {
+    await seedConsent(page);
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/browse?view=map", { waitUntil: "networkidle" });
     await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
 
     // Desktop card panel is hidden; the bottom sheet + Filters pill show.
     await expect(page.locator(".map-split__cards")).toBeHidden();
+    await expect(page.locator(".browse-search")).toBeHidden();
     const sheet = page.locator(".map-sheet");
     await expect(sheet).toBeVisible();
-    expect(await sheet.locator(".listing-card").count()).toBeGreaterThan(0);
+    expect(await sheet.locator(".map-sheet-row").count()).toBeGreaterThan(0);
+    const mapBox = await page.locator(".map-view__canvas").evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom, height: rect.height, viewport: window.innerHeight };
+    });
+    expect(mapBox.top, "mobile map should enter first viewport immediately").toBeLessThanOrEqual(90);
+    expect(mapBox.bottom, "mobile map should fill behind the sheet").toBeGreaterThanOrEqual(mapBox.viewport - 2);
 
-    // Sheet starts collapsed; tapping the handle expands it.
+    const collapsedScroll = await page.locator(".map-sheet__cards").evaluate((el) => ({
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+    }));
+    expect(collapsedScroll.scrollWidth - collapsedScroll.clientWidth, "collapsed sheet should not be a giant horizontal rail").toBeLessThanOrEqual(1);
+
+    const handleTop = await topElementAtCenter(page, ".map-sheet__handle");
+    expect(handleTop.inSheet, "sheet handle should be tappable/topmost").toBe(true);
+
+    // Sheet starts collapsed; tapping the handle expands it into a vertical scroller.
     await expect(sheet).toHaveClass(/map-sheet--collapsed/);
     await page.locator(".map-sheet__handle").click();
     await expect(sheet).toHaveClass(/map-sheet--expanded/);
+    const expandedScroll = await page.locator(".map-sheet__cards").evaluate((el) => {
+      el.scrollTop = 180;
+      return {
+        scrollTop: el.scrollTop,
+        scrollHeight: el.scrollHeight,
+        clientHeight: el.clientHeight,
+        overflowY: getComputedStyle(el).overflowY,
+      };
+    });
+    expect(expandedScroll.scrollHeight).toBeGreaterThan(expandedScroll.clientHeight);
+    expect(expandedScroll.scrollTop).toBeGreaterThan(0);
+    expect(expandedScroll.overflowY).toMatch(/auto|scroll/);
 
     // Filters pill opens the existing filter drawer.
     await page.locator(".map-filters-pill").click();
     await page.locator(".filter-drawer").waitFor({ state: "visible", timeout: 3_000 });
+    const drawerTop = await topElementAtCenter(page, ".map-view__canvas");
+    expect(drawerTop.inDrawer, "filter drawer backdrop should sit above map panes").toBe(true);
+  });
+
+  test("map panes stay below detail and conversion overlays", async ({ page }) => {
+    await seedConsent(page);
+    await seedProUser(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".map-split__cards .listing-card").first().click();
+    await expect(page.locator(".detail-overlay")).toBeVisible();
+    const detailTop = await topElementAtCenter(page, ".map-view__canvas");
+    expect(detailTop.inDetail, "detail panel should sit above map panes").toBe(true);
+  });
+
+  test("map panes stay below anonymous upgrade modal", async ({ page }) => {
+    await seedConsent(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".map-split__cards .listing-card").first().click();
+    await expect(page.locator(".free-month-modal")).toBeVisible({ timeout: 5_000 });
+    const modalTop = await topElementAtCenter(page, ".map-view__canvas");
+    expect(modalTop.inModal, "upgrade modal backdrop should sit above map panes").toBe(true);
   });
 });

@@ -184,14 +184,28 @@ export default function MapView({
     // view toggle/layout switch, lazy mount), so without this the tiles
     // render gray/blank and panning "rocks". Recompute once on the next
     // frame, and again whenever the viewport changes (rotate/resize).
+    let resizeTimer = null;
+    const invalidateSoon = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        map.invalidateSize();
+      }, 80);
+    };
     requestAnimationFrame(() => map.invalidateSize());
-    const handleResize = () => map.invalidateSize();
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined" && elRef.current
+        ? new ResizeObserver(invalidateSoon)
+        : null;
+    resizeObserver?.observe(elRef.current);
+    const handleResize = invalidateSoon;
     window.addEventListener("resize", handleResize);
     window.addEventListener("orientationchange", handleResize);
 
     return () => {
       clearTimeout(readyTimer);
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeObserver?.disconnect();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("orientationchange", handleResize);
       map.remove();
