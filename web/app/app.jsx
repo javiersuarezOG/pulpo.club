@@ -146,9 +146,13 @@ function HomeBlockOverridesPanel() {
               border: ".5px solid rgba(0,0,0,0.1)", background: "rgba(255,255,255,0.6)",
             }}
           >
-            {BLOCK_OVERRIDE_VALUES.map((v) => (
-              <option key={v} value={v}>{v.replace("_", " ")}</option>
-            ))}
+            {BLOCK_OVERRIDE_VALUES.map((v) => {
+              // i18n-allow: dev-only block-override control, not user-facing copy
+              const label = v.replace("_", " ");
+              return (
+                <option key={v} value={v}>{label}</option>
+              );
+            })}
           </select>
         </div>
       ))}

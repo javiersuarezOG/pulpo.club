@@ -1,19 +1,23 @@
 #!/usr/bin/env node
-// i18n static linter — flags hardcoded English in JSX attribute strings
-// under web/app/. Runs in CI on every PR (fast: <1s) so this catches
-// the most common i18n regression before the slower Playwright canary
-// fires. The Playwright spec (tests/e2e/preview-smoke.spec.ts) covers
-// JSX text content; this script covers attributes:
+// i18n static linter — two fast (<1s) checks that catch the most common i18n
+// regressions in CI before the slower Playwright canary fires. The Playwright
+// spec (tests/e2e/preview-smoke.spec.ts) covers rendered JSX text; this script
+// covers what static analysis can see cheaply:
 //
-//   aria-label="..."
-//   placeholder="..."
-//   alt="..."           (when not empty — empty alt is fine for decor imgs)
-//   title="..."
+//   1. Hardcoded English in JSX attribute strings:
+//        aria-label="..."  placeholder="..."  alt="..."  title="..."
+//      (empty alt="" is fine for decorative imgs).
 //
-// A literal string in any of those is a bug (or, rarely, a legitimate
-// shared brand token — annotate with `// i18n-allow: <reason>` on the
-// SAME line). Anything else fails the build with a file:line and the
-// remediation hint.
+//   2. The "raw-enum render" trap — `{x.replace("_", " ")}` humanizes an enum
+//      slug for display in EVERY locale, bypassing t(). This is the exact bug
+//      behind the active-filter chip + table-header leaks. Scanned in JSX/TSX
+//      render files only.
+//
+// A flagged literal/pattern is a bug (or, rarely, legitimate — a shared brand
+// token, a capitalize() safety net after a closed-set t() guard, an SEO slug,
+// or a dev-only control). Annotate those with `// i18n-allow: <reason>` on the
+// same line (attribute check) or the same/preceding line (enum-render check).
+// Anything else fails the build with a file:line and a remediation hint.
 //
 // Usage: `node scripts/i18n_lint.mjs` (zero deps).
 
@@ -100,21 +104,67 @@ for (const file of walk(ROOT)) {
   }
 }
 
-if (violations === 0) {
-  console.log("[i18n-lint] 0 hardcoded JSX attribute strings under web/app/ ✓");
+// ── Enum-render trap ──────────────────────────────────────────────────────
+// `{x.replace("_", " ")}` humanizes an enum slug for display in EVERY locale,
+// bypassing t() — the exact bug behind the active-filter chip + table-header
+// leaks (raw "ocean view" / "price drop" shown to Spanish users). Catch the
+// humanize pattern in JSX/TSX render files. A legitimate site (the capitalize()
+// safety net AFTER a closed-set t() guard, an SEO slug, or a dev-only control)
+// is exempted with `// i18n-allow: <reason>` on the same or preceding line.
+const ENUM_RENDER_REGEX = /\.replace\(\s*(?:["'`]_["'`]|\/_\/[gimsuy]*)\s*,\s*["'` ]/;
+const enumFindings = [];
+for (const file of walk(ROOT)) {
+  if (![".jsx", ".tsx"].includes(path.extname(file))) continue;
+  const lines = fs.readFileSync(file, "utf8").split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (!ENUM_RENDER_REGEX.test(lines[i])) continue;
+    const exempt =
+      lines[i].includes("i18n-allow") || (i > 0 && lines[i - 1].includes("i18n-allow"));
+    if (exempt) continue;
+    enumFindings.push({
+      file: path.relative(process.cwd(), file),
+      line: i + 1,
+      snippet: lines[i].trim(),
+    });
+  }
+}
+
+if (violations === 0 && enumFindings.length === 0) {
+  console.log(
+    "[i18n-lint] 0 hardcoded JSX attribute strings + 0 raw-enum renders under web/app/ ✓",
+  );
   process.exit(0);
 }
 
-console.error(`[i18n-lint] ${violations} hardcoded JSX attribute string(s) found:`);
-for (const f of findings) {
-  console.error(`  ${f.file}:${f.line}  ${f.attr}="${f.value}"`);
-  console.error(`    > ${f.snippet}`);
+if (violations > 0) {
+  console.error(`[i18n-lint] ${violations} hardcoded JSX attribute string(s) found:`);
+  for (const f of findings) {
+    console.error(`  ${f.file}:${f.line}  ${f.attr}="${f.value}"`);
+    console.error(`    > ${f.snippet}`);
+  }
+  console.error("");
+  console.error("Fix one of these ways:");
+  console.error('  1. Add a row to web/app/i18n.jsx UI_STRINGS, then use t("your.key", locale).');
+  console.error('  2. If the literal is shared between EN and ES (brand name etc.),');
+  console.error('     append `// i18n-allow: <reason>` to the same line.');
+  console.error("");
 }
-console.error("");
-console.error("Fix one of these ways:");
-console.error('  1. Add a row to web/app/i18n.jsx UI_STRINGS, then use t("your.key", locale).');
-console.error('  2. If the literal is shared between EN and ES (brand name etc.),');
-console.error('     append `// i18n-allow: <reason>` to the same line.');
-console.error("");
+
+if (enumFindings.length > 0) {
+  console.error(
+    `[i18n-lint] ${enumFindings.length} raw-enum render(s) found (humanizing an enum slug bypasses t()):`,
+  );
+  for (const f of enumFindings) {
+    console.error(`  ${f.file}:${f.line}`);
+    console.error(`    > ${f.snippet}`);
+  }
+  console.error("");
+  console.error("Fix: look the value up per-key via a closed-set t() guard (the road_access /");
+  console.error("beachfront_tier pattern in CLAUDE.md → i18n). If legitimately exempt (the");
+  console.error("capitalize() safety net after a t() guard, an SEO slug, or a dev-only control),");
+  console.error("append `// i18n-allow: <reason>` to the same or preceding line.");
+  console.error("");
+}
+
 console.error("See CLAUDE.md → \"i18n — every user-visible string goes through t()\".");
 process.exit(1);
