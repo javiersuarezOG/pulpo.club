@@ -94,6 +94,24 @@ describe("/api/admin/newsletter/config-status", () => {
     }
   });
 
+  it("names the EXACT missing var on a partially-configured dependency", async () => {
+    // Personal API key set, numeric project id NOT — the row must point at
+    // the one var that's actually missing, not a vague "read keys missing".
+    process.env.POSTHOG_PERSONAL_API_KEY = "phx_set";
+    const res = mockRes();
+    await configStatus(mockReq(), res);
+    const row = rowOf(res, "posthog_read");
+    expect(row.detail).toBe("POSTHOG_PROJECT_ID missing");
+    expect(row.detail).not.toMatch(/POSTHOG_PERSONAL_API_KEY/);
+  });
+
+  it("joins multiple missing vars with + in the detail", async () => {
+    // Neither Resend var set → both named.
+    const res = mockRes();
+    await configStatus(mockReq(), res);
+    expect(rowOf(res, "resend").detail).toBe("RESEND_API_KEY + RESEND_AUDIENCE_ID missing");
+  });
+
   it("echoes the dispatch repo/ref but NEVER a secret value", async () => {
     process.env.GITHUB_DISPATCH_TOKEN = "ghd_TOPSECRET_value";
     process.env.GITHUB_DISPATCH_REPO = "acme/pulpo";

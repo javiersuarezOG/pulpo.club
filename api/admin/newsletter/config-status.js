@@ -36,6 +36,20 @@ function present(name) {
   return (process.env[name] || "").trim().length > 0;
 }
 
+// Names of the env vars in `names` that are unset/blank. Lets a red row
+// say exactly which var to set ("POSTHOG_PROJECT_ID missing") instead of
+// a vague "read keys missing" the operator then has to go decode.
+function missingVars(...names) {
+  return names.filter((n) => !present(n));
+}
+
+// "X missing" / "X + Y missing" — the actionable tail of a config row.
+function missingDetail(...names) {
+  const missing = missingVars(...names);
+  if (missing.length === 0) return null;
+  return `${missing.join(" + ")} missing`;
+}
+
 // PULPO_NEWSLETTER_DRY_RUN gates real sends in the Python pipeline. It's
 // "on" for any truthy-ish value; anything else (unset / "0" / "false")
 // means live sends go out. Mirror the pipeline's own parsing so the
@@ -81,36 +95,40 @@ module.exports = async (req, res) => {
       id: "github_dispatch",
       label: "GitHub dispatch",
       status: githubOk ? "ok" : "bad",
-      detail: githubOk ? `${dispatchRepo} · ${dispatchRef}` : "GITHUB_DISPATCH_TOKEN missing",
+      detail: githubOk ? `${dispatchRepo} · ${dispatchRef}` : missingDetail("GITHUB_DISPATCH_TOKEN"),
       blocks: "Weekly test-sends + Send-to-everyone (workflow dispatch)",
     },
     {
       id: "resend",
       label: "Resend",
       status: resendOk ? "ok" : "bad",
-      detail: resendOk ? "API key + audience set" : "RESEND_API_KEY / RESEND_AUDIENCE_ID missing",
+      detail: resendOk ? "API key + audience set" : missingDetail("RESEND_API_KEY", "RESEND_AUDIENCE_ID"),
       blocks: "All real email delivery + live audience count",
     },
     {
       id: "clerk",
       label: "Clerk",
       status: clerkOk ? "ok" : "bad",
-      detail: clerkOk ? "connected" : "CLERK_SECRET_KEY missing",
+      detail: clerkOk ? "connected" : missingDetail("CLERK_SECRET_KEY"),
       blocks: "Pro audience count + Pro welcome test-sends",
     },
     {
       id: "internal_welcome",
       label: "Welcome dispatcher",
       status: internalOk ? "ok" : "warn",
-      detail: internalOk ? "internal token set" : "PULPO_INTERNAL_TOKEN missing",
+      detail: internalOk ? "internal token set" : missingDetail("PULPO_INTERNAL_TOKEN"),
       blocks: "Pro / Free welcome + welcome-back test-sends",
     },
     {
       id: "posthog_read",
       label: "PostHog read",
       status: posthogOk ? "ok" : "warn",
-      detail: posthogOk ? "connected" : "read keys missing",
-      blocks: "Deliverability health + cross-device activity log",
+      // Names the exact missing var (personal API key vs numeric project
+      // id) — the two are different credentials from the POSTHOG_PROJECT_TOKEN
+      // the rest of the app uses to WRITE events, so "read keys missing"
+      // was easy to misread as "PostHog is down" when ingest works fine.
+      detail: posthogOk ? "connected" : missingDetail("POSTHOG_PERSONAL_API_KEY", "POSTHOG_PROJECT_ID"),
+      blocks: "Deliverability health + cross-device activity log (read-only; ingest is unaffected)",
     },
     {
       id: "send_mode",
