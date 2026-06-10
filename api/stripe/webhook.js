@@ -47,7 +47,7 @@ const posthog = require("../_posthog");
 const { sendActivationEmail } = require("../_activation_email");
 const { GRACE_MS } = require("../_plan");
 const { auditEnvOverridesOnce } = require("../_env_audit");
-const { enrollPaidUserInAudience, unsubscribeOnPlanLoss } = require("../_resend_audience");
+const { enrollPaidUserInAudience } = require("../_resend_audience");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 // Statuses that mean "subscription is finished, not paused": fully
@@ -214,6 +214,59 @@ async function callInternalWelcomeSend({
       ? "timeout"
       : `fetch_failed:${(err && err.message) || "unknown"}`;
     return { ok: false, reason };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+// Churned-Pro → Free welcome-back. Fires the DB-free internal dispatcher
+// (/api/internal/free-welcome-send → free_welcome_dispatch). Best-effort:
+// NO GH fallback (unlike the Pro activation welcome, a missed welcome-back
+// is low-stakes), never throws, never blocks the subscription lifecycle.
+// The caller dedups on the Clerk stamp so this fires once per cancellation.
+const FREE_WELCOME_INTERNAL_URL_PATH = "/api/internal/free-welcome-send";
+
+async function fireFreeWelcomeBack({ email, locale, source, distinctId, t0, fetchImpl, internalBaseUrl }) {
+  const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
+  if (!token) {
+    logApi("stripe.webhook", { status: 200, reason: "free_welcome_back_no_internal_token" });
+    return { fired: false, reason: "internal_token_unset" };
+  }
+  const baseUrl = internalBaseUrl || process.env.PULPO_SITE_ROOT || "https://pulpo.club";
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 12_000);
+  try {
+    const r = await (fetchImpl || fetch)(`${baseUrl}${FREE_WELCOME_INTERNAL_URL_PATH}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "pulpo-stripe-webhook-free-welcome-back",
+      },
+      body: JSON.stringify({
+        email,
+        variant: "free_welcome_back",
+        locale: locale || "en",
+        source: source || "stripe_downgrade",
+        is_new_contact: true,
+      }),
+      signal: controller.signal,
+    });
+    let body = null;
+    try { body = await r.json(); } catch { /* best-effort */ }
+    posthog.capture(distinctId, "newsletter.free_welcome_back_dispatched", {
+      http_status: r.status,
+      dispatcher_status: body && body.status,
+      dispatcher_reason: body && body.reason,
+      source: source || "stripe_downgrade",
+      dry_run: body && body.dry_run,
+      ms: Date.now() - t0,
+    });
+    return { fired: true, status: r.status, body };
+  } catch (err) {
+    const reason = (err && err.name === "AbortError") ? "timeout" : `fetch_failed:${(err && err.message) || "unknown"}`;
+    logApi("stripe.webhook", { status: 200, reason: "free_welcome_back_unreachable", detail: reason });
+    return { fired: false, reason };
   } finally {
     clearTimeout(tid);
   }
@@ -1131,19 +1184,44 @@ module.exports = async (req, res) => {
         }
 
         if (userId) {
-          await patchPublicMetadata(clerk, userId, patch);
-          // Resend audience symmetry — when the subscription terminates
-          // (canceled / expired / deleted), the user is no longer in the
-          // Pro tier the newsletter is gated to. Flag their Resend
-          // contact unsubscribed=true so they stop receiving issues.
-          // Reversible: a re-upgrade re-enrolls them via the checkout
-          // path above (enrollPaidUserInAudience flips unsubscribed=false
-          // on the dedup branch). Best-effort: Resend outage doesn't
-          // block subscription cleanup.
+          // Churned Pro → Free: keep them in the audience as a FREE reader
+          // (two-state — a canceled member IS a Free subscriber and should
+          // keep getting the free weekly), and send the free welcome-back
+          // ONCE. We deliberately DON'T unsubscribe on cancel anymore: the
+          // Pro Sunday send is already gated to the Pro cohort, so a free
+          // contact can't receive Pro issues; dropping the unsubscribe is
+          // what lets them flow into the free digest. Dedup on the
+          // subscription id so repeated subscription.updated/deleted
+          // redeliveries don't re-send. Stamp BEFORE dispatch (at-most-once:
+          // a rare dispatch failure means no welcome-back — never a
+          // duplicate to a churned customer).
+          let sendWelcomeBack = false;
+          let welcomeLocale = "en";
           if (isTerminal && subEmail) {
-            await unsubscribeOnPlanLoss({
+            try {
+              const u = await clerk.users.getUser(userId);
+              const md = (u && u.publicMetadata) || {};
+              if (md.downgrade_welcome_sub_id !== sub.id) sendWelcomeBack = true;
+              const profLocale = md.profile && md.profile.locale;
+              if (profLocale === "es" || profLocale === "en") welcomeLocale = profLocale;
+            } catch {
+              // Couldn't read the dedup stamp — favor NOT spamming a churned
+              // customer over a possible duplicate; a later Stripe redelivery
+              // can retry the read.
+              sendWelcomeBack = false;
+            }
+            if (sendWelcomeBack) patch.downgrade_welcome_sub_id = sub.id;
+          }
+
+          await patchPublicMetadata(clerk, userId, patch);
+
+          if (sendWelcomeBack) {
+            await fireFreeWelcomeBack({
               email: subEmail,
-              source: `stripe.${event.type}`,
+              locale: welcomeLocale,
+              source: "stripe_downgrade",
+              distinctId: posthog.emailDistinctId(subEmail),
+              t0,
             });
           }
           // Also stamp privateMetadata.stripeCustomerId + stripeSubscriptionId
@@ -1344,3 +1422,4 @@ module.exports.markStripeEventProcessed = markStripeEventProcessed;
 module.exports.dispatchProWelcomeWorkflow = dispatchProWelcomeWorkflow;
 module.exports.dispatchProWelcome = dispatchProWelcome;
 module.exports.callInternalWelcomeSend = callInternalWelcomeSend;
+module.exports.fireFreeWelcomeBack = fireFreeWelcomeBack;

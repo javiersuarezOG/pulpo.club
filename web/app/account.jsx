@@ -1435,6 +1435,15 @@ function SubscriptionSection({ app }) {
           {!isPaid && display === "active"
             && t("account.sub.status_copy.free", lc)}
         </div>
+        {/* Post-cancel "you're on Free now" panel — frames the downgrade as
+           a real choice (keep the free weekly vs resubscribe). The
+           Resubscribe button below is the CTA. */}
+        {display === "canceled" && (
+          <div className="sub-free-panel" data-testid="sub-free-panel">
+            <div className="sub-free-panel-head">{t("account.sub.free_panel.head", lc)}</div>
+            <p className="sub-free-panel-body">{t("account.sub.free_panel.body", lc)}</p>
+          </div>
+        )}
         <div className="sub-plan-actions">
           {/* Active or canceling: Stripe portal (manage / re-enable
              renewal). Canceled or free: upgrade CTA. */}
