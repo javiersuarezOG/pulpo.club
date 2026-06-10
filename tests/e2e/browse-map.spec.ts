@@ -211,6 +211,30 @@ test.describe("Browse map view", () => {
     expect(scrollHeight, "spacers preserve the full scroll height").toBeGreaterThan(clientHeight * 3);
   });
 
+  test("mobile map offset tracks the real header height (not a hardcoded 72px)", async ({ page }) => {
+    await seedConsent(page);
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    const m = await page.evaluate(() => {
+      const header = document.querySelector(".topnav");
+      const prop = getComputedStyle(document.documentElement)
+        .getPropertyValue("--map-mobile-top-offset").trim();
+      const canvas = document.querySelector(".map-view__canvas");
+      return {
+        headerH: header ? Math.round(header.getBoundingClientRect().height) : 0,
+        offset: parseFloat(prop),
+        canvasTop: canvas ? Math.round(canvas.getBoundingClientRect().top) : -1,
+      };
+    });
+    // The published offset must equal the measured header, proving it's dynamic.
+    expect(m.headerH, "header should be measurable").toBeGreaterThan(0);
+    expect(Math.abs(m.offset - m.headerH), "offset tracks the live header height").toBeLessThanOrEqual(1);
+    // And the map canvas must sit below the header — never overlapping it.
+    expect(m.canvasTop, "map canvas starts at or below the header bottom").toBeGreaterThanOrEqual(m.headerH - 1);
+  });
+
   test("map panes stay below detail and conversion overlays", async ({ page }) => {
     await seedConsent(page);
     await seedProUser(page);

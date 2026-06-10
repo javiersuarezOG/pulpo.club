@@ -1479,6 +1479,39 @@ function BrowsePage({ app }) {
     };
   }, [view]);
 
+  // Mobile map height keys off the REAL header height, not a hardcoded 72px.
+  // The .topnav grows/shrinks with auth state (signed-out vs Pro), locale
+  // wrapping, and viewport — a fixed offset re-breaks the map layout whenever
+  // any of those change. Measure .topnav and publish it as
+  // --map-mobile-top-offset while the mobile map surface is active; clear it on
+  // exit so the token default (72px) applies everywhere else.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return undefined;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const root = document.documentElement;
+    const PROP = "--map-mobile-top-offset";
+    const header = document.querySelector(".topnav");
+    const apply = () => {
+      if (view !== "map" || !mq.matches || !header) { root.style.removeProperty(PROP); return; }
+      const h = Math.round(header.getBoundingClientRect().height);
+      if (h > 0) root.style.setProperty(PROP, `${h}px`);
+    };
+    apply();
+    let ro;
+    if (view === "map" && header && typeof ResizeObserver === "function") {
+      ro = new ResizeObserver(apply);
+      ro.observe(header);
+    }
+    mq.addEventListener?.("change", apply);
+    window.addEventListener("resize", apply);
+    return () => {
+      ro?.disconnect();
+      mq.removeEventListener?.("change", apply);
+      window.removeEventListener("resize", apply);
+      root.style.removeProperty(PROP);
+    };
+  }, [view]);
+
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
   pUseEffect(() => {
