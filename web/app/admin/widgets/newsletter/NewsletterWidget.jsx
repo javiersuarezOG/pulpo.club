@@ -1,39 +1,30 @@
-// NewsletterWidget — admin preview trigger.
+// NewsletterWidget — the newsletter console.
 //
-// One email input + one button. Pressing the button asks
-// /api/admin/newsletter/trigger-preview to dispatch the `pulpo-newsletter`
-// GitHub Actions workflow with `preview_cohorts=<email>`. The workflow
-// runs the production Python pipeline end-to-end and sends ONE real
-// email — the Pro-with-prefs variant — so the operator can vet what a
-// real Pro subscriber sees before flipping send_mode=yes on the real
-// audience.
+// One screen, one row per template. Everything the operator needs to
+// answer "is each email healthy, and can I send one?" is on this page,
+// and every value is read live from its source of truth — no hardcoded
+// versions, no placeholder dates, no "Issue 01" stubs:
 //
-// PR-NL-9 (audience scope): the personalised newsletter is a Pro
-// feature. The free + anonymous preview variants we used to send are
-// gone — Free users will get a different product on a separate
-// pipeline; anonymous subscribers are not part of this audience.
+//   Config & connections   ← /api/admin/newsletter/config-status (env probe)
+//   Template version        ← /api/admin/newsletter/template-version
+//                             (regex of automation/.../_common.py)
+//   Last sent / 7d health   ← /api/admin/newsletter/health (PostHog HogQL)
+//   Live audience count     ← /api/admin/newsletter/audience-count (Resend∩Clerk)
+//   Activity log            ← /api/admin/newsletter/recent-triggers (PostHog)
+//                             merged with this browser's localStorage log
 //
-// Subject is prefixed `[PULPO PREVIEW · pro_prefs]` so the test
-// email is unambiguously not a real audience send.
+// The Config strip is the headline fix over the old widget: a missing
+// secret (empty GITHUB_DISPATCH_TOKEN, dropped Resend key, dry-run left
+// on) shows as a red row up front, so "why won't it send" is answered
+// before the click, not after a cryptic failure.
 //
-// Why we don't preview / send inline in the admin UI: the production
-// renderer is Python. Routing through the workflow guarantees the
-// preview matches what real subscribers receive byte-for-byte. The
-// 30–60s lag for the workflow to spin up is acceptable for an
-// iteration-level QA loop — the iteration itself happens in code, not
-// in this widget.
-//
-// Auth: write calls use adminFetch(), which attaches the
-// PULPO_ADMIN_DEBUG_TOKEN bearer. The server-side endpoints also keep
-// their rate limits and the high-blast audience send keeps its SEND gate.
+// Auth: none. The /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed).
+// Plain fetch(); the server endpoints keep their rate limits and the
+// audience send keeps its type-to-confirm SEND gate.
 
 import React, { useState, useEffect, useCallback } from "react";
-import { adminFetch } from "../../lib/admin-token.ts";
 
-// Empty by default — every test send goes to whatever the operator types
-// into the "Send test to" field. No prefilled recipient, so a test can
-// never silently fire at a stale hardcoded address.
-const DEFAULT_EMAIL = "";
 const DEFAULT_LOCALE = "en";
 const LOCALE_OPTIONS = [
   { value: "en", label: "EN" },
@@ -41,854 +32,127 @@ const LOCALE_OPTIONS = [
 ];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Mirrors `synthesize_preview_recipients(email)` in
-// automation/newsletter/subscribers.py — kept here as an array (not a
-// scalar) so the rendering loop in the success card stays identical if
-// we ever add cohorts back. Today it's exactly one: pro_prefs.
-const PREVIEW_COHORTS = ["pro_prefs"];
-
-// ── Newsletter registry ────────────────────────────────────────────
-// One row per newsletter Pulpo publishes (or plans to). The widget
-// renders tier sections (PRO / FREE) and cards from this list — adding
-// a new newsletter once it ships is a one-row patch here plus enabling
-// `status: "live"`. The matching server allow-list lives in
-// `api/admin/newsletter/trigger-preview.js :: KNOWN_NEWSLETTER_IDS`;
-// keep them in lock-step.
+// ── Template registry ───────────────────────────────────────────────
+// One row per email Pulpo sends. `id` is the stable key shared across
+// three surfaces and MUST match in all of them:
+//   • health family id        (api/admin/newsletter/health.js :: FAMILIES)
+//   • trigger allow-list value (api/admin/newsletter/trigger-preview.js)
+//   • PostHog event key        (newsletter.<id>_sent / _skipped / _failed)
 //
-//   id            stable PostHog event key + closed-set allow-list value
-//   tier          "pro" | "free" — drives section assignment + log pill
-//   title         card heading shown in the chrome
-//   description   one-line subhead under the title
-//   cadenceMode   "scheduled" (shows the 3-row Upcoming sends list) |
-//                 "onetime"   (single trigger row — welcome-style)
-//   status        "live" (card renders the trigger UI) |
-//                 "coming-soon" (card renders disabled with a tag)
-//   template      stable template id (matches the Python composition
-//                 function on the renderer side — kept in lock-step)
-//   templateLabel human-readable template name shown on the card
-//                 chrome ("TEMPLATE · Pulpo Pro General"). When a
-//                 new template ships (e.g. "Pulpo Pro Welcome"), the
-//                 corresponding newsletter row swaps to that template.
-//
-// `cadenceMode` is wired today only for "scheduled". When the welcome
-// newsletters ship we'll add the "onetime" body next to the existing
-// upcoming-list renderer.
-//
-// All four newsletters currently reference the SAME template
-// ("pulpo-pro-general") since it's the only one that exists. Each
-// newsletter will swap to its own template when that template lands
-// (e.g. Pro Welcome → "pulpo-pro-welcome"). The label is what the
-// operator sees on the card chrome.
-const NEWSLETTERS = [
+//   id           stable key (see above)
+//   tier         "pro" | "free" | "system" — drives the chip + grouping
+//   title        row heading
+//   templateId   key into the template-version map (null = no own version)
+//   route        which trigger endpoint a Test send hits:
+//                  "preview"  → async GitHub workflow (weekly digests)
+//                  "welcome"  → sync /trigger-welcome-test (Pro welcome/-back)
+//                  "free"     → sync /trigger-free-welcome-test (Free welcome/-back)
+//                  null       → no Test button (automatic-only / system)
+//   audience     true → also offers "Send to everyone" (high-blast).
+//                Today only Pro · Weekly routes a real audience send.
+//   trigger      human note on how the email fires in production
+const TEMPLATES = [
   {
-    id: "pro-weekly",
-    tier: "pro",
-    title: "Pro · Weekly digest",
-    description: "Sundays 10 AM SV · 10 curated picks per recipient, personalised to their discover_filters.",
-    template: "pulpo-pro-general",
-    templateLabel: "Pulpo Pro General",
-    cadenceMode: "scheduled",
-    status: "live",
+    id: "pro-weekly", tier: "pro", title: "Pro · Weekly",
+    templateId: "pulpo-pro-general", route: "preview", audience: true,
+    trigger: "Mondays 14:00 UTC · cron",
   },
   {
-    id: "pro-welcome",
-    tier: "pro",
-    title: "Pro · Welcome",
-    description: "The weekly digest body with a 'Welcome to Pulpo Pro' hero — the SAME master template as Pro · Weekly, only the top hero differs. Fired on first Pro payment: <5s for existing users (Stripe webhook → Vercel Python), or after Clerk signup (~5s) for /start. Hourly reconcile cron catches silent failures.",
-    template: "pulpo-pro-welcome",
-    templateLabel: "Pulpo Pro Welcome",
-    cadenceMode: "onetime",
-    // status="live" as of 2026-06-01 — end-to-end verified in prod:
-    //   • PULPO_INTERNAL_TOKEN set in Vercel env (Vercel Python instant path active)
-    //   • Clerk user.created webhook subscribed (Path C wired)
-    //   • Filter fix #607 deployed (stripeCustomerId, not invitation_id)
-    //   • Resend send + Clerk publicMetadata stamp confirmed working
-    //   • Reconcile cron at :15 * * * * provides safety net for orphans
-    status: "live",
+    id: "free-weekly", tier: "free", title: "Free · Weekly",
+    templateId: "pulpo-free-general", route: "preview", audience: false,
+    trigger: "Mondays 14:00 UTC · cron",
   },
   {
-    id: "pro-welcome-back",
-    tier: "pro",
-    title: "Pro · Welcome-back",
-    description: "Resubscribe re-acquisition email — the SAME master template as Pro · Weekly / Pro · Welcome, only the hero differs ('Welcome back' + 'your next 10'), derived from the Welcome copy so they never drift. Fires on every resubscribe (deduped on Stripe subscription id). Test-send renders the welcome_back variant to your inbox — no Stripe resubscribe needed.",
-    template: "pulpo-pro-welcome-back",
-    templateLabel: "Pulpo Pro Welcome-back",
-    cadenceMode: "onetime",
-    status: "live",
+    id: "pro-welcome", tier: "pro", title: "Pro · Welcome",
+    templateId: "pulpo-pro-welcome", route: "welcome", audience: false,
+    trigger: "Auto · on first Pro payment",
   },
   {
-    id: "free-welcome",
-    tier: "free",
-    title: "Free · Welcome",
-    description: "Sent once when a free reader subscribes via the homepage form. The free weekly body (plain 'pulpo' masthead, top-3 'See on Pulpo', ranks 04-10 'Sign up to Pro', Pro-locked news) under a 'Welcome to Pulpo' hero. Test-send renders the free_welcome variant synchronously to your inbox — DB-free, no Clerk account needed. The production subscribe-trigger dispatch is a follow-up.",
-    template: "pulpo-free-welcome",
-    templateLabel: "Pulpo Free Welcome",
-    cadenceMode: "onetime",
-    status: "live",
+    id: "pro-welcome-back", tier: "pro", title: "Pro · Welcome-back",
+    templateId: "pulpo-pro-welcome-back", route: "welcome", audience: false,
+    trigger: "Auto · on resubscribe",
   },
   {
-    id: "free-welcome-back",
-    tier: "free",
-    title: "Free · Welcome-back",
-    description: "Re-acquisition email for a returning free reader (a churned Pro who drops to free, or a resubscribing free subscriber). Same free body + a 'Welcome back' hero derived from the Free Welcome copy. Test-send renders the free_welcome_back variant synchronously to your inbox — DB-free, no Clerk account needed. The production trigger dispatch is a follow-up.",
-    template: "pulpo-free-welcome-back",
-    templateLabel: "Pulpo Free Welcome-back",
-    cadenceMode: "onetime",
-    status: "live",
+    id: "free-welcome", tier: "free", title: "Free · Welcome",
+    templateId: "pulpo-free-welcome", route: "free", audience: false,
+    trigger: "Auto · on homepage subscribe",
   },
   {
-    id: "free-weekly",
-    tier: "free",
-    title: "Free · Weekly",
-    description: "Free-tier digest. Same Sunday cadence + same 10 full listing cards as Pro, but: plain 'pulpo' masthead (no Pro badge), ranks 04-10 swap 'See on Pulpo' for a 'Sign up to Pro' CTA, and the Weekly News Spotlight is Pro-locked (real headline + source show, the read sits behind a sign-up panel). The SAME master body as Pro · Weekly — only the variant differs.",
-    template: "pulpo-free-general",
-    templateLabel: "Pulpo Free General",
-    cadenceMode: "scheduled",
-    // Template is built + test-sendable from admin (routes the
-    // pulpo-free-general template through the same preview pipeline as
-    // Pro · Weekly). Scheduled free-tier audience routing is a separate
-    // follow-up; the card offers a TEST send only for now.
-    status: "live",
+    id: "free-welcome-back", tier: "free", title: "Free · Welcome-back",
+    templateId: "pulpo-free-welcome-back", route: "free", audience: false,
+    trigger: "Auto · on free resubscribe",
+  },
+  {
+    id: "activation", tier: "system", title: "Activation (Clerk invite)",
+    templateId: null, route: null, audience: false,
+    trigger: "Auto · Clerk invitation email",
   },
 ];
 
-// Template-version source of truth: Python `TEMPLATE_VERSION` +
-// `LAST_UPDATED` in `automation/newsletter/components/_common.py`,
-// surfaced via `GET /api/admin/newsletter/template-version`. The
-// widget fetches once at mount and renders `—` for the brief window
-// before the response lands. No hardcoded mirror: a template bump
-// in Python is now a single-file edit; this widget reflects whatever
-// is currently deployed automatically.
+// ── Source-of-truth fetchers ────────────────────────────────────────
+// All read endpoints graceful-degrade: they never throw, they return a
+// neutral shape + an `unavailable_reason` string so the console renders
+// "why this is empty" instead of a blank panel.
 
-const PRO_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "pro");
-const FREE_NEWSLETTERS = NEWSLETTERS.filter((n) => n.tier === "free");
-
-// Look up the registry row for a given id. Pre-registry log rows from
-// before the rollout have `newsletter_id == null` — the log renders
-// those as Pro · Weekly (the only newsletter that existed before this
-// rollout, so attribution is correct).
-function newsletterForId(id) {
-  return NEWSLETTERS.find((n) => n.id === id) || NEWSLETTERS[0];
-}
-
-const WIDGET_STYLES = `
-.nl-preview-widget {
-  /* Was a single column at 560px. The tier-section layout needs
-     more width so the "Send test" + "Send to everyone" buttons stay
-     on one row inside each upcoming-send row at 980px container width. */
-  max-width: 760px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-/* ── Tier sections (PRO / FREE) ─────────────────────────────────── */
-.nl-preview-widget .nl-tier-section {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.nl-preview-widget .nl-tier-header {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin: 12px 0 2px;
-}
-.nl-preview-widget .nl-tier-header hr {
-  flex: 1;
-  border: 0;
-  border-top: 1px solid var(--line-2);
-  margin: 0;
-}
-.nl-preview-widget .nl-tier-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.nl-preview-widget .nl-tier-label.pro {
-  background: var(--accent-strong);
-  color: var(--paper);
-}
-.nl-preview-widget .nl-tier-label.free {
-  background: var(--paper-3);
-  color: var(--ink-2);
-}
-.nl-preview-widget .nl-tier-count {
-  font-size: 12px;
-  color: var(--ink-3);
-}
-/* ── Per-newsletter card (head + body) ──────────────────────────── */
-.nl-preview-widget .nl-newsletter-card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.nl-preview-widget .nl-newsletter-card.coming-soon { opacity: 0.7; }
-.nl-preview-widget .nl-newsletter-head {
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--line);
-}
-.nl-preview-widget .nl-newsletter-card.coming-soon .nl-newsletter-head {
-  border-bottom-color: transparent;
-}
-.nl-preview-widget .nl-newsletter-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.nl-preview-widget .nl-newsletter-status {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-.nl-preview-widget .nl-newsletter-status.live {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-.nl-preview-widget .nl-newsletter-status.coming-soon {
-  background: var(--paper-3);
-  color: var(--ink-3);
-}
-.nl-preview-widget .nl-newsletter-desc {
-  padding: 10px 18px 8px;
-  font-size: 13px;
-  color: var(--ink-3);
-  line-height: 1.5;
-  margin: 0;
-}
-/* Template label row — small caps badge + optional hint, sits under
-   the description so every card is self-describing about which
-   renderer template it uses. When a future newsletter swaps templates
-   (e.g. Pro Welcome → Pulpo Pro Welcome), this line is where the
-   operator sees that. The hint after the dot only shows on live
-   newsletters where a test send is actually possible. */
-.nl-preview-widget .nl-newsletter-template {
-  padding: 0 18px 14px;
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.10em;
-  color: var(--ink-3);
-  line-height: 1.5;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.nl-preview-widget .nl-newsletter-template strong {
-  color: var(--ink-2);
-  font-weight: 700;
-}
-.nl-preview-widget .nl-newsletter-template .nl-newsletter-template-hint {
-  letter-spacing: 0;
-  text-transform: none;
-  font-weight: 500;
-  color: var(--ink-3);
-  font-family: var(--font-sans);
-  font-size: 12px;
-}
-.nl-preview-widget .nl-newsletter-body {
-  padding: 0 18px 16px;
-}
-.nl-preview-widget .nl-newsletter-card.coming-soon .nl-newsletter-body {
-  display: none;
-}
-/* Existing .nl-card primitive retained below for back-compat (used by
-   the shared controls bar). */
-
-.nl-preview-widget .nl-card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.nl-preview-widget label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.nl-preview-widget input[type=email] {
-  font: inherit;
-  padding: 10px 12px;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-  background: var(--paper);
-  color: var(--ink);
-  width: 100%;
-}
-.nl-preview-widget input[type=email]:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-/* The nl-trigger class styled the bottom submit button — removed
-   alongside the button itself. The per-row "Send test" buttons in
-   Upcoming Sends use .nl-upcoming-btn (defined further down). */
-
-.nl-preview-widget .nl-hint {
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--ink-3);
-  margin: 0;
-}
-.nl-preview-widget .nl-hint code {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  background: var(--paper-2);
-  padding: 1px 4px;
-  border-radius: 3px;
-}
-
-/* ── status: success → structured card ────────────────────────────── */
-.nl-preview-widget .nl-success {
-  margin: 4px 0 0;
-  background: var(--paper-2);
-  border: 1px solid var(--line-2);
-  border-left: 3px solid var(--accent-strong);
-  border-radius: 8px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.nl-preview-widget .nl-success-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0;
-}
-.nl-preview-widget .nl-success-check {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: var(--accent-strong);
-  color: var(--paper);
-  font-size: 11px;
-  line-height: 1;
-  flex: 0 0 auto;
-}
-.nl-preview-widget .nl-success-body {
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--ink-2);
-  margin: 0;
-}
-.nl-preview-widget .nl-success-body strong { color: var(--ink); }
-.nl-preview-widget .nl-success-subjects {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.nl-preview-widget .nl-success-subjects li {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 18px;
-  color: var(--ink-2);
-  padding: 4px 8px;
-  background: var(--paper);
-  border: 1px solid var(--line-2);
-  border-radius: 4px;
-  overflow-wrap: anywhere;
-}
-.nl-preview-widget .nl-success-footer {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  margin: 2px 0 0;
-}
-.nl-preview-widget .nl-success-footer a {
-  color: var(--accent-strong);
-  text-decoration: none;
-  font-weight: 600;
-}
-.nl-preview-widget .nl-success-footer a:hover { text-decoration: underline; }
-
-/* ── status: error / pending → single inline line ─────────────────── */
-.nl-preview-widget .nl-status {
-  font-size: 13px;
-  line-height: 19px;
-  margin: 4px 0 0;
-  min-height: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.nl-preview-widget .nl-status.error {
-  color: var(--badge-drop);
-}
-.nl-preview-widget .nl-status.pending {
-  color: var(--ink-3);
-}
-.nl-preview-widget .nl-status .nl-status-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  font-size: 10px;
-  line-height: 1;
-  flex: 0 0 auto;
-}
-.nl-preview-widget .nl-status.error .nl-status-icon {
-  background: var(--badge-drop);
-  color: var(--paper);
-}
-.nl-preview-widget .nl-status.pending .nl-status-icon {
-  border: 2px solid var(--line-2);
-  border-top-color: var(--ink-3);
-  animation: nl-spin 800ms linear infinite;
-}
-@keyframes nl-spin { to { transform: rotate(360deg); } }
-
-/* ── Locale toggle (EN | ES) ──────────────────────────────────────── */
-.nl-preview-widget .nl-locale {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.nl-preview-widget .nl-locale-toggle {
-  display: inline-flex;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--paper);
-}
-.nl-preview-widget .nl-locale-btn {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  font: inherit;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 6px 14px;
-  color: var(--ink-3);
-  cursor: pointer;
-}
-.nl-preview-widget .nl-locale-btn + .nl-locale-btn {
-  border-left: 1px solid var(--line-2);
-}
-.nl-preview-widget .nl-locale-btn[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--paper);
-}
-.nl-preview-widget .nl-locale-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-.nl-preview-widget .nl-locale-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-/* Per-card language toggle, sits inline with the card's send button.
-   Wraps on narrow viewports (mobile-first). */
-.nl-preview-widget .nl-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.nl-preview-widget .nl-card-locale {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.nl-preview-widget .nl-card-locale-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-/* ── PR-NL-7a · Upcoming sends panel ────────────────────────────── */
-.nl-preview-widget .nl-upcoming {
-  margin: 4px 0 0;
-  padding: 14px 16px 12px;
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.nl-preview-widget .nl-upcoming-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin: 0 0 10px;
-  font-weight: 600;
-}
-.nl-preview-widget .nl-upcoming-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.nl-preview-widget .nl-upcoming-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 8px 10px;
-  background: var(--paper);
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-}
-.nl-preview-widget .nl-upcoming-row-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.nl-preview-widget .nl-upcoming-row .nl-upcoming-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.nl-preview-widget .nl-upcoming-row .nl-upcoming-issue {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.nl-preview-widget .nl-upcoming-row .nl-upcoming-when {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-3);
-}
-.nl-preview-widget .nl-upcoming-actions {
-  display: flex;
-  gap: 8px;
-  flex: 0 0 auto;
-  align-items: center;
-}
-.nl-preview-widget .nl-upcoming-btn,
-.nl-preview-widget .nl-audience-btn {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line-2);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.nl-preview-widget .nl-upcoming-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.nl-preview-widget .nl-audience-btn {
-  /* Audience send is the high-blast-radius action — use a deliberate
-     warm tone (clay border) so the button doesn't look like just
-     another "Send test" sibling. Type-to-confirm gate sits behind it. */
-  border-color: var(--clay, #B8643C);
-  color: var(--clay, #B8643C);
-}
-.nl-preview-widget .nl-audience-btn:hover {
-  background: var(--clay, #B8643C);
-  color: #fff;
-}
-.nl-preview-widget .nl-upcoming-btn[disabled],
-.nl-preview-widget .nl-audience-btn[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-/* ── Audience-send inline confirmation ─────────────────────────────
-   Drops in below the row when the operator clicks "Send to everyone".
-   Type-to-confirm input + Cancel/Send buttons. Server-side mirror of
-   the SEND gate at /api/admin/newsletter/trigger-audience-send. */
-.nl-preview-widget .nl-audience-confirm {
-  margin-top: 4px;
-  padding: 14px;
-  background: #FFF8F0;
-  border: 1px solid var(--clay, #B8643C);
-  border-radius: 6px;
-}
-.nl-preview-widget .nl-audience-headline {
-  margin: 0 0 6px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.nl-preview-widget .nl-audience-headline.ok { color: #1F3D31; }
-.nl-preview-widget .nl-audience-headline.err { color: #6B2C2C; }
-.nl-preview-widget .nl-audience-warn,
-.nl-preview-widget .nl-audience-body {
-  margin: 4px 0 10px;
-  font-size: 13px;
-  color: var(--ink-2);
-  line-height: 1.5;
-}
-.nl-preview-widget .nl-audience-confirm-label {
-  display: block;
-  font-size: 12px;
-  color: var(--ink-2);
-  margin-bottom: 10px;
-}
-.nl-preview-widget .nl-audience-confirm-input {
-  display: block;
-  width: 100%;
-  margin-top: 6px;
-  padding: 8px 10px;
-  font: inherit;
-  font-size: 14px;
-  font-family: var(--font-mono, monospace);
-  border: 1px solid var(--line-2);
-  border-radius: 4px;
-  letter-spacing: 0.08em;
-}
-.nl-preview-widget .nl-audience-confirm-input:focus {
-  outline: 2px solid var(--clay, #B8643C);
-  outline-offset: 1px;
-}
-.nl-preview-widget .nl-audience-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-.nl-preview-widget .nl-audience-cancel {
-  background: transparent;
-  color: var(--ink-2);
-  border: 1px solid var(--line-2);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.nl-preview-widget .nl-audience-send {
-  background: var(--clay, #B8643C);
-  color: #fff;
-  border: 1px solid var(--clay, #B8643C);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.nl-preview-widget .nl-audience-send[disabled] {
-  background: #ccc;
-  border-color: #ccc;
-  cursor: not-allowed;
-}
-.nl-preview-widget .nl-audience-loading {
-  margin: 0;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-/* ── Recent test sends log ─────────────────────────────────────────
-   Per-browser localStorage log of trigger attempts. Lives below the
-   Upcoming sends panel so the operator can see whether the last test
-   actually fired without flipping to Gmail or PostHog. Persistence is
-   browser-scoped — operators on a fresh laptop start with an empty
-   log. Cross-device history is a follow-up. */
-.nl-preview-widget .nl-health {
-  margin: 4px 0 6px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--paper-2);
-}
-.nl-preview-widget .nl-health-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 8px;
-}
-.nl-preview-widget .nl-health-eyebrow {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-3);
-}
-.nl-preview-widget .nl-health-refresh {
-  background: none; border: none; cursor: pointer; color: var(--ink-3);
-  font-size: 14px; line-height: 1; padding: 2px 4px;
-}
-.nl-preview-widget .nl-health-refresh:hover { color: var(--ink); }
-.nl-preview-widget .nl-health-rows { display: flex; flex-direction: column; gap: 6px; }
-.nl-preview-widget .nl-health-row {
-  display: grid;
-  grid-template-columns: 12px 1fr auto auto;
-  align-items: center; gap: 10px;
-  font-size: 13px;
-}
-.nl-preview-widget .nl-health-dot {
-  width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3);
-}
-.nl-preview-widget .nl-health-dot--ok    { background: var(--accent); }
-.nl-preview-widget .nl-health-dot--error { background: oklch(55% 0.18 25); }
-.nl-preview-widget .nl-health-dot--dry,
-.nl-preview-widget .nl-health-dot--skip  { background: oklch(72% 0.15 75); }
-.nl-preview-widget .nl-health-dot--idle  { background: var(--line-2, var(--ink-3)); opacity: 0.5; }
-.nl-preview-widget .nl-health-label  { color: var(--ink); font-weight: 600; }
-.nl-preview-widget .nl-health-status { color: var(--ink-2); font-size: 12px; }
-.nl-preview-widget .nl-health-last {
-  color: var(--ink-3); font-family: var(--font-mono); font-size: 11px;
-  white-space: nowrap;
-}
-.nl-preview-widget .nl-health-unavailable {
-  font-size: 12px; color: var(--ink-3); margin: 0; line-height: 1.5;
-}
-
-.nl-preview-widget .nl-log {
-  margin-top: 10px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-.nl-preview-widget .nl-log-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-.nl-preview-widget .nl-log-eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin: 0;
-}
-.nl-preview-widget .nl-log-clear {
-  margin-left: auto;
-  background: transparent;
-  border: 0;
-  font: inherit;
-  font-size: 11px;
-  color: var(--ink-3);
-  cursor: pointer;
-  padding: 0;
-}
-.nl-preview-widget .nl-log-clear:hover { color: var(--ink); }
-.nl-preview-widget .nl-log-empty {
-  font-size: 12px;
-  color: var(--ink-3);
-  margin: 0;
-}
-.nl-preview-widget .nl-log-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  table-layout: fixed;
-}
-.nl-preview-widget .nl-log-table th,
-.nl-preview-widget .nl-log-table td {
-  text-align: left;
-  padding: 6px 8px 6px 0;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.nl-preview-widget .nl-log-table th {
-  font-size: 10px;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 600;
-  border-bottom-color: var(--line-2);
-}
-.nl-preview-widget .nl-log-table tr:last-child td { border-bottom: 0; }
-.nl-preview-widget .nl-log-when { width: 14%; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; }
-.nl-preview-widget .nl-log-newsletter { width: 22%; }
-.nl-preview-widget .nl-log-newsletter .nl-log-pill {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 700;
-  margin-right: 6px;
-  vertical-align: 1px;
-}
-.nl-preview-widget .nl-log-newsletter .nl-log-pill.pro {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-.nl-preview-widget .nl-log-newsletter .nl-log-pill.free {
-  background: var(--paper-3);
-  color: var(--ink-2);
-}
-.nl-preview-widget .nl-log-to { width: 22%; color: var(--ink); }
-.nl-preview-widget .nl-log-locale { width: 6%; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; }
-.nl-preview-widget .nl-log-by { width: 22%; color: var(--ink-3); }
-.nl-preview-widget .nl-log-result { width: 14%; font-weight: 600; }
-.nl-preview-widget .nl-log-result.ok { color: var(--accent); }
-.nl-preview-widget .nl-log-result.err { color: oklch(55% 0.18 25); }
-`;
-
-// PR-NL-7a — next-Monday helper. Cron runs every Mon 14:00 UTC; we
-// just enumerate the next N Mondays from "now" in the operator's local
-// timezone so the displayed date matches what they expect. Issue
-// numbers are inferred from the same source-of-truth in build_issue.py
-// — falling back to a "next / +2 weeks / +4 weeks" framing when no
-// concrete number is plumbed yet (PR-NL-9 will wire the real number).
-function nextMondays(count = 3, from = new Date()) {
-  const out = [];
-  const base = new Date(from);
-  base.setHours(0, 0, 0, 0);
-  // 0 = Sunday … 1 = Monday … 6 = Saturday
-  const daysUntilMon = (1 - base.getDay() + 7) % 7 || 7;
-  const next = new Date(base);
-  next.setDate(base.getDate() + daysUntilMon);
-  for (let i = 0; i < count; i++) {
-    const d = new Date(next);
-    d.setDate(next.getDate() + i * 7);
-    out.push(d);
+async function fetchConfig() {
+  if (typeof window === "undefined") return { connections: [], all_ready: false, unavailable_reason: null };
+  try {
+    const r = await fetch("/api/admin/newsletter/config-status", { headers: { accept: "application/json" } });
+    if (!r.ok) return { connections: [], all_ready: false, unavailable_reason: `HTTP ${r.status}` };
+    const body = await r.json().catch(() => null);
+    return {
+      connections: Array.isArray(body?.connections) ? body.connections : [],
+      all_ready: !!body?.all_ready,
+      unavailable_reason: null,
+    };
+  } catch (err) {
+    return { connections: [], all_ready: false, unavailable_reason: String((err && err.message) || err) };
   }
-  return out;
 }
 
-function formatMondayLabel(d, now = new Date()) {
-  const dayMs = 24 * 60 * 60 * 1000;
-  const today = new Date(now); today.setHours(0, 0, 0, 0);
-  const days = Math.round((d.getTime() - today.getTime()) / dayMs);
-  const dateStr = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
-  const inLabel = days <= 0 ? "today"
-    : days === 1 ? "tomorrow"
-    : days < 14 ? `in ${days} days`
-    : `in ${Math.round(days / 7)} weeks`;
-  return `${dateStr} · ${inLabel}`;
+async function fetchHealth() {
+  if (typeof window === "undefined") return { families: [], unavailable_reason: null };
+  try {
+    const r = await fetch("/api/admin/newsletter/health", { headers: { accept: "application/json" } });
+    if (!r.ok) return { families: [], unavailable_reason: `HTTP ${r.status}` };
+    const body = await r.json().catch(() => null);
+    return {
+      families: Array.isArray(body?.families) ? body.families : [],
+      unavailable_reason: typeof body?.unavailable_reason === "string" ? body.unavailable_reason : null,
+    };
+  } catch (err) {
+    return { families: [], unavailable_reason: String((err && err.message) || err) };
+  }
 }
 
-// ── Recent test sends log ────────────────────────────────────────────
-// Per-browser localStorage log of trigger attempts. Keys + helpers live
-// at module scope so a future operator surface (e.g. an admin export
-// button) can reuse them. Cap at LOG_CAP so the row never grows
-// unbounded; oldest entries fall off first.
+async function fetchTemplateVersions() {
+  if (typeof window === "undefined") return {};
+  try {
+    const r = await fetch("/api/admin/newsletter/template-version", { headers: { accept: "application/json" } });
+    if (!r.ok) return {};
+    const body = await r.json().catch(() => null);
+    return body && typeof body === "object" ? body : {};
+  } catch {
+    return {};
+  }
+}
+
+async function fetchServerLog() {
+  if (typeof window === "undefined") return { events: [], unavailable_reason: null };
+  try {
+    const r = await fetch("/api/admin/newsletter/recent-triggers", { headers: { accept: "application/json" } });
+    if (!r.ok) return { events: [], unavailable_reason: `HTTP ${r.status}` };
+    const body = await r.json().catch(() => null);
+    return {
+      events: Array.isArray(body?.events) ? body.events : [],
+      unavailable_reason: typeof body?.unavailable_reason === "string" ? body.unavailable_reason : null,
+    };
+  } catch (err) {
+    return { events: [], unavailable_reason: String((err && err.message) || err) };
+  }
+}
+
+// ── Recent-sends log (per-browser layer) ────────────────────────────
 const LOG_LS_KEY = "pulpo-admin-newsletter-trigger-log";
 const LOG_CAP = 20;
 
@@ -896,109 +160,42 @@ function readLog() {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(LOG_LS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
+    const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
-
 function writeLog(entries) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(LOG_LS_KEY, JSON.stringify(entries.slice(0, LOG_CAP)));
   } catch {
-    // localStorage quota / private-mode failures are silent — the
-    // log is a UX convenience, not a contract.
+    /* quota / private-mode — the log is a convenience, not a contract */
   }
 }
-
 function appendLogEntry(entry) {
   const next = [entry, ...readLog()];
   writeLog(next);
   return next;
 }
 
-// Operator identity for the "By" column. /admin is Clerk-gated so a
-// session is guaranteed to exist by the time a trigger fires — we read
-// it off the same `pulpo-user` localStorage blob app.jsx writes (see
-// app.jsx :: setUser localStorage mirror). Falls back to "—" if the
-// blob is missing or malformed (legacy auth path, dev without Clerk).
+// Operator identity for the "By" column — read off the same pulpo-user
+// localStorage blob app.jsx writes. Falls back to null (renders "—").
 function readOperatorEmail() {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem("pulpo-user");
-    if (!raw) return null;
-    const u = JSON.parse(raw);
+    const u = JSON.parse(window.localStorage.getItem("pulpo-user") || "null");
     return typeof u?.email === "string" ? u.email : null;
   } catch {
     return null;
   }
 }
 
-// Cross-device log: fetched from /api/admin/newsletter/recent-triggers
-// which queries PostHog HogQL server-side. Merges with the local
-// localStorage log so the operator sees their own just-fired test
-// instantly (PostHog ingestion has ~1-5s latency before the event
-// shows up in a HogQL query). Dedupe by the `at` timestamp — both
-// sources write ISO strings produced within the same trigger call.
-async function fetchServerLog() {
-  if (typeof window === "undefined") return { events: [], unavailable_reason: null };
-  try {
-    const r = await fetch("/api/admin/newsletter/recent-triggers", {
-      method: "GET",
-      headers: { "accept": "application/json" },
-    });
-    if (!r.ok) return { events: [], unavailable_reason: `HTTP ${r.status}` };
-    const body = await r.json().catch(() => null);
-    return {
-      events: Array.isArray(body?.events) ? body.events : [],
-      unavailable_reason: typeof body?.unavailable_reason === "string"
-        ? body.unavailable_reason
-        : null,
-    };
-  } catch (err) {
-    return { events: [], unavailable_reason: String(err && err.message || err) };
-  }
-}
-
-// Per-template deliverability health from /api/admin/newsletter/health
-// (PostHog HogQL, last 7 days). Graceful: returns an empty shape on any
-// error so the panel renders a neutral "unavailable" state, never throws.
-async function fetchHealth() {
-  if (typeof window === "undefined") return { families: [], unavailable_reason: null, window_days: 7 };
-  try {
-    const r = await fetch("/api/admin/newsletter/health", {
-      method: "GET", headers: { "accept": "application/json" },
-    });
-    if (!r.ok) return { families: [], unavailable_reason: `HTTP ${r.status}`, window_days: 7 };
-    const body = await r.json().catch(() => null);
-    return {
-      families: Array.isArray(body?.families) ? body.families : [],
-      unavailable_reason: typeof body?.unavailable_reason === "string" ? body.unavailable_reason : null,
-      window_days: typeof body?.window_days === "number" ? body.window_days : 7,
-    };
-  } catch (err) {
-    return { families: [], unavailable_reason: String(err && err.message || err), window_days: 7 };
-  }
-}
-
-// Map a health row to a status: red (failures) > amber (only dry-run /
-// only skips / idle) > green (real sends, no failures).
-function healthStatus(row) {
-  if (!row) return { kind: "idle", label: "—" };
-  if (row.failed > 0) return { kind: "error", label: `${row.failed} failed` };
-  if (row.sent > 0 && row.dry_run === true) return { kind: "dry", label: "dry-run only" };
-  if (row.sent > 0) return { kind: "ok", label: `${row.sent} sent` };
-  if (row.skipped > 0) return { kind: "skip", label: `${row.skipped} skipped` };
-  return { kind: "idle", label: "no activity" };
-}
-
+// Merge the canonical PostHog log with this browser's localStorage log.
+// PostHog wins on duplicates (canonical once ingested); local stays for
+// entries PostHog hasn't seen yet (1-5s ingestion lag). Dedupe by `at`.
 function mergeLogs(serverEvents, localEvents) {
-  // Both sources produce ISO timestamps in the `at` field. Server
-  // wins on duplicates (it's the canonical record once PostHog has
-  // ingested); local stays for entries the server hasn't seen yet.
   const seen = new Set();
   const out = [];
   for (const e of serverEvents) {
@@ -1010,20 +207,17 @@ function mergeLogs(serverEvents, localEvents) {
     if (!e || !e.at || seen.has(e.at)) continue;
     out.push(e);
   }
-  // Resort by timestamp DESC — server returns DESC but the merge order
-  // depends on whichever side had the entry first.
   out.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
   return out.slice(0, LOG_CAP);
 }
 
-// Compact "5 min ago" / "Wed 30 May, 10:43" formatter. Recent rows
-// stay relative so the operator can scan latency at a glance; rows
-// older than ~6 hours flip to absolute so the log still reads after
-// returning the next day.
-function formatLogWhen(iso, now = new Date()) {
+// "just now" / "5 min ago" / "3 h ago" / absolute past ~6h. Shared by the
+// log and the per-template "last sent" cell so latency reads at a glance.
+function formatWhen(iso, now = new Date()) {
+  if (!iso) return "—";
   const t = new Date(iso);
-  const diffMs = now.getTime() - t.getTime();
-  const min = Math.round(diffMs / 60_000);
+  if (Number.isNaN(t.getTime())) return "—";
+  const min = Math.round((now.getTime() - t.getTime()) / 60_000);
   if (min < 1) return "just now";
   if (min < 60) return `${min} min ago`;
   const hr = Math.round(min / 60);
@@ -1031,963 +225,636 @@ function formatLogWhen(iso, now = new Date()) {
   return t.toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
+// Map a health family row to a status dot. red (failures) > amber
+// (dry-run-only / skip-only) > green (real sends) > grey (idle).
+function healthStatus(row) {
+  if (!row) return { kind: "idle", label: "no activity" };
+  if (row.failed > 0) return { kind: "fail", label: `${row.failed} failed` };
+  if (row.sent > 0 && row.dry_run === true) return { kind: "dry", label: "dry-run only" };
+  if (row.sent > 0) return { kind: "ok", label: `${row.sent} sent` };
+  if (row.skipped > 0) return { kind: "skip", label: `${row.skipped} skipped` };
+  return { kind: "idle", label: "no activity" };
+}
+
+const WIDGET_STYLES = `
+.nl-console { color: var(--ink); font-family: var(--font-sans); max-width: 920px; }
+.nl-console .nl-sec { margin: 0 0 28px; }
+.nl-console .nl-sec-title {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.nl-console .nl-sec-title .nl-count {
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: 999px;
+  padding: 1px 8px; font-size: 10px; color: var(--ink-2);
+}
+.nl-console .nl-muted { color: var(--ink-3); font-size: 12px; }
+.nl-console code { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ── Header: test-to field + send-mode pill ── */
+.nl-console .nl-head {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  justify-content: space-between; margin: 0 0 24px;
+}
+.nl-console .nl-testfield { flex: 1; min-width: 240px; }
+.nl-console .nl-testfield label {
+  display: block; font-size: 12px; color: var(--ink-2); margin: 0 0 5px; font-weight: 600;
+}
+.nl-console .nl-testfield input {
+  width: 100%; border: 1px solid var(--line-2); border-radius: 8px;
+  background: var(--paper); color: var(--ink); font: inherit; padding: 9px 11px;
+}
+.nl-console .nl-testfield input:focus { outline: 2px solid var(--clay, #B8643C); outline-offset: 1px; }
+.nl-console .nl-mode-pill {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600;
+  padding: 7px 12px; border-radius: 999px; white-space: nowrap;
+}
+.nl-console .nl-mode-pill .nl-dot { width: 8px; height: 8px; border-radius: 50%; }
+.nl-console .nl-mode-pill.live { background: #E2F1E7; color: #1F6B43; }
+.nl-console .nl-mode-pill.live .nl-dot { background: #2F8F5B; }
+.nl-console .nl-mode-pill.dry { background: #F6ECD5; color: #8A6314; }
+.nl-console .nl-mode-pill.dry .nl-dot { background: #B9821F; }
+
+/* ── Config & connections ── */
+.nl-console .nl-conf { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 600px) { .nl-console .nl-conf { grid-template-columns: 1fr 1fr; } }
+.nl-console .nl-conf-row {
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+  border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; background: var(--paper);
+}
+.nl-console .nl-conf-row .nl-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.nl-console .nl-conf-row .nl-k { font-weight: 600; flex: none; }
+.nl-console .nl-conf-row .nl-v { color: var(--ink-2); font-size: 12px; margin-left: auto; text-align: right; }
+.nl-console .nl-conf-row.ok { border-color: #CFE7D8; }
+.nl-console .nl-conf-row.ok .nl-dot { background: #2F8F5B; }
+.nl-console .nl-conf-row.warn { border-color: #ECD9AE; background: #FBF6EA; }
+.nl-console .nl-conf-row.warn .nl-dot { background: #B9821F; }
+.nl-console .nl-conf-row.warn .nl-v { color: #8A6314; }
+.nl-console .nl-conf-row.bad { border-color: #E4B4AE; background: #FBEDEB; }
+.nl-console .nl-conf-row.bad .nl-dot { background: #C0392B; }
+.nl-console .nl-conf-row.bad .nl-v { color: #A23227; font-weight: 600; }
+.nl-console .nl-conf-blocks { font-size: 11px; color: var(--ink-3); margin: 6px 2px 0; }
+
+/* ── Template rows ── */
+.nl-console .nl-tpl {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--paper);
+  padding: 14px 16px; margin: 0 0 10px;
+}
+.nl-console .nl-tpl-top {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; align-items: start;
+}
+.nl-console .nl-tpl-title { font-size: 15px; font-weight: 700; margin: 0; }
+.nl-console .nl-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 0; }
+.nl-console .nl-chip {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em; padding: 2px 7px; border-radius: 999px;
+}
+.nl-console .nl-chip.pro { background: #EFE7FB; color: #6D3FB0; }
+.nl-console .nl-chip.free { background: var(--paper-3); color: var(--ink-2); }
+.nl-console .nl-chip.system { background: var(--paper-3); color: var(--ink-3); }
+.nl-console .nl-chip.ver { background: #F4E2D6; color: #9A4A1E; font-family: var(--font-mono); }
+.nl-console .nl-hd {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap; justify-self: end;
+}
+.nl-console .nl-hd .nl-dot { width: 7px; height: 7px; border-radius: 50%; }
+.nl-console .nl-hd.ok { background: #E2F1E7; color: #1F6B43; } .nl-console .nl-hd.ok .nl-dot { background: #2F8F5B; }
+.nl-console .nl-hd.dry { background: #F6ECD5; color: #8A6314; } .nl-console .nl-hd.dry .nl-dot { background: #B9821F; }
+.nl-console .nl-hd.skip { background: #F6ECD5; color: #8A6314; } .nl-console .nl-hd.skip .nl-dot { background: #B9821F; }
+.nl-console .nl-hd.fail { background: #FBEDEB; color: #A23227; } .nl-console .nl-hd.fail .nl-dot { background: #C0392B; }
+.nl-console .nl-hd.idle { background: var(--paper-3); color: var(--ink-3); } .nl-console .nl-hd.idle .nl-dot { background: var(--ink-4); }
+.nl-console .nl-tpl-meta {
+  display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; font-size: 12px; color: var(--ink-2);
+}
+.nl-console .nl-tpl-meta b { color: var(--ink); font-weight: 600; }
+.nl-console .nl-tpl-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 13px 0 0; }
+.nl-console .nl-btn {
+  border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--paper); color: var(--ink);
+}
+.nl-console .nl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.nl-console .nl-btn.test { border-color: var(--clay, #B8643C); color: var(--clay, #B8643C); }
+.nl-console .nl-btn.send { border-color: var(--clay, #B8643C); background: var(--clay, #B8643C); color: #fff; }
+
+/* per-row locale toggle */
+.nl-console .nl-loc { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+.nl-console .nl-loc-label { font-size: 11px; color: var(--ink-3); }
+.nl-console .nl-loc-toggle { display: inline-flex; border: 1px solid var(--line-2); border-radius: 7px; overflow: hidden; }
+.nl-console .nl-loc-btn {
+  border: none; background: var(--paper); color: var(--ink-2); font: inherit; font-size: 11px;
+  font-weight: 600; padding: 5px 9px; cursor: pointer;
+}
+.nl-console .nl-loc-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* inline status under a row */
+.nl-console .nl-status {
+  display: flex; align-items: center; gap: 8px; margin: 11px 0 0; font-size: 13px;
+  border-radius: 8px; padding: 9px 11px;
+}
+.nl-console .nl-status .nl-si { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.nl-console .nl-status.pending { background: var(--paper-2); color: var(--ink-2); }
+.nl-console .nl-status.pending .nl-si { background: var(--ink-4); animation: nlpulse 1s ease-in-out infinite; }
+.nl-console .nl-status.ok { background: #E2F1E7; color: #1F6B43; } .nl-console .nl-status.ok .nl-si { background: #2F8F5B; }
+.nl-console .nl-status.warn { background: #F6ECD5; color: #8A6314; } .nl-console .nl-status.warn .nl-si { background: #B9821F; }
+.nl-console .nl-status.err { background: #FBEDEB; color: #A23227; } .nl-console .nl-status.err .nl-si { background: #C0392B; }
+.nl-console .nl-status a { color: inherit; text-decoration: underline; }
+@keyframes nlpulse { 0%,100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+/* audience-send confirm */
+.nl-console .nl-confirm {
+  margin: 12px 0 0; border: 1px solid var(--clay, #B8643C); border-radius: 10px;
+  background: #FFF8F0; padding: 13px 15px;
+}
+.nl-console .nl-confirm h4 { margin: 0 0 6px; font-size: 14px; }
+.nl-console .nl-confirm p { margin: 0 0 10px; font-size: 13px; color: var(--ink-2); }
+.nl-console .nl-confirm .nl-cfields { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.nl-console .nl-confirm input {
+  border: 1px solid var(--line-2); border-radius: 7px; background: var(--paper);
+  color: var(--ink); font: inherit; padding: 7px 9px;
+}
+.nl-console .nl-confirm input.issue { width: 90px; }
+.nl-console .nl-confirm input.confirm { width: 130px; letter-spacing: 0.1em; }
+.nl-console .nl-confirm .nl-cactions { display: flex; gap: 8px; margin: 11px 0 0; }
+.nl-console .nl-confirm .nl-btn.cancel { border-color: var(--line-2); color: var(--ink-2); }
+
+/* activity log */
+.nl-console .nl-log-head { display: flex; align-items: center; justify-content: space-between; }
+.nl-console .nl-log-clear {
+  border: 1px solid var(--line-2); background: var(--paper); color: var(--ink-2);
+  border-radius: 7px; font: inherit; font-size: 12px; padding: 5px 10px; cursor: pointer;
+}
+.nl-console .nl-log {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--paper); overflow: hidden;
+}
+.nl-console .nl-log-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px;
+}
+.nl-console .nl-log-row:last-child { border-bottom: none; }
+.nl-console .nl-log-when { color: var(--ink-3); font-size: 12px; white-space: nowrap; }
+.nl-console .nl-log-main b { font-weight: 600; }
+.nl-console .nl-log-sub { color: var(--ink-3); font-size: 11px; }
+.nl-console .nl-res {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+}
+.nl-console .nl-res.ok { background: #E2F1E7; color: #1F6B43; }
+.nl-console .nl-res.dispatched { background: #E6EEF6; color: #2B5786; }
+.nl-console .nl-res.dry_run { background: #F6ECD5; color: #8A6314; }
+.nl-console .nl-res.skipped { background: var(--paper-3); color: var(--ink-2); }
+.nl-console .nl-res.failed, .nl-console .nl-res.error { background: #FBEDEB; color: #A23227; }
+.nl-console .nl-log-empty { padding: 20px; text-align: center; color: var(--ink-3); font-size: 13px; }
+`;
+
+// Honest, actionable copy for sync welcome outcomes (admin-only — JSX
+// text content, not linted; no t() needed on this internal surface).
+const WELCOME_SKIP_TEXT = {
+  not_pro: "that email's account isn't Pro — the Pro welcome only renders for a Pro member. Use an existing Pro member's email.",
+  clerk_lookup_failed: "no Clerk member for that email — test with an existing Pro member's email (a fresh address can't be used here).",
+  ranked_missing: "listings data is unavailable right now — try again shortly.",
+  no_picks_available: "no listings were available to include.",
+  already_sent: "already sent (idempotency stamp) — re-send forces past it.",
+  already_sent_for_subscription: "already sent for this subscription.",
+};
+const DISPATCH_ERROR_TEXT = {
+  rate_limited: "Test-send limit reached (20 per hour) — give it a bit and try again.",
+  github_dispatch_not_configured: "Server can't dispatch the run (GITHUB_DISPATCH_TOKEN missing in env).",
+  github_dispatch_not_configured_repo: "Server can't dispatch the run (dispatch repo/ref not configured).",
+  invalid_newsletter_id: "That newsletter id isn't recognized by the dispatcher.",
+  invalid_email: "Enter a valid email address.",
+  internal_endpoint_not_configured: "Welcome dispatcher not configured (PULPO_INTERNAL_TOKEN missing in env).",
+  method_not_allowed: "Unexpected request — refresh and try again.",
+};
+const reasonText = (r) => WELCOME_SKIP_TEXT[r] || r || "unknown reason";
+const dispatchErrorText = (c) => DISPATCH_ERROR_TEXT[c] || c || "unknown error";
 
 export function NewsletterWidget() {
-  const [email, setEmail] = useState(DEFAULT_EMAIL);
-  // Per-newsletter language. Each card has its own EN/ES toggle so an
-  // operator can fire an EN welcome and an ES welcome-back without
-  // flipping a shared control. Defaults to DEFAULT_LOCALE per card.
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
   const [localeByNl, setLocaleByNl] = useState({});
   const localeFor = (id) => localeByNl[id] || DEFAULT_LOCALE;
   const setLocaleFor = (id, loc) => setLocaleByNl((m) => ({ ...m, [id]: loc }));
-  const [busy, setBusy] = useState(false);
-  // statusByNewsletterId — per-card status, so the success/pending/
-  // error confirmation lands INSIDE the card the operator triggered
-  // from instead of at the bottom of the page (operator feedback
-  // 2026-05-31: the global block was easy to miss without scrolling).
-  // Shape: { [newsletterId]: { kind, message?, recipient?, runsUrl?, when? } }
-  // Each entry is the same discriminated union by `kind` as v3's
-  // single `status` state:
-  //   { kind: null }                            — nothing rendered
-  //   { kind: "pending" }                       — spinner + "Dispatching…"
-  //   { kind: "error",   message }              — red inline line
-  //   { kind: "success", recipient, runsUrl }   — structured success card
-  const [statusByNewsletterId, setStatusByNewsletterId] = useState({});
-  const setStatusFor = useCallback((newsletterId, next) => {
-    setStatusByNewsletterId((prev) => ({ ...prev, [newsletterId]: next }));
-  }, []);
-  const statusFor = (newsletterId) => statusByNewsletterId[newsletterId] || { kind: null };
-  // Per-browser localStorage log of trigger attempts. Hydrates from
-  // localStorage on mount so the log survives a reload.
-  const [localEntries, setLocalEntries] = useState(() => readLog());
-  // Server-side cross-device log via /api/admin/newsletter/recent-triggers
-  // (PostHog HogQL). Fetched on mount + after every trigger. Falls back
-  // to "" when POSTHOG_PERSONAL_API_KEY / POSTHOG_PROJECT_ID env vars
-  // are missing in Vercel — the response body's `unavailable_reason`
-  // tells the operator why the cross-device view is empty.
+
+  // Per-row status: { [id]: { kind, message?, recipient?, runsUrl? } }
+  const [statusById, setStatusById] = useState({});
+  const setStatusFor = useCallback((id, next) => setStatusById((p) => ({ ...p, [id]: next })), []);
+  const statusFor = (id) => statusById[id] || { kind: null };
+
+  // Source-of-truth state.
+  const [config, setConfig] = useState({ connections: [], all_ready: false, unavailable_reason: null, loaded: false });
+  const [health, setHealth] = useState({ families: [], unavailable_reason: null });
+  // Named `templateVersions` (not `versions`) — the Python guard
+  // tests/newsletter/test_templates.py greps the widget for a
+  // `templateVersions[...]` read to prove the chrome renders FETCHED
+  // versions, never a hardcoded mirror. Keep the name in lock-step.
+  const [templateVersions, setTemplateVersions] = useState({});
   const [serverEntries, setServerEntries] = useState([]);
   const [serverUnavailable, setServerUnavailable] = useState(null);
+  const [localEntries, setLocalEntries] = useState(() => readLog());
+
   const refreshServerLog = useCallback(async () => {
     const { events, unavailable_reason } = await fetchServerLog();
     setServerEntries(events);
     setServerUnavailable(unavailable_reason);
   }, []);
-  useEffect(() => {
-    refreshServerLog();
-  }, [refreshServerLog]);
-
-  // Per-template deliverability health (last 7d, PostHog). Refreshed on
-  // mount + after every trigger so a just-fired test moves the dot.
-  const [health, setHealth] = useState({ families: [], unavailable_reason: null, window_days: 7, loaded: false });
   const refreshHealth = useCallback(async () => {
-    const h = await fetchHealth();
-    setHealth({ ...h, loaded: true });
+    setHealth(await fetchHealth());
   }, []);
-  useEffect(() => { refreshHealth(); }, [refreshHealth]);
-
-  // Template version — pulled from the deployed Python source of truth
-  // (automation/newsletter/components/_common.py) via the dedicated
-  // endpoint, so the widget always reflects what's actually live. The
-  // initial empty object renders `—` placeholders; the fetch settles in
-  // ~50ms after mount. If the endpoint errors (Python file missing or
-  // unparseable), we surface a {error: ...} shape and the chrome keeps
-  // the placeholder rather than lying with a stale hardcoded value.
-  const [templateVersions, setTemplateVersions] = useState({});
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/admin/newsletter/template-version")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((data) => { if (!cancelled) setTemplateVersions(data); })
-      .catch(() => { /* fallthrough: keep placeholders */ });
-    return () => { cancelled = true; };
-  }, []);
-  // Merged + capped log for rendering. Re-derived on every change of
-  // either source — both are tiny arrays so the cost is negligible.
+    fetchConfig().then((c) => setConfig({ ...c, loaded: true }));
+    refreshHealth();
+    refreshServerLog();
+    fetchTemplateVersions().then(setTemplateVersions);
+  }, [refreshHealth, refreshServerLog]);
+
   const log = mergeLogs(serverEntries, localEntries);
+  const healthById = {};
+  for (const f of health.families) healthById[f.id] = f;
+  const sendModeRow = config.connections.find((c) => c.id === "send_mode");
+  const dryRun = sendModeRow ? sendModeRow.status === "warn" : null;
 
-  // Upcoming Monday cron date — only the next one. Operator feedback
-  // (2026-05-30): the 3-row preview was clutter; only the very next
-  // issue is what gets tested or sent ad-hoc. `nextMondays` returns
-  // an array so the existing `.map(...)` renderer keeps working
-  // unchanged — it just iterates a 1-element list.
-  const upcoming = nextMondays(1);
-
-  // ── Audience-send (per-row inline confirmation) ─────────────────
-  //
-  // The "Send to everyone" button next to each upcoming row fires a
-  // LIVE send to every Pro/Agency subscriber. The flow:
-  //
-  //   1. Operator clicks "Send to everyone".
-  //   2. `audienceConfirm` opens for that row + we GET
-  //      /api/admin/newsletter/audience-count to populate the count.
-  //   3. The inline card shows "Send Issue N to X readers?" + a
-  //      type-to-confirm input.
-  //   4. Operator types SEND + clicks Send → POST
-  //      /api/admin/newsletter/trigger-audience-send.
-  //   5. On success: row's audienceConfirm transitions to "dispatched"
-  //      with a link to the workflow run.
-  //
-  // State shape (null = no row in confirm mode; only one at a time):
-  //   {
-  //     issueNumber: number,
-  //     phase: "loading_count" | "ready" | "submitting" | "dispatched" | "error",
-  //     typedConfirm: string,         // what's in the input
-  //     audienceCount: number | null, // populated after step 2
-  //     runsUrl: string | null,       // populated after step 5
-  //     errorMessage: string | null,
-  //   }
-  const [audienceConfirm, setAudienceConfirm] = useState(null);
-
-  const openAudienceConfirm = useCallback(async (issueNumber) => {
-    setAudienceConfirm({
-      issueNumber,
-      phase: "loading_count",
-      typedConfirm: "",
-      audienceCount: null,
-      runsUrl: null,
-      errorMessage: null,
-    });
-    try {
-      const r = await fetch("/api/admin/newsletter/audience-count");
-      const body = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
-          ...prev,
-          phase: "error",
-          errorMessage: body.error || `Couldn't load audience count (HTTP ${r.status})`,
-        } : prev);
-        return;
-      }
-      setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
-        ...prev,
-        phase: "ready",
-        audienceCount: typeof body.count === "number" ? body.count : 0,
-      } : prev);
-    } catch (err) {
-      const msg = String(err && err.message || err);
-      setAudienceConfirm((prev) => prev && prev.issueNumber === issueNumber ? {
-        ...prev,
-        phase: "error",
-        errorMessage: msg,
-      } : prev);
-    }
-  }, []);
-
-  const cancelAudienceConfirm = useCallback(() => {
-    setAudienceConfirm(null);
-  }, []);
-
-  const submitAudienceConfirm = useCallback(async () => {
-    setAudienceConfirm((prev) => prev ? { ...prev, phase: "submitting", errorMessage: null } : prev);
-    const operatorEmail = readOperatorEmail();
-    const snapshot = audienceConfirm;
-    if (!snapshot) return;
-    try {
-      const r = await adminFetch("/api/admin/newsletter/trigger-audience-send", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          confirm: snapshot.typedConfirm,
-          issue_number: snapshot.issueNumber,
-          audience_count: snapshot.audienceCount,
-          by: operatorEmail || undefined,
-        }),
-      });
-      const body = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        const detail = body.error || `HTTP ${r.status}`;
-        const hint = body.hint ? ` — ${body.hint}` : "";
-        setAudienceConfirm((prev) => prev ? {
-          ...prev,
-          phase: "error",
-          errorMessage: `${detail}${hint}`,
-        } : prev);
-        return;
-      }
-      setAudienceConfirm((prev) => prev ? {
-        ...prev,
-        phase: "dispatched",
-        runsUrl: body.runs_url_hint || null,
-      } : prev);
-      // Refresh the server-side log so the audience send shows up in
-      // "Recent test sends" — uses the same PostHog ingestion path.
-      window.setTimeout(() => { refreshServerLog(); }, 5000);
-    } catch (err) {
-      const msg = String(err && err.message || err);
-      setAudienceConfirm((prev) => prev ? {
-        ...prev,
-        phase: "error",
-        errorMessage: msg,
-      } : prev);
-    }
-  }, [audienceConfirm, refreshServerLog]);
-
-  // Shared trigger for the per-row "Send test →" buttons in the
-  // Upcoming Sends panel. `issueNumber=null` keeps the legacy default
-  // ("1" server-side). `newsletterId` routes per-newsletter to the
-  // correct admin endpoint:
-  //   • pro-weekly → /api/admin/newsletter/trigger-preview (dispatches
-  //     the weekly digest workflow with preview_cohorts=<email>)
-  //   • pro-welcome → /api/admin/newsletter/trigger-welcome-test
-  //     (dispatches the welcome workflow with force=yes so the
-  //     operator can re-test against Clerk users who already have
-  //     the welcome_newsletter_sent_at stamp)
-  //   • free-welcome / free-welcome-back → /api/admin/newsletter/
-  //     trigger-free-welcome-test (synchronous DB-free dispatcher)
-  //   • free-weekly → /api/admin/newsletter/trigger-preview
-  // The endpoint shapes differ (body fields, headers) so we branch
-  // here rather than hiding the routing in the server-side allow-list.
-  const trigger = async ({ issueNumber = null, when = null, newsletterId = "pro-weekly", locale = DEFAULT_LOCALE } = {}) => {
+  // ── Test-send trigger ──────────────────────────────────────────────
+  const trigger = async (tpl) => {
     const value = email.trim().toLowerCase();
     if (!value || !EMAIL_RE.test(value)) {
-      setStatusFor(newsletterId, { kind: "error", message: "Enter a valid email address." });
+      setStatusFor(tpl.id, { kind: "err", message: "Enter a valid email address above." });
       return;
     }
-    setBusy(true);
-    setStatusFor(newsletterId, { kind: "pending", when });
+    const locale = localeFor(tpl.id);
     const operatorEmail = readOperatorEmail();
-    // One-shot welcome variants route to synchronous endpoints that return
-    // the real send/skip/fail result. Weekly variants route to the async
-    // GitHub workflow preview.
-    const isWelcome = newsletterId === "pro-welcome" || newsletterId === "pro-welcome-back";
-    const isFreeWelcome = newsletterId === "free-welcome" || newsletterId === "free-welcome-back";
-    const endpoint = isWelcome
+    setBusy(true);
+    setStatusFor(tpl.id, { kind: "pending", message: "Sending…" });
+    const baseEntry = { at: new Date().toISOString(), to: value, locale, by: operatorEmail, newsletter_id: tpl.id };
+
+    const endpoint = tpl.route === "welcome"
       ? "/api/admin/newsletter/trigger-welcome-test"
-      : isFreeWelcome
+      : tpl.route === "free"
         ? "/api/admin/newsletter/trigger-free-welcome-test"
-      : "/api/admin/newsletter/trigger-preview";
-    const baseEntry = {
-      at: new Date().toISOString(),
-      to: value,
-      locale,
-      by: operatorEmail,
-      newsletter_id: newsletterId,
-    };
+        : "/api/admin/newsletter/trigger-preview";
+
     try {
-      // `locale` follows THIS card's toggle. The welcome endpoint treats
-      // it as an override; production sends (Stripe webhook) keep Clerk's.
       const payload = { email: value, by: operatorEmail || undefined, locale };
-      if (isWelcome) {
-        if (newsletterId === "pro-welcome-back") payload.variant = "welcome_back";
-      } else if (isFreeWelcome) {
-        payload.variant = newsletterId === "free-welcome-back" ? "free_welcome_back" : "free_welcome";
+      if (tpl.route === "welcome") {
+        if (tpl.id === "pro-welcome-back") payload.variant = "welcome_back";
+      } else if (tpl.route === "free") {
+        payload.variant = tpl.id === "free-welcome-back" ? "free_welcome_back" : "free_welcome";
       } else {
-        payload.newsletter_id = newsletterId;
-        if (issueNumber != null) payload.issue_number = issueNumber;
+        payload.newsletter_id = tpl.id;
       }
-      const r = await adminFetch(endpoint, {
+      const r = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
       });
       const body = await r.json().catch(() => ({}));
 
-      if (isWelcome || isFreeWelcome) {
-        // Synchronous real outcome — only confirm "Sent" when it sent.
+      // Synchronous routes (welcome / free) return the REAL outcome.
+      if (tpl.route === "welcome" || tpl.route === "free") {
         const st = body.status;
         if (st === "sent") {
-          setStatusFor(newsletterId, {
-            kind: "sent", recipient: value, dryRun: !!body.dry_run,
-            messageId: body.message_id || null, locale, when,
+          setStatusFor(tpl.id, {
+            kind: "ok",
+            message: body.dry_run
+              ? `Rendered to ${value} · dry-run (no email left the building)`
+              : `Sent to ${value} ✓`,
           });
           setLocalEntries(appendLogEntry({ ...baseEntry, result: body.dry_run ? "dry_run" : "ok" }));
         } else if (st === "skipped") {
-          setStatusFor(newsletterId, { kind: "skipped", recipient: value, reason: body.reason || "skipped", locale });
+          setStatusFor(tpl.id, { kind: "warn", message: `Skipped — ${reasonText(body.reason)}` });
           setLocalEntries(appendLogEntry({ ...baseEntry, result: "skipped", detail: body.reason || "" }));
         } else if (st === "failed") {
-          setStatusFor(newsletterId, { kind: "failed", recipient: value, reason: body.reason || "failed", locale });
+          setStatusFor(tpl.id, { kind: "err", message: `Failed — ${reasonText(body.reason)}` });
           setLocalEntries(appendLogEntry({ ...baseEntry, result: "failed", detail: body.reason || "" }));
         } else {
-          const rawCode = body.reason || body.error || `HTTP ${r.status}`;
-          const friendly = body.reason
-            ? welcomeReasonText(body.reason)
-            : (body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`);
-          setStatusFor(newsletterId, { kind: "error", message: friendly });
-          setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: rawCode }));
+          const friendly = body.reason ? reasonText(body.reason)
+            : body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`;
+          setStatusFor(tpl.id, { kind: "err", message: friendly });
+          setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: body.reason || body.error || `HTTP ${r.status}` }));
         }
         return;
       }
 
-      // Weekly (async cohort preview) — dispatch semantics unchanged.
+      // Async preview route — we only know it was DISPATCHED.
       if (!r.ok) {
-        const rawCode = body.error || `HTTP ${r.status}`;
         let friendly = body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`;
-        // The 429 carries retry_after_s — surface the actual wait.
         if (body.error === "rate_limited" && body.retry_after_s) {
           const mins = Math.max(1, Math.ceil(body.retry_after_s / 60));
           friendly = `Test-send limit reached (20 per hour) — try again in ~${mins} min.`;
         }
-        setStatusFor(newsletterId, { kind: "error", message: friendly });
-        setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: rawCode }));
+        setStatusFor(tpl.id, { kind: "err", message: friendly });
+        setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: body.error || `HTTP ${r.status}` }));
         return;
       }
-      setStatusFor(newsletterId, {
-        kind: "success",
-        recipient: value,
+      setStatusFor(tpl.id, {
+        kind: "ok",
+        message: `Dispatched · 1 preview email to ${value} (~30–60s via GitHub Actions)`,
         runsUrl: body.runs_url || null,
-        when,
       });
-      // The weekly goes through an async GitHub-Actions workflow — we only
-      // know the run was DISPATCHED, not that Resend actually delivered.
-      // Log it as "dispatched" (not "ok"/"Sent") so the log doesn't claim a
-      // delivery it can't confirm. (The Welcome path IS synchronous, so it
-      // logs the real sent/skipped/failed outcome above.)
       setLocalEntries(appendLogEntry({ ...baseEntry, result: "dispatched" }));
     } catch (err) {
-      const msg = String(err && err.message || err);
-      setStatusFor(newsletterId, { kind: "error", message: msg });
-      setLocalEntries(appendLogEntry({
-        at: new Date().toISOString(),
-        to: value,
-        locale,
-        by: operatorEmail,
-        newsletter_id: newsletterId,
-        result: "error",
-        detail: msg,
-      }));
+      const msg = String((err && err.message) || err);
+      setStatusFor(tpl.id, { kind: "err", message: msg });
+      setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: msg }));
     } finally {
       setBusy(false);
-      // PostHog ingestion has 1-5s latency before the event lands in
-      // a HogQL query result. Refresh after 5s so the just-fired
-      // entry promotes from "local-only" to "server-canonical" on
-      // its own (the merge dedupes by `at` so there's no flicker).
-      window.setTimeout(() => { refreshServerLog(); }, 5000);
+      // Promote the just-fired entry from local-only to PostHog-canonical
+      // once ingestion lands (~1-5s). Merge dedupes by `at`, no flicker.
+      window.setTimeout(() => { refreshServerLog(); refreshHealth(); }, 5000);
     }
   };
 
-  // Clear only wipes the per-browser localStorage layer. The
-  // server-side log (PostHog events) is immutable history — operators
-  // shouldn't be able to one-click delete an audit trail from the
-  // admin UI. The merged view recomputes immediately.
-  const clearLog = () => {
-    writeLog([]);
-    setLocalEntries([]);
-  };
+  // ── Audience send (Pro · Weekly only, high blast) ──────────────────
+  // State: null | { phase, audienceCount, issueInput, typedConfirm, runsUrl, errorMessage }
+  const [audienceConfirm, setAudienceConfirm] = useState(null);
 
-  // Per-card EN/ES toggle — rendered next to each card's send button so
-  // the language is chosen per newsletter, not via a shared control.
-  const localeToggle = (nlId) => (
-    <div className="nl-card-locale">
-      <span className="nl-card-locale-label">Lang</span>
-      <div className="nl-locale-toggle">
+  const openAudienceConfirm = useCallback(async () => {
+    setAudienceConfirm({ phase: "loading_count", audienceCount: null, issueInput: "", typedConfirm: "", runsUrl: null, errorMessage: null });
+    try {
+      const r = await fetch("/api/admin/newsletter/audience-count");
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: body.error || `Couldn't load audience count (HTTP ${r.status})` } : p);
+        return;
+      }
+      setAudienceConfirm((p) => p ? { ...p, phase: "ready", audienceCount: typeof body.count === "number" ? body.count : 0 } : p);
+    } catch (err) {
+      setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: String((err && err.message) || err) } : p);
+    }
+  }, []);
+
+  const submitAudienceConfirm = useCallback(async () => {
+    const snap = audienceConfirm;
+    if (!snap) return;
+    setAudienceConfirm((p) => p ? { ...p, phase: "submitting", errorMessage: null } : p);
+    const operatorEmail = readOperatorEmail();
+    try {
+      const r = await fetch("/api/admin/newsletter/trigger-audience-send", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          confirm: snap.typedConfirm,
+          issue_number: Number(snap.issueInput),
+          audience_count: snap.audienceCount,
+          by: operatorEmail || undefined,
+        }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const hint = body.hint ? ` — ${body.hint}` : "";
+        setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: `${body.error || `HTTP ${r.status}`}${hint}` } : p);
+        return;
+      }
+      setAudienceConfirm((p) => p ? { ...p, phase: "dispatched", runsUrl: body.runs_url_hint || null } : p);
+      setLocalEntries(appendLogEntry({
+        at: new Date().toISOString(), to: `all · ${snap.audienceCount} readers`,
+        locale: DEFAULT_LOCALE, by: operatorEmail, newsletter_id: "pro-weekly", result: "dispatched",
+      }));
+      window.setTimeout(() => { refreshServerLog(); refreshHealth(); }, 5000);
+    } catch (err) {
+      setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: String((err && err.message) || err) } : p);
+    }
+  }, [audienceConfirm, refreshServerLog, refreshHealth]);
+
+  const clearLog = () => { writeLog([]); setLocalEntries([]); };
+
+  // issue number must be a positive int ≤ 9999 (server contract).
+  const issueValid = (() => {
+    if (!audienceConfirm) return false;
+    const n = Number(audienceConfirm.issueInput);
+    return Number.isInteger(n) && n > 0 && n <= 9999;
+  })();
+  const confirmReady = issueValid && audienceConfirm?.typedConfirm === "SEND";
+
+  const localeToggle = (tpl) => (
+    <span className="nl-loc">
+      <span className="nl-loc-label">Lang</span>
+      <span className="nl-loc-toggle">
         {LOCALE_OPTIONS.map((opt) => (
           <button
-            key={opt.value}
-            type="button"
-            className="nl-locale-btn"
-            aria-pressed={localeFor(nlId) === opt.value}
-            onClick={() => setLocaleFor(nlId, opt.value)}
-            disabled={busy}
+            key={opt.value} type="button" className="nl-loc-btn"
+            aria-pressed={localeFor(tpl.id) === opt.value}
+            onClick={() => setLocaleFor(tpl.id, opt.value)} disabled={busy}
           >
             {opt.label}
           </button>
         ))}
-      </div>
-    </div>
+      </span>
+    </span>
   );
-
-  // Honest, actionable copy for the welcome test-send outcomes (admin-only).
-  // i18n-allow: admin-only widget
-  const WELCOME_SKIP_TEXT = {
-    not_pro: "that email's account isn't Pro — the Pro welcome only renders for a Pro member. Use an existing Pro member's email.",
-    clerk_lookup_failed: "no Clerk member for that email — the Pro welcome renders from a member's profile, so test it with an existing Pro member's email (a fresh address can't be used here).",
-    ranked_missing: "listings data is unavailable right now — try again shortly.",
-    no_picks_available: "no listings were available to include.",
-    already_sent: "already sent (idempotency stamp) — re-send forces past it.",
-    already_sent_for_subscription: "already sent for this subscription.",
-  };
-  const welcomeReasonText = (reason) => WELCOME_SKIP_TEXT[reason] || reason || "unknown reason";
-
-  // Honest copy for the async preview/dispatch path (weekly + free cards).
-  // These are the codes /api/admin/newsletter/trigger-preview can return.
-  // i18n-allow: admin-only widget
-  const DISPATCH_ERROR_TEXT = {
-    rate_limited: "Test-send limit reached (20 per hour) — give it a bit and try again.",
-    github_dispatch_not_configured: "Server can't dispatch the run (GITHUB_DISPATCH_TOKEN missing in env).",
-    github_dispatch_not_configured_repo: "Server can't dispatch the run (dispatch repo/ref not configured).",
-    invalid_newsletter_id: "That newsletter id isn't recognized by the dispatcher.",
-    invalid_email: "Enter a valid email address.",
-    method_not_allowed: "Unexpected request — refresh and try again.",
-  };
-  const dispatchErrorText = (code) => DISPATCH_ERROR_TEXT[code] || code || "unknown error";
-  const welcomeSubject = (nlId, loc) => {
-    if (nlId === "free-welcome-back") {
-      return loc === "es" ? "Bienvenido de nuevo a Pulpo — tus próximas 10" : "Welcome back to Pulpo — your next 10";
-    }
-    if (nlId === "free-welcome") {
-      return loc === "es" ? "Bienvenido a Pulpo — tus primeras 10" : "Welcome to Pulpo — your first 10";
-    }
-    return nlId === "pro-welcome-back"
-      ? (loc === "es" ? "Bienvenido de nuevo a Pulpo Pro — tus próximas 10" : "Welcome back to Pulpo Pro — your next 10")
-      : (loc === "es" ? "Bienvenido a Pulpo Pro — tus primeras 10" : "Welcome to Pulpo Pro — your first 10");
-  };
 
   return (
     <>
       <style>{WIDGET_STYLES}</style>
-      <div className="nl-preview-widget">
-        {/* Was a <form> with a "Send next 3 cohort variants" submit
-            button at the bottom. PR-NL-9 follow-up: the per-row "Send
-            test →" buttons in Upcoming Sends are the only triggers, so
-            the form wrapper became dead weight. Plain <div> means Enter
-            on the email input no longer accidentally fires a preview. */}
-        <div className="nl-card">
-          <div>
-            <label htmlFor="nl-preview-email">Send test to</label>
+      <div className="nl-console">
+
+        {/* Header — test recipient + send-mode pill */}
+        <div className="nl-head">
+          <div className="nl-testfield">
+            <label htmlFor="nl-test-to">Send test to</label>
             <input
-              id="nl-preview-email"
-              type="email"
-              value={email}
+              id="nl-test-to" type="email" value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
-              spellCheck={false}
-              required
+              placeholder="you@pulpo.club" // i18n-allow: admin-only operator surface, never shown to end users
+              autoComplete="off"
             />
           </div>
-
-          {/* Language is now a per-newsletter toggle rendered next to each
-              card's send button (localeToggle below) — no shared control. */}
-
-          {/* ── Deliverability health (per template, last 7 days) ── */}
-          <div className="nl-health">
-            <div className="nl-health-head">
-              <span className="nl-health-eyebrow">Deliverability · last {health.window_days}d</span>
-              <button type="button" className="nl-health-refresh" onClick={refreshHealth} title="Refresh health">↻</button>
-            </div>
-            {health.unavailable_reason ? (
-              <p className="nl-health-unavailable">{health.unavailable_reason}</p>
-            ) : (
-              <div className="nl-health-rows">
-                {(health.families || []).map((row) => {
-                  const st = healthStatus(row);
-                  return (
-                    <div className="nl-health-row" key={row.id}>
-                      <span className={`nl-health-dot nl-health-dot--${st.kind}`} aria-hidden="true" />
-                      <span className="nl-health-label">{row.label}</span>
-                      <span className="nl-health-status">{st.label}</span>
-                      <span className="nl-health-last">{row.last_sent_at ? formatLogWhen(row.last_sent_at) : "—"}</span>
-                    </div>
-                  );
-                })}
-                {health.loaded && (health.families || []).length === 0 && (
-                  <p className="nl-health-unavailable">No dispatch activity in the last {health.window_days} days.</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* ── PRO section ─────────────────────────────────────── */}
-          <div className="nl-tier-section">
-            <div className="nl-tier-header">
-              <span className="nl-tier-label pro">Pro</span>
-              <hr />
-              <span className="nl-tier-count">{PRO_NEWSLETTERS.length} newsletters</span>
-            </div>
-
-            {/* Pro · Weekly — LIVE. Body wraps the existing Upcoming
-                sends panel (test + audience triggers per row). */}
-            <article className="nl-newsletter-card">
-              <div className="nl-newsletter-head">
-                <h3 className="nl-newsletter-title">{NEWSLETTERS.find(n => n.id === "pro-weekly").title}</h3>
-                <span className="nl-newsletter-status live">● Live</span>
-              </div>
-              <p className="nl-newsletter-desc">{NEWSLETTERS.find(n => n.id === "pro-weekly").description}</p>
-              <p className="nl-newsletter-template">
-                Template · <strong>{NEWSLETTERS.find(n => n.id === "pro-weekly").templateLabel}</strong>
-                {templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template] && (
-                  <> · {templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template].version} ({templateVersions[NEWSLETTERS.find(n => n.id === "pro-weekly").template].lastUpdated})</>
-                )}
-                <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
-              </p>
-              <div className="nl-newsletter-body">
-
-          {/* PR-NL-7a — Upcoming sends. Per-row test button fires the
-              same endpoint with that row's issue_number. The shared
-              email input above is the recipient for all of them. */}
-          <div className="nl-upcoming">
-            <p className="nl-upcoming-eyebrow">Upcoming sends</p>
-            <ul className="nl-upcoming-list">
-              {upcoming.map((d, idx) => {
-                const label = formatMondayLabel(d);
-                // Issue numbering: the cron's issue_number is operator-
-                // driven (PR-NL-9 will plumb the real next number). Until
-                // then we use "next / +2 weeks / +4 weeks" as the human
-                // label and a stable sequential number for the API call.
-                const humanIssue = idx === 0 ? "Next issue"
-                  : idx === 1 ? "Following"
-                  : "After that";
-                const issueNum = idx + 1;
-                const confirmOpen = audienceConfirm && audienceConfirm.issueNumber === issueNum;
-                return (
-                  <li className="nl-upcoming-row" key={d.toISOString()}>
-                    <div className="nl-upcoming-row-main">
-                      <div className="nl-upcoming-meta">
-                        <span className="nl-upcoming-issue">{humanIssue}</span>
-                        <span className="nl-upcoming-when">{label}</span>
-                      </div>
-                      <div className="nl-upcoming-actions nl-card-actions">
-                        {localeToggle("pro-weekly")}
-                        <button
-                          type="button"
-                          className="nl-upcoming-btn"
-                          disabled={busy || !!audienceConfirm}
-                          onClick={() => trigger({ issueNumber: issueNum, when: label, newsletterId: "pro-weekly", locale: localeFor("pro-weekly") })}
-                          title="Send a test copy to your email only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
-                        >
-                          Send test →
-                        </button>
-                        <button
-                          type="button"
-                          className="nl-audience-btn"
-                          disabled={busy || !!audienceConfirm}
-                          onClick={() => openAudienceConfirm(issueNum)}
-                          title="Send this issue to every paying Pulpo subscriber. Confirmation required." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
-                        >
-                          Send to everyone
-                        </button>
-                      </div>
-                    </div>
-                    {confirmOpen && (
-                      <div className="nl-audience-confirm" role="dialog" aria-live="polite">
-                        {audienceConfirm.phase === "loading_count" && (
-                          <p className="nl-audience-loading">
-                            <span className="nl-status-icon" aria-hidden="true" />
-                            Counting subscribers…
-                          </p>
-                        )}
-                        {audienceConfirm.phase === "ready" && (
-                          <>
-                            <p className="nl-audience-headline">
-                              Send Issue {issueNum} to <strong>{audienceConfirm.audienceCount} {audienceConfirm.audienceCount === 1 ? "reader" : "readers"}</strong>?
-                            </p>
-                            <p className="nl-audience-warn">
-                              This goes to every paying Pulpo subscriber right now. The email can&rsquo;t be recalled once sent.
-                            </p>
-                            <label className="nl-audience-confirm-label">
-                              Type <strong>SEND</strong> to confirm:
-                              <input
-                                type="text"
-                                className="nl-audience-confirm-input"
-                                value={audienceConfirm.typedConfirm}
-                                onChange={(e) => setAudienceConfirm((prev) => prev ? { ...prev, typedConfirm: e.target.value } : prev)}
-                                autoFocus
-                                spellCheck={false}
-                                autoComplete="off"
-                              />
-                            </label>
-                            <div className="nl-audience-confirm-actions">
-                              <button
-                                type="button"
-                                className="nl-audience-cancel"
-                                onClick={cancelAudienceConfirm}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                type="button"
-                                className="nl-audience-send"
-                                disabled={audienceConfirm.typedConfirm !== "SEND"}
-                                onClick={submitAudienceConfirm}
-                              >
-                                Send now
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        {audienceConfirm.phase === "submitting" && (
-                          <p className="nl-audience-loading">
-                            <span className="nl-status-icon" aria-hidden="true" />
-                            Dispatching to all subscribers…
-                          </p>
-                        )}
-                        {audienceConfirm.phase === "dispatched" && (
-                          <>
-                            <p className="nl-audience-headline ok">
-                              <span className="nl-success-check" aria-hidden="true">✓</span>
-                              Sent Issue {issueNum} to {audienceConfirm.audienceCount} {audienceConfirm.audienceCount === 1 ? "reader" : "readers"}
-                            </p>
-                            <p className="nl-audience-body">
-                              The workflow is dispatching now. Resend deliveries follow as the job runs (~30s–2m).
-                            </p>
-                            {audienceConfirm.runsUrl && (
-                              <p>
-                                <a href={audienceConfirm.runsUrl} target="_blank" rel="noreferrer">
-                                  View workflow run on GitHub →
-                                </a>
-                              </p>
-                            )}
-                            <div className="nl-audience-confirm-actions">
-                              <button
-                                type="button"
-                                className="nl-audience-cancel"
-                                onClick={cancelAudienceConfirm}
-                              >
-                                Close
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        {audienceConfirm.phase === "error" && (
-                          <>
-                            <p className="nl-audience-headline err">
-                              <span aria-hidden="true">!</span> {audienceConfirm.errorMessage || "Something went wrong."}
-                            </p>
-                            <div className="nl-audience-confirm-actions">
-                              <button
-                                type="button"
-                                className="nl-audience-cancel"
-                                onClick={cancelAudienceConfirm}
-                              >
-                                Close
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* PR-A (2026-05-31) — per-card test-send confirmation. Lives
-              INSIDE the Pro · Weekly card body so the operator sees
-              the result without scrolling past the cross-device log
-              to find a global status block. Threaded by newsletter
-              ID via `statusFor()`. */}
-          {statusFor("pro-weekly").kind === "pending" && (
-            <p className="nl-status pending" aria-live="polite" style={{ marginTop: "12px" }}>
-              <span className="nl-status-icon" aria-hidden="true" />
-              Dispatching workflow…
-            </p>
+          {dryRun != null && (
+            <span className={`nl-mode-pill ${dryRun ? "dry" : "live"}`}>
+              <span className="nl-dot" />
+              {dryRun ? "Dry-run — no live mail" : "Live — real mail sends"}
+            </span>
           )}
-          {statusFor("pro-weekly").kind === "error" && (
-            <p className="nl-status error" role="alert" aria-live="polite" style={{ marginTop: "12px" }}>
-              <span className="nl-status-icon" aria-hidden="true">!</span>
-              {statusFor("pro-weekly").message}
-            </p>
-          )}
-          {statusFor("pro-weekly").kind === "success" && (
-            <div className="nl-success" role="status" aria-live="polite" style={{ marginTop: "12px" }}>
-              <p className="nl-success-head">
-                <span className="nl-success-check" aria-hidden="true">✓</span>
-                Dispatched · 1 email on the way
-              </p>
-              <p className="nl-success-body">
-                Sending to <strong>{statusFor("pro-weekly").recipient}</strong>
-                {statusFor("pro-weekly").when ? <> — preview of the issue scheduled for <strong>{statusFor("pro-weekly").when}</strong></> : null}.
-                Should land in ~30–60 seconds. Look for this subject in your inbox:
-              </p>
-              <ul className="nl-success-subjects">
-                {PREVIEW_COHORTS.map((cohort) => (
-                  <li key={cohort}>[PULPO PREVIEW · {cohort}] Issue 01</li>
+        </div>
+
+        {/* Config & connections */}
+        <section className="nl-sec">
+          <p className="nl-sec-title">Config &amp; connections <span className="nl-count">live</span></p>
+          {config.unavailable_reason ? (
+            <p className="nl-muted">Config probe unavailable — {config.unavailable_reason}</p>
+          ) : !config.loaded ? (
+            <p className="nl-muted">Loading…</p>
+          ) : (
+            <>
+              <div className="nl-conf">
+                {config.connections.map((c) => (
+                  <div key={c.id} className={`nl-conf-row ${c.status}`} title={c.blocks ? `Blocks: ${c.blocks}` : undefined}>
+                    <span className="nl-dot" />
+                    <span className="nl-k">{c.label}</span>
+                    <span className="nl-v">{c.detail}</span>
+                  </div>
                 ))}
-              </ul>
-              {statusFor("pro-weekly").runsUrl && (
-                <p className="nl-success-footer">
-                  <a href={statusFor("pro-weekly").runsUrl} target="_blank" rel="noreferrer">
-                    View workflow run on GitHub →
-                  </a>
+              </div>
+              {config.connections.some((c) => c.status === "bad") && (
+                <p className="nl-conf-blocks">
+                  A red row above means that dependency's send path is broken until the env var is set. Hover a row for what it blocks.
                 </p>
               )}
-            </div>
+            </>
           )}
+        </section>
 
-              </div>
-            </article>
-
-            {/* Pro · Welcome (+ any future non-weekly Pro newsletter).
-                Status comes from the NEWSLETTERS registry — when a
-                card flips status: "live" the render here picks it up
-                automatically. The previous version hardcoded "Coming
-                soon" for every non-weekly card, missing the 2026-06-01
-                Pro Welcome go-live.
-
-                Live cards get a "Send test welcome to me" button that
-                dispatches via /api/admin/newsletter/trigger-welcome-test
-                (the trigger() helper routes by newsletterId). Status
-                feedback renders inline below the button using the same
-                statusFor() store the weekly card uses. */}
-            {PRO_NEWSLETTERS.filter((n) => n.id !== "pro-weekly").map((nl) => {
-              const isLive = nl.status === "live";
-              const cardStatus = statusFor(nl.id);
-              return (
-                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
-                  <div className="nl-newsletter-head">
-                    <h3 className="nl-newsletter-title">{nl.title}</h3>
-                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
-                      {isLive ? "● Live" : "◌ Coming soon"}
-                    </span>
+        {/* Templates */}
+        <section className="nl-sec">
+          <p className="nl-sec-title">Templates <span className="nl-count">{TEMPLATES.length}</span></p>
+          {TEMPLATES.map((tpl) => {
+            const ver = tpl.templateId ? templateVersions[tpl.templateId] : null;
+            const hrow = healthById[tpl.id];
+            const hs = healthStatus(hrow);
+            const st = statusFor(tpl.id);
+            const confirmOpen = tpl.audience && !!audienceConfirm;
+            return (
+              <div key={tpl.id} className="nl-tpl">
+                <div className="nl-tpl-top">
+                  <div>
+                    <p className="nl-tpl-title">{tpl.title}</p>
+                    <div className="nl-chips">
+                      <span className={`nl-chip ${tpl.tier}`}>{tpl.tier.toUpperCase()}</span>
+                      {ver?.version
+                        ? <span className="nl-chip ver">{ver.version}</span>
+                        : tpl.templateId ? <span className="nl-chip ver">—</span> : null}
+                    </div>
                   </div>
-                  <p className="nl-newsletter-desc">{nl.description}</p>
-                  <p className="nl-newsletter-template">
-                    Template · <strong>{nl.templateLabel}</strong>
-                    {templateVersions[nl.template] && (
-                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
-                    )}
-                  </p>
-                  {isLive && (
-                    <>
-                      <div className="nl-upcoming-actions nl-card-actions" style={{ marginTop: 12 }}>
-                        {localeToggle(nl.id)}
-                        <button
-                          type="button"
-                          className="nl-upcoming-btn"
-                          onClick={() => trigger({ newsletterId: nl.id, locale: localeFor(nl.id) })}
-                          disabled={busy}
-                          title="Sends the real email synchronously and reports the actual outcome — only confirms Sent when it sent." // i18n-allow: admin-only widget
-                        >
-                          {nl.id === "pro-welcome-back" ? "Send test welcome-back to me →" : "Send test welcome to me →"}
-                        </button>
-                      </div>
-                      {cardStatus.kind === "pending" && (
-                        <p className="nl-result pending" style={{ marginTop: 8 }}>
-                          <span className="nl-status-icon" aria-hidden="true" />
-                          Sending…
-                        </p>
-                      )}
-                      {cardStatus.kind === "error" && (
-                        <p className="nl-result error" style={{ marginTop: 8 }}>
-                          ⚠ {cardStatus.message}
-                        </p>
-                      )}
-                      {cardStatus.kind === "failed" && (
-                        <p className="nl-result error" style={{ marginTop: 8 }}>
-                          ✗ Not sent — {welcomeReasonText(cardStatus.reason)}
-                        </p>
-                      )}
-                      {cardStatus.kind === "skipped" && (
-                        <p className="nl-result error" style={{ marginTop: 8 }}>
-                          ⊘ Not sent — {welcomeReasonText(cardStatus.reason)}
-                        </p>
-                      )}
-                      {cardStatus.kind === "sent" && (
-                        <div className="nl-success-card" style={{ marginTop: 8 }}>
-                          <p className="nl-success-head">
-                            <span className="nl-success-check" aria-hidden="true">✓</span>
-                            {cardStatus.dryRun ? "Rendered OK · dry-run (no email sent)" : "Sent ✓"}
-                          </p>
-                          <p className="nl-success-body">
-                            {cardStatus.dryRun ? (
-                              <>The dispatcher ran in <strong>DRY-RUN</strong>, so no real email went out. Set <strong>PULPO_NEWSLETTER_DRY_RUN=0</strong> in the Vercel env to send for real.</>
-                            ) : (
-                              <>Sent to <strong>{cardStatus.recipient}</strong> in <strong>{cardStatus.locale === "es" ? "Spanish" : "English"}</strong>. Subject: <strong>{welcomeSubject(nl.id, cardStatus.locale)}</strong>.{cardStatus.messageId ? <> · id <code>{cardStatus.messageId}</code></> : null}</>
-                            )}
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </article>
-              );
-            })}
-          </div>
+                  <span className={`nl-hd ${hs.kind}`}><span className="nl-dot" />{hs.label}</span>
+                </div>
 
-          {/* ── FREE section ────────────────────────────────────── */}
-          <div className="nl-tier-section">
-            <div className="nl-tier-header">
-              <span className="nl-tier-label free">Free</span>
-              <hr />
-              <span className="nl-tier-count">{FREE_NEWSLETTERS.length} newsletters</span>
-            </div>
-            {FREE_NEWSLETTERS.map((nl) => {
-              const isLive = nl.status === "live";
-              const cardStatus = statusFor(nl.id);
-              // EVERY free template is test-sendable, but via TWO different
-              // paths (trigger() routes by id):
-              //   • free-weekly → /api/admin/newsletter/trigger-preview
-              //     (async GitHub workflow → kind "success" = dispatched).
-              //   • free-welcome / free-welcome-back →
-              //     /api/admin/newsletter/trigger-free-welcome-test
-              //     (synchronous DB-free dispatcher → kind sent/skipped/
-              //     failed). No Clerk account needed — the free recipient
-              //     is synthesized. TEST only — no audience send.
-              const canTest = true;
-              return (
-                <article key={nl.id} className={`nl-newsletter-card ${isLive ? "" : "coming-soon"}`}>
-                  <div className="nl-newsletter-head">
-                    <h3 className="nl-newsletter-title">{nl.title}</h3>
-                    <span className={`nl-newsletter-status ${isLive ? "live" : "coming-soon"}`}>
-                      {isLive ? "● Live" : "◌ Coming soon"}
-                    </span>
-                  </div>
-                  <p className="nl-newsletter-desc">{nl.description}</p>
-                  <p className="nl-newsletter-template">
-                    Template · <strong>{nl.templateLabel}</strong>
-                    {templateVersions[nl.template] && (
-                      <> · {templateVersions[nl.template].version} ({templateVersions[nl.template].lastUpdated})</>
-                    )}
-                    {canTest && (
-                      <span className="nl-newsletter-template-hint"> · Trigger test to see it</span>
-                    )}
-                  </p>
-                  {canTest && (
-                    <div className="nl-upcoming-actions nl-card-actions" style={{ marginTop: 12 }}>
-                      {localeToggle(nl.id)}
-                      <button
-                        type="button"
-                        className="nl-upcoming-btn"
-                        disabled={busy || !!audienceConfirm}
-                        onClick={() => trigger({ issueNumber: 1, newsletterId: nl.id, locale: localeFor(nl.id) })}
-                        title="Send a test copy of this free-tier email to your address only — no real subscribers receive this." // i18n-allow: admin-only widget, operator surface, never shown to subscribers
-                      >
-                        Send test →
+                <div className="nl-tpl-meta">
+                  <span>Last sent <b>{formatWhen(hrow?.last_sent_at)}</b></span>
+                  <span>7d <b>{hrow?.sent ?? 0}</b> sent · <b>{hrow?.skipped ?? 0}</b> skip · <b>{hrow?.failed ?? 0}</b> fail</span>
+                  {ver?.lastUpdated && <span>Template <b>{ver.lastUpdated}</b></span>}
+                  <span>{tpl.trigger}</span>
+                </div>
+
+                {tpl.route && (
+                  <div className="nl-tpl-actions">
+                    <button type="button" className="nl-btn test" disabled={busy} onClick={() => trigger(tpl)}>
+                      Send test →
+                    </button>
+                    {tpl.audience && (
+                      <button type="button" className="nl-btn send" disabled={busy || confirmOpen} onClick={openAudienceConfirm}>
+                        Send to everyone
                       </button>
-                    </div>
-                  )}
-                  {/* Inline test-send feedback. The free section previously
-                      had a Send-test button but rendered NO status below it,
-                      so the operator got zero confirmation. free-welcome /
-                      welcome-back return synchronous sent/skipped/failed;
-                      free-weekly returns an async "dispatched" success. */}
-                  {cardStatus.kind === "pending" && (
-                    <p className="nl-result pending" style={{ marginTop: 8 }}>
-                      <span className="nl-status-icon" aria-hidden="true" />
-                      {nl.cadenceMode === "scheduled" ? "Dispatching workflow…" : "Sending…"}
-                    </p>
-                  )}
-                  {cardStatus.kind === "error" && (
-                    <p className="nl-result error" style={{ marginTop: 8 }}>
-                      ⚠ {cardStatus.message}
-                    </p>
-                  )}
-                  {cardStatus.kind === "failed" && (
-                    <p className="nl-result error" style={{ marginTop: 8 }}>
-                      ✗ Not sent — {welcomeReasonText(cardStatus.reason)}
-                    </p>
-                  )}
-                  {cardStatus.kind === "skipped" && (
-                    <p className="nl-result error" style={{ marginTop: 8 }}>
-                      ⊘ Not sent — {welcomeReasonText(cardStatus.reason)}
-                    </p>
-                  )}
-                  {cardStatus.kind === "sent" && (
-                    <div className="nl-success-card" style={{ marginTop: 8 }}>
-                      <p className="nl-success-head">
-                        <span className="nl-success-check" aria-hidden="true">✓</span>
-                        {cardStatus.dryRun ? "Rendered OK · dry-run (no email sent)" : "Sent ✓"}
-                      </p>
-                      <p className="nl-success-body">
-                        {cardStatus.dryRun ? (
-                          <>The dispatcher ran in <strong>DRY-RUN</strong>, so no real email went out. Set <strong>PULPO_NEWSLETTER_DRY_RUN=0</strong> in the Vercel env to send for real.</>
-                        ) : (
-                          <>Sent to <strong>{cardStatus.recipient}</strong> in <strong>{cardStatus.locale === "es" ? "Spanish" : "English"}</strong>. Subject: <strong>{welcomeSubject(nl.id, cardStatus.locale)}</strong>.{cardStatus.messageId ? <> · id <code>{cardStatus.messageId}</code></> : null}</>
-                        )}
-                      </p>
-                    </div>
-                  )}
-                  {cardStatus.kind === "success" && (
-                    <div className="nl-success-card" style={{ marginTop: 8 }}>
-                      <p className="nl-success-head">
-                        <span className="nl-success-check" aria-hidden="true">✓</span>
-                        Dispatched · test on the way
-                      </p>
-                      <p className="nl-success-body">
-                        Sending to <strong>{cardStatus.recipient}</strong>. Should land in ~30–60 seconds.
-                      </p>
-                      {cardStatus.runsUrl && (
-                        <p className="nl-success-footer">
-                          <a href={cardStatus.runsUrl} target="_blank" rel="noreferrer">
-                            View workflow run on GitHub →
-                          </a>
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
+                    )}
+                    {(tpl.route === "welcome" || tpl.route === "free") && localeToggle(tpl)}
+                  </div>
+                )}
 
-          {/* Per-browser log of trigger attempts (localStorage). Cap at
-              LOG_CAP rows so the row never grows unbounded. Empty state
-              renders a one-liner so the operator knows the panel exists
-              before they've fired anything. */}
-          <div className="nl-log">
-            <div className="nl-log-head">
-              <p className="nl-log-eyebrow">Recent test sends</p>
-              {log.length > 0 && (
-                <button type="button" className="nl-log-clear" onClick={clearLog}>
-                  Clear
-                </button>
-              )}
-            </div>
-            {log.length === 0 ? (
-              <p className="nl-log-empty">
-                No test sends yet — try one above.
-                {serverUnavailable ? (
-                  <>
-                    <br />
-                    <span style={{ color: "var(--ink-3)", fontSize: "12px" }}>
-                      You're only seeing sends from this browser. To see what other operators sent (and to see your own sends on other devices), ask your dev to add <code>POSTHOG_PERSONAL_API_KEY</code> and <code>POSTHOG_PROJECT_ID</code> to Vercel.
+                {/* inline status */}
+                {st.kind && (
+                  <div className={`nl-status ${st.kind}`}>
+                    <span className="nl-si" />
+                    <span>
+                      {st.message}
+                      {st.runsUrl && (
+                        <> · <a href={st.runsUrl} target="_blank" rel="noreferrer">view run →</a></>
+                      )}
                     </span>
-                  </>
-                ) : null}
-              </p>
-            ) : (
-              <table className="nl-log-table">
-                <thead>
-                  <tr>
-                    <th className="nl-log-when">When</th>
-                    <th className="nl-log-newsletter">Newsletter</th>
-                    <th className="nl-log-to">To</th>
-                    <th className="nl-log-locale">Lang</th>
-                    <th className="nl-log-by">By</th>
-                    <th className="nl-log-result">Result</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {log.map((entry, idx) => {
-                    // Pre-registry events have newsletter_id == null —
-                    // attribute those to Pro · Weekly, the only newsletter
-                    // that existed before the rollout.
-                    const nl = newsletterForId(entry.newsletter_id || "pro-weekly");
-                    return (
-                      <tr key={`${entry.at}-${idx}`}>
-                        <td className="nl-log-when" title={entry.at}>{formatLogWhen(entry.at)}</td>
-                        <td className="nl-log-newsletter">
-                          <span className={`nl-log-pill ${nl.tier}`}>{nl.tier}</span>
-                          {nl.title.replace(/^(Pro|Free)\s*·\s*/, "")}
-                        </td>
-                        <td className="nl-log-to" title={entry.to}>{entry.to}</td>
-                        <td className="nl-log-locale">{entry.locale}</td>
-                        <td className="nl-log-by" title={entry.by || ""}>{entry.by || "—"}</td>
-                        {(() => {
-                          // Accurate per-result label — not just ok-vs-Failed.
-                          // "dispatched" = weekly async (queued, not confirmed);
-                          // dry_run/skipped are NOT failures.
-                          const map = {
-                            ok:         ["✓ Sent", "ok"],
-                            dispatched: ["↗ Dispatched", ""],
-                            dry_run:    ["○ Dry-run", ""],
-                            skipped:    ["⊘ Skipped", ""],
-                            failed:     ["✗ Failed", "err"],
-                            error:      ["✗ Error", "err"],
-                          };
-                          const [label, cls] = map[entry.result] || [`✗ ${entry.result || "?"}`, "err"];
-                          return (
-                            <td className={`nl-log-result ${cls}`} title={entry.detail || ""}>
-                              {label}
-                            </td>
-                          );
-                        })()}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                  </div>
+                )}
+
+                {/* audience-send confirm (pro-weekly) */}
+                {confirmOpen && (
+                  <div className="nl-confirm">
+                    {audienceConfirm.phase === "loading_count" && <p>Counting live audience (Resend ∩ Clerk Pro)…</p>}
+                    {audienceConfirm.phase === "error" && (
+                      <>
+                        <h4>Couldn't start the send</h4>
+                        <p>{audienceConfirm.errorMessage}</p>
+                        <div className="nl-cactions">
+                          <button type="button" className="nl-btn cancel" onClick={() => setAudienceConfirm(null)}>Close</button>
+                        </div>
+                      </>
+                    )}
+                    {audienceConfirm.phase === "dispatched" && (
+                      <>
+                        <h4>Dispatched ✓</h4>
+                        <p>
+                          The weekly send is running to {audienceConfirm.audienceCount} readers.
+                          {audienceConfirm.runsUrl && <> <a href={audienceConfirm.runsUrl} target="_blank" rel="noreferrer">View run →</a></>}
+                        </p>
+                        <div className="nl-cactions">
+                          <button type="button" className="nl-btn cancel" onClick={() => setAudienceConfirm(null)}>Done</button>
+                        </div>
+                      </>
+                    )}
+                    {(audienceConfirm.phase === "ready" || audienceConfirm.phase === "submitting") && (
+                      <>
+                        <h4>Send the weekly to {audienceConfirm.audienceCount} readers?</h4>
+                        <p>This emails every Pro/Agency subscriber. Set the issue number, then type <code>SEND</code> to confirm.</p>
+                        <div className="nl-cfields">
+                          <input
+                            className="issue" type="number" min="1" max="9999"
+                            value={audienceConfirm.issueInput}
+                            onChange={(e) => setAudienceConfirm((p) => p ? { ...p, issueInput: e.target.value } : p)}
+                            placeholder="Issue #" // i18n-allow: admin-only operator surface
+                            disabled={audienceConfirm.phase === "submitting"}
+                          />
+                          <input
+                            className="confirm" type="text"
+                            value={audienceConfirm.typedConfirm}
+                            onChange={(e) => setAudienceConfirm((p) => p ? { ...p, typedConfirm: e.target.value } : p)}
+                            placeholder="type SEND" // i18n-allow: admin-only operator surface
+                            disabled={audienceConfirm.phase === "submitting"}
+                          />
+                        </div>
+                        <div className="nl-cactions">
+                          <button
+                            type="button" className="nl-btn send"
+                            disabled={!confirmReady || audienceConfirm.phase === "submitting"}
+                            onClick={submitAudienceConfirm}
+                          >
+                            {audienceConfirm.phase === "submitting" ? "Sending…" : `Send Issue ${issueValid ? Number(audienceConfirm.issueInput) : "—"} →`}
+                          </button>
+                          <button
+                            type="button" className="nl-btn cancel"
+                            disabled={audienceConfirm.phase === "submitting"}
+                            onClick={() => setAudienceConfirm(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {health.unavailable_reason && (
+            <p className="nl-conf-blocks">Health unavailable — {health.unavailable_reason}</p>
+          )}
+        </section>
+
+        {/* Activity log */}
+        <section className="nl-sec">
+          <div className="nl-log-head">
+            <p className="nl-sec-title" style={{ margin: 0 }}>Activity <span className="nl-count">PostHog + this device</span></p>
+            {localEntries.length > 0 && (
+              <button type="button" className="nl-log-clear" onClick={clearLog}>Clear local</button>
             )}
           </div>
+          <div className="nl-log" style={{ marginTop: 12 }}>
+            {log.length === 0 ? (
+              <div className="nl-log-empty">
+                {serverUnavailable
+                  ? `No activity yet. Cross-device log unavailable — ${serverUnavailable}`
+                  : "No test sends yet. Fire one above and it lands here."}
+              </div>
+            ) : log.map((e, i) => {
+              const tpl = TEMPLATES.find((t) => t.id === e.newsletter_id) || TEMPLATES[0];
+              const res = e.result || "ok";
+              return (
+                <div key={`${e.at}-${i}`} className="nl-log-row">
+                  <span className="nl-log-when">{formatWhen(e.at)}</span>
+                  <span className="nl-log-main">
+                    <b>{tpl.title}</b> → {e.to}
+                    <span className="nl-log-sub"> · {(e.locale || "en").toUpperCase()} · {e.by || "—"}{e.detail ? ` · ${e.detail}` : ""}</span>
+                  </span>
+                  <span className={`nl-res ${res}`}>{res.replace("_", "-")}</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
-          {/* PR-A (2026-05-31): the global success/pending/error block
-              that used to live here is gone — status now renders
-              inline UNDER the specific newsletter card that was
-              triggered (see the `statusFor(...)` blocks inside each
-              card body above). The "Recent test sends" table above
-              still gives the cross-device audit log. */}
-        </div>
       </div>
     </>
   );

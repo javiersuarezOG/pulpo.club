@@ -141,11 +141,19 @@ describe("api/admin/newsletter/trigger-audience-send", () => {
 });
 
 describe("api/admin/newsletter write endpoints auth", () => {
-  it("requires admin bearer auth on all newsletter write triggers", () => {
+  it("admin surface is intentionally open — no requireAdminAuth gate on the triggers", () => {
+    // Operator decision 2026-06-10: the PULPO_ADMIN_DEBUG_TOKEN gate was
+    // removed from /admin entirely. This test pins that decision so a
+    // future re-introduction of the gate is a deliberate, visible change.
     for (const src of [sendSrc, previewSrc, welcomeTestSrc, freeWelcomeTestSrc]) {
-      expect(src).toMatch(/requireAdminAuth/);
-      expect(src).toMatch(/if \(!requireAdminAuth\(req, res\)\) return/);
+      expect(src).not.toMatch(/requireAdminAuth/);
     }
+  });
+
+  it("the high-blast audience send keeps its type-to-confirm SEND gate", () => {
+    // Removing auth does NOT remove the guardrail on the one path that
+    // emails every Pro subscriber — the literal "SEND" confirm must stay.
+    expect(sendSrc).toMatch(/SEND/);
   });
 
   it("free welcome tests use the dedicated synchronous endpoint, not the weekly preview workflow", () => {

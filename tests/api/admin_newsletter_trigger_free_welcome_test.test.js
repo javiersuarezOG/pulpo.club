@@ -44,11 +44,17 @@ describe("trigger-free-welcome-test → internal endpoint", () => {
     delete process.env.PULPO_SITE_ROOT;
   });
 
-  it("requires the admin bearer token", async () => {
+  it("does NOT require an admin bearer token (admin surface is open by design)", async () => {
+    // The PULPO_ADMIN_DEBUG_TOKEN gate was removed 2026-06-10. With no
+    // Authorization header the endpoint must still proceed to the
+    // internal send — never a 401.
+    const fetchImpl = vi.fn(async () => ({
+      status: 200, json: async () => ({ status: "sent", message_id: "re_x", dry_run: false }),
+    }));
     const res = mockRes();
-    await handler(mockReq({ email: "me@pulpo.club" }, { authorization: "" }), res, { fetchImpl: vi.fn() });
-    expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("unauthorized");
+    await handler(mockReq({ email: "me@pulpo.club" }, { authorization: "" }), res, { fetchImpl });
+    expect(res.statusCode).not.toBe(401);
+    expect(res.body.status).toBe("sent");
   });
 
   it("forwards free welcome-back variant/locale and returns status:sent", async () => {

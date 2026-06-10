@@ -25,8 +25,10 @@
 // how many. Returns { run_url_hint, dispatched_at } so the UI can
 // link the operator to the workflow run.
 //
-// Auth: PULPO_ADMIN_DEBUG_TOKEN bearer via requireAdminAuth(), plus the
-// SEND gate and 1/hour rate-limit. The GitHub PAT stays server-side.
+// Auth: none — the /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed).
+// The type-to-confirm SEND gate and 1/hour rate-limit are the remaining
+// guardrails on this high-blast path. The GitHub PAT stays server-side.
 //
 // Dispatch verification: GitHub's workflow_dispatch POST returns 204
 // on accepted payload, but the run is created async and can be
@@ -39,7 +41,6 @@
 // error instead of "Sent Issue N to X readers."
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
-const { requireAdminAuth } = require("../../_admin_auth");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
@@ -106,7 +107,8 @@ module.exports = async (req, res) => {
     logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
     return res.status(405).json({ error: "method_not_allowed" });
   }
-  if (!requireAdminAuth(req, res)) return;
+  // No auth gate — admin surface is open by design (see header). The
+  // type-to-confirm SEND gate below is the guardrail on this path.
 
   // Validation FIRST, rate-limit AFTER. The rate-limiter exists to
   // prevent runaway REAL sends (one per hour cap); it should only

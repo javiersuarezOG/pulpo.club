@@ -27,9 +27,10 @@
 // workflow real subscribers receive guarantees the preview matches the
 // production cut byte-for-byte.
 //
-// Auth: PULPO_ADMIN_DEBUG_TOKEN bearer via requireAdminAuth(), plus a
-// rate-limit. The GitHub PAT stays server-side and only dispatches this
-// workflow; the admin bearer is the operator-facing gate.
+// Auth: none. The /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed).
+// The rate-limit below is the only throttle. The GitHub PAT stays
+// server-side and only dispatches this workflow.
 //
 // Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
 // AND a real Resend send — cheap insurance against a stuck-button loop).
@@ -45,7 +46,6 @@
 // the widget surfaces a real error and the operator can retry.
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
-const { requireAdminAuth } = require("../../_admin_auth");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
 
@@ -152,7 +152,7 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
-  if (!requireAdminAuth(req, res)) return;
+  // No auth gate — admin surface is open by design (see header).
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {

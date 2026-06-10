@@ -40,9 +40,9 @@ export type AdminWidgetCategory = "comms" | "data" | "ops";
 export const ADMIN_WIDGETS: readonly AdminWidget[] = [
   {
     slug: "newsletter",
-    label: "Newsletter preview",
+    label: "Newsletter console",
     description:
-      "Trigger the production newsletter pipeline to send three cohort variants (anonymous, free, pro) of the next issue to any email. Routes through GitHub Actions — ~30–60s lag, real Resend send.",
+      "One row per template: live version (from _common.py), 7-day deliverability + last-sent (PostHog), audience count (Resend∩Clerk), and a config strip that shows missing secrets up front. Test-send any template; blast the weekly to all Pro subscribers behind a type-to-confirm gate.",
     category: "comms",
     Component: NewsletterWidget,
   },

@@ -29,26 +29,30 @@ _WIDGET_PATH = _REPO_ROOT / "web" / "app" / "admin" / "widgets" / "newsletter" /
 
 
 def _template_ids_from_widget() -> set[str]:
-    """Pull every `template: "…"` literal out of NewsletterWidget.jsx.
+    """Pull every `templateId: "…"` literal out of NewsletterWidget.jsx.
 
-    The widget's NEWSLETTERS array is hand-edited (no JSON / no build
+    The widget's TEMPLATES array is hand-edited (no JSON / no build
     step), so a regex over the source is more reliable than a JS
     parser. If the widget ever switches to a different declaration
     shape, update this regex + the matching helper in the widget.
+
+    (Pre-2026-06-10 the field was `template:`; the console rewrite
+    renamed it to `templateId:` — `templateId: null` rows like the
+    Activation system email carry no quote and are correctly skipped.)
     """
     src = _WIDGET_PATH.read_text(encoding="utf-8")
-    # Match `template: "<id>"` inside the NEWSLETTERS literal.
+    # Match `templateId: "<id>"` inside the TEMPLATES literal.
     # Allows single OR double quotes; ids are kebab-case ASCII.
-    pattern = re.compile(r'template\s*:\s*[\'\"]([a-z0-9][a-z0-9\-]*)[\'\"]')
+    pattern = re.compile(r'templateId\s*:\s*[\'\"]([a-z0-9][a-z0-9\-]*)[\'\"]')
     return set(pattern.findall(src))
 
 
 def test_template_ids_align_widget_to_python():
-    """Every `template: "…"` in the widget must be a key in TEMPLATES."""
+    """Every `templateId: "…"` in the widget must be a key in TEMPLATES."""
     widget_ids = _template_ids_from_widget()
     assert widget_ids, (
-        "No `template:` field found in NewsletterWidget.jsx — the regex "
-        "may need updating after a refactor of the NEWSLETTERS array shape."
+        "No `templateId:` field found in NewsletterWidget.jsx — the regex "
+        "may need updating after a refactor of the TEMPLATES array shape."
     )
     python_ids = set(TEMPLATES.keys())
     missing_in_python = widget_ids - python_ids

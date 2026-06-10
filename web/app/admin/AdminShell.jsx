@@ -5,16 +5,16 @@
 //   - `/admin/<slug>`       → the matching widget's Component, wrapped in a
 //                             consistent header with back-to-grid link
 //
-// /admin is browseable, but write tools are bearer-gated. The operator
-// enters PULPO_ADMIN_DEBUG_TOKEN once; adminFetch threads it to the
-// /api/admin/* write endpoints where requireAdminAuth() checks it.
+// /admin is fully open — no token gate (operator decision 2026-06-10).
+// Anyone who reaches the page can use the tools; the server endpoints
+// keep their own rate limits and per-action confirm gates (e.g. the
+// newsletter audience send's type-to-confirm SEND).
 //
 // Widgets that need state/coordination across pages can use sessionStorage
 // or React context — this shell intentionally passes nothing in.
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ADMIN_WIDGETS, findWidget } from "./widgets/registry.ts";
-import { clearAdminToken, hasAdminToken, setAdminToken } from "./lib/admin-token.ts";
 
 const SHELL_STYLES = `
 .page-admin {
@@ -47,56 +47,6 @@ const SHELL_STYLES = `
   color: var(--ink-2);
   margin: 0 0 24px;
   max-width: 56ch;
-}
-.page-admin .admin-banner {
-  border: 1px solid var(--line-2);
-  background: var(--paper-2);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 13px;
-  line-height: 20px;
-  color: var(--ink-2);
-  margin: 0 0 32px;
-}
-.page-admin .admin-banner strong { color: var(--ink); }
-.page-admin .admin-token-card {
-  max-width: 460px;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  border-radius: 8px;
-  padding: 18px;
-}
-.page-admin .admin-token-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-.page-admin .admin-token-row input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-  background: var(--paper-2);
-  color: var(--ink);
-  font: inherit;
-  padding: 9px 10px;
-}
-.page-admin .admin-token-row button,
-.page-admin .admin-token-clear {
-  border: 1px solid var(--ink);
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--paper);
-  font: inherit;
-  font-weight: 600;
-  padding: 9px 12px;
-  cursor: pointer;
-}
-.page-admin .admin-token-clear {
-  margin-top: 10px;
-  background: transparent;
-  color: var(--ink-2);
-  border-color: var(--line-2);
 }
 
 .page-admin .widget-grid {
@@ -171,8 +121,6 @@ const SHELL_STYLES = `
 export function AdminPage({ app }) {
   const adminWidget = app?.routeParams?.adminWidget ?? null;
   const widget = findWidget(adminWidget);
-  const [tokenOk, setTokenOkState] = useState(() => hasAdminToken());
-  const [tokenDraft, setTokenDraft] = useState("");
 
   // Belt-and-braces noindex — `robots.txt` already disallows /admin
   // for compliant crawlers; this meta tag covers anyone who skips it.
@@ -232,24 +180,6 @@ export function AdminPage({ app }) {
     // popstate dispatch above triggers the app's existing listener.
   }, []);
 
-  useEffect(() => {
-    const onInvalid = () => setTokenOkState(false);
-    window.addEventListener("pulpo:admin-token-invalid", onInvalid);
-    return () => window.removeEventListener("pulpo:admin-token-invalid", onInvalid);
-  }, []);
-
-  const saveToken = (e) => {
-    e.preventDefault();
-    setAdminToken(tokenDraft);
-    setTokenOkState(hasAdminToken());
-    setTokenDraft("");
-  };
-
-  const forgetToken = () => {
-    clearAdminToken();
-    setTokenOkState(false);
-  };
-
   return (
     <>
       <style>{SHELL_STYLES}</style>
@@ -262,33 +192,7 @@ export function AdminPage({ app }) {
             </button>
             <h1 id="admin-title" className="admin-title">{widget.label}</h1>
             <p className="admin-subhead">{widget.description}</p>
-            <div className="admin-banner">
-              <strong>Protected actions —</strong> newsletter send/preview calls
-              require the admin bearer token. Keep it private; it unlocks real
-              email sends from this browser.
-            </div>
-            {!tokenOk ? (
-              <form className="admin-token-card" onSubmit={saveToken}>
-                <p className="wc-desc">Enter the admin token to use write tools.</p>
-                <div className="admin-token-row">
-                  <input
-                    type="password"
-                    value={tokenDraft}
-                    onChange={(e) => setTokenDraft(e.target.value)}
-                    placeholder="Admin token" // i18n-allow: admin-only widget, operator surface, never shown to end users
-                    autoComplete="off"
-                  />
-                  <button type="submit">Unlock</button>
-                </div>
-              </form>
-            ) : (
-              <>
-                <button type="button" className="admin-token-clear" onClick={forgetToken}>
-                  Lock admin actions
-                </button>
-                <widget.Component />
-              </>
-            )}
+            <widget.Component />
           </>
         ) : (
           <>
@@ -296,11 +200,6 @@ export function AdminPage({ app }) {
             <p className="admin-subhead">
               Internal Pulpo tools. Pick a widget below to get started.
             </p>
-            <div className="admin-banner">
-              <strong>Heads up —</strong> write actions require the admin token.
-              Browsing this page is open, but sends and publishing tools are
-              bearer-gated server-side.
-            </div>
             {ADMIN_WIDGETS.length === 0 ? (
               <div className="widget-empty">No widgets registered yet.</div>
             ) : (
