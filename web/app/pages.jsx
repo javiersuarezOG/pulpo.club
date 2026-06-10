@@ -1176,6 +1176,12 @@ function BrowsePage({ app }) {
   const [mapBbox, setMapBbox] = pUseState(() =>
     typeof window !== "undefined" ? readBboxFromURL(window.location.search) : null,
   );
+  // WS4 map↔search sync — fitNonce is the parent→MapView "refit to the
+  // matches" signal; didInitMapRef skips the entry run so an inbound ?bbox=
+  // deep-link survives (unless a text query is active — that's authoritative).
+  const [fitNonce, setFitNonce] = pUseState(0);
+  const didInitMapRef = pUseRef(false);
+  const searchSigRef = pUseRef(null);
   const hoverSourceRef = pUseRef(null); // "card" | "map" — gates scroll-into-view
   const cardPanelRef = pUseRef(null);
 
@@ -1385,6 +1391,11 @@ function BrowsePage({ app }) {
     );
   }, [results, view, searchAsIMove, mapBbox]);
 
+  // In map view every visible count reflects what's actually shown
+  // (mapResults) so the list, the map, and the header never disagree —
+  // after a fresh search mapResults===results; after a pan both narrow.
+  const displayCount = view === "map" ? mapResults.length : results.length;
+
   const handleMapBounds = pUseCallback((bbox) => {
     setMapBbox(bbox);
     writeBboxToURL(bbox);
@@ -1392,6 +1403,12 @@ function BrowsePage({ app }) {
   const handleToggleSearchAsIMove = pUseCallback((on) => {
     setSearchAsIMove(on);
     if (!on) { setMapBbox(null); writeBboxToURL(null); }
+  }, []);
+  // Empty-in-view escape hatch: clear the viewport filter and refit to all
+  // matches (same path the authoritative-search refit uses).
+  const handleShowAllInView = pUseCallback(() => {
+    setMapBbox(null); writeBboxToURL(null);
+    setFitNonce((n) => n + 1);
   }, []);
   const handleMarkerHover = pUseCallback((id) => { hoverSourceRef.current = "map"; setHoveredId(id); }, []);
   const handleCardHover = pUseCallback((id) => { hoverSourceRef.current = "card"; setHoveredId(id); }, []);
@@ -1409,6 +1426,47 @@ function BrowsePage({ app }) {
   pUseEffect(() => {
     if (view !== "map" && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
   }, [view]);
+
+  // Map↔search sync — the search/filters are authoritative over the map
+  // viewport: a real search change drops the stale viewport bbox and tells
+  // MapView to refit to the matches. We key off an explicit SIGNATURE of the
+  // search intent (query+sort+filters), NOT the `results` array identity.
+  // `results` churns during mount (the URL→filters re-seed + the 300ms
+  // debounce, doubled under StrictMode) WITHOUT the search actually changing;
+  // keying the effect off `results` made that hydration churn race the entry
+  // latch and wrongly clear an inbound ?bbox= deep-link. `searchSig` is a
+  // primitive string derived from debouncedFilters, so React's own dependency
+  // check on the effect below short-circuits it whenever the intent is
+  // unchanged — the effect simply never fires on hydration churn.
+  const searchSig = pUseMemo(() => JSON.stringify([
+    debouncedFilters.query || "", sort,
+    [...debouncedFilters.zones].sort(), [...debouncedFilters.land_types].sort(),
+    [...debouncedFilters.features].sort(), [...debouncedFilters.infra].sort(),
+    [...debouncedFilters.status].sort(),
+    debouncedFilters.price_min, debouncedFilters.price_max,
+    debouncedFilters.readiness, debouncedFilters.rank_max,
+  ]), [debouncedFilters, sort]);
+
+  pUseEffect(() => {
+    if (view !== "map") { didInitMapRef.current = false; searchSigRef.current = null; return; }
+    if (!didInitMapRef.current) {
+      // ENTRY (first map render): latch the baseline signature and PRESERVE an
+      // inbound ?bbox= deep-link (PR-9 shareable viewport) — UNLESS a text
+      // query is active, which is authoritative over a stale viewport (handles
+      // ?q=…&bbox=elsewhere). We never clear bbox on hydration here: the effect
+      // only re-runs when `searchSig` genuinely changes (primitive dep).
+      didInitMapRef.current = true;
+      searchSigRef.current = searchSig;
+      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+      setFitNonce((n) => n + 1);
+      return;
+    }
+    if (searchSig === searchSigRef.current) return; // unchanged intent — ignore
+    // Genuine post-init search change: the viewport is now stale → refit.
+    searchSigRef.current = searchSig;
+    setMapBbox(null); writeBboxToURL(null);
+    setFitNonce((n) => n + 1);
+  }, [searchSig, view]);
 
   // Mobile map mode is a viewport surface, not a long Browse document.
   // Toggle a body class only while the mobile media query matches so
@@ -1432,6 +1490,39 @@ function BrowsePage({ app }) {
     return () => {
       mq.removeListener(sync);
       document.body.classList.remove(cls);
+    };
+  }, [view]);
+
+  // Mobile map height keys off the REAL header height, not a hardcoded 72px.
+  // The .topnav grows/shrinks with auth state (signed-out vs Pro), locale
+  // wrapping, and viewport — a fixed offset re-breaks the map layout whenever
+  // any of those change. Measure .topnav and publish it as
+  // --map-mobile-top-offset while the mobile map surface is active; clear it on
+  // exit so the token default (72px) applies everywhere else.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return undefined;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const root = document.documentElement;
+    const PROP = "--map-mobile-top-offset";
+    const header = document.querySelector(".topnav");
+    const apply = () => {
+      if (view !== "map" || !mq.matches || !header) { root.style.removeProperty(PROP); return; }
+      const h = Math.round(header.getBoundingClientRect().height);
+      if (h > 0) root.style.setProperty(PROP, `${h}px`);
+    };
+    apply();
+    let ro;
+    if (view === "map" && header && typeof ResizeObserver === "function") {
+      ro = new ResizeObserver(apply);
+      ro.observe(header);
+    }
+    mq.addEventListener?.("change", apply);
+    window.addEventListener("resize", apply);
+    return () => {
+      ro?.disconnect();
+      mq.removeEventListener?.("change", apply);
+      window.removeEventListener("resize", apply);
+      root.style.removeProperty(PROP);
     };
   }, [view]);
 
@@ -1534,13 +1625,13 @@ function BrowsePage({ app }) {
       <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">
-          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
+          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={displayCount} app={app} />
         </div>
         <div className="results-col">
           <BrowseSearchBar
             value={filters.query || ""}
             onChange={(next) => setFiltersWithPinClear({ ...filters, query: next })}
-            resultCount={results.length}
+            resultCount={displayCount}
             locale={app.locale}
             listings={LISTINGS}
             filters={filters}
@@ -1553,11 +1644,11 @@ function BrowsePage({ app }) {
                 // URL `cat=` slug. See resolveResultsHeader's docblock —
                 // without this, switching from Lake to Beach (etc.) left
                 // the original slug pinned at the top of the page.
-                const header = resolveResultsHeader(filters, app.locale, results.length);
+                const header = resolveResultsHeader(filters, app.locale, displayCount);
                 if (!header) {
                   return (
                     <>
-                      <span className="num">{results.length}</span> {t("card.listings_count", app.locale)}
+                      <span className="num">{displayCount}</span> {t("card.listings_count", app.locale)}
                     </>
                   );
                 }
@@ -1567,11 +1658,11 @@ function BrowsePage({ app }) {
                     <span className="results-cat-meta">
                       {header.meta ? (
                         <>
-                          <span className="num">{results.length}</span> {t("browse.top10.of_ten", app.locale)}
+                          <span className="num">{displayCount}</span> {t("browse.top10.of_ten", app.locale)}
                         </>
                       ) : (
                         <>
-                          <span className="num">{results.length}</span> {t("browse.in_country", app.locale)}
+                          <span className="num">{displayCount}</span> {t("browse.in_country", app.locale)}
                         </>
                       )}
                       <button
@@ -1685,8 +1776,23 @@ function BrowsePage({ app }) {
                   onBoundsChange={handleMapBounds}
                   searchAsIMove={searchAsIMove}
                   onToggleSearchAsIMove={handleToggleSearchAsIMove}
+                  fitNonce={fitNonce}
                 />
               </React.Suspense>
+              {/* Search-as-I-move narrowed the viewport to nothing (the
+                  outer guard guarantees results.length > 0 here, so this is
+                  the "no matches in THIS area" case, never "no matches"). */}
+              {mapResults.length === 0 && (
+                <div className="map-empty-inview" role="status">
+                  <p className="map-empty-inview__title">{t("map.empty_in_view.title", app.locale)}</p>
+                  <button className="map-empty-inview__primary" onClick={handleShowAllInView}>
+                    {t("map.empty_in_view.show_all", app.locale, { n: results.length })}
+                  </button>
+                  <button className="map-empty-inview__secondary" onClick={() => handleToggleSearchAsIMove(false)}>
+                    {t("map.empty_in_view.turn_off_saim", app.locale)}
+                  </button>
+                </div>
+              )}
               {/* Mobile-only (CSS): floating Filters pill + bottom sheet
                   with the result cards. Desktop uses the split-pane panel. */}
               <button

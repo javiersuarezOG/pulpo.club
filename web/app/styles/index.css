@@ -1399,8 +1399,33 @@ h1,h2,h3,h4,h5 { margin: 0; }
 /* ====== Map view (WS4 PR-7) ====== */
 /* PR-9 — desktop split-pane: scrollable card panel ↔ map. Mobile keeps
    the map full-width (the bottom sheet lands in PR-10). */
-.map-split { display: block; }
+.map-split { display: block; position: relative; }
 .map-split__cards { display: none; }
+
+/* Empty-in-view escape hatch — search-as-I-move narrowed the viewport to
+   zero matches (but the search itself has matches elsewhere). Centered
+   over the map so the user always has a way back to all results. */
+.map-empty-inview {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-map-ui);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
+  max-width: 320px; width: calc(100% - var(--space-6));
+  padding: var(--space-5); text-align: center;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-2);
+}
+.map-empty-inview__title { color: var(--ink); font-weight: 650; font-size: 15px; }
+.map-empty-inview__primary {
+  padding: 10px 18px; border-radius: 999px;
+  background: var(--accent); color: var(--paper); border: none;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.map-empty-inview__secondary {
+  background: none; border: none; color: var(--ink-3);
+  font-size: 13px; cursor: pointer; text-decoration: underline;
+}
 @media (min-width: 768px) {
   .map-split { display: flex; align-items: flex-start; gap: var(--space-4); }
   .map-split__cards {
@@ -1525,6 +1550,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
     overflow: hidden;
   }
   .map-sheet-row {
+    position: relative;
     display: grid;
     grid-template-columns: 58px minmax(0, 1fr) 32px;
     gap: var(--space-3);
@@ -1538,7 +1564,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .map-sheet-row:first-child {
     border-top: 0;
   }
-  .map-sheet-row:focus-visible,
+  /* Stretched primary-action button — covers the row, sits beneath the heart. */
+  .map-sheet-row__open {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .map-sheet-row__open:focus-visible,
   .map-sheet-row.is-highlighted {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
@@ -1599,6 +1637,8 @@ h1,h2,h3,h4,h5 { margin: 0; }
     font-weight: 700;
   }
   .map-sheet-row__heart {
+    position: relative; /* raised above the stretched .map-sheet-row__open button */
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;
