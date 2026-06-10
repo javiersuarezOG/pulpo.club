@@ -6,8 +6,11 @@
 // Operator surface for the DB-free Pulpo Free Welcome / Welcome-back
 // templates. Calls /api/internal/free-welcome-send synchronously and
 // returns the real sent / skipped / failed outcome.
+//
+// Auth: none — the /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed);
+// the rate-limit is the only throttle.
 
-const { requireAdminAuth } = require("../../_admin_auth");
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
 
@@ -100,7 +103,7 @@ async function handler(req, res, { fetchImpl } = {}) {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
-  if (!requireAdminAuth(req, res)) return;
+  // No auth gate — admin surface is open by design (see header).
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
