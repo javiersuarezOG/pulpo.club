@@ -1125,6 +1125,7 @@ const STATUS_CHIP_KEYS = {
   new: "filter.ranking.new",
 };
 function statusChipLabel(v, lc) {
+  // i18n-allow: capitalize() safety net after the closed-set t() guard above
   return STATUS_CHIP_KEYS[v] ? t(STATUS_CHIP_KEYS[v], lc) : capitalize(v.replace(/_/g, " "));
 }
 
@@ -1613,6 +1614,7 @@ function BrowsePage({ app }) {
     // good enough — Google reads the trail as breadcrumb context, not
     // marketing copy. Full localization lives in the page <title> +
     // meta description set by useDocumentMeta.
+    // i18n-allow: SEO breadcrumb leaf; full localization is in the page <title>/meta
     const leaf = browseCat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     browseBreadcrumb.push({
       name: leaf,
@@ -2462,6 +2464,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
     const v = listing.beachfront_tier;
     const beachValue = BEACHFRONT_ENUMS.has(v)
       ? t(`detail.fact.beachfront_tier.${v}`, lc)
+      // i18n-allow: capitalize() safety net after the closed-set t() guard
       : capitalize(v.replace("_", " "));
     facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: beachValue });
   }

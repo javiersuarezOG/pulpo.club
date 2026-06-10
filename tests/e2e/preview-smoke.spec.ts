@@ -674,6 +674,29 @@ test.describe("New app boots cleanly on key routes", () => {
       const hit = ariaLabels.find((l) => l.includes(word));
       expect(hit, `aria-label still in English: "${word}" — wire via t()`).toBeUndefined();
     }
+
+    // Non-default render states — the scans above only cover the home, the
+    // default card view, and the detail panel. The active-filter chips +
+    // results-table headers leaked precisely BECAUSE no canary ever rendered
+    // them (table view, applied facets). Drive those states in ES and scan the
+    // whole canary set against them, so the next leak in these views is caught
+    // too — not just the chip/header words. (Locale persists from above.)
+    await page.setViewportSize({ width: 1280, height: 800 }); // desktop → real <table> headers
+    await page.goto("/browse?view=table&features=ocean_view&status=price_drop", {
+      waitUntil: "networkidle",
+    });
+    await page.locator(".results-table thead, .active-filter-row").first().waitFor({
+      state: "visible",
+      timeout: 10_000,
+    });
+    await page.waitForTimeout(500);
+    const tableFacetText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of ENGLISH_CANARIES) {
+      expect(
+        tableFacetText,
+        `Spanish locale leaked English text in table/facet view: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
+    }
   });
 
   // Mirror of the EN-into-ES canary above: English-locale users must not

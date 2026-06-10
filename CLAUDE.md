@@ -407,6 +407,61 @@ Add the language code to `LOCALES` at the top of `i18n.jsx`. Every existing entr
 
 When you add a new translatable string, **also add an English canary for it to the smoke test if it's the kind of word that would silently look fine in English**. Cheap insurance.
 
+## NEVER ship a silent i18n leak again (post-2026-06-10)
+
+Two Spanish leaks shipped to **production** and were found by a manual
+browser walk, not by CI: the `/browse` active-filter chips rendered raw
+enum slugs (`ocean view`, `price drop`) and the results-table column
+headers were hardcoded English — both shown to Spanish-first LATAM users
+on a paid surface. Three things conspired:
+
+1. **A producer that didn't reuse its consumer's keys.** The FilterPanel
+   rendered `t("filter.feature.ocean_view")` → "Vista al mar", but the
+   active-filter *row* re-humanized the raw slug. The keys existed; the
+   second render site bypassed them.
+2. **The enum-render trap** — `{f.replace("_", " ")}` humanizes a slug
+   into English in *every* locale (the same class as the `road_access`
+   example above).
+3. **A canary blind to non-default states.** `preview-smoke.spec.ts`
+   only ever rendered the home, the default *card* view, and the detail
+   panel — it never drove table view or an applied facet, so the leaking
+   DOM was never scanned. "Add a canary word" was necessary but
+   insufficient.
+
+Three defenses now exist — keep all three healthy:
+
+1. **Telemetry — `t()` self-reports leaks.** When a non-default-locale
+   lookup falls back to English (or the raw key), `t()` fires
+   `i18n.fallback_used { key, locale }` (deduped once per key+locale per
+   session; never throws; no-op off-browser). **PostHog alert: any
+   `i18n.fallback_used` with `locale=es` in prod = a live leak — the
+   `key` names the exact `UI_STRINGS` row to fix.** This is the catch-all
+   that sees leaks in *any* render state a test didn't think to drive. Do
+   not silence it by widening the dedupe or removing the call.
+2. **Static lint — the enum-render trap is banned in CI.**
+   [`scripts/i18n_lint.mjs`](scripts/i18n_lint.mjs) (already wired in
+   `ci.yml`) flags `{x.replace("_", " ")}`-style humanizing in JSX/TSX
+   render files in addition to hardcoded JSX attribute strings. Fix it
+   with a closed-set `t()` guard; a legitimate site (the `capitalize()`
+   safety net *after* a `t()` guard, an SEO slug, a dev-only control) is
+   exempted with `// i18n-allow: <reason>` on the same or preceding line.
+   Do not blanket-exempt — each marker must carry a reason.
+3. **Canary state-sweep.** The ES canary in `preview-smoke.spec.ts` now
+   also drives `/browse?view=table&features=…&status=…` at desktop width
+   and scans the full canary set against the rendered table + active
+   filters. Any new user-facing render state (a new view, a new panel)
+   that can show enum/label text should be added to this sweep, not just
+   the default views.
+
+**Mandatory for any PR that renders an enum/closed-set value to the
+user:** look it up through the *same* `t()` keys the canonical control
+uses (don't re-humanize the slug); if no key exists, add the closed-set
+key set first. The lint blocks the `replace` form at the wire; the
+telemetry turns anything that slips through into a prod alert; the canary
+sweep catches it in the states a test renders. A leak that survives all
+three means a brand-new render state nobody scanned — add it to the
+sweep when you find it.
+
 ## Geocoding & beach reference table
 
 Coastal listings get their lat/lng from a single LLM call (DeepSeek). The
