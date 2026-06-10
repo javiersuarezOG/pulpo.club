@@ -1415,36 +1415,44 @@ function BrowsePage({ app }) {
 
   // Map↔search sync — the search/filters are authoritative over the map
   // viewport: a real search change drops the stale viewport bbox and tells
-  // MapView to refit to the matches. We key off a SIGNATURE of the search
-  // intent (query+sort+filters), NOT the `results` array identity — `results`
-  // also churns during mount (the URL→filters re-seed effect + the 300ms
-  // debounce, doubled under StrictMode), and treating that churn as a user
-  // search would wrongly clear an inbound ?bbox= deep-link. The signature is
-  // built from debouncedFilters so it stays in phase with `results`.
+  // MapView to refit to the matches. We key off an explicit SIGNATURE of the
+  // search intent (query+sort+filters), NOT the `results` array identity.
+  // `results` churns during mount (the URL→filters re-seed + the 300ms
+  // debounce, doubled under StrictMode) WITHOUT the search actually changing;
+  // keying the effect off `results` made that hydration churn race the entry
+  // latch and wrongly clear an inbound ?bbox= deep-link. `searchSig` is a
+  // primitive string derived from debouncedFilters, so React's own dependency
+  // check on the effect below short-circuits it whenever the intent is
+  // unchanged — the effect simply never fires on hydration churn.
+  const searchSig = pUseMemo(() => JSON.stringify([
+    debouncedFilters.query || "", sort,
+    [...debouncedFilters.zones].sort(), [...debouncedFilters.land_types].sort(),
+    [...debouncedFilters.features].sort(), [...debouncedFilters.infra].sort(),
+    [...debouncedFilters.status].sort(),
+    debouncedFilters.price_min, debouncedFilters.price_max,
+    debouncedFilters.readiness, debouncedFilters.rank_max,
+  ]), [debouncedFilters, sort]);
+
   pUseEffect(() => {
     if (view !== "map") { didInitMapRef.current = false; searchSigRef.current = null; return; }
-    const f = debouncedFilters;
-    const sig = JSON.stringify([
-      f.query || "", sort,
-      [...f.zones].sort(), [...f.land_types].sort(), [...f.features].sort(),
-      [...f.infra].sort(), [...f.status].sort(),
-      f.price_min, f.price_max, f.readiness, f.rank_max,
-    ]);
     if (!didInitMapRef.current) {
-      // ENTRY: preserve an inbound ?bbox= deep-link (PR-9 shareable viewport)
-      // — UNLESS a text query is active, which is authoritative over a stale
-      // viewport (handles ?q=…&bbox=elsewhere).
+      // ENTRY (first map render): latch the baseline signature and PRESERVE an
+      // inbound ?bbox= deep-link (PR-9 shareable viewport) — UNLESS a text
+      // query is active, which is authoritative over a stale viewport (handles
+      // ?q=…&bbox=elsewhere). We never clear bbox on hydration here: the effect
+      // only re-runs when `searchSig` genuinely changes (primitive dep).
       didInitMapRef.current = true;
-      searchSigRef.current = sig;
-      if (tokenize(f.query).length > 0 && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+      searchSigRef.current = searchSig;
+      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
       setFitNonce((n) => n + 1);
       return;
     }
-    if (sig === searchSigRef.current) return; // results churned but the search didn't — ignore
-    searchSigRef.current = sig;
+    if (searchSig === searchSigRef.current) return; // unchanged intent — ignore
+    // Genuine post-init search change: the viewport is now stale → refit.
+    searchSigRef.current = searchSig;
     setMapBbox(null); writeBboxToURL(null);
     setFitNonce((n) => n + 1);
-  }, [results, view]);
+  }, [searchSig, view]);
 
   // Mobile map mode is a viewport surface, not a long Browse document.
   // Toggle a body class only while the mobile media query matches so
