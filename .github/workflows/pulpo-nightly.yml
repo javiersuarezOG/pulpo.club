@@ -159,6 +159,17 @@ jobs:
         env:
           PULPO_OFFLINE: "0"
           PULPO_LIMIT: "1000"
+          # Crawl the per-source scrapers concurrently (PR #817). Sources are
+          # independent and each keeps its OWN per-host RateLimiter, so this
+          # does NOT raise the request rate to any single site — wall-clock
+          # drops from the SUM of per-source durations toward the MAX. Output
+          # is bit-identical: outcomes merge back in source order before
+          # ranking (the ranker's stable sort lets input order break ties),
+          # proven by tests/test_scrape_concurrency.py.
+          # Repo-variable escape hatch: set PULPO_SCRAPE_CONCURRENCY=1 in
+          # Settings → Variables → Actions to instantly fall back to the old
+          # sequential path with NO code change / NO revert PR.
+          PULPO_SCRAPE_CONCURRENCY: ${{ vars.PULPO_SCRAPE_CONCURRENCY || '6' }}
           # Disabled sources (re-add when the blocker is resolved):
           #   kazu              — Nuxt SPA, panel API denylisted; needs headless browser
           #
