@@ -62,6 +62,7 @@ from automation.posthog_client import (  # noqa: E402
 import hashlib  # noqa: E402
 import io      # noqa: E402
 import time as _time  # noqa: E402
+import concurrent.futures  # noqa: E402
 
 
 def _classify_error(exc: BaseException) -> str:
@@ -1324,41 +1325,52 @@ def main() -> int:
         is_enabled as _failure_capture_enabled,
     )
 
-    for src in sources:
+    # ── Crawl phase ──────────────────────────────────────────────────
+    # Each source crawls independently and is independently rate-limited
+    # (per-host RateLimiter, _runtime.py). `_crawl_one` does the fetch +
+    # any failure-snapshot I/O and returns a fully-resolved OUTCOME; it does
+    # NOT mutate the shared run-level structures (raw / errors / source_*).
+    # The deterministic merge below applies outcomes in `sources` order, so a
+    # parallel run produces a bit-identical `raw` ordering to the sequential
+    # one — which matters because the ranker's stable sort lets input order
+    # break rank-score ties (see pulpo/ranker.py). Concurrency is gated by
+    # PULPO_SCRAPE_CONCURRENCY (default 1 = the original sequential path);
+    # bumping it fans the sources across a bounded thread pool so wall-clock
+    # becomes ~max(per-source duration) instead of the sum. Per-host request
+    # rate is unchanged (distinct domains; each keeps its own limiter).
+    def _crawl_one(src: str) -> dict:
         src = src.strip()
         mod = REGISTRY.get(src)
         if not mod:
             err = f"unknown source: {src}"
-            errors.append(err)
-            source_errors[src] = err
-            source_error_class[src] = "UnknownSource"
+            fid = None
             if _failure_capture_enabled():
                 fid = _write_failure_snapshot(
                     src,
                     kind="unknown_source",
                     context={"registry_keys": sorted(REGISTRY.keys())},
-                )
-                if fid:
-                    source_failure_id[src] = fid
-            continue
+                ) or None
+            return {
+                "src": src, "kind": "unknown",
+                "errors_line": err, "error_msg": err,
+                "error_class": "UnknownSource", "failure_id": fid,
+            }
         crawl_started = _time.monotonic()
         try:
             if hasattr(mod, "crawl_with_meta"):
                 result = mod.crawl_with_meta(limit=limit, offline=offline or None)
                 recs = result["records"]
-                source_meta[src] = {
+                meta = {
                     "max_pages_hit": result["max_pages_hit"],
                     "limit_hit": result["limit_hit"],
                 }
             else:
                 recs = mod.crawl(limit=limit, offline=offline or None)
-                source_meta[src] = {"max_pages_hit": False, "limit_hit": False}
+                meta = {"max_pages_hit": False, "limit_hit": False}
         except Exception as e:
+            duration = round(_time.monotonic() - crawl_started, 2)
             err = repr(e)
-            errors.append(f"{src}: {err}")
-            source_errors[src] = err
-            source_error_class[src] = _classify_error(e)
-            source_durations[src] = round(_time.monotonic() - crawl_started, 2)
+            fid = None
             if _failure_capture_enabled():
                 # The scraper may attach .last_response / .last_request_url
                 # on failure (Phase-0 polite_get does this once realtyelsalvador
@@ -1370,38 +1382,84 @@ def main() -> int:
                     response=getattr(mod, "last_response", None),
                     request_url=getattr(mod, "last_request_url", None),
                     request_headers=getattr(mod, "last_request_headers", None),
-                    context={
-                        "duration_s": source_durations[src],
-                        "offline":    bool(offline),
-                    },
-                )
-                if fid:
-                    source_failure_id[src] = fid
-            continue
-        source_durations[src] = round(_time.monotonic() - crawl_started, 2)
-        per_source_count[src] = len(recs)
+                    context={"duration_s": duration, "offline": bool(offline)},
+                ) or None
+            return {
+                "src": src, "kind": "exception",
+                "errors_line": f"{src}: {err}", "error_msg": err,
+                "error_class": _classify_error(e),
+                "duration_s": duration, "failure_id": fid,
+            }
+        duration = round(_time.monotonic() - crawl_started, 2)
         for r in recs:
             r.setdefault("source", src)
-            raw.append(r)
-
         # Capture an "empty_yield" snapshot when the scraper completed
         # without exception but returned zero records. This is the silent-
         # failure mode that bit realtyelsalvador (Cloudflare 403 swallowed
         # by the `break` in its pagination loop) — no traceback, just a
         # quiet count=0. The snapshot gives the watchdog + auto-repair
         # agent something concrete to look at.
+        fid = None
         if not recs and _failure_capture_enabled() and not offline:
             fid = _write_failure_snapshot(
                 src,
                 kind="empty_yield",
                 context={
-                    "duration_s":    source_durations[src],
-                    "max_pages_hit": source_meta[src].get("max_pages_hit"),
-                    "limit_hit":     source_meta[src].get("limit_hit"),
+                    "duration_s":    duration,
+                    "max_pages_hit": meta.get("max_pages_hit"),
+                    "limit_hit":     meta.get("limit_hit"),
                 },
-            )
-            if fid:
-                source_failure_id[src] = fid
+            ) or None
+        return {
+            "src": src, "kind": "ok", "records": recs, "meta": meta,
+            "duration_s": duration, "count": len(recs), "failure_id": fid,
+        }
+
+    scrape_concurrency = _env_int("PULPO_SCRAPE_CONCURRENCY", 1)
+    outcomes: list[dict] = []
+    if scrape_concurrency <= 1:
+        outcomes = [_crawl_one(s) for s in sources]
+    else:
+        # Index-aligned so the merge below stays in `sources` order even
+        # though futures resolve out of order. Duplicate source entries are
+        # preserved (each crawls), matching the sequential path.
+        slots: list[Optional[dict]] = [None] * len(sources)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=scrape_concurrency) as _ex:
+            _futs = {_ex.submit(_crawl_one, s): i for i, s in enumerate(sources)}
+            for _fut in concurrent.futures.as_completed(_futs):
+                slots[_futs[_fut]] = _fut.result()
+        outcomes = [o for o in slots if o is not None]
+        print(f"[scrape] crawled {len(sources)} sources at concurrency={scrape_concurrency}")
+
+    # Deterministic merge — apply outcomes in `sources` order. Keeps `raw`
+    # and `errors` byte-identical to the sequential path regardless of how
+    # the pool scheduled the work.
+    for res in outcomes:
+        src = res["src"]
+        kind = res["kind"]
+        if kind == "unknown":
+            errors.append(res["errors_line"])
+            source_errors[src] = res["error_msg"]
+            source_error_class[src] = res["error_class"]
+            if res["failure_id"]:
+                source_failure_id[src] = res["failure_id"]
+            continue
+        if kind == "exception":
+            errors.append(res["errors_line"])
+            source_errors[src] = res["error_msg"]
+            source_error_class[src] = res["error_class"]
+            source_durations[src] = res["duration_s"]
+            if res["failure_id"]:
+                source_failure_id[src] = res["failure_id"]
+            continue
+        # kind == "ok"
+        source_durations[src] = res["duration_s"]
+        source_meta[src] = res["meta"]
+        per_source_count[src] = res["count"]
+        for r in res["records"]:
+            raw.append(r)
+        if res["failure_id"]:
+            source_failure_id[src] = res["failure_id"]
 
     # ── PostHog: per-source crawl results ────────────────────────────
     # Emit one event per source after the loop completes (success or
