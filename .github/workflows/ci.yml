@@ -67,10 +67,12 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm run lint:css
-      # Static i18n guard — catches hardcoded English in JSX attribute
-      # strings (`aria-label`, `placeholder`, `alt`, `title`) under
-      # web/app/. ~1s, runs before the heavier checks. See
-      # scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
+      # Static i18n guard — two checks, ~1s, before the heavier steps:
+      #   1. hardcoded English in JSX attribute strings (`aria-label`,
+      #      `placeholder`, `alt`, `title`) under web/app/;
+      #   2. the raw-enum render trap (`{x.replace("_"," ")}`) that shipped
+      #      the active-filter chip + table-header leaks.
+      # See scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
       - run: node scripts/i18n_lint.mjs
       - run: node scripts/check_e2e_stale_selectors.mjs
       - name: CSP allowlist drop guard

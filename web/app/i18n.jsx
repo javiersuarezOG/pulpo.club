@@ -1,5 +1,6 @@
 import React from "react";
 import { ACTIVE_COUNTRY } from "./config/countries";
+import { track } from "./telemetry/client";
 
 // Pulpo — minimal i18n layer.
 //
@@ -1956,11 +1957,34 @@ const UI_STRINGS = {
                                              es: "Bloqueadores activos" },
 };
 
+// i18n leak canary — a non-default-locale user who falls back to English (or
+// to the raw key) is the silent failure mode that shipped to prod twice. Make
+// it observable: fire i18n.fallback_used ONCE per (locale, key) per session so
+// the hot render path never spams PostHog, and never let reporting break t().
+const _reportedI18nFallbacks = new Set();
+function reportI18nFallback(key, locale) {
+  if (typeof window === "undefined") return; // build/SSR/node: no-op
+  const sig = `${locale}:${key}`;
+  if (_reportedI18nFallbacks.has(sig)) return;
+  _reportedI18nFallbacks.add(sig);
+  try {
+    track("i18n.fallback_used", { key, locale });
+  } catch {
+    /* telemetry must never break a render */
+  }
+}
+
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation
 function t(key, locale, vars) {
   const entry = UI_STRINGS[key];
+  const localized = entry ? entry[locale] : undefined;
+  // A real leak only when a NON-default locale was asked for and missed — the
+  // entry has no row for this locale (or the key doesn't exist at all).
+  if (localized == null && locale && locale !== DEFAULT_LOCALE) {
+    reportI18nFallback(key, locale);
+  }
   if (!entry) return key; // fallback so missing keys are visible
-  let s = entry[locale] ?? entry[DEFAULT_LOCALE] ?? key;
+  let s = localized ?? entry[DEFAULT_LOCALE] ?? key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, v);
   }

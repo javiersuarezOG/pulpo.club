@@ -80,6 +80,11 @@ export type EventMap = {
   "browse.sort_changed": { sort: string };
   "browse.view_toggled": { view: "cards" | "table" };
   "browse.empty_results": { filters: Record<string, unknown> };
+  // i18n leak canary — fired (deduped per key+locale per session) by t()
+  // when a non-default-locale lookup falls back to English or to the raw
+  // key. Non-zero for locale=es in prod = a live Spanish leak; the `key`
+  // names the exact UI_STRINGS row to fix. See CLAUDE.md → i18n guardrail.
+  "i18n.fallback_used": { key: string; locale: string };
   // PR-4f — interactive PriceHistogram instrumentation
   "browse.price_histogram.dragged": {
     from_min: number;
