@@ -204,4 +204,80 @@ test.describe("Browse map view", () => {
     const modalTop = await topElementAtCenter(page, ".map-view__canvas");
     expect(modalTop.inModal, "upgrade modal backdrop should sit above map panes").toBe(true);
   });
+
+  // ── WS4 map↔search sync (desktop — the mobile search box is hidden in
+  //    map mode, so this surface is desktop-only by design). ──
+  const intOf = (s: string | null) => parseInt((s ?? "").replace(/[^\d]/g, ""), 10);
+
+  test("the list, the map, and the header always show the same count", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    await page.locator(".map-split__cards .listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
+
+    const readCounts = async () => {
+      const headerNum = intOf(await page.locator(".results-count .num").first().textContent());
+      const cardCount = await page.locator(".map-split__cards .listing-card").count();
+      const mapText = (await page.locator(".map-view__count").textContent()) ?? "";
+      const m = mapText.match(/([\d,]+)\s+of\s+([\d,]+)/); // "X of Y listings mapped"
+      const mapTotal = m ? intOf(m[2]) : NaN;
+      return { headerNum, cardCount, mapTotal };
+    };
+
+    const before = await readCounts();
+    expect(before.headerNum, "header == card count (initial)").toBe(before.cardCount);
+    expect(before.mapTotal, "map 'of Y' == card count (initial)").toBe(before.cardCount);
+
+    // Type a search — the header, the card list, and the map's "of Y" must
+    // stay locked to the same number (the reported bug was that they diverged).
+    await page.locator(".browse-search__input").fill("be"); // common substring → narrows but non-empty
+    await page.waitForTimeout(700); // debounce (300ms) + refit settle
+
+    const after = await readCounts();
+    expect(after.cardCount, "search yields some matches").toBeGreaterThan(0);
+    expect(after.headerNum, "header == card count (after search)").toBe(after.cardCount);
+    expect(after.mapTotal, "map 'of Y' == card count (after search)").toBe(after.cardCount);
+  });
+
+  test("a query-driven refit clears a stale bbox and writes none of its own", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    // Cold-load with a stale viewport filter but NO query.
+    await page.goto("/browse?view=map&bbox=13.0000,-90.0000,14.5000,-88.0000", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    // Typing a query is authoritative → it drops the stale bbox…
+    await page.locator(".browse-search__input").fill("be");
+    await page.waitForTimeout(700);
+    await page.waitForFunction(() => !/[?&]bbox=/.test(window.location.search), { timeout: 3_000 });
+    // …and the programmatic refit must NOT write a fresh ?bbox= back.
+    expect(/[?&]bbox=/.test(new URL(page.url()).search)).toBe(false);
+  });
+
+  test("[regression] a deep-linked ?bbox= is preserved on entry (no query)", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const bbox = "13.4000,-89.4000,13.6000,-89.2000";
+    await page.goto(`/browse?view=map&bbox=${bbox}`, { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(700); // let the entry effect run
+    // Entry must NOT nuke the shared viewport (PR-9 shareable-bbox link).
+    expect(new URL(page.url()).searchParams.get("bbox"), "inbound bbox survives entry").toBe(bbox);
+  });
+
+  test("empty-in-view panel offers a way back to all results", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    // bbox out in the Pacific — matches nothing, but the search itself has
+    // matches → the "no results in this view" escape hatch, not EmptyResults.
+    await page.goto("/browse?view=map&bbox=12.0000,-92.5000,12.4000,-92.0000", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    const panel = page.locator(".map-empty-inview");
+    await expect(panel).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator(".map-split__cards .listing-card")).toHaveCount(0);
+
+    // "Show all N" clears the viewport filter and brings the markers back.
+    await panel.locator(".map-empty-inview__primary").click();
+    await page.locator(".pulpo-cluster, .pulpo-pin").first().waitFor({ state: "visible", timeout: 10_000 });
+    await expect(panel).toBeHidden();
+    await page.waitForFunction(() => !/[?&]bbox=/.test(window.location.search), { timeout: 3_000 });
+  });
 });

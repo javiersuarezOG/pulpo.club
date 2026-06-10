@@ -636,6 +636,12 @@ const UI_STRINGS = {
                                    es: "Resultados del mapa" },
   "map.sheet.row_aria":          { en: "{title}, {price}. Open listing",
                                    es: "{title}, {price}. Abrir propiedad" },
+  "map.empty_in_view.title":     { en: "No results in this view",
+                                   es: "Sin resultados en esta vista" },
+  "map.empty_in_view.show_all":  { en: "Show all {n}",
+                                   es: "Mostrar las {n}" },
+  "map.empty_in_view.turn_off_saim": { en: "Turn off search as I move",
+                                   es: "Desactivar buscar al mover" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },

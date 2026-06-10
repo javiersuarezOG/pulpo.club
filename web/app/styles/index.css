@@ -1399,8 +1399,33 @@ h1,h2,h3,h4,h5 { margin: 0; }
 /* ====== Map view (WS4 PR-7) ====== */
 /* PR-9 — desktop split-pane: scrollable card panel ↔ map. Mobile keeps
    the map full-width (the bottom sheet lands in PR-10). */
-.map-split { display: block; }
+.map-split { display: block; position: relative; }
 .map-split__cards { display: none; }
+
+/* Empty-in-view escape hatch — search-as-I-move narrowed the viewport to
+   zero matches (but the search itself has matches elsewhere). Centered
+   over the map so the user always has a way back to all results. */
+.map-empty-inview {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-map-ui);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
+  max-width: 320px; width: calc(100% - var(--space-6));
+  padding: var(--space-5); text-align: center;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-2);
+}
+.map-empty-inview__title { color: var(--ink); font-weight: 650; font-size: 15px; }
+.map-empty-inview__primary {
+  padding: 10px 18px; border-radius: 999px;
+  background: var(--accent); color: var(--paper); border: none;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.map-empty-inview__secondary {
+  background: none; border: none; color: var(--ink-3);
+  font-size: 13px; cursor: pointer; text-decoration: underline;
+}
 @media (min-width: 768px) {
   .map-split { display: flex; align-items: flex-start; gap: var(--space-4); }
   .map-split__cards {

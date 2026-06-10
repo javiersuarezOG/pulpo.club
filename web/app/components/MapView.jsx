@@ -63,6 +63,9 @@ export default function MapView({
   // PR-9 — card↔marker sync + search-as-I-move.
   hoveredId = null, onHoverMarker, onBoundsChange,
   searchAsIMove = true, onToggleSearchAsIMove,
+  // WS4 map↔search sync — parent bumps this to refit the map to the
+  // current result set when the search/filters change.
+  fitNonce = 0,
 }) {
   const lc = app?.locale || currentLocale();
   const elRef = useRef(null);
@@ -75,6 +78,7 @@ export default function MapView({
   const searchAsIMoveRef = useRef(searchAsIMove);
   const moveTimerRef = useRef(null);
   const readyRef = useRef(false); // suppress the init-triggered moveend
+  const suppressMoveendRef = useRef(false); // suppress the moveend from a programmatic fitBounds (refit)
   const lcRef = useRef(lc);
   useEffect(() => { onOpenRef.current = onOpenListing; }, [onOpenListing]);
   useEffect(() => { onHoverRef.current = onHoverMarker; }, [onHoverMarker]);
@@ -93,6 +97,11 @@ export default function MapView({
     () => (hideApprox ? mappable.filter((l) => !isLowConfidenceGeo(l)) : mappable),
     [mappable, hideApprox],
   );
+  // The refit effect reads `shown` through a ref so it can depend ONLY on
+  // fitNonce — a pan changes `shown` (via bbox→mapResults) but must NOT
+  // trigger a refit, or it would fight "search as I move".
+  const shownRef = useRef(shown);
+  useEffect(() => { shownRef.current = shown; }, [shown]);
   // Too few mappable listings to be useful → graceful unavailable state
   // rather than a near-empty map.
   const unavailable = (results?.length ?? 0) > 0 && mappable.length === 0;
@@ -165,6 +174,9 @@ export default function MapView({
     // programmatic moveend(s) from the initial setView.
     const readyTimer = setTimeout(() => { readyRef.current = true; }, 600);
     map.on("moveend", () => {
+      // A programmatic refit (fitNonce) must not be read as a user pan —
+      // consume the flag and skip writing ?bbox=.
+      if (suppressMoveendRef.current) { suppressMoveendRef.current = false; return; }
       if (!searchAsIMoveRef.current || !readyRef.current) return;
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       moveTimerRef.current = setTimeout(() => {
@@ -262,6 +274,29 @@ export default function MapView({
     markerByIdRef.current = byId;
     cluster.addLayers(markers);
   }, [shown]);
+
+  // WS4 map↔search sync — refit the viewport to the shown set when the
+  // parent signals a search/filter change (fitNonce bump), and once on
+  // mount so the map lands on the results instead of the static SV centre.
+  // Reads `shown` via shownRef and depends only on [fitNonce], so a pan
+  // never refits. invalidateSize first (the lazy/mobile container may not
+  // be settled), and flag the move so its moveend doesn't write ?bbox=.
+  useEffect(() => {
+    const pts = shownRef.current.map((l) => [l.lat, l.lng]);
+    if (!mapRef.current || pts.length === 0) return;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    requestAnimationFrame(() => {
+      const map = mapRef.current;
+      if (!map) return;
+      map.invalidateSize();
+      suppressMoveendRef.current = true;
+      map.fitBounds(L.latLngBounds(pts), {
+        padding: [40, 40], maxZoom: 13, animate: !reduced, duration: 0.4,
+      });
+    });
+  }, [fitNonce]);
 
   // PR-9 — reflect an externally-hovered card onto its marker (add the
   // sync highlight class to the matching pin, if it's currently in the
