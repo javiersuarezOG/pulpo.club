@@ -24,21 +24,18 @@ function MapSheetRow({ listing, app, lc, onOpenListing, onHover, highlighted }) 
   const ppmText = ppm === "—" ? null : `${ppm}${ppmSuffix()}`;
   const facts = [formatSize(listing.size_m2), ppmText].filter(Boolean);
 
+  // Accessible card pattern: the row is a non-interactive listitem; the primary
+  // "open" action is a transparent button stretched over the whole row, and the
+  // heart is a SIBLING button raised above it. This avoids the invalid
+  // interactive-in-interactive nesting (a real <button> inside a role="button")
+  // the row had before, while keeping the whole-row tap target.
   return (
-    <article
+    <div
       className={`map-sheet-row${highlighted ? " is-highlighted" : ""}`}
-      role="button"
-      tabIndex={0}
-      aria-label={t("map.sheet.row_aria", lc, { title, price })}
+      role="listitem"
       data-listing-id={listing.id}
-      onClick={() => onOpenListing(listing.id)}
       onMouseEnter={() => onHover?.(listing.id)}
       onMouseLeave={() => onHover?.(null)}
-      onKeyDown={(e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        e.preventDefault();
-        onOpenListing(listing.id);
-      }}
     >
       <Photo
         listing={listing}
@@ -60,10 +57,16 @@ function MapSheetRow({ listing, app, lc, onOpenListing, onHover, highlighted }) 
           ))}
         </div>
       </div>
-      <div className="map-sheet-row__heart" onClick={(e) => e.stopPropagation()}>
+      <div className="map-sheet-row__heart">
         <HeartButton listingId={listing.id} app={app} variant="inline" size={16} />
       </div>
-    </article>
+      <button
+        type="button"
+        className="map-sheet-row__open"
+        aria-label={t("map.sheet.row_aria", lc, { title, price })}
+        onClick={() => onOpenListing(listing.id)}
+      />
+    </div>
   );
 }
 
@@ -155,6 +158,7 @@ export default function MapBottomSheet({ listings, app, lc, onOpenListing, onHov
         className="map-sheet__cards"
         ref={scrollRef}
         onScroll={onScroll}
+        role="list"
         aria-label={t("map.sheet.results_aria", lc)}
       >
         {padTop > 0 && <div aria-hidden="true" style={{ height: padTop, flexShrink: 0 }} />}

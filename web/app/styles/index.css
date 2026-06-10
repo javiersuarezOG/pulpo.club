@@ -1550,6 +1550,7 @@ h1,h2,h3,h4,h5 { margin: 0; }
     overflow: hidden;
   }
   .map-sheet-row {
+    position: relative;
     display: grid;
     grid-template-columns: 58px minmax(0, 1fr) 32px;
     gap: var(--space-3);
@@ -1563,7 +1564,19 @@ h1,h2,h3,h4,h5 { margin: 0; }
   .map-sheet-row:first-child {
     border-top: 0;
   }
-  .map-sheet-row:focus-visible,
+  /* Stretched primary-action button — covers the row, sits beneath the heart. */
+  .map-sheet-row__open {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .map-sheet-row__open:focus-visible,
   .map-sheet-row.is-highlighted {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
@@ -1624,6 +1637,8 @@ h1,h2,h3,h4,h5 { margin: 0; }
     font-weight: 700;
   }
   .map-sheet-row__heart {
+    position: relative; /* raised above the stretched .map-sheet-row__open button */
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;

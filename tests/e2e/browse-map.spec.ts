@@ -235,6 +235,34 @@ test.describe("Browse map view", () => {
     expect(m.canvasTop, "map canvas starts at or below the header bottom").toBeGreaterThanOrEqual(m.headerH - 1);
   });
 
+  test("[a11y] mobile sheet uses list semantics with no nested interactive controls", async ({ page }) => {
+    await seedConsent(page);
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+
+    await expect(page.locator(".map-sheet__cards[role='list']")).toBeVisible();
+    const firstRow = page.locator(".map-sheet-row[role='listitem']").first();
+    await expect(firstRow).toBeVisible();
+
+    const a11y = await firstRow.evaluate((row) => {
+      const open = row.querySelector(".map-sheet-row__open");
+      const heart = row.querySelector(".map-sheet-row__heart button");
+      return {
+        openIsButton: open?.tagName === "BUTTON",
+        openHasName: !!open?.getAttribute("aria-label"),
+        heartIsButton: heart?.tagName === "BUTTON",
+        nested: !!(open && heart && (open.contains(heart) || heart.contains(open))),
+        rowInteractive: row.hasAttribute("tabindex") || row.getAttribute("role") === "button",
+      };
+    });
+    expect(a11y.openIsButton, "primary open action is a real <button>").toBe(true);
+    expect(a11y.openHasName, "open button has an accessible name").toBe(true);
+    expect(a11y.heartIsButton, "heart is a real <button>").toBe(true);
+    expect(a11y.nested, "open + heart must be siblings, never nested").toBe(false);
+    expect(a11y.rowInteractive, "the listitem row itself is not interactive").toBe(false);
+  });
+
   test("map panes stay below detail and conversion overlays", async ({ page }) => {
     await seedConsent(page);
     await seedProUser(page);
