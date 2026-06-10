@@ -1114,6 +1114,20 @@ function resolveResultsHeader(filters, locale, resultCount) {
   return null;
 }
 
+// Active-filter chips echo the SAME labels the FilterPanel renders, so a
+// Spanish user never sees a raw enum slug. features/infra reuse their
+// filter.feature.* / filter.infra.* keys directly (the panel guarantees a key
+// for every value in the set); status has ad-hoc per-value keys, mapped here
+// with a capitalize() safety net for any future untranslated value (a smell to
+// catch in review, never a raw slug shipped to the user).
+const STATUS_CHIP_KEYS = {
+  price_drop: "filter.ranking.price_drops",
+  new: "filter.ranking.new",
+};
+function statusChipLabel(v, lc) {
+  return STATUS_CHIP_KEYS[v] ? t(STATUS_CHIP_KEYS[v], lc) : capitalize(v.replace(/_/g, " "));
+}
+
 function BrowsePage({ app }) {
   const LISTINGS = useListings();
   const listingsState = useListingsState();
@@ -1631,9 +1645,9 @@ function BrowsePage({ app }) {
             <div className="active-filter-row">
               {[...filters.zones].map(z => <span key={z} className="active-chip" onClick={() => { const s = new Set(filters.zones); s.delete(z); setFiltersWithPinClear({...filters, zones: s});}}>{z} <Icon name="close" size={12}/></span>)}
               {[...filters.land_types].map(t => <span key={t} className="active-chip" onClick={() => { const s = new Set(filters.land_types); s.delete(t); setFiltersWithPinClear({...filters, land_types: s});}}>{landTypeLabel(t)} <Icon name="close" size={12}/></span>)}
-              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
-              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{f} <Icon name="close" size={12}/></span>)}
-              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
+              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{t(`filter.feature.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
+              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{t(`filter.infra.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
+              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{statusChipLabel(f, app.locale)} <Icon name="close" size={12}/></span>)}
               {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
             </div>
           )}
@@ -1847,7 +1861,7 @@ function MobileListRow({ listing: l, app, topRank }) {
       <div className="mobile-list-row__thumb">
         <Photo listing={listingForCompactPhoto(l)} thumbnail ratio="1/1" className="mobile-list-row__photo" source="browse_mobile_list" />
         {topRank != null && (
-          <span className="mobile-list-row__rank" aria-label={`Pulpo ranked ${topRank}`}>
+          <span className="mobile-list-row__rank" aria-label={t("browse.table.rank_aria", app.locale, { rank: topRank })}>
             <RankTrophy />
             <span>{topRank}</span>
           </span>
@@ -1908,14 +1922,14 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
         <thead>
           <tr>
             <th></th>
-            <th>Listing</th>
-            <th>Zone</th>
-            <th>Type</th>
-            {headerSortable("size", "Size")}
-            {headerSortable("price", "Price")}
+            <th>{t("browse.table.col.listing", app.locale)}</th>
+            <th>{t("browse.table.col.zone", app.locale)}</th>
+            <th>{t("browse.table.col.type", app.locale)}</th>
+            {headerSortable("size", t("browse.table.col.size", app.locale))}
+            {headerSortable("price", t("browse.table.col.price", app.locale))}
             {headerSortable("ppm", `$${ppmSuffix()}`)}
-            {headerSortable("days", "Days")}
-            <th>Signal</th>
+            {headerSortable("days", t("browse.table.col.days", app.locale))}
+            <th>{t("browse.table.col.signal", app.locale)}</th>
             <th></th>
           </tr>
         </thead>
@@ -1927,7 +1941,7 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
-                  <span className="pulpo-rank pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
+                  <span className="pulpo-rank pulpo-rank-inline" aria-label={t("browse.table.rank_aria", app.locale, { rank: topRankMap.get(l.id) })}>
                     <span className="pulpo-rank-star" aria-hidden="true">
                       <RankTrophy />
                     </span>
