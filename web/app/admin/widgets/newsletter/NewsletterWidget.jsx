@@ -716,6 +716,51 @@ const WIDGET_STYLES = `
    actually fired without flipping to Gmail or PostHog. Persistence is
    browser-scoped — operators on a fresh laptop start with an empty
    log. Cross-device history is a follow-up. */
+.nl-preview-widget .nl-health {
+  margin: 4px 0 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+.nl-preview-widget .nl-health-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.nl-preview-widget .nl-health-eyebrow {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.nl-preview-widget .nl-health-refresh {
+  background: none; border: none; cursor: pointer; color: var(--ink-3);
+  font-size: 14px; line-height: 1; padding: 2px 4px;
+}
+.nl-preview-widget .nl-health-refresh:hover { color: var(--ink); }
+.nl-preview-widget .nl-health-rows { display: flex; flex-direction: column; gap: 6px; }
+.nl-preview-widget .nl-health-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto auto;
+  align-items: center; gap: 10px;
+  font-size: 13px;
+}
+.nl-preview-widget .nl-health-dot {
+  width: 9px; height: 9px; border-radius: 50%; background: var(--ink-3);
+}
+.nl-preview-widget .nl-health-dot--ok    { background: var(--accent); }
+.nl-preview-widget .nl-health-dot--error { background: oklch(55% 0.18 25); }
+.nl-preview-widget .nl-health-dot--dry,
+.nl-preview-widget .nl-health-dot--skip  { background: oklch(72% 0.15 75); }
+.nl-preview-widget .nl-health-dot--idle  { background: var(--line-2, var(--ink-3)); opacity: 0.5; }
+.nl-preview-widget .nl-health-label  { color: var(--ink); font-weight: 600; }
+.nl-preview-widget .nl-health-status { color: var(--ink-2); font-size: 12px; }
+.nl-preview-widget .nl-health-last {
+  color: var(--ink-3); font-family: var(--font-mono); font-size: 11px;
+  white-space: nowrap;
+}
+.nl-preview-widget .nl-health-unavailable {
+  font-size: 12px; color: var(--ink-3); margin: 0; line-height: 1.5;
+}
+
 .nl-preview-widget .nl-log {
   margin-top: 10px;
   padding-top: 14px;
@@ -918,6 +963,38 @@ async function fetchServerLog() {
   }
 }
 
+// Per-template deliverability health from /api/admin/newsletter/health
+// (PostHog HogQL, last 7 days). Graceful: returns an empty shape on any
+// error so the panel renders a neutral "unavailable" state, never throws.
+async function fetchHealth() {
+  if (typeof window === "undefined") return { families: [], unavailable_reason: null, window_days: 7 };
+  try {
+    const r = await fetch("/api/admin/newsletter/health", {
+      method: "GET", headers: { "accept": "application/json" },
+    });
+    if (!r.ok) return { families: [], unavailable_reason: `HTTP ${r.status}`, window_days: 7 };
+    const body = await r.json().catch(() => null);
+    return {
+      families: Array.isArray(body?.families) ? body.families : [],
+      unavailable_reason: typeof body?.unavailable_reason === "string" ? body.unavailable_reason : null,
+      window_days: typeof body?.window_days === "number" ? body.window_days : 7,
+    };
+  } catch (err) {
+    return { families: [], unavailable_reason: String(err && err.message || err), window_days: 7 };
+  }
+}
+
+// Map a health row to a status: red (failures) > amber (only dry-run /
+// only skips / idle) > green (real sends, no failures).
+function healthStatus(row) {
+  if (!row) return { kind: "idle", label: "—" };
+  if (row.failed > 0) return { kind: "error", label: `${row.failed} failed` };
+  if (row.sent > 0 && row.dry_run === true) return { kind: "dry", label: "dry-run only" };
+  if (row.sent > 0) return { kind: "ok", label: `${row.sent} sent` };
+  if (row.skipped > 0) return { kind: "skip", label: `${row.skipped} skipped` };
+  return { kind: "idle", label: "no activity" };
+}
+
 function mergeLogs(serverEvents, localEvents) {
   // Both sources produce ISO timestamps in the `at` field. Server
   // wins on duplicates (it's the canonical record once PostHog has
@@ -998,6 +1075,15 @@ export function NewsletterWidget() {
   useEffect(() => {
     refreshServerLog();
   }, [refreshServerLog]);
+
+  // Per-template deliverability health (last 7d, PostHog). Refreshed on
+  // mount + after every trigger so a just-fired test moves the dot.
+  const [health, setHealth] = useState({ families: [], unavailable_reason: null, window_days: 7, loaded: false });
+  const refreshHealth = useCallback(async () => {
+    const h = await fetchHealth();
+    setHealth({ ...h, loaded: true });
+  }, []);
+  useEffect(() => { refreshHealth(); }, [refreshHealth]);
 
   // Template version — pulled from the deployed Python source of truth
   // (automation/newsletter/components/_common.py) via the dedicated
@@ -1362,6 +1448,34 @@ export function NewsletterWidget() {
 
           {/* Language is now a per-newsletter toggle rendered next to each
               card's send button (localeToggle below) — no shared control. */}
+
+          {/* ── Deliverability health (per template, last 7 days) ── */}
+          <div className="nl-health">
+            <div className="nl-health-head">
+              <span className="nl-health-eyebrow">Deliverability · last {health.window_days}d</span>
+              <button type="button" className="nl-health-refresh" onClick={refreshHealth} title="Refresh health">↻</button>
+            </div>
+            {health.unavailable_reason ? (
+              <p className="nl-health-unavailable">{health.unavailable_reason}</p>
+            ) : (
+              <div className="nl-health-rows">
+                {(health.families || []).map((row) => {
+                  const st = healthStatus(row);
+                  return (
+                    <div className="nl-health-row" key={row.id}>
+                      <span className={`nl-health-dot nl-health-dot--${st.kind}`} aria-hidden="true" />
+                      <span className="nl-health-label">{row.label}</span>
+                      <span className="nl-health-status">{st.label}</span>
+                      <span className="nl-health-last">{row.last_sent_at ? formatLogWhen(row.last_sent_at) : "—"}</span>
+                    </div>
+                  );
+                })}
+                {health.loaded && (health.families || []).length === 0 && (
+                  <p className="nl-health-unavailable">No dispatch activity in the last {health.window_days} days.</p>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* ── PRO section ─────────────────────────────────────── */}
           <div className="nl-tier-section">
