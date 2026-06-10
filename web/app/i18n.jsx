@@ -1436,6 +1436,12 @@ const UI_STRINGS = {
   // Reactivate CTA shown to canceling + canceled users instead of "Manage plan".
   "account.sub.reactivate":            { en: "Resubscribe →",
                                           es: "Volver a suscribirme →" },
+  // Post-cancel "you're on Free now" panel — frames the downgrade as a
+  // real choice: keep the free weekly, or resubscribe for the full thing.
+  "account.sub.free_panel.head":       { en: "You're on Pulpo Free",
+                                          es: "Estás en Pulpo Free" },
+  "account.sub.free_panel.body":       { en: "Your weekly top 3 — the best new beach & lake listings — still lands in your inbox every Sunday. Resubscribe to Pro for all 10 plus the full listings catalogue.",
+                                          es: "Tu top 3 semanal — las mejores propiedades nuevas de playa y lago — sigue llegando a tu correo cada domingo. Vuelve a Pro para las 10 y el catálogo completo." },
 
   // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
   // Public marketing surfaces that funnel cold visitors into Stripe

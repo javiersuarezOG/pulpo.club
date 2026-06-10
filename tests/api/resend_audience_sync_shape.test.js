@@ -72,7 +72,16 @@ describe("api/stripe/webhook.js — Pro upgrade enroll sites", () => {
   it("imports the helper", () => {
     expect(webhookSrc).toMatch(/require\("\.\.\/_resend_audience"\)/);
     expect(webhookSrc).toMatch(/enrollPaidUserInAudience/);
-    expect(webhookSrc).toMatch(/unsubscribeOnPlanLoss/);
+  });
+
+  it("does NOT unsubscribe on churn — a canceled Pro stays a Free subscriber (two-state)", () => {
+    // 2026-06-10: the cancel-time unsubscribeOnPlanLoss call was removed.
+    // A churned Pro is now a Free reader and keeps the free weekly; the
+    // Pro Sunday send is cohort-gated so they can't receive Pro issues.
+    // Instead the terminal branch fires the free welcome-back.
+    expect(webhookSrc).not.toMatch(/unsubscribeOnPlanLoss/);
+    expect(webhookSrc).toMatch(/fireFreeWelcomeBack/);
+    expect(webhookSrc).toMatch(/downgrade_welcome_sub_id/);
   });
 
   it("enrolls on the auth-gated upgrade path", () => {
@@ -104,21 +113,24 @@ describe("api/stripe/webhook.js — Pro upgrade enroll sites", () => {
   });
 });
 
-describe("api/stripe/webhook.js — subscription cancellation unsubscribe site", () => {
-  it("unsubscribes on terminal subscription state (canceled / expired / deleted)", () => {
-    // The isTerminal boolean gates the unsubscribe call — only fires
-    // when the user is actually dropping out of Pro, not on grace-period
-    // past_due states (where they're still entitled to newsletters).
-    expect(webhookSrc).toMatch(/if \(isTerminal && subEmail\)\s*\{\s*await unsubscribeOnPlanLoss/);
+describe("api/stripe/webhook.js — churned-Pro → Free welcome-back site", () => {
+  // 2026-06-10: the cancel-time unsubscribe was REMOVED. Two-state — a
+  // canceled member is a Free subscriber and keeps the free weekly (the
+  // Pro Sunday send is cohort-gated, so they can't receive Pro issues).
+  // The terminal branch now fires the free welcome-back once instead.
+  it("no longer unsubscribes on churn", () => {
+    expect(webhookSrc).not.toMatch(/unsubscribeOnPlanLoss/);
   });
 
-  it("unsubscribe call is exactly once (not in the active/grace paths)", () => {
-    const unsubCalls = (webhookSrc.match(/await unsubscribeOnPlanLoss\(/g) || []).length;
-    expect(unsubCalls).toBe(1);
+  it("fires the free welcome-back on terminal state, gated on subEmail", () => {
+    expect(webhookSrc).toMatch(/if \(isTerminal && subEmail\)/);
+    expect(webhookSrc).toMatch(/await fireFreeWelcomeBack\(/);
+    expect(webhookSrc).toMatch(/source:\s*"stripe_downgrade"/);
   });
 
-  it("source tag carries the event type for audit", () => {
-    expect(webhookSrc).toMatch(/source:\s*`stripe\.\$\{event\.type\}`/);
+  it("dedups the welcome-back on the subscription id (at-most-once per churn)", () => {
+    expect(webhookSrc).toMatch(/downgrade_welcome_sub_id !== sub\.id/);
+    expect(webhookSrc).toMatch(/patch\.downgrade_welcome_sub_id = sub\.id/);
   });
 });
 
