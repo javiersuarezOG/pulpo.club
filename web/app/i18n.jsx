@@ -912,6 +912,15 @@ const UI_STRINGS = {
   "view.cards":              { en: "Card view",                     es: "Vista en tarjetas" },
   "view.table":              { en: "Table view",                    es: "Vista en tabla" },
   "view.filters":            { en: "Filters",                       es: "Filtros" },
+  // Results table (desktop) column headers + the per-row rank screen-reader label.
+  "browse.table.col.listing": { en: "Listing",  es: "Propiedad" },
+  "browse.table.col.zone":    { en: "Zone",     es: "Zona" },
+  "browse.table.col.type":    { en: "Type",     es: "Tipo" },
+  "browse.table.col.size":    { en: "Size",     es: "Tamaño" },
+  "browse.table.col.price":   { en: "Price",    es: "Precio" },
+  "browse.table.col.days":    { en: "Days",     es: "Días" },
+  "browse.table.col.signal":  { en: "Signal",   es: "Señal" },
+  "browse.table.rank_aria":   { en: "Pulpo ranked {rank}", es: "Clasificación Pulpo {rank}" },
 
   // PillRail
   "pill.scroll_left":        { en: "Scroll left",                   es: "Desplazar a la izquierda" },
