@@ -624,6 +624,8 @@ const UI_STRINGS = {
                                    es: "Mapa no disponible — no hay propiedades ubicadas para este filtro." },
   "map.marker.aria":             { en: "{price} · {zone} — press Enter to preview",
                                    es: "{price} · {zone} — presiona Enter para ver" },
+  "map.cluster.aria":            { en: "{n} listings in this area — click to zoom in",
+                                   es: "{n} propiedades en esta zona — haz clic para acercar" },
   "map.popup.approx_location":   { en: "Approximate location",
                                    es: "Ubicación aproximada" },
   "map.popup.view_listing":      { en: "View listing →", es: "Ver propiedad →" },

@@ -145,10 +145,14 @@ export default function MapView({
         // cluster reads differently from a 100-listing one.
         const step = n < 10 ? "sm" : n < 100 ? "md" : "lg";
         const px = step === "sm" ? 34 : step === "md" ? 44 : 54;
+        // Accessible name for the bubble — without it a screen reader
+        // announces only the bare number. role="img" + aria-label so the
+        // localized "N listings — click to zoom in" replaces the digits.
+        const aria = escapeHtml(t("map.cluster.aria", lcRef.current, { n }));
         return L.divIcon({
           // Count lives in a centered span so it stays optically centred
           // in the bubble at every tier; k-formatted so big clusters fit.
-          html: `<span class="pulpo-cluster__count">${formatClusterCount(n)}</span>`,
+          html: `<span class="pulpo-cluster__count" role="img" aria-label="${aria}">${formatClusterCount(n)}</span>`,
           className: `pulpo-cluster pulpo-cluster--${step}`,
           iconSize: L.point(px, px),
         });
