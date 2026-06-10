@@ -63,6 +63,9 @@ export default function MapView({
   // PR-9 — card↔marker sync + search-as-I-move.
   hoveredId = null, onHoverMarker, onBoundsChange,
   searchAsIMove = true, onToggleSearchAsIMove,
+  // WS4 map↔search sync — parent bumps this to refit the map to the
+  // current result set when the search/filters change.
+  fitNonce = 0,
 }) {
   const lc = app?.locale || currentLocale();
   const elRef = useRef(null);
@@ -75,6 +78,11 @@ export default function MapView({
   const searchAsIMoveRef = useRef(searchAsIMove);
   const moveTimerRef = useRef(null);
   const readyRef = useRef(false); // suppress the init-triggered moveend
+  // Ignore programmatic-fitBounds moveends until this timestamp. A one-shot
+  // boolean was wrong: an animated fitBounds emits MORE than one moveend, so a
+  // single consume left later events to write a spurious ?bbox=. A time window
+  // covers every moveend the animation produces.
+  const suppressMoveUntilRef = useRef(0);
   const lcRef = useRef(lc);
   useEffect(() => { onOpenRef.current = onOpenListing; }, [onOpenListing]);
   useEffect(() => { onHoverRef.current = onHoverMarker; }, [onHoverMarker]);
@@ -93,6 +101,11 @@ export default function MapView({
     () => (hideApprox ? mappable.filter((l) => !isLowConfidenceGeo(l)) : mappable),
     [mappable, hideApprox],
   );
+  // The refit effect reads `shown` through a ref so it can depend ONLY on
+  // fitNonce — a pan changes `shown` (via bbox→mapResults) but must NOT
+  // trigger a refit, or it would fight "search as I move".
+  const shownRef = useRef(shown);
+  useEffect(() => { shownRef.current = shown; }, [shown]);
   // Too few mappable listings to be useful → graceful unavailable state
   // rather than a near-empty map.
   const unavailable = (results?.length ?? 0) > 0 && mappable.length === 0;
@@ -132,10 +145,14 @@ export default function MapView({
         // cluster reads differently from a 100-listing one.
         const step = n < 10 ? "sm" : n < 100 ? "md" : "lg";
         const px = step === "sm" ? 34 : step === "md" ? 44 : 54;
+        // Accessible name for the bubble — without it a screen reader
+        // announces only the bare number. role="img" + aria-label so the
+        // localized "N listings — click to zoom in" replaces the digits.
+        const aria = escapeHtml(t("map.cluster.aria", lcRef.current, { n }));
         return L.divIcon({
           // Count lives in a centered span so it stays optically centred
           // in the bubble at every tier; k-formatted so big clusters fit.
-          html: `<span class="pulpo-cluster__count">${formatClusterCount(n)}</span>`,
+          html: `<span class="pulpo-cluster__count" role="img" aria-label="${aria}">${formatClusterCount(n)}</span>`,
           className: `pulpo-cluster pulpo-cluster--${step}`,
           iconSize: L.point(px, px),
         });
@@ -165,6 +182,9 @@ export default function MapView({
     // programmatic moveend(s) from the initial setView.
     const readyTimer = setTimeout(() => { readyRef.current = true; }, 600);
     map.on("moveend", () => {
+      // A programmatic refit (fitNonce) must not be read as a user pan — ignore
+      // every moveend inside the suppress window, not just the first one.
+      if (Date.now() < suppressMoveUntilRef.current) return;
       if (!searchAsIMoveRef.current || !readyRef.current) return;
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       moveTimerRef.current = setTimeout(() => {
@@ -262,6 +282,33 @@ export default function MapView({
     markerByIdRef.current = byId;
     cluster.addLayers(markers);
   }, [shown]);
+
+  // WS4 map↔search sync — refit the viewport to the shown set when the
+  // parent signals a search/filter change (fitNonce bump), and once on
+  // mount so the map lands on the results instead of the static SV centre.
+  // Reads `shown` via shownRef and depends only on [fitNonce], so a pan
+  // never refits. invalidateSize first (the lazy/mobile container may not
+  // be settled), and flag the move so its moveend doesn't write ?bbox=.
+  useEffect(() => {
+    const pts = shownRef.current.map((l) => [l.lat, l.lng]);
+    if (!mapRef.current || pts.length === 0) return;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    requestAnimationFrame(() => {
+      const map = mapRef.current;
+      if (!map) return;
+      map.invalidateSize();
+      // Drop any queued user-pan bbox write so a stale debounce can't fire with
+      // the post-refit bounds, then open a window that covers the animation's
+      // moveend(s). 0.4s animate + buffer; instant when reduced-motion.
+      if (moveTimerRef.current) { clearTimeout(moveTimerRef.current); moveTimerRef.current = null; }
+      suppressMoveUntilRef.current = Date.now() + (reduced ? 250 : 750);
+      map.fitBounds(L.latLngBounds(pts), {
+        padding: [40, 40], maxZoom: 13, animate: !reduced, duration: 0.4,
+      });
+    });
+  }, [fitNonce]);
 
   // PR-9 — reflect an externally-hovered card onto its marker (add the
   // sync highlight class to the matching pin, if it's currently in the
