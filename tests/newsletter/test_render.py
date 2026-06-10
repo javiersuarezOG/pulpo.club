@@ -80,6 +80,51 @@ def test_render_free_prefs_shows_paywall(free_with_prefs, ranked_pool):
     assert "stripe/start-checkout" in html
 
 
+def test_unsubscribe_link_edition_matches_email_edition(
+    pro_with_prefs, free_with_prefs, ranked_pool
+):
+    """The /api/unsubscribe confirmation page edition (`&e=`) must match the
+    EDITION the reader was actually sent — which is the render `variant`
+    (free vs pro chrome), NOT `recipient.tier`. The two can diverge:
+
+      • a free-tier reader can be rendered into a Pro template (the
+        `paywall_all` path), and
+      • `agency` is a PAID tier that is not "free".
+
+    Deriving the stamp from the same `free` flag that draws the masthead
+    PRO badge (in `_footer_html`) keeps page == email by construction.
+    Regression guard for the tier-based stamp that shipped in #808.
+    """
+    import dataclasses
+
+    def stamp(recipient, variant):
+        issue = build_issue(
+            recipient=recipient, ranked_listings=ranked_pool,
+            issue_number=1, issue_date=ISSUE_DATE, history_rows=[],
+        )
+        html = render_html(issue, variant=variant).replace("&amp;", "&")
+        m = re.search(r"/api/unsubscribe\?[^\"']*", html)
+        assert m, "no unsubscribe link rendered in footer"
+        link = m.group(0)
+        e = re.search(r"[?&]e=(\w+)", link)
+        loc = re.search(r"[?&]l=(\w+)", link)
+        return (e.group(1) if e else None, loc.group(1) if loc else None)
+
+    # Pro variant -> Pro retention page.
+    assert stamp(pro_with_prefs, "general")[0] == "pro"
+    # Free variant -> Free upsell page.
+    assert stamp(free_with_prefs, "free_general")[0] == "free"
+    # Divergence guard #1: a FREE-tier reader rendered into the PRO
+    # template lands on the Pro page (matches the email), not the free one.
+    assert stamp(free_with_prefs, "general")[0] == "pro"
+    # Divergence guard #2: `agency` (paid) in the Pro template -> Pro page.
+    agency = dataclasses.replace(pro_with_prefs, tier="agency")
+    assert stamp(agency, "general")[0] == "pro"
+    # Locale flows into `&l=` from the same render path.
+    es_reader = dataclasses.replace(free_with_prefs, locale="es")
+    assert stamp(es_reader, "free_general") == ("free", "es")
+
+
 def test_render_anonymous_has_welcome_cta(anonymous, ranked_pool):
     html = _render(anonymous, ranked_pool)
     assert "/welcome?r=" in html
