@@ -182,6 +182,35 @@ test.describe("Browse map view", () => {
     expect(drawerTop.inDrawer, "filter drawer backdrop should sit above map panes").toBe(true);
   });
 
+  test("[perf] mobile sheet virtualizes — only a windowed slice of rows is mounted", async ({ page }) => {
+    await seedConsent(page);
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    const sheet = page.locator(".map-sheet");
+    await expect(sheet).toBeVisible();
+
+    // Worst case: expand into the full vertical scroller, then jump deep.
+    await page.locator(".map-sheet__handle").click();
+    await expect(sheet).toHaveClass(/map-sheet--expanded/);
+    await page.locator(".map-sheet__cards").evaluate((el) => { el.scrollTop = Math.floor(el.scrollHeight / 2); });
+    await page.waitForTimeout(120); // let the rAF-throttled window recompute
+
+    const mounted = await page.locator(".map-sheet__cards .map-sheet-row").count();
+    const imgs = await page.locator(".map-sheet__cards .map-sheet-row img").count();
+    // The catalogue is ~1,400 mapped listings; pre-fix this sheet mounted ALL of
+    // them (~54k DOM nodes / ~93MB heap). A windowed sheet mounts a tiny slice.
+    expect(mounted, "sheet rows must be windowed, not the full catalogue").toBeLessThan(80);
+    expect(mounted, "the window must still render rows").toBeGreaterThan(0);
+    expect(imgs, "image count tracks the row window").toBeLessThan(80);
+
+    // The scrollbar stays honest — spacers preserve the full content height.
+    const { scrollHeight, clientHeight } = await page.locator(".map-sheet__cards").evaluate((el) => ({
+      scrollHeight: el.scrollHeight, clientHeight: el.clientHeight,
+    }));
+    expect(scrollHeight, "spacers preserve the full scroll height").toBeGreaterThan(clientHeight * 3);
+  });
+
   test("map panes stay below detail and conversion overlays", async ({ page }) => {
     await seedConsent(page);
     await seedProUser(page);
