@@ -600,6 +600,11 @@ test.describe("New app boots cleanly on key routes", () => {
       "Search listings",                              // browse.search.aria_label
       "Clear search",                                 // browse.search.clear_aria
       "Best match",                                   // browse.sort.by_relevance (relevance label, query-active)
+      // Browse active-filter chips + results-table headers. These render only
+      // with a facet applied / table view active (driven by dedicated tests in
+      // browse-search-autocomplete.spec.ts) — listed here as documented backstop.
+      "ocean view", "price drop",                     // active-filter enum chips (raw-slug leak)
+      "Signal",                                       // browse.table.col.signal header
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would

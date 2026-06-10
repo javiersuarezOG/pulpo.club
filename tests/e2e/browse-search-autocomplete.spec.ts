@@ -106,4 +106,36 @@ test.describe("Browse search autocomplete", () => {
     await search.press("Escape");
     await expect(search).toHaveJSProperty("value", "");
   });
+
+  // [i18n] The active-filter row used to render raw enum slugs ("ocean view",
+  // "price drop") in Spanish while the FilterPanel rendered the translated
+  // label — verified live on prod. The canary smoke test never applies a facet,
+  // so this drives the leaking state directly. (B1)
+  test("[i18n] active-filter chips localize enum values in Spanish", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "es"));
+    await page.goto("/browse?features=ocean_view&status=price_drop", { waitUntil: "networkidle" });
+    const row = page.locator(".active-filter-row");
+    await row.waitFor({ state: "visible", timeout: 10_000 });
+    const text = (await row.textContent()) ?? "";
+    expect(text, "feature chip reuses filter.feature.ocean_view (es)").toContain("Vista al mar");
+    expect(text, "status chip reuses filter.ranking.price_drops (es)").toContain("Bajó de precio");
+    expect(text, "raw English feature enum must not leak").not.toContain("ocean view");
+    expect(text, "raw English status enum must not leak").not.toContain("price drop");
+  });
+
+  // [i18n] The desktop results-table column headers were hardcoded English —
+  // Spanish users saw "Listing/Zone/.../Signal". The canary smoke never renders
+  // the table view, so drive it here at desktop width. (B2)
+  test("[i18n] results-table headers localize in Spanish", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "es"));
+    await page.goto("/browse?view=table", { waitUntil: "networkidle" });
+    const thead = page.locator(".results-table thead");
+    await thead.waitFor({ state: "visible", timeout: 10_000 });
+    const headerText = (await thead.textContent()) ?? "";
+    expect(headerText, "header 'Listing' → 'Propiedad'").toContain("Propiedad");
+    expect(headerText, "header 'Signal' → 'Señal'").toContain("Señal");
+    expect(headerText, "English 'Listing' must not leak").not.toContain("Listing");
+    expect(headerText, "English 'Signal' must not leak").not.toContain("Signal");
+  });
 });
