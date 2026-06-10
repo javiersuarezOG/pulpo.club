@@ -848,6 +848,7 @@ export function NewsletterWidget() {
                     <b>{tpl.title}</b> → {e.to}
                     <span className="nl-log-sub"> · {(e.locale || "en").toUpperCase()} · {e.by || "—"}{e.detail ? ` · ${e.detail}` : ""}</span>
                   </span>
+                  {/* i18n-allow: admin-only delivery-log status enum (operator console, not a user-facing surface) */}
                   <span className={`nl-res ${res}`}>{res.replace("_", "-")}</span>
                 </div>
               );
