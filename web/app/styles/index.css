@@ -4251,6 +4251,28 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 .sub-plan-status-copy { font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
 .sub-plan-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
+/* Post-cancel "you're on Free now" panel — keeps the free value visible
+   next to the Resubscribe CTA so churn reads as a choice, not a dead end. */
+.sub-free-panel {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.sub-free-panel-head {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.sub-free-panel-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0;
+}
+
 .status-pill {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 12px; border-radius: 999px;

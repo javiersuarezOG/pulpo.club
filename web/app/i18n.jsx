@@ -920,6 +920,15 @@ const UI_STRINGS = {
   "view.cards":              { en: "Card view",                     es: "Vista en tarjetas" },
   "view.table":              { en: "Table view",                    es: "Vista en tabla" },
   "view.filters":            { en: "Filters",                       es: "Filtros" },
+  // Results table (desktop) column headers + the per-row rank screen-reader label.
+  "browse.table.col.listing": { en: "Listing",  es: "Propiedad" },
+  "browse.table.col.zone":    { en: "Zone",     es: "Zona" },
+  "browse.table.col.type":    { en: "Type",     es: "Tipo" },
+  "browse.table.col.size":    { en: "Size",     es: "Tamaño" },
+  "browse.table.col.price":   { en: "Price",    es: "Precio" },
+  "browse.table.col.days":    { en: "Days",     es: "Días" },
+  "browse.table.col.signal":  { en: "Signal",   es: "Señal" },
+  "browse.table.rank_aria":   { en: "Pulpo ranked {rank}", es: "Clasificación Pulpo {rank}" },
 
   // PillRail
   "pill.scroll_left":        { en: "Scroll left",                   es: "Desplazar a la izquierda" },
@@ -1444,6 +1453,12 @@ const UI_STRINGS = {
   // Reactivate CTA shown to canceling + canceled users instead of "Manage plan".
   "account.sub.reactivate":            { en: "Resubscribe →",
                                           es: "Volver a suscribirme →" },
+  // Post-cancel "you're on Free now" panel — frames the downgrade as a
+  // real choice: keep the free weekly, or resubscribe for the full thing.
+  "account.sub.free_panel.head":       { en: "You're on Pulpo Free",
+                                          es: "Estás en Pulpo Free" },
+  "account.sub.free_panel.body":       { en: "Your weekly top 3 — the best new beach & lake listings — still lands in your inbox every Sunday. Resubscribe to Pro for all 10 plus the full listings catalogue.",
+                                          es: "Tu top 3 semanal — las mejores propiedades nuevas de playa y lago — sigue llegando a tu correo cada domingo. Vuelve a Pro para las 10 y el catálogo completo." },
 
   // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
   // Public marketing surfaces that funnel cold visitors into Stripe

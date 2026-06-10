@@ -133,9 +133,71 @@ function logApi(fields) {
   console.log(parts.join(" "));
 }
 
+// ── Free welcome trigger ──────────────────────────────────────────────
+//
+// After a successful subscribe we fire the DB-free welcome email via the
+// internal Python dispatcher (api/internal/free-welcome-send.py → the same
+// free_welcome_dispatch the admin test uses). New contact → "free_welcome";
+// a re-subscribe (was unsubscribed) → "free_welcome_back" (the re-engaged
+// path). `is_new_contact: true` is the dispatcher's idempotency signal:
+// we only call this on a genuine create / re-subscribe.
+//
+// Best-effort + AWAITED. Best-effort: a slow / failed / unconfigured
+// dispatch must NEVER fail the subscribe — the Resend contact already
+// exists, the welcome is secondary, and the caller already saw success.
+// Awaited (not fire-and-forget) because Vercel can freeze the function the
+// instant the response is sent, dropping a detached promise. Short timeout
+// caps the added latency. Skips silently when PULPO_INTERNAL_TOKEN is unset
+// (e.g. a preview deploy without the secret) — logged, not thrown.
+
+const FREE_WELCOME_PATH = "/api/internal/free-welcome-send";
+const FREE_WELCOME_TIMEOUT_MS = 8000;
+
+function freeWelcomeBaseUrl() {
+  return process.env.PULPO_SITE_ROOT || "https://pulpo.club";
+}
+
+async function fireFreeWelcome({ email, locale, variant, source, fetchImpl } = {}) {
+  const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
+  if (!token) {
+    logApi({ free_welcome: "skipped", reason: "internal_token_unset", variant, domain: emailDomain(email) });
+    return { fired: false, reason: "internal_token_unset" };
+  }
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), FREE_WELCOME_TIMEOUT_MS);
+  try {
+    const r = await (fetchImpl || fetch)(`${freeWelcomeBaseUrl()}${FREE_WELCOME_PATH}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "pulpo-newsletter-signup",
+      },
+      body: JSON.stringify({ email, source, variant, locale, is_new_contact: true }),
+      signal: controller.signal,
+    });
+    let body = null;
+    try { body = await r.json(); } catch { /* best-effort */ }
+    logApi({
+      free_welcome: (body && body.status) || `http_${r.status}`,
+      reason: (body && body.reason) || "-",
+      variant, dry_run: !!(body && body.dry_run), domain: emailDomain(email),
+    });
+    return { fired: true, status: body && body.status, httpStatus: r.status };
+  } catch (err) {
+    const reason = err && err.name === "AbortError"
+      ? "timeout"
+      : `fetch_failed:${(err && err.message) || "unknown"}`;
+    logApi({ free_welcome: "error", reason, variant, domain: emailDomain(email) });
+    return { fired: false, reason };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
 // ── Handler ──────────────────────────────────────────────────────────
 
-module.exports = async (req, res) => {
+async function handler(req, res, { fetchImpl, resendImpl } = {}) {
   const t0 = Date.now();
 
   if (req.method !== "POST") {
@@ -179,7 +241,7 @@ module.exports = async (req, res) => {
   // Returns 503 (not 500) so monitoring tells "feature not configured"
   // apart from "feature crashed." Vercel ops sets the env vars and
   // the endpoint comes online without a redeploy of the FE.
-  const client = resendClient();
+  const client = resendImpl || resendClient();
   const audienceId = process.env.RESEND_AUDIENCE_ID;
   if (!client || !audienceId) {
     logApi({
@@ -235,6 +297,8 @@ module.exports = async (req, res) => {
             email,
             unsubscribed: false,
           });
+          // Re-engaged free subscriber → welcome-back (best-effort).
+          await fireFreeWelcome({ email, locale, variant: "free_welcome_back", source: "resend_resubscribe", fetchImpl });
           logApi({
             status: 200, ms: Date.now() - t0,
             reason: "resubscribed",
@@ -263,6 +327,8 @@ module.exports = async (req, res) => {
       });
       return res.status(502).json({ error: "upstream_error" });
     }
+    // New free subscriber → welcome (best-effort; never fails the subscribe).
+    await fireFreeWelcome({ email, locale, variant: "free_welcome", source: "signup", fetchImpl });
     logApi({
       status: 200, ms: Date.now() - t0,
       domain: emailDomain(email),
@@ -282,4 +348,8 @@ module.exports = async (req, res) => {
     });
     return res.status(500).json({ error: "internal_error" });
   }
-};
+}
+
+module.exports = (req, res) => handler(req, res);
+module.exports.handler = handler;
+module.exports.fireFreeWelcome = fireFreeWelcome;
