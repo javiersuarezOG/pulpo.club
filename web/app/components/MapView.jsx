@@ -78,7 +78,11 @@ export default function MapView({
   const searchAsIMoveRef = useRef(searchAsIMove);
   const moveTimerRef = useRef(null);
   const readyRef = useRef(false); // suppress the init-triggered moveend
-  const suppressMoveendRef = useRef(false); // suppress the moveend from a programmatic fitBounds (refit)
+  // Ignore programmatic-fitBounds moveends until this timestamp. A one-shot
+  // boolean was wrong: an animated fitBounds emits MORE than one moveend, so a
+  // single consume left later events to write a spurious ?bbox=. A time window
+  // covers every moveend the animation produces.
+  const suppressMoveUntilRef = useRef(0);
   const lcRef = useRef(lc);
   useEffect(() => { onOpenRef.current = onOpenListing; }, [onOpenListing]);
   useEffect(() => { onHoverRef.current = onHoverMarker; }, [onHoverMarker]);
@@ -174,9 +178,9 @@ export default function MapView({
     // programmatic moveend(s) from the initial setView.
     const readyTimer = setTimeout(() => { readyRef.current = true; }, 600);
     map.on("moveend", () => {
-      // A programmatic refit (fitNonce) must not be read as a user pan —
-      // consume the flag and skip writing ?bbox=.
-      if (suppressMoveendRef.current) { suppressMoveendRef.current = false; return; }
+      // A programmatic refit (fitNonce) must not be read as a user pan — ignore
+      // every moveend inside the suppress window, not just the first one.
+      if (Date.now() < suppressMoveUntilRef.current) return;
       if (!searchAsIMoveRef.current || !readyRef.current) return;
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       moveTimerRef.current = setTimeout(() => {
@@ -291,7 +295,11 @@ export default function MapView({
       const map = mapRef.current;
       if (!map) return;
       map.invalidateSize();
-      suppressMoveendRef.current = true;
+      // Drop any queued user-pan bbox write so a stale debounce can't fire with
+      // the post-refit bounds, then open a window that covers the animation's
+      // moveend(s). 0.4s animate + buffer; instant when reduced-motion.
+      if (moveTimerRef.current) { clearTimeout(moveTimerRef.current); moveTimerRef.current = null; }
+      suppressMoveUntilRef.current = Date.now() + (reduced ? 250 : 750);
       map.fitBounds(L.latLngBounds(pts), {
         padding: [40, 40], maxZoom: 13, animate: !reduced, duration: 0.4,
       });

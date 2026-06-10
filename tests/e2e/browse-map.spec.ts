@@ -344,6 +344,17 @@ test.describe("Browse map view", () => {
     expect(new URL(page.url()).searchParams.get("bbox"), "inbound bbox survives entry").toBe(bbox);
   });
 
+  test("[regression] a programmatic refit never writes its own ?bbox= (multi-moveend)", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    // Cold map load with NO bbox → the entry fitBounds refit runs (animated),
+    // which can emit more than one moveend. None may be mistaken for a user pan.
+    await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+    await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+    // Wait well past the fit animation (0.4s) + the moveend debounce (0.4s).
+    await page.waitForTimeout(1500);
+    expect(/[?&]bbox=/.test(new URL(page.url()).search), "refit must not synthesize a bbox").toBe(false);
+  });
+
   test("empty-in-view panel offers a way back to all results", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     // bbox out in the Pacific — matches nothing, but the search itself has
