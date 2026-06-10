@@ -442,7 +442,11 @@ export function NewsletterWidget() {
   // Source-of-truth state.
   const [config, setConfig] = useState({ connections: [], all_ready: false, unavailable_reason: null, loaded: false });
   const [health, setHealth] = useState({ families: [], unavailable_reason: null });
-  const [versions, setVersions] = useState({});
+  // Named `templateVersions` (not `versions`) — the Python guard
+  // tests/newsletter/test_templates.py greps the widget for a
+  // `templateVersions[...]` read to prove the chrome renders FETCHED
+  // versions, never a hardcoded mirror. Keep the name in lock-step.
+  const [templateVersions, setTemplateVersions] = useState({});
   const [serverEntries, setServerEntries] = useState([]);
   const [serverUnavailable, setServerUnavailable] = useState(null);
   const [localEntries, setLocalEntries] = useState(() => readLog());
@@ -459,7 +463,7 @@ export function NewsletterWidget() {
     fetchConfig().then((c) => setConfig({ ...c, loaded: true }));
     refreshHealth();
     refreshServerLog();
-    fetchTemplateVersions().then(setVersions);
+    fetchTemplateVersions().then(setTemplateVersions);
   }, [refreshHealth, refreshServerLog]);
 
   const log = mergeLogs(serverEntries, localEntries);
@@ -692,7 +696,7 @@ export function NewsletterWidget() {
         <section className="nl-sec">
           <p className="nl-sec-title">Templates <span className="nl-count">{TEMPLATES.length}</span></p>
           {TEMPLATES.map((tpl) => {
-            const ver = tpl.templateId ? versions[tpl.templateId] : null;
+            const ver = tpl.templateId ? templateVersions[tpl.templateId] : null;
             const hrow = healthById[tpl.id];
             const hs = healthStatus(hrow);
             const st = statusFor(tpl.id);
