@@ -4,7 +4,7 @@ import { attachErrorRecorder } from "./_helpers";
 const CLERK_CAPTCHA_RE = /Clerk:.*Failed to load the CAPTCHA|Failed to load the CAPTCHA script/i;
 const CSP_VIOLATION_RE = /violates the following Content Security Policy directive/i;
 
-test.describe("Clerk CAPTCHA CSP guard", () => {
+test.describe("@critical Clerk CAPTCHA CSP guard", () => {
   test("activation landing does not emit Clerk CAPTCHA or CSP console failures", async ({ page }) => {
     await page.addInitScript(() => {
       try { localStorage.removeItem("pulpo-user"); } catch { /* ignore */ }

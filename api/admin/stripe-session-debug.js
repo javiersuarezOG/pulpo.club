@@ -24,6 +24,7 @@
 // is calling this and from where. Does NOT call any Clerk mutation
 // or Stripe mutation API.
 
+const crypto = require("crypto");
 const {
   stripeClient,
   clerkClient,
@@ -44,7 +45,7 @@ async function findClerkUserByEmail(clerk, email) {
 async function findPendingInvitationsForEmail(clerk, email) {
   if (!email) return [];
   try {
-    const result = await clerk.invitations.getInvitationList({ status: "pending" });
+    const result = await clerk.invitations.getInvitationList({ status: "pending", limit: 500 });
     const list = Array.isArray(result) ? result : (result && result.data) || [];
     return list
       .filter((inv) => (inv.emailAddress || "").toLowerCase() === email.toLowerCase())

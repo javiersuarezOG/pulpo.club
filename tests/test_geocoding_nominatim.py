@@ -71,6 +71,12 @@ def test_build_query_skips_empty_strings():
     assert build_query(li) == "La Libertad, El Salvador"
 
 
+def test_build_query_uses_active_country_name(monkeypatch):
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    li = {"zone": "san-carlos", "municipality": None, "department": None}
+    assert build_query(li) == "San Carlos, Panama"
+
+
 # ── geocode_one ───────────────────────────────────────────────────────
 
 def test_geocode_one_returns_result_on_valid_response():
@@ -86,6 +92,20 @@ def test_geocode_one_returns_result_on_valid_response():
     assert "El Tunco" in result.display_name
     # Header check — Nominatim policy requires User-Agent
     assert stub.calls[0]["headers"].get("User-Agent")
+
+
+def test_geocode_one_uses_active_country_code_and_bbox(monkeypatch):
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    stub = _StubGet({
+        "San Carlos, Panama": _StubResponse(200, [
+            {"lat": "8.47", "lon": "-80.05", "display_name": "San Carlos, Panamá Oeste, Panama"}
+        ])
+    })
+    result = geocode_one("San Carlos, Panama", http_get=stub)
+    assert isinstance(result, GeocodeResult)
+    assert result.lat == 8.47
+    assert result.lng == -80.05
+    assert stub.calls[0]["params"]["countrycodes"] == "pa"
 
 
 def test_geocode_one_rejects_outside_sv_bbox():

@@ -44,14 +44,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from pulpo.countries import active as _active_country
+
 
 NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search"
 NOMINATIM_USER_AGENT = "pulpo.club/0.1 (sebastian@pulpo.club)"
 RATE_LIMIT_SLEEP_S = 1.1   # Nominatim's policy is 1 req/sec; 1.1s adds margin
 
-# El Salvador bounding box (same as automation/llm_enrichment_schema.py).
-# Reject Nominatim results that fall outside — defensive against
-# geocoder picking a same-named place in another country.
+# Default SV bounding box. The live validator reads the active country
+# manifest; these constants remain as compatibility pins for tests and
+# callers that imported them directly.
 SV_BBOX_LAT = (13.0, 14.6)
 SV_BBOX_LNG = (-90.6, -87.6)
 
@@ -98,7 +100,7 @@ def build_query(li: Any) -> Optional[str]:
         parts.append(department.strip())
     if not parts:
         return None
-    parts.append("El Salvador")  # multi-country-exempt: FIXME PR-MC-PA-4 — should read active().name_en; PA listings currently get SV appended
+    parts.append(_active_country().name_en)
     return ", ".join(parts)
 
 
@@ -120,9 +122,12 @@ def save_cache(path: Path, cache: dict) -> None:
     )
 
 
-def _result_in_sv_bbox(lat: float, lng: float) -> bool:
-    return (SV_BBOX_LAT[0] <= lat <= SV_BBOX_LAT[1]
-            and SV_BBOX_LNG[0] <= lng <= SV_BBOX_LNG[1])
+def _result_in_active_bbox(lat: float, lng: float) -> bool:
+    bbox = _active_country().bbox()
+    lat_bbox = bbox["lat"]
+    lng_bbox = bbox["lng"]
+    return (lat_bbox[0] <= lat <= lat_bbox[1]
+            and lng_bbox[0] <= lng <= lng_bbox[1])
 
 
 def _default_http_get(url: str, params: dict, headers: dict, timeout: float):
@@ -147,7 +152,7 @@ def geocode_one(query: str,
                 "q":             query,
                 "format":        "json",
                 "limit":         1,
-                "countrycodes":  "sv",     # restrict to El Salvador
+                "countrycodes":  _active_country().code.lower(),
             },
             headers={"User-Agent": NOMINATIM_USER_AGENT},
             timeout=10.0,
@@ -165,7 +170,7 @@ def geocode_one(query: str,
             lng = float(lng_s)
         except (TypeError, ValueError):
             return None
-        if not _result_in_sv_bbox(lat, lng):
+        if not _result_in_active_bbox(lat, lng):
             return None
         return GeocodeResult(
             lat          = round(lat, 6),

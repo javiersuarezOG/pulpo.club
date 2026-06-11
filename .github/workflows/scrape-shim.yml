@@ -170,6 +170,6 @@ jobs:
           # path but the cache is non-code so admin-merge is appropriate.
           # Mirrors the main nightly's data-PR pattern.
           PR_NUM=$(gh pr view "$BRANCH" --json number --jq .number)
-          gh pr merge "$PR_NUM" --squash --delete-branch --admin || \
-            gh pr merge "$PR_NUM" --squash --delete-branch --auto
+          gh pr merge "$PR_NUM" --squash --delete-branch --auto || \
+            gh pr merge "$PR_NUM" --squash --delete-branch --admin
           echo "committed=true" >> "$GITHUB_OUTPUT"

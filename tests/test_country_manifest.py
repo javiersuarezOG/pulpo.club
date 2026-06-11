@@ -38,6 +38,7 @@ def test_sv_manifest_loads():
     assert sv.locale_es == "es-SV"
     assert sv.locale_en == "en-US"
     assert sv.currency == "USD"
+    assert sv.bbox() == {"lat": (13.0, 14.6), "lng": (-90.6, -87.6)}
 
 
 def test_load_is_case_insensitive():
@@ -335,6 +336,7 @@ def test_pa_manifest_loads_with_required_only():
     assert pa.locale_es == "es-PA"
     assert pa.locale_en == "en-US"
     assert pa.currency == "USD"
+    assert pa.bbox() == {"lat": (7.0, 9.8), "lng": (-83.2, -77.0)}
     # Every optional reference-data section is intentionally absent.
     # When PA reference data lands, update these assertions deliberately.
     assert pa.named_beaches() == ()
