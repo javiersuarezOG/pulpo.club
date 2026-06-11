@@ -241,11 +241,20 @@ Key fields:
   force_vacation_gate: bool = True   # set False for broad national for-sale sources
 Override hooks (subclass methods) for quirks:
   _extract_detail(self, body, url, *, strategy) -> Optional[dict]
+      return the record dict, or None to skip the page.
   _extract_detail_urls_from_catalog_page(self, body, page_num) -> list[str]
-  _post_finalize_filter(self, record) -> bool
+      return the absolute detail-page URLs found on one catalog page.
+  _post_finalize_filter(self, record: dict) -> Optional[dict]
+      last-mile drop hook. RETURN THE RECORD DICT (optionally modified), or
+      None to DROP it. It must NOT return a bool — the skeleton passes the
+      return value straight to finalize_record(), so returning True/False
+      raises "'bool' object has no attribute 'get'". Default: return record.
 
-A record dict should carry at least: source, source_id, url, title, description,
-price_usd, area_m2, photo_urls, property_type, location_text.
+A record dict must carry: source, source_id, url, title, description,
+price_usd (numeric — REQUIRED to survive validation), area_m2, photo_urls,
+property_type (REQUIRED), location_text (or zone/municipality — REQUIRED).
+finalize_record() handles photo upgrade + type classification afterward; the
+hooks just return the record.
 
 The module MUST end with these two side effects, verbatim shape:
     register(SOURCES, "<slug>", <Class>())
