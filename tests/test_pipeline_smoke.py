@@ -52,6 +52,21 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
             "the listings_history.json sidecar should populate this for every listing."
         )
 
+    # The pre-commit row-count gate HARD-REQUIRES the country-scoped fresh
+    # candidate (#830 — it fail-loud errors if missing). Prove the offline
+    # pipeline actually produces it, so a refactor that stops writing it fails
+    # here instead of erroring every nightly at 02:00 UTC. (Active country
+    # defaults to SV → ranked.fresh.SV.json.)
+    fresh_sv_path = tmp_path / "web" / "data" / "ranked.fresh.SV.json"
+    assert fresh_sv_path.exists(), (
+        "ranked.fresh.SV.json not written by the offline pipeline — the "
+        "row-count gate would error on every nightly without it."
+    )
+    fresh_data = json.loads(fresh_sv_path.read_text())
+    assert isinstance(fresh_data, list) and len(fresh_data) > 0, (
+        "ranked.fresh.SV.json must be a non-empty list of candidate listings."
+    )
+
     # Confirm the real production file was NOT touched
     prod_ranked = REPO / "web" / "data" / "ranked.json"
     if prod_ranked.exists():

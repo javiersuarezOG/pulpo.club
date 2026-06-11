@@ -1213,6 +1213,26 @@ jobs:
           python3 scripts/nightly_summary.py --data-dir web/data --write-md \
             || echo "::warning::nightly summary script failed (non-blocking)"
 
+      - name: Classify nightly outcome
+        # One queryable verdict per run so dashboards/alerts can treat a
+        # data-quality HOLD (production protected; the site keeps serving
+        # last-good from main — safe) differently from a plumbing failure
+        # (page someone). Writes web/data/nightly_outcome.json (uploaded with
+        # the diagnostics below, so it survives even when the data commit
+        # didn't land) and fires the `nightly.outcome` PostHog event.
+        # Best-effort: never fails the nightly.
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMITTED: ${{ steps.commit.outputs.committed || '' }}
+          DEPLOY_CONCLUSION: ${{ steps.deploy.conclusion || '' }}
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+        run: |
+          python3 scripts/classify_nightly_outcome.py \
+            || echo "::warning::nightly outcome classification failed (non-blocking)"
+
       - name: Upload nightly diagnostics
         # Runs on success AND failure so the auto-repair workflow + a
         # human looking at the run page can always grab the working-tree
@@ -1238,6 +1258,7 @@ jobs:
             web/data/run_history.json
             web/data/hires_pipeline_metrics.jsonl
             web/data/nightly_summary.md
+            web/data/nightly_outcome.json
 
       - name: Slack on failure or cancellation
         # Final-line alert: any failed OR cancelled step in this job sends
