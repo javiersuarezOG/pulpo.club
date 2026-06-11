@@ -101,8 +101,19 @@ DEFAULT_MIN_RANKED = 10
 
 _UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
        "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15")
+# URL fragments that suggest a listing-detail page.
 _DETAIL_HINT_RE = re.compile(
-    r"(propiedad|inmueble|listing|property|detalle|/p/|/id/|/venta/)", re.IGNORECASE)
+    r"(ficha|propiedad|inmueble|listing|property|detalle|aviso|anuncio|"
+    r"venta|vende|/p/|/id/)", re.IGNORECASE)
+# Utility / navigation pages that also contain listing-ish words but are NOT
+# listings (e.g. "publicar-propiedad" = a 'post your property' page). These
+# must be excluded or the probe shows the model a junk page and it authors a
+# wrong detail_url_pattern — the exact bug the bienesonline run hit.
+_NAV_DENY_RE = re.compile(
+    r"(publicar|dashboard|login|logout|registr|cuenta|account|contacto|contact|"
+    r"about|nosotros|quienes|sell\b|vender|favorit|ayuda|help|terminos|privac|"
+    r"sitemap|/tag/|/categoria/|/blog/|noticia|facebook|twitter|instagram|"
+    r"whatsapp|mailto:|tel:|javascript:)", re.IGNORECASE)
 
 
 def _http_get(url: str, *, cap: int = 200_000, timeout: float = 20.0) -> Optional[str]:
@@ -129,22 +140,36 @@ def _clean_html(html: str, *, cap: int) -> str:
     return html.strip()[:cap]
 
 
+def _detail_candidates(catalog_url: str, raw_html: str) -> list[str]:
+    """Listing-detail URLs discovered in the catalog HTML: hint-matching,
+    nav-denylisted, deduped, for-sale (venta) preferred. Real listings recur;
+    nav links are filtered, so the head of this list is a good sample."""
+    seen: list[str] = []
+    for href in re.findall(r'href="([^"#]+)"', raw_html):
+        full = urljoin(catalog_url, href)
+        if full == catalog_url or full in seen:
+            continue
+        if not _DETAIL_HINT_RE.search(full) or _NAV_DENY_RE.search(full):
+            continue
+        seen.append(full)
+    venta = [u for u in seen if re.search(r"venta|vende|for-sale", u, re.IGNORECASE)]
+    return (venta or seen)[:6]
+
+
 def _probe_site(catalog_url: str) -> dict:
-    """Fetch catalog + a sample detail page + sitemap <loc>s. Best-effort:
-    any field may be None/empty; onboarding proceeds regardless."""
+    """Fetch catalog + sample detail URLs + one detail page + sitemap <loc>s.
+    Best-effort: any field may be None/empty; onboarding proceeds regardless."""
     out: dict = {"catalog_html": None, "detail_url": None, "detail_html": None,
-                 "sitemap_locs": []}
+                 "sample_detail_urls": [], "sitemap_locs": []}
     raw = _http_get(catalog_url)
     if raw:
         out["catalog_html"] = _clean_html(raw, cap=9000)
-        hrefs = re.findall(r'href="([^"#]+)"', raw)
-        det = next((h for h in hrefs if _DETAIL_HINT_RE.search(h)
-                    and urljoin(catalog_url, h) != catalog_url), None)
-        if det:
-            det_url = urljoin(catalog_url, det)
-            draw = _http_get(det_url)
+        out["sample_detail_urls"] = _detail_candidates(catalog_url, raw)
+        if out["sample_detail_urls"]:
+            best = out["sample_detail_urls"][0]
+            draw = _http_get(best)
             if draw:
-                out["detail_url"] = det_url
+                out["detail_url"] = best
                 out["detail_html"] = _clean_html(draw, cap=9000)
     base = "{0.scheme}://{0.netloc}".format(urlsplit(catalog_url))
     for sm in ("/sitemap.xml", "/sitemap_index.xml"):
@@ -162,24 +187,31 @@ def _render_probe(probe: Optional[dict]) -> str:
     catalog = probe.get("catalog_html") or "<catalog fetch failed>"
     locs = probe.get("sitemap_locs") or []
     sitemap = "\n".join(locs) if locs else "<no sitemap.xml found>"
+    samples = probe.get("sample_detail_urls") or []
+    sample_block = "\n".join(samples) if samples else "<none found in the catalog HTML>"
     detail_url = probe.get("detail_url") or "<no detail page discovered from the catalog>"
     detail = probe.get("detail_html") or "<none>"
     return f"""
 What the live site actually looks like — READ THIS to choose extract_strategy
 and detail_url_pattern (don't guess):
 
-Catalog HTML (cleaned + truncated). If the listing links here are JS anchors
+REAL detail-page URLs found in the catalog — derive detail_url_pattern from
+these EXACT examples (do NOT invent a path like /inmueble/ that isn't here):
+{sample_block}
+
+Catalog HTML (cleaned + truncated). If the listing links are JS anchors
 (href="#...") rather than real detail URLs, the catalog is JS-rendered — use
 extract_strategy="sitemap" and the <loc> URLs below:
 ```html
 {catalog}
 ```
 
-sitemap.xml <loc> sample (the detail-URL shape lives here):
+sitemap.xml <loc> sample (a detail-URL source if the catalog is JS-rendered):
 {sitemap}
 
 Sample detail page ({detail_url}) — look for application/ld+json (use
-"detail_jsonld") or og: meta tags (use "detail_og_meta"):
+"detail_jsonld") or og: meta tags (use "detail_og_meta"), and the exact price
+/ area text to match:
 ```html
 {detail}
 ```

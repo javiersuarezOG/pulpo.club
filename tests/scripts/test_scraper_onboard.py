@@ -151,26 +151,49 @@ def test_clean_html_keeps_jsonld_drops_scripts_and_styles():
     assert "/propiedad/1" in cleaned          # markup kept
 
 
+def test_detail_candidates_denylists_nav_and_prefers_venta():
+    # the catalog links a 'post your property' nav page (contains "propiedad")
+    # plus real venta + alquiler listings. The nav page must be excluded and
+    # for-sale (venta) listings preferred — the exact bug the bienesonline run
+    # hit (it picked /publicar-propiedad.php and authored a wrong pattern).
+    html = (
+        '<a href="/publicar-propiedad.php">Publish</a>'
+        '<a href="/ficha-casa-venta-la-libertad_CAV1.php">A</a>'
+        '<a href="/ficha-casa-alquiler-san-salvador_CAA9.php">B</a>'
+        '<a href="/ficha-apartamento-venta-san-salvador_APV2.php">C</a>'
+    )
+    cands = onboard._detail_candidates("https://b.sv/inmuebles", html)
+    assert all("publicar" not in u for u in cands)            # nav excluded
+    assert all("venta" in u for u in cands)                   # venta preferred over alquiler
+    assert "https://b.sv/ficha-casa-venta-la-libertad_CAV1.php" in cands
+
+
 def test_probe_site_extracts_detail_url_and_sitemap(monkeypatch):
     pages = {
-        "https://acme.sv/propiedades": '<a href="/propiedad/123">x</a>',
-        "https://acme.sv/propiedad/123": '<meta property="og:title" content="Lot">',
-        "https://acme.sv/sitemap.xml": "<urlset><loc>https://acme.sv/propiedad/123</loc></urlset>",
+        "https://acme.sv/propiedades":
+            '<a href="/publicar-propiedad.php">nav</a>'
+            '<a href="/propiedad-venta/123">x</a>',
+        "https://acme.sv/propiedad-venta/123": '<meta property="og:title" content="Lot">',
+        "https://acme.sv/sitemap.xml": "<urlset><loc>https://acme.sv/propiedad-venta/123</loc></urlset>",
     }
     monkeypatch.setattr(onboard, "_http_get", lambda url, **kw: pages.get(url))
     probe = onboard._probe_site("https://acme.sv/propiedades")
-    assert probe["detail_url"] == "https://acme.sv/propiedad/123"
+    assert probe["detail_url"] == "https://acme.sv/propiedad-venta/123"  # not the publicar nav page
+    assert probe["sample_detail_urls"] == ["https://acme.sv/propiedad-venta/123"]
     assert "og:title" in (probe["detail_html"] or "")
-    assert probe["sitemap_locs"] == ["https://acme.sv/propiedad/123"]
+    assert probe["sitemap_locs"] == ["https://acme.sv/propiedad-venta/123"]
 
 
 def test_build_prompt_renders_probe():
-    probe = {"catalog_html": "<a href='/propiedad/1'>", "detail_url": "https://acme.sv/propiedad/1",
+    probe = {"catalog_html": "<a href='/propiedad-venta/1'>",
+             "detail_url": "https://acme.sv/propiedad-venta/1",
              "detail_html": '<script type="application/ld+json">{}</script>',
-             "sitemap_locs": ["https://acme.sv/propiedad/1", "https://acme.sv/propiedad/2"]}
+             "sample_detail_urls": ["https://acme.sv/propiedad-venta/1", "https://acme.sv/propiedad-venta/2"],
+             "sitemap_locs": ["https://acme.sv/propiedad-venta/1"]}
     prompt = onboard.build_onboard_prompt(_ctx("acme"), source_url="https://acme.sv", probe=probe)
     assert "What the live site actually looks like" in prompt
-    assert "https://acme.sv/propiedad/2" in prompt   # sitemap loc rendered
+    assert "REAL detail-page URLs" in prompt
+    assert "https://acme.sv/propiedad-venta/2" in prompt   # sample detail URL rendered
     assert "READ THIS" in prompt
 
 
