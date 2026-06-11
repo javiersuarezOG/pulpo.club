@@ -1246,6 +1246,11 @@ function BrowsePage({ app }) {
   // the priority lane.
   const ABOVE_FOLD_COUNT = 6;
   const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
+  // Map view paginates its card panel + bottom sheet too: unfiltered, the
+  // map shows the whole catalog (~1500), and rendering that many full
+  // ListingCards — on mobile, inside a fixed bottom sheet — janks low-end
+  // devices. Same PAGE_SIZE cap + "Load more" as the list view.
+  const [mapVisibleCount, setMapVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
@@ -1391,6 +1396,13 @@ function BrowsePage({ app }) {
         l.lng >= mapBbox.minLng && l.lng <= mapBbox.maxLng,
     );
   }, [results, view, searchAsIMove, mapBbox]);
+
+  // Reset the map card cap whenever the shown set changes (fresh search or
+  // a pan that re-narrows the viewport) so the first 60 of the new set show.
+  pUseEffect(() => {
+    setMapVisibleCount(PAGE_SIZE);
+  }, [mapResults]);
+  const mapVisible = pUseMemo(() => mapResults.slice(0, mapVisibleCount), [mapResults, mapVisibleCount]);
 
   // In map view every visible count reflects what's actually shown
   // (mapResults) so the list, the map, and the header never disagree —
@@ -1755,7 +1767,7 @@ function BrowsePage({ app }) {
           ) : view === "map" ? (
             <div className="map-split">
               <div className="map-split__cards" ref={cardPanelRef}>
-                {mapResults.map((l) => (
+                {mapVisible.map((l) => (
                   <ListingCard
                     key={l.id}
                     listing={l}
@@ -1767,6 +1779,26 @@ function BrowsePage({ app }) {
                     onOpen={() => handleMapOpenListing(l.id)}
                   />
                 ))}
+                {mapVisibleCount < mapResults.length && (
+                  <div className="browse-load-more">
+                    <button
+                      type="button"
+                      className="btn-ghost lg"
+                      onClick={() => {
+                        const next = mapVisibleCount + PAGE_SIZE;
+                        track("browse.load_more_clicked", {
+                          from: mapVisibleCount,
+                          to: Math.min(next, mapResults.length),
+                          total: mapResults.length,
+                          surface: "map",
+                        });
+                        setMapVisibleCount(next);
+                      }}
+                    >
+                      {t("browse.load_more", app.locale, { n: mapResults.length - mapVisibleCount })}
+                    </button>
+                  </div>
+                )}
               </div>
               <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
                 <LazyMapView
