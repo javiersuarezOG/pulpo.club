@@ -540,6 +540,7 @@ def run_onboarding(
     budget_usd: float,
     limit: int = 50,
     min_ranked: int = DEFAULT_MIN_RANKED,
+    trace_dir: Optional[Path] = None,
     log=print,
 ):
     """Run the onboarding loop and, on success, leave the scraper on disk +
@@ -549,7 +550,7 @@ def run_onboarding(
         result = agent_loop(
             slug, propose=propose, evaluate=evaluate, sandbox=sb,
             budget=Budget(limit_usd=budget_usd), kind="onboard",
-            max_iters=max_iters, log=log,
+            max_iters=max_iters, log=log, trace_dir=trace_dir,
         )
         pr_body = None
         if result.passed:
@@ -575,6 +576,9 @@ def main(argv: Optional[list[str]] = None) -> int:
                    help="Fetch the source each eval (required for a real new source).")
     p.add_argument("--dry-run", action="store_true",
                    help="Print the first-iteration prompt and exit. No API call, no edits.")
+    p.add_argument("--trace-dir", default=None,
+                   help="Where to write per-iteration diagnostics (module source + "
+                        "funnel). Default: a temp dir, path printed at the end.")
     args = p.parse_args(argv)
 
     if not re.fullmatch(r"[a-z0-9_]+", args.slug):
@@ -599,18 +603,24 @@ def main(argv: Optional[list[str]] = None) -> int:
               "fixtures, so the eval cannot make progress. Pass --live for a "
               "real onboarding run.")
 
+    import tempfile
+    trace_dir = Path(args.trace_dir) if args.trace_dir else (
+        Path(tempfile.gettempdir()) / "scraper_agent" / args.slug)
+
     propose = make_propose(args.url, provider=args.provider, model=args.model)
     result, _ = run_onboarding(
         args.slug, args.url, propose=propose, live=args.live,
         max_iters=args.max_iters, budget_usd=args.budget, limit=args.limit,
-        min_ranked=args.min_ranked,
+        min_ranked=args.min_ranked, trace_dir=trace_dir,
     )
     print("\n" + result.summary())
+    print(f"   trace (every attempt's module + funnel): {trace_dir}")
     if result.passed:
         print(f"\n✅ scraper left at pulpo/scrapers/{args.slug}.py — review & PR.")
         print(f"   draft PR body: PR_BODY_{args.slug}.md")
         return 0
     print("\n❌ did not reach the acceptance gate — nothing committed.")
+    print(f"   diagnose: open {trace_dir}/best-scraper.py and the iter-NN.json funnels.")
     return 1
 
 

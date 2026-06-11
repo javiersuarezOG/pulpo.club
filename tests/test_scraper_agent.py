@@ -274,3 +274,29 @@ def test_loop_hits_max_iters_without_pass():
     assert res.stop_reason == "max_iters"
     assert res.iterations == 3
     assert not res.passed
+
+
+def test_loop_trace_dir_persists_attempts_and_funnel(tmp_path):
+    # observability: every attempt's module source + funnel breakdown lands on
+    # disk so a failed run is diagnosable without a hand-written script.
+    scripted = iter([_report(SLUG, 0.4, False, 5), _report(SLUG, 0.95, True, 30)])
+    trace = tmp_path / "trace"
+    with Sandbox(REPO, SLUG) as sb:
+        res = agent_loop(
+            SLUG, propose=_stub_propose(), evaluate=lambda: next(scripted),
+            sandbox=sb, budget=Budget(limit_usd=5.0), max_iters=4,
+            baseline=_report(SLUG, 0.0, False, 0), trace_dir=trace,
+        )
+    import json
+
+    names = {p.name for p in trace.iterdir()}
+    assert {"iter-00.json", "iter-01.json", "iter-02.json", "best-scraper.py",
+            "summary.json"} <= names
+    it1 = json.loads((trace / "iter-01.json").read_text())
+    assert it1["module_source"] == "# candidate 1\n"   # the exact scraper tried
+    assert "raw_sample" in it1["report"] and "failures" in it1["report"]
+    summary = json.loads((trace / "summary.json").read_text())
+    assert summary["passed"] is True and summary["best_iteration"] == 2
+    # best-scraper.py is the winning attempt
+    assert (trace / "best-scraper.py").read_text() == "# candidate 2\n"
+    assert res.passed

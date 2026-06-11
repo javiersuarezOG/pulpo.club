@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import json
 import tempfile
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 
@@ -71,6 +71,7 @@ class EvalReport:
     live: bool
     error: Optional[str] = None
     write_dir: Optional[str] = None
+    raw_sample: list[dict] = field(default_factory=list)  # first few raw records, for diagnosis
 
     def to_json(self) -> dict:
         return asdict(self)
@@ -172,6 +173,7 @@ def evaluate_scraper(
             live=live,
             error=result.error,
             write_dir=str(wd),
+            raw_sample=list(result.raw_sample or []),
         )
     finally:
         if own_tmp is not None:
