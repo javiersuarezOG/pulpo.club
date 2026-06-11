@@ -162,4 +162,5 @@ async function _setUnsubscribed({ email, unsubscribed, source }) {
 module.exports = {
   enrollPaidUserInAudience,
   unsubscribeOnPlanLoss,
+  _setUnsubscribed,
 };

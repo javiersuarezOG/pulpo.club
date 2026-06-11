@@ -149,7 +149,7 @@ def _run_free_welcome(args) -> int:
     return 0
 
 
-def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
+def _subject_for(issue, locale: str, *, preview: bool = False, newsletter: str = "pulpo-pro-general") -> str:
     # Tag-style subject: "{Brand} {Tier} · Issue NN". The brand-only
     # prefix was redundant with the From column ("Pulpo · ...") so we
     # drop the wasted chars and surface the tier ("Pro") instead — both
@@ -161,9 +161,10 @@ def _subject_for(issue, locale: str, *, preview: bool = False) -> str:
     # prefix so operators can tell test sends from real broadcasts.
     if preview:
         return f"[PULPO PREVIEW · {issue.cohort}] Issue {issue.issue_number:02d}"
+    tier = "Free" if newsletter.startswith("pulpo-free-") else "Pro"
     if locale == "es":
-        return f"Pulpo Pro · Edición {issue.issue_number:02d}"
-    return f"Pulpo Pro · Issue {issue.issue_number:02d}"
+        return f"Pulpo {tier} · Edición {issue.issue_number:02d}"
+    return f"Pulpo {tier} · Issue {issue.issue_number:02d}"
 
 
 def main() -> int:
@@ -413,6 +414,23 @@ def main() -> int:
         f"[send] mode={mode_label} recipients={len(queue)} "
         f"issue={args.issue_number} ranked={len(ranked)}"
     )
+    if len(queue) == 0 and not dry and not preview_mode and not args.only_email:
+        print(
+            "[send] ERROR: live audience run resolved 0 recipients; "
+            "failing so the workflow alerts instead of silently succeeding.",
+            file=sys.stderr,
+        )
+        _capture("email.newsletter.batch_failed", {
+            "issue_number": args.issue_number,
+            "issue_id": issue_date.strftime("%Y-%m-%d"),
+            "recipient_count": 0,
+            "template_version": TEMPLATE_VERSION,
+            "dry_run": dry,
+            "preview_mode": preview_mode,
+            "reason": "zero_recipients",
+            "audience_gate_bypassed": bool(args.allow_all_subscribers),
+        })
+        return 1
 
     out_dir = Path(args.write_html_to) if args.write_html_to else None
     if out_dir:
@@ -436,7 +454,7 @@ def main() -> int:
         # General master, preserving the prior behaviour.
         _render = TEMPLATES.get(args.newsletter) or render_html
         html = _render(issue)
-        subject = _subject_for(issue, recipient.locale, preview=preview_mode)
+        subject = _subject_for(issue, recipient.locale, preview=preview_mode, newsletter=args.newsletter)
 
         if out_dir:
             stem = f"{issue.issue_id}-issue{args.issue_number:02d}-{recipient.email_hash[:8]}.html"

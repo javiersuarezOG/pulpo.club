@@ -206,6 +206,16 @@ def test_validate_rejects_lat_outside_sv_bbox():
     assert reason == "invalid:latlong"
 
 
+def test_validate_accepts_latlong_inside_pa_bbox(monkeypatch):
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    r = _ok_response()
+    r["latlong"]["lat"] = 8.53
+    r["latlong"]["lng"] = -80.78
+    ok, reason = validate_response(r)
+    assert ok is True
+    assert reason is None
+
+
 def test_validate_rejects_lat_as_string():
     r = _ok_response()
     r["latlong"]["lat"] = "13.5"

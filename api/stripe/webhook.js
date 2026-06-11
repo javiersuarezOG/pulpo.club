@@ -1259,6 +1259,12 @@ module.exports = async (req, res) => {
           // subscription lifecycle.
           const subLocale = clerkLocaleFromStripe(sub.metadata && sub.metadata.locale);
           if (subCustomerId && subLocale) {
+            // `stripe` is declared inside the checkout.session.completed case
+            // block, which is out of scope here; this case needs its own
+            // client or it throws a ReferenceError → HTTP 500 on every
+            // locale-stamped subscription event (Stripe then retries ~3 days
+            // and subscription_changed telemetry below never fires).
+            const stripe = stripeClient();
             await setStripeCustomerPreferredLocale(
               stripe, subCustomerId, subLocale, "subscription_updated",
               posthog.emailDistinctId(subEmail), t0,

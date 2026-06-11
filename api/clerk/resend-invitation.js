@@ -75,7 +75,7 @@ async function findClerkUserByEmail(clerk, email) {
 async function findPendingInvitation(clerk, email) {
   if (!email) return null;
   try {
-    const result = await clerk.invitations.getInvitationList({ status: "pending" });
+    const result = await clerk.invitations.getInvitationList({ status: "pending", limit: 500 });
     const list = Array.isArray(result) ? result : (result && result.data) || [];
     return list.find((inv) => (inv.emailAddress || "").toLowerCase() === email.toLowerCase()) || null;
   } catch {

@@ -22,6 +22,7 @@ jobs:
   watchdog:
     name: Watchdog checks
     runs-on: ubuntu-latest
+    if: ${{ vars.WATCHDOG_SKIP != '1' }}
     # Read repo contents + write issues
     permissions:
       contents: read
@@ -63,6 +64,7 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
+          WATCHDOG_BODY: ${{ steps.watchdog.outputs.body }}
         run: |
           TODAY=$(date -u +%Y-%m-%d)
           TITLE="[watchdog] Pipeline check failed $TODAY"
@@ -79,16 +81,19 @@ jobs:
             --jq ".[] | select(.title == \"$TITLE\") | .number" \
             | head -1)
 
-          BODY="## Watchdog failure — $TODAY
+          BODY=$(cat <<EOF
+          ## Watchdog failure — $TODAY
 
           \`\`\`
-          ${{ steps.watchdog.outputs.body }}
+          $WATCHDOG_BODY
           \`\`\`
 
           **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           **To silence temporarily:** rename \`.github/workflows/pulpo-watchdog.yml\` via PR or set \`WATCHDOG_SKIP=1\` as a repo variable.
-          **To re-run manually:** \`gh workflow run pulpo-watchdog.yml\`"
+          **To re-run manually:** \`gh workflow run pulpo-watchdog.yml\`
+          EOF
+          )
 
           if [ -n "$EXISTING" ]; then
             echo "Commenting on existing issue #$EXISTING"

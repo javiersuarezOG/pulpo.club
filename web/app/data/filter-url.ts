@@ -194,10 +194,12 @@ export type Bbox = { minLat: number; minLng: number; maxLat: number; maxLng: num
 export function readBboxFromURL(search: string): Bbox | null {
   const raw = new URLSearchParams(search).get("bbox");
   if (!raw) return null;
-  const parts = raw.split(",").map((s) => Number(s));
+  const tokens = raw.split(",");
+  if (tokens.length !== 4 || tokens.some((s) => s.trim() === "")) return null;
+  const parts = tokens.map((s) => Number(s));
   if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return null;
   const [minLat, minLng, maxLat, maxLng] = parts;
-  if (minLat > maxLat || minLng > maxLng) return null;
+  if (minLat >= maxLat || minLng >= maxLng) return null;
   return { minLat, minLng, maxLat, maxLng };
 }
 
