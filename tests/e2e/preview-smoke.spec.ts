@@ -14,6 +14,7 @@
 
 import { test, expect } from "@playwright/test";
 import { isTolerated, seedProUser } from "./_helpers";
+import { pathForListing } from "../../web/app/lib/url-routing";
 
 test.describe("New app boots cleanly on key routes", () => {
   for (const route of ["/", "/?dev=1"]) {
@@ -649,10 +650,24 @@ test.describe("New app boots cleanly on key routes", () => {
     // scan exercise the in-panel upgrade CTA ("Contrata Pulpo Pro —
     // 1 mes gratis"), which renders only for non-paid tiers.
 
-    await page.goto("/browse", { waitUntil: "networkidle" });
-    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
-    await page.locator(".listing-card").first().click();
-    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+    // The road_access "Paved" bug was on the detail panel; scan it in ES.
+    // Two-state walls an anonymous viewer out of arbitrary detail — but
+    // this week's TOP 3 open in full for anyone (web/app/lib/free-view), so
+    // deep-link to one of those to mount the panel. The app exposes the
+    // live ids on a DEV-only window seam (the set is adapter-computed, so
+    // it's not derivable from raw ranked.json). locale=es persists from the
+    // home sweep above, so the panel bootstraps in Spanish.
+    const top3Id: string | null = await page.evaluate(async () => {
+      for (let i = 0; i < 100; i++) {
+        const ids = (window as unknown as { __pulpoTestIds?: { freeViewable?: string[] } }).__pulpoTestIds;
+        if (ids?.freeViewable?.length) return ids.freeViewable[0];
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return null;
+    });
+    expect(top3Id, "free-viewable top-3 id should be exposed for the ES detail scan").toBeTruthy();
+    await page.goto(pathForListing(top3Id as string), { waitUntil: "networkidle" });
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 8_000 });
     await page.waitForTimeout(500);
     const detailText: string = await page.evaluate(() => document.body.textContent || "");
     for (const word of ENGLISH_CANARIES) {

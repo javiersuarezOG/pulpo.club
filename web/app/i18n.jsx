@@ -144,7 +144,10 @@ function tr(value, locale) {
 
 // UI strings table.
 // Keep keys descriptive and grouped. In a real app this becomes en.json / es.json.
-const UI_STRINGS = {
+// Exported (read-only) so capability-contract tests can iterate the table —
+// e.g. plans-copy.test.ts asserts the Free plan never advertises a Pro-gated
+// capability. Do not mutate at runtime.
+export const UI_STRINGS = {
   // Nav — Wave 3a renamed the three section labels:
   //   * Home tab stays "Home" (the /browse tab took the "Discover" label).
   //   * /browse is labelled "Discover" — catalog/search is where you discover.
@@ -1152,8 +1155,8 @@ const UI_STRINGS = {
   "plans.free.name":         { en: "Free",                    es: "Gratis" },
   "plans.free.tag":          { en: "Browse the catalogue",    es: "Explora el catálogo" },
   "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Explora tarjetas sin límite" },
-  "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 fichas detalladas al mes" },
-  "plans.free.feat.saves_cap":        { en: "Save up to 10 listings",       es: "Guarda hasta 10 propiedades" },
+  "plans.free.feat.top3_detail":      { en: "Full details on this week's top 3", es: "Ficha completa del top 3 de la semana" },
+  "plans.free.feat.weekly_email":     { en: "Weekly top-3 email every Sunday",   es: "Correo semanal con tu top 3 cada domingo" },
   // The Free plan card "what Pro adds" mirrors live at pro.usp.*.short
   // (used with the featMuted variant). The two old `_excluded` keys are
   // gone with the rest of the deprecated Pro USP copy.

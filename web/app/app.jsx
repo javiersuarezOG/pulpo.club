@@ -49,6 +49,7 @@ import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
 import { isPaid } from "./lib/gating";
+import { freeViewableIds } from "./lib/free-view";
 import { deriveSubscriptionState } from "./lib/subscription";
 
 // Resolves the hydrated user object's `plan` field to the effective
@@ -263,6 +264,11 @@ function App() {
   // popstate listener captures it via the closure and stale state would
   // restore yesterday's value.
   const scrollBeforeListingOpenRef = useRef(null);
+  // Free top-3 exemption: ids a non-paid viewer may open in full. Kept in
+  // a ref so `openListing` (defined before `listings` loads) reads the
+  // latest set at click time without re-creating the callback. Populated
+  // from the live listings just below the useListings() call.
+  const freeViewableRef = useRef(/** @type {Set<string>} */ (new Set()));
   // Mirror of `route` for the popstate listener, which is registered
   // once with [] deps and would otherwise see the route at mount.
   // Needed to distinguish "modal close within the same section" (preserve
@@ -939,7 +945,11 @@ function App() {
     // /listing/<id> push), so the panel never mounts. `setFreeMonthModal`
     // is the conversion surface (→ Stripe checkout). A deep-link backstop
     // effect below covers cold-loads straight to /listing/<id>.
-    if (!isPaid(user)) {
+    //
+    // Exception (free top-3): a non-paid viewer MAY open this week's top 3
+    // ranked picks in full — the same set the home hero unlocks. Ranks 4+
+    // stay walled. `freeViewableRef` holds the live id set (see below).
+    if (!isPaid(user) && !freeViewableRef.current.has(id)) {
       track("paywall.shown", { kind: "listing_click", listing_id: id });
       setFreeMonthModal({ trigger: "browse_card" });
       return;
@@ -1178,6 +1188,30 @@ function App() {
   const listings = useListings();
   const listingsState = useListingsState();
 
+  // Free top-3 exemption — the ids a non-paid viewer may open in full.
+  // Derived from the same ranked picks the home hero shows (shared helper
+  // → can't drift). Mirrored into `freeViewableRef` for `openListing`,
+  // and exposed to the detail panel via `app.isFreeViewable`.
+  const freeViewableIdSet = useMemo(() => freeViewableIds(listings), [listings]);
+  freeViewableRef.current = freeViewableIdSet;
+  const isFreeViewable = useCallback(
+    (id) => !!id && freeViewableRef.current.has(id),
+    [],
+  );
+
+  // Dev/test-only seam: expose the free-viewable top-3 ids (plus one walled
+  // id) so e2e can deterministically drive the open-gate. The set is
+  // adapter-computed (card_eligible/thumbnail_url are derived), so it can't
+  // be recomputed from raw ranked.json in a Playwright spec. DEV-gated, so
+  // it never ships in the production bundle.
+  useEffect(() => {
+    if (!import.meta.env.DEV || typeof window === "undefined") return;
+    window.__pulpoTestIds = {
+      freeViewable: [...freeViewableIdSet],
+      walled: (listings.find((l) => l && l.card_eligible && l.id && !freeViewableIdSet.has(l.id)) || {}).id || null,
+    };
+  }, [freeViewableIdSet, listings]);
+
   // Resolve the open listing once (used both by route-meta below and
   // the detail overlay further down). null while listings.json is still
   // loading OR if the id doesn't resolve (deleted/sold).
@@ -1359,15 +1393,22 @@ function App() {
   // modal instead of the panel — symmetric with the openListing click
   // gate. We clear openListingId so the panel never mounts and strip the
   // URL back to /browse so refresh/back doesn't replay the listing path.
+  //
+  // Exceptions: paid viewers, and the free top-3 (a shared link to one of
+  // this week's top picks opens in full for anyone — SEO + virality). We
+  // must wait for listings to load before deciding: until the set is
+  // known, a cold-loaded top-3 link would otherwise be walled mid-fetch.
   useEffect(() => {
     if (!openListingId || isPaid(user)) return;
+    if (listingsState.state.status === "loading") return; // decide once the set is known
+    if (freeViewableIdSet.has(openListingId)) return; // top-3 deep link → open in full
     track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId });
     setFreeMonthModal({ trigger: "browse_card" });
     setOpenListingId(null);
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
       window.history.replaceState({ pulpo: true }, "", "/browse");
     }
-  }, [openListingId, user]);
+  }, [openListingId, user, listingsState.state.status, freeViewableIdSet]);
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //
@@ -1439,6 +1480,7 @@ function App() {
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
     freeMonthModal, openFreeMonthModal, closeFreeMonthModal,
     openListing, closeListing, openListingId,
+    isFreeViewable,
     detailViewCount, recordDetailView,
     showToast, toast,
     locale, setLocale,
@@ -1454,8 +1496,8 @@ function App() {
   const openListingObj = _openListingObj;
   // Detail panel pending state: URL says /listing/:id but listings.json
   // hasn't resolved yet, OR the id doesn't match a known listing.
-  const listingPending = openListingId && !openListingObj && listingsState.status === "loading";
-  const listingMissing = openListingId && !openListingObj && listingsState.status !== "loading";
+  const listingPending = openListingId && !openListingObj && listingsState.state.status === "loading";
+  const listingMissing = openListingId && !openListingObj && listingsState.state.status !== "loading";
 
   return (
     // <ClerkShell> mounts <ClerkProvider> only when VITE_USE_CLERK=1.
