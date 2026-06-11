@@ -291,6 +291,35 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
         errName === "validation_error" &&
         /already exists|already subscribed|duplicate/i.test(errMessage);
       if (isDup) {
+        // Distinguish a genuine re-subscribe (contact was unsubscribed)
+        // from an already-active subscriber re-submitting the form. The
+        // create no-ops on dup, so without this check we'd fire a
+        // "welcome back" email on EVERY resubmit — spamming people who
+        // never left. One contacts.list (~200ms); shape-tolerant per
+        // api/unsubscribe.js. Best-effort: if the lookup throws we fall
+        // through to the resubscribe path (prior behaviour) rather than
+        // block a legitimate re-subscribe.
+        let wasUnsubscribed = true;
+        try {
+          const listed = await client.contacts.list({ audienceId });
+          const contacts = (listed && listed.data && Array.isArray(listed.data.data) ? listed.data.data
+                          : listed && Array.isArray(listed.data) ? listed.data
+                          : []);
+          const match = contacts.find((c) => (c && c.email || "").toLowerCase() === email.toLowerCase());
+          if (match) wasUnsubscribed = !!match.unsubscribed;
+        } catch { /* lookup failed — treat as re-subscribe (prior behaviour) */ }
+
+        if (!wasUnsubscribed) {
+          // Already an active subscriber. Idempotent no-op — no state
+          // change, no email. (Resend's create already no-op'd.)
+          logApi({
+            status: 200, ms: Date.now() - t0,
+            reason: "already_subscribed_noop",
+            domain: emailDomain(email),
+            source,
+          });
+          return res.status(200).json({ ok: true, already_subscribed: true });
+        }
         try {
           await client.contacts.update({
             audienceId,
