@@ -63,7 +63,7 @@ function ppmSuffix() {
 // (low/None geocoding_confidence — the only quality signal available,
 // since ~97% of coords share the 'estimated' source).
 function hasCoords(l) {
-  return l != null && typeof l.lat === "number" && typeof l.lng === "number";
+  return l != null && Number.isFinite(l.lat) && Number.isFinite(l.lng);
 }
 function isLowConfidenceGeo(l) {
   return l == null || l.geocoding_confidence === "low" || l.geocoding_confidence == null;

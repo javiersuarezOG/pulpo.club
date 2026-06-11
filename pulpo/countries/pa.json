@@ -8,6 +8,7 @@
   "currency": "USD",
   "centroid_lat": 8.5380,
   "centroid_lng": -80.7821,
+  "bbox": { "lat": [7.0, 9.8], "lng": [-83.2, -77.0] },
   "traditional_units": [],
   "listing_count_floor": 50,
   "listing_count_ceiling": 5000,

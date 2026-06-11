@@ -25,6 +25,7 @@
 
 const crypto = require("crypto");
 const { capture, flush } = require("./_posthog");
+const { _setUnsubscribed } = require("./_resend_audience");
 const { verifySvixSignature: sharedVerifySvixSignature, readRawBody: sharedReadRawBody } = require("./_svix");
 
 const SVIX_SECRET_ENV = "RESEND_WEBHOOK_SECRET";
@@ -149,6 +150,26 @@ function pickPostHogProps(event, body) {
   return props;
 }
 
+function pickRecipientEmail(body) {
+  const data = (body && body.data) || {};
+  const candidates = [
+    data.to,
+    data.email,
+    data.recipient,
+    data.recipient_email,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.includes("@")) {
+      return candidate.trim();
+    }
+    if (Array.isArray(candidate)) {
+      const first = candidate.find((v) => typeof v === "string" && v.includes("@"));
+      if (first) return first.trim();
+    }
+  }
+  return null;
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
   if (req.method !== "POST") {
@@ -223,6 +244,30 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true, ignored: true });
   }
 
+  if (eventType === "email.bounced" || eventType === "email.complained") {
+    const email = pickRecipientEmail(body);
+    const bounceType = props.bounce_type || "";
+    const shouldSuppress = eventType === "email.complained"
+      || !bounceType
+      || /hard|permanent/i.test(String(bounceType));
+    if (email && shouldSuppress) {
+      try {
+        await _setUnsubscribed({
+          email,
+          unsubscribed: true,
+          source: `resend.${eventType}`,
+        });
+      } catch (err) {
+        logApi({
+          status: 200, ms: Date.now() - t0,
+          reason: "suppression_failed",
+          type: eventType,
+          error: err && err.message,
+        });
+      }
+    }
+  }
+
   try {
     capture(distinctId, "resend.webhook_received", heartbeatProps);
     capture(distinctId, phEvent, props);
@@ -247,6 +292,7 @@ module.exports = async (req, res) => {
 };
 
 // Test seam exports — Vercel doesn't import these in prod.
+module.exports.config = { api: { bodyParser: false } };
 module.exports.verifySvixSignature = verifySvixSignature;
 module.exports.pickPostHogProps = pickPostHogProps;
 module.exports.EVENT_MAP = EVENT_MAP;

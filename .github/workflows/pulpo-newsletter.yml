@@ -212,3 +212,18 @@ jobs:
           path: newsletter-drafts/sent/*.html
           retention-days: 30
           if-no-files-found: ignore
+
+      - name: Slack on newsletter job failure
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping newsletter failure Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo newsletter JOB FAILED* — weekly send may be silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"

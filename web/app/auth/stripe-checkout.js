@@ -83,7 +83,14 @@ export async function startStripeCheckout({ onError, locale } = {}) {
     return false;
   }
 
-  const { url } = await res.json();
+  let payload = null;
+  try {
+    payload = await res.json();
+  } catch (err) {
+    if (onError) onError("bad_json", err);
+    return false;
+  }
+  const { url } = payload || {};
   if (!url) {
     if (onError) onError("no_url");
     return false;

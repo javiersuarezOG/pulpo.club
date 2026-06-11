@@ -263,6 +263,25 @@ class CountryManifest:
                     out[ptype][field_name] = tuple(float(x) for x in bounds)  # type: ignore[assignment]
         return out
 
+    def bbox(self) -> dict[str, tuple[float, float]]:
+        """Country bounding box as ``{"lat": (min, max), "lng": (min, max)}``."""
+        raw = self.raw.get("bbox") or {}
+        if isinstance(raw, dict):
+            lat = raw.get("lat")
+            lng = raw.get("lng")
+            if (
+                isinstance(lat, (list, tuple)) and len(lat) == 2
+                and isinstance(lng, (list, tuple)) and len(lng) == 2
+            ):
+                lat_pair = (float(lat[0]), float(lat[1]))
+                lng_pair = (float(lng[0]), float(lng[1]))
+                if lat_pair[0] < lat_pair[1] and lng_pair[0] < lng_pair[1]:
+                    return {"lat": lat_pair, "lng": lng_pair}
+        return {
+            "lat": (self.centroid_lat - 1.0, self.centroid_lat + 1.0),
+            "lng": (self.centroid_lng - 1.5, self.centroid_lng + 1.5),
+        }
+
 
 def _manifest_path(cc: str) -> Path:
     return _MANIFEST_DIR / f"{cc.lower()}.json"

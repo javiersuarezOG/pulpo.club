@@ -19,6 +19,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from pulpo.countries import active as _active_country
+
 
 # ── dict / dataclass helpers (pattern shared with price_history.py) ────
 
@@ -67,9 +69,9 @@ def _present_latlong(li: Any) -> bool:
 # Fail-closed: any False here → the entire enrichment for this listing
 # is rejected. Partial saves are forbidden.
 
-# El Salvador bounding box — same constants as automation/geocoding.py
-# (kept duplicated rather than imported to avoid coupling the schema
-# module to the legacy Mapbox path).
+# Default SV bounding box. The live validator reads the active country
+# manifest; these constants remain as compatibility pins for tests and
+# callers that imported them directly.
 _SV_BBOX_LAT = (13.0, 14.6)
 _SV_BBOX_LNG = (-90.6, -87.6)
 _VALID_CONFIDENCES = {"high", "medium", "low"}
@@ -122,7 +124,7 @@ def _valid_url_language(v: Any) -> bool:
 
 
 def _valid_latlong(v: Any) -> bool:
-    """Dict with lat (number, in SV bbox), lng (number, in SV bbox),
+    """Dict with lat/lng inside the active country's bbox,
     source ∈ {extracted, estimated}, confidence ∈ {high, medium, low},
     reference (string, may be empty)."""
     if not isinstance(v, dict):
@@ -132,9 +134,12 @@ def _valid_latlong(v: Any) -> bool:
         return False
     if not (isinstance(lng, (int, float)) and not isinstance(lng, bool)):
         return False
-    if not (_SV_BBOX_LAT[0] <= float(lat) <= _SV_BBOX_LAT[1]):
+    bbox = _active_country().bbox()
+    lat_bbox = bbox["lat"]
+    lng_bbox = bbox["lng"]
+    if not (lat_bbox[0] <= float(lat) <= lat_bbox[1]):
         return False
-    if not (_SV_BBOX_LNG[0] <= float(lng) <= _SV_BBOX_LNG[1]):
+    if not (lng_bbox[0] <= float(lng) <= lng_bbox[1]):
         return False
     if v.get("source") not in _VALID_LATLONG_SOURCES:
         return False
