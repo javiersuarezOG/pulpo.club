@@ -164,6 +164,17 @@ function FreeTopCard({ app, locale }) {
           {t("home.hero.v5.card_title_c", locale)}
         </div>
         <p className="hv6-card-kick">{t("home.hero.v5.card_kick", locale)}</p>
+        <div className="hv6-filters">
+          <span className="hv6-filters-lead">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 6h16M7 12h10M10 18h4" />
+            </svg>
+            {t("home.hero.v5.card_filters_lead", locale)}
+          </span>
+          {["home.hero.v5.card_filter_1", "home.hero.v5.card_filter_2", "home.hero.v5.card_filter_3", "home.hero.v5.card_filter_4"].map((k) => (
+            <span className="hv6-chip" key={k}>{t(k, locale)}</span>
+          ))}
+        </div>
 
         {haveData
           ? top3.map((l, i) => <ListingRow key={l.id} listing={l} rank={i + 1} locale={locale} />)

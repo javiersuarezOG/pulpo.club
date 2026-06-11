@@ -371,6 +371,13 @@ const UI_STRINGS = {
   "home.hero.v5.card_title_c":   { en: "this week",                             es: "esta semana" },
   "home.hero.v5.card_kick":      { en: "Ranked by value · filtered to your preferences",
                                    es: "Ordenado por valor · filtrado a tus preferencias" },
+  // Personalisation filter bubbles — sample chips that show the list is
+  // tuned to the reader (category, zone, budget, property type).
+  "home.hero.v5.card_filters_lead": { en: "Your filters",                       es: "Tus filtros" },
+  "home.hero.v5.card_filter_1":  { en: "Beach",                                 es: "Playa" },
+  "home.hero.v5.card_filter_2":  { en: "Surf City II",                          es: "Surf City II" },
+  "home.hero.v5.card_filter_3":  { en: "Under $500k",                           es: "Menos de $500k" },
+  "home.hero.v5.card_filter_4":  { en: "Lot",                                   es: "Terreno" },
   "home.hero.v5.grade_value":    { en: "value",                                 es: "valor" },
   "home.hero.v5.lock_more":      { en: "+{n} more in your top 10",              es: "+{n} más en tu top 10" },
   "home.hero.v5.lock_sub":       { en: "Free gives you the top 3 each Sunday. Unlock all 10 — plus the full catalogue — with Pulpo Pro.",

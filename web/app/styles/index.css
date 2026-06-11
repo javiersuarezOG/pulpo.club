@@ -7828,15 +7828,15 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 .homepage-v2 .hp-hero-v5-section {
   border-top: 1px solid var(--color-line-soft);
   border-bottom: 1px solid var(--color-line-soft);
-  padding-top: 28px;
-  padding-bottom: 28px;
-  margin-top: 8px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  margin-top: 20px;
 }
 @media (min-width: 1024px) {
   .homepage-v2 .hp-hero-v5-section {
-    padding-top: 44px;
-    padding-bottom: 44px;
-    margin-top: 24px;
+    padding-top: 34px;
+    padding-bottom: 34px;
+    margin-top: 28px;
   }
 }
 .homepage-v2 .hp-hero-v5-section-head {
@@ -7996,9 +7996,9 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
    Hero v6 redesign — copy + checklist + inline email | Pulpo Free card
    Mobile-first; every size-up is a min-width enhancement.
    ══════════════════════════════════════════════════════════════════════ */
-.homepage-v2 .hv6-top { display: flex; flex-direction: column; gap: 30px; margin-bottom: 8px; }
+.homepage-v2 .hv6-top { display: flex; flex-direction: column; gap: 30px; margin-bottom: 0; }
 @media (min-width: 1024px) {
-  .homepage-v2 .hv6-top { display: grid; grid-template-columns: 1fr 1.08fr; gap: 48px; align-items: center; margin-bottom: 24px; }
+  .homepage-v2 .hv6-top { display: grid; grid-template-columns: 1fr 1.08fr; gap: 48px; align-items: center; margin-bottom: 8px; }
 }
 
 /* ── Copy ──────────────────────────────────────────────────────────── */
@@ -8093,8 +8093,13 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 .homepage-v2 .hv6-card-title { font-family: var(--font-display); font-style: italic; font-size: 25px; line-height: 1; color: var(--color-ink-primary); margin: 12px 0 4px; }
 @media (min-width: 1024px) { .homepage-v2 .hv6-card-title { font-size: 31px; } }
 .homepage-v2 .hv6-card-title b { font-style: normal; font-weight: 400; color: var(--color-clay-primary); }
-.homepage-v2 .hv6-card-kick { font-family: var(--font-sans); font-size: 11.5px; color: var(--color-ink-muted); margin: 0 0 10px; }
-@media (min-width: 1024px) { .homepage-v2 .hv6-card-kick { font-size: 12.5px; margin-bottom: 12px; } }
+.homepage-v2 .hv6-card-kick { font-family: var(--font-sans); font-size: 11.5px; color: var(--color-ink-muted); margin: 0 0 9px; }
+@media (min-width: 1024px) { .homepage-v2 .hv6-card-kick { font-size: 12.5px; } }
+/* personalisation filter bubbles — sample chips showing the list is tuned to the reader */
+.homepage-v2 .hv6-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
+.homepage-v2 .hv6-filters-lead { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-muted); margin-right: 1px; }
+.homepage-v2 .hv6-chip { font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: var(--color-forest-deep); background: var(--color-bg-sage); border: 1px solid var(--color-bg-sage-2); border-radius: 999px; padding: 4px 10px; line-height: 1.2; }
+@media (min-width: 1024px) { .homepage-v2 .hv6-chip { font-size: 11.5px; } }
 
 .homepage-v2 .hv6-r { display: flex; align-items: center; gap: 11px; padding: 9px 2px; border-top: 1px solid var(--color-line-faint); }
 .homepage-v2 .hv6-r:first-of-type { border-top: none; }
