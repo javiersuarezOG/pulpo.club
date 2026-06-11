@@ -1159,9 +1159,17 @@ jobs:
           # so the required check has a status to report against.
           gh workflow run ci.yml --ref "$BRANCH" || true
           gh workflow run tests-required.yml --ref "$BRANCH" || true
-          # Try auto-merge; fall back to admin merge for protected branches
-          gh pr merge "$BRANCH" --squash --delete-branch --admin || \
-            gh pr merge "$BRANCH" --squash --delete-branch --auto
+          # Auto-merge first: queue the merge to fire once the required
+          # checks (pytest / frontend / Vercel) dispatched above report
+          # green. Admin is the FALLBACK only — used when enabling
+          # auto-merge fails (e.g. auto-merge disabled on the repo). The
+          # previous order ran --admin FIRST, which merged immediately and
+          # bypassed every required check on every nightly data PR, making
+          # the ci.yml / tests-required dispatch above pointless. Matches
+          # CLAUDE.md: "--auto handles the Expected-Waiting race; reserve
+          # --admin for the data-PR fallback path."
+          gh pr merge "$BRANCH" --squash --delete-branch --auto || \
+            gh pr merge "$BRANCH" --squash --delete-branch --admin
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel
