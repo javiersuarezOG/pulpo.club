@@ -33,6 +33,16 @@ function resendDuplicate() {
   return { contacts: {
     create: vi.fn(async () => ({ data: null, error: { name: "validation_error", message: "Contact already exists" } })),
     update: vi.fn(async () => ({ data: {}, error: null })),
+    // Contact exists AND was unsubscribed → genuine re-subscribe path.
+    list: vi.fn(async () => ({ data: { data: [{ id: "c1", email: "back@example.com", unsubscribed: true }] } })),
+  } };
+}
+function resendDuplicateActive() {
+  return { contacts: {
+    create: vi.fn(async () => ({ data: null, error: { name: "validation_error", message: "Contact already exists" } })),
+    update: vi.fn(async () => ({ data: {}, error: null })),
+    // Contact exists and is STILL subscribed → resubmit, not a re-subscribe.
+    list: vi.fn(async () => ({ data: { data: [{ id: "c1", email: "active@example.com", unsubscribed: false }] } })),
   } };
 }
 
@@ -90,6 +100,20 @@ describe("newsletter → free-welcome trigger", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     const payload = JSON.parse(fetchImpl.mock.calls[0][1].body);
     expect(payload).toMatchObject({ variant: "free_welcome_back", source: "resend_resubscribe", locale: "es" });
+  });
+
+  it("already-subscribed resubmit → no welcome-back email, returns already_subscribed", async () => {
+    // Regression guard (010): an active subscriber re-entering their email
+    // must NOT trigger a "welcome back" email on every resubmit.
+    const fetchImpl = vi.fn(async () => ({ status: 200, json: async () => ({ status: "sent" }) }));
+    const res = mockRes();
+    await handler(
+      mockReq({ email: "active@example.com", locale: "en" }),
+      res,
+      { fetchImpl, resendImpl: resendDuplicateActive() },
+    );
+    expect(res.body).toEqual({ ok: true, already_subscribed: true });
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it("dispatch failure is best-effort — subscribe still succeeds", async () => {
