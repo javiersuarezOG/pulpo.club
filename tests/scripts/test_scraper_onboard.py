@@ -156,6 +156,16 @@ def test_run_onboarding_end_to_end_offline_real_source():
     finally:
         if pr_body_file.exists():
             pr_body_file.unlink()
+        # The Sandbox lifecycle (commit + exit) deregisters goodlife from the
+        # global SOURCES registry. Because we borrowed a REAL slug, restore its
+        # registration so later tests in the session still see goodlife —
+        # otherwise test_scrape_concurrency etc. fail with "goodlife not
+        # registered". (A brand-new onboarding slug needs no such restore.)
+        import importlib
+
+        from automation.scraper_agent.sandbox import reload_scraper
+        reload_scraper(slug)
+        importlib.import_module(f"pulpo.scrapers.{slug}")
 
 
 # ── CLI ──────────────────────────────────────────────────────────────
