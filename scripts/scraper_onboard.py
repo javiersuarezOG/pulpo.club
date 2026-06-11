@@ -18,10 +18,18 @@ representative data — there's no stale-fixture trap the way there is for
 repair. The agent fills the declarative ``SkeletonConfig`` (95% of authoring),
 overriding ``_extract_detail`` only for quirks.
 
+The proposer is provider-agnostic. It defaults to **DeepSeek** — Pulpo already
+pays for it (DEEPSEEK_API_TOKEN, used by enrichment) and it's ~20x cheaper than
+Opus; the strict acceptance gate compensates for a weaker model by iterating a
+few more times. Pass ``--provider anthropic`` for the harder sites.
+
 Usage:
 
-    # Real run (needs ANTHROPIC_API_KEY + network):
+    # Real run (default DeepSeek; needs DEEPSEEK_API_TOKEN + network):
     python3 scripts/scraper_onboard.py --slug acme --url https://acme.com/ventas --live
+
+    # Use Claude instead (needs ANTHROPIC_API_KEY):
+    python3 scripts/scraper_onboard.py --slug acme --url https://acme.com/ventas --live --provider anthropic
 
     # Show the first-iteration prompt and exit, no API call, no edits:
     python3 scripts/scraper_onboard.py --slug acme --url https://acme.com/ventas --dry-run
@@ -56,7 +64,25 @@ from automation.scraper_agent import (  # noqa: E402
 from automation.scraper_agent.eval import EvalReport  # noqa: E402
 from automation.scraper_agent.loop import LoopContext  # noqa: E402
 
-DEFAULT_MODEL = os.environ.get("SCRAPER_ONBOARD_MODEL", "claude-opus-4-8")
+# Provider config. DeepSeek is the DEFAULT: Pulpo already pays for it
+# (DEEPSEEK_API_TOKEN, used by the enrichment pipeline) and it's ~20x cheaper
+# than Opus. The autoresearch design tolerates a weaker proposer because the
+# acceptance gate filters bad output — a cheap model just iterates a few more
+# times against the eval. Anthropic stays available for the harder sites.
+PROVIDERS = {
+    "deepseek": {
+        "default_model": "deepseek-chat",
+        "key_env": "DEEPSEEK_API_TOKEN",
+        "base_url": "https://api.deepseek.com",
+    },
+    "anthropic": {
+        "default_model": "claude-opus-4-8",
+        "key_env": "ANTHROPIC_API_KEY",
+        "base_url": None,
+    },
+}
+DEFAULT_PROVIDER = os.environ.get("SCRAPER_ONBOARD_PROVIDER", "deepseek")
+
 # Onboarding should clear the product's min-shelf bar, not just parse a couple
 # of listings. field_audit's hard-gate is the quality gate; this is the volume
 # floor (matches the min-shelf-listings rule).
@@ -238,45 +264,77 @@ def parse_proposal(text: str) -> Optional[tuple[str, str]]:
     return module, rationale_line
 
 
-# ── Anthropic call ───────────────────────────────────────────────────
+# ── model calls (provider-agnostic) ──────────────────────────────────
+#
+# Each returns ``(text, usage_dict)`` where usage_dict uses the budget's field
+# names (input_tokens / output_tokens / cache_*), so budget.charge_usage works
+# uniformly regardless of provider.
 
-def _call_anthropic(prompt: str, *, model: str) -> tuple[str, object]:
-    """Return ``(text, usage)`` from one Claude call.
-
-    The repo pins an older anthropic SDK (0.42.x) whose ``messages.create``
-    has no named ``thinking`` / ``output_config`` params, so we route them
-    through ``extra_body`` (valid request-body fields for Opus 4.8: adaptive
-    thinking + high effort, which lift code-gen quality). If that enhanced
-    call fails for any reason — even older SDK, body quirk — we fall back to
-    the basic call shape the existing ``scraper_autorepair.py`` already uses
-    successfully, and let its errors surface.
-    """
+def _call_anthropic(prompt: str, *, model: str) -> tuple[str, dict]:
+    """One Claude call. The repo pins anthropic 0.42.x (no named
+    ``thinking`` / ``output_config`` params), so we route adaptive-thinking +
+    high-effort through ``extra_body`` and fall back to the basic call shape
+    ``scraper_autorepair.py`` already uses on this SDK if that fails."""
     from anthropic import Anthropic
 
     client = Anthropic()
     messages = [{"role": "user", "content": prompt}]
     try:
         msg = client.messages.create(
-            model=model,
-            max_tokens=12000,
-            messages=messages,
-            extra_body={
-                "thinking": {"type": "adaptive"},
-                "output_config": {"effort": "high"},
-            },
+            model=model, max_tokens=12000, messages=messages,
+            extra_body={"thinking": {"type": "adaptive"},
+                        "output_config": {"effort": "high"}},
         )
     except Exception:  # noqa: BLE001 — enhanced call is best-effort; basic call's errors propagate
         msg = client.messages.create(model=model, max_tokens=12000, messages=messages)
     text = "\n".join(b.text for b in msg.content if getattr(b, "text", ""))
-    return text or "<empty>", msg.usage
+    u = msg.usage
+    return text or "<empty>", {
+        "input_tokens": getattr(u, "input_tokens", 0) or 0,
+        "output_tokens": getattr(u, "output_tokens", 0) or 0,
+        "cache_read_input_tokens": getattr(u, "cache_read_input_tokens", 0) or 0,
+        "cache_creation_input_tokens": getattr(u, "cache_creation_input_tokens", 0) or 0,
+    }
 
 
-def make_propose(source_url: str, *, model: str = DEFAULT_MODEL):
-    """Build the real ``propose`` callable (calls Claude)."""
+def _call_deepseek(prompt: str, *, model: str) -> tuple[str, dict]:
+    """One DeepSeek call via the OpenAI-compatible SDK — same base_url + token
+    Pulpo's enrichment pipeline uses. ``prompt_tokens`` is billed in full
+    (conservative for a budget guard; ignores the small cache-hit discount)."""
+    from openai import OpenAI
+
+    cfg = PROVIDERS["deepseek"]
+    client = OpenAI(base_url=cfg["base_url"], api_key=os.environ[cfg["key_env"]])
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=8000,
+        temperature=0.2,
+    )
+    text = resp.choices[0].message.content or "<empty>"
+    u = resp.usage
+    return text, {
+        "input_tokens": getattr(u, "prompt_tokens", 0) or 0,
+        "output_tokens": getattr(u, "completion_tokens", 0) or 0,
+    }
+
+
+def _call_model(prompt: str, *, provider: str, model: str) -> tuple[str, dict]:
+    if provider == "anthropic":
+        return _call_anthropic(prompt, model=model)
+    if provider == "deepseek":
+        return _call_deepseek(prompt, model=model)
+    raise ValueError(f"unknown provider {provider!r}")
+
+
+def make_propose(source_url: str, *, provider: str = DEFAULT_PROVIDER, model: Optional[str] = None):
+    """Build the real ``propose`` callable. ``provider`` picks the LLM backend
+    (default DeepSeek); ``model`` defaults to that provider's default model."""
+    model = model or PROVIDERS[provider]["default_model"]
 
     def propose(ctx: LoopContext) -> Optional[ProposedEdit]:
         prompt = build_onboard_prompt(ctx, source_url=source_url)
-        text, usage = _call_anthropic(prompt, model=model)
+        text, usage = _call_model(prompt, provider=provider, model=model)
         parsed = parse_proposal(text)
         if parsed is None:
             return None
@@ -361,7 +419,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--url", required=True, help="For-sale catalog URL of the source.")
     p.add_argument("--max-iters", type=int, default=6)
     p.add_argument("--budget", type=float, default=2.0, help="Per-run USD ceiling.")
-    p.add_argument("--model", default=DEFAULT_MODEL)
+    p.add_argument("--provider", choices=sorted(PROVIDERS), default=DEFAULT_PROVIDER,
+                   help="LLM backend for the proposer (default: deepseek — already paid for, cheap).")
+    p.add_argument("--model", default=None,
+                   help="Override the provider's default model.")
     p.add_argument("--min-ranked", type=int, default=DEFAULT_MIN_RANKED)
     p.add_argument("--limit", type=int, default=50, help="Listings to fetch per eval.")
     p.add_argument("--live", action="store_true",
@@ -382,15 +443,17 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(build_onboard_prompt(ctx, source_url=args.url))
         return 0
 
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("error: ANTHROPIC_API_KEY unset (use --dry-run to preview the prompt).")
+    key_env = PROVIDERS[args.provider]["key_env"]
+    if not os.environ.get(key_env):
+        print(f"error: {key_env} unset for --provider {args.provider} "
+              f"(use --dry-run to preview the prompt, or pick another --provider).")
         return 2
     if not args.live:
         print("warning: --live not set; a brand-new source has no offline "
               "fixtures, so the eval cannot make progress. Pass --live for a "
               "real onboarding run.")
 
-    propose = make_propose(args.url, model=args.model)
+    propose = make_propose(args.url, provider=args.provider, model=args.model)
     result, _ = run_onboarding(
         args.slug, args.url, propose=propose, live=args.live,
         max_iters=args.max_iters, budget_usd=args.budget, limit=args.limit,

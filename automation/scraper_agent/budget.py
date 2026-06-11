@@ -26,6 +26,9 @@ PRICES_USD_PER_MTOK: dict[str, tuple[float, float]] = {
     "claude-opus-4-6":   (5.00, 25.00),
     "claude-sonnet-4-6": (3.00, 15.00),
     "claude-haiku-4-5":  (1.00,  5.00),
+    # DeepSeek (OpenAI-compatible) — the provider Pulpo already pays for via
+    # enrichment. Numbers match automation/llm_enrichment.py's constants.
+    "deepseek-chat":     (0.27,  1.10),
 }
 # Unknown model → assume Opus-tier. Over-charging a mystery model is the safe
 # direction for a *budget* guard: it trips the ceiling earlier, never later.
@@ -68,7 +71,14 @@ class Budget:
     )
 
     def price_for(self, model: str) -> tuple[float, float]:
-        return self.prices.get(model, DEFAULT_PRICE_USD_PER_MTOK)
+        if model in self.prices:
+            return self.prices[model]
+        # A DeepSeek variant must NOT fall back to the Opus default — that
+        # would over-charge a cheap model ~18x and trip the cap far too early.
+        # Map any deepseek-* id to the deepseek-chat tier.
+        if model.startswith("deepseek"):
+            return self.prices.get("deepseek-chat", DEFAULT_PRICE_USD_PER_MTOK)
+        return DEFAULT_PRICE_USD_PER_MTOK
 
     def cost_of(
         self,

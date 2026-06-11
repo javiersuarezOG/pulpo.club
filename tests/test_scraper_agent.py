@@ -98,6 +98,16 @@ def test_budget_unknown_model_defaults_to_opus_tier():
     assert b.price_for("some-future-model") == (5.00, 25.00)
 
 
+def test_budget_deepseek_pricing_and_variant_fallback():
+    b = Budget(limit_usd=10.0)
+    assert b.price_for("deepseek-chat") == (0.27, 1.10)
+    # a deepseek-* variant must map to the cheap tier, NOT the opus default —
+    # else the budget over-charges ~18x and trips far too early.
+    assert b.price_for("deepseek-reasoner") == (0.27, 1.10)
+    cost = b.cost_of("deepseek-chat", input_tokens=1_000_000, output_tokens=1_000_000)
+    assert cost == pytest.approx(0.27 + 1.10)
+
+
 def test_budget_check_trips_with_and_without_headroom():
     b = Budget(limit_usd=1.0)
     b.charge("claude-opus-4-8", input_tokens=100_000)  # $0.50

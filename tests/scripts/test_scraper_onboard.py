@@ -81,23 +81,33 @@ def test_build_prompt_reports_gate_coverage_when_funnel_ran():
 
 def test_make_propose_returns_edit_with_usage(monkeypatch):
     canned = "## Rationale\nuse og meta.\n## Module\n```python\n# acme scraper\n```"
-
-    class FakeUsage:
-        input_tokens, output_tokens = 2000, 800
-        cache_read_input_tokens = cache_creation_input_tokens = 0
-
-    monkeypatch.setattr(onboard, "_call_anthropic", lambda prompt, *, model: (canned, FakeUsage()))
-    propose = onboard.make_propose("https://acme.sv", model="claude-opus-4-8")
+    monkeypatch.setattr(
+        onboard, "_call_model",
+        lambda prompt, *, provider, model: (canned, {"input_tokens": 2000, "output_tokens": 800}),
+    )
+    propose = onboard.make_propose("https://acme.sv", provider="deepseek")
     edit = propose(_ctx("acme"))
     assert edit is not None
     assert edit.content == "# acme scraper\n"
     assert edit.rationale == "use og meta."
-    assert edit.model == "claude-opus-4-8"
-    assert edit.usage is not None
+    assert edit.model == "deepseek-chat"  # provider default
+    assert edit.usage == {"input_tokens": 2000, "output_tokens": 800}
+
+
+def test_make_propose_defaults_model_per_provider(monkeypatch):
+    captured = {}
+
+    def fake(prompt, *, provider, model):
+        captured.update(provider=provider, model=model)
+        return "## Module\n```python\n# x\n```", {}
+
+    monkeypatch.setattr(onboard, "_call_model", fake)
+    onboard.make_propose("https://acme.sv", provider="anthropic")(_ctx("acme"))
+    assert captured == {"provider": "anthropic", "model": "claude-opus-4-8"}
 
 
 def test_make_propose_returns_none_when_model_gives_no_code(monkeypatch):
-    monkeypatch.setattr(onboard, "_call_anthropic", lambda prompt, *, model: ("needs human", None))
+    monkeypatch.setattr(onboard, "_call_model", lambda prompt, *, provider, model: ("needs human", {}))
     assert onboard.make_propose("https://acme.sv")(_ctx("acme")) is None
 
 
@@ -161,6 +171,12 @@ def test_cli_rejects_bad_slug():
     assert onboard.main(["--slug", "Bad-Slug", "--url", "https://x.sv"]) == 2
 
 
-def test_cli_requires_api_key_when_not_dry_run(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+def test_cli_requires_provider_key_when_not_dry_run(monkeypatch):
+    # default provider is deepseek -> checks DEEPSEEK_API_TOKEN
+    monkeypatch.delenv("DEEPSEEK_API_TOKEN", raising=False)
     assert onboard.main(["--slug", "acme", "--url", "https://acme.sv", "--live"]) == 2
+    # --provider anthropic -> checks ANTHROPIC_API_KEY
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    assert onboard.main(
+        ["--slug", "acme", "--url", "https://acme.sv", "--live", "--provider", "anthropic"]
+    ) == 2
