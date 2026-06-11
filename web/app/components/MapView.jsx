@@ -32,6 +32,12 @@ const SV_ZOOM = 8;
 // pathological set; if it ever trips we log rather than silently drop,
 // because "X of Y mapped" must stay truthful. Tuned/observed in PR-8.
 const MAX_MARKERS = 5000;
+// A viewport ?bbox= write landing within this window of a programmatic
+// fitBounds is a refit-tail moveend that escaped the suppress window — the
+// A6 regression. The longest healthy suppress window (750ms) + the 400ms
+// move-debounce = ~1150ms, so a write inside ~1.2s can't be a correctly
+// suppressed refit; it fires the map.refit_wrote_bbox canary (should be 0).
+const REFIT_CANARY_MS = 1200;
 
 // "$65k" / "$1.3M" — PRD open-Q4 chose the compact form. "" when price
 // is unknown (the pin renders a neutral dot instead).
@@ -83,6 +89,7 @@ export default function MapView({
   // single consume left later events to write a spurious ?bbox=. A time window
   // covers every moveend the animation produces.
   const suppressMoveUntilRef = useRef(0);
+  const lastFitAtRef = useRef(0); // timestamp of the last programmatic refit (A6 canary)
   const lcRef = useRef(lc);
   useEffect(() => { onOpenRef.current = onOpenListing; }, [onOpenListing]);
   useEffect(() => { onHoverRef.current = onHoverMarker; }, [onHoverMarker]);
@@ -189,6 +196,13 @@ export default function MapView({
       if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
       moveTimerRef.current = setTimeout(() => {
         const b = map.getBounds();
+        // Should-be-zero canary — a write this soon after a programmatic refit
+        // means a refit-tail moveend escaped the suppress window (A6 bug). The
+        // gate above keeps this at 0 in healthy code; alert on a non-zero rate.
+        const sinceFit = Date.now() - lastFitAtRef.current;
+        if (sinceFit < REFIT_CANARY_MS) {
+          track("map.refit_wrote_bbox", { ms_since_fit: Math.round(sinceFit) });
+        }
         onBoundsRef.current?.({
           minLat: b.getSouth(), minLng: b.getWest(),
           maxLat: b.getNorth(), maxLng: b.getEast(),
@@ -304,6 +318,7 @@ export default function MapView({
       // moveend(s). 0.4s animate + buffer; instant when reduced-motion.
       if (moveTimerRef.current) { clearTimeout(moveTimerRef.current); moveTimerRef.current = null; }
       suppressMoveUntilRef.current = Date.now() + (reduced ? 250 : 750);
+      lastFitAtRef.current = Date.now();
       map.fitBounds(L.latLngBounds(pts), {
         padding: [40, 40], maxZoom: 13, animate: !reduced, duration: 0.4,
       });

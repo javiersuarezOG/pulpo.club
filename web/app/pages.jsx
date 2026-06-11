@@ -1458,7 +1458,15 @@ function BrowsePage({ app }) {
       // only re-runs when `searchSig` genuinely changes (primitive dep).
       didInitMapRef.current = true;
       searchSigRef.current = searchSig;
-      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) {
+        setMapBbox(null); writeBboxToURL(null);
+      } else if (mapBbox) {
+        // Positive heartbeat — an inbound ?bbox= deep-link survived the
+        // hydration race and is being applied to the viewport. Alert if
+        // ?bbox= traffic stops producing this (A1 regressed). See
+        // map.deeplink_bbox_applied in telemetry/events.ts.
+        track("map.deeplink_bbox_applied", {});
+      }
       setFitNonce((n) => n + 1);
       return;
     }
