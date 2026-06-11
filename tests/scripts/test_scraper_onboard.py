@@ -77,9 +77,15 @@ def test_build_prompt_reports_gate_coverage_when_funnel_ran():
     assert "60%" in prompt
 
 
-# ── propose (stubbed model call) ─────────────────────────────────────
+# ── propose (stubbed model call + no-network probe) ──────────────────
+
+def _no_probe(monkeypatch):
+    """Stub the live site probe so make_propose tests never hit the network."""
+    monkeypatch.setattr(onboard, "_probe_site", lambda url: {})
+
 
 def test_make_propose_returns_edit_with_usage(monkeypatch):
+    _no_probe(monkeypatch)
     canned = "## Rationale\nuse og meta.\n## Module\n```python\n# acme scraper\n```"
     monkeypatch.setattr(
         onboard, "_call_model",
@@ -95,6 +101,7 @@ def test_make_propose_returns_edit_with_usage(monkeypatch):
 
 
 def test_make_propose_defaults_model_per_provider(monkeypatch):
+    _no_probe(monkeypatch)
     captured = {}
 
     def fake(prompt, *, provider, model):
@@ -106,9 +113,65 @@ def test_make_propose_defaults_model_per_provider(monkeypatch):
     assert captured == {"provider": "anthropic", "model": "claude-opus-4-8"}
 
 
+def test_make_propose_probes_once_and_reuses(monkeypatch):
+    calls = {"n": 0}
+
+    def fake_probe(url):
+        calls["n"] += 1
+        return {"catalog_html": "<html>seen</html>"}
+
+    monkeypatch.setattr(onboard, "_probe_site", fake_probe)
+    monkeypatch.setattr(onboard, "_call_model",
+                        lambda prompt, *, provider, model: ("## Module\n```python\n# x\n```", {}))
+    propose = onboard.make_propose("https://acme.sv")
+    propose(_ctx("acme", iteration=1))
+    propose(_ctx("acme", iteration=2))
+    assert calls["n"] == 1  # probed once, reused across iterations
+
+
 def test_make_propose_returns_none_when_model_gives_no_code(monkeypatch):
+    _no_probe(monkeypatch)
     monkeypatch.setattr(onboard, "_call_model", lambda prompt, *, provider, model: ("needs human", {}))
     assert onboard.make_propose("https://acme.sv")(_ctx("acme")) is None
+
+
+# ── site probe ───────────────────────────────────────────────────────
+
+def test_clean_html_keeps_jsonld_drops_scripts_and_styles():
+    raw = (
+        '<style>.x{color:red}</style>'
+        '<script>var tracking=1;</script>'
+        '<script type="application/ld+json">{"@type":"RealEstateListing"}</script>'
+        '<a href="/propiedad/1">A</a>'
+    )
+    cleaned = onboard._clean_html(raw, cap=10_000)
+    assert "tracking" not in cleaned          # generic script dropped
+    assert "color:red" not in cleaned         # style dropped
+    assert "RealEstateListing" in cleaned     # JSON-LD kept
+    assert "/propiedad/1" in cleaned          # markup kept
+
+
+def test_probe_site_extracts_detail_url_and_sitemap(monkeypatch):
+    pages = {
+        "https://acme.sv/propiedades": '<a href="/propiedad/123">x</a>',
+        "https://acme.sv/propiedad/123": '<meta property="og:title" content="Lot">',
+        "https://acme.sv/sitemap.xml": "<urlset><loc>https://acme.sv/propiedad/123</loc></urlset>",
+    }
+    monkeypatch.setattr(onboard, "_http_get", lambda url, **kw: pages.get(url))
+    probe = onboard._probe_site("https://acme.sv/propiedades")
+    assert probe["detail_url"] == "https://acme.sv/propiedad/123"
+    assert "og:title" in (probe["detail_html"] or "")
+    assert probe["sitemap_locs"] == ["https://acme.sv/propiedad/123"]
+
+
+def test_build_prompt_renders_probe():
+    probe = {"catalog_html": "<a href='/propiedad/1'>", "detail_url": "https://acme.sv/propiedad/1",
+             "detail_html": '<script type="application/ld+json">{}</script>',
+             "sitemap_locs": ["https://acme.sv/propiedad/1", "https://acme.sv/propiedad/2"]}
+    prompt = onboard.build_onboard_prompt(_ctx("acme"), source_url="https://acme.sv", probe=probe)
+    assert "What the live site actually looks like" in prompt
+    assert "https://acme.sv/propiedad/2" in prompt   # sitemap loc rendered
+    assert "READ THIS" in prompt
 
 
 # ── pr body ──────────────────────────────────────────────────────────

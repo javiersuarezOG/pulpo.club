@@ -50,6 +50,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urljoin, urlsplit
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
@@ -87,6 +88,102 @@ DEFAULT_PROVIDER = os.environ.get("SCRAPER_ONBOARD_PROVIDER", "deepseek")
 # of listings. field_audit's hard-gate is the quality gate; this is the volume
 # floor (matches the min-shelf-listings rule).
 DEFAULT_MIN_RANKED = 10
+
+
+# ── site probe (so the proposer reads the structure, not guesses it) ──
+#
+# The single biggest lever for onboarding quality: fetch the live catalog +
+# one sample detail page + the sitemap ONCE, and put them in the prompt. The
+# model then picks extract_strategy / detail_url_pattern by reading the markup
+# instead of guessing from listing counts. A JS-rendered catalog (detail URLs
+# absent from the HTML) becomes obvious, and the sitemap's <loc> entries hand
+# the model the detail-URL shape directly.
+
+_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+       "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15")
+_DETAIL_HINT_RE = re.compile(
+    r"(propiedad|inmueble|listing|property|detalle|/p/|/id/|/venta/)", re.IGNORECASE)
+
+
+def _http_get(url: str, *, cap: int = 200_000, timeout: float = 20.0) -> Optional[str]:
+    try:
+        import httpx
+        r = httpx.get(url, headers={"User-Agent": _UA}, timeout=timeout,
+                      follow_redirects=True)
+        if r.status_code >= 400:
+            return None
+        return r.text[:cap]
+    except Exception:  # noqa: BLE001 — a probe failure must not abort onboarding
+        return None
+
+
+def _clean_html(html: str, *, cap: int) -> str:
+    """Drop non-JSON-LD <script>, <style>, and comments so the budget is spent
+    on structural markup (links, JSON-LD, og: tags), then truncate."""
+    html = re.sub(r"<script(?![^>]*ld\+json)\b[^>]*>.*?</script>", "", html,
+                  flags=re.DOTALL | re.IGNORECASE)
+    html = re.sub(r"<style\b[^>]*>.*?</style>", "", html, flags=re.DOTALL | re.IGNORECASE)
+    html = re.sub(r"<!--.*?-->", "", html, flags=re.DOTALL)
+    html = re.sub(r"[ \t]+\n", "\n", html)
+    html = re.sub(r"\n{3,}", "\n\n", html)
+    return html.strip()[:cap]
+
+
+def _probe_site(catalog_url: str) -> dict:
+    """Fetch catalog + a sample detail page + sitemap <loc>s. Best-effort:
+    any field may be None/empty; onboarding proceeds regardless."""
+    out: dict = {"catalog_html": None, "detail_url": None, "detail_html": None,
+                 "sitemap_locs": []}
+    raw = _http_get(catalog_url)
+    if raw:
+        out["catalog_html"] = _clean_html(raw, cap=9000)
+        hrefs = re.findall(r'href="([^"#]+)"', raw)
+        det = next((h for h in hrefs if _DETAIL_HINT_RE.search(h)
+                    and urljoin(catalog_url, h) != catalog_url), None)
+        if det:
+            det_url = urljoin(catalog_url, det)
+            draw = _http_get(det_url)
+            if draw:
+                out["detail_url"] = det_url
+                out["detail_html"] = _clean_html(draw, cap=9000)
+    base = "{0.scheme}://{0.netloc}".format(urlsplit(catalog_url))
+    for sm in ("/sitemap.xml", "/sitemap_index.xml"):
+        smraw = _http_get(base + sm, cap=120_000)
+        if smraw and "<loc>" in smraw:
+            out["sitemap_locs"] = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", smraw)[:40]
+            break
+    return out
+
+
+def _render_probe(probe: Optional[dict]) -> str:
+    """Render the probe into the prompt. Empty when no probe was run."""
+    if not probe:
+        return ""
+    catalog = probe.get("catalog_html") or "<catalog fetch failed>"
+    locs = probe.get("sitemap_locs") or []
+    sitemap = "\n".join(locs) if locs else "<no sitemap.xml found>"
+    detail_url = probe.get("detail_url") or "<no detail page discovered from the catalog>"
+    detail = probe.get("detail_html") or "<none>"
+    return f"""
+What the live site actually looks like — READ THIS to choose extract_strategy
+and detail_url_pattern (don't guess):
+
+Catalog HTML (cleaned + truncated). If the listing links here are JS anchors
+(href="#...") rather than real detail URLs, the catalog is JS-rendered — use
+extract_strategy="sitemap" and the <loc> URLs below:
+```html
+{catalog}
+```
+
+sitemap.xml <loc> sample (the detail-URL shape lives here):
+{sitemap}
+
+Sample detail page ({detail_url}) — look for application/ld+json (use
+"detail_jsonld") or og: meta tags (use "detail_og_meta"):
+```html
+{detail}
+```
+"""
 
 
 # ── prompt construction ──────────────────────────────────────────────
@@ -188,8 +285,11 @@ def _eval_feedback(report: EvalReport) -> str:
     )
 
 
-def build_onboard_prompt(ctx: LoopContext, *, source_url: str) -> str:
-    """Construct the per-iteration prompt for Claude."""
+def build_onboard_prompt(ctx: LoopContext, *, source_url: str,
+                         probe: Optional[dict] = None) -> str:
+    """Construct the per-iteration prompt for the model. ``probe`` (from
+    :func:`_probe_site`) injects the live catalog/detail/sitemap so the model
+    reads the structure instead of guessing."""
     if ctx.iteration <= 1 and ctx.current_source is None:
         situation = (
             "There is NO scraper for this source yet. Author one from scratch."
@@ -216,7 +316,7 @@ Canonical output shape (a real skeleton-based scraper — match this structure):
 ```python
 {_EXEMPLAR}
 ```
-
+{_render_probe(probe)}
 Latest eval feedback (iteration {ctx.iteration}):
 {feedback}
 
@@ -329,11 +429,16 @@ def _call_model(prompt: str, *, provider: str, model: str) -> tuple[str, dict]:
 
 def make_propose(source_url: str, *, provider: str = DEFAULT_PROVIDER, model: Optional[str] = None):
     """Build the real ``propose`` callable. ``provider`` picks the LLM backend
-    (default DeepSeek); ``model`` defaults to that provider's default model."""
+    (default DeepSeek); ``model`` defaults to that provider's default model.
+    The live site is probed ONCE (catalog + detail + sitemap) and the result is
+    reused across iterations so the model authors against real markup."""
     model = model or PROVIDERS[provider]["default_model"]
+    cache: dict = {}
 
     def propose(ctx: LoopContext) -> Optional[ProposedEdit]:
-        prompt = build_onboard_prompt(ctx, source_url=source_url)
+        if "probe" not in cache:
+            cache["probe"] = _probe_site(source_url)
+        prompt = build_onboard_prompt(ctx, source_url=source_url, probe=cache["probe"])
         text, usage = _call_model(prompt, provider=provider, model=model)
         parsed = parse_proposal(text)
         if parsed is None:
