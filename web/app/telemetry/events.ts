@@ -1169,6 +1169,23 @@ export type EventMap = {
    *  subscription block. Pairs with start_checkout.session_created to
    *  build a re-acquisition funnel. */
   "account.sub_resubscribe_clicked": Record<string, never>;
+
+  // ───── Map view (WS4 Discovery) ─────
+  /** Viewport had more in-bounds listings than the render cap; the
+   *  excess were dropped from the marker layer. */
+  "map.markers_truncated": { shown: number; cap: number };
+  /** Positive heartbeat — an inbound `?bbox=` deep-link survived the map
+   *  entry hydration race and was applied to the viewport (NOT cleared).
+   *  Alert: sessions landing on a `?bbox=` URL should produce this; if the
+   *  rate drops to ~0 while `?bbox=` traffic continues, the A1 search-sync
+   *  state machine regressed and deep-links are being silently dropped. */
+  "map.deeplink_bbox_applied": Record<string, never>;
+  /** Should-be-zero canary — a viewport `?bbox=` write fired suspiciously
+   *  soon after a programmatic `fitBounds` refit, i.e. a refit-tail moveend
+   *  escaped the suppress window (the A6 one-shot-flag bug). Non-zero rate
+   *  in prod = the suppress window is too short / was reverted to a one-shot.
+   *  `ms_since_fit` is how long after the refit the write landed. */
+  "map.refit_wrote_bbox": { ms_since_fit: number };
 };
 
 export type EventName = keyof EventMap;
