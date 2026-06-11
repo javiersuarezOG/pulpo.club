@@ -141,13 +141,25 @@ describe("api/admin/newsletter/trigger-audience-send", () => {
 });
 
 describe("api/admin/newsletter write endpoints auth", () => {
-  it("admin surface is intentionally open — no requireAdminAuth gate on the triggers", () => {
+  it("single-recipient test endpoints stay open — no requireAdminAuth gate", () => {
     // Operator decision 2026-06-10: the PULPO_ADMIN_DEBUG_TOKEN gate was
-    // removed from /admin entirely. This test pins that decision so a
-    // future re-introduction of the gate is a deliberate, visible change.
-    for (const src of [sendSrc, previewSrc, welcomeTestSrc, freeWelcomeTestSrc]) {
+    // removed from /admin. That decision still holds for the low-blast
+    // single-recipient surfaces (preview + the two test-send triggers):
+    // they email one operator-chosen address, so the open posture is an
+    // accepted, bounded risk. This test pins that so a future
+    // re-introduction of the gate on these is a deliberate, visible change.
+    for (const src of [previewSrc, welcomeTestSrc, freeWelcomeTestSrc]) {
       expect(src).not.toMatch(/requireAdminAuth/);
     }
+  });
+
+  it("the full-audience blast IS bearer-gated (deliberate carve-out from open admin)", () => {
+    // Operator decision (audit 2026-06-11): trigger-audience-send fires a
+    // LIVE blast to the ENTIRE Pro audience. The public SEND string + per-IP
+    // (cold-start-resettable) rate-limit are not sufficient for an unbounded
+    // consent/reputation surface, so this one endpoint is re-gated with
+    // requireAdminAuth while the single-recipient triggers stay open.
+    expect(sendSrc).toMatch(/requireAdminAuth/);
   });
 
   it("the high-blast audience send keeps its type-to-confirm SEND gate", () => {

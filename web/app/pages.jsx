@@ -4576,6 +4576,8 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
       locale: lc,
       utms,
       urlCode,
+      // Lock Stripe's email to the signed-in account (anonymous → null).
+      email: app.user?.email || null,
       // Return to where they were if they cancel on Stripe (not /start).
       cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
     });
