@@ -352,6 +352,31 @@ const UI_STRINGS = {
   "home.hero.v5.tier_pro":       { en: " — a weekly email with your top 10, plus the full listings catalogue unlocked.",
                                    es: " — un correo semanal con tu top 10, más el catálogo completo desbloqueado." },
 
+  // ── Hero v6 (redesign): lead + 3-point checklist + inline email
+  //    capture + the "Pulpo Free" Top-3 card with a locked 4–10 zone.
+  "home.hero.v5.lead":           { en: "Pulpo is the best real estate agent you've ever had.",
+                                   es: "Pulpo es el mejor agente inmobiliario que has tenido." },
+  "home.hero.v5.usp_1":          { en: "Scans every beach & lake listing in El Salvador",
+                                   es: "Rastrea cada propiedad de playa y lago en El Salvador" },
+  "home.hero.v5.usp_2":          { en: "Ranks them by best value for money",
+                                   es: "Las ordena por la mejor relación calidad-precio" },
+  "home.hero.v5.usp_3":          { en: "Delivers your top picks to your inbox, every Sunday",
+                                   es: "Te envía tus mejores opciones al correo, cada domingo" },
+  "home.hero.v5.email_cta":      { en: "Get going — it's free",                 es: "Empieza — es gratis" },
+  // Pulpo Free Top-3 card
+  "home.hero.v5.card_free_tag":  { en: "Free",                                  es: "Gratis" },
+  "home.hero.v5.card_live":      { en: "Live · 6:00 AM",                        es: "En vivo · 6:00 AM" },
+  "home.hero.v5.card_title_a":   { en: "Your",                                  es: "Tu" },
+  "home.hero.v5.card_title_b":   { en: "Top 3",                                 es: "Top 3" },
+  "home.hero.v5.card_title_c":   { en: "this week",                             es: "esta semana" },
+  "home.hero.v5.card_kick":      { en: "Ranked by value · filtered to your preferences",
+                                   es: "Ordenado por valor · filtrado a tus preferencias" },
+  "home.hero.v5.grade_value":    { en: "value",                                 es: "valor" },
+  "home.hero.v5.lock_more":      { en: "+{n} more in your top 10",              es: "+{n} más en tu top 10" },
+  "home.hero.v5.lock_sub":       { en: "Free gives you the top 3 each Sunday. Unlock all 10 — plus the full catalogue — with Pulpo Pro.",
+                                   es: "Gratis te da el top 3 cada domingo. Desbloquea las 10 — y el catálogo completo — con Pulpo Pro." },
+  "home.hero.v5.lock_cta":       { en: "Unlock with Pulpo Pro",                 es: "Desbloquea con Pulpo Pro" },
+
   // Hero CTAs (two-state): primary = free newsletter ("Your property
   // tracker", email captured in a modal — no account, Resend only),
   // secondary = Go Pro.
