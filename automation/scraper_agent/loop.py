@@ -131,6 +131,17 @@ def agent_loop(
     ]
     _log(f"[{slug}] baseline: {best.summary()}")
 
+    # If the starting state already clears the gate, there's nothing to do —
+    # don't burn an iteration (or budget). Happens when a "repair" fires on a
+    # source that self-healed, or onboarding re-runs on an already-good scraper.
+    if best.passed:
+        _log(f"[{slug}] baseline already passes — nothing to do")
+        return LoopResult(
+            slug=slug, kind=kind, passed=True, best=best, best_iteration=0,
+            iterations=0, stop_reason="passed", history=history,
+            budget_summary=budget.summary(),
+        )
+
     stop_reason = "max_iters"
     last = best
 
