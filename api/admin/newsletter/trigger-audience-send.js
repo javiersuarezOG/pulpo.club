@@ -43,6 +43,7 @@
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
+const { requireAdminAuth } = require("../../_admin_auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
@@ -107,8 +108,17 @@ module.exports = async (req, res) => {
     logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
     return res.status(405).json({ error: "method_not_allowed" });
   }
-  // No auth gate — admin surface is open by design (see header). The
-  // type-to-confirm SEND gate below is the guardrail on this path.
+  // Bearer-gated: unlike the single-recipient test-send endpoints (which
+  // stay open per the 2026-06-10 operator decision), this path fires a
+  // LIVE blast to the ENTIRE Pro audience. The type-to-confirm "SEND"
+  // string is public knowledge and the per-IP rate-limit resets on cold
+  // start, so an unauthenticated full-audience send is an unbounded
+  // consent/reputation risk. requireAdminAuth sends 401/503 and returns
+  // false on failure.
+  if (!requireAdminAuth(req, res)) {
+    logApi({ status: 401, ms: Date.now() - t0, reason: "unauthorized" });
+    return;
+  }
 
   // Validation FIRST, rate-limit AFTER. The rate-limiter exists to
   // prevent runaway REAL sends (one per hour cap); it should only
