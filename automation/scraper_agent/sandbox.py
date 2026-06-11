@@ -35,14 +35,30 @@ class ScopeViolation(RuntimeError):
 
 
 def reload_scraper(slug: str) -> None:
-    """Evict a scraper module (and its lab cache) so the next import re-reads
-    the file from disk. Call after every edit, before re-evaluating."""
+    """Evict a scraper module so the next import re-reads the edited file.
+
+    Two evictions are needed for a clean re-import, because a scraper module
+    has an import-time side effect: it calls ``register(SOURCES, slug, ...)``
+    into the global ``pulpo.agents.SOURCES`` registry, which raises on a
+    duplicate slug. Dropping only ``sys.modules`` would make the *next* import
+    re-run that registration and blow up with "Slug '<slug>' already
+    registered". So we also pop the slug from the registry, making re-import
+    idempotent — which is exactly what the loop does after every edit.
+    """
     importlib.invalidate_caches()
     for name in list(sys.modules):
         if name == f"pulpo.scrapers.{slug}" or name.startswith(
             f"pulpo.scrapers.{slug}."
         ):
             del sys.modules[name]
+    # Deregister so the re-import's register() side effect succeeds. Scrapers
+    # only register into SOURCES; ENRICHERS / RANKER_LEGS are untouched.
+    try:
+        from pulpo.agents import SOURCES
+
+        SOURCES.pop(slug, None)
+    except Exception:  # noqa: BLE001 — registry shape changes shouldn't break reload
+        pass
 
 
 class Sandbox:

@@ -150,14 +150,26 @@ def test_sandbox_commit_persists_best():
             target.unlink()
 
 
-def test_reload_scraper_evicts_module_cache():
+def test_reload_scraper_evicts_module_cache_and_deregisters():
     import importlib
+
+    from pulpo.agents import SOURCES
 
     mod_name = "pulpo.scrapers.goodlife"
     importlib.import_module(mod_name)
     assert mod_name in sys.modules
+    assert "goodlife" in SOURCES
+
     reload_scraper("goodlife")
+    # both evictions: the module cache AND the registry slot, so a re-import's
+    # register() side effect won't raise "already registered".
     assert mod_name not in sys.modules
+    assert "goodlife" not in SOURCES
+
+    # restore global state so test ordering can't strand the registry for any
+    # other test that assumes goodlife is registered.
+    importlib.import_module(mod_name)
+    assert "goodlife" in SOURCES
 
 
 # ── loop ─────────────────────────────────────────────────────────────
