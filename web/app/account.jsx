@@ -1240,6 +1240,14 @@ function SubscriptionSection({ app }) {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("from") !== "portal") return;
+    // Wait for Clerk to hydrate before consuming the flag. On first mount
+    // app.clerkActions is null (lazy chunk), so without this guard we'd
+    // strip ?from=portal and poll with reloadUser=undefined (a no-op);
+    // the effect re-run after clerkActions binds would then early-return
+    // on the now-missing flag, and the user keeps seeing stale "Renews
+    // on…" copy. Deferring until clerkActions is ready means the strip +
+    // poll happen once, with a real reloadUser.
+    if (clerkEnabled() && !app.clerkActions) return;
     // Strip the flag before the reload completes so back/forward
     // navigation doesn't replay it.
     params.delete("from");
