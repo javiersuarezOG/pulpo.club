@@ -2518,6 +2518,45 @@ function ListingDetail({ listing, app, asPanel = true }) {
   const BEACHFRONT_ENUMS = new Set(["on_beach", "walk_to_beach", "near_beach"]);
 
   const facts = [];
+  // Built-property facts (plan 010) — houses/condos lead with bedrooms /
+  // bathrooms / built area instead of the land-centric set. Every field
+  // is nullable in the Listing type and presence-gated here (the two
+  // shipped /preview crashes were missing exactly these guards — see
+  // CLAUDE.md). Coverage is sparse until plans 009/011 land; tiles
+  // simply appear as data arrives.
+  const isBuilt = listing.property_type === "house" || listing.property_type === "condo";
+  if (isBuilt) {
+    if (isKnown(listing.bedrooms)) {
+      facts.push({ icon: "bed", label: t("detail.fact.bedrooms", lc), value: `${listing.bedrooms}` });
+    }
+    if (isKnown(listing.bathrooms)) {
+      facts.push({ icon: "bath", label: t("detail.fact.bathrooms", lc), value: `${listing.bathrooms}` });
+    }
+    if (isKnown(listing.built_area_m2)) {
+      facts.push({ icon: "ruler", label: t("detail.fact.built_area", lc), value: formatSize(listing.built_area_m2) });
+    }
+    if (isKnown(listing.year_built)) {
+      facts.push({ icon: "calendar", label: t("detail.fact.year_built", lc), value: `${listing.year_built}` });
+    }
+    if (isKnown(listing.year_renovated)) {
+      facts.push({ icon: "refresh", label: t("detail.fact.year_renovated", lc), value: `${listing.year_renovated}` });
+    }
+    if (isKnown(listing.parking_spaces) && listing.parking_spaces > 0) {
+      facts.push({ icon: "car", label: t("detail.fact.parking", lc), value: `${listing.parking_spaces}` });
+    }
+    if (listing.property_type === "condo" && isKnown(listing.floor)) {
+      facts.push({ icon: "type_condo", label: t("detail.fact.floor", lc), value: `${listing.floor}` });
+    }
+    if (listing.property_type === "condo" && isKnown(listing.hoa_fee_usd_monthly)) {
+      facts.push({ icon: "receipt", label: t("detail.fact.hoa", lc), value: formatPrice(listing.hoa_fee_usd_monthly) + t("detail.fact.per_month", lc) });
+    }
+    if (listing.furnished === true) {
+      facts.push({ icon: "sofa", label: t("detail.fact.furnished", lc), value: t("detail.fact.yes", lc) });
+    }
+    if (listing.has_pool === true) {
+      facts.push({ icon: "droplet", label: t("detail.fact.pool", lc), value: t("detail.fact.yes", lc) });
+    }
+  }
   if (isKnown(listing.road_access_type)) {
     const v = listing.road_access_type;
     const roadValue = ROAD_ENUMS.has(v)
@@ -2531,8 +2570,12 @@ function ListingDetail({ listing, app, asPanel = true }) {
   if (listing.has_power) {
     facts.push({ icon: "bolt", label: t("detail.fact.electricity", lc), value: t("detail.fact.power_at", lc) });
   }
-  // Topography is always known (boolean), so it always shows.
-  facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
+  // Topography is always known (boolean), so it always shows — for LAND.
+  // Built properties skip it: a condo labeled "Sloped" reads as a bug
+  // (plan 010 — the only edit to the existing land facts).
+  if (!isBuilt) {
+    facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
+  }
   if (isKnown(listing.beachfront_tier)) {
     const v = listing.beachfront_tier;
     const beachValue = BEACHFRONT_ENUMS.has(v)

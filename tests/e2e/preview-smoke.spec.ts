@@ -606,6 +606,12 @@ test.describe("New app boots cleanly on key routes", () => {
       // browse-search-autocomplete.spec.ts) — listed here as documented backstop.
       "ocean view", "price drop",                     // active-filter enum chips (raw-slug leak)
       "Signal",                                       // browse.table.col.signal header
+      // Built-property fact tiles (plan 010) — house/condo Key Facts.
+      // Render on the detail panel when ranked.json carries the field;
+      // a hardcoded EN label would leak on every Spanish-locale house.
+      "Bedrooms",                                     // detail.fact.bedrooms (es: Habitaciones)
+      "Year built",                                   // detail.fact.year_built (es: Año de construcción)
+      "Built area",                                   // detail.fact.built_area (es: Área construida)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would

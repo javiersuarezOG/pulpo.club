@@ -1011,6 +1011,19 @@ export const UI_STRINGS = {
   "detail.fact.yes":         { en: "Yes",                           es: "Sí" },
   "detail.fact.zoning":      { en: "Zoning",                        es: "Zonificación" },
   "detail.fact.photos":      { en: "Photos",                        es: "Fotos" },
+  // Built-property (house/condo) fact tiles — plan 010. Presence-gated
+  // on sparse ranked.json fields; plan 009/011 raise coverage.
+  "detail.fact.bedrooms":       { en: "Bedrooms",        es: "Habitaciones" },
+  "detail.fact.bathrooms":      { en: "Bathrooms",       es: "Baños" },
+  "detail.fact.built_area":     { en: "Built area",      es: "Área construida" },
+  "detail.fact.year_built":     { en: "Year built",      es: "Año de construcción" },
+  "detail.fact.year_renovated": { en: "Renovated",       es: "Remodelado" },
+  "detail.fact.parking":        { en: "Parking",         es: "Estacionamiento" },
+  "detail.fact.floor":          { en: "Floor",           es: "Piso" },
+  "detail.fact.hoa":            { en: "HOA fee",         es: "Cuota de mantenimiento" },
+  "detail.fact.furnished":      { en: "Furnished",       es: "Amueblado" },
+  "detail.fact.pool":           { en: "Pool",            es: "Piscina" },
+  "detail.fact.per_month":      { en: "/month",          es: "/mes" },
   // PriceContextBlock — "How this price compares" section on the
   // detail page. Pill copy + caption. Peer-kind adapts to subcategory
   // (homes / condos / lots / listings). Scope label adapts to the

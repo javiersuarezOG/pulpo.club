@@ -385,6 +385,18 @@ export function adaptListing(raw: any): Listing {
     momentum_score: typeof raw.momentum_score === "number" ? raw.momentum_score : null,
     property_type: typeof raw.property_type === "string" ? raw.property_type : null,
     bedrooms: typeof raw.bedrooms === "number" ? raw.bedrooms : null,
+    // Built-property facts (plan 010) — same graceful-null guard style
+    // as bedrooms above. ranked.json carries these sparsely today;
+    // plan 009/011 raise coverage and the tiles light up as data lands.
+    bathrooms: typeof raw.bathrooms === "number" ? raw.bathrooms : null,
+    built_area_m2: typeof raw.built_area_m2 === "number" ? raw.built_area_m2 : null,
+    year_built: typeof raw.year_built === "number" ? raw.year_built : null,
+    year_renovated: typeof raw.year_renovated === "number" ? raw.year_renovated : null,
+    parking_spaces: typeof raw.parking_spaces === "number" ? raw.parking_spaces : null,
+    floor: typeof raw.floor === "number" ? raw.floor : null,
+    hoa_fee_usd_monthly: typeof raw.hoa_fee_usd_monthly === "number" ? raw.hoa_fee_usd_monthly : null,
+    furnished: typeof raw.furnished === "boolean" ? raw.furnished : null,
+    has_pool: typeof raw.has_pool === "boolean" ? raw.has_pool : null,
     // IA-axis fields. During the rollout window, ranked.json may not
     // yet carry them — graceful nulls keep the legacy homepage code
     // working unchanged while the backend catches up.
