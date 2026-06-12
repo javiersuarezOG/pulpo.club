@@ -475,6 +475,16 @@ def _populate_hires_fields_from_sidecar(li, sidecar: dict, *, quarantined: bool)
         li.hires_eligible = bool(sidecar.get("hires_eligible"))
     if sidecar.get("hires_photo_quality_score") is not None:
         li.hires_photo_quality_score = int(sidecar["hires_photo_quality_score"])
+    # Deterministic aesthetic issues (logo_or_watermark, etc.) — written by
+    # the hires QC pass as sidecar["aesthetic"] = {"issues": [...], ...}
+    # (see assess_deterministic_aesthetic). Consumed by the featured pools
+    # and the IG gate. Older sidecars predate the "aesthetic" key and leave
+    # the field None.
+    aes = sidecar.get("aesthetic")
+    if isinstance(aes, dict):
+        issues = aes.get("issues")
+        if isinstance(issues, list) and issues:
+            li.hires_aesthetic_issues = [str(x) for x in issues]
     if "resdet_upscaled" in sidecar:
         v = sidecar.get("resdet_upscaled")
         li.hires_resdet_upscaled = bool(v) if v is not None else None

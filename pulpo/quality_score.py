@@ -14,8 +14,11 @@ Scoring table (PRD §"Soft Quality Score — Used for Ranking, Not Filtering"):
   +1  source institutional (encuentra24, remax, century21, citymax, csbr,
       santizo — agency portals)
   +1  price_per_m2 calculable (price_usd AND area_m2 both present)
+  +1  card_eligible (photo phase verdict: hero clears the resolution
+      floor, not a logo/placeholder)
+  +1  hero_eligible (≥1080² source) — only when card_eligible is also True
 
-Maximum 9. Pure function; no I/O. Tested by `tests/test_quality_score.py`.
+Maximum 11. Pure function; no I/O. Tested by `tests/test_quality_score.py`.
 
 Consumer: `pulpo/ranker_legs/quality_score.py` (registered as a 4th leg
 with weight 0.05 — a rank nudge, not a reshuffle). After PR-renormalization
@@ -42,7 +45,7 @@ INSTITUTIONAL_SOURCES: frozenset[str] = frozenset({
 })
 
 
-MAX_SCORE = 9
+MAX_SCORE = 11
 
 
 def _g(li: Any, name: str) -> Any:
@@ -95,5 +98,14 @@ def compute(li: Any) -> int:
         and isinstance(area, (int, float)) and area > 0
     ):
         score += 1
+
+    # Image fitness — the photo phase's verdicts. +1 for a card-suitable
+    # hero (resolution floor, not a logo/placeholder), +1 more when the
+    # hero is hero_eligible (>=1080^2 source). None counts as 0: unverified
+    # photos confer no rank benefit.
+    if _g(li, "card_eligible") is True:
+        score += 1
+        if _g(li, "hero_eligible") is True:
+            score += 1
 
     return score

@@ -168,6 +168,11 @@ class Listing:
     hires_photo_quality_score: Optional[int] = None  # compute_score on native bytes, 0..100
     hires_resdet_upscaled: Optional[bool] = None     # resdet detected upscale fraud
     hires_quarantined: Optional[bool] = None         # True when .quarantine marker is present
+    # Deterministic aesthetic issues detected on the hires derivative
+    # (automation/aesthetic_deterministic.py): e.g. "logo_or_watermark",
+    # "poor_lighting". Consumers: featured_listing._is_elite/_is_soft and
+    # ig_photo_gate exclude listings whose hero carries logo_or_watermark.
+    hires_aesthetic_issues: Optional[list[str]] = None
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
     # PR-S4b — existence ledger output (see automation/listing_ledger.py).
     # One of KNOWN_EXISTENCE_STATUSES: confirmed_current | missing_recently | stale.

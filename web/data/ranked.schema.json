@@ -77,6 +77,7 @@
       "hires_photo_quality_score",
       "hires_resdet_upscaled",
       "hires_quarantined",
+      "hires_aesthetic_issues",
       "first_seen_at",
       "existence_status",
       "last_seen_at",
@@ -503,6 +504,15 @@
           "boolean",
           "null"
         ]
+      },
+      "hires_aesthetic_issues": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        }
       },
       "first_seen_at": {
         "type": [

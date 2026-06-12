@@ -128,6 +128,27 @@ def test_card_eligible_none_excluded_from_elite_and_soft():
     assert pool.tier == "fallback"
 
 
+def test_watermark_hero_excluded_from_elite_and_soft():
+    """Watermark signal (plan 005): a listing meeting every other curated
+    gate but whose hires hero was flagged logo_or_watermark by the
+    deterministic aesthetic pass is excluded from BOTH curated pools and
+    drops to the last-resort fallback tier."""
+    from pulpo.featured_listing import _is_elite, _is_soft
+    li = _li(hires_aesthetic_issues=["logo_or_watermark"])
+    assert _is_elite(li) is False
+    assert _is_soft(li) is False
+    pool = pick_featured_pool([li], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "fallback"
+
+
+def test_non_watermark_aesthetic_issue_does_not_exclude():
+    """Only logo_or_watermark gates the curated pools — other aesthetic
+    issues (e.g. low_quality) are not a curated-surface exclusion here."""
+    from pulpo.featured_listing import _is_elite
+    assert _is_elite(_li(hires_aesthetic_issues=["low_quality"])) is True
+
+
 def test_elite_accepts_null_text_overlay():
     """None means 'no OCR signal' (Tesseract absent / undecodable image).
     Same null-tolerance pattern as hero_photo_quality_score — keep the

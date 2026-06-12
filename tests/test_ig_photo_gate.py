@@ -100,6 +100,7 @@ def test_good_terreno_passes():
     ({"card_eligible": False, "hero_eligible": False}, "not_eligible"),
     ({"has_text_overlay": True},                  "text_overlay"),
     ({"has_marketing_overlay": True},             "marketing_overlay"),
+    ({"hires_aesthetic_issues": ["logo_or_watermark"]}, "logo_or_watermark"),
     ({"is_incomplete": True},                     "incomplete"),
     ({"data_quality_score": 0.40},                "low_data_quality"),
     ({"data_quality_score": None},                "low_data_quality"),
@@ -284,6 +285,34 @@ def test_build_candidates_mixed_input():
     assert payload["stats"]["rejection_reasons"]["low_photos"] == 1
     # candidates ordered by rank_score desc — b (90) before a (80)
     assert [c["listing_id"] for c in payload["candidates"]] == ["b__2", "a__1"]
+
+
+def test_watermark_reason_lands_in_rejection_telemetry():
+    """Watermark signal (plan 005): a logo_or_watermark hero is rejected and
+    the reason is counted in the build's rejection_reasons stats."""
+    listings = [
+        _good_terreno(source="a", source_id="1"),
+        _good_terreno(source="b", source_id="2",
+                      hires_aesthetic_issues=["logo_or_watermark"]),  # rejected
+    ]
+    payload = build_candidates(listings, cfg=_CFG)
+    assert payload["stats"]["passed"] == 1
+    assert payload["stats"]["rejection_reasons"]["logo_or_watermark"] == 1
+
+
+def test_non_watermark_aesthetic_issue_passes_ig_gate():
+    """Only logo_or_watermark gates IG — other deterministic issues (e.g.
+    low_quality) don't block a post."""
+    li = _good_terreno(hires_aesthetic_issues=["low_quality"])
+    assert passes_gate(li, _CFG) is True
+
+
+def test_no_hires_aesthetic_field_passes_ig_gate():
+    """Older listings without the hires_aesthetic_issues field (None) are
+    not blocked — no signal means no exclusion."""
+    li = _good_terreno()
+    li.pop("hires_aesthetic_issues", None)
+    assert passes_gate(li, _CFG) is True
 
 
 def test_build_candidates_orders_by_rank_score_descending():
