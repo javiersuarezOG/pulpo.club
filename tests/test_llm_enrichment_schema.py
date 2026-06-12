@@ -432,6 +432,26 @@ def test_validate_rejects_usps_with_partial_translation():
     assert reason == "invalid:usps"
 
 
+# ── schema v4: description length cap (plan 008) ──────────────────────
+
+def test_validate_rejects_701_char_description():
+    """v4 caps each language at 700 chars (prompt asks for ≤60 words;
+    700 leaves ES-rendering headroom). 701 fails."""
+    r = _ok_response()
+    r["description"] = {"en": "x" * 701, "es": "Descripción corta."}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:description"
+
+
+def test_validate_accepts_400_char_description():
+    r = _ok_response()
+    r["description"] = {"en": "y" * 400, "es": "z" * 400}
+    ok, reason = validate_response(r)
+    assert ok is True
+    assert reason is None
+
+
 # ── schema v3: url_language ───────────────────────────────────────────
 
 def test_validate_rejects_missing_url_language():

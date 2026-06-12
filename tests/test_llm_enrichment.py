@@ -353,6 +353,87 @@ def test_sidecar_persists_validated_payload(tmp_path):
     assert "tokens_in" in entry and "tokens_out" in entry and "cost_usd" in entry
 
 
+def test_sidecar_entry_carries_prompt_version_4(tmp_path):
+    """Plan 008 — every new sidecar entry stamps the writing-instructions
+    version so plan 011's retroactive backfill can target entries with
+    prompt_version < 4 / missing."""
+    sidecar = tmp_path / "side.json"
+    li = _li()
+    client = _StubClient(responses=[_OK_JSON])
+    enrich_listings([li], sidecar, tmp_path / "log.jsonl", client=client)
+    saved = json.loads(sidecar.read_text(encoding="utf-8"))
+    entry = saved["goodlife|GL-001"]
+    assert entry["prompt_version"] == 4
+
+
+def test_user_prompt_carries_property_facts_for_house(tmp_path):
+    """Plan 008 — structured facts the pipeline already parsed reach the
+    model so house/condo copy can differ from land copy."""
+    li = _li(property_type="house", bedrooms=3, bathrooms=2.0,
+             built_area_m2=180.0, year_built=2019)
+    client = _StubClient(responses=[_OK_JSON])
+    enrich_listings([li], tmp_path / "side.json", tmp_path / "log.jsonl",
+                    client=client)
+    user_msg = next(m for m in client.chat.completions.calls[0]["messages"]
+                    if m["role"] == "user")
+    assert "PROPERTY FACTS" in user_msg["content"]
+    assert "- property_type: house" in user_msg["content"]
+    assert "- bedrooms: 3" in user_msg["content"]
+    assert "- year_built: 2019" in user_msg["content"]
+
+
+def test_user_prompt_facts_block_collapses_when_no_facts(tmp_path):
+    """Listings with no structured facts (the _li default) keep a
+    facts-free user prompt — the block collapses like LOCATION HINTS."""
+    li = _li()
+    client = _StubClient(responses=[_OK_JSON])
+    enrich_listings([li], tmp_path / "side.json", tmp_path / "log.jsonl",
+                    client=client)
+    user_msg = next(m for m in client.chat.completions.calls[0]["messages"]
+                    if m["role"] == "user")
+    assert "PROPERTY FACTS" not in user_msg["content"]
+
+
+# ── cliché lint wiring (plan 008 — observability, not a gate) ──────────
+
+def test_quality_flags_logged_but_enrichment_kept(tmp_path):
+    """A banned phrase in the generated description flags the JSONL
+    event and bumps quality_flagged — but the enrichment is KEPT
+    (rejecting would re-spend the API call for a tone issue)."""
+    flagged = {**_OK_JSON,
+               "description": {"en": "Discover this stunning parcel near the beach.",
+                               "es": "Descubra esta parcela impresionante cerca de la playa."}}
+    li = _li()
+    log = tmp_path / "log.jsonl"
+    client = _StubClient(responses=[flagged])
+    metrics = enrich_listings([li], tmp_path / "side.json", log, client=client)
+    assert metrics["enriched"] == 1
+    assert metrics["quality_flagged"] == 1
+    # Enrichment kept — listing carries the (flagged) copy
+    assert li["short_description_canonical"]["en"].startswith("Discover")
+    # JSONL event carries the deduped, sorted flag list
+    events = [json.loads(ln) for ln in log.read_text().splitlines() if ln.strip()]
+    enriched = next(ev for ev in events if ev["decision"] == "enriched")
+    assert enriched["quality_flags"] == ["descubra", "discover",
+                                         "impresionante", "stunning"]
+
+
+def test_clean_description_has_no_quality_flags(tmp_path):
+    """Clean copy → no quality_flags key on the event, counter stays 0."""
+    clean = {**_OK_JSON,
+             "description": {"en": "Flat 850 m² residential lot in Santa Ana with paved access.",
+                             "es": "Lote residencial plano de 850 m² en Santa Ana con acceso pavimentado."}}
+    li = _li()
+    log = tmp_path / "log.jsonl"
+    client = _StubClient(responses=[clean])
+    metrics = enrich_listings([li], tmp_path / "side.json", log, client=client)
+    assert metrics["enriched"] == 1
+    assert metrics["quality_flagged"] == 0
+    events = [json.loads(ln) for ln in log.read_text().splitlines() if ln.strip()]
+    enriched = next(ev for ev in events if ev["decision"] == "enriched")
+    assert "quality_flags" not in enriched
+
+
 # ── telemetry — JSONL audit log ───────────────────────────────────────
 
 def test_audit_log_jsonl_appended_per_decision(tmp_path):
