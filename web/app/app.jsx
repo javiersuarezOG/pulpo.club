@@ -22,6 +22,8 @@ import {
   ConsentBanner,
 } from "./pages.jsx";
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
+import { EmailCaptureModal } from "./components/EmailCaptureModal.jsx";
+import { AccessModal } from "./components/AccessModal.jsx";
 import { NewHomePage } from "./home";
 // PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
 // + its child widgets only render for users on /account or /admin, which
@@ -49,7 +51,7 @@ import { safeLocalGet, safeLocalSet, safeLocalRemove } from "./lib/safe-storage"
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
-import { isPaid } from "./lib/gating";
+import { isPaid, isFreeMember } from "./lib/gating";
 import { freeViewableIds } from "./lib/free-view";
 import { deriveSubscriptionState } from "./lib/subscription";
 
@@ -987,13 +989,19 @@ function App() {
     // is the conversion surface (→ Stripe checkout). A deep-link backstop
     // effect below covers cold-loads straight to /listing/<id>.
     //
-    // Exception (free top-3): a non-paid viewer MAY open this week's top 3
-    // ranked picks in full — the same set the home hero unlocks. Ranks 4+
-    // stay walled. `freeViewableRef` holds the live id set (see below).
-    if (!isPaid(user) && !freeViewableRef.current.has(id)) {
-      track("paywall.shown", { kind: "listing_click", listing_id: id });
-      setFreeMonthModal({ trigger: "browse_card" });
-      return;
+    // Email-first gate. Pro opens everything. Otherwise:
+    //   • anonymous (no email yet)  → start-free email-capture modal. If the
+    //     click was a top-3, we remember the id and open it once they join.
+    //   • free member, top-3        → opens in full (the email unlocked it).
+    //   • free member, rank 4+      → Go-Pro modal.
+    if (!isPaid(user)) {
+      const isTop3 = freeViewableRef.current.has(id);
+      const member = isFreeMember(user);
+      if (!(isTop3 && member)) {
+        track("paywall.shown", { kind: "listing_click", listing_id: id, top3: isTop3, member });
+        requestAccess({ reason: isTop3 ? "top3" : "listing", listingId: isTop3 ? id : null, member });
+        return;
+      }
     }
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
@@ -1016,6 +1024,8 @@ function App() {
       }
     }
     _measure("perf.detail_open", { listing_id: id });
+    // openEmailCapture is a stable callback defined below; referenced in the
+    // body only (deps would hit its TDZ at this render position).
   }, [_measure, user]);
 
   const closeListing = useCallback(() => {
@@ -1056,9 +1066,11 @@ function App() {
     // anonymous-stash + sign-up, no free 10-save cap; you save once you're
     // Pro. (The /api/saves cap is now dead for this path — backend cleanup
     // is a follow-up; saving simply can't be reached by a non-paid user.)
+    // Saving is a Pro capability. Anonymous → start-free email capture
+    // (get them into Free first); free member → Go-Pro modal.
     if (!isPaid(user)) {
       track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
-      setFreeMonthModal({ trigger: "favorites_action" });
+      requestAccess({ reason: "save", member: isFreeMember(user) });
       return;
     }
 
@@ -1108,7 +1120,7 @@ function App() {
         showToast("Couldn't save — try again.");
       }
     });
-  }, [clerkUserId, showToast, locale, user]);
+  }, [clerkUserId, showToast, locale, user]); // openEmailCapture used in body (stable, defined below)
 
   // ── PR-NL-8 — auto-save from email "♥ Save to favorites" links ────────
   //
@@ -1309,6 +1321,13 @@ function App() {
       : undefined;
     const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
+      // Email-first: a route gate (Favorites / Account) for a non-member
+      // routes through the unified access surface (join free / go pro /
+      // sign in), same as every other gate.
+      if (accessV2) {
+        requestAccess({ reason: route, member: isFreeMember(user) });
+        return;
+      }
       // Two-state model: /saved (Favorites) is a Pro feature. A non-paid
       // visitor clicking it should be sold Pro, not shown a "welcome back"
       // login — they're a prospect, not a returning member. /account keeps
@@ -1429,6 +1448,90 @@ function App() {
   }, []);
   const closeFreeMonthModal = useCallback(() => setFreeMonthModal(null), []);
 
+  // Email-first funnel — start-free email-capture modal. Shown to ANONYMOUS
+  // visitors hitting any gated action (open a top-3, save, hero lock). cfg =
+  // { reason, listingId } — listingId set when the gate was a top-3 click so
+  // we can open it the moment they become a member. Mutually exclusive with
+  // the Pro modals.
+  const [emailCaptureModal, setEmailCaptureModal] = useState(null);
+  const openEmailCapture = useCallback((cfg) => {
+    setProUpsellModal(null);
+    setFreeMonthModal(null);
+    setEmailCaptureModal(cfg || {});
+  }, []);
+  const closeEmailCapture = useCallback(() => setEmailCaptureModal(null), []);
+
+  // Access v2 — the unified "3 ways in" surface (registry-driven
+  // AccessBlock/AccessModal). ON by default; switch off with ?ff_access_v2=0.
+  // Deliberately NOT PostHog-gated yet: `readFeatureFlag` would resolve to
+  // OFF wherever PostHog is live but the flag is undefined (i.e. every
+  // deployed environment). When we want dashboard control, define the flag
+  // in PostHog and swap this to readFeatureFlag("access_v2", true).
+  const accessV2 = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = new URLSearchParams(window.location.search).get("ff_access_v2");
+      if (v === "0") return false;
+      if (v === "1") return true;
+    } catch { /* ignore */ }
+    return true; // default ON
+  }, []);
+  const [accessModal, setAccessModal] = useState(null);
+  const openAccessModal = useCallback((cfg) => {
+    setProUpsellModal(null); setFreeMonthModal(null); setEmailCaptureModal(null);
+    setAccessModal(cfg || { surface: "gate_anon" });
+  }, []);
+  const closeAccessModal = useCallback(() => setAccessModal(null), []);
+
+  // Single gate entry point. Anonymous → start-free surface; Free member →
+  // Pro surface. v2 → AccessModal; otherwise the legacy split modals. All
+  // gates route through this so the funnel lives in one place.
+  const requestAccess = useCallback(({ reason, listingId, member } = {}) => {
+    if (accessV2) {
+      openAccessModal({ surface: member ? "gate_member" : "gate_anon", reason, listingId });
+    } else if (member) {
+      setFreeMonthModal({ trigger: reason || "browse_card" });
+    } else {
+      openEmailCapture({ reason: reason || "gate", listingId: listingId || null });
+    }
+  }, [accessV2, openAccessModal, openEmailCapture]);
+
+  // Turn an email submission into a Free member (no Clerk account). Mirrors
+  // the legacy `signin` seed but stamps plan:"free" + provider:"email" so
+  // `isFreeMember`/`tierFor` recognize it and ClerkUserSync preserves it
+  // while signed out. The pulpo-user localStorage effect persists it.
+  // `openListingId` (a top-3 they were trying to open) is opened once the
+  // membership lands — see the effect below (setUser is async, so the
+  // modal can't call openListing directly without a stale-user race).
+  const pendingOpenAfterJoinRef = useRef(null);
+  const becomeFreeMember = useCallback(({ email, openListingId } = {}) => {
+    if (!email) return;
+    if (openListingId) pendingOpenAfterJoinRef.current = openListingId;
+    setUser((prev) => {
+      // Never downgrade a paid/Clerk user to free-member.
+      if (prev && isPaid(prev)) return prev;
+      return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
+    });
+  }, []);
+
+  // Unified "they want more access" gate: anonymous → start-free email
+  // capture; free member → Go-Pro modal; Pro → no-op. Used by the hero lock
+  // and any direct upsell CTA so the anon-vs-member split stays in one place.
+  const gateToPro = useCallback(({ reason } = {}) => {
+    if (isPaid(user)) return;
+    requestAccess({ reason: reason || "gate", member: isFreeMember(user) });
+  }, [user, requestAccess]);
+
+  // Once a Free membership lands, open the top-3 the visitor was reaching
+  // for when the email-capture gate fired (continue-the-intent).
+  useEffect(() => {
+    if (isFreeMember(user) && pendingOpenAfterJoinRef.current) {
+      const id = pendingOpenAfterJoinRef.current;
+      pendingOpenAfterJoinRef.current = null;
+      openListing(id);
+    }
+  }, [user, openListing]);
+
   // Two-state deep-link backstop: a non-paid user landing directly on
   // /listing/<id> (shared link, bookmark, cold reload) gets the subscribe
   // modal instead of the panel — symmetric with the openListing click
@@ -1442,14 +1545,16 @@ function App() {
   useEffect(() => {
     if (!openListingId || isPaid(user)) return;
     if (listingsState.state.status === "loading") return; // decide once the set is known
-    if (freeViewableIdSet.has(openListingId)) return; // top-3 deep link → open in full
-    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId });
-    setFreeMonthModal({ trigger: "browse_card" });
+    if (freeViewableIdSet.has(openListingId)) return; // top-3 deep link → open in full (SEO/share)
+    // Non-top-3 deep link, non-paid: anonymous → start-free; member → Pro.
+    const member = isFreeMember(user);
+    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId, member });
+    requestAccess({ reason: "listing", member });
     setOpenListingId(null);
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
       window.history.replaceState({ pulpo: true }, "", "/browse");
     }
-  }, [openListingId, user, listingsState.state.status, freeViewableIdSet]);
+  }, [openListingId, user, listingsState.state.status, freeViewableIdSet]); // openEmailCapture: stable, body-only
 
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //
@@ -1520,6 +1625,8 @@ function App() {
     signupModal, openSignup, closeSignup,
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
     freeMonthModal, openFreeMonthModal, closeFreeMonthModal,
+    emailCaptureModal, openEmailCapture, closeEmailCapture, becomeFreeMember, gateToPro,
+    accessV2, accessModal, openAccessModal, closeAccessModal, requestAccess,
     openListing, closeListing, openListingId,
     isFreeViewable,
     detailViewCount, recordDetailView,
@@ -1649,6 +1756,22 @@ function App() {
           app={app}
           trigger={freeMonthModal.trigger}
           onClose={closeFreeMonthModal}
+        />
+      )}
+      {emailCaptureModal && (
+        <EmailCaptureModal
+          app={app}
+          locale={locale}
+          cfg={emailCaptureModal}
+          onClose={closeEmailCapture}
+        />
+      )}
+      {accessModal && (
+        <AccessModal
+          app={app}
+          locale={locale}
+          cfg={accessModal}
+          onClose={closeAccessModal}
         />
       )}
       <ToastHost app={app} />

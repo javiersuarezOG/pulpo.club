@@ -21,6 +21,7 @@ import { track } from "../telemetry/hook";
 import { Icon, PulpoMark } from "../components.jsx";
 import { useListings } from "../data/use-listings";
 import { pickTopRanked } from "../lib/free-view";
+import { AccessBlock } from "../components/AccessBlock.jsx";
 import versions from "./versions.json";
 
 const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
@@ -134,9 +135,9 @@ function FreeTopCard({ app, locale }) {
 
   const onUnlock = useCallback(() => {
     try { track("hero_v6_pro_unlock_clicked", { version: HERO_V5_VERSION }); } catch { /* ignore */ }
-    if (app && typeof app.openFreeMonthModal === "function") {
-      app.openFreeMonthModal({ trigger: "hero_pro_lock" });
-    }
+    // Email-first: anonymous → start-free capture; free member → Go-Pro.
+    if (app && typeof app.gateToPro === "function") app.gateToPro({ reason: "hero_pro_lock" });
+    else if (app && typeof app.openFreeMonthModal === "function") app.openFreeMonthModal({ trigger: "hero_pro_lock" });
   }, [app]);
 
   return (
@@ -203,7 +204,7 @@ function FreeTopCard({ app, locale }) {
 }
 
 // ── Inline free email capture → POST /api/newsletter (Resend, no account).
-function EmailCapture({ locale }) {
+function EmailCapture({ app, locale }) {
   const [email, setEmail] = React.useState("");
   const [status, setStatus] = React.useState({ kind: "idle" }); // idle|loading|success|already|error|invalid
 
@@ -221,7 +222,12 @@ function EmailCapture({ locale }) {
       });
       const body = await r.json().catch(() => ({}));
       let result;
-      if (r.ok) { setStatus({ kind: body.resubscribed ? "already" : "success" }); result = body.resubscribed ? "already_subscribed" : "success"; }
+      if (r.ok) {
+        setStatus({ kind: body.resubscribed ? "already" : "success" }); result = body.resubscribed ? "already_subscribed" : "success";
+        // Email-first: submitting the hero form makes you a Free member, so
+        // the top-3 unlock immediately (no second prompt).
+        if (app && typeof app.becomeFreeMember === "function") app.becomeFreeMember({ email: value });
+      }
       else if (r.status === 429) { setStatus({ kind: "error" }); result = "rate_limited"; }
       else if (body && body.error === "invalid_email") { setStatus({ kind: "invalid" }); result = "validation_failed"; }
       else { setStatus({ kind: "error" }); result = "error"; }
@@ -230,7 +236,7 @@ function EmailCapture({ locale }) {
       setStatus({ kind: "error" });
       try { track("hero.email_submitted", { source: "homepage_hero", email_domain_only: domain, result: "error" }); } catch { /* ignore */ }
     }
-  }, [email, locale]);
+  }, [email, locale, app]);
 
   if (status.kind === "success" || status.kind === "already") {
     return (
@@ -303,7 +309,9 @@ export function HeroV5({ app, locale }) {
               <li>{t("home.hero.v5.usp_2", locale)}</li>
               <li>{t("home.hero.v5.usp_3", locale)}</li>
             </ul>
-            <EmailCapture locale={locale} />
+            {app && app.accessV2
+              ? <AccessBlock app={app} locale={locale} surface="hero" />
+              : <EmailCapture app={app} locale={locale} />}
           </div>
           <div className="hv6-viz">
             <FreeTopCard app={app} locale={locale} />

@@ -43,7 +43,7 @@ test.describe("Free top-3 view exemption (anonymous viewer)", () => {
     await expect(page.locator(".free-month-modal"), "top-3 must not be walled").toHaveCount(0);
   });
 
-  test("a non-top-3 listing is walled behind the Pro modal", async ({ page }) => {
+  test("an anonymous non-top-3 deep link → 3-option access modal (not Stripe)", async ({ page }) => {
     await seedConsent(page);
     await page.goto("/", { waitUntil: "networkidle" });
 
@@ -52,7 +52,33 @@ test.describe("Free top-3 view exemption (anonymous viewer)", () => {
 
     await page.goto(pathForListing(ids.walled as string), { waitUntil: "networkidle" });
 
-    await expect(page.locator(".free-month-modal"), "rank 4+ must wall").toBeVisible({ timeout: 8_000 });
+    // Email-first: an anonymous visitor gets the start-free access modal
+    // (which leads with email), NOT a bare Stripe push and NOT the panel.
+    await expect(page.locator(".access-modal"), "anon should get the access modal").toBeVisible({ timeout: 8_000 });
+    await expect(page.locator(".access-modal .access-input"), "email-first").toBeVisible();
     await expect(page.locator(".detail-panel")).toHaveCount(0);
+  });
+
+  test("submitting the access modal makes a Free member who can open the top-3", async ({ page }) => {
+    // The dev server doesn't run /api functions; mock the newsletter POST.
+    await page.route("**/api/newsletter", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
+    );
+    await seedConsent(page);
+    await page.goto("/", { waitUntil: "networkidle" });
+    const ids = await readTestIds(page);
+
+    // Top-3 deep links open for anyone (SEO); drive the click gate from a
+    // non-top-3 to force the access modal, then join free.
+    await page.goto(pathForListing(ids.walled as string), { waitUntil: "networkidle" });
+    await expect(page.locator(".access-modal")).toBeVisible({ timeout: 8_000 });
+    await page.locator(".access-modal .access-input").fill("e2e-test@example.com");
+    await page.locator(".access-modal .access-free button[type=submit]").click();
+    await expect(page.locator(".access-modal")).toHaveCount(0, { timeout: 8_000 });
+
+    // Now a Free member: opening a top-3 by click works without a gate.
+    await page.goto(pathForListing(ids.freeViewable[0]), { waitUntil: "networkidle" });
+    await expect(page.locator(".detail-panel")).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator(".access-modal")).toHaveCount(0);
   });
 });
