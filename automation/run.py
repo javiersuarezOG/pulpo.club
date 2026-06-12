@@ -2505,25 +2505,67 @@ def main() -> int:
             print(f"[regression-guard] could not parse previous last_updated.json: {_e!r}")
     regressions = check_population_regression(prev_meta, new_rates, threshold=0.20)
     if regressions:
-        # PostHog: emit BEFORE SystemExit so a failing run still reports.
-        # atexit flush in posthog_client guarantees the event ships before
-        # the process dies.
+        # R2 guard policy: a population-MIX shift is a quality WARNING, not
+        # corruption, as long as the catalogue is healthy (visible inventory
+        # at/above the count floor). Only a drop that coincides with a genuine
+        # collapse (count < floor) BLOCKS. This is the fix for run 27050642483,
+        # which hard-failed on is_motivated 15.3%→8.1% while 2107 valid
+        # listings existed — stranding a perfectly shippable catalogue.
+        from automation.guard_policy import (
+            evaluate_population_regression, append_guard_report, BLOCK,
+        )
+        # Count floor: same source the nightly count canary uses — the active
+        # country manifest, falling back to the env default.
+        try:
+            _floor = _active_country().raw.get("listing_count_floor")
+        except Exception:
+            _floor = None
+        if _floor is None:
+            _floor = _env_int("LISTING_COUNT_FLOOR", 1000)
+        _floor = int(_floor)
+        decision = evaluate_population_regression(
+            regressions, visible_count=len(ranked), floor=_floor,
+        )
+        append_guard_report(web_data_dir, decision)
+
+        # PostHog: emit BEFORE any SystemExit so a failing run still reports.
+        # atexit flush in posthog_client guarantees the event ships before the
+        # process dies. New severity-aware event + the legacy event (so existing
+        # dashboards/alerts don't go dark mid-migration).
+        _override = _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False)
+        _ph_capture("nightly.guard_evaluated", {
+            "guard":            decision.name,
+            "severity":         decision.severity,
+            "visible_count":    len(ranked),
+            "floor":            _floor,
+            "regression_count": len(regressions),
+            "regressions":      regressions[:20],
+            "override_active":  _override,
+        })
         _ph_capture("regression_guard_triggered", {
             "regression_count": len(regressions),
-            "regressions":      regressions[:20],   # cap payload size
-            "override_active":  _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False),
+            "regressions":      regressions[:20],
+            "override_active":  _override,
         })
-        msg = "[regression-guard] population-rate drops exceeded 20% threshold:\n  " + "\n  ".join(regressions)
-        if _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False):
-            print(f"{msg}\n[regression-guard] override active — continuing.")
-        else:
+
+        msg = "[regression-guard] " + decision.message
+        if decision.severity == BLOCK and not _override:
             print(msg, file=sys.stderr)
             print(
-                "[regression-guard] failing run. Set PULPO_ALLOW_POPULATION_REGRESSION=1 "
-                "to override (use sparingly — this guard exists to catch silent NLP/keyword regressions).",
+                f"[regression-guard] BLOCK: population drop AND visible inventory "
+                f"below floor ({len(ranked)} < {_floor}) — genuine collapse, failing run. "
+                f"Set PULPO_ALLOW_POPULATION_REGRESSION=1 to override.",
                 file=sys.stderr,
             )
             raise SystemExit(2)
+        # WARN (or an explicitly-overridden block): ship the catalogue, but make
+        # the degradation loud and recorded (guard_report.json + telemetry).
+        _reason = "override" if (_override and decision.severity == BLOCK) else decision.severity
+        print(
+            f"{msg}\n[regression-guard] {_reason}: shipping — inventory healthy "
+            f"({len(ranked)} ≥ floor {_floor}); a population-mix shift is a quality "
+            f"warning, not corruption."
+        )
     else:
         print(f"[regression-guard] population rates OK (new={new_rates})")
 
