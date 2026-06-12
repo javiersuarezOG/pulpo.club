@@ -68,6 +68,7 @@ from automation.llm_enrichment_prompts import (   # type: ignore  # noqa: E402
     SYSTEM_PROMPT,
     render_user_prompt,
 )
+from automation.description_lint import lint_description  # type: ignore  # noqa: E402
 
 
 # DeepSeek pricing — public docs as of 2026-05. Used for cost telemetry
@@ -420,8 +421,19 @@ def _enrich_one(client, li: Any, schema: EnrichmentSchema
                                  model=schema.model, ts=ts,
                                  finish_reason=finish_reason,
                                  usage=usage, latency_ms=latency_ms)
+
+    # Plan 008 — cliché lint. Observability only, NOT a gate: a banned-
+    # phrase hit is logged on the event (quality_flags) but the
+    # enrichment is kept — rejecting would re-spend the API call for a
+    # tone issue. Consumers: the JSONL audit log + the quality_flagged
+    # metrics counter in enrich_listings.
+    desc = _g(li, "short_description_canonical") or {}
+    flags = sorted(set(
+        lint_description(desc.get("en")) + lint_description(desc.get("es"))
+    )) if isinstance(desc, dict) else []
     return ("enriched", entry,
-            {**base_event, "decision": "enriched"})
+            {**base_event, "decision": "enriched",
+             **({"quality_flags": flags} if flags else {})})
 
 
 def enrich_listings(listings: list[Any],
@@ -468,6 +480,7 @@ def enrich_listings(listings: list[Any],
         eligible:           int   # listings that passed the eligibility check
         cache_hits:         int   # rehydrated from sidecar, no API call
         enriched:           int   # NEW enrichments via API call
+        quality_flagged:    int   # enriched AND description tripped the cliché lint
         skipped:            int   # ineligible (one of 4 fields already set)
         failed:             int   # API/parse/schema failure
         deadline_skipped:   int   # eligible but deadline cut us off
@@ -487,6 +500,7 @@ def enrich_listings(listings: list[Any],
         "eligible":           0,
         "cache_hits":         0,
         "enriched":           0,
+        "quality_flagged":    0,  # plan 008: enrichments whose description tripped the cliché lint (kept, not rejected)
         "skipped":            0,
         "failed":             0,
         "deadline_skipped":   0,
@@ -613,6 +627,8 @@ def enrich_listings(listings: list[Any],
             _append_log(log_path, event)
         if decision == "enriched" and entry is not None:
             metrics["enriched"] += 1
+            if event.get("quality_flags"):
+                metrics["quality_flagged"] += 1
             call_cost = float(event.get("cost_usd") or 0.0)
             metrics["cost_usd"] += call_cost
             if "latency_ms" in event:
