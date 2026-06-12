@@ -68,7 +68,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from pulpo.display_gates import is_card_displayable
+from pulpo.display_gates import has_watermark_issue, is_card_displayable
 
 
 # Elite tier - the visible, exclusive bar.
@@ -142,6 +142,12 @@ def _is_elite(li: Any) -> bool:
     # photos no longer slips into the elite pool.
     if not is_card_displayable(li):
         return False
+    # Watermark signal (plan 005): the hires deterministic aesthetic pass
+    # already detected a logo/watermark on this hero — never run it on a
+    # full-bleed curated surface. has_watermark_issue reads
+    # li.hires_aesthetic_issues (single source of truth in display_gates).
+    if has_watermark_issue(li):
+        return False
     if (_g(li, "photos_count") or 0) < MIN_PHOTOS_COUNT:
         return False
     days = _g(li, "days_listed")
@@ -165,6 +171,10 @@ def _is_soft(li: Any) -> bool:
     # surface — a non-card-displayable image (logo/flyer/text-overlay or
     # an unapproved card image) drops the listing here too.
     if not is_card_displayable(li):
+        return False
+    # Watermark signal (plan 005): same exclusion as the elite pool — the
+    # soft pool is still curated.
+    if has_watermark_issue(li):
         return False
     if (_g(li, "photos_count") or 0) < SOFT_MIN_PHOTOS:
         return False
