@@ -1199,6 +1199,34 @@ jobs:
           done
           exit 1
 
+      - name: Social-floor canary (alert-only, NEVER blocks)
+        # Guards the /api/social/listings hires floor: the contract test
+        # (web/tests/contracts/social-api.test.ts) + pulpo-social's daily
+        # Instagram/Facebook publish both need ≥1 listing in the top-50
+        # with hires_width≥1080 / hires_height≥1350 / hires_available≠false.
+        # 2026-06-12: nightly #861 silently dropped that count to 0 —
+        # every open PR failed the required check and nothing alerted.
+        #
+        # DELIBERATELY alert-only: `continue-on-error: true` + `if: always()`
+        # mean even a CRITICAL verdict (exit 1) only pages Slack + emits the
+        # `social_floor.checked` PostHog event — it NEVER blocks the data
+        # commit or fails the workflow. The 2026-05-26 → 2026-06-01 six-day
+        # freeze (CLAUDE.md: "NEVER let the nightly freeze data without a
+        # Slack page") was caused by a canary gating the commit path; a
+        # stale site is worse than a quiet Instagram day. Do not "harden"
+        # this step into a gate.
+        if: always()
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+        run: |
+          python3 scripts/check_social_floor.py \
+            --data-dir web/data \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            || echo "::warning::social floor CRITICAL — 0 hires-eligible listings in /api/social/listings top-50 (alert-only; data commit unaffected)"
+
       - name: Nightly summary (story)
         # End-of-run synthesis. Reads run_history.json +
         # source_health_history.jsonl + last_updated.json + ranked.json
