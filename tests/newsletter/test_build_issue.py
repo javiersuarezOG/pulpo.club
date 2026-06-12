@@ -215,6 +215,58 @@ def test_pulpo_urls_canonical_form():
     assert ":" not in see_url.split("/listing/", 1)[1].split("?", 1)[0]
 
 
+def test_absolute_photo_prefers_selected_photo_url():
+    """Continuity contract (PR #785): when the hero picker's winning URL
+    is present and the card is eligible, the email leads with it — not
+    raw photo_urls[0]."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": False,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg", "https://cdn.example/winner.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == "https://cdn.example/winner.jpg"
+
+
+def test_absolute_photo_falls_back_to_first_url_without_selected():
+    """No selected_photo_url → original photo_urls[0] behaviour intact."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": False,
+        "photo_urls": ["https://cdn.example/first.jpg", "https://cdn.example/second.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == "https://cdn.example/first.jpg"
+
+
+def test_absolute_photo_eligibility_gate_outranks_selected_url():
+    """Regression guard: the card_eligible gate stays ABOVE the URL pick.
+    A non-eligible card returns '' even when selected_photo_url is set —
+    we never surface a broker-branded image in the newsletter."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": False,
+        "has_text_overlay": False,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == ""
+
+
+def test_absolute_photo_text_overlay_gate_outranks_selected_url():
+    """Regression guard: has_text_overlay rejection stays ABOVE the URL
+    pick even when selected_photo_url is set."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": True,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == ""
+
+
 def test_chips_warm_price_drop():
     """A repriced listing with previous_price set should produce a warm
     'Just dropped' chip — leading dollar amount for small drops, percent

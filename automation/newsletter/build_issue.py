@@ -362,6 +362,14 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
         return ""
     if listing.get("has_text_overlay") is True:
         return ""
+    # Continuity contract (PR #785): prefer the hero picker's winning
+    # broker URL so the email leads with the same image the listing page
+    # shows first. Eligibility guards above still apply — the selected
+    # winner is only surfaced once the card has cleared card_eligible /
+    # has_text_overlay. Falls back to photo_urls[0] / hero_photo_path.
+    sel = listing.get("selected_photo_url")
+    if isinstance(sel, str) and sel.startswith("http"):
+        return sel
     urls = listing.get("photo_urls") or []
     if urls and isinstance(urls[0], str) and urls[0].startswith("http"):
         return urls[0]
