@@ -16,6 +16,12 @@ import { describe, it, expect } from "vitest";
 const PULPO_API_BASE = process.env.PULPO_API_BASE;
 const PULPO_INTERNAL_API_KEY = process.env.PULPO_INTERNAL_API_KEY;
 const ENABLED = Boolean(PULPO_API_BASE);
+// When true, a thin hires-4:5 pool hard-fails the run (scheduled monitor +
+// Slack page). When false (the default on pull_request/push), the
+// data-driven hires-floor warns-not-blocks so a single bad nightly can't
+// turn the required `contract` check red on every PR in the repo. See plan
+// 017 + the SOCIAL_HIRES_FLOOR_STRICT wiring in social-api-contract.yml.
+const HIRES_FLOOR_STRICT = process.env.SOCIAL_HIRES_FLOOR_STRICT === "true";
 
 function authHeaders(): Record<string, string> {
   // api/social/listings.js authenticates via `Authorization: Bearer …`,
@@ -70,7 +76,7 @@ function authHeaders(): Record<string, string> {
     // _download_hires_photos from the broker's NATIVE bytes). The legacy
     // quality.source_width / source_height fields report the post-clamp hero
     // derivative dims (≤1920×1080) and so never clear the 1080×1350 4:5 bar.
-    async function findEligibleListingId(): Promise<string> {
+    async function findEligibleListingId(): Promise<string | null> {
       const res = await fetch(
         `${PULPO_API_BASE}/api/social/listings?limit=50`,
         { headers: authHeaders() }
@@ -95,18 +101,32 @@ function authHeaders(): Record<string, string> {
         return available && w >= TARGET_W && h >= TARGET_H;
       });
       if (!hit) {
-        throw new Error(
+        const msg =
           `no listing with hires source ≥${TARGET_W}×${TARGET_H} in top 50 — ` +
           `data drift or hires-backfill regression. ` +
           `Check the hires pipeline (PULPO_HIRES_ENABLED) and hires_width/` +
-          `hires_height population in ranked.json.`
-        );
+          `hires_height population in ranked.json.`;
+        // The hires-4:5 pool is thin and volatile (a single nightly dropped
+        // it to 0/50 on 2026-06-12; it recovered to ~2/50). Gating MERGES on
+        // this data-driven floor turned the required `contract` check red on
+        // every PR in the repo and forced admin-merges. So warn-not-block on
+        // the merge path; stay strict ONLY on the scheduled monitor, where
+        // SOCIAL_HIRES_FLOOR_STRICT=true preserves the hard page (plan 017).
+        if (HIRES_FLOOR_STRICT) {
+          throw new Error(msg);
+        }
+        console.warn(`::warning title=social-hires-floor::${msg}`);
+        return null;
       }
       return hit.id;
     }
 
     it("GET /api/social/image?ratio=1:1 returns a valid JPEG for an eligible listing", async () => {
       const id = await findEligibleListingId();
+      if (id === null) {
+        console.warn("::warning title=social-hires-floor::no eligible listing in top-50; skipping image-render assertion (data-thin, not a code regression)");
+        return; // pass — can't render-test without an eligible listing; this is a data condition
+      }
       const imgRes = await fetch(
         `${PULPO_API_BASE}/api/social/image?id=${encodeURIComponent(id)}&ratio=1:1`,
         { headers: authHeaders() }
@@ -121,6 +141,10 @@ function authHeaders(): Record<string, string> {
       // path is exercised every cron tick; the 4:5 path is rarer and would
       // otherwise rot.
       const id = await findEligibleListingId();
+      if (id === null) {
+        console.warn("::warning title=social-hires-floor::no eligible listing in top-50; skipping image-render assertion (data-thin, not a code regression)");
+        return; // pass — can't render-test without an eligible listing; this is a data condition
+      }
       const imgRes = await fetch(
         `${PULPO_API_BASE}/api/social/image?id=${encodeURIComponent(id)}&ratio=4:5`,
         { headers: authHeaders() }
