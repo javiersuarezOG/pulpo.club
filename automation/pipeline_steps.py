@@ -270,7 +270,7 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "dist_beach_km", "dist_airport_km", "dist_nearest_town_km",
     "lat", "lng", "geocoding_confidence",
     # State
-    "is_sold",
+    "is_sold", "sold_detected_at",
     # Ranking
     "rank", "rank_score",
     "value_score", "location_score", "momentum_score",

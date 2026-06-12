@@ -176,6 +176,16 @@ class Listing:
     existence_status: Optional[str] = None
     last_seen_at: Optional[str] = None
     missing_since: Optional[str] = None
+    # Plan 012 — sold detection. Producers: pulpo/normalize.py (a
+    # previously-seen listing re-scraped with a sold/under-contract
+    # marker is kept + flagged instead of dropped) and
+    # automation/sold_probe.py via run.py's probe block (a missing
+    # listing whose live page says sold). Consumers: FE sold banner
+    # (web/app/pages.jsx, listings.ts), Browse slice exclusion,
+    # zone_medians.py comp exclusion, sitemap.py exclusion, the
+    # ranked-list allowlist in pipeline_steps.py.
+    is_sold: bool = False
+    sold_detected_at: Optional[str] = None  # ISO-8601; when we first labeled it sold
 
     # Broker
     broker_name: Optional[str] = None
