@@ -10,6 +10,7 @@ ranked.json already carries:
   - card_eligible OR hero_eligible        truthy
   - has_text_overlay                      not True
   - has_marketing_overlay                 not True
+  - hires_aesthetic_issues       no "logo_or_watermark"   (plan 005)
   - data_quality_score    ≥ IG_GATE_MIN_DATA_QUALITY  (default 0.55)
   - is_incomplete                         not True
   - is_agricultural                       not True   (per the founder brief)
@@ -67,6 +68,7 @@ from typing import Any, Iterable, Optional, Tuple
 
 from automation._atomic import atomic_write_json
 from automation._config import env_bool, env_float, env_int
+from pulpo.display_gates import has_watermark_issue
 
 
 # ── tunables (env-overridable) ─────────────────────────────────────────
@@ -123,6 +125,10 @@ def _check_overlays(li: dict, _cfg: dict) -> _LandPredicate:
         return False, "text_overlay"
     if li.get("has_marketing_overlay") is True:
         return False, "marketing_overlay"
+    # Watermark signal (plan 005): the hires deterministic aesthetic pass
+    # flagged this hero as a logo/watermark — never run it full-bleed on IG.
+    if has_watermark_issue(li):
+        return False, "logo_or_watermark"
     return True, None
 
 
