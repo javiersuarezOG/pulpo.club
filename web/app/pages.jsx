@@ -36,6 +36,7 @@ import {
 import { track, optIn, optOut } from "./telemetry/hook";
 import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import { safeLocalGet, safeLocalSet } from "./lib/safe-storage";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
@@ -1161,7 +1162,7 @@ function BrowsePage({ app }) {
   // back to the localStorage default. Cards remains the default.
   const [view, setView] = pUseState(() => {
     if (typeof window === "undefined") return "cards";
-    const ls = localStorage.getItem("pulpo-view") || "cards";
+    const ls = safeLocalGet("pulpo-view") || "cards";
     return readViewFromURL(window.location.search, ls);
   });
   const [sort, setSort] = pUseState(() =>
@@ -1229,7 +1230,7 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
-      setView(readViewFromURL(window.location.search, localStorage.getItem("pulpo-view") || "cards"));
+      setView(readViewFromURL(window.location.search, safeLocalGet("pulpo-view") || "cards"));
       setMapBbox(readBboxFromURL(window.location.search));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
@@ -1276,7 +1277,7 @@ function BrowsePage({ app }) {
     writeFilterToURL(filters, app.routeParams.category ?? null, sort, view);
   }, [filters, sort, app.routeParams.category, view]);
 
-  pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-view", view); }, [view]);
 
   // Reset pagination back to page 1 whenever the result set could change.
   // Without this, a filter that drops the count below visibleCount leaves
@@ -2958,9 +2959,9 @@ function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 function SavedPage({ app }) {
   const LISTINGS = useListings();
   const items = LISTINGS.filter(l => app.savedIds.has(l.id));
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-saved-view") || "cards");
+  const [view, setView] = pUseState(() => safeLocalGet("pulpo-saved-view") || "cards");
   const [sort, setSort] = pUseState("recent");
-  pUseEffect(() => { localStorage.setItem("pulpo-saved-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-saved-view", view); }, [view]);
 
   const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
 

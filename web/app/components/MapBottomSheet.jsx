@@ -140,6 +140,13 @@ export default function MapBottomSheet({ listings, app, lc, onOpenListing, onHov
     d.dragging = false;
     e.currentTarget.releasePointerCapture?.(e.pointerId);
   };
+  const onPointerCancel = () => { dragRef.current.dragging = false; };
+  // Keyboard activation (Enter/Space) fires a click with detail===0 and no
+  // pointer events — without this the handle is unreachable by keyboard /
+  // switch users despite advertising aria-expanded. Pointer taps already
+  // toggled in onPointerUp and fire click with detail>0, so guard on
+  // detail===0 to avoid a double-toggle.
+  const onClick = (e) => { if (e.detail === 0) setExpanded((v) => !v); };
 
   return (
     <div className={`map-sheet ${expanded ? "map-sheet--expanded" : "map-sheet--collapsed"}`}>
@@ -151,6 +158,8 @@ export default function MapBottomSheet({ listings, app, lc, onOpenListing, onHov
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onClick={onClick}
       >
         <span className="map-sheet__grip" aria-hidden="true" />
       </button>
