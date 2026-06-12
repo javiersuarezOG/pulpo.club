@@ -370,9 +370,10 @@ def test_default_schema_uses_deepseek_model_and_env():
     assert DEFAULT_SCHEMA.max_tokens >= 1500
 
 
-def test_default_schema_version_is_v3():
-    """Schema v3 = bilingual + url_language. Bumping invalidates older sidecars."""
-    assert DEFAULT_SCHEMA.schema_version == 3
+def test_default_schema_version_is_v4():
+    """Schema v4 = prompt v4 short factual descriptions (≤700 chars) +
+    fact-anchored usps. Bumping invalidates older sidecars."""
+    assert DEFAULT_SCHEMA.schema_version == 4
 
 
 # ── schema v3: bilingual {en, es} validators ──────────────────────────

@@ -103,8 +103,13 @@ def _valid_title(v: Any) -> bool:
 
 
 def _valid_description(v: Any) -> bool:
-    """Bilingual description — each language ≤ 2000 chars (prompt asks for ≤150 words)."""
-    return _valid_localized(v, 2000)
+    """Bilingual description — each language ≤ 700 chars (prompt asks for ≤60 words).
+
+    60 words ≈ 400–480 chars; 700 leaves headroom so a slightly long ES
+    rendering doesn't burn the API call (the fail-closed gate in
+    _enrich_one discards the whole response on validation failure).
+    """
+    return _valid_localized(v, 700)
 
 
 def _valid_usps(v: Any) -> bool:
@@ -232,11 +237,10 @@ class EnrichmentSchema:
     temperature: float = 0.3
     base_url:    str = "https://api.deepseek.com"
     api_key_env: str = "DEEPSEEK_API_TOKEN"
-    # Schema version 3: bilingual {en, es} dicts on title/description/usps
-    # + url_language. Bumped from 1 (post-#149 monolingual revert) so any
-    # on-disk sidecar entries written under v1 fail re-validation in
-    # _hydrate_from_sidecar and trigger a fresh DeepSeek call.
-    schema_version: int = 3
+    # Schema version 4: prompt v4 — short factual descriptions (≤700 chars),
+    # fact-anchored usps. (v3 was bilingual {en, es} dicts on title/
+    # description/usps + url_language; v1 the post-#149 monolingual revert.)
+    schema_version: int = 4
 
 
 DEFAULT_SCHEMA = EnrichmentSchema(
