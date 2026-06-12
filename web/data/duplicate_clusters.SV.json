@@ -110,61 +110,6 @@
     ]
   },
   {
-    "count": 5,
-    "cross_source": false,
-    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650128",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650128/",
-        "zone": "suchitoto"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
     "count": 4,
     "cross_source": false,
     "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
@@ -300,6 +245,52 @@
     ],
     "sources": [
       "remax"
+    ]
+  },
+  {
+    "count": 4,
+    "cross_source": false,
+    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
+        "zone": "suchitoto"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -439,6 +430,34 @@
     ],
     "sources": [
       "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "2219e5242b117f34c602369561c809a91d306026",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 458925.93,
+        "source": "vivolatam",
+        "source_id": "47nhyj2e8z",
+        "title": "Industrial land for sale in Industrial Intercomplex Park",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-47nhyj2e8z",
+        "zone": "san-juan-opico"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 458978.83,
+        "source": "vivolatam",
+        "source_id": "59qh16unx7",
+        "title": "Industrial land for sale in Industrial Intercomplex Park",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-59qh16unx7",
+        "zone": "san-juan-opico"
+      }
+    ],
+    "sources": [
+      "vivolatam"
     ]
   },
   {
@@ -612,6 +631,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "5cff8d18bfa70cba1606326d0175ba3d3ad0a9b5",
+    "samples": [
+      {
+        "area_m2": 340.0,
+        "price_usd": 651000.0,
+        "source": "vivolatam",
+        "source_id": "353yee97fx",
+        "title": "Home for sale in El Encanto",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/home-for-sale-in-el-encanto-353yee97fx",
+        "zone": "san-jose-villanueva"
+      },
+      {
+        "area_m2": 340.0,
+        "price_usd": 651200.0,
+        "source": "vivolatam",
+        "source_id": "5737ue2fpk",
+        "title": "Home for sale in El Encanto",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/home-for-sale-in-el-encanto-5737ue2fpk",
+        "zone": "san-jose-villanueva"
+      }
+    ],
+    "sources": [
+      "vivolatam"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "5f6b24a4d4b10ac8f2042a8242bfe5288446516a",
     "samples": [
       {
@@ -780,6 +827,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 2416879.58,
+        "source": "vivolatam",
+        "source_id": "263hkfuh6x",
+        "title": "Industrial land for sale in Industrial Intercomplex Park",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-263hkfuh6x",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 2416879.58,
+        "source": "vivolatam",
+        "source_id": "13e7urktk9",
+        "title": "Industrial land for sale in Industrial Intercomplex Park",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-13e7urktk9",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "vivolatam"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "ac65702194f016d384f516624d5e994fce1c85eb",
     "samples": [
       {
@@ -911,34 +986,6 @@
         "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892/",
         "zone": "chalchuapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "f5498a184249fb8b044535e6e3cae999e1ecf67a",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 38000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650766",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650766/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 38000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650135",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650135/",
-        "zone": "suchitoto"
       }
     ],
     "sources": [
