@@ -241,6 +241,14 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "zone", "department", "country",
     # Land type / property
     "land_type", "property_type", "bedrooms",
+    # Built-property facts (plan 010) — the FE adapter
+    # (web/app/data/listings.ts) now reads these for the detail-page
+    # Key Facts tiles on houses/condos. Sparse coverage today; plans
+    # 009/011 raise it. All-null per record costs ~nothing in the slim
+    # file (nulls are dropped only if absent from the source dict).
+    "bathrooms", "built_area_m2", "year_built", "year_renovated",
+    "parking_spaces", "floor", "hoa_fee_usd_monthly",
+    "furnished", "has_pool",
     # Price + size
     "area_m2", "price_usd", "previous_price", "price_per_m2",
     # Zone-relative price context (powers the detail-page PriceContextBlock).
