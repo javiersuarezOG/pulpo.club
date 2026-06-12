@@ -155,6 +155,13 @@ export interface Listing {
     existence_status: string | null;
     last_seen_at: string | null;       // ISO8601 UTC, from existence ledger
     missing_since: string | null;      // ISO8601 UTC when absence streak began
+    /** Plan 012 — sold detection. Producers: normalize's transition
+     *  rule (previously-seen listing re-scraped with a sold marker)
+     *  and the nightly sold probe (missing listing whose live page
+     *  says sold). Consumers: detail-page sold banner, Browse slice
+     *  exclusion, zone medians, featured pool, sitemap. */
+    is_sold: boolean;
+    sold_detected_at: string | null;   // ISO8601 UTC, first labeled sold
 
     // ── Broker ──────────────────────────────────────────────────────
     broker_name: string | null;

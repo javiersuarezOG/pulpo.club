@@ -81,6 +81,8 @@
       "existence_status",
       "last_seen_at",
       "missing_since",
+      "is_sold",
+      "sold_detected_at",
       "broker_name",
       "broker_phone",
       "broker_email",
@@ -521,6 +523,15 @@
         ]
       },
       "missing_since": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "is_sold": {
+        "type": "boolean"
+      },
+      "sold_detected_at": {
         "type": [
           "string",
           "null"
