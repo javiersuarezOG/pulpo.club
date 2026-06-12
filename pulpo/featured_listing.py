@@ -68,6 +68,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from pulpo.display_gates import is_card_displayable
+
 
 # Elite tier - the visible, exclusive bar.
 MIN_PHOTOS_COUNT     = 8        # rich gallery; signals seller invested
@@ -132,7 +134,13 @@ def _is_elite(li: Any) -> bool:
     """
     if _g(li, "is_sold") is True:
         return False
-    if _g(li, "has_text_overlay") is True:
+    # Display-gate contract (plan 003): a logo/flyer/text-overlay hero
+    # never qualifies for a curated pool. is_card_displayable covers both
+    # the has_text_overlay flag AND the card_eligible verdict — a None
+    # card_eligible (photo phase never approved a card image) is treated
+    # as ineligible by design, so a logo-hero listing with 8 broker
+    # photos no longer slips into the elite pool.
+    if not is_card_displayable(li):
         return False
     if (_g(li, "photos_count") or 0) < MIN_PHOTOS_COUNT:
         return False
@@ -152,6 +160,11 @@ def _is_elite(li: Any) -> bool:
 def _is_soft(li: Any) -> bool:
     """Softer gates - still selective. Used only if elite pool is empty."""
     if _g(li, "is_sold") is True:
+        return False
+    # Display-gate contract (plan 003): the soft pool is still a curated
+    # surface — a non-card-displayable image (logo/flyer/text-overlay or
+    # an unapproved card image) drops the listing here too.
+    if not is_card_displayable(li):
         return False
     if (_g(li, "photos_count") or 0) < SOFT_MIN_PHOTOS:
         return False

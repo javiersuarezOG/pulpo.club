@@ -22,6 +22,7 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import { t } from "../i18n.jsx";
 import { hasCoords, isLowConfidenceGeo, currentLocale } from "../components.jsx";
 import { track } from "../telemetry/hook";
+import { isCardImageDisplayable } from "../lib/card-image";
 
 // El Salvador rough center + zoom for the initial view.
 const SV_CENTER = [13.7942, -88.8965];
@@ -382,9 +383,16 @@ export default function MapView({
 function buildPopupHtml(l, price, lc) {
   const title = (l.title && (l.title[lc] || l.title.en || l.title.es)) || l.zone_name || "";
   const bits = [price, l.zone_name].filter(Boolean).map(escapeHtml).join(" · ");
-  const img = l.thumbnail_url
-    ? `<img class="pulpo-popup__img" src="${escapeHtml(l.thumbnail_url)}" alt="" loading="lazy"/>`
-    : "";
+  // Display-gate contract (plan 003): never render a non-card-eligible
+  // image (logo/flyer/text-overlay) in the marker popup. This popup is a
+  // raw-HTML Leaflet render path, so it can't reuse the <Photo> choke
+  // point — gate the thumbnail here with the same predicate. The popup
+  // has no bundled-illustration slot, so a blocked image simply renders
+  // no <img> (title + meta still show); the listing stays on the map.
+  const img =
+    l.thumbnail_url && isCardImageDisplayable(l)
+      ? `<img class="pulpo-popup__img" src="${escapeHtml(l.thumbnail_url)}" alt="" loading="lazy"/>`
+      : "";
   return `
     <div class="pulpo-popup">
       ${img}

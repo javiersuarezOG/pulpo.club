@@ -102,7 +102,17 @@ const MIN_REAL_LISTINGS = 4;
 // False for those). `photos.length > 0` is NOT the gate — a broker-URL
 // array is not proof of a renderable, non-404, non-logo card image (the
 // exact failure that put 1,037 broken heroes + 19 xitios logos on the
-// homepage). Discovery/Browse stays EXEMPT and shows full inventory.
+// homepage).
+//
+// Display-gate contract (plan 003, owner rule 2026-06-12): curated
+// surfaces (these shelves, the featured pools, newsletter picks) DROP a
+// non-card-eligible listing entirely. Inventory surfaces
+// (Browse/Discover, Saved, map cards) keep the listing findable but
+// swap the bad image for the bundled category fallback — they no longer
+// render the source image (see web/app/lib/card-image.ts +
+// the <Photo thumbnail> choke point). The old "Discovery/Browse stays
+// EXEMPT" note is superseded: inventory stays visible, but the IMAGE is
+// gated everywhere.
 function isShelfEligible(l) {
   return (
     !l.is_incomplete &&
