@@ -1,0 +1,106 @@
+name: pulpo free-welcome reconcile
+
+# Hourly backstop for the FREE-tier welcome email. The free welcome is a
+# single best-effort send on signup (api/newsletter.js → free-welcome-send)
+# with no retry; if it drops, the welcome is silently lost. Free members
+# are email-only (no Clerk account), so this enumerates the RESEND audience
+# and re-sends to recent contacts who have no real `newsletter.free_welcome_sent`
+# event in PostHog. See automation/newsletter/free_welcome_reconcile.py for
+# the safety guards (PostHog-failure abort, dark-path guard, per-run cap).
+#
+# Trigger paths (mirror the Pro reconcile):
+#   • Scheduled cron — LIVE. Hourly at :25 (staggered off the Pro reconcile :15).
+#   • workflow_dispatch (manual) — dry-run by default; send_mode=yes for live.
+
+on:
+  schedule:
+    - cron: "25 * * * *"
+  workflow_dispatch:
+    inputs:
+      send_mode:
+        description: "no = dry-run (log who would be re-welcomed). yes = LIVE."
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+      max_contacts:
+        description: "Per-run cap (default 10)."
+        required: false
+        default: "10"
+
+concurrency:
+  group: pulpo-free-welcome-reconcile
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # Scheduled cron = LIVE; manual = dry-run unless send_mode=yes.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.send_mode != 'yes') && '1' || '0' }}"
+
+      # PostHog QUERY API (welcomed-set lookup) — the app host, NOT ingest.
+      POSTHOG_QUERY_HOST: "${{ secrets.POSTHOG_HOST || 'https://eu.posthog.com' }}"
+      POSTHOG_PROJECT_ID: "${{ secrets.POSTHOG_PROJECT_ID }}"
+      POSTHOG_PERSONAL_API_KEY: "${{ secrets.POSTHOG_PERSONAL_API_KEY }}"
+      # PostHog ingest (the completion event via posthog_client.capture).
+      POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
+      POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
+
+      # Resend audience enumeration + send pipeline.
+      RESEND_API_KEY: "${{ secrets.RESEND_API_KEY }}"
+      RESEND_AUDIENCE_ID: "${{ vars.RESEND_AUDIENCE_ID || secrets.RESEND_AUDIENCE_ID }}"
+      RESEND_FROM_EMAIL: "${{ vars.RESEND_FROM_EMAIL }}"
+      RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
+      PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
+      # CRITICAL: must match the salt the dispatch used, or recipient_hash
+      # won't line up with the PostHog welcomed-set and we'd re-send everyone.
+      PULPO_NEWSLETTER_SALT: "${{ secrets.PULPO_NEWSLETTER_SALT }}"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: install runtime deps
+        run: pip install -q posthog httpx
+
+      - name: assert ranked.json present
+        run: |
+          test -s web/data/ranked.json \
+            || echo "::warning::web/data/ranked.json missing — dispatcher will skip per contact"
+
+      - name: run free-welcome reconcile
+        run: |
+          SEND_MODE="${{ github.event_name == 'schedule' && 'yes' || github.event.inputs.send_mode || 'no' }}"
+          MAX_CONTACTS="${{ github.event.inputs.max_contacts || '10' }}"
+          python3 -m automation.newsletter.free_welcome_reconcile \
+            --send-mode "$SEND_MODE" \
+            --max-contacts "$MAX_CONTACTS"
+
+      - name: Slack on job failure
+        # Every cron Slack-pages on failure (CLAUDE.md: NEVER let a webhook
+        # go silent / NEVER let the nightly freeze without a page). Fires
+        # only if the job itself crashed — the "alerting system silently
+        # broken" case. Non-blocking when SLACK_WEBHOOK_URL is unset.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset — skipping"
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo free-welcome reconcile JOB CRASHED* — free welcome backstop is silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true

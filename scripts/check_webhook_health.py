@@ -105,6 +105,14 @@ FAMILIES = {
         "where": "event = 'newsletter.welcome_reconcile_completed'",
         "max_age_hours": 2.0,
     },
+    # Free-welcome reconcile cron — hourly at :25. Same 2h staleness rule
+    # as the Pro reconcile above. A gap means the free-welcome backstop
+    # stopped running (cron broken or the script threw pre-capture).
+    "free_welcome_reconcile": {
+        "label": "Free-welcome reconcile cron (newsletter.free_welcome_reconcile_completed)",
+        "where": "event = 'newsletter.free_welcome_reconcile_completed'",
+        "max_age_hours": 2.0,
+    },
 }
 
 
