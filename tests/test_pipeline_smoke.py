@@ -67,6 +67,21 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
         "ranked.fresh.SV.json must be a non-empty list of candidate listings."
     )
 
+    # The photo-contract truth canary (scripts/check_photo_contract_truth.py)
+    # cross-checks photo_contract.json.ranked_total against the committed
+    # ranked.json and hard-fails on drift > 5. enforce_photo_contract MUST run
+    # AFTER the agricultural-land purge, or the sidecar describes a pre-purge
+    # SUPERSET and the canary false-fails a shippable catalogue (nightly
+    # 27394603436: sidecar 2129 vs ranked.json 1932). Lock that ordering here.
+    contract_path = tmp_path / "web" / "data" / "photo_contract.json"
+    if contract_path.exists():
+        contract = json.loads(contract_path.read_text())
+        assert contract.get("ranked_total") == len(data), (
+            f"photo_contract.ranked_total ({contract.get('ranked_total')}) must "
+            f"equal len(ranked.json) ({len(data)}) — enforce_photo_contract is "
+            f"running before the agricultural purge again (sidecar/ship drift)."
+        )
+
     # Confirm the real production file was NOT touched
     prod_ranked = REPO / "web" / "data" / "ranked.json"
     if prod_ranked.exists():
