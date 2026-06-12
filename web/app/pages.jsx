@@ -2340,11 +2340,22 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // Single source of truth for paywall rules — see web/app/lib/gating.ts.
   // Off-market is paid-only; anonymous + free hit the soft paywall.
   const isPaid = gateIsPaid(app.user);
-  const offMarketLocked = isOffMarket && !isPaid;
+  // Free top-3 exemption: a non-paid viewer reaching this panel for one of
+  // this week's top 3 picks (the only listings openListing lets them open)
+  // sees the FULL detail — broker/source link, full gallery, all USPs,
+  // precise location. We feed the tier-based visual gates a synthetic Pro
+  // user for these; real paid status (`isPaid`) still drives telemetry.
+  const freeUnlocked = !isPaid && typeof app.isFreeViewable === "function" && app.isFreeViewable(listing.id);
+  // Effective unlock for THIS listing: truly paid, or a free top-3 pick.
+  // Drives every visual gate (broker outbound link, USP cap, gallery,
+  // off-market). `isPaid` alone still drives telemetry auth_state.
+  const effectivePaid = isPaid || freeUnlocked;
+  const gateUser = freeUnlocked ? { plan: "pro" } : app.user;
+  const offMarketLocked = isOffMarket && !effectivePaid;
   // Free signup unlocks: source URL, full gallery, all USPs, precise location.
-  const needsSignup = !app.user;
-  const uspCap = uspsVisibleFor(app.user);
-  const thumbCap = galleryThumbsUnlockedFor(app.user);
+  const needsSignup = !app.user && !freeUnlocked;
+  const uspCap = uspsVisibleFor(gateUser);
+  const thumbCap = galleryThumbsUnlockedFor(gateUser);
 
   // PR-5 — detail telemetry. Fire `detail.opened` once per listing
   // (re-fires when user navigates to a different listing). Auth state
@@ -2742,7 +2753,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 FreeMonthModal with `detail_upgrade` trigger, which
                 pre-applies PULPOFREEMONTH at /api/stripe/start-checkout.
                 Paid users see every USP and skip this row. */}
-            {!isPaid && listing.usps.length > uspCap && (
+            {!effectivePaid && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
                 <button
@@ -2850,7 +2861,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           (no point upselling on a finished sale). */}
       {!isSold && (
         <div className="detail-cta-bar">
-          {!isPaid ? (
+          {!effectivePaid ? (
             <button
               className="btn-primary lg block"
               onClick={() => {
@@ -3143,8 +3154,8 @@ function PlansPage({ app }) {
           <div className="plan-tag">{t("plans.free.tag", lc)}</div>
           <ul className="plan-features">
             {feat("plans.free.feat.browsing")}
-            {feat("plans.free.feat.detail_views")}
-            {feat("plans.free.feat.saves_cap")}
+            {feat("plans.free.feat.top3_detail")}
+            {feat("plans.free.feat.weekly_email")}
             {/* The three "this is what Pro adds" mirrors, muted on Free. */}
             {featMuted("pro.usp.alerts.short")}
             {featMuted("pro.usp.browse.short")}

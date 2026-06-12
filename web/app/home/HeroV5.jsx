@@ -20,6 +20,7 @@ import { t, formatPriceI18n, formatSizeI18n } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { Icon, PulpoMark } from "../components.jsx";
 import { useListings } from "../data/use-listings";
+import { pickTopRanked } from "../lib/free-view";
 import versions from "./versions.json";
 
 const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
@@ -74,16 +75,10 @@ function DestinationCard({ dest, locale, onNavigate }) {
 // ── Helpers ───────────────────────────────────────────────────────────
 const NL_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Top-N ranked, shelf-eligible listings (gate mirrors isShelfEligible:
-// rank_score present + a real local thumbnail + card-eligible). Pure +
-// null-safe so an empty/loading dataset never throws.
-function pickTop(listings, n) {
-  return (listings || [])
-    .filter((l) => l && l.rank_score != null && l.thumbnail_url && l.card_eligible)
-    .slice()
-    .sort((a, b) => b.rank_score - a.rank_score)
-    .slice(0, n);
-}
+// Top-N ranked, shelf-eligible listings. Shared with the Free top-3
+// open-gate (web/app/lib/free-view) so the picks shown here and the
+// listings a Free viewer can open never drift.
+const pickTop = pickTopRanked;
 
 // Value grade derived from the real composite rank_score (0–100).
 function valueGrade(score) {
