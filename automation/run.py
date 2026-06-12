@@ -1657,8 +1657,21 @@ def main() -> int:
                 "failure_id":   source_failure_id.get(src),
             }, ensure_ascii=False) + "\n")
 
-    # Normalize
-    listings, dropped = phase_normalize(raw)
+    # Normalize. seen_keys (plan 012): read-only ledger snapshot so the
+    # transition-aware sold rule in pulpo/normalize.py can distinguish
+    # "never-seen + sold marker → drop" from "previously-tracked listing
+    # now sold → keep + is_sold=True". The ledger is loaded again later
+    # for the existence update — this early load is read-only and
+    # fail-open (empty set ⇒ legacy drop-all-sold behavior).
+    try:
+        from automation.listing_ledger import load_ledger as _sold_load_ledger
+        _seen_keys = frozenset(
+            _sold_load_ledger(REPO / "web" / "data" / "listings_ledger.json").keys()
+        )
+    except Exception as _seen_err:  # noqa: BLE001 — never crash on ledger
+        print(f"[sold_transition] seen-keys load failed (non-fatal): {_seen_err!r}")
+        _seen_keys = frozenset()
+    listings, dropped = phase_normalize(raw, seen_keys=_seen_keys)
 
     # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
     # at startup, runs all dictionaries against title+description+location_text
@@ -1828,6 +1841,69 @@ def main() -> int:
               f"missing_recently={missing_count} stale={stale_count}")
     except Exception as _ledger_err:  # noqa: BLE001 — never crash on ledger
         print(f"[listing_ledger] update failed (non-fatal): {_ledger_err!r}")
+
+    # Plan 012 — sold/delisted probe for missing listings. Fail-open,
+    # capped, non-fatal (same contract as the ledger block above): a
+    # probe bug must never freeze the nightly. Reloads the ledger from
+    # disk rather than reusing the previous block's locals so a partial
+    # ledger failure can't leak an inconsistent in-memory state here.
+    # urls_by_key reads the PREVIOUS nightly's ranked.json — still the
+    # checked-out artifact at this point (phase_write_outputs runs much
+    # later); see automation/sold_probe.py's docstring for why that's
+    # the reliable URL source.
+    try:
+        if os.environ.get("PULPO_OFFLINE"):
+            print("[sold_probe] offline — probed=0")
+        else:
+            from automation.listing_ledger import (
+                load_ledger as _sp_load_ledger,
+                save_ledger as _sp_save_ledger,
+            )
+            from automation.sold_probe import probe_missing_listings
+            _sp_ledger_path = web_data_dir / "listings_ledger.json"
+            _sp_ledger = _sp_load_ledger(_sp_ledger_path)
+            _urls_by_key: dict[str, str] = {}
+            try:
+                _prev_ranked = json.loads(
+                    (web_data_dir / "ranked.json").read_text(encoding="utf-8")
+                )
+                if isinstance(_prev_ranked, list):
+                    for _row in _prev_ranked:
+                        if isinstance(_row, dict) and _row.get("url"):
+                            _urls_by_key[
+                                f"{_row.get('source')}|{_row.get('source_id')}"
+                            ] = str(_row["url"])
+            except (OSError, json.JSONDecodeError):
+                pass  # no previous ranked.json → probe skips (skipped_no_url)
+            _sp = probe_missing_listings(
+                _sp_ledger,
+                urls_by_key=_urls_by_key,
+                max_probes=int(os.environ.get("PULPO_SOLD_PROBE_MAX", "40")),
+                llm_budget=int(os.environ.get("PULPO_SOLD_PROBE_LLM_MAX", "20")),
+                now_iso=started_iso,
+            )
+            _sp_save_ledger(_sp_ledger, _sp_ledger_path)  # persist removal reasons
+            # Stamp is_sold onto shipped listings whose ledger entry says
+            # sold. Rarely hits in the fresh path (a probed listing is by
+            # definition missing from today's scrape) — the label's
+            # primary store is the ledger; this covers carried/recent rows.
+            for li in listings:
+                _sp_entry = _sp_ledger.get(f"{li.source}|{li.source_id}")
+                if (
+                    _sp_entry is not None
+                    and _sp_entry.removal_reason == "sold"
+                    and not getattr(li, "is_sold", False)
+                ):
+                    li.is_sold = True
+                    li.sold_detected_at = _sp_entry.removal_detected_at
+            print(f"[sold_probe] probed={_sp['probed']} sold={_sp['sold']} "
+                  f"delisted={_sp['delisted']} unknown={_sp['unknown']} "
+                  f"active={_sp['active']} fetch_errors={_sp['fetch_errors']} "
+                  f"skipped_no_url={_sp['skipped_no_url']} "
+                  f"llm_calls={_sp['llm_calls']} cost=${_sp['cost_usd']:.4f}")
+            _ph_capture("sold_probe_completed", _sp)
+    except Exception as _sp_err:  # noqa: BLE001 — never crash the nightly
+        print(f"[sold_probe] failed (non-fatal): {_sp_err!r}")
 
     # Price history (PRD §FR-3). Sets is_repriced before derived rules and
     # AI run, so downstream fields reflect cross-run price comparison.
@@ -2447,6 +2523,24 @@ def main() -> int:
     if agri_dropped:
         print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
               f"(built structures retained) — {len(ranked)} remain")
+
+    # Plan 012 — sold listings keep shipping (detail page renders the
+    # sold banner; Browse/zone_medians/sitemap/featured all exclude
+    # is_sold themselves) but must not OCCUPY rank positions or sort
+    # above live inventory. Mirror of carry_forward.py's tail-demotion
+    # pattern (rank=None + rank_score=-1.0). NOTE asymmetry vs stale:
+    # the PR-S4c stale filter above is flag-gated FULL REMOVAL
+    # (default off); sold is keep-but-derank because the sold state is
+    # itself the product surface. Rank gaps are established precedent —
+    # the agricultural purge above already removes ranked rows.
+    sold_deranked = 0
+    for li in ranked:
+        if getattr(li, "is_sold", False):
+            li.rank = None
+            li.rank_score = -1.0
+            sold_deranked += 1
+    if sold_deranked:
+        print(f"[sold_derank] deranked={sold_deranked} (kept in ranked.json, rank=None)")
 
     # PRD P1-2 — enforce the card-photo contract: every listing whose
     # `hero_photo_path` is set must point at a present root file. Listings

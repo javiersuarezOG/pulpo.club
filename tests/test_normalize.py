@@ -405,3 +405,61 @@ def test_classifier_default_when_nothing_matches():
     comp pool rather than leaking them into houses."""
     assert detect_property_type(title="", description="", location_text="") == "land"
     assert detect_property_type(title="Investment Opportunity") == "land"
+
+
+# ── Plan 012 — transition-aware sold handling ─────────────────────────
+# Old rule: any sold-marked raw listing was dropped at ingest. New rule:
+# drop only when never tracked by the existence ledger (seen_keys);
+# a previously-live listing turning sold is KEPT with is_sold=True so
+# the FE sold banner renders while comps/sitemap/Browse exclude it.
+
+def test_sold_marker_previously_seen_kept_and_flagged():
+    li = normalize(
+        _raw(title="VENDIDO — Lote frente al mar en El Tunco"),
+        source="bienesraices",
+        seen_keys=frozenset({"bienesraices|test-001"}),
+    )
+    assert li is not None
+    assert li.is_sold is True
+    assert li.sold_detected_at  # ISO timestamp stamped at transition
+
+
+def test_sold_marker_never_seen_dropped():
+    li = normalize(
+        _raw(title="VENDIDO — Lote frente al mar en El Tunco"),
+        source="bienesraices",
+        seen_keys=frozenset({"bienesraices|some-other-id"}),
+    )
+    assert li is None
+
+
+def test_sold_marker_no_seen_keys_legacy_drop():
+    """seen_keys=None (un-updated callers) preserves the legacy
+    drop-every-sold-listing behavior — fail-safe."""
+    li = normalize(
+        _raw(title="VENDIDO — Lote frente al mar en El Tunco"),
+        source="bienesraices",
+    )
+    assert li is None
+
+
+def test_clean_listing_not_flagged_sold():
+    li = normalize(
+        _raw(title="Lote frente al mar en El Tunco"),
+        source="bienesraices",
+        seen_keys=frozenset({"bienesraices|test-001"}),
+    )
+    assert li is not None
+    assert li.is_sold is False
+    assert li.sold_detected_at is None
+
+
+def test_sold_marker_in_body_blob_previously_seen_kept():
+    """oceanside-style: clean title, SOLD marker only in the price blob."""
+    li = normalize(
+        _raw(raw_price_text="$SOLDAvailable today"),
+        source="bienesraices",
+        seen_keys=frozenset({"bienesraices|test-001"}),
+    )
+    assert li is not None
+    assert li.is_sold is True

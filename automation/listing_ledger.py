@@ -63,6 +63,16 @@ distribution; "new this week" UI checks ``first_seen_at + 7d``."""
 # (still in ranked.json but UI/ranker may de-emphasise).
 STALE_THRESHOLD_RUNS = 3
 
+KNOWN_REMOVAL_REASONS: frozenset[str] = frozenset({
+    "sold",        # probe found a sold/under-contract marker on the live page
+    "delisted",    # page gone (404/410) or redirected to a non-listing page
+    "unknown",     # probe ran but couldn't classify
+})
+"""Closed set per CLAUDE.md producer-consumer rule. Producer:
+automation/sold_probe.py. Consumers: the [sold_probe] nightly summary,
+the sold_probe_completed PostHog event, and run.py's is_sold stamping.
+Contract test: tests/test_listing_ledger.py::test_known_removal_reasons_contract."""
+
 # PR-S4b: write to a PARALLEL file rather than overwriting the
 # pre-existing ``listings_history.json``. The old file has a
 # stable {key: iso_string} contract that other code paths (and
@@ -83,6 +93,12 @@ class LedgerEntry:
     consecutive_seen_count: int
     missing_since: str | None
     existence_status: str
+    # Plan 012 — why a missing listing left the market, as classified by
+    # automation/sold_probe.py. One of KNOWN_REMOVAL_REASONS, or None
+    # when un-probed (or the listing is present). Cleared on reappear,
+    # same branch as missing_since.
+    removal_reason: str | None = None
+    removal_detected_at: str | None = None
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
@@ -95,6 +111,9 @@ class LedgerEntry:
             consecutive_seen_count=int(d.get("consecutive_seen_count", 1)),
             missing_since=d.get("missing_since"),
             existence_status=d.get("existence_status", "confirmed_current"),
+            # Backward-compatible defaults — pre-012 files lack these keys.
+            removal_reason=d.get("removal_reason"),
+            removal_detected_at=d.get("removal_detected_at"),
         )
 
 
@@ -178,13 +197,17 @@ def compute_state(
         )
 
     if is_present:
-        # Listing is back. Reset missing tracker.
+        # Listing is back. Reset missing tracker — and any probe-assigned
+        # removal classification (plan 012): a reappearing listing is
+        # live again, so a prior "sold"/"delisted" verdict is void.
         return LedgerEntry(
             first_seen_at=prior.first_seen_at,
             last_seen_at=tick_iso,
             consecutive_seen_count=prior.consecutive_seen_count + 1,
             missing_since=None,
             existence_status="confirmed_current",
+            removal_reason=None,
+            removal_detected_at=None,
         )
 
     # Listing is absent.
@@ -210,6 +233,10 @@ def compute_state(
         consecutive_seen_count=0,
         missing_since=new_missing_since,
         existence_status=status,
+        # Carry the probe's classification forward while still missing
+        # (plan 012) — the probe only runs on un-classified entries.
+        removal_reason=prior.removal_reason,
+        removal_detected_at=prior.removal_detected_at,
     )
 
 

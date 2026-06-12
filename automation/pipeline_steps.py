@@ -28,17 +28,24 @@ from pulpo.countries import active as _active_country, data_filename as _data_fi
 
 # ── Phase: normalize ──────────────────────────────────────────────────
 
-def phase_normalize(raw: list[dict]) -> tuple[list, int]:
+def phase_normalize(
+    raw: list[dict], *, seen_keys: Optional[frozenset] = None,
+) -> tuple[list, int]:
     """Convert raw scraper dicts → Listing objects. Returns (listings, dropped_count).
 
     Dropped count is the number of raw records that normalize() rejected
     (returned None) — typically because both price and area were missing,
     or the listing failed property-type filters.
+
+    ``seen_keys`` (plan 012): ledger keys (``source|source_id``) tracked
+    before this run — threads into normalize()'s transition-aware sold
+    rule (previously-seen listing turning sold is kept + flagged instead
+    of dropped). ``None`` preserves the legacy drop-all-sold behavior.
     """
     listings: list = []
     dropped = 0
     for r in raw:
-        li = _normalize(r, source=r.get("source") or "unknown")
+        li = _normalize(r, source=r.get("source") or "unknown", seen_keys=seen_keys)
         if li:
             listings.append(li)
         else:
@@ -278,7 +285,7 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "dist_beach_km", "dist_airport_km", "dist_nearest_town_km",
     "lat", "lng", "geocoding_confidence",
     # State
-    "is_sold",
+    "is_sold", "sold_detected_at",
     # Ranking
     "rank", "rank_score",
     "value_score", "location_score", "momentum_score",
