@@ -43,6 +43,16 @@ Return a JSON object with these fields:
   "title": {{ "en": "string", "es": "string" }},
   "description": {{ "en": "string", "es": "string" }},
   "usps": [ {{ "en": "string", "es": "string" }}, ... ],
+  "extracted_facts": {{
+    "year_built": 0 or null,
+    "year_renovated": 0 or null,
+    "bedrooms": 0 or null,
+    "bathrooms": 0.0 or null,
+    "built_area_m2": 0.0 or null,
+    "parking_spaces": 0 or null,
+    "furnished": true or false or null,
+    "has_pool": true or false or null
+  }},
   "url_language": "en or es or mixed",
   "latlong": {{
     "lat": 0.0,
@@ -66,6 +76,12 @@ Field rules:
   - Do not state facts absent from the source. If the source is thin, write a shorter description — never pad.
 - When PROPERTY FACTS are provided in the user message, treat them as authoritative; weave the relevant ones in and do not contradict them.
 - "usps": 3 to 5 reasons to buy; each is an {{en, es}} pair, MAX 8 words per language, and each must be a CONCRETE, verifiable fact from the source or the PROPERTY FACTS (e.g. "Beachfront first row", "Renovated 2023, new roof", "12% below zone median $/m²"). Never generic aspiration ("perfect for your dream home").
+- "extracted_facts": structured facts read from the source text. RULES:
+  - A value goes in ONLY when the source states it explicitly ("built in 2015", "construida en 2015", "remodelada 2023", "3 habitaciones", "amueblada", "con piscina"). NEVER infer, estimate, or copy from typical values. When not stated: null.
+  - "year_renovated": only from explicit renovation/remodel wording (remodelada, renovada, remodeled, renovated, "new roof 2023" counts as 2023).
+  - "bathrooms" may be fractional (2.5).
+  - For land listings most values will be null — that is correct, do not force values.
+  - These are extraction fields, not marketing: when in doubt, null.
 - "url_language":
   - "en" if source text is mostly English;
   - "es" if source text is mostly Spanish;
