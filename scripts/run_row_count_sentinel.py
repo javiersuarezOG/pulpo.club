@@ -55,11 +55,22 @@ def main() -> int:
             "Use for pre-commit candidate gates."
         ),
     )
+    parser.add_argument(
+        "--floor",
+        type=int,
+        default=None,
+        help=(
+            "Catalogue count floor. When set, a per-source CRITICAL drop no "
+            "longer blocks the commit if the sv __total__ is healthy (>= floor "
+            "and not itself critical) — a single dead source can't freeze a "
+            "healthy catalogue. Only a catastrophic total collapse blocks."
+        ),
+    )
     args = parser.parse_args()
 
     from automation.row_count_sentinel import (
-        any_critical,
         downgrade_experimental,
+        gate_decision,
         load_history,
         run_tick,
     )
@@ -93,9 +104,11 @@ def main() -> int:
     else:
         print(f"\nWrote {len(verdicts)} ticks to {args.history_path}")
 
-    if args.fail_on_crit and any_critical(verdicts):
-        print("\n[row_count] at least one source is CRITICAL — exiting 1")
-        return 1
+    if args.fail_on_crit:
+        should_block, msg = gate_decision(verdicts, floor=args.floor)
+        if msg:
+            print(f"\n[row_count] {msg}")
+        return 1 if should_block else 0
     return 0
 
 

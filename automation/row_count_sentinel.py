@@ -382,6 +382,63 @@ def any_critical(verdicts: t.Sequence[DropVerdict]) -> bool:
     return any(v.level == "critical" for v in verdicts)
 
 
+def gate_decision(
+    verdicts: t.Sequence[DropVerdict],
+    floor: int | None = None,
+) -> tuple[bool, str]:
+    """Decide whether a ``--fail-on-crit`` row-count gate should BLOCK or DEGRADE.
+
+    A single source cratering must never freeze a healthy catalogue. Block ONLY
+    on a catastrophic TOTAL collapse — the ``sv __total__`` verdict itself going
+    critical, or the total dropping below ``floor``. Per-source craters while the
+    catalogue is healthy DEGRADE to a non-blocking warning (the dead source is
+    still surfaced by delta-decision, the source_health red row, and the
+    scraper-repair agent).
+
+    Motivation — nightly 27399389866: ``xitios`` 28→0 (critical) hard-failed the
+    run while the ``sv __total__`` GREW 1590→2104 (+32%). One dead source froze
+    2104 perfectly good listings.
+
+    ``floor=None`` preserves the original strict behaviour (any critical blocks),
+    so callers that don't pass a floor are unchanged.
+
+    Returns ``(should_block, message)``. ``message`` is empty when nothing is
+    critical.
+    """
+    crit = [v for v in verdicts if v.level == "critical"]
+    if not crit:
+        return False, ""
+
+    sv_total = next(
+        (v for v in verdicts if v.source == TOTAL_KEY and v.country == "sv"),
+        None,
+    )
+    total_curr = (
+        sv_total.curr_count
+        if sv_total is not None
+        else sum(v.curr_count for v in verdicts
+                 if v.source != TOTAL_KEY and v.country == "sv")
+    )
+    total_critical = bool(sv_total is not None and sv_total.level == "critical")
+    crit_sources = [v.source for v in crit if v.source != TOTAL_KEY]
+    catalogue_healthy = (
+        floor is not None and total_curr >= floor and not total_critical
+    )
+
+    if catalogue_healthy and crit_sources:
+        return False, (
+            f"DEGRADE: per-source CRITICAL {crit_sources} but the catalogue is "
+            f"healthy (sv total {total_curr} >= floor {floor}, sv __total__ not "
+            f"critical) — shipping. A single source cratering must not freeze "
+            f"{total_curr} good listings; the dead source(s) are alerted via "
+            f"delta-decision + source_health + auto-repair."
+        )
+    return True, (
+        f"CATASTROPHIC: blocking commit (total_critical={total_critical}, "
+        f"total={total_curr}, floor={floor}, crit_sources={crit_sources})."
+    )
+
+
 def _lifecycle_for(source: str, metadata: t.Mapping[str, dict] | None) -> str:
     if source == TOTAL_KEY:
         return "active"
