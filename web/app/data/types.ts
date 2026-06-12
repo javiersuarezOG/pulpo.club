@@ -152,6 +152,20 @@ export type Listing = {
   momentum_score: number | null;
   property_type: string | null;
   bedrooms: number | null;
+  // Built-property facts for the detail page Key Facts grid (plan 010).
+  // Coverage is sparse today (bathrooms ~107/308 built listings,
+  // year_built 3) — plan 009 ships year_renovated/furnished/has_pool
+  // and plan 011's backfill raises coverage. Tiles are presence-gated,
+  // so null simply means "no tile". bathrooms can be fractional (3.5).
+  bathrooms: number | null;
+  built_area_m2: number | null;
+  year_built: number | null;
+  year_renovated: number | null;
+  parking_spaces: number | null;
+  floor: number | null;
+  hoa_fee_usd_monthly: number | null;
+  furnished: boolean | null;
+  has_pool: boolean | null;
   // IA-axis derives (populated by pulpo.derived_rules.apply_ia_derives).
   // master_category/subcategory are null for interior land, raw, or
   // property_type that doesn't map to the homes/condos/land trichotomy.
