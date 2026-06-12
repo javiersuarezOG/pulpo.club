@@ -23,6 +23,7 @@ import {
 } from "./pages.jsx";
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { EmailCaptureModal } from "./components/EmailCaptureModal.jsx";
+import { AccessModal } from "./components/AccessModal.jsx";
 import { NewHomePage } from "./home";
 // PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
 // + its child widgets only render for users on /account or /admin, which
@@ -997,13 +998,8 @@ function App() {
       const isTop3 = freeViewableRef.current.has(id);
       const member = isFreeMember(user);
       if (!(isTop3 && member)) {
-        if (!member) {
-          track("paywall.shown", { kind: "listing_click", listing_id: id, gate: "email_capture", top3: isTop3 });
-          openEmailCapture({ reason: isTop3 ? "top3" : "listing", listingId: isTop3 ? id : null });
-        } else {
-          track("paywall.shown", { kind: "listing_click", listing_id: id, gate: "go_pro" });
-          setFreeMonthModal({ trigger: "browse_card" });
-        }
+        track("paywall.shown", { kind: "listing_click", listing_id: id, top3: isTop3, member });
+        requestAccess({ reason: isTop3 ? "top3" : "listing", listingId: isTop3 ? id : null, member });
         return;
       }
     }
@@ -1074,8 +1070,7 @@ function App() {
     // (get them into Free first); free member → Go-Pro modal.
     if (!isPaid(user)) {
       track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
-      if (isFreeMember(user)) setFreeMonthModal({ trigger: "favorites_action" });
-      else openEmailCapture({ reason: "save" });
+      requestAccess({ reason: "save", member: isFreeMember(user) });
       return;
     }
 
@@ -1459,6 +1454,31 @@ function App() {
   }, []);
   const closeEmailCapture = useCallback(() => setEmailCaptureModal(null), []);
 
+  // Access v2 — the unified "3 ways in" surface (registry-driven
+  // AccessBlock/AccessModal). Flag-gated so it can be switched off with
+  // ?ff_access_v2=0; when off the gates fall back to the legacy email-
+  // capture + Pro modals. Default ON.
+  const accessV2 = useMemo(() => readFeatureFlag("access_v2", true), []);
+  const [accessModal, setAccessModal] = useState(null);
+  const openAccessModal = useCallback((cfg) => {
+    setProUpsellModal(null); setFreeMonthModal(null); setEmailCaptureModal(null);
+    setAccessModal(cfg || { surface: "gate_anon" });
+  }, []);
+  const closeAccessModal = useCallback(() => setAccessModal(null), []);
+
+  // Single gate entry point. Anonymous → start-free surface; Free member →
+  // Pro surface. v2 → AccessModal; otherwise the legacy split modals. All
+  // gates route through this so the funnel lives in one place.
+  const requestAccess = useCallback(({ reason, listingId, member } = {}) => {
+    if (accessV2) {
+      openAccessModal({ surface: member ? "gate_member" : "gate_anon", reason, listingId });
+    } else if (member) {
+      setFreeMonthModal({ trigger: reason || "browse_card" });
+    } else {
+      openEmailCapture({ reason: reason || "gate", listingId: listingId || null });
+    }
+  }, [accessV2, openAccessModal, openEmailCapture]);
+
   // Turn an email submission into a Free member (no Clerk account). Mirrors
   // the legacy `signin` seed but stamps plan:"free" + provider:"email" so
   // `isFreeMember`/`tierFor` recognize it and ClerkUserSync preserves it
@@ -1482,9 +1502,8 @@ function App() {
   // and any direct upsell CTA so the anon-vs-member split stays in one place.
   const gateToPro = useCallback(({ reason } = {}) => {
     if (isPaid(user)) return;
-    if (isFreeMember(user)) setFreeMonthModal({ trigger: reason || "browse_card" });
-    else openEmailCapture({ reason: reason || "gate" });
-  }, [user, openEmailCapture]);
+    requestAccess({ reason: reason || "gate", member: isFreeMember(user) });
+  }, [user, requestAccess]);
 
   // Once a Free membership lands, open the top-3 the visitor was reaching
   // for when the email-capture gate fired (continue-the-intent).
@@ -1510,15 +1529,10 @@ function App() {
     if (!openListingId || isPaid(user)) return;
     if (listingsState.state.status === "loading") return; // decide once the set is known
     if (freeViewableIdSet.has(openListingId)) return; // top-3 deep link → open in full (SEO/share)
-    // Non-top-3 deep link, non-paid: anonymous → start-free email capture;
-    // free member → Go-Pro modal.
-    if (isFreeMember(user)) {
-      track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId, gate: "go_pro" });
-      setFreeMonthModal({ trigger: "browse_card" });
-    } else {
-      track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId, gate: "email_capture" });
-      openEmailCapture({ reason: "listing" });
-    }
+    // Non-top-3 deep link, non-paid: anonymous → start-free; member → Pro.
+    const member = isFreeMember(user);
+    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId, member });
+    requestAccess({ reason: "listing", member });
     setOpenListingId(null);
     if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
       window.history.replaceState({ pulpo: true }, "", "/browse");
@@ -1595,6 +1609,7 @@ function App() {
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
     freeMonthModal, openFreeMonthModal, closeFreeMonthModal,
     emailCaptureModal, openEmailCapture, closeEmailCapture, becomeFreeMember, gateToPro,
+    accessV2, accessModal, openAccessModal, closeAccessModal, requestAccess,
     openListing, closeListing, openListingId,
     isFreeViewable,
     detailViewCount, recordDetailView,
@@ -1732,6 +1747,14 @@ function App() {
           locale={locale}
           cfg={emailCaptureModal}
           onClose={closeEmailCapture}
+        />
+      )}
+      {accessModal && (
+        <AccessModal
+          app={app}
+          locale={locale}
+          cfg={accessModal}
+          onClose={closeAccessModal}
         />
       )}
       <ToastHost app={app} />

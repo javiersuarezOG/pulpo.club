@@ -21,6 +21,7 @@ import { track } from "../telemetry/hook";
 import { Icon, PulpoMark } from "../components.jsx";
 import { useListings } from "../data/use-listings";
 import { pickTopRanked } from "../lib/free-view";
+import { AccessBlock } from "../components/AccessBlock.jsx";
 import versions from "./versions.json";
 
 const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
@@ -308,7 +309,9 @@ export function HeroV5({ app, locale }) {
               <li>{t("home.hero.v5.usp_2", locale)}</li>
               <li>{t("home.hero.v5.usp_3", locale)}</li>
             </ul>
-            <EmailCapture app={app} locale={locale} />
+            {app && app.accessV2
+              ? <AccessBlock app={app} locale={locale} surface="hero" />
+              : <EmailCapture app={app} locale={locale} />}
           </div>
           <div className="hv6-viz">
             <FreeTopCard app={app} locale={locale} />
