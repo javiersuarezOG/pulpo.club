@@ -64,6 +64,17 @@ def _ok_response() -> dict:
         "usps":        [{"en": "Direct beach access", "es": "Acceso directo a la playa"},
                         {"en": "Flat terrain",        "es": "Terreno plano"},
                         {"en": "Paved road",          "es": "Camino pavimentado"}],
+        # Plan 009 — structured facts; nulls are the common case (land).
+        "extracted_facts": {
+            "year_built":     None,
+            "year_renovated": None,
+            "bedrooms":       None,
+            "bathrooms":      None,
+            "built_area_m2":  None,
+            "parking_spaces": None,
+            "furnished":      None,
+            "has_pool":       None,
+        },
         "url_language": "en",
         "latlong": {
             "lat":        13.4912,
@@ -358,7 +369,8 @@ def test_custom_schema_extends_eligibility_with_new_field():
 def test_default_schema_has_expected_fields_in_order():
     """Lock the field order — telemetry skip_reason depends on it."""
     keys = [f.json_key for f in DEFAULT_SCHEMA.fields]
-    assert keys == ["title", "description", "usps", "latlong", "url_language"]
+    assert keys == ["title", "description", "usps", "extracted_facts",
+                    "latlong", "url_language"]
 
 
 def test_default_schema_uses_deepseek_model_and_env():
@@ -476,3 +488,129 @@ def test_validate_accepts_url_language_mixed():
     ok, reason = validate_response(r)
     assert ok is True
     assert reason is None
+
+
+# ── plan 009: extracted_facts — validator (shape, not bounds) ──────────
+
+def test_validate_extracted_facts_all_nulls_is_valid():
+    ok, reason = validate_response(_ok_response())
+    assert ok is True
+    assert reason is None
+
+
+def test_validate_extracted_facts_empty_dict_is_valid():
+    """{} is the shape old pre-plan-009 sidecar entries hydrate with —
+    it MUST validate or every cached listing loses its enrichment."""
+    r = _ok_response()
+    r["extracted_facts"] = {}
+    ok, reason = validate_response(r)
+    assert ok is True
+
+
+def test_validate_extracted_facts_with_values_is_valid():
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 2015, "bedrooms": 3,
+                            "bathrooms": 2.5, "furnished": True}
+    ok, reason = validate_response(r)
+    assert ok is True
+
+
+def test_validate_extracted_facts_unknown_key_rejected():
+    """Closed key set — a hallucinated key fails the whole response so
+    the contract surfaces loudly in telemetry, not silently."""
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 2015, "swimming_lanes": 4}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:extracted_facts"
+
+
+def test_validate_extracted_facts_non_dict_rejected():
+    r = _ok_response()
+    r["extracted_facts"] = ["year_built", 2015]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:extracted_facts"
+
+
+def test_validate_extracted_facts_missing_key_rejected():
+    """extracted_facts is REQUIRED in fresh model output (the prompt
+    always emits it, with nulls inside)."""
+    r = _ok_response()
+    del r["extracted_facts"]
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "missing:extracted_facts"
+
+
+def test_validate_extracted_facts_out_of_bounds_value_still_valid_shape():
+    """Out-of-bounds VALUES pass validation (sanitized to None at apply)
+    — rejecting the response would re-spend the API call over one bad
+    number."""
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 1850}   # below the 1900 floor
+    ok, reason = validate_response(r)
+    assert ok is True
+
+
+# ── plan 009: extracted_facts — only-fill-nulls merge semantics ────────
+
+def test_apply_extracted_facts_scraper_value_wins():
+    """Listing already has bedrooms=3 from the scraper; LLM says 5 →
+    the scraper value is kept."""
+    li = _li(bedrooms=3)
+    r = _ok_response()
+    r["extracted_facts"] = {"bedrooms": 5}
+    apply_response(li, r)
+    assert li["bedrooms"] == 3
+
+
+def test_apply_extracted_facts_fills_null():
+    li = _li(year_built=None)
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 2015, "year_renovated": 2023}
+    apply_response(li, r)
+    assert li["year_built"] == 2015
+    assert li["year_renovated"] == 2023
+
+
+def test_apply_extracted_facts_out_of_bounds_coerced_to_none():
+    """year_built=1850 is outside the 1900..2100 anti-hallucination
+    bound — sanitized to None, the listing field stays unset."""
+    li = _li(year_built=None)
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 1850}
+    apply_response(li, r)
+    assert li.get("year_built") is None
+    assert li["extracted_facts"] == {"year_built": None}
+
+
+def test_apply_extracted_facts_fractional_bathrooms():
+    li = _li()
+    r = _ok_response()
+    r["extracted_facts"] = {"bathrooms": 2.5}
+    apply_response(li, r)
+    assert li["bathrooms"] == 2.5
+
+
+def test_apply_extracted_facts_booleans_and_bool_guard():
+    """furnished/has_pool accept real booleans; a bool smuggled into a
+    numeric key (isinstance(True, int) is True!) is coerced to None."""
+    li = _li()
+    r = _ok_response()
+    r["extracted_facts"] = {"furnished": True, "has_pool": False,
+                            "bedrooms": True}
+    apply_response(li, r)
+    assert li["furnished"] is True
+    assert li["has_pool"] is False
+    assert li.get("bedrooms") is None
+
+
+def test_apply_extracted_facts_raw_store_persisted_on_listing():
+    """The sanitized dict lands on the listing as `extracted_facts` so
+    the sidecar entry builder + hydration replay can read it back."""
+    li = _li()
+    r = _ok_response()
+    r["extracted_facts"] = {"year_built": 2015, "has_pool": True}
+    apply_response(li, r)
+    assert li["extracted_facts"] == {"year_built": 2015, "has_pool": True}
