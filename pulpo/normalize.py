@@ -576,7 +576,12 @@ def _attr(raw: dict, key: str, pattern: re.Pattern, *texts: str) -> bool:
     return bool(pattern.search(blob)) if blob else False
 
 
-def normalize(raw: dict, source: str) -> Optional[Listing]:
+def normalize(
+    raw: dict,
+    source: str,
+    *,
+    seen_keys: Optional[frozenset] = None,
+) -> Optional[Listing]:
     """
     Convert a raw scraper dict into a canonical Listing.
 
@@ -584,6 +589,12 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     Optional raw keys: description, location_text, lat, lng, area_m2,
         raw_size_text, price_usd, raw_price_text, photos_count, days_listed,
         is_beachfront, has_paved_access, is_repriced, broker_name, broker_phone.
+
+    ``seen_keys`` (plan 012): the set of ``source|source_id`` keys the
+    existence ledger has tracked before this run. Drives the
+    transition-aware sold rule below. ``None`` (the default) preserves
+    the legacy drop-every-sold-listing behavior for callers that don't
+    thread it — fail-safe.
 
     Returns None if the record can't be salvaged (missing both price and area).
     """
@@ -594,17 +605,28 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     if not sid or not url:
         return None
 
-    # Drop sold / under-contract listings before we spend any work normalizing
-    # them. Brokers commonly leave these indexed for SEO; they pollute the
-    # ranker because their advertised prices no longer reflect the market.
-    # Some sites (oceanside seen) keep the title clean and put the SOLD marker
-    # only in the body blob that ends up in raw_price_text/raw_size_text — so
-    # we check those too. Pulled forward of any parsing work.
+    # Sold / under-contract markers — transition-aware (plan 012).
+    # Brokers commonly leave sold pages indexed for SEO; their advertised
+    # prices no longer reflect the market. Old rule: drop them all. New
+    # rule: drop only if we've NEVER tracked the listing (never-seen +
+    # already sold → not inventory, just SEO residue); a listing we
+    # showed before that now carries a sold marker is exactly the event
+    # worth labeling — keep it with is_sold=True so the FE renders the
+    # sold banner while comps/sitemap/Browse exclude it.
+    # Some sites (oceanside seen) keep the title clean and put the SOLD
+    # marker only in the body blob that ends up in raw_price_text /
+    # raw_size_text — so we check those too. Pulled forward of any
+    # parsing work.
     description = str(raw.get("description") or "")
     raw_size_text = str(raw.get("raw_size_text") or "")
     raw_price_text = str(raw.get("raw_price_text") or "")
     if is_sold(title, description, raw_price_text, raw_size_text):
-        return None
+        key = f"{source}|{sid}"
+        if not seen_keys or key not in seen_keys:
+            return None          # never-seen + already sold → not inventory
+        sold_flag = True         # previously-live listing now sold → keep, label
+    else:
+        sold_flag = False
 
     # Phase 1: drop non-land listings by title pattern (bienesraices/remax/goodlife only)
     if is_non_land_title(title, source):
@@ -655,6 +677,12 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         source=source,
         source_id=sid,
         url=url,
+        # Plan 012 — sold transition: only True when the listing was
+        # tracked before (seen_keys hit) AND now carries a sold marker.
+        is_sold=sold_flag,
+        sold_detected_at=(
+            datetime.now(timezone.utc).isoformat() if sold_flag else None
+        ),
         scraped_at=raw.get("scraped_at") or datetime.now(timezone.utc).isoformat(),
         title=title or "(untitled)",
         description=description,
