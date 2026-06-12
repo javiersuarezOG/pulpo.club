@@ -50,10 +50,17 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
   // ② Go Pro — straight to Stripe checkout (first month free pre-applied).
   const onGoPro = async () => {
     try { track("access.go_pro_clicked", { surface, reason }); } catch { /* ignore */ }
+    // Free→Pro linking: a Free member already has an email (no Clerk
+    // account). Pass it so Stripe locks `customer_email` and the eventual
+    // Clerk account links to the SAME person — and stamp source=free_upgrade
+    // so the conversion is attributable. Anonymous Go-Pro has no email yet.
+    const memberEmail = (app.user && app.user.email) || null;
     const result = await startCheckoutFromModal({
       locale: lc,
       urlCode: "PULPOFREEMONTH",
       cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
+      email: memberEmail,
+      source: memberEmail ? "free_upgrade" : "start",
     });
     if (result && result.kind === "redirect") { window.location.assign(result.url); return; }
     setStatus("error");
