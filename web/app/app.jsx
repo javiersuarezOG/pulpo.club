@@ -45,6 +45,7 @@ import { ContactPage } from "./pages/legal/ContactPage.jsx";
 const AdminPage = React.lazy(() =>
   import("./admin/AdminShell.jsx").then((m) => ({ default: m.AdminPage })),
 );
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from "./lib/safe-storage";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
@@ -275,7 +276,7 @@ function App() {
   // scroll) from a real cross-section pop (scroll to top).
   const routeRef = useRef(_initialParsed.route);
   const [detailViewCount, setDetailViewCount] = useState(() => {
-    return +localStorage.getItem("pulpo-detail-views") || 0;
+    return +safeLocalGet("pulpo-detail-views") || 0;
   });
 
   // Dev panel gate: visible only when (a) the build is non-production AND
@@ -525,6 +526,46 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 008: after a Stripe checkout return, poll Clerk for the webhook-flipped
+  // plan so a just-paid user isn't immediately re-paywalled. The webhook
+  // updates publicMetadata.plan 1–10s after the redirect; the toast effect
+  // above is one-shot and can land before the metadata catches up (esp. on
+  // a Clerk cold start), leaving isPaid(user)=false and the next listing
+  // click reopening the upgrade modal. Mirrors the /account ?from=portal
+  // poll: wait for clerkActions, then reload up to 5×1.5s until the plan
+  // flips. `userRef` gives the polling closure a live read of user state
+  // (the captured `user` would be stale). Captured via ref at first render
+  // because the toast effect strips ?upgrade before this effect settles.
+  const sawCheckoutSuccessRef = useRef(
+    typeof window !== "undefined"
+      && new URLSearchParams(window.location.search).get("upgrade") === "success",
+  );
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => {
+    if (!sawCheckoutSuccessRef.current) return undefined;
+    if (clerkEnabled() && !clerkActions) return undefined; // wait for hydrate
+    sawCheckoutSuccessRef.current = false;                 // consume once
+    const reload = clerkActions && typeof clerkActions.reloadUser === "function"
+      ? clerkActions.reloadUser
+      : null;
+    if (!reload || isPaid(userRef.current)) return undefined; // nothing to wait for
+    let cancelled = false;
+    (async () => {
+      for (let i = 0; i < 5 && !cancelled; i += 1) {
+        try { await reload(); } catch { /* transient — keep polling */ }
+        await new Promise((r) => setTimeout(r, 1500));
+        if (isPaid(userRef.current)) {
+          track("upgrade.plan_refresh_state_changed", { attempts: i + 1 });
+          return;
+        }
+      }
+      if (!cancelled) track("upgrade.plan_refresh_stale", { attempts: 5 });
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerkActions]);
+
   // Handle `?welcome=1` — set by Stripe `success_url` after a /start
   // checkout AND by Clerk's invitation `redirectUrl` after a magic-link
   // accept. Both moments converge on the same surface; the
@@ -705,14 +746,14 @@ function App() {
   }, [clerkActions]);
 
   useEffect(() => {
-    if (user) localStorage.setItem("pulpo-user", JSON.stringify(user));
-    else localStorage.removeItem("pulpo-user");
+    if (user) safeLocalSet("pulpo-user", JSON.stringify(user));
+    else safeLocalRemove("pulpo-user");
   }, [user]);
   useEffect(() => {
-    localStorage.setItem("pulpo-saved", JSON.stringify([...savedIds]));
+    safeLocalSet("pulpo-saved", JSON.stringify([...savedIds]));
   }, [savedIds]);
   useEffect(() => {
-    localStorage.setItem("pulpo-detail-views", String(detailViewCount));
+    safeLocalSet("pulpo-detail-views", String(detailViewCount));
   }, [detailViewCount]);
 
   useEffect(() => {

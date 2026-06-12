@@ -36,6 +36,7 @@ import {
 import { track, optIn, optOut } from "./telemetry/hook";
 import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import { safeLocalGet, safeLocalSet } from "./lib/safe-storage";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
@@ -1161,7 +1162,7 @@ function BrowsePage({ app }) {
   // back to the localStorage default. Cards remains the default.
   const [view, setView] = pUseState(() => {
     if (typeof window === "undefined") return "cards";
-    const ls = localStorage.getItem("pulpo-view") || "cards";
+    const ls = safeLocalGet("pulpo-view") || "cards";
     return readViewFromURL(window.location.search, ls);
   });
   const [sort, setSort] = pUseState(() =>
@@ -1229,7 +1230,7 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
-      setView(readViewFromURL(window.location.search, localStorage.getItem("pulpo-view") || "cards"));
+      setView(readViewFromURL(window.location.search, safeLocalGet("pulpo-view") || "cards"));
       setMapBbox(readBboxFromURL(window.location.search));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
@@ -1246,6 +1247,11 @@ function BrowsePage({ app }) {
   // the priority lane.
   const ABOVE_FOLD_COUNT = 6;
   const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
+  // Map view paginates its card panel + bottom sheet too: unfiltered, the
+  // map shows the whole catalog (~1500), and rendering that many full
+  // ListingCards — on mobile, inside a fixed bottom sheet — janks low-end
+  // devices. Same PAGE_SIZE cap + "Load more" as the list view.
+  const [mapVisibleCount, setMapVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
@@ -1271,7 +1277,7 @@ function BrowsePage({ app }) {
     writeFilterToURL(filters, app.routeParams.category ?? null, sort, view);
   }, [filters, sort, app.routeParams.category, view]);
 
-  pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-view", view); }, [view]);
 
   // Reset pagination back to page 1 whenever the result set could change.
   // Without this, a filter that drops the count below visibleCount leaves
@@ -1392,6 +1398,13 @@ function BrowsePage({ app }) {
     );
   }, [results, view, searchAsIMove, mapBbox]);
 
+  // Reset the map card cap whenever the shown set changes (fresh search or
+  // a pan that re-narrows the viewport) so the first 60 of the new set show.
+  pUseEffect(() => {
+    setMapVisibleCount(PAGE_SIZE);
+  }, [mapResults]);
+  const mapVisible = pUseMemo(() => mapResults.slice(0, mapVisibleCount), [mapResults, mapVisibleCount]);
+
   // In map view every visible count reflects what's actually shown
   // (mapResults) so the list, the map, and the header never disagree —
   // after a fresh search mapResults===results; after a pan both narrow.
@@ -1458,7 +1471,15 @@ function BrowsePage({ app }) {
       // only re-runs when `searchSig` genuinely changes (primitive dep).
       didInitMapRef.current = true;
       searchSigRef.current = searchSig;
-      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) {
+        setMapBbox(null); writeBboxToURL(null);
+      } else if (mapBbox) {
+        // Positive heartbeat — an inbound ?bbox= deep-link survived the
+        // hydration race and is being applied to the viewport. Alert if
+        // ?bbox= traffic stops producing this (A1 regressed). See
+        // map.deeplink_bbox_applied in telemetry/events.ts.
+        track("map.deeplink_bbox_applied", {});
+      }
       setFitNonce((n) => n + 1);
       return;
     }
@@ -1755,7 +1776,7 @@ function BrowsePage({ app }) {
           ) : view === "map" ? (
             <div className="map-split">
               <div className="map-split__cards" ref={cardPanelRef}>
-                {mapResults.map((l) => (
+                {mapVisible.map((l) => (
                   <ListingCard
                     key={l.id}
                     listing={l}
@@ -1767,6 +1788,26 @@ function BrowsePage({ app }) {
                     onOpen={() => handleMapOpenListing(l.id)}
                   />
                 ))}
+                {mapVisibleCount < mapResults.length && (
+                  <div className="browse-load-more">
+                    <button
+                      type="button"
+                      className="btn-ghost lg"
+                      onClick={() => {
+                        const next = mapVisibleCount + PAGE_SIZE;
+                        track("browse.load_more_clicked", {
+                          from: mapVisibleCount,
+                          to: Math.min(next, mapResults.length),
+                          total: mapResults.length,
+                          surface: "map",
+                        });
+                        setMapVisibleCount(next);
+                      }}
+                    >
+                      {t("browse.load_more", app.locale, { n: mapResults.length - mapVisibleCount })}
+                    </button>
+                  </div>
+                )}
               </div>
               <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
                 <LazyMapView
@@ -2929,9 +2970,9 @@ function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 function SavedPage({ app }) {
   const LISTINGS = useListings();
   const items = LISTINGS.filter(l => app.savedIds.has(l.id));
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-saved-view") || "cards");
+  const [view, setView] = pUseState(() => safeLocalGet("pulpo-saved-view") || "cards");
   const [sort, setSort] = pUseState("recent");
-  pUseEffect(() => { localStorage.setItem("pulpo-saved-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-saved-view", view); }, [view]);
 
   const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
 
@@ -4587,6 +4628,8 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
       locale: lc,
       utms,
       urlCode,
+      // Lock Stripe's email to the signed-in account (anonymous → null).
+      email: app.user?.email || null,
       // Return to where they were if they cancel on Stripe (not /start).
       cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
     });

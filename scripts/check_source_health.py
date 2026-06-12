@@ -145,7 +145,7 @@ def _post_slack(webhook_url: str, text: str) -> None:
         method="POST",
     )
     try:
-        urllib.request.urlopen(req, timeout=20).read()
+        urllib.request.urlopen(req, timeout=5).read()
     except (urllib.error.URLError, TimeoutError) as e:
         # We never block the nightly on alerting. The next scheduled
         # watchdog will still see the row once it commits.

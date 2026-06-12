@@ -16,8 +16,8 @@ landed in PR #780 and this wires it into the nightly so it is not a
 tombstone.
 
 Design:
-- Reads the same candidate ``ranked.fresh.json`` (fallback
-  ``ranked.json``) the gate reads, classifies per-source deltas with
+- Reads the same country-scoped candidate ``ranked.fresh.SV.json``
+  (fallback ``ranked.SV.json``) the gate reads, classifies per-source deltas with
   ``record=False`` so the 7-tick baseline is untouched.
 - Derives ``succeeded_sources`` from ``source_health_history.jsonl``:
   a source whose latest row is NOT ``status=red`` ran successfully
@@ -59,8 +59,8 @@ def _latest_status_by_source(rows: list[dict]) -> dict[str, str]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--sv-ranked", type=Path, default=Path("web/data/ranked.json"))
-    parser.add_argument("--fresh-ranked", type=Path, default=Path("web/data/ranked.fresh.json"))
+    parser.add_argument("--sv-ranked", type=Path, default=Path("web/data/ranked.SV.json"))
+    parser.add_argument("--fresh-ranked", type=Path, default=Path("web/data/ranked.fresh.SV.json"))
     parser.add_argument("--pa-ranked", type=Path, default=Path("web/data/ranked.PA.json"))
     parser.add_argument("--history-path", type=Path, default=Path("web/data/row_count_history.jsonl"))
     parser.add_argument("--data-dir", type=Path, default=Path("web/data"))

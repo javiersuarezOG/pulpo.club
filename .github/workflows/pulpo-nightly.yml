@@ -22,12 +22,13 @@ on:
         default: "1"
         type: string
 
-# Single-flight: a manual trigger or a backed-up cron must not race a
-# still-running nightly — both would try to PR-merge dated data branches and
-# the second commit would lose. cancel-in-progress kills the older run.
+# Single-flight queue: a manual trigger or a backed-up cron must not race a
+# still-running nightly, but cancelling the older run can strand an otherwise
+# good candidate before canaries/commit run. Queue instead; the commit step is
+# still the single writer.
 concurrency:
   group: pulpo-nightly
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 # Count canaries — both fail the workflow without committing stale data.
 # FLOOR: raise if clean baseline grows. CEILING: raise if ceiling is hit
@@ -380,6 +381,7 @@ jobs:
           # describe the SV apex deployment.
           mkdir -p /tmp/sv-legacy
           for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   ranked.fresh.json \
                    validation_log.jsonl dedup_audit.json duplicate_clusters.json \
                    shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
@@ -403,6 +405,7 @@ jobs:
           # serving SV data. PA-specific outputs (`ranked.PA.json` etc.)
           # are untouched by this restore.
           for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   ranked.fresh.json \
                    validation_log.jsonl dedup_audit.json duplicate_clusters.json \
                    shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
@@ -602,16 +605,19 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          python3 scripts/run_delta_decision.py || \
+          python3 scripts/run_delta_decision.py \
+            --fresh-ranked web/data/ranked.fresh.SV.json \
+            --sv-ranked web/data/ranked.SV.json || \
             echo "::warning::delta-decision step errored (non-blocking)"
 
       - name: Per-source row-count delta gate
         env:
           ROW_COUNT_GATE_LOG_ONLY: ${{ vars.ROW_COUNT_GATE_LOG_ONLY || 'false' }}
         run: |
-          ranked_arg="web/data/ranked.json"
-          if [ -s web/data/ranked.fresh.json ]; then
-            ranked_arg="web/data/ranked.fresh.json"
+          ranked_arg="web/data/ranked.fresh.SV.json"
+          if [ ! -s "$ranked_arg" ]; then
+            echo "::error::missing $ranked_arg; refusing to run row-count gate on legacy ranked.json because carry-forward or PA output could mask a real SV delta."
+            exit 1
           fi
           echo "Row-count gate using $ranked_arg"
           set +e
@@ -1153,9 +1159,17 @@ jobs:
           # so the required check has a status to report against.
           gh workflow run ci.yml --ref "$BRANCH" || true
           gh workflow run tests-required.yml --ref "$BRANCH" || true
-          # Try auto-merge; fall back to admin merge for protected branches
-          gh pr merge "$BRANCH" --squash --delete-branch --admin || \
-            gh pr merge "$BRANCH" --squash --delete-branch --auto
+          # Auto-merge first: queue the merge to fire once the required
+          # checks (pytest / frontend / Vercel) dispatched above report
+          # green. Admin is the FALLBACK only — used when enabling
+          # auto-merge fails (e.g. auto-merge disabled on the repo). The
+          # previous order ran --admin FIRST, which merged immediately and
+          # bypassed every required check on every nightly data PR, making
+          # the ci.yml / tests-required dispatch above pointless. Matches
+          # CLAUDE.md: "--auto handles the Expected-Waiting race; reserve
+          # --admin for the data-PR fallback path."
+          gh pr merge "$BRANCH" --squash --delete-branch --auto || \
+            gh pr merge "$BRANCH" --squash --delete-branch --admin
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel
@@ -1174,8 +1188,15 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npm install -g vercel@latest
-          vercel deploy --prod --yes
+          npm install -g vercel@44.7.3
+          for attempt in 1 2; do
+            if vercel deploy --prod --yes --archive=tgz; then
+              exit 0
+            fi
+            echo "::warning::Vercel deploy attempt $attempt failed"
+            sleep 15
+          done
+          exit 1
 
       - name: Nightly summary (story)
         # End-of-run synthesis. Reads run_history.json +
@@ -1199,6 +1220,26 @@ jobs:
         run: |
           python3 scripts/nightly_summary.py --data-dir web/data --write-md \
             || echo "::warning::nightly summary script failed (non-blocking)"
+
+      - name: Classify nightly outcome
+        # One queryable verdict per run so dashboards/alerts can treat a
+        # data-quality HOLD (production protected; the site keeps serving
+        # last-good from main — safe) differently from a plumbing failure
+        # (page someone). Writes web/data/nightly_outcome.json (uploaded with
+        # the diagnostics below, so it survives even when the data commit
+        # didn't land) and fires the `nightly.outcome` PostHog event.
+        # Best-effort: never fails the nightly.
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMITTED: ${{ steps.commit.outputs.committed || '' }}
+          DEPLOY_CONCLUSION: ${{ steps.deploy.conclusion || '' }}
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+        run: |
+          python3 scripts/classify_nightly_outcome.py \
+            || echo "::warning::nightly outcome classification failed (non-blocking)"
 
       - name: Upload nightly diagnostics
         # Runs on success AND failure so the auto-repair workflow + a
@@ -1225,6 +1266,7 @@ jobs:
             web/data/run_history.json
             web/data/hires_pipeline_metrics.jsonl
             web/data/nightly_summary.md
+            web/data/nightly_outcome.json
 
       - name: Slack on failure or cancellation
         # Final-line alert: any failed OR cancelled step in this job sends
@@ -1258,7 +1300,7 @@ jobs:
             STATUS_TEXT="CANCELLED (likely timeout — look at last in-progress step)"
           fi
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          curl -sS -X POST -H 'Content-Type: application/json' \
+          curl -sS --connect-timeout 3 --max-time 8 -X POST -H 'Content-Type: application/json' \
             "$SLACK_WEBHOOK_URL" \
             -d "$(printf '{"text":"*Pulpo nightly %s* — <%s|view run>"}' "$STATUS_TEXT" "$RUN_URL")" \
             >/dev/null || echo "Slack POST failed (non-blocking)"

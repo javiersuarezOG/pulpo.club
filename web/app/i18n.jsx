@@ -1662,6 +1662,10 @@ export const UI_STRINGS = {
                                 es: "Qué incluye" },
   "start.nav.login_link":     { en: "Log in",
                                 es: "Iniciar sesión" },
+  "start.already_pro.cta":    { en: "Manage your plan",
+                                es: "Administrar tu plan" },
+  "start.already_pro.note":   { en: "You're already on Pulpo Pro.",
+                                es: "Ya tienes Pulpo Pro." },
   // /  home-page Pro upsell modal (PR-B.5). Triggered when the URL
   // carries a campaign signal (utm_*, code, or ?upsell=1). Pro signed-in
   // users never see it. Mobile-first; reuses the .modal infra in index.css.

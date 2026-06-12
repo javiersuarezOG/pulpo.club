@@ -37,8 +37,10 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..");
 // keeps the test fast and the surface obvious.
 const PRODUCER_FILES = [
   "api/_activation_email.js",
+  "api/contact.js",
   "scripts/send_newsletter.py",
   "automation/newsletter/welcome_dispatch.py",
+  "automation/newsletter/free_welcome_dispatch.py",
 ];
 
 // Patterns covering both the JS object-tag form

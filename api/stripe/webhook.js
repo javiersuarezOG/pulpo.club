@@ -824,9 +824,33 @@ module.exports = async (req, res) => {
         }
         const existing = await findClerkUserByEmail(clerk, email);
         if (existing) {
+          // Double-billing detection (003). A second checkout by an
+          // already-Pro user overwrites stripeSubscriptionId below,
+          // orphaning the prior still-billing subscription — which the
+          // Customer Portal can't see (it keys off the stored id), so the
+          // user can't self-cancel it. Telemetry-only + preserve the
+          // prior id for support reconciliation; auto-cancel/refund moves
+          // money and is a deliberate manual decision, not a default.
+          const priorSubId = (existing.privateMetadata
+            && existing.privateMetadata.stripeSubscriptionId) || null;
+          const wasAlreadyPro = !!(existing.publicMetadata
+            && existing.publicMetadata.plan === "pro");
+          const duplicateActiveSub = !!(wasAlreadyPro && priorSubId
+            && subscriptionId && priorSubId !== subscriptionId);
+          if (duplicateActiveSub) {
+            posthog.capture(distinctId, "webhook.duplicate_subscription_detected", {
+              ...baseProps,
+              path: "anonymous_existing_user",
+              clerk_user_id: existing.id,
+              existing_subscription_id: priorSubId,
+              new_subscription_id: subscriptionId,
+            });
+          }
           await setPlanForClerkUser(clerk, existing.id, "pro", {
             stripeCustomerId: customerId || undefined,
             stripeSubscriptionId: subscriptionId || undefined,
+            // Keep the orphaned prior id discoverable for manual cleanup.
+            ...(duplicateActiveSub ? { priorStripeSubscriptionId: priorSubId } : {}),
             acquisitionSource: source || undefined,
             acquisitionUtms: Object.keys(utms).length ? utms : undefined,
           });
@@ -859,6 +883,7 @@ module.exports = async (req, res) => {
           posthog.capture(distinctId, "webhook.checkout_completed", {
             ...baseProps, path: "anonymous_existing_user",
             clerk_user_id: existing.id, invitation_sent: false,
+            duplicate_subscription_detected: duplicateActiveSub,
             ms: Date.now() - t0,
           });
           break;
@@ -1259,6 +1284,12 @@ module.exports = async (req, res) => {
           // subscription lifecycle.
           const subLocale = clerkLocaleFromStripe(sub.metadata && sub.metadata.locale);
           if (subCustomerId && subLocale) {
+            // `stripe` is declared inside the checkout.session.completed case
+            // block, which is out of scope here; this case needs its own
+            // client or it throws a ReferenceError → HTTP 500 on every
+            // locale-stamped subscription event (Stripe then retries ~3 days
+            // and subscription_changed telemetry below never fires).
+            const stripe = stripeClient();
             await setStripeCustomerPreferredLocale(
               stripe, subCustomerId, subLocale, "subscription_updated",
               posthog.emailDistinctId(subEmail), t0,

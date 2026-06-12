@@ -58,11 +58,31 @@ from automation.posthog_client import (  # noqa: E402
     capture as _ph_capture,
     set_run_id as _ph_set_run_id,
 )
+from pulpo.countries import active as _active_country, data_filename as _data_filename  # noqa: E402
 
 import hashlib  # noqa: E402
 import io      # noqa: E402
 import time as _time  # noqa: E402
 import concurrent.futures  # noqa: E402
+
+
+def _write_fresh_ranked_snapshot(
+    web_data_dir: Path,
+    ranked: list,
+    *,
+    active_cc: str | None = None,
+) -> None:
+    """Write fresh-only ranked candidates before carry-forward can mutate them."""
+    fresh_ranked_dicts = [li.to_dict() for li in ranked]
+    cc = active_cc or _active_country().code
+    _atomic_write_json(
+        web_data_dir / "ranked.fresh.json",
+        fresh_ranked_dicts,
+    )
+    _atomic_write_json(
+        web_data_dir / _data_filename("ranked.fresh.json", cc),
+        fresh_ranked_dicts,
+    )
 
 
 def _classify_error(exc: BaseException) -> str:
@@ -2253,10 +2273,7 @@ def main() -> int:
     # this file when present so stale carry-forward cannot mask a source
     # delta. The file is intentionally not staged by the workflow.
     try:
-        _atomic_write_json(
-            web_data_dir / "ranked.fresh.json",
-            [li.to_dict() for li in ranked_pre],
-        )
+        _write_fresh_ranked_snapshot(web_data_dir, ranked_pre)
     except Exception as _e:  # noqa: BLE001
         print(f"[carry_forward] fresh snapshot failed (non-fatal): {_e!r}")
 
@@ -2624,8 +2641,6 @@ def main() -> int:
     # bytes today; the legacy unified file goes away in PR-MC-5.
     try:
         from pulpo.featured_listing import write_featured_json
-        from pulpo.countries import active as _active_country
-        from pulpo.countries import data_filename as _data_filename
         active_cc = _active_country().code
         pool = write_featured_json(web_data_dir / "featured.json", ranked)
         # Mirror the same content to the per-country file. We re-call

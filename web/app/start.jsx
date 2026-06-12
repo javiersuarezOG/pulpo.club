@@ -37,6 +37,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { getDistinctId } from "./telemetry/hook";
 import { pickHeroPhoto } from "./lib/hero-photos";
 import { useCampaignParams } from "./lib/campaign";
+import { isPaid } from "./lib/gating";
 import "./styles/start.css";
 
 // Total catalog size — surfaced in the trust strip. Hardcoded for v1;
@@ -58,6 +59,10 @@ export default function StartPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [price, setPrice] = useState(() => priceForCountry(null));
+  const [localUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pulpo-user")) || null; } catch { return null; }
+  });
+  const alreadyPro = isPaid(localUser);
   const [stickyVisible, setStickyVisible] = useState(false);
   const heroSentinelRef = useRef(null);
   // Rotate the hero photo on each mount among the curated landscape-
@@ -135,6 +140,11 @@ export default function StartPage() {
 
   const handleSubmit = useCallback(
     async () => {
+      if (alreadyPro) {
+        track("start.already_pro_manage_clicked", {});
+        window.location.assign("/account/subscription");
+        return;
+      }
       setError(null);
       track("start.cta_clicked", {
         has_code: checkoutPromoCode.length > 0,
@@ -192,7 +202,7 @@ export default function StartPage() {
         setSubmitting(false);
       }
     },
-    [lc, urlCode, checkoutPromoCode, postCheckout]
+    [alreadyPro, lc, urlCode, checkoutPromoCode, postCheckout]
   );
 
   return (
@@ -221,18 +231,33 @@ export default function StartPage() {
             <li>{t("pro.usp.links.short", lc)}</li>
           </ul>
           <div className="start-hero-ctas">
-            <button
-              type="button"
-              className="start-cta-primary"
-              onClick={handleSubmit}
-              disabled={submitting}
-            >
-              {submitting
-                ? t("start.join.paid.cta_submitting", lc)
-                : t("start.hero.cta_primary", lc, { price: price.displayString })}
-            </button>
+            {alreadyPro ? (
+              <a
+                className="start-cta-primary"
+                href="/account/subscription"
+                onClick={() => track("start.already_pro_manage_clicked", { surface: "hero" })}
+              >
+                {t("start.already_pro.cta", lc)}
+              </a>
+            ) : (
+              <button
+                type="button"
+                className="start-cta-primary"
+                onClick={handleSubmit}
+                disabled={submitting}
+              >
+                {submitting
+                  ? t("start.join.paid.cta_submitting", lc)
+                  : t("start.hero.cta_primary", lc, { price: price.displayString })}
+              </button>
+            )}
           </div>
-          {checkoutPromoCode && (
+          {alreadyPro && (
+            <p className="start-hero-code-note" aria-live="polite">
+              {t("start.already_pro.note", lc)}
+            </p>
+          )}
+          {checkoutPromoCode && !alreadyPro && (
             <p className="start-hero-code-note" aria-live="polite">
               {t("start.code.applied_note", lc)}
             </p>
@@ -292,17 +317,27 @@ export default function StartPage() {
             <li>{t("pro.usp.browse.short", lc)}</li>
             <li>{t("pro.usp.links.short", lc)}</li>
           </ul>
-          <button
-            type="button"
-            className="start-card-cta start-card-cta-primary"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting
-              ? t("start.join.paid.cta_submitting", lc)
-              : t("start.join.paid.cta", lc)}
-          </button>
-          {checkoutPromoCode && (
+          {alreadyPro ? (
+            <a
+              className="start-card-cta start-card-cta-primary"
+              href="/account/subscription"
+              onClick={() => track("start.already_pro_manage_clicked", { surface: "join" })}
+            >
+              {t("start.already_pro.cta", lc)}
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="start-card-cta start-card-cta-primary"
+              onClick={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting
+                ? t("start.join.paid.cta_submitting", lc)
+                : t("start.join.paid.cta", lc)}
+            </button>
+          )}
+          {checkoutPromoCode && !alreadyPro && (
             <p className="start-code-applied-note" aria-live="polite">
               {t("start.code.applied_note", lc)}
             </p>
@@ -329,16 +364,26 @@ export default function StartPage() {
 
       {stickyVisible && (
         <div className="start-sticky-cta" role="region" aria-label={t("start.aria.sticky_cta", lc)}>
-          <button
-            type="button"
-            className="start-cta-primary"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting
-              ? t("start.join.paid.cta_submitting", lc)
-              : t("start.sticky_cta", lc, { price: price.displayString })}
-          </button>
+          {alreadyPro ? (
+            <a
+              className="start-cta-primary"
+              href="/account/subscription"
+              onClick={() => track("start.already_pro_manage_clicked", { surface: "sticky" })}
+            >
+              {t("start.already_pro.cta", lc)}
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="start-cta-primary"
+              onClick={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting
+                ? t("start.join.paid.cta_submitting", lc)
+                : t("start.sticky_cta", lc, { price: price.displayString })}
+            </button>
+          )}
         </div>
       )}
     </div>
