@@ -74,6 +74,11 @@ jobs:
       #      the active-filter chip + table-header leaks.
       # See scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
       - run: node scripts/i18n_lint.mjs
+      # Card-image gate guard — flags a raw <img> rendering a listing image
+      # (thumbnail_url / selected_photo_url / .photos[...]) outside the gated
+      # <Photo> component, the regression class behind the browse_table + map
+      # blank-slot 404s. See scripts/check_card_image_gate.mjs and plan 014.
+      - run: node scripts/check_card_image_gate.mjs
       - run: node scripts/check_e2e_stale_selectors.mjs
       - name: CSP allowlist drop guard
         run: |

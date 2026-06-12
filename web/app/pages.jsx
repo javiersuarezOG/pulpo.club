@@ -2642,6 +2642,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
             aria-label={listing.photos.length ? t("detail.gallery.open", lc) : undefined}
           >
             {(detailLocalHeroUrl || listing.photos[0]) ? (
+              // card-image-allow: detail-page gallery main photo, user-navigated (plan 004/007)
               <img
                 src={detailLocalHeroUrl || listing.photos[0]}
                 alt={tr(listing.title, app.locale)}
@@ -2711,6 +2712,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   }
                 }}
               >
+                {/* card-image-allow: detail-page gallery thumb, user-navigated (plan 004/007) */}
                 <img
                   src={listing.photos[i]}
                   alt=""
@@ -2991,6 +2993,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           >
             <Icon name="close" size={22}/>
           </button>
+          {/* card-image-allow: detail-page lightbox, user-navigated (plan 004/007) */}
           <img
             src={lbFailed ? categoryImageForListing(listing) : listing.photos[galleryIdx]}
             alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}
