@@ -14,7 +14,9 @@ export type Tier = "anonymous" | "free" | "pro" | "agency";
 
 export type GatingUser = {
   plan?: string | null;
-  // app.user has more fields (email, etc.) — we only need plan here.
+  // `provider:"email"` marks an email-only Free member (no Clerk account).
+  provider?: string | null;
+  // app.user has more fields (email, etc.) — we only need these here.
 } | null | undefined;
 
 export function tierFor(user: GatingUser): Tier {
@@ -31,6 +33,15 @@ export function isPaid(user: GatingUser): boolean {
 
 export function needsSignup(user: GatingUser): boolean {
   return tierFor(user) === "anonymous";
+}
+
+// Email-first Free model: a "free member" gave their email (no Clerk
+// login) — `app.user = { provider:"email", plan:"free", email }`. They can
+// open the top-3 in full; Pro-gated actions (rank 4+, saves) route them to
+// the Go-Pro modal, while anonymous (no email yet) visitors route to the
+// start-free email-capture modal. Pro/Clerk users are never "free members".
+export function isFreeMember(user: GatingUser): boolean {
+  return !!user && (user as { provider?: string | null }).provider === "email" && !isPaid(user);
 }
 
 // ── Per-surface caps ─────────────────────────────────────────────────

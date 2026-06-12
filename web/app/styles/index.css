@@ -3512,11 +3512,22 @@ h1,h2,h3,h4,h5 { margin: 0; }
    from ProUpsellModal (no eyebrow, no nested USP headlines) and from
    USPBand (no icon-in-circle cards) so the three surfaces don't
    visually conflate. Single anchor: the headline. */
-.free-month-modal {
+.free-month-modal,
+.email-capture-modal {
   text-align: left;
   max-width: 460px;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
+}
+
+/* Email-first capture modal — secondary Go-Pro link + dismiss spacing. */
+.email-capture-go-pro {
+  display: block;
+  margin-top: var(--space-4);
+  font-weight: 600;
+}
+.email-capture-modal .free-month-modal-dismiss {
+  margin-top: var(--space-2);
 }
 .free-month-modal-headline {
   font-family: var(--font-sans);

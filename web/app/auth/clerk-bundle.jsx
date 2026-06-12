@@ -112,7 +112,12 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
     // briefly clear the localStorage-restored user on first paint.
     if (!isLoaded) return;
     if (!isSignedIn || !user) {
-      setUser(null);
+      // Email-first Free model: a signed-out visitor may still be a Free
+      // member (email-only, no Clerk account — `provider:"email"`). Clear
+      // only Clerk-derived users; preserve a Free member so Clerk loading
+      // doesn't wipe their state. Clerk always WINS when actually signed in
+      // (the branch below overwrites), so a Pro never reads as free-member.
+      setUser((prev) => (prev && prev.provider === "email" ? prev : null));
       return;
     }
     const rawPlan = planFromMetadata(user.publicMetadata);
