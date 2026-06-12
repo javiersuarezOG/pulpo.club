@@ -2,8 +2,9 @@
 ranker leg added in PR A6.
 
 The leg reads pre-computed `listing.quality_score` (stamped by
-automation/run.py via pulpo.quality_score.compute) and scales 0..9 →
-0..100 for the composite. Weight defaults to 0.05; after renormalization
+automation/run.py via pulpo.quality_score.compute) and scales
+0..MAX_SCORE → 0..100 for the composite. Weight defaults to 0.05;
+after renormalization
 the three pre-existing legs (value 0.40, location 0.35, momentum 0.25)
 keep ~95% of their original weight.
 """
@@ -62,9 +63,12 @@ def test_zero_quality_score_maps_to_zero():
 
 def test_intermediate_quality_score_scales_linearly():
     leg = QualityScoreLeg()
-    score, _ = leg.score(_FakeListing(quality_score=3), [])
-    # 3/9 * 100 ≈ 33.3
-    assert 33.0 < score < 34.0
+    raw = 3
+    score, _ = leg.score(_FakeListing(quality_score=raw), [])
+    # MAX_SCORE-relative so the assertion survives a bump (3/11*100 ≈ 27.3
+    # after the image-fitness inputs landed; was 3/9 ≈ 33.3).
+    expected = 100.0 * (raw / MAX_SCORE)
+    assert abs(score - expected) < 0.5
 
 
 def test_out_of_range_quality_score_is_clamped():
@@ -80,7 +84,9 @@ def test_out_of_range_quality_score_is_clamped():
 def test_quality_score_reason_includes_raw_score():
     leg = QualityScoreLeg()
     _, reason = leg.score(_FakeListing(quality_score=6), [])
-    assert "6/9" in reason
+    # MAX_SCORE-relative so the assertion survives a bump (now 11 after the
+    # image-fitness inputs landed in pulpo.quality_score).
+    assert f"6/{MAX_SCORE}" in reason
 
 
 def test_ranker_includes_quality_leg_in_composite():
