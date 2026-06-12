@@ -68,13 +68,14 @@ def test_sv_prompt_mentions_el_salvador():
     sv = load("SV")
     prompt = system_prompt_for(sv)
     assert "El Salvador" in prompt, (
-        "SV prompt must address the model as 'specializing in El Salvador'."
+        "SV prompt must address the model as an analyst "
+        "'writing listing summaries for buyers in El Salvador'."
     )
     # Specifically the country-templated slots. The "Assume the property
     # is in <country>." sentence wraps across a line in the rendered
     # prompt; we normalize whitespace before matching to be robust.
     normalized = " ".join(prompt.split())
-    assert "specializing in El Salvador" in normalized
+    assert "writing listing summaries for buyers in El Salvador" in normalized
     assert "Assume the property is in El Salvador." in normalized
     assert "El Salvador centroid" in normalized
 
@@ -145,7 +146,7 @@ def test_gt_synthetic_prompt_mentions_guatemala_not_el_salvador():
     prompt = system_prompt_for(gt)
     normalized = " ".join(prompt.split())
     # GT-side
-    assert "specializing in Guatemala" in normalized
+    assert "writing listing summaries for buyers in Guatemala" in normalized
     assert "Assume the property is in Guatemala." in normalized
     assert "Guatemala centroid" in normalized
     # No SV leakage. NB: "El Salvador" check has to be on the raw
