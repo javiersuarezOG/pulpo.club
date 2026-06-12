@@ -200,10 +200,19 @@ def passes_gate(li: dict, cfg: dict | None = None) -> bool:
 def select_hero_index(li: dict) -> int:
     """Which photo_url index is the hero shot.
 
-    Today: 0.  The nightly's repick_heroes.py has already shuffled
-    photo_urls so the best image is first (that's the whole point of
-    that module).  Future: if per-photo quality scores get computed,
-    pick the max here."""
+    The nightly picker writes its winning broker URL to
+    ``selected_photo_url`` (repick_heroes.py / run.py); ``photo_urls``
+    itself is NOT reordered. Resolve the winner's index so the IG
+    carousel leads with the same image every other surface shows first.
+    Falls back to 0 when the field is missing or no longer present in
+    photo_urls (e.g. the broker dropped the image between runs)."""
+    sel = li.get("selected_photo_url")
+    urls = li.get("photo_urls") or []
+    if isinstance(sel, str) and sel:
+        try:
+            return urls.index(sel)
+        except ValueError:
+            pass
     return 0
 
 

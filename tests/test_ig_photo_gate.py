@@ -138,11 +138,44 @@ def test_lower_min_photos_threshold_lets_thin_listing_through():
 
 # ── hero + photo ordering ──────────────────────────────────────────────
 
-def test_select_hero_index_returns_zero_today():
-    """Current pipeline shuffles photo_urls so hero is at index 0.
-    Pin the contract — if select_hero_index ever changes, the
-    publisher needs to know."""
+def test_select_hero_index_defaults_to_zero_without_selected_url():
+    """No selected_photo_url field → fall back to index 0 (older
+    listings, or the winner is already photo_urls[0])."""
     assert select_hero_index(_good_terreno()) == 0
+
+
+def test_select_hero_index_resolves_selected_photo_url():
+    """The picker's winner (selected_photo_url) decides the hero index so
+    the carousel leads with the same image every other surface shows
+    first (continuity contract, PR #785)."""
+    li = _good_terreno(
+        photo_urls=["http://x/a.jpg", "http://x/b.jpg", "http://x/c.jpg"],
+        selected_photo_url="http://x/c.jpg",
+    )
+    assert select_hero_index(li) == 2
+
+
+def test_select_hero_index_falls_back_when_selected_url_absent_from_list():
+    """Broker dropped the winning image between runs → URL no longer in
+    photo_urls → fall back to 0 rather than crash."""
+    li = _good_terreno(
+        photo_urls=["http://x/a.jpg", "http://x/b.jpg"],
+        selected_photo_url="http://x/gone.jpg",
+    )
+    assert select_hero_index(li) == 0
+
+
+def test_order_photo_indices_leads_with_selected_hero():
+    """The resolved hero index lands first in the carousel order."""
+    li = _good_terreno(
+        photos_count=5,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg",
+                    "http://x/3.jpg", "http://x/4.jpg"],
+        selected_photo_url="http://x/3.jpg",
+    )
+    ordered = order_photo_indices(li)
+    assert ordered[0] == 3
+    assert sorted(ordered) == [0, 1, 2, 3, 4]
 
 
 @pytest.mark.parametrize("count,expected", [
