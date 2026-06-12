@@ -98,6 +98,7 @@ function ListingRow({ listing, rank, locale }) {
     <div className="hv6-r">
       <span className="hv6-rank">{rank}</span>
       <span className="hv6-thumb">
+        {/* card-image-allow: shelf ListingRow thumb, gated upstream by the shelf's isShelfEligible */}
         <img src={listing.thumbnail_url} alt="" loading="lazy" decoding="async" />
       </span>
       <span className="hv6-meta">
