@@ -1267,6 +1267,7 @@ jobs:
             web/data/hires_pipeline_metrics.jsonl
             web/data/nightly_summary.md
             web/data/nightly_outcome.json
+            web/data/guard_report.json
 
       - name: Slack on failure or cancellation
         # Final-line alert: any failed OR cancelled step in this job sends
