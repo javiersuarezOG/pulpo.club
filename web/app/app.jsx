@@ -1455,10 +1455,20 @@ function App() {
   const closeEmailCapture = useCallback(() => setEmailCaptureModal(null), []);
 
   // Access v2 — the unified "3 ways in" surface (registry-driven
-  // AccessBlock/AccessModal). Flag-gated so it can be switched off with
-  // ?ff_access_v2=0; when off the gates fall back to the legacy email-
-  // capture + Pro modals. Default ON.
-  const accessV2 = useMemo(() => readFeatureFlag("access_v2", true), []);
+  // AccessBlock/AccessModal). ON by default; switch off with ?ff_access_v2=0.
+  // Deliberately NOT PostHog-gated yet: `readFeatureFlag` would resolve to
+  // OFF wherever PostHog is live but the flag is undefined (i.e. every
+  // deployed environment). When we want dashboard control, define the flag
+  // in PostHog and swap this to readFeatureFlag("access_v2", true).
+  const accessV2 = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = new URLSearchParams(window.location.search).get("ff_access_v2");
+      if (v === "0") return false;
+      if (v === "1") return true;
+    } catch { /* ignore */ }
+    return true; // default ON
+  }, []);
   const [accessModal, setAccessModal] = useState(null);
   const openAccessModal = useCallback((cfg) => {
     setProUpsellModal(null); setFreeMonthModal(null); setEmailCaptureModal(null);
