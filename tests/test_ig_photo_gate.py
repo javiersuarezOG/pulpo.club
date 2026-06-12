@@ -195,6 +195,44 @@ def test_order_photo_indices_None_safe():
     assert order_photo_indices(li) == []
 
 
+# ── per-photo verdicts: rejected indices dropped (plan 004) ────────────────
+
+def test_order_photo_indices_drops_rejected_middle_index():
+    """A rejected broker URL in the middle of the carousel is skipped."""
+    li = _good_terreno(
+        photos_count=4,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg",
+                    "http://x/2.jpg", "http://x/3.jpg"],
+        selected_photo_url="http://x/0.jpg",
+        photo_urls_rejected=["http://x/2.jpg"],
+    )
+    # index 2 dropped; hero (0) leads; 1 and 3 follow in source order.
+    assert order_photo_indices(li) == [0, 1, 3]
+
+
+def test_order_photo_indices_never_drops_hero_even_if_rejected():
+    """Hero is picker-approved by definition — never dropped, even if its
+    URL somehow appears in photo_urls_rejected."""
+    li = _good_terreno(
+        photos_count=3,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg"],
+        selected_photo_url="http://x/1.jpg",
+        photo_urls_rejected=["http://x/1.jpg", "http://x/2.jpg"],
+    )
+    # hero (1) survives + leads; 2 dropped; 0 kept.
+    assert order_photo_indices(li) == [1, 0]
+
+
+def test_order_photo_indices_no_rejected_field_is_unchanged():
+    """Pre-004 record (no photo_urls_rejected) → identical to today."""
+    li = _good_terreno(
+        photos_count=3,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg"],
+        selected_photo_url="http://x/2.jpg",
+    )
+    assert order_photo_indices(li) == [2, 0, 1]
+
+
 # ── palette suggestion ─────────────────────────────────────────────────
 
 def test_palette_default_for_normal_terreno():

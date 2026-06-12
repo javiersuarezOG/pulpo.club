@@ -147,9 +147,20 @@ function buildPhotos(raw: any): string[] {
   // upscaled thumb right next to the same image at broker-native
   // resolution — the visible "low+high quality dupe."
   const urls = Array.isArray(raw.photo_urls) ? raw.photo_urls : [];
+  // Per-photo picker verdicts (plan 004): broker URLs the hero picker
+  // downloaded, scored, and rejected (below the cheap-score floor or a
+  // text overlay). Skip them so a rejected flyer/logo/thumbnail never
+  // renders as photo 2..N. Absence (pre-field record) → null → no-op,
+  // identical to today's order. Producer: automation/run.py +
+  // automation/repick_heroes.py (`photo_urls_rejected`).
+  const rejected =
+    Array.isArray(raw.photo_urls_rejected)
+      ? new Set(raw.photo_urls_rejected.filter((u: any) => typeof u === "string"))
+      : null;
   const out: string[] = [];
   for (const u of urls) {
     if (typeof u !== "string") continue;
+    if (rejected && rejected.has(u)) continue;
     if (out.length === 0 || u !== out[out.length - 1]) out.push(u);
   }
   // P2 — surface the hero picker's SELECTED image first so the detail
@@ -162,10 +173,16 @@ function buildPhotos(raw: any): string[] {
     typeof raw.selected_photo_url === "string" && raw.selected_photo_url.length > 0
       ? raw.selected_photo_url
       : null;
+  // Survival guard: the picker APPROVED selected_photo_url by definition,
+  // so it must never be filtered out — even if it was (incorrectly) also
+  // listed as rejected, or if rejection emptied the gallery entirely. Keep
+  // it as photos[0] so the detail page always has at least the hero shot.
   if (selected) {
     const idx = out.indexOf(selected);
     if (idx > 0) {
       out.splice(idx, 1);
+      out.unshift(selected);
+    } else if (idx < 0 && urls.includes(selected)) {
       out.unshift(selected);
     }
   }

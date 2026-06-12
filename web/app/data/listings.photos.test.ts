@@ -56,3 +56,53 @@ describe("adaptListing photo reordering (P2)", () => {
     expect(l.photos).toEqual(["https://b/1.jpg", "https://b/2.jpg"]);
   });
 });
+
+describe("adaptListing photo_urls_rejected filter (plan 004)", () => {
+  it("drops rejected URLs from the gallery", () => {
+    const l = adaptListing({
+      ...base,
+      photo_urls: ["https://b/1.jpg", "https://b/2.jpg", "https://b/3.jpg"],
+      selected_photo_url: "https://b/1.jpg",
+      photo_urls_rejected: ["https://b/2.jpg"],
+    });
+    expect(l.photos).toEqual(["https://b/1.jpg", "https://b/3.jpg"]);
+  });
+
+  it("golden: missing field renders identically to today (no filter)", () => {
+    const raw = {
+      ...base,
+      photo_urls: ["https://b/1.jpg", "https://b/2.jpg", "https://b/3.jpg"],
+      selected_photo_url: "https://b/2.jpg",
+    };
+    const withField = adaptListing({ ...raw, photo_urls_rejected: null });
+    const withoutField = adaptListing(raw);
+    expect(withField.photos).toEqual(withoutField.photos);
+    // And it matches the pre-004 reorder behaviour exactly.
+    expect(withoutField.photos).toEqual([
+      "https://b/2.jpg",
+      "https://b/1.jpg",
+      "https://b/3.jpg",
+    ]);
+  });
+
+  it("selected URL survives even if (incorrectly) listed as rejected", () => {
+    const l = adaptListing({
+      ...base,
+      photo_urls: ["https://b/1.jpg", "https://b/2.jpg"],
+      selected_photo_url: "https://b/1.jpg",
+      photo_urls_rejected: ["https://b/1.jpg", "https://b/2.jpg"],
+    });
+    // Both were marked rejected, but the picker approved the selected one
+    // by definition — keep it so the gallery is never empty.
+    expect(l.photos).toEqual(["https://b/1.jpg"]);
+  });
+
+  it("ignores non-string entries in photo_urls_rejected", () => {
+    const l = adaptListing({
+      ...base,
+      photo_urls: ["https://b/1.jpg", "https://b/2.jpg"],
+      photo_urls_rejected: [null, 42, "https://b/2.jpg"],
+    });
+    expect(l.photos).toEqual(["https://b/1.jpg"]);
+  });
+});

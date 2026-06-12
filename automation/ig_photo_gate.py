@@ -225,7 +225,23 @@ def order_photo_indices(li: dict) -> list[int]:
     if n <= 0:
         return []
     hero = select_hero_index(li)
-    rest = [i for i in range(n) if i != hero]
+    # Per-photo picker verdicts (plan 004): drop indices whose broker URL
+    # the hero picker scored + rejected (below the cheap-score floor or a
+    # text overlay) so a rejected flyer/logo never lands in the carousel.
+    # Producer: automation/run.py + automation/repick_heroes.py
+    # (`photo_urls_rejected`). Absence/None → no drop (pre-field record).
+    # The hero index is approved by definition — never dropped, even if it
+    # somehow appears in the rejected set.
+    urls = li.get("photo_urls") or []
+    rejected = li.get("photo_urls_rejected")
+    rejected_idx: set[int] = set()
+    if isinstance(rejected, list) and rejected:
+        rejected_urls = {u for u in rejected if isinstance(u, str)}
+        rejected_idx = {
+            i for i, u in enumerate(urls)
+            if i < n and isinstance(u, str) and u in rejected_urls and i != hero
+        }
+    rest = [i for i in range(n) if i != hero and i not in rejected_idx]
     ordered = [hero, *rest]
     return ordered[:10]
 
