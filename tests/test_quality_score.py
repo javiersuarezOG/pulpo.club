@@ -13,8 +13,10 @@ Scoring table:
   +1  contact info (email OR phone OR agent_url)
   +1  source institutional (encuentra24 / remax / century21 / citymax / csbr / ...)
   +1  price_per_m2 calculable (price_usd > 0 AND area_m2 > 0)
+  +1  card_eligible (photo phase verdict)
+  +1  hero_eligible (only when card_eligible is also True)
 
-Max 9.
+Max 11.
 """
 from __future__ import annotations
 
@@ -36,6 +38,8 @@ def _li(**fields):
         "description": "x" * 200,  # easily > 30 words once split by re
         "broker_email": "agent@example.test",
         "broker_phone": "555-1234",
+        "card_eligible": True,
+        "hero_eligible": True,
     }
     base.update(fields)
     return base
@@ -117,6 +121,32 @@ def test_price_per_m2_calculable_grants_one():
     assert no_price == full - 1
 
 
+def test_image_fitness_adds_two_when_both_eligible():
+    """card_eligible + hero_eligible grants +2 over the same listing with
+    both image verdicts None (unverified)."""
+    none_li = _li(card_eligible=None, hero_eligible=None)
+    both_li = _li(card_eligible=True, hero_eligible=True)
+    assert compute(both_li) == compute(none_li) + 2
+
+
+def test_hero_eligible_without_card_eligible_confers_nothing():
+    """The nesting matters: hero_eligible only counts when card_eligible is
+    also True. card_eligible None/False zeroes both image points even if
+    hero_eligible is True."""
+    base = compute(_li(card_eligible=None, hero_eligible=None))
+    none_card = compute(_li(card_eligible=None, hero_eligible=True))
+    false_card = compute(_li(card_eligible=False, hero_eligible=True))
+    assert none_card == base
+    assert false_card == base
+
+
+def test_card_eligible_alone_adds_one():
+    """card_eligible True with hero_eligible False/None grants exactly +1."""
+    base = compute(_li(card_eligible=None, hero_eligible=None))
+    card_only = compute(_li(card_eligible=True, hero_eligible=False))
+    assert card_only == base + 1
+
+
 def test_score_is_int_in_range():
     """Score is always an int in [0, MAX_SCORE]."""
     for li in (
@@ -143,6 +173,8 @@ def test_compute_accepts_dataclass_like_object():
         broker_email = "x@example.com"
         broker_phone = None
         agent_url = None
+        card_eligible = True
+        hero_eligible = True
 
     score = compute(FakeListing())
     assert score == MAX_SCORE
