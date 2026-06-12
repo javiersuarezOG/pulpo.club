@@ -58,6 +58,20 @@ _VALID_LLM_STATES = frozenset(KNOWN_REMOVAL_REASONS) | {_ACTIVE}
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+_H1_RE = re.compile(r"<h1[^>]*>(.*?)</h1>", re.IGNORECASE | re.DOTALL)
+_OG_TITLE_RE = re.compile(
+    r'<meta[^>]+(?:property|name)=["\']og:title["\'][^>]*content=["\']([^"\']*)',
+    re.IGNORECASE,
+)
+# Legal boilerplate that collides with _SOLD_RE's reservado/reservada
+# markers: "Todos los derechos reservados" sits in the footer of
+# virtually every Spanish-language broker site (live finding from the
+# 2026-06-12 pre-merge probe dry-run: EVERY bienesraices page matched).
+# Stripped from body text before the ambiguity check below.
+_RIGHTS_RESERVED_RE = re.compile(
+    r"(?:todos\s+los\s+)?derechos\s+reservados|all\s+rights\s+reserved",
+    re.IGNORECASE,
+)
 
 _LLM_SYSTEM_PROMPT = (
     'Classify this real-estate listing page: respond JSON '
@@ -80,6 +94,22 @@ def _path_depth(url: str) -> int:
         return 0
 
 
+def _focused_text(html: str) -> str:
+    """The page surfaces where a listing's OWN status is stamped:
+    ``<title>``, ``og:title``, and ``<h1>`` headings. Related-listings
+    widgets and footers never reach these."""
+    parts: list[str] = []
+    m = _TITLE_RE.search(html)
+    if m:
+        parts.append(_strip_tags(m.group(1)))
+    og = _OG_TITLE_RE.search(html)
+    if og:
+        parts.append(og.group(1))
+    for h1 in _H1_RE.finditer(html):
+        parts.append(_strip_tags(h1.group(1)))
+    return " ".join(" ".join(parts).split())
+
+
 def classify_page(
     status_code: int,
     final_url: str,
@@ -91,13 +121,27 @@ def classify_page(
     a removal).
 
     Ladder (first hit wins):
-      1. 404/410                                → delisted
+      1. 404/410                                  → delisted
       2. redirect landed far from the listing
          (final path is root/near-root while the
-         original had a deeper path)            → delisted
-      3. 200 + sold marker in visible text      → sold
-      4. 200, no marker                         → active
-      5. anything else                          → unknown (LLM-eligible)
+         original had a deeper path)              → delisted
+      3. 200 + sold marker in the page's FOCUSED
+         text (<title>/og:title/<h1>)             → sold
+      4. 200, no marker anywhere in the body
+         (legal "derechos reservados" boilerplate
+         stripped first)                          → active
+      5. 200, marker in the body but NOT in the
+         focused text — could be a "recently
+         sold" related-listings widget            → unknown (LLM decides)
+      6. anything else                            → unknown (LLM-eligible)
+
+    Steps 3-5 exist because of a live pre-merge finding (2026-06-12):
+    scanning the whole body with the shared ``_SOLD_RE`` classified two
+    KNOWN-LIVE listings as sold — goodlife's related-properties widget
+    lists other "*SOLD*" listings, and bienesraices' footer says
+    "Todos los derechos reservados" on every page. The regex stays
+    shared with ingest on purpose (one pattern, one test surface);
+    what differs here is WHICH text it runs against.
     """
     if status_code in (404, 410):
         return "delisted"
@@ -113,9 +157,15 @@ def classify_page(
     ):
         return "delisted"
     if status_code == 200 and html_text:
-        if _SOLD_RE.search(_strip_tags(html_text)):
+        if _SOLD_RE.search(_focused_text(html_text)):
             return "sold"
-        return "active"
+        body = _RIGHTS_RESERVED_RE.sub(" ", _strip_tags(html_text))
+        if not _SOLD_RE.search(body):
+            return "active"
+        # Marker somewhere in the body but not on the page's own
+        # title/headings — ambiguous (related-listings widget vs. an
+        # un-headlined sold ribbon). Hand to the LLM fallback.
+        return "unknown"
     return "unknown"
 
 

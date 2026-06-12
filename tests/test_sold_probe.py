@@ -42,15 +42,46 @@ def test_classify_404_is_delisted():
     assert classify_page(410, _URL, _URL, "") == "delisted"
 
 
-def test_classify_200_with_vendido_is_sold():
-    html = "<html><body><h1>Lote en El Tunco</h1><p>VENDIDO</p></body></html>"
+def test_classify_200_with_vendido_in_title_is_sold():
+    html = "<html><head><title>VENDIDO — Lote en El Tunco</title></head><body><p>500 m2</p></body></html>"
     assert classify_page(200, _URL, _URL, html) == "sold"
 
 
-def test_classify_sold_marker_inside_tag_soup_is_sold():
-    # marker glued to markup — tag stripping must expose it
-    html = "<div class='ribbon'>Under contract</div><p>Great lot</p>"
+def test_classify_200_with_sold_in_h1_is_sold():
+    html = "<html><body><h1>*SOLD* <span>Beautiful Oceanview Condo</span></h1></body></html>"
     assert classify_page(200, _URL, _URL, html) == "sold"
+
+
+def test_classify_200_with_under_contract_in_og_title_is_sold():
+    html = '<meta property="og:title" content="Under Contract - Lote El Sunzal"><p>Great lot</p>'
+    assert classify_page(200, _URL, _URL, html) == "sold"
+
+
+def test_classify_body_only_marker_is_unknown_not_sold():
+    """Live finding 2026-06-12: goodlife's related-properties widget
+    lists OTHER '*SOLD*' listings in the body. A marker that never
+    reaches the page's own title/h1 is ambiguous → unknown (LLM-eligible),
+    never a direct 'sold'."""
+    html = (
+        "<html><head><title>Beautiful Oceanview Condo at Zonset</title></head>"
+        "<body><h1>Beautiful Oceanview Condo at Zonset</h1>"
+        "<div class='related'><a>*SOLD* Lot in El Zonte</a>"
+        "<a>*SOLD OUT* Wave House El Zonte</a></div></body></html>"
+    )
+    assert classify_page(200, _URL, _URL, html) == "unknown"
+
+
+def test_classify_rights_reserved_footer_is_active():
+    """Live finding 2026-06-12: 'Todos los derechos reservados' sits in
+    the footer of virtually every Spanish broker page and matches
+    _SOLD_RE's 'reservado'. Must classify active, not sold/unknown."""
+    html = (
+        "<html><head><title>Terreno en Tamanique</title></head>"
+        "<body><h1>Terreno en Tamanique</h1><p>US$64,900 — 2,100 m2</p>"
+        "<footer>2026 Bienes Raíces, Todos los derechos reservados</footer>"
+        "<footer>© 2026 All rights reserved</footer></body></html>"
+    )
+    assert classify_page(200, _URL, _URL, html) == "active"
 
 
 def test_classify_200_clean_is_active():
@@ -92,7 +123,7 @@ def test_probe_classifies_and_stamps_ledger():
 
     def fake_fetch(url: str, source: str):
         if "sold-1" in url:
-            return 200, url, "<p>vendido</p>"
+            return 200, url, "<title>VENDIDO — Lote en El Tunco</title>"
         if "gone-1" in url:
             return 404, url, ""
         return 200, url, "<p>lote disponible US$50,000</p>"
@@ -188,7 +219,7 @@ def test_llm_consulted_only_on_unknown_and_within_budget():
 
     def fake_fetch(url: str, source: str):
         if "s1" in url:
-            return 200, url, "<p>VENDIDO</p>"
+            return 200, url, "<h1>VENDIDO — Casa El Zonte</h1>"
         return 403, url, "<html>captcha wall</html>"
 
     llm_inputs: list[str] = []
