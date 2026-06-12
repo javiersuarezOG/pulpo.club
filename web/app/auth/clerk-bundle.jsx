@@ -113,11 +113,11 @@ function ClerkUserSync({ setUser, setAuthLoaded }) {
     if (!isLoaded) return;
     if (!isSignedIn || !user) {
       // Email-first Free model: a signed-out visitor may still be a Free
-      // member (email-only, no Clerk account — `provider:"email"`). Clear
+      // member (email-only, no Clerk account — `email_member:true`). Clear
       // only Clerk-derived users; preserve a Free member so Clerk loading
       // doesn't wipe their state. Clerk always WINS when actually signed in
       // (the branch below overwrites), so a Pro never reads as free-member.
-      setUser((prev) => (prev && prev.provider === "email" ? prev : null));
+      setUser((prev) => (prev && prev.email_member ? prev : null));
       return;
     }
     const rawPlan = planFromMetadata(user.publicMetadata);

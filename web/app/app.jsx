@@ -1510,7 +1510,7 @@ function App() {
     setUser((prev) => {
       // Never downgrade a paid/Clerk user to free-member.
       if (prev && isPaid(prev)) return prev;
-      return hydrateUser({ email, provider: "email", plan: "free", joined: Date.now() });
+      return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
     });
   }, []);
 
