@@ -50,6 +50,15 @@ class Listing:
     # the lot-based price_per_m2 metric in the value leg.
     price_per_built_m2: Optional[float] = None
     year_built: Optional[int] = None
+    # Plan 009 — LLM-extracted facts. Producer: the DeepSeek enrichment
+    # call (automation/llm_enrichment_schema.py::_apply_extracted_facts,
+    # only-fill-nulls — a scraper-parsed value always wins). Consumers:
+    # the detail-page Key Facts tiles (web/app/pages.jsx, plan 010) via
+    # the _RANKED_LIST_FIELDS allowlist in automation/pipeline_steps.py.
+    # All tri-state: None = source didn't state it, never inferred.
+    year_renovated: Optional[int] = None   # only from explicit renovation/remodel wording
+    furnished: Optional[bool] = None       # True/False only when source states it
+    has_pool: Optional[bool] = None
     parking_spaces: Optional[int] = None
     floor: Optional[int] = None                  # condo only
     hoa_fee_usd_monthly: Optional[float] = None  # condo only

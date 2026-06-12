@@ -96,6 +96,11 @@ export interface Listing {
     built_area_m2: number | null;
     price_per_built_m2: number | null;
     year_built: number | null;
+    // Plan 009 — LLM-extracted facts (only-fill-nulls; scraper wins).
+    // Tri-state: null = source didn't state it, never inferred.
+    year_renovated: number | null;     // explicit renovation/remodel wording only
+    furnished: boolean | null;
+    has_pool: boolean | null;
     parking_spaces: number | null;
     floor: number | null;              // condo only
     hoa_fee_usd_monthly: number | null;

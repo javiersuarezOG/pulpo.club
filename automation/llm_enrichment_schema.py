@@ -188,6 +188,67 @@ def _present_url_language(li: Any) -> bool:
     return _g(li, "url_language") in _VALID_URL_LANGUAGES
 
 
+# ── extracted_facts (plan 009) ─────────────────────────────────────────
+# Structured house/condo facts the LLM reads out of the source text in
+# the SAME enrichment call (~zero marginal tokens). Merge is only-fill-
+# nulls: a scraper-parsed value always wins over the LLM's extraction.
+# Consumers: the listing attrs below (shipped via the _RANKED_LIST_FIELDS
+# allowlist in automation/pipeline_steps.py) → the detail-page Key Facts
+# tiles (web/app/pages.jsx, plan 010); the raw dict is also persisted to
+# the web/data/llm_enrichment.json sidecar for rebuild + audit.
+
+_FACT_KEYS: frozenset[str] = frozenset({
+    "year_built", "year_renovated", "bedrooms", "bathrooms",
+    "built_area_m2", "parking_spaces", "furnished", "has_pool",
+})
+
+
+def _fact_in_bounds(key: str, v: Any) -> bool:
+    """Anti-hallucination bounds. A value outside its bound invalidates
+    ONLY that key (coerced to None at apply time), never the whole
+    response — rejecting the response would re-spend the API call over
+    one bad number."""
+    if v is None:
+        return True
+    if key in ("furnished", "has_pool"):
+        return isinstance(v, bool)
+    if isinstance(v, bool):
+        return False   # bool is an int subclass; never valid for numerics
+    if key in ("year_built", "year_renovated"):
+        return isinstance(v, int) and 1900 <= v <= 2100
+    if key == "bedrooms":
+        return isinstance(v, int) and 0 <= v <= 20
+    if key == "parking_spaces":
+        return isinstance(v, int) and 0 <= v <= 50
+    if key == "bathrooms":
+        return isinstance(v, (int, float)) and 0 <= v <= 20
+    if key == "built_area_m2":
+        return isinstance(v, (int, float)) and 10 <= v <= 5000
+    return False
+
+
+def _present_extracted_facts(li: Any) -> bool:
+    return isinstance(_g(li, "extracted_facts"), dict)
+
+
+def _valid_extracted_facts(v: Any) -> bool:
+    """Accept a dict whose keys ⊆ _FACT_KEYS. Out-of-bounds VALUES are
+    allowed here (sanitized at apply) — validity is about shape. Missing
+    keys are tolerated as null; an empty dict is valid (this is what old
+    pre-plan-009 sidecar entries hydrate with — see _hydrate_from_sidecar)."""
+    return isinstance(v, dict) and set(v.keys()) <= _FACT_KEYS
+
+
+def _apply_extracted_facts(li: Any, v: Any) -> None:
+    """Sanitize + only-fill-nulls merge: scraper value always wins."""
+    clean = {k: (val if _fact_in_bounds(k, val) else None)
+             for k, val in (v or {}).items() if k in _FACT_KEYS}
+    _set(li, "extracted_facts", clean)   # raw store: sidecar rebuild + audit
+    for k, val in clean.items():
+        if val is not None and _g(li, k) is None:
+            _set(li, k, val)
+
+
 def _apply_latlong(li: Any, v: Any) -> None:
     _set(li, "lat",                   round(float(v["lat"]), 6))
     _set(li, "lng",                   round(float(v["lng"]), 6))
@@ -268,6 +329,19 @@ DEFAULT_SCHEMA = EnrichmentSchema(
             validate     = _valid_usps,
             apply        = _apply_usps,
             skip_reason  = "already_has_reasons_to_buy",
+        ),
+        # extracted_facts (plan 009): structured house/condo facts read
+        # from the source text. NOT part of eligibility-by-presence in
+        # practice — it sits after title/description/usps, and any listing
+        # carrying it also carries those. The merge in
+        # _apply_extracted_facts only fills nulls (scraper wins).
+        EnrichmentField(
+            json_key     = "extracted_facts",
+            target_attrs = ("extracted_facts",),
+            is_present   = _present_extracted_facts,
+            validate     = _valid_extracted_facts,
+            apply        = _apply_extracted_facts,
+            skip_reason  = "already_has_extracted_facts",
         ),
         EnrichmentField(
             json_key     = "latlong",
