@@ -1,0 +1,77 @@
+name: pulpo prod-photo canary
+
+# Plan 013 — every 6h, HEAD-probe the top-N ranked listings'
+# /photos/<id>.jpg against production. Catches a `web/photos` 404
+# regression (the 2026-06-02 → 08 wipe class, peak image.error 89%,
+# all is_local=true) BETWEEN nightlies. The in-pipeline photo-contract
+# canary only sees local files at commit time; this probes the
+# deployed Vercel build, which is the only proof of what users hit.
+#
+# Why 6h: the wipe was invisible for ~6 days. 6h ticks bound the
+# time-to-discovery to ~3h average.
+#
+# Read-only: unlike pulpo-url-drift.yml (which commits refreshed
+# baselines), this canary writes nothing — it only probes and pages.
+# Hence `permissions: contents: read` and no commit step.
+
+on:
+  schedule:
+    # Every 6 hours, offset 37 min off the top of the hour to avoid
+    # both the global cron stampede at :00 and the url-drift slot (:17).
+    - cron: "37 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pulpo-photo-canary
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Probe production photos
+        # Top-200 = the view-weighted head where a 404 hurts most.
+        # continue-on-error so a non-zero exit (a 404 was found) routes
+        # to the Slack step below instead of crashing the job here.
+        id: probe
+        run: |
+          python3 scripts/check_production_photos.py --base https://pulpo.club --top 200
+        continue-on-error: true
+
+      - name: Slack on prod-photo 404 detected
+        # Fires whenever the probe found a non-2xx photo. Per CLAUDE.md
+        # post-2026-06-02 silent-freeze rule: every alertable surface
+        # gets a Slack page. Skips gracefully when the secret is unset
+        # (local/forked runs) so the absence of Slack never masks the
+        # canary signal.
+        if: steps.probe.outcome == 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo prod-photo canary FAILED* — at least one top-200 listing photo is 404ing in production (the is_local=true web/photos regression class). <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"
+
+      - name: Mark run red on failure
+        # Re-surface the probe's non-zero exit as the run's own status so
+        # the GitHub Actions system-of-record shows red, mirroring how
+        # url-drift surfaces failure.
+        if: steps.probe.outcome == 'failure'
+        run: exit 1
