@@ -34,6 +34,9 @@
       "built_area_m2",
       "price_per_built_m2",
       "year_built",
+      "year_renovated",
+      "furnished",
+      "has_pool",
       "parking_spaces",
       "floor",
       "hoa_fee_usd_monthly",
@@ -286,6 +289,26 @@
         ],
         "minimum": 1800,
         "maximum": 2100
+      },
+      "year_renovated": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1900,
+        "maximum": 2100
+      },
+      "furnished": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "has_pool": {
+        "type": [
+          "boolean",
+          "null"
+        ]
       },
       "parking_spaces": {
         "type": [

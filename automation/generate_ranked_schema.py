@@ -75,6 +75,9 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
     "parking_spaces":       {"minimum": 0},
     "floor":                {"minimum": 0},
     "year_built":           {"minimum": 1800, "maximum": 2100},
+    # Plan 009 — LLM-extracted; tighter floor than year_built because a
+    # renovation predating 1900 is an extraction error, not history.
+    "year_renovated":       {"minimum": 1900, "maximum": 2100},
     "rank":                 {"minimum": 1},
     "price_usd":            {"minimum": 0},
     "price_per_m2":         {"minimum": 0},
