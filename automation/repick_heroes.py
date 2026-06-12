@@ -243,6 +243,20 @@ def _repick_one_listing(
     # P2 — persist the picker's winning broker URL so the FE reorders the
     # detail gallery to match the card. Consumer: listings.ts::buildPhotos.
     listing["selected_photo_url"] = winning_url
+    # Per-photo verdicts: every scored candidate the picker rejected —
+    # below the cheap-score floor (picker_excluded) or carrying a
+    # Tesseract text overlay. `candidates` dicts don't carry
+    # has_marketing_overlay (resolved only for the winner), so the verdict
+    # set is limited to those two signals. Winner never appears here.
+    # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
+    # order_photo_indices. None = nothing rejected.
+    rejected = [
+        c["url"] for c in candidates
+        if c.get("url") and c["url"] != winning_url
+        and (c.get("picker_excluded")
+             or c.get("has_text_overlay") is True)
+    ]
+    listing["photo_urls_rejected"] = rejected or None
     listing["hero_photo_quality_score"] = winning_score
     listing["has_text_overlay"] = winning_has_text
     listing["has_marketing_overlay"] = winning_has_marketing

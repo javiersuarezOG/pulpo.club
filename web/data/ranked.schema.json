@@ -62,6 +62,7 @@
       "photo_urls",
       "hero_photo_path",
       "selected_photo_url",
+      "photo_urls_rejected",
       "hero_photo_quality_score",
       "has_text_overlay",
       "has_marketing_overlay",
@@ -413,6 +414,15 @@
           "string",
           "null"
         ]
+      },
+      "photo_urls_rejected": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        }
       },
       "hero_photo_quality_score": {
         "type": [

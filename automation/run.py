@@ -871,6 +871,23 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # same image first in the detail gallery (P2). Consumer:
             # web/app/data/listings.ts::buildPhotos.
             li.selected_photo_url = winning_url
+            # Per-photo verdicts: every SCORED candidate (the first `cap`
+            # photo_urls) that the picker rejected — below the cheap-score
+            # floor (picker_excluded) or carrying a Tesseract text overlay.
+            # `scored` dicts don't carry has_marketing_overlay (that's only
+            # resolved for the winner in _pick_winner_from_scored), so the
+            # verdict set is limited to those two signals. URLs beyond the
+            # cap were never scored and stay out of the list (absence ≠
+            # rejected). The winner is never in this set by construction.
+            # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
+            # order_photo_indices.
+            rejected = [
+                c["url"] for c in scored
+                if c.get("url") and c["url"] != winning_url
+                and (c.get("picker_excluded")
+                     or c.get("has_text_overlay") is True)
+            ]
+            li.photo_urls_rejected = rejected or None
             if li.card_eligible:
                 card_eligible_count += 1
             if li.hero_eligible:

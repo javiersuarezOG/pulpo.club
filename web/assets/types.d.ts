@@ -132,6 +132,7 @@ export interface Listing {
     photo_urls: string[];               // [0] is hero
     hero_photo_path: string | null;     // local /photos/<source>_<id>.jpg
     selected_photo_url: string | null;  // picker's winning broker URL; FE reorders photos[0] to match the card
+    photo_urls_rejected: string[] | null;  // broker URLs the picker scored + rejected; consumers skip them in galleries. null = none/no-verdict
     /** PR-7.6 — heuristic quality score (0..100) for hero_photo_path. null when not scored. */
     hero_photo_quality_score: number | null;
     /** OCR-based text-overlay flag for hero photos. True = brochure-style image

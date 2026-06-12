@@ -169,7 +169,11 @@ def _field_to_schema(name: str, annotation: Any) -> dict:
             # validation_warnings: list[?] which is empty in practice
         else:
             item_schema = {"type": item_json_t}
-        return {"type": "array", "items": item_schema}
+        # Optional[list[X]] (default None) serializes to JSON null, so the
+        # array type must permit null. Non-optional lists use a
+        # default_factory and never emit null, so they stay plain "array".
+        list_type = ["array", "null"] if is_opt else "array"
+        return {"type": list_type, "items": item_schema}
 
     primitive = _python_type_to_json_type(inner)
     if primitive is None:

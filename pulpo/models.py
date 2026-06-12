@@ -97,6 +97,17 @@ class Listing:
     # Consumer: web/app/data/listings.ts::buildPhotos. None = not picked
     # (offline, no candidates, or pre-P2 record).
     selected_photo_url: Optional[str] = None
+    # Per-photo picker verdicts: broker URLs the hero picker downloaded,
+    # scored, and REJECTED (picker_excluded below the cheap-score floor,
+    # or a Tesseract text overlay). Consumers filter these out of
+    # user-facing galleries so a rejected flyer/logo/thumbnail never
+    # renders as photo 2..N. Consumers: web/app/data/listings.ts::
+    # buildPhotos + automation/ig_photo_gate.py::order_photo_indices.
+    # Only URLs the picker actually scored can appear here (the picker
+    # caps at PULPO_PHOTO_MAX_CANDIDATES, default 5); URLs beyond the cap
+    # are never scored and stay absent. Absence means "no verdict", NOT
+    # "approved". None = nothing rejected (or offline / pre-field record).
+    photo_urls_rejected: Optional[list[str]] = None
     # PR-7.6 — heuristic quality score (0..100) for hero_photo_path.
     # None = not yet scored (offline mode, OpenCV unavailable, or
     # download failed). Featured-listing picker filters on this.
