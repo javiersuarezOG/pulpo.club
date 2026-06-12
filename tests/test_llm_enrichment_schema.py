@@ -370,9 +370,10 @@ def test_default_schema_uses_deepseek_model_and_env():
     assert DEFAULT_SCHEMA.max_tokens >= 1500
 
 
-def test_default_schema_version_is_v3():
-    """Schema v3 = bilingual + url_language. Bumping invalidates older sidecars."""
-    assert DEFAULT_SCHEMA.schema_version == 3
+def test_default_schema_version_is_v4():
+    """Schema v4 = prompt v4 short factual descriptions (≤700 chars) +
+    fact-anchored usps. Bumping invalidates older sidecars."""
+    assert DEFAULT_SCHEMA.schema_version == 4
 
 
 # ── schema v3: bilingual {en, es} validators ──────────────────────────
@@ -429,6 +430,26 @@ def test_validate_rejects_usps_with_partial_translation():
     ok, reason = validate_response(r)
     assert ok is False
     assert reason == "invalid:usps"
+
+
+# ── schema v4: description length cap (plan 008) ──────────────────────
+
+def test_validate_rejects_701_char_description():
+    """v4 caps each language at 700 chars (prompt asks for ≤60 words;
+    700 leaves ES-rendering headroom). 701 fails."""
+    r = _ok_response()
+    r["description"] = {"en": "x" * 701, "es": "Descripción corta."}
+    ok, reason = validate_response(r)
+    assert ok is False
+    assert reason == "invalid:description"
+
+
+def test_validate_accepts_400_char_description():
+    r = _ok_response()
+    r["description"] = {"en": "y" * 400, "es": "z" * 400}
+    ok, reason = validate_response(r)
+    assert ok is True
+    assert reason is None
 
 
 # ── schema v3: url_language ───────────────────────────────────────────

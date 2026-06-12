@@ -21,8 +21,16 @@ from __future__ import annotations
 from pulpo.countries import CountryManifest, active as _active_country
 
 
-_SYSTEM_PROMPT_BODY = """You are a real estate marketing expert specializing in {country_name_en}.
-Analyze the land description provided in the next message and generate the requested derived fields.
+# Bump whenever the *content contract* of the prompts changes (tone, format,
+# fields requested). The sidecar stamps this per entry; the retroactive
+# backfill (scripts/retrofit_descriptions.py, plan 011) targets entries with
+# a lower/missing prompt_version. schema_version (llm_enrichment_schema.py)
+# tracks the JSON *shape*; this tracks the *writing instructions*.
+PROMPT_VERSION = 4
+
+
+_SYSTEM_PROMPT_BODY = """You are a senior property analyst writing listing summaries for buyers in {country_name_en}. You write like a knowledgeable local agent briefing a serious buyer: concise, factual, specific.
+Analyze the property listing provided in the next message and generate the requested derived fields.
 Respond ONLY with valid JSON and no extra text.
 The source description may be in Spanish, English, or mixed.
 
@@ -47,8 +55,17 @@ Return a JSON object with these fields:
 
 Field rules:
 - "title": attractive marketing title in BOTH languages, each max 10 words.
-- "description": optimized commercial description in BOTH languages, each max 150 words. Rewrite the source in fresh marketing language — DO NOT echo or copy the source text verbatim, even when the source is short. The output must read as new copy a broker would publish, not as a paraphrase that reuses the source's sentence structure.
-- "usps": list of 3 to 5 short unique selling points; each USP is a {{en, es}} pair.
+- "description": a factual summary in BOTH languages, each MAX 60 words and MAX 3 sentences, in this fixed order:
+  1. WHAT + WHERE: property type, size, and location in one plain sentence.
+  2. CONCRETE ATTRIBUTES: only facts present in the source — for LAND: terrain, road access, utilities, zoning/permits, title status; for HOUSE/CONDO: built area, bedrooms/bathrooms, year built, renovations, parking, amenities.
+  3. (optional) ONE differentiator that is verifiable from the source (e.g. beachfront row, below-zone price, turnkey rental history).
+  STYLE RULES (hard requirements):
+  - No hype adjectives or filler: never use "discover", "dream", "paradise", "oasis", "stunning", "breathtaking", "exceptional opportunity", "hidden gem", "perfect canvas", "tranquil", "vibrant", "unparalleled", "prime location", "don't miss" — nor their Spanish equivalents ("descubra", "soñado", "paraíso", "impresionante", "oportunidad excepcional", "joya", "lienzo perfecto", "no pierda", "incomparable").
+  - No exclamation marks, no rhetorical questions, no direct sales appeals ("schedule a visit", "contact us"), no second-person aspiration ("your vision", "your dream").
+  - Start with the property, not with an imperative or a feeling. Good: "Flat 850 m² residential lot in Barrio San Antonio, Santa Ana." Bad: "Discover this exceptional opportunity...".
+  - Do not state facts absent from the source. If the source is thin, write a shorter description — never pad.
+- When PROPERTY FACTS are provided in the user message, treat them as authoritative; weave the relevant ones in and do not contradict them.
+- "usps": 3 to 5 reasons to buy; each is an {{en, es}} pair, MAX 8 words per language, and each must be a CONCRETE, verifiable fact from the source or the PROPERTY FACTS (e.g. "Beachfront first row", "Renovated 2023, new roof", "12% below zone median $/m²"). Never generic aspiration ("perfect for your dream home").
 - "url_language":
   - "en" if source text is mostly English;
   - "es" if source text is mostly Spanish;
@@ -186,11 +203,11 @@ def system_prompt_for(country: CountryManifest) -> str:
 SYSTEM_PROMPT: str = system_prompt_for(_active_country())
 
 
-USER_PROMPT_TEMPLATE = """LAND DESCRIPTION:
+USER_PROMPT_TEMPLATE = """PROPERTY LISTING:
 \"\"\"
 {original_description}
 \"\"\"
-{location_block}
+{location_block}{facts_block}
 Return the JSON object now."""
 
 
@@ -203,6 +220,16 @@ LOCATION HINTS (authoritative for the latlong field):
 """
 
 
+# Rendered into {facts_block} only when at least one structured property
+# fact is provided; collapses to empty otherwise (same pattern as the
+# location-hints block). The system prompt tells the model to treat
+# these as authoritative for the description/usps content.
+PROPERTY_FACTS_TEMPLATE = """
+PROPERTY FACTS (parsed from the listing — authoritative):
+{lines}
+"""
+
+
 def render_user_prompt(
     original_description: str | None,
     *,
@@ -210,6 +237,15 @@ def render_user_prompt(
     municipality:  str | None = None,
     department:    str | None = None,
     country:       str | None = None,
+    property_type:  str | None = None,
+    area_m2:        float | None = None,
+    built_area_m2:  float | None = None,
+    bedrooms:       int | None = None,
+    bathrooms:      float | None = None,
+    year_built:     int | None = None,
+    parking_spaces: int | None = None,
+    floor:          int | None = None,
+    price_usd:      float | None = None,
 ) -> str:
     """Render the per-listing user prompt.
 
@@ -223,6 +259,11 @@ def render_user_prompt(
     rendered as a separate "LOCATION HINTS" block the model is told to
     treat as authoritative for latlong. Each hint is included only when
     truthy, so callers can pass whatever the listing happens to carry.
+
+    Property facts (prompt v4) are keyword-only and optional too —
+    existing callers (scripts/retrofit_geocoding.py) keep working
+    unchanged. Truthy facts render into a "PROPERTY FACTS" block the
+    model treats as authoritative for description/usps content.
     """
     parts: list[str] = []
     if location_text and location_text.strip():
@@ -237,7 +278,32 @@ def render_user_prompt(
     location_block = (
         LOCATION_HINTS_TEMPLATE.format(lines="\n".join(parts)) if parts else ""
     )
+
+    fact_parts: list[str] = []
+    for label, value in (
+        ("property_type",  property_type),
+        ("area_m2",        area_m2),
+        ("built_area_m2",  built_area_m2),
+        ("bedrooms",       bedrooms),
+        ("bathrooms",      bathrooms),
+        ("year_built",     year_built),
+        ("parking_spaces", parking_spaces),
+        ("floor",          floor),
+        ("price_usd",      price_usd),
+    ):
+        if isinstance(value, str):
+            if value.strip():
+                fact_parts.append(f"- {label}: {value.strip()}")
+        elif value:
+            fact_parts.append(f"- {label}: {value}")
+
+    facts_block = (
+        PROPERTY_FACTS_TEMPLATE.format(lines="\n".join(fact_parts))
+        if fact_parts else ""
+    )
+
     return USER_PROMPT_TEMPLATE.format(
         original_description=original_description or "",
         location_block=location_block,
+        facts_block=facts_block,
     )
