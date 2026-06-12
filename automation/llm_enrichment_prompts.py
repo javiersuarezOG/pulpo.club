@@ -21,6 +21,14 @@ from __future__ import annotations
 from pulpo.countries import CountryManifest, active as _active_country
 
 
+# Bump whenever the *content contract* of the prompts changes (tone, format,
+# fields requested). The sidecar stamps this per entry; the retroactive
+# backfill (scripts/retrofit_descriptions.py, plan 011) targets entries with
+# a lower/missing prompt_version. schema_version (llm_enrichment_schema.py)
+# tracks the JSON *shape*; this tracks the *writing instructions*.
+PROMPT_VERSION = 4
+
+
 _SYSTEM_PROMPT_BODY = """You are a real estate marketing expert specializing in {country_name_en}.
 Analyze the land description provided in the next message and generate the requested derived fields.
 Respond ONLY with valid JSON and no extra text.

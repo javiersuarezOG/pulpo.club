@@ -64,6 +64,7 @@ from automation.llm_enrichment_schema import (   # type: ignore  # noqa: E402
     validate_response,
 )
 from automation.llm_enrichment_prompts import (   # type: ignore  # noqa: E402
+    PROMPT_VERSION,
     SYSTEM_PROMPT,
     render_user_prompt,
 )
@@ -234,6 +235,10 @@ def _build_sidecar_entry(li: Any, schema: EnrichmentSchema,
         "ts":                          ts,
         "model":                       model,
         "schema_version":              schema.schema_version,
+        # Plan 008 — writing-instructions version. Plan 011's retroactive
+        # backfill (scripts/retrofit_descriptions.py) targets entries with
+        # prompt_version < PROMPT_VERSION or missing.
+        "prompt_version":              PROMPT_VERSION,
         "title_canonical":             _g(li, "title_canonical"),
         "short_description_canonical": _g(li, "short_description_canonical"),
         "reasons_to_buy":              list(_g(li, "reasons_to_buy") or []),
