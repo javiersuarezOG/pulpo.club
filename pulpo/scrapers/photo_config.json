@@ -32,7 +32,11 @@
     },
     "encuentra24": {
       "full_res": {
-        "strategy": "noop"
+        "strategy": "url_replace",
+        "rules": [
+          { "match": "/t_or_fh_m/", "replace": "/t_full/" }
+        ],
+        "validate_via_head": true
       },
       "min_source_long_side_px": 1080,
       "deprioritize_weight": 1.0
