@@ -35,6 +35,10 @@ jobs:
         env:
           PULPO_API_BASE: ${{ secrets.PULPO_PREVIEW_URL }}
           PULPO_INTERNAL_API_KEY: ${{ secrets.PULPO_INTERNAL_API_KEY }}
+          # plan 017: strict (hard-fail + Slack page) only on the scheduled
+          # monitor; pull_request/push warn-not-block on the thin hires-4:5
+          # data floor so one bad nightly can't red the required check repo-wide.
+          SOCIAL_HIRES_FLOOR_STRICT: ${{ github.event_name == 'schedule' }}
         # vite.config.js sets root: web/, so vitest discovers tests under
         # web/. Mirror that path here.
         run: npx vitest run web/tests/contracts/
