@@ -23,8 +23,6 @@ import { track } from "../telemetry/hook";
 import { getCategoryImage } from "../assets/categories/index.js";
 import { Photo, HeartButton, formatPrice, landTypeLabel, formatDaysListed, Icon, RankTrophy, CardSignalChip } from "../components.jsx";
 import { useListings } from "../data/use-listings.tsx";
-import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "../lib/cta-routing";
-import { readFeatureFlag } from "../lib/feature-flag";
 
 // Per-shelf listing limits (hero_v4 on). Desktop renders all of these
 // in a wrapping grid; mobile keeps a horizontal scroll-snap rail.
@@ -149,7 +147,7 @@ function badgeForListing(_listing, _shelfKey) {
 // Real listings get a `<Photo>` + heart + computed badge + real
 // price/meta. Hardcoded cards keep their static layout.
 
-function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank, locale }) {
+function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank, locale, onNavigate }) {
   const isReal = !!listing;
   const id = isReal ? listing.id : (card?.id || `placeholder-${shelfKey}-${position}`);
 
@@ -161,29 +159,14 @@ function ShelfCard({ listing, card, position, shelfKey, app, heroV4, eager, rank
         listing_id: id,
       });
     } catch { /* ignore */ }
-
-    const flagEnabled = readFeatureFlag("cta_routing_v2", true);
-    if (!flagEnabled) {
-      if (app && typeof app.openSignup === "function") {
-        app.openSignup({ mode: "signup" });
-      }
-      return;
-    }
-    const branch = routeCtaForState("shelf_card", app?.user);
-    trackCtaRouted("shelf_card", app?.user, branch, true);
-    if (branch === "passthrough") {
-      // Wave-5 polish: real listings now have a destination; hardcoded
-      // cards still no-op (no listing to open).
-      if (isReal && app && typeof app.openListing === "function") {
-        app.openListing(listing.id);
-      }
-      return;
-    }
-    // Post-#262: anon + free shelf clicks resolve to free_month_modal
-    // (conversion-modal funnel). The dispatcher ignores listing context
-    // for that branch — funnel attribution uses `trigger: "shelf_card"`.
-    void dispatchCentralBranch(branch, app, { trigger: "shelf_card" });
-  }, [shelfKey, position, id, isReal, listing, app]);
+    // Home shelves are NAVIGATION, not gated detail. A card click takes you
+    // to the filtered Discover view (free + anonymous included) — same
+    // destination as the shelf's "View all →". The detail-panel access gate
+    // lives on Discover (openListing), not on the home shelf, so a Free
+    // user can browse the catalogue and only hits the gate when they try to
+    // open a listing's panel.
+    if (typeof onNavigate === "function") onNavigate();
+  }, [shelfKey, position, id, onNavigate]);
 
   // Real-listing rendering path
   if (isReal && heroV4) {
@@ -448,6 +431,7 @@ export function HomeShelf({
                   heroV4={heroV4}
                   eager={i < 4}
                   locale={locale}
+                  onNavigate={onViewAllClick}
                 />
               ) : (
                 <ShelfCard
@@ -457,6 +441,7 @@ export function HomeShelf({
                   app={app}
                   heroV4={heroV4}
                   locale={locale}
+                  onNavigate={onViewAllClick}
                 />
               )}
             </div>
