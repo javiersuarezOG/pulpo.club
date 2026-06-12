@@ -1,15 +1,15 @@
 {
-  "computed_at": "2026-06-08T09:28:12.187533+00:00",
+  "computed_at": "2026-06-12T14:38:31.420295+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 1,
+        "count": 0,
         "renders_on_homepage": false
       },
       "beach_homes": {
-        "count": 0,
+        "count": 3,
         "renders_on_homepage": false
       },
       "beach_land": {
@@ -54,14 +54,14 @@
       "citymax": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "citymax_sc": {
         "coverage_pct_vs_discovered": 0.0,
         "kept": 0,
-        "status": "skipped",
+        "status": "green",
         "target_discovered": null,
         "target_prd": 300
       },
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.6,
-        "kept": 17,
+        "coverage_pct_vs_discovered": 1.1,
+        "kept": 33,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -152,7 +152,7 @@
       "vivolatam": {
         "coverage_pct_vs_discovered": 0.0,
         "kept": 0,
-        "status": "skipped",
+        "status": "green",
         "target_discovered": null,
         "target_prd": 400
       },
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 17,
-    "total_visible_listings": 2
+    "total_in_dataset": 33,
+    "total_visible_listings": 5
   },
-  "min_real_listings": 10
+  "min_real_listings": 4
 }
