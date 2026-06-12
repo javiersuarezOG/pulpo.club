@@ -2319,30 +2319,13 @@ def main() -> int:
     except Exception as _e:  # noqa: BLE001
         print(f"[carry_forward] failed (non-fatal): {_e!r}")
 
-    # PRD P1-2 — enforce the card-photo contract: every listing whose
-    # `hero_photo_path` is set must point at a present root file. The
-    # audit found 884/959 stale references after the prune sweep
-    # archived the old root files. Listings whose root path is missing
-    # have `hero_photo_path` nulled (UI's Photo component falls back
-    # gracefully). Stats land in web/data/photo_contract.json + an
-    # append-only audit log; the nightly Slack alert (caller's call)
-    # can hard-fail on threshold violations.
-    try:
-        from pulpo.photo_contract import enforce_photo_contract
-        photo_contract_stats = enforce_photo_contract(
-            ranked,
-            REPO / "web" / "photos",
-            data_dir=REPO / "web" / "data",
-        )
-        print(f"[photo_contract] ranked={photo_contract_stats.ranked_total} "
-              f"with_path={photo_contract_stats.with_local_path} "
-              f"exists={photo_contract_stats.local_path_exists} "
-              f"missing={photo_contract_stats.local_path_missing} "
-              f"nulled={photo_contract_stats.nulled}")
-        for violation in photo_contract_stats.fails_threshold():
-            print(f"[photo_contract] WARNING: {violation}")
-    except Exception as _e:  # noqa: BLE001
-        print(f"[photo_contract] failed (non-fatal): {_e!r}")
+    # NOTE: photo-contract enforcement (enforce_photo_contract) is run
+    # AFTER the agricultural-purge below — it MUST describe the final
+    # shipped set, or photo_contract.json's ranked_total drifts from
+    # len(ranked.json) and the photo-contract truth canary hard-fails
+    # the commit (the residual leg of the 2026-06-08→ data freeze: the
+    # purge dropped ~197 agri-land listings after the contract was
+    # written against the pre-purge set, 2129 vs 1932).
 
     # IA-axis derives — master_category × subcategory + discovery_tags
     # + star_rating. Runs AFTER rank() so star_rating + the top_rated
@@ -2398,6 +2381,32 @@ def main() -> int:
     if agri_dropped:
         print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
               f"(built structures retained) — {len(ranked)} remain")
+
+    # PRD P1-2 — enforce the card-photo contract: every listing whose
+    # `hero_photo_path` is set must point at a present root file; a
+    # missing root path gets nulled (UI Photo component falls back
+    # gracefully). Stats land in web/data/photo_contract.json + an
+    # append-only audit log. Runs HERE — after EVERY content filter
+    # (incl. the agri-purge above) — so photo_contract.json.ranked_total
+    # equals len(ranked.json) and the photo-contract truth canary can
+    # trust the sidecar. Running it before the purge drifted the count
+    # (2129 sidecar vs 1932 shipped) and hard-failed the commit.
+    try:
+        from pulpo.photo_contract import enforce_photo_contract
+        photo_contract_stats = enforce_photo_contract(
+            ranked,
+            REPO / "web" / "photos",
+            data_dir=REPO / "web" / "data",
+        )
+        print(f"[photo_contract] ranked={photo_contract_stats.ranked_total} "
+              f"with_path={photo_contract_stats.with_local_path} "
+              f"exists={photo_contract_stats.local_path_exists} "
+              f"missing={photo_contract_stats.local_path_missing} "
+              f"nulled={photo_contract_stats.nulled}")
+        for violation in photo_contract_stats.fails_threshold():
+            print(f"[photo_contract] WARNING: {violation}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[photo_contract] failed (non-fatal): {_e!r}")
 
     # PRD "Inventory Expansion & Listing Quality Filter" — emit per-shelf
     # eligibility audit + KPI dashboard. Read-only telemetry; does not
