@@ -45,6 +45,7 @@ import { ContactPage } from "./pages/legal/ContactPage.jsx";
 const AdminPage = React.lazy(() =>
   import("./admin/AdminShell.jsx").then((m) => ({ default: m.AdminPage })),
 );
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from "./lib/safe-storage";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
@@ -269,7 +270,7 @@ function App() {
   // scroll) from a real cross-section pop (scroll to top).
   const routeRef = useRef(_initialParsed.route);
   const [detailViewCount, setDetailViewCount] = useState(() => {
-    return +localStorage.getItem("pulpo-detail-views") || 0;
+    return +safeLocalGet("pulpo-detail-views") || 0;
   });
 
   // Dev panel gate: visible only when (a) the build is non-production AND
@@ -739,14 +740,14 @@ function App() {
   }, [clerkActions]);
 
   useEffect(() => {
-    if (user) localStorage.setItem("pulpo-user", JSON.stringify(user));
-    else localStorage.removeItem("pulpo-user");
+    if (user) safeLocalSet("pulpo-user", JSON.stringify(user));
+    else safeLocalRemove("pulpo-user");
   }, [user]);
   useEffect(() => {
-    localStorage.setItem("pulpo-saved", JSON.stringify([...savedIds]));
+    safeLocalSet("pulpo-saved", JSON.stringify([...savedIds]));
   }, [savedIds]);
   useEffect(() => {
-    localStorage.setItem("pulpo-detail-views", String(detailViewCount));
+    safeLocalSet("pulpo-detail-views", String(detailViewCount));
   }, [detailViewCount]);
 
   useEffect(() => {
