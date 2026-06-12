@@ -1321,6 +1321,13 @@ function App() {
       : undefined;
     const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
+      // Email-first: a route gate (Favorites / Account) for a non-member
+      // routes through the unified access surface (join free / go pro /
+      // sign in), same as every other gate.
+      if (accessV2) {
+        requestAccess({ reason: route, member: isFreeMember(user) });
+        return;
+      }
       // Two-state model: /saved (Favorites) is a Pro feature. A non-paid
       // visitor clicking it should be sold Pro, not shown a "welcome back"
       // login — they're a prospect, not a returning member. /account keeps

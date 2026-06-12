@@ -39,9 +39,17 @@ export function AccessModal({ app, locale: lc, cfg, onClose }) {
   };
 
   // Contextual headline: a Free member reaching for Pro sees the upsell
-  // framing; everyone else sees the "your top 3 are ready" framing.
-  const titleKey = surface === "gate_member" ? "access.modal.gopro.title" : "access.modal.top3.title";
-  const leadKey = surface === "gate_member" ? "access.modal.gopro.lead" : "access.modal.top3.lead";
+  // framing; an account / sign-in entry sees a neutral welcome; everyone
+  // else (a listing/save gate) sees the "your top 3 are ready" framing.
+  let titleKey = "access.modal.top3.title";
+  let leadKey = "access.modal.top3.lead";
+  if (surface === "gate_member") {
+    titleKey = "access.modal.gopro.title";
+    leadKey = "access.modal.gopro.lead";
+  } else if (reason === "account_entry") {
+    titleKey = "access.modal.welcome.title";
+    leadKey = "access.modal.welcome.lead";
+  }
 
   return (
     <div className="modal-backdrop" role="presentation" onClick={() => dismiss("backdrop")}>

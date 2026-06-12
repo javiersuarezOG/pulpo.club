@@ -1750,6 +1750,8 @@ export const UI_STRINGS = {
   "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
   "access.modal.top3.title":           { en: "We've picked this week's top 3 for you.", es: "Elegimos el top 3 de esta semana para ti." },
   "access.modal.top3.lead":            { en: "We read every new beach & lake listing in El Salvador and keep the three best. They're yours to open in full — free.", es: "Leemos cada propiedad nueva de playa y lago en El Salvador y nos quedamos con las tres mejores. Son tuyas para abrir completas — gratis." },
+  "access.modal.welcome.title":        { en: "Welcome to Pulpo.",             es: "Bienvenido a Pulpo." },
+  "access.modal.welcome.lead":         { en: "Start free with this week's top 3, go Pro for everything, or sign in if you're already one of us.", es: "Empieza gratis con el top 3 de esta semana, hazte Pro para todo, o inicia sesión si ya eres de los nuestros." },
   "access.modal.gopro.title":          { en: "Want the whole coast?",         es: "¿Quieres toda la costa?" },
   "access.modal.gopro.lead":           { en: "You've got your free top 3. Go Pro to open every listing and get all 10 of our weekly picks.", es: "Ya tienes tu top 3 gratis. Hazte Pro para abrir todas las propiedades y recibir las 10 selecciones de la semana." },
   "access.modal.aria":                 { en: "Get started with Pulpo",        es: "Empieza con Pulpo" },

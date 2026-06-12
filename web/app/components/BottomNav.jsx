@@ -28,8 +28,10 @@ export function BottomNav({ app }) {
           className={(app.route === tab.key || (tab.key === "profile" && app.route === "account")) ? "active" : ""}
           onClick={() => {
             if (tab.key === "profile") {
-              if (!app.user) app.openSignup({ mode: "login" });
-              else app.go("account");
+              if (!app.user) {
+                if (app.accessV2) app.requestAccess({ reason: "account_entry", member: false });
+                else app.openSignup({ mode: "login" });
+              } else app.go("account");
             } else app.go(tab.key);
           }}
           data-testid={tab.key === "profile" && proMember ? "bottomnav-profile-pro" : undefined}
