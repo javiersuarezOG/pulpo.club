@@ -15,6 +15,7 @@ async function startStripeCheckout(opts) {
 }
 import { openStripePortal } from "./auth/stripe-portal.js";
 import { clerkEnabled } from "./auth/clerk-shell.jsx";
+import { isFreeMember } from "./lib/gating";
 import { COUNTRIES } from "./lib/countries.js";
 import { track } from "./telemetry/hook";
 import {
@@ -165,6 +166,13 @@ function AccountPage({ app }) {
     return null;
   }
 
+  // Email-first: a Free member (email-only, no Clerk account) gets a
+  // dedicated lightweight settings view — the Pro tabs (Profile / Security
+  // via Clerk, billing) don't apply and would render empty/broken controls.
+  if (isFreeMember(app.user)) {
+    return <FreeMemberAccount app={app} />;
+  }
+
   // 2026-05-29: renamed `notifications` → `newsletter`. The tab always
   // managed the newsletter filter; ACCOUNT_SECTION_KEYS aliases the old
   // slug in url-routing.ts so existing bookmarks survive.
@@ -203,6 +211,57 @@ function AccountPage({ app }) {
           {section === "newsletter"   && <NotificationsSection app={app} />}
           {section === "subscription" && <SubscriptionSection app={app} />}
           {section === "security"     && <SecuritySection app={app} />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ============== Free-member settings ==============
+// A Free member has an email on the Resend audience and NO Clerk account.
+// We only render controls with a real consumer: Go-Pro (Stripe), email
+// display, language (header toggle owns it), and sign out (clears local
+// state). Newsletter preferences live behind a Resend-backed store that
+// doesn't exist yet — deliberately omitted rather than ship a control that
+// lies about persistence. Language is changed from the header EN/ES toggle.
+function FreeMemberAccount({ app }) {
+  const lc = app.locale;
+  const email = (app.user && app.user.email) || "";
+
+  aUseEffect(() => {
+    try { track("account.free_view_shown", {}); } catch { /* ignore */ }
+  }, []);
+
+  const onGoPro = () => {
+    try { track("account.free_go_pro_clicked", {}); } catch { /* ignore */ }
+    if (typeof app.gateToPro === "function") app.gateToPro({ reason: "account" });
+    else if (typeof app.openFreeMonthModal === "function") app.openFreeMonthModal({ trigger: "account" });
+  };
+
+  return (
+    <div className="page page-account">
+      <div className="account-layout account-layout-free">
+        <main className="account-content account-free">
+          <h1 className="account-free-title">{t("account.free.title", lc)}</h1>
+
+          <section className="account-free-card">
+            <span className="account-free-badge">{t("account.free.badge", lc)}</span>
+            <p className="account-free-value">{t("account.free.value", lc)}</p>
+            <button type="button" className="btn-pro lg block" onClick={onGoPro}>
+              {t("access.go_pro.cta", lc)}
+            </button>
+            <div className="access-pro-sub">{t("access.go_pro.sub", lc)}</div>
+          </section>
+
+          <section className="account-free-row">
+            <div className="account-free-label">{t("account.free.email_label", lc)}</div>
+            <div className="field-readonly-value">{email || "—"}</div>
+            <p className="account-free-hint">{t("account.free.email_hint", lc)}</p>
+          </section>
+
+          <button type="button" className="btn-ghost account-free-signout" onClick={() => app.signout()}>
+            {t("account.free.signout", lc)}
+          </button>
         </main>
       </div>
     </div>

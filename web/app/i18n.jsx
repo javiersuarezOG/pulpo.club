@@ -1287,6 +1287,13 @@ export const UI_STRINGS = {
   // the nav rename "Discover" labels /browse, so this label moved to
   // "Home" to match the actual destination.
   "account.back":            { en: "← Back to Home",                es: "← Volver al Inicio" },
+  // Free-member settings view (email-only, no Clerk account).
+  "account.free.title":       { en: "Your Pulpo",                    es: "Tu Pulpo" },
+  "account.free.badge":       { en: "Pulpo Free",                    es: "Pulpo Free" },
+  "account.free.value":       { en: "This week's top 3 — the best new beach & lake listings — in your inbox every Sunday.", es: "El top 3 de esta semana — las mejores propiedades nuevas de playa y lago — en tu correo cada domingo." },
+  "account.free.email_label": { en: "Your email",                    es: "Tu correo" },
+  "account.free.email_hint":  { en: "This is where your weekly picks land. To stop them, use the unsubscribe link in any Pulpo email.", es: "Aquí llegan tus selecciones semanales. Para detenerlas, usa el enlace para darte de baja en cualquier correo de Pulpo." },
+  "account.free.signout":     { en: "Sign out",                      es: "Cerrar sesión" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
   // Renamed `notifications` → `newsletter` 2026-05-29. The legacy key
   // is preserved for back-compat with cached bundles during rollout.
