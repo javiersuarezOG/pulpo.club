@@ -13,3 +13,7 @@ def test_row_count_gate_enforces_by_default_and_does_not_append():
     )[0]
     assert "web/data/ranked.fresh.json" not in gate_step
     assert "missing $ranked_arg" in gate_step
+    # Floor-aware degrade: the gate must pass --floor so a single-source crater
+    # degrades to a warn while the catalogue is healthy, instead of freezing the
+    # whole run (nightly 27399389866: xitios 28→0 froze a 2104-listing run).
+    assert "--floor" in gate_step

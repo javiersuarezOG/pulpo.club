@@ -623,6 +623,7 @@ jobs:
           set +e
           python3 scripts/run_row_count_sentinel.py \
             --sv-ranked "$ranked_arg" \
+            --floor "${LISTING_COUNT_FLOOR:-1000}" \
             --fail-on-crit \
             --no-append
           rc=$?
