@@ -7,6 +7,7 @@ import { categoryImageForListing } from "./assets/categories";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { buildSrcSet } from "./lib/img-url";
 import { deriveLocationPrecision } from "./lib/location-precision";
+import { isCardImageDisplayable } from "./lib/card-image";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -447,7 +448,19 @@ function Photo({
   // lands on a real image" guarantee while keeping us off the
   // generic stock visual when a real photo exists upstream.
   const [localUrlFailed, setLocalUrlFailed] = useState(false);
-  const url = heroSrc
+  // Display-gate contract (plan 003): on the CARD image (the
+  // `thumbnail` choke point used by Browse/Saved/home/map cards), a
+  // listing the photo phase never approved as card-displayable
+  // (logo/flyer/text-overlay/render) must NEVER render its source
+  // image — resolve to null so the category-fallback path below paints
+  // the bundled illustration instead. The listing stays findable; only
+  // the bad image is suppressed. This does NOT touch the detail-page
+  // gallery (raw <img>, not <Photo thumbnail>) or the carousel
+  // broker-native slots (idx > 0, non-thumbnail) — those are plan 004.
+  const cardImageBlocked = thumbnail && !isCardImageDisplayable(listing);
+  const url = cardImageBlocked
+    ? null
+    : heroSrc
     ? heroSrc
     : thumbnail
       ? (

@@ -1,8 +1,13 @@
 // Homepage hard-rule eligibility (P4). A listing only appears on a
 // homepage shelf when it has a suitable LOCAL thumbnail: thumbnail_url
 // present AND card_eligible === true (P5 forces card_eligible False for
-// logos/placeholders). photos.length is no longer the gate. Discovery is
-// exempt and is not exercised here (it has no eligibility gate).
+// logos/placeholders). photos.length is no longer the gate.
+//
+// Display-gate contract (plan 003): inventory surfaces (Browse/Discover,
+// Saved, map cards) keep the listing findable but swap a non-eligible
+// IMAGE for the category fallback (see web/app/lib/card-image.ts) — they
+// are not "exempt" from the image rule, only from the drop-the-listing
+// rule. This spec exercises only the curated-shelf DROP behavior.
 
 import { describe, it, expect } from "vitest";
 import { pickTopRanked } from "./HomeShelf.jsx";

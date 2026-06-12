@@ -11,6 +11,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
+from pulpo.display_gates import is_card_displayable
+
 from . import commentary as commentary_mod
 from . import i18n
 from .favorites import build_ranked_index, compute_favorites
@@ -328,10 +330,13 @@ def _listing_has_eligible_photo(listing: dict) -> bool:
     that passes here will always produce a non-empty photo_url after
     being picked. Keeping the rules in one helper here prevents drift
     between the upstream filter and the downstream resolver.
+
+    The card_eligible + has_text_overlay verdict is the shared
+    display-gate contract (plan 003) — `is_card_displayable` is the
+    single source of truth, mirrored on the frontend and in the
+    featured pools.
     """
-    if listing.get("card_eligible") is not True:
-        return False
-    if listing.get("has_text_overlay") is True:
+    if not is_card_displayable(listing):
         return False
     urls = listing.get("photo_urls") or []
     has_url = bool(urls and isinstance(urls[0], str) and urls[0].startswith("http"))
@@ -356,11 +361,11 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     brand-logo placeholder.
 
     Belt-and-suspenders: also reject when `has_text_overlay == True`
-    (the pipeline's positive flag for branded watermarks).
+    (the pipeline's positive flag for branded watermarks). Both checks
+    are the shared display-gate contract (plan 003) via
+    `is_card_displayable` — the single source of truth.
     """
-    if listing.get("card_eligible") is not True:
-        return ""
-    if listing.get("has_text_overlay") is True:
+    if not is_card_displayable(listing):
         return ""
     # Continuity contract (PR #785): prefer the hero picker's winning
     # broker URL so the email leads with the same image the listing page
