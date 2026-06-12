@@ -110,6 +110,17 @@ _OK_JSON = {
     "usps":        [{"en": "🏖 Beachfront access",   "es": "🏖 Acceso a la playa"},
                     {"en": "📐 Flat terrain",        "es": "📐 Terreno plano"},
                     {"en": "🛣 Paved road",          "es": "🛣 Camino pavimentado"}],
+    # Plan 009 — required in fresh model output; nulls = land listing.
+    "extracted_facts": {
+        "year_built":     None,
+        "year_renovated": None,
+        "bedrooms":       None,
+        "bathrooms":      None,
+        "built_area_m2":  None,
+        "parking_spaces": None,
+        "furnished":      None,
+        "has_pool":       None,
+    },
     "url_language": "en",
     "latlong":     {"lat": 13.4912, "lng": -89.3818,
                     "source": "estimated",
@@ -392,6 +403,132 @@ def test_user_prompt_facts_block_collapses_when_no_facts(tmp_path):
     user_msg = next(m for m in client.chat.completions.calls[0]["messages"]
                     if m["role"] == "user")
     assert "PROPERTY FACTS" not in user_msg["content"]
+
+
+# ── plan 009: extracted_facts — sidecar round-trip + tolerant hydration ─
+
+def test_old_shape_sidecar_entry_hydrates_without_api_call(tmp_path):
+    """THE no-recall guarantee (plan 009 step 5c). A sidecar entry written
+    BEFORE plan 009 has no `extracted_facts` key. It must still hydrate
+    title/description/etc. cleanly, make ZERO API calls, and not be
+    marked failed — a mistake here either re-spends ~$2 over the 2,107
+    cached listings on the next nightly, or silently ships them all
+    un-hydrated (no canonical title/description)."""
+    sidecar_path = tmp_path / "side.json"
+    # Hand-write a pre-plan-009 entry: same shape _build_sidecar_entry
+    # produced at schema v4 before this plan — NO extracted_facts key.
+    old_entry = {
+        "ts":                          "2026-06-01T00:00:00+00:00",
+        "model":                       "deepseek-chat",
+        "schema_version":              4,
+        "prompt_version":              4,
+        "title_canonical":             _OK_JSON["title"],
+        "short_description_canonical": _OK_JSON["description"],
+        "reasons_to_buy":              _OK_JSON["usps"],
+        "lat":                         13.4912,
+        "lng":                         -89.3818,
+        "geocoding_confidence":        "medium",
+        "geocoding_source":            "estimated",
+        "geocoding_reference":         "near El Tunco, La Libertad",
+        "url_language":                "en",
+        "tokens_in":                   600,
+        "tokens_out":                  200,
+        "cost_usd":                    0.000382,
+        "finish_reason":               "stop",
+        "latency_ms":                  900,
+    }
+    assert "extracted_facts" not in old_entry
+    sidecar_path.write_text(json.dumps({"goodlife|GL-001": old_entry}),
+                            encoding="utf-8")
+
+    li = _li()
+    client = _StubClient(responses=[ValueError])  # would raise if called
+    metrics = enrich_listings([li], sidecar_path, tmp_path / "log.jsonl",
+                              client=client)
+    # ZERO API calls — the cache hit short-circuits before eligibility.
+    assert client.chat.completions.calls == []
+    assert metrics["cache_hits"] == 1
+    assert metrics["enriched"] == 0
+    assert metrics["failed"] == 0
+    # And hydration actually applied the old entry (tolerant path):
+    assert li["title_canonical"] == _OK_JSON["title"]
+    assert li["short_description_canonical"] == _OK_JSON["description"]
+    assert li["lat"] == 13.4912
+    assert li["enrichment_model"] == "deepseek-chat"
+    # The injected empty-facts shape merged nothing.
+    assert li.get("year_built") is None
+    assert li.get("furnished") is None
+
+
+def test_fresh_enrichment_persists_extracted_facts_in_sidecar(tmp_path):
+    """Plan 009 step 5d — a fresh response carrying extracted_facts
+    lands in the sidecar entry AND merges into null listing fields."""
+    sidecar_path = tmp_path / "side.json"
+    response = {**_OK_JSON,
+                "extracted_facts": {"year_built": 2015,
+                                    "year_renovated": 2023,
+                                    "bedrooms": 3,
+                                    "bathrooms": 2.5,
+                                    "furnished": True,
+                                    "has_pool": None}}
+    li = _li(property_type="house")
+    client = _StubClient(responses=[response])
+    metrics = enrich_listings([li], sidecar_path, tmp_path / "log.jsonl",
+                              client=client)
+    assert metrics["enriched"] == 1
+    # Merged onto the listing (all fields were null → filled)
+    assert li["year_built"] == 2015
+    assert li["year_renovated"] == 2023
+    assert li["bedrooms"] == 3
+    assert li["bathrooms"] == 2.5
+    assert li["furnished"] is True
+    # Persisted in the sidecar entry
+    saved = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    entry = saved["goodlife|GL-001"]
+    assert entry["extracted_facts"] == {"year_built": 2015,
+                                        "year_renovated": 2023,
+                                        "bedrooms": 3,
+                                        "bathrooms": 2.5,
+                                        "furnished": True,
+                                        "has_pool": None}
+
+
+def test_new_shape_sidecar_rehydrates_extracted_facts(tmp_path):
+    """Round-trip: run 1 enriches with facts; run 2 hydrates a FRESH
+    listing copy from the sidecar — facts merge again, no API call."""
+    sidecar_path = tmp_path / "side.json"
+    response = {**_OK_JSON,
+                "extracted_facts": {"year_built": 2015, "has_pool": True}}
+    li1 = _li(property_type="house")
+    client1 = _StubClient(responses=[response])
+    enrich_listings([li1], sidecar_path, tmp_path / "log.jsonl",
+                    client=client1)
+
+    li2 = _li(property_type="house")
+    client2 = _StubClient(responses=[ValueError])
+    m2 = enrich_listings([li2], sidecar_path, tmp_path / "log.jsonl",
+                         client=client2)
+    assert client2.chat.completions.calls == []
+    assert m2["cache_hits"] == 1
+    assert li2["year_built"] == 2015
+    assert li2["has_pool"] is True
+
+
+def test_hydration_merge_respects_scraper_value(tmp_path):
+    """Hydration replays the only-fill-nulls merge: a listing that NOW
+    carries a scraper-parsed bedrooms keeps it over the cached LLM value."""
+    sidecar_path = tmp_path / "side.json"
+    response = {**_OK_JSON, "extracted_facts": {"bedrooms": 5}}
+    li1 = _li()
+    client1 = _StubClient(responses=[response])
+    enrich_listings([li1], sidecar_path, tmp_path / "log.jsonl",
+                    client=client1)
+
+    li2 = _li(bedrooms=3)   # scraper parsed it this time
+    client2 = _StubClient(responses=[ValueError])
+    enrich_listings([li2], sidecar_path, tmp_path / "log.jsonl",
+                    client=client2)
+    assert li2["bedrooms"] == 3
 
 
 # ── cliché lint wiring (plan 008 — observability, not a gate) ──────────

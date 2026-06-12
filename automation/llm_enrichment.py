@@ -205,6 +205,20 @@ def _hydrate_from_sidecar(li: Any, entry: dict,
                 "reference":  entry.get("geocoding_reference"),
                 "confidence": entry.get("geocoding_confidence"),
             }
+        elif f.json_key == "extracted_facts":
+            # Plan 009 — tolerant hydration. Sidecar entries written
+            # before plan 009 carry no `extracted_facts`; injecting the
+            # valid empty shape lets them re-validate and hydrate
+            # title/description/usps/latlong as before. Without this,
+            # validate_response below fails on every pre-plan entry and
+            # ~2,107 cached listings silently ship UN-hydrated (no
+            # canonical title/description) each nightly until plan 011's
+            # backfill. NOTE the failure mode is silent data loss, not
+            # API re-spend: the `key in sidecar` cache check in
+            # enrich_listings runs BEFORE the eligibility check, so a
+            # cached listing never reaches the API path either way.
+            raw = entry.get("extracted_facts")
+            parsed["extracted_facts"] = raw if isinstance(raw, dict) else {}
         else:
             parsed[f.json_key] = entry.get(f.target_attrs[0])
 
@@ -252,6 +266,11 @@ def _build_sidecar_entry(li: Any, schema: EnrichmentSchema,
         # re-validate it under the current schema (sidecar re-validation
         # in _hydrate_from_sidecar would silently skip the apply otherwise).
         "url_language":                _g(li, "url_language"),
+        # Plan 009 — raw extracted-facts dict (sanitized at apply time).
+        # Persisted so hydration can replay the only-fill-nulls merge;
+        # consumer: _hydrate_from_sidecar + the detail Key Facts tiles
+        # downstream (plan 010).
+        "extracted_facts":             dict(_g(li, "extracted_facts") or {}),
         "tokens_in":                   tokens_in,
         "tokens_out":                  tokens_out,
         "cost_usd":                    _cost_usd(tokens_in, tokens_out),
