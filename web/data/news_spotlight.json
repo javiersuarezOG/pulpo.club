@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 0,
-    "llm_cost_usd": 0.0,
-    "paragraph": "Aloft — a Marriott brand — is opening its first El Salvador hotel at Punta Roca in La Libertad, with 100+ rooms, part of the government's Surf City push. A major international flag landing on the coast is a maturity signal: it tends to pull infrastructure, dining, and year-round demand into the surrounding stretch. If you're weighing a lot near Punta Roca or La Libertad town, that's the kind of anchor that lifts both rental potential and resale.",
-    "picked_at": "2026-06-07",
-    "source_date": "5 Jun 2026",
-    "source_name": "El Diario de Hoy",
-    "source_url": "https://www.elsalvador.com/dinero-y-negocios/entorno-economico/hoteles-ocupacion-hotelera-el-salvador-playa-punta-roca/1277237/2026/",
-    "title": "Marriott's Aloft is coming to Punta Roca"
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00030884000000000006,
+    "paragraph": "El Salvador lowered its national alert from orange to yellow as Tropical Storm Cristina weakens. For you as a coastal or lake property buyer, this signals reduced immediate storm risk, but lingering rain may affect property inspections and access. Stay informed on local conditions and consider flood history before closing. A calmer weather window is opening—good for site visits.",
+    "picked_at": "2026-06-12",
+    "source_date": "12 Jun 2026",
+    "source_name": "La Página",
+    "source_url": "https://lapagina.com.sv/general/%f0%9f%9f%a1-pais-baja-a-alerta-amarilla-nacional/?utm_source=rss&utm_medium=rss&utm_campaign=%25f0%259f%259f%25a1-pais-baja-a-alerta-amarilla-nacional",
+    "title": "Storm alert downgraded: what it means for buyers"
   },
   "es": {
-    "candidates_seen": 0,
-    "llm_cost_usd": 0.0,
-    "paragraph": "Aloft —una marca de Marriott— abrirá su primer hotel en El Salvador en Punta Roca, La Libertad, con más de 100 habitaciones, dentro de la apuesta del gobierno por Surf City. Una marca internacional grande llegando a la costa es señal de madurez: suele atraer infraestructura, restaurantes y demanda todo el año a la zona. Si estás viendo un lote cerca de Punta Roca o el puerto de La Libertad, es el tipo de ancla que sube el potencial de alquiler y la reventa.",
-    "picked_at": "2026-06-07",
-    "source_date": "5 jun 2026",
-    "source_name": "El Diario de Hoy",
-    "source_url": "https://www.elsalvador.com/dinero-y-negocios/entorno-economico/hoteles-ocupacion-hotelera-el-salvador-playa-punta-roca/1277237/2026/",
-    "title": "Aloft de Marriott llega a Punta Roca"
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00037987,
+    "paragraph": "Protección Civil redujo la alerta de naranja a amarilla tras la degradación de la tormenta Cristina. Aunque las lluvias continúan, el riesgo inmediato disminuyó. Si estás evaluando propiedades costeras o de lago, este cambio indica que la temporada lluviosa sigue activa, pero sin eventos extremos. Monitoreá los accesos y el estado de los terrenos antes de decidir. La alerta amarilla aún exige precaución, especialmente en zonas propensas a inundaciones o deslizamientos.",
+    "picked_at": "2026-06-12",
+    "source_date": "12 jun 2026",
+    "source_name": "La Página",
+    "source_url": "https://lapagina.com.sv/general/%f0%9f%9f%a1-pais-baja-a-alerta-amarilla-nacional/?utm_source=rss&utm_medium=rss&utm_campaign=%25f0%259f%259f%25a1-pais-baja-a-alerta-amarilla-nacional",
+    "title": "🟡 País baja a alerta amarilla nacional"
   }
 }
