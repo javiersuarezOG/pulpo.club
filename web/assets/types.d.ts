@@ -268,4 +268,5 @@ export interface Listing {
     hires_photo_quality_score: number | null;
     hires_resdet_upscaled: boolean | null;
     hires_quarantined: boolean | null;
+    hires_aesthetic_issues: string[] | null;  // deterministic aesthetic issues on the hires derivative (e.g. "logo_or_watermark"); featured + IG gates exclude on logo_or_watermark
 }
