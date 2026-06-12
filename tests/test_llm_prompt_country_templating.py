@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from pulpo.countries import CountryManifest, load
 from automation.llm_enrichment_prompts import (
+    PROMPT_VERSION,
     SYSTEM_PROMPT,
     system_prompt_for,
 )
@@ -68,13 +69,14 @@ def test_sv_prompt_mentions_el_salvador():
     sv = load("SV")
     prompt = system_prompt_for(sv)
     assert "El Salvador" in prompt, (
-        "SV prompt must address the model as 'specializing in El Salvador'."
+        "SV prompt must address the model as an analyst "
+        "'writing listing summaries for buyers in El Salvador'."
     )
     # Specifically the country-templated slots. The "Assume the property
     # is in <country>." sentence wraps across a line in the rendered
     # prompt; we normalize whitespace before matching to be robust.
     normalized = " ".join(prompt.split())
-    assert "specializing in El Salvador" in normalized
+    assert "writing listing summaries for buyers in El Salvador" in normalized
     assert "Assume the property is in El Salvador." in normalized
     assert "El Salvador centroid" in normalized
 
@@ -145,7 +147,7 @@ def test_gt_synthetic_prompt_mentions_guatemala_not_el_salvador():
     prompt = system_prompt_for(gt)
     normalized = " ".join(prompt.split())
     # GT-side
-    assert "specializing in Guatemala" in normalized
+    assert "writing listing summaries for buyers in Guatemala" in normalized
     assert "Assume the property is in Guatemala." in normalized
     assert "Guatemala centroid" in normalized
     # No SV leakage. NB: "El Salvador" check has to be on the raw
@@ -185,6 +187,32 @@ def test_gt_synthetic_prompt_carries_gt_beach_table_only():
 def test_gt_synthetic_prompt_passes_structural_invariants():
     gt = _synthetic_gt_manifest()
     _assert_structural_invariants(system_prompt_for(gt), ctx="GT")
+
+
+# ── Prompt v4: to-the-point factual contract (plan 008) ──────────────
+
+
+def test_prompt_version_is_4():
+    """Plan 011's retroactive backfill keys off prompt_version < 4.
+    Any future prompt-content change must bump this again."""
+    assert PROMPT_VERSION == 4
+
+
+def test_v4_description_rule_is_short_and_factual():
+    """The v4 description contract: 60-word cap present, the v3
+    marketing-copy rule gone."""
+    assert "MAX 60 words" in SYSTEM_PROMPT
+    assert "optimized commercial description" not in SYSTEM_PROMPT
+
+
+def test_v4_prompt_has_no_land_description_header():
+    """Houses and condos go through the same prompt — the old
+    LAND DESCRIPTION framing is banned everywhere in the module."""
+    from automation import llm_enrichment_prompts as mod
+    import inspect
+    source = inspect.getsource(mod)
+    assert "LAND DESCRIPTION" not in source
+    assert "PROPERTY LISTING:" in source
 
 
 # ── Partial manifests degrade cleanly ────────────────────────────────

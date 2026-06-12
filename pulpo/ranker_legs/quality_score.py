@@ -1,6 +1,6 @@
 """Quality-score ranker leg — PRD A6.
 
-Adds the listing's soft quality_score (0..9, computed by
+Adds the listing's soft quality_score (0..MAX_SCORE, computed by
 `pulpo.quality_score.compute`) as a small ranking nudge on top of
 the three primary legs (value / location / momentum).
 
