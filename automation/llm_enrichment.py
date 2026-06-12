@@ -343,10 +343,19 @@ def _enrich_one(client, li: Any, schema: EnrichmentSchema
     """
     user_prompt = render_user_prompt(
         _g(li, "description"),
-        location_text = _g(li, "location_text"),
-        municipality  = _g(li, "municipality"),
-        department    = _g(li, "department"),
-        country       = _g(li, "country"),
+        location_text  = _g(li, "location_text"),
+        municipality   = _g(li, "municipality"),
+        department     = _g(li, "department"),
+        country        = _g(li, "country"),
+        property_type  = _g(li, "property_type"),
+        area_m2        = _g(li, "area_m2"),
+        built_area_m2  = _g(li, "built_area_m2"),
+        bedrooms       = _g(li, "bedrooms"),
+        bathrooms      = _g(li, "bathrooms"),
+        year_built     = _g(li, "year_built"),
+        parking_spaces = _g(li, "parking_spaces"),
+        floor          = _g(li, "floor"),
+        price_usd      = _g(li, "price_usd"),
     )
 
     t0 = time.monotonic()

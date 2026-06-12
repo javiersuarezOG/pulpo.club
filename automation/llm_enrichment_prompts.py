@@ -203,11 +203,11 @@ def system_prompt_for(country: CountryManifest) -> str:
 SYSTEM_PROMPT: str = system_prompt_for(_active_country())
 
 
-USER_PROMPT_TEMPLATE = """LAND DESCRIPTION:
+USER_PROMPT_TEMPLATE = """PROPERTY LISTING:
 \"\"\"
 {original_description}
 \"\"\"
-{location_block}
+{location_block}{facts_block}
 Return the JSON object now."""
 
 
@@ -220,6 +220,16 @@ LOCATION HINTS (authoritative for the latlong field):
 """
 
 
+# Rendered into {facts_block} only when at least one structured property
+# fact is provided; collapses to empty otherwise (same pattern as the
+# location-hints block). The system prompt tells the model to treat
+# these as authoritative for the description/usps content.
+PROPERTY_FACTS_TEMPLATE = """
+PROPERTY FACTS (parsed from the listing — authoritative):
+{lines}
+"""
+
+
 def render_user_prompt(
     original_description: str | None,
     *,
@@ -227,6 +237,15 @@ def render_user_prompt(
     municipality:  str | None = None,
     department:    str | None = None,
     country:       str | None = None,
+    property_type:  str | None = None,
+    area_m2:        float | None = None,
+    built_area_m2:  float | None = None,
+    bedrooms:       int | None = None,
+    bathrooms:      float | None = None,
+    year_built:     int | None = None,
+    parking_spaces: int | None = None,
+    floor:          int | None = None,
+    price_usd:      float | None = None,
 ) -> str:
     """Render the per-listing user prompt.
 
@@ -240,6 +259,11 @@ def render_user_prompt(
     rendered as a separate "LOCATION HINTS" block the model is told to
     treat as authoritative for latlong. Each hint is included only when
     truthy, so callers can pass whatever the listing happens to carry.
+
+    Property facts (prompt v4) are keyword-only and optional too —
+    existing callers (scripts/retrofit_geocoding.py) keep working
+    unchanged. Truthy facts render into a "PROPERTY FACTS" block the
+    model treats as authoritative for description/usps content.
     """
     parts: list[str] = []
     if location_text and location_text.strip():
@@ -254,7 +278,32 @@ def render_user_prompt(
     location_block = (
         LOCATION_HINTS_TEMPLATE.format(lines="\n".join(parts)) if parts else ""
     )
+
+    fact_parts: list[str] = []
+    for label, value in (
+        ("property_type",  property_type),
+        ("area_m2",        area_m2),
+        ("built_area_m2",  built_area_m2),
+        ("bedrooms",       bedrooms),
+        ("bathrooms",      bathrooms),
+        ("year_built",     year_built),
+        ("parking_spaces", parking_spaces),
+        ("floor",          floor),
+        ("price_usd",      price_usd),
+    ):
+        if isinstance(value, str):
+            if value.strip():
+                fact_parts.append(f"- {label}: {value.strip()}")
+        elif value:
+            fact_parts.append(f"- {label}: {value}")
+
+    facts_block = (
+        PROPERTY_FACTS_TEMPLATE.format(lines="\n".join(fact_parts))
+        if fact_parts else ""
+    )
+
     return USER_PROMPT_TEMPLATE.format(
         original_description=original_description or "",
         location_block=location_block,
+        facts_block=facts_block,
     )
