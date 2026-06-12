@@ -679,14 +679,23 @@ def _photo_html(pick: IssuePick) -> str:
     if not pick.photo_url:
         return ""
     alt = pick.title or "Pulpo listing photo"
-    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="680" />'
+    # height reserves vertical space pre-load so email clients don't reflow
+    # when the photo arrives. Listing photos render at natural aspect, but
+    # the dominant cohort is landscape ~3:2; at the 680px frame width that
+    # is 453px tall. The `img { height: auto }` rule (head <style>) overrides
+    # this attribute once CSS applies, so the numeric value is a reservation,
+    # not a forced crop. 680x453 = 3:2.
+    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="680" height="453" />'
 
 
 def _photo_html_short(pick: IssuePick) -> str:
     if not pick.photo_url:
         return ""
     alt = pick.title or "Pulpo listing photo"
-    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="100%" />'
+    # Fluid width but same 3:2 reservation as _photo_html (680x453); the
+    # head <style> `img { max-width:100%; height:auto }` rescales both axes
+    # on load, so the numeric height only reserves space pre-load.
+    return f'<img src="{_e(pick.photo_url)}" alt="{_e(alt)}" width="680" height="453" style="width:100%;height:auto;display:block;" />'
 
 
 def _new_pill(pick: IssuePick, locale: Locale) -> str:
@@ -1126,8 +1135,10 @@ def _favorite_card_html(u, locale: str) -> str:
 
     cta_text = "See on Pulpo &rarr;" if en else "Verla en Pulpo &rarr;"
 
+    # Fixed 96x84 crop box (.save-thumb-cell img { width:96px;height:84px;
+    # object-fit:cover }), so the attribute pair is an exact reservation.
     photo_block = (
-        f'<img src="{_e(u.photo_url)}" alt="" />'
+        f'<img src="{_e(u.photo_url)}" alt="" width="96" height="84" />'
         if u.photo_url
         else '<span class="save-thumb-fallback" aria-hidden="true"></span>'
     )
@@ -1596,9 +1607,12 @@ def _pick_card_html(
     # reach here `pick.photo_url` is guaranteed non-empty. Operator
     # policy: a listing can only appear in the newsletter if every
     # field needed to render its card — photo included — is available.
+    # width/height give email clients a 3:2 (680x453) reservation pre-load;
+    # the inline width:100%;height:auto rescales on load so the numeric pair
+    # only prevents reflow, never forces a crop.
     photo_html = (
         f'<img src="{_e(pick.photo_url)}" alt="{_e(pick.title or "")}" '
-        f'width="100%" style="width:100%;height:auto;display:block;" />'
+        f'width="680" height="453" style="width:100%;height:auto;display:block;" />'
     )
 
     # Price line — "$900,000" + optional " · $621/m²" inline.
