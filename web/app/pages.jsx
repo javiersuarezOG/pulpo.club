@@ -18,7 +18,7 @@ import {
   SUBCATEGORY_LABELS,
   DISCOVERY_PILL_LABELS,
 } from "./config/ia.ts";
-import { getCategoryImage } from "./assets/categories/index.js";
+import { getCategoryImage, categoryImageForListing } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
   hasFilterParamsInURL,
@@ -2335,6 +2335,10 @@ function PriceContextBlock({ listing, locale }) {
 function ListingDetail({ listing, app, asPanel = true }) {
   const [galleryIdx, setGalleryIdx] = pUseState(0);
   const [lightbox, setLightbox] = pUseState(false);
+  // Lightbox image-load failure (dead broker URL). Reset on every
+  // galleryIdx change so a failed slide doesn't poison the next one.
+  const [lbFailed, setLbFailed] = pUseState(false);
+  pUseEffect(() => { setLbFailed(false); }, [galleryIdx]);
   const isSold = listing.is_sold;
   const isOffMarket = listing.source_type === "off_market";
   // Single source of truth for paywall rules — see web/app/lib/gating.ts.
@@ -2416,6 +2420,23 @@ function ListingDetail({ listing, app, asPanel = true }) {
     if (!offMarketLocked) return;
     track("paywall.shown", { kind: "off_market", listing_id: listing.id });
   }, [listing.id, offMarketLocked]);
+
+  // Prefetch the lightbox neighbors (galleryIdx ± 1, modulo to match the
+  // arrow wraparound below) so arrow navigation hits warm cache instead
+  // of a cold fetch. Bounds-safe: no-op with fewer than 2 photos.
+  pUseEffect(() => {
+    if (!lightbox || typeof Image === "undefined") return;
+    const photos = Array.isArray(listing.photos) ? listing.photos : [];
+    if (photos.length < 2) return;
+    const n = photos.length;
+    for (const j of [(galleryIdx + 1) % n, (galleryIdx - 1 + n) % n]) {
+      const url = photos[j];
+      if (typeof url === "string" && url) {
+        const im = new Image();
+        im.src = url;
+      }
+    }
+  }, [lightbox, galleryIdx, listing.photos]);
 
   // PR-5 — lightbox a11y. ESC closes, ←/→ navigate, Tab is trapped
   // inside the lightbox. Focus moves to the close button on open and
@@ -2928,7 +2949,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
             <Icon name="close" size={22}/>
           </button>
           <img
-            src={listing.photos[galleryIdx]}
+            src={lbFailed ? categoryImageForListing(listing) : listing.photos[galleryIdx]}
             alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}
             decoding="async"
             fetchpriority="high"
@@ -2942,6 +2963,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   is_local: String(listing.photos[galleryIdx] ?? "").startsWith("/photos/"),
                 });
               } catch { /* never let telemetry break the render */ }
+              // Swap to the bundled category image so a dead broker URL
+              // shows a relevant photo, not a blank modal. Guarded: only
+              // flip once (the fallback is a bundled WebP that won't 404).
+              if (!lbFailed) setLbFailed(true);
             }}
           />
           <div className="lightbox-controls" onClick={(e) => e.stopPropagation()}>

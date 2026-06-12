@@ -63,13 +63,17 @@ from ..types import Issue
 #       _footer_html (variant-driven) instead of recipient.tier, so the
 #       /api/unsubscribe confirmation page always matches the edition
 #       sent. Standard-send output byte-identical; logic changed.
-TEMPLATE_VERSION = "newsletter-v4.7-2026-06-10"
+#   v4.8 (2026-06-12) — listing <img> tags now carry a height attribute
+#       (680x453 = 3:2 reservation; save-thumb 96x84) so email clients
+#       reserve vertical space pre-load and don't reflow. CSS height:auto
+#       still rescales on load (plan 007 step 4).
+TEMPLATE_VERSION = "newsletter-v4.8-2026-06-12"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-10"
+LAST_UPDATED = "2026-06-12"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -108,8 +112,10 @@ LAST_UPDATED = "2026-06-10"
 #       HTML changed.
 #   welcome-v2.3 (2026-06-10) — inherits the v4.7 footer edition-stamp
 #       change (page == email edition). Welcome body carries the footer.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.3-2026-06-10"
-WELCOME_LAST_UPDATED = "2026-06-10"
+#   welcome-v2.4 (2026-06-12) — inherits the v4.8 listing <img> height
+#       reservation. Welcome body carries listing cards, so its HTML changed.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.4-2026-06-12"
+WELCOME_LAST_UPDATED = "2026-06-12"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -137,8 +143,10 @@ WELCOME_LAST_UPDATED = "2026-06-10"
 #       the footer, so its HTML changed.
 #   welcome-back-v1.3 (2026-06-10) — inherits the v4.7 footer edition-
 #       stamp change. Welcome-back body carries the footer.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.3-2026-06-10"
-WELCOME_BACK_LAST_UPDATED = "2026-06-10"
+#   welcome-back-v1.4 (2026-06-12) — inherits the v4.8 listing <img>
+#       height reservation. Welcome-back body carries listing cards.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.4-2026-06-12"
+WELCOME_BACK_LAST_UPDATED = "2026-06-12"
 
 
 # ─────────────────────────────────────────────────────────────────────
