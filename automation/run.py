@@ -1647,8 +1647,21 @@ def main() -> int:
                 "failure_id":   source_failure_id.get(src),
             }, ensure_ascii=False) + "\n")
 
-    # Normalize
-    listings, dropped = phase_normalize(raw)
+    # Normalize. seen_keys (plan 012): read-only ledger snapshot so the
+    # transition-aware sold rule in pulpo/normalize.py can distinguish
+    # "never-seen + sold marker → drop" from "previously-tracked listing
+    # now sold → keep + is_sold=True". The ledger is loaded again later
+    # for the existence update — this early load is read-only and
+    # fail-open (empty set ⇒ legacy drop-all-sold behavior).
+    try:
+        from automation.listing_ledger import load_ledger as _sold_load_ledger
+        _seen_keys = frozenset(
+            _sold_load_ledger(REPO / "web" / "data" / "listings_ledger.json").keys()
+        )
+    except Exception as _seen_err:  # noqa: BLE001 — never crash on ledger
+        print(f"[sold_transition] seen-keys load failed (non-fatal): {_seen_err!r}")
+        _seen_keys = frozenset()
+    listings, dropped = phase_normalize(raw, seen_keys=_seen_keys)
 
     # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
     # at startup, runs all dictionaries against title+description+location_text
@@ -2437,6 +2450,24 @@ def main() -> int:
     if agri_dropped:
         print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
               f"(built structures retained) — {len(ranked)} remain")
+
+    # Plan 012 — sold listings keep shipping (detail page renders the
+    # sold banner; Browse/zone_medians/sitemap/featured all exclude
+    # is_sold themselves) but must not OCCUPY rank positions or sort
+    # above live inventory. Mirror of carry_forward.py's tail-demotion
+    # pattern (rank=None + rank_score=-1.0). NOTE asymmetry vs stale:
+    # the PR-S4c stale filter above is flag-gated FULL REMOVAL
+    # (default off); sold is keep-but-derank because the sold state is
+    # itself the product surface. Rank gaps are established precedent —
+    # the agricultural purge above already removes ranked rows.
+    sold_deranked = 0
+    for li in ranked:
+        if getattr(li, "is_sold", False):
+            li.rank = None
+            li.rank_score = -1.0
+            sold_deranked += 1
+    if sold_deranked:
+        print(f"[sold_derank] deranked={sold_deranked} (kept in ranked.json, rank=None)")
 
     # PRD P1-2 — enforce the card-photo contract: every listing whose
     # `hero_photo_path` is set must point at a present root file. Listings
