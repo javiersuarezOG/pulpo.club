@@ -208,64 +208,6 @@ def test_hero_download_skips_when_all_derivatives_present(tmp_repo):
     assert li.hero_eligible is True
 
 
-def test_hero_cache_hit_normalizes_stale_encuentra24_winning_url(tmp_repo):
-    """A cached encuentra24 sidecar can pre-date the t_or_fh_m → t_full
-    photo_config switch. On the cache-hit skip path, selected_photo_url
-    must be normalized to the t_full variant so it matches the freshly
-    upgraded photo_urls and buildPhotos' exact-match reorder holds.
-
-    The encuentra24 config sets validate_via_head: true, but the
-    normalization on this path is pure string work (no HEAD network) by
-    design — this test runs fully offline and asserts that.
-    """
-    pytest.importorskip("PIL")
-    import hashlib
-    from pulpo.models import Listing
-    from automation.run import _download_hero_photos
-
-    # photo_urls already carries the upgraded full-res variant (as it
-    # would post-scrape); the cached sidecar carries the stale medium URL.
-    full_url = "https://img.encuentra24.com/x/t_full/v1/cached.jpg"
-    stale_medium = "https://img.encuentra24.com/x/t_or_fh_m/v1/cached.jpg"
-    url_hash = hashlib.sha1(full_url.encode()).hexdigest()[:12]
-
-    fname = "encuentra24_e24-cache-001.jpg"
-    photos_dir = tmp_repo / "web" / "photos"
-    fpath = photos_dir / fname
-    hero_fpath = photos_dir / "encuentra24_e24-cache-001.hero.jpg"
-    fpath.write_bytes(b"fake-thumbnail")
-    hero_fpath.write_bytes(b"fake-hero")
-    (photos_dir / (fname + ".hash")).write_text(url_hash)
-    (photos_dir / (fname + ".meta.json")).write_text(
-        '{"width": 600, "height": 400, "card_eligible": true, "hero_eligible": false}'
-    )
-    (photos_dir / "encuentra24_e24-cache-001.hero.jpg.meta.json").write_text(
-        json.dumps({
-            "width": 1920, "height": 1080,
-            "card_eligible": True, "hero_eligible": True,
-            "winning_url": stale_medium,
-        })
-    )
-
-    li = Listing(
-        source="encuentra24", source_id="e24-cache-001",
-        url="https://example.com/listing",
-        scraped_at="2026-01-01T00:00:00Z",
-        title="Cached encuentra24 listing",
-        photo_urls=[full_url],
-    )
-
-    with mock.patch("httpx.get") as mock_get:
-        result = _download_hero_photos([li], tmp_repo)
-        mock_get.assert_not_called()
-
-    assert result["skipped"] == 1
-    assert li.selected_photo_url == full_url, (
-        "stale medium winning_url must be normalized to the t_full variant "
-        "so it matches the upgraded photo_urls"
-    )
-
-
 def test_hero_download_refetches_when_hero_missing(tmp_repo):
     """Pre-Phase-2 cached entries (thumbnail + hash only, no hero file)
     trigger a re-fetch even when the URL hash matches. This is how the

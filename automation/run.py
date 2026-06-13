@@ -505,42 +505,6 @@ def _populate_hires_fields_from_sidecar(li, sidecar: dict, *, quarantined: bool)
     li.hires_available = not bool(quarantined)
 
 
-def _normalize_winning_url(source: str, url: str) -> str:
-    """Apply the source's photo_config full-res transform to a single URL,
-    purely (no HEAD network) — for normalizing a cached sidecar's
-    ``winning_url`` so it matches the freshly-upgraded ``photo_urls``.
-
-    A cached sidecar can pre-date a config change (e.g. encuentra24's
-    ``t_or_fh_m`` → ``t_full`` switch). ``selected_photo_url`` is consumed
-    by ``web/app/data/listings.ts::buildPhotos`` via an exact string match
-    against the gallery URLs; if it stays on the stale variant the
-    card-first reorder silently no-ops. We deliberately bypass
-    ``upgrade_photo_urls`` here because that path can issue
-    ``validate_via_head`` HEAD requests — this must be pure string work.
-    Only ``url_replace`` / ``wordpress_size_strip`` (string-only
-    strategies) are normalized; other strategies fall through unchanged.
-    """
-    from pulpo.scrapers._photo_url_upgrade import (
-        _apply_url_replace,
-        _apply_wordpress_size_strip,
-        _source_entry,
-    )
-
-    if not url:
-        return url
-    try:
-        full_res = (_source_entry(source) or {}).get("full_res") or {}
-        strategy = full_res.get("strategy", "noop")
-        rules = full_res.get("rules") or []
-        if strategy == "url_replace":
-            return _apply_url_replace(url, rules)
-        if strategy == "wordpress_size_strip":
-            return _apply_wordpress_size_strip(url, rules)
-    except Exception:
-        return url
-    return url
-
-
 def _download_hero_photos(listings, repo: Path) -> dict:
     """Download the first photo_url for each listing with photos, then write
     two derivatives:
@@ -646,18 +610,7 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 # the sidecar so selected_photo_url is populated even when
                 # we don't re-run the pick (P2 consumer: listings.ts).
                 if hero_meta.get("winning_url"):
-                    # Cached sidecars can pre-date a photo_config upgrade
-                    # rule (e.g. encuentra24's t_or_fh_m → t_full switch); a
-                    # stale winning_url no longer matches the freshly-upgraded
-                    # li.photo_urls, so buildPhotos' exact-match reorder in
-                    # listings.ts would silently no-op. Normalize through the
-                    # same upgrade so selected_photo_url stays in lockstep.
-                    # Pure string work only here — must not do HEAD network
-                    # (validate_via_head), so call the url_replace strategy
-                    # directly rather than upgrade_photo_urls.
-                    li.selected_photo_url = _normalize_winning_url(
-                        li.source, hero_meta["winning_url"]
-                    )
+                    li.selected_photo_url = hero_meta["winning_url"]
                 # P5 — also reject a logo/placeholder winner so the 19
                 # existing xitios-icon listings self-heal on the next
                 # nightly without a forced repick.
