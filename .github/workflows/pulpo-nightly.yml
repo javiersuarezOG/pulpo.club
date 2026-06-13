@@ -216,7 +216,15 @@ jobs:
           # NOT the now-bounded t_full network calls). 1000 fits with margin;
           # raise back toward 2000 once e24 crawl/photo per-listing cost is
           # reduced (photo workstream) or e24 moves to its own cadence.
-          PULPO_E24_LIMIT: "1000"
+          # Lowered to 500 (2026-06-13, below e24's ~868 natural yield so it
+          # actually bites — #881's 1000 was above yield and changed nothing).
+          # The #851/#855/#859 photo cascade added ~70min/run; healthy was 126min,
+          # post-fix runs run >240min. Timeout bump is OFF the table per the
+          # job timeout-minutes comment ("per-source tuning, not another bump").
+          # Cutting the dominant slow source (e24 Playwright detail crawl, ~868
+          # listings) is that per-source tuning. Restore once the photo cascade
+          # per-photo/per-listing cost is reduced (photo workstream).
+          PULPO_E24_LIMIT: "500"
           # Hero-photo wall budget (Phase A download + Phase C derivative
           # write inside automation/run.py::_download_hero_photos). The
           # default 600s was too small for the post-encuentra24 baseline:
