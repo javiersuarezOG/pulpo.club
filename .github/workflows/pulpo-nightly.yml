@@ -209,14 +209,7 @@ jobs:
           # global cap) but never raises it. Set high enough that real
           # nightly yield is bounded by inventory + vacation-zone filter
           # rather than by this ceiling.
-          # EMERGENCY UNFREEZE 2026-06-13: temporarily lowered 2000→300.
-          # The 2026-06-12 t_full switch (#851) makes encuentra24 HEAD-validate
-          # full-res Cloudinary URLs during the scrape; at 2000 listings ×
-          # multiple photos × up to 3s/HEAD the aggregate blew the 240-min job
-          # cap (two consecutive nightlies hung silent → cancelled; last
-          # healthy 2h pipeline predated t_full). Restore to 2000 once the
-          # photo workstream makes t_full validation cheaper (skip/cache HEAD).
-          PULPO_E24_LIMIT: "300"
+          PULPO_E24_LIMIT: "2000"
           # Hero-photo wall budget (Phase A download + Phase C derivative
           # write inside automation/run.py::_download_hero_photos). The
           # default 600s was too small for the post-encuentra24 baseline:
@@ -292,12 +285,7 @@ jobs:
           # per-source coverage in hires_pipeline_metrics.jsonl tells
           # us which sources need a transform added.
           PULPO_HIRES_ENABLED: "1"
-          # EMERGENCY UNFREEZE 2026-06-13: encuentra24 dropped from hires for
-          # one+ nightly. Its t_full full-res variant (#851) + PULPO_HIRES_LIMIT=0
-          # (unlimited) is the suspected cap-buster alongside the scrape-time HEAD
-          # cost above. Re-add once the photo workstream confirms t_full hires
-          # download cost is bounded. Other 6 sources keep hires unchanged.
-          PULPO_HIRES_SOURCES: "bienesraices,century21,goodlife,nexo,oceanside,remax"
+          PULPO_HIRES_SOURCES: "bienesraices,century21,encuentra24,goodlife,nexo,oceanside,remax"
           PULPO_HIRES_BUDGET_S: "5400"   # 90 min wall budget; cold first run ~60 min
           PULPO_HIRES_LIMIT: "0"          # process every listing in scope
           PULPO_HIRES_SHADOW: "0"         # informational only — not gated on serve

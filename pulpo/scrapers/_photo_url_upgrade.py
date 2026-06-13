@@ -252,8 +252,21 @@ def _head_validated(new_url: str, fallback_url: str) -> str:
         import httpx
     except ImportError:
         return fallback_url
+    # Hardened 2026-06-13: a float ``timeout=3.0`` + ``follow_redirects=True``
+    # hung the nightly 90s+ on encuentra24 t_full URLs — Cloudinary generates
+    # the full-res derivative on-demand and dribbles bytes/redirects, so the
+    # between-bytes read timer kept resetting and the nominal 3s never fired
+    # (froze 3 nightlies; faulthandler caught it at ssl.read under
+    # _receive_response_headers). Defense in depth so NO source using
+    # validate_via_head can wedge the pipeline again: explicit per-phase
+    # httpx.Timeout, and follow_redirects=False (a redirect chain was a hang
+    # vector; a 3xx already means the URL resolves, which is all we need here).
     try:
-        r = httpx.head(new_url, timeout=3.0, follow_redirects=True)
+        r = httpx.head(
+            new_url,
+            timeout=httpx.Timeout(3.0, connect=3.0, read=3.0, write=3.0, pool=3.0),
+            follow_redirects=False,
+        )
         if r.status_code >= 400:
             return fallback_url
     except Exception:
