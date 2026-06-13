@@ -1,27 +1,27 @@
 {
-  "computed_at": "2026-06-12T13:58:33.715968+00:00",
+  "computed_at": "2026-06-13T16:43:04.102175+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 51,
+        "count": 28,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 168,
+        "count": 164,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 459,
+        "count": 461,
         "renders_on_homepage": true
       },
       "lake_condos": {
-        "count": 1,
+        "count": 0,
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 10,
+        "count": 11,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.8,
-        "kept": 53,
+        "coverage_pct_vs_discovered": 1.0,
+        "kept": 29,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -95,7 +95,7 @@
       },
       "goodlife": {
         "coverage_pct_vs_discovered": null,
-        "kept": 37,
+        "kept": 35,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 298,
+        "kept": 288,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -137,7 +137,7 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 259,
+        "kept": 262,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1931,
-    "total_visible_listings": 1696
+    "total_in_dataset": 1898,
+    "total_visible_listings": 1664
   },
   "min_real_listings": 4
 }
