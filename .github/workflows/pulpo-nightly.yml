@@ -209,7 +209,14 @@ jobs:
           # global cap) but never raises it. Set high enough that real
           # nightly yield is bounded by inventory + vacation-zone filter
           # rather than by this ceiling.
-          PULPO_E24_LIMIT: "2000"
+          # Lowered 2000->1000 (2026-06-13): the per-listing detail-crawl + photo
+          # cost roughly doubled after the #851/#855/#859 photo cascade, pushing
+          # the e24 Playwright crawl (~2-3s/listing) past the 240-min job cap
+          # (proven via local faulthandler repro — time sink is detail-page nav,
+          # NOT the now-bounded t_full network calls). 1000 fits with margin;
+          # raise back toward 2000 once e24 crawl/photo per-listing cost is
+          # reduced (photo workstream) or e24 moves to its own cadence.
+          PULPO_E24_LIMIT: "1000"
           # Hero-photo wall budget (Phase A download + Phase C derivative
           # write inside automation/run.py::_download_hero_photos). The
           # default 600s was too small for the post-encuentra24 baseline:
