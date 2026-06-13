@@ -33,6 +33,12 @@ export type StartCheckoutInput = {
   // the wrong account. null/undefined for anonymous visitors (Stripe
   // collects the email itself).
   email?: string | null;
+  // Acquisition channel for attribution. Stamped into Stripe session
+  // metadata.source → read by the webhook as acquisitionSource. e.g.
+  // "free_upgrade" when an email-captured Free member converts to Pro, so
+  // free→Pro conversions are distinguishable from cold anonymous checkouts.
+  // Defaults server-side to "start".
+  source?: string | null;
 };
 
 export type StartCheckoutResult =
@@ -57,6 +63,7 @@ async function postCheckout(input: StartCheckoutInput, includeCode: boolean): Pr
       // Lock the Stripe email field to the signed-in account (omitted/null
       // for anonymous visitors → Stripe collects it).
       email: input.email || null,
+      source: input.source || null,
       ...(input.utms || {}),
     }),
   });
