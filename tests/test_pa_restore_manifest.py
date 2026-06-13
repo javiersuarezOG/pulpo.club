@@ -80,7 +80,10 @@ def test_vercel_deploy_uses_archive_retry_and_pinned_cli():
         "- name: Nightly summary", 1
     )[0]
 
-    assert "npm install -g vercel@44.7.3" in deploy_step
+    # Pinned CLI version — bumped 44.7.3 → 47.2.2 (2026-06-13) when Vercel's
+    # deploy endpoint began rejecting the older client. Update both this
+    # assertion and the workflow together on future bumps.
+    assert "npm install -g vercel@47.2.2" in deploy_step
     assert "vercel deploy --prod --yes --archive=tgz" in deploy_step
     assert "for attempt in 1 2" in deploy_step
 
