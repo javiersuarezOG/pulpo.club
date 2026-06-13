@@ -1107,7 +1107,16 @@ def _download_hires_photos(listings, repo: Path) -> dict:
         print(f"[hires] start  {li.source}__{li.source_id} url={url}", file=sys.stderr)
         fetch_t0 = _time.monotonic()
         try:
-            r = httpx.get(url, timeout=8.0, follow_redirects=True)
+            # Explicit per-phase timeout (not a bare float): the same t_full
+            # Cloudinary URLs that hung the scrape-time HEAD (dribbled bytes
+            # past a float read-timeout; froze the nightly 2026-06-13) are
+            # fetched here. An explicit read timeout bounds a dribbling body
+            # so one slow derivative can't eat the whole hires wall budget.
+            r = httpx.get(
+                url,
+                timeout=httpx.Timeout(8.0, connect=8.0, read=8.0, write=8.0, pool=8.0),
+                follow_redirects=True,
+            )
             r.raise_for_status()
             raw = r.content
         except Exception as e:
