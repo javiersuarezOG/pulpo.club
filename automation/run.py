@@ -2740,6 +2740,18 @@ def main() -> int:
     # pipeline_started via the shared distinct_id (`pipeline:nightly`),
     # so PostHog stitches them by run order; per-run drill-down uses
     # the run_id property propagated by posthog_client.set_run_id.
+    # Scrape-phase observability (added 2026-06-13 after the nightly freeze):
+    # per-source crawl seconds are already measured in source_durations; surface
+    # the total + the slowest source here. The freeze was a slow scrape phase
+    # creeping toward the 240-min job cap, invisible because only the OVERALL
+    # duration_s was emitted — and a HUNG run emits no completion event at all
+    # (see the operator alerts in the PR / postmortem: alert on pipeline_started
+    # with no pipeline_completed within the cap window, and on scrape_total_s /
+    # duration_s p95 trending up). slowest_source names the long pole instantly.
+    _scrape_total_s = round(sum(source_durations.values()), 1)
+    _slowest_src, _slowest_s = ("", 0.0)
+    if source_durations:
+        _slowest_src, _slowest_s = max(source_durations.items(), key=lambda kv: kv[1])
     _ph_capture("pipeline_completed", {
         "ranked_count":            len(ranked),
         "dropped":                 dropped,
@@ -2747,9 +2759,14 @@ def main() -> int:
         "sources_succeeded":       sum(1 for s in sources if s.strip() not in source_errors and per_source_count.get(s.strip(), 0) > 0),
         "sources_failed":          len([s for s in sources if s.strip() in source_errors]),
         "duration_s":              round((finished - started).total_seconds(), 2),
+        "scrape_total_s":          _scrape_total_s,
+        "scrape_slowest_source":   _slowest_src,
+        "scrape_slowest_s":        round(_slowest_s, 1),
         "offline":                 offline,
         "fixture_fallback_active": fixture_fallback_active,
     })
+    print(f"[pipeline] scrape_total={_scrape_total_s}s slowest={_slowest_src}({round(_slowest_s,1)}s) "
+          f"wall={round((finished - started).total_seconds(),1)}s")
 
     # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}
     # so weekly drift in field populations is visible without a manual re-run.
