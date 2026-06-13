@@ -198,7 +198,18 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
     candidates = []
     for url in photo_urls[:cap]:
         try:
-            r = httpx.get(url, timeout=5.0, follow_redirects=True)
+            # Explicit per-phase timeout (not a bare float): these are the same
+            # t_full Cloudinary URLs that hung the scrape-time HEAD and the hires
+            # GET (on-demand full-res generation dribbles bytes, so a float
+            # read-timeout never fires). This hero-download loop has NO wall
+            # budget, so one un-bounded GET wedges the whole phase indefinitely —
+            # the hang that survived the validate_via_head fix (froze nightly
+            # 2026-06-13). An explicit read timeout bounds each download.
+            r = httpx.get(
+                url,
+                timeout=httpx.Timeout(5.0, connect=5.0, read=5.0, write=5.0, pool=5.0),
+                follow_redirects=True,
+            )
             r.raise_for_status()
         except Exception as e:
             if on_url_error is not None:
