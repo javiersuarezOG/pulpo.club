@@ -1215,7 +1215,14 @@ jobs:
             echo "::error::VERCEL_TOKEN secret is empty — deploy cannot run. Rotate/restore it in Settings → Secrets."
             exit 1
           fi
-          npm install -g vercel@44.7.3
+          # Pinned to 47.2.2 (2026-06-13): Vercel's deploy endpoint began
+          # rejecting CLI 44.7.3 with "Your Vercel CLI version is outdated.
+          # This endpoint requires version 47.2.2 or later." (nightly
+          # 27471280829 — auth + 2.8GB upload succeeded, then the server
+          # rejected the old client). Vercel deprecates old CLIs server-side
+          # over time, so this pin needs periodic bumps; if this error recurs,
+          # raise it to the version named in the error.
+          npm install -g vercel@47.2.2
           for attempt in 1 2; do
             if vercel deploy --prod --yes --archive=tgz --token "$VERCEL_TOKEN"; then
               exit 0
