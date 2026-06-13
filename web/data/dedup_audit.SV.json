@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-12T13:18:58.849900+00:00",
+  "computed_at": "2026-06-13T16:37:44.167371+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -432,6 +432,34 @@
       ],
       "sources": [
         "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "0d6b8b66dd6a87142a811633bac75fc783ea6048",
+      "samples": [
+        {
+          "area_m2": 11515.77,
+          "price_usd": 3625000.0,
+          "source": "remax",
+          "source_id": "001461962093",
+          "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
+          "url": "https://www.remax-elsalvador.com/001461962093",
+          "zone": "el-zonte"
+        },
+        {
+          "area_m2": 11515.77,
+          "price_usd": 3625000.0,
+          "source": "remax",
+          "source_id": "001461962092",
+          "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
+          "url": "https://www.remax-elsalvador.com/001461962092",
+          "zone": "el-zonte"
+        }
+      ],
+      "sources": [
+        "remax"
       ]
     },
     {
@@ -1062,10 +1090,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 53,
-      "raw": 53,
+      "kept_as_unique": 29,
+      "raw": 29,
       "shared_with_others": 0,
-      "unique_in_source": 53
+      "unique_in_source": 29
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1074,10 +1102,10 @@
       "unique_in_source": 40
     },
     "goodlife": {
-      "kept_as_unique": 39,
-      "raw": 39,
+      "kept_as_unique": 37,
+      "raw": 37,
       "shared_with_others": 0,
-      "unique_in_source": 39
+      "unique_in_source": 37
     },
     "nexo": {
       "kept_as_unique": 5,
@@ -1092,10 +1120,10 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 280,
-      "raw": 309,
+      "kept_as_unique": 270,
+      "raw": 299,
       "shared_with_others": 0,
-      "unique_in_source": 280
+      "unique_in_source": 270
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1104,10 +1132,10 @@
       "unique_in_source": 98
     },
     "remax": {
-      "kept_as_unique": 300,
-      "raw": 314,
+      "kept_as_unique": 302,
+      "raw": 317,
       "shared_with_others": 0,
-      "unique_in_source": 300
+      "unique_in_source": 302
     },
     "santizo": {
       "kept_as_unique": 89,
@@ -1128,6 +1156,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2127,
-  "total_unique_fingerprints": 2077
+  "total_in_dataset": 2094,
+  "total_unique_fingerprints": 2043
 }

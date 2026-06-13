@@ -111982,5 +111982,323 @@
     "cost_usd": 0.00133959,
     "finish_reason": "stop",
     "latency_ms": 5522
+  },
+  "realestate_au_sv|inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289": {
+    "ts": "2026-06-13T16:37:49.361852+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land parcel in El Zonte, Chiltiupán",
+      "es": "Parcela de terreno en El Zonte, Chiltiupán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel #06 in Polígono 1, El Zonte, Chiltiupán, La Libertad. Located in the La Libertad coastal area. Priced at $3,625,000.",
+      "es": "Parcela de terreno #06 en Polígono 1, El Zonte, Chiltiupán, La Libertad. Ubicada en la zona costera de La Libertad. Precio: $3,625,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in El Zonte",
+        "es": "Ubicado en El Zonte"
+      },
+      {
+        "en": "Coastal area of La Libertad",
+        "es": "Zona costera de La Libertad"
+      },
+      {
+        "en": "Part of Polígono 1",
+        "es": "Parte del Polígono 1"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3116,
+    "tokens_out": 397,
+    "cost_usd": 0.00127802,
+    "finish_reason": "stop",
+    "latency_ms": 4276
+  },
+  "remax|001461962093": {
+    "ts": "2026-06-13T16:37:50.184992+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "2.67-Acre Cliffside Lot with Ocean Views in El Zonte",
+      "es": "Terreno Acantilado de 2.67 Acres con Vista al Mar en El Zonte"
+    },
+    "short_description_canonical": {
+      "en": "11,516 m² cliffside lot in El Zonte, La Libertad, with panoramic Pacific Ocean views. Part of the Surf City initiative with government-backed infrastructure improvements. Priced at $3,625,000, ideal for a major development project.",
+      "es": "Lote acantilado de 11,516 m² en El Zonte, La Libertad, con vistas panorámicas al Océano Pacífico. Parte de la iniciativa Surf City con mejoras de infraestructura respaldadas por el gobierno. Precio de $3,625,000, ideal para un proyecto de desarrollo importante."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2.67 acres cliffside with ocean views",
+        "es": "2.67 acres acantilado con vista al mar"
+      },
+      {
+        "en": "Part of Surf City initiative",
+        "es": "Parte de la iniciativa Surf City"
+      },
+      {
+        "en": "Government-backed infrastructure improvements",
+        "es": "Mejoras de infraestructura respaldadas por el gobierno"
+      },
+      {
+        "en": "Fast-growing coastal real estate market",
+        "es": "Mercado inmobiliario costero de rápido crecimiento"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3269,
+    "tokens_out": 477,
+    "cost_usd": 0.00140733,
+    "finish_reason": "stop",
+    "latency_ms": 5099
+  },
+  "realestate_au_sv|ubicacion-hato-nuevo-san-miguel-a-pocos-metros-de-la-carretera-ruta-militar-y-del-by-pass-gerardo-barrios-hato-nuevo-san-miguel-hato-nuevo-san-miguel-310108733288": {
+    "ts": "2026-06-13T16:37:50.257060+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot near Ruta Militar, San Miguel",
+      "es": "Terreno 850 m² cerca de Ruta Militar, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Hato Nuevo, San Miguel, near Ruta Militar and By Pass Gerardo Barrios. Zoned for residential use with road access and utilities available. Priced at $450,000, below zone median per m².",
+      "es": "Terreno residencial plano de 850 m² en Hato Nuevo, San Miguel, cerca de Ruta Militar y By Pass Gerardo Barrios. Zona residencial con acceso vial y servicios disponibles. Precio de $450,000, por debajo de la mediana de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Terreno plano de 850 m²"
+      },
+      {
+        "en": "Near Ruta Militar and By Pass",
+        "es": "Cerca de Ruta Militar y By Pass"
+      },
+      {
+        "en": "Residential zoning with utilities",
+        "es": "Zona residencial con servicios"
+      },
+      {
+        "en": "Below zone median price per m²",
+        "es": "Precio por m² bajo la mediana de la zona"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 460,
+    "cost_usd": 0.00134381,
+    "finish_reason": "stop",
+    "latency_ms": 5171
+  },
+  "santizo|9574927": {
+    "ts": "2026-06-13T16:37:53.133370+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "7 Luxury Villas in Temozón Norte, Mérida",
+      "es": "7 Villas de Lujo en Temozón Norte, Mérida"
+    },
+    "short_description_canonical": {
+      "en": "7 luxury villas in Temozón Norte, Mérida, designed for high-quality living. Each villa offers spacious interiors and premium finishes. Located in a high-appreciation area.",
+      "es": "7 villas de lujo en Temozón Norte, Mérida, diseñadas para una vida de alta calidad. Cada villa ofrece interiores espaciosos y acabados premium. Ubicadas en una zona de alta plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "7 luxury villas in one project",
+        "es": "7 villas de lujo en un proyecto"
+      },
+      {
+        "en": "High-appreciation area in Mérida",
+        "es": "Zona de alta plusvalía en Mérida"
+      },
+      {
+        "en": "Designed for comfort and quality",
+        "es": "Diseñadas para confort y calidad"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3081,
+    "tokens_out": 390,
+    "cost_usd": 0.00126087,
+    "finish_reason": "stop",
+    "latency_ms": 3771
+  },
+  "santizo|9574928": {
+    "ts": "2026-06-13T16:37:53.364288+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Townhouse in Mérida, Yucatán, Mexico",
+      "es": "Townhouse en Mérida, Yucatán, México"
+    },
+    "short_description_canonical": {
+      "en": "This townhouse is located in Mérida, Yucatán, Mexico, not El Salvador. It features double-height ceilings, a private pool, and wooden finishes. The property is part of a development of seven townhouses in the Temozón area.",
+      "es": "Este townhouse está ubicado en Mérida, Yucatán, México, no en El Salvador. Cuenta con techos de doble altura, piscina privada y acabados en madera. La propiedad es parte de un desarrollo de siete townhouses en la zona de Temozón."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Double-height ceilings",
+        "es": "Techos de doble altura"
+      },
+      {
+        "en": "Private indoor pool",
+        "es": "Piscina interior privada"
+      },
+      {
+        "en": "Wooden finishes",
+        "es": "Acabados en madera"
+      },
+      {
+        "en": "Part of 7-townhouse development",
+        "es": "Parte de desarrollo de 7 townhouses"
+      },
+      {
+        "en": "Located in growing Temozón area",
+        "es": "Ubicado en la creciente zona de Temozón"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3446,
+    "tokens_out": 465,
+    "cost_usd": 0.00144192,
+    "finish_reason": "stop",
+    "latency_ms": 4364
+  },
+  "encuentra24|32563529": {
+    "ts": "2026-06-13T17:20:28.186665+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view house with private beach access, 7 bedrooms",
+      "es": "Casa con vista al mar y acceso privado a la playa, 7 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "Unique 882 m² house on a 9,710 m² lot atop a mountain in Chumico Redondo, Río Hato, with panoramic ocean views. It has 7 bedrooms, 6 bathrooms, a pool, terrace, balcony, and two additional guest structures. Direct private beach access and exclusive residential complex of only 6 homes.",
+      "es": "Casa única de 882 m² en un terreno de 9,710 m² en la cima de una montaña en Chumico Redondo, Río Hato, con vistas panorámicas al océano. Cuenta con 7 habitaciones, 6 baños, piscina, terraza, balcón y dos construcciones adicionales para invitados. Acceso directo y privado a la playa y residencial exclusivo de solo 6 casas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct private beach access",
+        "es": "Acceso directo y privado a la playa"
+      },
+      {
+        "en": "Panoramic ocean views from mountaintop",
+        "es": "Vistas panorámicas al océano desde la cima"
+      },
+      {
+        "en": "Exclusive 6-home residential complex",
+        "es": "Residencial exclusivo de solo 6 casas"
+      },
+      {
+        "en": "882 m² built on 9,710 m² lot",
+        "es": "882 m² construidos en 9,710 m² de terreno"
+      },
+      {
+        "en": "Two additional guest structures",
+        "es": "Dos construcciones adicionales para invitados"
+      }
+    ],
+    "lat": 8.2833,
+    "lng": -80.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chumico Redondo, Río Hato",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 7,
+      "bathrooms": 6.0,
+      "built_area_m2": 882.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2591,
+    "tokens_out": 576,
+    "cost_usd": 0.00133317,
+    "finish_reason": "stop",
+    "latency_ms": 5077
   }
 }

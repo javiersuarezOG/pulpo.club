@@ -435,6 +435,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "0d6b8b66dd6a87142a811633bac75fc783ea6048",
+    "samples": [
+      {
+        "area_m2": 11515.77,
+        "price_usd": 3625000.0,
+        "source": "remax",
+        "source_id": "001461962093",
+        "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
+        "url": "https://www.remax-elsalvador.com/001461962093",
+        "zone": "el-zonte"
+      },
+      {
+        "area_m2": 11515.77,
+        "price_usd": 3625000.0,
+        "source": "remax",
+        "source_id": "001461962092",
+        "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
+        "url": "https://www.remax-elsalvador.com/001461962092",
+        "zone": "el-zonte"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "2219e5242b117f34c602369561c809a91d306026",
     "samples": [
       {
