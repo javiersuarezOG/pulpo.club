@@ -1178,8 +1178,15 @@ jobs:
         # Direct vercel deploy --prod: no local build needed — this is a static
         # site (buildCommand = "echo ..."). Skipping vercel build avoids the
         # 'spawn uv ENOENT' error caused by Vercel CLI trying to install Python
-        # deps on the runner. VERCEL_TOKEN env var is read automatically by the
-        # CLI; no --token flag needed (which was rejected for containing hyphens).
+        # deps on the runner.
+        # IMPORTANT: Vercel CLI 44.x does NOT read the VERCEL_TOKEN env var —
+        # only `--token` works. The env-var assumption shipped in #830 and the
+        # step failed every run since with "No existing credentials found"
+        # (first real execution: run 27413389659, 2026-06-12 — data committed,
+        # deploy dead, site only refreshed because human PR merges triggered
+        # integration deploys). The value is passed via "$VERCEL_TOKEN" quoted,
+        # which is also the fix for the earlier hyphen-rejection: that came
+        # from unquoted interpolation, not from --token itself.
         # vercel.json ignoreCommand stops the GitHub-integration from making a
         # duplicate Blocked deploy for the same bot commit.
         id: deploy
@@ -1189,9 +1196,13 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret is empty — deploy cannot run. Rotate/restore it in Settings → Secrets."
+            exit 1
+          fi
           npm install -g vercel@44.7.3
           for attempt in 1 2; do
-            if vercel deploy --prod --yes --archive=tgz; then
+            if vercel deploy --prod --yes --archive=tgz --token "$VERCEL_TOKEN"; then
               exit 0
             fi
             echo "::warning::Vercel deploy attempt $attempt failed"
