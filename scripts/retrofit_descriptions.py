@@ -61,7 +61,7 @@ from automation.llm_enrichment_prompts import (  # type: ignore  # noqa: E402
 )
 from automation.llm_enrichment_schema import (  # type: ignore  # noqa: E402
     DEFAULT_SCHEMA, _apply_extracted_facts, _FACT_KEYS,
-    _normalize_localized, validate_response,
+    _normalize_localized,
 )
 
 
@@ -130,7 +130,7 @@ def apply_result(entry: dict, listing: dict, parsed: dict,
     """Write a validated v4 response onto the sidecar entry and mirror it
     onto the ranked listing. Mutates both dicts in place.
 
-    Pre-condition: validate_response(parsed, DEFAULT_SCHEMA) returned ok.
+    Pre-condition: the consumed-fields validation in _rewrite_one passed.
 
     Replaces: title_canonical, short_description_canonical,
     reasons_to_buy, extracted_facts (sanitized; only-fill-nulls merge on
@@ -296,7 +296,26 @@ def _rewrite_one(client, key: str, listing: dict) -> dict:
             continue
         usage = usage_or_reason
         spent += usage["cost_usd"]
-        ok, reason = validate_response(parsed, DEFAULT_SCHEMA)
+        # We discard the response's latlong (cached geocoding is preserved,
+        # even when the cache has none), yet validate_response checks the
+        # WHOLE schema — so a malformed latlong rejected entries whose copy
+        # was perfectly good (37/1828 in the 2026-06-13 backfill, all
+        # `invalid:latlong`; 26 of those have NO cached lat/lng either, so
+        # substitution can't fix them). Validate exactly what we consume:
+        # every schema field EXCEPT latlong.
+        ok, reason = True, None
+        if not isinstance(parsed, dict):
+            ok, reason = False, "not_a_dict"
+        else:
+            for _f in DEFAULT_SCHEMA.fields:
+                if _f.json_key == "latlong":
+                    continue
+                if _f.json_key not in parsed:
+                    ok, reason = False, f"missing:{_f.json_key}"
+                    break
+                if not _f.validate(parsed[_f.json_key]):
+                    ok, reason = False, f"invalid:{_f.json_key}"
+                    break
         if ok:
             usage["cost_usd"] = round(spent, 8)  # charge retries to the entry
             return {"key": key, "ok": True, "parsed": parsed, "usage": usage}
