@@ -18,31 +18,19 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-13T16:43:14.265365+00:00",
-  "expires_at": "2026-06-14T00:00:00+00:00",
+  "picked_at": "2026-06-14T07:42:50.865138+00:00",
+  "expires_at": "2026-06-15T00:00:00+00:00",
   "tier": "elite",
-  "listing_id": "encuentra24|32426908",
-  "rank_score": 83.83,
-  "hero_photo_quality_score": 100,
+  "listing_id": "bienesraices|1424",
+  "rank_score": 79.13,
+  "hero_photo_quality_score": 90,
   "fallback": false,
   "pool": [
-    {
-      "listing_id": "encuentra24|32426908",
-      "rank_score": 83.83,
-      "hero_photo_quality_score": 100,
-      "photos_count": 12
-    },
     {
       "listing_id": "bienesraices|1424",
       "rank_score": 79.13,
       "hero_photo_quality_score": 90,
       "photos_count": 9
-    },
-    {
-      "listing_id": "encuentra24|31345998",
-      "rank_score": 77.16,
-      "hero_photo_quality_score": 100,
-      "photos_count": 13
     },
     {
       "listing_id": "bienesraices|1783",
@@ -74,18 +62,18 @@
       "card_eligible": true
     },
     {
-      "listing_id": "encuentra24|32426908",
-      "rank_score": 83.83,
-      "master_category": "beach",
-      "subcategory": "condos",
+      "listing_id": "citymax|152836",
+      "rank_score": 81.23,
+      "master_category": null,
+      "subcategory": "land",
       "star_rating": 4.5,
       "hero_eligible": true,
       "card_eligible": true
     },
     {
-      "listing_id": "citymax|152836",
-      "rank_score": 81.23,
-      "master_category": null,
+      "listing_id": "remax|002282623028",
+      "rank_score": 78.87,
+      "master_category": "beach",
       "subcategory": "land",
       "star_rating": 4.5,
       "hero_eligible": true,
