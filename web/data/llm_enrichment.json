@@ -112300,5 +112300,62 @@
     "cost_usd": 0.00133317,
     "finish_reason": "stop",
     "latency_ms": 5077
+  },
+  "encuentra24|30632901": {
+    "ts": "2026-06-14T08:17:11.977990+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House in Gated Community, 6 min to Coronado",
+      "es": "Casa 3 hab en conjunto cerrado, a 6 min de Coronado"
+    },
+    "short_description_canonical": {
+      "en": "House of 133 m² on a 228 m² lot in a gated community with social area and pool. 3 bedrooms, 2 bathrooms, 2 parking spaces, covered front terrace and rear yard. 6 minutes from Coronado, the central hub of Panama's Pacific Riviera.",
+      "es": "Casa de 133 m² en terreno de 228 m² en conjunto cerrado con área social y piscina. 3 recámaras, 2 baños, 2 estacionamientos, terraza techada frontal y patio trasero. A 6 minutos de Coronado, el eje central de la Riviera del Pacífico de Panamá."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with pool and BBQ",
+        "es": "Conjunto cerrado con piscina y barbacoas"
+      },
+      {
+        "en": "6 minutes from Coronado's services",
+        "es": "A 6 minutos de servicios de Coronado"
+      },
+      {
+        "en": "Includes A/C, fans, lamps, curtains",
+        "es": "Incluye aires, abanicos, lámparas y cortinas"
+      },
+      {
+        "en": "Low HOA fee of $140/month",
+        "es": "Mantenimiento bajo de $140/mes"
+      },
+      {
+        "en": "Price $136,000 - good investment",
+        "es": "Precio $136,000 - buena inversión"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 133.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2607,
+    "tokens_out": 542,
+    "cost_usd": 0.00130009,
+    "finish_reason": "stop",
+    "latency_ms": 5844
   }
 }
