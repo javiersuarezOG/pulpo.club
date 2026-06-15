@@ -112357,5 +112357,445 @@
     "cost_usd": 0.00130009,
     "finish_reason": "stop",
     "latency_ms": 5844
+  },
+  "realestate_au_sv|inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442": {
+    "ts": "2026-06-15T08:21:36.913233+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land parcel in El Zonte, La Libertad",
+      "es": "Parcela de terreno en El Zonte, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel #06, polygon 1 in El Zonte, Chiltiupán, La Libertad. This lot is located in the coastal area of La Libertad. Offered for sale at $3,625,000.",
+      "es": "Parcela de terreno #06, polígono 1 en El Zonte, Chiltiupán, La Libertad. Este lote está ubicado en la zona costera de La Libertad. Se ofrece en venta por $3,625,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in El Zonte, La Libertad",
+        "es": "Ubicado en El Zonte, La Libertad"
+      },
+      {
+        "en": "Coastal area of La Libertad",
+        "es": "Zona costera de La Libertad"
+      },
+      {
+        "en": "Parcel #06, polygon 1",
+        "es": "Parcela #06, polígono 1"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3116,
+    "tokens_out": 414,
+    "cost_usd": 0.00129672,
+    "finish_reason": "stop",
+    "latency_ms": 4158
+  },
+  "encuentra24|32068320": {
+    "ts": "2026-06-15T08:21:37.778760+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House with Ocean View, Zaragoza, La Libertad",
+      "es": "Casa 3 habs con vista al mar, Zaragoza, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "90 m² house in Zaragoza, La Libertad, with 3 bedrooms and 2.5 bathrooms. Features 2 parking spaces, A/C, solar panels, and ocean view from terrace. Currently rented at $1,250/month until October 2027, offering immediate cash flow.",
+      "es": "Casa de 90 m² en Zaragoza, La Libertad, con 3 habitaciones y 2.5 baños. Incluye 2 estacionamientos, A/A, paneles solares y vista al mar desde terraza. Actualmente alquilada en $1,250/mes hasta octubre 2027, generando flujo inmediato."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Rented at $1,250/month until Oct 2027",
+        "es": "Alquilada en $1,250/mes hasta oct 2027"
+      },
+      {
+        "en": "Ocean view from second-level terrace",
+        "es": "Vista al mar desde terraza del segundo nivel"
+      },
+      {
+        "en": "Solar panels included",
+        "es": "Paneles solares incluidos"
+      },
+      {
+        "en": "Airbnb permitted in condominium",
+        "es": "Se permite Airbnb en el condominio"
+      },
+      {
+        "en": "2 parking spaces",
+        "es": "2 estacionamientos"
+      }
+    ],
+    "lat": 13.586,
+    "lng": -89.294,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 90.0,
+      "parking_spaces": 2,
+      "furnished": false,
+      "has_pool": true
+    },
+    "tokens_in": 3358,
+    "tokens_out": 521,
+    "cost_usd": 0.00147976,
+    "finish_reason": "stop",
+    "latency_ms": 5024
+  },
+  "encuentra24|32549028": {
+    "ts": "2026-06-15T08:21:38.142921+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern 4BR House in Cumbres de Peñaflor, Near Surf City",
+      "es": "Casa Moderna 4 Dorm. en Cumbres de Peñaflor, Cerca Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Contemporary 220 m² house on a 400 v² lot in Residencial Cumbres de Peñaflor, Zaragoza. 4 bedrooms (master with A/C), 3.5 baths, quartz kitchen, terrace and garden. Built one year ago, 2 parking spaces, 15 min from Surf City.",
+      "es": "Casa contemporánea de 220 m² en lote de 400 v² en Residencial Cumbres de Peñaflor, Zaragoza. 4 dormitorios (principal con A/A), 3.5 baños, cocina de cuarzo, terraza y jardín. Construida hace un año, 2 estacionamientos, a 15 min de Surf City."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Built only one year ago",
+        "es": "Construida hace solo un año"
+      },
+      {
+        "en": "4 bedrooms, one independent",
+        "es": "4 dormitorios, uno independiente"
+      },
+      {
+        "en": "15 minutes from Surf City",
+        "es": "15 minutos de Surf City"
+      },
+      {
+        "en": "Gated community on La Libertad road",
+        "es": "Residencial privado sobre carretera a La Libertad"
+      },
+      {
+        "en": "Quartz countertops in kitchen",
+        "es": "Topes de cuarzo en cocina"
+      }
+    ],
+    "lat": 13.589,
+    "lng": -89.264,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.5,
+      "built_area_m2": 220.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3514,
+    "tokens_out": 543,
+    "cost_usd": 0.00154608,
+    "finish_reason": "stop",
+    "latency_ms": 5388
+  },
+  "encuentra24|24092018": {
+    "ts": "2026-06-15T09:03:01.799836+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished 3BR House Near Playa Malibú, Panama",
+      "es": "Casa Amoblada 3 Hab. Cerca de Playa Malibú, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "Furnished 350 m² house in Nueva Gorgona, steps from Playa Malibú. 3 bedrooms, 2 bathrooms, 4 parking spaces, pool, and gazebo. Located 1 hour from Panama City, with easy access to services and beaches.",
+      "es": "Casa amoblada de 350 m² en Nueva Gorgona, a pasos de Playa Malibú. 3 recámaras, 2 baños, 4 estacionamientos, piscina y gazebo. Ubicada a 1 hora de la Ciudad de Panamá, con fácil acceso a servicios y playas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from Playa Malibú beach",
+        "es": "A pasos de la playa Malibú"
+      },
+      {
+        "en": "Fully furnished, move-in ready",
+        "es": "Totalmente amoblado, listo para mudarse"
+      },
+      {
+        "en": "350 m² with pool and gazebo",
+        "es": "350 m² con piscina y gazebo"
+      },
+      {
+        "en": "1 hour from Panama City",
+        "es": "1 hora de la Ciudad de Panamá"
+      }
+    ],
+    "lat": 8.4333,
+    "lng": -79.8833,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Malibú, Nueva Gorgona, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 350.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2589,
+    "tokens_out": 501,
+    "cost_usd": 0.00125013,
+    "finish_reason": "stop",
+    "latency_ms": 5241
+  },
+  "encuentra24|32510492": {
+    "ts": "2026-06-15T09:03:01.887275+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House with Guest House, Pool, Coronado",
+      "es": "Casa frente al mar con casa de huéspedes, piscina, Coronado"
+    },
+    "short_description_canonical": {
+      "en": "House for sale on the street parallel to the sea in Coronado. 330 m² built with 3 bedrooms, 3 bathrooms, and a guest house with 1 bedroom and bathroom. Features a large lot with garden, gazebo, pool, and excellent location facing the beach access.",
+      "es": "Casa en venta en la calle paralela al mar en Coronado. 330 m² construidos con 3 recámaras, 3 baños y casa de huéspedes con 1 recámara y baño. Cuenta con amplio terreno con jardín, gazebo, piscina y excelente ubicación frente a la bajada a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location, steps to beach",
+        "es": "Ubicación frente al mar, pasos de la playa"
+      },
+      {
+        "en": "Guest house with own bedroom and bath",
+        "es": "Casa de huéspedes con recámara y baño propio"
+      },
+      {
+        "en": "Pool, gazebo, and large garden",
+        "es": "Piscina, gazebo y amplio jardín"
+      },
+      {
+        "en": "3 parking spaces",
+        "es": "3 espacios de estacionamiento"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 330.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2322,
+    "tokens_out": 502,
+    "cost_usd": 0.00117914,
+    "finish_reason": "stop",
+    "latency_ms": 5327
+  },
+  "encuentra24|31960545": {
+    "ts": "2026-06-15T09:03:02.144636+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Estate with 6BR House in Playa Nanzal",
+      "es": "Finca frente al mar con casa de 6 hab. en Playa Nanzal"
+    },
+    "short_description_canonical": {
+      "en": "1.5-hectare beachfront property on a quiet stretch of Playa Nanzal with direct ocean access. The 492 m² main residence has 6 bedrooms, 6 bathrooms, high ceilings, and a modern kitchen. Sold fully furnished with appliances, includes 4 parking spaces.",
+      "es": "Propiedad frente al mar de 1.5 hectáreas en un tramo tranquilo de Playa Nanzal con acceso directo al océano. La residencia principal de 492 m² tiene 6 dormitorios, 6 baños, techos altos y cocina moderna. Se vende totalmente amueblada con electrodomésticos, incluye 4 estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1.5-hectare beachfront lot",
+        "es": "Lote frente al mar de 1.5 hectáreas"
+      },
+      {
+        "en": "492 m² house, 6 bedrooms",
+        "es": "Casa de 492 m², 6 dormitorios"
+      },
+      {
+        "en": "Sold fully furnished",
+        "es": "Se vende totalmente amueblada"
+      },
+      {
+        "en": "4 parking spaces included",
+        "es": "Incluye 4 estacionamientos"
+      },
+      {
+        "en": "Quiet, low-light coastal setting",
+        "es": "Entorno costero tranquilo y con poca luz"
+      }
+    ],
+    "lat": 8.25,
+    "lng": -79.0,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Nanzal, San Lorenzo, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 6.0,
+      "built_area_m2": 492.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2598,
+    "tokens_out": 539,
+    "cost_usd": 0.00129436,
+    "finish_reason": "stop",
+    "latency_ms": 5584
+  },
+  "encuentra24|31450973": {
+    "ts": "2026-06-15T09:03:02.345758+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4BR House with Sea & Mountain Views in Las Lajas",
+      "es": "Casa 4 habs con vista al mar y montaña en Las Lajas"
+    },
+    "short_description_canonical": {
+      "en": "Newly built 242 m² house on 6,600 m² lot in Las Lajas, Chame. 4 bedrooms each with private bath, open-concept kitchen, terrace with private pool and sea views. Located 2 minutes from the main road, 5 minutes from local market, 17 minutes from Coronado.",
+      "es": "Casa a estrenar de 242 m² en terreno de 6,600 m² en Las Lajas, Chame. 4 recámaras cada una con baño privado, cocina abierta, terraza con piscina privada y vista al mar. Ubicada a 2 minutos de la vía principal, 5 minutos del minimercado, 17 minutos de Coronado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "New construction, never lived in",
+        "es": "A estrenar, nunca habitada"
+      },
+      {
+        "en": "Private pool with ocean views",
+        "es": "Piscina privada con vista al mar"
+      },
+      {
+        "en": "4 bedrooms each with private bath",
+        "es": "4 recámaras cada una con baño privado"
+      },
+      {
+        "en": "Large lot of 6,600 m²",
+        "es": "Gran terreno de 6,600 m²"
+      },
+      {
+        "en": "Security cameras and electric gate",
+        "es": "Cámaras de seguridad y portón eléctrico"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 242.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2635,
+    "tokens_out": 540,
+    "cost_usd": 0.00130545,
+    "finish_reason": "stop",
+    "latency_ms": 5785
+  },
+  "encuentra24|29690073": {
+    "ts": "2026-06-15T09:03:02.600745+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Duplex in Playa Blanca Resort, 4BR, 454m²",
+      "es": "Dúplex en Playa Blanca Resort, 4 hab, 454m²"
+    },
+    "short_description_canonical": {
+      "en": "Duplex within Playa Blanca Resort, El Farallón. 454 m² built on 510 m² lot, 4 bedrooms (3 en-suite), 4 bathrooms, plus service quarters. Open kitchen with appliances, terrace, barbecue area, 2 covered parking spaces. 5-minute walk to beach, resort pool with bohío, security gate.",
+      "es": "Dúplex dentro de Playa Blanca Resort, El Farallón. 454 m² construidos en 510 m² de terreno, 4 recámaras (3 con baño privado), 4 baños, más cuarto de servicio. Cocina abierta con electrodomésticos, terraza, área de barbacoa, 2 estacionamientos techados. A 5 minutos caminando de la playa, piscina del resort con bohío, garita de seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5-min walk to beach",
+        "es": "5 min caminando a la playa"
+      },
+      {
+        "en": "Resort pool with bohío",
+        "es": "Piscina del resort con bohío"
+      },
+      {
+        "en": "4 bedrooms, 3 en-suite",
+        "es": "4 recámaras, 3 con baño privado"
+      },
+      {
+        "en": "2 covered parking spaces",
+        "es": "2 estacionamientos techados"
+      },
+      {
+        "en": "3 km from commercial plaza",
+        "es": "3 km de plaza comercial"
+      }
+    ],
+    "lat": 8.2833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Blanca Resort, El Farallón",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 454.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2572,
+    "tokens_out": 564,
+    "cost_usd": 0.00131484,
+    "finish_reason": "stop",
+    "latency_ms": 6041
   }
 }

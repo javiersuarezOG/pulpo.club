@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-14T07:42:40.506284+00:00",
+  "computed_at": "2026-06-15T08:27:52.624302+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
@@ -9,7 +9,7 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 165,
+        "count": 163,
         "renders_on_homepage": true
       },
       "beach_land": {
@@ -116,7 +116,7 @@
       },
       "oceanside": {
         "coverage_pct_vs_discovered": null,
-        "kept": 24,
+        "kept": 23,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -143,8 +143,8 @@
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 59.3,
-        "kept": 89,
+        "coverage_pct_vs_discovered": 58.7,
+        "kept": 88,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,7 +168,7 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1898,
+    "total_in_dataset": 1896,
     "total_visible_listings": 1663
   },
   "min_real_listings": 4
