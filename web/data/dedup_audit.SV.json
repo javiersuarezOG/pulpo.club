@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-14T07:35:42.804443+00:00",
+  "computed_at": "2026-06-15T08:21:32.026893+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -512,6 +512,34 @@
           "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448/",
           "zone": "armenia"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "2f9f137f1e3a0de43e2a0f753ab1d542f4cc6293",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 3625000.0,
+          "source": "realestate_au_sv",
+          "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442",
+          "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442/",
+          "zone": "el-zonte"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 3625000.0,
+          "source": "realestate_au_sv",
+          "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289",
+          "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289/",
+          "zone": "el-zonte"
         }
       ],
       "sources": [
@@ -1114,16 +1142,16 @@
       "unique_in_source": 5
     },
     "oceanside": {
-      "kept_as_unique": 24,
-      "raw": 24,
+      "kept_as_unique": 23,
+      "raw": 23,
       "shared_with_others": 0,
-      "unique_in_source": 24
+      "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 270,
+      "kept_as_unique": 269,
       "raw": 299,
       "shared_with_others": 0,
-      "unique_in_source": 270
+      "unique_in_source": 269
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1138,10 +1166,10 @@
       "unique_in_source": 302
     },
     "santizo": {
-      "kept_as_unique": 89,
-      "raw": 89,
+      "kept_as_unique": 88,
+      "raw": 88,
       "shared_with_others": 0,
-      "unique_in_source": 89
+      "unique_in_source": 88
     },
     "vivolatam": {
       "kept_as_unique": 156,
@@ -1156,6 +1184,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2094,
-  "total_unique_fingerprints": 2043
+  "total_in_dataset": 2092,
+  "total_unique_fingerprints": 2040
 }

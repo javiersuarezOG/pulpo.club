@@ -519,6 +519,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "2f9f137f1e3a0de43e2a0f753ab1d542f4cc6293",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 3625000.0,
+        "source": "realestate_au_sv",
+        "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442",
+        "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442/",
+        "zone": "el-zonte"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 3625000.0,
+        "source": "realestate_au_sv",
+        "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289",
+        "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289/",
+        "zone": "el-zonte"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "3695c504c47f59c1971316eaee4df9d48cd620eb",
     "samples": [
       {
