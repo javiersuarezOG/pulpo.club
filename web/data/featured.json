@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-15T08:28:02.352067+00:00",
-  "expires_at": "2026-06-16T00:00:00+00:00",
+  "picked_at": "2026-06-16T08:29:20.132425+00:00",
+  "expires_at": "2026-06-17T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "bienesraices|1424",
   "rank_score": 79.13,
@@ -46,7 +46,7 @@
     },
     {
       "listing_id": "bienesraices|2191",
-      "rank_score": 75.3,
+      "rank_score": 75.25,
       "hero_photo_quality_score": 100,
       "photos_count": 19
     }

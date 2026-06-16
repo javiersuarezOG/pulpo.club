@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-15T08:21:32.026893+00:00",
+  "computed_at": "2026-06-16T08:22:49.113177+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -661,6 +661,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "51914f44a9271f62ff473404ae787a0cd74b0187",
+      "samples": [
+        {
+          "area_m2": 199.88,
+          "price_usd": 49775.0,
+          "source": "remax",
+          "source_id": "001463160066",
+          "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
+          "url": "https://www.remax-elsalvador.com/001463160066",
+          "zone": "san-diego"
+        },
+        {
+          "area_m2": 199.88,
+          "price_usd": 50000.0,
+          "source": "remax",
+          "source_id": "001463160064",
+          "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
+          "url": "https://www.remax-elsalvador.com/001463160064",
+          "zone": "san-diego"
+        }
+      ],
+      "sources": [
+        "remax"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "53b99fd00af920a8ded47a9bb7803b340b6bce68",
       "samples": [
         {
@@ -1106,10 +1134,10 @@
       "unique_in_source": 158
     },
     "csbr": {
-      "kept_as_unique": 255,
-      "raw": 257,
+      "kept_as_unique": 257,
+      "raw": 259,
       "shared_with_others": 0,
-      "unique_in_source": 255
+      "unique_in_source": 257
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1118,10 +1146,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 28,
-      "raw": 28,
+      "kept_as_unique": 31,
+      "raw": 31,
       "shared_with_others": 0,
-      "unique_in_source": 28
+      "unique_in_source": 31
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1130,10 +1158,10 @@
       "unique_in_source": 40
     },
     "goodlife": {
-      "kept_as_unique": 37,
-      "raw": 37,
+      "kept_as_unique": 36,
+      "raw": 36,
       "shared_with_others": 0,
-      "unique_in_source": 37
+      "unique_in_source": 36
     },
     "nexo": {
       "kept_as_unique": 5,
@@ -1160,10 +1188,10 @@
       "unique_in_source": 98
     },
     "remax": {
-      "kept_as_unique": 302,
-      "raw": 317,
+      "kept_as_unique": 304,
+      "raw": 320,
       "shared_with_others": 0,
-      "unique_in_source": 302
+      "unique_in_source": 304
     },
     "santizo": {
       "kept_as_unique": 88,
@@ -1184,6 +1212,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2092,
-  "total_unique_fingerprints": 2040
+  "total_in_dataset": 2099,
+  "total_unique_fingerprints": 2046
 }

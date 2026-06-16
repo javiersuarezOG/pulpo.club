@@ -659,6 +659,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "51914f44a9271f62ff473404ae787a0cd74b0187",
+    "samples": [
+      {
+        "area_m2": 199.88,
+        "price_usd": 49775.0,
+        "source": "remax",
+        "source_id": "001463160066",
+        "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
+        "url": "https://www.remax-elsalvador.com/001463160066",
+        "zone": "san-diego"
+      },
+      {
+        "area_m2": 199.88,
+        "price_usd": 50000.0,
+        "source": "remax",
+        "source_id": "001463160064",
+        "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
+        "url": "https://www.remax-elsalvador.com/001463160064",
+        "zone": "san-diego"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "53b99fd00af920a8ded47a9bb7803b340b6bce68",
     "samples": [
       {

@@ -112797,5 +112797,828 @@
     "cost_usd": 0.00131484,
     "finish_reason": "stop",
     "latency_ms": 6041
+  },
+  "csbr|terreno-venta-valle-el-carmen-res-andalucia-san-salvador-centro": {
+    "ts": "2026-06-16T08:22:54.337661+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Valle El Carmen, San Salvador",
+      "es": "Terreno en Venta en Valle El Carmen, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lot in Residencial Andalucía, Valle El Carmen, San Salvador. Located in a residential area near the city center. Price: $499,741.",
+      "es": "Terreno plano en Residencial Andalucía, Valle El Carmen, San Salvador. Ubicado en zona residencial cerca del centro de la ciudad. Precio: $499,741."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat lot in residential area",
+        "es": "Terreno plano en zona residencial"
+      },
+      {
+        "en": "Near San Salvador city center",
+        "es": "Cerca del centro de San Salvador"
+      },
+      {
+        "en": "Listed on official real estate chamber",
+        "es": "Listado en cámara oficial de bienes raíces"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3074,
+    "tokens_out": 374,
+    "cost_usd": 0.00124138,
+    "finish_reason": "stop",
+    "latency_ms": 4274
+  },
+  "csbr|venta-terreno-res-andalucia-valle-el-carmen-san-salvador-centro": {
+    "ts": "2026-06-16T08:22:54.466644+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Res. Andalucía, San Salvador",
+      "es": "Terreno en Venta en Res. Andalucía, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Residencial Andalucía, Valle El Carmen, San Salvador Centro. Flat lot suitable for development. Located in a residential area near the capital.",
+      "es": "Lote de terreno en Residencial Andalucía, Valle El Carmen, San Salvador Centro. Terreno plano apto para desarrollo. Ubicado en zona residencial cerca de la capital."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Residencial Andalucía",
+        "es": "Ubicado en Residencial Andalucía"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Terreno plano, listo para construir"
+      },
+      {
+        "en": "Near San Salvador Centro",
+        "es": "Cerca de San Salvador Centro"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 374,
+    "cost_usd": 0.00124111,
+    "finish_reason": "stop",
+    "latency_ms": 4403
+  },
+  "remax|001463160068": {
+    "ts": "2026-06-16T08:22:55.121050+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² Lot in San Diego, La Libertad",
+      "es": "Lote Plano de 200 m² en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² residential lot in a gated community in San Diego, La Libertad. Lot features paved access, electricity, and potable water. Includes private clubhouse, pool, and direct beach access.",
+      "es": "Lote residencial plano de 200 m² en comunidad cerrada en San Diego, La Libertad. El lote cuenta con acceso pavimentado, electricidad y agua potable. Incluye clubhouse privado, piscina y acceso directo a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Direct private beach access",
+        "es": "Acceso privado directo a la playa"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Lote plano, listo para construir"
+      },
+      {
+        "en": "Paved road access from highway",
+        "es": "Acceso pavimentado desde la carretera"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3386,
+    "tokens_out": 447,
+    "cost_usd": 0.00140592,
+    "finish_reason": "stop",
+    "latency_ms": 5056
+  },
+  "encuentra24|31289989": {
+    "ts": "2026-06-16T08:22:55.514926+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House in Residencial Atami, La Libertad",
+      "es": "Casa en Residencial Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in exclusive Residencial Atami, La Libertad. 180 m² built on 1,050 varas lot, with 3 bedrooms, 3 bathrooms, and parking for 3 cars. Open-concept kitchen, outdoor shower, and close to the beach.",
+      "es": "Casa en venta en exclusivo Residencial Atami, La Libertad. 180 m² construidos en lote de 1,050 varas, con 3 habitaciones, 3 baños y estacionamiento para 3 autos. Cocina abierta, ducha exterior y cerca de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with nature and security",
+        "es": "Residencial cerrado con naturaleza y seguridad"
+      },
+      {
+        "en": "1,050 varas lot with 180 m² built",
+        "es": "Lote de 1,050 varas con 180 m² construidos"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms, parking for 3",
+        "es": "3 habitaciones, 3 baños, estacionamiento para 3"
+      },
+      {
+        "en": "Outdoor shower for post-beach use",
+        "es": "Ducha exterior para después de la playa"
+      },
+      {
+        "en": "Close to the beach in La Libertad",
+        "es": "Cerca de la playa en La Libertad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 180.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3209,
+    "tokens_out": 532,
+    "cost_usd": 0.00145163,
+    "finish_reason": "stop",
+    "latency_ms": 5451
+  },
+  "encuentra24|32460469": {
+    "ts": "2026-06-16T08:22:55.859086+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront house in Club Atami, La Libertad",
+      "es": "Casa frente a la playa en Club Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House in Club Atami private residential, steps from the beach. 200 m² built, 3 bedrooms, 2 bathrooms, 2 living rooms, sleeps 16. Private pool, BBQ area, 3 parking spaces, new windows, A/C in all bedrooms. Excellent Airbnb income generator, $250-$380/night.",
+      "es": "Casa en residencial privado Club Atami, a pasos de la playa. 200 m² construidos, 3 dormitorios, 2 baños, 2 salas, capacidad 16 huéspedes. Piscina privada, zona de barbacoa, 3 estacionamientos, ventanas nuevas, A/A en todos los dormitorios. Excelente generadora de ingresos Airbnb, $250-$380/noche."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from private La Leona beach",
+        "es": "A pasos de la playa privada La Leona"
+      },
+      {
+        "en": "3 bedrooms, sleeps 16 guests",
+        "es": "3 dormitorios, capacidad 16 huéspedes"
+      },
+      {
+        "en": "Private pool and BBQ area",
+        "es": "Piscina privada y zona de barbacoa"
+      },
+      {
+        "en": "Proven Airbnb income, $250-$380/night",
+        "es": "Ingresos Airbnb comprobados, $250-$380/noche"
+      },
+      {
+        "en": "Gated community with beach access",
+        "es": "Residencial privado con acceso a la playa"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 200.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3202,
+    "tokens_out": 563,
+    "cost_usd": 0.00148384,
+    "finish_reason": "stop",
+    "latency_ms": 5795
+  },
+  "remax|001463160067": {
+    "ts": "2026-06-16T08:22:58.903720+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² lot, gated community, San Diego",
+      "es": "Lote plano 200 m², comunidad cerrada, San Diego"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² lot in a gated community in San Diego, La Libertad. Ready access to electricity and water, paved road from main highway. Includes private clubhouse, pool, and direct beach access.",
+      "es": "Lote plano de 200 m² en comunidad cerrada en San Diego, La Libertad. Acceso listo a electricidad y agua, carretera pavimentada desde la autopista. Incluye clubhouse privado, piscina y acceso directo a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 200 m² lot, ready to build",
+        "es": "Lote plano de 200 m², listo para construir"
+      },
+      {
+        "en": "Gated community with private beach access",
+        "es": "Comunidad cerrada con acceso privado a la playa"
+      },
+      {
+        "en": "Clubhouse and pool on San Diego beach",
+        "es": "Clubhouse y piscina en la playa San Diego"
+      },
+      {
+        "en": "Paved access from main highway",
+        "es": "Acceso pavimentado desde la autopista principal"
+      },
+      {
+        "en": "Near Surf City circuit and Sunset Park",
+        "es": "Cerca del circuito Surf City y Sunset Park"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3386,
+    "tokens_out": 496,
+    "cost_usd": 0.00145982,
+    "finish_reason": "stop",
+    "latency_ms": 4902
+  },
+  "remax|001463160065": {
+    "ts": "2026-06-16T08:22:59.237810+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² Lot in San Diego, La Libertad",
+      "es": "Lote plano de 200 m² en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² residential lot in a gated community in San Diego, La Libertad. Includes electricity, water, paved access, and private clubhouse with pool on San Diego beach. Last remaining lots in a premier coastal development.",
+      "es": "Lote residencial plano de 200 m² en comunidad cerrada en San Diego, La Libertad. Incluye electricidad, agua, acceso pavimentado y club privado con piscina en la playa San Diego. Últimos lotes disponibles en un desarrollo costero premier."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 200 m² lot, ready to build",
+        "es": "Lote plano de 200 m², listo para construir"
+      },
+      {
+        "en": "Gated community with private beach access",
+        "es": "Comunidad cerrada con acceso privado a la playa"
+      },
+      {
+        "en": "Clubhouse and pool on San Diego beach",
+        "es": "Club y piscina en la playa San Diego"
+      },
+      {
+        "en": "Paved access from main highway",
+        "es": "Acceso pavimentado desde carretera principal"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3386,
+    "tokens_out": 467,
+    "cost_usd": 0.00142792,
+    "finish_reason": "stop",
+    "latency_ms": 4770
+  },
+  "remax|001463160066": {
+    "ts": "2026-06-16T08:22:59.473207+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² Lot in San Diego, La Libertad",
+      "es": "Lote plano de 200 m² en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² residential lot in a gated community in San Diego, La Libertad. Lot has paved access, electricity, and water; dimensions are 20m x 10m. Includes private clubhouse, pool, and direct beach access.",
+      "es": "Lote residencial plano de 200 m² en comunidad cerrada en San Diego, La Libertad. El lote cuenta con acceso pavimentado, electricidad y agua; dimensiones de 20m x 10m. Incluye clubhouse privado, piscina y acceso directo a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 200 m² lot, ready to build",
+        "es": "Lote plano de 200 m², listo para construir"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Direct private beach access and pool",
+        "es": "Acceso privado directo a la playa y piscina"
+      },
+      {
+        "en": "Paved road from main highway",
+        "es": "Carretera pavimentada desde la autopista principal"
+      },
+      {
+        "en": "Near Surf City beaches and Sunset Park",
+        "es": "Cerca de playas de Surf City y Sunset Park"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3386,
+    "tokens_out": 514,
+    "cost_usd": 0.00147962,
+    "finish_reason": "stop",
+    "latency_ms": 5135
+  },
+  "remax|001463160064": {
+    "ts": "2026-06-16T08:22:59.949209+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² Lot in San Diego, La Libertad",
+      "es": "Lote Plano de 200 m² en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² residential lot in San Diego, La Libertad, within a gated community. Lot has paved access, electricity, and water; dimensions 20m x 10m. Includes private clubhouse, pool, and direct beach access.",
+      "es": "Lote residencial plano de 200 m² en San Diego, La Libertad, dentro de un condominio cerrado. El lote cuenta con acceso pavimentado, electricidad y agua; dimensiones 20m x 10m. Incluye clubhouse privado, piscina y acceso directo a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Condominio cerrado con seguridad 24/7"
+      },
+      {
+        "en": "Direct private access to San Diego beach",
+        "es": "Acceso privado directo a playa San Diego"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Lote plano, listo para construir"
+      },
+      {
+        "en": "Paved road access from main highway",
+        "es": "Acceso pavimentado desde carretera principal"
+      },
+      {
+        "en": "Clubhouse and pool included",
+        "es": "Clubhouse y piscina incluidos"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3386,
+    "tokens_out": 502,
+    "cost_usd": 0.00146642,
+    "finish_reason": "stop",
+    "latency_ms": 4827
+  },
+  "remax|00146927226": {
+    "ts": "2026-06-16T08:23:00.217842+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "7-Hectare Development Land, Guajoyo, Metapán",
+      "es": "Terreno de 7 Hectáreas en Guajoyo, Metapán"
+    },
+    "short_description_canonical": {
+      "en": "Flat 7-hectare (70,000 m²) development lot on Route to Metapán, Km 98, Guajoyo area, 8 minutes from Metapán. Three vehicle access points, potable water and electricity available. Suitable for residential subdivisions, tourism projects, or solar energy development.",
+      "es": "Lote plano de 7 hectáreas (70,000 m²) en Ruta a Metapán, Km 98, zona Guajoyo, a 8 minutos de Metapán. Tres accesos vehiculares, agua potable y electricidad disponibles. Ideal para fraccionamientos residenciales, proyectos turísticos o desarrollo de energía solar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from Metapán town",
+        "es": "8 minutos del pueblo de Metapán"
+      },
+      {
+        "en": "Three vehicle access points",
+        "es": "Tres accesos vehiculares"
+      },
+      {
+        "en": "Potable water and electricity on site",
+        "es": "Agua potable y electricidad en el sitio"
+      },
+      {
+        "en": "Near Guajoyo Hydroelectric Dam",
+        "es": "Cerca de la represa hidroeléctrica Guajoyo"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Guajoyo area, Metapán, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3406,
+    "tokens_out": 489,
+    "cost_usd": 0.00145752,
+    "finish_reason": "stop",
+    "latency_ms": 5001
+  },
+  "remax|2282685118": {
+    "ts": "2026-06-16T08:23:00.729531+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "300-acre mountain estate, Cerro Montecristo, Metapán",
+      "es": "Finca de 300 manzanas en Cerro Montecristo, Metapán"
+    },
+    "short_description_canonical": {
+      "en": "300-acre (1,651,500 m²) mountain property in Cerro Montecristo, Metapán, Santa Ana. Elevation 1,400-1,700 m, 9 permanent water sources, existing cabin, fruit and timber trees. Ideal for eco-resort, boutique hotel, or glamping development.",
+      "es": "Terreno de 300 manzanas (1,651,500 m²) en Cerro Montecristo, Metapán, Santa Ana. Elevación 1,400-1,700 m, 9 fuentes de agua permanentes, cabaña existente, árboles frutales y maderables. Ideal para eco-resort, hotel boutique o glamping."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 contiguous acres",
+        "es": "300 manzanas contiguas"
+      },
+      {
+        "en": "9 natural springs on site",
+        "es": "9 manantiales naturales en la propiedad"
+      },
+      {
+        "en": "Elevation 1,400-1,700 m, cool climate",
+        "es": "Elevación 1,400-1,700 m, clima fresco"
+      },
+      {
+        "en": "Existing cabin and fruit trees",
+        "es": "Cabaña existente y árboles frutales"
+      },
+      {
+        "en": "Prime for eco-tourism development",
+        "es": "Ideal para desarrollo eco-turístico"
+      }
+    ],
+    "lat": 14.3833,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cerro Montecristo, Metapán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3356,
+    "tokens_out": 531,
+    "cost_usd": 0.00149022,
+    "finish_reason": "stop",
+    "latency_ms": 5214
+  },
+  "remax|00146927225": {
+    "ts": "2026-06-16T08:23:00.867435+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "85-Acre Estate with River, Pools, 15 min from Airport",
+      "es": "Finca de 85 acres con río, piscinas, a 15 min del aeropuerto"
+    },
+    "short_description_canonical": {
+      "en": "85-acre estate in San Luis Talpa, La Paz, 15 minutes from El Salvador International Airport. Includes a 500.40 m² two-story country house, two swimming pools, cistern, and covered parking. Bordered by a year-round river, with electricity, potable water, and septic tank.",
+      "es": "Finca de 85 acres en San Luis Talpa, La Paz, a 15 minutos del Aeropuerto Internacional de El Salvador. Incluye casa campestre de dos niveles con 500.40 m² de construcción, dos piscinas, cisterna y estacionamiento techado. Limita con un río que provee agua todo el año, cuenta con electricidad, agua potable y tanque séptico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15 min from El Salvador International Airport",
+        "es": "15 min del Aeropuerto Internacional de El Salvador"
+      },
+      {
+        "en": "Year-round river water supply",
+        "es": "Río con agua todo el año"
+      },
+      {
+        "en": "Two swimming pools and cistern",
+        "es": "Dos piscinas y cisterna"
+      },
+      {
+        "en": "500.40 m² two-story country house",
+        "es": "Casa campestre de 500.40 m² en dos niveles"
+      },
+      {
+        "en": "Straight boundary lines, semi-flat terrain",
+        "es": "Linderos rectos, terreno semiplano"
+      }
+    ],
+    "lat": 13.4667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Luis Talpa, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": 500.4,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3307,
+    "tokens_out": 552,
+    "cost_usd": 0.00150009,
+    "finish_reason": "stop",
+    "latency_ms": 5416
+  },
+  "encuentra24|32323103": {
+    "ts": "2026-06-16T09:02:30.951241+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed House 1200m² Near Beach, Coronado",
+      "es": "Casa 3 hab 1200m² Cerca Playa, Coronado"
+    },
+    "short_description_canonical": {
+      "en": "House of 1200 m² built area with 3 bedrooms and 4 bathrooms in Coronado, 600 m from the beach. Features include a modern kitchen with island, office, laundry room, and a separate guest house. Fully furnished and equipped, with porcelain floors and wood carpentry.",
+      "es": "Casa de 1200 m² construidos con 3 recámaras y 4 baños en Coronado, a 600 m de la playa. Cuenta con cocina moderna con isla, oficina, lavandería y casita independiente. Totalmente amoblada y equipada, con pisos de porcelanato y carpintería de madera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "600 m from the beach",
+        "es": "A 600 m de la playa"
+      },
+      {
+        "en": "Fully furnished and equipped",
+        "es": "Totalmente amoblada y equipada"
+      },
+      {
+        "en": "Separate guest house included",
+        "es": "Casita independiente incluida"
+      },
+      {
+        "en": "Near Coronado Golf & Resort",
+        "es": "Cerca de Coronado Golf & Resort"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -82.5833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 1200.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2598,
+    "tokens_out": 483,
+    "cost_usd": 0.00123276,
+    "finish_reason": "stop",
+    "latency_ms": 4864
+  },
+  "encuentra24|32244654": {
+    "ts": "2026-06-16T09:02:31.326228+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant 4BR Beachfront Home in Bijao Beach Club",
+      "es": "Elegante Residencia 4H Frente al Mar en Bijao Beach Club"
+    },
+    "short_description_canonical": {
+      "en": "Two-story house in Bijao Beach Club & Residences, Quarry Heights, on a 750 m² lot with 388 m² built. It has 4 bedrooms, 3.5 bathrooms, covered parking for 2, and maid's quarters. Located in a resort-style gated community with beachfront access.",
+      "es": "Casa de dos niveles en Bijao Beach Club & Residences, Quarry Heights, en lote de 750 m² con 388 m² construidos. Cuenta con 4 habitaciones, 3.5 baños, estacionamiento techado para 2 y cuarto de empleada. Ubicada en comunidad cerrada tipo resort con acceso frente al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront resort community",
+        "es": "Comunidad resort frente al mar"
+      },
+      {
+        "en": "388 m² built on 750 m² lot",
+        "es": "388 m² construidos en lote de 750 m²"
+      },
+      {
+        "en": "4 bedrooms, 3.5 bathrooms",
+        "es": "4 habitaciones, 3.5 baños"
+      },
+      {
+        "en": "Covered parking for 2 cars",
+        "es": "Estacionamiento techado para 2 autos"
+      },
+      {
+        "en": "Maid's quarters with bathroom",
+        "es": "Cuarto de empleada con baño"
+      }
+    ],
+    "lat": 8.3792,
+    "lng": -80.0,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bijao Beach, Río Hato, Panama",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.5,
+      "built_area_m2": 388.09,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2583,
+    "tokens_out": 538,
+    "cost_usd": 0.00128921,
+    "finish_reason": "stop",
+    "latency_ms": 5239
+  },
+  "encuentra24|32529944": {
+    "ts": "2026-06-16T09:02:31.937160+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4-Bed House with Pool, 4269m² Lot, Chame",
+      "es": "Casa 4 Hab con Piscina, Terreno 4269m², Chame"
+    },
+    "short_description_canonical": {
+      "en": "Flat 4269 m² lot with fruit trees and fence, 1900 m from main road on a dead-end street. House has 4 bedrooms, 6 bathrooms, large kitchen, terrace, and bohio XL. Includes staff house, pool, fiber internet, and all municipal services plus private well. Sold fully furnished.",
+      "es": "Terreno plano de 4269 m² con árboles frutales y cercado, a 1900 m de la carretera principal en calle sin salida. Casa con 4 recámaras, 6 baños, cocina grande, terraza y bohío XL. Incluye casa de empleados, piscina, internet fibra óptica y todos los servicios municipales más pozo privado. Se vende completamente amoblado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4269 m² flat lot with fruit trees",
+        "es": "Terreno plano de 4269 m² con árboles frutales"
+      },
+      {
+        "en": "Fully furnished, turnkey property",
+        "es": "Completamente amoblado, listo para habitar"
+      },
+      {
+        "en": "10 min drive to Coronado or Gorgona beach",
+        "es": "10 min en auto a playa Coronado o Gorgona"
+      },
+      {
+        "en": "Private pool and staff house included",
+        "es": "Piscina privada y casa de empleados incluida"
+      },
+      {
+        "en": "Fiber optic internet and private well",
+        "es": "Internet fibra óptica y pozo privado"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chame Centro, near Vivero de Riba Smith, Chame",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 6.0,
+      "built_area_m2": 354.0,
+      "parking_spaces": 6,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2432,
+    "tokens_out": 590,
+    "cost_usd": 0.00130564,
+    "finish_reason": "stop",
+    "latency_ms": 5850
   }
 }
