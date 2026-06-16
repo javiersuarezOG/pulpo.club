@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-15T08:27:52.624302+00:00",
+  "computed_at": "2026-06-16T08:29:09.800192+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
@@ -9,11 +9,11 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 163,
+        "count": 166,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 461,
+        "count": 462,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -66,8 +66,8 @@
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 239.0,
-        "kept": 239,
+        "coverage_pct_vs_discovered": 241.0,
+        "kept": 241,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.0,
-        "kept": 28,
+        "coverage_pct_vs_discovered": 1.1,
+        "kept": 31,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -95,7 +95,7 @@
       },
       "goodlife": {
         "coverage_pct_vs_discovered": null,
-        "kept": 35,
+        "kept": 34,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -137,7 +137,7 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 262,
+        "kept": 264,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1896,
-    "total_visible_listings": 1663
+    "total_in_dataset": 1902,
+    "total_visible_listings": 1668
   },
   "min_real_listings": 4
 }
