@@ -113620,5 +113620,323 @@
     "cost_usd": 0.00130564,
     "finish_reason": "stop",
     "latency_ms": 5850
+  },
+  "csbr|terreno-premium-en-venta-kuaukali": {
+    "ts": "2026-06-17T08:07:00.315302+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Land for Sale in Kuaukali",
+      "es": "Terreno Premium en Venta en Kuaukali"
+    },
+    "short_description_canonical": {
+      "en": "371.6 m² residential lot in Kuaukali, El Salvador. Flat terrain with road access and utilities available. Priced at $219,000.",
+      "es": "Lote residencial de 371.6 m² en Kuaukali, El Salvador. Terreno plano con acceso vial y servicios disponibles. Precio de $219,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "371.6 m² flat lot",
+        "es": "Lote plano de 371.6 m²"
+      },
+      {
+        "en": "Road access and utilities",
+        "es": "Acceso vial y servicios"
+      },
+      {
+        "en": "Priced at $219,000",
+        "es": "Precio de $219,000"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -89.5,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Kuaukali, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3065,
+    "tokens_out": 361,
+    "cost_usd": 0.00122465,
+    "finish_reason": "stop",
+    "latency_ms": 3623
+  },
+  "remax|003284449009": {
+    "ts": "2026-06-17T08:07:00.579156+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "980 m² Lot in Riverside Park, San Miguel",
+      "es": "Lote de 980 m² en Riverside Park, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 980.35 m² residential lot in the luxury Riverside Park community, San Miguel. Lot has access to basic utilities and immediate access to the Gerardo Barrios Beltway. Community is close to shopping centers, schools, and restaurants.",
+      "es": "Lote residencial plano de 980.35 m² en la exclusiva comunidad Riverside Park, San Miguel. El lote cuenta con acceso a servicios básicos y acceso inmediato al Periférico Gerardo Barrios. La comunidad está cerca de centros comerciales, escuelas y restaurantes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "980.35 m² flat lot",
+        "es": "Lote plano de 980.35 m²"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Comunidad cerrada con seguridad"
+      },
+      {
+        "en": "Access to Gerardo Barrios Beltway",
+        "es": "Acceso al Periférico Gerardo Barrios"
+      },
+      {
+        "en": "Near shopping and schools",
+        "es": "Cerca de centros comerciales y escuelas"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel city centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3336,
+    "tokens_out": 444,
+    "cost_usd": 0.00138912,
+    "finish_reason": "stop",
+    "latency_ms": 3887
+  },
+  "santizo|10055622": {
+    "ts": "2026-06-17T08:07:00.593264+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Corporate Office in Torre Quattro, 26 Workstations",
+      "es": "Oficina Corporativa en Torre Quattro, 26 Puestos"
+    },
+    "short_description_canonical": {
+      "en": "Corporate office for sale in exclusive Torre Quattro. It includes reception, kitchenette, 5 corporate offices, meeting room, and 26 open-plan workstations. Features 9 dedicated parking spaces and 24/7 security.",
+      "es": "Oficina corporativa en venta en exclusiva Torre Quattro. Incluye recepción, kitchenette, 5 oficinas corporativas, sala de reuniones y 26 puestos de trabajo en espacio abierto. Cuenta con 9 estacionamientos propios y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "9 dedicated parking spaces",
+        "es": "9 estacionamientos propios"
+      },
+      {
+        "en": "26 open-plan workstations",
+        "es": "26 puestos en espacio abierto"
+      },
+      {
+        "en": "24/7 security",
+        "es": "Seguridad 24/7"
+      },
+      {
+        "en": "5 corporate offices plus meeting room",
+        "es": "5 oficinas corporativas más sala de reuniones"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": 9,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3148,
+    "tokens_out": 433,
+    "cost_usd": 0.00132626,
+    "finish_reason": "stop",
+    "latency_ms": 3901
+  },
+  "csbr|inversionista-en-la-union-al-lado-del-nuevo-aeropuerto-del-pacifico-terrerno-de-20-manzanas": {
+    "ts": "2026-06-17T08:07:00.908766+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "20 Manzanas Near New Pacific Airport, La Union",
+      "es": "20 Manzanas Cerca del Nuevo Aeropuerto del Pacífico, La Unión"
+    },
+    "short_description_canonical": {
+      "en": "20-manzana (approx. 14 ha) land parcel in La Unión, adjacent to the new Pacific Airport. Flat terrain with road access and utilities available. Priced at $250,000 for investors.",
+      "es": "Terreno de 20 manzanas (aprox. 14 ha) en La Unión, al lado del nuevo Aeropuerto del Pacífico. Terreno plano con acceso vial y servicios disponibles. Precio de $250,000 para inversionistas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Adjacent to new Pacific Airport",
+        "es": "Colindante con el nuevo Aeropuerto del Pacífico"
+      },
+      {
+        "en": "20 manzanas (14 ha) flat land",
+        "es": "20 manzanas (14 ha) terreno plano"
+      },
+      {
+        "en": "Road access and utilities available",
+        "es": "Acceso vial y servicios disponibles"
+      },
+      {
+        "en": "Investment opportunity at $250,000",
+        "es": "Oportunidad de inversión a $250,000"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 448,
+    "cost_usd": 0.00132683,
+    "finish_reason": "stop",
+    "latency_ms": 4217
+  },
+  "encuentra24|28054601": {
+    "ts": "2026-06-17T08:46:58.717730+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean View Apartment at Rivage Tower, Avenida Balboa",
+      "es": "Apartamento con Vista al Mar en Rivage Tower, Avenida Balboa"
+    },
+    "short_description_canonical": {
+      "en": "153 m² apartment for sale at Rivage Tower on Avenida Balboa. It has 2 bedrooms, 2 bathrooms, open kitchen, balcony with ocean view, and 1 parking space. Building amenities include 3 pools, gym, sauna, tennis court, and more.",
+      "es": "Apartamento de 153 m² en venta en Rivage Tower sobre Avenida Balboa. Tiene 2 recámaras, 2 baños, cocina abierta, balcón con vista al mar y 1 estacionamiento. Amenidades del edificio incluyen 3 piscinas, gimnasio, sauna, cancha de tenis y más."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean view balcony",
+        "es": "Balcón con vista al mar"
+      },
+      {
+        "en": "153 m², 2 bedrooms, 2 baths",
+        "es": "153 m², 2 recámaras, 2 baños"
+      },
+      {
+        "en": "Building with 3 pools and gym",
+        "es": "Edificio con 3 piscinas y gimnasio"
+      },
+      {
+        "en": "1 parking space included",
+        "es": "1 estacionamiento incluido"
+      }
+    ],
+    "lat": 8.9736,
+    "lng": -79.5206,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Avenida Balboa, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 2.0,
+      "built_area_m2": 153.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2377,
+    "tokens_out": 501,
+    "cost_usd": 0.00119289,
+    "finish_reason": "stop",
+    "latency_ms": 4011
+  },
+  "encuentra24|32491774": {
+    "ts": "2026-06-17T08:46:59.309955+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Golf Course Villa, 3BR, 220m², Río Hato",
+      "es": "Villa en campo de golf, 3 hab, 220m², Río Hato"
+    },
+    "short_description_canonical": {
+      "en": "Two-story villa townhouse on 270.92 m² lot bordering Golf Hole #2 in Río Hato. Built area 220 m² with 3 bedrooms, 3.5 bathrooms, floor-to-ceiling windows, and a shared terrace. Membership includes golf club, beach club with pool, and community pools.",
+      "es": "Villa townhouse de dos plantas en lote de 270.92 m² colindante con el Hoyo #2 de golf en Río Hato. Área construida 220 m² con 3 habitaciones, 3.5 baños, ventanales de piso a techo y terraza compartida. Membresía incluye club de golf, club de playa con piscina y piscinas comunitarias."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Borders Golf Hole #2 directly",
+        "es": "Colinda directamente con el Hoyo #2"
+      },
+      {
+        "en": "3 bedrooms each with private bath",
+        "es": "3 habitaciones cada una con baño privado"
+      },
+      {
+        "en": "Membership includes golf & beach club",
+        "es": "Membresía incluye club de golf y playa"
+      },
+      {
+        "en": "Walking distance to beach club",
+        "es": "A poca distancia caminando del club de playa"
+      },
+      {
+        "en": "Floor-to-ceiling panoramic windows",
+        "es": "Ventanas panorámicas de piso a techo"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -80.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 220.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2556,
+    "tokens_out": 554,
+    "cost_usd": 0.00129952,
+    "finish_reason": "stop",
+    "latency_ms": 4603
   }
 }
