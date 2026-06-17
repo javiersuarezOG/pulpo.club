@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-16T08:22:49.113177+00:00",
+  "computed_at": "2026-06-17T08:06:55.904217+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1134,10 +1134,10 @@
       "unique_in_source": 158
     },
     "csbr": {
-      "kept_as_unique": 257,
-      "raw": 259,
+      "kept_as_unique": 259,
+      "raw": 261,
       "shared_with_others": 0,
-      "unique_in_source": 257
+      "unique_in_source": 259
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1146,10 +1146,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 31,
-      "raw": 31,
+      "kept_as_unique": 29,
+      "raw": 29,
       "shared_with_others": 0,
-      "unique_in_source": 31
+      "unique_in_source": 29
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1158,10 +1158,10 @@
       "unique_in_source": 40
     },
     "goodlife": {
-      "kept_as_unique": 36,
-      "raw": 36,
+      "kept_as_unique": 38,
+      "raw": 38,
       "shared_with_others": 0,
-      "unique_in_source": 36
+      "unique_in_source": 38
     },
     "nexo": {
       "kept_as_unique": 5,
@@ -1194,10 +1194,10 @@
       "unique_in_source": 304
     },
     "santizo": {
-      "kept_as_unique": 88,
-      "raw": 88,
+      "kept_as_unique": 89,
+      "raw": 89,
       "shared_with_others": 0,
-      "unique_in_source": 88
+      "unique_in_source": 89
     },
     "vivolatam": {
       "kept_as_unique": 156,
@@ -1212,6 +1212,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2099,
-  "total_unique_fingerprints": 2046
+  "total_in_dataset": 2102,
+  "total_unique_fingerprints": 2049
 }
