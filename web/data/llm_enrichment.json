@@ -113938,5 +113938,466 @@
     "cost_usd": 0.00129952,
     "finish_reason": "stop",
     "latency_ms": 4603
+  },
+  "nexo|C-VE-TER-17-108-114830BB": {
+    "ts": "2026-06-18T07:49:54.996935+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Canarias, La Libertad",
+      "es": "Terreno en Venta en Canarias, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,357 vrs² (948 m²) residential lot in Canarias, La Libertad. Basic utilities available, ocean and mountain views. Priced at $220,000 negotiable.",
+      "es": "Lote residencial plano de 1,357 vrs² (948 m²) en Canarias, La Libertad. Servicios básicos disponibles, vista al mar y montañas. Precio $220,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean and mountain views",
+        "es": "Vista al mar y montañas"
+      },
+      {
+        "en": "Basic utilities available",
+        "es": "Servicios básicos disponibles"
+      },
+      {
+        "en": "1,357 vrs² (948 m²) flat lot",
+        "es": "Lote plano de 1,357 vrs² (948 m²)"
+      },
+      {
+        "en": "Safe and private area",
+        "es": "Zona segura y privada"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3139,
+    "tokens_out": 423,
+    "cost_usd": 0.00131283,
+    "finish_reason": "stop",
+    "latency_ms": 3685
+  },
+  "realestate_au_sv|km-38-1-2-carretera-del-litoral-calle-s-n-lote-s-n-hacienda-la-joya-canton-comalapa-san-luis-talpa-la-paz-200-lugar-conocido-como-la-joya-san-luis-talpa-la-paz-san-luis-talpa-la-paz-san-luis-talpa-la-paz-department-310108813073": {
+    "ts": "2026-06-18T07:49:55.079920+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.8M Land in Hacienda La Joya, San Luis Talpa",
+      "es": "Terreno en Hacienda La Joya, San Luis Talpa, $1.8M"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Hacienda La Joya, Cantón Comalapa, San Luis Talpa, La Paz. Located at Km 38.5 on the Litoral Highway. Priced at $1,800,000.",
+      "es": "Terreno en Hacienda La Joya, Cantón Comalapa, San Luis Talpa, La Paz. Ubicado en el Km 38.5 de la Carretera del Litoral. Precio: $1,800,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 38.5 on Litoral Highway",
+        "es": "Km 38.5 en Carretera del Litoral"
+      },
+      {
+        "en": "Located in Hacienda La Joya",
+        "es": "Ubicado en Hacienda La Joya"
+      },
+      {
+        "en": "Priced at $1,800,000",
+        "es": "Precio de $1,800,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Luis Talpa, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3140,
+    "tokens_out": 434,
+    "cost_usd": 0.0013252,
+    "finish_reason": "stop",
+    "latency_ms": 3767
+  },
+  "realestate_au_sv|canton-belen-guijat-metapan-porcion-uno-al-sur-metapan-santa-ana-norte-santa-ana-metapan-santa-ana-metapan-santa-ana-310108813087": {
+    "ts": "2026-06-18T07:49:55.526700+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1,150,000 USD Land in Metapan, Santa Ana",
+      "es": "Terreno en Metapán, Santa Ana por USD 1,150,000"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Belén Guijat, Metapán, Santa Ana. Located in Porción Uno al Sur, this lot offers development potential in a rural area. Priced at USD 1,150,000.",
+      "es": "Terreno en Cantón Belén Guijat, Metapán, Santa Ana. Ubicado en Porción Uno al Sur, este lote ofrece potencial de desarrollo en zona rural. Precio: USD 1,150,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Large land parcel in Metapán",
+        "es": "Gran parcela de terreno en Metapán"
+      },
+      {
+        "en": "Rural setting near Santa Ana",
+        "es": "Entorno rural cerca de Santa Ana"
+      },
+      {
+        "en": "Priced at USD 1,150,000",
+        "es": "Precio de USD 1,150,000"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Metapán, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3104,
+    "tokens_out": 411,
+    "cost_usd": 0.00129018,
+    "finish_reason": "stop",
+    "latency_ms": 4215
+  },
+  "realestate_au_sv|san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813074": {
+    "ts": "2026-06-18T07:49:57.190651+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Diego, La Libertad",
+      "es": "Terreno en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Diego, La Libertad department. Lot suitable for development. Priced at $73,960.",
+      "es": "Terreno en San Diego, departamento de La Libertad. Lote apto para desarrollo. Precio de $73,960."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Diego, La Libertad",
+        "es": "Ubicado en San Diego, La Libertad"
+      },
+      {
+        "en": "Price: $73,960",
+        "es": "Precio: $73,960"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Diego, La Libertad (near Puerto de La Libertad)",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 364,
+    "cost_usd": 0.00123281,
+    "finish_reason": "stop",
+    "latency_ms": 2908
+  },
+  "realestate_au_sv|san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079": {
+    "ts": "2026-06-18T07:49:57.298254+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Diego, La Libertad",
+      "es": "Terreno en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Vacant land in San Diego, La Libertad department. Flat lot suitable for development. No built area or amenities.",
+      "es": "Terreno baldío en San Diego, departamento de La Libertad. Lote plano apto para desarrollo. Sin área construida ni servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Diego, La Libertad",
+        "es": "Ubicado en San Diego, La Libertad"
+      },
+      {
+        "en": "Price: $49,775 USD",
+        "es": "Precio: $49,775 USD"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Diego beach, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 362,
+    "cost_usd": 0.00123061,
+    "finish_reason": "stop",
+    "latency_ms": 2893
+  },
+  "realestate_au_sv|san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067": {
+    "ts": "2026-06-18T07:49:58.372460+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Diego, La Libertad",
+      "es": "Terreno en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Diego, La Libertad department. Located in a developing area with potential for residential or commercial use. Priced at $50,000.",
+      "es": "Terreno en San Diego, departamento de La Libertad. Ubicado en una zona en desarrollo con potencial para uso residencial o comercial. Precio de $50,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Diego, La Libertad",
+        "es": "Ubicado en San Diego, La Libertad"
+      },
+      {
+        "en": "Priced at $50,000",
+        "es": "Precio de $50,000"
+      },
+      {
+        "en": "Potential for development",
+        "es": "Potencial para desarrollo"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Diego beach, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 368,
+    "cost_usd": 0.00123721,
+    "finish_reason": "stop",
+    "latency_ms": 3375
+  },
+  "remax|003093706018": {
+    "ts": "2026-06-18T07:49:58.770525+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Surf City 2, Playa El Carrizal",
+      "es": "Terreno Plano en Surf City 2, Playa El Carrizal"
+    },
+    "short_description_canonical": {
+      "en": "Flat lot of 2,286 v² (approx. 1,600 m²) in second row, 270 m from the beach. Water and electricity feasible, 100 m from new Surf City 2 road. Next to Punta Mango, ideal for surf season access.",
+      "es": "Terreno plano de 2,286 v² (aprox. 1,600 m²) en segunda fila, a 270 m de la playa. Agua y electricidad factibles, a 100 m de la nueva carretera Surf City 2. Junto a Punta Mango, ideal para acceso a temporada de surf."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "270 m from the beach",
+        "es": "A 270 m de la playa"
+      },
+      {
+        "en": "Water and electricity feasible",
+        "es": "Agua y electricidad factibles"
+      },
+      {
+        "en": "100 m from new Surf City 2 road",
+        "es": "A 100 m de la nueva carretera Surf City 2"
+      },
+      {
+        "en": "Next to Punta Mango",
+        "es": "Junto a Punta Mango"
+      }
+    ],
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Carrizal, near Punta Mango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3243,
+    "tokens_out": 479,
+    "cost_usd": 0.00140251,
+    "finish_reason": "stop",
+    "latency_ms": 3690
+  },
+  "remax|003093262011": {
+    "ts": "2026-06-18T07:49:59.551592+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot in El Encanto Villas & Golf, La Libertad",
+      "es": "Lote en El Encanto Villas & Golf, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "1,160 m² residential lot in El Encanto Villas & Golf, La Libertad, 15 minutes from Surf City. Gentle slope, 18.38 m frontage. Includes lifetime membership to El Encanto Country Club with golf course, pools, and fitness center.",
+      "es": "Lote residencial de 1,160 m² en El Encanto Villas & Golf, La Libertad, a 15 minutos de Surf City. Pendiente suave, 18.38 m de frente. Incluye membresía vitalicia al El Encanto Country Club con campo de golf, piscinas y gimnasio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15 min from Surf City",
+        "es": "15 min de Surf City"
+      },
+      {
+        "en": "Lifetime country club membership included",
+        "es": "Membresía vitalicia al club incluida"
+      },
+      {
+        "en": "Gated golf community, 24/7 security",
+        "es": "Comunidad de golf cerrada, seguridad 24/7"
+      },
+      {
+        "en": "Gentle slope, 18.38 m frontage",
+        "es": "Pendiente suave, 18.38 m de frente"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad (Surf City)",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3446,
+    "tokens_out": 484,
+    "cost_usd": 0.00146282,
+    "finish_reason": "stop",
+    "latency_ms": 4024
+  },
+  "encuentra24|32577324": {
+    "ts": "2026-06-18T08:28:27.082794+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern Lakefront Home in PH Ocean Lakes, Buenaventura",
+      "es": "Residencia Moderna Frente al Lago en PH Ocean Lakes, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "Modern luxury house in PH Ocean Lakes, Buenaventura, with 566 m² built area. 3 bedrooms each with private bath, 3.5 bathrooms, 4 parking spaces, and direct lake access. Two-story layout with balcony, formal dining, and service quarters.",
+      "es": "Casa moderna de lujo en PH Ocean Lakes, Buenaventura, con 566 m² construidos. 3 dormitorios cada uno con baño privado, 3.5 baños, 4 estacionamientos y acceso directo al lago. Distribución de dos pisos con balcón, comedor formal y cuarto de servicio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct lake access from backyard",
+        "es": "Acceso directo al lago desde el patio trasero"
+      },
+      {
+        "en": "566 m² of well-designed living space",
+        "es": "566 m² de espacio habitable bien diseñado"
+      },
+      {
+        "en": "Each bedroom with private bathroom",
+        "es": "Cada dormitorio con baño privado"
+      },
+      {
+        "en": "Private balcony with lake views",
+        "es": "Balcón privado con vistas al lago"
+      },
+      {
+        "en": "4 parking spaces included",
+        "es": "4 estacionamientos incluidos"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, El Chirú, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 566.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2647,
+    "tokens_out": 516,
+    "cost_usd": 0.00128229,
+    "finish_reason": "stop",
+    "latency_ms": 4435
   }
 }
