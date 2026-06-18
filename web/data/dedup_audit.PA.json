@@ -1,15 +1,15 @@
 {
-  "computed_at": "2026-06-17T08:46:54.372973+00:00",
+  "computed_at": "2026-06-18T08:28:22.215495+00:00",
   "duplicate_clusters": [],
   "overlap_matrix": {},
   "per_source": {
     "encuentra24": {
-      "kept_as_unique": 28,
-      "raw": 28,
+      "kept_as_unique": 27,
+      "raw": 27,
       "shared_with_others": 0,
-      "unique_in_source": 28
+      "unique_in_source": 27
     }
   },
-  "total_in_dataset": 28,
-  "total_unique_fingerprints": 28
+  "total_in_dataset": 27,
+  "total_unique_fingerprints": 27
 }

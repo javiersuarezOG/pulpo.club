@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-06-17T08:13:29.572870+00:00",
-  "started_at": "2026-06-17T07:11:57.683532+00:00",
-  "duration_seconds": 3691.89,
-  "total_listings": 1905,
-  "dropped": 245,
+  "last_updated": "2026-06-18T07:55:01.524741+00:00",
+  "started_at": "2026-06-18T06:53:46.331840+00:00",
+  "duration_seconds": 3675.19,
+  "total_listings": 1908,
+  "dropped": 246,
   "per_source_raw": {
     "agentiz": 0,
     "bienesraices": 578,
@@ -12,13 +12,13 @@
     "citymax_sc": 165,
     "csbr": 300,
     "elagente": 2,
-    "encuentra24": 31,
+    "encuentra24": 30,
     "essurf": 41,
     "goodlife": 70,
     "jamesedition": 0,
-    "nexo": 5,
-    "oceanside": 48,
-    "realestate_au_sv": 300,
+    "nexo": 6,
+    "oceanside": 49,
+    "realestate_au_sv": 303,
     "realtyelsalvador": 100,
     "remax": 344,
     "santizo": 118,
@@ -84,7 +84,7 @@
     },
     "encuentra24": {
       "supplier": null,
-      "pulled": 31,
+      "pulled": 30,
       "max_pages_hit": true
     },
     "essurf": {
@@ -104,17 +104,17 @@
     },
     "nexo": {
       "supplier": null,
-      "pulled": 5,
+      "pulled": 6,
       "max_pages_hit": false
     },
     "oceanside": {
       "supplier": null,
-      "pulled": 48,
+      "pulled": 49,
       "max_pages_hit": false
     },
     "realestate_au_sv": {
       "supplier": null,
-      "pulled": 300,
+      "pulled": 303,
       "max_pages_hit": false
     },
     "realtyelsalvador": {
@@ -147,13 +147,13 @@
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
     "previous_price": 0.0173,
-    "beachfront_tier_on_beach": 0.073,
+    "beachfront_tier_on_beach": 0.0729,
     "beachfront_tier_walk_to_beach": 0.0079,
-    "beachfront_tier_near_beach": 0.0205,
-    "land_type_commercial": 0.0546,
-    "land_type_tourist": 0.0714,
-    "land_type_residential": 0.874,
-    "is_motivated": 0.0819
+    "beachfront_tier_near_beach": 0.0204,
+    "land_type_commercial": 0.0545,
+    "land_type_tourist": 0.0718,
+    "land_type_residential": 0.8737,
+    "is_motivated": 0.0818
   },
   "field_completeness": {
     "bienesraices": {
@@ -307,21 +307,21 @@
       }
     },
     "encuentra24": {
-      "n_listings": 29,
+      "n_listings": 28,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.97,
-        "municipality": 0.97,
+        "zone": 0.96,
+        "municipality": 0.96,
         "department": 1.0,
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
         "is_beachfront": 0.21,
-        "has_paved_access": 0.24,
+        "has_paved_access": 0.25,
         "has_water": 0.21,
-        "has_power": 0.1,
-        "is_repriced": 0.07,
+        "has_power": 0.14,
+        "is_repriced": 0.04,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 1.0,
@@ -382,7 +382,7 @@
       }
     },
     "nexo": {
-      "n_listings": 5,
+      "n_listings": 6,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
@@ -395,7 +395,7 @@
         "is_beachfront": 0.0,
         "has_paved_access": 0.0,
         "has_water": 0.0,
-        "has_power": 0.4,
+        "has_power": 0.33,
         "is_repriced": 0.0,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -432,7 +432,7 @@
       }
     },
     "realestate_au_sv": {
-      "n_listings": 288,
+      "n_listings": 291,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
@@ -443,7 +443,7 @@
         "lat": 1.0,
         "lng": 1.0,
         "is_beachfront": 0.0,
-        "has_paved_access": 0.03,
+        "has_paved_access": 0.04,
         "has_water": 0.02,
         "has_power": 0.0,
         "is_repriced": 0.02,
@@ -486,7 +486,7 @@
       "fields": {
         "price_usd": 1.0,
         "area_m2": 1.0,
-        "zone": 0.93,
+        "zone": 0.94,
         "municipality": 0.95,
         "department": 0.97,
         "location_text": 1.0,
@@ -583,28 +583,28 @@
     }
   },
   "property_type_counts": {
-    "land": 1475,
-    "condo": 83,
-    "house": 347
+    "land": 1482,
+    "house": 345,
+    "condo": 81
   },
   "validation_by_type": {
     "land": {
-      "pass": 1546,
+      "pass": 1553,
       "flag": 126,
       "drop": 59
     },
     "house": {
-      "pass": 266,
+      "pass": 264,
       "flag": 81,
       "drop": 51
     },
     "condo": {
-      "pass": 65,
+      "pass": 63,
       "flag": 18,
-      "drop": 5
+      "drop": 6
     }
   },
-  "v_fallback_no_price": 829,
+  "v_fallback_no_price": 831,
   "v_fallback_no_comps": 0,
   "sources": [
     "agentiz",

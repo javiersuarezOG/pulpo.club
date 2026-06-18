@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-17T08:06:55.904217+00:00",
+  "computed_at": "2026-06-18T07:49:50.295625+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -745,6 +745,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "5e782636c68e1dc7a437d09431c26d59eb447aad",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 49775.0,
+          "source": "realestate_au_sv",
+          "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079",
+          "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079/",
+          "zone": "san-diego"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 50000.0,
+          "source": "realestate_au_sv",
+          "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067",
+          "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067/",
+          "zone": "san-diego"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "5f6b24a4d4b10ac8f2042a8242bfe5288446516a",
       "samples": [
         {
@@ -1146,10 +1174,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 29,
-      "raw": 29,
+      "kept_as_unique": 28,
+      "raw": 28,
       "shared_with_others": 0,
-      "unique_in_source": 29
+      "unique_in_source": 28
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1164,10 +1192,10 @@
       "unique_in_source": 38
     },
     "nexo": {
-      "kept_as_unique": 5,
-      "raw": 5,
+      "kept_as_unique": 6,
+      "raw": 6,
       "shared_with_others": 0,
-      "unique_in_source": 5
+      "unique_in_source": 6
     },
     "oceanside": {
       "kept_as_unique": 23,
@@ -1176,10 +1204,10 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 269,
-      "raw": 299,
+      "kept_as_unique": 271,
+      "raw": 302,
       "shared_with_others": 0,
-      "unique_in_source": 269
+      "unique_in_source": 271
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1212,6 +1240,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2102,
-  "total_unique_fingerprints": 2049
+  "total_in_dataset": 2105,
+  "total_unique_fingerprints": 2051
 }

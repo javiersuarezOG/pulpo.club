@@ -1,0 +1,28 @@
+{
+  "width": 1154,
+  "height": 1363,
+  "aspect_ratio": 1.181,
+  "file_size_kb": 398.5,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-06-18T07:53:45.617290+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093262011/v3/HDPhotos/Vista aerea Terreno El Encanto Lote 28 Pol O.jpeg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093262011/v3/HDPhotos/Vista aerea Terreno El Encanto Lote 28 Pol O.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-06-18T07:53:47.425005+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 1010,
+  "resdet_detected_height": 1022,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 5.3,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.071 color_entropy=0.521"
+  }
+}

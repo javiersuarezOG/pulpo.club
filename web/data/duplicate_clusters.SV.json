@@ -743,6 +743,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "5e782636c68e1dc7a437d09431c26d59eb447aad",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 49775.0,
+        "source": "realestate_au_sv",
+        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079",
+        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079/",
+        "zone": "san-diego"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 50000.0,
+        "source": "realestate_au_sv",
+        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067",
+        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067/",
+        "zone": "san-diego"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "5f6b24a4d4b10ac8f2042a8242bfe5288446516a",
     "samples": [
       {
