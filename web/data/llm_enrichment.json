@@ -114399,5 +114399,323 @@
     "cost_usd": 0.00128229,
     "finish_reason": "stop",
     "latency_ms": 4435
+  },
+  "realestate_au_sv|san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813075": {
+    "ts": "2026-06-19T08:03:11.234225+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Diego, La Libertad",
+      "es": "Terreno en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Diego, La Libertad department. Lot for development in a coastal area. Priced at $51,030.",
+      "es": "Terreno en San Diego, departamento de La Libertad. Lote para desarrollo en zona costera. Precio de $51,030."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Diego, La Libertad",
+        "es": "Ubicado en San Diego, La Libertad"
+      },
+      {
+        "en": "Price: $51,030",
+        "es": "Precio: $51,030"
+      },
+      {
+        "en": "Coastal area potential",
+        "es": "Potencial en zona costera"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Diego beach, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 357,
+    "cost_usd": 0.00122511,
+    "finish_reason": "stop",
+    "latency_ms": 3717
+  },
+  "realestate_au_sv|san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813071": {
+    "ts": "2026-06-19T08:03:11.416498+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Diego, La Libertad",
+      "es": "Terreno en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Diego, La Libertad department. Lot for development in a coastal area. Priced at $39,800.",
+      "es": "Terreno en San Diego, departamento de La Libertad. Lote para desarrollo en zona costera. Precio de $39,800."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Diego, La Libertad",
+        "es": "Ubicado en San Diego, La Libertad"
+      },
+      {
+        "en": "Price: $39,800",
+        "es": "Precio: $39,800"
+      },
+      {
+        "en": "Coastal area potential",
+        "es": "Potencial en zona costera"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa K59 / San Diego",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 357,
+    "cost_usd": 0.00122511,
+    "finish_reason": "stop",
+    "latency_ms": 3899
+  },
+  "encuentra24|32590620": {
+    "ts": "2026-06-19T08:03:12.583412+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "ITZEL Living – Luxury Lake Ilopango Homes",
+      "es": "ITZEL Living – Casas de lujo en Lago Ilopango"
+    },
+    "short_description_canonical": {
+      "en": "Exclusive residential development on Lake Ilopango peninsula, El Salvador. Model IXUMA offers 500 m² built area with 3 bedrooms, 3 bathrooms, and 2 parking spaces. Private community with beach club, regenerative eco-conscious design, and limited inventory.",
+      "es": "Desarrollo residencial exclusivo en la península del Lago Ilopango, El Salvador. El modelo IXUMA ofrece 500 m² construidos con 3 habitaciones, 3 baños y 2 estacionamientos. Comunidad privada con club de playa, diseño regenerativo eco-consciente e inventario limitado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lake Ilopango peninsula location",
+        "es": "Ubicación en península del Lago Ilopango"
+      },
+      {
+        "en": "500 m² built, 3 bedrooms",
+        "es": "500 m² construidos, 3 habitaciones"
+      },
+      {
+        "en": "Private beach club amenities",
+        "es": "Amenidades de club de playa privado"
+      },
+      {
+        "en": "Regenerative eco-conscious design",
+        "es": "Diseño regenerativo eco-consciente"
+      },
+      {
+        "en": "Limited inventory from USD 750,000",
+        "es": "Inventario limitado desde USD 750,000"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilopango municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 500.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3299,
+    "tokens_out": 514,
+    "cost_usd": 0.00145613,
+    "finish_reason": "stop",
+    "latency_ms": 5067
+  },
+  "remax|001463160070": {
+    "ts": "2026-06-19T08:03:12.650752+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "20,780 m² Land on Surf City Bypass, La Libertad",
+      "es": "Terreno de 20,780 m² en Periférico Surf City, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 20,780 m² (29,732 v²) on the Periférico Camino a Surf City in Cantón San Rafael, La Libertad. Semi-sloped topography with panoramic ocean views, dual access via the bypass and Calle Vieja. Ideal for high-rise residential, logistics, or mixed-use development.",
+      "es": "Terreno de 20,780 m² (29,732 v²) sobre el Periférico Camino a Surf City en Cantón San Rafael, La Libertad. Topografía semi inclinada con vistas panorámicas al océano, doble acceso por el periférico y Calle Vieja. Ideal para desarrollo residencial en altura, logística o uso mixto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20,780 m² on Surf City Bypass",
+        "es": "20,780 m² sobre Periférico Surf City"
+      },
+      {
+        "en": "Panoramic Pacific Ocean views",
+        "es": "Vistas panorámicas al Océano Pacífico"
+      },
+      {
+        "en": "Dual access for traffic segregation",
+        "es": "Doble acceso para segregación de tráfico"
+      },
+      {
+        "en": "High-growth tourism-commercial zone",
+        "es": "Zona de alto crecimiento turístico-comercial"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3400,
+    "tokens_out": 515,
+    "cost_usd": 0.0014845,
+    "finish_reason": "stop",
+    "latency_ms": 5133
+  },
+  "encuentra24|31154084": {
+    "ts": "2026-06-19T08:42:36.432338+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Countryside Home with Ocean View in Veracruz",
+      "es": "Casa de Campo de Lujo con Vista al Mar en Veracruz"
+    },
+    "short_description_canonical": {
+      "en": "This 964 m² luxury house sits on 5 acres in Veracruz, Panama Oeste, 20 minutes from Panama City. It features 4 bedrooms with private bathrooms, a fully equipped open kitchen, and a private pool with panoramic ocean views. The property includes full furnishings, parking for 4, and a separate guest house.",
+      "es": "Esta casa de lujo de 964 m² se ubica en 2 hectáreas en Veracruz, Panamá Oeste, a 20 minutos de la Ciudad de Panamá. Cuenta con 4 habitaciones con baños privados, cocina abierta totalmente equipada y piscina privada con vistas panorámicas al océano. Incluye mobiliario completo, estacionamiento para 4 y casa independiente para visitas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 minutes from Panama City",
+        "es": "20 minutos de la Ciudad de Panamá"
+      },
+      {
+        "en": "Private pool with ocean views",
+        "es": "Piscina privada con vistas al mar"
+      },
+      {
+        "en": "Fully furnished, turnkey property",
+        "es": "Totalmente amueblado, listo para habitar"
+      },
+      {
+        "en": "Separate guest house included",
+        "es": "Casa independiente para visitas incluida"
+      }
+    ],
+    "lat": 8.8833,
+    "lng": -79.6333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Veracruz, Panama Oeste",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 964.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2592,
+    "tokens_out": 518,
+    "cost_usd": 0.00126964,
+    "finish_reason": "stop",
+    "latency_ms": 4477
+  },
+  "encuentra24|32354888": {
+    "ts": "2026-06-19T08:42:37.023201+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Heated Pool House, 355m², Beach Access",
+      "es": "Casa con piscina climatizada, 355m², acceso a playa"
+    },
+    "short_description_canonical": {
+      "en": "House of 355 m² built in Río Hato, with 2 bedrooms and 3 bathrooms. Features a heated pool, covered terrace, BBQ area, maid's quarters, backup power, and water tanks. Includes quality furniture and appliances, alarm system, integrated sound, and high-speed WiFi. Gated complex with direct beach access 500 m away.",
+      "es": "Casa de 355 m² construidos en Río Hato, con 2 recámaras y 3 baños. Cuenta con piscina climatizada, terraza techada, área de parrilla, cuarto de empleada, respaldo de energía y tanques de agua. Incluye muebles de calidad y línea blanca, sistema de alarma, sonido integrado y WiFi de alta velocidad. Complejo con portón eléctrico y acceso directo a la playa a 500 m."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Heated pool and covered terrace",
+        "es": "Piscina climatizada y terraza techada"
+      },
+      {
+        "en": "Furnished with appliances included",
+        "es": "Amueblado con línea blanca incluida"
+      },
+      {
+        "en": "Direct beach access 500 m away",
+        "es": "Acceso directo a playa a 500 m"
+      },
+      {
+        "en": "Backup power and water tanks",
+        "es": "Respaldo de energía y tanques de agua"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Complejo cerrado con seguridad"
+      }
+    ],
+    "lat": 8.378,
+    "lng": -80.045,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 3.0,
+      "built_area_m2": 355.0,
+      "parking_spaces": 1,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2603,
+    "tokens_out": 563,
+    "cost_usd": 0.00132211,
+    "finish_reason": "stop",
+    "latency_ms": 5069
   }
 }
