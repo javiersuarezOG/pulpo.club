@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00025503,
-    "paragraph": "A new bridge over the El Sauce river in La Unión Norte is progressing, with 8 beam sections being installed. This improves access to eastern coastal areas, potentially boosting property values and making travel easier for buyers. If you're eyeing land in La Unión or nearby beaches, this infrastructure upgrade could enhance connectivity and future appreciation.",
-    "picked_at": "2026-06-16",
-    "source_date": "15 Jun 2026",
+    "llm_cost_usd": 0.00024357,
+    "paragraph": "Spring tides from June 15-19 will bring higher-than-normal waves and coastal flooding risks. If you're scouting property near the shore, avoid low-lying areas and check flood history. This is a good reminder to verify elevation and proximity to the sea before buying. Stay informed and choose wisely.",
+    "picked_at": "2026-06-19",
+    "source_date": "18 Jun 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/avanza-la-construccion-del-puente-sobre-rio-y-distrito-el-sauce-en-la-union-norte/?utm_source=rss&utm_medium=rss&utm_campaign=avanza-la-construccion-del-puente-sobre-rio-y-distrito-el-sauce-en-la-union-norte",
-    "title": "Bridge Construction Advances in La Unión Norte"
+    "source_url": "https://lapagina.com.sv/nacionales/advierten-sobre-mareas-vivas-que-afectaran-costas-salvadorenas/?utm_source=rss&utm_medium=rss&utm_campaign=advierten-sobre-mareas-vivas-que-afectaran-costas-salvadorenas",
+    "title": "Spring Tides Alert for Coastal Buyers"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00031396,
-    "paragraph": "La construcción del puente en La Unión Norte avanza con el montaje de vigas. Esta obra mejora la conectividad hacia la zona costera oriental, facilitando el acceso a playas y propiedades. Para vos, comprador, esto significa mayor potencial de plusvalía y mejor acceso a tu futura propiedad. Mantenete al tanto de los avances, ya que una vez terminado, la zona podría volverse más atractiva y accesible.",
-    "picked_at": "2026-06-16",
-    "source_date": "15 jun 2026",
+    "llm_cost_usd": 0.00031130000000000003,
+    "paragraph": "Las mareas vivas del 15 al 19 de junio elevan el nivel del mar y aumentan la erosión en las costas. Si estás evaluando terrenos cerca del mar, revisa el límite de la pleamar y la estabilidad del suelo. Estas mareas pueden inundar zonas bajas y afectar construcciones. Consulta mapas de riesgo y evita lotes en áreas propensas a inundación. La información es clave para una compra segura.",
+    "picked_at": "2026-06-19",
+    "source_date": "18 jun 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/avanza-la-construccion-del-puente-sobre-rio-y-distrito-el-sauce-en-la-union-norte/?utm_source=rss&utm_medium=rss&utm_campaign=avanza-la-construccion-del-puente-sobre-rio-y-distrito-el-sauce-en-la-union-norte",
-    "title": "Avanza la construcción del puente sobre río y distrito El Sauce en La Unión Norte"
+    "source_url": "https://lapagina.com.sv/nacionales/advierten-sobre-mareas-vivas-que-afectaran-costas-salvadorenas/?utm_source=rss&utm_medium=rss&utm_campaign=advierten-sobre-mareas-vivas-que-afectaran-costas-salvadorenas",
+    "title": "Advierten sobre mareas vivas que afectarán costas salvadoreñas"
   }
 }

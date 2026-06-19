@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-06-18T07:55:01.066901+00:00",
+  "computed_at": "2026-06-19T08:08:15.121716+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 25,
+        "count": 24,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 163,
+        "count": 164,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 470,
+        "count": 471,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 11,
+        "count": 12,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 50.0,
-        "kept": 150,
+        "coverage_pct_vs_discovered": 49.7,
+        "kept": 149,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -81,7 +81,7 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 1.0,
-        "kept": 28,
+        "kept": 30,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -95,7 +95,7 @@
       },
       "goodlife": {
         "coverage_pct_vs_discovered": null,
-        "kept": 36,
+        "kept": 35,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
