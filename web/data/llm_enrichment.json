@@ -114717,5 +114717,580 @@
     "cost_usd": 0.00132211,
     "finish_reason": "stop",
     "latency_ms": 5069
+  },
+  "bienesraices|2411": {
+    "ts": "2026-06-20T07:17:07.715060+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "13,500 v2 Lot Near Salamanca, Nuevo Cuscatlán",
+      "es": "Terreno de 13,500 v2 Cerca de Salamanca, Nuevo Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "13,500 v2 (9,435 m²) industrial lot in Nuevo Cuscatlán, near Salamanca complex. Fully fenced, flat topography, ready for immediate use. Ideal for logistics centers, storage yards, or heavy equipment parking.",
+      "es": "Terreno industrial de 13,500 v2 (9,435 m²) en Nuevo Cuscatlán, cerca del complejo Salamanca. Completamente cercado, topografía plana, listo para uso inmediato. Ideal para centros de distribución, patios de almacenamiento o maquinaria pesada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "13,500 v2 (9,435 m²) lot",
+        "es": "Lote de 13,500 v2 (9,435 m²)"
+      },
+      {
+        "en": "Near Salamanca complex",
+        "es": "Cerca del complejo Salamanca"
+      },
+      {
+        "en": "Fully fenced perimeter",
+        "es": "Perímetro completamente cercado"
+      },
+      {
+        "en": "Quick access to main highways",
+        "es": "Acceso rápido a principales carreteras"
+      }
+    ],
+    "lat": 13.6433,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nuevo Cuscatlán, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3427,
+    "tokens_out": 477,
+    "cost_usd": 0.00144999,
+    "finish_reason": "stop",
+    "latency_ms": 4111
+  },
+  "nexo|C-VE-TER-18-000-327EF2B4": {
+    "ts": "2026-06-20T07:17:07.889475+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 16,876 m² lot on Pan-American Highway, Sacacoyo",
+      "es": "Terreno plano de 16,876 m² sobre Carretera Panamericana, Sacacoyo"
+    },
+    "short_description_canonical": {
+      "en": "Flat 16,876 m² commercial/industrial lot on the Pan-American Highway at the entrance of Ateos, Sacacoyo, La Libertad. Located near major distribution centers with access to basic utilities. Priced at $65 per square vara ($93/m²).",
+      "es": "Terreno plano de 16,876 m² para uso comercial/industrial sobre la Carretera Panamericana, entrada de Ateos, Sacacoyo, La Libertad. Ubicado cerca de importantes centros de distribución con acceso a servicios básicos. Precio de $65 la vara cuadrada ($93/m²)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Pan-American Highway, entrance of Ateos",
+        "es": "Sobre Carretera Panamericana, entrada de Ateos"
+      },
+      {
+        "en": "Near major distribution centers",
+        "es": "Cerca de importantes centros de distribución"
+      },
+      {
+        "en": "Flat terrain, 16,876 m²",
+        "es": "Terreno plano, 16,876 m²"
+      },
+      {
+        "en": "Access to basic utilities",
+        "es": "Acceso a servicios básicos"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sacacoyo, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3129,
+    "tokens_out": 479,
+    "cost_usd": 0.00137173,
+    "finish_reason": "stop",
+    "latency_ms": 4284
+  },
+  "bienesraices|2413": {
+    "ts": "2026-06-20T07:17:08.162218+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront lot 3 min walk, Costa Azul, Sonsonate",
+      "es": "Terreno frente al mar a 3 min, Costa Azul, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,265 m² lot in third row at Playa Costa Azul, Sonsonate. Includes a concrete structure with 1 bedroom, 1 bathroom, and a covered terrace. Property has own water well, septic tank, perimeter walls, and electricity access.",
+      "es": "Terreno plano de 1,265 m² en tercera fila en Playa Costa Azul, Sonsonate. Incluye edificación de concreto con 1 habitación, 1 baño y terraza techada. Cuenta con pozo de agua propio, fosa séptica, muros perimetrales y acceso a electricidad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3-minute walk to the beach",
+        "es": "A 3 minutos caminando de la playa"
+      },
+      {
+        "en": "Flat 1,265 m² lot, ready to build",
+        "es": "Terreno plano de 1,265 m², listo para construir"
+      },
+      {
+        "en": "Own water well and septic tank",
+        "es": "Pozo de agua propio y fosa séptica"
+      },
+      {
+        "en": "Perimeter walls for privacy",
+        "es": "Muros perimetrales para privacidad"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla, Sonsonate",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 1,
+      "bathrooms": 1.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3469,
+    "tokens_out": 491,
+    "cost_usd": 0.00147673,
+    "finish_reason": "stop",
+    "latency_ms": 4559
+  },
+  "nexo|C-VE-TER-16-183-17DE0202": {
+    "ts": "2026-06-20T07:17:08.165482+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "26.5 Manzanas Industrial Land, Km 17 Troncal del Norte",
+      "es": "26.5 Manzanas Terreno Industrial, Km 17 Troncal del Norte"
+    },
+    "short_description_canonical": {
+      "en": "26.5 manzanas (approx. 18.5 ha) of flat land at Km 17 of Troncal del Norte highway, Apopa. 200 m frontage on the highway and facing the future bypass, zoned for industrial or commercial use. Priced at $12 per square vara ($3.18M total), 4 km from Plaza Mundo Apopa.",
+      "es": "26.5 manzanas (aprox. 18.5 ha) de terreno plano en el km 17 de la Carretera Troncal del Norte, Apopa. 200 m de frente sobre la carretera y frente al futuro bypass, zonificado para uso industrial o comercial. Precio de $12 la vara cuadrada ($3.18M total), a 4 km de Plaza Mundo Apopa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "200 m frontage on Troncal del Norte",
+        "es": "200 m de frente sobre Troncal del Norte"
+      },
+      {
+        "en": "Faces future bypass road",
+        "es": "Frente al futuro bypass"
+      },
+      {
+        "en": "4 km from Plaza Mundo Apopa",
+        "es": "4 km de Plaza Mundo Apopa"
+      },
+      {
+        "en": "Priced at $12 per square vara",
+        "es": "Precio de $12 la vara cuadrada"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Apopa, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3148,
+    "tokens_out": 515,
+    "cost_usd": 0.00141646,
+    "finish_reason": "stop",
+    "latency_ms": 4560
+  },
+  "realestate_au_sv|parque-residencial-riverside-san-miguel-san-miguel-centro-san-miguel-agua-zarca-san-miguel-agua-zarca-san-miguel-310108870357": {
+    "ts": "2026-06-20T07:17:09.548648+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Riverside, San Miguel",
+      "es": "Terreno en Venta en Riverside, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Parque Residencial Riverside, San Miguel Centro, San Miguel. Located in Agua Zarca, San Miguel department. Priced at $159,900.",
+      "es": "Lote en Parque Residencial Riverside, San Miguel Centro, San Miguel. Ubicado en Agua Zarca, departamento de San Miguel. Precio de $159,900."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Parque Residencial Riverside",
+        "es": "Ubicado en Parque Residencial Riverside"
+      },
+      {
+        "en": "In San Miguel Centro area",
+        "es": "En la zona de San Miguel Centro"
+      },
+      {
+        "en": "Listed by RE/MAX ELEVA",
+        "es": "Listado por RE/MAX ELEVA"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3100,
+    "tokens_out": 371,
+    "cost_usd": 0.0012451,
+    "finish_reason": "stop",
+    "latency_ms": 3170
+  },
+  "realestate_au_sv|condominio-villanueva-golf-country-club-etapa-2-fase-5-poligono-o-lote-28-san-jose-villanueva-la-libertad-san-jose-villanueva-la-libertad-department-310108870318": {
+    "ts": "2026-06-20T07:17:10.023133+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Condominio Villanueva Golf, San Jose Villanueva",
+      "es": "Terreno en Condominio Villanueva Golf, San José Villanueva"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Condominio Villanueva Golf Country Club, San Jose Villanueva, La Libertad. Located in Etapa 2, Fase 5, Polígono O, Lote #28. Priced at $355,000.",
+      "es": "Terreno en Condominio Villanueva Golf Country Club, San José Villanueva, La Libertad. Ubicado en Etapa 2, Fase 5, Polígono O, Lote #28. Precio de $355,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Golf country club community",
+        "es": "Comunidad en club de golf"
+      },
+      {
+        "en": "San Jose Villanueva location",
+        "es": "Ubicación en San José Villanueva"
+      },
+      {
+        "en": "La Libertad department",
+        "es": "Departamento de La Libertad"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3110,
+    "tokens_out": 414,
+    "cost_usd": 0.0012951,
+    "finish_reason": "stop",
+    "latency_ms": 3387
+  },
+  "realestate_au_sv|lote-52-poligono-el-carrizal-hacienda-la-piragua-jucuaran-usulutan-jucuaran-usulutan-310108870310": {
+    "ts": "2026-06-20T07:17:10.825657+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot in Hacienda La Piragua, Jucuaran",
+      "es": "Lote en Hacienda La Piragua, Jucuaran"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lot in Polígono El Carrizal, Hacienda La Piragua, Jucuaran, Usulután. Lot 52, suitable for residential development. Priced at $200,000.",
+      "es": "Lote de terreno plano en Polígono El Carrizal, Hacienda La Piragua, Jucuaran, Usulután. Lote 52, apto para desarrollo residencial. Precio de $200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Hacienda La Piragua",
+        "es": "Ubicado en Hacienda La Piragua"
+      },
+      {
+        "en": "Lot 52, Polígono El Carrizal",
+        "es": "Lote 52, Polígono El Carrizal"
+      },
+      {
+        "en": "Priced at $200,000",
+        "es": "Precio de $200,000"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 423,
+    "cost_usd": 0.00130203,
+    "finish_reason": "stop",
+    "latency_ms": 3110
+  },
+  "encuentra24|32491272": {
+    "ts": "2026-06-20T08:01:10.224552+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Renovated Condo in Costa del Este",
+      "es": "Apartamento de Lujo Renovado en Costa del Este"
+    },
+    "short_description_canonical": {
+      "en": "Renovated 342 m² luxury condo in PH Matisse, Costa del Este. Features 3 bedrooms, 3.5 bathrooms, Miele appliances, marble floors, central AC, and sea-view balcony. Includes 4 parking spaces, pool, gym, squash court, and 24-hour security.",
+      "es": "Apartamento de lujo renovado de 342 m² en PH Matisse, Costa del Este. Cuenta con 3 recámaras, 3.5 baños, electrodomésticos Miele, pisos de mármol, aire acondicionado central y balcón con vista al mar. Incluye 4 estacionamientos, piscina, gimnasio, cancha de squash y seguridad 24 horas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Renovated with Miele appliances",
+        "es": "Renovado con electrodomésticos Miele"
+      },
+      {
+        "en": "Sea-view balcony",
+        "es": "Balcón con vista al mar"
+      },
+      {
+        "en": "4 parking spaces included",
+        "es": "4 estacionamientos incluidos"
+      },
+      {
+        "en": "Full amenities: pool, gym, squash",
+        "es": "Amenidades completas: piscina, gimnasio, squash"
+      }
+    ],
+    "lat": 9.0089,
+    "lng": -79.4686,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Este, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 342.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2502,
+    "tokens_out": 502,
+    "cost_usd": 0.00122774,
+    "finish_reason": "stop",
+    "latency_ms": 4763
+  },
+  "encuentra24|32348540": {
+    "ts": "2026-06-20T08:01:10.430238+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "245 m² Townhouse in Decameron Costa Blanca, Beachfront",
+      "es": "Townhouse 245 m² en Decameron Costa Blanca, Frente al Mar"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished 245 m² townhouse in the exclusive Decameron Costa Blanca resort, with direct beach access. It has 4 bedrooms, 3.5 bathrooms, service quarters, terrace with BBQ, and 2 parking spaces. The complex offers 24/7 security, pools, and professional management.",
+      "es": "Townhouse completamente amoblado de 245 m² en el exclusivo complejo Decameron Costa Blanca, con acceso directo a la playa. Cuenta con 4 recámaras, 3.5 baños, cuarto de servicio, terraza con BBQ y 2 estacionamientos. El complejo ofrece seguridad 24/7, piscinas y administración profesional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access within resort",
+        "es": "Acceso directo a la playa dentro del resort"
+      },
+      {
+        "en": "Fully furnished, turnkey ready",
+        "es": "Completamente amoblado, listo para usar"
+      },
+      {
+        "en": "Resort amenities: pools, security",
+        "es": "Amenidades del resort: piscinas, seguridad"
+      },
+      {
+        "en": "High vacation rental demand",
+        "es": "Alta demanda de alquiler vacacional"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -79.7833,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Farallon, Royal Decameron Costa Blanca",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.5,
+      "built_area_m2": 245.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2506,
+    "tokens_out": 511,
+    "cost_usd": 0.00123872,
+    "finish_reason": "stop",
+    "latency_ms": 4968
+  },
+  "encuentra24|32581895": {
+    "ts": "2026-06-20T08:01:10.951077+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Exclusive 3BR House in Altos del María, Siena",
+      "es": "Casa exclusiva 3 hab. en Altos del María, Siena"
+    },
+    "short_description_canonical": {
+      "en": "This 460 m² house in Altos del María's Siena neighborhood offers 3 bedrooms and 3.5 bathrooms. Located at 600 m elevation with cooler year-round temperatures, it features 4 parking spaces and access to 37+ amenities. The property sits on a mostly flat lot near the main park and Sora village.",
+      "es": "Esta casa de 460 m² en el barrio Siena de Altos del María tiene 3 habitaciones y 3.5 baños. Ubicada a 600 m de altitud con temperaturas frescas todo el año, cuenta con 4 estacionamientos y acceso a más de 37 amenidades. El terreno es mayormente plano, cerca del parque principal y del pueblo de Sora."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "37+ amenities including waterfalls and trails",
+        "es": "Más de 37 amenidades incluyendo cascadas y senderos"
+      },
+      {
+        "en": "Mostly flat lot in consolidated Siena area",
+        "es": "Terreno mayormente plano en zona consolidada de Siena"
+      },
+      {
+        "en": "5 minutes from Sora village and Coronado",
+        "es": "A 5 minutos del pueblo de Sora y Coronado"
+      },
+      {
+        "en": "Cool mountain climate at 600 m elevation",
+        "es": "Clima fresco de montaña a 600 m de altitud"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Altos del María, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 460.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2594,
+    "tokens_out": 528,
+    "cost_usd": 0.00128118,
+    "finish_reason": "stop",
+    "latency_ms": 5489
+  },
+  "encuentra24|32507523": {
+    "ts": "2026-06-20T08:01:11.252134+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spanish-style lakefront house, 400 m², Las Cumbres",
+      "es": "Casa frente al lago estilo español, 400 m², Las Cumbres"
+    },
+    "short_description_canonical": {
+      "en": "Spanish-Basque style house on a 1,008 m² lot with 400 m² built area, located in Las Cumbres. Features 3 bedrooms with en-suite bathrooms, a bar with terrace overlooking the lake, a study on the upper floor, and a barbecue area. All windows and kitchen cabinets are made of mahogany and noble wood.",
+      "es": "Casa estilo español-vasco en terreno de 1,008 m² con 400 m² construidos, ubicada en Las Cumbres. Cuenta con 3 recámaras con baño, bar con terraza frente al lago, estudio en planta alta y área de barbacoa. Todas las ventanas y muebles de cocina son de caoba y madera noble."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront with direct water views",
+        "es": "Frente al lago con vistas directas al agua"
+      },
+      {
+        "en": "Mahogany and noble wood finishes",
+        "es": "Acabados en caoba y madera noble"
+      },
+      {
+        "en": "3 bedrooms with en-suite bathrooms",
+        "es": "3 recámaras con baño privado"
+      },
+      {
+        "en": "Bar and terrace overlooking lake",
+        "es": "Bar y terraza con vista al lago"
+      },
+      {
+        "en": "Study and barbecue area included",
+        "es": "Estudio y área de barbacoa incluidos"
+      }
+    ],
+    "lat": 9.0833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Las Cumbres, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 400.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2458,
+    "tokens_out": 544,
+    "cost_usd": 0.00126206,
+    "finish_reason": "stop",
+    "latency_ms": 5791
   }
 }

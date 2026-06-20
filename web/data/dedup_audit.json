@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-19T08:03:06.494934+00:00",
+  "computed_at": "2026-06-20T07:17:02.534898+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1138,10 +1138,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 506,
-      "raw": 507,
+      "kept_as_unique": 508,
+      "raw": 509,
       "shared_with_others": 0,
-      "unique_in_source": 506
+      "unique_in_source": 508
     },
     "century21": {
       "kept_as_unique": 13,
@@ -1174,10 +1174,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 30,
-      "raw": 30,
+      "kept_as_unique": 29,
+      "raw": 29,
       "shared_with_others": 0,
-      "unique_in_source": 30
+      "unique_in_source": 29
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1186,16 +1186,16 @@
       "unique_in_source": 40
     },
     "goodlife": {
-      "kept_as_unique": 37,
-      "raw": 37,
+      "kept_as_unique": 36,
+      "raw": 36,
       "shared_with_others": 0,
-      "unique_in_source": 37
+      "unique_in_source": 36
     },
     "nexo": {
-      "kept_as_unique": 6,
-      "raw": 6,
+      "kept_as_unique": 8,
+      "raw": 8,
       "shared_with_others": 0,
-      "unique_in_source": 6
+      "unique_in_source": 8
     },
     "oceanside": {
       "kept_as_unique": 23,
@@ -1204,10 +1204,10 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 271,
-      "raw": 302,
+      "kept_as_unique": 273,
+      "raw": 304,
       "shared_with_others": 0,
-      "unique_in_source": 271
+      "unique_in_source": 273
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1216,10 +1216,10 @@
       "unique_in_source": 98
     },
     "remax": {
-      "kept_as_unique": 304,
-      "raw": 320,
+      "kept_as_unique": 303,
+      "raw": 319,
       "shared_with_others": 0,
-      "unique_in_source": 304
+      "unique_in_source": 303
     },
     "santizo": {
       "kept_as_unique": 89,
@@ -1240,6 +1240,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2105,
-  "total_unique_fingerprints": 2051
+  "total_in_dataset": 2108,
+  "total_unique_fingerprints": 2054
 }
