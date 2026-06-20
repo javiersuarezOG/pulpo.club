@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-19T08:43:04.856550+00:00",
+  "computed_at": "2026-06-20T08:02:00.080782+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.0,
-        "kept": 29,
+        "coverage_pct_vs_discovered": 1.2,
+        "kept": 35,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -168,7 +168,7 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 29,
+    "total_in_dataset": 35,
     "total_visible_listings": 5
   },
   "min_real_listings": 4

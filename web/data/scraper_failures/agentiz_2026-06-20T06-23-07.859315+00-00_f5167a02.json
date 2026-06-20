@@ -1,0 +1,14 @@
+{
+  "failure_id": "f5167a02",
+  "source": "agentiz",
+  "ts": "2026-06-20T06:23:07.859315+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 8.7,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

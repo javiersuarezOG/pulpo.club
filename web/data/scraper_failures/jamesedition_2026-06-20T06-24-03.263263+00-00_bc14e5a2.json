@@ -1,0 +1,14 @@
+{
+  "failure_id": "bc14e5a2",
+  "source": "jamesedition",
+  "ts": "2026-06-20T06:24:03.263263+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.66,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
