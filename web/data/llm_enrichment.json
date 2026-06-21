@@ -115292,5 +115292,503 @@
     "cost_usd": 0.00126206,
     "finish_reason": "stop",
     "latency_ms": 5791
+  },
+  "csbr|finca-en-venta-en-candelaria-de-la-frontera": {
+    "ts": "2026-06-21T07:49:58.902646+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Farm for Sale in Candelaria de la Frontera",
+      "es": "Finca en Venta en Candelaria de la Frontera"
+    },
+    "short_description_canonical": {
+      "en": "Farm for sale in Candelaria de la Frontera, Cuscatlán. 840,000 USD. No further details provided.",
+      "es": "Finca en venta en Candelaria de la Frontera, Cuscatlán. 840,000 USD. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at 840,000 USD",
+        "es": "Listada en 840,000 USD"
+      },
+      {
+        "en": "Located in Candelaria de la Frontera",
+        "es": "Ubicada en Candelaria de la Frontera"
+      },
+      {
+        "en": "Available through CADABIEN",
+        "es": "Disponible a través de CADABIEN"
+      }
+    ],
+    "lat": 13.9833,
+    "lng": -89.5833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Candelaria, Cuscatlán, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 384,
+    "cost_usd": 0.00125157,
+    "finish_reason": "stop",
+    "latency_ms": 3675
+  },
+  "csbr|proyecto-residencial-las-nubes-calle-a-comasagua-la-libertad": {
+    "ts": "2026-06-21T07:49:58.949697+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Las Nubes Residential Lot, La Libertad",
+      "es": "Lote Residencial Las Nubes, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot in Las Nubes project on Calle a Comasagua, La Libertad. Price: $298,000. Located in a developing residential area.",
+      "es": "Lote residencial en proyecto Las Nubes sobre Calle a Comasagua, La Libertad. Precio: $298,000. Ubicado en zona residencial en desarrollo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated residential project",
+        "es": "Proyecto residencial cerrado"
+      },
+      {
+        "en": "Calle a Comasagua location",
+        "es": "Ubicación en Calle a Comasagua"
+      },
+      {
+        "en": "Near La Libertad coast",
+        "es": "Cerca de la costa de La Libertad"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.3167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3075,
+    "tokens_out": 374,
+    "cost_usd": 0.00124165,
+    "finish_reason": "stop",
+    "latency_ms": 3722
+  },
+  "goodlife|hillside-oceanview-land-in-la-libertad-150000": {
+    "ts": "2026-06-21T07:49:59.693277+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "510 m² Ocean View Lot in La Libertad",
+      "es": "Terreno de 510 m² con vista al mar en La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "510 m² lot above La Libertad harbor with Pacific Ocean and Punta Roca views. Undeveloped land requiring planning and investment; no structures exist. Located minutes from beaches, surf breaks, and restaurants in Surf City.",
+      "es": "Terreno de 510 m² sobre el puerto de La Libertad con vistas al Océano Pacífico y Punta Roca. Terreno sin desarrollar que requiere planificación e inversión; no existen estructuras. Ubicado a minutos de playas, olas y restaurantes en Surf City."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Elevated ocean and coastline views",
+        "es": "Vistas elevadas al océano y costa"
+      },
+      {
+        "en": "510 m² lot in Surf City",
+        "es": "Terreno de 510 m² en Surf City"
+      },
+      {
+        "en": "Minutes from beaches and surf breaks",
+        "es": "Minutos de playas y olas"
+      },
+      {
+        "en": "Undeveloped, ready for custom project",
+        "es": "Sin desarrollar, listo para proyecto personalizado"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3199,
+    "tokens_out": 453,
+    "cost_usd": 0.00136203,
+    "finish_reason": "stop",
+    "latency_ms": 4465
+  },
+  "goodlife|3-bedroom-house-in-el-zonte-799000": {
+    "ts": "2026-06-21T07:50:00.169847+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed Home Near El Zonte Beach, Private Pool",
+      "es": "Casa 3 Dorm. Cerca Playa El Zonte, Piscina Privada"
+    },
+    "short_description_canonical": {
+      "en": "House with 3 bedrooms, 2 bathrooms, and a private pool in El Zonte, La Libertad. Built on a lot with lush vegetation, it includes a separate apartment with kitchen and bath, plus staff quarters. Two-minute walk to a private beach in a high-demand area with limited inventory.",
+      "es": "Casa con 3 dormitorios, 2 baños y piscina privada en El Zonte, La Libertad. Construida en un lote con vegetación frondosa, incluye apartamento independiente con cocina y baño, más cuarto de servicio. A dos minutos caminando de una playa privada en zona de alta demanda y poca oferta."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two-minute walk to private beach",
+        "es": "A dos minutos de playa privada"
+      },
+      {
+        "en": "Separate apartment with own kitchen",
+        "es": "Apartamento independiente con cocina propia"
+      },
+      {
+        "en": "Private pool and garden views",
+        "es": "Piscina privada y vista al jardín"
+      },
+      {
+        "en": "Limited inventory in Bitcoin Beach area",
+        "es": "Poca oferta en zona Bitcoin Beach"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3212,
+    "tokens_out": 486,
+    "cost_usd": 0.00140184,
+    "finish_reason": "stop",
+    "latency_ms": 4942
+  },
+  "realestate_au_sv|lotificacion-el-mango-ubicacion-geografica-la-libertad-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-department-310108925487": {
+    "ts": "2026-06-21T07:50:01.575466+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lotificación El Mango, La Libertad Coast",
+      "es": "Terreno en Lotificación El Mango, Costa de La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lotificación El Mango, La Libertad Coast, La Libertad department. Located in a coastal area with potential for development. Price: $2,675,700.",
+      "es": "Lote en Lotificación El Mango, Costa de La Libertad, departamento de La Libertad. Ubicado en zona costera con potencial de desarrollo. Precio: $2,675,700."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Coastal location in La Libertad",
+        "es": "Ubicación costera en La Libertad"
+      },
+      {
+        "en": "Lotificación El Mango development",
+        "es": "Desarrollo Lotificación El Mango"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 388,
+    "cost_usd": 0.00126407,
+    "finish_reason": "stop",
+    "latency_ms": 3278
+  },
+  "realestate_au_sv|carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617": {
+    "ts": "2026-06-21T07:50:01.741428+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Chalchupa, Santa Ana",
+      "es": "Terreno en Venta en Chalchupa, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Ayutepeque, Chalchupa, Santa Ana, along Carretera a Ahuachapán. Priced at $35,638. Ideal for development or investment.",
+      "es": "Terreno en Cantón Ayutepeque, Chalchupa, Santa Ana, sobre Carretera a Ahuachapán. Precio de $35,638. Ideal para desarrollo o inversión."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera a Ahuachapán",
+        "es": "Ubicado sobre Carretera a Ahuachapán"
+      },
+      {
+        "en": "Price: $35,638",
+        "es": "Precio: $35,638"
+      },
+      {
+        "en": "In Cantón Ayutepeque, Chalchupa",
+        "es": "En Cantón Ayutepeque, Chalchupa"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 400,
+    "cost_usd": 0.00127133,
+    "finish_reason": "stop",
+    "latency_ms": 3196
+  },
+  "realestate_au_sv|carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392": {
+    "ts": "2026-06-21T07:50:02.281352+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Chalchupa, Santa Ana",
+      "es": "Terreno en Venta en Chalchupa, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. Located in a rural area with road access. Priced at $35,926.",
+      "es": "Terreno en Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. Ubicado en zona rural con acceso vial. Precio de $35,926."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Carretera a Ahuachapán",
+        "es": "Sobre Carretera a Ahuachapán"
+      },
+      {
+        "en": "Rural lot in Santa Ana",
+        "es": "Lote rural en Santa Ana"
+      },
+      {
+        "en": "Priced at $35,926",
+        "es": "Precio de $35,926"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 392,
+    "cost_usd": 0.00126253,
+    "finish_reason": "stop",
+    "latency_ms": 3331
+  },
+  "realestate_au_sv|carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614618": {
+    "ts": "2026-06-21T07:50:02.395276+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Ana, Chalchupa",
+      "es": "Terreno en Venta en Santa Ana, Chalchupa"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. No built area or structures. Priced at $32,466.",
+      "es": "Terreno en Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. Sin área construida ni estructuras. Precio de $32,466."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera a Ahuachapán",
+        "es": "Ubicado en Carretera a Ahuachapán"
+      },
+      {
+        "en": "Priced at $32,466",
+        "es": "Precio de $32,466"
+      },
+      {
+        "en": "In Santa Ana department",
+        "es": "En el departamento de Santa Ana"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5564,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 389,
+    "cost_usd": 0.00125923,
+    "finish_reason": "stop",
+    "latency_ms": 3492
+  },
+  "realestate_au_sv|carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383397": {
+    "ts": "2026-06-21T07:50:03.332656+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Ana, Carretera a Ahuachapán",
+      "es": "Terreno en Venta en Santa Ana, Carretera a Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Ayutepeque, Chalchupa, Santa Ana, along Carretera a Ahuachapán. No built area, bedrooms, or bathrooms. Priced at $33,046.",
+      "es": "Terreno en Cantón Ayutepeque, Chalchupa, Santa Ana, sobre Carretera a Ahuachapán. Sin área construida, habitaciones ni baños. Precio de $33,046."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera a Ahuachapán",
+        "es": "Ubicado sobre Carretera a Ahuachapán"
+      },
+      {
+        "en": "Price: $33,046",
+        "es": "Precio: $33,046"
+      },
+      {
+        "en": "In Cantón Ayutepeque, Chalchupa",
+        "es": "En Cantón Ayutepeque, Chalchupa"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 419,
+    "cost_usd": 0.00129223,
+    "finish_reason": "stop",
+    "latency_ms": 3638
+  },
+  "realestate_au_sv|carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093363083": {
+    "ts": "2026-06-21T07:50:03.900026+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for sale in Santa Ana, El Salvador",
+      "es": "Terreno en venta en Santa Ana, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located on Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. This lot is offered for sale by CENTURY 21 El Salvador. No further details on size or utilities are provided.",
+      "es": "Parcela de terreno ubicada en Carretera a Ahuachapán, Cantón Ayutepeque, Chalchupa, Santa Ana. Este lote se ofrece en venta por CENTURY 21 El Salvador. No se proporcionan más detalles sobre tamaño o servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera a Ahuachapán",
+        "es": "Ubicado en Carretera a Ahuachapán"
+      },
+      {
+        "en": "In Cantón Ayutepeque, Chalchupa",
+        "es": "En Cantón Ayutepeque, Chalchupa"
+      },
+      {
+        "en": "Offered by CENTURY 21 El Salvador",
+        "es": "Ofrecido por CENTURY 21 El Salvador"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 429,
+    "cost_usd": 0.00130323,
+    "finish_reason": "stop",
+    "latency_ms": 3957
   }
 }
