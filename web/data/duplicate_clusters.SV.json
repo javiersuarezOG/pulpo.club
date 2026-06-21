@@ -715,6 +715,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "560d0b3ada36080a89213064cd6c45cbedf3e508",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 35638.0,
+        "source": "realestate_au_sv",
+        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617",
+        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617/",
+        "zone": "santa-ana"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 35926.0,
+        "source": "realestate_au_sv",
+        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392",
+        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392/",
+        "zone": "santa-ana"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "5cff8d18bfa70cba1606326d0175ba3d3ad0a9b5",
     "samples": [
       {
