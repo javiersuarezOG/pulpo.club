@@ -115790,5 +115790,176 @@
     "cost_usd": 0.00130323,
     "finish_reason": "stop",
     "latency_ms": 3957
+  },
+  "santizo|9574946": {
+    "ts": "2026-06-22T08:21:06.315106+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Villa with private pool, dock, boat in Costa del Sol",
+      "es": "Villa con piscina privada, muelle, lancha en Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished villa in Estero Jaltepeque, Costa del Sol, San Luis La Herradura. Includes 3 bedrooms, 3 bathrooms, private pool, boat hangar, dock, and a boat. 24/7 security, immediate availability.",
+      "es": "Villa totalmente amueblada en Estero Jaltepeque, Costa del Sol, San Luis La Herradura. Incluye 3 habitaciones, 3 baños, piscina privada, hangar para lancha, muelle y una lancha. Seguridad 24/7, disponible de inmediato."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool and dock included",
+        "es": "Piscina privada y muelle incluidos"
+      },
+      {
+        "en": "Boat and boat hangar included",
+        "es": "Lancha y hangar para lancha incluidos"
+      },
+      {
+        "en": "Fully furnished with A/C throughout",
+        "es": "Totalmente amueblado con A/C en todos los ambientes"
+      },
+      {
+        "en": "24/7 security in Estero Jaltepeque",
+        "es": "Seguridad 24/7 en Estero Jaltepeque"
+      },
+      {
+        "en": "Immediate availability",
+        "es": "Disponible de inmediato"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3341,
+    "tokens_out": 510,
+    "cost_usd": 0.00146307,
+    "finish_reason": "stop",
+    "latency_ms": 4412
+  },
+  "remax|002472155043": {
+    "ts": "2026-06-22T08:21:06.641606+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3,232 m² Lot in San Antonio Abad, San Salvador",
+      "es": "Lote de 3,232 m² en San Antonio Abad, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 3,232.61 m² lot in Cantón San Antonio Abad, San Salvador. Land has sewer, water, electricity, paved roads, and public transport. Mixed residential-commercial zone with apartment towers and gas stations nearby.",
+      "es": "Lote semiplano de 3,232.61 m² en Cantón San Antonio Abad, San Salvador. Terreno con alcantarillado, agua, electricidad, calles pavimentadas y transporte público. Zona mixta residencial-comercial con torres de apartamentos y gasolineras cercanas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,232 m² lot in high-value area",
+        "es": "Lote de 3,232 m² en zona de alto valor"
+      },
+      {
+        "en": "Utilities available: sewer, water, electricity",
+        "es": "Servicios disponibles: alcantarillado, agua, electricidad"
+      },
+      {
+        "en": "Paved asphalt and concrete access roads",
+        "es": "Calles de acceso pavimentadas en asfalto y concreto"
+      },
+      {
+        "en": "Mixed residential and commercial zoning",
+        "es": "Zonificación mixta residencial y comercial"
+      },
+      {
+        "en": "Near apartment towers and gas stations",
+        "es": "Cerca de torres de apartamentos y gasolineras"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Antonio Abad, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3445,
+    "tokens_out": 519,
+    "cost_usd": 0.00150105,
+    "finish_reason": "stop",
+    "latency_ms": 4739
+  },
+  "encuentra24|30737567": {
+    "ts": "2026-06-22T09:01:05.279649+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Reduced Price Furnished House, Playa Blanca Resort",
+      "es": "Casa Amoblada Rebajada, Playa Blanca Resort"
+    },
+    "short_description_canonical": {
+      "en": "125 m² furnished house with 3 bedrooms, 3 bathrooms, and 2 parking spaces in Playa Blanca Resort. Features inverter A/C, open kitchen, garden, and access to the largest saltwater pool in Central America. Located steps from the beach within the Napa Village complex.",
+      "es": "Casa amoblada de 125 m² con 3 recámaras, 3 baños y 2 estacionamientos en Playa Blanca Resort. Cuenta con aires inverter, cocina abierta, jardín y acceso a la piscina de agua salada más grande de Centroamérica. Ubicada a pasos de la playa en el complejo Napa Village."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from the beach",
+        "es": "A pasos de la playa"
+      },
+      {
+        "en": "Furnished with inverter A/C",
+        "es": "Amoblada con aires inverter"
+      },
+      {
+        "en": "Access to largest saltwater pool",
+        "es": "Acceso a la piscina de agua salada más grande"
+      },
+      {
+        "en": "2 parking spaces included",
+        "es": "2 estacionamientos incluidos"
+      },
+      {
+        "en": "90 minutes from Panama City",
+        "es": "90 minutos de la Ciudad de Panamá"
+      }
+    ],
+    "lat": 8.2333,
+    "lng": -80.1833,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Blanca, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 125.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2362,
+    "tokens_out": 515,
+    "cost_usd": 0.00120424,
+    "finish_reason": "stop",
+    "latency_ms": 4357
   }
 }
