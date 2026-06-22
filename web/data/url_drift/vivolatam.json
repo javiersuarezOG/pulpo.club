@@ -2,13 +2,13 @@
   "source": "vivolatam",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-06-21T20:07:44.930047+00:00",
+  "probed_at": "2026-06-22T05:35:24.475152+00:00",
   "last_probe": {
     "probed_url": "https://www.vivolatam.com/sitemap/property_listings.xml",
     "status_code": 200,
     "final_url": "https://www.vivolatam.com/sitemap/property_listings.xml",
     "response_size_bytes": null,
-    "duration_ms": 2062,
+    "duration_ms": 1992,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.vivolatam.com/sitemap/property_listings.xml",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-06-21T20:07:44.930074+00:00"
+    "last_ok_at": "2026-06-22T05:35:24.475178+00:00"
   }
 }
