@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-21T07:49:54.187613+00:00",
+  "computed_at": "2026-06-22T08:21:00.772161+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1202,10 +1202,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 27,
-      "raw": 27,
+      "kept_as_unique": 28,
+      "raw": 28,
       "shared_with_others": 0,
-      "unique_in_source": 27
+      "unique_in_source": 28
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1244,16 +1244,16 @@
       "unique_in_source": 98
     },
     "remax": {
-      "kept_as_unique": 301,
-      "raw": 317,
+      "kept_as_unique": 302,
+      "raw": 318,
       "shared_with_others": 0,
-      "unique_in_source": 301
+      "unique_in_source": 302
     },
     "santizo": {
-      "kept_as_unique": 89,
-      "raw": 89,
+      "kept_as_unique": 90,
+      "raw": 90,
       "shared_with_others": 0,
-      "unique_in_source": 89
+      "unique_in_source": 90
     },
     "vivolatam": {
       "kept_as_unique": 156,
@@ -1268,6 +1268,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2111,
-  "total_unique_fingerprints": 2056
+  "total_in_dataset": 2114,
+  "total_unique_fingerprints": 2059
 }
