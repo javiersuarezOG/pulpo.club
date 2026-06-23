@@ -115961,5 +115961,421 @@
     "cost_usd": 0.00120424,
     "finish_reason": "stop",
     "latency_ms": 4357
+  },
+  "century21|1184640": {
+    "ts": "2026-06-23T07:02:26.904139+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "531 m² lot near Ilobasco, Cabañas",
+      "es": "Terreno de 531 m² cerca de Ilobasco, Cabañas"
+    },
+    "short_description_canonical": {
+      "en": "Flat 531 m² lot on the road from San Rafael Cedros to Ilobasco, near the Fiscalía, University of Ilobasco, and Sensuntepeque turnoff. Water and electricity access available (installation request required). Owner financing offered with 25% down and 12% annual interest.",
+      "es": "Terreno plano de 531 m² sobre la carretera de San Rafael Cedros a Ilobasco, cerca de la Fiscalía, Universidad de Ilobasco y desvío a Sensuntepeque. Acceso a agua y electricidad (sujeto a solicitud de instalación). Financiamiento propio con 25% de prima y 12% de interés anual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "531 m² flat lot",
+        "es": "Terreno plano de 531 m²"
+      },
+      {
+        "en": "Near university and highway",
+        "es": "Cerca de universidad y carretera"
+      },
+      {
+        "en": "Owner financing available",
+        "es": "Financiamiento propio disponible"
+      },
+      {
+        "en": "Water and electricity access",
+        "es": "Acceso a agua y electricidad"
+      }
+    ],
+    "lat": 13.7686,
+    "lng": -88.8622,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilobasco, Cabañas",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3250,
+    "tokens_out": 468,
+    "cost_usd": 0.0013923,
+    "finish_reason": "stop",
+    "latency_ms": 4925
+  },
+  "bienesraices|2415": {
+    "ts": "2026-06-23T07:02:27.345610+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land 1.5 Manzanas Near Acajutla Port",
+      "es": "Terreno Industrial 1.5 Manzanas Cerca Puerto Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "1.5 manzana (10,481 m²) industrial lot on Km 2.5 highway to Acajutla Port, Sonsonate. Includes compacted terrain for heavy equipment, two 2-story administrative buildings (5x20 m each) with full bathrooms. Ready for logistics, import/export operations with direct road access.",
+      "es": "Lote industrial de 1.5 manzanas (10,481 m²) en km 2.5 carretera al Puerto de Acajutla, Sonsonate. Incluye terracería compactada para equipo pesado, dos edificios administrativos de 2 niveles (5x20 m c/u) con baños completos. Listo para operaciones logísticas, importación/exportación con acceso directo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1.5 manzanas (10,481 m²) industrial lot",
+        "es": "1.5 manzanas (10,481 m²) lote industrial"
+      },
+      {
+        "en": "Km 2.5 highway to Acajutla Port",
+        "es": "Km 2.5 carretera al Puerto de Acajutla"
+      },
+      {
+        "en": "Compacted terrain for heavy equipment",
+        "es": "Terracería compactada para equipo pesado"
+      },
+      {
+        "en": "Two 2-story admin buildings included",
+        "es": "Dos edificios administrativos de 2 niveles incluidos"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla Port area, Sonsonate",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3457,
+    "tokens_out": 541,
+    "cost_usd": 0.00152849,
+    "finish_reason": "stop",
+    "latency_ms": 5367
+  },
+  "realestate_au_sv|carretera-a-san-rafel-cedros-agua-zarca-ilobasco-cabanas-310108952047": {
+    "ts": "2026-06-23T07:02:29.223160+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Ilobasco, Cabañas",
+      "es": "Terreno en Venta en Ilobasco, Cabañas"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on the road to San Rafael Cedros, Agua Zarca, Ilobasco, Cabañas. No built area or structures. Priced at $92,970.",
+      "es": "Terreno sobre la carretera a San Rafael Cedros, Agua Zarca, Ilobasco, Cabañas. Sin área construida ni estructuras. Precio de $92,970."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera a San Rafael Cedros",
+        "es": "Ubicado sobre Carretera a San Rafael Cedros"
+      },
+      {
+        "en": "In Agua Zarca, Ilobasco, Cabañas",
+        "es": "En Agua Zarca, Ilobasco, Cabañas"
+      },
+      {
+        "en": "Priced at $92,970",
+        "es": "Precio de $92,970"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilobasco municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 400,
+    "cost_usd": 0.0012716,
+    "finish_reason": "stop",
+    "latency_ms": 3927
+  },
+  "remax|001463699020": {
+    "ts": "2026-06-23T07:02:29.697988+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Colonia Escalón, San Salvador",
+      "es": "Terreno en Colonia Escalón, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 177.5 m² lot in Colonia Escalón, San Salvador. Electricity and water available, urban zoning. Ideal for residential development or investment.",
+      "es": "Terreno plano de 177.5 m² en Colonia Escalón, San Salvador. Acceso a electricidad y agua, zonificación urbana. Ideal para desarrollo residencial o inversión."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "177.5 m² lot in Colonia Escalón",
+        "es": "Terreno de 177.5 m² en Colonia Escalón"
+      },
+      {
+        "en": "Electricity and water available",
+        "es": "Electricidad y agua disponibles"
+      },
+      {
+        "en": "Urban zoning for development",
+        "es": "Zonificación urbana para desarrollo"
+      },
+      {
+        "en": "Prime location near shops and services",
+        "es": "Ubicación privilegiada cerca de comercios y servicios"
+      }
+    ],
+    "lat": 13.6989,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colonia Escalón, San Salvador",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3221,
+    "tokens_out": 415,
+    "cost_usd": 0.00132617,
+    "finish_reason": "stop",
+    "latency_ms": 4091
+  },
+  "remax|002472976047": {
+    "ts": "2026-06-23T07:02:29.924044+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Las Veraneras, Acajutla",
+      "es": "Lote Plano en Las Veraneras, Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,768.75 m² residential lot in Las Veraneras Beach Community, Acajutla. Gated community with 24/7 security, beach club, pools, and restaurant. Water and electricity connections available.",
+      "es": "Lote residencial plano de 1,768.75 m² en la comunidad Las Veraneras, Acajutla. Comunidad cerrada con seguridad 24/7, club de playa, piscinas y restaurante. Conexiones de agua y electricidad disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beach club access included",
+        "es": "Acceso al club de playa incluido"
+      },
+      {
+        "en": "24/7 gated security",
+        "es": "Seguridad privada 24/7"
+      },
+      {
+        "en": "Water and electricity ready",
+        "es": "Agua y electricidad listas"
+      },
+      {
+        "en": "100% flat topography",
+        "es": "Topografía 100% plana"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla beach area",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3332,
+    "tokens_out": 435,
+    "cost_usd": 0.00137814,
+    "finish_reason": "stop",
+    "latency_ms": 4088
+  },
+  "remax|001461171095": {
+    "ts": "2026-06-23T07:02:30.220110+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "13,615 sq varas land in Cuscatancingo, San Salvador",
+      "es": "Terreno de 13,615 varas cuadradas en Cuscatancingo, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 9,516 m² (13,615.79 sq varas) residential lot behind Our Lady of the Transit Chapel, Cuscatancingo. It has easements, public and private utilities, updated appraisal and perimeter survey by the Cadastral Office. Suitable for residential development, subdivision, or long-term investment.",
+      "es": "Terreno residencial plano de 9,516 m² (13,615.79 varas cuadradas) detrás de la Capilla Nuestra Señora del Tránsito, Cuscatancingo. Cuenta con servidumbres, servicios públicos y privados, avalúo actualizado y levantamiento perimetral por el Catastro. Ideal para desarrollo residencial, lotificación o inversión a largo plazo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Updated appraisal and perimeter survey",
+        "es": "Avalúo actualizado y levantamiento perimetral"
+      },
+      {
+        "en": "Public and private utilities available",
+        "es": "Servicios públicos y privados disponibles"
+      },
+      {
+        "en": "Easements for access",
+        "es": "Servidumbres de acceso"
+      },
+      {
+        "en": "9,516 m² buildable area",
+        "es": "9,516 m² de área edificable"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cuscatancingo, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3184,
+    "tokens_out": 504,
+    "cost_usd": 0.00141408,
+    "finish_reason": "stop",
+    "latency_ms": 4922
+  },
+  "encuentra24|31874831": {
+    "ts": "2026-06-23T07:44:46.293517+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view house in Morrillo Heights, 3 bedrooms",
+      "es": "Casa con vista al mar en Morrillo Heights, 3 recámaras"
+    },
+    "short_description_canonical": {
+      "en": "Corner lot house in Morrillo Heights with ocean views. 262 m² built, 3 bedrooms, 2.5 bathrooms, 1 parking space. Features a high-quality kitchen with pine cabinetry, a utility den, and west-facing Pacific sunset views.",
+      "es": "Casa en lote de esquina en Morrillo Heights con vista al mar. 262 m² construidos, 3 recámaras, 2.5 baños, 1 estacionamiento. Cuenta con cocina de alta calidad con carpintería en pino, un espacio tipo den y vistas al Pacífico hacia el oeste."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot in private community",
+        "es": "Lote de esquina en comunidad privada"
+      },
+      {
+        "en": "West-facing ocean sunset views",
+        "es": "Vistas al océano y atardeceres al oeste"
+      },
+      {
+        "en": "262 m² built, 3 bedrooms",
+        "es": "262 m² construidos, 3 recámaras"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mariatos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 262.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2608,
+    "tokens_out": 455,
+    "cost_usd": 0.00120466,
+    "finish_reason": "stop",
+    "latency_ms": 4561
+  },
+  "encuentra24|32404244": {
+    "ts": "2026-06-23T07:44:46.446405+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Villa in Coronado, 180 m², 4 Bedrooms",
+      "es": "Villa de Playa en Coronado, 180 m², 4 Habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "This 180 m² one-level beach villa is located in Coronado, 5 minutes from the sea. It has 4 bedrooms, 4 bathrooms, private pool, garden, BBQ area, and parking for 4 vehicles. Includes an independent annex ideal for guests or rental income.",
+      "es": "Esta villa de playa de un nivel de 180 m² está ubicada en Coronado, a 5 minutos del mar. Cuenta con 4 recámaras, 4 baños, piscina privada, jardín, parrillera y estacionamiento para 4 vehículos. Incluye un anexo independiente ideal para visitas o alquiler."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from the sea",
+        "es": "A 5 minutos del mar"
+      },
+      {
+        "en": "Private pool and garden",
+        "es": "Piscina privada y jardín"
+      },
+      {
+        "en": "Independent annex for rental",
+        "es": "Anexo independiente para alquiler"
+      },
+      {
+        "en": "Parking for 4 vehicles",
+        "es": "Estacionamiento para 4 vehículos"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 180.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2580,
+    "tokens_out": 485,
+    "cost_usd": 0.0012301,
+    "finish_reason": "stop",
+    "latency_ms": 4714
   }
 }
