@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-22T08:26:46.516022+00:00",
-  "expires_at": "2026-06-23T00:00:00+00:00",
+  "picked_at": "2026-06-23T07:07:49.955448+00:00",
+  "expires_at": "2026-06-24T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "bienesraices|1424",
   "rank_score": 79.13,
@@ -31,6 +31,12 @@
       "rank_score": 79.13,
       "hero_photo_quality_score": 90,
       "photos_count": 9
+    },
+    {
+      "listing_id": "encuentra24|31345998",
+      "rank_score": 77.16,
+      "hero_photo_quality_score": 90,
+      "photos_count": 13
     },
     {
       "listing_id": "bienesraices|1783",

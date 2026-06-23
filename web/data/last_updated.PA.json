@@ -1,7 +1,7 @@
 {
-  "last_updated": "2026-06-22T09:01:41.794980+00:00",
-  "started_at": "2026-06-22T08:26:50.788094+00:00",
-  "duration_seconds": 2091.01,
+  "last_updated": "2026-06-23T07:45:24.594717+00:00",
+  "started_at": "2026-06-23T07:07:52.382214+00:00",
+  "duration_seconds": 2252.21,
   "total_listings": 26,
   "dropped": 1,
   "per_source_raw": {
@@ -21,13 +21,13 @@
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
     "previous_price": 0.0385,
-    "beachfront_tier_on_beach": 0.2692,
+    "beachfront_tier_on_beach": 0.2308,
     "beachfront_tier_walk_to_beach": 0.0769,
     "beachfront_tier_near_beach": 0.0,
     "land_type_commercial": 0.1154,
-    "land_type_tourist": 0.1154,
-    "land_type_residential": 0.7692,
-    "is_motivated": 0.1923
+    "land_type_tourist": 0.1538,
+    "land_type_residential": 0.7308,
+    "is_motivated": 0.1538
   },
   "field_completeness": {
     "encuentra24": {
@@ -35,16 +35,16 @@
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.15,
-        "municipality": 0.15,
-        "department": 0.15,
+        "zone": 0.12,
+        "municipality": 0.12,
+        "department": 0.12,
         "location_text": 1.0,
         "lat": 0.54,
         "lng": 0.54,
-        "is_beachfront": 0.27,
-        "has_paved_access": 0.12,
-        "has_water": 0.23,
-        "has_power": 0.12,
+        "is_beachfront": 0.23,
+        "has_paved_access": 0.08,
+        "has_water": 0.19,
+        "has_power": 0.08,
         "is_repriced": 0.04,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -61,8 +61,8 @@
   },
   "validation_by_type": {
     "house": {
-      "pass": 4,
-      "flag": 22,
+      "pass": 3,
+      "flag": 23,
       "drop": 1
     }
   },
