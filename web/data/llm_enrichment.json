@@ -116377,5 +116377,470 @@
     "cost_usd": 0.0012301,
     "finish_reason": "stop",
     "latency_ms": 4714
+  },
+  "citymax_sc|oportunidad-unica-casa-en-zacatecoluca": {
+    "ts": "2026-06-24T07:02:28.983659+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Zacatecoluca, La Paz",
+      "es": "Casa en Venta en Zacatecoluca, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Zacatecoluca, La Paz. Price $85,000. No further details provided.",
+      "es": "Casa en venta en Zacatecoluca, La Paz. Precio $85,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Price $85,000",
+        "es": "Precio $85,000"
+      },
+      {
+        "en": "Located in Zacatecoluca",
+        "es": "Ubicada en Zacatecoluca"
+      },
+      {
+        "en": "Investment opportunity",
+        "es": "Oportunidad de inversión"
+      }
+    ],
+    "lat": 13.5078,
+    "lng": -88.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zacatecoluca, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3059,
+    "tokens_out": 347,
+    "cost_usd": 0.00120763,
+    "finish_reason": "stop",
+    "latency_ms": 2943
+  },
+  "citymax_sc|lote-para-vivienda-cerca-del-aeropuerto-internacional": {
+    "ts": "2026-06-24T07:02:29.220706+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Costa del Sol",
+      "es": "Terreno en Venta, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale in Costa del Sol, El Salvador. Lot near beach and airport. Priced at $25,000.",
+      "es": "Terreno en venta en Costa del Sol, El Salvador. Lote cerca de la playa y el aeropuerto. Precio de $25,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Costa del Sol beach",
+        "es": "Cerca de la playa Costa del Sol"
+      },
+      {
+        "en": "Close to international airport",
+        "es": "Cerca del aeropuerto internacional"
+      },
+      {
+        "en": "Price $25,000",
+        "es": "Precio $25,000"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3069,
+    "tokens_out": 349,
+    "cost_usd": 0.00121253,
+    "finish_reason": "stop",
+    "latency_ms": 3180
+  },
+  "csbr|terreno-en-venta-lotificacion-miraflores-dept-la-paz": {
+    "ts": "2026-06-24T07:02:29.416000+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Lotificacion Miraflores, La Paz",
+      "es": "Terreno en Venta en Lotificacion Miraflores, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Flat 3,283 m² residential lot in Lotificacion Miraflores, La Paz department. Paved road access, water and electricity available. Priced at $210,000.",
+      "es": "Lote residencial plano de 3,283 m² en Lotificacion Miraflores, departamento de La Paz. Acceso por calle pavimentada, agua y electricidad disponibles. Precio de $210,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,283 m² flat lot",
+        "es": "Lote plano de 3,283 m²"
+      },
+      {
+        "en": "Paved road access",
+        "es": "Acceso por calle pavimentada"
+      },
+      {
+        "en": "Water and electricity on site",
+        "es": "Agua y electricidad en el lugar"
+      },
+      {
+        "en": "Priced at $210,000",
+        "es": "Precio de $210,000"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.9,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Paz department centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3072,
+    "tokens_out": 420,
+    "cost_usd": 0.00129144,
+    "finish_reason": "stop",
+    "latency_ms": 3375
+  },
+  "csbr|lote-en-venta-alturas-de-tenerife": {
+    "ts": "2026-06-24T07:02:32.109786+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot for Sale in Alturas de Tenerife",
+      "es": "Lote en Venta en Alturas de Tenerife"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Alturas de Tenerife, El Salvador. No built area, bedrooms, or bathrooms. Price: $339,000.",
+      "es": "Terreno en Alturas de Tenerife, El Salvador. Sin área construida, habitaciones ni baños. Precio: $339,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Alturas de Tenerife",
+        "es": "Ubicado en Alturas de Tenerife"
+      },
+      {
+        "en": "Listed on CADABIENES",
+        "es": "Listado en CADABIENES"
+      },
+      {
+        "en": "Price: $339,000",
+        "es": "Precio: $339,000"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -89.0208,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Alturas de Tenerife, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3052,
+    "tokens_out": 369,
+    "cost_usd": 0.00122994,
+    "finish_reason": "stop",
+    "latency_ms": 3203
+  },
+  "realestate_au_sv|canton-san-antonio-abad-san-antonio-abad-san-salvador-san-antonio-abad-san-salvador-san-antonio-abad-san-salvador-310108953009": {
+    "ts": "2026-06-24T07:02:32.157594+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Land in San Antonio Abad, San Salvador",
+      "es": "Terreno 850 m² en San Antonio Abad, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Canton San Antonio Abad, San Salvador. Located in a consolidated urban area with access to utilities and roads. Priced at $500,000.",
+      "es": "Lote residencial plano de 850 m² en Cantón San Antonio Abad, San Salvador. Ubicado en zona urbana consolidada con acceso a servicios y vías. Precio: $500,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot in San Salvador",
+        "es": "Lote plano de 850 m² en San Salvador"
+      },
+      {
+        "en": "Urban area with utilities access",
+        "es": "Zona urbana con acceso a servicios"
+      },
+      {
+        "en": "Priced at $500,000",
+        "es": "Precio: $500,000"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 390,
+    "cost_usd": 0.00126195,
+    "finish_reason": "stop",
+    "latency_ms": 3173
+  },
+  "csbr|lote-en-condominio-canarias": {
+    "ts": "2026-06-24T07:02:32.278925+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Condo Lot in Canarias, 626 m²",
+      "es": "Lote en Condominio Canarias, 626 m²"
+    },
+    "short_description_canonical": {
+      "en": "Flat 626.45 m² lot in Condominio Canarias, listed on the Salvadoran Real Estate Chamber. Located in a private condominium with controlled access. Priced at $150,000.",
+      "es": "Lote plano de 626.45 m² en Condominio Canarias, listado en la Cámara Salvadoreña de Bienes Raíces. Ubicado en un condominio privado con acceso controlado. Precio de $150,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "626 m² lot in private condominium",
+        "es": "Lote de 626 m² en condominio privado"
+      },
+      {
+        "en": "Controlled access security",
+        "es": "Acceso controlado con seguridad"
+      },
+      {
+        "en": "Listed on official real estate chamber",
+        "es": "Listado en cámara oficial de bienes raíces"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3058,
+    "tokens_out": 411,
+    "cost_usd": 0.00127776,
+    "finish_reason": "stop",
+    "latency_ms": 3302
+  },
+  "remax|003093352051": {
+    "ts": "2026-06-24T07:02:33.512538+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "2-Bedroom House Near Malibu Beach, Condominio Miramar",
+      "es": "Casa de 2 Habitaciones Cerca de Playa Malibu, Condominio Miramar"
+    },
+    "short_description_canonical": {
+      "en": "House of 60 m² built on a 370 m² lot in Condominio Miramar, 250 m from Malibu Beach, Sonsonate. Two independent bedrooms each with full bathroom, plus half-bath, parking for 4 vehicles. Gated community with 24/7 security. Price $85,000 negotiable, appraised at $92,000.",
+      "es": "Casa de 60 m² construida en lote de 370 m² en Condominio Miramar, a 250 m de Playa Malibu, Sonsonate. Dos habitaciones independientes cada una con baño completo, más medio baño, estacionamiento para 4 vehículos. Comunidad cerrada con seguridad 24/7. Precio $85,000 negociable, avalúo en $92,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "250 m from Malibu Beach",
+        "es": "250 m de Playa Malibu"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Parking for 4 vehicles",
+        "es": "Estacionamiento para 4 vehículos"
+      },
+      {
+        "en": "Price below appraisal ($85k vs $92k)",
+        "es": "Precio por debajo del avalúo ($85k vs $92k)"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla (nearest beach in table, Malibu not listed)",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 2.5,
+      "built_area_m2": 60.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3376,
+    "tokens_out": 555,
+    "cost_usd": 0.00152202,
+    "finish_reason": "stop",
+    "latency_ms": 4461
+  },
+  "encuentra24|32610497": {
+    "ts": "2026-06-24T07:44:56.991895+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished 640 m² House, Ocean Reef Islands",
+      "es": "Casa amoblada de 640 m², Ocean Reef Islands"
+    },
+    "short_description_canonical": {
+      "en": "Furnished 640 m² house in Ocean Reef Islands, Punta Pacífica. 3 bedrooms, 5 bathrooms, gourmet kitchen, floor-to-ceiling windows with Pacific and marina views. 4 parking spaces.",
+      "es": "Casa amoblada de 640 m² en Ocean Reef Islands, Punta Pacífica. 3 habitaciones, 5 baños, cocina gourmet, ventanales con vistas al Pacífico y la marina. 4 estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Furnished, move-in ready",
+        "es": "Amoblada, lista para mudarse"
+      },
+      {
+        "en": "Ocean and marina views",
+        "es": "Vistas al océano y la marina"
+      },
+      {
+        "en": "640 m² living space",
+        "es": "640 m² de espacio habitable"
+      },
+      {
+        "en": "3 bedrooms, 5 bathrooms",
+        "es": "3 habitaciones, 5 baños"
+      },
+      {
+        "en": "4 parking spaces included",
+        "es": "4 estacionamientos incluidos"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Pacífica, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 5.0,
+      "built_area_m2": 640.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2421,
+    "tokens_out": 469,
+    "cost_usd": 0.00116957,
+    "finish_reason": "stop",
+    "latency_ms": 4334
+  },
+  "encuentra24|30660297": {
+    "ts": "2026-06-24T07:44:57.535776+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "2-Story Beachfront House in San Marino, Portobelo",
+      "es": "Casa de 2 Plantas Frente al Mar en San Marino, Portobelo"
+    },
+    "short_description_canonical": {
+      "en": "Two-story beachfront house on a 1,700 m² lot in San Marino, Portobelo, Colón. It has 4 bedrooms, 4.5 bathrooms, a 2-level guest house, pool with bar, BBQ area, and 6 parking spaces. The property includes a private well and water tanks, with 24/7 security.",
+      "es": "Casa de dos plantas frente al mar en lote de 1,700 m² en San Marino, Portobelo, Colón. Cuenta con 4 recámaras, 4.5 baños, casa de huéspedes de 2 niveles, piscina con bar, área de BBQ y 6 estacionamientos. Incluye pozo propio y tanques de agua, con seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "4 bedrooms, 4.5 bathrooms",
+        "es": "4 recámaras, 4.5 baños"
+      },
+      {
+        "en": "Guest house, pool, BBQ",
+        "es": "Casa de huéspedes, piscina, BBQ"
+      },
+      {
+        "en": "6 parking spaces",
+        "es": "6 estacionamientos"
+      },
+      {
+        "en": "24/7 security",
+        "es": "Seguridad 24/7"
+      }
+    ],
+    "lat": 9.55,
+    "lng": -79.65,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Marino, Portobelo, Colón",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 1700.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2575,
+    "tokens_out": 542,
+    "cost_usd": 0.00129145,
+    "finish_reason": "stop",
+    "latency_ms": 4878
   }
 }
