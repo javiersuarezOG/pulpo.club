@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-23T07:45:24.580060+00:00",
+  "computed_at": "2026-06-24T07:45:41.164599+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -9,7 +9,7 @@
         "renders_on_homepage": false
       },
       "beach_homes": {
-        "count": 1,
+        "count": 2,
         "renders_on_homepage": false
       },
       "beach_land": {
@@ -169,7 +169,7 @@
     "shelves_rendering": 0,
     "shelves_total": 6,
     "total_in_dataset": 26,
-    "total_visible_listings": 3
+    "total_visible_listings": 4
   },
   "min_real_listings": 4
 }
