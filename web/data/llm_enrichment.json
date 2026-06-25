@@ -116842,5 +116842,319 @@
     "cost_usd": 0.00129145,
     "finish_reason": "stop",
     "latency_ms": 4878
+  },
+  "realestate_au_sv|final-79-avenida-norte-colonia-escalon-norte-san-salvador-san-salvador-san-salvador-san-salvador-san-salvador-310108971970": {
+    "ts": "2026-06-25T07:09:57.648551+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Colonia Escalón Norte",
+      "es": "Terreno en Venta en Colonia Escalón Norte"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on 79 Avenida Norte, Colonia Escalón Norte, San Salvador. Located in a residential area of the capital. Priced at $150,000.",
+      "es": "Terreno en 79 Avenida Norte, Colonia Escalón Norte, San Salvador. Ubicado en zona residencial de la capital. Precio de $150,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "79 Avenida Norte location",
+        "es": "Ubicación en 79 Avenida Norte"
+      },
+      {
+        "en": "Colonia Escalón Norte neighborhood",
+        "es": "Colonia Escalón Norte"
+      },
+      {
+        "en": "Priced at $150,000",
+        "es": "Precio de $150,000"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 375,
+    "cost_usd": 0.00124491,
+    "finish_reason": "stop",
+    "latency_ms": 4105
+  },
+  "citymax_sc|casa-en-venta-en-zacatecoluca-colonia-27-de-marzo": {
+    "ts": "2026-06-25T07:09:59.782065+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Zacatecoluca, La Paz",
+      "es": "Casa en Venta en Zacatecoluca, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Zacatecoluca, La Paz. Located near Hospital Santa Teresa and commercial area. Price: $85,000.",
+      "es": "Casa en venta en Zacatecoluca, La Paz. Ubicada cerca del Hospital Santa Teresa y zona comercial. Precio: $85,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Hospital Santa Teresa",
+        "es": "Cerca del Hospital Santa Teresa"
+      },
+      {
+        "en": "Close to commercial area",
+        "es": "Cerca de zona comercial"
+      },
+      {
+        "en": "Price $85,000",
+        "es": "Precio $85,000"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zacatecoluca, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3077,
+    "tokens_out": 353,
+    "cost_usd": 0.00121909,
+    "finish_reason": "stop",
+    "latency_ms": 6239
+  },
+  "realestate_au_sv|lotificacion-las-veraneras-avenida-del-maranon-acajutla-sonsonate-el-salvador-punta-remedios-sonsonate-punta-remedios-sonsonate-310108971995": {
+    "ts": "2026-06-25T07:10:00.543911+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lotificación Las Veraneras, Acajutla",
+      "es": "Terreno en Lotificación Las Veraneras, Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificación Las Veraneras, Avenida del Marañón, Acajutla, Sonsonate. Located in Punta Remedios area. Priced at $120,000.",
+      "es": "Lote de terreno en Lotificación Las Veraneras, Avenida del Marañón, Acajutla, Sonsonate. Ubicado en la zona de Punta Remedios. Precio de $120,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lotificación Las Veraneras location",
+        "es": "Ubicación en Lotificación Las Veraneras"
+      },
+      {
+        "en": "Punta Remedios, Sonsonate area",
+        "es": "Zona de Punta Remedios, Sonsonate"
+      },
+      {
+        "en": "Listed by RE/MAX EXPANSION",
+        "es": "Listado por RE/MAX EXPANSION"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 403,
+    "cost_usd": 0.00127976,
+    "finish_reason": "stop",
+    "latency_ms": 3288
+  },
+  "realestate_au_sv|colonia-san-carlos-calle-principal-lote-s-n-cuscatancingo-san-salvador-centro-ss-cuscatancingo-san-salvador-cuscatancingo-san-salvador-310108971992": {
+    "ts": "2026-06-25T07:10:02.987996+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Colonia San Carlos, Cuscatancingo",
+      "es": "Lote de 850 m² en Colonia San Carlos, Cuscatancingo"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot on main street of Colonia San Carlos, Cuscatancingo, San Salvador. Located in a consolidated urban area with access to utilities and public transport. Priced at USD 250,000.",
+      "es": "Lote residencial plano de 850 m² en calle principal de Colonia San Carlos, Cuscatancingo, San Salvador. Ubicado en zona urbana consolidada con acceso a servicios y transporte público. Precio: USD 250,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Main street location",
+        "es": "Ubicación en calle principal"
+      },
+      {
+        "en": "Consolidated urban area",
+        "es": "Zona urbana consolidada"
+      },
+      {
+        "en": "USD 250,000 price",
+        "es": "Precio USD 250,000"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cuscatancingo, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3100,
+    "tokens_out": 437,
+    "cost_usd": 0.0013177,
+    "finish_reason": "stop",
+    "latency_ms": 9445
+  },
+  "encuentra24|32054112": {
+    "ts": "2026-06-25T07:48:25.366526+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Duplex House in Bijao Residences, Playa Blanca",
+      "es": "Casa Dúplex en Bijao Residences, Playa Blanca"
+    },
+    "short_description_canonical": {
+      "en": "Duplex house of 400 m² built on 800 m² lot in Bijao Residences Club, Playa Blanca. 5 bedrooms, 5 bathrooms, fully furnished with fine finishes, terrace with lake view, private garden. Gated community with golf, beach steps away, built 2016.",
+      "es": "Casa dúplex de 400 m² construidos en lote de 800 m² en Bijao Residences Club, Playa Blanca. 5 habitaciones, 5 baños, totalmente amoblada con finos acabados, terraza con vista al lago, jardín privado. Comunidad cerrada con golf, playa a pasos, construida en 2016."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beach steps away",
+        "es": "Playa a pocos pasos"
+      },
+      {
+        "en": "Golf course access",
+        "es": "Acceso a campos de golf"
+      },
+      {
+        "en": "Built 2016, fully furnished",
+        "es": "Construida en 2016, totalmente amoblada"
+      },
+      {
+        "en": "Lake view terrace",
+        "es": "Terraza con vista al lago"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Comunidad cerrada con vigilancia"
+      }
+    ],
+    "lat": 8.2333,
+    "lng": -80.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Blanca, Coclé",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2016,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 400.0,
+      "parking_spaces": 1,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2492,
+    "tokens_out": 516,
+    "cost_usd": 0.00124044,
+    "finish_reason": "stop",
+    "latency_ms": 5269
+  },
+  "encuentra24|31941360": {
+    "ts": "2026-06-25T07:48:25.441499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury 3-Bedroom House with Sea View in Punta Paitilla",
+      "es": "Casa de lujo 3 habitaciones con vista al mar en Punta Paitilla"
+    },
+    "short_description_canonical": {
+      "en": "Luxury house of 328 m² in Punta Paitilla, one of Panama's most exclusive neighborhoods. It features 3 bedrooms, 3.5 bathrooms, marble floors, infinity pool, and direct sea views. The property includes parking for 4 cars and approved permit for an additional bedroom.",
+      "es": "Casa de lujo de 328 m² en Punta Paitilla, uno de los vecindarios más exclusivos de Panamá. Cuenta con 3 habitaciones, 3.5 baños, pisos de mármol, piscina infinity y vista directa al mar. Incluye estacionamiento para 4 autos y permiso aprobado para una habitación adicional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct sea view from floor-to-ceiling windows",
+        "es": "Vista directa al mar desde ventanales de piso a techo"
+      },
+      {
+        "en": "Designed by renowned architect DOS G",
+        "es": "Diseñada por el reconocido arquitecto DOS G"
+      },
+      {
+        "en": "Italian Gessi faucets and Spanish marble floors",
+        "es": "Grifos Gessi italianos y pisos de mármol español"
+      },
+      {
+        "en": "Approved permit to build an extra bedroom",
+        "es": "Permiso aprobado para construir una habitación adicional"
+      },
+      {
+        "en": "Located steps from an embassy for added security",
+        "es": "Ubicada a pasos de una embajada para mayor seguridad"
+      }
+    ],
+    "lat": 8.9783,
+    "lng": -79.5186,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Paitilla, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 328.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2635,
+    "tokens_out": 573,
+    "cost_usd": 0.00134175,
+    "finish_reason": "stop",
+    "latency_ms": 5344
   }
 }
