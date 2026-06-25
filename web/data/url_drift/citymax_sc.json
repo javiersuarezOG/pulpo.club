@@ -1,15 +1,15 @@
 {
   "source": "citymax_sc",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-06-25T15:19:59.126629+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_error: ReadTimeout: The read operation timed out",
+  "probed_at": "2026-06-25T20:25:05.809628+00:00",
   "last_probe": {
     "probed_url": "https://www.citymax-sc.com/inmuebles/venta/el-salvador",
-    "status_code": 200,
-    "final_url": "https://www.citymax-sc.com/inmuebles/venta/el-salvador",
+    "status_code": null,
+    "final_url": null,
     "response_size_bytes": null,
-    "duration_ms": 329,
-    "error": null
+    "duration_ms": 10125,
+    "error": "ReadTimeout: The read operation timed out"
   },
   "baseline": {
     "source": "citymax_sc",
