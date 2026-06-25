@@ -18,20 +18,14 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-24T07:09:16.149509+00:00",
-  "expires_at": "2026-06-25T00:00:00+00:00",
+  "picked_at": "2026-06-25T07:14:47.893180+00:00",
+  "expires_at": "2026-06-26T00:00:00+00:00",
   "tier": "elite",
-  "listing_id": "citymax|156276",
-  "rank_score": 80.06,
-  "hero_photo_quality_score": 100,
+  "listing_id": "bienesraices|1424",
+  "rank_score": 79.13,
+  "hero_photo_quality_score": 90,
   "fallback": false,
   "pool": [
-    {
-      "listing_id": "citymax|156276",
-      "rank_score": 80.06,
-      "hero_photo_quality_score": 100,
-      "photos_count": 16
-    },
     {
       "listing_id": "bienesraices|1424",
       "rank_score": 79.13,
