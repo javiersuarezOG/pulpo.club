@@ -1,15 +1,15 @@
 {
   "source": "century21",
-  "drift_state": "unreachable",
-  "reason": "http_error: ConnectTimeout: timed out",
-  "probed_at": "2026-06-25T20:24:45.557870+00:00",
+  "drift_state": "ok",
+  "reason": "matches_baseline",
+  "probed_at": "2026-06-26T04:43:56.675616+00:00",
   "last_probe": {
     "probed_url": "https://www.century21elsalvador.com",
-    "status_code": null,
-    "final_url": null,
+    "status_code": 200,
+    "final_url": "https://www.century21elsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 10256,
-    "error": "ConnectTimeout: timed out"
+    "duration_ms": 797,
+    "error": null
   },
   "baseline": {
     "source": "century21",
@@ -17,6 +17,6 @@
     "final_url": "https://www.century21elsalvador.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-06-25T15:19:58.375376+00:00"
+    "last_ok_at": "2026-06-26T04:43:56.675650+00:00"
   }
 }

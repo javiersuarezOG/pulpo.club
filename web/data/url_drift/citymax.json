@@ -1,15 +1,15 @@
 {
   "source": "citymax",
-  "drift_state": "unreachable",
-  "reason": "http_error: ReadTimeout: The read operation timed out",
-  "probed_at": "2026-06-25T20:24:55.683484+00:00",
+  "drift_state": "ok",
+  "reason": "matches_baseline",
+  "probed_at": "2026-06-26T04:43:59.102618+00:00",
   "last_probe": {
     "probed_url": "https://www.citymax-sv.com",
-    "status_code": null,
-    "final_url": null,
+    "status_code": 200,
+    "final_url": "https://www.citymax-sv.com",
     "response_size_bytes": null,
-    "duration_ms": 10125,
-    "error": "ReadTimeout: The read operation timed out"
+    "duration_ms": 2426,
+    "error": null
   },
   "baseline": {
     "source": "citymax",
@@ -17,6 +17,6 @@
     "final_url": "https://www.citymax-sv.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-06-25T15:19:58.796228+00:00"
+    "last_ok_at": "2026-06-26T04:43:59.102647+00:00"
   }
 }

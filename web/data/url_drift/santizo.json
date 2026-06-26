@@ -1,15 +1,15 @@
 {
   "source": "santizo",
-  "drift_state": "unreachable",
-  "reason": "http_error: ConnectTimeout: timed out",
-  "probed_at": "2026-06-25T20:25:27.262049+00:00",
+  "drift_state": "ok",
+  "reason": "matches_baseline",
+  "probed_at": "2026-06-26T04:44:08.041280+00:00",
   "last_probe": {
     "probed_url": "https://santizorealestate.com/s/ventas",
-    "status_code": null,
-    "final_url": null,
+    "status_code": 200,
+    "final_url": "https://santizorealestate.com/s/ventas",
     "response_size_bytes": null,
-    "duration_ms": 10113,
-    "error": "ConnectTimeout: timed out"
+    "duration_ms": 1366,
+    "error": null
   },
   "baseline": {
     "source": "santizo",
@@ -17,6 +17,6 @@
     "final_url": "https://santizorealestate.com/s/ventas",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-06-25T15:20:09.485388+00:00"
+    "last_ok_at": "2026-06-26T04:44:08.041302+00:00"
   }
 }
