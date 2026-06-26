@@ -2,13 +2,13 @@
   "source": "elagente",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-06-26T04:44:02.870562+00:00",
+  "probed_at": "2026-06-26T09:54:27.668807+00:00",
   "last_probe": {
     "probed_url": "https://www.elagenteinmobiliario.com",
     "status_code": 403,
     "final_url": "https://www.elagenteinmobiliario.com",
     "response_size_bytes": null,
-    "duration_ms": 78,
+    "duration_ms": 137,
     "error": null
   },
   "baseline": null
