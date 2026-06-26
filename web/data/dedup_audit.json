@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-25T07:09:52.509028+00:00",
+  "computed_at": "2026-06-26T07:07:12.115320+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1190,10 +1190,10 @@
       "unique_in_source": 158
     },
     "csbr": {
-      "kept_as_unique": 264,
-      "raw": 266,
+      "kept_as_unique": 261,
+      "raw": 263,
       "shared_with_others": 0,
-      "unique_in_source": 264
+      "unique_in_source": 261
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1202,10 +1202,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 24,
-      "raw": 24,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 24
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1268,6 +1268,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2119,
-  "total_unique_fingerprints": 2064
+  "total_in_dataset": 2117,
+  "total_unique_fingerprints": 2062
 }
