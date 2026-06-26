@@ -1,20 +1,20 @@
 {
   "active_level": "moderate",
   "aggregate": {
-    "eligible_lenient": 1895,
+    "eligible_lenient": 1894,
     "eligible_moderate": 1686,
-    "eligible_strict": 885,
+    "eligible_strict": 886,
     "hidden_by_is_agricultural": 3,
     "hidden_by_no_area": 718,
-    "hidden_by_no_photos": 83,
+    "hidden_by_no_photos": 82,
     "hidden_by_no_price": 24,
     "hidden_by_no_type": 0,
-    "hidden_by_no_zone": 211
+    "hidden_by_no_zone": 210
   },
-  "computed_at": "2026-06-25T07:14:36.874994+00:00",
+  "computed_at": "2026-06-26T07:16:57.924409+00:00",
   "shelves": {
     "beach_condos": {
-      "eligible_lenient": 24,
+      "eligible_lenient": 25,
       "eligible_moderate": 21,
       "eligible_strict": 9,
       "hidden_by_is_agricultural": 0,
@@ -22,31 +22,31 @@
       "hidden_by_no_photos": 0,
       "hidden_by_no_price": 2,
       "hidden_by_no_type": 0,
-      "hidden_by_no_zone": 3,
-      "total_in_cohort": 26
+      "hidden_by_no_zone": 4,
+      "total_in_cohort": 27
     },
     "beach_homes": {
-      "eligible_lenient": 180,
-      "eligible_moderate": 165,
+      "eligible_lenient": 179,
+      "eligible_moderate": 164,
       "eligible_strict": 94,
       "hidden_by_is_agricultural": 3,
-      "hidden_by_no_area": 68,
+      "hidden_by_no_area": 67,
       "hidden_by_no_photos": 3,
       "hidden_by_no_price": 1,
       "hidden_by_no_type": 0,
       "hidden_by_no_zone": 15,
-      "total_in_cohort": 181
+      "total_in_cohort": 180
     },
     "beach_land": {
       "eligible_lenient": 498,
-      "eligible_moderate": 475,
-      "eligible_strict": 279,
+      "eligible_moderate": 476,
+      "eligible_strict": 280,
       "hidden_by_is_agricultural": 0,
       "hidden_by_no_area": 169,
       "hidden_by_no_photos": 27,
       "hidden_by_no_price": 5,
       "hidden_by_no_type": 0,
-      "hidden_by_no_zone": 23,
+      "hidden_by_no_zone": 22,
       "total_in_cohort": 503
     },
     "lake_condos": {
@@ -62,16 +62,16 @@
       "total_in_cohort": 0
     },
     "lake_homes": {
-      "eligible_lenient": 12,
-      "eligible_moderate": 12,
+      "eligible_lenient": 13,
+      "eligible_moderate": 13,
       "eligible_strict": 5,
       "hidden_by_is_agricultural": 0,
-      "hidden_by_no_area": 6,
+      "hidden_by_no_area": 7,
       "hidden_by_no_photos": 1,
       "hidden_by_no_price": 0,
       "hidden_by_no_type": 0,
       "hidden_by_no_zone": 0,
-      "total_in_cohort": 12
+      "total_in_cohort": 13
     },
     "lake_land": {
       "eligible_lenient": 18,
@@ -86,5 +86,5 @@
       "total_in_cohort": 18
     }
   },
-  "total_in_dataset": 1921
+  "total_in_dataset": 1920
 }

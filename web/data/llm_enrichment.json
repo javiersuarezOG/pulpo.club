@@ -117156,5 +117156,164 @@
     "cost_usd": 0.00134175,
     "finish_reason": "stop",
     "latency_ms": 5344
+  },
+  "citymax_sc|se-vende-apartamento-estudio-en-punta-cana": {
+    "ts": "2026-06-26T07:07:17.043695+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Studio Apartment for Sale in Punta Cana",
+      "es": "Apartamento estudio en venta en Punta Cana"
+    },
+    "short_description_canonical": {
+      "en": "Studio apartment for sale in Punta Cana. Price: $215,000. This is a condo unit in a popular tourist area.",
+      "es": "Apartamento estudio en venta en Punta Cana. Precio: $215,000. Es una unidad de condominio en una zona turística popular."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Punta Cana",
+        "es": "Ubicado en Punta Cana"
+      },
+      {
+        "en": "Price: $215,000",
+        "es": "Precio: $215,000"
+      },
+      {
+        "en": "Studio condo unit",
+        "es": "Unidad de condominio tipo estudio"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Cana is in Dominican Republic, not El Salvador; using default SV centroid",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3060,
+    "tokens_out": 368,
+    "cost_usd": 0.001231,
+    "finish_reason": "stop",
+    "latency_ms": 3872
+  },
+  "remax|002283140051": {
+    "ts": "2026-06-26T07:07:18.026423+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6.53 mz Industrial Land, Comalapa Highway",
+      "es": "6.53 mz Terreno Industrial, Carretera Comalapa"
+    },
+    "short_description_canonical": {
+      "en": "Flat industrial land of 6.53 manzanas (47,089 m²) with 100 m frontage on the Comalapa Highway, Olocuilta, La Paz. Features two terraces, a heavy-vehicle ramp, and direct motorway access. Full visibility from the busiest road to the international airport.",
+      "es": "Terreno industrial plano de 6.53 manzanas (47,089 m²) con 100 m de frente sobre la Carretera Comalapa, Olocuilta, La Paz. Cuenta con dos terrazas, rampa para vehículos pesados y acceso directo a la autopista. Visibilidad total desde la carretera más transitada hacia el aeropuerto internacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "100 m frontage on Comalapa Highway",
+        "es": "100 m de frente sobre Carretera Comalapa"
+      },
+      {
+        "en": "6.53 manzanas flat land, two terraces",
+        "es": "6.53 manzanas planas, dos terrazas"
+      },
+      {
+        "en": "Heavy-vehicle ramp and direct access",
+        "es": "Rampa para vehículos pesados y acceso directo"
+      },
+      {
+        "en": "High visibility to international airport",
+        "es": "Alta visibilidad hacia el aeropuerto internacional"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa K59 / San Diego",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3456,
+    "tokens_out": 515,
+    "cost_usd": 0.00149962,
+    "finish_reason": "stop",
+    "latency_ms": 4855
+  },
+  "encuentra24|32612904": {
+    "ts": "2026-06-26T07:07:18.211190+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House in Los Manantiales, 15 min to San Salvador",
+      "es": "Casa en Los Manantiales, 15 min a San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "House in exclusive Residencial Los Manantiales, on Carretera al Puerto de la Libertad, 15 min from San Salvador and 20 min from Surf City. 230 m² built, 3 bedrooms, 2 bathrooms, parking for 4 vehicles. Gated community with 24/7 security, high ceilings, and ample gardens.",
+      "es": "Casa en exclusivo Residencial Los Manantiales, sobre Carretera al Puerto de la Libertad, a 15 min de San Salvador y 20 min de Surf City. 230 m² construidos, 3 habitaciones, 2 baños, parqueo para 4 vehículos. Residencial cerrada con seguridad 24/7, techos altos y amplios jardines."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15 min to San Salvador",
+        "es": "15 min a San Salvador"
+      },
+      {
+        "en": "20 min to Surf City beaches",
+        "es": "20 min a playas de Surf City"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Residencial cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Parking for 4 vehicles",
+        "es": "Parqueo para 4 vehículos"
+      },
+      {
+        "en": "High ceilings and ample gardens",
+        "es": "Techos altos y amplios jardines"
+      }
+    ],
+    "lat": 13.5867,
+    "lng": -89.322,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 230.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3383,
+    "tokens_out": 538,
+    "cost_usd": 0.00150521,
+    "finish_reason": "stop",
+    "latency_ms": 5040
   }
 }
