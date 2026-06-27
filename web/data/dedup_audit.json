@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-26T07:07:12.115320+00:00",
+  "computed_at": "2026-06-27T06:49:14.514587+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -801,34 +801,6 @@
     {
       "count": 2,
       "cross_source": false,
-      "fingerprint": "5f6b24a4d4b10ac8f2042a8242bfe5288446516a",
-      "samples": [
-        {
-          "area_m2": 99452.9,
-          "price_usd": 1610000.0,
-          "source": "remax",
-          "source_id": "001461172166",
-          "title": "Strategic land for sale on the Pan-American Highway, ideal for commercial, logistics or industrial development",
-          "url": "https://www.remax-elsalvador.com/001461172166",
-          "zone": "san-miguel"
-        },
-        {
-          "area_m2": 99452.9,
-          "price_usd": 1610000.0,
-          "source": "remax",
-          "source_id": "001461172165",
-          "title": "Strategic land for sale on the Pan-American Highway, ideal for commercial, logistics or industrial development",
-          "url": "https://www.remax-elsalvador.com/001461172165",
-          "zone": "san-miguel"
-        }
-      ],
-      "sources": [
-        "remax"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
       "fingerprint": "677ebaaeb1d9d323bc897eebc89cb5dc183c9525",
       "samples": [
         {
@@ -1184,16 +1156,16 @@
       "unique_in_source": 32
     },
     "citymax_sc": {
-      "kept_as_unique": 158,
-      "raw": 158,
+      "kept_as_unique": 157,
+      "raw": 157,
       "shared_with_others": 0,
-      "unique_in_source": 158
+      "unique_in_source": 157
     },
     "csbr": {
-      "kept_as_unique": 261,
-      "raw": 263,
+      "kept_as_unique": 254,
+      "raw": 256,
       "shared_with_others": 0,
-      "unique_in_source": 261
+      "unique_in_source": 254
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1202,10 +1174,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 25,
-      "raw": 25,
+      "kept_as_unique": 24,
+      "raw": 24,
       "shared_with_others": 0,
-      "unique_in_source": 25
+      "unique_in_source": 24
     },
     "essurf": {
       "kept_as_unique": 40,
@@ -1232,10 +1204,10 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 281,
-      "raw": 313,
+      "kept_as_unique": 277,
+      "raw": 309,
       "shared_with_others": 0,
-      "unique_in_source": 281
+      "unique_in_source": 277
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1244,10 +1216,10 @@
       "unique_in_source": 98
     },
     "remax": {
-      "kept_as_unique": 302,
-      "raw": 318,
+      "kept_as_unique": 299,
+      "raw": 314,
       "shared_with_others": 0,
-      "unique_in_source": 302
+      "unique_in_source": 299
     },
     "santizo": {
       "kept_as_unique": 90,
@@ -1268,6 +1240,6 @@
       "unique_in_source": 28
     }
   },
-  "total_in_dataset": 2117,
-  "total_unique_fingerprints": 2062
+  "total_in_dataset": 2100,
+  "total_unique_fingerprints": 2046
 }

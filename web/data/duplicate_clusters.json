@@ -799,34 +799,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "5f6b24a4d4b10ac8f2042a8242bfe5288446516a",
-    "samples": [
-      {
-        "area_m2": 99452.9,
-        "price_usd": 1610000.0,
-        "source": "remax",
-        "source_id": "001461172166",
-        "title": "Strategic land for sale on the Pan-American Highway, ideal for commercial, logistics or industrial development",
-        "url": "https://www.remax-elsalvador.com/001461172166",
-        "zone": "san-miguel"
-      },
-      {
-        "area_m2": 99452.9,
-        "price_usd": 1610000.0,
-        "source": "remax",
-        "source_id": "001461172165",
-        "title": "Strategic land for sale on the Pan-American Highway, ideal for commercial, logistics or industrial development",
-        "url": "https://www.remax-elsalvador.com/001461172165",
-        "zone": "san-miguel"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "677ebaaeb1d9d323bc897eebc89cb5dc183c9525",
     "samples": [
       {

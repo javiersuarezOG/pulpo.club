@@ -1,0 +1,14 @@
+{
+  "failure_id": "beeff964",
+  "source": "agentiz",
+  "ts": "2026-06-27T05:55:05.459890+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 8.6,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

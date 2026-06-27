@@ -117315,5 +117315,111 @@
     "cost_usd": 0.00150521,
     "finish_reason": "stop",
     "latency_ms": 5040
+  },
+  "encuentra24|32132806": {
+    "ts": "2026-06-27T07:28:12.506275+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern House in Velamar Village, Buenaventura",
+      "es": "Casa Moderna en Velamar Village, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "Modern house in Velamar Village, Buenaventura, Río Hato, Coclé. Built area 540 m² on a 1,335 m² lot. 5 bedrooms, 5.5 bathrooms, open kitchen, family room, terrace, large pool with children's areas. Luxury finishes, A/C, marble bar, video surveillance.",
+      "es": "Casa moderna en Velamar Village, Buenaventura, Río Hato, Coclé. 540 m² de construcción en lote de 1,335 m². 5 recámaras, 5,5 baños, cocina abierta, sala familiar, terraza, gran piscina con áreas infantiles. Acabados de lujo, A/A, barra de mármol, videovigilancia."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Designed by Arango Arquitectos",
+        "es": "Diseñado por Arango Arquitectos"
+      },
+      {
+        "en": "Direct proximity to marina and beach",
+        "es": "Proximidad directa a marina y playa"
+      },
+      {
+        "en": "Large pool with children's areas",
+        "es": "Gran piscina con zonas infantiles"
+      },
+      {
+        "en": "Over 50% green areas in community",
+        "es": "Más del 50% de áreas verdes en comunidad"
+      }
+    ],
+    "lat": 8.1,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato, Coclé",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.5,
+      "built_area_m2": 539.92,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2517,
+    "tokens_out": 520,
+    "cost_usd": 0.00125159,
+    "finish_reason": "stop",
+    "latency_ms": 4826
+  },
+  "encuentra24|32491731": {
+    "ts": "2026-06-27T07:28:12.512072+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in La Chorrera – 180 m², 2 Bedrooms",
+      "es": "Casa en Venta en La Chorrera – 180 m², 2 Dormitorios"
+    },
+    "short_description_canonical": {
+      "en": "Single-family house of 180 m² in Villas del Carmen, La Chorrera. 2 bedrooms, 1 bathroom, 1 parking space, patio, terrace, and laundry area. Built 8 years ago, free of mortgages, with recent appraisal. Priced at $35,000, below appraisal of $68,000, for quick sale.",
+      "es": "Vivienda unifamiliar de 180 m² en Villas del Carmen, La Chorrera. 2 recámaras, 1 baño, 1 estacionamiento, patio, terraza y área de lavandería. Construida hace 8 años, libre de hipotecas, con avalúo reciente. Precio de $35,000, por debajo del avalúo de $68,000, venta rápida."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Below appraisal: $35,000 vs $68,000",
+        "es": "Por debajo del avalúo: $35,000 vs $68,000"
+      },
+      {
+        "en": "Free of mortgages, recent appraisal",
+        "es": "Libre de hipotecas, avalúo reciente"
+      },
+      {
+        "en": "5 min from Nicolás Solano Hospital",
+        "es": "5 min del Hospital Nicolás Solano"
+      },
+      {
+        "en": "10 min from Chorrera beach",
+        "es": "10 min de la playa de Chorrera"
+      }
+    ],
+    "lat": 8.8803,
+    "lng": -79.7836,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Chorrera, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 1.0,
+      "built_area_m2": 180.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2423,
+    "tokens_out": 548,
+    "cost_usd": 0.00125701,
+    "finish_reason": "stop",
+    "latency_ms": 4832
   }
 }
