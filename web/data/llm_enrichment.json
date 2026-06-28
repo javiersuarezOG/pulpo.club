@@ -117421,5 +117421,584 @@
     "cost_usd": 0.00125701,
     "finish_reason": "stop",
     "latency_ms": 4832
+  },
+  "realestate_au_sv|a-45-minutos-de-la-cuidad-de-san-miguel-las-lomitas-san-miguel-las-lomitas-san-miguel-310109020102": {
+    "ts": "2026-06-28T07:13:20.267153+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Las Lomitas, San Miguel",
+      "es": "Terreno en Venta en Las Lomitas, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Las Lomitas, San Miguel, 45 minutes from San Miguel city. Lot suitable for development. Priced at USD 65,000.",
+      "es": "Terreno en Las Lomitas, San Miguel, a 45 minutos de la ciudad de San Miguel. Lote apto para desarrollo. Precio USD 65,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "45 min from San Miguel city",
+        "es": "45 min de la ciudad de San Miguel"
+      },
+      {
+        "en": "USD 65,000 price",
+        "es": "Precio USD 65,000"
+      },
+      {
+        "en": "Located in Las Lomitas",
+        "es": "Ubicado en Las Lomitas"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 363,
+    "cost_usd": 0.00123063,
+    "finish_reason": "stop",
+    "latency_ms": 3371
+  },
+  "citymax_sc|casa-en-venta-santiago-nonualco-la-paz": {
+    "ts": "2026-06-28T07:13:20.402901+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in San Luis La Herradura, La Paz",
+      "es": "Casa en Venta en San Luis La Herradura, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in San Luis La Herradura, La Paz, priced at $345,000. No details on size, bedrooms, or bathrooms are provided. Located in a coastal municipality near Costa del Sol.",
+      "es": "Casa en venta en San Luis La Herradura, La Paz, con precio de $345,000. No se proporcionan detalles sobre tamaño, dormitorios o baños. Ubicada en un municipio costero cerca de Costa del Sol."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Priced at $345,000",
+        "es": "Precio de $345,000"
+      },
+      {
+        "en": "Located in San Luis La Herradura",
+        "es": "Ubicada en San Luis La Herradura"
+      },
+      {
+        "en": "Near Costa del Sol beaches",
+        "es": "Cerca de playas de Costa del Sol"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 405,
+    "cost_usd": 0.0012771,
+    "finish_reason": "stop",
+    "latency_ms": 3509
+  },
+  "realestate_au_sv|km-61-autopista-a-comalapa-olocuilta-la-paz-olocuilta-la-paz-department-310109078094": {
+    "ts": "2026-06-28T07:13:20.738906+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Olocuilta, La Paz",
+      "es": "Terreno en Venta en Olocuilta, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located at Km 61, Autopista a Comalapa, Olocuilta, La Paz. The property is offered for sale at $5,300,000. No further details on size or features are provided.",
+      "es": "Terreno ubicado en Km 61, Autopista a Comalapa, Olocuilta, La Paz. La propiedad se ofrece en venta por $5,300,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Autopista a Comalapa",
+        "es": "Ubicado en Autopista a Comalapa"
+      },
+      {
+        "en": "Km 61, accessible location",
+        "es": "Km 61, ubicación accesible"
+      },
+      {
+        "en": "Price: $5,300,000 USD",
+        "es": "Precio: $5,300,000 USD"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad (nearest known beach)",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 418,
+    "cost_usd": 0.00129275,
+    "finish_reason": "stop",
+    "latency_ms": 3844
+  },
+  "csbr|colon-vendo-terreno-grande-en-agua-fria-300-manzanas": {
+    "ts": "2026-06-28T07:13:21.139446+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "300 Manzana Land in Agua Fría, Colón",
+      "es": "300 Manzanas de Terreno en Agua Fría, Colón"
+    },
+    "short_description_canonical": {
+      "en": "Large 300 manzana (approx. 210 ha) land lot in Agua Fría, Colón, La Libertad. Flat terrain with road access and utilities available. Priced at $3,900,000, below zone median per m².",
+      "es": "Gran terreno de 300 manzanas (aprox. 210 ha) en Agua Fría, Colón, La Libertad. Terreno plano con acceso vial y servicios disponibles. Precio de $3,900,000, por debajo de la mediana de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 manzanas (210 ha) flat land",
+        "es": "300 manzanas (210 ha) de terreno plano"
+      },
+      {
+        "en": "Road access and utilities available",
+        "es": "Acceso vial y servicios disponibles"
+      },
+      {
+        "en": "Priced at $3,900,000",
+        "es": "Precio de $3,900,000"
+      },
+      {
+        "en": "Located in Agua Fría, Colón",
+        "es": "Ubicado en Agua Fría, Colón"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.3667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colón, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 467,
+    "cost_usd": 0.00134422,
+    "finish_reason": "stop",
+    "latency_ms": 4244
+  },
+  "encuentra24|32601475": {
+    "ts": "2026-06-28T07:13:21.631946+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House in Las Pergolas, Zaragoza",
+      "es": "Casa 3 Hab en Las Pergolas, Zaragoza"
+    },
+    "short_description_canonical": {
+      "en": "House in Las Pergolas, Zaragoza, 194 m² built on 215 m² lot. 3 bedrooms, 3.5 bathrooms, 2 covered parking spaces. Solar panels, polarized windows, 4 A/C units, large cistern, water heater. 15 min from La Libertad beaches, 40 min from airport.",
+      "es": "Casa en Las Pergolas, Zaragoza, 194 m² construidos en 215 m² de terreno. 3 habitaciones, 3.5 baños, parqueo techado para 2 vehículos. Paneles solares, ventanas polarizadas, 4 aires acondicionados, cisterna grande, calentador de agua. A 15 min de playas de La Libertad, 40 min del aeropuerto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Solar panels, 40% electricity savings",
+        "es": "Paneles solares, 40% ahorro eléctrico"
+      },
+      {
+        "en": "15 min from La Libertad beaches",
+        "es": "15 min de playas de La Libertad"
+      },
+      {
+        "en": "Gated community with pool and sports courts",
+        "es": "Complejo privado con piscina y canchas"
+      },
+      {
+        "en": "40 min from airport, 20 min from malls",
+        "es": "40 min del aeropuerto, 20 min de centros comerciales"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "15 min from La Libertad beaches (San Blas, El Tunco)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 194.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3509,
+    "tokens_out": 546,
+    "cost_usd": 0.00154803,
+    "finish_reason": "stop",
+    "latency_ms": 4737
+  },
+  "santizo|9575018": {
+    "ts": "2026-06-28T07:13:23.794535+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach House in Playas Blancas, La Union",
+      "es": "Casa de playa en Playas Blancas, La Unión"
+    },
+    "short_description_canonical": {
+      "en": "Beautiful beach house in Playas Blancas, La Union. Two independent houses, each with 2 bedrooms, shared bathroom, living room, dining room, kitchen, terrace, and pool. Currently producing excellent Airbnb rental income. Sold fully furnished.",
+      "es": "Hermosa casa de playa en Playas Blancas, La Unión. Dos casas independientes, cada una con 2 habitaciones, baño compartido, sala, comedor, cocina, terraza y piscina. Actualmente produciendo excelente rentabilidad en Airbnb. Se vende completamente amueblada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two independent houses on one lot",
+        "es": "Dos casas independientes en un lote"
+      },
+      {
+        "en": "Each house has private pool",
+        "es": "Cada casa tiene piscina privada"
+      },
+      {
+        "en": "Proven Airbnb rental income",
+        "es": "Rentabilidad comprobada en Airbnb"
+      },
+      {
+        "en": "Sold fully furnished",
+        "es": "Se vende completamente amueblada"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 2.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3138,
+    "tokens_out": 447,
+    "cost_usd": 0.00133896,
+    "finish_reason": "stop",
+    "latency_ms": 3526
+  },
+  "remax|001463594051": {
+    "ts": "2026-06-28T07:13:24.080409+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "58,499 m² Land in San Pedro Nonualco",
+      "es": "58,499 m² Terreno en San Pedro Nonualco"
+    },
+    "short_description_canonical": {
+      "en": "58,499 m² plot in San Pedro Nonualco, La Paz, with adobe and wattle-and-daub structure. Currently used for partial agriculture with potable water and electricity available. Suitable for residential or agro-industrial use with established fruit trees and coffee.",
+      "es": "Parcela de 58,499 m² en San Pedro Nonualco, La Paz, con estructura de adobe y bahareque. Actualmente uso agrícola parcial, con agua potable y electricidad disponible. Apto para uso residencial o agroindustrial con árboles frutales y café establecidos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "58,499 m² lot, $225,000",
+        "es": "Lote de 58,499 m², $225,000"
+      },
+      {
+        "en": "Potable water and electricity available",
+        "es": "Agua potable y electricidad disponibles"
+      },
+      {
+        "en": "Established fruit trees and coffee",
+        "es": "Árboles frutales y café establecidos"
+      },
+      {
+        "en": "Suitable for residential or agro-industrial use",
+        "es": "Apto para uso residencial o agroindustrial"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Pedro Nonualco, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3152,
+    "tokens_out": 471,
+    "cost_usd": 0.00136914,
+    "finish_reason": "stop",
+    "latency_ms": 4192
+  },
+  "xitios|venta-de-apartamento-en-costa-del-sol-en-complejo-privado-cp": {
+    "ts": "2026-06-28T07:13:25.683080+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo in Costa del Sol, Private Complex",
+      "es": "Apartamento frente al mar en Costa del Sol, Complejo Privado"
+    },
+    "short_description_canonical": {
+      "en": "135 m² beachfront condo in a private complex at Costa del Sol, La Paz. 3 bedrooms, 2 bathrooms, private pool, 2 parking spaces, fully furnished with modern finishes. Turnkey Airbnb-ready unit in a premium zone with 24/7 security and pet-friendly policy.",
+      "es": "Apartamento frente al mar de 135 m² en complejo privado en Costa del Sol, La Paz. 3 habitaciones, 2 baños, piscina privada, 2 estacionamientos, completamente amueblado con acabados modernos. Listo para Airbnb en zona premium con seguridad 24/7 y admite mascotas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row in Costa del Sol",
+        "es": "Primera fila frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Private pool and complex amenities",
+        "es": "Piscina privada y amenidades del complejo"
+      },
+      {
+        "en": "Fully furnished, turnkey Airbnb ready",
+        "es": "Completamente amueblado, listo para Airbnb"
+      },
+      {
+        "en": "50 minutes from International Airport",
+        "es": "50 minutos del Aeropuerto Internacional"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 135.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3784,
+    "tokens_out": 486,
+    "cost_usd": 0.00155628,
+    "finish_reason": "stop",
+    "latency_ms": 4437
+  },
+  "encuentra24|32266461": {
+    "ts": "2026-06-28T07:55:59.712942+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach house in Buenaventura, 5 beds, pool",
+      "es": "Casa en Buenaventura, 5 habitaciones, piscina"
+    },
+    "short_description_canonical": {
+      "en": "Spacious house in one of Panama's most exclusive beach communities. 3,920 m² lot with 958 m² built, 5 bedrooms, 7 bathrooms, plus service quarters. Outdoor social area with pool, bohío with kitchenette, and terraces. Ideal for vacation home or investment in high-demand area.",
+      "es": "Amplia casa en una de las comunidades de playa más exclusivas de Panamá. Terreno de 3,920 m² con 958 m² construidos, 5 recámaras, 7 baños, más cuarto de servicio. Área social exterior con piscina, bohío con cocineta y terrazas. Ideal para residencia vacacional o inversión en zona de alta demanda."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "958 m² built, 5 bedrooms",
+        "es": "958 m² construidos, 5 recámaras"
+      },
+      {
+        "en": "Exclusive beach community Buenaventura",
+        "es": "Comunidad de playa exclusiva Buenaventura"
+      },
+      {
+        "en": "Pool, bohío with kitchenette",
+        "es": "Piscina, bohío con cocineta"
+      },
+      {
+        "en": "3,920 m² lot, ample space",
+        "es": "Terreno de 3,920 m², amplio espacio"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 7.0,
+      "built_area_m2": 958.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2434,
+    "tokens_out": 528,
+    "cost_usd": 0.00123798,
+    "finish_reason": "stop",
+    "latency_ms": 4393
+  },
+  "encuentra24|32124745": {
+    "ts": "2026-06-28T07:55:59.818778+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6-Bedroom Property with Pool, Solar Panels, Chame",
+      "es": "Propiedad de 6 habitaciones con piscina, paneles solares, Chame"
+    },
+    "short_description_canonical": {
+      "en": "A 1,651.57 m² lot with two independent houses in Chame, 10 minutes from the beach. The main house (140 m²) has 4 bedrooms and 3 bathrooms; the second house (55 m²) has 2 bedrooms and 1 bathroom. Features include a pool, BBQ area, social bohío, and 14 solar panels providing 98% energy savings.",
+      "es": "Terreno de 1,651.57 m² con dos casas independientes en Chame, a 10 minutos de la playa. La casa principal (140 m²) tiene 4 habitaciones y 3 baños; la segunda casa (55 m²) tiene 2 habitaciones y 1 baño. Incluye piscina, área de barbacoa, bohío social y 14 paneles solares con 98% de ahorro energético."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two independent houses on one lot",
+        "es": "Dos casas independientes en un mismo terreno"
+      },
+      {
+        "en": "98% energy savings with solar panels",
+        "es": "98% de ahorro energético con paneles solares"
+      },
+      {
+        "en": "Pool, BBQ, and social bohío",
+        "es": "Piscina, barbacoa y bohío social"
+      },
+      {
+        "en": "10 minutes from the beach",
+        "es": "A 10 minutos de la playa"
+      },
+      {
+        "en": "Easy access to Pan-American Highway",
+        "es": "Fácil acceso a la Carretera Panamericana"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chame, Panama Oeste",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 4.0,
+      "built_area_m2": 195.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2693,
+    "tokens_out": 578,
+    "cost_usd": 0.00136291,
+    "finish_reason": "stop",
+    "latency_ms": 4499
+  },
+  "encuentra24|30034463": {
+    "ts": "2026-06-28T07:55:59.893771+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Private Community House in Santa Clara, Pacific Coast",
+      "es": "Casa en Comunidad Privada en Santa Clara, Costa Pacífica"
+    },
+    "short_description_canonical": {
+      "en": "House in Golden Reef, Santa Clara, 2 hours from Panama City. Main house 380 m² with 3 bedrooms, 3.5 baths, plus three guest houses (118 m² each, 2 bedrooms each). Solar panels, private well, pool, gazebo, toolhouse. Turnkey furnished.",
+      "es": "Casa en Golden Reef, Santa Clara, a 2 horas de la Ciudad de Panamá. Casa principal de 380 m² con 3 dormitorios, 3.5 baños, más tres casas de huéspedes (118 m² cada una, 2 recámaras). Paneles solares, pozo privado, piscina, gazebo, toolhouse. Llave en mano amueblada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private beach access 5 min away",
+        "es": "Acceso privado a playa a 5 min"
+      },
+      {
+        "en": "Solar panels, no electric bill",
+        "es": "Paneles solares, sin cuenta eléctrica"
+      },
+      {
+        "en": "Turnkey furnished, 9 bedrooms total",
+        "es": "Llave en mano, 9 dormitorios total"
+      },
+      {
+        "en": "Annual HOA fee only $300",
+        "es": "Cuota anual de solo $300"
+      },
+      {
+        "en": "Private well and irrigation system",
+        "es": "Pozo privado y sistema de riego"
+      }
+    ],
+    "lat": 8.35,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Clara, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 9,
+      "bathrooms": 10.0,
+      "built_area_m2": 800.0,
+      "parking_spaces": 10,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2639,
+    "tokens_out": 533,
+    "cost_usd": 0.00129883,
+    "finish_reason": "stop",
+    "latency_ms": 4575
   }
 }

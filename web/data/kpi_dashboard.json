@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-06-27T06:53:38.562158+00:00",
+  "computed_at": "2026-06-28T07:19:43.215453+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 21,
+        "count": 22,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 161,
+        "count": 164,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 473,
+        "count": 474,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -66,8 +66,8 @@
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 237.0,
-        "kept": 237,
+        "coverage_pct_vs_discovered": 238.0,
+        "kept": 238,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.8,
-        "kept": 24,
+        "coverage_pct_vs_discovered": 0.9,
+        "kept": 26,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 298,
+        "kept": 299,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -143,8 +143,8 @@
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 60.0,
-        "kept": 90,
+        "coverage_pct_vs_discovered": 60.7,
+        "kept": 91,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -158,7 +158,7 @@
       },
       "xitios": {
         "coverage_pct_vs_discovered": null,
-        "kept": 28,
+        "kept": 29,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1904,
-    "total_visible_listings": 1668
+    "total_in_dataset": 1910,
+    "total_visible_listings": 1674
   },
   "min_real_listings": 4
 }
