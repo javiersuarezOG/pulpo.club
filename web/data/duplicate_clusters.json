@@ -603,34 +603,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "4da8427dc72e43baa7382f0fae0a5a0e7ee49e94",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 1610000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106054020",
-        "title": "Canton Miraflores, San Miguel, Lote #3, San Miguel Centro, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106054020/",
-        "zone": "san-miguel"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 1610000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106017747",
-        "title": "Canton Miraflores, San Miguel, Lote #3, San Miguel Centro, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106017747/",
-        "zone": "san-miguel"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "4f374c83615d26c4bfea80ada518838169a028d1",
     "samples": [
       {

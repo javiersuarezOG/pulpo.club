@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-28T07:13:15.832028+00:00",
+  "computed_at": "2026-06-29T07:44:40.405245+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -605,34 +605,6 @@
     {
       "count": 2,
       "cross_source": false,
-      "fingerprint": "4da8427dc72e43baa7382f0fae0a5a0e7ee49e94",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 1610000.0,
-          "source": "realestate_au_sv",
-          "source_id": "canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106054020",
-          "title": "Canton Miraflores, San Miguel, Lote #3, San Miguel Centro, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106054020/",
-          "zone": "san-miguel"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 1610000.0,
-          "source": "realestate_au_sv",
-          "source_id": "canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106017747",
-          "title": "Canton Miraflores, San Miguel, Lote #3, San Miguel Centro, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/canton-miraflores-san-miguel-lote-3-san-miguel-centro-san-miguel-san-miguel-san-miguel-san-miguel-310106017747/",
-          "zone": "san-miguel"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
       "fingerprint": "4f374c83615d26c4bfea80ada518838169a028d1",
       "samples": [
         {
@@ -1156,10 +1128,10 @@
       "unique_in_source": 32
     },
     "citymax_sc": {
-      "kept_as_unique": 157,
-      "raw": 157,
+      "kept_as_unique": 156,
+      "raw": 156,
       "shared_with_others": 0,
-      "unique_in_source": 157
+      "unique_in_source": 156
     },
     "csbr": {
       "kept_as_unique": 255,
@@ -1174,16 +1146,16 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 26,
-      "raw": 26,
+      "kept_as_unique": 23,
+      "raw": 23,
       "shared_with_others": 0,
-      "unique_in_source": 26
+      "unique_in_source": 23
     },
     "essurf": {
-      "kept_as_unique": 40,
-      "raw": 40,
+      "kept_as_unique": 38,
+      "raw": 38,
       "shared_with_others": 0,
-      "unique_in_source": 40
+      "unique_in_source": 38
     },
     "goodlife": {
       "kept_as_unique": 35,
@@ -1204,10 +1176,10 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 278,
-      "raw": 310,
+      "kept_as_unique": 276,
+      "raw": 307,
       "shared_with_others": 0,
-      "unique_in_source": 278
+      "unique_in_source": 276
     },
     "realtyelsalvador": {
       "kept_as_unique": 98,
@@ -1240,6 +1212,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2106,
-  "total_unique_fingerprints": 2052
+  "total_in_dataset": 2097,
+  "total_unique_fingerprints": 2044
 }
