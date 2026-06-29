@@ -1,0 +1,14 @@
+{
+  "failure_id": "95623ddb",
+  "source": "agentiz",
+  "ts": "2026-06-29T06:49:10.664102+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 8.84,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

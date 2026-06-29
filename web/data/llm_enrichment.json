@@ -118000,5 +118000,58 @@
     "cost_usd": 0.00129883,
     "finish_reason": "stop",
     "latency_ms": 4575
+  },
+  "encuentra24|31084416": {
+    "ts": "2026-06-29T08:27:54.238834+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "8-Bed Lakefront Home in Buenaventura, Panama",
+      "es": "Casa frente al lago en Buenaventura, 8 recámaras"
+    },
+    "short_description_canonical": {
+      "en": "This 909 m² lakefront house in Buenaventura resort community has 8 bedrooms each with private bath, open kitchen, and spacious living areas with lake views. Features include private pool, jacuzzi, BBQ area, 6 parking spaces, and high-end finishes. Located 90 minutes from Panama City in a gated resort with golf, marina, and 24/7 security.",
+      "es": "Esta casa de 909 m² frente al lago en el complejo Buenaventura tiene 8 recámaras con baño privado, cocina abierta y amplias áreas con vista al lago. Cuenta con piscina privada, jacuzzi, área de BBQ, 6 estacionamientos y acabados de lujo. Ubicada a 90 minutos de la ciudad de Panamá en un resort con golf, marina y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront with private pool and jacuzzi",
+        "es": "Frente al lago con piscina y jacuzzi privados"
+      },
+      {
+        "en": "8 bedrooms each with private bath",
+        "es": "8 recámaras cada una con baño privado"
+      },
+      {
+        "en": "Gated resort: golf, marina, 24/7 security",
+        "es": "Resort cerrado: golf, marina, seguridad 24/7"
+      },
+      {
+        "en": "90 minutes from Panama City",
+        "es": "90 minutos de la ciudad de Panamá"
+      }
+    ],
+    "lat": 8.2833,
+    "lng": -80.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Farallón, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 8,
+      "bathrooms": 8.0,
+      "built_area_m2": 909.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2593,
+    "tokens_out": 554,
+    "cost_usd": 0.00130951,
+    "finish_reason": "stop",
+    "latency_ms": 4807
   }
 }

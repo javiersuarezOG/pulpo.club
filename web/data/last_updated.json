@@ -1,27 +1,27 @@
 {
-  "last_updated": "2026-06-28T07:19:43.678684+00:00",
-  "started_at": "2026-06-28T06:19:29.596470+00:00",
-  "duration_seconds": 3614.08,
-  "total_listings": 1910,
-  "dropped": 247,
+  "last_updated": "2026-06-29T07:50:36.945905+00:00",
+  "started_at": "2026-06-29T06:49:01.594610+00:00",
+  "duration_seconds": 3695.35,
+  "total_listings": 1901,
+  "dropped": 248,
   "per_source_raw": {
     "agentiz": 0,
     "bienesraices": 582,
     "century21": 15,
     "citymax": 32,
-    "citymax_sc": 164,
+    "citymax_sc": 163,
     "csbr": 296,
     "elagente": 2,
-    "encuentra24": 27,
-    "essurf": 41,
+    "encuentra24": 24,
+    "essurf": 39,
     "goodlife": 67,
     "jamesedition": 0,
     "nexo": 8,
     "oceanside": 48,
-    "realestate_au_sv": 311,
+    "realestate_au_sv": 308,
     "realtyelsalvador": 100,
     "remax": 340,
-    "santizo": 120,
+    "santizo": 121,
     "vivolatam": 169,
     "xitios": 31
   },
@@ -69,7 +69,7 @@
     },
     "citymax_sc": {
       "supplier": null,
-      "pulled": 164,
+      "pulled": 163,
       "max_pages_hit": false
     },
     "csbr": {
@@ -84,12 +84,12 @@
     },
     "encuentra24": {
       "supplier": null,
-      "pulled": 27,
+      "pulled": 24,
       "max_pages_hit": true
     },
     "essurf": {
       "supplier": null,
-      "pulled": 41,
+      "pulled": 39,
       "max_pages_hit": false
     },
     "goodlife": {
@@ -114,7 +114,7 @@
     },
     "realestate_au_sv": {
       "supplier": null,
-      "pulled": 311,
+      "pulled": 308,
       "max_pages_hit": false
     },
     "realtyelsalvador": {
@@ -129,7 +129,7 @@
     },
     "santizo": {
       "supplier": null,
-      "pulled": 120,
+      "pulled": 121,
       "max_pages_hit": false
     },
     "vivolatam": {
@@ -146,14 +146,14 @@
   "derived_field_population": {
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
-    "previous_price": 0.0204,
-    "beachfront_tier_on_beach": 0.0728,
+    "previous_price": 0.021,
+    "beachfront_tier_on_beach": 0.0736,
     "beachfront_tier_walk_to_beach": 0.0084,
-    "beachfront_tier_near_beach": 0.0204,
-    "land_type_commercial": 0.055,
-    "land_type_tourist": 0.0728,
-    "land_type_residential": 0.8723,
-    "is_motivated": 0.0822
+    "beachfront_tier_near_beach": 0.0205,
+    "land_type_commercial": 0.0552,
+    "land_type_tourist": 0.0731,
+    "land_type_residential": 0.8716,
+    "is_motivated": 0.0821
   },
   "field_completeness": {
     "bienesraices": {
@@ -232,7 +232,7 @@
       }
     },
     "citymax_sc": {
-      "n_listings": 149,
+      "n_listings": 148,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
@@ -307,21 +307,21 @@
       }
     },
     "encuentra24": {
-      "n_listings": 26,
+      "n_listings": 23,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.92,
-        "municipality": 0.92,
+        "zone": 0.91,
+        "municipality": 0.91,
         "department": 1.0,
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.12,
-        "has_paved_access": 0.15,
-        "has_water": 0.27,
-        "has_power": 0.19,
-        "is_repriced": 0.08,
+        "is_beachfront": 0.17,
+        "has_paved_access": 0.22,
+        "has_water": 0.22,
+        "has_power": 0.13,
+        "is_repriced": 0.09,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 1.0,
@@ -332,17 +332,17 @@
       }
     },
     "essurf": {
-      "n_listings": 40,
+      "n_listings": 38,
       "fields": {
         "price_usd": 1.0,
-        "area_m2": 0.9,
+        "area_m2": 0.89,
         "zone": 0.97,
         "municipality": 0.97,
         "department": 0.97,
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.3,
+        "is_beachfront": 0.32,
         "has_paved_access": 0.0,
         "has_water": 0.0,
         "has_power": 0.0,
@@ -432,7 +432,7 @@
       }
     },
     "realestate_au_sv": {
-      "n_listings": 299,
+      "n_listings": 296,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
@@ -583,28 +583,28 @@
     }
   },
   "property_type_counts": {
-    "land": 1485,
-    "house": 346,
-    "condo": 79
+    "land": 1481,
+    "house": 342,
+    "condo": 78
   },
   "validation_by_type": {
     "land": {
-      "pass": 1558,
+      "pass": 1554,
       "flag": 123,
       "drop": 60
     },
     "house": {
-      "pass": 262,
+      "pass": 258,
       "flag": 84,
-      "drop": 51
+      "drop": 52
     },
     "condo": {
-      "pass": 60,
+      "pass": 59,
       "flag": 19,
       "drop": 6
     }
   },
-  "v_fallback_no_price": 835,
+  "v_fallback_no_price": 828,
   "v_fallback_no_comps": 0,
   "sources": [
     "agentiz",
