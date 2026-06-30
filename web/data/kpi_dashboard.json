@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-29T07:50:36.454649+00:00",
+  "computed_at": "2026-06-30T07:12:43.891489+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 17,
@@ -66,8 +66,8 @@
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 238.0,
-        "kept": 238,
+        "coverage_pct_vs_discovered": 240.0,
+        "kept": 240,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 296,
+        "kept": 295,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -137,7 +137,7 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 260,
+        "kept": 257,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1901,
-    "total_visible_listings": 1665
+    "total_in_dataset": 1899,
+    "total_visible_listings": 1661
   },
   "min_real_listings": 4
 }

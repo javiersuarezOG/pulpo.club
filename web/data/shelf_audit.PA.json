@@ -1,17 +1,17 @@
 {
   "active_level": "moderate",
   "aggregate": {
-    "eligible_lenient": 28,
-    "eligible_moderate": 4,
+    "eligible_lenient": 34,
+    "eligible_moderate": 5,
     "eligible_strict": 0,
     "hidden_by_is_agricultural": 0,
-    "hidden_by_no_area": 4,
+    "hidden_by_no_area": 5,
     "hidden_by_no_photos": 0,
     "hidden_by_no_price": 0,
     "hidden_by_no_type": 0,
-    "hidden_by_no_zone": 24
+    "hidden_by_no_zone": 29
   },
-  "computed_at": "2026-06-29T08:28:35.808438+00:00",
+  "computed_at": "2026-06-30T07:46:44.930308+00:00",
   "shelves": {
     "beach_condos": {
       "eligible_lenient": 0,
@@ -86,5 +86,5 @@
       "total_in_cohort": 0
     }
   },
-  "total_in_dataset": 28
+  "total_in_dataset": 34
 }

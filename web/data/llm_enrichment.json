@@ -118053,5 +118053,217 @@
     "cost_usd": 0.00130951,
     "finish_reason": "stop",
     "latency_ms": 4807
+  },
+  "realestate_au_sv|lugar-denominado-como-la-carbonera-san-pedro-nonualco-la-paz-san-pedro-nonualco-la-paz-san-pedro-nonualco-la-paz-department-310109099183": {
+    "ts": "2026-06-30T07:08:14.093485+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in San Pedro Nonualco, La Paz",
+      "es": "Terreno en San Pedro Nonualco, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in La Carbonera, San Pedro Nonualco, La Paz Department. The property is a 225,000 USD lot. No further details on size or utilities are provided.",
+      "es": "Terreno en La Carbonera, San Pedro Nonualco, departamento de La Paz. La propiedad es un lote de 225,000 USD. No se proporcionan más detalles sobre tamaño o servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Pedro Nonualco",
+        "es": "Ubicado en San Pedro Nonualco"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      },
+      {
+        "en": "Price: 225,000 USD",
+        "es": "Precio: 225,000 USD"
+      }
+    ],
+    "lat": 13.6,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Pedro Nonualco, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3092,
+    "tokens_out": 385,
+    "cost_usd": 0.00125834,
+    "finish_reason": "stop",
+    "latency_ms": 4290
+  },
+  "remax|2523392029": {
+    "ts": "2026-06-30T07:08:15.039246+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 200 m² Lot Near Airport",
+      "es": "Lote Plano de 200 m² Cerca del Aeropuerto"
+    },
+    "short_description_canonical": {
+      "en": "Flat 200 m² residential lot (286 varas² / 2,153 ft²) located 20 minutes from El Salvador International Airport. The lot has front and side walls, with rear wall to be built before sale, and independent front access. Utilities include potable water and electricity; fruit trees on site.",
+      "es": "Lote residencial plano de 200 m² (286 varas² / 2,153 ft²) ubicado a 20 minutos del Aeropuerto Internacional de El Salvador. El lote cuenta con muro frontal y lateral, el muro trasero se construirá antes de la venta, y acceso frontal independiente. Servicios incluyen agua potable y electricidad; árboles frutales en el terreno."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 minutes from International Airport",
+        "es": "20 minutos del Aeropuerto Internacional"
+      },
+      {
+        "en": "Flat lot, 10m x 20m",
+        "es": "Lote plano, 10m x 20m"
+      },
+      {
+        "en": "Walls built, utilities connected",
+        "es": "Muros construidos, servicios conectados"
+      },
+      {
+        "en": "Fruit trees on property",
+        "es": "Árboles frutales en la propiedad"
+      },
+      {
+        "en": "Price $25,000",
+        "es": "Precio $25,000"
+      }
+    ],
+    "lat": 13.44,
+    "lng": -89.06,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador International Airport",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3284,
+    "tokens_out": 519,
+    "cost_usd": 0.00145758,
+    "finish_reason": "stop",
+    "latency_ms": 5235
+  },
+  "remax|001463696023": {
+    "ts": "2026-06-30T07:08:15.108309+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Semi-flat land with house, San José Sacaré, La Palma",
+      "es": "Terreno semiplano con casa, San José Sacaré, La Palma"
+    },
+    "short_description_canonical": {
+      "en": "4,917 m² semi-flat lot with a house to remodel in San José Sacaré, La Palma, Chalatenango. Utilities (water, electricity) connected, direct road access, river at rear, fruit trees. 4 km from La Palma town center.",
+      "es": "Lote semiplano de 4,917 m² con casa a remodelar en San José Sacaré, La Palma, Chalatenango. Servicios (agua, electricidad) conectados, acceso directo desde carretera, río al fondo, árboles frutales. A 4 km del centro de La Palma."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4,917 m² lot with river frontage",
+        "es": "Lote de 4,917 m² con frente al río"
+      },
+      {
+        "en": "Utilities connected: water and electricity",
+        "es": "Servicios conectados: agua y electricidad"
+      },
+      {
+        "en": "4 km from La Palma town center",
+        "es": "A 4 km del centro de La Palma"
+      },
+      {
+        "en": "Fruit trees: lime, lemon, orange, mango",
+        "es": "Árboles frutales: lima, limón, naranja, mango"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3423,
+    "tokens_out": 491,
+    "cost_usd": 0.00146431,
+    "finish_reason": "stop",
+    "latency_ms": 5305
+  },
+  "encuentra24|32092491": {
+    "ts": "2026-06-30T07:46:10.029376+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Playa Dorada, Arraiján",
+      "es": "Casa en Venta en Playa Dorada, Arraiján"
+    },
+    "short_description_canonical": {
+      "en": "Two-level house in Las Olas, Playa Dorada, Arraiján. 287 m² built, 3 bedrooms, 2.5 bathrooms, covered parking. Gated community with gas installation and hermeticity test. Family-oriented residential area with security and space.",
+      "es": "Casa de dos niveles en Las Olas, Playa Dorada, Arraiján. 287 m² construidos, 3 recámaras, 2.5 baños, estacionamiento techado. Comunidad cerrada con instalación de gas y prueba de hermeticidad. Zona residencial familiar con seguridad y amplitud."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "287 m² built, ample space",
+        "es": "287 m² construidos, amplio espacio"
+      },
+      {
+        "en": "Gated community, secure environment",
+        "es": "Comunidad cerrada, entorno seguro"
+      },
+      {
+        "en": "Gas installation with hermeticity test",
+        "es": "Instalación de gas con prueba de hermeticidad"
+      },
+      {
+        "en": "Near Playa Dorada beach",
+        "es": "Cerca de la playa Playa Dorada"
+      }
+    ],
+    "lat": 8.9333,
+    "lng": -79.6333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, Arraiján, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 287.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2496,
+    "tokens_out": 488,
+    "cost_usd": 0.00121072,
+    "finish_reason": "stop",
+    "latency_ms": 5214
   }
 }
