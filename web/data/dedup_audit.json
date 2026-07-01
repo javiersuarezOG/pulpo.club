@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-30T07:08:08.747358+00:00",
+  "computed_at": "2026-07-01T07:25:14.222470+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1110,10 +1110,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 509,
-      "raw": 510,
+      "kept_as_unique": 508,
+      "raw": 509,
       "shared_with_others": 0,
-      "unique_in_source": 509
+      "unique_in_source": 508
     },
     "century21": {
       "kept_as_unique": 14,
@@ -1128,16 +1128,16 @@
       "unique_in_source": 32
     },
     "citymax_sc": {
-      "kept_as_unique": 156,
-      "raw": 156,
+      "kept_as_unique": 157,
+      "raw": 157,
       "shared_with_others": 0,
-      "unique_in_source": 156
+      "unique_in_source": 157
     },
     "csbr": {
-      "kept_as_unique": 257,
-      "raw": 259,
+      "kept_as_unique": 255,
+      "raw": 257,
       "shared_with_others": 0,
-      "unique_in_source": 257
+      "unique_in_source": 255
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1146,10 +1146,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 23,
-      "raw": 23,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 23
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 38,
@@ -1194,10 +1194,10 @@
       "unique_in_source": 297
     },
     "santizo": {
-      "kept_as_unique": 91,
-      "raw": 91,
+      "kept_as_unique": 90,
+      "raw": 90,
       "shared_with_others": 0,
-      "unique_in_source": 91
+      "unique_in_source": 90
     },
     "vivolatam": {
       "kept_as_unique": 156,
@@ -1212,6 +1212,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2096,
-  "total_unique_fingerprints": 2043
+  "total_in_dataset": 2095,
+  "total_unique_fingerprints": 2042
 }

@@ -1,0 +1,14 @@
+{
+  "failure_id": "8818f4fb",
+  "source": "agentiz",
+  "ts": "2026-07-01T06:28:29.355957+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 8.82,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

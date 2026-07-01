@@ -1,5 +1,5 @@
 {
-  "ranked_total": 1899,
+  "ranked_total": 1898,
   "with_local_path": 1354,
   "local_path_exists": 1354,
   "local_path_missing": 0,
@@ -23,5 +23,5 @@
     "top_browse_coverage": 0.95,
     "top_hero_coverage": 1.0
   },
-  "evaluated_at": "2026-06-30T07:12:43.867538+00:00"
+  "evaluated_at": "2026-07-01T07:33:24.855524+00:00"
 }

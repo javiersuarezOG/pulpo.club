@@ -118265,5 +118265,335 @@
     "cost_usd": 0.00121072,
     "finish_reason": "stop",
     "latency_ms": 5214
+  },
+  "citymax_sc|complejo-industrial-con-bodegas-en-lourdes-colon": {
+    "ts": "2026-07-01T07:25:19.130149+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land in Lourdes Colón, La Libertad",
+      "es": "Terreno Industrial en Lourdes Colón, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Industrial land in Lourdes Colón, La Libertad, part of an industrial complex. The property is zoned for industrial use and is available for sale or lease. Priced at $2,200,000.",
+      "es": "Terreno industrial en Lourdes Colón, La Libertad, parte de un complejo industrial. La propiedad está zonificada para uso industrial y está disponible para venta o alquiler. Precio: $2,200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Industrial complex location",
+        "es": "Ubicación en complejo industrial"
+      },
+      {
+        "en": "Sale and lease options",
+        "es": "Opciones de venta y alquiler"
+      },
+      {
+        "en": "Zoned for industrial use",
+        "es": "Zonificado para uso industrial"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.3167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 390,
+    "cost_usd": 0.00126168,
+    "finish_reason": "stop",
+    "latency_ms": 3813
+  },
+  "bienesraices|2423": {
+    "ts": "2026-07-01T07:25:19.842432+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Exclusive Land Lots, Costa del Sol Estero Front",
+      "es": "4 Terrenos Exclusivos Frente al Estero, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Four 1,000-varas (698.9 m²) lots on Costa del Sol, between Costa Real and Tesoro Beach. Direct frontage to Estero de Jaltepeque, ideal for private dock. Priced at $140,000 per lot.",
+      "es": "Cuatro lotes de 1,000 varas (698.9 m²) en Costa del Sol, entre Costa Real y Tesoro Beach. Frente directo al Estero de Jaltepeque, ideal para muelle privado. Precio de $140,000 por lote."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct Estero de Jaltepeque frontage",
+        "es": "Frente directo al Estero de Jaltepeque"
+      },
+      {
+        "en": "Between Costa Real and Tesoro Beach",
+        "es": "Entre Costa Real y Tesoro Beach"
+      },
+      {
+        "en": "Suitable for private dock construction",
+        "es": "Apto para construcción de muelle privado"
+      },
+      {
+        "en": "698.9 m² per lot, regular shape",
+        "es": "698.9 m² por lote, forma regular"
+      },
+      {
+        "en": "High appreciation tourist zone",
+        "es": "Zona turística de alta plusvalía"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3456,
+    "tokens_out": 496,
+    "cost_usd": 0.00147872,
+    "finish_reason": "stop",
+    "latency_ms": 4526
+  },
+  "remax|001463594052": {
+    "ts": "2026-07-01T07:25:19.854895+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.74 Acre Lot in San Rafael Obrajuelo, La Paz",
+      "es": "Terreno de 1.74 Acre en San Rafael Obrajuelo, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Flat 7,000 m² semi-urban lot in Cantón La Palma, San Rafael Obrajuelo, La Paz. Mostly flat terrain with gentle slope, suitable for residential development. Electricity, potable water, and mobile coverage available; good road access to urban center.",
+      "es": "Lote semiurbano plano de 7,000 m² en Cantón La Palma, San Rafael Obrajuelo, La Paz. Terreno mayormente plano con pendiente suave, apto para desarrollo residencial. Disponibilidad de electricidad, agua potable y cobertura móvil; buen acceso vial al centro urbano."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1.74 acres (7,000 m²) flat lot",
+        "es": "1.74 acres (7,000 m²) de terreno plano"
+      },
+      {
+        "en": "Electricity, water, mobile coverage available",
+        "es": "Electricidad, agua, cobertura móvil disponibles"
+      },
+      {
+        "en": "Good road access to urban center",
+        "es": "Buen acceso vial al centro urbano"
+      },
+      {
+        "en": "Suitable for residential development",
+        "es": "Apto para desarrollo residencial"
+      }
+    ],
+    "lat": 13.5167,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Obrajuelo, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3225,
+    "tokens_out": 489,
+    "cost_usd": 0.00140865,
+    "finish_reason": "stop",
+    "latency_ms": 4537
+  },
+  "encuentra24|31989052": {
+    "ts": "2026-07-01T08:13:41.483365+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6-Bedroom House in Coronado Golf & Beach Club",
+      "es": "Casa de 6 Habitaciones en Coronado Golf & Beach Club"
+    },
+    "short_description_canonical": {
+      "en": "House of 800 m² built on a 1,250 m² lot in Coronado Golf & Beach Club, Panama. It has 6 bedrooms, 5 bathrooms, and a private pool. The property includes a large living-dining room with floor-to-ceiling windows, a covered terrace, and a garden.",
+      "es": "Casa de 800 m² construidos en un terreno de 1,250 m² en Coronado Golf & Beach Club, Panamá. Cuenta con 6 habitaciones, 5 baños y piscina privada. La propiedad incluye un amplio salón de sala y comedor con ventanales de piso a techo, terraza techada y jardín."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in exclusive Coronado Golf & Beach Club",
+        "es": "Ubicada en el exclusivo Coronado Golf & Beach Club"
+      },
+      {
+        "en": "Private pool and garden",
+        "es": "Piscina privada y jardín"
+      },
+      {
+        "en": "6 bedrooms, 5 bathrooms",
+        "es": "6 habitaciones, 5 baños"
+      },
+      {
+        "en": "Community with golf course and beach club",
+        "es": "Comunidad con campo de golf y club de playa"
+      },
+      {
+        "en": "1 hour from Panama City",
+        "es": "1 hora de la Ciudad de Panamá"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -79.9,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 5.0,
+      "built_area_m2": 800.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2612,
+    "tokens_out": 527,
+    "cost_usd": 0.00128494,
+    "finish_reason": "stop",
+    "latency_ms": 4213
+  },
+  "encuentra24|32586058": {
+    "ts": "2026-07-01T08:13:41.495893+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Residence in Alcázar Park, Coronado Golf",
+      "es": "Residencia de Lujo en Alcázar Park, Coronado Golf"
+    },
+    "short_description_canonical": {
+      "en": "Luxury house on a 2,250 m² lot in Alcázar Park, Coronado Golf & Country Club. It has 4 bedrooms, 3 bathrooms, private pool, gazebo, bar, and 5 parking spaces. Located within the exclusive residential area facing the Tom Fazio golf course, minutes from beaches and services.",
+      "es": "Casa de lujo en terreno de 2,250 m² en Alcázar Park, Coronado Golf & Country Club. Cuenta con 4 recámaras, 3 baños, piscina privada, gazebo, bar y 5 estacionamientos. Ubicada dentro de la exclusiva zona residencial frente al campo de golf Tom Fazio, a minutos de playas y servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2,250 m² lot in Alcázar Park",
+        "es": "Terreno de 2,250 m² en Alcázar Park"
+      },
+      {
+        "en": "Private pool, gazebo, and bar",
+        "es": "Piscina privada, gazebo y bar"
+      },
+      {
+        "en": "Facing Tom Fazio golf course",
+        "es": "Frente al campo de golf Tom Fazio"
+      },
+      {
+        "en": "5 parking spaces",
+        "es": "5 estacionamientos"
+      },
+      {
+        "en": "Minutes from beaches and services",
+        "es": "Minutos de playas y servicios"
+      }
+    ],
+    "lat": 8.5233,
+    "lng": -79.8772,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado Golf & Country Club, Playa Coronado",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 2250.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2603,
+    "tokens_out": 544,
+    "cost_usd": 0.00130121,
+    "finish_reason": "stop",
+    "latency_ms": 4227
+  },
+  "encuentra24|32625456": {
+    "ts": "2026-07-01T08:13:41.517043+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront Colonial House in Buenaventura Resort",
+      "es": "Casa Colonial Frente al Lago en Buenaventura Resort"
+    },
+    "short_description_canonical": {
+      "en": "Single-story Spanish colonial house on a 1,251 m² lot in PH Los Portales, Buenaventura Golf & Beach Resort, Pacific coast. 287 m² built with 3 bedrooms, 4 bathrooms, and 2 parking spaces. Lakefront location within a gated resort community.",
+      "es": "Casa uniplanta de inspiración colonial española en lote de 1,251 m² en PH Los Portales, Buenaventura Golf & Beach Resort, costa pacífica. 287 m² construidos con 3 habitaciones, 4 baños y 2 estacionamientos. Ubicación frente al lago dentro de un resort cerrado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront lot in Buenaventura Resort",
+        "es": "Lote frente al lago en Buenaventura Resort"
+      },
+      {
+        "en": "1,251 m² flat lot",
+        "es": "Lote plano de 1,251 m²"
+      },
+      {
+        "en": "Spanish colonial single-story design",
+        "es": "Diseño uniplanta colonial español"
+      },
+      {
+        "en": "3 bedrooms, 4 bathrooms",
+        "es": "3 habitaciones, 4 baños"
+      },
+      {
+        "en": "Gated community with golf and beach",
+        "es": "Comunidad cerrada con golf y playa"
+      }
+    ],
+    "lat": 8.2833,
+    "lng": -80.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 287.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2340,
+    "tokens_out": 523,
+    "cost_usd": 0.0012071,
+    "finish_reason": "stop",
+    "latency_ms": 4247
   }
 }
