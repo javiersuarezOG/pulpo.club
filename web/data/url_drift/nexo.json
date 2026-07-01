@@ -2,7 +2,7 @@
   "source": "nexo",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-06-30T20:23:30.965837+00:00",
+  "probed_at": "2026-07-01T04:57:28.461329+00:00",
   "last_probe": {
     "probed_url": "https://nexo.com.sv",
     "status_code": 200,
@@ -17,6 +17,6 @@
     "final_url": "https://nexo.com.sv",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-06-30T20:23:30.965867+00:00"
+    "last_ok_at": "2026-07-01T04:57:28.461356+00:00"
   }
 }
