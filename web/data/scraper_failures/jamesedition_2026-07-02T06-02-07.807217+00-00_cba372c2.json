@@ -1,0 +1,14 @@
+{
+  "failure_id": "cba372c2",
+  "source": "jamesedition",
+  "ts": "2026-07-02T06:02:07.807217+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.98,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
