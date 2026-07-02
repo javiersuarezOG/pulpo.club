@@ -1,5 +1,5 @@
 {
-  "ts": "2026-06-30T05:49:26Z",
+  "ts": "2026-07-02T05:40:22Z",
   "source": "elagente",
   "count": 2,
   "records": [
@@ -44,7 +44,7 @@
         "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_20251009_170249_461-780x780.jpg",
         "https://www.elagenteinmobiliario.com/wp-content/uploads/2025/10/DJI_0352-780x780.jpg"
       ],
-      "scraped_at": "2026-06-01T14:48:02.890605+00:00",
+      "scraped_at": "2026-07-02T05:39:46.630358+00:00",
       "bathrooms": 5.0,
       "_type_signals": [],
       "_type_confidence": "uncertain",
@@ -64,7 +64,7 @@
       "photo_urls": [
         "https://www.elagenteinmobiliario.com/wp-content/uploads/2024/07/Costa-del-Sol-3.jpeg"
       ],
-      "scraped_at": "2026-06-01T14:48:08.741353+00:00",
+      "scraped_at": "2026-07-02T05:39:52.634479+00:00",
       "_type_signals": [
         {
           "type": "land",
