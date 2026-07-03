@@ -197,9 +197,10 @@ def _stamp_resubscribe_welcome(user_id: str, iso_ts: str, subscription_id: Optio
         welcome-back send.
       • `welcome_newsletter_sent_at` — REFRESHED to `iso_ts`. This keeps
         the first-time welcome's permanent stamp set (so it never
-        re-fires) AND re-arms the weekly cron's 24h same-day-collision
-        skip, so a resubscriber doesn't get welcome-back + the Sunday
-        weekly with the same 10 picks inside a day.
+        re-fires) AND re-arms the weekly cron's first-Sunday skip
+        (SIGNUP_SKIP_WINDOW_HOURS, 96h), so a resubscriber doesn't get
+        welcome-back + a Sunday weekly with the same 10 picks inside the
+        window.
 
     Returns True on 2xx; False (with stderr log) on any failure. A failed
     stamp doesn't unwind the send — the PostHog event still fires so

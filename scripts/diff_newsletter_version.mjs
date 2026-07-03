@@ -52,15 +52,24 @@ try {
 const COMMON_PY = "automation/newsletter/components/_common.py";
 
 // Operational (non-render) newsletter modules. These orchestrate WHO gets a
-// send and WHEN (reconcile crons) — they don't render any email HTML/CSS, so
-// changing them can't make a dispatched email's version stamp stale. Editing
-// one must NOT require a TEMPLATE_VERSION bump (that would falsely stamp every
-// pro-general/welcome email as a new template revision). Render modules — the
+// send and WHEN — they own no email HTML/CSS and no version constant, so
+// changing them can't make a dispatched email's version stamp stale. (A module
+// that merely *calls* `template.render()` still owns no template content: the
+// HTML/CSS + version constants live in templates/ + components/ + _common.py,
+// and subject lines are guarded separately by i18n_lint.) Editing one must NOT
+// require a TEMPLATE_VERSION bump — that would falsely stamp every
+// pro-general/welcome email as a new template revision. Render modules — the
 // templates/, components/, render_html, i18n — are NOT in this list and stay
 // guarded.
 const NON_RENDER_MODULES = new Set([
   "automation/newsletter/welcome_reconcile.py",
   "automation/newsletter/free_welcome_reconcile.py",
+  // Recipient selection (audience join) — produces a list, zero HTML.
+  "automation/newsletter/subscribers.py",
+  // Welcome/welcome-back dispatch orchestration — picks variant + subject
+  // and stamps Clerk metadata; the HTML it sends comes from the guarded
+  // pulpo_pro_welcome* template modules, which it only invokes.
+  "automation/newsletter/welcome_dispatch.py",
 ]);
 
 function isNewsletterRenderChange(file) {
