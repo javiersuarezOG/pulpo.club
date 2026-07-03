@@ -235,17 +235,24 @@ def ensure_under_budget(
     history_path: Path = DEFAULT_HISTORY_PATH,
     monthly_cap: float | None = None,
     daily_cap: float | None = None,
+    now: dt.datetime | None = None,
 ) -> BudgetSnapshot:
     """Convenience wrapper for the call-site guard.
 
     Raises ``BudgetExceededError`` if verdict is ``blocked``; otherwise
     returns the snapshot. Callers should use this just before issuing
     a new LLM API call so we don't blow the budget on a runaway loop.
+
+    ``now`` is threaded to ``check_budget`` for test determinism — the
+    month-to-date window is computed from it, so a test that seeds a
+    fixed-date history MUST pin ``now`` to the same month or the spend
+    reads as $0 outside it.
     """
     snap = check_budget(
         history_path=history_path,
         monthly_cap=monthly_cap,
         daily_cap=daily_cap,
+        now=now,
     )
     if snap.verdict == "blocked":
         raise BudgetExceededError(snap.blocking_reason or "budget exceeded")
