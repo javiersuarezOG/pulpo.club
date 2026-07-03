@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-30T07:46:44.938187+00:00",
+  "computed_at": "2026-07-03T07:33:53.585914+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -75,13 +75,13 @@
       "elagente": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "green",
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.2,
-        "kept": 34,
+        "coverage_pct_vs_discovered": 1.4,
+        "kept": 42,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -131,7 +131,7 @@
       "realtyelsalvador": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "green",
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 34,
-    "total_visible_listings": 4
+    "total_in_dataset": 42,
+    "total_visible_listings": 7
   },
   "min_real_listings": 4
 }

@@ -118265,5 +118265,792 @@
     "cost_usd": 0.00121072,
     "finish_reason": "stop",
     "latency_ms": 5214
+  },
+  "citymax_sc|complejo-industrial-con-bodegas-en-lourdes-colon": {
+    "ts": "2026-07-03T06:49:59.882068+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land in Lourdes Colón, La Libertad",
+      "es": "Terreno Industrial en Lourdes Colón, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Industrial land in Lourdes Colón, La Libertad. Located within an industrial complex, suitable for warehouses or commercial use. Price: $2,200,000.",
+      "es": "Terreno industrial en Lourdes Colón, La Libertad. Ubicado dentro de un complejo industrial, apto para bodegas o uso comercial. Precio: $2,200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in industrial complex",
+        "es": "Ubicado en complejo industrial"
+      },
+      {
+        "en": "Price: $2,200,000",
+        "es": "Precio: $2,200,000"
+      },
+      {
+        "en": "In Lourdes Colón, La Libertad",
+        "es": "En Lourdes Colón, La Libertad"
+      }
+    ],
+    "lat": 13.4889,
+    "lng": -89.3222,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 387,
+    "cost_usd": 0.00125838,
+    "finish_reason": "stop",
+    "latency_ms": 3154
+  },
+  "realestate_au_sv|lote-sin-numero-canton-la-palma-jurisdiccion-san-rafael-obrajuelo-san-rafael-obrajuelo-la-paz-san-rafael-obrajuelo-la-paz-department-310109150804": {
+    "ts": "2026-07-03T06:50:00.283885+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Palma, Chalatenango",
+      "es": "Terreno en Venta en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Palma, San Rafael Obrajuelo, La Paz. No built area or structures. Lot without number, suitable for development. Priced at $264,000.",
+      "es": "Lote en Cantón La Palma, San Rafael Obrajuelo, La Paz. Sin área construida ni estructuras. Lote sin número, apto para desarrollo. Precio de $264,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Price: $264,000",
+        "es": "Precio: $264,000"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 390,
+    "cost_usd": 0.00126573,
+    "finish_reason": "stop",
+    "latency_ms": 3555
+  },
+  "bienesraices|2425": {
+    "ts": "2026-07-03T06:50:00.792181+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "20 Manzana Land for Sale in Ahuachapán",
+      "es": "Terreno de 20 Manzanas en Venta en Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "20-manzana (139,779 m²) land parcel in Ahuachapán, 15 minutes from Ahuachapán city center. Flat to semi-flat topography, ideal for agriculture, livestock, or solar energy projects. Requires 4x4 vehicle for access; water via artesian well.",
+      "es": "Terreno de 20 manzanas (139,779 m²) en Ahuachapán, a 15 minutos del centro de la ciudad de Ahuachapán. Topografía plana y semiplana, ideal para agricultura, ganadería o proyectos de energía solar. Requiere vehículo 4x4; agua mediante pozo artesanal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 manzanas (139,779 m²) of land",
+        "es": "20 manzanas (139,779 m²) de terreno"
+      },
+      {
+        "en": "15 minutes from Ahuachapán city center",
+        "es": "15 minutos del centro de Ahuachapán"
+      },
+      {
+        "en": "Flat and semi-flat topography",
+        "es": "Topografía plana y semiplana"
+      },
+      {
+        "en": "Suitable for solar panel installation",
+        "es": "Apto para instalación de paneles solares"
+      }
+    ],
+    "lat": 13.9,
+    "lng": -89.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tacuba, Ahuachapán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3469,
+    "tokens_out": 504,
+    "cost_usd": 0.00149103,
+    "finish_reason": "stop",
+    "latency_ms": 4066
+  },
+  "bienesraices|2423": {
+    "ts": "2026-07-03T06:50:01.333683+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Exclusive Land Lots on Costa del Sol Estuary",
+      "es": "4 Terrenos Exclusivos Frente al Estero de Jaltepeque"
+    },
+    "short_description_canonical": {
+      "en": "Four 1,000-varas (698.9 m²) lots on Costa del Sol, between Costa Real and Tesoro Beach. Direct estuary frontage suitable for private dock construction. Located in a high-appreciation tourist-residential zone with nautical access.",
+      "es": "Cuatro lotes de 1,000 varas (698.9 m²) en Costa del Sol, entre Costa Real y Tesoro Beach. Frente directo al estero apto para construcción de muelle privado. Ubicados en zona turístico-residencial de alta plusvalía con acceso náutico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct estuary frontage, private dock possible",
+        "es": "Frente directo al estero, muelle privado posible"
+      },
+      {
+        "en": "Between Costa Real and Tesoro Beach",
+        "es": "Entre Costa Real y Tesoro Beach"
+      },
+      {
+        "en": "1,000 varas (698.9 m²) per lot",
+        "es": "1,000 varas (698.9 m²) por lote"
+      },
+      {
+        "en": "High-appreciation tourist-residential zone",
+        "es": "Zona turístico-residencial de alta plusvalía"
+      },
+      {
+        "en": "Ideal for vacation investment or private villa",
+        "es": "Ideal para inversión vacacional o villa privada"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3456,
+    "tokens_out": 517,
+    "cost_usd": 0.00150182,
+    "finish_reason": "stop",
+    "latency_ms": 4607
+  },
+  "encuentra24|32622652": {
+    "ts": "2026-07-03T06:50:01.371824+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Beach House in Isla San Blas",
+      "es": "Casa de lujo en la playa en Isla San Blas"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished 390 m² luxury house in a private gated community on Isla San Blas, La Libertad. 5 bedrooms, 6 bathrooms, private pool, covered parking for 5 vehicles. Modern high-end finishes, air conditioning throughout, and entertainment room with billiard table. Beachfront access within the community.",
+      "es": "Casa de lujo de 390 m² totalmente amueblada en comunidad privada cerrada en Isla San Blas, La Libertad. 5 habitaciones, 6 baños, piscina privada, aparcamiento cubierto para 5 vehículos. Acabados modernos de alta gama, aire acondicionado en toda la propiedad y sala de entretenimiento con mesa de billar. Acceso a la playa dentro de la comunidad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fully furnished, move-in ready",
+        "es": "Totalmente amueblado, listo para entrar"
+      },
+      {
+        "en": "Private pool and entertainment room",
+        "es": "Piscina privada y sala de entretenimiento"
+      },
+      {
+        "en": "Gated community with beach access",
+        "es": "Comunidad cerrada con acceso a la playa"
+      },
+      {
+        "en": "5 bedrooms, 6 bathrooms, 390 m²",
+        "es": "5 habitaciones, 6 baños, 390 m²"
+      },
+      {
+        "en": "Covered parking for 5 vehicles",
+        "es": "Aparcamiento cubierto para 5 vehículos"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 6.0,
+      "built_area_m2": 390.0,
+      "parking_spaces": 5,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3430,
+    "tokens_out": 565,
+    "cost_usd": 0.0015476,
+    "finish_reason": "stop",
+    "latency_ms": 4643
+  },
+  "remax|002684399006": {
+    "ts": "2026-07-03T06:50:03.170677+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in El Refugio, Atiquizaya, Ahuachapán",
+      "es": "Terreno Plano en El Refugio, Atiquizaya, Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Flat 224.76 m² residential lot in El Salitrero canton, El Refugio, Atiquizaya. Access to potable water and electricity available. Ready for construction in a growing area.",
+      "es": "Terreno residencial plano de 224.76 m² en cantón El Salitrero, El Refugio, Atiquizaya. Acceso a agua potable y electricidad disponible. Listo para construir en una zona en crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Potable water and electricity available",
+        "es": "Agua potable y electricidad disponibles"
+      },
+      {
+        "en": "224.76 m² lot in growing area",
+        "es": "Terreno de 224.76 m² en zona en crecimiento"
+      }
+    ],
+    "lat": 13.9167,
+    "lng": -89.8333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Atiquizaya, Ahuachapán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3204,
+    "tokens_out": 421,
+    "cost_usd": 0.00132818,
+    "finish_reason": "stop",
+    "latency_ms": 3288
+  },
+  "realestate_au_sv|marcado-como-segundo-canton-san-jose-sacare-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-chalatenango-310109126938": {
+    "ts": "2026-07-03T06:50:03.219593+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in La Palma, Chalatenango",
+      "es": "Lote de 850 m² en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in second canton San José Sacare, La Palma, Chalatenango. Located in northern Chalatenango department, with mountain views and quiet surroundings. Priced at $115,000 USD.",
+      "es": "Lote residencial plano de 850 m² en segundo cantón San José Sacare, La Palma, Chalatenango. Ubicado en el norte del departamento de Chalatenango, con vistas a la montaña y entorno tranquilo. Precio de $115,000 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Quiet mountain area",
+        "es": "Zona montañosa tranquila"
+      },
+      {
+        "en": "La Palma, Chalatenango",
+        "es": "La Palma, Chalatenango"
+      }
+    ],
+    "lat": 14.2994,
+    "lng": -89.1636,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 403,
+    "cost_usd": 0.00127787,
+    "finish_reason": "stop",
+    "latency_ms": 3766
+  },
+  "remax|001463594052": {
+    "ts": "2026-07-03T06:50:04.081541+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.74 Acre Lot in San Rafael Obrajuelo",
+      "es": "Lote de 1.74 acres en San Rafael Obrajuelo"
+    },
+    "short_description_canonical": {
+      "en": "Flat 7,000 m² semi-urban lot in Cantón La Palma, San Rafael Obrajuelo, La Paz. Mostly flat terrain with gentle slope, suitable for residential development. Electricity, potable water, and mobile coverage available; good road access to urban center.",
+      "es": "Lote semiurbano plano de 7,000 m² en Cantón La Palma, San Rafael Obrajuelo, La Paz. Terreno mayormente plano con pendiente suave, apto para desarrollo residencial. Cuenta con electricidad, agua potable y cobertura móvil; buen acceso vial al centro urbano."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "7,000 m² flat lot",
+        "es": "Lote plano de 7,000 m²"
+      },
+      {
+        "en": "Electricity, water, mobile coverage",
+        "es": "Electricidad, agua, cobertura móvil"
+      },
+      {
+        "en": "Good road access to urban center",
+        "es": "Buen acceso vial al centro urbano"
+      },
+      {
+        "en": "Suitable for residential development",
+        "es": "Apto para desarrollo residencial"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Obrajuelo, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3225,
+    "tokens_out": 470,
+    "cost_usd": 0.00138775,
+    "finish_reason": "stop",
+    "latency_ms": 3797
+  },
+  "santizo|10118706": {
+    "ts": "2026-07-03T06:50:04.559681+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House in Gated Community, Los Planes de Renderos",
+      "es": "Casa 3 habs. en Residencial Privada, Los Planes de Renderos"
+    },
+    "short_description_canonical": {
+      "en": "3-bedroom, 3-bathroom house in a gated community in Los Planes de Renderos, Panchimalco. Features living room, dining room, kitchen, full service area, storage room, and large garden. 24/7 security included.",
+      "es": "Casa de 3 habitaciones y 3 baños en residencial privada en Los Planes de Renderos, Panchimalco. Cuenta con sala, comedor, cocina, área de servicio completa, bodega y amplio jardín. Seguridad 24/7 incluida."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Residencial privada con seguridad 24/7"
+      },
+      {
+        "en": "Large garden and storage room",
+        "es": "Amplio jardín y bodega"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms",
+        "es": "3 habitaciones, 3 baños"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3136,
+    "tokens_out": 441,
+    "cost_usd": 0.00133182,
+    "finish_reason": "stop",
+    "latency_ms": 3767
+  },
+  "santizo|10115712": {
+    "ts": "2026-07-03T06:50:05.110122+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Torre Avia Luxury Apartments, Lomas de San Francisco",
+      "es": "Torre Avia Apartamentos de Lujo, Lomas de San Francisco"
+    },
+    "short_description_canonical": {
+      "en": "Torre Avia is a new apartment project in Lomas de San Francisco, combining comfort, functionality, and exclusivity. Amenities include pool, gym, coworking, cinema room, and rooftop deck. Price: $248,500.",
+      "es": "Torre Avia es un proyecto de apartamentos en Lomas de San Francisco que combina confort, funcionalidad y exclusividad. Las amenidades incluyen piscina, gimnasio, coworking, sala de cine y terraza en la azotea. Precio: $248,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in exclusive Lomas de San Francisco",
+        "es": "Ubicado en exclusivas Lomas de San Francisco"
+      },
+      {
+        "en": "Pool, gym, coworking, cinema room",
+        "es": "Piscina, gimnasio, coworking, sala de cine"
+      },
+      {
+        "en": "Rooftop deck with sky lounge",
+        "es": "Terraza en la azotea con sky lounge"
+      },
+      {
+        "en": "Pet wash and yoga garden included",
+        "es": "Pet wash y jardín de yoga incluidos"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lomas de San Francisco, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3311,
+    "tokens_out": 473,
+    "cost_usd": 0.00141427,
+    "finish_reason": "stop",
+    "latency_ms": 3831
+  },
+  "encuentra24|32586058": {
+    "ts": "2026-07-03T07:32:42.172523+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Home in Alcázar Park, Coronado Golf",
+      "es": "Residencia de Lujo en Alcázar Park, Coronado Golf"
+    },
+    "short_description_canonical": {
+      "en": "Luxury home on a 2,250 m² lot in Alcázar Park, Coronado Golf & Country Club. It has 4 bedrooms, 3 bathrooms, private pool, gazebo, and bar. Located within a secure, exclusive residential area near the Tom Fazio golf course, beaches, and services.",
+      "es": "Residencia de lujo en terreno de 2,250 m² en Alcázar Park, Coronado Golf & Country Club. Cuenta con 4 recámaras, 3 baños, piscina privada, gazebo y bar. Ubicada dentro de una zona residencial exclusiva y segura, cerca del campo de golf Tom Fazio, playas y servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2,250 m² lot, 4 bedrooms",
+        "es": "Terreno de 2,250 m², 4 recámaras"
+      },
+      {
+        "en": "Private pool, gazebo, bar",
+        "es": "Piscina privada, gazebo, bar"
+      },
+      {
+        "en": "In Alcázar Park, Coronado Golf",
+        "es": "En Alcázar Park, Coronado Golf"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado Golf & Country Club, Playa Coronado",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 2250.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2603,
+    "tokens_out": 486,
+    "cost_usd": 0.00123741,
+    "finish_reason": "stop",
+    "latency_ms": 4934
+  },
+  "encuentra24|31989052": {
+    "ts": "2026-07-03T07:32:42.193513+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6-Bed House in Coronado Golf & Beach Club",
+      "es": "Casa de 6 habs en Coronado Golf & Beach Club"
+    },
+    "short_description_canonical": {
+      "en": "House in Coronado Golf & Beach Club, 800 m² built on 1,250 m² lot. 6 bedrooms, 5 bathrooms, private pool, terrace, and garden. Gated community with golf course, beach club, and 24/7 security.",
+      "es": "Casa en Coronado Golf & Beach Club, 800 m² construidos en 1,250 m² de terreno. 6 recámaras, 5 baños, piscina privada, terraza y jardín. Comunidad cerrada con campo de golf, club de playa y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Inside Coronado Golf & Beach Club",
+        "es": "Dentro de Coronado Golf & Beach Club"
+      },
+      {
+        "en": "800 m² built, 1,250 m² lot",
+        "es": "800 m² construidos, 1,250 m² de terreno"
+      },
+      {
+        "en": "Private pool and terrace",
+        "es": "Piscina privada y terraza"
+      },
+      {
+        "en": "6 bedrooms, 5 bathrooms",
+        "es": "6 recámaras, 5 baños"
+      },
+      {
+        "en": "24/7 security and amenities",
+        "es": "Seguridad 24/7 y amenidades"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -80.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 5.0,
+      "built_area_m2": 800.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2612,
+    "tokens_out": 509,
+    "cost_usd": 0.00126514,
+    "finish_reason": "stop",
+    "latency_ms": 4955
+  },
+  "encuentra24|32486912": {
+    "ts": "2026-07-03T07:32:42.428876+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4BR House with Pool in Coronado, 500m²",
+      "es": "Casa 4 habs con piscina en Coronado, 500m²"
+    },
+    "short_description_canonical": {
+      "en": "House on a 1,200 m² fenced lot in Coronado, near beaches and services. Built area 500 m² with 4 bedrooms, 3 bathrooms, private pool, BBQ bohío, and fruit trees. Includes water tank, hot water system, voltage protector, CCTV, and electric gate.",
+      "es": "Casa en lote cercado de 1,200 m² en Coronado, cerca de playas y servicios. Área construida de 500 m² con 4 recámaras, 3 baños, piscina privada, bohío con BBQ y árboles frutales. Incluye tanque de agua, sistema de agua caliente, protector de voltaje, circuito cerrado y portón eléctrico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool and BBQ area",
+        "es": "Piscina privada y área BBQ"
+      },
+      {
+        "en": "1,200 m² lot with fruit trees",
+        "es": "Terreno de 1,200 m² con árboles frutales"
+      },
+      {
+        "en": "4 bedrooms, 3 bathrooms, 500m²",
+        "es": "4 recámaras, 3 baños, 500m²"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 500.0,
+      "parking_spaces": 2,
+      "furnished": false,
+      "has_pool": true
+    },
+    "tokens_in": 2660,
+    "tokens_out": 490,
+    "cost_usd": 0.0012572,
+    "finish_reason": "stop",
+    "latency_ms": 5192
+  },
+  "encuentra24|32625456": {
+    "ts": "2026-07-03T07:32:42.655411+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront Colonial Home, Buenaventura Golf Resort",
+      "es": "Casa Colonial Frente al Lago, Buenaventura Golf Resort"
+    },
+    "short_description_canonical": {
+      "en": "Single-story colonial Spanish-inspired residence on 1,251 m² flat lot with 287 m² built area in PH Los Portales, Buenaventura Golf & Beach Resort, Pacific coast. 3 bedrooms, 4 bathrooms, 2 parking spaces. Lakefront location within a gated resort community.",
+      "es": "Residencia uniplanta de inspiración colonial española en lote plano de 1,251 m² con 287 m² construidos en PH Los Portales, Buenaventura Golf & Beach Resort, costa pacífica. 3 habitaciones, 4 baños, 2 estacionamientos. Ubicación frente al lago dentro de comunidad resort cerrada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront lot in Buenaventura Resort",
+        "es": "Lote frente al lago en Buenaventura Resort"
+      },
+      {
+        "en": "1,251 m² flat terrain",
+        "es": "1,251 m² de terreno plano"
+      },
+      {
+        "en": "287 m² built, 3 bedrooms",
+        "es": "287 m² construidos, 3 habitaciones"
+      },
+      {
+        "en": "Gated community PH Los Portales",
+        "es": "Comunidad cerrada PH Los Portales"
+      },
+      {
+        "en": "Colonial Spanish architecture",
+        "es": "Arquitectura colonial española"
+      }
+    ],
+    "lat": 8.25,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 287.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2340,
+    "tokens_out": 524,
+    "cost_usd": 0.0012082,
+    "finish_reason": "stop",
+    "latency_ms": 5417
+  },
+  "encuentra24|32643943": {
+    "ts": "2026-07-03T07:32:42.767924+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "680m² Luxury House in Ocean Lakes, Buenaventura",
+      "es": "Casa de lujo de 680m² en Ocean Lakes, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "A 680 m² three-level house in Ocean Lakes, Buenaventura, Playa Blanca. It has 4 bedrooms, 5.5 bathrooms, a private pool, jacuzzi, and a terrace with lake and golf course views. Fully furnished with high-end finishes, it includes a golf cart and is located within the Buenaventura Golf & Beach Resort.",
+      "es": "Casa de tres niveles de 680 m² en Ocean Lakes, Buenaventura, Playa Blanca. Cuenta con 4 recámaras, 5.5 baños, piscina privada, jacuzzi y terraza con vista al lago y al campo de golf. Totalmente amoblada con acabados de lujo, incluye carro de golf y está ubicada dentro de Buenaventura Golf & Beach Resort."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "680 m², 4 bedrooms, 5.5 baths",
+        "es": "680 m², 4 recámaras, 5.5 baños"
+      },
+      {
+        "en": "Private pool and jacuzzi",
+        "es": "Piscina privada y jacuzzi"
+      },
+      {
+        "en": "Fully furnished with golf cart",
+        "es": "Totalmente amoblado con carro de golf"
+      },
+      {
+        "en": "Lake and golf course views",
+        "es": "Vista al lago y al campo de golf"
+      },
+      {
+        "en": "Within Buenaventura Golf & Beach Resort",
+        "es": "Dentro de Buenaventura Golf & Beach Resort"
+      }
+    ],
+    "lat": 8.4089,
+    "lng": -80.0556,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Blanca, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.5,
+      "built_area_m2": 680.0,
+      "parking_spaces": null,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2609,
+    "tokens_out": 574,
+    "cost_usd": 0.00133583,
+    "finish_reason": "stop",
+    "latency_ms": 5530
   }
 }
