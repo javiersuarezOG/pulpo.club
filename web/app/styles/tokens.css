@@ -167,6 +167,7 @@
   --z-modal: 300;
   --z-toast: 400;
   --z-consent: 500;
+  --z-celebration: 520;  /* free-join octopus reveal — a brief moment above everything incl. consent (which returns when it auto-dismisses) */
 
   /* ============== MAP XP ============== */
   --map-mobile-top-offset: 72px;

@@ -9118,3 +9118,92 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
 @media (min-width: 640px) {
   .price-context__row       { flex-flow: row wrap; align-items: center; gap: var(--space-5); }
 }
+
+/* ── Free-join celebration (JoinCelebration.jsx) ──────────────────────────
+   The branded octopus "you're in" moment. Deliberately single-look: a
+   deep-sea scene that stays dark-green in both themes. Mobile-first. */
+.jc-backdrop {
+  position: fixed; inset: 0; z-index: var(--z-celebration);
+  display: flex; align-items: center; justify-content: center; padding: var(--space-5);
+  background: rgb(10, 20, 15, 0.62); /* token-exception: celebration scrim */
+  animation: jcFade 0.28s ease both;
+}
+.jc-panel {
+  --jc-ink: rgb(9, 44, 29, 0.9);        /* token-exception: canvas ink (matches --color-forest-bg) */
+  --jc-bubble: rgb(190, 230, 205, 0.16); /* token-exception: canvas bubble */
+  position: relative; width: 100%; max-width: 380px; overflow: hidden;
+  border-radius: 24px; padding: 30px 22px 26px; text-align: center;
+  background:
+    radial-gradient(130% 110% at 50% -8%, var(--color-forest-mid), var(--color-forest-deep) 52%, var(--color-forest-bg) 100%);
+  box-shadow: 0 40px 90px -30px rgb(10, 36, 24, 0.9), inset 0 1px 0 rgb(255, 255, 255, 0.06); /* token-exception: celebration lift + inner highlight */
+  animation: jcPop 0.42s cubic-bezier(0.16, 1.05, 0.3, 1) both;
+}
+.jc-ink { position: absolute; inset: 0; width: 100%; height: 100%; }
+.jc-stage { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+.jc-close {
+  position: absolute; top: 12px; right: 12px; z-index: 3; width: 32px; height: 32px;
+  display: grid; place-items: center; border-radius: 50%; border: 0; cursor: pointer;
+  color: var(--color-bg-sage); background: rgb(255, 255, 255, 0.08); /* token-exception: subtle close chip on dark */
+}
+.jc-close:hover { background: rgb(255, 255, 255, 0.16); } /* token-exception */
+.jc-close:focus-visible { outline: 2px solid var(--color-bg-sage); outline-offset: 2px; }
+
+/* octopus + the picks it hands over, composed as one scene */
+.jc-scene { position: relative; width: 100%; height: 150px; display: flex; justify-content: center; margin-bottom: 6px; }
+.jc-octo { position: relative; z-index: 1; width: 128px; height: 124px; filter: drop-shadow(0 10px 16px rgb(0, 0, 0, 0.35)); } /* token-exception: octopus drop shadow */
+.jc-octo-rise { animation: jcOctoIn 0.7s cubic-bezier(0.16, 1.05, 0.3, 1) both; }
+.jc-octo-body { animation: jcBob 3.4s ease-in-out 0.7s infinite; transform-origin: 50% 42%; }
+.jc-head { fill: var(--tone-success); }
+.jc-head-hi { fill: var(--color-bg-white); opacity: 0.28; }
+.jc-tent-fill { fill: var(--color-forest-mid); }
+.jc-tent-back { opacity: 0.9; }
+.jc-eye { fill: var(--color-bg-white); transform-box: fill-box; transform-origin: center; animation: jcBlink 5s ease-in-out 1.4s infinite; }
+.jc-pupil { fill: var(--color-forest-bg); }
+.jc-glint { fill: var(--color-bg-white); }
+.jc-smile { stroke: var(--color-forest-bg); stroke-width: 2.2; stroke-linecap: round; }
+.jc-blush { fill: var(--color-clay-mid); opacity: 0.5; }
+.jc-tent { transform-box: fill-box; transform-origin: 50% 8%; }
+.jc-tent.a { animation: jcSway 2.6s ease-in-out 0.8s infinite; }
+.jc-tent.b { animation: jcSway 2.6s ease-in-out 1s infinite reverse; }
+.jc-tent.c { animation: jcSway 3s ease-in-out 0.9s infinite; }
+.jc-tent.d { animation: jcSway 3s ease-in-out 1.15s infinite reverse; }
+
+/* the 3 picks the octopus hands over — fanned at its "hands", in front of
+   the lower tentacles, leaving the face clear above */
+.jc-picks { position: absolute; z-index: 2; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.jc-pick {
+  width: 42px; height: 54px; border-radius: 9px; padding: 5px;
+  display: flex; flex-direction: column; justify-content: flex-end; opacity: 0;
+  background: var(--color-bg-white); box-shadow: 0 10px 18px -8px rgb(0, 0, 0, 0.6); /* token-exception: floating pick card */
+}
+.jc-pick i { display: block; height: 23px; border-radius: 5px; background: var(--color-bg-sage-2); margin-bottom: 4px; }
+.jc-grade { font-size: 12px; font-weight: 800; color: var(--color-forest-deep); }
+.jc-pick.p1 { transform: rotate(-13deg); animation: jcPickOut 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.5s both; }
+.jc-pick.p2 { transform: rotate(0deg);   animation: jcPickOut 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.62s both; }
+.jc-pick.p3 { transform: rotate(13deg);  animation: jcPickOut 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.74s both; }
+
+.jc-title { font-family: var(--font-display, var(--font-sans)); color: var(--color-bg-white); font-size: 25px; font-weight: 800; letter-spacing: -0.02em; margin: 12px 0 6px; opacity: 0; animation: jcUp 0.5s ease 0.78s both; }
+.jc-body { color: var(--color-bg-sage); font-size: 14.5px; line-height: 1.45; margin: 0; max-width: 30ch; opacity: 0; animation: jcUp 0.5s ease 0.9s both; }
+.jc-cta {
+  margin-top: 18px; font-family: var(--font-sans); font-size: 15px; font-weight: 700; cursor: pointer;
+  border: 0; border-radius: 12px; padding: 13px 22px; background: var(--color-bg-white); color: var(--color-forest-deep);
+  opacity: 0; animation: jcUp 0.5s ease 1.02s both;
+}
+.jc-cta:hover { background: var(--color-bg-sage); }
+.jc-cta:focus-visible { outline: 2px solid var(--color-bg-white); outline-offset: 2px; }
+
+@keyframes jcFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jcPop { 0% { opacity: 0; transform: translateY(14px) scale(0.94); } 100% { opacity: 1; transform: none; } }
+@keyframes jcOctoIn { 0% { opacity: 0; transform: translateY(34px) scale(0.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@keyframes jcBob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-4px) rotate(1deg); } }
+@keyframes jcSway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes jcBlink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+@keyframes jcPickOut { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes jcUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .jc-backdrop, .jc-panel, .jc-octo-rise, .jc-octo-body, .jc-tent, .jc-eye,
+  .jc-pick, .jc-title, .jc-body, .jc-cta {
+    animation: none !important; opacity: 1 !important; transform: none !important;
+  }
+}
