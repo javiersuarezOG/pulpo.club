@@ -244,8 +244,12 @@ def test_check_budget_tolerates_malformed_rows(tmp_path: Path):
 def test_ensure_under_budget_returns_snapshot_when_ok(tmp_path: Path):
     p = tmp_path / "history.jsonl"
     _seed(p, [("2026-06-05T00:00:00+00:00", 0.1)])
+    # Pin `now` to the seed's month — otherwise month-to-date is computed
+    # from the real clock and reads $0 in any later month (this test was
+    # silently date-fragile and started failing on 2026-07-01).
     snap = ensure_under_budget(
         history_path=p, monthly_cap=10.0, daily_cap=1.0,
+        now=dt.datetime(2026, 6, 15, 12, tzinfo=dt.timezone.utc),
     )
     assert isinstance(snap, BudgetSnapshot)
     assert snap.verdict == "ok"
@@ -254,7 +258,10 @@ def test_ensure_under_budget_returns_snapshot_when_ok(tmp_path: Path):
 def test_ensure_under_budget_raises_when_blocked(tmp_path: Path):
     p = tmp_path / "history.jsonl"
     _seed(p, [("2026-06-05T00:00:00+00:00", 99.9)])  # blow the cap
+    # Pin `now` to the seed's month (see note above) so the month-to-date
+    # spend actually includes the seeded row and trips the cap.
     with pytest.raises(BudgetExceededError, match="monthly"):
         ensure_under_budget(
             history_path=p, monthly_cap=10.0, daily_cap=1.0,
+            now=dt.datetime(2026, 6, 15, 12, tzinfo=dt.timezone.utc),
         )
