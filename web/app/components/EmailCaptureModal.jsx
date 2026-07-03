@@ -53,8 +53,9 @@ export function EmailCaptureModal({ app, locale: lc, cfg, onClose }) {
     try { track("email_capture.submitted", { reason, email_domain_only: domain, result: result.kind }); } catch { /* ignore */ }
     if (result.kind === "success" || result.kind === "already") {
       try { track("free_member_created", { reason, via: "email_capture" }); } catch { /* ignore */ }
-      // Become a Free member; opens the stashed top-3 (if any) once state lands.
-      app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null });
+      // Become a Free member; opens the stashed top-3 (if any) once state
+      // lands, and fires the app-level JoinCelebration reveal.
+      app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null, returning: result.kind === "already" });
       onClose();
       return;
     }

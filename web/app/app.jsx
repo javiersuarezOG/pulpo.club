@@ -24,6 +24,7 @@ import {
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { EmailCaptureModal } from "./components/EmailCaptureModal.jsx";
 import { AccessModal } from "./components/AccessModal.jsx";
+import { JoinCelebration } from "./components/JoinCelebration.jsx";
 import { NewHomePage } from "./home";
 // PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
 // + its child widgets only render for users on /account or /admin, which
@@ -1504,15 +1505,23 @@ function App() {
   // membership lands — see the effect below (setUser is async, so the
   // modal can't call openListing directly without a stale-user race).
   const pendingOpenAfterJoinRef = useRef(null);
-  const becomeFreeMember = useCallback(({ email, openListingId } = {}) => {
+  // The branded "you're in" octopus reveal. Fired here — the single choke
+  // point every free-signup passes through — so it plays on EVERY surface
+  // (hero, favorites/discover/save gates, listing deep-links) and can never
+  // be missed by a flow or need re-wiring per component.
+  const [celebration, setCelebration] = useState(null);
+  const becomeFreeMember = useCallback(({ email, openListingId, returning } = {}) => {
     if (!email) return;
+    // Paid/Clerk users never see the free gate — no state change, no reveal.
+    if (isPaid(user)) return;
     if (openListingId) pendingOpenAfterJoinRef.current = openListingId;
     setUser((prev) => {
       // Never downgrade a paid/Clerk user to free-member.
       if (prev && isPaid(prev)) return prev;
       return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
     });
-  }, []);
+    setCelebration({ returning: !!returning });
+  }, [user]);
 
   // Unified "they want more access" gate: anonymous → start-free email
   // capture; free member → Go-Pro modal; Pro → no-op. Used by the hero lock
@@ -1772,6 +1781,13 @@ function App() {
           locale={locale}
           cfg={accessModal}
           onClose={closeAccessModal}
+        />
+      )}
+      {celebration && (
+        <JoinCelebration
+          locale={locale}
+          returning={celebration.returning}
+          onDone={() => setCelebration(null)}
         />
       )}
       <ToastHost app={app} />

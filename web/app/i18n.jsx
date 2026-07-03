@@ -1764,6 +1764,15 @@ export const UI_STRINGS = {
   "access.modal.aria":                 { en: "Get started with Pulpo",        es: "Empieza con Pulpo" },
   "access.modal.aria.close":           { en: "Close",                         es: "Cerrar" },
 
+  // Free-join celebration — the branded octopus reveal shown on every
+  // free-signup success (hero + every gated modal). Deep-sea moment.
+  "access.join.title":                 { en: "You're in!",                    es: "¡Ya estás dentro!" },
+  "access.join.back_title":            { en: "Welcome back!",                 es: "¡Bienvenido de nuevo!" },
+  "access.join.body":                  { en: "The pulpo just sent your top 3 to your inbox. Fresh picks land every Sunday.", es: "El pulpo acaba de enviar tu top 3 a tu correo. Nuevas opciones llegan cada domingo." },
+  "access.join.cta":                   { en: "See my picks",                  es: "Ver mis opciones" },
+  "access.join.aria":                  { en: "You're now a Pulpo Free member", es: "Ahora eres miembro de Pulpo Free" },
+  "access.join.aria.close":            { en: "Close",                         es: "Cerrar" },
+
   // Email-first "start free" capture modal (anonymous → Free member).
   "email_capture.headline":            { en: "See this week's top 3 — free.",
                                           es: "Mira el top 3 de la semana — gratis." },
